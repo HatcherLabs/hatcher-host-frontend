@@ -15,6 +15,7 @@ import {
   Search,
   PlusCircle,
   Bot,
+  Cpu,
   ArrowUpDown,
   Zap,
   Layers,
@@ -25,6 +26,7 @@ import {
   Square,
   RotateCcw,
 } from 'lucide-react';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 import { AGENT_STATUSES, AGENT_STATUS_CONFIG } from '@hatcher/shared';
 
@@ -420,33 +422,40 @@ export default function MyAgentsPage() {
 
         {/* ── Agent Grid ──────────────────────────────────── */}
         {filteredAgents.length === 0 ? (
-          /* Empty state */
-          <motion.div
-            className="card glass-noise flex flex-col items-center justify-center py-20 px-6 text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <RobotMascot
-              size="lg"
-              mood={agents.length === 0 ? 'confused' : 'thinking'}
-              className="mb-6"
-            />
-            <h2 className="text-xl font-semibold text-[#FFFFFF] mb-2">
-              {agents.length === 0 ? 'No agents yet' : 'No matching agents'}
-            </h2>
-            <p className="text-sm text-[#A5A1C2] max-w-sm mb-6">
-              {agents.length === 0
-                ? 'Create your first AI agent and start building.'
-                : 'Try adjusting your search or filter criteria.'}
-            </p>
-            {agents.length === 0 && (
-              <Link href="/create" className="btn-primary text-sm">
-                <PlusCircle size={16} />
-                Create Your First Agent
-              </Link>
-            )}
-          </motion.div>
+          agents.length === 0 ? (
+            /* True empty state — no agents created yet */
+            <div className="card glass-noise">
+              <EmptyState
+                icon={Cpu}
+                title="No agents yet"
+                description="Create your first AI agent and deploy it in 60 seconds."
+                actionLabel="Create Agent"
+                actionHref="/create"
+                secondaryLabel="Explore"
+                secondaryHref="/explore"
+              />
+            </div>
+          ) : (
+            /* Filter/search returned no results */
+            <motion.div
+              className="card glass-noise flex flex-col items-center justify-center py-20 px-6 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <RobotMascot
+                size="lg"
+                mood="thinking"
+                className="mb-6"
+              />
+              <h2 className="text-xl font-semibold text-[#FFFFFF] mb-2">
+                No matching agents
+              </h2>
+              <p className="text-sm text-[#A5A1C2] max-w-sm mb-6">
+                Try adjusting your search or filter criteria.
+              </p>
+            </motion.div>
+          )
         ) : (
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"

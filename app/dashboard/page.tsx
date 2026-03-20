@@ -26,6 +26,7 @@ import {
   Wallet,
   Globe,
 } from 'lucide-react';
+import { EmptyState } from '@/components/ui/EmptyState';
 import dynamic from 'next/dynamic';
 
 // Dynamically import recharts-based chart components (SSR disabled — recharts needs DOM)
@@ -674,19 +675,15 @@ export default function DashboardPage() {
             </div>
 
             {agents.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16">
-                <Activity size={40} style={{ color: COLORS.textMuted }} className="mb-3 opacity-40" />
-                <p className="text-sm" style={{ color: COLORS.textMuted }}>
-                  No agents yet. Create an agent to get started.
-                </p>
-                <Link
-                  href="/create"
-                  className="mt-4 px-6 py-2 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
-                  style={{ background: COLORS.accent }}
-                >
-                  Create Agent
-                </Link>
-              </div>
+              <EmptyState
+                icon={Cpu}
+                title="No agents yet"
+                description="Create your first AI agent and deploy it in 60 seconds."
+                actionLabel="Create Agent"
+                actionHref="/create"
+                secondaryLabel="Explore"
+                secondaryHref="/explore"
+              />
             ) : (
               <AgentStatusChart data={agentStatusData} />
             )}

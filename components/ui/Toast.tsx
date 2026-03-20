@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, XCircle, Info, AlertTriangle, X } from 'lucide-react';
 
@@ -13,11 +13,39 @@ export interface ToastData {
   duration: number;
 }
 
-const TOAST_STYLES: Record<ToastType, { border: string; icon: typeof CheckCircle; iconColor: string }> = {
-  success: { border: 'border-l-green-500', icon: CheckCircle, iconColor: 'text-green-400' },
-  error:   { border: 'border-l-red-500',   icon: XCircle,     iconColor: 'text-red-400' },
-  info:    { border: 'border-l-purple-500', icon: Info,        iconColor: 'text-purple-400' },
-  warning: { border: 'border-l-amber-500',  icon: AlertTriangle, iconColor: 'text-amber-400' },
+const TOAST_CONFIG: Record<
+  ToastType,
+  {
+    borderColor: string;
+    icon: typeof CheckCircle;
+    iconColor: string;
+    progressColor: string;
+  }
+> = {
+  success: {
+    borderColor: '#4ADE80',
+    icon: CheckCircle,
+    iconColor: 'text-[#4ADE80]',
+    progressColor: '#4ADE80',
+  },
+  error: {
+    borderColor: '#F87171',
+    icon: XCircle,
+    iconColor: 'text-[#F87171]',
+    progressColor: '#F87171',
+  },
+  info: {
+    borderColor: '#A78BFA',
+    icon: Info,
+    iconColor: 'text-[#A78BFA]',
+    progressColor: '#A78BFA',
+  },
+  warning: {
+    borderColor: '#FBBF24',
+    icon: AlertTriangle,
+    iconColor: 'text-[#FBBF24]',
+    progressColor: '#FBBF24',
+  },
 };
 
 interface ToastProps {
@@ -26,47 +54,110 @@ interface ToastProps {
 }
 
 export function Toast({ toast, onDismiss }: ToastProps) {
-  const [progress, setProgress] = useState(100);
-  const style = TOAST_STYLES[toast.type];
-  const Icon = style.icon;
+  const config = TOAST_CONFIG[toast.type];
+  const Icon = config.icon;
+  const [paused, setPaused] = useState(false);
+  const remainingRef = useRef(toast.duration);
+  const startTimeRef = useRef(Date.now());
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
 
+  const dismiss = useCallback(() => {
+    onDismiss(toast.id);
+  }, [onDismiss, toast.id]);
+
+  // Manage the auto-dismiss timer with pause/resume support
   useEffect(() => {
-    const start = Date.now();
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - start;
-      const remaining = Math.max(0, 100 - (elapsed / toast.duration) * 100);
-      setProgress(remaining);
-      if (remaining <= 0) {
-        clearInterval(interval);
-        onDismiss(toast.id);
+    if (paused) {
+      // On pause, calculate how much time is left and clear the timer
+      const elapsed = Date.now() - startTimeRef.current;
+      remainingRef.current = Math.max(0, remainingRef.current - elapsed);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
       }
-    }, 50);
-    return () => clearInterval(interval);
-  }, [toast.id, toast.duration, onDismiss]);
+      return;
+    }
 
-  const progressColor: Record<ToastType, string> = {
-    success: 'bg-green-500',
-    error: 'bg-red-500',
-    info: 'bg-purple-500',
-    warning: 'bg-amber-500',
-  };
+    // On resume (or initial mount), start a timeout for the remaining duration
+    startTimeRef.current = Date.now();
+    timerRef.current = setTimeout(dismiss, remainingRef.current);
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [paused, dismiss]);
+
+  // Drive the progress bar width via a CSS transition for smoothness.
+  // When paused we freeze at the current computed width; on resume we
+  // transition the remaining distance to 0 over the remaining time.
+  useEffect(() => {
+    const bar = progressRef.current;
+    if (!bar) return;
+
+    if (paused) {
+      // Freeze at current computed width
+      const computed = bar.getBoundingClientRect().width;
+      const parentWidth = bar.parentElement?.getBoundingClientRect().width ?? 1;
+      const pct = (computed / parentWidth) * 100;
+      bar.style.transition = 'none';
+      bar.style.width = `${pct}%`;
+    } else {
+      // Animate from current width to 0 over the remaining time
+      // Force a reflow so the browser picks up the "none" transition reset
+      void bar.offsetWidth;
+      bar.style.transition = `width ${remainingRef.current}ms linear`;
+      bar.style.width = '0%';
+    }
+  }, [paused]);
+
+  // Set the initial progress bar width on mount
+  useEffect(() => {
+    const bar = progressRef.current;
+    if (!bar) return;
+    // Start at 100% instantly, then on next frame animate to 0
+    bar.style.width = '100%';
+    bar.style.transition = 'none';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        bar.style.transition = `width ${toast.duration}ms linear`;
+        bar.style.width = '0%';
+      });
+    });
+  }, [toast.duration]);
 
   return (
     <motion.div
       layout
-      initial={{ x: 360, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: 360, opacity: 0 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-      className={`relative w-[360px] rounded-xl border-l-4 ${style.border} bg-[#1A1730] p-4 shadow-lg overflow-hidden`}
-      style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.3)' }}
+      initial={{ x: 400, opacity: 0, scale: 0.95 }}
+      animate={{ x: 0, opacity: 1, scale: 1 }}
+      exit={{ x: 400, opacity: 0, scale: 0.95 }}
+      transition={{ type: 'spring', stiffness: 500, damping: 35, mass: 0.8 }}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      className="relative w-[380px] overflow-hidden rounded-xl border border-white/[0.06] bg-[#1A1730]/90 shadow-lg backdrop-blur-xl"
+      style={{
+        borderLeft: `4px solid ${config.borderColor}`,
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.03)',
+      }}
+      role="alert"
     >
-      <div className="flex items-start gap-3">
-        <Icon size={18} className={`mt-0.5 flex-shrink-0 ${style.iconColor}`} />
-        <p className="flex-1 text-sm text-[#F0EEFC] leading-relaxed">{toast.message}</p>
+      {/* Content */}
+      <div className="flex items-start gap-3 p-4">
+        <Icon
+          size={20}
+          className={`mt-0.5 flex-shrink-0 ${config.iconColor}`}
+          aria-hidden="true"
+        />
+        <p className="min-w-0 flex-1 text-sm leading-relaxed text-[#F0EEFC]">
+          {toast.message}
+        </p>
         <button
-          onClick={() => onDismiss(toast.id)}
-          className="flex-shrink-0 p-0.5 rounded-md text-[#6B6890] hover:text-[#A5A1C2] transition-colors"
+          onClick={dismiss}
+          className="flex-shrink-0 rounded-lg p-1 text-[#6B6890] transition-colors hover:bg-white/[0.06] hover:text-[#A5A1C2]"
           aria-label="Dismiss notification"
         >
           <X size={14} />
@@ -74,11 +165,15 @@ export function Toast({ toast, onDismiss }: ToastProps) {
       </div>
 
       {/* Progress bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/5">
-        <motion.div
-          className={`h-full ${progressColor[toast.type]}`}
-          style={{ width: `${progress}%` }}
-          transition={{ duration: 0.05, ease: 'linear' }}
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/[0.04]">
+        <div
+          ref={progressRef}
+          className="h-full"
+          style={{
+            backgroundColor: config.progressColor,
+            opacity: 0.7,
+            width: '100%',
+          }}
         />
       </div>
     </motion.div>

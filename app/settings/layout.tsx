@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Settings',
+  title: 'Settings — Hatcher',
   description:
     'Manage your Hatcher account settings, API keys, wallet connections, and notification preferences.',
   openGraph: {
-    title: 'Settings',
+    title: 'Settings — Hatcher',
     description:
       'Manage your Hatcher account settings, API keys, and wallet connections.',
   },

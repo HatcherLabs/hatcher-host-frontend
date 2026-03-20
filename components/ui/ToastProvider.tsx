@@ -1,17 +1,40 @@
 'use client';
 
-import { createContext, useCallback, useContext, useState, useRef } from 'react';
+import { createContext, useCallback, useContext, useState, useRef, useMemo } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Toast, type ToastData, type ToastType } from './Toast';
 
 const MAX_VISIBLE = 3;
 
+/** Base callable signature: toast('success', 'message') */
+type ToastFn = (type: ToastType, message: string, duration?: number) => void;
+
+/** Convenience methods: toast.success('message') */
+interface ToastMethods {
+  success: (message: string, duration?: number) => void;
+  error: (message: string, duration?: number) => void;
+  info: (message: string, duration?: number) => void;
+  warning: (message: string, duration?: number) => void;
+}
+
+/** Combined type — callable with shorthand methods attached */
+export type ToastAPI = ToastFn & ToastMethods;
+
 interface ToastContextValue {
-  toast: (type: ToastType, message: string, duration?: number) => void;
+  toast: ToastAPI;
 }
 
 const ToastContext = createContext<ToastContextValue | null>(null);
 
+/**
+ * Hook to access the toast notification system.
+ *
+ * Usage:
+ *   const { toast } = useToast();
+ *   toast.success('Saved!');
+ *   toast.error('Something went wrong');
+ *   toast('info', 'FYI...');
+ */
 export function useToast(): ToastContextValue {
   const ctx = useContext(ToastContext);
   if (!ctx) throw new Error('useToast must be used within a ToastProvider');
@@ -36,13 +59,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const dismiss = useCallback(
     (id: string) => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
-      // Use setTimeout so state update settles before promoting
+      // Allow state to settle before promoting queued toasts
       setTimeout(promoteFromQueue, 50);
     },
     [promoteFromQueue],
   );
 
-  const toast = useCallback(
+  const addToast = useCallback(
     (type: ToastType, message: string, duration = 5000) => {
       const id = `toast-${++counterRef.current}-${Date.now()}`;
       const newToast: ToastData = { id, type, message, duration };
@@ -58,13 +81,27 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
+  // Build the combined toast API: callable function + convenience methods
+  const toast = useMemo<ToastAPI>(() => {
+    const fn = ((type: ToastType, message: string, duration?: number) => {
+      addToast(type, message, duration);
+    }) as ToastAPI;
+
+    fn.success = (message: string, duration?: number) => addToast('success', message, duration);
+    fn.error = (message: string, duration?: number) => addToast('error', message, duration);
+    fn.info = (message: string, duration?: number) => addToast('info', message, duration);
+    fn.warning = (message: string, duration?: number) => addToast('warning', message, duration);
+
+    return fn;
+  }, [addToast]);
+
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
 
-      {/* Toast container — fixed bottom-right */}
+      {/* Toast container -- fixed bottom-right */}
       <div
-        className="fixed bottom-6 right-6 z-50 flex flex-col-reverse gap-3 pointer-events-none"
+        className="pointer-events-none fixed bottom-6 right-6 z-50 flex flex-col-reverse gap-3"
         aria-live="polite"
         aria-label="Notifications"
       >
