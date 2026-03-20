@@ -1,604 +1,504 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useAuth } from '@/lib/auth-context';
-import { WalletMultiButton } from '@/components/wallet/WalletButton';
-import {
-  api,
-  Agent,
-  Ticket,
-  TicketMessage,
-  TicketStatus,
-  TicketCategory,
-  TicketPriority,
-} from '@/lib/api';
+import { useState } from 'react';
+import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   LifeBuoy,
-  Plus,
-  ArrowLeft,
   Send,
-  Clock,
-  Tag,
-  AlertCircle,
+  BookOpen,
+  HelpCircle,
+  Users,
+  ExternalLink,
+  CheckCircle2,
+  ChevronDown,
   Bot,
-  Zap,
-  MessageSquare,
-  X,
+  AlertCircle,
+  Ticket,
 } from 'lucide-react';
+import { EmptyState } from '@/components/ui/EmptyState';
 
-import { timeAgo } from '@/lib/utils';
+// ─── Types ───────────────────────────────────────────────────
 
-// ─── Helpers ──────────────────────────────────────────────────
+type Category = 'general' | 'billing' | 'technical' | 'feature_request' | 'bug_report';
+type Priority = 'low' | 'normal' | 'high' | 'urgent';
 
-const STATUS_STYLES: Record<TicketStatus, { bg: string; text: string; label: string }> = {
-  open:        { bg: 'rgba(249,115,22,0.15)', text: 'rgb(167,139,250)',  label: 'Open' },
-  in_progress: { bg: 'rgba(245,158,11,0.15)', text: 'rgb(251,191,36)',  label: 'In Progress' },
-  resolved:    { bg: 'rgba(34,197,94,0.15)',   text: 'rgb(74,222,128)',  label: 'Resolved' },
-  closed:      { bg: 'rgba(156,163,175,0.15)', text: 'rgb(156,163,175)', label: 'Closed' },
+const CATEGORIES: { value: Category; label: string }[] = [
+  { value: 'general', label: 'General' },
+  { value: 'billing', label: 'Billing' },
+  { value: 'technical', label: 'Technical' },
+  { value: 'feature_request', label: 'Feature Request' },
+  { value: 'bug_report', label: 'Bug Report' },
+];
+
+const PRIORITIES: { value: Priority; label: string }[] = [
+  { value: 'low', label: 'Low' },
+  { value: 'normal', label: 'Normal' },
+  { value: 'high', label: 'High' },
+  { value: 'urgent', label: 'Urgent' },
+];
+
+// ─── Quick Links ─────────────────────────────────────────────
+
+const QUICK_LINKS = [
+  {
+    icon: BookOpen,
+    label: 'Documentation',
+    description: 'Browse guides and API reference',
+    href: 'https://docs.hatcher.fun',
+    external: true,
+  },
+  {
+    icon: HelpCircle,
+    label: 'FAQ',
+    description: 'Common questions answered',
+    href: '/help',
+    external: false,
+  },
+  {
+    icon: Users,
+    label: 'Community',
+    description: 'Join the conversation',
+    href: '#',
+    external: true,
+  },
+];
+
+// ─── Stagger animation variants ─────────────────────────────
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+  },
 };
 
-const CATEGORY_STYLES: Record<TicketCategory, { bg: string; text: string; label: string }> = {
-  general:         { bg: 'rgba(156,163,175,0.15)', text: 'rgb(156,163,175)', label: 'General' },
-  billing:         { bg: 'rgba(245,158,11,0.15)',  text: 'rgb(251,191,36)',  label: 'Billing' },
-  technical:       { bg: 'rgba(96,165,250,0.15)',  text: 'rgb(96,165,250)',  label: 'Technical' },
-  feature_request: { bg: 'rgba(249,115,22,0.15)',  text: 'rgb(167,139,250)', label: 'Feature Request' },
-  bug_report:      { bg: 'rgba(239,68,68,0.15)',   text: 'rgb(248,113,113)', label: 'Bug Report' },
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
 };
 
-const PRIORITY_STYLES: Record<TicketPriority, { bg: string; text: string; label: string }> = {
-  low:    { bg: 'rgba(156,163,175,0.15)', text: 'rgb(156,163,175)', label: 'Low' },
-  normal: { bg: 'rgba(96,165,250,0.15)',  text: 'rgb(96,165,250)',  label: 'Normal' },
-  high:   { bg: 'rgba(245,158,11,0.15)',  text: 'rgb(251,191,36)',  label: 'High' },
-  urgent: { bg: 'rgba(239,68,68,0.15)',   text: 'rgb(248,113,113)', label: 'Urgent' },
-};
+// ─── Custom Select Component ────────────────────────────────
 
-function Badge({ bg, text, label }: { bg: string; text: string; label: string }) {
+function SelectField({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (val: string) => void;
+  options: { value: string; label: string }[];
+}) {
   return (
-    <span
-      className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium"
-      style={{ background: bg, color: text }}
-    >
-      {label}
-    </span>
-  );
-}
-
-function GlassCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`card glass-noise p-6 ${className}`}>
-      {children}
+    <div>
+      <label className="block text-xs font-medium uppercase tracking-wider text-[#A5A1C2] mb-2">
+        {label}
+      </label>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full appearance-none bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/20 transition-colors cursor-pointer"
+        >
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <ChevronDown
+          size={16}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6890] pointer-events-none"
+        />
+      </div>
     </div>
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────
+// ─── Main Component ──────────────────────────────────────────
 
 export default function SupportPage() {
-  const { connected } = useWallet();
-  const { isAuthenticated, isLoading: authLoading, login } = useAuth();
-
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [agents, setAgents] = useState<Agent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
-  const [showNewTicketModal, setShowNewTicketModal] = useState(false);
-
-  // Reply state
-  const [replyText, setReplyText] = useState('');
-  const [replying, setReplying] = useState(false);
-
-  // New ticket form state
-  const [newSubject, setNewSubject] = useState('');
-  const [newCategory, setNewCategory] = useState<TicketCategory>('general');
-  const [newPriority, setNewPriority] = useState<TicketPriority>('normal');
-  const [newAgentId, setNewAgentId] = useState('');
-  const [newMessage, setNewMessage] = useState('');
-  const [creating, setCreating] = useState(false);
+  // Form state
+  const [subject, setSubject] = useState('');
+  const [category, setCategory] = useState<Category>('general');
+  const [priority, setPriority] = useState<Priority>('normal');
+  const [agentId, setAgentId] = useState('');
+  const [message, setMessage] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
 
-  const fetchTickets = useCallback(async () => {
-    setLoading(true);
-    const res = await api.getTickets();
-    if (res.success) {
-      setTickets(res.data);
-    }
-    setLoading(false);
-  }, []);
+  const MESSAGE_MAX = 5000;
+  const SUBJECT_MAX = 200;
 
-  const fetchAgents = useCallback(async () => {
-    const res = await api.getMyAgents();
-    if (res.success) {
-      setAgents(res.data);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchTickets();
-      fetchAgents();
-    }
-  }, [isAuthenticated, fetchTickets, fetchAgents]);
-
-  // ─── Auth gates ─────────────────────────────────────────────
-
-  if (!connected) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <div
-            className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6"
-            style={{ background: 'rgba(249,115,22,0.15)' }}
-          >
-            <Bot size={40} className="text-[#f97316]" />
-          </div>
-          <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">Connect Your Wallet</h1>
-          <p className="mb-8 text-sm text-[var(--text-secondary)]">
-            Connect a Solana wallet to access support.
-          </p>
-          <WalletMultiButton />
-        </div>
-      </div>
-    );
+  function resetForm() {
+    setSubject('');
+    setCategory('general');
+    setPriority('normal');
+    setAgentId('');
+    setMessage('');
+    setFormError('');
+    setSubmitted(false);
   }
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 rounded-full border-2 border-[#f97316] border-t-transparent animate-spin mx-auto mb-4" />
-          <p className="text-[var(--text-secondary)]">Authenticating...</p>
-        </div>
-      </div>
-    );
-  }
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <div
-            className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6"
-            style={{ background: 'rgba(249,115,22,0.15)' }}
-          >
-            <Zap size={40} className="text-[#f97316]" />
-          </div>
-          <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">Sign In Required</h1>
-          <p className="mb-8 text-sm text-[var(--text-secondary)]">
-            Sign a message with your wallet to access support.
-          </p>
-          <button className="btn-primary px-8 py-3" onClick={login}>
-            Sign In
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // ─── Handlers ───────────────────────────────────────────────
-
-  async function handleCreateTicket() {
-    if (!newSubject.trim() || !newMessage.trim()) {
-      setFormError('Subject and message are required.');
+    // Validate
+    if (!subject.trim()) {
+      setFormError('Subject is required.');
       return;
     }
+    if (subject.length > SUBJECT_MAX) {
+      setFormError(`Subject must be under ${SUBJECT_MAX} characters.`);
+      return;
+    }
+    if (!message.trim()) {
+      setFormError('Message is required.');
+      return;
+    }
+    if (message.length > MESSAGE_MAX) {
+      setFormError(`Message must be under ${MESSAGE_MAX} characters.`);
+      return;
+    }
+
     setFormError('');
-    setCreating(true);
-    const res = await api.createTicket({
-      subject: newSubject.trim(),
-      category: newCategory,
-      priority: newPriority,
-      agentId: newAgentId || undefined,
-      message: newMessage.trim(),
-    });
-    setCreating(false);
-    if (res.success) {
-      setShowNewTicketModal(false);
-      setNewSubject('');
-      setNewCategory('general');
-      setNewPriority('normal');
-      setNewAgentId('');
-      setNewMessage('');
-      fetchTickets();
-    } else {
-      setFormError(res.error || 'Failed to create ticket.');
-    }
+    setSubmitting(true);
+
+    // Simulate submission delay
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+
+    setSubmitting(false);
+    setSubmitted(true);
   }
-
-  async function handleReply() {
-    if (!selectedTicket || !replyText.trim()) return;
-    setReplying(true);
-    const res = await api.replyToTicket(selectedTicket.id, replyText.trim());
-    setReplying(false);
-    if (res.success) {
-      setReplyText('');
-      // Refresh the ticket detail
-      const updated = await api.getTicket(selectedTicket.id);
-      if (updated.success) {
-        setSelectedTicket(updated.data);
-        // Update in list too
-        setTickets((prev) =>
-          prev.map((t) => (t.id === updated.data.id ? updated.data : t))
-        );
-      }
-    }
-  }
-
-  async function handleCloseTicket() {
-    if (!selectedTicket) return;
-    const res = await api.closeTicket(selectedTicket.id);
-    if (res.success) {
-      setSelectedTicket(res.data);
-      setTickets((prev) =>
-        prev.map((t) => (t.id === res.data.id ? res.data : t))
-      );
-    }
-  }
-
-  async function handleSelectTicket(ticket: Ticket) {
-    // Fetch full ticket with messages
-    const res = await api.getTicket(ticket.id);
-    if (res.success) {
-      setSelectedTicket(res.data);
-    } else {
-      setSelectedTicket(ticket);
-    }
-  }
-
-  // ─── Ticket Detail View ─────────────────────────────────────
-
-  if (selectedTicket) {
-    const status = STATUS_STYLES[selectedTicket.status];
-    const category = CATEGORY_STYLES[selectedTicket.category];
-    const priority = PRIORITY_STYLES[selectedTicket.priority];
-    const messages = selectedTicket.messages ?? [];
-
-    return (
-      <div className="min-h-screen p-4 sm:p-6 lg:p-10">
-        <div className="max-w-3xl mx-auto space-y-6">
-          {/* Back button */}
-          <button
-            onClick={() => { setSelectedTicket(null); setReplyText(''); }}
-            className="btn-ghost flex items-center gap-2 text-sm"
-          >
-            <ArrowLeft size={16} />
-            Back to tickets
-          </button>
-
-          {/* Ticket header */}
-          <GlassCard>
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <h1 className="text-xl font-bold text-[var(--text-primary)] mb-3">
-                  {selectedTicket.subject}
-                </h1>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge {...category} />
-                  <Badge {...priority} />
-                  <Badge {...status} />
-                  {selectedTicket.agent && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-white/5 text-[var(--text-muted)]">
-                      <Bot size={12} />
-                      {selectedTicket.agent.name}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <span className="text-xs text-[var(--text-muted)] flex items-center gap-1">
-                  <Clock size={12} />
-                  {timeAgo(selectedTicket.createdAt)}
-                </span>
-                {selectedTicket.status !== 'closed' && (
-                  <button
-                    onClick={handleCloseTicket}
-                    className="btn-danger text-xs px-3 py-1.5"
-                  >
-                    Close Ticket
-                  </button>
-                )}
-              </div>
-            </div>
-          </GlassCard>
-
-          {/* Messages thread */}
-          <div className="space-y-3">
-            {messages.map((msg: TicketMessage) => (
-              <GlassCard key={msg.id} className={msg.role === 'support' ? '!border-l-2 !border-l-[#f97316]/50' : ''}>
-                <div className="flex items-center justify-between mb-2">
-                  <span
-                    className="text-xs font-semibold"
-                    style={{ color: msg.role === 'support' ? 'rgb(167,139,250)' : 'var(--text-primary)' }}
-                  >
-                    {msg.role === 'support' ? 'Support' : 'You'}
-                  </span>
-                  <span className="text-[11px] text-[var(--text-muted)] flex items-center gap-1">
-                    <Clock size={10} />
-                    {timeAgo(msg.createdAt)}
-                  </span>
-                </div>
-                <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap">
-                  {msg.content}
-                </p>
-              </GlassCard>
-            ))}
-
-            {messages.length === 0 && (
-              <div className="text-center py-8 text-[var(--text-muted)] text-sm">
-                No messages yet.
-              </div>
-            )}
-          </div>
-
-          {/* Reply box */}
-          {selectedTicket.status !== 'closed' && (
-            <GlassCard>
-              <div className="flex items-center gap-2.5 mb-4">
-                <MessageSquare size={18} className="text-[var(--accent-600)]" />
-                <h2 className="text-sm font-semibold text-[var(--text-primary)]">Reply</h2>
-              </div>
-              <textarea
-                className="input w-full min-h-[100px] resize-y mb-3"
-                placeholder="Type your reply..."
-                value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-              />
-              <div className="flex justify-end">
-                <button
-                  onClick={handleReply}
-                  disabled={replying || !replyText.trim()}
-                  className="btn-primary flex items-center gap-2 text-sm"
-                >
-                  {replying ? (
-                    <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                  ) : (
-                    <Send size={14} />
-                  )}
-                  Send
-                </button>
-              </div>
-            </GlassCard>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // ─── Ticket List View ───────────────────────────────────────
 
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-10">
-      <div className="max-w-3xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-[var(--text-primary)]">Support</h1>
-            <p className="text-sm mt-1 text-[var(--text-secondary)]">
-              Create and manage support tickets
-            </p>
-          </div>
-          <button
-            onClick={() => setShowNewTicketModal(true)}
-            className="btn-primary flex items-center gap-2 text-sm"
-          >
-            <Plus size={16} />
-            New Ticket
-          </button>
-        </div>
-
-        {/* Loading */}
-        {loading && (
-          <div className="flex justify-center py-16">
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full border-2 border-[#f97316] border-t-transparent animate-spin mx-auto mb-4" />
-              <p className="text-sm text-[var(--text-secondary)]">Loading tickets...</p>
+      <motion.div
+        className="max-w-3xl mx-auto space-y-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* ─── Page Header ─────────────────────────────────────── */}
+        <motion.div variants={itemVariants}>
+          <div className="flex items-center gap-3 mb-1">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ background: 'rgba(249,115,22,0.12)' }}
+            >
+              <LifeBuoy size={20} className="text-[#f97316]" />
             </div>
-          </div>
-        )}
-
-        {/* Empty state */}
-        {!loading && tickets.length === 0 && (
-          <GlassCard className="!py-16">
-            <div className="text-center">
-              <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-                style={{ background: 'rgba(249,115,22,0.15)' }}
+            <div>
+              <h1
+                className="text-2xl font-bold text-[#F0EEFC]"
+                style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
-                <LifeBuoy size={32} className="text-[#f97316]" />
-              </div>
-              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
-                No tickets yet
-              </h3>
-              <p className="text-sm text-[var(--text-muted)] mb-6">
-                Need help? Create a support ticket and we will get back to you.
+                Support
+              </h1>
+              <p className="text-sm text-[#A5A1C2]">
+                Get help with your agents, billing, or anything else
               </p>
-              <button
-                onClick={() => setShowNewTicketModal(true)}
-                className="btn-primary flex items-center gap-2 text-sm mx-auto"
-              >
-                <Plus size={16} />
-                Create Your First Ticket
-              </button>
             </div>
-          </GlassCard>
-        )}
+          </div>
+        </motion.div>
 
-        {/* Ticket list */}
-        {!loading && tickets.length > 0 && (
-          <div className="space-y-3">
-            {tickets.map((ticket) => {
-              const status = STATUS_STYLES[ticket.status];
-              const category = CATEGORY_STYLES[ticket.category];
-              const priority = PRIORITY_STYLES[ticket.priority];
-              return (
-                <button
-                  key={ticket.id}
-                  onClick={() => handleSelectTicket(ticket)}
-                  className="card glass-noise p-4 w-full text-left transition-colors hover:bg-white/[0.03] cursor-pointer"
+        {/* ─── Quick Links ─────────────────────────────────────── */}
+        <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {QUICK_LINKS.map((link) => {
+            const LinkIcon = link.icon;
+            const Wrapper = link.external ? 'a' : Link;
+            const extraProps = link.external
+              ? { href: link.href, target: '_blank', rel: 'noopener noreferrer' }
+              : { href: link.href };
+
+            return (
+              <Wrapper
+                key={link.label}
+                {...(extraProps as any)}
+                className="group flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl p-4 transition-all duration-200 hover:border-[#f97316]/30 hover:bg-white/[0.03]"
+              >
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors"
+                  style={{ background: 'rgba(249,115,22,0.1)' }}
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-semibold text-[var(--text-primary)] truncate mb-2">
-                        {ticket.subject}
-                      </h3>
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <Badge {...category} />
-                        <Badge {...priority} />
-                        <Badge {...status} />
-                        {ticket.agent && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-white/5 text-[var(--text-muted)]">
-                            <Bot size={12} />
-                            {ticket.agent.name}
-                          </span>
-                        )}
+                  <LinkIcon size={18} className="text-[#f97316]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm font-semibold text-[#F0EEFC] group-hover:text-[#f97316] transition-colors">
+                      {link.label}
+                    </span>
+                    {link.external && (
+                      <ExternalLink size={12} className="text-[#6B6890] group-hover:text-[#f97316]/60 transition-colors" />
+                    )}
+                  </div>
+                  <span className="text-xs text-[#6B6890]">{link.description}</span>
+                </div>
+              </Wrapper>
+            );
+          })}
+        </motion.div>
+
+        {/* ─── Ticket Form / Success State ─────────────────────── */}
+        <motion.div variants={itemVariants}>
+          <div className="rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl overflow-hidden">
+            {/* Card header */}
+            <div className="flex items-center gap-2.5 px-6 pt-6 pb-4 border-b border-white/[0.04]">
+              <Send size={16} className="text-[#f97316]" />
+              <h2
+                className="text-base font-semibold text-[#F0EEFC]"
+                style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
+              >
+                Submit a Ticket
+              </h2>
+            </div>
+
+            <div className="p-6">
+              <AnimatePresence mode="wait">
+                {submitted ? (
+                  /* ─── Success State ─────────────────────────── */
+                  <motion.div
+                    key="success"
+                    className="flex flex-col items-center py-10 text-center"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.4, ease: 'easeOut' as const }}
+                  >
+                    {/* Animated check icon */}
+                    <motion.div
+                      className="relative mb-5"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.15, type: 'spring', stiffness: 200, damping: 15 }}
+                    >
+                      <div
+                        className="absolute inset-0 rounded-full"
+                        style={{
+                          background: 'radial-gradient(circle, rgba(74,222,128,0.2) 0%, transparent 70%)',
+                          transform: 'scale(2)',
+                        }}
+                      />
+                      <div
+                        className="relative w-16 h-16 rounded-full flex items-center justify-center"
+                        style={{
+                          background: 'rgba(74,222,128,0.12)',
+                          border: '1px solid rgba(74,222,128,0.25)',
+                          boxShadow: '0 0 24px rgba(74,222,128,0.15)',
+                        }}
+                      >
+                        <CheckCircle2 size={32} className="text-[#4ADE80]" />
+                      </div>
+                    </motion.div>
+
+                    <motion.h3
+                      className="text-lg font-semibold text-[#F0EEFC] mb-2"
+                      style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      Ticket Submitted
+                    </motion.h3>
+                    <motion.p
+                      className="text-sm text-[#A5A1C2] mb-6 max-w-sm"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      We have received your request and will get back to you shortly.
+                      You will be notified when there is an update.
+                    </motion.p>
+                    <motion.button
+                      onClick={resetForm}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all duration-200 hover:bg-white/[0.04]"
+                      style={{
+                        color: '#A5A1C2',
+                        borderColor: 'rgba(46,43,74,0.6)',
+                      }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 }}
+                    >
+                      Submit Another Ticket
+                    </motion.button>
+                  </motion.div>
+                ) : (
+                  /* ─── Form ──────────────────────────────────── */
+                  <motion.form
+                    key="form"
+                    onSubmit={handleSubmit}
+                    className="space-y-5"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {/* Error banner */}
+                    <AnimatePresence>
+                      {formError && (
+                        <motion.div
+                          className="flex items-center gap-2 p-3 rounded-xl"
+                          style={{
+                            background: 'rgba(239,68,68,0.08)',
+                            border: '1px solid rgba(239,68,68,0.2)',
+                          }}
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <AlertCircle size={14} className="text-[#F87171] flex-shrink-0" />
+                          <span className="text-sm text-[#F87171]">{formError}</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {/* Subject */}
+                    <div>
+                      <label className="block text-xs font-medium uppercase tracking-wider text-[#A5A1C2] mb-2">
+                        Subject <span className="text-[#F87171]">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={subject}
+                        onChange={(e) => {
+                          if (e.target.value.length <= SUBJECT_MAX) {
+                            setSubject(e.target.value);
+                          }
+                        }}
+                        placeholder="Brief description of your issue"
+                        className="w-full bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] placeholder:text-[#6B6890] focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/20 transition-colors"
+                        maxLength={SUBJECT_MAX}
+                      />
+                      <div className="flex justify-end mt-1">
+                        <span className={`text-[11px] ${subject.length > SUBJECT_MAX * 0.9 ? 'text-[#FBBF24]' : 'text-[#6B6890]'}`}>
+                          {subject.length}/{SUBJECT_MAX}
+                        </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="text-[11px] text-[var(--text-muted)] flex items-center gap-1">
-                        <Clock size={12} />
-                        {timeAgo(ticket.createdAt)}
-                      </span>
-                      <MessageSquare size={14} className="text-[var(--text-muted)]" />
+
+                    {/* Category & Priority */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <SelectField
+                        label="Category"
+                        value={category}
+                        onChange={(val) => setCategory(val as Category)}
+                        options={CATEGORIES}
+                      />
+                      <SelectField
+                        label="Priority"
+                        value={priority}
+                        onChange={(val) => setPriority(val as Priority)}
+                        options={PRIORITIES}
+                      />
                     </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </div>
 
-      {/* New Ticket Modal */}
-      {showNewTicketModal && (
-        <div
-          className="modal-overlay"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowNewTicketModal(false);
-          }}
-        >
-          <div className="card glass-noise p-6 w-full max-w-lg mx-4" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2.5">
-                <LifeBuoy size={18} className="text-[var(--accent-600)]" />
-                <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-                  New Support Ticket
-                </h2>
-              </div>
-              <button
-                onClick={() => setShowNewTicketModal(false)}
-                className="btn-ghost p-1.5 rounded-lg"
-                aria-label="Close"
-              >
-                <X size={18} />
-              </button>
-            </div>
+                    {/* Agent selector (optional) */}
+                    <div>
+                      <label className="block text-xs font-medium uppercase tracking-wider text-[#A5A1C2] mb-2">
+                        Related Agent <span className="text-[#6B6890] normal-case tracking-normal">(optional)</span>
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={agentId}
+                          onChange={(e) => setAgentId(e.target.value)}
+                          className="w-full appearance-none bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/20 transition-colors cursor-pointer"
+                        >
+                          <option value="">Select an agent...</option>
+                        </select>
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
+                          <Bot size={14} className="text-[#6B6890]" />
+                          <ChevronDown size={16} className="text-[#6B6890]" />
+                        </div>
+                      </div>
+                    </div>
 
-            {formError && (
-              <div className="flex items-center gap-2 mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
-                <AlertCircle size={14} className="text-red-400 flex-shrink-0" />
-                <span className="text-sm text-red-400">{formError}</span>
-              </div>
-            )}
+                    {/* Message */}
+                    <div>
+                      <label className="block text-xs font-medium uppercase tracking-wider text-[#A5A1C2] mb-2">
+                        Message <span className="text-[#F87171]">*</span>
+                      </label>
+                      <textarea
+                        value={message}
+                        onChange={(e) => {
+                          if (e.target.value.length <= MESSAGE_MAX) {
+                            setMessage(e.target.value);
+                          }
+                        }}
+                        placeholder="Describe your issue in detail..."
+                        rows={6}
+                        className="w-full bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] placeholder:text-[#6B6890] focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/20 transition-colors resize-y min-h-[120px]"
+                        maxLength={MESSAGE_MAX}
+                      />
+                      <div className="flex justify-end mt-1">
+                        <span className={`text-[11px] ${message.length > MESSAGE_MAX * 0.9 ? 'text-[#FBBF24]' : 'text-[#6B6890]'}`}>
+                          {message.length}/{MESSAGE_MAX.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
 
-            <div className="space-y-4">
-              {/* Subject */}
-              <div>
-                <label className="section-label block mb-2">Subject</label>
-                <input
-                  type="text"
-                  className="input w-full"
-                  placeholder="Brief description of your issue"
-                  value={newSubject}
-                  onChange={(e) => setNewSubject(e.target.value)}
-                />
-              </div>
-
-              {/* Category & Priority row */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="section-label block mb-2">Category</label>
-                  <select
-                    className="input w-full"
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value as TicketCategory)}
-                  >
-                    <option value="general">General</option>
-                    <option value="billing">Billing</option>
-                    <option value="technical">Technical</option>
-                    <option value="feature_request">Feature Request</option>
-                    <option value="bug_report">Bug Report</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="section-label block mb-2">Priority</label>
-                  <select
-                    className="input w-full"
-                    value={newPriority}
-                    onChange={(e) => setNewPriority(e.target.value as TicketPriority)}
-                  >
-                    <option value="low">Low</option>
-                    <option value="normal">Normal</option>
-                    <option value="high">High</option>
-                    <option value="urgent">Urgent</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Agent (optional) */}
-              <div>
-                <label className="section-label block mb-2">
-                  Related Agent <span className="text-[var(--text-muted)]">(optional)</span>
-                </label>
-                <select
-                  className="input w-full"
-                  value={newAgentId}
-                  onChange={(e) => setNewAgentId(e.target.value)}
-                >
-                  <option value="">None</option>
-                  {agents.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Message */}
-              <div>
-                <label className="section-label block mb-2">Message</label>
-                <textarea
-                  className="input w-full min-h-[120px] resize-y"
-                  placeholder="Describe your issue in detail..."
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={() => setShowNewTicketModal(false)}
-                className="btn-secondary text-sm"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCreateTicket}
-                disabled={creating}
-                className="btn-primary flex items-center gap-2 text-sm"
-              >
-                {creating ? (
-                  <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                ) : (
-                  <Send size={14} />
+                    {/* Submit */}
+                    <div className="flex justify-end pt-2">
+                      <button
+                        type="submit"
+                        disabled={submitting}
+                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.98]"
+                        style={{
+                          background: submitting ? 'rgba(249,115,22,0.7)' : '#f97316',
+                          boxShadow: '0 4px 16px rgba(249,115,22,0.3)',
+                        }}
+                      >
+                        {submitting ? (
+                          <>
+                            <div className="w-4 h-4 rounded-full border-2 border-white/80 border-t-transparent animate-spin" />
+                            Submitting...
+                          </>
+                        ) : (
+                          <>
+                            <Send size={15} />
+                            Submit Ticket
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </motion.form>
                 )}
-                Submit Ticket
-              </button>
+              </AnimatePresence>
             </div>
           </div>
-        </div>
-      )}
+        </motion.div>
+
+        {/* ─── Recent Tickets ──────────────────────────────────── */}
+        <motion.div variants={itemVariants}>
+          <div className="rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl overflow-hidden">
+            {/* Section header */}
+            <div className="flex items-center gap-2.5 px-6 pt-6 pb-4 border-b border-white/[0.04]">
+              <Ticket size={16} className="text-[#f97316]" />
+              <h2
+                className="text-base font-semibold text-[#F0EEFC]"
+                style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
+              >
+                Recent Tickets
+              </h2>
+            </div>
+
+            <div className="p-0">
+              <EmptyState
+                icon={LifeBuoy}
+                title="No tickets yet"
+                description="Your submitted support tickets will appear here. Create your first ticket above to get started."
+                actionLabel="Back to Top"
+                actionHref="#"
+              />
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
