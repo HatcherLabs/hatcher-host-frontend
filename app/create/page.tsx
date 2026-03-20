@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RobotMascot } from '@/components/ui/RobotMascot';
+import { useToast } from '@/components/ui/ToastProvider';
 import {
   Bot,
   Check,
@@ -86,10 +87,10 @@ export default function CreatePage() {
   const router = useRouter();
   const { connected } = useWallet();
   const { isAuthenticated, isLoading: authLoading, login } = useAuth();
+  const { toast } = useToast();
   const [step, setStep] = useState<Step>(1);
   const [launching, setLaunching] = useState(false);
   const [launched, setLaunched] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null);
 
   // ── LLM selection state ──
   const [llmChoice, setLlmChoice] = useState<LLMChoice>('free_groq');
@@ -184,7 +185,6 @@ export default function CreatePage() {
 
   const handleLaunch = async () => {
     setLaunching(true);
-    setApiError(null);
 
     try {
       const llm = getLLMConfig();
@@ -209,7 +209,7 @@ export default function CreatePage() {
       const res = await api.createAgent(payload);
 
       if (!res.success) {
-        setApiError(res.error);
+        toast('error', res.error ?? 'Failed to create agent');
         setLaunching(false);
         return;
       }
@@ -235,7 +235,7 @@ export default function CreatePage() {
         router.push(`/dashboard/agent/${res.data.id}?new=1`);
       }, 2000);
     } catch {
-      setApiError('Network error — please check your connection and try again.');
+      toast('error', 'Network error — please check your connection and try again.');
       setLaunching(false);
     }
   };
@@ -471,7 +471,7 @@ export default function CreatePage() {
               </motion.div>
 
               <div className="mt-8 flex justify-end">
-                <button className="btn-primary" onClick={() => { applyTemplate(); setApiError(null); setStep(2); }}>
+                <button className="btn-primary" onClick={() => { applyTemplate(); setStep(2); }}>
                   Continue
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -816,14 +816,14 @@ export default function CreatePage() {
               </div>
 
               <div className="mt-8 flex justify-between">
-                <button className="btn-secondary" onClick={() => { setApiError(null); setStep(1); }}>
+                <button className="btn-secondary" onClick={() => { setStep(1); }}>
                   <ChevronLeft className="w-4 h-4" />
                   Back
                 </button>
                 <button
                   className="btn-primary"
                   disabled={!isConfigValid}
-                  onClick={() => { setApiError(null); setStep(3); }}
+                  onClick={() => { setStep(3); }}
                 >
                   Continue
                   <ChevronRight className="w-4 h-4" />
@@ -892,18 +892,6 @@ export default function CreatePage() {
                 </div>
               </motion.div>
 
-              {apiError && (
-                <motion.div
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-red-500/10 border border-red-500/25 text-red-400 text-sm rounded-xl p-4 mb-5"
-                  role="alert"
-                  aria-live="polite"
-                >
-                  {apiError}
-                </motion.div>
-              )}
-
               {launched && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -919,7 +907,7 @@ export default function CreatePage() {
               <div className="flex justify-between items-center">
                 <button
                   className="btn-secondary"
-                  onClick={() => { setApiError(null); setStep(2); }}
+                  onClick={() => { setStep(2); }}
                   disabled={launching || launched}
                 >
                   <ChevronLeft className="w-4 h-4" />

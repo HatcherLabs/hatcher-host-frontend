@@ -14,6 +14,7 @@ import { FRAMEWORKS, FREE_TIER_LIMITS, FEATURE_CATALOG, BUNDLES, BYOK_PROVIDERS,
 import type { FeaturePricing } from '@hatcher/shared';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RobotMascot } from '@/components/ui/RobotMascot';
+import { useToast } from '@/components/ui/ToastProvider';
 import {
   ArrowLeft,
   Play,
@@ -404,6 +405,7 @@ export default function AgentManagePage() {
   const { isAuthenticated } = useAuth();
   const wallet = useWallet();
   const { connection } = useConnection();
+  const { toast } = useToast();
 
   // Core state
   const [agent, setAgent] = useState<Agent | null>(null);
@@ -474,7 +476,6 @@ export default function AgentManagePage() {
   const [byokKeyInput, setByokKeyInput] = useState('');
   const [showByokKey, setShowByokKey] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [saveMsg, setSaveMsg] = useState<string | null>(null);
 
   // Integration secrets config
   const [integrationSecrets, setIntegrationSecrets] = useState<Record<string, Record<string, string>>>({});
@@ -675,14 +676,9 @@ export default function AgentManagePage() {
 
   // ─── Actions ─────────────────────────────────────────────
 
-  const [actionError, setActionError] = useState<string | null>(null);
-  const [actionSuccess, setActionSuccess] = useState<string | null>(null);
-
   const handleAction = async (action: 'start' | 'stop' | 'restart') => {
     if (!agent) return;
     setActionLoading(action);
-    setActionError(null);
-    setActionSuccess(null);
 
     try {
       let res;
@@ -695,16 +691,13 @@ export default function AgentManagePage() {
       }
 
       if (res && !res.success) {
-        setActionError(`Failed to ${action} agent: ${res.error ?? 'Unknown error'}`);
-        setTimeout(() => setActionError(null), 5000);
+        toast('error', `Failed to ${action} agent: ${res.error ?? 'Unknown error'}`);
       } else if (res?.success) {
         const labels = { start: 'started', stop: 'stopped', restart: 'restarted' };
-        setActionSuccess(`Agent ${labels[action]} successfully`);
-        setTimeout(() => setActionSuccess(null), 3000);
+        toast('success', `Agent ${labels[action]} successfully`);
       }
     } catch {
-      setActionError(`Failed to ${action} agent. Check your connection.`);
-      setTimeout(() => setActionError(null), 5000);
+      toast('error', `Failed to ${action} agent. Check your connection.`);
     }
 
     // Reload agent to reflect new status
@@ -728,11 +721,10 @@ export default function AgentManagePage() {
 
   const handleUnlockFeature = async (featureKey: string, usdPrice: number) => {
     if (!wallet.publicKey) {
-      setActionError('Please connect your wallet first.');
+      toast('warning', 'Please connect your wallet first.');
       return;
     }
     setUnlocking(featureKey);
-    setActionError(null);
     try {
       const solAmount = usdToSol(usdPrice);
       const txSignature = await sendSolPayment({ wallet, connection, solAmount });
@@ -745,14 +737,13 @@ export default function AgentManagePage() {
       if (res.success) {
         loadFeatures();
         loadAgent();
-        setActionSuccess('Feature unlocked!');
-        setTimeout(() => setActionSuccess(null), 3000);
+        toast('success', 'Feature unlocked!');
       } else {
-        setActionError((res as { error?: string }).error ?? 'Failed to unlock feature');
+        toast('error', (res as { error?: string }).error ?? 'Failed to unlock feature');
       }
     } catch (err) {
       setUnlocking(null);
-      setActionError(err instanceof Error ? err.message : 'Payment failed');
+      toast('error', err instanceof Error ? err.message : 'Payment failed');
     }
   };
 
@@ -895,11 +886,11 @@ export default function AgentManagePage() {
 
     const trimmedName = configName.trim() || agent.name;
     if (trimmedName.length < 3 || trimmedName.length > 50) {
-      setSaveMsg('Error: Agent name must be 3-50 characters');
+      toast('error', 'Agent name must be 3-50 characters');
       return;
     }
     if (!/^[a-zA-Z0-9 \-]+$/.test(trimmedName)) {
-      setSaveMsg('Error: Name can only contain letters, numbers, spaces, and hyphens');
+      toast('error', 'Name can only contain letters, numbers, spaces, and hyphens');
       return;
     }
 
@@ -909,13 +900,12 @@ export default function AgentManagePage() {
       const hasNewKey = byokKeyInput.trim().length > 0;
       if (!hasExistingKey && !hasNewKey) {
         const providerName = getBYOKProvider(configProvider)?.name ?? configProvider;
-        setSaveMsg(`Error: API key is required for ${providerName}. Enter your key or revert to the free Groq tier.`);
+        toast('error', `API key is required for ${providerName}. Enter your key or revert to the free Groq tier.`);
         return;
       }
     }
 
     setSaving(true);
-    setSaveMsg(null);
 
     const updateData: Record<string, unknown> = {
       name: trimmedName,
@@ -945,10 +935,9 @@ export default function AgentManagePage() {
       const restartNote = (res.data as unknown as Record<string, unknown>)?.restarted
         ? ' — container restarting with new config'
         : '';
-      setSaveMsg(`Configuration saved successfully${restartNote}`);
-      setTimeout(() => setSaveMsg(null), 5000);
+      toast('success', `Configuration saved successfully${restartNote}`);
     } else {
-      setSaveMsg('Error: ' + res.error);
+      toast('error', res.error ?? 'Failed to save configuration');
     }
   };
 
@@ -1182,7 +1171,7 @@ export default function AgentManagePage() {
               onChange={async (e) => {
                 const file = e.target.files?.[0];
                 if (!file || file.size > 2 * 1024 * 1024) {
-                  setSaveMsg(file ? 'Error: Avatar must be under 2MB' : null);
+                  if (file) toast('error', 'Avatar must be under 2MB');
                   return;
                 }
                 // Convert to base64 data URL for now (proper upload in v2)
@@ -1192,10 +1181,9 @@ export default function AgentManagePage() {
                   const res = await api.updateAgent(id, { avatarUrl: dataUrl } as Parameters<typeof api.updateAgent>[1]);
                   if (res.success) {
                     setAgent(res.data);
-                    setSaveMsg('Avatar updated');
-                    setTimeout(() => setSaveMsg(null), 3000);
+                    toast('success', 'Avatar updated');
                   } else {
-                    setSaveMsg('Error: ' + res.error);
+                    toast('error', res.error ?? 'Failed to update avatar');
                   }
                 };
                 reader.readAsDataURL(file);
@@ -1300,20 +1288,6 @@ export default function AgentManagePage() {
           </div>
           {deleteError && (
             <p className="text-xs text-red-400 mt-2">{deleteError}</p>
-          )}
-          {actionError && (
-            <div className="mt-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
-              <p className="text-xs text-red-400">{actionError}</p>
-            </div>
-          )}
-          {actionSuccess && (
-            <motion.div
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-3 p-3 rounded-xl bg-green-500/10 border border-green-500/20"
-            >
-              <p className="text-xs text-green-400">{actionSuccess}</p>
-            </motion.div>
           )}
         </div>
       </div>
@@ -2092,15 +2066,6 @@ export default function AgentManagePage() {
                 <><CheckCircle size={15} /> Save Configuration</>
               )}
             </button>
-            {saveMsg && (
-              <motion.span
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                className={`text-sm font-medium ${saveMsg.startsWith('Error') ? 'text-red-400' : 'text-emerald-400'}`}
-              >
-                {saveMsg}
-              </motion.span>
-            )}
           </div>
         </motion.div>
       )}
@@ -2573,18 +2538,19 @@ export default function AgentManagePage() {
                               onClick={async () => {
                                 const solAmt = usdToSol(bundle.usdPrice);
                                 if (!confirm(`Unlock ${bundle.name} bundle for $${bundle.usdPrice} (${solAmt} SOL)?`)) return;
-                                if (!wallet.publicKey) { setActionError('Please connect your wallet first.'); return; }
+                                if (!wallet.publicKey) { toast('warning', 'Please connect your wallet first.'); return; }
                                 try {
                                   const txSig = await sendSolPayment({ wallet, connection, solAmount: solAmt });
                                   const res = await api.unlockBundle({ agentId: agent.id, bundleKey: bundle.key, paymentToken: 'sol', amount: solAmt, txSignature: txSig });
                                   if (res.success) {
+                                    toast('success', `${bundle.name} bundle unlocked!`);
                                     const featRes = await api.getAgentFeatures(agent.id);
                                     if (featRes.success) setActiveFeatures(featRes.data);
                                   } else {
-                                    setActionError((res as {error: string}).error || 'Bundle unlock failed');
+                                    toast('error', (res as {error: string}).error || 'Bundle unlock failed');
                                   }
                                 } catch (err) {
-                                  setActionError(err instanceof Error ? err.message : 'Payment failed');
+                                  toast('error', err instanceof Error ? err.message : 'Payment failed');
                                 }
                               }}
                             >

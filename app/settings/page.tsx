@@ -6,7 +6,9 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useAuth } from '@/lib/auth-context';
 import { api, clearToken } from '@/lib/api';
 import { WalletMultiButton } from '@/components/wallet/WalletButton';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { motion } from 'framer-motion';
+import { useToast } from '@/components/ui/ToastProvider';
 import { Copy, Check, Eye, EyeOff, Shield, Bell, Trash2, Bot, Zap, AlertTriangle, Key, Wallet, RefreshCw } from 'lucide-react';
 
 const pageVariants = {
@@ -23,6 +25,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const { publicKey, connected, disconnect } = useWallet();
   const { isAuthenticated, isLoading: authLoading, login } = useAuth();
+  const { toast } = useToast();
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [showKey, setShowKey] = useState(false);
   const [notifications, setNotifications] = useState(() => {
@@ -42,6 +45,8 @@ export default function SettingsPage() {
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [regenerating, setRegenerating] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showRegenConfirm, setShowRegenConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const walletAddress = publicKey?.toString() ?? 'Not connected';
   const apiKeyAvailable = isAuthenticated && connected;
@@ -240,23 +245,7 @@ export default function SettingsPage() {
                 {apiKeyAvailable && apiKey && (
                   <button
                     disabled={regenerating}
-                    onClick={async () => {
-                      if (!window.confirm(
-                        'Regenerate your API key? The old key will stop working immediately.'
-                      )) return;
-                      setRegenerating(true);
-                      try {
-                        const res = await api.regenerateApiKey();
-                        if (res.success) {
-                          setApiKey(res.data.apiKey);
-                          setCopiedField(null);
-                        }
-                      } catch {
-                        // Regeneration failed — non-critical
-                      } finally {
-                        setRegenerating(false);
-                      }
-                    }}
+                    onClick={() => setShowRegenConfirm(true)}
                     className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-all duration-200 text-[var(--text-muted)] hover:text-[#f97316] hover:bg-[#f97316]/10"
                   >
                     <RefreshCw size={12} className={regenerating ? 'animate-spin' : ''} />
@@ -363,32 +352,72 @@ export default function SettingsPage() {
           <button
             disabled={deleting}
             className={`btn-danger ${deleting ? 'opacity-50 cursor-not-allowed' : ''}`}
-            onClick={async () => {
-              if (!window.confirm(
-                'Are you sure you want to delete your account? This will permanently remove all your agents, data, and payment history. This action CANNOT be undone.'
-              )) return;
-              setDeleting(true);
-              try {
-                const res = await api.deleteAccount();
-                if (res.success) {
-                  clearToken();
-                  disconnect();
-                  router.push('/');
-                } else {
-                  alert((res as {error: string}).error || 'Failed to delete account');
-                  setDeleting(false);
-                }
-              } catch {
-                alert('Failed to delete account. Please try again.');
-                setDeleting(false);
-              }
-            }}
+            onClick={() => setShowDeleteConfirm(true)}
           >
             <Trash2 size={14} />
             {deleting ? 'Deleting...' : 'Delete Account'}
           </button>
         </motion.div>
       </div>
+
+      {/* Regenerate API Key Confirmation */}
+      <ConfirmDialog
+        open={showRegenConfirm}
+        title="Regenerate API Key?"
+        description="The old key will stop working immediately. Any integrations using it will need to be updated."
+        confirmLabel={regenerating ? 'Regenerating...' : 'Regenerate Key'}
+        variant="warning"
+        loading={regenerating}
+        onCancel={() => setShowRegenConfirm(false)}
+        onConfirm={async () => {
+          setRegenerating(true);
+          try {
+            const res = await api.regenerateApiKey();
+            if (res.success) {
+              setApiKey(res.data.apiKey);
+              setCopiedField(null);
+              toast('success', 'API key regenerated successfully');
+            } else {
+              toast('error', 'Failed to regenerate API key');
+            }
+          } catch {
+            toast('error', 'Failed to regenerate API key. Please try again.');
+          } finally {
+            setRegenerating(false);
+            setShowRegenConfirm(false);
+          }
+        }}
+      />
+
+      {/* Delete Account Confirmation */}
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        title="Delete Your Account?"
+        description="This will permanently remove all your agents, data, and payment history. This action cannot be undone."
+        confirmLabel={deleting ? 'Deleting...' : 'Delete Account'}
+        variant="danger"
+        loading={deleting}
+        onCancel={() => setShowDeleteConfirm(false)}
+        onConfirm={async () => {
+          setDeleting(true);
+          try {
+            const res = await api.deleteAccount();
+            if (res.success) {
+              clearToken();
+              disconnect();
+              router.push('/');
+            } else {
+              toast('error', (res as { error: string }).error || 'Failed to delete account');
+              setDeleting(false);
+              setShowDeleteConfirm(false);
+            }
+          } catch {
+            toast('error', 'Failed to delete account. Please try again.');
+            setDeleting(false);
+            setShowDeleteConfirm(false);
+          }
+        }}
+      />
     </motion.div>
   );
 }

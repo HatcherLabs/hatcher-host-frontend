@@ -4,7 +4,7 @@ import '@solana/wallet-adapter-react-ui/styles.css';
 import './globals.css';
 import { WalletProvider } from '@/components/providers/WalletProvider';
 import { LayoutShell } from '@/components/layout/LayoutShell';
-import { Toaster } from 'sonner';
+import { ToastProvider } from '@/components/ui/ToastProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -39,19 +39,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`dark scroll-smooth ${inter.variable} ${jetbrainsMono.variable} ${sora.variable}`}>
       <body>
         <WalletProvider>
-          <LayoutShell>{children}</LayoutShell>
-          <Toaster
-            theme="dark"
-            position="bottom-right"
-            toastOptions={{
-              style: {
-                background: '#1A1730',
-                border: '1px solid rgba(46,43,74,0.6)',
-                color: '#fafafa',
-                fontFamily: 'var(--font-inter), Inter, system-ui, sans-serif',
-              },
-            }}
-          />
+          <ToastProvider>
+            <LayoutShell>{children}</LayoutShell>
+          </ToastProvider>
         </WalletProvider>
       </body>
     </html>
