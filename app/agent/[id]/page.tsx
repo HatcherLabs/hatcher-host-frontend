@@ -14,9 +14,7 @@ import { motion } from 'framer-motion';
 import { RobotMascot } from '@/components/ui/RobotMascot';
 import {
   ArrowLeft,
-  Copy,
   Check,
-  ExternalLink,
   MessageSquare,
   Settings,
   Share2,
@@ -25,7 +23,6 @@ import {
   Cpu,
 } from 'lucide-react';
 
-const DEFAULT_PROMPTS = ["Hello! Who are you?", "What can you help me with?", "Tell me about yourself"];
 
 const STATUS_STYLES: Record<string, { bg: string; text: string; border: string; dot: string; pulse: boolean; label: string }> = {
   active:   { bg: 'bg-green-500/10',  text: 'text-green-400',  border: 'border-green-500/20',  dot: 'bg-green-400',  pulse: true,  label: 'Active' },
@@ -264,19 +261,16 @@ export default function PublicAgentPage() {
         </div>
       </motion.div>
 
-      {/* Chat CTA */}
-      <motion.div className={`${cardClass} p-6`} variants={itemVariants}>
-        <div className="text-center">
-          <h2 className="text-lg font-semibold mb-2 text-[var(--text-primary)]">
-            {isOwner ? `Manage ${agent.name}` : `Chat with ${agent.name}`}
-          </h2>
-          <p className="text-sm mb-5 text-[var(--text-muted)]">
-            {isOwner
-              ? 'You own this agent. Head to your dashboard to chat or configure it.'
-              : `${agent.name} is live and ready to chat.`}
-          </p>
-
-          {isOwner ? (
+      {/* Owner: manage buttons / Non-owner: stats only */}
+      {isOwner ? (
+        <motion.div className={`${cardClass} p-6`} variants={itemVariants}>
+          <div className="text-center">
+            <h2 className="text-lg font-semibold mb-2 text-[var(--text-primary)]">
+              Manage {agent.name}
+            </h2>
+            <p className="text-sm mb-5 text-[var(--text-muted)]">
+              You own this agent. Head to your dashboard to chat or configure it.
+            </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href={`/dashboard/agent/${id}`} className="btn-primary inline-flex items-center gap-2 justify-center">
                 <Settings className="w-4 h-4" />
@@ -287,70 +281,44 @@ export default function PublicAgentPage() {
                 Open Chat
               </Link>
             </div>
-          ) : authed ? (
-            <div className="space-y-4">
-              {/* Suggested prompts */}
-              <div className="flex flex-wrap gap-2 justify-center">
-                {DEFAULT_PROMPTS.map((prompt) => (
-                  <Link
-                    key={prompt}
-                    href={`/dashboard/agent/${id}?tab=chat`}
-                    className="text-xs px-3 py-1.5 rounded-full border border-[#f97316]/15 bg-[#f97316]/5 hover:bg-[#f97316]/10 hover:border-[#f97316]/30 text-[var(--text-secondary)] hover:text-[#fed7aa] transition-all duration-200"
-                  >
-                    {prompt}
-                  </Link>
-                ))}
-              </div>
-              <Link
-                href={`/dashboard/agent/${id}?tab=chat`}
-                className="btn-primary inline-flex items-center gap-2 justify-center w-full"
-              >
-                <MessageSquare className="w-4 h-4" />
-                Start Chatting
-              </Link>
+          </div>
+        </motion.div>
+      ) : (
+        <motion.div className={`${cardClass} p-6`} variants={itemVariants}>
+          <h2 className="text-lg font-semibold mb-4 text-[var(--text-primary)]">Agent Stats</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
+              <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Status</div>
+              <span className={`inline-flex items-center gap-1.5 text-sm font-semibold ${statusStyle.text}`}>
+                <span className={`w-2 h-2 rounded-full ${statusStyle.dot} ${statusStyle.pulse ? 'animate-pulse' : ''}`} />
+                {statusStyle.label}
+              </span>
             </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="glass rounded-xl p-4 text-left">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-6 h-6 rounded-full bg-[#f97316]/50 flex items-center justify-center text-xs text-white font-bold">
-                    {initials.slice(0, 1)}
-                  </div>
-                  <span className="text-xs font-medium text-[var(--text-muted)]">{agent.name}</span>
-                  <span className="ml-auto text-[10px] text-[var(--text-muted)] px-2 py-0.5 rounded-full border border-[var(--border-default)]">
-                    Powered by Hatcher
-                  </span>
-                </div>
-                <p className="text-sm italic text-[var(--text-secondary)]">
-                  Connect wallet to chat with {agent.name}.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-2 justify-center">
-                {DEFAULT_PROMPTS.map((prompt) => (
-                  <span
-                    key={prompt}
-                    className="text-xs px-3 py-1.5 rounded-full border border-[#f97316]/10 bg-[#f97316]/3 cursor-default text-[var(--text-muted)]"
-                  >
-                    {prompt}
-                  </span>
-                ))}
-              </div>
-
-              <Link href="/dashboard/agents" className="btn-primary inline-flex items-center gap-2 justify-center w-full">
-                <ExternalLink className="w-4 h-4" />
-                Connect Wallet to Chat
-              </Link>
+            <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
+              <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Framework</div>
+              <div className="text-sm font-semibold text-[var(--text-primary)]">{frameworkMeta?.name ?? agent.framework}</div>
             </div>
-          )}
-
-          {!isOwner && !authed && (
-            <p className="text-xs mt-3 text-[var(--text-muted)]">
-              Sign in with your Solana wallet to continue
+            <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
+              <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Features</div>
+              <div className="text-sm font-semibold text-[var(--text-primary)]">{featureCount} active</div>
+            </div>
+            <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
+              <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Created</div>
+              <div className="text-sm font-semibold text-[var(--text-primary)]">{timeAgo(agent.createdAt)}</div>
+            </div>
+            <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center col-span-2 sm:col-span-2">
+              <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Owner</div>
+              <div className="text-sm font-mono font-semibold text-[var(--text-primary)]">{shortenAddress(ownerAddress)}</div>
+            </div>
+          </div>
+          <div className="mt-5 pt-4 border-t border-[var(--border-default)] text-center">
+            <p className="text-xs text-[var(--text-muted)]">
+              Powered by Hatcher — deploy your own AI agent at{' '}
+              <Link href="/create" className="text-[#f97316] hover:underline">hatcher.fun/create</Link>
             </p>
-          )}
-        </div>
-      </motion.div>
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   );
 }
