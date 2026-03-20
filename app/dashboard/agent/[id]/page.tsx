@@ -2654,12 +2654,7 @@ export default function AgentManagePage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
                 <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Provider</p>
-                <div className="flex items-center gap-2">
-                  {currentProviderMeta?.icon && (
-                    <span className="text-lg">{currentProviderMeta.icon}</span>
-                  )}
-                  <p className="text-sm font-medium text-[#fafafa] capitalize">{currentProviderMeta?.name ?? llmProvider}</p>
-                </div>
+                <p className="text-sm font-medium text-[#fafafa] capitalize">{currentProviderMeta?.name ?? llmProvider}</p>
               </div>
               <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
                 <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Model</p>
