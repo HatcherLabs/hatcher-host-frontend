@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
@@ -538,7 +538,7 @@ function generatePageNumbers(current: number, total: number): (number | '...')[]
 
 // ── Explore Agent Card ──────────────────────────────────────
 
-function ExploreAgentCard({ agent }: { agent: Agent }) {
+const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agent }) {
   const gradient = stringToColor(agent.id);
   const initials = getInitials(agent.name);
   const status = STATUS_CONFIG[agent.status] ?? STATUS_CONFIG['paused']!
@@ -626,4 +626,4 @@ function ExploreAgentCard({ agent }: { agent: Agent }) {
       </Link>
     </motion.div>
   );
-}
+});
