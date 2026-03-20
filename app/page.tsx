@@ -25,7 +25,7 @@ function HeroRobot() {
     <div className="absolute inset-0 flex items-center justify-center">
       <svg
         viewBox="0 0 320 400"
-        className="w-[500px] h-[600px] animate-[float-gentle_4s_ease-in-out_infinite]"
+        className="w-full h-full animate-[float-gentle_4s_ease-in-out_infinite]"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -342,7 +342,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-[#0D0B1A] text-white overflow-x-hidden">
 
       {/* ── HERO ───────────────────────────────────────── */}
-      <section id="hero" className="relative min-h-screen flex items-center justify-center">
+      <section id="hero" className="relative min-h-screen flex items-center">
         {/* Grid background */}
         <div
           className="absolute inset-0 opacity-[0.03]"
@@ -352,88 +352,105 @@ export default function LandingPage() {
             backgroundSize: '60px 60px',
           }}
         />
-        {/* Radial glow */}
+        {/* Radial glow — shifted right to illuminate robot */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(249,115,22,0.15), transparent)',
+            background: 'radial-gradient(ellipse 50% 50% at 65% 35%, rgba(249,115,22,0.12), transparent)',
           }}
         />
-        {/* Secondary orange glow */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse 40% 30% at 50% 30%, rgba(249,115,22,0.06), transparent)',
+            background: 'radial-gradient(ellipse 40% 40% at 30% 50%, rgba(249,115,22,0.06), transparent)',
           }}
         />
 
-        {/* Animated Robot — background accent */}
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-25 hidden lg:block">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px]">
-            <HeroRobot />
-          </div>
-        </div>
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
+            {/* Left — Text content */}
+            <div className="flex-1 text-center lg:text-left pt-20 lg:pt-0">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+              >
+                <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold tracking-tight leading-[0.9]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+                  <span className="text-white">Hatch</span>
+                  <br />
+                  <span className="text-white">Your </span>
+                  <span className="bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 bg-clip-text text-transparent">
+                    AI Agent
+                  </span>
+                </h1>
+              </motion.div>
 
-        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-          >
-            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-9xl font-extrabold tracking-tight leading-[0.9]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              <span className="text-white">Hatch Your</span>
-              <br />
-              <span className="bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 bg-clip-text text-transparent">
-                AI Agent
-              </span>
-            </h1>
-          </motion.div>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
+                className="mt-6 sm:mt-8 text-base sm:text-lg md:text-xl text-[#A5A1C2] max-w-lg leading-relaxed mx-auto lg:mx-0"
+              >
+                Deploy autonomous agents across 20+ platforms with 13,700+ skills.
+                Zero infrastructure. Live in 60 seconds.
+              </motion.p>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
-            className="mt-6 sm:mt-8 text-base sm:text-lg md:text-xl text-[#A5A1C2] max-w-xl mx-auto leading-relaxed px-2"
-          >
-            Deploy autonomous agents across 20+ platforms with 13,700+ skills.
-            Zero infrastructure. Live in 60 seconds.
-          </motion.p>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+                className="mt-10 flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4"
+              >
+                <Link
+                  href="/create"
+                  className="bg-white text-black font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-base hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 shadow-lg shadow-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0D0B1A]"
+                >
+                  Create Agent
+                </Link>
+                <Link
+                  href="/explore"
+                  className="border border-white/20 text-white font-medium px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-base hover:bg-white/5 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0D0B1A]"
+                >
+                  Explore
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </Link>
+              </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-            className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
-          >
-            <Link
-              href="/create"
-              className="bg-white text-black font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-base hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 shadow-lg shadow-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0D0B1A]"
-            >
-              Create Agent
-            </Link>
-            <Link
-              href="/explore"
-              className="border border-white/20 text-white font-medium px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-base hover:bg-white/5 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0D0B1A]"
-            >
-              Explore
-              <ArrowRight className="w-4 h-4" aria-hidden="true" />
-            </Link>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.6 }}
-            className="mt-16"
-          >
-            <div className="inline-flex items-center gap-3 sm:gap-6 px-4 sm:px-6 py-3 rounded-full bg-white/[0.03] border border-white/[0.06] text-xs sm:text-sm text-[#A5A1C2]">
-              <span><AnimatedCounter target={platformStats.totalAgents} /> Agents</span>
-              <span className="w-px h-4 bg-white/10" aria-hidden="true" />
-              <span><AnimatedCounter target={platformStats.activeAgents} /> Active</span>
-              <span className="w-px h-4 bg-white/10" aria-hidden="true" />
-              <span>Free to Start</span>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 0.6 }}
+                className="mt-12"
+              >
+                <div className="inline-flex items-center gap-3 sm:gap-6 px-4 sm:px-6 py-3 rounded-full bg-white/[0.03] border border-white/[0.06] text-xs sm:text-sm text-[#A5A1C2]">
+                  <span><AnimatedCounter target={platformStats.totalAgents} /> Agents</span>
+                  <span className="w-px h-4 bg-white/10" aria-hidden="true" />
+                  <span><AnimatedCounter target={platformStats.activeAgents} /> Active</span>
+                  <span className="w-px h-4 bg-white/10" aria-hidden="true" />
+                  <span>Free to Start</span>
+                </div>
+              </motion.div>
             </div>
-          </motion.div>
+
+            {/* Right — Robot mascot */}
+            <motion.div
+              className="flex-shrink-0 relative hidden md:flex items-center justify-center"
+              initial={{ opacity: 0, x: 40, scale: 0.9 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              transition={{ duration: 1, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              {/* Glow behind robot */}
+              <div
+                className="absolute inset-0 -m-16 pointer-events-none"
+                style={{
+                  background: 'radial-gradient(circle at center, rgba(249,115,22,0.12) 0%, transparent 65%)',
+                }}
+              />
+              <div className="relative w-[280px] h-[340px] lg:w-[400px] lg:h-[480px] xl:w-[460px] xl:h-[560px]">
+                <HeroRobot />
+              </div>
+            </motion.div>
+          </div>
         </div>
 
         {/* Scroll indicator */}
