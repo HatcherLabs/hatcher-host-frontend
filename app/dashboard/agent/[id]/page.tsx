@@ -129,11 +129,30 @@ interface IntegrationField {
 
 interface IntegrationDef {
   featureKey: string;
+  /** Unique key for state management (defaults to featureKey if not set) */
+  stateKey?: string;
   name: string;
   description: string;
   secretPrefix: string;
   fields: IntegrationField[];
+  /** If true, channel settings (dmPolicy, groupPolicy, streaming) are shown */
+  hasChannelSettings?: boolean;
 }
+
+/** Get the unique state key for an integration (used for form state, expand/collapse, etc.) */
+function integrationStateKey(i: IntegrationDef): string {
+  return i.stateKey ?? i.featureKey;
+}
+
+/** Channel settings options shared across platforms */
+const CHANNEL_SETTINGS_FIELDS: IntegrationField[] = [
+  { key: '_CS_DM_POLICY', label: 'DM Policy', type: 'select', helper: 'Who can message the bot in DMs',
+    options: [{ value: 'open', label: 'Open — anyone' }, { value: 'allowlist', label: 'Allowlist only' }, { value: 'disabled', label: 'Disabled' }] },
+  { key: '_CS_GROUP_POLICY', label: 'Group Policy', type: 'select', helper: 'How the bot responds in group chats',
+    options: [{ value: 'open', label: 'Open — all messages' }, { value: 'mention', label: 'Mention only' }, { value: 'disabled', label: 'Disabled' }] },
+  { key: '_CS_STREAMING', label: 'Streaming', type: 'select', helper: 'How responses are delivered',
+    options: [{ value: 'partial', label: 'Partial — edit as tokens arrive' }, { value: 'full', label: 'Full — send complete' }, { value: 'off', label: 'Off' }] },
+];
 
 const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
   {
@@ -141,6 +160,7 @@ const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     name: 'Telegram',
     description: 'Deploy your agent as a Telegram bot.',
     secretPrefix: 'TELEGRAM',
+    hasChannelSettings: true,
     fields: [
       { key: 'TELEGRAM_BOT_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'Bot token from @BotFather', helper: 'Message @BotFather on Telegram to create a bot and get the token', required: true },
     ],
@@ -150,6 +170,7 @@ const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     name: 'Discord',
     description: 'Deploy your agent as a Discord bot.',
     secretPrefix: 'DISCORD',
+    hasChannelSettings: true,
     fields: [
       { key: 'DISCORD_BOT_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'Discord bot token', helper: 'From Discord Developer Portal > Bot > Token', required: true },
       { key: 'DISCORD_APPLICATION_ID', label: 'Application ID', type: 'text', placeholder: 'e.g. 123456789012345678', helper: 'From Discord Developer Portal > General Information' },
@@ -160,6 +181,7 @@ const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     name: 'WhatsApp',
     description: 'Connect your agent to WhatsApp Business.',
     secretPrefix: 'WHATSAPP',
+    hasChannelSettings: true,
     fields: [
       { key: 'WHATSAPP_TOKEN', label: 'Business API Token', type: 'password', placeholder: 'WhatsApp Business API token', helper: 'From Meta Business Suite > WhatsApp > API Setup', required: true },
       { key: 'WHATSAPP_PHONE_NUMBER_ID', label: 'Phone Number ID', type: 'text', placeholder: 'e.g. 1234567890', helper: 'Phone Number ID from WhatsApp Business API', required: true },
@@ -170,6 +192,7 @@ const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     name: 'Signal',
     description: 'Connect your agent to Signal messenger.',
     secretPrefix: 'SIGNAL',
+    hasChannelSettings: true,
     fields: [
       { key: 'SIGNAL_CLI_CONFIG', label: 'CLI Config Path', type: 'text', placeholder: '/home/user/.local/share/signal-cli', helper: 'Path to signal-cli config directory on your server', required: true },
     ],
@@ -179,6 +202,7 @@ const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     name: 'Slack',
     description: 'Deploy your agent in Slack workspaces.',
     secretPrefix: 'SLACK',
+    hasChannelSettings: true,
     fields: [
       { key: 'SLACK_BOT_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'xoxb-...', helper: 'Bot User OAuth Token from Slack API', required: true },
       { key: 'SLACK_APP_TOKEN', label: 'App Token', type: 'password', placeholder: 'xapp-...', helper: 'App-Level Token for Socket Mode (from Slack API > Basic Information)' },
@@ -202,6 +226,143 @@ const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     fields: [
       { key: 'WEBHOOK_URL', label: 'Webhook URL', type: 'text', placeholder: 'https://your-service.com/webhook', helper: 'URL that will send events to your agent', required: true },
       { key: 'WEBHOOK_SECRET', label: 'Webhook Secret', type: 'password', placeholder: 'Shared secret for HMAC verification', helper: 'Used to verify incoming webhook payloads' },
+    ],
+  },
+];
+
+/** Extra platforms unlocked by openclaw.platform.extra ($12 one-time) */
+const EXTRA_PLATFORM_INTEGRATIONS: IntegrationDef[] = [
+  {
+    featureKey: 'openclaw.platform.extra',
+    stateKey: 'extra.twitch',
+    name: 'Twitch',
+    description: 'Connect your agent to Twitch chat.',
+    secretPrefix: 'TWITCH',
+    hasChannelSettings: true,
+    fields: [
+      { key: 'TWITCH_TOKEN', label: 'OAuth Token', type: 'password', placeholder: 'oauth:abc123...', helper: 'Generate at twitchtokengenerator.com', required: true },
+      { key: 'TWITCH_CLIENT_ID', label: 'Client ID', type: 'text', placeholder: 'Your Twitch app client ID', helper: 'From Twitch Developer Console' },
+    ],
+  },
+  {
+    featureKey: 'openclaw.platform.extra',
+    stateKey: 'extra.irc',
+    name: 'IRC',
+    description: 'Connect to any IRC server.',
+    secretPrefix: 'IRC',
+    fields: [
+      { key: 'IRC_SERVER', label: 'Server', type: 'text', placeholder: 'irc.libera.chat', required: true },
+      { key: 'IRC_PORT', label: 'Port', type: 'text', placeholder: '6697' },
+      { key: 'IRC_NICKNAME', label: 'Nickname', type: 'text', placeholder: 'my-agent', required: true },
+      { key: 'IRC_PASSWORD', label: 'Password', type: 'password', placeholder: 'Server password (if needed)' },
+    ],
+  },
+  {
+    featureKey: 'openclaw.platform.extra',
+    stateKey: 'extra.googlechat',
+    name: 'Google Chat',
+    description: 'Deploy in Google Workspace via Google Chat.',
+    secretPrefix: 'GOOGLECHAT',
+    fields: [
+      { key: 'GOOGLECHAT_SERVICE_ACCOUNT_KEY', label: 'Service Account Key (JSON)', type: 'password', placeholder: '{"type":"service_account",...}', helper: 'From Google Cloud Console > IAM > Service Accounts', required: true },
+    ],
+  },
+  {
+    featureKey: 'openclaw.platform.extra',
+    stateKey: 'extra.msteams',
+    name: 'Microsoft Teams',
+    description: 'Deploy your agent in MS Teams channels.',
+    secretPrefix: 'MSTEAMS',
+    fields: [
+      { key: 'MSTEAMS_APP_ID', label: 'App ID', type: 'text', placeholder: 'Azure Bot registration App ID', helper: 'From Azure Portal > Bot Channels Registration', required: true },
+      { key: 'MSTEAMS_APP_PASSWORD', label: 'App Password', type: 'password', placeholder: 'Client secret', helper: 'From Azure Portal > Certificates & Secrets' },
+    ],
+  },
+  {
+    featureKey: 'openclaw.platform.extra',
+    stateKey: 'extra.mattermost',
+    name: 'Mattermost',
+    description: 'Connect to a self-hosted Mattermost instance.',
+    secretPrefix: 'MATTERMOST',
+    fields: [
+      { key: 'MATTERMOST_URL', label: 'Server URL', type: 'text', placeholder: 'https://mattermost.example.com', required: true },
+      { key: 'MATTERMOST_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'Bot access token', helper: 'From Mattermost > Integrations > Bot Accounts' },
+    ],
+  },
+  {
+    featureKey: 'openclaw.platform.extra',
+    stateKey: 'extra.line',
+    name: 'Line',
+    description: 'Deploy your agent on LINE Messenger.',
+    secretPrefix: 'LINE',
+    fields: [
+      { key: 'LINE_CHANNEL_ACCESS_TOKEN', label: 'Channel Access Token', type: 'password', placeholder: 'Long-lived token', helper: 'From LINE Developers Console > Messaging API', required: true },
+      { key: 'LINE_CHANNEL_SECRET', label: 'Channel Secret', type: 'password', placeholder: 'Channel secret', helper: 'From LINE Developers Console > Basic Settings' },
+    ],
+  },
+  {
+    featureKey: 'openclaw.platform.extra',
+    stateKey: 'extra.matrix',
+    name: 'Matrix',
+    description: 'Connect to Matrix/Element rooms.',
+    secretPrefix: 'MATRIX',
+    fields: [
+      { key: 'MATRIX_HOMESERVER', label: 'Homeserver URL', type: 'text', placeholder: 'https://matrix.org', required: true },
+      { key: 'MATRIX_ACCESS_TOKEN', label: 'Access Token', type: 'password', placeholder: 'Bot user access token', helper: 'Create a bot user and get an access token from Element settings' },
+    ],
+  },
+  {
+    featureKey: 'openclaw.platform.extra',
+    stateKey: 'extra.nostr',
+    name: 'Nostr',
+    description: 'Connect your agent to the Nostr protocol.',
+    secretPrefix: 'NOSTR',
+    fields: [
+      { key: 'NOSTR_PRIVATE_KEY', label: 'Private Key (nsec)', type: 'password', placeholder: 'nsec1...', helper: 'Your Nostr private key — will be encrypted at rest', required: true },
+    ],
+  },
+  {
+    featureKey: 'openclaw.platform.extra',
+    stateKey: 'extra.feishu',
+    name: 'Feishu / Lark',
+    description: 'Deploy in Feishu (Lark) workspaces.',
+    secretPrefix: 'FEISHU',
+    fields: [
+      { key: 'FEISHU_APP_ID', label: 'App ID', type: 'text', placeholder: 'cli_xxxxx', helper: 'From Feishu Open Platform > App Credentials', required: true },
+      { key: 'FEISHU_APP_SECRET', label: 'App Secret', type: 'password', placeholder: 'App secret', helper: 'From Feishu Open Platform > App Credentials', required: true },
+    ],
+  },
+  {
+    featureKey: 'openclaw.platform.extra',
+    stateKey: 'extra.zalo',
+    name: 'Zalo',
+    description: 'Connect your agent to Zalo (popular in Vietnam).',
+    secretPrefix: 'ZALO',
+    fields: [
+      { key: 'ZALO_APP_ID', label: 'App ID', type: 'text', placeholder: 'Zalo App ID', required: true },
+      { key: 'ZALO_APP_SECRET', label: 'App Secret', type: 'password', placeholder: 'Zalo App Secret', required: true },
+    ],
+  },
+  {
+    featureKey: 'openclaw.platform.extra',
+    stateKey: 'extra.nextcloud',
+    name: 'Nextcloud Talk',
+    description: 'Connect to Nextcloud Talk rooms.',
+    secretPrefix: 'NEXTCLOUD',
+    fields: [
+      { key: 'NEXTCLOUD_URL', label: 'Server URL', type: 'text', placeholder: 'https://nextcloud.example.com' },
+      { key: 'NEXTCLOUD_TOKEN', label: 'App Token', type: 'password', placeholder: 'Nextcloud app password' },
+    ],
+  },
+  {
+    featureKey: 'openclaw.platform.extra',
+    stateKey: 'extra.bluebubbles',
+    name: 'BlueBubbles',
+    description: 'iMessage bridge via BlueBubbles (macOS server).',
+    secretPrefix: 'BLUEBUBBLES',
+    fields: [
+      { key: 'BLUEBUBBLES_URL', label: 'Server URL', type: 'text', placeholder: 'http://localhost:1234' },
+      { key: 'BLUEBUBBLES_PASSWORD', label: 'Server Password', type: 'password', placeholder: 'BlueBubbles server password' },
     ],
   },
 ];
@@ -627,17 +788,24 @@ export default function AgentManagePage() {
 
   const saveIntegrationSecrets = async (integration: IntegrationDef) => {
     if (!agent) return;
-    setSavingIntegration(integration.featureKey);
-    setIntegrationSaveMsg((prev) => ({ ...prev, [integration.featureKey]: '' }));
+    const sk = integrationStateKey(integration);
+    setSavingIntegration(sk);
+    setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: '' }));
 
-    const secrets = integrationSecrets[integration.featureKey] ?? {};
-    // Filter out empty values
+    const secrets = integrationSecrets[sk] ?? {};
+    // Separate channel settings (_CS_ prefix) from credential secrets
     const filteredSecrets: Record<string, string> = {};
+    const channelSettingsUpdate: Record<string, string> = {};
     for (const [k, v] of Object.entries(secrets)) {
-      if (v && v.trim()) filteredSecrets[k] = v.trim();
+      if (!v || !v.trim()) continue;
+      if (k.startsWith('_CS_')) {
+        channelSettingsUpdate[k] = v.trim();
+      } else {
+        filteredSecrets[k] = v.trim();
+      }
     }
 
-    // Check required fields
+    // Check required fields (only credential fields, not channel settings)
     const missingRequired = integration.fields
       .filter((f) => f.required && !filteredSecrets[f.key] && !hasExistingSecret(f.key))
       .map((f) => f.label);
@@ -646,26 +814,50 @@ export default function AgentManagePage() {
       setSavingIntegration(null);
       setIntegrationSaveMsg((prev) => ({
         ...prev,
-        [integration.featureKey]: `Missing required: ${missingRequired.join(', ')}`,
+        [sk]: `Missing required: ${missingRequired.join(', ')}`,
       }));
-      setTimeout(() => setIntegrationSaveMsg((prev) => ({ ...prev, [integration.featureKey]: '' })), 5000);
+      setTimeout(() => setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: '' })), 5000);
       return;
     }
 
-    if (Object.keys(filteredSecrets).length === 0) {
+    const hasSecrets = Object.keys(filteredSecrets).length > 0;
+    const hasSettings = Object.keys(channelSettingsUpdate).length > 0;
+
+    if (!hasSecrets && !hasSettings) {
       setSavingIntegration(null);
-      setIntegrationSaveMsg((prev) => ({ ...prev, [integration.featureKey]: 'No new values to save' }));
-      setTimeout(() => setIntegrationSaveMsg((prev) => ({ ...prev, [integration.featureKey]: '' })), 3000);
+      setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: 'No new values to save' }));
+      setTimeout(() => setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: '' })), 3000);
       return;
     }
 
     const existingConfig = (agent.config ?? {}) as Record<string, unknown>;
 
-    // OpenClaw: secrets go at config root level
+    // Build channel settings object if any _CS_ values changed
+    // Map _CS_DM_POLICY → dmPolicy, _CS_GROUP_POLICY → groupPolicy, _CS_STREAMING → streaming
+    // Channel name is derived from secretPrefix (lowercased)
+    let channelSettingsMerge: Record<string, unknown> = {};
+    if (hasSettings) {
+      const channelName = integration.secretPrefix.toLowerCase();
+      const existing = (existingConfig.channelSettings ?? {}) as Record<string, Record<string, unknown>>;
+      const existingChannel = existing[channelName] ?? {};
+      const mapped: Record<string, string> = {};
+      if (channelSettingsUpdate._CS_DM_POLICY) mapped.dmPolicy = channelSettingsUpdate._CS_DM_POLICY;
+      if (channelSettingsUpdate._CS_GROUP_POLICY) mapped.groupPolicy = channelSettingsUpdate._CS_GROUP_POLICY;
+      if (channelSettingsUpdate._CS_STREAMING) mapped.streaming = channelSettingsUpdate._CS_STREAMING;
+      channelSettingsMerge = {
+        channelSettings: {
+          ...existing,
+          [channelName]: { ...existingChannel, ...mapped },
+        },
+      };
+    }
+
+    // OpenClaw: secrets go at config root level, channelSettings nested
     const updateData: Record<string, unknown> = {
       config: {
         ...existingConfig,
         ...filteredSecrets,
+        ...channelSettingsMerge,
       },
     };
 
@@ -674,15 +866,14 @@ export default function AgentManagePage() {
 
     if (res.success) {
       setAgent(res.data);
-      // Clear the form values after save (secrets should not be shown again)
-      setIntegrationSecrets((prev) => ({ ...prev, [integration.featureKey]: {} }));
+      setIntegrationSecrets((prev) => ({ ...prev, [sk]: {} }));
       const restartNote = (res.data as unknown as Record<string, unknown>)?.restarted
         ? ' — container restarting with new config'
         : '';
-      setIntegrationSaveMsg((prev) => ({ ...prev, [integration.featureKey]: `Credentials saved and encrypted${restartNote}` }));
-      setTimeout(() => setIntegrationSaveMsg((prev) => ({ ...prev, [integration.featureKey]: '' })), 5000);
+      setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: `Credentials saved and encrypted${restartNote}` }));
+      setTimeout(() => setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: '' })), 5000);
     } else {
-      setIntegrationSaveMsg((prev) => ({ ...prev, [integration.featureKey]: 'Error: ' + res.error }));
+      setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: 'Error: ' + res.error }));
     }
   };
 
@@ -1700,18 +1891,19 @@ export default function AgentManagePage() {
 
                 {/* Integration cards */}
                 {unlockedIntegrations.map((integration) => {
-                  const isExpanded = expandedIntegrations.has(integration.featureKey);
-                  const isSaving = savingIntegration === integration.featureKey;
-                  const msg = integrationSaveMsg[integration.featureKey] ?? '';
-                  const currentValues = integrationSecrets[integration.featureKey] ?? {};
+                  const sk = integrationStateKey(integration);
+                  const isExpanded = expandedIntegrations.has(sk);
+                  const isSaving = savingIntegration === sk;
+                  const msg = integrationSaveMsg[sk] ?? '';
+                  const currentValues = integrationSecrets[sk] ?? {};
                   const hasAnyConfigured = integration.fields.some((f) => hasExistingSecret(f.key));
 
                   return (
-                    <GlassCard key={integration.featureKey} className="!p-0 overflow-hidden">
+                    <GlassCard key={sk} className="!p-0 overflow-hidden">
                       {/* Header - always visible */}
                       <button
                         type="button"
-                        onClick={() => toggleIntegrationExpanded(integration.featureKey)}
+                        onClick={() => toggleIntegrationExpanded(sk)}
                         className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition-colors"
                       >
                         <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-[#f97316]/10 border border-[#f97316]/20 flex items-center justify-center">
@@ -1744,14 +1936,19 @@ export default function AgentManagePage() {
                       {/* Expanded form */}
                       {isExpanded && (
                         <div className="border-t border-white/[0.06] p-4 space-y-4">
-                          {integration.fields.map((field) => {
-                            const fieldId = `${integration.featureKey}.${field.key}`;
+                          {[...integration.fields, ...(integration.hasChannelSettings ? CHANNEL_SETTINGS_FIELDS : [])].map((field) => {
+                            const fieldId = `${sk}.${field.key}`;
                             const isVisible = visibleFields.has(fieldId);
-                            const existsAlready = hasExistingSecret(field.key);
+                            const existsAlready = !field.key.startsWith('_CS_') && hasExistingSecret(field.key);
                             const value = currentValues[field.key] ?? '';
 
                             return (
                               <div key={field.key}>
+                                {field.key === '_CS_DM_POLICY' && (
+                                  <p className="text-[10px] font-semibold uppercase tracking-wider mb-3 text-[#71717a] border-t border-white/[0.04] pt-3">
+                                    Channel Behavior
+                                  </p>
+                                )}
                                 <label htmlFor={`field-${fieldId}`} className="flex items-center gap-1.5 text-xs mb-1.5 text-[#71717a]">
                                   {field.label}
                                   {field.required && <span className="text-[#f97316]">*</span>}
@@ -1763,7 +1960,7 @@ export default function AgentManagePage() {
                                       id={`field-${fieldId}`}
                                       className="config-input text-sm appearance-none pr-8 cursor-pointer"
                                       value={value}
-                                      onChange={(e) => setIntegrationField(integration.featureKey, field.key, e.target.value)}
+                                      onChange={(e) => setIntegrationField(sk, field.key, e.target.value)}
                                     >
                                       <option value="" style={{ background: '#0D0B1A' }}>Select...</option>
                                       {field.options?.map((opt) => (
@@ -1781,7 +1978,7 @@ export default function AgentManagePage() {
                                       type={field.type === 'password' && !isVisible ? 'password' : 'text'}
                                       className="config-input text-sm pr-10"
                                       value={value}
-                                      onChange={(e) => setIntegrationField(integration.featureKey, field.key, e.target.value)}
+                                      onChange={(e) => setIntegrationField(sk, field.key, e.target.value)}
                                       placeholder={existsAlready ? '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022 (already configured)' : (field.placeholder ?? '')}
                                     />
                                     {field.type === 'password' && (
@@ -1933,10 +2130,11 @@ export default function AgentManagePage() {
                       const isUnlocking = unlocking === feature.key;
                       const activeData = activeFeatures.find((f) => f.featureKey === feature.key);
                       const integration = OPENCLAW_INTEGRATIONS.find((i) => i.featureKey === feature.key);
-                      const isExpanded = expandedIntegrations.has(feature.key);
-                      const isSaving = savingIntegration === feature.key;
-                      const integrationMsg = integrationSaveMsg[feature.key] ?? '';
-                      const currentValues = integrationSecrets[feature.key] ?? {};
+                      const sk = integration ? integrationStateKey(integration) : feature.key;
+                      const isExpanded = expandedIntegrations.has(sk);
+                      const isSaving = savingIntegration === sk;
+                      const integrationMsg = integrationSaveMsg[sk] ?? '';
+                      const currentValues = integrationSecrets[sk] ?? {};
 
                       return (
                         <GlassCard key={feature.key} className={`!p-0 overflow-hidden ${featureIsActive ? 'border-emerald-500/20' : ''}`}>
@@ -2005,7 +2203,7 @@ export default function AgentManagePage() {
                               {featureIsActive && integration && (
                                 <button
                                   type="button"
-                                  onClick={() => toggleIntegrationExpanded(feature.key)}
+                                  onClick={() => toggleIntegrationExpanded(sk)}
                                   className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-all mt-1"
                                 >
                                   <Settings size={12} />
@@ -2028,14 +2226,20 @@ export default function AgentManagePage() {
                           {/* Inline credential fields for unlocked integrations */}
                           {featureIsActive && integration && isExpanded && (
                             <div className="border-t border-white/[0.06] p-5 space-y-4 bg-white/[0.01]">
-                              {integration.fields.map((field) => {
-                                const fieldId = `integrations-tab.${integration.featureKey}.${field.key}`;
+                              {[...integration.fields, ...(integration.hasChannelSettings ? CHANNEL_SETTINGS_FIELDS : [])].map((field) => {
+                                const fieldId = `integrations-tab.${sk}.${field.key}`;
                                 const isVisible = visibleFields.has(fieldId);
-                                const existsAlready = hasExistingSecret(field.key);
+                                const existsAlready = !field.key.startsWith('_CS_') && hasExistingSecret(field.key);
                                 const value = currentValues[field.key] ?? '';
 
                                 return (
                                   <div key={field.key}>
+                                    {/* Section divider before channel settings */}
+                                    {field.key === '_CS_DM_POLICY' && (
+                                      <p className="text-[10px] font-semibold uppercase tracking-wider mb-3 text-[#71717a] border-t border-white/[0.04] pt-3">
+                                        Channel Behavior
+                                      </p>
+                                    )}
                                     <label htmlFor={`field-${fieldId}`} className="flex items-center gap-1.5 text-xs mb-1.5 text-[#71717a]">
                                       {field.label}
                                       {field.required && <span className="text-[#f97316]">*</span>}
@@ -2047,7 +2251,7 @@ export default function AgentManagePage() {
                                           id={`field-${fieldId}`}
                                           className="config-input text-sm appearance-none pr-8 cursor-pointer"
                                           value={value}
-                                          onChange={(e) => setIntegrationField(integration.featureKey, field.key, e.target.value)}
+                                          onChange={(e) => setIntegrationField(sk, field.key, e.target.value)}
                                         >
                                           <option value="" style={{ background: '#0D0B1A' }}>Select...</option>
                                           {field.options?.map((opt) => (
@@ -2065,7 +2269,7 @@ export default function AgentManagePage() {
                                           type={field.type === 'password' && !isVisible ? 'password' : 'text'}
                                           className="config-input text-sm pr-10"
                                           value={value}
-                                          onChange={(e) => setIntegrationField(integration.featureKey, field.key, e.target.value)}
+                                          onChange={(e) => setIntegrationField(sk, field.key, e.target.value)}
                                           placeholder={existsAlready ? '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022 (already configured)' : (field.placeholder ?? '')}
                                         />
                                         {field.type === 'password' && (
@@ -2127,32 +2331,21 @@ export default function AgentManagePage() {
                     <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[#71717a]">
                       Other Platforms
                     </h3>
-                    <GlassCard className={extraIsActive ? 'border-emerald-500/20' : ''}>
-                      <div className="flex items-start gap-3">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${extraIsActive ? 'bg-emerald-500/15' : 'bg-white/5'}`}>
-                          {extraIsActive ? (
-                            <CheckCircle size={18} className="text-emerald-400" />
-                          ) : (
+
+                    {/* Unlock card (shown when not yet unlocked) */}
+                    {!extraIsActive && (
+                      <GlassCard>
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-white/5">
                             <Lock size={18} className="text-[#71717a]" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-sm font-medium text-[#FFFFFF]">All Platforms</span>
-                            {extraIsActive && (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
-                                Unlocked
-                              </span>
-                            )}
                           </div>
-                          <p className="text-xs mb-2 text-[#71717a]">
-                            Unlock 15+ additional platforms including Twitch, Matrix, IRC, Line, WeChat, and more.
-                          </p>
-                          {extraIsActive ? (
-                            <p className="text-xs text-emerald-400/80">
-                              All platforms enabled. Configure additional platform credentials via your agent&apos;s openclaw.json config.
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-sm font-medium text-[#FFFFFF]">All Platforms</span>
+                            </div>
+                            <p className="text-xs mb-2 text-[#71717a]">
+                              Unlock 12+ additional platforms including Twitch, Matrix, IRC, Line, Teams, and more.
                             </p>
-                          ) : (
                             <button
                               onClick={() => handleUnlockFeature('openclaw.platform.extra', extraFeature.usdPrice)}
                               disabled={isUnlockingExtra}
@@ -2167,15 +2360,154 @@ export default function AgentManagePage() {
                                 </>
                               )}
                             </button>
-                          )}
+                          </div>
+                          <div className="flex-shrink-0">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
+                              One-time
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex-shrink-0">
-                          <span className="text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
-                            One-time
-                          </span>
+                      </GlassCard>
+                    )}
+
+                    {/* Configurable extra platform cards (shown when unlocked) */}
+                    {extraIsActive && (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <CheckCircle size={14} className="text-emerald-400" />
+                          <span className="text-xs text-emerald-400/80">All platforms unlocked — configure credentials below</span>
                         </div>
+                        {EXTRA_PLATFORM_INTEGRATIONS.map((integration) => {
+                          const sk = integrationStateKey(integration);
+                          const isExpanded = expandedIntegrations.has(sk);
+                          const isSaving = savingIntegration === sk;
+                          const msg = integrationSaveMsg[sk] ?? '';
+                          const vals = integrationSecrets[sk] ?? {};
+                          const hasAnyConfigured = integration.fields.some((f) => hasExistingSecret(f.key));
+
+                          return (
+                            <GlassCard key={sk} className={`!p-0 overflow-hidden ${hasAnyConfigured ? 'border-emerald-500/20' : ''}`}>
+                              <button
+                                type="button"
+                                onClick={() => toggleIntegrationExpanded(sk)}
+                                className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition-colors"
+                              >
+                                <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${hasAnyConfigured ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-white/5 border border-white/[0.06]'}`}>
+                                  {hasAnyConfigured ? (
+                                    <CheckCircle size={14} className="text-emerald-400" />
+                                  ) : (
+                                    <Settings size={14} className="text-[#71717a]" />
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium text-[#FFFFFF]">{integration.name}</span>
+                                    {hasAnyConfigured && (
+                                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#f97316]/15 text-[#f97316] border border-[#f97316]/20">
+                                        Configured
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs mt-0.5 truncate text-[#71717a]">{integration.description}</p>
+                                </div>
+                                {isExpanded
+                                  ? <ChevronUp size={16} className="text-[#71717a]" />
+                                  : <ChevronDown size={16} className="text-[#71717a]" />
+                                }
+                              </button>
+
+                              {isExpanded && (
+                                <div className="border-t border-white/[0.06] p-4 space-y-4 bg-white/[0.01]">
+                                  {[...integration.fields, ...(integration.hasChannelSettings ? CHANNEL_SETTINGS_FIELDS : [])].map((field) => {
+                                    const fieldId = `extra.${sk}.${field.key}`;
+                                    const isVisible = visibleFields.has(fieldId);
+                                    const existsAlready = !field.key.startsWith('_CS_') && hasExistingSecret(field.key);
+                                    const value = vals[field.key] ?? '';
+
+                                    return (
+                                      <div key={field.key}>
+                                        {field.key === '_CS_DM_POLICY' && (
+                                          <p className="text-[10px] font-semibold uppercase tracking-wider mb-3 text-[#71717a] border-t border-white/[0.04] pt-3">
+                                            Channel Behavior
+                                          </p>
+                                        )}
+                                        <label htmlFor={`field-${fieldId}`} className="flex items-center gap-1.5 text-xs mb-1.5 text-[#71717a]">
+                                          {field.label}
+                                          {field.required && <span className="text-[#f97316]">*</span>}
+                                        </label>
+
+                                        {field.type === 'select' ? (
+                                          <div className="relative">
+                                            <select
+                                              id={`field-${fieldId}`}
+                                              className="config-input text-sm appearance-none pr-8 cursor-pointer"
+                                              value={value}
+                                              onChange={(e) => setIntegrationField(sk, field.key, e.target.value)}
+                                            >
+                                              <option value="" style={{ background: '#0D0B1A' }}>Select...</option>
+                                              {field.options?.map((opt) => (
+                                                <option key={opt.value} value={opt.value} style={{ background: '#0D0B1A' }}>
+                                                  {opt.label}
+                                                </option>
+                                              ))}
+                                            </select>
+                                            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                                          </div>
+                                        ) : (
+                                          <div className="relative">
+                                            <input
+                                              id={`field-${fieldId}`}
+                                              type={field.type === 'password' && !isVisible ? 'password' : 'text'}
+                                              className="config-input text-sm pr-10"
+                                              value={value}
+                                              onChange={(e) => setIntegrationField(sk, field.key, e.target.value)}
+                                              placeholder={existsAlready ? '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022 (already configured)' : (field.placeholder ?? '')}
+                                            />
+                                            {field.type === 'password' && (
+                                              <button
+                                                type="button"
+                                                onClick={() => toggleFieldVisibility(fieldId)}
+                                                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-white/5 rounded transition-colors"
+                                              >
+                                                {isVisible
+                                                  ? <EyeOff size={14} className="text-[#71717a]" />
+                                                  : <Eye size={14} className="text-[#71717a]" />
+                                                }
+                                              </button>
+                                            )}
+                                          </div>
+                                        )}
+
+                                        {field.helper && (
+                                          <p className="text-[10px] mt-1 leading-relaxed text-[#71717a]">
+                                            {field.helper}
+                                          </p>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+
+                                  <div className="flex items-center gap-3 pt-2 border-t border-white/[0.04]">
+                                    <button
+                                      onClick={() => saveIntegrationSecrets(integration)}
+                                      disabled={isSaving}
+                                      className="px-4 py-2 rounded-lg text-xs font-medium text-white transition-all disabled:opacity-40 hover:opacity-90 bg-[#f97316]"
+                                    >
+                                      {isSaving ? 'Saving...' : 'Save Credentials'}
+                                    </button>
+                                    {msg && (
+                                      <span className={`text-xs ${msg.startsWith('Error') || msg.startsWith('Missing') ? 'text-red-400' : 'text-emerald-400'}`}>
+                                        {msg}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </GlassCard>
+                          );
+                        })}
                       </div>
-                    </GlassCard>
+                    )}
                   </div>
                 );
               })()}
