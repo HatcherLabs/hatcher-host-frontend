@@ -457,6 +457,7 @@ export default function DashboardPage() {
   }, [recentActivity, activityFilter]);
 
   const activeCount = agents.filter((a) => a.status === 'active').length;
+  const totalMessages = agents.reduce((sum, a) => sum + ((a as Agent & { messageCount?: number }).messageCount ?? 0), 0);
   const addr = publicKey?.toString() ?? '';
   const shortAddr = addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : '';
 
@@ -640,13 +641,41 @@ export default function DashboardPage() {
             subtitle="Unlocked"
           />
           <StatCard
-            label="Active Rate"
-            value={agents.length > 0 ? `${Math.round((activeCount / agents.length) * 100)}%` : '—'}
-            change={0}
-            donutValue={agents.length > 0 ? Math.round((activeCount / agents.length) * 100) : 0}
+            label="Messages"
+            value={`${totalMessages}`}
+            change={totalMessages > 0 ? 100 : 0}
+            donutValue={Math.min(totalMessages * 5, 100)}
             donutColor={COLORS.amber}
-            subtitle={`${activeCount} of ${agents.length} agents`}
+            subtitle="All time"
           />
+        </motion.div>
+
+        {/* ── Quick Actions Bar ──────────────────────────── */}
+        <motion.div className="flex flex-wrap items-center gap-3" variants={itemVariants}>
+          <Link
+            href="/create"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 shadow-lg"
+            style={{ background: COLORS.accent, boxShadow: `0 4px 16px ${COLORS.accent}30` }}
+          >
+            <Zap size={15} />
+            Create Agent
+          </Link>
+          <Link
+            href="/dashboard/agents"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-80 border"
+            style={{ color: COLORS.textSecondary, borderColor: COLORS.cardBorder, background: 'rgba(255,255,255,0.02)' }}
+          >
+            <Bot size={15} />
+            My Agents ({agents.length})
+          </Link>
+          <Link
+            href="/explore"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-80 border"
+            style={{ color: COLORS.textSecondary, borderColor: COLORS.cardBorder, background: 'rgba(255,255,255,0.02)' }}
+          >
+            <Globe size={15} />
+            Explore
+          </Link>
         </motion.div>
 
         <div className="divider-glow" />
