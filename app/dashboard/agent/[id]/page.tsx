@@ -861,19 +861,25 @@ export default function AgentManagePage() {
       },
     };
 
-    const res = await api.updateAgent(id, updateData as Parameters<typeof api.updateAgent>[1]);
-    setSavingIntegration(null);
+    try {
+      const res = await api.updateAgent(id, updateData as Parameters<typeof api.updateAgent>[1]);
+      setSavingIntegration(null);
 
-    if (res.success) {
-      setAgent(res.data);
-      setIntegrationSecrets((prev) => ({ ...prev, [sk]: {} }));
-      const restartNote = (res.data as unknown as Record<string, unknown>)?.restarted
-        ? ' — container restarting with new config'
-        : '';
-      setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: `Credentials saved and encrypted${restartNote}` }));
+      if (res.success) {
+        setAgent(res.data);
+        setIntegrationSecrets((prev) => ({ ...prev, [sk]: {} }));
+        const restartNote = (res.data as unknown as Record<string, unknown>)?.restarted
+          ? ' — container restarting with new config'
+          : '';
+        setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: `Credentials saved and encrypted${restartNote}` }));
+        setTimeout(() => setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: '' })), 5000);
+      } else {
+        setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: 'Error: ' + res.error }));
+      }
+    } catch {
+      setSavingIntegration(null);
+      setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: 'Failed to save credentials. Check your connection.' }));
       setTimeout(() => setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: '' })), 5000);
-    } else {
-      setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: 'Error: ' + res.error }));
     }
   };
 
