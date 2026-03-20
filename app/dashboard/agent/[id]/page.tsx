@@ -2645,6 +2645,49 @@ export default function AgentManagePage() {
             </div>
           </div>
 
+          {/* LLM Configuration */}
+          <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
+            <div className="flex items-center gap-2 mb-4">
+              <Cpu size={18} className="text-[#f97316]" />
+              <h3 className="text-base font-semibold text-[#fafafa]">LLM Configuration</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
+                <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Provider</p>
+                <div className="flex items-center gap-2">
+                  {currentProviderMeta?.icon && (
+                    <span className="text-lg">{currentProviderMeta.icon}</span>
+                  )}
+                  <p className="text-sm font-medium text-[#fafafa] capitalize">{currentProviderMeta?.name ?? llmProvider}</p>
+                </div>
+              </div>
+              <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
+                <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Model</p>
+                <p className="text-sm font-medium text-[#fafafa] font-mono">
+                  {(() => {
+                    const cfg = (agent?.config ?? {}) as Record<string, unknown>;
+                    const byok = cfg.byok as Record<string, unknown> | undefined;
+                    return (byok?.model as string) ?? (cfg.model as string) ?? 'Default';
+                  })()}
+                </p>
+              </div>
+              <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
+                <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">API Key</p>
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                  hasApiKey
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                    : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                }`}>
+                  {hasApiKey ? (
+                    <><Shield size={12} /> BYOK Active</>
+                  ) : (
+                    <>Free Tier (Groq)</>
+                  )}
+                </span>
+              </div>
+            </div>
+          </div>
+
           {/* Active Features */}
           <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
             <div className="flex items-center gap-2 mb-4">
