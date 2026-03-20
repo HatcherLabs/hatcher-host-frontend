@@ -1,0 +1,57 @@
+{
+  "name": "hatcher-host-frontend",
+  "version": "1.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run build:shared && next dev",
+    "build": "npm run build:shared && next build",
+    "build:shared": "cd packages/shared && npm run build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf .next node_modules packages/shared/dist",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@hatcher/shared": "*",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@solana/wallet-adapter-base": "^0.9.25",
+    "@solana/wallet-adapter-phantom": "^0.9.25",
+    "@solana/wallet-adapter-react": "^0.15.38",
+    "@solana/wallet-adapter-react-ui": "^0.9.38",
+    "@solana/wallet-adapter-solflare": "^0.6.31",
+    "@solana/web3.js": "^1.98.0",
+    "@splinetool/react-spline": "^4.1.0",
+    "@splinetool/runtime": "^1.12.69",
+    "canvas-confetti": "^1.9.4",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^0.468.0",
+    "next": "14.2.35",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^3.8.0",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^2.6.0"
+  },
+  "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "14.2.35",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.2",
+    "vitest": "^4.0.18"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
