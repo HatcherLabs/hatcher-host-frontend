@@ -20,7 +20,7 @@ export default function DashboardLoading() {
         {/* Stat cards skeleton */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="card p-5">
+            <div key={i} className="card glass-noise p-5">
               <div className="h-3 w-20 rounded shimmer mb-4" />
               <div className="h-8 w-16 rounded shimmer mb-3" />
               <div className="h-3 w-24 rounded shimmer" />
@@ -37,11 +37,11 @@ export default function DashboardLoading() {
 
         {/* Charts skeleton */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-          <div className="lg:col-span-3 card p-5">
+          <div className="lg:col-span-3 card glass-noise p-5">
             <div className="h-5 w-32 rounded shimmer mb-6" />
             <div className="h-[220px] rounded-xl shimmer" />
           </div>
-          <div className="lg:col-span-2 card p-5">
+          <div className="lg:col-span-2 card glass-noise p-5">
             <div className="h-5 w-28 rounded shimmer mb-6" />
             <div className="flex justify-center mb-6">
               <div className="w-40 h-40 rounded-full shimmer" />
