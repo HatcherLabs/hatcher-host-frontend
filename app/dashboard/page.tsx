@@ -812,7 +812,7 @@ export default function DashboardPage() {
                   <div className="space-y-2.5 pl-2">
                     {group.items.map((item, ii) => (
                       <div
-                        key={ii}
+                        key={`${item.tag}-${item.ago}-${ii}`}
                         className="flex items-center gap-3 p-3 rounded-xl"
                         style={{ background: 'rgba(255,255,255,0.02)' }}
                       >

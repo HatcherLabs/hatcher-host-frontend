@@ -106,7 +106,7 @@ export function LogsTab() {
           ) : (
             filteredLogs.map((log, i) => (
               <div
-                key={i}
+                key={`${log.timestamp}-${i}`}
                 className={`log-line log-line-${log.level}`}
               >
                 <span className="log-timestamp">
