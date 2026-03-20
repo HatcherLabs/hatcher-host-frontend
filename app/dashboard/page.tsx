@@ -26,18 +26,23 @@ import {
   Wallet,
   Globe,
 } from 'lucide-react';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-} from 'recharts';
+import dynamic from 'next/dynamic';
+
+// Dynamically import recharts-based chart components (SSR disabled — recharts needs DOM)
+const MiniDonut = dynamic(
+  () => import('@/components/dashboard/DashboardCharts').then(mod => ({ default: mod.MiniDonut })),
+  { ssr: false, loading: () => <div className="shimmer rounded-full" style={{ width: 44, height: 44 }} /> }
+);
+
+const FeatureDonut = dynamic(
+  () => import('@/components/dashboard/DashboardCharts').then(mod => ({ default: mod.FeatureDonut })),
+  { ssr: false, loading: () => <div className="shimmer rounded-full" style={{ width: 160, height: 160 }} /> }
+);
+
+const AgentStatusChart = dynamic(
+  () => import('@/components/dashboard/DashboardCharts').then(mod => ({ default: mod.AgentStatusChart })),
+  { ssr: false, loading: () => <div className="shimmer rounded-xl" style={{ width: '100%', height: 220 }} /> }
+);
 
 // ── Color constants ─────────────────────────────────────────
 const COLORS = {
@@ -111,43 +116,7 @@ const AnimatedValue = memo(function AnimatedValue({ value, suffix = '' }: { valu
   return <>{display}{rest}{suffix}</>;
 });
 
-// ── Mini Donut for Stat Cards ───────────────────────────────
-function MiniDonut({
-  value,
-  color,
-  size = 44,
-}: {
-  value: number;
-  color: string;
-  size?: number;
-}) {
-  const data = [
-    { name: 'filled', value: value },
-    { name: 'empty', value: 100 - value },
-  ];
-  return (
-    <div style={{ width: size, height: size }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            innerRadius={size * 0.32}
-            outerRadius={size * 0.46}
-            startAngle={90}
-            endAngle={-270}
-            dataKey="value"
-            stroke="none"
-          >
-            <Cell fill={color} />
-            <Cell fill={color + '20'} />
-          </Pie>
-        </PieChart>
-      </ResponsiveContainer>
-    </div>
-  );
-}
+// MiniDonut is dynamically imported from DashboardCharts (see top of file)
 
 // ── Stat Card component ─────────────────────────────────────
 function StatCard({
@@ -602,6 +571,9 @@ export default function DashboardPage() {
                 className="bg-transparent outline-none text-sm w-full sm:w-48 placeholder:opacity-50"
                 style={{ color: COLORS.textPrimary }}
               />
+              <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono rounded" style={{ color: COLORS.textMuted, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                ⌘K
+              </kbd>
             </div>
             <Link
               href="/settings"
@@ -716,43 +688,7 @@ export default function DashboardPage() {
                 </Link>
               </div>
             ) : (
-              <div style={{ width: '100%', height: 220 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={agentStatusData}
-                    margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(46,43,74,0.3)" vertical={false} />
-                    <XAxis
-                      dataKey="name"
-                      tick={{ fill: COLORS.textMuted, fontSize: 12 }}
-                      axisLine={{ stroke: COLORS.cardBorder }}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      allowDecimals={false}
-                      tick={{ fill: COLORS.textMuted, fontSize: 12 }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        background: '#252240',
-                        border: '1px solid rgba(46,43,74,0.6)',
-                        borderRadius: '12px',
-                        color: COLORS.textPrimary,
-                        fontSize: '13px',
-                      }}
-                      cursor={{ fill: 'rgba(249,115,22,0.06)' }}
-                    />
-                    <Bar dataKey="count" radius={[8, 8, 0, 0]} maxBarSize={48}>
-                      {agentStatusData.map((entry, index) => (
-                        <Cell key={index} fill={entry.color} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+              <AgentStatusChart data={agentStatusData} />
             )}
           </Card>
 
@@ -772,38 +708,7 @@ export default function DashboardPage() {
 
             {/* Donut chart with center label */}
             <div className="flex justify-center mb-4">
-              <div className="relative" style={{ width: 160, height: 160 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={featureCategories}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={72}
-                      paddingAngle={3}
-                      dataKey="value"
-                      stroke="none"
-                    >
-                      {featureCategories.map((entry, index) => (
-                        <Cell key={index} fill={entry.color} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-                {/* Center total */}
-                <div
-                  className="absolute inset-0 flex flex-col items-center justify-center"
-                  style={{ pointerEvents: 'none' }}
-                >
-                  <span className="font-bold text-2xl" style={{ color: COLORS.textPrimary }}>
-                    {featureTotal}
-                  </span>
-                  <span className="text-xs" style={{ color: COLORS.textMuted }}>
-                    Total
-                  </span>
-                </div>
-              </div>
+              <FeatureDonut data={featureCategories} total={featureTotal} />
             </div>
 
             {/* Legend */}

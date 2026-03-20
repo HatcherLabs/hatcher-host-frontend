@@ -5,6 +5,7 @@ import './globals.css';
 import { WalletProvider } from '@/components/providers/WalletProvider';
 import { LayoutShell } from '@/components/layout/LayoutShell';
 import { ToastProvider } from '@/components/ui/ToastProvider';
+import { CommandPalette } from '@/components/ui/CommandPalette';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <WalletProvider>
           <ToastProvider>
             <LayoutShell>{children}</LayoutShell>
+            <CommandPalette />
           </ToastProvider>
         </WalletProvider>
       </body>

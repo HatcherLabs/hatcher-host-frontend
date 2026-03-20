@@ -36,6 +36,9 @@ export function Header() {
   const walletAddress = publicKey?.toString() ?? '';
   const isAdmin = ADMIN_WALLET ? walletAddress === ADMIN_WALLET : false;
 
+  // On dashboard/create/settings routes, sidebar handles navigation — hide header nav
+  const hasSidebar = pathname.startsWith('/dashboard') || pathname === '/create' || pathname === '/settings';
+
   return (
     <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-black/50 backdrop-blur-xl">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -94,8 +97,8 @@ export function Header() {
             )}
           </div>
 
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-0.5 relative" aria-label="Main navigation">
+          {/* Desktop Nav — hidden when sidebar is present */}
+          <nav className={`${hasSidebar ? 'hidden' : 'hidden lg:flex'} items-center gap-0.5 relative`} aria-label="Main navigation">
             {NAV_LINKS.map((link) => {
               const active = isActive(pathname, link.href);
               return (
@@ -136,9 +139,9 @@ export function Header() {
           <div className="flex items-center gap-3">
             <WalletMultiButton />
 
-            {/* Hamburger -- mobile/tablet only */}
+            {/* Hamburger -- mobile/tablet only, hidden on sidebar routes */}
             <button
-              className="lg:hidden flex flex-col justify-center items-center w-10 h-10 rounded-lg hover:bg-[rgba(249,115,22,0.1)] transition-colors gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+              className={`${hasSidebar ? 'hidden' : 'lg:hidden'} flex flex-col justify-center items-center w-10 h-10 rounded-lg hover:bg-[rgba(249,115,22,0.1)] transition-colors gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500`}
               onClick={() => setMobileOpen((o) => !o)}
               aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={mobileOpen}

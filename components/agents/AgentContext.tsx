@@ -358,7 +358,7 @@ export interface AgentContextValue {
   isActive: boolean;
   isNotActive: boolean;
   statusInfo: { classes: string; label: string; pulse: boolean; dotColor: string };
-  frameworkMeta: { name: string; icon: string; description: string } | undefined;
+  frameworkMeta: import('@hatcher/shared').FrameworkMeta | undefined;
 
   // Tab
   tab: Tab;

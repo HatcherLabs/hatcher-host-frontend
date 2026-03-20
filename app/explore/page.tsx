@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
@@ -10,16 +10,24 @@ import { RobotMascot } from '@/components/ui/RobotMascot';
 import {
   AlertTriangle,
   Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
   Layers,
+  Loader2,
   MessageSquare,
   Plus,
   RefreshCw,
   Search,
+  SearchX,
   Sparkles,
+  X,
 } from 'lucide-react';
 
 type SortOption = 'newest' | 'most_features' | 'most_messages' | 'name_az';
 type StatusFilter = 'all' | 'active' | 'sleeping' | 'paused' | 'error' | 'restarting';
+
+const PAGE_SIZE = 12;
 
 const SORT_LABELS: Record<SortOption, string> = {
   newest: 'Newest',
@@ -37,11 +45,30 @@ const STATUS_FILTER_LABELS: Record<StatusFilter, string> = {
   restarting: 'Restarting',
 };
 
+const STATUS_ICONS: Record<StatusFilter, string> = {
+  all: '',
+  active: 'bg-green-400',
+  sleeping: 'bg-blue-400',
+  paused: 'bg-amber-400',
+  error: 'bg-red-400',
+  restarting: 'bg-cyan-400',
+};
+
 const cardClass = 'card glass-noise';
 
 import { AGENT_STATUS_CONFIG, type AgentStatus } from '@hatcher/shared';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; pulse: boolean }> = AGENT_STATUS_CONFIG;
+
+// ── Debounce hook ────────────────────────────────────────────
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debouncedValue;
+}
 
 // ── Animation variants ───────────────────────────────────────
 const pageVariants = {
@@ -85,8 +112,14 @@ export default function ExplorePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<SortOption>('newest');
-  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [page, setPage] = useState(1);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  // Debounce search input by 300ms
+  const search = useDebounce(searchInput, 300);
+  const isSearching = searchInput !== search;
 
   const fetchAgents = useCallback(() => {
     setLoading(true);
@@ -107,6 +140,11 @@ export default function ExplorePage() {
   useEffect(() => {
     fetchAgents();
   }, [fetchAgents]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [search, statusFilter, sort]);
 
   const filtered = useMemo(() => {
     let result = [...agents];
@@ -136,7 +174,25 @@ export default function ExplorePage() {
     return result;
   }, [agents, sort, search, statusFilter]);
 
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paginatedAgents = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  const goToPage = useCallback((p: number) => {
+    setPage(p);
+    // Scroll grid into view smoothly
+    gridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
+
   const activeCount = agents.filter((a) => a.status === 'active').length;
+  const hasActiveFilters = statusFilter !== 'all' || search.trim() !== '';
+
+  const clearAllFilters = useCallback(() => {
+    setSearchInput('');
+    setStatusFilter('all');
+    setSort('newest');
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -179,144 +235,305 @@ export default function ExplorePage() {
         {/* ── Search + Filter Bar ────────────────────────── */}
         {!loading && !error && agents.length > 0 && (
           <motion.div
-            className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8"
+            className="flex flex-col gap-4 mb-8"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.4 }}
           >
-            {/* Search */}
-            <div className="relative w-full sm:w-80 group/search">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none group-focus-within/search:text-[var(--accent-400)] transition-colors duration-200" />
-              <input
-                type="text"
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[#f97316]/50 focus:shadow-[0_0_16px_rgba(249,115,22,0.12)] transition-all duration-200 backdrop-blur-xl"
-                placeholder="Search agents..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              {search && (
-                <button
-                  onClick={() => setSearch('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors text-xs"
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              {/* Search */}
+              <div className="relative w-full sm:w-80 group/search">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none group-focus-within/search:text-[#f97316] transition-colors duration-200" />
+                <input
+                  type="text"
+                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[#f97316]/50 focus:shadow-[0_0_16px_rgba(249,115,22,0.12)] transition-all duration-200 backdrop-blur-xl"
+                  placeholder="Search agents by name or description..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                />
+                {searchInput && (
+                  <button
+                    onClick={() => setSearchInput('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[rgba(249,115,22,0.1)] transition-all duration-150"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+                {/* Debounce indicator */}
+                {isSearching && (
+                  <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                    <Loader2 className="w-3.5 h-3.5 text-[#f97316] animate-spin" />
+                  </div>
+                )}
+              </div>
+
+              {/* Status filter */}
+              <div className="flex gap-1 bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto">
+                {(Object.entries(STATUS_FILTER_LABELS) as [StatusFilter, string][]).map(([val, label]) => (
+                  <button
+                    key={val}
+                    onClick={() => setStatusFilter(val)}
+                    className={cn(
+                      'px-3 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium whitespace-nowrap flex items-center gap-1.5',
+                      statusFilter === val
+                        ? 'bg-[#f97316] text-white shadow-[0_0_12px_rgba(249,115,22,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
+                        : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[rgba(249,115,22,0.05)]'
+                    )}
+                  >
+                    {val !== 'all' && (
+                      <span className={cn(
+                        'w-1.5 h-1.5 rounded-full',
+                        statusFilter === val ? 'bg-white' : STATUS_ICONS[val]
+                      )} />
+                    )}
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Sort */}
+              <div className="flex gap-1 bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto">
+                {(Object.entries(SORT_LABELS) as [SortOption, string][]).map(([val, label]) => (
+                  <button
+                    key={val}
+                    onClick={() => setSort(val)}
+                    className={cn(
+                      'px-4 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium whitespace-nowrap',
+                      sort === val
+                        ? 'bg-[#f97316] text-white shadow-[0_0_12px_rgba(249,115,22,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
+                        : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[rgba(249,115,22,0.05)]'
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Results summary bar */}
+            <div className="flex items-center justify-between">
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={`${filtered.length}-${search}-${statusFilter}`}
+                  className="text-sm text-[var(--text-muted)]"
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  Clear
-                </button>
+                  {hasActiveFilters ? (
+                    <>
+                      Showing <span className="text-[var(--text-secondary)] font-medium">{filtered.length}</span> of{' '}
+                      <span className="text-[var(--text-secondary)] font-medium">{agents.length}</span> agents
+                      {isSearching && <span className="text-[#f97316] ml-2">searching...</span>}
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-[var(--text-secondary)] font-medium">{agents.length}</span> agent{agents.length !== 1 ? 's' : ''}
+                      {totalPages > 1 && (
+                        <span className="ml-2">
+                          — page {safePage} of {totalPages}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </motion.p>
+              </AnimatePresence>
+
+              {hasActiveFilters && (
+                <motion.button
+                  className="flex items-center gap-1.5 text-xs font-medium text-[#f97316] hover:text-[#fb923c] transition-colors duration-150 px-2.5 py-1 rounded-lg hover:bg-[rgba(249,115,22,0.08)]"
+                  onClick={clearAllFilters}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                >
+                  <X className="w-3 h-3" />
+                  Clear all filters
+                </motion.button>
               )}
-            </div>
-
-            {/* Status filter */}
-            <div className="flex gap-1 bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1">
-              {(Object.entries(STATUS_FILTER_LABELS) as [StatusFilter, string][]).map(([val, label]) => (
-                <button
-                  key={val}
-                  onClick={() => setStatusFilter(val)}
-                  className={cn(
-                    'px-3 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium',
-                    statusFilter === val
-                      ? 'bg-[var(--accent-600)] text-white shadow-[0_0_12px_rgba(249,115,22,0.25)]'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[rgba(249,115,22,0.05)]'
-                  )}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-
-            {/* Sort */}
-            <div className="flex gap-1 bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1">
-              {(Object.entries(SORT_LABELS) as [SortOption, string][]).map(([val, label]) => (
-                <button
-                  key={val}
-                  onClick={() => setSort(val)}
-                  className={cn(
-                    'px-4 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium',
-                    sort === val
-                      ? 'bg-[var(--accent-600)] text-white shadow-[0_0_12px_rgba(249,115,22,0.25)]'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[rgba(249,115,22,0.05)]'
-                  )}
-                >
-                  {label}
-                </button>
-              ))}
             </div>
           </motion.div>
         )}
 
         {/* Content */}
-        {loading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <AgentSkeleton key={i} />
-            ))}
-          </div>
-        ) : error ? (
-          <div className={cn(cardClass, 'p-8 text-center')}>
-            <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
-            <p className="text-red-400 text-sm">{error}</p>
-            <p className="text-[#71717a] text-xs mt-2">Check your connection and try again</p>
-            <button
-              onClick={fetchAgents}
-              className="btn-secondary inline-flex items-center gap-2 mt-4"
+        <div ref={gridRef} className="scroll-mt-8">
+          {loading ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: PAGE_SIZE }, (_, i) => (
+                <AgentSkeleton key={i} />
+              ))}
+            </div>
+          ) : error ? (
+            <div className={cn(cardClass, 'p-8 text-center')}>
+              <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
+              <p className="text-red-400 text-sm">{error}</p>
+              <p className="text-[var(--text-muted)] text-xs mt-2">Check your connection and try again</p>
+              <button
+                onClick={fetchAgents}
+                className="btn-secondary inline-flex items-center gap-2 mt-4"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Retry
+              </button>
+            </div>
+          ) : agents.length === 0 ? (
+            <motion.div
+              className={cn(cardClass, 'p-16 text-center')}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
             >
-              <RefreshCw className="w-4 h-4" />
-              Retry
-            </button>
-          </div>
-        ) : agents.length === 0 ? (
-          <motion.div
-            className={cn(cardClass, 'p-16 text-center')}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <RobotMascot size="lg" mood="confused" className="mx-auto mb-6" />
-            <h3 className="text-xl font-medium text-[#FFFFFF] mb-2">No agents yet</h3>
-            <p className="text-[#71717a] mb-6">Be the first to hatch an agent!</p>
-            <Link
-              href="/create"
-              className="btn-primary"
+              <RobotMascot size="lg" mood="confused" className="mx-auto mb-6" />
+              <h3 className="text-xl font-medium text-[var(--text-primary)] mb-2">No agents yet</h3>
+              <p className="text-[var(--text-muted)] mb-6">Be the first to hatch an agent!</p>
+              <Link
+                href="/create"
+                className="btn-primary"
+              >
+                <Plus className="w-4 h-4" />
+                Create Agent
+              </Link>
+            </motion.div>
+          ) : filtered.length === 0 ? (
+            <motion.div
+              className={cn(cardClass, 'p-16 text-center max-w-lg mx-auto')}
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
             >
-              <Plus className="w-4 h-4" />
-              Create Agent
-            </Link>
-          </motion.div>
-        ) : filtered.length === 0 ? (
-          <motion.div
-            className={cn(cardClass, 'p-16 text-center')}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <Search className="w-10 h-10 text-[#71717a] mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-[#FFFFFF] mb-2">No agents found</h3>
-            <p className="text-[#71717a] text-sm mb-4">Try a different search or filter.</p>
-            <button
-              className="text-[#f97316] hover:text-[#f97316] text-sm font-medium transition-colors"
-              onClick={() => { setSearch(''); setStatusFilter('all'); }}
-            >
-              Clear filters
-            </button>
-          </motion.div>
-        ) : (
-          <motion.div
-            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
-            variants={pageVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {filtered.map((agent) => (
-              <ExploreAgentCard key={agent.id} agent={agent} />
-            ))}
-          </motion.div>
-        )}
+              <div className="w-16 h-16 rounded-2xl bg-[rgba(249,115,22,0.08)] border border-[rgba(249,115,22,0.15)] flex items-center justify-center mx-auto mb-5">
+                <SearchX className="w-8 h-8 text-[#f97316]/60" />
+              </div>
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">No agents found</h3>
+              <p className="text-[var(--text-muted)] text-sm mb-1.5">
+                {search
+                  ? `No results for "${search.length > 30 ? search.slice(0, 30) + '...' : search}"`
+                  : 'No agents match the selected filters.'}
+              </p>
+              <p className="text-[var(--text-muted)] text-xs mb-6">
+                Try adjusting your search or filter criteria.
+              </p>
+              <button
+                className="btn-secondary inline-flex items-center gap-2"
+                onClick={clearAllFilters}
+              >
+                <Filter className="w-3.5 h-3.5" />
+                Clear all filters
+              </button>
+            </motion.div>
+          ) : (
+            <>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`page-${safePage}-${search}-${statusFilter}-${sort}`}
+                  className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                  variants={pageVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit={{ opacity: 0, transition: { duration: 0.15 } }}
+                >
+                  {paginatedAgents.map((agent) => (
+                    <ExploreAgentCard key={agent.id} agent={agent} />
+                  ))}
+                </motion.div>
+              </AnimatePresence>
 
-        {/* Results count when filtering */}
-        {!loading && !error && agents.length > 0 && filtered.length > 0 && search && (
-          <p className="text-center text-sm text-[#71717a] mt-8">
-            Showing {filtered.length} of {agents.length} agents
-          </p>
-        )}
+              {/* ── Pagination ──────────────────────────── */}
+              {totalPages > 1 && (
+                <motion.div
+                  className="flex items-center justify-center gap-2 mt-10"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  {/* Previous */}
+                  <button
+                    onClick={() => goToPage(safePage - 1)}
+                    disabled={safePage <= 1}
+                    className={cn(
+                      'p-2 rounded-xl transition-all duration-200',
+                      safePage <= 1
+                        ? 'text-[var(--text-muted)]/30 cursor-not-allowed'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[rgba(249,115,22,0.08)]'
+                    )}
+                    aria-label="Previous page"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+
+                  {/* Page numbers */}
+                  <div className="flex items-center gap-1">
+                    {generatePageNumbers(safePage, totalPages).map((p, idx) =>
+                      p === '...' ? (
+                        <span key={`ellipsis-${idx}`} className="px-1.5 text-[var(--text-muted)] text-sm select-none">
+                          ...
+                        </span>
+                      ) : (
+                        <button
+                          key={p}
+                          onClick={() => goToPage(p as number)}
+                          className={cn(
+                            'min-w-[36px] h-9 rounded-xl text-sm font-medium transition-all duration-200',
+                            safePage === p
+                              ? 'bg-[#f97316] text-white shadow-[0_0_16px_rgba(249,115,22,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
+                              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[rgba(249,115,22,0.08)]'
+                          )}
+                        >
+                          {p}
+                        </button>
+                      )
+                    )}
+                  </div>
+
+                  {/* Next */}
+                  <button
+                    onClick={() => goToPage(safePage + 1)}
+                    disabled={safePage >= totalPages}
+                    className={cn(
+                      'p-2 rounded-xl transition-all duration-200',
+                      safePage >= totalPages
+                        ? 'text-[var(--text-muted)]/30 cursor-not-allowed'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[rgba(249,115,22,0.08)]'
+                    )}
+                    aria-label="Next page"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </motion.div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
+}
+
+// ── Pagination helper ───────────────────────────────────────
+function generatePageNumbers(current: number, total: number): (number | '...')[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+
+  const pages: (number | '...')[] = [];
+
+  // Always show first page
+  pages.push(1);
+
+  if (current > 3) pages.push('...');
+
+  // Show pages around current
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+
+  if (current < total - 2) pages.push('...');
+
+  // Always show last page
+  pages.push(total);
+
+  return pages;
 }
 
 // ── Explore Agent Card ──────────────────────────────────────
