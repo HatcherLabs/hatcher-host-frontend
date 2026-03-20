@@ -17,8 +17,7 @@ import {
   Users,
   Mic,
 } from 'lucide-react';
-
-const DOCS_URL = process.env.NEXT_PUBLIC_DOCS_URL || 'https://docs.hatcher.fun';
+import { DOCS_URL } from '@/lib/config';
 
 // ─── Animated Robot SVG ─────────────────────────────────────────
 function HeroRobot() {

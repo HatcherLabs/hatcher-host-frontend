@@ -2,7 +2,9 @@
 // API Client — wraps all calls to the Hatcher backend
 // ============================================================
 
-const API_BASE = process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001';
+import { API_URL } from '@/lib/config';
+
+const API_BASE = API_URL;
 const TOKEN_KEY = 'hatcher_jwt';
 
 // ─── Token helpers ───────────────────────────────────────────

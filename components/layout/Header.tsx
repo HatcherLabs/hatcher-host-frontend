@@ -8,8 +8,7 @@ import { WalletMultiButton } from '@/components/wallet/WalletButton';
 import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield } from 'lucide-react';
-
-const DOCS_URL = process.env.NEXT_PUBLIC_DOCS_URL || 'https://docs.hatcher.fun';
+import { DOCS_URL } from '@/lib/config';
 const ADMIN_WALLET = process.env['NEXT_PUBLIC_ADMIN_WALLET'] ?? '';
 
 const NAV_LINKS = [

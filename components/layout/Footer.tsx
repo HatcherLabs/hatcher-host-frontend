@@ -1,6 +1,5 @@
 import Link from 'next/link';
-
-const DOCS_URL = process.env.NEXT_PUBLIC_DOCS_URL || 'https://docs.hatcher.fun';
+import { DOCS_URL, SOCIAL_LINKS, EXTERNAL_LINKS } from '@/lib/config';
 
 const PRODUCT_LINKS = [
   { label: 'Create Agent', href: '/create' },
@@ -14,20 +13,20 @@ const RESOURCE_LINKS = [
   { label: 'Documentation', href: DOCS_URL, external: true },
   { label: 'Support', href: '/support' },
   { label: 'Help', href: '/help' },
-  { label: 'OpenClaw', href: 'https://openclaw.org', external: true },
-  { label: 'ClawHub Skills', href: 'https://clawhub.org', external: true },
+  { label: 'OpenClaw', href: EXTERNAL_LINKS.openclaw, external: true },
+  { label: 'ClawHub Skills', href: EXTERNAL_LINKS.clawhub, external: true },
 ];
 
 const COMMUNITY_LINKS = [
-  { label: 'Twitter', href: 'https://x.com/hatcherfun' },
-  { label: 'Discord', href: 'https://discord.gg/hatcher' },
-  { label: 'Telegram', href: 'https://t.me/hatcherfun' },
-  { label: 'GitHub', href: 'https://github.com/HatcherLabs' },
+  { label: 'Twitter', href: SOCIAL_LINKS.twitter },
+  { label: 'Discord', href: SOCIAL_LINKS.discord },
+  { label: 'Telegram', href: SOCIAL_LINKS.telegram },
+  { label: 'GitHub', href: SOCIAL_LINKS.github },
 ];
 
 const SOCIAL_ICONS = [
   {
-    href: 'https://x.com/hatcherfun',
+    href: SOCIAL_LINKS.twitter,
     label: 'X (Twitter)',
     icon: (
       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -36,7 +35,7 @@ const SOCIAL_ICONS = [
     ),
   },
   {
-    href: 'https://t.me/hatcherfun',
+    href: SOCIAL_LINKS.telegram,
     label: 'Telegram',
     icon: (
       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -45,7 +44,7 @@ const SOCIAL_ICONS = [
     ),
   },
   {
-    href: 'https://discord.gg/hatcher',
+    href: SOCIAL_LINKS.discord,
     label: 'Discord',
     icon: (
       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">

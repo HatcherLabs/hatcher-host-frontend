@@ -1,10 +1,10 @@
 'use client';
 import { useEffect } from 'react';
+import { DOCS_URL } from '@/lib/config';
 
 export default function DocsPage() {
   useEffect(() => {
-    const docsUrl = process.env.NEXT_PUBLIC_DOCS_URL || 'https://docs.hatcher.fun';
-    window.location.href = docsUrl;
+    window.location.href = DOCS_URL;
   }, []);
 
   return (

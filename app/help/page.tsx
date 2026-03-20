@@ -15,8 +15,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const DOCS_URL = process.env.NEXT_PUBLIC_DOCS_URL || 'https://docs.hatcher.fun';
+import { DOCS_URL, SOCIAL_LINKS } from '@/lib/config';
 
 const pageVariants = {
   hidden: { opacity: 0 },
@@ -46,21 +45,21 @@ const LINKS = [
   {
     label: 'Discord Community',
     description: 'Join our community for support and discussion',
-    href: 'https://discord.gg/hatcher',
+    href: SOCIAL_LINKS.discord,
     icon: MessageCircle,
     color: '#5865F2',
   },
   {
     label: 'X (Twitter)',
     description: 'Follow us for updates and announcements',
-    href: 'https://x.com/hatcherfun',
+    href: SOCIAL_LINKS.twitter,
     icon: ExternalLink,
     color: '#fafafa',
   },
   {
     label: 'Telegram',
     description: 'Chat with the team and community',
-    href: 'https://t.me/hatcherfun',
+    href: SOCIAL_LINKS.telegram,
     icon: Send,
     color: '#26A5E4',
   },
