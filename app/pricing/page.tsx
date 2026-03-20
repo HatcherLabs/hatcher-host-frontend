@@ -17,19 +17,24 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RobotMascot } from '@/components/ui/RobotMascot';
 import {
+  ArrowRight,
   Check,
   ChevronDown,
   CreditCard,
   Gift,
+  HelpCircle,
   Layers,
+  Minus,
   Package,
   Rocket,
   Shield,
   Sparkles,
+  Table,
   Zap,
   Star,
   Flame,
   Crown,
+  X,
 } from 'lucide-react';
 
 // ── Animation variants ───────────────────────────────────────
@@ -58,6 +63,23 @@ const checkVariants = {
   }),
 };
 
+const scrollFadeIn = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+};
+
+const staggerGrid = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.07 } },
+};
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+};
+
+const displayFont = { fontFamily: 'var(--font-display), system-ui, sans-serif' };
+
 // Group features by category within a framework
 function groupByCategory(features: FeaturePricing[]): Record<string, FeaturePricing[]> {
   const groups: Record<string, FeaturePricing[]> = {};
@@ -71,6 +93,30 @@ function groupByCategory(features: FeaturePricing[]): Record<string, FeaturePric
 // Identify "popular" bundles and features
 const POPULAR_BUNDLES = ['bundle.social', 'bundle.power'];
 const RECOMMENDED_FEATURES = ['openclaw.platform.telegram', 'openclaw.platform.discord', 'openclaw.skills.unlimited'];
+
+// ── Compare Plans Data ──────────────────────────────────────
+type PlanCellValue = boolean | string;
+
+const COMPARE_PLANS: { feature: string; free: PlanCellValue; starter: PlanCellValue; power: PlanCellValue }[] = [
+  { feature: 'Active Agents', free: '1', starter: '1', power: '1' },
+  { feature: 'LLM (Groq Free)', free: true, starter: true, power: true },
+  { feature: 'BYOK (Bring Your Own Key)', free: true, starter: true, power: true },
+  { feature: 'Telegram Integration', free: false, starter: true, power: true },
+  { feature: 'Discord Integration', free: false, starter: true, power: true },
+  { feature: 'WhatsApp Integration', free: false, starter: false, power: true },
+  { feature: 'Skills', free: '3 basic', starter: '10', power: 'Unlimited' },
+  { feature: 'Dedicated Container', free: false, starter: false, power: true },
+  { feature: 'Persistent Memory', free: false, starter: false, power: true },
+  { feature: 'Full Log Retention', free: '24h', starter: '24h', power: 'Unlimited' },
+  { feature: 'Webhooks', free: false, starter: false, power: true },
+  { feature: 'Community Support', free: true, starter: true, power: true },
+];
+
+function renderPlanCell(value: PlanCellValue) {
+  if (value === true) return <Check className="w-4 h-4 text-green-400 mx-auto" />;
+  if (value === false) return <X className="w-4 h-4 text-[var(--text-muted)] opacity-40 mx-auto" />;
+  return <span className="text-[var(--text-secondary)] text-xs font-medium">{value}</span>;
+}
 
 export default function PricingPage() {
   const openclawFeatures = getFeaturesByFramework('openclaw');
@@ -102,7 +148,7 @@ export default function PricingPage() {
             <Sparkles className="w-3.5 h-3.5" />
             Transparent Pricing
           </motion.div>
-          <h1 className="text-4xl sm:text-5xl font-extrabold mb-5 relative">
+          <h1 className="text-4xl sm:text-5xl font-extrabold mb-5 relative" style={displayFont}>
             <span className="text-gradient">Simple, Transparent</span>{' '}
             <span className="text-[var(--text-primary)]">Pricing</span>
           </h1>
@@ -177,17 +223,29 @@ export default function PricingPage() {
         />
 
         {/* BUNDLES */}
-        <motion.section className="mb-20" variants={sectionVariants}>
+        <motion.section
+          className="mb-20"
+          variants={scrollFadeIn}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+        >
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3">
+            <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3" style={displayFont}>
               <Package className="w-6 h-6 text-[#f97316]" />
               <span className="text-[var(--text-primary)]">Bundles</span>
             </h2>
             <p className="text-[var(--text-muted)] text-sm">Save by purchasing features together</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {BUNDLES.map((bundle, index) => {
+          <motion.div
+            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4"
+            variants={staggerGrid}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+          >
+            {BUNDLES.map((bundle) => {
               const isPopular = POPULAR_BUNDLES.includes(bundle.key);
               return (
                 <motion.div
@@ -197,9 +255,7 @@ export default function PricingPage() {
                     isPopular && 'border-[#f97316]/30 shadow-[0_0_24px_rgba(249,115,22,0.08)]'
                   )}
                   whileHover={cardHover}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.06 }}
+                  variants={staggerItem}
                 >
                   {isPopular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
@@ -252,13 +308,19 @@ export default function PricingPage() {
                 </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </motion.section>
 
         {/* CREDIT PACKS */}
-        <motion.section className="mb-20" variants={sectionVariants}>
+        <motion.section
+          className="mb-20"
+          variants={scrollFadeIn}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+        >
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3">
+            <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3" style={displayFont}>
               <CreditCard className="w-6 h-6 text-[#f97316]" />
               <span className="text-[var(--text-primary)]">Hatcher Credits</span>
             </h2>
@@ -336,17 +398,29 @@ export default function PricingPage() {
         </motion.section>
 
         {/* ACCOUNT FEATURES */}
-        <motion.section className="mb-20" variants={sectionVariants}>
+        <motion.section
+          className="mb-20"
+          variants={scrollFadeIn}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+        >
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3">
+            <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3" style={displayFont}>
               <Shield className="w-6 h-6 text-[#f97316]" />
               <span className="text-[var(--text-primary)]">Account Features</span>
             </h2>
             <p className="text-[var(--text-muted)] text-sm">Scale your agent fleet with account-level upgrades</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {accountFeatures.map((f, index) => {
+          <motion.div
+            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            variants={staggerGrid}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+          >
+            {accountFeatures.map((f) => {
               const isRecommended = f.key === 'account.agents.5';
               return (
                 <motion.div
@@ -356,9 +430,7 @@ export default function PricingPage() {
                     isRecommended && 'border-[#f97316]/30 shadow-[0_0_20px_rgba(249,115,22,0.08)]'
                   )}
                   whileHover={cardHover}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.06 }}
+                  variants={staggerItem}
                 >
                   {isRecommended && (
                     <div className="absolute -top-2.5 right-4 z-10">
@@ -382,11 +454,84 @@ export default function PricingPage() {
                 </motion.div>
               );
             })}
+          </motion.div>
+        </motion.section>
+
+        {/* COMPARE PLANS */}
+        <motion.section
+          className="mb-20"
+          variants={scrollFadeIn}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+        >
+          <div className="text-center mb-10">
+            <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3" style={displayFont}>
+              <Table className="w-6 h-6 text-[#f97316]" />
+              <span className="text-[var(--text-primary)]">Compare Plans</span>
+            </h2>
+            <p className="text-[var(--text-muted)] text-sm">See what each plan includes at a glance</p>
+          </div>
+
+          <div className="card glass-noise p-0 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[rgba(46,43,74,0.4)]">
+                    <th className="text-left p-5 text-[var(--text-muted)] font-medium text-xs uppercase tracking-wider w-[40%]">Feature</th>
+                    <th className="text-center p-5 text-green-400 font-semibold">
+                      <div className="text-xs uppercase tracking-wider mb-1">Free</div>
+                      <div className="text-lg font-extrabold">$0</div>
+                    </th>
+                    <th className="text-center p-5 text-[var(--text-primary)] font-semibold relative">
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-[#f97316] to-[#ea580c] text-white text-[9px] font-bold uppercase tracking-wider shadow-[0_0_12px_rgba(249,115,22,0.4)]">
+                          <Flame className="w-2.5 h-2.5" />
+                          POPULAR
+                        </span>
+                      </div>
+                      <div className="text-xs uppercase tracking-wider mb-1">Starter</div>
+                      <div className="text-lg font-extrabold text-gradient">$18</div>
+                    </th>
+                    <th className="text-center p-5 text-[var(--text-primary)] font-semibold">
+                      <div className="text-xs uppercase tracking-wider mb-1">Power</div>
+                      <div className="text-lg font-extrabold text-gradient">$30<span className="text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {COMPARE_PLANS.map((row, i) => (
+                    <motion.tr
+                      key={row.feature}
+                      className={cn(
+                        'border-b border-[rgba(46,43,74,0.2)] transition-colors hover:bg-white/[0.02]',
+                        i % 2 === 0 && 'bg-white/[0.01]'
+                      )}
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.03 }}
+                    >
+                      <td className="p-4 text-[var(--text-secondary)]">{row.feature}</td>
+                      <td className="p-4 text-center">{renderPlanCell(row.free)}</td>
+                      <td className="p-4 text-center bg-[#f97316]/[0.02]">{renderPlanCell(row.starter)}</td>
+                      <td className="p-4 text-center">{renderPlanCell(row.power)}</td>
+                    </motion.tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </motion.section>
 
         {/* TOKEN ECONOMY */}
-        <motion.section className="mb-20" variants={sectionVariants}>
+        <motion.section
+          className="mb-20"
+          variants={scrollFadeIn}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+        >
           <div className="glass-premium glass-noise p-8 sm:p-12 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(249,115,22,0.08),transparent_60%)] pointer-events-none" />
             <motion.div
@@ -396,7 +541,7 @@ export default function PricingPage() {
             >
               <Sparkles className="w-8 h-8 text-[#f97316] mx-auto mb-4" />
             </motion.div>
-            <h2 className="text-2xl font-bold mb-3 relative">
+            <h2 className="text-2xl font-bold mb-3 relative" style={displayFont}>
               <span className="text-gradient">The $HATCH Token Economy</span>
             </h2>
             <p className="text-[var(--text-secondary)] text-sm max-w-xl mx-auto mb-10 leading-relaxed relative">
@@ -429,9 +574,18 @@ export default function PricingPage() {
         </motion.section>
 
         {/* FAQ */}
-        <motion.section className="mb-20" variants={sectionVariants}>
+        <motion.section
+          className="mb-20"
+          variants={scrollFadeIn}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+        >
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold text-[var(--text-primary)]">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold flex items-center justify-center gap-3" style={displayFont}>
+              <HelpCircle className="w-6 h-6 text-[#f97316]" />
+              <span className="text-[var(--text-primary)]">Frequently Asked Questions</span>
+            </h2>
           </div>
           <div className="max-w-3xl mx-auto space-y-3">
             {FAQ.map((item, index) => (
@@ -440,28 +594,45 @@ export default function PricingPage() {
           </div>
         </motion.section>
 
-        {/* CTA with Robot */}
+        {/* CTA BANNER */}
         <motion.div
-          className="text-center"
-          variants={sectionVariants}
+          className="card-gradient-border glass-noise p-10 sm:p-14 text-center relative overflow-hidden"
+          variants={scrollFadeIn}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
         >
-          <RobotMascot size="lg" mood="waving" className="mx-auto mb-6" />
-          <h2 className="text-2xl font-bold mb-4">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(249,115,22,0.1),transparent_60%)] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(6,182,212,0.05),transparent_60%)] pointer-events-none" />
+          <RobotMascot size="lg" mood="waving" className="mx-auto mb-6 relative" />
+          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 relative" style={displayFont}>
             <span className="text-gradient">Ready to hatch</span>{' '}
             <span className="text-[var(--text-primary)]">your agent?</span>
           </h2>
-          <p className="text-[var(--text-muted)] text-sm mb-8">
-            Free to start -- no wallet needed until you unlock features.
+          <p className="text-[var(--text-secondary)] text-base max-w-lg mx-auto mb-8 leading-relaxed relative">
+            Start free with Groq LLM. Bring your own API key anytime -- always free.
+            Unlock premium features with $HATCH when you are ready.
           </p>
-          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
-            <Link
-              href="/create"
-              className="btn-primary px-10 py-4 text-base font-bold"
-            >
-              <Rocket className="w-5 h-5" />
-              Create Agent
-            </Link>
-          </motion.div>
+          <div className="flex items-center justify-center gap-4 relative">
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+              <Link
+                href="/create"
+                className="btn-primary px-10 py-4 text-base font-bold"
+              >
+                <Rocket className="w-5 h-5" />
+                Create Agent
+              </Link>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+              <Link
+                href="/explore"
+                className="inline-flex items-center gap-2 px-6 py-4 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+              >
+                Browse Agents
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
+          </div>
         </motion.div>
       </div>
     </motion.div>
@@ -480,9 +651,15 @@ function FrameworkFeaturesSection({
   const meta = FRAMEWORKS[framework];
 
   return (
-    <motion.section className="mb-20" variants={sectionVariants}>
+    <motion.section
+      className="mb-20"
+      variants={scrollFadeIn}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.1 }}
+    >
       <div className="text-center mb-10">
-        <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3">
+        <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3" style={displayFont}>
           <Zap className="w-6 h-6 text-[#f97316]" />
           <span className="text-[var(--text-primary)]">{meta.name} Features</span>
         </h2>
@@ -493,8 +670,14 @@ function FrameworkFeaturesSection({
         {Object.entries(categories).map(([category, features]) => (
           <div key={category}>
             <h3 className="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-medium mb-3 px-1">{category}</h3>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {features.map((f, index) => {
+            <motion.div
+              className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3"
+              variants={staggerGrid}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.1 }}
+            >
+              {features.map((f) => {
                 const isRecommended = RECOMMENDED_FEATURES.includes(f.key);
                 return (
                   <motion.div
@@ -504,9 +687,7 @@ function FrameworkFeaturesSection({
                       isRecommended && 'border-[#f97316]/25'
                     )}
                     whileHover={cardHover}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.04 }}
+                    variants={staggerItem}
                   >
                     {isRecommended && (
                       <div className="absolute -top-2 right-3 z-10">
@@ -545,7 +726,7 @@ function FrameworkFeaturesSection({
                   </motion.div>
                 );
               })}
-            </div>
+            </motion.div>
           </div>
         ))}
       </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -15,8 +15,15 @@ import {
   Bot,
   AlertCircle,
   Ticket,
+  Clock,
+  MessageSquare,
+  XCircle,
 } from 'lucide-react';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { api } from '@/lib/api';
+import type { Ticket as TicketType, Agent } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/components/ui/ToastProvider';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -121,6 +128,9 @@ function SelectField({
 // ─── Main Component ──────────────────────────────────────────
 
 export default function SupportPage() {
+  const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
+
   // Form state
   const [subject, setSubject] = useState('');
   const [category, setCategory] = useState<Category>('general');
@@ -131,8 +141,26 @@ export default function SupportPage() {
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
 
+  // Tickets + agents state
+  const [tickets, setTickets] = useState<TicketType[]>([]);
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [ticketsLoading, setTicketsLoading] = useState(false);
+
   const MESSAGE_MAX = 5000;
   const SUBJECT_MAX = 200;
+
+  // Fetch tickets and agents on auth
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    setTicketsLoading(true);
+    Promise.all([api.getTickets(), api.getMyAgents()])
+      .then(([ticketRes, agentRes]) => {
+        if (ticketRes.success) setTickets(ticketRes.data);
+        if (agentRes.success) setAgents(agentRes.data);
+      })
+      .catch(() => {})
+      .finally(() => setTicketsLoading(false));
+  }, [isAuthenticated]);
 
   function resetForm() {
     setSubject('');
@@ -168,11 +196,28 @@ export default function SupportPage() {
     setFormError('');
     setSubmitting(true);
 
-    // Simulate submission delay
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-
-    setSubmitting(false);
-    setSubmitted(true);
+    try {
+      const res = await api.createTicket({
+        subject: subject.trim(),
+        message: message.trim(),
+        category,
+        priority,
+        agentId: agentId || undefined,
+      });
+      if (res.success) {
+        setSubmitted(true);
+        toast('success', 'Ticket submitted successfully');
+        // Refresh tickets list
+        const ticketRes = await api.getTickets();
+        if (ticketRes.success) setTickets(ticketRes.data);
+      } else {
+        setFormError(res.error || 'Failed to submit ticket');
+      }
+    } catch {
+      setFormError('Failed to submit ticket. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -410,6 +455,11 @@ export default function SupportPage() {
                           className="w-full appearance-none bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/20 transition-colors cursor-pointer"
                         >
                           <option value="">Select an agent...</option>
+                          {agents.map((a) => (
+                            <option key={a.id} value={a.id}>
+                              {a.name} ({a.status})
+                            </option>
+                          ))}
                         </select>
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
                           <Bot size={14} className="text-[#6B6890]" />
@@ -485,16 +535,83 @@ export default function SupportPage() {
               >
                 Recent Tickets
               </h2>
+              {tickets.length > 0 && (
+                <span className="ml-auto text-xs font-medium text-[#6B6890]">
+                  {tickets.length} ticket{tickets.length !== 1 ? 's' : ''}
+                </span>
+              )}
             </div>
 
             <div className="p-0">
-              <EmptyState
-                icon={LifeBuoy}
-                title="No tickets yet"
-                description="Your submitted support tickets will appear here. Create your first ticket above to get started."
-                actionLabel="Back to Top"
-                actionHref="#"
-              />
+              {ticketsLoading ? (
+                <div className="p-6 space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl">
+                      <div className="w-8 h-8 rounded-lg shimmer flex-shrink-0" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-3.5 w-48 rounded shimmer" />
+                        <div className="h-3 w-24 rounded shimmer" />
+                      </div>
+                      <div className="h-5 w-16 rounded-full shimmer" />
+                    </div>
+                  ))}
+                </div>
+              ) : tickets.length === 0 ? (
+                <EmptyState
+                  icon={LifeBuoy}
+                  title="No tickets yet"
+                  description="Your submitted support tickets will appear here. Create your first ticket above to get started."
+                  actionLabel="Back to Top"
+                  actionHref="#"
+                />
+              ) : (
+                <div className="divide-y divide-white/[0.04]">
+                  {tickets.map((ticket) => {
+                    const statusConfig: Record<string, { color: string; bg: string; icon: typeof Clock }> = {
+                      open: { color: 'text-amber-400', bg: 'bg-amber-500/10', icon: Clock },
+                      in_progress: { color: 'text-blue-400', bg: 'bg-blue-500/10', icon: MessageSquare },
+                      resolved: { color: 'text-green-400', bg: 'bg-green-500/10', icon: CheckCircle2 },
+                      closed: { color: 'text-[#6B6890]', bg: 'bg-[#252240]', icon: XCircle },
+                    };
+                    const sc = statusConfig[ticket.status] ?? statusConfig.open;
+                    const StatusIcon = sc.icon;
+                    return (
+                      <Link
+                        key={ticket.id}
+                        href={`/support/${ticket.id}`}
+                        className="flex items-center gap-3 px-6 py-4 transition-colors hover:bg-white/[0.02] group"
+                      >
+                        <div className={`w-8 h-8 rounded-lg ${sc.bg} flex items-center justify-center flex-shrink-0`}>
+                          <StatusIcon size={14} className={sc.color} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-[#F0EEFC] truncate group-hover:text-[#f97316] transition-colors">
+                            {ticket.subject}
+                          </p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[11px] text-[#6B6890]">
+                              {ticket.category.replace('_', ' ')}
+                            </span>
+                            {ticket.agent && (
+                              <>
+                                <span className="text-[#6B6890]">&middot;</span>
+                                <span className="text-[11px] text-[#6B6890]">{ticket.agent.name}</span>
+                              </>
+                            )}
+                            <span className="text-[#6B6890]">&middot;</span>
+                            <span className="text-[11px] text-[#6B6890]">
+                              {new Date(ticket.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${sc.bg} ${sc.color} border-current/20 capitalize`}>
+                          {ticket.status.replace('_', ' ')}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </motion.div>
