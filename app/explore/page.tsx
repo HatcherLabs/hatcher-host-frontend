@@ -11,18 +11,20 @@ import {
   AlertTriangle,
   Calendar,
   Layers,
+  MessageSquare,
   Plus,
   RefreshCw,
   Search,
   Sparkles,
 } from 'lucide-react';
 
-type SortOption = 'newest' | 'most_features' | 'name_az';
+type SortOption = 'newest' | 'most_features' | 'most_messages' | 'name_az';
 type StatusFilter = 'all' | 'active' | 'sleeping' | 'paused' | 'error' | 'restarting';
 
 const SORT_LABELS: Record<SortOption, string> = {
   newest: 'Newest',
   most_features: 'Most Features',
+  most_messages: 'Most Active',
   name_az: 'A-Z',
 };
 
@@ -126,6 +128,7 @@ export default function ExplorePage() {
     result.sort((a, b) => {
       if (sort === 'newest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       if (sort === 'most_features') return (b.features?.length ?? 0) - (a.features?.length ?? 0);
+      if (sort === 'most_messages') return ((b as Agent & { messageCount?: number }).messageCount ?? 0) - ((a as Agent & { messageCount?: number }).messageCount ?? 0);
       if (sort === 'name_az') return a.name.localeCompare(b.name);
       return 0;
     });
@@ -386,10 +389,16 @@ function ExploreAgentCard({ agent }: { agent: Agent }) {
 
             {/* Footer */}
             <div className="flex items-center justify-between text-xs text-[#71717a] pt-3 border-t border-[rgba(46,43,74,0.3)] group-hover:border-[rgba(249,115,22,0.15)] transition-colors duration-300">
-              <span className="flex items-center gap-1">
-                <Layers className="w-3.5 h-3.5" />
-                {agent.features?.length ?? 0} features
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="flex items-center gap-1">
+                  <Layers className="w-3.5 h-3.5" />
+                  {agent.features?.length ?? 0}
+                </span>
+                <span className="flex items-center gap-1">
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  {(agent as Agent & { messageCount?: number }).messageCount ?? 0}
+                </span>
+              </div>
               <span className="flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5" />
                 {timeAgo(agent.createdAt)}
