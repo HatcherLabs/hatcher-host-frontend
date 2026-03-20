@@ -52,7 +52,7 @@ const QUICK_LINKS = [
     icon: BookOpen,
     label: 'Documentation',
     description: 'Browse guides and API reference',
-    href: 'https://docs.hatcher.fun',
+    href: 'https://docs.hatcher.host',
     external: true,
   },
   {

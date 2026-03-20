@@ -347,10 +347,10 @@ export default function HelpPage() {
           <p className="text-sm text-[var(--text-secondary)] leading-relaxed relative">
             For direct support, reach out to us at{' '}
             <a
-              href="mailto:support@hatcher.fun"
+              href="mailto:support@hatcher.host"
               className="font-medium text-[#f97316] hover:text-[#f97316] transition-colors underline decoration-[#f97316]/30 underline-offset-2"
             >
-              support@hatcher.fun
+              support@hatcher.host
             </a>
             . We typically respond within 24 hours.
           </p>

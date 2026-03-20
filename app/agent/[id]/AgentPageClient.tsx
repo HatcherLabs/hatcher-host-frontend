@@ -314,7 +314,7 @@ export function AgentPageClient() {
           <div className="mt-5 pt-4 border-t border-[var(--border-default)] text-center">
             <p className="text-xs text-[var(--text-muted)]">
               Powered by Hatcher — deploy your own AI agent at{' '}
-              <Link href="/create" className="text-[#f97316] hover:underline">hatcher.fun/create</Link>
+              <Link href="/create" className="text-[#f97316] hover:underline">hatcher.host/create</Link>
             </p>
           </div>
         </motion.div>

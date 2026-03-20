@@ -8,9 +8,9 @@ export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001
 export const SOLANA_RPC = process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.devnet.solana.com';
 
 export const SOCIAL_LINKS = {
-  twitter: 'https://x.com/hatcherfun',
+  twitter: 'https://x.com/HatcherLabs',
   discord: 'https://discord.gg/hatcher',
-  telegram: 'https://t.me/hatcherfun',
+  telegram: 'https://t.me/HatcherLabs',
   github: 'https://github.com/HatcherLabs',
 } as const;
 
@@ -18,5 +18,5 @@ export const EXTERNAL_LINKS = {
   openclaw: 'https://openclaw.org',
   clawhub: 'https://clawhub.org',
   jupiterSwap: 'https://jup.ag/swap/SOL-HATCH',
-  supportEmail: 'support@hatcher.fun',
+  supportEmail: 'support@hatcher.host',
 } as const;

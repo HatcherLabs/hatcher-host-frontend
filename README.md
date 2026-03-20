@@ -1,6 +1,6 @@
 # Hatcher Frontend
 
-Web dashboard for [Hatcher](https://hatcher.fun) — a managed AI agent hosting platform on Solana.
+Web dashboard for [Hatcher](https://hatcher.host) — a managed AI agent hosting platform on Solana.
 
 ## Stack
 
