@@ -24,6 +24,7 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
       <Sidebar />
       <main
         id="main-content"
+        role="main"
         className={isDashboard ? 'flex-1 dashboard-content' : 'flex-1'}
         tabIndex={-1}
       >

@@ -93,7 +93,7 @@ export function Sidebar() {
         </div>
 
         {/* Main nav */}
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1" aria-label="Dashboard navigation">
+        <nav role="navigation" className="flex-1 overflow-y-auto px-3 py-4 space-y-1" aria-label="Main navigation">
           {NAV_ITEMS.map((item) => {
             const active = isActive(pathname, item.href);
             const Icon = item.icon;
@@ -195,7 +195,7 @@ export function Sidebar() {
         </div>
 
         {/* Nav icons */}
-        <nav className="flex-1 flex flex-col items-center gap-1 py-4" aria-label="Dashboard navigation (compact)">
+        <nav role="navigation" className="flex-1 flex flex-col items-center gap-1 py-4" aria-label="Main navigation">
           {NAV_ITEMS.map((item) => {
             const active = isActive(pathname, item.href);
             const Icon = item.icon;
