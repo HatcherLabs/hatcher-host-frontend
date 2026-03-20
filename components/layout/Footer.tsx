@@ -62,15 +62,22 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-3">
-              <svg viewBox="0 0 28 28" width="22" height="22" fill="none" className="drop-shadow-[0_0_6px_rgba(249,115,22,0.3)]">
-                <ellipse cx="14" cy="15" rx="9" ry="11" fill="url(#eggGradF)" stroke="#f97316" strokeWidth="1" opacity="0.9" />
-                <circle cx="14" cy="12" r="2" fill="#f97316" opacity="0.6" />
+              <svg viewBox="0 0 28 28" width="22" height="22" fill="none" className="drop-shadow-[0_0_6px_rgba(249,115,22,0.2)]">
                 <defs>
-                  <linearGradient id="eggGradF" x1="14" y1="4" x2="14" y2="26" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#252240" />
+                  <linearGradient id="eggShellF" x1="14" y1="3" x2="14" y2="27" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stopColor="#3D375E" />
+                    <stop offset="50%" stopColor="#252240" />
                     <stop offset="100%" stopColor="#1A1730" />
                   </linearGradient>
+                  <radialGradient id="eggGlowF" cx="50%" cy="40%" r="40%">
+                    <stop offset="0%" stopColor="#f97316" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
+                  </radialGradient>
                 </defs>
+                <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggShellF)" stroke="rgba(249,115,22,0.5)" strokeWidth="0.8" />
+                <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggGlowF)" />
+                <path d="M10 14.5 L12.5 12.5 L11 10.5 L13.5 9 L12 7" stroke="#f97316" strokeWidth="0.7" strokeLinecap="round" fill="none" opacity="0.5" />
+                <circle cx="12" cy="11" r="1.5" fill="#f97316" opacity="0.25" />
               </svg>
               <span className="text-base font-bold text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Hatcher</span>
             </div>

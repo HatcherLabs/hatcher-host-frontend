@@ -46,18 +46,30 @@ export function Header() {
               <span className="flex items-center gap-2">
                 {/* Egg logo mark */}
                 <span className="relative flex items-center justify-center w-7 h-7">
-                  <svg viewBox="0 0 28 28" width="28" height="28" fill="none" className="drop-shadow-[0_0_6px_rgba(249,115,22,0.3)]">
-                    <ellipse cx="14" cy="15" rx="9" ry="11" fill="url(#eggGrad)" stroke="#f97316" strokeWidth="1" opacity="0.9" />
-                    <ellipse cx="14" cy="13" rx="5" ry="6" fill="none" stroke="rgba(249,115,22,0.3)" strokeWidth="0.5" />
-                    <circle cx="14" cy="12" r="2" fill="#f97316" opacity="0.6">
-                      <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.5s" repeatCount="indefinite" />
-                    </circle>
+                  <svg viewBox="0 0 28 28" width="28" height="28" fill="none" className="drop-shadow-[0_0_8px_rgba(249,115,22,0.25)]">
                     <defs>
-                      <linearGradient id="eggGrad" x1="14" y1="4" x2="14" y2="26" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stopColor="#252240" />
+                      <linearGradient id="eggShell" x1="14" y1="3" x2="14" y2="27" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stopColor="#3D375E" />
+                        <stop offset="50%" stopColor="#252240" />
                         <stop offset="100%" stopColor="#1A1730" />
                       </linearGradient>
+                      <radialGradient id="eggInnerGlow" cx="50%" cy="40%" r="40%">
+                        <stop offset="0%" stopColor="#f97316" stopOpacity="0.35" />
+                        <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
+                      </radialGradient>
                     </defs>
+                    {/* Egg shape */}
+                    <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggShell)" stroke="rgba(249,115,22,0.5)" strokeWidth="0.8" />
+                    {/* Inner warm glow */}
+                    <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggInnerGlow)" />
+                    {/* Crack line — hatching */}
+                    <path d="M10 14.5 L12.5 12.5 L11 10.5 L13.5 9 L12 7" stroke="#f97316" strokeWidth="0.7" strokeLinecap="round" fill="none" opacity="0.6" />
+                    {/* Light spill through crack */}
+                    <circle cx="12" cy="11" r="1.5" fill="#f97316" opacity="0.3">
+                      <animate attributeName="opacity" values="0.2;0.45;0.2" dur="3s" repeatCount="indefinite" />
+                    </circle>
+                    {/* Shell highlight */}
+                    <ellipse cx="11" cy="10" rx="2.5" ry="4" fill="white" opacity="0.04" transform="rotate(-15 11 10)" />
                   </svg>
                 </span>
                 <span className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>

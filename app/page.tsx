@@ -668,7 +668,7 @@ export default function LandingPage() {
               Start free, scale up
             </h2>
             <p className="mt-4 text-[#A5A1C2] max-w-lg mx-auto">
-              No rigid tiers. Free baseline with Groq. Unlock features with $HATCH. Bring your own keys -- always free.
+              No rigid tiers. Free baseline with Groq. Unlock features with $HATCH. Bring your own keys — always free.
             </p>
           </div>
 
