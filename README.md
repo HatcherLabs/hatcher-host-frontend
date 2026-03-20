@@ -69,9 +69,4 @@ lib/                  # API client, hooks, utils
 
 ## Design
 
-Dark-only theme with glassmorphism, purple/cyan gradients, and glow effects. See `CLAUDE.md` in the [main repo](https://github.com/HatcherLabs/Hatcher) for the full design system spec.
-
-## Related
-
-- [Hatcher API](https://github.com/HatcherLabs/Hatcher) — Backend + monorepo
-- [hatcher-shared](https://github.com/HatcherLabs/hatcher-shared) — Shared types and constants
+Dark-only theme with glassmorphism, purple/cyan gradients, and glow effects.
