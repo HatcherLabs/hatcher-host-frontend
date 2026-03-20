@@ -504,7 +504,11 @@ export default function CreatePage() {
                   <input
                     id="agent-name"
                     type="text"
-                    className={cn('input', !openclawForm.name.trim() && openclawForm.name !== '' && 'border-red-500/50')}
+                    className={cn(
+                      'input',
+                      openclawForm.name.length > 0 && openclawForm.name.trim().length < 3 && 'border-[#F87171]/50 focus:border-[#F87171]/70 focus:ring-[#F87171]/20',
+                      openclawForm.name.trim().length === 0 && openclawForm.name !== '' && 'border-[#F87171]/50'
+                    )}
                     placeholder="e.g. AlphaResearcher, TweetLord..."
                     value={openclawForm.name}
                     onChange={(e) => setOpenclawForm((p) => ({ ...p, name: e.target.value }))}
@@ -513,10 +517,18 @@ export default function CreatePage() {
                     required
                     aria-required="true"
                     aria-describedby="agent-name-hint"
+                    aria-invalid={openclawForm.name.length > 0 && openclawForm.name.trim().length < 3 ? 'true' : undefined}
                     autoComplete="off"
                   />
-                  <p id="agent-name-hint" className="text-xs text-[var(--text-muted)] mt-1.5 ml-1">
-                    {openclawForm.name.trim().length}/50 characters{openclawForm.name.length > 0 && openclawForm.name.trim().length < 3 ? ' (min 3)' : ''}
+                  <p id="agent-name-hint" className={cn(
+                    'text-xs mt-1.5 ml-1',
+                    openclawForm.name.length > 0 && openclawForm.name.trim().length < 3
+                      ? 'text-[#F87171]'
+                      : 'text-[var(--text-muted)]'
+                  )}>
+                    {openclawForm.name.length > 0 && openclawForm.name.trim().length < 3
+                      ? 'Name must be at least 3 characters'
+                      : `${openclawForm.name.trim().length}/50 characters`}
                   </p>
                 </div>
 
@@ -1025,6 +1037,11 @@ function SystemPromptSection({
             </p>
             <span className="text-xs text-[var(--text-muted)]">{form.systemPrompt.length}/8000</span>
           </div>
+          {form.systemPrompt.trim().length === 0 && (
+            <p className="text-xs text-[#FBBF24] mt-2 ml-1">
+              Consider adding a system prompt for better results
+            </p>
+          )}
         </div>
       )}
     </div>

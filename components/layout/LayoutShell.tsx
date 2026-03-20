@@ -5,6 +5,7 @@ import { Header } from './Header';
 import { Footer } from './Footer';
 import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
+import { ScrollToTop } from '@/components/ui/ScrollToTop';
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -29,6 +30,7 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       {isDashboard ? <BottomNav /> : <Footer />}
+      <ScrollToTop />
     </div>
   );
 }
