@@ -619,4 +619,8 @@ export const api = {
       platform: string;
       createdAt: string;
     }>>(`/agents/${agentId}/feed`),
+
+  /** Get API usage stats for the current user */
+  getApiUsage: () =>
+    req<{ requestsToday: number; limit: number; remaining: number; resetAt: string }>('/usage'),
 };

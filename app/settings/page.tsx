@@ -9,6 +9,7 @@ import { WalletMultiButton } from '@/components/wallet/WalletButton';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { motion } from 'framer-motion';
 import { useToast } from '@/components/ui/ToastProvider';
+import Link from 'next/link';
 import {
   Copy,
   Check,
@@ -28,6 +29,8 @@ import {
   X,
   Download,
   ChevronDown,
+  ExternalLink,
+  BarChart3,
 } from 'lucide-react';
 
 // ── Animation variants ──────────────────────────────────────
@@ -110,6 +113,10 @@ export default function SettingsPage() {
   const [regenerating, setRegenerating] = useState(false);
   const [showRegenConfirm, setShowRegenConfirm] = useState(false);
 
+  // ── API Usage state ─────────────────────────────────────
+  const [apiUsage, setApiUsage] = useState<{ requestsToday: number; limit: number; remaining: number; resetAt: string } | null>(null);
+  const [usageLoading, setUsageLoading] = useState(false);
+
   // ── BYOK state ──────────────────────────────────────────
   const [byokKeys, setByokKeys] = useState<StoredKey[]>([]);
   const [showAddKey, setShowAddKey] = useState(false);
@@ -173,6 +180,18 @@ export default function SettingsPage() {
       }
     }).catch(() => {
       // Non-critical
+    });
+
+    // Fetch API usage stats
+    setUsageLoading(true);
+    api.getApiUsage().then((res) => {
+      if (res.success) {
+        setApiUsage(res.data);
+      }
+    }).catch(() => {
+      // Non-critical — endpoint may not exist yet
+    }).finally(() => {
+      setUsageLoading(false);
     });
   }, [isAuthenticated]);
 
@@ -457,7 +476,7 @@ export default function SettingsPage() {
                   {apiKeyAvailable && apiKey
                     ? showKey
                       ? apiKey
-                      : apiKey.slice(0, 8) + '****************************'
+                      : `hk_${'*'.repeat(20)}...${apiKey.slice(-4)}`
                     : 'Connect wallet to view your API key'}
                 </span>
                 {apiKeyAvailable && apiKey && (
@@ -489,16 +508,25 @@ export default function SettingsPage() {
                 <p className="text-xs text-[var(--text-muted)]">
                   Use this key to authenticate API requests programmatically.
                 </p>
-                {apiKeyAvailable && apiKey && (
-                  <button
-                    disabled={regenerating}
-                    onClick={() => setShowRegenConfirm(true)}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {apiKeyAvailable && apiKey && (
+                    <button
+                      disabled={regenerating}
+                      onClick={() => setShowRegenConfirm(true)}
+                      className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-all duration-200 text-[var(--text-muted)] hover:text-[#f97316] hover:bg-[#f97316]/10"
+                    >
+                      <RefreshCw size={12} className={regenerating ? 'animate-spin' : ''} />
+                      {regenerating ? 'Regenerating...' : 'Regenerate'}
+                    </button>
+                  )}
+                  <Link
+                    href="/docs/api"
                     className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-all duration-200 text-[var(--text-muted)] hover:text-[#f97316] hover:bg-[#f97316]/10"
                   >
-                    <RefreshCw size={12} className={regenerating ? 'animate-spin' : ''} />
-                    {regenerating ? 'Regenerating...' : 'Regenerate'}
-                  </button>
-                )}
+                    <ExternalLink size={12} />
+                    View API Docs
+                  </Link>
+                </div>
               </div>
             </div>
 
@@ -679,6 +707,151 @@ export default function SettingsPage() {
               )}
             </div>
           </div>
+        </motion.div>
+
+        {/* ════════════════════════════════════════════════════
+            2b. API USAGE SECTION
+            ════════════════════════════════════════════════════ */}
+        <motion.div className="card glass-noise p-6" variants={cardVariants}>
+          <div className="flex items-center gap-2.5 mb-6">
+            <div className="w-8 h-8 rounded-lg bg-[#f97316]/15 flex items-center justify-center">
+              <BarChart3 size={16} className="text-[#f97316]" />
+            </div>
+            <h2
+              className="text-lg font-semibold text-[var(--text-primary)]"
+              style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
+            >
+              API Usage
+            </h2>
+          </div>
+
+          {usageLoading ? (
+            <div className="space-y-3">
+              <div className="h-4 w-48 rounded bg-[#252240] animate-pulse" />
+              <div className="h-3 w-full rounded-full bg-[#252240] animate-pulse" />
+              <div className="h-3 w-32 rounded bg-[#252240] animate-pulse" />
+            </div>
+          ) : apiUsage ? (
+            <div className="space-y-4">
+              {/* Usage count */}
+              <div className="flex items-baseline justify-between">
+                <p className="text-sm text-[var(--text-secondary)]">
+                  <span className="text-lg font-bold text-[var(--text-primary)] font-mono">
+                    {apiUsage.requestsToday.toLocaleString()}
+                  </span>
+                  {' / '}
+                  <span className="font-mono">{apiUsage.limit.toLocaleString()}</span>
+                  {' requests today'}
+                </p>
+                <span className="text-xs font-medium text-[var(--text-muted)]">
+                  {Math.round((apiUsage.requestsToday / apiUsage.limit) * 100)}%
+                </span>
+              </div>
+
+              {/* Progress bar */}
+              {(() => {
+                const pct = Math.min((apiUsage.requestsToday / apiUsage.limit) * 100, 100);
+                const barColor =
+                  pct > 80
+                    ? 'bg-[#F87171]'
+                    : pct > 50
+                      ? 'bg-[#FBBF24]'
+                      : 'bg-[#4ADE80]';
+                const glowColor =
+                  pct > 80
+                    ? 'shadow-[0_0_8px_rgba(248,113,113,0.4)]'
+                    : pct > 50
+                      ? 'shadow-[0_0_8px_rgba(251,191,36,0.3)]'
+                      : 'shadow-[0_0_8px_rgba(74,222,128,0.3)]';
+                return (
+                  <div className="h-2.5 rounded-full bg-[#252240] overflow-hidden">
+                    <motion.div
+                      className={`h-full rounded-full ${barColor} ${glowColor}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    />
+                  </div>
+                );
+              })()}
+
+              {/* Reset time & remaining */}
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-[var(--text-muted)]">
+                  Resets at midnight UTC
+                </p>
+                <p className="text-xs text-[var(--text-muted)]">
+                  {apiUsage.remaining.toLocaleString()} remaining
+                </p>
+              </div>
+
+              {/* Upgrade CTA for free tier (limit <= 100) */}
+              {apiUsage.limit <= 100 && (
+                <>
+                  <div className="h-px bg-[rgba(46,43,74,0.4)]" />
+                  <div className="flex items-center justify-between rounded-xl px-4 py-3 bg-[#f97316]/[0.04] border border-[#f97316]/10">
+                    <div>
+                      <p className="text-sm font-medium text-[var(--text-primary)]">
+                        Need more requests?
+                      </p>
+                      <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                        Upgrade to Pro for 10,000 req/day — $15/mo
+                      </p>
+                    </div>
+                    <Link
+                      href="/pricing"
+                      className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-xl transition-all duration-200 bg-[#f97316] text-white hover:bg-[#ea580c] shadow-lg shadow-[#f97316]/20 flex-shrink-0"
+                    >
+                      <Zap size={12} />
+                      Upgrade
+                    </Link>
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            /* Fallback when endpoint is unavailable — show placeholder */
+            <div className="space-y-4">
+              <div className="flex items-baseline justify-between">
+                <p className="text-sm text-[var(--text-secondary)]">
+                  <span className="text-lg font-bold text-[var(--text-primary)] font-mono">0</span>
+                  {' / '}
+                  <span className="font-mono">100</span>
+                  {' requests today'}
+                </p>
+                <span className="text-xs font-medium text-[var(--text-muted)]">0%</span>
+              </div>
+              <div className="h-2.5 rounded-full bg-[#252240] overflow-hidden">
+                <div className="h-full rounded-full bg-[#4ADE80] w-0" />
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-[var(--text-muted)]">
+                  Resets at midnight UTC
+                </p>
+                <p className="text-xs text-[var(--text-muted)]">
+                  100 remaining
+                </p>
+              </div>
+              <div className="h-px bg-[rgba(46,43,74,0.4)]" />
+              <div className="flex items-center justify-between rounded-xl px-4 py-3 bg-[#f97316]/[0.04] border border-[#f97316]/10">
+                <div>
+                  <p className="text-sm font-medium text-[var(--text-primary)]">
+                    Need more requests?
+                  </p>
+                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                    Upgrade to Pro for 10,000 req/day — $15/mo
+                  </p>
+                </div>
+                <Link
+                  href="/pricing"
+                  className="flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-xl transition-all duration-200 bg-[#f97316] text-white hover:bg-[#ea580c] shadow-lg shadow-[#f97316]/20 flex-shrink-0"
+                >
+                  <Zap size={12} />
+                  Upgrade
+                </Link>
+              </div>
+            </div>
+          )}
         </motion.div>
 
         {/* ════════════════════════════════════════════════════

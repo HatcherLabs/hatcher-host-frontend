@@ -16,6 +16,8 @@ import {
   LifeBuoy,
   ArrowRight,
   BookOpen,
+  Plug,
+  Zap,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 
@@ -136,6 +138,59 @@ export default function DocsPage() {
               </span>
             )}
           </div>
+        </motion.div>
+
+        {/* ── Featured internal pages ────────────────────────── */}
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="mb-10 grid gap-4 sm:grid-cols-2"
+        >
+          <motion.div variants={staggerItem}>
+            <Link
+              href="/docs/api"
+              className="group relative flex items-start gap-4 rounded-2xl border border-[#f97316]/20 bg-[rgba(26,23,48,0.8)] p-6 backdrop-blur-xl transition-all duration-200 hover:border-[#f97316]/40 hover:shadow-[0_0_32px_rgba(249,115,22,0.1)]"
+            >
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-[#f97316]/15">
+                <Code className="h-6 w-6 text-[#f97316]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="mb-1 text-base font-semibold text-[#F0EEFC] group-hover:text-[#f97316] transition-colors">
+                  API Reference
+                </h3>
+                <p className="text-sm leading-relaxed text-[#A5A1C2]">
+                  Full endpoint documentation with examples in cURL, JavaScript, and Python. Auth, rate limits, and error codes.
+                </p>
+                <div className="mt-3 flex items-center gap-1 text-xs font-medium text-[#f97316]">
+                  Explore endpoints
+                  <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5" />
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+          <motion.div variants={staggerItem}>
+            <Link
+              href="/docs/integrations"
+              className="group relative flex items-start gap-4 rounded-2xl border border-[#a78bfa]/20 bg-[rgba(26,23,48,0.8)] p-6 backdrop-blur-xl transition-all duration-200 hover:border-[#a78bfa]/40 hover:shadow-[0_0_32px_rgba(167,139,250,0.1)]"
+            >
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-[#a78bfa]/15">
+                <Plug className="h-6 w-6 text-[#a78bfa]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="mb-1 text-base font-semibold text-[#F0EEFC] group-hover:text-[#a78bfa] transition-colors">
+                  Integration Guides
+                </h3>
+                <p className="text-sm leading-relaxed text-[#A5A1C2]">
+                  Step-by-step setup for Telegram, Discord, WhatsApp, Slack, Twitter/X, and Signal. From credentials to first message.
+                </p>
+                <div className="mt-3 flex items-center gap-1 text-xs font-medium text-[#a78bfa]">
+                  Browse platforms
+                  <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5" />
+                </div>
+              </div>
+            </Link>
+          </motion.div>
         </motion.div>
 
         {/* ── Quick links grid ─────────────────────────────── */}
