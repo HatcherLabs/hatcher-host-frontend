@@ -373,7 +373,26 @@ export const api = {
       activeAgents: number;
       totalFeaturesUnlocked: number;
       totalPayments: number;
+      totalRevenueUsd: number;
+      totalMessages: number;
+      newUsersLast7d: number;
     }>('/admin/stats'),
+
+  /** Admin: list all users with agent/payment counts */
+  adminGetUsers: (skip = 0, take = 50) =>
+    req<{
+      users: Array<{
+        id: string;
+        walletAddress: string;
+        agentCount: number;
+        paymentCount: number;
+        hatchCredits: number;
+        createdAt: string;
+      }>;
+      total: number;
+      skip: number;
+      take: number;
+    }>(`/admin/users?skip=${skip}&take=${take}`),
 
   /** Run a research task for an agent */
   research: (agentId: string, query: string) =>

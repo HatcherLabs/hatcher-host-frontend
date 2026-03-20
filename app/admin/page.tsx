@@ -21,6 +21,9 @@ import {
   Layers,
   AlertTriangle,
   RefreshCw,
+  MessageSquare,
+  UserPlus,
+  Wallet,
 } from 'lucide-react';
 
 // ── Admin wallet -- matches backend env.ADMIN_WALLET ──────────
@@ -124,11 +127,23 @@ export default function AdminPage() {
     activeAgents: number;
     totalFeaturesUnlocked: number;
     totalPayments: number;
+    totalRevenueUsd: number;
+    totalMessages: number;
+    newUsersLast7d: number;
   } | null>(null);
   const [agents, setAgents] = useState<AdminAgent[]>([]);
+  const [users, setUsers] = useState<Array<{
+    id: string;
+    walletAddress: string;
+    agentCount: number;
+    paymentCount: number;
+    hatchCredits: number;
+    createdAt: string;
+  }>>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [activeTab, setActiveTab] = useState<'agents' | 'users'>('agents');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
@@ -145,14 +160,17 @@ export default function AdminPage() {
     setLoading(true);
     setError(null);
 
-    Promise.all([api.adminGetStats(), api.adminGetAgents()])
-      .then(([statsRes, agentsRes]) => {
+    Promise.all([api.adminGetStats(), api.adminGetAgents(), api.adminGetUsers()])
+      .then(([statsRes, agentsRes, usersRes]) => {
         setLoading(false);
         if (statsRes.success) setStats(statsRes.data);
         else setError(statsRes.error);
 
         if (agentsRes.success) setAgents(agentsRes.data);
         else setError((prev) => prev ?? agentsRes.error);
+
+        if (usersRes.success) setUsers(usersRes.data.users);
+        else setError((prev) => prev ?? usersRes.error);
       })
       .catch(() => {
         setLoading(false);
@@ -228,10 +246,11 @@ export default function AdminPage() {
   async function handleRefresh() {
     setLoading(true);
     setError(null);
-    const [statsRes, agentsRes] = await Promise.all([api.adminGetStats(), api.adminGetAgents()]);
+    const [statsRes, agentsRes, usersRes] = await Promise.all([api.adminGetStats(), api.adminGetAgents(), api.adminGetUsers()]);
     setLoading(false);
     if (statsRes.success) setStats(statsRes.data);
     if (agentsRes.success) setAgents(agentsRes.data);
+    if (usersRes.success) setUsers(usersRes.data.users);
   }
 
   // ── Not connected ──────────────────────────────────────────
@@ -327,9 +346,17 @@ export default function AdminPage() {
   if (loading && !stats) {
     return (
       <div className="min-h-screen p-4 sm:p-6 lg:p-10">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-            {[1, 2, 3, 4, 5].map((i) => (
+        <div className="max-w-7xl mx-auto space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="card glass-noise p-5 animate-pulse">
+                <div className="h-4 rounded w-24 mb-4 shimmer" />
+                <div className="h-8 rounded w-16 shimmer" />
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {[1, 2, 3, 4].map((i) => (
               <div key={i} className="card glass-noise p-5 animate-pulse">
                 <div className="h-4 rounded w-24 mb-4 shimmer" />
                 <div className="h-8 rounded w-16 shimmer" />
@@ -387,202 +414,333 @@ export default function AdminPage() {
 
         {/* ── Stat Cards ────────────────────────────────────── */}
         {stats && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <StatCard
-              label="Total Users"
-              value={stats.totalUsers}
-              icon={Users}
-              iconColor="#f97316"
-            />
-            <StatCard
-              label="Total Agents"
-              value={stats.totalAgents}
-              icon={Bot}
-              iconColor="#60A5FA"
-            />
-            <StatCard
-              label="Active Agents"
-              value={stats.activeAgents}
-              icon={Activity}
-              iconColor="#4ADE80"
-            />
-            <StatCard
-              label="Total Payments"
-              value={stats.totalPayments}
-              icon={DollarSign}
-              iconColor="#FBBF24"
-            />
-            <StatCard
-              label="Features Unlocked"
-              value={stats.totalFeaturesUnlocked}
-              icon={Layers}
-              iconColor="#f97316"
-            />
+          <div className="space-y-4">
+            {/* Top row — 3 cols */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <StatCard
+                label="Total Users"
+                value={stats.totalUsers}
+                icon={Users}
+                iconColor="#f97316"
+              />
+              <StatCard
+                label="Total Agents"
+                value={stats.totalAgents}
+                icon={Bot}
+                iconColor="#60A5FA"
+              />
+              <StatCard
+                label="Active Agents"
+                value={stats.activeAgents}
+                icon={Activity}
+                iconColor="#4ADE80"
+              />
+            </div>
+            {/* Bottom row — 4 cols */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <StatCard
+                label="Total Payments"
+                value={stats.totalPayments}
+                icon={DollarSign}
+                iconColor="#FBBF24"
+              />
+              <StatCard
+                label="Revenue"
+                value={`$${stats.totalRevenueUsd.toFixed(2)}`}
+                icon={Wallet}
+                iconColor="#4ADE80"
+              />
+              <StatCard
+                label="Messages"
+                value={stats.totalMessages}
+                icon={MessageSquare}
+                iconColor="#60A5FA"
+              />
+              <StatCard
+                label="New Users 7d"
+                value={stats.newUsersLast7d}
+                icon={UserPlus}
+                iconColor="#f97316"
+              />
+            </div>
           </div>
         )}
 
-        {/* ── Agents Table ──────────────────────────────────── */}
+        {/* ── Tab Switcher + Table Area ─────────────────────── */}
         <motion.div className="card glass-noise p-5" variants={cardVariants}>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-5">
-            <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-              All Agents
-              <span className="text-sm font-normal ml-2 text-[var(--text-muted)]">
-                ({filteredAgents.length})
-              </span>
-            </h2>
-
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
-              {/* Status filters */}
-              <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)]">
-                {STATUS_FILTERS.map((f) => (
-                  <button
-                    key={f.key}
-                    onClick={() => setStatusFilter(f.key)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 ${
-                      statusFilter === f.key
-                        ? 'text-[var(--text-primary)] bg-[#f97316]/20'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                    }`}
-                  >
-                    {f.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Search */}
-              <div className="flex items-center gap-2 flex-1 sm:flex-initial rounded-xl px-4 py-2.5 bg-[var(--bg-elevated)] border border-[var(--border-default)] transition-all duration-200 focus-within:border-[rgba(249,115,22,0.4)]">
-                <Search size={16} className="text-[var(--text-muted)]" />
-                <input
-                  type="text"
-                  placeholder="Search agents, wallets..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-transparent outline-none text-sm w-full sm:w-56 text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
-                />
-              </div>
+          {/* Tab switcher */}
+          <div className="flex items-center gap-4 mb-5">
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)]">
+              {(['agents', 'users'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-2 ${
+                    activeTab === tab
+                      ? 'text-[var(--text-primary)] bg-[#f97316]/20'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  {tab === 'agents' ? <Bot size={14} /> : <Users size={14} />}
+                  {tab === 'agents' ? 'Agents' : 'Users'}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Table */}
-          {filteredAgents.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16">
-              <Bot size={40} className="text-[var(--text-muted)] mb-3 opacity-40" />
-              <p className="text-sm text-[var(--text-muted)]">
-                {agents.length === 0 ? 'No agents on the platform yet.' : 'No agents match your filters.'}
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-[var(--border-default)]">
-                    {['Agent', 'Owner', 'Framework', 'Status', 'Created', 'Actions'].map(
-                      (header) => (
-                        <th
-                          key={header}
-                          className="pb-3 pr-4 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]"
-                        >
-                          {header}
-                        </th>
-                      )
-                    )}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredAgents.map((agent) => {
-                    const inProgress = actionInProgress[agent.id];
-                    return (
-                      <tr
-                        key={agent.id}
-                        className="transition-colors hover:bg-white/[0.02] border-b border-[var(--border-default)]"
+          {/* ── Agents Tab ──────────────────────────────────── */}
+          {activeTab === 'agents' && (
+            <>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-5">
+                <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+                  All Agents
+                  <span className="text-sm font-normal ml-2 text-[var(--text-muted)]">
+                    ({filteredAgents.length})
+                  </span>
+                </h2>
+
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+                  {/* Status filters */}
+                  <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)]">
+                    {STATUS_FILTERS.map((f) => (
+                      <button
+                        key={f.key}
+                        onClick={() => setStatusFilter(f.key)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 ${
+                          statusFilter === f.key
+                            ? 'text-[var(--text-primary)] bg-[#f97316]/20'
+                            : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                        }`}
                       >
-                        {/* Agent name */}
-                        <td className="py-3.5 pr-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-[#f97316]/12 flex items-center justify-center flex-shrink-0">
-                              <Bot size={14} className="text-[#f97316]" />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium truncate max-w-[180px] text-[var(--text-primary)]">
-                                {agent.name}
-                              </p>
-                              <p className="text-xs font-mono truncate max-w-[180px] text-[var(--text-muted)]">
-                                {agent.id.slice(0, 8)}...
-                              </p>
-                            </div>
-                          </div>
-                        </td>
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
 
-                        {/* Owner wallet */}
-                        <td className="py-3.5 pr-4">
-                          <span className="text-xs font-mono px-2 py-1 rounded-md bg-[var(--bg-elevated)] text-[var(--text-secondary)]">
-                            {shortenAddress(agent.ownerWallet ?? '', 4)}
-                          </span>
-                        </td>
+                  {/* Search */}
+                  <div className="flex items-center gap-2 flex-1 sm:flex-initial rounded-xl px-4 py-2.5 bg-[var(--bg-elevated)] border border-[var(--border-default)] transition-all duration-200 focus-within:border-[rgba(249,115,22,0.4)]">
+                    <Search size={16} className="text-[var(--text-muted)]" />
+                    <input
+                      type="text"
+                      placeholder="Search agents, wallets..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="bg-transparent outline-none text-sm w-full sm:w-56 text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
+                    />
+                  </div>
+                </div>
+              </div>
 
-                        {/* Framework */}
-                        <td className="py-3.5 pr-4">
-                          <FrameworkTag />
-                        </td>
-
-                        {/* Status */}
-                        <td className="py-3.5 pr-4">
-                          <StatusBadge status={agent.status} />
-                        </td>
-
-                        {/* Created */}
-                        <td className="py-3.5 pr-4">
-                          <span className="text-xs text-[var(--text-muted)]">
-                            {timeAgo(agent.createdAt)}
-                          </span>
-                        </td>
-
-                        {/* Actions */}
-                        <td className="py-3.5">
-                          <div className="flex items-center gap-2">
-                            {/* Pause button */}
-                            <button
-                              onClick={() => handlePause(agent.id)}
-                              disabled={
-                                agent.status === 'paused' ||
-                                agent.status === 'killed' ||
-                                agent.status === 'sleeping' ||
-                                agent.status === 'restarting' ||
-                                !!inProgress
-                              }
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed bg-amber-400/10 text-amber-400 border border-amber-400/20 hover:bg-amber-400/20"
-                              title="Pause agent"
+              {/* Agents Table */}
+              {filteredAgents.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16">
+                  <Bot size={40} className="text-[var(--text-muted)] mb-3 opacity-40" />
+                  <p className="text-sm text-[var(--text-muted)]">
+                    {agents.length === 0 ? 'No agents on the platform yet.' : 'No agents match your filters.'}
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="border-b border-[var(--border-default)]">
+                        {['Agent', 'Owner', 'Framework', 'Status', 'Created', 'Actions'].map(
+                          (header) => (
+                            <th
+                              key={header}
+                              className="pb-3 pr-4 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]"
                             >
-                              {inProgress === 'pause' ? (
-                                <RefreshCw size={12} className="animate-spin" />
-                              ) : (
-                                <Pause size={12} />
-                              )}
-                              Pause
-                            </button>
-
-                            {/* Kill button */}
-                            <button
-                              onClick={() => handleKill(agent.id)}
-                              disabled={agent.status === 'killed' || !!inProgress}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed bg-red-400/10 text-red-400 border border-red-400/20 hover:bg-red-400/20"
-                              title="Kill agent"
-                            >
-                              {inProgress === 'kill' ? (
-                                <RefreshCw size={12} className="animate-spin" />
-                              ) : (
-                                <XCircle size={12} />
-                              )}
-                              Kill
-                            </button>
-                          </div>
-                        </td>
+                              {header}
+                            </th>
+                          )
+                        )}
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                    </thead>
+                    <tbody>
+                      {filteredAgents.map((agent) => {
+                        const inProgress = actionInProgress[agent.id];
+                        return (
+                          <tr
+                            key={agent.id}
+                            className="transition-colors hover:bg-white/[0.02] border-b border-[var(--border-default)]"
+                          >
+                            {/* Agent name */}
+                            <td className="py-3.5 pr-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-[#f97316]/12 flex items-center justify-center flex-shrink-0">
+                                  <Bot size={14} className="text-[#f97316]" />
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="text-sm font-medium truncate max-w-[180px] text-[var(--text-primary)]">
+                                    {agent.name}
+                                  </p>
+                                  <p className="text-xs font-mono truncate max-w-[180px] text-[var(--text-muted)]">
+                                    {agent.id.slice(0, 8)}...
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Owner wallet */}
+                            <td className="py-3.5 pr-4">
+                              <span className="text-xs font-mono px-2 py-1 rounded-md bg-[var(--bg-elevated)] text-[var(--text-secondary)]">
+                                {shortenAddress(agent.ownerWallet ?? '', 4)}
+                              </span>
+                            </td>
+
+                            {/* Framework */}
+                            <td className="py-3.5 pr-4">
+                              <FrameworkTag />
+                            </td>
+
+                            {/* Status */}
+                            <td className="py-3.5 pr-4">
+                              <StatusBadge status={agent.status} />
+                            </td>
+
+                            {/* Created */}
+                            <td className="py-3.5 pr-4">
+                              <span className="text-xs text-[var(--text-muted)]">
+                                {timeAgo(agent.createdAt)}
+                              </span>
+                            </td>
+
+                            {/* Actions */}
+                            <td className="py-3.5">
+                              <div className="flex items-center gap-2">
+                                {/* Pause button */}
+                                <button
+                                  onClick={() => handlePause(agent.id)}
+                                  disabled={
+                                    agent.status === 'paused' ||
+                                    agent.status === 'killed' ||
+                                    agent.status === 'sleeping' ||
+                                    agent.status === 'restarting' ||
+                                    !!inProgress
+                                  }
+                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed bg-amber-400/10 text-amber-400 border border-amber-400/20 hover:bg-amber-400/20"
+                                  title="Pause agent"
+                                >
+                                  {inProgress === 'pause' ? (
+                                    <RefreshCw size={12} className="animate-spin" />
+                                  ) : (
+                                    <Pause size={12} />
+                                  )}
+                                  Pause
+                                </button>
+
+                                {/* Kill button */}
+                                <button
+                                  onClick={() => handleKill(agent.id)}
+                                  disabled={agent.status === 'killed' || !!inProgress}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed bg-red-400/10 text-red-400 border border-red-400/20 hover:bg-red-400/20"
+                                  title="Kill agent"
+                                >
+                                  {inProgress === 'kill' ? (
+                                    <RefreshCw size={12} className="animate-spin" />
+                                  ) : (
+                                    <XCircle size={12} />
+                                  )}
+                                  Kill
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* ── Users Tab ───────────────────────────────────── */}
+          {activeTab === 'users' && (
+            <>
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+                  All Users
+                  <span className="text-sm font-normal ml-2 text-[var(--text-muted)]">
+                    ({users.length})
+                  </span>
+                </h2>
+              </div>
+
+              {users.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16">
+                  <Users size={40} className="text-[var(--text-muted)] mb-3 opacity-40" />
+                  <p className="text-sm text-[var(--text-muted)]">No users on the platform yet.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="border-b border-[var(--border-default)]">
+                        {['Wallet', 'Agents', 'Payments', 'Credits', 'Joined'].map(
+                          (header) => (
+                            <th
+                              key={header}
+                              className="pb-3 pr-4 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]"
+                            >
+                              {header}
+                            </th>
+                          )
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.map((user) => (
+                        <tr
+                          key={user.id}
+                          className="transition-colors hover:bg-white/[0.02] border-b border-[var(--border-default)]"
+                        >
+                          {/* Wallet */}
+                          <td className="py-3.5 pr-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-[#f97316]/12 flex items-center justify-center flex-shrink-0">
+                                <Users size={14} className="text-[#f97316]" />
+                              </div>
+                              <span className="text-xs font-mono px-2 py-1 rounded-md bg-[var(--bg-elevated)] text-[var(--text-secondary)]">
+                                {shortenAddress(user.walletAddress, 4)}
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* Agent count */}
+                          <td className="py-3.5 pr-4">
+                            <span className="text-sm text-[var(--text-primary)]">
+                              {user.agentCount}
+                            </span>
+                          </td>
+
+                          {/* Payment count */}
+                          <td className="py-3.5 pr-4">
+                            <span className="text-sm text-[var(--text-primary)]">
+                              {user.paymentCount}
+                            </span>
+                          </td>
+
+                          {/* Credits */}
+                          <td className="py-3.5 pr-4">
+                            <span className="text-sm font-mono text-[var(--text-primary)]">
+                              {user.hatchCredits.toFixed(2)}
+                            </span>
+                          </td>
+
+                          {/* Joined */}
+                          <td className="py-3.5 pr-4">
+                            <span className="text-xs text-[var(--text-muted)]">
+                              {timeAgo(user.createdAt)}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
           )}
         </motion.div>
 
