@@ -2,15 +2,30 @@ import Link from 'next/link';
 
 const DOCS_URL = process.env.NEXT_PUBLIC_DOCS_URL || 'https://docs.hatcher.fun';
 
-const NAV_LINKS = [
-  { href: '/',        label: 'Home'    },
-  { href: '/pricing', label: 'Pricing' },
-  { href: '/token',   label: '$HATCH'  },
-  { href: DOCS_URL,   label: 'Docs',   external: true },
-  { href: 'https://github.com/HatcherLabs/Hatcher', label: 'GitHub', external: true },
+const PRODUCT_LINKS = [
+  { label: 'Create Agent', href: '/create' },
+  { label: 'Explore', href: '/explore' },
+  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Pricing', href: '/pricing' },
+  { label: '$HATCH', href: '/token' },
 ];
 
-const SOCIAL_LINKS = [
+const RESOURCE_LINKS = [
+  { label: 'Documentation', href: DOCS_URL, external: true },
+  { label: 'Support', href: '/support' },
+  { label: 'Help', href: '/help' },
+  { label: 'OpenClaw', href: 'https://openclaw.org', external: true },
+  { label: 'ClawHub Skills', href: 'https://clawhub.org', external: true },
+];
+
+const COMMUNITY_LINKS = [
+  { label: 'Twitter', href: 'https://x.com/hatcherfun' },
+  { label: 'Discord', href: 'https://discord.gg/hatcher' },
+  { label: 'Telegram', href: 'https://t.me/hatcherfun' },
+  { label: 'GitHub', href: 'https://github.com/HatcherLabs' },
+];
+
+const SOCIAL_ICONS = [
   {
     href: 'https://x.com/hatcherfun',
     label: 'X (Twitter)',
@@ -43,58 +58,110 @@ const SOCIAL_LINKS = [
 export function Footer() {
   return (
     <footer className="mt-auto border-t border-white/[0.06]">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          {/* Logo */}
-          <span className="text-sm font-semibold text-white">Hatcher</span>
-
-          {/* Nav links */}
-          <nav className="flex flex-wrap gap-x-5 gap-y-1.5">
-            {NAV_LINKS.map((link) =>
-              link.external ? (
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+          {/* Brand */}
+          <div className="col-span-2 md:col-span-1">
+            <div className="flex items-center gap-2 mb-3">
+              <svg viewBox="0 0 28 28" width="22" height="22" fill="none" className="drop-shadow-[0_0_6px_rgba(249,115,22,0.3)]">
+                <ellipse cx="14" cy="15" rx="9" ry="11" fill="url(#eggGradF)" stroke="#f97316" strokeWidth="1" opacity="0.9" />
+                <circle cx="14" cy="12" r="2" fill="#f97316" opacity="0.6" />
+                <defs>
+                  <linearGradient id="eggGradF" x1="14" y1="4" x2="14" y2="26" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stopColor="#252240" />
+                    <stop offset="100%" stopColor="#1A1730" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <span className="text-base font-bold text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Hatcher</span>
+            </div>
+            <p className="text-xs text-[#A5A1C2] leading-relaxed max-w-[200px]">
+              Deploy autonomous AI agents across 20+ platforms. Powered by OpenClaw.
+            </p>
+            {/* Social icons */}
+            <div className="flex items-center gap-1.5 mt-4">
+              {SOCIAL_ICONS.map((s) => (
                 <a
-                  key={link.href}
-                  href={link.href}
+                  key={s.href}
+                  href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+                  aria-label={s.label}
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-[#71717a] hover:text-white hover:bg-white/[0.04] transition-colors duration-200"
                 >
-                  {link.label}
+                  {s.icon}
                 </a>
-              ) : (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-sm text-[#71717a] hover:text-[#A5A1C2] transition-colors"
-                >
-                  {link.label}
-                </Link>
-              )
-            )}
-          </nav>
+              ))}
+            </div>
+          </div>
 
-          {/* Social icons */}
-          <div className="flex items-center gap-2">
-            {SOCIAL_LINKS.map((s) => (
-              <a
-                key={s.href}
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={s.label}
-                className="w-7 h-7 rounded-lg flex items-center justify-center text-[#71717a] hover:text-[#A5A1C2] transition-colors duration-200"
-              >
-                {s.icon}
-              </a>
-            ))}
+          {/* Product */}
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[#71717a] mb-3">Product</p>
+            <ul className="space-y-2">
+              {PRODUCT_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="text-sm text-[#A5A1C2] hover:text-white transition-colors duration-200">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Resources */}
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[#71717a] mb-3">Resources</p>
+            <ul className="space-y-2">
+              {RESOURCE_LINKS.map((link) => (
+                <li key={link.href}>
+                  {link.external ? (
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-[#A5A1C2] hover:text-white transition-colors duration-200"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link href={link.href} className="text-sm text-[#A5A1C2] hover:text-white transition-colors duration-200">
+                      {link.label}
+                    </Link>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Community */}
+          <div>
+            <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[#71717a] mb-3">Community</p>
+            <ul className="space-y-2">
+              {COMMUNITY_LINKS.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-[#A5A1C2] hover:text-white transition-colors duration-200"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
-        {/* Bottom line */}
-        <div className="border-t border-white/[0.06] mt-6 pt-5">
-          <div className="text-sm text-[#71717a] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <span>Powered by OpenClaw</span>
-            <span>&copy; {new Date().getFullYear()} hatcher.fun</span>
+        {/* Bottom bar */}
+        <div className="border-t border-white/[0.06] pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <span className="text-xs text-[#71717a]">&copy; {new Date().getFullYear()} HatcherLabs. All rights reserved.</span>
+          <div className="flex items-center gap-3 text-xs text-[#71717a]">
+            <span>Powered by</span>
+            <span className="font-medium text-[#A5A1C2]">OpenClaw</span>
+            <span>&middot;</span>
+            <span className="font-medium text-[#A5A1C2]">Solana</span>
           </div>
         </div>
       </div>
