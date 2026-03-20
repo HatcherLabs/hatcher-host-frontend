@@ -377,7 +377,7 @@ export default function BillingPage() {
               <div className="stat-label">Total Spent</div>
               <div className="stat-value text-[var(--accent-400)]">
                 {totalSpent.toLocaleString()}{' '}
-                <span className="text-sm font-normal text-[var(--accent-500)]">$HATCH</span>
+                <span className="text-sm font-normal text-[var(--accent-500)]">tokens</span>
               </div>
             </div>
             <div className="flex items-end gap-[2px] h-6 self-end">
@@ -644,7 +644,7 @@ export default function BillingPage() {
             <Zap size={16} className="text-amber-400" />
             <h2 className="font-semibold text-[var(--text-primary)]">Hosted Credit Packs</h2>
           </div>
-          <span className="text-[10px] text-[var(--text-muted)]">Pay with $HATCH &rarr; get LLM credits</span>
+          <span className="text-[10px] text-[var(--text-muted)]">Pay with tokens &rarr; get LLM credits</span>
         </div>
         <div className="p-6">
           <p className="text-xs text-[var(--text-muted)] mb-4">
@@ -669,7 +669,7 @@ export default function BillingPage() {
                     >
                       ${pack.hatchUsd}
                     </span>
-                    <span className="text-xs text-[var(--text-muted)]">in $HATCH</span>
+                    <span className="text-xs text-[var(--text-muted)]">in tokens</span>
                   </div>
                   <p className="text-xs text-[var(--text-secondary)] mb-3">
                     &rarr; ${pack.creditsUsd} USD in hosted credits
@@ -722,7 +722,7 @@ export default function BillingPage() {
           <EmptyState
             icon={Receipt}
             title="No payments yet"
-            description="Unlock premium features for your agents using $HATCH tokens. Your transaction history will appear here."
+            description="Unlock premium features for your agents using platform tokens. Your transaction history will appear here."
             actionLabel="View Features & Pricing"
             actionHref="/pricing"
           />
@@ -741,7 +741,7 @@ export default function BillingPage() {
                     Amount (USD)
                   </th>
                   <th className="text-right text-[10px] font-bold uppercase tracking-[0.08em] px-6 py-3.5 text-[var(--text-muted)]">
-                    $HATCH
+                    Tokens
                   </th>
                   <th className="text-right text-[10px] font-bold uppercase tracking-[0.08em] px-6 py-3.5 text-[var(--text-muted)]">
                     Status
@@ -798,7 +798,7 @@ export default function BillingPage() {
                       >
                         {payment.hatchAmount.toLocaleString()}
                       </span>
-                      <span className="text-[10px] ml-1 text-[var(--text-muted)]">$HATCH</span>
+                      <span className="text-[10px] ml-1 text-[var(--text-muted)]">tokens</span>
                     </td>
                     <td className="px-6 py-4 text-right whitespace-nowrap">
                       <StatusBadge status={payment.status} />

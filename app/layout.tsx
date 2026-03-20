@@ -31,8 +31,8 @@ const sora = Sora({
 export const metadata: Metadata = {
   title: 'Hatcher — AI Agent Platform on Solana',
   description:
-    'Create, customize, and run AI agents powered by OpenClaw. Pay for premium features with $HATCH tokens.',
-  keywords: ['AI agents', 'Solana', 'crypto', 'OpenClaw', '$HATCH'],
+    'Create, customize, and run AI agents powered by OpenClaw. Pay for premium features with platform tokens.',
+  keywords: ['AI agents', 'Solana', 'crypto', 'OpenClaw', 'Hatcher'],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -64,9 +64,9 @@ const QUICK_LINKS = [
   },
   {
     icon: Users,
-    label: 'Community',
-    description: 'Join the conversation',
-    href: '#',
+    label: 'Follow Us',
+    description: 'Updates and announcements',
+    href: 'https://x.com/HatcherLabs',
     external: true,
   },
 ];

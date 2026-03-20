@@ -66,13 +66,6 @@ const LINKS = [
     color: '#f97316',
   },
   {
-    label: 'Discord Community',
-    description: 'Join our community for support and discussion',
-    href: SOCIAL_LINKS.discord,
-    icon: MessageCircle,
-    color: '#5865F2',
-  },
-  {
     label: 'X (Twitter)',
     description: 'Follow us for updates and announcements',
     href: SOCIAL_LINKS.twitter,
@@ -80,11 +73,11 @@ const LINKS = [
     color: '#fafafa',
   },
   {
-    label: 'Telegram',
-    description: 'Chat with the team and community',
-    href: SOCIAL_LINKS.telegram,
-    icon: Send,
-    color: '#26A5E4',
+    label: 'GitHub',
+    description: 'Source code and issue tracking',
+    href: SOCIAL_LINKS.github,
+    icon: ExternalLink,
+    color: '#fafafa',
   },
 ];
 
@@ -99,7 +92,7 @@ const GETTING_STARTED = [
     title: 'Connect Platforms',
     description: 'Link Telegram, Discord, WhatsApp, and 20+ messaging platforms.',
     icon: Plug,
-    href: '/docs#integrations',
+    href: 'https://docs.hatcher.host/integrations',
   },
   {
     title: 'Add BYOK Key',
@@ -133,8 +126,8 @@ const QUICK_FAQ = [
     a: 'Hatcher automatically restarts crashed containers up to 3 times within a 5-minute window. If the issue persists, the agent will be marked as errored and you will be notified. Check the logs for error details.',
   },
   {
-    q: 'How do payments work with $HATCH?',
-    a: 'Feature prices are listed in USD. When you purchase, the equivalent $HATCH amount is calculated using the live Jupiter Price API rate. You sign a Solana transaction, and once confirmed, the feature is unlocked.',
+    q: 'How do payments work?',
+    a: 'Feature prices are listed in USD. When you purchase, the equivalent token amount is calculated using the live Jupiter Price API rate. You sign a Solana transaction, and once confirmed, the feature is unlocked.',
   },
   {
     q: 'Can I export my agent configuration?',

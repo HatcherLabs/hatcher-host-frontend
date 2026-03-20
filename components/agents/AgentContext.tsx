@@ -44,6 +44,8 @@ export interface IntegrationDef {
   fields: IntegrationField[];
   /** If true, channel settings (dmPolicy, groupPolicy, streaming) are shown */
   hasChannelSettings?: boolean;
+  /** Link to docs page explaining how to obtain API keys */
+  docsUrl?: string;
 }
 
 export interface AgentStats {
@@ -125,6 +127,7 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     name: 'Telegram',
     description: 'Deploy your agent as a Telegram bot.',
     secretPrefix: 'TELEGRAM',
+    docsUrl: 'https://docs.hatcher.host/integrations/telegram',
     hasChannelSettings: true,
     fields: [
       { key: 'TELEGRAM_BOT_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'Bot token from @BotFather', helper: 'Message @BotFather on Telegram to create a bot and get the token', required: true },
@@ -135,6 +138,7 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     name: 'Discord',
     description: 'Deploy your agent as a Discord bot.',
     secretPrefix: 'DISCORD',
+    docsUrl: 'https://docs.hatcher.host/integrations/discord',
     hasChannelSettings: true,
     fields: [
       { key: 'DISCORD_BOT_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'Discord bot token', helper: 'From Discord Developer Portal > Bot > Token', required: true },
@@ -146,6 +150,7 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     name: 'WhatsApp',
     description: 'Connect your agent to WhatsApp Business.',
     secretPrefix: 'WHATSAPP',
+    docsUrl: 'https://docs.hatcher.host/integrations/whatsapp',
     hasChannelSettings: true,
     fields: [
       { key: 'WHATSAPP_TOKEN', label: 'Business API Token', type: 'password', placeholder: 'WhatsApp Business API token', helper: 'From Meta Business Suite > WhatsApp > API Setup', required: true },
@@ -157,9 +162,24 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     name: 'Signal',
     description: 'Connect your agent to Signal messenger.',
     secretPrefix: 'SIGNAL',
+    docsUrl: 'https://docs.hatcher.host/integrations/signal',
     hasChannelSettings: true,
     fields: [
       { key: 'SIGNAL_CLI_CONFIG', label: 'CLI Config Path', type: 'text', placeholder: '/home/user/.local/share/signal-cli', helper: 'Path to signal-cli config directory on your server', required: true },
+    ],
+  },
+  {
+    featureKey: 'openclaw.platform.twitter',
+    name: 'X (Twitter)',
+    description: 'Post and interact on Twitter/X.',
+    secretPrefix: 'TWITTER',
+    docsUrl: 'https://docs.hatcher.host/integrations/twitter',
+    hasChannelSettings: false,
+    fields: [
+      { key: 'TWITTER_API_KEY', label: 'API Key', type: 'password', placeholder: 'Your Twitter API key', helper: 'From Twitter Developer Portal > Keys and Tokens', required: true },
+      { key: 'TWITTER_API_SECRET', label: 'API Secret', type: 'password', placeholder: 'Your Twitter API secret', required: true },
+      { key: 'TWITTER_ACCESS_TOKEN', label: 'Access Token', type: 'password', placeholder: 'Your access token', required: true },
+      { key: 'TWITTER_ACCESS_SECRET', label: 'Access Token Secret', type: 'password', placeholder: 'Your access token secret', required: true },
     ],
   },
   {
@@ -167,6 +187,7 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     name: 'Slack',
     description: 'Deploy your agent in Slack workspaces.',
     secretPrefix: 'SLACK',
+    docsUrl: 'https://docs.hatcher.host/integrations/slack',
     hasChannelSettings: true,
     fields: [
       { key: 'SLACK_BOT_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'xoxb-...', helper: 'Bot User OAuth Token from Slack API', required: true },

@@ -1,16 +1,10 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import { Header } from './Header';
 import { Footer } from './Footer';
-import { Sidebar } from './Sidebar';
-import { BottomNav } from './BottomNav';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isDashboard = pathname.startsWith('/dashboard') || pathname === '/create' || pathname === '/settings';
-
   return (
     <div className="min-h-screen flex flex-col">
       {/* Skip to content -- accessibility */}
@@ -21,16 +15,15 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
         Skip to content
       </a>
       <Header />
-      <Sidebar />
       <main
         id="main-content"
         role="main"
-        className={isDashboard ? 'flex-1 dashboard-content' : 'flex-1'}
+        className="flex-1"
         tabIndex={-1}
       >
         {children}
       </main>
-      {isDashboard ? <BottomNav /> : <Footer />}
+      <Footer />
       <ScrollToTop />
     </div>
   );

@@ -394,6 +394,37 @@ export const api = {
       take: number;
     }>(`/admin/users?skip=${skip}&take=${take}`),
 
+  /** Admin: list all support tickets */
+  adminGetTickets: () =>
+    req<{
+      tickets: Array<{
+        id: string;
+        subject: string;
+        category: string;
+        priority: string;
+        status: string;
+        userWallet: string;
+        agentName: string | null;
+        messages: Array<{ role: string; content: string; timestamp: string }>;
+        createdAt: string;
+        updatedAt: string;
+      }>;
+    }>('/admin/tickets'),
+
+  /** Admin: reply to a ticket */
+  adminReplyTicket: (ticketId: string, message: string) =>
+    req<{ id: string }>(`/admin/tickets/${ticketId}/reply`, {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    }),
+
+  /** Admin: update ticket status */
+  adminUpdateTicketStatus: (ticketId: string, status: string) =>
+    req<{ id: string; status: string }>(`/admin/tickets/${ticketId}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    }),
+
   /** Run a research task for an agent */
   research: (agentId: string, query: string) =>
     req<{ query: string; result: string; model: string; completedAt: string }>(`/agents/${agentId}/research`, {

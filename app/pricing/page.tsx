@@ -9,7 +9,7 @@ import {
   HOSTED_CREDIT_MODELS,
   FREE_TIER_LIMITS,
   FRAMEWORKS,
-  TOKEN_ECONOMY,
+
   getFeaturesByFramework,
 } from '@hatcher/shared';
 import type { FeaturePricing, AgentFramework } from '@hatcher/shared';
@@ -153,7 +153,7 @@ export default function PricingPage() {
             <span className="text-[var(--text-primary)]">Pricing</span>
           </h1>
           <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto leading-relaxed relative">
-            Every agent starts free with Groq LLM. Unlock features a la carte with $HATCH tokens.
+            Every agent starts free with Groq LLM. Unlock features a la carte with platform tokens.
             Bring your own API key anytime -- always free.
           </p>
         </motion.div>
@@ -336,7 +336,7 @@ export default function PricingPage() {
                 <motion.div
                   key={pack.key}
                   className={cn(
-                    'card glass-noise p-6 text-center relative overflow-hidden',
+                    'card glass-noise p-6 text-center relative',
                     isBestValue && 'card-gradient-border'
                   )}
                   whileHover={cardHover}
@@ -359,7 +359,7 @@ export default function PricingPage() {
                   <div className="text-3xl font-extrabold mb-1 relative">
                     <span className="text-gradient">${pack.hatchUsd}</span>
                   </div>
-                  <p className="text-[var(--text-muted)] text-xs mb-5 relative">in $HATCH</p>
+                  <p className="text-[var(--text-muted)] text-xs mb-5 relative">in tokens</p>
                   <div className="bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] rounded-xl px-4 py-3 mb-3 backdrop-blur-sm relative">
                     <span className="text-sm text-[var(--text-secondary)]">
                       ${pack.creditsUsd} <span className="text-[var(--text-muted)]">in credits</span>
@@ -473,7 +473,7 @@ export default function PricingPage() {
             <p className="text-[var(--text-muted)] text-sm">See what each plan includes at a glance</p>
           </div>
 
-          <div className="card glass-noise p-0 overflow-hidden">
+          <div className="card glass-noise p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -483,13 +483,7 @@ export default function PricingPage() {
                       <div className="text-xs uppercase tracking-wider mb-1">Free</div>
                       <div className="text-lg font-extrabold">$0</div>
                     </th>
-                    <th className="text-center p-5 text-[var(--text-primary)] font-semibold relative">
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-[#f97316] to-[#ea580c] text-white text-[9px] font-bold uppercase tracking-wider shadow-[0_0_12px_rgba(249,115,22,0.4)]">
-                          <Flame className="w-2.5 h-2.5" />
-                          POPULAR
-                        </span>
-                      </div>
+                    <th className="text-center p-5 text-[var(--text-primary)] font-semibold">
                       <div className="text-xs uppercase tracking-wider mb-1">Starter</div>
                       <div className="text-lg font-extrabold text-gradient">$18</div>
                     </th>
@@ -520,55 +514,6 @@ export default function PricingPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
-          </div>
-        </motion.section>
-
-        {/* TOKEN ECONOMY */}
-        <motion.section
-          className="mb-20"
-          variants={scrollFadeIn}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.15 }}
-        >
-          <div className="glass-premium glass-noise p-8 sm:p-12 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(249,115,22,0.08),transparent_60%)] pointer-events-none" />
-            <motion.div
-              animate={{ rotate: [0, 5, -5, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-              className="relative"
-            >
-              <Sparkles className="w-8 h-8 text-[#f97316] mx-auto mb-4" />
-            </motion.div>
-            <h2 className="text-2xl font-bold mb-3 relative" style={displayFont}>
-              <span className="text-gradient">The $HATCH Token Economy</span>
-            </h2>
-            <p className="text-[var(--text-secondary)] text-sm max-w-xl mx-auto mb-10 leading-relaxed relative">
-              Every payment is split: {TOKEN_ECONOMY.burnRate * 100}% burned forever (deflationary),
-              {' '}{TOKEN_ECONOMY.treasuryRate * 100}% to the treasury.
-              The more the platform grows, the more $HATCH gets burned.
-            </p>
-
-            <div className="grid grid-cols-3 gap-4 max-w-md mx-auto relative">
-              {[
-                { value: `${TOKEN_ECONOMY.burnRate * 100}%`, label: 'Burned', sub: 'deflationary', color: '#F87171' },
-                { value: `${TOKEN_ECONOMY.treasuryRate * 100}%`, label: 'Treasury', sub: 'operations', color: '#f97316' },
-                { value: 'Live', label: 'Price Feed', sub: 'Jupiter API', color: '#f97316' },
-              ].map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  className="bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] rounded-xl p-4 text-center backdrop-blur-sm transition-all duration-200 hover:border-[rgba(249,115,22,0.3)]"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3 + i * 0.1 }}
-                  whileHover={{ boxShadow: '0 0 20px rgba(249,115,22,0.08)' }}
-                >
-                  <div className="text-2xl font-extrabold text-gradient">{stat.value}</div>
-                  <div className="text-xs font-medium mt-1 text-[var(--text-secondary)]">{stat.label}</div>
-                  <div className="text-[10px] text-[var(--text-muted)] mt-0.5">{stat.sub}</div>
-                </motion.div>
-              ))}
             </div>
           </div>
         </motion.section>
@@ -611,7 +556,7 @@ export default function PricingPage() {
           </h2>
           <p className="text-[var(--text-secondary)] text-base max-w-lg mx-auto mb-8 leading-relaxed relative">
             Start free with Groq LLM. Bring your own API key anytime -- always free.
-            Unlock premium features with $HATCH when you are ready.
+            Unlock premium features with tokens when you are ready.
           </p>
           <div className="flex items-center justify-center gap-4 relative">
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
@@ -698,10 +643,10 @@ function FrameworkFeaturesSection({
                       </div>
                     )}
                     <div className="flex items-start justify-between gap-3 mb-2">
-                      <div>
+                      <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-[var(--text-primary)]">{f.name}</span>
                         {f.free && (
-                          <span className="ml-2 text-[10px] text-green-400 border border-green-500/20 bg-green-500/10 rounded-full px-2 py-0.5 font-medium">
+                          <span className="text-[10px] text-green-400 border border-green-500/20 bg-green-500/10 rounded-full px-2 py-0.5 font-medium">
                             free
                           </span>
                         )}
@@ -788,7 +733,7 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
 const FAQ = [
   {
     q: 'Do I need a Solana wallet to create an agent?',
-    a: 'You need a wallet to authenticate (Phantom or Solflare). Creating and using the free tier is completely free -- you only need $HATCH tokens when unlocking paid features.',
+    a: 'You need a wallet to authenticate (Phantom or Solflare). Creating and using the free tier is completely free -- you only need tokens when unlocking paid features.',
   },
   {
     q: 'What is BYOK (Bring Your Own Key)?',
@@ -796,11 +741,11 @@ const FAQ = [
   },
   {
     q: 'How are Hatcher Credits different from BYOK?',
-    a: 'Credits let you use premium models (Claude Haiku 4.5, GPT-4o mini, Gemini 2.0 Flash) through Hatcher without your own API key. You buy credit packs with $HATCH and we proxy the calls.',
+    a: 'Credits let you use premium models (Claude Haiku 4.5, GPT-4o mini, Gemini 2.0 Flash) through Hatcher without your own API key. You buy credit packs with tokens and we proxy the calls.',
   },
   {
-    q: 'How is the $HATCH price determined?',
-    a: 'Feature prices are listed in USD. The equivalent $HATCH amount is calculated at payment time using the live Jupiter Price API rate.',
+    q: 'How is the token price determined?',
+    a: 'Feature prices are listed in USD. The equivalent token amount is calculated at payment time using the live Jupiter Price API rate.',
   },
   {
     q: 'What framework does Hatcher use?',
@@ -815,7 +760,7 @@ const FAQ = [
     a: 'One-time features (like platform integrations and plugins) are permanent -- pay once and keep them forever. Subscription features (like persistent memory) renew monthly.',
   },
   {
-    q: 'Is the $HATCH token launched?',
-    a: '$HATCH launches on PumpFun and graduates to Raydium once it reaches the bonding curve target. Until then, you can buy it on PumpFun.',
+    q: 'Is the token launched?',
+    a: 'The token has not launched yet. Stay tuned for official announcements on our social channels.',
   },
 ];

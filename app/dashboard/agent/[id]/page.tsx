@@ -206,6 +206,7 @@ export default function AgentManagePage() {
     setLoading(false);
     if (res.success) {
       setAgent(res.data);
+      setMsgCount((res.data as any).chatUsedToday ?? 0);
       setConfigName(res.data.name);
       setConfigDesc(res.data.description ?? '');
       const char = res.data.config ?? {};
@@ -490,28 +491,32 @@ export default function AgentManagePage() {
       return;
     }
 
-    const existingConfig = (agent.config ?? {}) as Record<string, unknown>;
-
     let channelSettingsMerge: Record<string, unknown> = {};
     if (hasSettings) {
       const channelName = integration.secretPrefix.toLowerCase();
-      const existing = (existingConfig.channelSettings ?? {}) as Record<string, Record<string, unknown>>;
-      const existingChannel = existing[channelName] ?? {};
-      const mapped: Record<string, string> = {};
+      const mapped: Record<string, unknown> = {};
       if (channelSettingsUpdate._CS_DM_POLICY) mapped.dmPolicy = channelSettingsUpdate._CS_DM_POLICY;
       if (channelSettingsUpdate._CS_GROUP_POLICY) mapped.groupPolicy = channelSettingsUpdate._CS_GROUP_POLICY;
       if (channelSettingsUpdate._CS_STREAMING) mapped.streaming = channelSettingsUpdate._CS_STREAMING;
+      if (channelSettingsUpdate._CS_DM_ALLOWLIST) {
+        mapped.allowFrom = channelSettingsUpdate._CS_DM_ALLOWLIST.split(',').map((s) => s.trim()).filter(Boolean);
+      }
+      if (channelSettingsUpdate._CS_GROUP_ALLOWLIST) {
+        mapped.groupAllowFrom = channelSettingsUpdate._CS_GROUP_ALLOWLIST.split(',').map((s) => s.trim()).filter(Boolean);
+      }
       channelSettingsMerge = {
         channelSettings: {
-          ...existing,
-          [channelName]: { ...existingChannel, ...mapped },
+          [channelName]: mapped,
         },
       };
     }
 
+    // Only send new secrets and channel settings — do NOT send existingConfig back.
+    // The API's deepMerge handles merging with the existing decrypted config on the
+    // server side. Sending existingConfig would re-send masked '***' values which
+    // would overwrite real encrypted secrets and can also cause Zod validation errors.
     const updateData: Record<string, unknown> = {
       config: {
-        ...existingConfig,
         ...filteredSecrets,
         ...channelSettingsMerge,
       },
@@ -599,7 +604,7 @@ export default function AgentManagePage() {
     if (!text || sending) return;
     if (!hasUnlimitedChat && msgCount >= msgLimit) {
       setChatErrorType('ratelimit');
-      setChatError('Daily message limit reached. Unlock more features with $HATCH.');
+      setChatError('Daily message limit reached. Unlock more features with tokens.');
       return;
     }
     setInput('');
@@ -645,7 +650,7 @@ export default function AgentManagePage() {
           const lower = errMsg.toLowerCase();
           if (lower.includes('429') || lower.includes('rate limit') || lower.includes('daily limit')) {
             setChatErrorType('ratelimit');
-            setChatError('Daily limit reached. Unlock more features with $HATCH.');
+            setChatError('Daily limit reached. Unlock more features with tokens.');
           } else if (lower.includes('timeout') || lower.includes('504') || lower.includes('502')) {
             setChatErrorType('timeout');
             setChatError('Agent had trouble thinking. Try again.');
@@ -732,6 +737,7 @@ export default function AgentManagePage() {
   const frameworkFeatures = FEATURE_CATALOG.filter((f) => f.framework === agent.framework);
   const featuresByCategory: Record<string, FeaturePricing[]> = {};
   for (const f of frameworkFeatures) {
+    if (f.key === 'openclaw.platform.extra') continue; // shown separately in "Other Platforms"
     if (!featuresByCategory[f.category]) featuresByCategory[f.category] = [];
     featuresByCategory[f.category].push(f);
   }

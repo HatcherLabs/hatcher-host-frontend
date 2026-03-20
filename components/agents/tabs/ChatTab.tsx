@@ -171,13 +171,6 @@ export function ChatTab() {
         </div>
       ) : (
         <div>
-          {/* Message counter */}
-          {!hasUnlimitedChat && (
-            <div className="text-right text-[10px] mb-1.5 pr-1 text-[#71717a]">
-              {msgCount}/{msgLimit} messages today
-            </div>
-          )}
-
           <div className="flex gap-2 items-end rounded-2xl p-3 border border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.6)] backdrop-blur-xl focus-within:border-[#f97316]/40 focus-within:shadow-[0_0_20px_rgba(249,115,22,0.06)] transition-all duration-200">
             <textarea
               ref={inputRef}

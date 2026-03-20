@@ -49,6 +49,16 @@ function IntegrationFieldsForm({
 
   return (
     <div className="border-t border-white/[0.06] p-5 space-y-4 bg-white/[0.01]">
+      {integration.docsUrl && (
+        <a
+          href={integration.docsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-xs text-[#f97316] hover:text-[#fb923c] transition-colors"
+        >
+          How to get your API key &rarr;
+        </a>
+      )}
       {[...integration.fields, ...(integration.hasChannelSettings ? CHANNEL_SETTINGS_FIELDS : [])].map((field) => {
         const fieldId = `${fieldIdPrefix}.${sk}.${field.key}`;
         const isVisible = visibleFields.has(fieldId);
@@ -107,6 +117,32 @@ function IntegrationFieldsForm({
                     }
                   </button>
                 )}
+              </div>
+            )}
+
+            {/* Show allowlist input when DM or Group policy is set to allowlist */}
+            {field.key === '_CS_DM_POLICY' && value === 'allowlist' && (
+              <div className="mt-2">
+                <label className="text-[10px] text-[#71717a] mb-1 block">Allowed User IDs (comma-separated)</label>
+                <input
+                  type="text"
+                  className="config-input text-sm"
+                  value={currentValues['_CS_DM_ALLOWLIST'] ?? ''}
+                  onChange={(e) => setIntegrationField(sk, '_CS_DM_ALLOWLIST', e.target.value)}
+                  placeholder="e.g. 123456789, 987654321"
+                />
+              </div>
+            )}
+            {field.key === '_CS_GROUP_POLICY' && value === 'allowlist' && (
+              <div className="mt-2">
+                <label className="text-[10px] text-[#71717a] mb-1 block">Allowed Group IDs (comma-separated)</label>
+                <input
+                  type="text"
+                  className="config-input text-sm"
+                  value={currentValues['_CS_GROUP_ALLOWLIST'] ?? ''}
+                  onChange={(e) => setIntegrationField(sk, '_CS_GROUP_ALLOWLIST', e.target.value)}
+                  placeholder="e.g. -100123456789"
+                />
               </div>
             )}
 
@@ -479,7 +515,7 @@ export function IntegrationsTab() {
 
           {/* Price note */}
           <p className="text-center text-xs text-[#71717a]">
-            All prices in USD, paid in $HATCH at live market rate via Jupiter
+            All prices in USD, paid in tokens at live market rate via Jupiter
           </p>
         </>
       )}

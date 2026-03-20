@@ -80,7 +80,7 @@ const QUICK_LINKS = [
   {
     icon: CreditCard,
     title: 'Billing & Pricing',
-    description: 'Understand $HATCH payments, feature unlocks, hosted credits, and subscription management.',
+    description: 'Understand token payments, feature unlocks, hosted credits, and subscription management.',
     href: '/billing',
     color: '#fbbf24',
   },
@@ -246,7 +246,7 @@ export default function DocsPage() {
               { label: 'OpenClaw configuration reference', href: '/agent-configuration#openclaw' },
               { label: 'Container lifecycle & status codes', href: '/api-reference#containers' },
               { label: 'Setting up Telegram integration', href: '/integrations#telegram' },
-              { label: 'Understanding $HATCH payments', href: '/billing#hatch-payments' },
+              { label: 'Understanding token payments', href: '/billing#hatch-payments' },
             ].map((topic) => (
               <a
                 key={topic.label}

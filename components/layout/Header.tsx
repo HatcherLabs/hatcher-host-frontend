@@ -18,7 +18,7 @@ const NAV_LINKS = [
   { href: '/create',            label: 'Create' },
   { href: '/dashboard/billing', label: 'Billing' },
   { href: '/pricing',           label: 'Pricing' },
-  { href: '/token',             label: '$HATCH' },
+  { href: '/token',             label: 'Our Token' },
   { href: '/support',           label: 'Support' },
 ];
 
@@ -26,7 +26,7 @@ function isActive(pathname: string, href: string) {
   if (pathname === href) return true;
   if (href === '/dashboard') return false;
   if (href === '/dashboard/agents' && pathname.startsWith('/dashboard/agent/')) return true;
-  return pathname.startsWith(href + '/') || pathname.startsWith(href);
+  return pathname.startsWith(href + '/');
 }
 
 export function Header() {
@@ -36,8 +36,8 @@ export function Header() {
   const walletAddress = publicKey?.toString() ?? '';
   const isAdmin = ADMIN_WALLET ? walletAddress === ADMIN_WALLET : false;
 
-  // On dashboard/create/settings routes, sidebar handles navigation — hide header nav
-  const hasSidebar = pathname.startsWith('/dashboard') || pathname === '/create' || pathname === '/settings';
+  // Always show header nav — no sidebar
+  const hasSidebar = false;
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-black/50 backdrop-blur-xl">

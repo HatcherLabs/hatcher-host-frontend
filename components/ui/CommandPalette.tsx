@@ -33,7 +33,7 @@ const COMMANDS: CommandItem[] = [
   { id: 'billing', label: 'Billing', icon: CreditCard, href: '/dashboard/billing', shortcut: 'B', section: 'Navigation' },
   { id: 'settings', label: 'Settings', icon: Settings, href: '/settings', shortcut: 'S', section: 'Navigation' },
   { id: 'pricing', label: 'Pricing', icon: Zap, href: '/pricing', section: 'Navigation' },
-  { id: 'token', label: '$HATCH Token', icon: Coins, href: '/token', section: 'Navigation' },
+  { id: 'token', label: 'Platform Token', icon: Coins, href: '/token', section: 'Navigation' },
   { id: 'help', label: 'Help & Support', icon: HelpCircle, href: '/support', section: 'Navigation' },
 ];
 

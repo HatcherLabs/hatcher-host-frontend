@@ -24,6 +24,10 @@ import {
   MessageSquare,
   UserPlus,
   Wallet,
+  Ticket,
+  Clock,
+  CheckCircle2,
+  ExternalLink,
 } from 'lucide-react';
 
 // ── Admin wallet -- matches backend env.ADMIN_WALLET ──────────
@@ -140,10 +144,23 @@ export default function AdminPage() {
     hatchCredits: number;
     createdAt: string;
   }>>([]);
+  const [tickets, setTickets] = useState<Array<{
+    id: string;
+    subject: string;
+    category: string;
+    priority: string;
+    status: string;
+    userWallet: string;
+    agentName: string | null;
+    messages: Array<{ role: string; content: string; timestamp: string }>;
+    createdAt: string;
+    updatedAt: string;
+  }>>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'agents' | 'users'>('agents');
+  const [activeTab, setActiveTab] = useState<'agents' | 'users' | 'tickets'>('agents');
+  const [ticketFilter, setTicketFilter] = useState<'all' | 'open' | 'in_progress' | 'resolved'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
@@ -160,17 +177,19 @@ export default function AdminPage() {
     setLoading(true);
     setError(null);
 
-    Promise.all([api.adminGetStats(), api.adminGetAgents(), api.adminGetUsers()])
-      .then(([statsRes, agentsRes, usersRes]) => {
+    Promise.all([api.adminGetStats(), api.adminGetAgents(), api.adminGetUsers(), api.adminGetTickets()])
+      .then(([statsRes, agentsRes, usersRes, ticketsRes]) => {
         setLoading(false);
         if (statsRes.success) setStats(statsRes.data);
         else setError(statsRes.error);
 
-        if (agentsRes.success) setAgents(agentsRes.data);
+        if (agentsRes.success) setAgents(Array.isArray(agentsRes.data) ? agentsRes.data : (agentsRes.data as any).agents ?? []);
         else setError((prev) => prev ?? agentsRes.error);
 
-        if (usersRes.success) setUsers(usersRes.data.users);
+        if (usersRes.success) setUsers(Array.isArray(usersRes.data) ? usersRes.data : (usersRes.data as any).users ?? []);
         else setError((prev) => prev ?? usersRes.error);
+
+        if (ticketsRes.success) setTickets((ticketsRes.data as any).tickets ?? []);
       })
       .catch(() => {
         setLoading(false);
@@ -246,11 +265,25 @@ export default function AdminPage() {
   async function handleRefresh() {
     setLoading(true);
     setError(null);
-    const [statsRes, agentsRes, usersRes] = await Promise.all([api.adminGetStats(), api.adminGetAgents(), api.adminGetUsers()]);
+    const [statsRes, agentsRes, usersRes, ticketsRes] = await Promise.all([api.adminGetStats(), api.adminGetAgents(), api.adminGetUsers(), api.adminGetTickets()]);
     setLoading(false);
     if (statsRes.success) setStats(statsRes.data);
-    if (agentsRes.success) setAgents(agentsRes.data);
-    if (usersRes.success) setUsers(usersRes.data.users);
+    if (agentsRes.success) setAgents(Array.isArray(agentsRes.data) ? agentsRes.data : (agentsRes.data as any).agents ?? []);
+    if (usersRes.success) setUsers(Array.isArray(usersRes.data) ? usersRes.data : (usersRes.data as any).users ?? []);
+    if (ticketsRes.success) setTickets((ticketsRes.data as any).tickets ?? []);
+  }
+
+  async function handleUpdateTicketStatus(ticketId: string, status: string) {
+    try {
+      const res = await api.adminUpdateTicketStatus(ticketId, status);
+      if (res.success) {
+        setTickets(prev => prev.map(t => t.id === ticketId ? { ...t, status } : t));
+      } else {
+        alert(`Failed to update status: ${(res as any).error ?? 'Unknown error'}`);
+      }
+    } catch (e) {
+      alert(`Error: ${(e as Error).message}`);
+    }
   }
 
   // ── Not connected ──────────────────────────────────────────
@@ -471,7 +504,7 @@ export default function AdminPage() {
           {/* Tab switcher */}
           <div className="flex items-center gap-4 mb-5">
             <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)]">
-              {(['agents', 'users'] as const).map((tab) => (
+              {(['agents', 'users', 'tickets'] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -481,8 +514,8 @@ export default function AdminPage() {
                       : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                   }`}
                 >
-                  {tab === 'agents' ? <Bot size={14} /> : <Users size={14} />}
-                  {tab === 'agents' ? 'Agents' : 'Users'}
+                  {tab === 'agents' ? <Bot size={14} /> : tab === 'users' ? <Users size={14} /> : <Ticket size={14} />}
+                  {tab === 'agents' ? 'Agents' : tab === 'users' ? 'Users' : `Tickets${tickets.length ? ` (${tickets.length})` : ''}`}
                 </button>
               ))}
             </div>
@@ -742,6 +775,115 @@ export default function AdminPage() {
               )}
             </>
           )}
+
+          {/* ── Tickets Tab ──────────────────────────────────── */}
+          {activeTab === 'tickets' && (() => {
+            const TICKET_FILTERS = ['all', 'open', 'in_progress', 'resolved'] as const;
+            const filteredTickets = ticketFilter === 'all' ? tickets : tickets.filter(t => t.status === ticketFilter);
+            const statusColors: Record<string, string> = {
+              open: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+              in_progress: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+              resolved: 'text-green-400 bg-green-500/10 border-green-500/20',
+            };
+            const priorityColors: Record<string, string> = {
+              urgent: 'text-red-400',
+              high: 'text-amber-400',
+              normal: 'text-[var(--text-secondary)]',
+              low: 'text-[#6B6890]',
+            };
+            return (
+              <>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-5">
+                  <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+                    Support Tickets
+                    <span className="text-sm font-normal ml-2 text-[var(--text-muted)]">({filteredTickets.length})</span>
+                  </h2>
+                  <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)]">
+                    {TICKET_FILTERS.map((f) => (
+                      <button
+                        key={f}
+                        onClick={() => setTicketFilter(f)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 capitalize ${
+                          ticketFilter === f
+                            ? 'text-[var(--text-primary)] bg-[#f97316]/20'
+                            : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                        }`}
+                      >
+                        {f === 'all' ? 'All' : f.replace('_', ' ')}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {filteredTickets.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16">
+                    <Ticket size={40} className="text-[var(--text-muted)] mb-3 opacity-40" />
+                    <p className="text-sm text-[var(--text-muted)]">
+                      {tickets.length === 0 ? 'No support tickets yet.' : 'No tickets match this filter.'}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead>
+                        <tr className="border-b border-[var(--border-default)]">
+                          {['Subject', 'User', 'Category', 'Priority', 'Status', 'Updated', ''].map((h) => (
+                            <th key={h} className="pb-3 pr-4 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredTickets.map((ticket) => (
+                          <tr key={ticket.id} className="transition-colors hover:bg-white/[0.02] border-b border-[var(--border-default)]">
+                            <td className="py-3.5 pr-4">
+                              <p className="text-sm font-medium text-[var(--text-primary)] truncate max-w-[250px]">{ticket.subject}</p>
+                              <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{ticket.messages.length} message{ticket.messages.length !== 1 ? 's' : ''}</p>
+                            </td>
+                            <td className="py-3.5 pr-4">
+                              <span className="text-xs font-mono px-2 py-1 rounded-md bg-[var(--bg-elevated)] text-[var(--text-secondary)]">
+                                {shortenAddress(ticket.userWallet, 4)}
+                              </span>
+                            </td>
+                            <td className="py-3.5 pr-4">
+                              <span className="text-xs text-[var(--text-muted)] capitalize">{ticket.category.replace('_', ' ')}</span>
+                            </td>
+                            <td className="py-3.5 pr-4">
+                              <span className={`text-xs font-medium capitalize ${priorityColors[ticket.priority] ?? ''}`}>{ticket.priority}</span>
+                            </td>
+                            <td className="py-3.5 pr-4">
+                              <select
+                                value={ticket.status}
+                                onChange={(e) => handleUpdateTicketStatus(ticket.id, e.target.value)}
+                                className={`text-[10px] font-semibold px-2 py-1 rounded-full border capitalize cursor-pointer appearance-none bg-transparent ${statusColors[ticket.status] ?? statusColors.open}`}
+                              >
+                                <option value="open">Open</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="resolved">Resolved</option>
+                              </select>
+                            </td>
+                            <td className="py-3.5 pr-4">
+                              <span className="text-xs text-[var(--text-muted)]">{timeAgo(ticket.updatedAt)}</span>
+                            </td>
+                            <td className="py-3.5">
+                              <a
+                                href={`/admin/tickets/${ticket.id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#f97316]/10 text-[#f97316] border border-[#f97316]/20 hover:bg-[#f97316]/20 transition-colors"
+                              >
+                                Open
+                                <ExternalLink size={10} />
+                              </a>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </motion.div>
 
         {/* ── Error display ─────────────────────────────────── */}

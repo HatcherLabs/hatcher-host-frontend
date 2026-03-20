@@ -279,7 +279,6 @@
   .card-gradient-border {
     position: relative;
     border: none;
-    overflow: hidden;
   }
   .card-gradient-border::before {
     content: '';

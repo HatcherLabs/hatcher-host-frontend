@@ -263,65 +263,6 @@ function BentoCard({
   );
 }
 
-// ─── Agent Showcase Card ──────────────────────────────────────
-function AgentCard({
-  name,
-  description,
-  status,
-  platforms,
-  delay = 0,
-}: {
-  name: string;
-  description: string;
-  status: string;
-  platforms: string[];
-  delay?: number;
-}) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-40px' });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay, ease: [0.25, 0.1, 0.25, 1] }}
-      className="group relative bg-gradient-to-br from-[rgba(26,23,48,0.6)] to-[rgba(20,18,40,0.8)] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 transition-all duration-300 hover:border-[rgba(249,115,22,0.3)] hover:-translate-y-1 hover:scale-[1.03] hover:shadow-[0_8px_32px_rgba(249,115,22,0.1)] active:scale-[0.98] will-change-transform"
-    >
-      <div className="flex items-start justify-between mb-4">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500/20 to-orange-500/20 border border-white/[0.08] flex items-center justify-center text-sm font-bold text-white group-hover:from-orange-500/30 group-hover:to-orange-500/30 group-hover:border-[rgba(249,115,22,0.3)] transition-all duration-300">
-          {name[0]}
-        </div>
-        <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${
-          status === 'active'
-            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-            : status === 'sleeping'
-            ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-            : status === 'error'
-            ? 'bg-red-500/10 text-red-400 border border-red-500/20'
-            : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-        }`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${
-            status === 'active' ? 'bg-emerald-400 animate-pulse'
-            : status === 'sleeping' ? 'bg-blue-400'
-            : status === 'error' ? 'bg-red-400'
-            : 'bg-amber-400'
-          }`} />
-          {status === 'active' ? 'Active' : status === 'sleeping' ? 'Sleeping' : status === 'error' ? 'Error' : 'Paused'}
-        </span>
-      </div>
-      <h3 className="text-lg font-semibold text-white mb-2">{name}</h3>
-      <p className="text-sm text-[#A5A1C2] leading-relaxed mb-4">{description}</p>
-      <div className="flex flex-wrap gap-2">
-        {platforms.map((p) => (
-          <span key={p} className="text-xs px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.06] text-[#71717a]">
-            {p}
-          </span>
-        ))}
-      </div>
-    </motion.div>
-  );
-}
 
 // ─── Main Page ────────────────────────────────────────────────
 export default function LandingPage() {
@@ -578,7 +519,7 @@ export default function LandingPage() {
               {
                 num: '02',
                 title: 'Power Up',
-                desc: 'Unlock platforms and features with $HATCH tokens. Bring your own API keys — always free.',
+                desc: 'Unlock platforms and features with platform tokens. Bring your own API keys — always free.',
               },
               {
                 num: '03',
@@ -602,63 +543,6 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* ── AGENT SHOWCASE ─────────────────────────────── */}
-      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="showcase">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-10 sm:mb-16">
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">Showcase</p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              <span className="bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 bg-clip-text text-transparent">Built on Hatcher</span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <AgentCard
-              name="Alpha Trader"
-              description="Autonomous trading agent monitoring Solana DEX opportunities 24/7 with real-time alerts."
-              status="active"
-              platforms={['Telegram', 'Discord']}
-              delay={0}
-            />
-            <AgentCard
-              name="Social Butterfly"
-              description="Multi-platform social agent posting daily insights with 13,700+ skills and content generation."
-              status="active"
-              platforms={['Twitter', 'Discord', 'Telegram']}
-              delay={0.1}
-            />
-            <AgentCard
-              name="Research Bot"
-              description="Web research agent that scrapes, summarizes, and delivers crypto news on schedule."
-              status="active"
-              platforms={['Slack', 'WhatsApp']}
-              delay={0.2}
-            />
-            <AgentCard
-              name="DeFi Sentinel"
-              description="Monitors DeFi protocols for yield opportunities, liquidation risks, and arbitrage."
-              status="active"
-              platforms={['Telegram', 'Signal']}
-              delay={0.3}
-            />
-            <AgentCard
-              name="Community Mod"
-              description="AI-powered community moderator with anti-spam, auto-responses, and sentiment analysis."
-              status="active"
-              platforms={['Discord', 'Telegram']}
-              delay={0.4}
-            />
-            <AgentCard
-              name="News Curator"
-              description="Curates personalized crypto and tech news briefings delivered every morning."
-              status="paused"
-              platforms={['WhatsApp', 'Slack', 'iMessage']}
-              delay={0.5}
-            />
-          </div>
-        </div>
-      </Section>
-
       {/* ── PRICING PREVIEW ────────────────────────────── */}
       <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="pricing">
         <div className="max-w-4xl mx-auto">
@@ -668,7 +552,7 @@ export default function LandingPage() {
               Start free, scale up
             </h2>
             <p className="mt-4 text-[#A5A1C2] max-w-lg mx-auto">
-              No rigid tiers. Free baseline with Groq. Unlock features with $HATCH. Bring your own keys — always free.
+              No rigid tiers. Free baseline with Groq. Unlock features with tokens. Bring your own keys — always free.
             </p>
           </div>
 
@@ -706,7 +590,7 @@ export default function LandingPage() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-orange-400 mb-2">Premium</p>
               <p className="text-4xl font-bold text-white mb-1">Pay as you go</p>
-              <p className="text-sm text-[#A5A1C2] mb-8">Unlock with $HATCH tokens.</p>
+              <p className="text-sm text-[#A5A1C2] mb-8">Unlock with platform tokens.</p>
               <ul className="space-y-3">
                 {[
                   'Unlimited agents',
@@ -744,9 +628,9 @@ export default function LandingPage() {
           </div>
           <div className="space-y-3">
             {[
-              { q: 'Is it really free to start?', a: 'Yes. You get 1 agent, Groq free LLM, 50 messages/day, and BYOK — all at zero cost. No $HATCH required.' },
+              { q: 'Is it really free to start?', a: 'Yes. You get 1 agent, Groq free LLM, 50 messages/day, and BYOK — all at zero cost. No tokens required.' },
               { q: 'What is BYOK?', a: 'Bring Your Own Key — use your own API keys from OpenAI, Anthropic, Google, Groq, xAI, OpenRouter, or Ollama. Always free, no payment needed.' },
-              { q: 'How do I pay for features?', a: 'All prices are in USD, paid with $HATCH tokens on Solana. Approve a wallet transaction and the feature activates instantly.' },
+              { q: 'How do I pay for features?', a: 'All prices are in USD, paid with platform tokens on Solana. Approve a wallet transaction and the feature activates instantly.' },
               { q: 'What happens when a subscription expires?', a: 'Your agent keeps running, but the feature is disabled. Renew anytime to re-enable it. 24-hour grace period included.' },
               { q: 'Can I run multiple agents?', a: 'Free tier includes 1 agent. Unlock up to 5, 20, or unlimited agents with account-level subscriptions.' },
             ].map((item, i) => (
