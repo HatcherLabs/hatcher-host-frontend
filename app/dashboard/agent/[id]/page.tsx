@@ -941,30 +941,53 @@ export default function AgentManagePage() {
         </div>
 
         {/* ─── Tab Bar ──────────────────────────────────────── */}
-        <div className="flex items-center gap-0 mb-8 border-b border-[rgba(46,43,74,0.3)] relative overflow-x-auto touch-action-manipulation" role="tablist" style={{ touchAction: 'manipulation', WebkitOverflowScrolling: 'touch' }}>
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              role="tab"
-              aria-selected={tab === t.id}
-              onClick={() => { setTab(t.id); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              className={`relative flex items-center gap-2 px-5 py-3 text-sm transition-all duration-300 -mb-px ${
-                tab === t.id
-                  ? 'text-[#FFFFFF]'
-                  : 'text-[#71717a] hover:text-[#A5A1C2]'
-              }`}
-            >
-              {t.icon}
-              {t.label}
-              {tab === t.id && (
-                <motion.div
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#f97316] to-[#f97316] rounded-full"
-                  layoutId="activeTab"
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                />
-              )}
-            </button>
-          ))}
+        {/* Desktop: horizontal row. Mobile: 2-row grid with icons */}
+        <div className="mb-8 border-b border-[rgba(46,43,74,0.3)]" role="tablist">
+          {/* Mobile grid */}
+          <div className="grid grid-cols-4 gap-1 sm:hidden p-1">
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                role="tab"
+                aria-selected={tab === t.id}
+                onClick={() => { setTab(t.id); setTimeout(() => window.scrollTo(0, 0), 50); }}
+                className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg text-[10px] transition-all ${
+                  tab === t.id
+                    ? 'text-[#f97316] bg-[#f97316]/10'
+                    : 'text-[#71717a]'
+                }`}
+              >
+                {t.icon}
+                {t.label}
+              </button>
+            ))}
+          </div>
+          {/* Desktop row */}
+          <div className="hidden sm:flex items-center gap-0 relative">
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                role="tab"
+                aria-selected={tab === t.id}
+                onClick={() => { setTab(t.id); setTimeout(() => window.scrollTo(0, 0), 50); }}
+                className={`relative flex items-center gap-2 px-5 py-3 text-sm transition-all duration-300 -mb-px ${
+                  tab === t.id
+                    ? 'text-[#FFFFFF]'
+                    : 'text-[#71717a] hover:text-[#A5A1C2]'
+                }`}
+              >
+                {t.icon}
+                {t.label}
+                {tab === t.id && (
+                  <motion.div
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#f97316] to-[#f97316] rounded-full"
+                    layoutId="activeTab"
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  />
+                )}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* ─── Tab Content ──────────────────────────────────── */}
