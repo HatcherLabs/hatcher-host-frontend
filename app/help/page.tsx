@@ -338,14 +338,23 @@ export default function HelpPage() {
             </h2>
           </div>
           <p className="text-sm text-[var(--text-secondary)] leading-relaxed relative">
-            For direct support, reach out to us at{' '}
-            <a
-              href="mailto:support@hatcher.host"
+            Need help?{' '}
+            <Link
+              href="/support"
               className="font-medium text-[#f97316] hover:text-[#f97316] transition-colors underline decoration-[#f97316]/30 underline-offset-2"
             >
-              support@hatcher.host
+              Open a support ticket
+            </Link>{' '}
+            or find us on{' '}
+            <a
+              href="https://x.com/haborohost"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-[#f97316] hover:text-[#f97316] transition-colors underline decoration-[#f97316]/30 underline-offset-2"
+            >
+              X (@haborohost)
             </a>
-            . We typically respond within 24 hours.
+            .
           </p>
         </motion.div>
 
