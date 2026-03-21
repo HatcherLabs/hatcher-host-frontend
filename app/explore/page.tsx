@@ -24,14 +24,13 @@ import {
   X,
 } from 'lucide-react';
 
-type SortOption = 'newest' | 'most_features' | 'most_messages' | 'name_az';
-type StatusFilter = 'all' | 'active' | 'sleeping' | 'paused' | 'error' | 'restarting';
+type SortOption = 'newest' | 'most_messages' | 'name_az';
+type StatusFilter = 'all' | 'active' | 'sleeping' | 'paused' | 'error';
 
 const PAGE_SIZE = 12;
 
 const SORT_LABELS: Record<SortOption, string> = {
   newest: 'Newest',
-  most_features: 'Most Features',
   most_messages: 'Most Active',
   name_az: 'A-Z',
 };
@@ -42,7 +41,6 @@ const STATUS_FILTER_LABELS: Record<StatusFilter, string> = {
   sleeping: 'Sleeping',
   paused: 'Paused',
   error: 'Error',
-  restarting: 'Restarting',
 };
 
 const STATUS_ICONS: Record<StatusFilter, string> = {
@@ -51,7 +49,6 @@ const STATUS_ICONS: Record<StatusFilter, string> = {
   sleeping: 'bg-blue-400',
   paused: 'bg-amber-400',
   error: 'bg-red-400',
-  restarting: 'bg-cyan-400',
 };
 
 const cardClass = 'card glass-noise';
@@ -165,7 +162,6 @@ export default function ExplorePage() {
 
     result.sort((a, b) => {
       if (sort === 'newest') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      if (sort === 'most_features') return (b.features?.length ?? 0) - (a.features?.length ?? 0);
       if (sort === 'most_messages') return ((b as Agent & { messageCount?: number }).messageCount ?? 0) - ((a as Agent & { messageCount?: number }).messageCount ?? 0);
       if (sort === 'name_az') return a.name.localeCompare(b.name);
       return 0;

@@ -84,7 +84,6 @@ export default function BillingPage() {
   const [error, setError] = useState<string | null>(null);
   const [subscribing, setSubscribing] = useState<string | null>(null);
   const [purchasingAddon, setPurchasingAddon] = useState<string | null>(null);
-  const [cancelling, setCancelling] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const showSuccess = (msg: string) => {
@@ -159,26 +158,6 @@ export default function BillingPage() {
     }
   };
 
-  /* ── Cancel subscription ───────────────────────────────── */
-  const handleCancel = async () => {
-    if (!confirm('Are you sure you want to cancel? Your tier will revert to Free at the end of the billing period.')) return;
-    setCancelling(true);
-    setError(null);
-    try {
-      const res = await api.cancelSubscription();
-      if (res.success) {
-        await loadAccountData();
-        showSuccess('Subscription cancelled');
-      } else {
-        setError(res.error ?? 'Cancel failed');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Cancel failed');
-    } finally {
-      setCancelling(false);
-    }
-  };
-
   /* ── Loading / auth states ─────────────────────────────── */
   if (authLoading) {
     return (
@@ -194,7 +173,7 @@ export default function BillingPage() {
       <div className="mx-auto max-w-md px-4 py-24 text-center">
         <Shield className="w-12 h-12 text-[var(--text-muted)] mx-auto mb-4" />
         <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">Sign In Required</h1>
-        <p className="mb-6 text-[var(--text-secondary)]">Sign in to manage your subscription and billing.</p>
+        <p className="mb-6 text-[var(--text-secondary)]">Sign in to manage your plan and billing.</p>
         <Link href="/login" className="btn-primary">Sign In</Link>
       </div>
     );
@@ -234,7 +213,7 @@ export default function BillingPage() {
         style={displayFont}
         variants={itemVariants}
       >
-        Billing &amp; Subscription
+        Billing &amp; Plans
       </motion.h1>
 
       {error && (
@@ -282,27 +261,18 @@ export default function BillingPage() {
                   </span>
                 </div>
                 <p className="text-sm text-[var(--text-muted)]">
-                  {tierConfig.usdPrice === 0 ? 'No charge' : `$${tierConfig.usdPrice}/mo`}
+                  {tierConfig.usdPrice === 0 ? 'No charge' : `$${tierConfig.usdPrice} / 30 days`}
                   {tierConfig.messagesPerDay === 0 ? ' -- Unlimited messages' : ` -- ${tierConfig.messagesPerDay} messages/day`}
                 </p>
                 {accountData?.subscriptionExpiresAt && (
                   <div className="flex items-center gap-1.5 mt-1.5 text-xs text-[var(--text-muted)]">
                     <Clock className="w-3 h-3" />
-                    Renews {formatDate(accountData.subscriptionExpiresAt)}
+                    Active until {formatDate(accountData.subscriptionExpiresAt)}
                   </div>
                 )}
               </div>
             </div>
 
-            {currentTier !== 'free' && (
-              <button
-                onClick={handleCancel}
-                disabled={cancelling}
-                className="text-xs px-4 py-2 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-40 flex-shrink-0"
-              >
-                {cancelling ? 'Cancelling...' : 'Cancel Subscription'}
-              </button>
-            )}
           </div>
         </div>
       </motion.div>
@@ -404,7 +374,7 @@ export default function BillingPage() {
                           </span>
                         )}
                       </div>
-                      <span className="text-xl font-extrabold text-gradient">${tier.usdPrice}<span className="text-xs text-[var(--text-muted)] font-normal">/mo</span></span>
+                      <span className="text-xl font-extrabold text-gradient">${tier.usdPrice}<span className="text-xs text-[var(--text-muted)] font-normal"> / 30 days</span></span>
                     </div>
                     <div className="space-y-1.5 mb-4">
                       <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
@@ -438,7 +408,7 @@ export default function BillingPage() {
                       {isSubscribing ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          Subscribing...
+                          Processing...
                         </>
                       ) : (
                         <>
@@ -481,7 +451,7 @@ export default function BillingPage() {
                     <span className="text-2xl font-bold text-gradient tabular-nums">
                       ${addon.usdPrice}
                     </span>
-                    <span className="text-xs text-[var(--text-muted)]">/mo</span>
+                    <span className="text-xs text-[var(--text-muted)]">/ 30 days</span>
                   </div>
                   <p className="text-xs text-[var(--text-secondary)] mb-3">
                     {addon.extraAgents} additional agent slots
@@ -499,7 +469,7 @@ export default function BillingPage() {
                     ) : (
                       <>
                         <Plus className="w-3 h-3" />
-                        Buy for ${addon.usdPrice}/mo
+                        Buy for ${addon.usdPrice}
                       </>
                     )}
                   </button>
@@ -531,7 +501,7 @@ export default function BillingPage() {
           <EmptyState
             icon={Receipt}
             title="No payments yet"
-            description="Your payment history will appear here once you subscribe or purchase add-ons."
+            description="Your payment history will appear here once you purchase a plan or add-ons."
             actionLabel="View Pricing"
             actionHref="/pricing"
           />
