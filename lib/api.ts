@@ -53,8 +53,9 @@ export interface Agent {
   status: string;
   framework: 'openclaw';
   ownerId?: string;
+  ownerUsername?: string;
   ownerAddress?: string;
-  owner?: { walletAddress: string };
+  owner?: { username?: string; walletAddress?: string | null };
   config?: Record<string, unknown>;
   features?: Array<{ featureKey: string }>;
   createdAt: string;
@@ -158,22 +159,36 @@ async function req<T>(
 
 // ─── API methods ─────────────────────────────────────────────
 export const api = {
-  /** Get a sign challenge for a wallet address */
+  /** Register a new account */
+  register: (email: string, username: string, password: string) =>
+    req<{ token: string; expiresIn: string; user: { id: string; email: string; username: string } }>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ email, username, password }),
+    }),
+
+  /** Login with email + password */
+  login: (email: string, password: string) =>
+    req<{ token: string; expiresIn: string; user: { id: string; email: string; username: string; walletAddress: string | null; isAdmin: boolean } }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    }),
+
+  /** Get a sign challenge for wallet linking */
   challenge: (walletAddress: string) =>
     req<{ message: string; nonce: string }>('/auth/challenge', {
       method: 'POST',
       body: JSON.stringify({ walletAddress }),
     }),
 
-  /** Verify wallet signature → JWT */
-  verify: (walletAddress: string, signature: string) =>
-    req<{ token: string; user: { id: string; walletAddress: string } }>('/auth/verify', {
+  /** Link a wallet to the current account */
+  linkWallet: (walletAddress: string, signature: string) =>
+    req<{ walletAddress: string }>('/auth/link-wallet', {
       method: 'POST',
       body: JSON.stringify({ walletAddress, signature }),
     }),
 
-  /** Get current user profile (includes API key) */
-  getProfile: () => req<{id: string; walletAddress: string; apiKey: string; hatchCredits: number; createdAt: string}>('/auth/me'),
+  /** Get current user profile */
+  getProfile: () => req<{id: string; email: string; username: string; walletAddress: string | null; apiKey: string; hatchCredits: number; isAdmin: boolean; tier: string; createdAt: string}>('/auth/me'),
 
   /** Delete current user account */
   deleteAccount: () => req<{deleted: boolean}>('/auth/me', { method: 'DELETE' }),
@@ -251,25 +266,6 @@ export const api = {
   restartAgent: (id: string) =>
     req<{ status: string; containerId?: string }>(`/agents/${id}/restart`, { method: 'POST' }),
 
-  /** Unlock a feature after on-chain payment. Pass agentId as empty string or omit for account-level features. */
-  unlockFeature: (agentId: string | undefined, featureKey: string, opts: {
-    paymentToken: 'hatch' | 'sol';
-    amount: number;
-    txSignature: string;
-  }) =>
-    req<{ id: string; featureKey: string; type: string; expiresAt: string | null }>('/features/unlock', {
-      method: 'POST',
-      body: JSON.stringify({
-        ...(agentId ? { agentId } : {}),
-        featureKey,
-        txSignature: opts.txSignature,
-        paymentToken: opts.paymentToken,
-        ...(opts.paymentToken === 'sol'
-          ? { solAmount: opts.amount }
-          : { hatchAmount: opts.amount }),
-      }),
-    }),
-
   /** Chat with an agent (non-streaming) */
   chat: (agentId: string, message: string, history?: Array<{ role: 'user' | 'assistant'; content: string }>) =>
     req<{ content: string; model: string }>(`/agents/${agentId}/chat`, {
@@ -287,10 +283,37 @@ export const api = {
   /** Get active account-level features for the current user */
   getAccountFeatures: () =>
     req<{
-      activeFeatures: Array<{ featureKey: string; type: string; expiresAt: string | null }>;
-      availableFeatures: Array<{ key: string; name: string; description: string; usdPrice: number; type: string; framework: string; category: string }>;
-      hatchCredits: number;
+      tier: string;
+      tierConfig: any;
+      addons: Array<{ key: string; name: string; expiresAt: string | null }>;
+      agentLimit: number;
+      agentCount: number;
+      subscriptionExpiresAt?: string | null;
+      // Legacy compat fields
+      activeFeatures?: Array<{ featureKey: string; type: string; expiresAt: string | null }>;
+      hatchCredits?: number;
     }>('/features/account'),
+
+  /** Get feature catalog (tiers + addons) */
+  getFeatureCatalog: () => req<{ tiers: any; addons: any }>('/features'),
+
+  /** Subscribe to a tier */
+  subscribe: (tier: string, txSignature: string) =>
+    req<{ tier: string }>('/features/subscribe', {
+      method: 'POST',
+      body: JSON.stringify({ tier, txSignature }),
+    }),
+
+  /** Purchase an add-on (optionally per-agent) */
+  purchaseAddon: (addonKey: string, txSignature: string, agentId?: string) =>
+    req<{ addonKey: string }>('/features/addon', {
+      method: 'POST',
+      body: JSON.stringify({ addonKey, txSignature, ...(agentId ? { agentId } : {}) }),
+    }),
+
+  /** Cancel current subscription (revert to free at end of period) */
+  cancelSubscription: () =>
+    req<{ tier: string }>('/features/cancel', { method: 'POST' }),
 
   /** Refresh JWT token */
   refreshToken: () =>
@@ -324,28 +347,7 @@ export const api = {
       body: JSON.stringify({ wallets }),
     }),
 
-  /** Unlock all features in a bundle after a single payment */
-  unlockBundle: (data: {
-    agentId: string;
-    bundleKey: string;
-    paymentToken: 'hatch' | 'sol';
-    amount: number;
-    txSignature: string;
-  }) =>
-    req<{ bundleKey: string; featuresUnlocked: string[]; paymentId: string }>('/features/bundle', {
-      method: 'POST',
-      body: JSON.stringify({
-        agentId: data.agentId,
-        bundleKey: data.bundleKey,
-        txSignature: data.txSignature,
-        paymentToken: data.paymentToken,
-        ...(data.paymentToken === 'sol'
-          ? { solAmount: data.amount }
-          : { hatchAmount: data.amount }),
-      }),
-    }),
-
-  /** Get $HATCH token price from Jupiter */
+  /** Get token price from Jupiter */
   getPrice: (token: 'hatch' | 'sol') =>
     req<{ price: number; currency: string; source: string; error?: string }>(`/prices/${token}`),
 
@@ -490,6 +492,29 @@ export const api = {
       method: 'DELETE',
     }),
 
+  /** List files in agent's running container */
+  listContainerFiles: (agentId: string, path?: string) =>
+    req<{ files: Array<{ name: string; path: string; type: 'file' | 'directory'; size: number }>; currentPath: string; status: string; message?: string }>(
+      `/agents/${agentId}/container-files${path ? `?path=${encodeURIComponent(path)}` : ''}`
+    ),
+
+  /** Read a file from agent's running container */
+  readContainerFile: (agentId: string, path: string) =>
+    req<{ path: string; content: string }>(`/agents/${agentId}/container-files/read?path=${encodeURIComponent(path)}`),
+
+  /** Write a file to agent's running container */
+  writeContainerFile: (agentId: string, path: string, content: string) =>
+    req<{ path: string; written: boolean }>(`/agents/${agentId}/container-files/write`, {
+      method: 'PUT',
+      body: JSON.stringify({ path, content }),
+    }),
+
+  /** Delete a file from agent's running container */
+  deleteContainerFile: (agentId: string, path: string) =>
+    req<{ path: string; deleted: boolean }>(`/agents/${agentId}/container-files/delete?path=${encodeURIComponent(path)}`, {
+      method: 'DELETE',
+    }),
+
   /** Streaming chat — falls back to non-streaming if stream unavailable */
   chatStream: async (
     agentId: string,
@@ -603,30 +628,6 @@ export const api = {
   closeTicket: (id: string) =>
     req<Ticket>(`/support/tickets/${id}/close`, {
       method: 'PATCH',
-    }),
-
-  /** Renew a subscription feature */
-  renewFeature: (featureId: string, opts: {
-    paymentToken: 'hatch' | 'sol';
-    amount: number;
-    txSignature: string;
-  }) =>
-    req<{
-      featureId: string;
-      paymentId: string;
-      featureKey: string;
-      previousExpiresAt: string | null;
-      newExpiresAt: string;
-    }>('/features/renew', {
-      method: 'POST',
-      body: JSON.stringify({
-        featureId,
-        txSignature: opts.txSignature,
-        paymentToken: opts.paymentToken,
-        ...(opts.paymentToken === 'sol'
-          ? { solAmount: opts.amount }
-          : { hatchAmount: opts.amount }),
-      }),
     }),
 
   /** Get active subscriptions for the user */

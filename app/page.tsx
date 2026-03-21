@@ -545,77 +545,118 @@ export default function LandingPage() {
 
       {/* ── PRICING PREVIEW ────────────────────────────── */}
       <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="pricing">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10 sm:mb-16">
             <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">Pricing</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
               Start free, scale up
             </h2>
             <p className="mt-4 text-[#A5A1C2] max-w-lg mx-auto">
-              No rigid tiers. Free baseline with Groq. Unlock features with tokens. Bring your own keys — always free.
+              All integrations included. BYOK always free. Pay with SOL or platform tokens.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Free */}
-            <div className="bg-[#111019] border border-white/[0.06] rounded-2xl p-8">
+            <div className="bg-[#111019] border border-white/[0.06] rounded-2xl p-7">
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-2">Free</p>
-              <p className="text-4xl font-bold text-white mb-1">$0</p>
-              <p className="text-sm text-[#A5A1C2] mb-8">Forever. No credit card.</p>
-              <ul className="space-y-3">
+              <p className="text-3xl font-bold text-white mb-1">$0</p>
+              <p className="text-sm text-[#A5A1C2] mb-6">Forever. No credit card.</p>
+              <ul className="space-y-2.5">
                 {[
-                  '1 active agent',
-                  'Groq LLM (free tier)',
-                  'BYOK any provider',
-                  '1 platform (Telegram or Discord)',
-                  '24h log retention',
-                  'Shared container',
+                  '1 agent',
+                  '20 messages/day',
+                  'All integrations',
+                  'BYOK any LLM',
+                  '150MB workspace',
+                  'Auto-sleep (15 min)',
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-[#A5A1C2]">
-                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <li key={item} className="flex items-center gap-2.5 text-sm text-[#A5A1C2]">
+                    <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     {item}
                   </li>
                 ))}
               </ul>
               <Link
-                href="/create"
-                className="mt-8 block text-center border border-white/20 text-white font-medium px-6 py-3 rounded-full hover:bg-white/5 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200"
+                href="/register"
+                className="mt-7 block text-center border border-white/20 text-white font-medium px-6 py-2.5 rounded-full hover:bg-white/5 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 text-sm"
               >
                 Get Started
               </Link>
             </div>
 
-            {/* Premium */}
-            <div className="bg-[#111019] border border-orange-500/30 rounded-2xl p-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
-              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-orange-400 mb-2">Premium</p>
-              <p className="text-4xl font-bold text-white mb-1">Pay as you go</p>
-              <p className="text-sm text-[#A5A1C2] mb-8">Unlock with platform tokens.</p>
-              <ul className="space-y-3">
+            {/* Unlimited */}
+            <div className="bg-[#111019] border border-white/[0.06] rounded-2xl p-7">
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-2">Unlimited</p>
+              <div className="flex items-baseline gap-1">
+                <p className="text-3xl font-bold text-white">$9.99</p>
+                <span className="text-sm text-[#71717a]">/mo</span>
+              </div>
+              <p className="text-sm text-[#A5A1C2] mb-6 mt-1">Unlimited messages, always on.</p>
+              <ul className="space-y-2.5">
                 {[
-                  'Unlimited agents',
-                  'All 20+ platforms',
-                  'Hosted LLM credits',
-                  '13,700+ skills',
-                  'Dedicated containers',
-                  'Persistent memory & cron',
-                  'Voice, webhooks, multi-agent',
-                  'Full log retention',
+                  '1 agent included',
+                  'Unlimited messages',
+                  'All integrations',
+                  'BYOK any LLM',
+                  '300MB workspace',
+                  'Always-on (no sleep)',
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-[#A5A1C2]">
-                    <Check className="w-4 h-4 text-orange-400 shrink-0" />
+                  <li key={item} className="flex items-center gap-2.5 text-sm text-[#A5A1C2]">
+                    <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     {item}
                   </li>
                 ))}
               </ul>
               <Link
-                href="/create"
-                className="mt-8 block text-center bg-white text-black font-semibold px-6 py-3 rounded-full hover:bg-white/90 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200"
+                href="/pricing"
+                className="mt-7 block text-center border border-white/20 text-white font-medium px-6 py-2.5 rounded-full hover:bg-white/5 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 text-sm"
               >
-                Create Agent
+                Subscribe
+              </Link>
+            </div>
+
+            {/* Pro */}
+            <div className="bg-[#111019] border border-orange-500/30 rounded-2xl p-7 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="flex items-center gap-2 mb-2">
+                <p className="text-xs font-semibold tracking-[0.2em] uppercase text-orange-400">Pro</p>
+                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-400 border border-orange-500/20">POPULAR</span>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <p className="text-3xl font-bold text-white">$19.99</p>
+                <span className="text-sm text-[#71717a]">/mo</span>
+              </div>
+              <p className="text-sm text-[#A5A1C2] mb-6 mt-1">Full power for serious builders.</p>
+              <ul className="space-y-2.5">
+                {[
+                  '5 agents included',
+                  'Unlimited messages',
+                  'Dedicated resources (1 CPU, 1GB)',
+                  'File manager',
+                  'Full log viewer',
+                  '600MB workspace/agent',
+                  'Priority support',
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2.5 text-sm text-[#A5A1C2]">
+                    <Check className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/pricing"
+                className="mt-7 block text-center bg-white text-black font-semibold px-6 py-2.5 rounded-full hover:bg-white/90 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 text-sm"
+              >
+                Go Pro
               </Link>
             </div>
           </div>
+
+          <p className="text-center text-xs text-[#71717a] mt-6">
+            Need more agents? Add +3, +5, or +10 with stackable add-ons.{' '}
+            <Link href="/pricing" className="text-[#f97316] hover:underline">See full pricing</Link>
+          </p>
         </div>
       </Section>
 
@@ -628,11 +669,11 @@ export default function LandingPage() {
           </div>
           <div className="space-y-3">
             {[
-              { q: 'Is it really free to start?', a: 'Yes. You get 1 agent, Groq free LLM, 50 messages/day, and BYOK — all at zero cost. No tokens required.' },
+              { q: 'Is it really free to start?', a: 'Yes. You get 1 agent, Groq free LLM, 20 messages/day, and BYOK — all at zero cost. No tokens required.' },
               { q: 'What is BYOK?', a: 'Bring Your Own Key — use your own API keys from OpenAI, Anthropic, Google, Groq, xAI, OpenRouter, or Ollama. Always free, no payment needed.' },
               { q: 'How do I pay for features?', a: 'All prices are in USD, paid with platform tokens on Solana. Approve a wallet transaction and the feature activates instantly.' },
               { q: 'What happens when a subscription expires?', a: 'Your agent keeps running, but the feature is disabled. Renew anytime to re-enable it. 24-hour grace period included.' },
-              { q: 'Can I run multiple agents?', a: 'Free tier includes 1 agent. Unlock up to 5, 20, or unlimited agents with account-level subscriptions.' },
+              { q: 'Can I run multiple agents?', a: 'Free tier includes 1 agent. Pro includes 5. Add more with stackable add-ons.' },
             ].map((item, i) => (
               <FAQItem key={i} question={item.q} answer={item.a} />
             ))}

@@ -10,8 +10,7 @@ import type { Agent, AgentFeature } from '@/lib/api';
 import { sendSolPayment, usdToSol } from '@/lib/solana-pay';
 import { useAuth } from '@/lib/auth-context';
 import { getInitials, stringToColor, timeAgo } from '@/lib/utils';
-import { FRAMEWORKS, FREE_TIER_LIMITS, FEATURE_CATALOG, BUNDLES, getBYOKProvider } from '@hatcher/shared';
-import type { FeaturePricing } from '@hatcher/shared';
+import { FRAMEWORKS, TIERS, getBYOKProvider } from '@hatcher/shared';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
@@ -25,6 +24,7 @@ import {
   ScrollText,
   LayoutDashboard,
   BarChart3,
+  FolderOpen,
 } from 'lucide-react';
 import {
   AgentContext,
@@ -70,6 +70,11 @@ const IntegrationsTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const FilesTab = dynamic(
+  () => import('@/components/agents/tabs/FilesTab').then(mod => ({ default: mod.FilesTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 const LogsTab = dynamic(
   () => import('@/components/agents/tabs/LogsTab').then(mod => ({ default: mod.LogsTab })),
   { loading: () => <TabSkeleton /> }
@@ -91,6 +96,7 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={16} /> },
   { id: 'config', label: 'Config', icon: <Settings size={16} /> },
   { id: 'integrations', label: 'Integrations', icon: <Puzzle size={16} /> },
+  { id: 'files', label: 'Files', icon: <FolderOpen size={16} /> },
   { id: 'logs', label: 'Logs', icon: <ScrollText size={16} /> },
   { id: 'chat', label: 'Chat', icon: <MessageSquare size={16} /> },
   { id: 'stats', label: 'Stats', icon: <BarChart3 size={16} /> },
@@ -101,7 +107,7 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
 export default function AgentManagePage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const wallet = useWallet();
   const { connection } = useConnection();
 
@@ -180,7 +186,7 @@ export default function AgentManagePage() {
   // Features / integrations
   const [activeFeatures, setActiveFeatures] = useState<AgentFeature[]>([]);
   const [featuresLoading, setFeaturesLoading] = useState(false);
-  const [unlocking, setUnlocking] = useState<string | null>(null);
+  // unlocking state removed — features are now tier-based
 
   // Delete state
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -192,12 +198,8 @@ export default function AgentManagePage() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
-  const hasUnlimitedChat = agent?.features?.some(
-    (f: { featureKey: string; expiresAt?: string | null }) =>
-      f.featureKey === 'openclaw.feature.unlimited_chat' &&
-      (!f.expiresAt || new Date(f.expiresAt) > new Date())
-  ) ?? false;
-  const msgLimit = FREE_TIER_LIMITS.chatMessagesPerDay;
+  const hasUnlimitedChat = (user?.tier ?? 'free') !== 'free';
+  const msgLimit = TIERS.free.messagesPerDay;
 
   // ─── Data loaders ────────────────────────────────────────
 
@@ -383,35 +385,7 @@ export default function AgentManagePage() {
     }
   };
 
-  const handleUnlockFeature = async (featureKey: string, usdPrice: number) => {
-    if (!wallet.publicKey) {
-      setActionError('Please connect your wallet first.');
-      return;
-    }
-    setUnlocking(featureKey);
-    setActionError(null);
-    try {
-      const solAmount = usdToSol(usdPrice);
-      const txSignature = await sendSolPayment({ wallet, connection, solAmount });
-      const res = await api.unlockFeature(id, featureKey, {
-        paymentToken: 'sol',
-        amount: solAmount,
-        txSignature,
-      });
-      setUnlocking(null);
-      if (res.success) {
-        loadFeatures();
-        loadAgent();
-        setActionSuccess('Feature unlocked!');
-        setTimeout(() => setActionSuccess(null), 3000);
-      } else {
-        setActionError((res as { error?: string }).error ?? 'Failed to unlock feature');
-      }
-    } catch (err) {
-      setUnlocking(null);
-      setActionError(err instanceof Error ? err.message : 'Payment failed');
-    }
-  };
+  // handleUnlockFeature removed — features are now tier-based
 
   // ─── Integration config helpers ─────────────────────────────
 
@@ -734,14 +708,7 @@ export default function AgentManagePage() {
   const isNotActive = agent.status === 'paused' || agent.status === 'sleeping' || agent.status === 'error';
 
   const activeFeatureKeys = new Set(activeFeatures.map((f) => f.featureKey));
-  const frameworkFeatures = FEATURE_CATALOG.filter((f) => f.framework === agent.framework);
-  const featuresByCategory: Record<string, FeaturePricing[]> = {};
-  for (const f of frameworkFeatures) {
-    if (f.key === 'openclaw.platform.extra') continue; // shown separately in "Other Platforms"
-    if (!featuresByCategory[f.category]) featuresByCategory[f.category] = [];
-    featuresByCategory[f.category].push(f);
-  }
-  const frameworkBundles = BUNDLES.filter((b) => b.framework === agent.framework);
+  // Feature catalog and bundles removed — using tier-based model now
 
   const remaining = !hasUnlimitedChat ? Math.max(0, msgLimit - msgCount) : null;
   const isLimitReached = !hasUnlimitedChat && remaining !== null && remaining === 0;
@@ -790,8 +757,7 @@ export default function AgentManagePage() {
     llmProvider, currentProviderMeta, providerModels, hasApiKey,
     displayUptime, isLiveUptime,
     activeFeatures, activeFeatureKeys, featuresLoading,
-    unlocking, handleUnlockFeature,
-    featuresByCategory, frameworkBundles,
+    unlocking: null, handleUnlockFeature: async () => {},
     integrationSecrets, expandedIntegrations, visibleFields,
     savingIntegration, integrationSaveMsg,
     toggleIntegrationExpanded, toggleFieldVisibility,
@@ -1006,6 +972,7 @@ export default function AgentManagePage() {
           {tab === 'overview' && <OverviewTab />}
           {tab === 'config' && <ConfigTab />}
           {tab === 'integrations' && <IntegrationsTab />}
+          {tab === 'files' && <FilesTab />}
           {tab === 'logs' && <LogsTab />}
           {tab === 'chat' && <ChatTab />}
           {tab === 'stats' && <StatsTab />}

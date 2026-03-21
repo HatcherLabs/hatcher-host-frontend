@@ -8,8 +8,8 @@ import {
   Rocket,
   Zap,
   CreditCard,
-  Vote,
   Bell,
+  Users,
 } from 'lucide-react';
 import { SOCIAL_LINKS } from '@/lib/config';
 
@@ -43,18 +43,18 @@ const scaleIn = {
 const PLANNED_USE_CASES = [
   {
     icon: Zap,
-    title: 'Agent Features',
-    description: 'Unlock premium platforms, skills, persistent memory, webhooks, and more for your AI agents.',
+    title: 'Subscriptions & Add-ons',
+    description: 'Subscribe to Unlimited ($9.99/mo) or Pro ($19.99/mo) tiers. Purchase agent add-ons to scale your fleet.',
     color: '#f97316',
   },
   {
     icon: CreditCard,
-    title: 'Platform Credits',
-    description: 'Purchase hosted LLM credits to power your agents with premium models without managing API keys.',
+    title: 'Token Economy',
+    description: 'Prices listed in USD. Pay with SOL or platform tokens at live rates.',
     color: '#22D3EE',
   },
   {
-    icon: Vote,
+    icon: Users,
     title: 'Governance',
     description: 'Participate in platform governance decisions, vote on new features, and shape the future roadmap.',
     color: '#A78BFA',
@@ -99,8 +99,8 @@ export default function TokenPage() {
           </motion.h1>
 
           <motion.p variants={fadeUp} className="text-lg md:text-xl mb-6 max-w-2xl mx-auto leading-relaxed text-[var(--text-secondary)]">
-            The native token of the Hatcher platform. It will power feature unlocks,
-            hosted LLM credits, and platform governance on Solana.
+            The native token of the Hatcher platform. It will power tier subscriptions,
+            agent add-ons, and platform governance on Solana.
           </motion.p>
 
           <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#1A1730] border border-[rgba(46,43,74,0.6)] text-[var(--text-secondary)] text-sm">
@@ -195,7 +195,7 @@ export default function TokenPage() {
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                 <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">Platform</span>
-                <span className="text-[var(--text-primary)] font-medium">Free to use now with BYOK &mdash; token adds premium features</span>
+                <span className="text-[var(--text-primary)] font-medium">Free tier available now &mdash; token enables paid tiers &amp; add-ons</span>
               </div>
             </div>
           </motion.div>

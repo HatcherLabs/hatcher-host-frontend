@@ -154,19 +154,19 @@ export function ChatTab() {
       {!isAuthenticated ? (
         <GlassCard className="text-center">
           <p className="text-sm text-[#71717a]">
-            Connect your wallet to chat with this agent.
+            Sign in to chat with this agent.
           </p>
         </GlassCard>
       ) : isLimitReached ? (
         <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-4 py-3 text-center">
           <p className="text-sm text-amber-400">
             Daily limit reached.{' '}
-            <button
+            <a
               className="underline hover:opacity-80 transition-opacity text-[#f97316]"
-              onClick={() => setTab('integrations')}
+              href="/dashboard/billing"
             >
-              Unlock more features
-            </button>
+              Upgrade your tier
+            </a>
           </p>
         </div>
       ) : (

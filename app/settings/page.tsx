@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useAuth } from '@/lib/auth-context';
 import { api, clearToken } from '@/lib/api';
-import { WalletMultiButton } from '@/components/wallet/WalletButton';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { motion } from 'framer-motion';
 import { useToast } from '@/components/ui/ToastProvider';
@@ -100,7 +99,7 @@ interface StoredKey {
 export default function SettingsPage() {
   const router = useRouter();
   const { publicKey, connected, disconnect } = useWallet();
-  const { isAuthenticated, isLoading: authLoading, login } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const { toast } = useToast();
 
   // ── Profile state ───────────────────────────────────────
@@ -160,8 +159,8 @@ export default function SettingsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [exporting, setExporting] = useState(false);
 
-  const walletAddress = publicKey?.toString() ?? 'Not connected';
-  const apiKeyAvailable = isAuthenticated && connected;
+  const walletAddress = user?.walletAddress ?? publicKey?.toString() ?? null;
+  const apiKeyAvailable = isAuthenticated;
 
   // ── Persist preferences ─────────────────────────────────
   useEffect(() => { localStorage.setItem('hatcher:pref:notifications', String(notifications)); }, [notifications]);
@@ -277,28 +276,6 @@ export default function SettingsPage() {
   const selectedProvider = BYOK_PROVIDERS.find(p => p.id === newKeyProvider)!;
 
   // ── Auth gates ──────────────────────────────────────────
-  if (!connected) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <motion.div
-          className="text-center max-w-md"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-        >
-          <div className="w-20 h-20 rounded-2xl bg-[#f97316]/15 flex items-center justify-center mx-auto mb-6">
-            <Bot size={40} className="text-[#f97316]" />
-          </div>
-          <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">Connect Your Wallet</h1>
-          <p className="mb-8 text-sm text-[var(--text-secondary)]">
-            Connect a Solana wallet to view your settings.
-          </p>
-          <WalletMultiButton />
-        </motion.div>
-      </div>
-    );
-  }
-
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -324,11 +301,11 @@ export default function SettingsPage() {
           </div>
           <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">Sign In Required</h1>
           <p className="mb-8 text-sm text-[var(--text-secondary)]">
-            Sign a message with your wallet to access settings.
+            Sign in to your account to access settings.
           </p>
-          <button className="btn-primary px-8 py-3" onClick={login}>
+          <a href="/login" className="btn-primary px-8 py-3 inline-block">
             Sign In
-          </button>
+          </a>
         </motion.div>
       </div>
     );
@@ -389,12 +366,12 @@ export default function SettingsPage() {
                   className="text-2xl font-bold"
                   style={{ color: '#f97316' }}
                 >
-                  {displayName ? displayName.charAt(0).toUpperCase() : walletAddress.charAt(0)}
+                  {(displayName || user?.username || '?').charAt(0).toUpperCase()}
                 </span>
               </div>
               <div>
                 <p className="text-sm font-medium text-[var(--text-primary)]">
-                  {displayName || 'Anonymous'}
+                  {displayName || user?.username || 'Anonymous'}
                 </p>
                 <p className="text-xs text-[var(--text-muted)] mt-0.5">
                   Avatar support coming soon
@@ -402,12 +379,13 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            {/* Wallet Address (read-only) */}
+            {/* Wallet Address (read-only, shown only if linked) */}
             <div>
               <label className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-2.5">
                 <Wallet size={12} />
                 Wallet Address
               </label>
+              {walletAddress ? (
               <div className="flex items-center justify-between rounded-xl px-4 py-3 bg-[var(--bg-elevated)] border border-[var(--border-default)] transition-all duration-200 hover:border-[rgba(249,115,22,0.3)]">
                 <span className="font-mono text-sm truncate mr-3 text-[var(--text-primary)]">
                   {walletAddress}
@@ -426,6 +404,11 @@ export default function SettingsPage() {
                   )}
                 </button>
               </div>
+              ) : (
+              <div className="rounded-xl px-4 py-3 bg-[var(--bg-elevated)] border border-[var(--border-default)]">
+                <span className="text-sm text-[var(--text-muted)]">No wallet linked. Connect a wallet when making payments.</span>
+              </div>
+              )}
             </div>
 
             {/* Display Name */}

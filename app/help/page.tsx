@@ -119,7 +119,7 @@ const QUICK_FAQ = [
   },
   {
     q: 'How do I connect my agent to Telegram or Discord?',
-    a: 'Navigate to your agent\'s Integrations tab, unlock the platform you want (e.g., Telegram for $4), then enter your bot token. The agent will automatically connect on the next deploy.',
+    a: 'Navigate to your agent\'s Integrations tab, configure the platform you want (e.g., Telegram) — all integrations are free. Enter your bot token and the agent will automatically connect on the next deploy.',
   },
   {
     q: 'What happens when my agent crashes?',

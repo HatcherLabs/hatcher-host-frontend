@@ -76,7 +76,7 @@ export default function TicketDetailPage() {
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
           <LifeBuoy size={40} className="mx-auto text-[var(--text-muted)] mb-4" />
-          <p className="text-[var(--text-secondary)]">Connect your wallet to view this ticket.</p>
+          <p className="text-[var(--text-secondary)]">Sign in to view this ticket.</p>
         </div>
       </div>
     );

@@ -1,106 +1,134 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { api, getToken, setToken, clearToken, isAuthenticated } from './api';
+
+interface UserProfile {
+  id: string;
+  email: string;
+  username: string;
+  walletAddress: string | null;
+  isAdmin: boolean;
+  tier: string;
+}
 
 interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  login: () => Promise<void>;
+  user: UserProfile | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, username: string, password: string) => Promise<void>;
   logout: () => void;
+  clearError: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue>({
   isAuthenticated: false,
   isLoading: false,
   error: null,
+  user: null,
   login: async () => {},
+  register: async () => {},
   logout: () => {},
+  clearError: () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { publicKey, signMessage, connected, disconnect } = useWallet();
   const [authed, setAuthed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const loginInProgress = useRef(false);
-  // Track if wallet has ever connected in this session (to distinguish
-  // "not yet connected on mount" from "user disconnected")
-  const hasConnectedRef = useRef(false);
+  const [user, setUser] = useState<UserProfile | null>(null);
 
-  // Encode Uint8Array → base64 (browser-safe, no bs58 needed)
-  function toBase64(bytes: Uint8Array): string {
-    return btoa(String.fromCharCode(...Array.from(bytes)));
-  }
-
-  const login = useCallback(async () => {
-    if (!publicKey || !signMessage || loginInProgress.current) return;
-    loginInProgress.current = true;
+  const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const walletAddress = publicKey.toString();
+      const res = await api.login(email, password);
+      if (!res.success) throw new Error(res.error);
 
-      // 1. Request challenge
-      const challengeRes = await api.challenge(walletAddress);
-      if (!challengeRes.success) throw new Error(challengeRes.error);
-
-      // 2. Sign message with wallet
-      const msgBytes = new TextEncoder().encode(challengeRes.data.message);
-      const sigBytes = await signMessage(msgBytes);
-
-      // 3. Verify with API → get JWT
-      const verifyRes = await api.verify(walletAddress, toBase64(sigBytes));
-      if (!verifyRes.success) throw new Error(verifyRes.error);
-
-      setToken(verifyRes.data.token);
+      setToken(res.data.token);
+      setUser({
+        id: res.data.user.id,
+        email: res.data.user.email,
+        username: res.data.user.username,
+        walletAddress: res.data.user.walletAddress ?? null,
+        isAdmin: res.data.user.isAdmin ?? false,
+        tier: (res.data.user as any).tier ?? 'free',
+      });
       setAuthed(true);
     } catch (e) {
       setError((e as Error).message);
       setAuthed(false);
     } finally {
       setIsLoading(false);
-      loginInProgress.current = false;
     }
-  }, [publicKey, signMessage]);
+  }, []);
+
+  const register = useCallback(async (email: string, username: string, password: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const res = await api.register(email, username, password);
+      if (!res.success) throw new Error(res.error);
+
+      setToken(res.data.token);
+      setUser({
+        id: res.data.user.id,
+        email: res.data.user.email,
+        username: res.data.user.username,
+        walletAddress: null,
+        isAdmin: false,
+        tier: 'free',
+      });
+      setAuthed(true);
+    } catch (e) {
+      setError((e as Error).message);
+      setAuthed(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const logout = useCallback(() => {
     clearToken();
     setAuthed(false);
-    disconnect();
-  }, [disconnect]);
+    setUser(null);
+  }, []);
 
-  // Auto-login when wallet connects; clear only on explicit disconnect
-  useEffect(() => {
-    if (connected && publicKey) {
-      hasConnectedRef.current = true;
-      if (!isAuthenticated()) {
-        login();
-      } else {
-        // Token already in localStorage — trust it until the API rejects it
-        setAuthed(true);
-      }
-    }
-    // Only wipe token if the wallet was previously connected and is now gone
-    // (i.e. user clicked Disconnect). NOT on initial page load where connected=false.
-    if (!connected && hasConnectedRef.current) {
-      clearToken();
-      setAuthed(false);
-    }
-  }, [connected, publicKey, login]);
+  const clearError = useCallback(() => setError(null), []);
 
   // Sync state with token on mount (e.g. page refresh)
   useEffect(() => {
-    setAuthed(isAuthenticated());
+    if (isAuthenticated()) {
+      setAuthed(true);
+      // Fetch profile to get user data
+      api.getProfile().then((res) => {
+        if (res.success) {
+          setUser({
+            id: res.data.id,
+            email: res.data.email,
+            username: res.data.username,
+            walletAddress: res.data.walletAddress ?? null,
+            isAdmin: res.data.isAdmin ?? false,
+            tier: (res.data as any).tier ?? 'free',
+          });
+        } else {
+          // Token invalid — clear
+          clearToken();
+          setAuthed(false);
+        }
+      });
+    }
   }, []);
 
   // Listen for auth-expired event dispatched by the API client on 401
   useEffect(() => {
     const handleAuthExpired = () => {
       setAuthed(false);
+      setUser(null);
     };
     window.addEventListener('hatcher:auth-expired', handleAuthExpired);
     return () => {
@@ -109,7 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated: authed, isLoading, error, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated: authed, isLoading, error, user, login, register, logout, clearError }}>
       {children}
     </AuthContext.Provider>
   );

@@ -5,12 +5,11 @@ import { ConnectionProvider, WalletProvider as SolanaWalletProvider } from '@sol
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
-import { AuthProvider } from '@/lib/auth-context';
 import { SOLANA_RPC } from '@/lib/config';
 
-// Import wallet adapter styles
 import '@solana/wallet-adapter-react-ui/styles.css';
 
+/** Solana wallet adapter — used only for payments, not for auth */
 export function WalletProvider({ children }: { children: React.ReactNode }) {
   const wallets = useMemo(
     () => [new PhantomWalletAdapter(), new SolflareWalletAdapter()],
@@ -21,7 +20,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     <ConnectionProvider endpoint={SOLANA_RPC}>
       <SolanaWalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          <AuthProvider>{children}</AuthProvider>
+          {children}
         </WalletModalProvider>
       </SolanaWalletProvider>
     </ConnectionProvider>

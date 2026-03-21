@@ -1,11 +1,9 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
-import { WalletMultiButton } from '@/components/wallet/WalletButton';
 import { shortenAddress, timeAgo } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import {
@@ -30,8 +28,6 @@ import {
   ExternalLink,
 } from 'lucide-react';
 
-// ── Admin wallet -- matches backend env.ADMIN_WALLET ──────────
-const ADMIN_WALLET = process.env['NEXT_PUBLIC_ADMIN_WALLET'] ?? '';
 
 // ── Status filters ───────────────────────────────────────────
 const STATUS_FILTERS = [
@@ -116,14 +112,13 @@ function FrameworkTag() {
 }
 
 // ── Admin agent type ─────────────────────────────────────────
-type AdminAgent = Agent & { ownerWallet: string };
+type AdminAgent = Agent & { ownerUsername?: string; ownerWallet: string | null };
 
 // ═════════════════════════════════════════════════════════════
 // Admin Page
 // ═════════════════════════════════════════════════════════════
 export default function AdminPage() {
-  const { connected, publicKey } = useWallet();
-  const { isAuthenticated, isLoading: authLoading, login } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
 
   const [stats, setStats] = useState<{
     totalUsers: number;
@@ -138,7 +133,10 @@ export default function AdminPage() {
   const [agents, setAgents] = useState<AdminAgent[]>([]);
   const [users, setUsers] = useState<Array<{
     id: string;
-    walletAddress: string;
+    email: string;
+    username: string;
+    walletAddress: string | null;
+    isAdmin: boolean;
     agentCount: number;
     paymentCount: number;
     hatchCredits: number;
@@ -150,7 +148,9 @@ export default function AdminPage() {
     category: string;
     priority: string;
     status: string;
-    userWallet: string;
+    userUsername: string;
+    userEmail: string;
+    userWallet: string | null;
     agentName: string | null;
     messages: Array<{ role: string; content: string; timestamp: string }>;
     createdAt: string;
@@ -167,8 +167,7 @@ export default function AdminPage() {
   // Action in-progress tracking
   const [actionInProgress, setActionInProgress] = useState<Record<string, string>>({});
 
-  const walletAddress = publicKey?.toString() ?? '';
-  const isAdmin = ADMIN_WALLET ? walletAddress === ADMIN_WALLET : false;
+  const isAdmin = user?.isAdmin ?? false;
 
   // ── Fetch data ─────────────────────────────────────────────
   useEffect(() => {
@@ -212,7 +211,7 @@ export default function AdminPage() {
           a.name.toLowerCase().includes(q) ||
           a.status.toLowerCase().includes(q) ||
           a.framework.toLowerCase().includes(q) ||
-          (a.ownerWallet ?? '').toLowerCase().includes(q)
+          (a.ownerUsername ?? a.ownerWallet ?? '').toLowerCase().includes(q)
       );
     }
 
@@ -286,31 +285,6 @@ export default function AdminPage() {
     }
   }
 
-  // ── Not connected ──────────────────────────────────────────
-  if (!connected) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <motion.div
-          className="text-center max-w-md px-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-        >
-          <div className="w-20 h-20 rounded-2xl bg-[#f97316]/15 flex items-center justify-center mx-auto mb-6">
-            <Shield size={40} className="text-[#f97316]" />
-          </div>
-          <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">
-            Admin Access
-          </h1>
-          <p className="mb-8 text-sm text-[var(--text-secondary)]">
-            Connect the admin wallet to access platform controls.
-          </p>
-          <WalletMultiButton />
-        </motion.div>
-      </div>
-    );
-  }
-
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -338,11 +312,11 @@ export default function AdminPage() {
             Sign In Required
           </h1>
           <p className="mb-8 text-sm text-[var(--text-secondary)]">
-            Sign a message with your wallet to access admin controls.
+            Sign in to your account to access admin controls.
           </p>
-          <button className="btn-primary px-8 py-3" onClick={login}>
+          <a href="/login" className="btn-primary px-8 py-3 inline-block">
             Sign In
-          </button>
+          </a>
         </motion.div>
       </div>
     );
@@ -365,10 +339,7 @@ export default function AdminPage() {
             Access Denied
           </h1>
           <p className="mb-4 text-sm text-[var(--text-secondary)]">
-            This wallet does not have admin privileges.
-          </p>
-          <p className="text-xs font-mono text-[var(--text-muted)]">
-            {shortenAddress(walletAddress, 6)}
+            Your account does not have admin privileges.
           </p>
         </motion.div>
       </div>
@@ -617,7 +588,7 @@ export default function AdminPage() {
                             {/* Owner wallet */}
                             <td className="py-3.5 pr-4">
                               <span className="text-xs font-mono px-2 py-1 rounded-md bg-[var(--bg-elevated)] text-[var(--text-secondary)]">
-                                {shortenAddress(agent.ownerWallet ?? '', 4)}
+                                {agent.ownerUsername ?? shortenAddress(agent.ownerWallet ?? '', 4)}
                               </span>
                             </td>
 
@@ -728,15 +699,19 @@ export default function AdminPage() {
                           key={user.id}
                           className="transition-colors hover:bg-white/[0.02] border-b border-[var(--border-default)]"
                         >
-                          {/* Wallet */}
+                          {/* User */}
                           <td className="py-3.5 pr-4">
                             <div className="flex items-center gap-3">
                               <div className="w-8 h-8 rounded-lg bg-[#f97316]/12 flex items-center justify-center flex-shrink-0">
                                 <Users size={14} className="text-[#f97316]" />
                               </div>
-                              <span className="text-xs font-mono px-2 py-1 rounded-md bg-[var(--bg-elevated)] text-[var(--text-secondary)]">
-                                {shortenAddress(user.walletAddress, 4)}
-                              </span>
+                              <div>
+                                <span className="text-xs font-medium text-[var(--text-primary)] block">{user.username}</span>
+                                <span className="text-[10px] text-[var(--text-muted)]">{user.email}</span>
+                              </div>
+                              {user.isAdmin && (
+                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-orange-500/15 text-orange-400 uppercase">Admin</span>
+                              )}
                             </div>
                           </td>
 
@@ -840,8 +815,8 @@ export default function AdminPage() {
                               <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{ticket.messages.length} message{ticket.messages.length !== 1 ? 's' : ''}</p>
                             </td>
                             <td className="py-3.5 pr-4">
-                              <span className="text-xs font-mono px-2 py-1 rounded-md bg-[var(--bg-elevated)] text-[var(--text-secondary)]">
-                                {shortenAddress(ticket.userWallet, 4)}
+                              <span className="text-xs font-medium px-2 py-1 rounded-md bg-[var(--bg-elevated)] text-[var(--text-secondary)]">
+                                {ticket.userUsername}
                               </span>
                             </td>
                             <td className="py-3.5 pr-4">

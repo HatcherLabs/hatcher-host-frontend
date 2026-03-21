@@ -1,8 +1,6 @@
 'use client';
 
 import { useEffect, useState, useMemo, memo, useRef } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@/components/wallet/WalletButton';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
@@ -25,6 +23,9 @@ import {
   Share2,
   Wallet,
   Globe,
+  Clock,
+  Square,
+  MessageSquare,
 } from 'lucide-react';
 import { EmptyState } from '@/components/ui/EmptyState';
 import dynamic from 'next/dynamic';
@@ -185,36 +186,18 @@ function StatCard({
   );
 }
 
-// ── Derive feature usage from real agent data ───────────────
+// ── Derive resource usage from agents ───────────────
 function deriveFeatureCategories(agents: Agent[]) {
-  let social = 0, defi = 0, ai = 0, infra = 0;
-
-  for (const agent of agents) {
-    const features = (agent as Agent & { features?: Array<{ featureKey: string }> }).features ?? [];
-    for (const f of features) {
-      const key = f.featureKey;
-      if (key.includes('platform.')) social++;
-      else if (key.includes('skills.') || key.includes('feature.voice') || key.includes('feature.multiagent')) ai++;
-      else if (key.includes('resources.') || key.includes('logs')) infra++;
-      else defi++;
-    }
-  }
-
-  const total = social + defi + ai + infra;
-  if (total === 0) {
-    return [
-      { name: 'Social', value: 0, color: COLORS.blue, icon: Share2 },
-      { name: 'DeFi', value: 0, color: COLORS.green, icon: Wallet },
-      { name: 'AI', value: 0, color: COLORS.accentLight, icon: Cpu },
-      { name: 'Infrastructure', value: 0, color: COLORS.amber, icon: Globe },
-    ];
-  }
+  const active = agents.filter(a => a.status === 'active').length;
+  const sleeping = agents.filter(a => a.status === 'sleeping').length;
+  const stopped = agents.filter(a => !['active', 'sleeping'].includes(a.status)).length;
+  const totalMessages = agents.reduce((sum, a) => sum + ((a as Agent & { messageCount?: number }).messageCount ?? 0), 0);
 
   return [
-    { name: 'Social', value: social, color: COLORS.blue, icon: Share2 },
-    { name: 'DeFi', value: defi, color: COLORS.green, icon: Wallet },
-    { name: 'AI', value: ai, color: COLORS.accentLight, icon: Cpu },
-    { name: 'Infrastructure', value: infra, color: COLORS.amber, icon: Globe },
+    { name: 'Active', value: active, color: COLORS.green, icon: Zap },
+    { name: 'Sleeping', value: sleeping, color: COLORS.blue, icon: Clock },
+    { name: 'Stopped', value: stopped, color: COLORS.textMuted, icon: Square },
+    { name: 'Messages', value: totalMessages, color: COLORS.accent, icon: MessageSquare },
   ];
 }
 
@@ -321,15 +304,14 @@ function deriveInsights(agents: Agent[]): Array<{ text: string; accentColor: str
     });
   }
 
-  // Check for agents without features (minimal config)
-  const agentsWithFeatures = agents.filter((a) => {
-    const feats = (a as Agent & { features?: Array<{ featureKey: string }> }).features;
-    return feats && feats.length > 0;
+  // Check for agents without integrations configured
+  const noConfig = agents.filter((a) => {
+    const cfg = (a as Agent & { config?: Record<string, unknown> }).config;
+    return !cfg || Object.keys(cfg).length <= 2; // only basic fields
   });
-  const noFeatureCount = agents.length - agentsWithFeatures.length;
-  if (noFeatureCount > 0) {
+  if (noConfig.length > 0) {
     insights.push({
-      text: `${noFeatureCount} agent${noFeatureCount > 1 ? 's have' : ' has'} no unlocked features. Upgrade with platform integrations or skills to unlock full potential.`,
+      text: `${noConfig.length} agent${noConfig.length > 1 ? 's have' : ' has'} minimal configuration. Add integrations (Telegram, Discord, etc.) to connect to users.`,
       accentColor: COLORS.accent,
     });
   }
@@ -367,8 +349,7 @@ function deriveInsights(agents: Agent[]): Array<{ text: string; accentColor: str
 // Main Dashboard Page
 // ═════════════════════════════════════════════════════════════
 export default function DashboardPage() {
-  const { connected, publicKey } = useWallet();
-  const { isAuthenticated, isLoading: authLoading, login } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -428,32 +409,10 @@ export default function DashboardPage() {
 
   const activeCount = agents.filter((a) => a.status === 'active').length;
   const totalMessages = agents.reduce((sum, a) => sum + ((a as Agent & { messageCount?: number }).messageCount ?? 0), 0);
-  const addr = publicKey?.toString() ?? '';
-  const shortAddr = addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : '';
+  const displayIdent = user?.username ?? user?.walletAddress ?? '';
+  const shortIdent = displayIdent.length > 16 ? `${displayIdent.slice(0, 6)}...${displayIdent.slice(-4)}` : displayIdent;
 
   // ── Unauthenticated states ──────────────────────────────
-  if (!connected) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: COLORS.bg }}>
-        <div className="text-center max-w-md px-4">
-          <div
-            className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6"
-            style={{ background: COLORS.accent + '20' }}
-          >
-            <Bot size={40} style={{ color: COLORS.accent }} />
-          </div>
-          <h1 className="text-2xl font-bold mb-3" style={{ color: COLORS.textPrimary }}>
-            Connect Your Wallet
-          </h1>
-          <p className="mb-8 text-sm" style={{ color: COLORS.textSecondary }}>
-            Connect a Solana wallet to access your agent dashboard.
-          </p>
-          <WalletMultiButton />
-        </div>
-      </div>
-    );
-  }
-
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: COLORS.bg }}>
@@ -482,15 +441,15 @@ export default function DashboardPage() {
             Sign In Required
           </h1>
           <p className="mb-8 text-sm" style={{ color: COLORS.textSecondary }}>
-            Sign a message with your wallet to access your dashboard.
+            Sign in to your account to access your dashboard.
           </p>
-          <button
-            className="px-8 py-3 rounded-xl font-semibold text-white transition-all hover:opacity-90"
+          <a
+            href="/login"
+            className="px-8 py-3 rounded-xl font-semibold text-white transition-all hover:opacity-90 inline-block"
             style={{ background: COLORS.accent }}
-            onClick={login}
           >
             Sign In
-          </button>
+          </a>
         </div>
       </div>
     );
@@ -556,7 +515,7 @@ export default function DashboardPage() {
                 Welcome back!
               </h1>
               <p className="text-sm mt-0.5 font-mono" style={{ color: COLORS.textSecondary }}>
-                {shortAddr}
+                {shortIdent}
               </p>
             </div>
           </div>
@@ -689,18 +648,12 @@ export default function DashboardPage() {
             )}
           </Card>
 
-          {/* RIGHT: Feature Usage - donut chart */}
+          {/* RIGHT: Agent Overview - donut chart */}
           <Card className="lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold" style={{ color: COLORS.textPrimary, fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-                Feature Usage
+                Agent Overview
               </h2>
-              <button
-                className="text-xs px-3 py-1 rounded-lg"
-                style={{ color: COLORS.textMuted, background: COLORS.textMuted + '15' }}
-              >
-                This Month
-              </button>
             </div>
 
             {/* Donut chart with center label */}
@@ -750,13 +703,13 @@ export default function DashboardPage() {
                   color: COLORS.textSecondary,
                 }}
               >
-                {featureTotal === 0
-                  ? 'Unlock platform integrations like Telegram or Discord to start connecting your agents to the world.'
-                  : featureCategories.find((c) => c.name === 'Social')?.value === 0
-                    ? 'Consider adding social platform integrations to increase your agent reach.'
-                    : featureCategories.find((c) => c.name === 'AI')?.value === 0
-                      ? 'Unlock skills and voice features to make your agents more capable.'
-                      : 'Your feature usage is balanced. Consider upgrading to dedicated resources for better performance.'}
+                {agents.length === 0
+                  ? 'Create your first agent to get started. All integrations are included free — connect Telegram, Discord, or any platform.'
+                  : featureCategories.find((c) => c.name === 'Active')?.value === 0
+                    ? 'None of your agents are running. Start an agent to begin processing messages.'
+                    : featureCategories.find((c) => c.name === 'Sleeping')?.value ?? 0 > 0
+                      ? 'Some agents are sleeping due to inactivity. Upgrade to a paid tier for always-on agents.'
+                      : 'All agents running smoothly. Configure integrations to connect your agents to more platforms.'}
               </div>
             )}
           </Card>

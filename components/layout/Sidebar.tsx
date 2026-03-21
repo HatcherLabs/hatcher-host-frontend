@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useAuth } from '@/lib/auth-context';
 import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -33,21 +33,16 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(href + '/');
 }
 
-function truncateWallet(address: string) {
-  if (address.length <= 10) return address;
-  return `${address.slice(0, 4)}...${address.slice(-4)}`;
-}
-
 export function Sidebar() {
   const pathname = usePathname();
-  const { publicKey, connected } = useWallet();
+  const { isAuthenticated, user } = useAuth();
 
   const isDashboard = useMemo(
     () => pathname.startsWith('/dashboard') || pathname === '/create' || pathname === '/settings',
     [pathname],
   );
 
-  const walletAddress = publicKey?.toString() ?? '';
+  const displayName = user?.username ?? user?.email ?? '';
 
   if (!isDashboard) return null;
 
@@ -145,18 +140,18 @@ export function Sidebar() {
             );
           })}
 
-          {/* Wallet info */}
-          {connected && walletAddress && (
+          {/* User info */}
+          {isAuthenticated && displayName && (
             <div className="mt-3 px-3 py-2.5 rounded-xl border border-white/[0.06] bg-white/[0.02]">
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#f97316]/30 to-[#f97316]/10 flex items-center justify-center flex-shrink-0">
                   <div className="w-2 h-2 rounded-full bg-[#4ade80] shadow-[0_0_6px_rgba(74,222,128,0.5)]" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-mono text-[#A5A1C2] truncate">
-                    {truncateWallet(walletAddress)}
+                  <p className="text-xs text-[#A5A1C2] truncate">
+                    {displayName}
                   </p>
-                  <p className="text-[10px] text-[#4ade80] font-medium">Connected</p>
+                  <p className="text-[10px] text-[#4ade80] font-medium">Signed in</p>
                 </div>
               </div>
             </div>
@@ -247,9 +242,9 @@ export function Sidebar() {
             );
           })}
 
-          {/* Wallet dot indicator */}
-          {connected && (
-            <div className="mt-2 w-7 h-7 rounded-full bg-white/[0.04] flex items-center justify-center" aria-label="Wallet connected">
+          {/* Auth indicator */}
+          {isAuthenticated && (
+            <div className="mt-2 w-7 h-7 rounded-full bg-white/[0.04] flex items-center justify-center" aria-label="Signed in">
               <div className="w-2 h-2 rounded-full bg-[#4ade80] shadow-[0_0_6px_rgba(74,222,128,0.5)]" />
             </div>
           )}

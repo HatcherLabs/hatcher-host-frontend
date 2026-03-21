@@ -69,7 +69,7 @@ export function AgentCard({ agent, href }: AgentCardProps) {
   const gradient = stringToColor(agent.id);
   const initials = getInitials(agent.name);
 
-  const ownerAddress = agent.ownerAddress ?? agent.owner?.walletAddress ?? 'Unknown';
+  const ownerDisplay = agent.ownerUsername ?? agent.owner?.username ?? (agent.ownerAddress ? shortenAddress(agent.ownerAddress) : 'Unknown');
   const frameworkMeta = FRAMEWORKS[agent.framework as AgentFramework];
 
   return (
@@ -118,7 +118,7 @@ export function AgentCard({ agent, href }: AgentCardProps) {
                 {agent.framework}
               </span>
               <span className="text-xs font-mono" style={{ color: '#71717a' }}>
-                {shortenAddress(ownerAddress)}
+                {ownerDisplay}
               </span>
             </div>
           </div>

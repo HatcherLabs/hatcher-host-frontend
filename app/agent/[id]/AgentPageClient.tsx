@@ -51,7 +51,7 @@ export function AgentPageClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const { isAuthenticated: authed } = useAuth();
+  const { isAuthenticated: authed, user: authUser } = useAuth();
   const wallet = useWallet();
 
   useEffect(() => {
@@ -136,9 +136,11 @@ export function AgentPageClient() {
 
   const gradient = stringToColor(agent.id);
   const initials = getInitials(agent.name);
+  const ownerUsername = agent.ownerUsername ?? agent.owner?.username;
   const ownerAddress = agent.ownerAddress ?? agent.owner?.walletAddress ?? '';
+  const ownerDisplay = ownerUsername ?? (ownerAddress ? shortenAddress(ownerAddress) : 'Unknown');
   const frameworkMeta = FRAMEWORKS[agent.framework as AgentFramework];
-  const isOwner = !!(authed && wallet.publicKey && ownerAddress && wallet.publicKey.toBase58() === ownerAddress);
+  const isOwner = !!(authed && authUser && agent.ownerId === authUser.id);
   const statusStyle = STATUS_STYLES[agent.status] ?? STATUS_STYLES['paused']!;
   const featureCount = agent.features?.length ?? 0;
 
@@ -203,11 +205,9 @@ export function AgentPageClient() {
               )}
             </div>
 
-            {ownerAddress && (
-              <div className="text-xs font-mono text-[var(--text-muted)]">
-                by {shortenAddress(ownerAddress)}
-              </div>
-            )}
+            <div className="text-xs text-[var(--text-muted)]">
+              by <span className="font-medium text-[var(--text-secondary)]">{ownerDisplay}</span>
+            </div>
           </div>
         </div>
 
@@ -308,7 +308,7 @@ export function AgentPageClient() {
             </div>
             <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center col-span-2 sm:col-span-2">
               <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Owner</div>
-              <div className="text-sm font-mono font-semibold text-[var(--text-primary)]">{shortenAddress(ownerAddress)}</div>
+              <div className="text-sm font-semibold text-[var(--text-primary)]">{ownerDisplay}</div>
             </div>
           </div>
           <div className="mt-5 pt-4 border-t border-[var(--border-default)] text-center">

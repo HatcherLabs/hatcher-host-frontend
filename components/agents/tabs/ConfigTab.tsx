@@ -15,7 +15,7 @@ import {
   Shield,
   RefreshCw,
 } from 'lucide-react';
-import { FREE_TIER_LIMITS, FEATURE_CATALOG, BYOK_PROVIDERS, getBYOKProvider } from '@hatcher/shared';
+import { BYOK_PROVIDERS, getBYOKProvider } from '@hatcher/shared';
 import {
   useAgentContext,
   tabContentVariants,
@@ -118,20 +118,13 @@ export function ConfigTab() {
           </div>
           <div>
             {(() => {
-              const hasUnlimitedSkills = activeFeatureKeys.has('openclaw.skills.unlimited');
-              const hasPack10 = activeFeatureKeys.has('openclaw.skills.pack10');
-              const maxSkills = hasUnlimitedSkills ? Infinity : hasPack10 ? 10 : FREE_TIER_LIMITS.openclaw.maxSkills;
               const parsedSkills = configSkills ? configSkills.split(',').map((s) => s.trim()).filter(Boolean) : [];
-              const overLimit = !hasUnlimitedSkills && parsedSkills.length > maxSkills;
               return (
                 <>
                   <div className="flex items-center justify-between mb-1.5">
                     <label htmlFor="config-skills" className="block text-[11px] font-medium uppercase tracking-wider text-[#71717a]">Skills (comma-separated)</label>
-                    <span className={`text-[10px] font-medium ${overLimit ? 'text-amber-400' : 'text-[#71717a]'}`}>
-                      {parsedSkills.length}/{hasUnlimitedSkills ? '\u221e' : maxSkills}
-                      {!hasUnlimitedSkills && !hasPack10 && <span className="ml-1 text-[#71717a]">· Free tier</span>}
-                      {hasPack10 && !hasUnlimitedSkills && <span className="ml-1 text-[#f97316]">· Pack 10</span>}
-                      {hasUnlimitedSkills && <span className="ml-1 text-[#f97316]">· Unlimited</span>}
+                    <span className="text-[10px] font-medium text-[#71717a]">
+                      {parsedSkills.length} skills
                     </span>
                   </div>
                   <input
@@ -142,20 +135,11 @@ export function ConfigTab() {
                     onChange={(e) => setConfigSkills(e.target.value)}
                     placeholder="chat, search, calculator..."
                   />
-                  {overLimit && (
-                    <p className="text-[10px] mt-1 text-amber-400 flex items-center gap-1">
-                      <AlertTriangle size={10} />
-                      {parsedSkills.length - maxSkills} skill{parsedSkills.length - maxSkills > 1 ? 's' : ''} over limit — extra skills will be ignored at runtime
-                    </p>
-                  )}
+                  {/* Skills are unlimited on all tiers */}
                   {parsedSkills.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {parsedSkills.map((skill, i) => (
-                        <span key={skill} className={`text-[10px] px-2 py-0.5 rounded-full border ${
-                          !hasUnlimitedSkills && i >= maxSkills
-                            ? 'bg-amber-500/10 text-amber-400 border-amber-500/20 line-through opacity-60'
-                            : 'bg-[#f97316]/10 text-[#f97316] border-[#f97316]/20'
-                        }`}>
+                        <span key={skill} className="text-[10px] px-2 py-0.5 rounded-full border bg-[#f97316]/10 text-[#f97316] border-[#f97316]/20">
                           {skill}
                         </span>
                       ))}
@@ -177,105 +161,163 @@ export function ConfigTab() {
           <h3 className="text-sm font-semibold text-[#A5A1C2]">LLM Configuration</h3>
         </div>
         <div className="space-y-4">
-          {/* 1. Provider selector */}
+          {/* 1. LLM Mode toggle */}
           <div>
-            <label htmlFor="config-provider" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Provider</label>
-            <div className="relative">
-              <select
-                id="config-provider"
-                className="config-input text-sm appearance-none pr-8 cursor-pointer"
-                value={configProvider}
-                onChange={(e) => {
-                  const newProvider = e.target.value;
-                  setConfigProvider(newProvider);
+            <label className="block text-[11px] font-medium uppercase tracking-wider mb-2 text-[#71717a]">Mode</label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setConfigProvider('groq');
                   setUseCustomModel(false);
-                  setCustomModelInput('');
-                  // Auto-select the first model of the new provider
-                  const meta = getBYOKProvider(newProvider);
-                  setConfigModel(meta?.models[0]?.id ?? '');
+                  setByokKeyInput('');
                 }}
+                className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-left transition-all ${
+                  configProvider === 'groq'
+                    ? 'border-[#f97316]/40 bg-[#f97316]/10 text-white'
+                    : 'border-white/[0.06] bg-white/[0.02] text-[#71717a] hover:border-white/[0.12]'
+                }`}
               >
-                {BYOK_PROVIDERS.map((p) => (
-                  <option key={p.key} value={p.key} style={{ background: '#0D0B1A' }}>{p.name} — {p.description}</option>
-                ))}
-              </select>
-              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                <Zap size={16} className={configProvider === 'groq' ? 'text-[#f97316]' : ''} />
+                <div>
+                  <p className="text-xs font-medium">Hatcher Platform</p>
+                  <p className="text-[10px] opacity-60">Free, no setup needed</p>
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (configProvider === 'groq') {
+                    const firstBYOK = BYOK_PROVIDERS.find(p => p.key !== 'groq') ?? BYOK_PROVIDERS[0];
+                    setConfigProvider(firstBYOK!.key);
+                    const meta = getBYOKProvider(firstBYOK!.key);
+                    setConfigModel(meta?.models[0]?.id ?? '');
+                  }
+                }}
+                className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-left transition-all ${
+                  configProvider !== 'groq'
+                    ? 'border-emerald-500/40 bg-emerald-500/10 text-white'
+                    : 'border-white/[0.06] bg-white/[0.02] text-[#71717a] hover:border-white/[0.12]'
+                }`}
+              >
+                <Shield size={16} className={configProvider !== 'groq' ? 'text-emerald-400' : ''} />
+                <div>
+                  <p className="text-xs font-medium">BYOK</p>
+                  <p className="text-[10px] opacity-60">Bring Your Own Key</p>
+                </div>
+              </button>
             </div>
-            {configProvider === 'groq' && (
-              <p className="text-[10px] mt-1.5 text-emerald-400 flex items-center gap-1">
-                <CheckCircle size={10} />
-                Free tier — using Hatcher&apos;s default Groq key. No API key needed.
-              </p>
-            )}
           </div>
 
-          {/* 2. Model selector */}
-          <div>
-            <label htmlFor="config-model" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Model</label>
-            {!useCustomModel ? (
-              <>
+          {/* Platform mode — show info only */}
+          {configProvider === 'groq' && (
+            <div className="rounded-xl p-4 border border-[#f97316]/20 bg-[#f97316]/5">
+              <div className="flex items-center gap-2 mb-1">
+                <CheckCircle size={14} className="text-[#f97316]" />
+                <p className="text-xs font-medium text-white">Platform Model Active</p>
+              </div>
+              <p className="text-[10px] text-[#A5A1C2] ml-[22px]">
+                Using Hatcher&apos;s LLM via proxy. No API key needed. Switch to BYOK to use your own provider and model.
+              </p>
+            </div>
+          )}
+
+          {/* BYOK mode — provider, model, and API key */}
+          {configProvider !== 'groq' && (
+            <>
+              {/* BYOK Provider selector */}
+              <div>
+                <label htmlFor="config-provider" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Provider</label>
                 <div className="relative">
                   <select
-                    id="config-model"
-                    className="config-input text-sm font-mono appearance-none pr-8 cursor-pointer"
-                    value={configModel}
+                    id="config-provider"
+                    className="config-input text-sm appearance-none pr-8 cursor-pointer"
+                    value={configProvider}
                     onChange={(e) => {
-                      if (e.target.value === '__custom__') {
-                        setUseCustomModel(true);
-                        setCustomModelInput(configModel);
-                      } else {
-                        setConfigModel(e.target.value);
-                      }
+                      const newProvider = e.target.value;
+                      setConfigProvider(newProvider);
+                      setUseCustomModel(false);
+                      setCustomModelInput('');
+                      const meta = getBYOKProvider(newProvider);
+                      setConfigModel(meta?.models[0]?.id ?? '');
                     }}
                   >
-                    {providerModels.map((m) => (
-                      <option key={m.id} value={m.id} style={{ background: '#0D0B1A' }}>
-                        {m.name}{m.context ? ` (${m.context})` : ''}
-                      </option>
+                    {BYOK_PROVIDERS.filter(p => p.key !== 'groq').map((p) => (
+                      <option key={p.key} value={p.key} style={{ background: '#0D0B1A' }}>{p.name} — {p.description}</option>
                     ))}
-                    <option value="__custom__" style={{ background: '#0D0B1A' }}>Custom model...</option>
                   </select>
                   <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
                 </div>
-                <p className="text-[10px] mt-1 text-[#71717a]">
-                  Select a model for {currentProviderMeta?.name ?? llmProvider}, or choose &quot;Custom model...&quot; to enter a model ID manually.
-                </p>
-              </>
-            ) : (
-              <>
-                <input
-                  id="config-model-custom"
-                  type="text"
-                  className="config-input font-mono text-xs"
-                  value={customModelInput}
-                  onChange={(e) => setCustomModelInput(e.target.value)}
-                  placeholder="e.g. my-fine-tuned-model-v2"
-                />
-                <div className="flex items-center justify-between mt-1">
-                  <p className="text-[10px] text-[#71717a]">
-                    Enter a custom model ID for {currentProviderMeta?.name ?? llmProvider}.
-                  </p>
-                  <button
-                    type="button"
-                    className="text-[10px] text-[#A78BFA] hover:text-[#c4b5fd] transition-colors"
-                    onClick={() => {
-                      setUseCustomModel(false);
-                      // Restore to first known model if custom input is empty
-                      if (!customModelInput.trim()) {
-                        setConfigModel(providerModels[0]?.id ?? '');
-                      } else {
-                        setConfigModel(customModelInput.trim());
-                      }
-                    }}
-                  >
-                    Back to model list
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+              </div>
 
-          {/* 3. BYOK API Key — hidden for groq free tier */}
+              {/* BYOK Model selector */}
+              <div>
+                <label htmlFor="config-model" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Model</label>
+                {!useCustomModel ? (
+                  <>
+                    <div className="relative">
+                      <select
+                        id="config-model"
+                        className="config-input text-sm font-mono appearance-none pr-8 cursor-pointer"
+                        value={configModel}
+                        onChange={(e) => {
+                          if (e.target.value === '__custom__') {
+                            setUseCustomModel(true);
+                            setCustomModelInput(configModel);
+                          } else {
+                            setConfigModel(e.target.value);
+                          }
+                        }}
+                      >
+                        {providerModels.map((m) => (
+                          <option key={m.id} value={m.id} style={{ background: '#0D0B1A' }}>
+                            {m.name}{m.context ? ` (${m.context})` : ''}
+                          </option>
+                        ))}
+                        <option value="__custom__" style={{ background: '#0D0B1A' }}>Custom model...</option>
+                      </select>
+                      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                    </div>
+                    <p className="text-[10px] mt-1 text-[#71717a]">
+                      Select a model or choose &quot;Custom model...&quot; to enter an ID manually.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <input
+                      id="config-model-custom"
+                      type="text"
+                      className="config-input font-mono text-xs"
+                      value={customModelInput}
+                      onChange={(e) => setCustomModelInput(e.target.value)}
+                      placeholder="e.g. my-fine-tuned-model-v2"
+                    />
+                    <div className="flex items-center justify-between mt-1">
+                      <p className="text-[10px] text-[#71717a]">
+                        Enter a custom model ID for {currentProviderMeta?.name ?? configProvider}.
+                      </p>
+                      <button
+                        type="button"
+                        className="text-[10px] text-[#A78BFA] hover:text-[#c4b5fd] transition-colors"
+                        onClick={() => {
+                          setUseCustomModel(false);
+                          if (!customModelInput.trim()) {
+                            setConfigModel(providerModels[0]?.id ?? '');
+                          } else {
+                            setConfigModel(customModelInput.trim());
+                          }
+                        }}
+                      >
+                        Back to model list
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* 3. BYOK API Key — only shown in BYOK mode */}
           {configProvider !== 'groq' && (
             <div>
               <label htmlFor="config-byok-key" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">
@@ -348,21 +390,7 @@ export function ConfigTab() {
 
       {/* Integrations are configured in the Integrations tab */}
 
-      {/* No features unlocked hint */}
-      {activeFeatures.length === 0 && !featuresLoading && (
-        <div className="p-4 rounded-lg border border-white/[0.06] text-center bg-[rgba(26,23,48,0.6)]">
-          <Lock size={20} className="mx-auto mb-2 text-[#71717a]" />
-          <p className="text-sm mb-2 text-[#A5A1C2]">
-            No integrations unlocked yet
-          </p>
-          <button
-            onClick={() => setTab('integrations')}
-            className="text-xs px-4 py-2 rounded-lg border border-[#f97316]/30 hover:bg-[#f97316]/10 transition-all text-[#f97316]"
-          >
-            Browse Integrations
-          </button>
-        </div>
-      )}
+      {/* Integrations hint — all integrations are free */}
 
       {/* Save button */}
       <div className="flex items-center gap-3 pt-2">

@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono, Sora } from 'next/font/google';
 import '@solana/wallet-adapter-react-ui/styles.css';
 import './globals.css';
 import { WalletProvider } from '@/components/providers/WalletProvider';
+import { AuthProvider } from '@/lib/auth-context';
 import { LayoutShell } from '@/components/layout/LayoutShell';
 import { ToastProvider } from '@/components/ui/ToastProvider';
 import { CommandPalette } from '@/components/ui/CommandPalette';
@@ -39,12 +40,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`dark scroll-smooth ${inter.variable} ${jetbrainsMono.variable} ${sora.variable}`}>
       <body>
-        <WalletProvider>
-          <ToastProvider>
-            <LayoutShell>{children}</LayoutShell>
-            <CommandPalette />
-          </ToastProvider>
-        </WalletProvider>
+        <AuthProvider>
+          <WalletProvider>
+            <ToastProvider>
+              <LayoutShell>{children}</LayoutShell>
+              <CommandPalette />
+            </ToastProvider>
+          </WalletProvider>
+        </AuthProvider>
       </body>
     </html>
   );

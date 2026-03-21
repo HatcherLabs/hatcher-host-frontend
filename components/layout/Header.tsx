@@ -1,15 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@/components/wallet/WalletButton';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/auth-context';
 import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield } from 'lucide-react';
+import { Shield, LogOut, Settings, User } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
-const ADMIN_WALLET = process.env['NEXT_PUBLIC_ADMIN_WALLET'] ?? '';
 
 const NAV_LINKS = [
   { href: '/dashboard',         label: 'Dashboard' },
@@ -31,13 +29,36 @@ function isActive(pathname: string, href: string) {
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { publicKey, connected } = useWallet();
-  const walletAddress = publicKey?.toString() ?? '';
-  const isAdmin = ADMIN_WALLET ? walletAddress === ADMIN_WALLET : false;
+  const { isAuthenticated, user, logout } = useAuth();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Always show header nav — no sidebar
-  const hasSidebar = false;
+  const isAdmin = user?.isAdmin ?? false;
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setDropdownOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    setDropdownOpen(false);
+    router.push('/');
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-black/50 backdrop-blur-xl">
@@ -47,7 +68,6 @@ export function Header() {
           <div className="flex items-center gap-3 flex-shrink-0">
             <Link href="/" className="flex items-center gap-2 group">
               <span className="flex items-center gap-2">
-                {/* Egg logo mark */}
                 <span className="relative flex items-center justify-center w-7 h-7">
                   <svg viewBox="0 0 28 28" width="28" height="28" fill="none" className="drop-shadow-[0_0_8px_rgba(249,115,22,0.25)]">
                     <defs>
@@ -61,17 +81,12 @@ export function Header() {
                         <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
                       </radialGradient>
                     </defs>
-                    {/* Egg shape */}
                     <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggShell)" stroke="rgba(249,115,22,0.5)" strokeWidth="0.8" />
-                    {/* Inner warm glow */}
                     <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggInnerGlow)" />
-                    {/* Crack line — hatching */}
                     <path d="M10 14.5 L12.5 12.5 L11 10.5 L13.5 9 L12 7" stroke="#f97316" strokeWidth="0.7" strokeLinecap="round" fill="none" opacity="0.6" />
-                    {/* Light spill through crack */}
                     <circle cx="12" cy="11" r="1.5" fill="#f97316" opacity="0.3">
                       <animate attributeName="opacity" values="0.2;0.45;0.2" dur="3s" repeatCount="indefinite" />
                     </circle>
-                    {/* Shell highlight */}
                     <ellipse cx="11" cy="10" rx="2.5" ry="4" fill="white" opacity="0.04" transform="rotate(-15 11 10)" />
                   </svg>
                 </span>
@@ -97,8 +112,8 @@ export function Header() {
             )}
           </div>
 
-          {/* Desktop Nav — hidden when sidebar is present */}
-          <nav className={`${hasSidebar ? 'hidden' : 'hidden lg:flex'} items-center gap-0.5 relative`} aria-label="Main navigation">
+          {/* Desktop Nav */}
+          <nav className="hidden lg:flex items-center gap-0.5 relative" aria-label="Main navigation">
             {NAV_LINKS.map((link) => {
               const active = isActive(pathname, link.href);
               return (
@@ -135,13 +150,73 @@ export function Header() {
             </a>
           </nav>
 
-          {/* Right side: wallet button + hamburger */}
+          {/* Right side: auth button/user menu + hamburger */}
           <div className="flex items-center gap-3">
-            <WalletMultiButton />
+            {isAuthenticated && user ? (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen((o) => !o)}
+                  aria-expanded={dropdownOpen}
+                  aria-haspopup="menu"
+                  className="h-9 px-3 flex items-center gap-2 rounded-lg border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition-all duration-200"
+                >
+                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
+                  <span className="text-xs font-medium text-orange-300">{user.username}</span>
+                  <span className="text-xs ml-1" style={{ color: 'rgba(167,139,250,0.6)' }}>&#9662;</span>
+                </button>
 
-            {/* Hamburger -- mobile/tablet only, hidden on sidebar routes */}
+                {dropdownOpen && (
+                  <div
+                    className="absolute right-0 mt-1 w-48 rounded-xl shadow-xl z-50 overflow-hidden"
+                    style={{
+                      background: 'rgba(13, 11, 26, 0.95)',
+                      backdropFilter: 'blur(24px)',
+                      WebkitBackdropFilter: 'blur(24px)',
+                      border: '1px solid rgba(46, 43, 74, 0.4)',
+                    }}
+                  >
+                    <div className="px-4 py-2.5 border-b border-white/[0.06]">
+                      <p className="text-xs text-white font-medium truncate">{user.username}</p>
+                      <p className="text-[10px] text-[#A5A1C2] truncate">{user.email}</p>
+                    </div>
+                    <Link
+                      href="/settings"
+                      onClick={() => setDropdownOpen(false)}
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-[#A5A1C2] hover:bg-white/[0.04] transition-colors duration-200 border-b border-white/[0.06]"
+                    >
+                      <Settings className="w-3 h-3" />
+                      Settings
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 text-left px-4 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors duration-200"
+                    >
+                      <LogOut className="w-3 h-3" />
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/login"
+                  className="h-9 px-4 text-white font-medium text-xs rounded-full border border-white/20 bg-transparent hover:bg-white/[0.04] transition-all duration-200 flex items-center"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/register"
+                  className="h-9 px-4 text-white font-medium text-xs rounded-full bg-orange-600 hover:bg-orange-500 transition-all duration-200 flex items-center"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
+
+            {/* Hamburger -- mobile/tablet only */}
             <button
-              className={`${hasSidebar ? 'hidden' : 'lg:hidden'} flex flex-col justify-center items-center w-10 h-10 rounded-lg hover:bg-[rgba(249,115,22,0.1)] transition-colors gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500`}
+              className="lg:hidden flex flex-col justify-center items-center w-10 h-10 rounded-lg hover:bg-[rgba(249,115,22,0.1)] transition-colors gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
               onClick={() => setMobileOpen((o) => !o)}
               aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={mobileOpen}

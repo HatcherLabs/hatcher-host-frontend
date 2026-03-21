@@ -11,6 +11,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { timeAgo } from '@/lib/utils';
+import { useAuth } from '@/lib/auth-context';
 import {
   useAgentContext,
   STATUS_STYLES,
@@ -18,6 +19,7 @@ import {
 
 export function StatsTab() {
   const ctx = useAgentContext();
+  const { user: authUser } = useAuth();
   const {
     agent,
     stats,
@@ -26,8 +28,8 @@ export function StatsTab() {
     llmProvider,
     currentProviderMeta,
     hasApiKey,
-    activeFeatures,
   } = ctx;
+  const tierKey = authUser?.tier ?? 'free';
 
   return (
     <motion.div
@@ -126,12 +128,15 @@ export function StatsTab() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
             <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Provider</p>
-            <p className="text-sm font-medium text-[#fafafa] capitalize">{currentProviderMeta?.name ?? llmProvider}</p>
+            <p className="text-sm font-medium text-[#fafafa] capitalize">
+              {hasApiKey ? (currentProviderMeta?.name ?? llmProvider) : 'Hatcher Platform'}
+            </p>
           </div>
           <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
             <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Model</p>
             <p className="text-sm font-medium text-[#fafafa] font-mono">
               {(() => {
+                if (!hasApiKey) return 'Platform Default';
                 const cfg = (agent?.config ?? {}) as Record<string, unknown>;
                 const byok = cfg.byok as Record<string, unknown> | undefined;
                 return (byok?.model as string) ?? (cfg.model as string) ?? 'Default';
@@ -139,66 +144,63 @@ export function StatsTab() {
             </p>
           </div>
           <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
-            <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">API Key</p>
+            <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Mode</p>
             <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${
               hasApiKey
                 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                : 'bg-[#f97316]/10 text-[#f97316] border-[#f97316]/20'
             }`}>
               {hasApiKey ? (
-                <><Shield size={12} /> BYOK Active</>
+                <><Shield size={12} /> BYOK</>
               ) : (
-                <>Free Tier (Groq)</>
+                <><Zap size={12} /> Platform LLM</>
               )}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Active Features */}
+      {/* Your Plan */}
       <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
         <div className="flex items-center gap-2 mb-4">
           <Zap size={18} className="text-[#f97316]" />
-          <h3 className="text-base font-semibold text-[#fafafa]">Active Features</h3>
-          <span className="ml-auto text-xs text-[#71717a]">{activeFeatures.length} unlocked</span>
+          <h3 className="text-base font-semibold text-[#fafafa]">Your Plan</h3>
         </div>
-        {activeFeatures.length === 0 ? (
-          <div className="rounded-xl p-6 text-center" style={{ background: 'rgba(46,43,74,0.3)' }}>
-            <Lock size={24} className="mx-auto mb-2 text-[#71717a]" />
-            <p className="text-sm text-[#71717a]">No features unlocked yet.</p>
-            <p className="text-xs text-[#71717a] mt-1">Unlock features in the Integrations tab to power up your agent.</p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {activeFeatures.map((feat) => {
-              const parts = feat.featureKey.split('.');
-              const category = parts.length >= 2 ? parts[parts.length - 2] : '';
-              const name = parts[parts.length - 1];
-              const displayCategory = category.charAt(0).toUpperCase() + category.slice(1);
-              const displayName = name.split('_').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-              return (
-                <div
-                  key={feat.id}
-                  className="flex items-center justify-between rounded-xl px-4 py-3"
-                  style={{ background: 'rgba(46,43,74,0.3)' }}
-                >
-                  <div className="flex items-center gap-3">
-                    <CheckCircle size={16} className="text-green-400 flex-shrink-0" />
-                    <div>
-                      <p className="text-sm font-medium text-[#fafafa]">{displayCategory}: {displayName}</p>
-                      <p className="text-xs text-[#71717a]">{feat.type === 'subscription' ? 'Subscription' : 'One-time'}</p>
-                    </div>
-                  </div>
-                  {feat.expiresAt && (
-                    <span className="text-xs text-[#A5A1C2]">
-                      Expires {new Date(feat.expiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </span>
-                  )}
+        {(() => {
+          // Import tier info from auth context
+          // tierKey from component scope
+          const tierNames: Record<string, string> = { free: 'Free', unlimited: 'Unlimited', pro: 'Pro' };
+          const tierName = tierNames[tierKey] ?? 'Free';
+          const isPaid = tierKey !== 'free';
+
+          const features = [
+            { label: 'Messages', value: isPaid ? 'Unlimited' : '20/day' },
+            { label: 'Resources', value: tierKey === 'pro' ? '1 CPU, 1GB RAM' : tierKey === 'unlimited' ? '0.5 CPU, 512MB' : '0.25 CPU, 256MB' },
+            { label: 'Auto-sleep', value: isPaid ? 'Always-on' : '15 min idle' },
+            { label: 'File Manager', value: tierKey === 'pro' ? 'Included' : 'Add-on ($9.99)' },
+            { label: 'Integrations', value: 'All included' },
+          ];
+
+          return (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 rounded-xl px-4 py-3" style={{ background: 'rgba(46,43,74,0.3)' }}>
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isPaid ? 'bg-[#f97316]/15' : 'bg-white/[0.06]'}`}>
+                  <Shield size={16} className={isPaid ? 'text-[#f97316]' : 'text-[#71717a]'} />
                 </div>
-              );
-            })}
-          </div>
-        )}
+                <div>
+                  <p className="text-sm font-semibold text-white">{tierName} Tier</p>
+                  <p className="text-[10px] text-[#71717a]">{tierKey === 'free' ? 'No charge' : tierKey === 'unlimited' ? '$9.99/mo' : '$19.99/mo'}</p>
+                </div>
+              </div>
+              {features.map((f) => (
+                <div key={f.label} className="flex items-center justify-between px-4 py-2">
+                  <span className="text-xs text-[#71717a]">{f.label}</span>
+                  <span className="text-xs font-medium text-[#A5A1C2]">{f.value}</span>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
       </div>
     </motion.div>
   );

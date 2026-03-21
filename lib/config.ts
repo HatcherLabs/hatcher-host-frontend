@@ -15,6 +15,6 @@ export const SOCIAL_LINKS = {
 export const EXTERNAL_LINKS = {
   openclaw: 'https://openclaw.org',
   clawhub: 'https://clawhub.org',
-  jupiterSwap: 'https://jup.ag/swap/SOL-HATCH',
+  jupiterSwap: 'https://jup.ag/swap/SOL',
   supportEmail: 'support@hatcher.host',
 } as const;

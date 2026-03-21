@@ -514,8 +514,8 @@ print(f"{usage['requestsUsed']}/{usage['requestsLimit']} requests used")`,
 
 const RATE_LIMIT_TIERS = [
   { tier: 'Free', requests: '100', price: '$0' },
-  { tier: 'Pro', requests: '10,000', price: '$15/mo' },
-  { tier: 'Business', requests: '100,000', price: '$45/mo' },
+  { tier: 'Unlimited', requests: '10,000', price: '$9.99/mo' },
+  { tier: 'Pro', requests: '100,000', price: '$19.99/mo' },
 ];
 
 const ERROR_CODES = [

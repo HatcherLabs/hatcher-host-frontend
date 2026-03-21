@@ -41,7 +41,7 @@ npm run dev                   # http://localhost:3000
 | `/settings` | Account settings |
 | `/admin` | Admin panel |
 | `/docs` | Documentation |
-| `/token` | $HATCH token info |
+| `/token` | Platform token info |
 
 ## Scripts
 

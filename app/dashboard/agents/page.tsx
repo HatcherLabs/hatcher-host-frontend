@@ -1,13 +1,11 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { WalletMultiButton } from '@/components/wallet/WalletButton';
 import { getInitials, stringToColor, timeAgo } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RobotMascot } from '@/components/ui/RobotMascot';
@@ -131,8 +129,7 @@ function SkeletonCard() {
 // My Agents Page
 // ═════════════════════════════════════════════════════════════
 export default function MyAgentsPage() {
-  const { connected } = useWallet();
-  const { isAuthenticated, isLoading: authLoading, login } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
   const [agents, setAgents] = useState<Agent[]>([]);
@@ -199,27 +196,6 @@ export default function MyAgentsPage() {
   const totalFeatures = agents.reduce((sum, a) => sum + (a.features?.length ?? 0), 0);
 
   // ── Unauthenticated states ───────────────────────────────
-  if (!connected) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="min-h-screen flex items-center justify-center"
-      >
-        <div className="text-center max-w-md px-4">
-          <div className="w-20 h-20 rounded-2xl bg-[#f97316]/15 flex items-center justify-center mx-auto mb-6">
-            <Bot size={40} className="text-[#f97316]" />
-          </div>
-          <h1 className="text-2xl font-bold mb-3 text-[#FFFFFF]">Connect Your Wallet</h1>
-          <p className="mb-8 text-sm text-[#A5A1C2]">
-            Connect a Solana wallet to see your agents.
-          </p>
-          <WalletMultiButton />
-        </div>
-      </motion.div>
-    );
-  }
-
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -244,14 +220,11 @@ export default function MyAgentsPage() {
           </div>
           <h1 className="text-2xl font-bold mb-3 text-[#FFFFFF]">Sign In Required</h1>
           <p className="mb-8 text-sm text-[#A5A1C2]">
-            Sign a message with your wallet to access your agents.
+            Sign in to your account to access your agents.
           </p>
-          <button
-            className="btn-primary px-8 py-3"
-            onClick={login}
-          >
+          <a href="/login" className="btn-primary px-8 py-3 inline-block">
             Sign In
-          </button>
+          </a>
         </div>
       </motion.div>
     );

@@ -2,11 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@/components/wallet/WalletButton';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
-import { FREE_TIER_LIMITS, HOSTED_CREDIT_MODELS, BYOK_PROVIDERS, getBYOKProvider, AGENT_TEMPLATES } from '@hatcher/shared';
+import { BYOK_PROVIDERS, getBYOKProvider, AGENT_TEMPLATES } from '@hatcher/shared';
 import type { BYOKProvider, AgentTemplateId } from '@hatcher/shared';
 import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
@@ -38,7 +36,7 @@ const STEP_LABELS: Record<Step, string> = {
   3: 'Ready to hatch?',
 };
 
-type LLMChoice = 'free_groq' | 'byok' | 'hatcher_credits';
+type LLMChoice = 'free_groq' | 'byok';
 
 // BYOK_PROVIDERS imported from @hatcher/shared
 
@@ -46,7 +44,7 @@ type LLMChoice = 'free_groq' | 'byok' | 'hatcher_credits';
 
 const CATEGORY_ORDER = ['business', 'development', 'crypto', 'research', 'support', 'custom'] as const;
 
-const OPENCLAW_FREE_SKILLS = FREE_TIER_LIMITS.openclaw.skills;
+const OPENCLAW_FREE_SKILLS = ['web_search', 'calculator', 'weather'];
 
 // ── Animation variants ───────────────────────────────────────
 
@@ -85,8 +83,7 @@ const cardClass = 'card glass-noise';
 
 export default function CreatePage() {
   const router = useRouter();
-  const { connected } = useWallet();
-  const { isAuthenticated, isLoading: authLoading, login } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const [step, setStep] = useState<Step>(1);
   const [launching, setLaunching] = useState(false);
@@ -99,7 +96,7 @@ export default function CreatePage() {
   const [byokCustomModel, setByokCustomModel] = useState(false);
   const [byokApiKey, setByokApiKey] = useState('');
   const [byokBaseUrl, setByokBaseUrl] = useState('');
-  const [creditsModel, setCreditsModel] = useState<string>(HOSTED_CREDIT_MODELS[0].model);
+  // Credits model removed — using Groq free or BYOK only
 
   // ── Template state ──
   const [selectedTemplate, setSelectedTemplate] = useState('custom');
@@ -164,21 +161,14 @@ export default function CreatePage() {
         },
       };
     }
-    const selected = HOSTED_CREDIT_MODELS.find((m) => m.model === creditsModel) ?? HOSTED_CREDIT_MODELS[0];
-    return {
-      modelProvider: 'hatcher_proxy',
-      model: selected.model,
-    };
+    // Fallback: use free groq
+    return { modelProvider: 'groq', model: 'llama-3.3-70b-versatile' };
   }
 
   function getLLMSummary(): string {
     if (llmChoice === 'free_groq') return 'Groq Llama 4 Scout (free)';
-    if (llmChoice === 'byok') {
-      const prov = getBYOKProvider(byokProvider);
-      return `BYOK: ${prov?.name ?? byokProvider}${byokModel ? ` / ${byokModel}` : ''}`;
-    }
-    const selected = HOSTED_CREDIT_MODELS.find((m) => m.model === creditsModel);
-    return `Credits: ${selected?.label ?? creditsModel}`;
+    const prov = getBYOKProvider(byokProvider);
+    return `BYOK: ${prov?.name ?? byokProvider}${byokModel ? ` / ${byokModel}` : ''}`;
   }
 
   // ── Launch ──
@@ -242,28 +232,6 @@ export default function CreatePage() {
 
   // ── Auth gates ──
 
-  if (!connected) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4 }}
-        className="min-h-screen flex items-center justify-center px-4"
-      >
-        <div className={cn(cardClass, 'p-10 max-w-md w-full text-center')}>
-          <div className="w-16 h-16 rounded-2xl bg-[#f97316]/10 border border-[#f97316]/20 flex items-center justify-center mx-auto mb-6">
-            <Bot className="w-8 h-8 text-[#f97316]" />
-          </div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-3">Connect Wallet</h1>
-          <p className="text-[var(--text-secondary)] text-sm mb-8">
-            Connect your Solana wallet to create and manage your AI agents.
-          </p>
-          <WalletMultiButton />
-        </div>
-      </motion.div>
-    );
-  }
-
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
@@ -288,10 +256,10 @@ export default function CreatePage() {
             <Key className="w-8 h-8 text-[#f97316]" />
           </div>
           <h1 className="text-xl font-bold text-[var(--text-primary)] mb-3">Sign In Required</h1>
-          <p className="text-[var(--text-secondary)] text-sm mb-8">Sign a message with your wallet to authenticate.</p>
-          <button className="btn-primary" onClick={login}>
+          <p className="text-[var(--text-secondary)] text-sm mb-8">Sign in to your account to create agents.</p>
+          <a href="/login" className="btn-primary inline-block">
             Sign In
-          </button>
+          </a>
         </div>
       </motion.div>
     );
@@ -747,72 +715,7 @@ export default function CreatePage() {
                       </AnimatePresence>
                     </div>
 
-                    {/* Hatcher Credits */}
-                    <div
-                      className={cn(
-                        'rounded-xl border transition-all duration-200',
-                        llmChoice === 'hatcher_credits'
-                          ? 'bg-[#f97316]/10 border-[#f97316] shadow-[0_0_16px_rgba(249,115,22,0.1)]'
-                          : 'bg-[rgba(26,23,48,0.6)] border-[rgba(46,43,74,0.4)]'
-                      )}
-                    >
-                      <button
-                        onClick={() => setLlmChoice('hatcher_credits')}
-                        className="w-full p-4 text-left"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-[#f97316]/10 flex items-center justify-center">
-                            <Sparkles className="w-5 h-5 text-[#f97316]" />
-                          </div>
-                          <div>
-                            <div className="text-sm font-medium text-[#FFFFFF]">Hatcher Credits</div>
-                            <div className="text-xs text-[#71717a] mt-0.5">Premium models through Hatcher -- no API key needed</div>
-                          </div>
-                        </div>
-                      </button>
-
-                      <AnimatePresence>
-                        {llmChoice === 'hatcher_credits' && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.25 }}
-                            className="overflow-hidden"
-                          >
-                            <div className="px-4 pb-4 space-y-3 border-t border-[rgba(46,43,74,0.3)] pt-4">
-                              <label className="block text-xs text-[#A5A1C2] mb-2 uppercase tracking-wider">Select Model</label>
-                              <div className="space-y-2">
-                                {HOSTED_CREDIT_MODELS.map((m) => (
-                                  <motion.button
-                                    key={m.model}
-                                    type="button"
-                                    whileHover={{ scale: 1.01 }}
-                                    onClick={() => setCreditsModel(m.model)}
-                                    className={cn(
-                                      'w-full text-left border rounded-xl px-4 py-3 transition-all',
-                                      creditsModel === m.model
-                                        ? 'border-[#f97316] bg-[#f97316]/5 shadow-[0_0_8px_rgba(249,115,22,0.1)]'
-                                        : 'border-[rgba(46,43,74,0.4)] hover:border-[rgba(249,115,22,0.3)]'
-                                    )}
-                                  >
-                                    <div className="flex items-center justify-between">
-                                      <div>
-                                        <span className="text-sm font-medium text-[#FFFFFF]">{m.label}</span>
-                                        <span className="text-xs text-[#71717a] ml-2">{m.provider}</span>
-                                      </div>
-                                      <div className="text-xs text-[#71717a]">
-                                        ${m.inputPer1k}/1k in | ${m.outputPer1k}/1k out
-                                      </div>
-                                    </div>
-                                  </motion.button>
-                                ))}
-                              </div>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
+                    {/* Hatcher Credits option removed — use Groq free or BYOK */}
                   </div>
                 </fieldset>
 
@@ -1131,8 +1034,8 @@ function OpenClawFields({
 
         <div className="bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] rounded-xl px-4 py-3 text-center backdrop-blur-sm">
           <Lock className="w-4 h-4 text-[#f97316]/40 mx-auto mb-1.5" />
-          <p className="text-xs text-[#71717a]">Unlock more skills after creation via the features tab</p>
-          <p className="text-[10px] text-[#71717a]/70 mt-0.5">10 skills ($5) or unlimited ($18)</p>
+          <p className="text-xs text-[#71717a]">More skills available after creation</p>
+          <p className="text-[10px] text-[#71717a]/70 mt-0.5">Included with your plan</p>
         </div>
       </div>
 
@@ -1150,12 +1053,12 @@ function OpenClawFields({
         <div className="border border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.6)] rounded-xl px-4 py-4 text-center backdrop-blur-sm">
           <Lock className="w-4 h-4 text-[#f97316]/40 mx-auto mb-1.5" />
           <p className="text-sm text-[#71717a]">Scheduled Tasks</p>
-          <p className="text-xs text-[#71717a]/70 mt-0.5">$5/mo -- unlock after creation</p>
+          <p className="text-xs text-[#71717a]/70 mt-0.5">Included with your plan</p>
         </div>
         <div className="border border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.6)] rounded-xl px-4 py-4 text-center backdrop-blur-sm">
           <Lock className="w-4 h-4 text-[#f97316]/40 mx-auto mb-1.5" />
           <p className="text-sm text-[#71717a]">Webhooks</p>
-          <p className="text-xs text-[#71717a]/70 mt-0.5">$6/mo -- unlock after creation</p>
+          <p className="text-xs text-[#71717a]/70 mt-0.5">Included with your plan</p>
         </div>
       </div>
     </>

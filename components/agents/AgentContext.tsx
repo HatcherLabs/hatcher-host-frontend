@@ -2,11 +2,11 @@
 
 import { createContext, useContext } from 'react';
 import type { Agent, AgentFeature } from '@/lib/api';
-import type { FeaturePricing } from '@hatcher/shared';
+// FeaturePricing type removed — using tier-based model now
 
 // ─── Types ───────────────────────────────────────────────────
 
-export type Tab = 'overview' | 'config' | 'integrations' | 'logs' | 'chat' | 'stats';
+export type Tab = 'overview' | 'config' | 'integrations' | 'files' | 'logs' | 'chat' | 'stats';
 
 export interface Message {
   id: string;
@@ -216,7 +216,7 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
   },
 ];
 
-/** Extra platforms unlocked by openclaw.platform.extra ($12 one-time) */
+/** Extra platforms — all extra platforms included free */
 export const EXTRA_PLATFORM_INTEGRATIONS: IntegrationDef[] = [
   {
     featureKey: 'openclaw.platform.extra',
@@ -462,9 +462,6 @@ export interface AgentContextValue {
   featuresLoading: boolean;
   unlocking: string | null;
   handleUnlockFeature: (featureKey: string, usdPrice: number) => Promise<void>;
-  featuresByCategory: Record<string, FeaturePricing[]>;
-  frameworkBundles: ReturnType<typeof import('@hatcher/shared').BUNDLES['filter']>;
-
   // Integration config
   integrationSecrets: Record<string, Record<string, string>>;
   expandedIntegrations: Set<string>;

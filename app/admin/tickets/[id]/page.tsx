@@ -12,15 +12,11 @@ import {
   XCircle,
   Send,
   AlertCircle,
-  Shield,
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { useWallet } from '@solana/wallet-adapter-react';
 import { useAuth } from '@/lib/auth-context';
 import { shortenAddress, timeAgo } from '@/lib/utils';
-import { WalletMultiButton } from '@/components/wallet/WalletButton';
 
-const ADMIN_WALLET = process.env['NEXT_PUBLIC_ADMIN_WALLET'] ?? '';
 
 interface AdminTicket {
   id: string;
@@ -28,7 +24,9 @@ interface AdminTicket {
   category: string;
   priority: string;
   status: string;
-  userWallet: string;
+  userUsername: string;
+  userEmail: string;
+  userWallet: string | null;
   agentName: string | null;
   messages: Array<{ role: string; content: string; timestamp: string }>;
   createdAt: string;
@@ -44,10 +42,8 @@ const statusColors: Record<string, string> = {
 export default function AdminTicketDetailPage() {
   const params = useParams();
   const ticketId = params.id as string;
-  const { publicKey, connected } = useWallet();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const walletAddress = publicKey?.toString() ?? '';
-  const isAdmin = ADMIN_WALLET ? walletAddress === ADMIN_WALLET : false;
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
+  const isAdmin = user?.isAdmin ?? false;
 
   const [ticket, setTicket] = useState<AdminTicket | null>(null);
   const [loading, setLoading] = useState(true);
@@ -94,18 +90,6 @@ export default function AdminTicketDetailPage() {
     if (res.success && ticket) {
       setTicket({ ...ticket, status });
     }
-  }
-
-  if (!connected) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="text-center">
-          <Shield size={40} className="mx-auto text-[#f97316] mb-4" />
-          <p className="text-[var(--text-secondary)] mb-4">Connect admin wallet to view this ticket.</p>
-          <WalletMultiButton />
-        </div>
-      </div>
-    );
   }
 
   if (authLoading || loading) {
@@ -159,7 +143,8 @@ export default function AdminTicketDetailPage() {
             <div className="flex-1 min-w-0">
               <h1 className="text-xl font-bold text-[var(--text-primary)] mb-2">{ticket.subject}</h1>
               <div className="flex items-center gap-3 text-xs text-[var(--text-muted)] flex-wrap">
-                <span className="font-mono">{shortenAddress(ticket.userWallet, 4)}</span>
+                <span className="font-medium">{ticket.userUsername}</span>
+                <span className="text-[var(--text-muted)] ml-1">({ticket.userEmail})</span>
                 <span>&middot;</span>
                 <span className="capitalize">{ticket.category.replace('_', ' ')}</span>
                 <span>&middot;</span>
