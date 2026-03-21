@@ -351,16 +351,20 @@ export function IntegrationsTab() {
                 const isExpanded = expandedIntegrations.has(sk);
                 const hasAnyConfigured = integration.fields.some((f) => hasExistingSecret(f.key));
                 const isPairing = !!integration.pairingRequired;
+                // For pairing integrations, check if pairing marker exists in config
+                const pairingKey = integration.pairingChannel === 'whatsapp' ? 'WHATSAPP_PAIRING' : integration.pairingChannel === 'signal' ? 'SIGNAL_PAIRING' : '';
+                const isPaired = isPairing && pairingKey && hasExistingSecret(pairingKey);
+                const isConfigured = hasAnyConfigured || isPaired;
 
                 return (
-                  <GlassCard key={sk} className={`!p-0 ${hasAnyConfigured ? 'border-emerald-500/20' : ''}`}>
+                  <GlassCard key={sk} className={`!p-0 ${isConfigured ? 'border-emerald-500/20' : ''}`}>
                     <button
                       type="button"
                       onClick={() => toggleIntegrationExpanded(sk)}
                       className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition-colors"
                     >
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${hasAnyConfigured ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-white/5 border border-white/[0.06]'}`}>
-                        {hasAnyConfigured ? (
+                      <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${isConfigured ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-white/5 border border-white/[0.06]'}`}>
+                        {isConfigured ? (
                           <CheckCircle size={14} className="text-emerald-400" />
                         ) : isPairing ? (
                           <Smartphone size={14} className="text-[#71717a]" />
@@ -374,14 +378,14 @@ export function IntegrationsTab() {
                           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                             Free
                           </span>
-                          {isPairing && (
+                          {isPairing && !isPaired && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
                               QR Pairing
                             </span>
                           )}
-                          {hasAnyConfigured && (
+                          {isConfigured && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#f97316]/15 text-[#f97316] border border-[#f97316]/20">
-                              Configured
+                              {isPaired ? 'Paired' : 'Configured'}
                             </span>
                           )}
                         </div>
