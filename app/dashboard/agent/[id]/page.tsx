@@ -942,7 +942,7 @@ export default function AgentManagePage() {
 
         {/* ─── Tab Bar ──────────────────────────────────────── */}
         {/* Desktop: horizontal row. Mobile: 2-row grid with icons */}
-        <div className="mb-8 border-b border-[rgba(46,43,74,0.3)]" role="tablist">
+        <div id="agent-tabs" className="mb-8 border-b border-[rgba(46,43,74,0.3)]" role="tablist">
           {/* Mobile grid */}
           <div className="grid grid-cols-4 gap-1 sm:hidden p-1">
             {TABS.map((t) => (
@@ -950,7 +950,7 @@ export default function AgentManagePage() {
                 key={t.id}
                 role="tab"
                 aria-selected={tab === t.id}
-                onClick={() => { setTab(t.id); setTimeout(() => window.scrollTo(0, 0), 50); }}
+                onClick={() => { setTab(t.id); setTimeout(() => document.getElementById('agent-tabs')?.scrollIntoView({ behavior: 'instant', block: 'start' }), 50); }}
                 className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg text-[10px] transition-all ${
                   tab === t.id
                     ? 'text-[#f97316] bg-[#f97316]/10'
@@ -969,7 +969,7 @@ export default function AgentManagePage() {
                 key={t.id}
                 role="tab"
                 aria-selected={tab === t.id}
-                onClick={() => { setTab(t.id); setTimeout(() => window.scrollTo(0, 0), 50); }}
+                onClick={() => { setTab(t.id); setTimeout(() => document.getElementById('agent-tabs')?.scrollIntoView({ behavior: 'instant', block: 'start' }), 50); }}
                 className={`relative flex items-center gap-2 px-5 py-3 text-sm transition-all duration-300 -mb-px ${
                   tab === t.id
                     ? 'text-[#FFFFFF]'
