@@ -655,4 +655,11 @@ export const api = {
   /** Get API usage stats for the current user */
   getApiUsage: () =>
     req<{ requestsToday: number; limit: number; remaining: number; resetAt: string }>('/usage'),
+
+  /** Start channel pairing (WhatsApp QR, Signal, etc.) */
+  pairChannel: (agentId: string, channel: string) =>
+    req<{ status: string; qrCode?: string; message: string; raw?: string }>(`/agents/${agentId}/pair-channel`, {
+      method: 'POST',
+      body: JSON.stringify({ channel }),
+    }),
 };

@@ -46,6 +46,10 @@ export interface IntegrationDef {
   hasChannelSettings?: boolean;
   /** Link to docs page explaining how to obtain API keys */
   docsUrl?: string;
+  /** If true, this integration requires QR/device pairing instead of credential fields */
+  pairingRequired?: boolean;
+  /** Channel name used for the pair-channel API call (e.g. 'whatsapp', 'signal') */
+  pairingChannel?: string;
 }
 
 export interface AgentStats {
@@ -148,19 +152,23 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
   {
     featureKey: 'openclaw.platform.whatsapp',
     name: 'WhatsApp',
-    description: 'Requires QR pairing via CLI — coming soon to web UI.',
+    description: 'Connect your agent to WhatsApp via QR code pairing.',
     secretPrefix: 'WHATSAPP',
     docsUrl: 'https://docs.hatcher.host/integrations/whatsapp',
     hasChannelSettings: false,
+    pairingRequired: true,
+    pairingChannel: 'whatsapp',
     fields: [],
   },
   {
     featureKey: 'openclaw.platform.signal',
     name: 'Signal',
-    description: 'Requires phone pairing via CLI — coming soon to web UI.',
+    description: 'Connect your agent to Signal via device pairing.',
     secretPrefix: 'SIGNAL',
     docsUrl: 'https://docs.hatcher.host/integrations/signal',
     hasChannelSettings: false,
+    pairingRequired: true,
+    pairingChannel: 'signal',
     fields: [],
   },
   {
@@ -186,14 +194,6 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
       { key: 'SLACK_BOT_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'xoxb-...', helper: 'Bot User OAuth Token from Slack API', required: true },
       { key: 'SLACK_APP_TOKEN', label: 'App Token', type: 'password', placeholder: 'xapp-...', helper: 'App-Level Token for Socket Mode (from Slack API > Basic Information)' },
     ],
-  },
-  {
-    featureKey: 'openclaw.platform.imessage',
-    name: 'iMessage',
-    description: 'Requires macOS — not available in Docker containers.',
-    secretPrefix: 'IMESSAGE',
-    hasChannelSettings: false,
-    fields: [],
   },
   {
     featureKey: 'openclaw.feature.webhooks',

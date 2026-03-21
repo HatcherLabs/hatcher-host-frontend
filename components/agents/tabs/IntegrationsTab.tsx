@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   CheckCircle,
@@ -9,6 +10,8 @@ import {
   ChevronDown,
   ChevronUp,
   AlertTriangle,
+  Loader2,
+  Smartphone,
 } from 'lucide-react';
 import {
   useAgentContext,
@@ -21,6 +24,7 @@ import {
   integrationStateKey,
   type IntegrationDef,
 } from '../AgentContext';
+import { api } from '@/lib/api';
 
 function IntegrationFieldsForm({
   integration,
@@ -169,6 +173,120 @@ function IntegrationFieldsForm({
   );
 }
 
+function PairingPanel({ integration }: { integration: IntegrationDef }) {
+  const { agent } = useAgentContext();
+  const [loading, setLoading] = useState(false);
+  const [qrCode, setQrCode] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handlePair = async () => {
+    if (!integration.pairingChannel) return;
+    setLoading(true);
+    setQrCode(null);
+    setMessage(null);
+    setError(null);
+
+    try {
+      const res = await api.pairChannel(agent.id, integration.pairingChannel);
+      if (!res.success) {
+        setError(res.error || 'Pairing failed');
+        return;
+      }
+      const data = res.data;
+      if (data.status === 'qr_ready' && data.qrCode) {
+        setQrCode(data.qrCode);
+        setMessage(data.message);
+      } else if (data.status === 'already_paired') {
+        setMessage(data.message);
+      } else {
+        setError(data.message || 'Could not generate QR code');
+      }
+    } catch (e) {
+      setError((e as Error).message || 'Network error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isRunning = agent.status === 'active';
+
+  return (
+    <div className="border-t border-white/[0.06] p-5 space-y-4 bg-white/[0.01]">
+      {integration.docsUrl && (
+        <a
+          href={integration.docsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-xs text-[#f97316] hover:text-[#fb923c] transition-colors"
+        >
+          How to set up {integration.name} &rarr;
+        </a>
+      )}
+
+      {!isRunning && (
+        <div className="flex items-start gap-2.5 p-3 rounded-lg border border-amber-500/20 bg-amber-500/5">
+          <AlertTriangle size={14} className="text-amber-400 mt-0.5 flex-shrink-0" />
+          <p className="text-xs leading-relaxed text-[#A5A1C2]">
+            Your agent must be running to pair {integration.name}. Start the agent first.
+          </p>
+        </div>
+      )}
+
+      {isRunning && !qrCode && (
+        <button
+          onClick={handlePair}
+          disabled={loading}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-all disabled:opacity-40 hover:opacity-90 bg-[#f97316]"
+        >
+          {loading ? (
+            <>
+              <Loader2 size={16} className="animate-spin" />
+              Generating QR code...
+            </>
+          ) : (
+            <>
+              <Smartphone size={16} />
+              Pair {integration.name}
+            </>
+          )}
+        </button>
+      )}
+
+      {qrCode && (
+        <div className="space-y-3">
+          <div className="rounded-lg overflow-hidden border border-white/[0.08] bg-[#0a0818] p-4">
+            <pre
+              className="text-[10px] leading-[1.1] text-white whitespace-pre overflow-x-auto"
+              style={{ fontFamily: 'monospace', letterSpacing: '0.05em' }}
+            >
+              {qrCode}
+            </pre>
+          </div>
+          {message && (
+            <p className="text-xs text-[#A5A1C2]">{message}</p>
+          )}
+          <button
+            onClick={handlePair}
+            disabled={loading}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-white/70 transition-all hover:text-white hover:bg-white/5 border border-white/[0.08]"
+          >
+            {loading ? <Loader2 size={14} className="animate-spin" /> : null}
+            Refresh QR Code
+          </button>
+        </div>
+      )}
+
+      {error && (
+        <div className="flex items-start gap-2 p-3 rounded-lg border border-red-500/20 bg-red-500/5">
+          <AlertTriangle size={14} className="text-red-400 mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-red-300">{error}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function IntegrationsTab() {
   const ctx = useAgentContext();
   const {
@@ -207,6 +325,7 @@ export function IntegrationsTab() {
                 const sk = integrationStateKey(integration);
                 const isExpanded = expandedIntegrations.has(sk);
                 const hasAnyConfigured = integration.fields.some((f) => hasExistingSecret(f.key));
+                const isPairing = !!integration.pairingRequired;
 
                 return (
                   <GlassCard key={sk} className={`!p-0 overflow-hidden ${hasAnyConfigured ? 'border-emerald-500/20' : ''}`}>
@@ -218,6 +337,8 @@ export function IntegrationsTab() {
                       <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${hasAnyConfigured ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-white/5 border border-white/[0.06]'}`}>
                         {hasAnyConfigured ? (
                           <CheckCircle size={14} className="text-emerald-400" />
+                        ) : isPairing ? (
+                          <Smartphone size={14} className="text-[#71717a]" />
                         ) : (
                           <Settings size={14} className="text-[#71717a]" />
                         )}
@@ -228,6 +349,11 @@ export function IntegrationsTab() {
                           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                             Free
                           </span>
+                          {isPairing && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
+                              QR Pairing
+                            </span>
+                          )}
                           {hasAnyConfigured && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#f97316]/15 text-[#f97316] border border-[#f97316]/20">
                               Configured
@@ -243,10 +369,14 @@ export function IntegrationsTab() {
                     </button>
 
                     {isExpanded && (
-                      <IntegrationFieldsForm
-                        integration={integration}
-                        fieldIdPrefix="integrations-tab"
-                      />
+                      isPairing ? (
+                        <PairingPanel integration={integration} />
+                      ) : (
+                        <IntegrationFieldsForm
+                          integration={integration}
+                          fieldIdPrefix="integrations-tab"
+                        />
+                      )
                     )}
                   </GlassCard>
                 );
