@@ -272,7 +272,7 @@ export function AgentPageClient() {
               You own this agent. Head to your dashboard to chat or configure it.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href={`/dashboard/agent/${id}`} className="btn-primary inline-flex items-center gap-2 justify-center">
+              <Link href={`/dashboard/agent/${id}?tab=config`} className="btn-primary inline-flex items-center gap-2 justify-center">
                 <Settings className="w-4 h-4" />
                 Manage Agent
               </Link>

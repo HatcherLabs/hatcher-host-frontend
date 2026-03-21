@@ -115,9 +115,9 @@ export default function AgentManagePage() {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const initialTab = (['overview','config','integrations','logs','chat'] as Tab[]).includes(searchParams.get('tab') as Tab)
+  const initialTab = (['overview','config','integrations','files','logs','chat','stats'] as Tab[]).includes(searchParams.get('tab') as Tab)
     ? (searchParams.get('tab') as Tab)
-    : 'chat';
+    : 'overview';
   const [tab, setTab] = useState<Tab>(initialTab);
 
   // Stats
@@ -341,7 +341,7 @@ export default function AgentManagePage() {
   }, [tab, loading, agent]);
 
   // Auto-scroll logs
-  useEffect(() => { logsEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [logs]);
+  // Removed: auto-scroll to end of logs was scrolling entire page down
 
   // ─── Actions ─────────────────────────────────────────────
 
