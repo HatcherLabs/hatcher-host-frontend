@@ -168,12 +168,10 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
   {
     featureKey: 'openclaw.platform.signal',
     name: 'Signal',
-    description: 'Connect your agent to Signal via device pairing.',
+    description: 'Signal integration — coming soon.',
     secretPrefix: 'SIGNAL',
     docsUrl: 'https://docs.hatcher.host/integrations/signal',
     hasChannelSettings: false,
-    pairingRequired: true,
-    pairingChannel: 'signal',
     fields: [],
   },
   {
