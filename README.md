@@ -1,15 +1,13 @@
 # Hatcher Frontend
 
-Web dashboard for [Hatcher](https://hatcher.host) — a managed AI agent hosting platform on Solana.
+Web interface for [Hatcher](https://hatcher.host) — managed AI agent hosting platform.
 
 ## Stack
 
 - **Next.js 15** (App Router)
-- **TailwindCSS** + custom dark design system
-- **Solana Wallet Adapter** (Phantom, Solflare)
+- **TailwindCSS** + custom dark glassmorphism design
+- **Solana Wallet Adapter** (Phantom, Solflare) — for payments only
 - **Framer Motion** for animations
-- **Recharts** for analytics
-- **Radix UI** + **cmdk** for UI primitives
 - **@hatcher/shared** for types and constants
 
 ## Getting Started
@@ -32,16 +30,41 @@ npm run dev                   # http://localhost:3000
 | Path | Description |
 |------|-------------|
 | `/` | Landing page |
+| `/login` | Email/password login |
+| `/register` | Account registration |
+| `/dashboard/agents` | My Agents (default after login) |
+| `/dashboard/agent/[id]` | Agent management (Overview, Config, Integrations, Files, Logs, Chat, Stats) |
+| `/dashboard/billing` | Billing & Plans |
+| `/create` | Agent creation wizard (11 templates) |
 | `/explore` | Browse public agents |
-| `/create` | Agent creation wizard |
-| `/dashboard` | Owner dashboard |
-| `/dashboard/agents` | Manage agents |
-| `/agent/[slug]` | Public agent page + chat |
-| `/pricing` | Feature pricing |
+| `/pricing` | Tier pricing (Free / Unlimited / Pro) |
 | `/settings` | Account settings |
-| `/admin` | Admin panel |
-| `/docs` | Documentation |
+| `/support` | Support tickets |
+| `/help` | Help center & FAQ |
 | `/token` | Platform token info |
+| `/admin` | Admin panel (isAdmin users only) |
+
+## Auth
+
+Email/password authentication (not wallet-based). Wallet connects optionally for crypto payments only.
+
+## Pricing Tiers
+
+| | Free | Unlimited ($9.99/30d) | Pro ($19.99/30d) |
+|---|---|---|---|
+| Agents | 1 | 1 | 5 |
+| Messages | 20/day | Unlimited | Unlimited |
+| CPU/RAM | 0.5/1GB | 1/1.5GB | 2/2GB |
+| Auto-sleep | 15 min | 6 hours | Never |
+| File Manager | Add-on | Add-on | Included |
+
+Add-ons: +3/+5/+10 agents, File Manager $9.99/agent.
+
+## Integrations
+
+Configurable via web: Telegram, Discord, Slack, X/Twitter
+QR pairing via web: WhatsApp
+Coming soon: Signal
 
 ## Scripts
 
@@ -49,8 +72,6 @@ npm run dev                   # http://localhost:3000
 npm run dev          # Dev server
 npm run build        # Production build
 npm run lint         # ESLint
-npm run type-check   # TypeScript check
-npm run test         # Vitest
 ```
 
 ## Project Structure
@@ -58,15 +79,9 @@ npm run test         # Vitest
 ```
 app/                  # Next.js App Router pages
 components/
-  agents/             # Agent cards, config, logs, chat
-  dashboard/          # Dashboard widgets, stats
-  layout/             # Sidebar, header, navigation
-  providers/          # Wallet + theme providers
+  agents/             # Agent management tabs (Config, Integrations, Files, Chat, etc.)
+  layout/             # Header, navigation
+  providers/          # Wallet + Auth providers
   ui/                 # Shared UI primitives
-  wallet/             # Wallet connect button
-lib/                  # API client, hooks, utils
+lib/                  # API client, auth context, utils
 ```
-
-## Design
-
-Dark-only theme with glassmorphism, purple/cyan gradients, and glow effects.
