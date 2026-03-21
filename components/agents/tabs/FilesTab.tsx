@@ -50,14 +50,6 @@ function getFileIcon(name: string, type: string) {
 
 const ROOT_PATH = '/home/node/.openclaw';
 
-const QUICK_NAV = [
-  { label: 'Home', path: '/home/node/.openclaw' },
-  { label: 'Workspace', path: '/home/node/.openclaw/workspace' },
-  { label: 'Config', path: '/app' },
-  { label: 'Logs', path: '/home/node/.openclaw/logs' },
-  { label: 'Plugins', path: '/home/node/.openclaw/plugins' },
-];
-
 export function FilesTab() {
   const ctx = useContext(AgentContext);
   const { user } = useAuth();
@@ -308,22 +300,7 @@ export function FilesTab() {
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
       {error && <div className="mb-4 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</div>}
 
-      {/* Quick nav */}
-      <div className="flex items-center gap-1.5 mb-3">
-        {QUICK_NAV.map((nav) => (
-          <button
-            key={nav.path}
-            onClick={() => navigateTo(nav.path)}
-            className={`px-2.5 py-1 rounded-md text-[10px] font-medium transition-colors ${
-              currentPath.startsWith(nav.path)
-                ? 'bg-[#f97316]/15 text-[#f97316] border border-[#f97316]/20'
-                : 'text-[#71717a] hover:text-white hover:bg-white/[0.04] border border-transparent'
-            }`}
-          >
-            {nav.label}
-          </button>
-        ))}
-      </div>
+
 
       {/* Header: breadcrumbs + actions */}
       <div className="flex items-center justify-between mb-4">
