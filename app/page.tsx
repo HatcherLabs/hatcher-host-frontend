@@ -600,7 +600,7 @@ export default function LandingPage() {
                   'All integrations',
                   'BYOK any LLM',
                   '300MB workspace',
-                  'Always-on (no sleep)',
+                  'Auto-sleep after 6h idle',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-2.5 text-sm text-[#A5A1C2]">
                     <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -632,7 +632,7 @@ export default function LandingPage() {
                 {[
                   '5 agents included',
                   'Unlimited messages',
-                  'Dedicated resources (1 CPU, 1GB)',
+                  'Dedicated resources (2 CPU, 2GB)',
                   'File manager',
                   'Full log viewer',
                   '600MB workspace/agent',

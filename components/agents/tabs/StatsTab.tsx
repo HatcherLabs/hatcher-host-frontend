@@ -175,8 +175,8 @@ export function StatsTab() {
 
           const features = [
             { label: 'Messages', value: isPaid ? 'Unlimited' : '20/day' },
-            { label: 'Resources', value: tierKey === 'pro' ? '1 CPU, 1GB RAM' : tierKey === 'unlimited' ? '0.5 CPU, 512MB' : '0.25 CPU, 256MB' },
-            { label: 'Auto-sleep', value: isPaid ? 'Always-on' : '15 min idle' },
+            { label: 'Resources', value: tierKey === 'pro' ? '2 CPU, 2GB RAM' : tierKey === 'unlimited' ? '1 CPU, 1.5GB RAM' : '0.5 CPU, 1GB RAM' },
+            { label: 'Auto-sleep', value: tierKey === 'pro' ? 'Always-on' : tierKey === 'unlimited' ? '6 hours idle' : '15 min idle' },
             { label: 'File Manager', value: tierKey === 'pro' ? 'Included' : 'Add-on ($9.99)' },
             { label: 'Integrations', value: 'All included' },
           ];
