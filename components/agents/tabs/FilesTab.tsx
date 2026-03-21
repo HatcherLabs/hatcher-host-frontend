@@ -48,13 +48,14 @@ function getFileIcon(name: string, type: string) {
   return <FileText size={16} className="text-[#A5A1C2]" />;
 }
 
-const ROOT_PATH = '/home/node/.openclaw/.openclaw/workspace';
+const ROOT_PATH = '/home/node/.openclaw';
 
 const QUICK_NAV = [
-  { label: 'Workspace', path: '/home/node/.openclaw/.openclaw/workspace' },
+  { label: 'Home', path: '/home/node/.openclaw' },
+  { label: 'Workspace', path: '/home/node/.openclaw/workspace' },
   { label: 'Config', path: '/app' },
-  { label: 'Logs', path: '/home/node/.openclaw/.openclaw/logs' },
-  { label: 'Plugins', path: '/home/node/.openclaw/.openclaw/plugins' },
+  { label: 'Logs', path: '/home/node/.openclaw/logs' },
+  { label: 'Plugins', path: '/home/node/.openclaw/plugins' },
 ];
 
 export function FilesTab() {
