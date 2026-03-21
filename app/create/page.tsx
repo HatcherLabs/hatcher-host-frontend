@@ -785,7 +785,6 @@ export default function CreatePage() {
 
                   {agentDesc && <SummaryRow label="Description" value={agentDesc} />}
 
-                  <SummaryRow label="Skills" value={`${openclawSkills.length} selected`} />
                   <SummaryRow
                     label="System Prompt"
                     value={openclawForm.systemPrompt.trim() ? 'Custom' : 'Template default'}
@@ -998,38 +997,6 @@ function OpenClawFields({
 
   return (
     <>
-      {/* Skills */}
-      <div>
-        <label className="block text-sm font-medium text-[var(--text-primary)] mb-3">
-          Skills
-          <span className="text-[#71717a] text-xs font-normal ml-2">All skills included free</span>
-        </label>
-
-        <div className="flex flex-wrap gap-2">
-          {OPENCLAW_SKILLS_LIST.map((skill) => {
-            const isActive = skills.includes(skill);
-            return (
-              <motion.button
-                key={skill}
-                type="button"
-                whileHover={{ scale: 1.06 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => toggleSkill(skill)}
-                className={cn(
-                  'text-sm border rounded-full px-4 py-2 transition-all duration-200',
-                  isActive
-                    ? 'border-[#f97316]/40 bg-[#f97316]/10 text-[#FFFFFF] shadow-[0_0_8px_rgba(249,115,22,0.12)]'
-                    : 'border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[rgba(249,115,22,0.3)] hover:bg-[rgba(249,115,22,0.05)]'
-                )}
-              >
-                {isActive && <Check className="w-3 h-3 inline mr-1.5" />}
-                {skill}
-              </motion.button>
-            );
-          })}
-        </div>
-      </div>
-
       {/* System Prompt */}
       <SystemPromptSection
         form={form}
