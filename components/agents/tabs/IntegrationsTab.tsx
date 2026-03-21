@@ -251,6 +251,8 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
   const isRunning = agent.status === 'active';
   const ctx = useAgentContext();
   const { integrationSecrets, setIntegrationField, saveIntegrationSecrets, savingIntegration, integrationSaveMsg, hasExistingSecret } = ctx;
+  const pairingMarker = integration.pairingChannel === 'whatsapp' ? 'WHATSAPP_PAIRING' : 'SIGNAL_PAIRING';
+  const isPaired = hasExistingSecret(pairingMarker);
 
   // AllowFrom field — always visible
   const allowFromKey = integration.pairingChannel === 'whatsapp' ? 'WHATSAPP_ALLOW_FROM' : 'SIGNAL_ALLOW_FROM';
@@ -327,12 +329,16 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
         )}
       </div>
 
-      {connected && (
-        <div className="flex items-center gap-3 p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
-          <CheckCircle size={16} className="text-emerald-400 flex-shrink-0" />
+      {(connected || isPaired) && (
+        <div className={`flex items-center gap-3 p-3 rounded-lg border ${connected ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-amber-500/20 bg-amber-500/5'}`}>
+          {connected ? <CheckCircle size={16} className="text-emerald-400 flex-shrink-0" /> : <AlertTriangle size={16} className="text-amber-400 flex-shrink-0" />}
           <div className="flex-1">
-            <p className="text-sm font-medium text-emerald-400">{integration.name} Connected</p>
-            <p className="text-xs text-[#A5A1C2] mt-0.5">Messages will be forwarded to your agent</p>
+            <p className={`text-sm font-medium ${connected ? 'text-emerald-400' : 'text-amber-400'}`}>
+              {connected ? `${integration.name} Connected` : `${integration.name} Disconnected`}
+            </p>
+            <p className="text-xs text-[#A5A1C2] mt-0.5">
+              {connected ? 'Messages will be forwarded to your agent' : 'Session expired. Re-pair or disconnect to clean up.'}
+            </p>
           </div>
           <div className="flex gap-2">
             <button
