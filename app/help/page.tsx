@@ -347,12 +347,12 @@ export default function HelpPage() {
             </Link>{' '}
             or find us on{' '}
             <a
-              href="https://x.com/haborohost"
+              href="https://x.com/HatcherLabs"
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-[#f97316] hover:text-[#f97316] transition-colors underline decoration-[#f97316]/30 underline-offset-2"
             >
-              X (@haborohost)
+              X (@HatcherLabs)
             </a>
             .
           </p>
