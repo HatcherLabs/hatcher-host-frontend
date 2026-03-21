@@ -447,7 +447,7 @@ export default function LandingPage() {
               icon={Globe}
               value="20+"
               title="Platforms"
-              description="Telegram, Discord, Twitter, WhatsApp, Signal, Slack, iMessage, Farcaster, Twitch, and more. Deploy once, reach everywhere."
+              description="Telegram, Discord, Twitter, WhatsApp, Signal, Slack, Farcaster, Twitch, and more. Deploy once, reach everywhere."
               delay={0}
             />
             <BentoCard
@@ -561,7 +561,7 @@ export default function LandingPage() {
             <div className="bg-[#111019] border border-white/[0.06] rounded-2xl p-7">
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-2">Free</p>
               <p className="text-3xl font-bold text-white mb-1">$0</p>
-              <p className="text-sm text-[#A5A1C2] mb-6">Forever. No credit card.</p>
+              <p className="text-sm text-[#A5A1C2] mb-6">0.5 CPU, 1GB RAM. No credit card.</p>
               <ul className="space-y-2.5">
                 {[
                   '1 agent',

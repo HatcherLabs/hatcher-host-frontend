@@ -10,7 +10,6 @@ import { Shield, LogOut, Settings, User } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 
 const NAV_LINKS = [
-  { href: '/dashboard',         label: 'Dashboard' },
   { href: '/dashboard/agents',  label: 'My Agents' },
   { href: '/explore',           label: 'Explore' },
   { href: '/create',            label: 'Create' },
@@ -22,8 +21,7 @@ const NAV_LINKS = [
 
 function isActive(pathname: string, href: string) {
   if (pathname === href) return true;
-  if (href === '/dashboard') return false;
-  if (href === '/dashboard/agents' && pathname.startsWith('/dashboard/agent/')) return true;
+  if (href === '/dashboard/agents' && (pathname.startsWith('/dashboard/agent/') || pathname === '/dashboard')) return true;
   return pathname.startsWith(href + '/');
 }
 
