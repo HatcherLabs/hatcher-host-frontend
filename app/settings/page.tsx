@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useWallet } from '@solana/wallet-adapter-react';
 import { useAuth } from '@/lib/auth-context';
 import { api, clearToken } from '@/lib/api';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -15,7 +14,6 @@ import {
   Trash2,
   Zap,
   AlertTriangle,
-  Wallet,
   User,
 } from 'lucide-react';
 
@@ -91,8 +89,7 @@ function getAvatarColor(name: string) {
 // ═════════════════════════════════════════════════════════════
 export default function SettingsPage() {
   const router = useRouter();
-  const { publicKey, disconnect } = useWallet();
-  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user, logout } = useAuth();
   const { toast } = useToast();
 
   // ── State ─────────────────────────────────────────────────
@@ -116,7 +113,6 @@ export default function SettingsPage() {
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const walletAddress = user?.walletAddress ?? publicKey?.toString() ?? null;
   const username = user?.username || 'Anonymous';
   const email = user?.email || '';
   const tier = user?.tier || 'free';
@@ -261,47 +257,6 @@ export default function SettingsPage() {
           </div>
         </motion.div>
 
-        {/* ════════════════════════════════════════════════════
-            2. WALLET SECTION
-            ════════════════════════════════════════════════════ */}
-        <motion.div className="card glass-noise p-6" variants={cardVariants}>
-          <div className="flex items-center gap-2.5 mb-6">
-            <div className="w-8 h-8 rounded-lg bg-[#f97316]/15 flex items-center justify-center">
-              <Wallet size={16} className="text-[#f97316]" />
-            </div>
-            <h2
-              className="text-lg font-semibold text-[var(--text-primary)]"
-              style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
-            >
-              Wallet
-            </h2>
-          </div>
-
-          {walletAddress ? (
-            <div className="flex items-center justify-between rounded-xl px-4 py-3 bg-[var(--bg-elevated)] border border-[var(--border-default)] transition-all duration-200 hover:border-[rgba(249,115,22,0.3)]">
-              <span className="font-mono text-sm truncate mr-3 text-[var(--text-primary)]">
-                {walletAddress}
-              </span>
-              <button
-                onClick={() => copyToClipboard(walletAddress, 'wallet')}
-                className="flex-shrink-0 p-2 rounded-lg transition-all duration-200 hover:bg-[#f97316]/10 text-[var(--text-muted)] hover:text-[#f97316]"
-                aria-label="Copy wallet address"
-              >
-                {copiedField === 'wallet' ? (
-                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 400 }}>
-                    <Check size={16} className="text-green-400" />
-                  </motion.div>
-                ) : (
-                  <Copy size={16} />
-                )}
-              </button>
-            </div>
-          ) : (
-            <div className="rounded-xl px-4 py-3 bg-[var(--bg-elevated)] border border-[var(--border-default)]">
-              <span className="text-sm text-[var(--text-muted)]">No wallet linked. Connect a wallet when making payments.</span>
-            </div>
-          )}
-        </motion.div>
 
         {/* ════════════════════════════════════════════════════
             3. NOTIFICATIONS SECTION
@@ -410,7 +365,7 @@ export default function SettingsPage() {
             const res = await api.deleteAccount();
             if (res.success) {
               clearToken();
-              disconnect();
+              logout();
               router.push('/');
             } else {
               toast('error', (res as { error: string }).error || 'Failed to delete account');
