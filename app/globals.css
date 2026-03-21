@@ -846,8 +846,8 @@
   line-height: 1.6;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  max-width: 75%;
   word-break: break-word;
+  width: fit-content;
 }
 
 .chat-bubble-user {

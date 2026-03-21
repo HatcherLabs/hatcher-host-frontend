@@ -947,7 +947,7 @@ export default function AgentManagePage() {
               key={t.id}
               role="tab"
               aria-selected={tab === t.id}
-              onClick={() => setTab(t.id)}
+              onClick={() => { setTab(t.id); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               className={`relative flex items-center gap-2 px-5 py-3 text-sm transition-all duration-300 -mb-px ${
                 tab === t.id
                   ? 'text-[#FFFFFF]'
