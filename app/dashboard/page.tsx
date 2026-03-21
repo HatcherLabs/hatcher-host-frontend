@@ -512,7 +512,7 @@ export default function DashboardPage() {
             <RobotMascot size="sm" mood="waving" />
             <div>
               <h1 className="text-2xl font-bold" style={{ color: COLORS.textPrimary, fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-                Welcome back!
+                Welcome!
               </h1>
               <p className="text-sm mt-0.5 font-mono" style={{ color: COLORS.textSecondary }}>
                 {shortIdent}
