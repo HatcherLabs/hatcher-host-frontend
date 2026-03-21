@@ -196,6 +196,8 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
           if (ch?.connected) {
             setConnected(true);
             setQrCode(null); // auto-close QR
+            // Restart agent so gateway picks up the new credentials
+            api.restartAgent(agent.id).catch(() => {});
           }
         }
       } catch { /* ignore */ }
