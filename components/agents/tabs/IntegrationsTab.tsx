@@ -267,29 +267,60 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
     <div className="border-t border-white/[0.06] p-5 space-y-4 bg-white/[0.01]">
       {/* AllowFrom — always visible */}
       <div>
-        <label className="block text-xs font-medium text-[#A5A1C2] mb-1.5">
-          Allowed Phone Numbers
+        <label className="block text-xs font-medium text-[#A5A1C2] mb-2">
+          Who can message your agent?
         </label>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={allowFromValue}
-            onChange={(e) => setIntegrationField(sk, allowFromKey, e.target.value)}
-            placeholder="+1234567890, +0987654321"
-            className="flex-1 h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-orange-500/50 focus:outline-none placeholder:text-[#71717a] transition-colors"
-          />
+        <div className="flex items-center gap-2 mb-2">
+          <button
+            type="button"
+            onClick={() => setIntegrationField(sk, allowFromKey, '*')}
+            className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+              allowFromValue === '*'
+                ? 'border-[#f97316]/40 bg-[#f97316]/10 text-white'
+                : 'border-white/[0.08] text-[#71717a] hover:border-white/[0.15]'
+            }`}
+          >
+            Everyone
+          </button>
+          <button
+            type="button"
+            onClick={() => { if (allowFromValue === '*') setIntegrationField(sk, allowFromKey, ''); }}
+            className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+              allowFromValue !== '*' && allowFromValue !== ''
+                ? 'border-[#f97316]/40 bg-[#f97316]/10 text-white'
+                : allowFromValue === '' ? 'border-[#f97316]/40 bg-[#f97316]/10 text-white' : 'border-white/[0.08] text-[#71717a] hover:border-white/[0.15]'
+            }`}
+          >
+            Specific numbers
+          </button>
+        </div>
+        {allowFromValue !== '*' && (
+          <div className="flex gap-2 mb-1">
+            <input
+              type="text"
+              value={allowFromValue}
+              onChange={(e) => setIntegrationField(sk, allowFromKey, e.target.value)}
+              placeholder="+1234567890, +0987654321"
+              className="flex-1 h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-orange-500/50 focus:outline-none placeholder:text-[#71717a] transition-colors"
+            />
+          </div>
+        )}
+        <div className="flex items-center gap-2 mt-2">
           <button
             onClick={handleSaveAllowFrom}
-            disabled={savingIntegration === sk}
-            className="px-3 h-9 rounded-lg text-xs font-medium text-white bg-[#f97316] hover:bg-[#ea580c] disabled:opacity-50 transition-colors"
+            disabled={savingIntegration === sk || !allowFromValue.trim()}
+            className="px-3 h-8 rounded-lg text-xs font-medium text-white bg-[#f97316] hover:bg-[#ea580c] disabled:opacity-50 transition-colors"
           >
             {savingIntegration === sk ? 'Saving...' : 'Save'}
           </button>
+          <p className="text-[10px] text-[#71717a]">
+            {allowFromValue === '*' ? 'Anyone can message your agent.' : 'Only listed numbers can message your agent.'}
+          </p>
         </div>
         <p className="text-[10px] text-[#71717a] mt-1">
           {existingAllowFrom
-            ? 'Only these numbers can message your agent. Restart agent after changing.'
-            : 'Leave empty to allow everyone. Set before pairing to restrict access.'}
+            ? 'Restart agent after changing.'
+            : 'Set before pairing. Phone numbers in E.164 format (+1234567890).'}
         </p>
         {(integrationSaveMsg as unknown as string) === sk && (
           <p className="text-[10px] text-emerald-400 mt-1">Saved! Restart agent to apply.</p>
@@ -341,7 +372,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
         <div className="space-y-3">
           <button
             onClick={handlePair}
-            disabled={loading || !allowFromValue.trim()}
+            disabled={loading}
             className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-white transition-all disabled:opacity-40 hover:opacity-90 bg-[#f97316]"
           >
             {loading ? (
