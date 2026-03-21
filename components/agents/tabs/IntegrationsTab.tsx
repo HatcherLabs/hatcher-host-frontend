@@ -211,19 +211,11 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
 
   const isRunning = agent.status === 'active';
 
+  // Calculate QR dimensions to auto-fit container
+  const qrWidth = qrCode ? Math.max(...qrCode.split('\n').map(l => l.length)) : 0;
+
   return (
     <div className="border-t border-white/[0.06] p-5 space-y-4 bg-white/[0.01]">
-      {integration.docsUrl && (
-        <a
-          href={integration.docsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-xs text-[#f97316] hover:text-[#fb923c] transition-colors"
-        >
-          How to set up {integration.name} &rarr;
-        </a>
-      )}
-
       {!isRunning && (
         <div className="flex items-start gap-2.5 p-3 rounded-lg border border-amber-500/20 bg-amber-500/5">
           <AlertTriangle size={14} className="text-amber-400 mt-0.5 flex-shrink-0" />
@@ -234,44 +226,58 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
       )}
 
       {isRunning && !qrCode && (
-        <button
-          onClick={handlePair}
-          disabled={loading}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-all disabled:opacity-40 hover:opacity-90 bg-[#f97316]"
-        >
-          {loading ? (
-            <>
-              <Loader2 size={16} className="animate-spin" />
-              Generating QR code...
-            </>
-          ) : (
-            <>
-              <Smartphone size={16} />
-              Pair {integration.name}
-            </>
+        <div className="space-y-3">
+          <button
+            onClick={handlePair}
+            disabled={loading}
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-white transition-all disabled:opacity-40 hover:opacity-90 bg-[#f97316]"
+          >
+            {loading ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Generating QR code — this takes ~30s...
+              </>
+            ) : (
+              <>
+                <Smartphone size={16} />
+                Pair {integration.name}
+              </>
+            )}
+          </button>
+          {integration.docsUrl && (
+            <a
+              href={integration.docsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-center text-xs text-[#71717a] hover:text-[#f97316] transition-colors"
+            >
+              How to set up {integration.name} &rarr;
+            </a>
           )}
-        </button>
+        </div>
       )}
 
       {qrCode && (
         <div className="space-y-3">
-          <div className="rounded-lg overflow-x-auto border border-white/[0.08] bg-black p-4">
+          <p className="text-xs text-center text-[#A5A1C2]">
+            {message || `Scan with ${integration.name} on your phone`}
+          </p>
+          <div
+            className="rounded-lg border border-white/[0.08] bg-black p-2 mx-auto"
+            style={{ width: 'fit-content', maxWidth: '100%' }}
+          >
             <pre
-              className="text-green-400 whitespace-pre leading-none mx-auto"
+              className="text-green-400 whitespace-pre leading-none"
               style={{
                 fontFamily: 'monospace',
-                fontSize: '5px',
-                lineHeight: '5.5px',
-                letterSpacing: '0px',
+                fontSize: `min(${280 / qrWidth}vw, 7px)`,
+                lineHeight: '1.1',
                 width: 'fit-content',
               }}
             >
               {qrCode}
             </pre>
           </div>
-          {message && (
-            <p className="text-xs text-[#A5A1C2]">{message}</p>
-          )}
           <button
             onClick={handlePair}
             disabled={loading}

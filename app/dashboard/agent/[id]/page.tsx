@@ -941,7 +941,7 @@ export default function AgentManagePage() {
         </div>
 
         {/* ─── Tab Bar ──────────────────────────────────────── */}
-        <div className="flex items-center gap-0 mb-8 border-b border-[rgba(46,43,74,0.3)] relative" role="tablist">
+        <div className="flex items-center gap-0 mb-8 border-b border-[rgba(46,43,74,0.3)] relative overflow-x-auto touch-action-manipulation" role="tablist" style={{ touchAction: 'manipulation', WebkitOverflowScrolling: 'touch' }}>
           {TABS.map((t) => (
             <button
               key={t.id}

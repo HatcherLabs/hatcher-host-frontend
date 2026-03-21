@@ -1145,3 +1145,9 @@
     min-width: 44px;
   }
 }
+
+/* Prevent iOS double-tap zoom on interactive elements */
+button, a, [role="tab"] {
+  touch-action: manipulation;
+}
+
