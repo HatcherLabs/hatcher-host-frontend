@@ -592,7 +592,7 @@ export default function LandingPage() {
                 <p className="text-3xl font-bold text-white">$9.99</p>
                 <span className="text-sm text-[#71717a]">/mo</span>
               </div>
-              <p className="text-sm text-[#A5A1C2] mb-6 mt-1">Unlimited messages, always on.</p>
+              <p className="text-sm text-[#A5A1C2] mb-6 mt-1">Unlimited messages, 1 CPU, 1.5GB RAM.</p>
               <ul className="space-y-2.5">
                 {[
                   '1 agent included',

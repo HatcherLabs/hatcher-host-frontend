@@ -67,12 +67,12 @@ interface FeatureRow {
 const FEATURE_ROWS: FeatureRow[] = [
   { label: 'Agents included',       free: '1',       unlimited: '1',         pro: '5' },
   { label: 'Messages',              free: '20/day',  unlimited: 'Unlimited', pro: 'Unlimited' },
-  { label: 'CPU',                   free: '0.25',    unlimited: '0.5',       pro: '1 core' },
-  { label: 'RAM',                   free: '256 MB',  unlimited: '512 MB',    pro: '1 GB' },
+  { label: 'CPU',                   free: '0.5',     unlimited: '1',         pro: '2 cores' },
+  { label: 'RAM',                   free: '1 GB',    unlimited: '1.5 GB',    pro: '2 GB' },
   { label: 'Storage',               free: '150 MB',  unlimited: '300 MB',    pro: '600 MB' },
   { label: 'File Manager',          free: false,      unlimited: false,       pro: true },
   { label: 'Full Logs',             free: false,      unlimited: false,       pro: true },
-  { label: 'Auto-sleep',            free: '15 min idle', unlimited: false,   pro: false },
+  { label: 'Auto-sleep',            free: '15 min idle', unlimited: '6h idle', pro: 'Always-on' },
   { label: 'All integrations',      free: true,       unlimited: true,        pro: true },
   { label: 'BYOK (own LLM key)',    free: true,       unlimited: true,        pro: true },
   { label: 'Default LLM (Groq)',    free: true,       unlimited: true,        pro: true },
@@ -543,6 +543,6 @@ const FAQ = [
   },
   {
     q: 'What is auto-sleep?',
-    a: 'Free tier agents automatically sleep after 15 minutes of inactivity to save resources. They wake up instantly on the next message. Paid tiers have no auto-sleep.',
+    a: 'Free tier agents automatically sleep after 15 minutes of inactivity to save resources. Unlimited tier agents sleep after 6 hours of inactivity. Both wake up instantly on the next message. Pro tier agents are always-on with no auto-sleep.',
   },
 ];

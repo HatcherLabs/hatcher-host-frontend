@@ -255,10 +255,15 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
 
       {qrCode && (
         <div className="space-y-3">
-          <div className="rounded-lg overflow-hidden border border-white/[0.08] bg-[#0a0818] p-4">
+          <div className="rounded-lg overflow-hidden border border-white/[0.08] bg-black p-3 flex items-center justify-center">
             <pre
-              className="text-[10px] leading-[1.1] text-white whitespace-pre overflow-x-auto"
-              style={{ fontFamily: 'monospace', letterSpacing: '0.05em' }}
+              className="text-white whitespace-pre leading-none"
+              style={{
+                fontFamily: '"Courier New", Courier, monospace',
+                fontSize: '3.5px',
+                lineHeight: '3.5px',
+                letterSpacing: '0.02em',
+              }}
             >
               {qrCode}
             </pre>
