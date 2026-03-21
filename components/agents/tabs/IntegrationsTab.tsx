@@ -257,26 +257,36 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
         </div>
       )}
 
-      {qrCode && (
+      {qrCode && (() => {
+        // Convert ASCII QR to a canvas-rendered image for reliable display
+        const lines = qrCode.split('\n');
+        const height = lines.length;
+        const svgRows = lines.map((line, y) => {
+          const pixels: string[] = [];
+          for (let x = 0; x < line.length; x++) {
+            const ch = line[x];
+            // Block characters: █ = full, ▄ = bottom half, ▀ = top half, space = empty
+            if (ch === '█' || ch === '▄' || ch === '▀' || ch === '▐' || ch === '▌') {
+              pixels.push(`<rect x="${x}" y="${y}" width="1" height="1" fill="white"/>`);
+            }
+          }
+          return pixels.join('');
+        }).join('');
+        const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${qrWidth} ${height}" shape-rendering="crispEdges"><rect width="${qrWidth}" height="${height}" fill="black"/>${svgRows}</svg>`;
+        const dataUrl = `data:image/svg+xml;base64,${btoa(svgStr)}`;
+
+        return (
         <div className="space-y-3">
           <p className="text-xs text-center text-[#A5A1C2]">
             {message || `Scan with ${integration.name} on your phone`}
           </p>
-          <div
-            className="rounded-lg border border-white/[0.08] bg-black p-2 mx-auto"
-            style={{ width: 'fit-content', maxWidth: '100%' }}
-          >
-            <pre
-              className="text-green-400 whitespace-pre leading-none"
-              style={{
-                fontFamily: 'monospace',
-                fontSize: `min(${280 / qrWidth}vw, 7px)`,
-                lineHeight: '1.1',
-                width: 'fit-content',
-              }}
-            >
-              {qrCode}
-            </pre>
+          <div className="flex justify-center">
+            <img
+              src={dataUrl}
+              alt="QR Code"
+              className="rounded-lg border border-white/[0.08]"
+              style={{ width: '240px', height: '240px', imageRendering: 'pixelated' }}
+            />
           </div>
           <button
             onClick={handlePair}
@@ -287,7 +297,8 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             Refresh QR Code
           </button>
         </div>
-      )}
+        );
+      })()}
 
       {error && (
         <div className="flex items-start gap-2 p-3 rounded-lg border border-red-500/20 bg-red-500/5">
