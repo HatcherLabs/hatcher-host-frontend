@@ -148,25 +148,20 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
   {
     featureKey: 'openclaw.platform.whatsapp',
     name: 'WhatsApp',
-    description: 'Connect your agent to WhatsApp Business.',
+    description: 'Requires QR pairing via CLI — coming soon to web UI.',
     secretPrefix: 'WHATSAPP',
     docsUrl: 'https://docs.hatcher.host/integrations/whatsapp',
-    hasChannelSettings: true,
-    fields: [
-      { key: 'WHATSAPP_TOKEN', label: 'Business API Token', type: 'password', placeholder: 'WhatsApp Business API token', helper: 'From Meta Business Suite > WhatsApp > API Setup', required: true },
-      { key: 'WHATSAPP_PHONE_NUMBER_ID', label: 'Phone Number ID', type: 'text', placeholder: 'e.g. 1234567890', helper: 'Phone Number ID from WhatsApp Business API', required: true },
-    ],
+    hasChannelSettings: false,
+    fields: [],
   },
   {
     featureKey: 'openclaw.platform.signal',
     name: 'Signal',
-    description: 'Connect your agent to Signal messenger.',
+    description: 'Requires phone pairing via CLI — coming soon to web UI.',
     secretPrefix: 'SIGNAL',
     docsUrl: 'https://docs.hatcher.host/integrations/signal',
-    hasChannelSettings: true,
-    fields: [
-      { key: 'SIGNAL_CLI_CONFIG', label: 'CLI Config Path', type: 'text', placeholder: '/home/user/.local/share/signal-cli', helper: 'Path to signal-cli config directory on your server', required: true },
-    ],
+    hasChannelSettings: false,
+    fields: [],
   },
   {
     featureKey: 'openclaw.platform.twitter',
@@ -195,12 +190,10 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
   {
     featureKey: 'openclaw.platform.imessage',
     name: 'iMessage',
-    description: 'Send and receive iMessages (requires macOS host).',
+    description: 'Requires macOS — not available in Docker containers.',
     secretPrefix: 'IMESSAGE',
-    fields: [
-      { key: 'IMESSAGE_APPLE_ID', label: 'Apple ID', type: 'text' as const, required: true, placeholder: 'your@icloud.com' },
-      { key: 'IMESSAGE_PASSWORD', label: 'App-Specific Password', type: 'password' as const, required: true, placeholder: 'xxxx-xxxx-xxxx-xxxx' },
-    ],
+    hasChannelSettings: false,
+    fields: [],
   },
   {
     featureKey: 'openclaw.feature.webhooks',
