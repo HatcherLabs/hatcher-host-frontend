@@ -50,6 +50,8 @@ export interface IntegrationDef {
   pairingRequired?: boolean;
   /** Channel name used for the pair-channel API call (e.g. 'whatsapp', 'signal') */
   pairingChannel?: string;
+  /** Additional config fields shown when paired (e.g. allowFrom for WhatsApp) */
+  pairingFields?: IntegrationField[];
 }
 
 export interface AgentStats {
@@ -157,6 +159,9 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     docsUrl: 'https://docs.hatcher.host/integrations/whatsapp',
     hasChannelSettings: false,
     pairingRequired: true,
+    pairingFields: [
+      { key: 'WHATSAPP_ALLOW_FROM', label: 'Allowed Phone Numbers', type: 'text', placeholder: '+1234567890, +0987654321', helper: 'Comma-separated phone numbers (E.164 format). Only these numbers can chat with your agent. Leave empty for everyone.' },
+    ],
     pairingChannel: 'whatsapp',
     fields: [],
   },

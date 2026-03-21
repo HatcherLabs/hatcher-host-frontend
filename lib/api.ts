@@ -666,4 +666,11 @@ export const api = {
   /** Get channel connection status */
   getChannelStatus: (agentId: string) =>
     req<{ channels: Record<string, { connected: boolean }> }>(`/agents/${agentId}/channel-status`),
+
+  /** Disconnect a paired channel */
+  disconnectChannel: (agentId: string, channel: string) =>
+    req<{ disconnected: boolean }>(`/agents/${agentId}/disconnect-channel`, {
+      method: 'POST',
+      body: JSON.stringify({ channel }),
+    }),
 };

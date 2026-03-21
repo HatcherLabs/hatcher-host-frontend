@@ -251,19 +251,36 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
   return (
     <div className="border-t border-white/[0.06] p-5 space-y-4 bg-white/[0.01]">
       {connected && (
-        <div className="flex items-center gap-3 p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
-          <CheckCircle size={16} className="text-emerald-400 flex-shrink-0" />
-          <div className="flex-1">
-            <p className="text-sm font-medium text-emerald-400">{integration.name} Connected</p>
-            <p className="text-xs text-[#A5A1C2] mt-0.5">Messages will be forwarded to your agent</p>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
+            <CheckCircle size={16} className="text-emerald-400 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-emerald-400">{integration.name} Connected</p>
+              <p className="text-xs text-[#A5A1C2] mt-0.5">Messages will be forwarded to your agent</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handlePair}
+                disabled={loading}
+                className="text-xs px-2 py-1 rounded border border-white/[0.08] text-[#71717a] hover:text-white hover:bg-white/5 transition-colors"
+              >
+                Re-pair
+              </button>
+              <button
+                onClick={async () => {
+                  if (!confirm(`Disconnect ${integration.name}? You will need to re-pair to use it again.`)) return;
+                  const ch = integration.pairingChannel;
+                  if (!ch) return;
+                  await api.disconnectChannel(agent.id, ch);
+                  setConnected(false);
+                  setQrCode(null);
+                }}
+                className="text-xs px-2 py-1 rounded border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors"
+              >
+                Disconnect
+              </button>
+            </div>
           </div>
-          <button
-            onClick={handlePair}
-            disabled={loading}
-            className="text-xs px-2 py-1 rounded border border-white/[0.08] text-[#71717a] hover:text-white hover:bg-white/5 transition-colors"
-          >
-            Re-pair
-          </button>
         </div>
       )}
 
