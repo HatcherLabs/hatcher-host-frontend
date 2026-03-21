@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import {
@@ -180,6 +180,40 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [connected, setConnected] = useState(false);
+
+  // Poll channel status every 5s when QR is showing
+  useEffect(() => {
+    if (!qrCode && !connected) return;
+    const channel = integration.pairingChannel;
+    if (!channel) return;
+
+    const poll = setInterval(async () => {
+      try {
+        const res = await api.getChannelStatus(agent.id);
+        if (res.success) {
+          const ch = res.data.channels[channel];
+          if (ch?.connected) {
+            setConnected(true);
+            setQrCode(null); // auto-close QR
+          }
+        }
+      } catch { /* ignore */ }
+    }, 5000);
+
+    return () => clearInterval(poll);
+  }, [qrCode, connected, agent.id, integration.pairingChannel]);
+
+  // Check status on mount
+  useEffect(() => {
+    const channel = integration.pairingChannel;
+    if (!channel || agent.status !== 'active') return;
+    api.getChannelStatus(agent.id).then(res => {
+      if (res.success && res.data.channels[channel]?.connected) {
+        setConnected(true);
+      }
+    }).catch(() => {});
+  }, [agent.id, agent.status, integration.pairingChannel]);
 
   const handlePair = async () => {
     if (!integration.pairingChannel) return;
@@ -187,6 +221,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
     setQrCode(null);
     setMessage(null);
     setError(null);
+    setConnected(false);
 
     try {
       const res = await api.pairChannel(agent.id, integration.pairingChannel);
@@ -199,6 +234,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
         setQrCode(data.qrCode);
         setMessage(data.message);
       } else if (data.status === 'already_paired') {
+        setConnected(true);
         setMessage(data.message);
       } else {
         setError(data.message || 'Could not generate QR code');
@@ -212,12 +248,26 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
 
   const isRunning = agent.status === 'active';
 
-  // Calculate QR dimensions to auto-fit container
-  const qrWidth = qrCode ? Math.max(...qrCode.split('\n').map(l => l.length)) : 0;
-
   return (
     <div className="border-t border-white/[0.06] p-5 space-y-4 bg-white/[0.01]">
-      {!isRunning && (
+      {connected && (
+        <div className="flex items-center gap-3 p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
+          <CheckCircle size={16} className="text-emerald-400 flex-shrink-0" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-emerald-400">{integration.name} Connected</p>
+            <p className="text-xs text-[#A5A1C2] mt-0.5">Messages will be forwarded to your agent</p>
+          </div>
+          <button
+            onClick={handlePair}
+            disabled={loading}
+            className="text-xs px-2 py-1 rounded border border-white/[0.08] text-[#71717a] hover:text-white hover:bg-white/5 transition-colors"
+          >
+            Re-pair
+          </button>
+        </div>
+      )}
+
+      {!isRunning && !connected && (
         <div className="flex items-start gap-2.5 p-3 rounded-lg border border-amber-500/20 bg-amber-500/5">
           <AlertTriangle size={14} className="text-amber-400 mt-0.5 flex-shrink-0" />
           <p className="text-xs leading-relaxed text-[#A5A1C2]">
@@ -226,7 +276,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
         </div>
       )}
 
-      {isRunning && !qrCode && (
+      {isRunning && !qrCode && !connected && (
         <div className="space-y-3">
           <button
             onClick={handlePair}

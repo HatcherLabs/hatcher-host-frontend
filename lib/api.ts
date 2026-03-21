@@ -662,4 +662,8 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ channel }),
     }),
+
+  /** Get channel connection status */
+  getChannelStatus: (agentId: string) =>
+    req<{ channels: Record<string, { connected: boolean }> }>(`/agents/${agentId}/channel-status`),
 };
