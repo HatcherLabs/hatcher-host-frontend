@@ -495,8 +495,8 @@ export function IntegrationsTab() {
                 const isPairing = !!integration.pairingRequired;
                 // For pairing integrations, check if pairing marker exists in config
                 const pairingKey = integration.pairingChannel === 'whatsapp' ? 'WHATSAPP_PAIRING' : integration.pairingChannel === 'signal' ? 'SIGNAL_PAIRING' : '';
-                const isPaired = isPairing && pairingKey && hasExistingSecret(pairingKey);
-                const isConfigured = hasAnyConfigured || isPaired;
+                // Don't show static "Paired" badge — live status is shown inside PairingPanel
+                const isConfigured = hasAnyConfigured;
 
                 return (
                   <GlassCard key={sk} className={`!p-0 ${isConfigured ? 'border-emerald-500/20' : ''}`}>
@@ -520,14 +520,14 @@ export function IntegrationsTab() {
                           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                             Free
                           </span>
-                          {isPairing && !isPaired && (
+                          {isPairing && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
                               QR Pairing
                             </span>
                           )}
                           {isConfigured && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#f97316]/15 text-[#f97316] border border-[#f97316]/20">
-                              {isPaired ? 'Paired' : 'Configured'}
+                              Configured
                             </span>
                           )}
                         </div>
