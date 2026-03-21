@@ -21,7 +21,6 @@ import {
   Key,
   Loader2,
   Rocket,
-  Sparkles,
   Zap,
 } from 'lucide-react';
 
@@ -438,7 +437,7 @@ export default function CreatePage() {
               </motion.div>
 
               <div className="mt-8 flex justify-end">
-                <button className="btn-primary" onClick={() => { applyTemplate(); setStep(2); }}>
+                <button className="btn-primary" onClick={() => { applyTemplate(); setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                   Continue
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -730,14 +729,14 @@ export default function CreatePage() {
               </div>
 
               <div className="mt-8 flex justify-between">
-                <button className="btn-secondary" onClick={() => { setStep(1); }}>
+                <button className="btn-secondary" onClick={() => { setStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                   <ChevronLeft className="w-4 h-4" />
                   Back
                 </button>
                 <button
                   className="btn-primary"
                   disabled={!isConfigValid}
-                  onClick={() => { setStep(3); }}
+                  onClick={() => { setStep(3); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 >
                   Continue
                   <ChevronRight className="w-4 h-4" />
@@ -820,7 +819,7 @@ export default function CreatePage() {
               <div className="flex justify-between items-center">
                 <button
                   className="btn-secondary"
-                  onClick={() => { setStep(2); }}
+                  onClick={() => { setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   disabled={launching || launched}
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -1006,19 +1005,6 @@ function OpenClawFields({
         inputClass={inputClass}
       />
 
-      {/* Extra features — all included */}
-      <div className="grid sm:grid-cols-2 gap-3">
-        <div className="border border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.6)] rounded-xl px-4 py-4 text-center backdrop-blur-sm">
-          <Sparkles className="w-4 h-4 text-green-400/60 mx-auto mb-1.5" />
-          <p className="text-sm text-[var(--text-secondary)]">Scheduled Tasks</p>
-          <p className="text-xs text-green-400/60 mt-0.5">Included free</p>
-        </div>
-        <div className="border border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.6)] rounded-xl px-4 py-4 text-center backdrop-blur-sm">
-          <Sparkles className="w-4 h-4 text-green-400/60 mx-auto mb-1.5" />
-          <p className="text-sm text-[var(--text-secondary)]">Webhooks</p>
-          <p className="text-xs text-green-400/60 mt-0.5">Included free</p>
-        </div>
-      </div>
     </>
   );
 }

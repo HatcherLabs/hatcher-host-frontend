@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Send } from 'lucide-react';
 import { FRAMEWORKS } from '@hatcher/shared';
@@ -31,11 +32,20 @@ export function ChatTab() {
   } = ctx;
 
   const frameworkMeta = FRAMEWORKS[agent.framework];
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  // Scroll chat container to bottom when messages change
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [messages]);
 
   return (
     <motion.div key="tab-chat" className="flex flex-col h-[calc(100vh-300px)] min-h-[400px]" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-1">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overscroll-contain space-y-4 mb-4 pr-1">
         {messages.length === 0 && (
           <motion.div
             className="text-center py-16"
