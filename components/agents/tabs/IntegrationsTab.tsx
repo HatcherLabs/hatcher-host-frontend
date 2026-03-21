@@ -249,39 +249,81 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
   };
 
   const isRunning = agent.status === 'active';
+  const ctx = useAgentContext();
+  const { integrationSecrets, setIntegrationField, saveIntegrationSecrets, savingIntegration, integrationSaveMsg, hasExistingSecret } = ctx;
+
+  // AllowFrom field — always visible
+  const allowFromKey = integration.pairingChannel === 'whatsapp' ? 'WHATSAPP_ALLOW_FROM' : 'SIGNAL_ALLOW_FROM';
+  const sk = integrationStateKey(integration);
+  const secrets = integrationSecrets[sk] ?? {};
+  const allowFromValue = secrets[allowFromKey] ?? '';
+  const existingAllowFrom = hasExistingSecret(allowFromKey);
+
+  const handleSaveAllowFrom = async () => {
+    await saveIntegrationSecrets(integration);
+  };
 
   return (
     <div className="border-t border-white/[0.06] p-5 space-y-4 bg-white/[0.01]">
+      {/* AllowFrom — always visible */}
+      <div>
+        <label className="block text-xs font-medium text-[#A5A1C2] mb-1.5">
+          Allowed Phone Numbers
+        </label>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={allowFromValue}
+            onChange={(e) => setIntegrationField(sk, allowFromKey, e.target.value)}
+            placeholder="+1234567890, +0987654321"
+            className="flex-1 h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-orange-500/50 focus:outline-none placeholder:text-[#71717a] transition-colors"
+          />
+          <button
+            onClick={handleSaveAllowFrom}
+            disabled={savingIntegration === sk}
+            className="px-3 h-9 rounded-lg text-xs font-medium text-white bg-[#f97316] hover:bg-[#ea580c] disabled:opacity-50 transition-colors"
+          >
+            {savingIntegration === sk ? 'Saving...' : 'Save'}
+          </button>
+        </div>
+        <p className="text-[10px] text-[#71717a] mt-1">
+          {existingAllowFrom
+            ? 'Only these numbers can message your agent. Restart agent after changing.'
+            : 'Leave empty to allow everyone. Set before pairing to restrict access.'}
+        </p>
+        {(integrationSaveMsg as unknown as string) === sk && (
+          <p className="text-[10px] text-emerald-400 mt-1">Saved! Restart agent to apply.</p>
+        )}
+      </div>
+
       {connected && (
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
-            <CheckCircle size={16} className="text-emerald-400 flex-shrink-0" />
-            <div className="flex-1">
-              <p className="text-sm font-medium text-emerald-400">{integration.name} Connected</p>
-              <p className="text-xs text-[#A5A1C2] mt-0.5">Messages will be forwarded to your agent</p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={handlePair}
-                disabled={loading}
-                className="text-xs px-2 py-1 rounded border border-white/[0.08] text-[#71717a] hover:text-white hover:bg-white/5 transition-colors"
-              >
-                Re-pair
-              </button>
-              <button
-                onClick={async () => {
-                  if (!confirm(`Disconnect ${integration.name}? You will need to re-pair to use it again.`)) return;
-                  const ch = integration.pairingChannel;
-                  if (!ch) return;
-                  await api.disconnectChannel(agent.id, ch);
-                  setConnected(false);
-                  setQrCode(null);
-                }}
-                className="text-xs px-2 py-1 rounded border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors"
-              >
-                Disconnect
-              </button>
-            </div>
+        <div className="flex items-center gap-3 p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
+          <CheckCircle size={16} className="text-emerald-400 flex-shrink-0" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-emerald-400">{integration.name} Connected</p>
+            <p className="text-xs text-[#A5A1C2] mt-0.5">Messages will be forwarded to your agent</p>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={handlePair}
+              disabled={loading}
+              className="text-xs px-2 py-1 rounded border border-white/[0.08] text-[#71717a] hover:text-white hover:bg-white/5 transition-colors"
+            >
+              Re-pair
+            </button>
+            <button
+              onClick={async () => {
+                if (!confirm(`Disconnect ${integration.name}? You will need to re-pair to use it again.`)) return;
+                const ch = integration.pairingChannel;
+                if (!ch) return;
+                await api.disconnectChannel(agent.id, ch);
+                setConnected(false);
+                setQrCode(null);
+              }}
+              className="text-xs px-2 py-1 rounded border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors"
+            >
+              Disconnect
+            </button>
           </div>
         </div>
       )}
@@ -299,7 +341,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
         <div className="space-y-3">
           <button
             onClick={handlePair}
-            disabled={loading}
+            disabled={loading || !allowFromValue.trim()}
             className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-white transition-all disabled:opacity-40 hover:opacity-90 bg-[#f97316]"
           >
             {loading ? (
