@@ -663,6 +663,21 @@ export const api = {
       body: JSON.stringify({ channel }),
     }),
 
+  /** Load chat history */
+  getChatHistory: (agentId: string) =>
+    req<{ messages: Array<{ role: string; content: string; ts: number }> }>(`/agents/${agentId}/chat/history`),
+
+  /** Save chat messages to history */
+  saveChatHistory: (agentId: string, messages: Array<{ role: string; content: string }>) =>
+    req<{ saved: number }>(`/agents/${agentId}/chat/history`, {
+      method: 'POST',
+      body: JSON.stringify({ messages }),
+    }),
+
+  /** Clear chat history */
+  clearChatHistory: (agentId: string) =>
+    req<{ cleared: boolean }>(`/agents/${agentId}/chat/history`, { method: 'DELETE' }),
+
   /** Get channel connection status */
   getChannelStatus: (agentId: string) =>
     req<{ channels: Record<string, { connected: boolean }> }>(`/agents/${agentId}/channel-status`),

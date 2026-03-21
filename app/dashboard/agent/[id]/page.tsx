@@ -132,29 +132,41 @@ export default function AgentManagePage() {
 
   // Chat state — restore from localStorage so history survives tab switches and soft navs
   const chatKey = `hatcher-chat-${id}`;
-  const [messages, setMessages] = useState<Message[]>(() => {
-    if (typeof window === 'undefined') return [];
-    try {
-      const stored = localStorage.getItem(chatKey);
-      if (stored) {
-        const parsed = JSON.parse(stored) as Message[];
-        return parsed.map(m => ({ ...m, timestamp: m.timestamp ? new Date(m.timestamp) : undefined }));
-      }
-    } catch { /* ignore */ }
-    return [];
-  });
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [chatError, setChatError] = useState<string | null>(null);
   const [chatErrorType, setChatErrorType] = useState<'timeout' | 'ratelimit' | 'network' | 'generic' | null>(null);
   const [msgCount, setMsgCount] = useState(0);
 
-  // Persist chat to localStorage
+  // Load chat history from server on mount
   useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem(chatKey, JSON.stringify(messages.slice(-100)));
-    }
-  }, [messages, chatKey]);
+    if (!id) return;
+    api.getChatHistory(id).then(res => {
+      if (res.success && res.data.messages.length > 0) {
+        setMessages(res.data.messages.map((m, i) => ({
+          id: `hist-${i}`,
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+          timestamp: new Date(m.ts),
+        })));
+      }
+    }).catch(() => {});
+  }, [id]);
+
+  // Save chat to server after each new message (debounced)
+  const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  useEffect(() => {
+    if (messages.length === 0 || !id) return;
+    // Only save non-streaming complete messages
+    const complete = messages.filter(m => !m.streaming && m.content);
+    if (complete.length === 0) return;
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      const toSave = complete.slice(-2); // save last 2 (user + assistant)
+      api.saveChatHistory(id, toSave.map(m => ({ role: m.role, content: m.content }))).catch(() => {});
+    }, 2000);
+  }, [messages, id]);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
