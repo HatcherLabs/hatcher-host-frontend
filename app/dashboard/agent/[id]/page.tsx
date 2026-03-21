@@ -950,7 +950,7 @@ export default function AgentManagePage() {
                 key={t.id}
                 role="tab"
                 aria-selected={tab === t.id}
-                onClick={() => { setTab(t.id); setTimeout(() => document.getElementById('agent-tabs')?.scrollIntoView({ behavior: 'instant', block: 'start' }), 50); }}
+                onClick={() => { setTab(t.id);  }}
                 className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg text-[10px] transition-all ${
                   tab === t.id
                     ? 'text-[#f97316] bg-[#f97316]/10'
@@ -969,7 +969,7 @@ export default function AgentManagePage() {
                 key={t.id}
                 role="tab"
                 aria-selected={tab === t.id}
-                onClick={() => { setTab(t.id); setTimeout(() => document.getElementById('agent-tabs')?.scrollIntoView({ behavior: 'instant', block: 'start' }), 50); }}
+                onClick={() => { setTab(t.id);  }}
                 className={`relative flex items-center gap-2 px-5 py-3 text-sm transition-all duration-300 -mb-px ${
                   tab === t.id
                     ? 'text-[#FFFFFF]'
