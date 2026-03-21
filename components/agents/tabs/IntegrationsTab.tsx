@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import {
   CheckCircle,
@@ -260,32 +261,35 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
       {qrCode && (() => {
         return (
         <div className="space-y-3">
-          {/* QR Modal Overlay */}
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-            onClick={() => setQrCode(null)}
-          >
+          {/* QR Modal — portaled to body so nothing can overlap it */}
+          {typeof document !== 'undefined' && createPortal(
             <div
-              className="bg-black rounded-2xl p-4 max-w-[95vw] max-h-[95vh] overflow-auto"
-              onClick={(e) => e.stopPropagation()}
+              className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+              onClick={() => setQrCode(null)}
             >
-              <p className="text-sm text-center text-white mb-3 font-medium">
-                {message || `Scan with ${integration.name}`}
-              </p>
-              <pre
-                className="text-green-400 whitespace-pre leading-none mx-auto select-none"
-                style={{
-                  fontFamily: '"Courier New", Courier, monospace',
-                  fontSize: 'min(1.4vw, 7px)',
-                  lineHeight: '1.15',
-                  width: 'fit-content',
-                }}
+              <div
+                className="bg-[#111] rounded-2xl p-6 max-w-[95vw] max-h-[95vh] overflow-auto border border-white/10"
+                onClick={(e) => e.stopPropagation()}
               >
-                {qrCode}
-              </pre>
-              <p className="text-xs text-center text-[#71717a] mt-3">Tap outside to close</p>
-            </div>
-          </div>
+                <p className="text-sm text-center text-white mb-4 font-medium">
+                  {message || `Scan with ${integration.name}`}
+                </p>
+                <pre
+                  className="text-green-400 whitespace-pre leading-none mx-auto select-none"
+                  style={{
+                    fontFamily: '"Courier New", Courier, monospace',
+                    fontSize: 'min(1.4vw, 7px)',
+                    lineHeight: '1.15',
+                    width: 'fit-content',
+                  }}
+                >
+                  {qrCode}
+                </pre>
+                <p className="text-xs text-center text-[#71717a] mt-4">Tap outside to close</p>
+              </div>
+            </div>,
+            document.body
+          )}
           <button
             onClick={handlePair}
             disabled={loading}
