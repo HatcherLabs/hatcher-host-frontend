@@ -264,12 +264,34 @@ export default function BillingPage() {
                   {tierConfig.usdPrice === 0 ? 'No charge' : `$${tierConfig.usdPrice} / 30 days`}
                   {tierConfig.messagesPerDay === 0 ? ' -- Unlimited messages' : ` -- ${tierConfig.messagesPerDay} messages/day`}
                 </p>
-                {accountData?.subscriptionExpiresAt && (
-                  <div className="flex items-center gap-1.5 mt-1.5 text-xs text-[var(--text-muted)]">
-                    <Clock className="w-3 h-3" />
-                    Active until {formatDate(accountData.subscriptionExpiresAt)}
-                  </div>
-                )}
+                {accountData?.subscriptionExpiresAt && (() => {
+                  const expires = new Date(accountData.subscriptionExpiresAt);
+                  const daysLeft = Math.ceil((expires.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                  const isExpiring = daysLeft <= 7 && daysLeft > 0;
+                  const isExpired = daysLeft <= 0;
+                  return (
+                    <div className="mt-2 space-y-2">
+                      <div className={`flex items-center gap-1.5 text-xs ${isExpired ? 'text-red-400' : isExpiring ? 'text-amber-400' : 'text-[var(--text-muted)]'}`}>
+                        <Clock className="w-3 h-3" />
+                        {isExpired
+                          ? 'Plan expired — renew to keep your tier'
+                          : isExpiring
+                            ? `Expires in ${daysLeft} day${daysLeft > 1 ? 's' : ''} — renew now`
+                            : `Active until ${formatDate(accountData.subscriptionExpiresAt)}`}
+                      </div>
+                      {(isExpiring || isExpired) && (
+                        <button
+                          onClick={() => handleSubscribe(currentTier)}
+                          disabled={subscribing !== null}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-[#f97316] hover:bg-[#ea580c] disabled:opacity-50 transition-colors"
+                        >
+                          {subscribing === currentTier ? <Loader2 className="w-3 h-3 animate-spin" /> : <ArrowRight className="w-3 h-3" />}
+                          Renew for ${tierConfig.usdPrice}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
 
