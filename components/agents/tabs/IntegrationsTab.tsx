@@ -258,35 +258,33 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
       )}
 
       {qrCode && (() => {
-        // Convert ASCII QR to a canvas-rendered image for reliable display
-        const lines = qrCode.split('\n');
-        const height = lines.length;
-        const svgRows = lines.map((line, y) => {
-          const pixels: string[] = [];
-          for (let x = 0; x < line.length; x++) {
-            const ch = line[x];
-            // Block characters: █ = full, ▄ = bottom half, ▀ = top half, space = empty
-            if (ch === '█' || ch === '▄' || ch === '▀' || ch === '▐' || ch === '▌') {
-              pixels.push(`<rect x="${x}" y="${y}" width="1" height="1" fill="white"/>`);
-            }
-          }
-          return pixels.join('');
-        }).join('');
-        const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${qrWidth} ${height}" shape-rendering="crispEdges"><rect width="${qrWidth}" height="${height}" fill="black"/>${svgRows}</svg>`;
-        const dataUrl = `data:image/svg+xml;base64,${btoa(svgStr)}`;
-
         return (
         <div className="space-y-3">
-          <p className="text-xs text-center text-[#A5A1C2]">
-            {message || `Scan with ${integration.name} on your phone`}
-          </p>
-          <div className="flex justify-center">
-            <img
-              src={dataUrl}
-              alt="QR Code"
-              className="rounded-lg border border-white/[0.08]"
-              style={{ width: '240px', height: '240px', imageRendering: 'pixelated' }}
-            />
+          {/* QR Modal Overlay */}
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+            onClick={() => setQrCode(null)}
+          >
+            <div
+              className="bg-black rounded-2xl p-4 max-w-[95vw] max-h-[95vh] overflow-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p className="text-sm text-center text-white mb-3 font-medium">
+                {message || `Scan with ${integration.name}`}
+              </p>
+              <pre
+                className="text-green-400 whitespace-pre leading-none mx-auto select-none"
+                style={{
+                  fontFamily: '"Courier New", Courier, monospace',
+                  fontSize: 'min(1.4vw, 7px)',
+                  lineHeight: '1.15',
+                  width: 'fit-content',
+                }}
+              >
+                {qrCode}
+              </pre>
+              <p className="text-xs text-center text-[#71717a] mt-3">Tap outside to close</p>
+            </div>
           </div>
           <button
             onClick={handlePair}
