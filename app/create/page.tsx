@@ -20,7 +20,6 @@ import {
   Cpu,
   Key,
   Loader2,
-  Lock,
   Rocket,
   Sparkles,
   Zap,
@@ -44,7 +43,7 @@ type LLMChoice = 'free_groq' | 'byok';
 
 const CATEGORY_ORDER = ['business', 'development', 'crypto', 'research', 'support', 'custom'] as const;
 
-const OPENCLAW_FREE_SKILLS = ['web_search', 'calculator', 'weather'];
+const OPENCLAW_SKILLS_LIST = ['web_search', 'calculator', 'weather', 'code_interpreter', 'file_manager', 'image_gen'];
 
 // ── Animation variants ───────────────────────────────────────
 
@@ -108,7 +107,7 @@ export default function CreatePage() {
     systemPrompt: '',  // custom override only — blank means "use template default"
   });
   const [showCustomPrompt, setShowCustomPrompt] = useState(false);
-  const [openclawSkills, setOpenclawSkills] = useState<string[]>([...OPENCLAW_FREE_SKILLS]);
+  const [openclawSkills, setOpenclawSkills] = useState<string[]>([...OPENCLAW_SKILLS_LIST]);
 
   const agentName = openclawForm.name;
   const agentDesc = openclawForm.description;
@@ -1003,39 +1002,31 @@ function OpenClawFields({
       <div>
         <label className="block text-sm font-medium text-[var(--text-primary)] mb-3">
           Skills
-          <span className="text-[#71717a] text-xs font-normal ml-2">Free tier: {OPENCLAW_FREE_SKILLS.length} basic skills</span>
+          <span className="text-[#71717a] text-xs font-normal ml-2">All skills included free</span>
         </label>
 
-        <div className="mb-3">
-          <div className="flex flex-wrap gap-2">
-            {OPENCLAW_FREE_SKILLS.map((skill) => {
-              const isActive = skills.includes(skill);
-              return (
-                <motion.button
-                  key={skill}
-                  type="button"
-                  whileHover={{ scale: 1.06 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => toggleSkill(skill)}
-                  className={cn(
-                    'text-sm border rounded-full px-4 py-2 transition-all duration-200',
-                    isActive
-                      ? 'border-[#f97316]/40 bg-[#f97316]/10 text-[#FFFFFF] shadow-[0_0_8px_rgba(249,115,22,0.12)]'
-                      : 'border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[rgba(249,115,22,0.3)] hover:bg-[rgba(249,115,22,0.05)]'
-                  )}
-                >
-                  {isActive && <Check className="w-3 h-3 inline mr-1.5" />}
-                  {skill}
-                </motion.button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] rounded-xl px-4 py-3 text-center backdrop-blur-sm">
-          <Lock className="w-4 h-4 text-[#f97316]/40 mx-auto mb-1.5" />
-          <p className="text-xs text-[#71717a]">More skills available after creation</p>
-          <p className="text-[10px] text-[#71717a]/70 mt-0.5">Included with your plan</p>
+        <div className="flex flex-wrap gap-2">
+          {OPENCLAW_SKILLS_LIST.map((skill) => {
+            const isActive = skills.includes(skill);
+            return (
+              <motion.button
+                key={skill}
+                type="button"
+                whileHover={{ scale: 1.06 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => toggleSkill(skill)}
+                className={cn(
+                  'text-sm border rounded-full px-4 py-2 transition-all duration-200',
+                  isActive
+                    ? 'border-[#f97316]/40 bg-[#f97316]/10 text-[#FFFFFF] shadow-[0_0_8px_rgba(249,115,22,0.12)]'
+                    : 'border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[rgba(249,115,22,0.3)] hover:bg-[rgba(249,115,22,0.05)]'
+                )}
+              >
+                {isActive && <Check className="w-3 h-3 inline mr-1.5" />}
+                {skill}
+              </motion.button>
+            );
+          })}
         </div>
       </div>
 
@@ -1048,17 +1039,17 @@ function OpenClawFields({
         inputClass={inputClass}
       />
 
-      {/* Locked features */}
+      {/* Extra features — all included */}
       <div className="grid sm:grid-cols-2 gap-3">
         <div className="border border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.6)] rounded-xl px-4 py-4 text-center backdrop-blur-sm">
-          <Lock className="w-4 h-4 text-[#f97316]/40 mx-auto mb-1.5" />
-          <p className="text-sm text-[#71717a]">Scheduled Tasks</p>
-          <p className="text-xs text-[#71717a]/70 mt-0.5">Included with your plan</p>
+          <Sparkles className="w-4 h-4 text-green-400/60 mx-auto mb-1.5" />
+          <p className="text-sm text-[var(--text-secondary)]">Scheduled Tasks</p>
+          <p className="text-xs text-green-400/60 mt-0.5">Included free</p>
         </div>
         <div className="border border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.6)] rounded-xl px-4 py-4 text-center backdrop-blur-sm">
-          <Lock className="w-4 h-4 text-[#f97316]/40 mx-auto mb-1.5" />
-          <p className="text-sm text-[#71717a]">Webhooks</p>
-          <p className="text-xs text-[#71717a]/70 mt-0.5">Included with your plan</p>
+          <Sparkles className="w-4 h-4 text-green-400/60 mx-auto mb-1.5" />
+          <p className="text-sm text-[var(--text-secondary)]">Webhooks</p>
+          <p className="text-xs text-green-400/60 mt-0.5">Included free</p>
         </div>
       </div>
     </>

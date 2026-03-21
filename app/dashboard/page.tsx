@@ -565,12 +565,20 @@ export default function DashboardPage() {
             subtitle={`of ${agents.length} total`}
           />
           <StatCard
-            label="Features"
-            value={`${featureTotal}`}
-            change={featureTotal > 0 ? 100 : 0}
-            donutValue={Math.min(featureTotal * 10, 100)}
+            label="Integrations"
+            value={`${agents.reduce((sum, a) => {
+              const cfg = (a as Agent & { config?: Record<string, unknown> }).config ?? {};
+              const integrationKeys = ['TELEGRAM_BOT_TOKEN', 'DISCORD_BOT_TOKEN', 'SLACK_BOT_TOKEN', 'XURL_CLIENT_ID', 'WHATSAPP_TOKEN', 'SIGNAL_CLI_CONFIG'];
+              const count = integrationKeys.filter(k => {
+                const v = (cfg as Record<string, unknown>)[k];
+                return v && typeof v === 'string' && v.length > 0;
+              }).length;
+              return sum + count;
+            }, 0)}`}
+            change={100}
+            donutValue={50}
             donutColor={COLORS.orange}
-            subtitle="Unlocked"
+            subtitle="Configured"
           />
           <StatCard
             label="Messages"

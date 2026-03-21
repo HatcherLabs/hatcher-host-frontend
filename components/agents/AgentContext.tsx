@@ -171,15 +171,13 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
   {
     featureKey: 'openclaw.platform.twitter',
     name: 'X (Twitter)',
-    description: 'Post and interact on Twitter/X.',
-    secretPrefix: 'TWITTER',
+    description: 'Post tweets, reply, search, read posts, manage followers, and more via xurl skill.',
+    secretPrefix: 'XURL',
     docsUrl: 'https://docs.hatcher.host/integrations/twitter',
     hasChannelSettings: false,
     fields: [
-      { key: 'TWITTER_API_KEY', label: 'API Key', type: 'password', placeholder: 'Your Twitter API key', helper: 'From Twitter Developer Portal > Keys and Tokens', required: true },
-      { key: 'TWITTER_API_SECRET', label: 'API Secret', type: 'password', placeholder: 'Your Twitter API secret', required: true },
-      { key: 'TWITTER_ACCESS_TOKEN', label: 'Access Token', type: 'password', placeholder: 'Your access token', required: true },
-      { key: 'TWITTER_ACCESS_SECRET', label: 'Access Token Secret', type: 'password', placeholder: 'Your access token secret', required: true },
+      { key: 'XURL_CLIENT_ID', label: 'OAuth2 Client ID', type: 'password', placeholder: 'Your X API OAuth2 Client ID', helper: 'From X Developer Portal > App > Keys and tokens > OAuth 2.0 Client ID', required: true },
+      { key: 'XURL_CLIENT_SECRET', label: 'OAuth2 Client Secret', type: 'password', placeholder: 'Your X API OAuth2 Client Secret', helper: 'From X Developer Portal > App > Keys and tokens > OAuth 2.0 Client Secret', required: true },
     ],
   },
   {
