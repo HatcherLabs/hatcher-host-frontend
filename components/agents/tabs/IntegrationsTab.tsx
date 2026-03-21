@@ -255,14 +255,15 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
 
       {qrCode && (
         <div className="space-y-3">
-          <div className="rounded-lg overflow-hidden border border-white/[0.08] bg-black p-3 flex items-center justify-center">
+          <div className="rounded-lg overflow-x-auto border border-white/[0.08] bg-black p-4">
             <pre
-              className="text-white whitespace-pre leading-none"
+              className="text-green-400 whitespace-pre leading-none mx-auto"
               style={{
-                fontFamily: '"Courier New", Courier, monospace',
-                fontSize: '3.5px',
-                lineHeight: '3.5px',
-                letterSpacing: '0.02em',
+                fontFamily: 'monospace',
+                fontSize: '5px',
+                lineHeight: '5.5px',
+                letterSpacing: '0px',
+                width: 'fit-content',
               }}
             >
               {qrCode}
@@ -333,7 +334,7 @@ export function IntegrationsTab() {
                 const isPairing = !!integration.pairingRequired;
 
                 return (
-                  <GlassCard key={sk} className={`!p-0 overflow-hidden ${hasAnyConfigured ? 'border-emerald-500/20' : ''}`}>
+                  <GlassCard key={sk} className={`!p-0 ${hasAnyConfigured ? 'border-emerald-500/20' : ''}`}>
                     <button
                       type="button"
                       onClick={() => toggleIntegrationExpanded(sk)}
@@ -405,7 +406,7 @@ export function IntegrationsTab() {
                 const hasAnyConfigured = integration.fields.some((f) => hasExistingSecret(f.key));
 
                 return (
-                  <GlassCard key={sk} className={`!p-0 overflow-hidden ${hasAnyConfigured ? 'border-emerald-500/20' : ''}`}>
+                  <GlassCard key={sk} className={`!p-0 ${hasAnyConfigured ? 'border-emerald-500/20' : ''}`}>
                     <button
                       type="button"
                       onClick={() => toggleIntegrationExpanded(sk)}
