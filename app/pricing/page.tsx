@@ -200,7 +200,7 @@ export default function PricingPage() {
                     <FeatureMissing>No full logs</FeatureMissing>
                   )}
                   {tier.autoSleep ? (
-                    <FeatureMissing>Auto-sleep after {tier.autoSleepMinutes} min idle</FeatureMissing>
+                    <FeatureMissing>Auto-sleep after {tier.autoSleepMinutes >= 60 ? `${Math.round(tier.autoSleepMinutes / 60)}h` : `${tier.autoSleepMinutes} min`} idle</FeatureMissing>
                   ) : (
                     <FeatureCheck color={style.accent}>No auto-sleep</FeatureCheck>
                   )}
@@ -271,9 +271,11 @@ export default function PricingPage() {
                 <div className="text-3xl font-extrabold mb-1">
                   <span className="text-gradient">${addon.usdPrice}</span>
                 </div>
-                <p className="text-[var(--text-muted)] text-xs mb-3">/month</p>
+                <p className="text-[var(--text-muted)] text-xs mb-3">
+                  {addon.type === 'one_time' ? 'one-time' : '/month'}
+                </p>
                 <p className="text-sm text-[var(--text-secondary)]">
-                  {addon.extraAgents} extra agent slots
+                  {addon.extraAgents ? `${addon.extraAgents} extra agent slots` : addon.description}
                 </p>
               </motion.div>
             ))}

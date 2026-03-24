@@ -364,9 +364,19 @@ export default function LandingPage() {
                 className="mt-12"
               >
                 <div className="inline-flex items-center gap-3 sm:gap-6 px-4 sm:px-6 py-3 rounded-full bg-white/[0.03] border border-white/[0.06] text-xs sm:text-sm text-[#A5A1C2]">
-                  <span><AnimatedCounter target={platformStats.totalAgents} /> Agents</span>
-                  <span className="w-px h-4 bg-white/10" aria-hidden="true" />
-                  <span><AnimatedCounter target={platformStats.activeAgents} /> Active</span>
+                  {platformStats.totalAgents > 0 ? (
+                    <>
+                      <span><AnimatedCounter target={platformStats.totalAgents} /> Agents Deployed</span>
+                      <span className="w-px h-4 bg-white/10" aria-hidden="true" />
+                      <span><AnimatedCounter target={platformStats.activeAgents} /> Active Now</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Deploy in Seconds</span>
+                      <span className="w-px h-4 bg-white/10" aria-hidden="true" />
+                      <span>All Integrations Included</span>
+                    </>
+                  )}
                   <span className="w-px h-4 bg-white/10" aria-hidden="true" />
                   <span>Free to Start</span>
                 </div>
@@ -679,7 +689,7 @@ export default function LandingPage() {
               { q: 'What frameworks are supported?', a: 'Hatcher supports OpenClaw (feature-rich, 13,700+ skills, plugin marketplace) and Hermes (lightweight, fast, API-focused). You choose when creating an agent.' },
               { q: 'What is BYOK?', a: 'Bring Your Own Key — use your own API keys from OpenAI, Anthropic, Google, Groq, xAI, OpenRouter, or Ollama. Always free, no markup.' },
               { q: 'How do I pay for upgrades?', a: 'All prices are in USD, paid with SOL or platform tokens on Solana. Approve a wallet transaction and the upgrade activates instantly.' },
-              { q: 'Can I run multiple agents?', a: 'Free tier includes 1 agent. Pro includes 5. Need more? Stack add-ons for +3, +5, or +10 agents.' },
+              { q: 'Can I run multiple agents?', a: 'Free tier includes 1 agent. Basic includes 1. Pro includes 5. Need more? Stack add-ons for +3, +5, or +10 agents.' },
             ].map((item, i) => (
               <FAQItem key={i} question={item.q} answer={item.a} />
             ))}

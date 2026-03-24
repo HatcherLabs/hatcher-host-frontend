@@ -264,26 +264,13 @@ function HealthPerformanceSection({ agentId, isActive }: { agentId: string; isAc
         />
       </div>
 
-      {/* Response times */}
+      {/* Response times — hidden until actual duration tracking is implemented */}
       {(data.responseTimes.avg > 0 || data.responseTimes.last > 0) && (
         <div className="border-t border-white/[0.04] pt-3">
-          <div className="flex items-center gap-1.5 mb-2">
+          <div className="flex items-center gap-1.5">
             <Zap size={12} className="text-[#f97316]" />
             <span className="text-xs text-[#71717a]">Response Times</span>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <div className="text-lg font-bold text-[#FFFFFF] tabular-nums">{data.responseTimes.avg}s</div>
-              <div className="text-[10px] text-[#6B6890]">Average</div>
-            </div>
-            <div>
-              <div className="text-lg font-bold text-[#FFFFFF] tabular-nums">{data.responseTimes.p95}s</div>
-              <div className="text-[10px] text-[#6B6890]">P95</div>
-            </div>
-            <div>
-              <div className="text-lg font-bold text-[#FFFFFF] tabular-nums">{data.responseTimes.last}s</div>
-              <div className="text-[10px] text-[#6B6890]">Last</div>
-            </div>
+            <span className="text-[10px] text-[#71717a] ml-auto">Tracking coming soon</span>
           </div>
         </div>
       )}
