@@ -319,6 +319,15 @@ export const api = {
   refreshToken: () =>
     req<{ token: string }>('/auth/refresh', { method: 'POST' }),
 
+  /** Get agent memory (MEMORY.md + daily logs) */
+  getAgentMemory: (id: string) =>
+    req<{
+      memoryMd: string;
+      dailyLogs: Array<{ date: string; content: string }>;
+      status?: string;
+      message?: string;
+    }>(`/agents/${id}/memory`),
+
   /** Get agent stats (messages processed, uptime, last active) */
   getAgentStats: (id: string) =>
     req<{
@@ -328,6 +337,16 @@ export const api = {
       containerId: string | null;
       status: string;
     }>(`/agents/${id}/stats`),
+
+  /** Get agent analytics (message activity over last 7 days) */
+  getAgentAnalytics: (id: string) =>
+    req<{
+      messagesPerDay: Array<{ date: string; count: number }>;
+      totalMessages: number;
+      avgPerDay: number;
+      peakDay: string | null;
+      framework: string;
+    }>(`/agents/${id}/analytics`),
 
   /** Get agent activity logs */
   getAgentLogs: (id: string) =>
@@ -687,5 +706,51 @@ export const api = {
     req<{ disconnected: boolean }>(`/agents/${agentId}/disconnect-channel`, {
       method: 'POST',
       body: JSON.stringify({ channel }),
+    }),
+
+  /** Get webhook URL and token for an agent */
+  getWebhookUrl: (agentId: string) =>
+    req<{ url: string; token: string }>(`/agents/${agentId}/webhook-url`),
+
+  // ─── Config Snapshots ──────────────────────────────────────
+
+  /** List config snapshots for an agent */
+  getConfigSnapshots: (agentId: string) =>
+    req<{ snapshots: Array<{ id: string; timestamp: number; preview: string }> }>(`/agents/${agentId}/config-snapshots`),
+
+  /** Restore a config snapshot */
+  restoreConfigSnapshot: (agentId: string, snapshotId: string) =>
+    req<{ restored: boolean; snapshotId: string }>(`/agents/${agentId}/config-snapshots/${encodeURIComponent(snapshotId)}/restore`, {
+      method: 'POST',
+    }),
+
+  // ─── Scheduled Tasks (Cron Jobs) ──────────────────────────
+  /** List all scheduled tasks for an agent */
+  getAgentSchedules: (agentId: string) =>
+    req<unknown>(`/agents/${agentId}/schedules`),
+
+  /** Create a new scheduled task */
+  createAgentSchedule: (agentId: string, data: { name: string; schedule: string; prompt: string }) =>
+    req<unknown>(`/agents/${agentId}/schedules`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  /** Delete a scheduled task */
+  deleteAgentSchedule: (agentId: string, jobId: string) =>
+    req<{ deleted: boolean }>(`/agents/${agentId}/schedules/${jobId}`, {
+      method: 'DELETE',
+    }),
+
+  /** Pause a scheduled task */
+  pauseAgentSchedule: (agentId: string, jobId: string) =>
+    req<unknown>(`/agents/${agentId}/schedules/${jobId}/pause`, {
+      method: 'POST',
+    }),
+
+  /** Resume a paused scheduled task */
+  resumeAgentSchedule: (agentId: string, jobId: string) =>
+    req<unknown>(`/agents/${agentId}/schedules/${jobId}/resume`, {
+      method: 'POST',
     }),
 };

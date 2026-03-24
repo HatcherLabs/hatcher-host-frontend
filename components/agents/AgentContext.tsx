@@ -6,7 +6,7 @@ import type { Agent, AgentFeature } from '@/lib/api';
 
 // ─── Types ───────────────────────────────────────────────────
 
-export type Tab = 'overview' | 'config' | 'integrations' | 'files' | 'logs' | 'chat' | 'stats';
+export type Tab = 'overview' | 'config' | 'integrations' | 'files' | 'logs' | 'memory' | 'schedules' | 'chat' | 'stats';
 
 export interface Message {
   id: string;

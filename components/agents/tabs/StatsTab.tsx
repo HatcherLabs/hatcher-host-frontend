@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   Settings,
@@ -9,13 +10,36 @@ import {
   Lock,
   CheckCircle,
   Shield,
+  BarChart3,
+  TrendingUp,
+  Calendar,
+  Hash,
 } from 'lucide-react';
 import { timeAgo } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
+import { api } from '@/lib/api';
 import {
   useAgentContext,
   STATUS_STYLES,
 } from '../AgentContext';
+
+interface AnalyticsData {
+  messagesPerDay: Array<{ date: string; count: number }>;
+  totalMessages: number;
+  avgPerDay: number;
+  peakDay: string | null;
+  framework: string;
+}
+
+function formatChartDate(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function formatWeekday(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { weekday: 'short' });
+}
 
 export function StatsTab() {
   const ctx = useAgentContext();
@@ -31,6 +55,36 @@ export function StatsTab() {
   } = ctx;
   const tierKey = authUser?.tier ?? 'free';
 
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(true);
+  const [analyticsError, setAnalyticsError] = useState<string | null>(null);
+
+  const fetchAnalytics = useCallback(async () => {
+    if (!agent?.id) return;
+    setAnalyticsLoading(true);
+    setAnalyticsError(null);
+    try {
+      const res = await api.getAgentAnalytics(agent.id);
+      if (res.success) {
+        setAnalytics(res.data);
+      } else {
+        setAnalyticsError(res.error ?? 'Failed to load analytics');
+      }
+    } catch {
+      setAnalyticsError('Failed to load analytics');
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  }, [agent?.id]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
+
+  const maxCount = analytics
+    ? Math.max(...analytics.messagesPerDay.map(d => d.count), 1)
+    : 1;
+
   return (
     <motion.div
       key="stats"
@@ -39,6 +93,106 @@ export function StatsTab() {
       exit={{ opacity: 0, y: -12 }}
       className="space-y-6"
     >
+      {/* Message Activity Chart */}
+      <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2">
+            <BarChart3 size={18} className="text-[#f97316]" />
+            <h3 className="text-base font-semibold text-[#fafafa]">Message Activity</h3>
+          </div>
+          <span className="text-[10px] text-[#71717a] uppercase tracking-wider">Last 7 days</span>
+        </div>
+
+        {analyticsLoading ? (
+          <div className="flex items-end gap-1.5 h-36">
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                <div className="w-full rounded-t bg-white/[0.04] animate-pulse" style={{ height: `${20 + Math.random() * 60}%` }} />
+                <div className="w-8 h-2 rounded bg-white/[0.04] animate-pulse" />
+              </div>
+            ))}
+          </div>
+        ) : analyticsError ? (
+          <div className="h-36 flex items-center justify-center">
+            <p className="text-sm text-[#6B6890]">{analyticsError}</p>
+          </div>
+        ) : analytics ? (
+          <>
+            {/* Bar Chart */}
+            <div className="flex items-end gap-1.5 h-36 mb-1">
+              {analytics.messagesPerDay.map((d, i) => {
+                const heightPct = maxCount > 0 ? (d.count / maxCount) * 100 : 0;
+                const isToday = i === analytics.messagesPerDay.length - 1;
+                const isPeak = d.date === analytics.peakDay && d.count > 0;
+                return (
+                  <div key={d.date} className="flex-1 flex flex-col items-center gap-1 group relative">
+                    {/* Count label */}
+                    <span className={`text-[10px] font-medium transition-colors ${
+                      isPeak ? 'text-[#f97316]' : 'text-[#71717a] group-hover:text-[#A5A1C2]'
+                    }`}>
+                      {d.count > 0 ? d.count : ''}
+                    </span>
+                    {/* Bar */}
+                    <div
+                      className={`w-full rounded-t transition-all duration-300 min-h-[2px] ${
+                        isToday
+                          ? 'bg-[#f97316]'
+                          : isPeak
+                          ? 'bg-[#f97316]/80'
+                          : 'bg-[#f97316]/40 group-hover:bg-[#f97316]/60'
+                      }`}
+                      style={{ height: `${Math.max(heightPct, d.count > 0 ? 4 : 1)}%` }}
+                    />
+                    {/* Date label */}
+                    <div className="flex flex-col items-center">
+                      <span className={`text-[9px] ${isToday ? 'text-[#f97316] font-medium' : 'text-[#71717a]'}`}>
+                        {isToday ? 'Today' : formatWeekday(d.date)}
+                      </span>
+                      <span className="text-[8px] text-[#71717a]/60">
+                        {formatChartDate(d.date)}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Summary Stats Row */}
+            <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/[0.04]">
+              <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#f97316]/10">
+                  <Hash size={13} className="text-[#f97316]" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Total</p>
+                  <p className="text-sm font-bold text-[#fafafa]">{analytics.totalMessages.toLocaleString()}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#f97316]/10">
+                  <TrendingUp size={13} className="text-[#f97316]" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Avg/Day</p>
+                  <p className="text-sm font-bold text-[#fafafa]">{analytics.avgPerDay}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#f97316]/10">
+                  <Calendar size={13} className="text-[#f97316]" />
+                </div>
+                <div>
+                  <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Peak</p>
+                  <p className="text-sm font-bold text-[#fafafa]">
+                    {analytics.peakDay ? formatChartDate(analytics.peakDay) : '--'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : null}
+      </div>
+
       {/* Agent Info */}
       <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
         <div className="flex items-center gap-2 mb-4">

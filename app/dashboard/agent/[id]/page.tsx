@@ -26,6 +26,8 @@ import {
   LayoutDashboard,
   BarChart3,
   FolderOpen,
+  Brain,
+  Clock,
 } from 'lucide-react';
 import {
   AgentContext,
@@ -86,8 +88,18 @@ const ChatTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const MemoryTab = dynamic(
+  () => import('@/components/agents/tabs/MemoryTab').then(mod => ({ default: mod.MemoryTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 const StatsTab = dynamic(
   () => import('@/components/agents/tabs/StatsTab').then(mod => ({ default: mod.StatsTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
+const SchedulesTab = dynamic(
+  () => import('@/components/agents/tabs/SchedulesTab').then(mod => ({ default: mod.SchedulesTab })),
   { loading: () => <TabSkeleton /> }
 );
 
@@ -99,6 +111,8 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: 'integrations', label: 'Integrations', icon: <Puzzle size={16} /> },
   { id: 'files', label: 'Files', icon: <FolderOpen size={16} /> },
   { id: 'logs', label: 'Logs', icon: <ScrollText size={16} /> },
+  { id: 'memory', label: 'Memory', icon: <Brain size={16} /> },
+  { id: 'schedules', label: 'Schedules', icon: <Clock size={16} /> },
   { id: 'chat', label: 'Chat', icon: <MessageSquare size={16} /> },
   { id: 'stats', label: 'Stats', icon: <BarChart3 size={16} /> },
 ];
@@ -116,7 +130,7 @@ export default function AgentManagePage() {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const initialTab = (['overview','config','integrations','files','logs','chat','stats'] as Tab[]).includes(searchParams.get('tab') as Tab)
+  const initialTab = (['overview','config','integrations','files','logs','memory','schedules','chat','stats'] as Tab[]).includes(searchParams.get('tab') as Tab)
     ? (searchParams.get('tab') as Tab)
     : 'overview';
   const [tab, setTab] = useState<Tab>(initialTab);
@@ -1027,6 +1041,8 @@ export default function AgentManagePage() {
           {tab === 'integrations' && <IntegrationsTab />}
           {tab === 'files' && <FilesTab />}
           {tab === 'logs' && <LogsTab />}
+          {tab === 'memory' && <MemoryTab />}
+          {tab === 'schedules' && <SchedulesTab />}
           {tab === 'chat' && <ChatTab />}
           {tab === 'stats' && <StatsTab />}
         </AnimatePresence>

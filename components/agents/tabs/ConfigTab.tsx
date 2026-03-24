@@ -1,6 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Settings,
   Cpu,
@@ -14,9 +15,12 @@ import {
   AlertTriangle,
   Shield,
   RefreshCw,
+  History,
+  RotateCcw,
 } from 'lucide-react';
 import { BYOK_PROVIDERS, getBYOKProvider, FRAMEWORKS } from '@hatcher/shared';
 import type { AgentFramework } from '@hatcher/shared';
+import { api } from '@/lib/api';
 import {
   useAgentContext,
   tabContentVariants,
@@ -393,6 +397,9 @@ export function ConfigTab() {
 
       {/* Integrations hint — all integrations are free */}
 
+      {/* Config History */}
+      <ConfigHistory agentId={agent?.id} />
+
       {/* Save button */}
       <div className="flex items-center gap-3 pt-2">
         <button
@@ -417,5 +424,175 @@ export function ConfigTab() {
         )}
       </div>
     </motion.div>
+  );
+}
+
+// ─── Config History (Snapshots) ──────────────────────────────
+
+function formatRelativeTime(timestamp: number): string {
+  const now = Date.now();
+  const diff = now - timestamp;
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (seconds < 60) return 'just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days === 1) return 'yesterday';
+  if (days < 30) return `${days}d ago`;
+  return new Date(timestamp).toLocaleDateString();
+}
+
+interface Snapshot {
+  id: string;
+  timestamp: number;
+  preview: string;
+}
+
+function ConfigHistory({ agentId }: { agentId?: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [restoring, setRestoring] = useState<string | null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const fetchSnapshots = useCallback(async () => {
+    if (!agentId) return;
+    setLoading(true);
+    try {
+      const res = await api.getConfigSnapshots(agentId);
+      if (res.success) {
+        setSnapshots(res.data.snapshots);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setLoading(false);
+    }
+  }, [agentId]);
+
+  useEffect(() => {
+    if (expanded && agentId) {
+      fetchSnapshots();
+    }
+  }, [expanded, agentId, fetchSnapshots]);
+
+  const handleRestore = async (snapshotId: string) => {
+    if (!agentId) return;
+    setRestoring(snapshotId);
+    setMessage(null);
+    try {
+      const res = await api.restoreConfigSnapshot(agentId, snapshotId);
+      if (res.success) {
+        setMessage('Config restored. Reload the page to see changes.');
+        setConfirmId(null);
+        fetchSnapshots();
+      } else {
+        setMessage(`Error: ${(res as { error?: string }).error ?? 'Restore failed'}`);
+      }
+    } catch {
+      setMessage('Error: Network error');
+    } finally {
+      setRestoring(null);
+    }
+  };
+
+  return (
+    <GlassCard>
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center justify-between w-full"
+      >
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-[#A78BFA]/10 flex items-center justify-center">
+            <History size={14} className="text-[#A78BFA]" />
+          </div>
+          <h3 className="text-sm font-semibold text-[#A5A1C2]">Config History</h3>
+        </div>
+        {expanded ? <ChevronUp size={16} className="text-[#71717a]" /> : <ChevronDown size={16} className="text-[#71717a]" />}
+      </button>
+
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="mt-4 space-y-2">
+              {loading && (
+                <div className="flex items-center gap-2 py-3">
+                  <div className="w-3 h-3 border-2 border-white/20 border-t-[#A78BFA] rounded-full animate-spin" />
+                  <span className="text-xs text-[#71717a]">Loading snapshots...</span>
+                </div>
+              )}
+
+              {!loading && snapshots.length === 0 && (
+                <p className="text-xs text-[#71717a] py-3">
+                  No config history yet. Changes will be tracked automatically.
+                </p>
+              )}
+
+              {!loading && snapshots.map((snap) => (
+                <div
+                  key={snap.id}
+                  className="flex items-center justify-between p-3 rounded-lg border border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] transition-colors"
+                >
+                  <div className="flex-1 min-w-0 mr-3">
+                    <p className="text-xs font-medium text-[#A5A1C2]">
+                      {formatRelativeTime(snap.timestamp)}
+                    </p>
+                    <p className="text-[10px] text-[#71717a] truncate mt-0.5 font-mono">
+                      {snap.preview}
+                    </p>
+                  </div>
+
+                  {confirmId === snap.id ? (
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleRestore(snap.id)}
+                        disabled={restoring === snap.id}
+                        className="text-[10px] font-medium text-amber-400 hover:text-amber-300 transition-colors disabled:opacity-40"
+                      >
+                        {restoring === snap.id ? 'Restoring...' : 'Confirm'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmId(null)}
+                        className="text-[10px] font-medium text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmId(snap.id)}
+                      className="flex items-center gap-1 text-[10px] font-medium text-[#A78BFA] hover:text-[#c4b5fd] transition-colors flex-shrink-0"
+                    >
+                      <RotateCcw size={11} />
+                      Restore
+                    </button>
+                  )}
+                </div>
+              ))}
+
+              {message && (
+                <p className={`text-xs font-medium mt-2 ${message.startsWith('Error') ? 'text-red-400' : 'text-emerald-400'}`}>
+                  {message}
+                </p>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </GlassCard>
   );
 }

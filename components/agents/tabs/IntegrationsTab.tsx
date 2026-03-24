@@ -13,6 +13,9 @@ import {
   AlertTriangle,
   Loader2,
   Smartphone,
+  Webhook,
+  Copy,
+  Check,
 } from 'lucide-react';
 import {
   useAgentContext,
@@ -460,6 +463,137 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
   );
 }
 
+function WebhookSection() {
+  const { agent } = useAgentContext();
+  const [webhookData, setWebhookData] = useState<{ url: string; token: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [tokenVisible, setTokenVisible] = useState(false);
+  const [copiedUrl, setCopiedUrl] = useState(false);
+  const [copiedToken, setCopiedToken] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    api.getWebhookUrl(agent.id).then((res) => {
+      if (res.success) setWebhookData(res.data);
+    }).finally(() => setLoading(false));
+  }, [agent.id]);
+
+  const copyToClipboard = (text: string, setter: (v: boolean) => void) => {
+    navigator.clipboard.writeText(text);
+    setter(true);
+    setTimeout(() => setter(false), 2000);
+  };
+
+  if (loading) return <Skeleton className="h-24 w-full" />;
+  if (!webhookData) return null;
+
+  const curlExample = `curl -X POST ${webhookData.url} \\
+  -H "Authorization: Bearer ${webhookData.token}" \\
+  -H "Content-Type: application/json" \\
+  -d '{"message": "Hello from webhook!"}'`;
+
+  return (
+    <div>
+      <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[#71717a]">
+        Webhook
+        <span className="ml-2 text-violet-400 normal-case tracking-normal font-normal">Inbound HTTP</span>
+      </h3>
+      <GlassCard className="!p-0">
+        <button
+          type="button"
+          onClick={() => setExpanded(!expanded)}
+          className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition-colors"
+        >
+          <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-violet-500/10 border border-violet-500/20">
+            <Webhook size={14} className="text-violet-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-[#FFFFFF]">Webhook URL</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                Always Active
+              </span>
+            </div>
+            <p className="text-xs mt-0.5 truncate text-[#71717a]">
+              Trigger your agent from external services (Zapier, GitHub, etc.)
+            </p>
+          </div>
+          {expanded
+            ? <ChevronUp size={16} className="text-[#71717a]" />
+            : <ChevronDown size={16} className="text-[#71717a]" />
+          }
+        </button>
+
+        {expanded && (
+          <div className="border-t border-white/[0.06] p-5 space-y-4 bg-white/[0.01]">
+            {/* Webhook URL */}
+            <div>
+              <label className="block text-xs font-medium text-[#A5A1C2] mb-1.5">Webhook URL</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={webhookData.url}
+                  className="flex-1 h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:outline-none font-mono"
+                />
+                <button
+                  onClick={() => copyToClipboard(webhookData.url, setCopiedUrl)}
+                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-white/[0.08] hover:bg-white/5 transition-colors"
+                  title="Copy URL"
+                >
+                  {copiedUrl ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[#71717a]" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Webhook Token */}
+            <div>
+              <label className="block text-xs font-medium text-[#A5A1C2] mb-1.5">Bearer Token</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type={tokenVisible ? 'text' : 'password'}
+                  readOnly
+                  value={webhookData.token}
+                  className="flex-1 h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:outline-none font-mono"
+                />
+                <button
+                  onClick={() => setTokenVisible(!tokenVisible)}
+                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-white/[0.08] hover:bg-white/5 transition-colors"
+                  title={tokenVisible ? 'Hide token' : 'Reveal token'}
+                >
+                  {tokenVisible ? <EyeOff size={14} className="text-[#71717a]" /> : <Eye size={14} className="text-[#71717a]" />}
+                </button>
+                <button
+                  onClick={() => copyToClipboard(webhookData.token, setCopiedToken)}
+                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-white/[0.08] hover:bg-white/5 transition-colors"
+                  title="Copy token"
+                >
+                  {copiedToken ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[#71717a]" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Example */}
+            <div>
+              <label className="block text-xs font-medium text-[#A5A1C2] mb-1.5">Example Request</label>
+              <pre className="p-3 rounded-lg text-xs text-[#A5A1C2] bg-black/30 border border-white/[0.06] overflow-x-auto font-mono leading-relaxed whitespace-pre-wrap break-all">
+                {curlExample}
+              </pre>
+            </div>
+
+            {/* Note */}
+            <p className="text-[10px] leading-relaxed text-[#71717a]">
+              Use this URL to trigger your agent from external services (Zapier, GitHub, n8n, etc.).
+              Send a POST request with a JSON body containing a <code className="text-violet-400">message</code> field.
+              The agent will auto-wake from sleep if needed.
+            </p>
+          </div>
+        )}
+      </GlassCard>
+    </div>
+  );
+}
+
 export function IntegrationsTab() {
   const ctx = useAgentContext();
   const {
@@ -490,6 +624,9 @@ export function IntegrationsTab() {
               </p>
             </div>
           )}
+
+          {/* Webhook section — always shown at top */}
+          <WebhookSection />
 
           {/* Main integrations — all free on every tier */}
           <div>
