@@ -58,7 +58,7 @@ export function ChatTab() {
               Start a conversation with <span className="font-medium text-[#f97316]">{agent.name}</span>
             </p>
             <p className="text-xs mb-1 text-[#71717a]">
-              Streaming support enabled
+              Responses appear in real time
             </p>
 
             {/* Suggested prompts */}
@@ -216,7 +216,7 @@ export function ChatTab() {
 
           <div className="flex items-center justify-between mt-1.5 px-1">
             <span className="text-[10px] text-[#71717a]">
-              Powered by {llmProvider} | {frameworkMeta?.name ?? agent.framework}
+              Powered by {llmProvider}
             </span>
             <span className="text-[10px] text-[#71717a]">
               Enter to send, Shift+Enter for new line

@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import {
   MessageSquare,
   Clock,
@@ -8,6 +9,8 @@ import {
   Activity,
   ScrollText,
   Settings,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { FRAMEWORKS } from '@hatcher/shared';
 import { timeAgo } from '@/lib/utils';
@@ -19,6 +22,34 @@ import {
   FRAMEWORK_BADGE,
   LOG_LEVEL_COLORS,
 } from '../AgentContext';
+
+function TechnicalDetails({ chatEndpoint, port }: { chatEndpoint?: string; port?: number }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1.5 text-[11px] text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+      >
+        {open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+        Technical Details
+      </button>
+      {open && (
+        <div className="grid sm:grid-cols-2 gap-4 mt-3 pt-3 border-t border-white/[0.04]">
+          <div>
+            <span className="text-xs block mb-1 text-[#71717a]">API Endpoint</span>
+            <span className="text-sm font-mono text-[#FFFFFF]">{chatEndpoint ?? 'N/A'}</span>
+          </div>
+          <div>
+            <span className="text-xs block mb-1 text-[#71717a]">Port</span>
+            <span className="text-sm font-mono text-[#FFFFFF]">{port ?? 'N/A'}</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function OverviewTab() {
   const ctx = useAgentContext();
@@ -52,7 +83,7 @@ export function OverviewTab() {
                 {stats?.messagesProcessed ?? 0}
               </div>
               <div className="text-xs text-[#71717a]">Messages</div>
-              <div className="text-[10px] text-[#6B6890] mt-0.5">Since last deploy</div>
+              <div className="text-[10px] text-[#6B6890] mt-0.5">Since last restart</div>
             </div>
             {/* Mini bar chart indicator */}
             <div className="flex items-end gap-[2px] h-5 self-end">
@@ -104,7 +135,7 @@ export function OverviewTab() {
             </div>
             {hasApiKey && (
               <div className="self-end">
-                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">BYOK</span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Own Key</span>
               </div>
             )}
           </div>
@@ -142,10 +173,10 @@ export function OverviewTab() {
         </GlassCard>
       </div>
 
-      {/* Framework info */}
+      {/* Agent info */}
       <GlassCard>
         <h3 className="text-sm font-semibold mb-4 text-[#A5A1C2]">
-          Framework Details
+          Agent Details
         </h3>
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
@@ -155,21 +186,9 @@ export function OverviewTab() {
             </span>
           </div>
           <div>
-            <span className="text-xs block mb-1 text-[#71717a]">Docker Image</span>
-            <span className="text-sm font-mono text-[#FFFFFF]">
+            <span className="text-xs block mb-1 text-[#71717a]">Runtime</span>
+            <span className="text-sm text-[#FFFFFF]">
               {frameworkMeta?.dockerImage ?? 'N/A'}
-            </span>
-          </div>
-          <div>
-            <span className="text-xs block mb-1 text-[#71717a]">Chat Endpoint</span>
-            <span className="text-sm font-mono text-[#FFFFFF]">
-              {frameworkMeta?.chatEndpoint ?? 'N/A'}
-            </span>
-          </div>
-          <div>
-            <span className="text-xs block mb-1 text-[#71717a]">Container Port</span>
-            <span className="text-sm font-mono text-[#FFFFFF]">
-              {frameworkMeta?.port ?? 'N/A'}
             </span>
           </div>
           {frameworkMeta?.bestFor && (
@@ -180,6 +199,14 @@ export function OverviewTab() {
               </span>
             </div>
           )}
+
+          {/* Collapsible technical details */}
+          <div className="sm:col-span-2">
+            <TechnicalDetails
+              chatEndpoint={frameworkMeta?.chatEndpoint}
+              port={frameworkMeta?.port}
+            />
+          </div>
         </div>
       </GlassCard>
 

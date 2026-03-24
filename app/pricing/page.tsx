@@ -119,8 +119,8 @@ export default function PricingPage() {
             <span className="text-[var(--text-primary)]">Plan</span>
           </h1>
           <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto leading-relaxed relative">
-            Start free, scale when you are ready. All integrations included.
-            BYOK always free. Pay with SOL or platform tokens.
+            Start free with any framework. Scale when you are ready.
+            All integrations included. BYOK always free. Pay with SOL or platform tokens.
           </p>
         </motion.div>
 
@@ -403,8 +403,8 @@ export default function PricingPage() {
             <span className="text-[var(--text-primary)]">your agent?</span>
           </h2>
           <p className="text-[var(--text-secondary)] text-base max-w-lg mx-auto mb-8 leading-relaxed relative">
-            Start free with Groq LLM. Bring your own API key anytime.
-            Upgrade when you need more power.
+            Pick your framework, choose a template, and deploy in seconds.
+            Start free with a built-in LLM. Upgrade when you need more power.
           </p>
           <div className="flex items-center justify-center gap-4 relative">
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
@@ -518,8 +518,12 @@ const FAQ = [
     a: 'No. You can register with email and create a free agent immediately. You only need to connect a Solana wallet when purchasing a paid subscription with SOL or platform tokens.',
   },
   {
+    q: 'What frameworks are supported?',
+    a: 'Hatcher supports OpenClaw and Hermes. OpenClaw offers 13,700+ skills and a rich plugin ecosystem. Hermes is lightweight and API-focused. You pick your framework when creating an agent -- all tiers support both.',
+  },
+  {
     q: 'What is BYOK (Bring Your Own Key)?',
-    a: 'BYOK lets you use your own API key for any LLM provider (OpenAI, Anthropic, Google, xAI, Groq, OpenRouter). This is always free on all tiers -- you pay the provider directly, no Hatcher markup.',
+    a: 'BYOK lets you use your own API key for any LLM provider (OpenAI, Anthropic, Google, xAI, Groq, OpenRouter). This is always free on all tiers -- you pay the provider directly, no Hatcher markup. Works with both frameworks.',
   },
   {
     q: 'Are integrations really free?',

@@ -57,9 +57,9 @@ export function StatsTab() {
             <p className="text-sm font-medium text-[#f97316] capitalize">{agent?.framework ?? '--'}</p>
           </div>
           <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
-            <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Container ID</p>
+            <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Instance ID</p>
             <p className="text-sm font-medium text-[#fafafa] font-mono">
-              {stats?.containerId ? stats.containerId.substring(0, 12) + '...' : 'None'}
+              {stats?.containerId ? stats.containerId.substring(0, 12) + '...' : 'Not running'}
             </p>
           </div>
           <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
@@ -88,7 +88,7 @@ export function StatsTab() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
-            <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Messages Processed</p>
+            <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Messages</p>
             {stats?.messagesProcessed && stats.messagesProcessed > 0 ? (
               <p className="text-2xl font-bold text-[#fafafa]">{stats.messagesProcessed.toLocaleString()}</p>
             ) : (
@@ -123,7 +123,7 @@ export function StatsTab() {
       <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
         <div className="flex items-center gap-2 mb-4">
           <Cpu size={18} className="text-[#f97316]" />
-          <h3 className="text-base font-semibold text-[#fafafa]">LLM Configuration</h3>
+          <h3 className="text-base font-semibold text-[#fafafa]">AI Model</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
@@ -151,9 +151,9 @@ export function StatsTab() {
                 : 'bg-[#f97316]/10 text-[#f97316] border-[#f97316]/20'
             }`}>
               {hasApiKey ? (
-                <><Shield size={12} /> BYOK</>
+                <><Shield size={12} /> Your Own Key</>
               ) : (
-                <><Zap size={12} /> Platform LLM</>
+                <><Zap size={12} /> Hatcher Platform</>
               )}
             </span>
           </div>

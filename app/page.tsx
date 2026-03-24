@@ -332,8 +332,8 @@ export default function LandingPage() {
                 transition={{ duration: 0.8, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
                 className="mt-6 sm:mt-8 text-base sm:text-lg md:text-xl text-[#A5A1C2] max-w-lg leading-relaxed mx-auto lg:mx-0"
               >
-                Deploy autonomous agents across 20+ platforms with 13,700+ skills.
-                Zero infrastructure. Live in 60 seconds.
+                Deploy autonomous AI agents across 20+ platforms.
+                Choose your framework, pick a template, and go live in 60 seconds.
               </motion.p>
 
               <motion.div
@@ -411,8 +411,8 @@ export default function LandingPage() {
           {[...Array(2)].map((_, i) => (
             <div key={i} className="flex items-center shrink-0">
               <MarqueeItem name="OpenClaw" />
-              <MarqueeItem name="Hermes Agent" />
-              <MarqueeItem name="ClawHub" />
+              <MarqueeItem name="Hermes" />
+              <MarqueeItem name="Multi-Framework" />
               <MarqueeItem name="Solana" />
               <MarqueeItem name="Groq" />
               <MarqueeItem name="Anthropic" />
@@ -454,9 +454,9 @@ export default function LandingPage() {
             <BentoCard
               className="lg:col-span-2 lg:row-span-2"
               icon={Zap}
-              value="13,700+"
-              title="Skills"
-              description="Access thousands of pre-built skills via ClawHub. Web scraping, trading, image generation, code execution, and custom actions."
+              value="2"
+              title="Frameworks"
+              description="Choose between OpenClaw (13,700+ skills, plugin marketplace) and Hermes (lightweight, fast, API-focused). Pick the right tool for the job."
               delay={0.1}
             />
 
@@ -506,26 +506,31 @@ export default function LandingPage() {
           <div className="text-center mb-12 sm:mb-20">
             <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">How it works</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              Three steps to launch
+              Four steps to launch
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-6">
             {[
               {
                 num: '01',
-                title: 'Configure',
-                desc: 'Pick a template, customize your agent\'s personality and skills. Powered by OpenClaw & Hermes.',
+                title: 'Pick a Framework',
+                desc: 'Choose OpenClaw for a rich plugin ecosystem, or Hermes for a lightweight, API-first approach.',
               },
               {
                 num: '02',
-                title: 'Power Up',
-                desc: 'Unlock platforms and features with platform tokens. Bring your own API keys — always free.',
+                title: 'Choose a Template',
+                desc: 'Start from a pre-built template or go blank. Each one is tuned for common use cases.',
               },
               {
                 num: '03',
-                title: 'Deploy',
-                desc: 'Your agent goes live across 20+ platforms in under 60 seconds. We handle all the infrastructure.',
+                title: 'Configure',
+                desc: 'Set your agent\'s name, personality, integrations, and LLM. Bring your own API key or use ours.',
+              },
+              {
+                num: '04',
+                title: 'Launch',
+                desc: 'Hit deploy and your agent goes live across 20+ platforms in under 60 seconds. We handle everything.',
               },
             ].map((step, i) => (
               <motion.div
@@ -670,11 +675,11 @@ export default function LandingPage() {
           </div>
           <div className="space-y-3">
             {[
-              { q: 'Is it really free to start?', a: 'Yes. You get 1 agent, Groq free LLM, 20 messages/day, and BYOK — all at zero cost. No tokens required.' },
-              { q: 'What is BYOK?', a: 'Bring Your Own Key — use your own API keys from OpenAI, Anthropic, Google, Groq, xAI, OpenRouter, or Ollama. Always free, no payment needed.' },
-              { q: 'How do I pay for features?', a: 'All prices are in USD, paid with platform tokens on Solana. Approve a wallet transaction and the feature activates instantly.' },
-              { q: 'What happens when a subscription expires?', a: 'Your agent keeps running, but the feature is disabled. Renew anytime to re-enable it. 24-hour grace period included.' },
-              { q: 'Can I run multiple agents?', a: 'Free tier includes 1 agent. Pro includes 5. Add more with stackable add-ons.' },
+              { q: 'Is it really free to start?', a: 'Yes. You get 1 agent, a free LLM (Groq), 20 messages/day, and BYOK — all at zero cost. No credit card or tokens required.' },
+              { q: 'What frameworks are supported?', a: 'Hatcher supports OpenClaw (feature-rich, 13,700+ skills, plugin marketplace) and Hermes (lightweight, fast, API-focused). You choose when creating an agent.' },
+              { q: 'What is BYOK?', a: 'Bring Your Own Key — use your own API keys from OpenAI, Anthropic, Google, Groq, xAI, OpenRouter, or Ollama. Always free, no markup.' },
+              { q: 'How do I pay for upgrades?', a: 'All prices are in USD, paid with SOL or platform tokens on Solana. Approve a wallet transaction and the upgrade activates instantly.' },
+              { q: 'Can I run multiple agents?', a: 'Free tier includes 1 agent. Pro includes 5. Need more? Stack add-ons for +3, +5, or +10 agents.' },
             ].map((item, i) => (
               <FAQItem key={i} question={item.q} answer={item.a} />
             ))}

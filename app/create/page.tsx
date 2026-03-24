@@ -29,9 +29,9 @@ import {
 type Step = 1 | 2 | 3 | 4;
 
 const STEP_LABELS: Record<Step, string> = {
-  1: 'Choose framework',
+  1: 'Pick a style',
   2: 'Choose a template',
-  3: 'Configure your agent',
+  3: 'Set it up',
   4: 'Ready to hatch?',
 };
 
@@ -166,9 +166,9 @@ export default function CreatePage() {
   }
 
   function getLLMSummary(): string {
-    if (llmChoice === 'free_groq') return 'Groq Llama 4 Scout (free)';
+    if (llmChoice === 'free_groq') return 'Free AI Model (Groq)';
     const prov = getBYOKProvider(byokProvider);
-    return `BYOK: ${prov?.name ?? byokProvider}${byokModel ? ` / ${byokModel}` : ''}`;
+    return `Your key: ${prov?.name ?? byokProvider}${byokModel ? ` / ${byokModel}` : ''}`;
   }
 
   // ── Launch ──
@@ -187,7 +187,7 @@ export default function CreatePage() {
         config: {
           model: llm.model ?? 'llama-4-scout-17b',
           provider: llm.modelProvider,
-          skills: openclawSkills,
+          ...(selectedFramework === 'openclaw' ? { skills: openclawSkills } : {}),
           systemPrompt: openclawForm.systemPrompt.trim()
             ? openclawForm.systemPrompt
             : (AGENT_TEMPLATES.find(t => t.id === selectedTemplate)?.defaultSystemPrompt ?? ''),
@@ -373,9 +373,9 @@ export default function CreatePage() {
               animate="center"
               exit="exit"
             >
-              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">Choose your framework</h2>
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">What kind of agent do you want?</h2>
               <p className="text-[var(--text-muted)] text-sm mb-8 text-center">
-                Select the AI agent framework to power your agent
+                Each style has different strengths -- pick the one that fits your needs
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
@@ -401,10 +401,10 @@ export default function CreatePage() {
                   </div>
                   <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">OpenClaw</h3>
                   <p className="text-sm text-[var(--text-muted)] mb-3">
-                    Self-hosted AI assistant with 3,200+ community skills and multi-channel messaging.
+                    Versatile AI assistant with thousands of community skills and multi-channel messaging.
                   </p>
                   <div className="flex flex-wrap gap-1.5">
-                    {['3,200+ skills', 'Browser automation', 'Cron jobs'].map(f => (
+                    {['Thousands of skills', 'Web browsing', 'Scheduled tasks'].map(f => (
                       <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)]">{f}</span>
                     ))}
                   </div>
@@ -430,12 +430,12 @@ export default function CreatePage() {
                   <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center mb-4">
                     <Zap className="w-6 h-6 text-purple-400" />
                   </div>
-                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">Hermes Agent</h3>
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">Hermes</h3>
                   <p className="text-sm text-[var(--text-muted)] mb-3">
-                    Autonomous AI agent by Nous Research with persistent memory and learning capabilities.
+                    Smart AI agent that remembers context across conversations and learns over time.
                   </p>
                   <div className="flex flex-wrap gap-1.5">
-                    {['Persistent memory', '40+ tools', 'Skills system'].map(f => (
+                    {['Long-term memory', '40+ built-in tools', 'Self-improving'].map(f => (
                       <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)]">{f}</span>
                     ))}
                   </div>
@@ -464,7 +464,7 @@ export default function CreatePage() {
               <p className="text-[var(--text-muted)] text-sm mb-2 text-center">
                 Pick a starting point for your agent
               </p>
-              <p className="text-xs text-[var(--text-muted)] mb-8 text-center opacity-60">{selectedFramework === 'openclaw' ? 'All templates are powered by OpenClaw' : 'All templates are powered by Hermes Agent'}</p>
+              <p className="text-xs text-[var(--text-muted)] mb-8 text-center opacity-60">Templates give your agent a head start -- you can customize everything later</p>
 
               <motion.div
                 className="space-y-6"
@@ -543,9 +543,9 @@ export default function CreatePage() {
               animate="center"
               exit="exit"
             >
-              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">Configure your agent</h2>
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">Personalize your agent</h2>
               <p className="text-[var(--text-muted)] text-sm mb-8 text-center">
-                Set up your agent&apos;s identity and capabilities
+                Give your agent a name and choose how it thinks
               </p>
 
               <div className={cn(cardClass, 'p-6 sm:p-8 space-y-6')}>
@@ -611,9 +611,9 @@ export default function CreatePage() {
                 {/* LLM Choice */}
                 <fieldset>
                   <legend className="block text-sm font-medium text-[#FFFFFF] mb-3">
-                    LLM Provider
+                    AI Model
                   </legend>
-                  <div className="space-y-3" role="radiogroup" aria-label="LLM Provider selection">
+                  <div className="space-y-3" role="radiogroup" aria-label="AI Model selection">
                     {/* Free Groq */}
                     <motion.button
                       whileHover={{ scale: 1.01 }}
@@ -632,12 +632,12 @@ export default function CreatePage() {
                         </div>
                         <div>
                           <div className="text-sm font-medium text-[#FFFFFF] flex items-center gap-2">
-                            Groq Llama 4 Scout
+                            Free AI Model
                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
                               FREE
                             </span>
                           </div>
-                          <div className="text-xs text-[#71717a] mt-0.5">Fast and free -- no API key needed</div>
+                          <div className="text-xs text-[#71717a] mt-0.5">Powered by Groq — no API key needed</div>
                         </div>
                       </div>
                     </motion.button>
@@ -661,10 +661,10 @@ export default function CreatePage() {
                           </div>
                           <div>
                             <div className="text-sm font-medium text-[#FFFFFF] flex items-center gap-2">
-                              Bring Your Own Key
+                              Use Your Own AI Key
                               <span className="text-[10px] text-green-400">always free</span>
                             </div>
-                            <div className="text-xs text-[#71717a] mt-0.5">Use your own API key for any provider</div>
+                            <div className="text-xs text-[#71717a] mt-0.5">Connect your own OpenAI, Anthropic, or other API key</div>
                           </div>
                         </div>
                       </button>
@@ -806,7 +806,7 @@ export default function CreatePage() {
                   </div>
                 </fieldset>
 
-                {/* OpenClaw fields */}
+                {/* Agent personality fields */}
                 <OpenClawFields
                   form={openclawForm}
                   setForm={setOpenclawForm}
@@ -861,21 +861,26 @@ export default function CreatePage() {
                   </div>
                   <div>
                     <div className="text-lg font-bold text-[#FFFFFF]">{agentName}</div>
-                    <div className="text-sm text-[#71717a]">{selectedFramework === 'openclaw' ? 'OpenClaw' : 'Hermes'} agent</div>
+                    <div className="text-sm text-[#71717a]">
+                      {selectedFramework === 'openclaw' ? 'OpenClaw' : 'Hermes'} agent
+                      <span className="ml-1.5 text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)] align-middle">
+                        {selectedFramework === 'openclaw' ? 'Multi-skill assistant' : 'Autonomous agent'}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Summary details */}
                 <div className="space-y-3 text-sm">
-                  <SummaryRow label="Framework" value={selectedFramework === 'openclaw' ? 'OpenClaw' : 'Hermes Agent'} />
+                  <SummaryRow label="Agent Type" value={selectedFramework === 'openclaw' ? 'OpenClaw' : 'Hermes'} />
                   <SummaryRow label="Template" value={AGENT_TEMPLATES.find(t => t.id === selectedTemplate)?.name ?? 'Custom'} />
-                  <SummaryRow label="LLM" value={getLLMSummary()} />
+                  <SummaryRow label="AI Model" value={getLLMSummary()} />
 
                   {agentDesc && <SummaryRow label="Description" value={agentDesc} />}
 
                   <SummaryRow
-                    label="System Prompt"
-                    value={openclawForm.systemPrompt.trim() ? 'Custom' : 'Template default'}
+                    label="Personality"
+                    value={openclawForm.systemPrompt.trim() ? 'Custom instructions' : 'Template default'}
                     highlight={!!openclawForm.systemPrompt.trim()}
                   />
 
@@ -884,7 +889,7 @@ export default function CreatePage() {
                       label="Cost"
                       value={
                         llmChoice === 'free_groq' ? '$0.00 -- free tier' :
-                        llmChoice === 'byok' ? '$0.00 -- BYOK (your key)' :
+                        llmChoice === 'byok' ? '$0.00 -- using your own key' :
                         'Credits deducted per use'
                       }
                       valueClass="text-green-400"
@@ -986,8 +991,8 @@ function SystemPromptSection({
           <p className="text-sm font-medium text-[var(--text-primary)]">System Prompt</p>
           <p className="text-xs text-[var(--text-muted)] mt-0.5">
             {showCustom
-              ? 'Your custom prompt will replace the template default'
-              : 'Pre-configured based on your template selection'}
+              ? 'Your custom instructions will replace the template default'
+              : "Your agent's personality is pre-configured. Customize if you want to change it."}
           </p>
         </div>
         <button
@@ -1063,7 +1068,7 @@ function SummaryRow({
   );
 }
 
-// ── OpenClaw-specific Fields ────────────────────────────────
+// ── Agent Personality Fields ─────────────────────────────────
 
 function OpenClawFields({
   form,

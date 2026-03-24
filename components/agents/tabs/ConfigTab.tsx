@@ -104,7 +104,7 @@ export function ConfigTab() {
 
         <div className="space-y-4">
           <div>
-            <label htmlFor="config-system-prompt" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">System Prompt</label>
+            <label htmlFor="config-system-prompt" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Behavior Instructions</label>
             <textarea
               id="config-system-prompt"
               className="config-textarea"
@@ -114,7 +114,7 @@ export function ConfigTab() {
               placeholder="You are a helpful AI assistant..."
             />
             <p className="text-[10px] mt-1 text-[#71717a]">
-              Define your agent&apos;s personality and behavior. Supports multi-line instructions.
+              Tell your agent how to behave, what tone to use, and what it should know. You can write multiple lines.
             </p>
           </div>
           <div>
@@ -123,7 +123,7 @@ export function ConfigTab() {
               return (
                 <>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label htmlFor="config-skills" className="block text-[11px] font-medium uppercase tracking-wider text-[#71717a]">Skills (comma-separated)</label>
+                    <label htmlFor="config-skills" className="block text-[11px] font-medium uppercase tracking-wider text-[#71717a]">Agent Skills</label>
                     <span className="text-[10px] font-medium text-[#71717a]">
                       {parsedSkills.length} skills
                     </span>
@@ -134,7 +134,7 @@ export function ConfigTab() {
                     className="config-input"
                     value={configSkills}
                     onChange={(e) => setConfigSkills(e.target.value)}
-                    placeholder="chat, search, calculator..."
+                    placeholder="e.g. chat, search, calculator (comma-separated)"
                   />
                   {/* Skills are unlimited on all tiers */}
                   {parsedSkills.length > 0 && (
@@ -159,7 +159,7 @@ export function ConfigTab() {
           <div className="w-7 h-7 rounded-lg bg-orange-500/10 flex items-center justify-center">
             <Zap size={14} className="text-orange-400" />
           </div>
-          <h3 className="text-sm font-semibold text-[#A5A1C2]">LLM Configuration</h3>
+          <h3 className="text-sm font-semibold text-[#A5A1C2]">AI Model</h3>
         </div>
         <div className="space-y-4">
           {/* 1. LLM Mode toggle */}
@@ -203,8 +203,8 @@ export function ConfigTab() {
               >
                 <Shield size={16} className={configProvider !== 'groq' ? 'text-emerald-400' : ''} />
                 <div>
-                  <p className="text-xs font-medium">BYOK</p>
-                  <p className="text-[10px] opacity-60">Bring Your Own Key</p>
+                  <p className="text-xs font-medium">Use Your Own AI</p>
+                  <p className="text-[10px] opacity-60">Bring your own API key</p>
                 </div>
               </button>
             </div>
@@ -218,7 +218,7 @@ export function ConfigTab() {
                 <p className="text-xs font-medium text-white">Platform Model Active</p>
               </div>
               <p className="text-[10px] text-[#A5A1C2] ml-[22px]">
-                Using Hatcher&apos;s LLM via proxy. No API key needed. Switch to BYOK to use your own provider and model.
+                Your agent is using Hatcher&apos;s built-in AI model. No setup needed. Switch to &quot;Use Your Own AI&quot; to connect your own provider.
               </p>
             </div>
           )}
@@ -343,8 +343,8 @@ export function ConfigTab() {
               </div>
               <p className="text-[10px] mt-1 text-[#71717a]">
                 {hasApiKey
-                  ? 'Key already set. Enter a new value to replace it. Your key is encrypted (AES-256) and never logged.'
-                  : 'Your key is encrypted (AES-256) and never logged.'}
+                  ? 'Key already saved. Enter a new one to replace it. Your key is securely encrypted and never shared.'
+                  : 'Your key is securely encrypted and never shared.'}
               </p>
 
               {/* Disclaimer warning */}
@@ -369,7 +369,7 @@ export function ConfigTab() {
                 }}
               >
                 <RefreshCw size={12} />
-                Revert to Free Tier (Groq)
+                Switch back to Hatcher Platform
               </button>
             </div>
           )}
