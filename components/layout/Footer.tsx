@@ -14,6 +14,7 @@ const RESOURCE_LINKS = [
   { label: 'Support', href: '/support' },
   { label: 'Help', href: '/help' },
   { label: 'OpenClaw', href: EXTERNAL_LINKS.openclaw, external: true },
+  { label: 'Hermes Agent', href: 'https://hermes-agent.nousresearch.com', external: true },
   { label: 'ClawHub Skills', href: EXTERNAL_LINKS.clawhub, external: true },
 ];
 
@@ -71,7 +72,7 @@ export function Footer() {
               <span className="text-base font-bold text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Hatcher</span>
             </div>
             <p className="text-xs text-[#A5A1C2] leading-relaxed max-w-[200px]">
-              Deploy autonomous AI agents across 20+ platforms. Powered by OpenClaw.
+              Deploy autonomous AI agents across 20+ platforms. Powered by OpenClaw &amp; Hermes.
             </p>
             {/* Social icons */}
             <div className="flex items-center gap-1.5 mt-4">
@@ -155,6 +156,8 @@ export function Footer() {
           <div className="flex items-center gap-3 text-xs text-[#71717a]">
             <span>Powered by</span>
             <span className="font-medium text-[#A5A1C2]">OpenClaw</span>
+            <span>&middot;</span>
+            <span className="font-medium text-[#A5A1C2]">Hermes</span>
             <span>&middot;</span>
             <span className="font-medium text-[#A5A1C2]">Solana</span>
           </div>

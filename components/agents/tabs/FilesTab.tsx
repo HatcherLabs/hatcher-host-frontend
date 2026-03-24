@@ -118,7 +118,7 @@ export function FilesTab() {
 
   const goUp = () => {
     const parent = currentPath.split('/').slice(0, -1).join('/') || '/';
-    if (parent.startsWith('/home/node/.openclaw') || parent === '/app') {
+    if (parent.startsWith(ROOT_PATH) || parent === '/app') {
       navigateTo(parent);
     }
   };
