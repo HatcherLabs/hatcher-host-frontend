@@ -28,6 +28,8 @@ import {
   FolderOpen,
   Brain,
   Clock,
+  BookOpen,
+  Sparkles,
 } from 'lucide-react';
 import {
   AgentContext,
@@ -103,15 +105,27 @@ const SchedulesTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const KnowledgeTab = dynamic(
+  () => import('@/components/agents/tabs/KnowledgeTab').then(mod => ({ default: mod.KnowledgeTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
+const SkillsTab = dynamic(
+  () => import('@/components/agents/tabs/SkillsTab').then(mod => ({ default: mod.SkillsTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 // ─── Tab definitions ─────────────────────────────────────────
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={16} /> },
   { id: 'config', label: 'Config', icon: <Settings size={16} /> },
   { id: 'integrations', label: 'Integrations', icon: <Puzzle size={16} /> },
+  { id: 'skills', label: 'Skills', icon: <Sparkles size={16} /> },
   { id: 'files', label: 'Files', icon: <FolderOpen size={16} /> },
   { id: 'logs', label: 'Logs', icon: <ScrollText size={16} /> },
   { id: 'memory', label: 'Memory', icon: <Brain size={16} /> },
+  { id: 'knowledge', label: 'Knowledge', icon: <BookOpen size={16} /> },
   { id: 'schedules', label: 'Schedules', icon: <Clock size={16} /> },
   { id: 'chat', label: 'Chat', icon: <MessageSquare size={16} /> },
   { id: 'stats', label: 'Stats', icon: <BarChart3 size={16} /> },
@@ -130,7 +144,7 @@ export default function AgentManagePage() {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const initialTab = (['overview','config','integrations','files','logs','memory','schedules','chat','stats'] as Tab[]).includes(searchParams.get('tab') as Tab)
+  const initialTab = (['overview','config','integrations','skills','files','logs','memory','knowledge','schedules','chat','stats'] as Tab[]).includes(searchParams.get('tab') as Tab)
     ? (searchParams.get('tab') as Tab)
     : 'overview';
   const [tab, setTab] = useState<Tab>(initialTab);
@@ -1039,9 +1053,11 @@ export default function AgentManagePage() {
           {tab === 'overview' && <OverviewTab />}
           {tab === 'config' && <ConfigTab />}
           {tab === 'integrations' && <IntegrationsTab />}
+          {tab === 'skills' && <SkillsTab />}
           {tab === 'files' && <FilesTab />}
           {tab === 'logs' && <LogsTab />}
           {tab === 'memory' && <MemoryTab />}
+          {tab === 'knowledge' && <KnowledgeTab />}
           {tab === 'schedules' && <SchedulesTab />}
           {tab === 'chat' && <ChatTab />}
           {tab === 'stats' && <StatsTab />}

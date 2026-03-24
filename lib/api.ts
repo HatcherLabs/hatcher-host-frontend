@@ -328,6 +328,17 @@ export const api = {
       message?: string;
     }>(`/agents/${id}/memory`),
 
+  /** Get agent monitoring data (health, resources, response times, errors) */
+  getAgentMonitoring: (id: string) =>
+    req<{
+      health: 'healthy' | 'unhealthy' | 'stopped';
+      uptime: { seconds: number; since: string | null };
+      restarts: number;
+      resources: { cpuPercent: number; memoryUsageMb: number; memoryLimitMb: number };
+      responseTimes: { avg: number; p95: number; last: number };
+      errors: { last24h: number; lastError: string | null };
+    }>(`/agents/${id}/monitoring`),
+
   /** Get agent stats (messages processed, uptime, last active) */
   getAgentStats: (id: string) =>
     req<{
@@ -752,5 +763,135 @@ export const api = {
   resumeAgentSchedule: (agentId: string, jobId: string) =>
     req<unknown>(`/agents/${agentId}/schedules/${jobId}/resume`, {
       method: 'POST',
+    }),
+
+  // ─── Knowledge Base ──────────────────────────────────────────
+
+  /** List knowledge files for an agent */
+  getAgentKnowledge: (agentId: string) =>
+    req<{ files: Array<{ name: string; size: number; createdAt: string }>; totalFiles: number }>(`/agents/${agentId}/knowledge`),
+
+  /** Upload a knowledge file (text content) */
+  uploadAgentKnowledge: (agentId: string, data: { filename: string; content: string }) =>
+    req<{ written: boolean; filename: string; size: number }>(`/agents/${agentId}/knowledge`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  /** Read a knowledge file */
+  readAgentKnowledge: (agentId: string, filename: string) =>
+    req<{ filename: string; content: string }>(`/agents/${agentId}/knowledge/${encodeURIComponent(filename)}`),
+
+  /** Delete a knowledge file */
+  deleteAgentKnowledge: (agentId: string, filename: string) =>
+    req<{ deleted: boolean; filename: string }>(`/agents/${agentId}/knowledge/${encodeURIComponent(filename)}`, {
+      method: 'DELETE',
+    }),
+
+  // ─── Marketplace ──────────────────────────────────────────
+
+  /** List marketplace templates */
+  getMarketplaceTemplates: (params?: {
+    search?: string;
+    category?: string;
+    framework?: string;
+    sort?: string;
+    page?: number;
+    limit?: number;
+  }) => {
+    const sp = new URLSearchParams();
+    if (params?.search) sp.set('search', params.search);
+    if (params?.category) sp.set('category', params.category);
+    if (params?.framework) sp.set('framework', params.framework);
+    if (params?.sort) sp.set('sort', params.sort);
+    if (params?.page) sp.set('page', String(params.page));
+    if (params?.limit) sp.set('limit', String(params.limit));
+    const qs = sp.toString();
+    return req<{
+      templates: Array<{
+        id: string;
+        name: string;
+        description: string;
+        framework: string;
+        category: string;
+        author: string;
+        authorId: string;
+        usageCount: number;
+        createdAt: string;
+      }>;
+      total: number;
+      page: number;
+      limit: number;
+    }>(`/marketplace/templates${qs ? `?${qs}` : ''}`);
+  },
+
+  /** Get a single marketplace template */
+  getMarketplaceTemplate: (id: string) =>
+    req<{
+      id: string;
+      name: string;
+      description: string;
+      framework: string;
+      category: string;
+      author: string;
+      authorId: string;
+      config: Record<string, unknown>;
+      usageCount: number;
+      createdAt: string;
+    }>(`/marketplace/templates/${id}`),
+
+  /** Publish an agent as a marketplace template */
+  publishToMarketplace: (agentId: string, category?: string) =>
+    req<{
+      id: string;
+      name: string;
+      description: string;
+      framework: string;
+      category: string;
+      author: string;
+      usageCount: number;
+      createdAt: string;
+    }>('/marketplace/templates', {
+      method: 'POST',
+      body: JSON.stringify({ agentId, ...(category ? { category } : {}) }),
+    }),
+
+  /** Clone a marketplace template to create a new agent */
+  cloneFromMarketplace: (templateId: string) =>
+    req<{ agentId: string; name: string }>(`/marketplace/templates/${templateId}/clone`, {
+      method: 'POST',
+    }),
+
+  /** Delete a marketplace template (owner only) */
+  deleteMarketplaceTemplate: (id: string) =>
+    req<{ deleted: boolean; id: string }>(`/marketplace/templates/${id}`, {
+      method: 'DELETE',
+    }),
+
+  // ─── Skills Browser ─────────────────────────────────────────
+  /** List available skills for an agent (reads from container) */
+  getAgentSkills: (agentId: string) =>
+    req<{
+      skills: Array<{
+        id: string;
+        name: string;
+        description: string;
+        category: string;
+        tags: string[];
+        enabled: boolean;
+      }>;
+      message?: string;
+    }>(`/agents/${agentId}/skills`),
+
+  /** Enable or disable a skill on an agent */
+  toggleAgentSkill: (agentId: string, skillId: string, enabled: boolean) =>
+    req<{
+      skillId: string;
+      enabled: boolean;
+      skills: string[];
+      note: string;
+    }>(`/agents/${agentId}/skills/${skillId}/toggle`, {
+      method: 'POST',
+      body: JSON.stringify({ enabled }),
     }),
 };
