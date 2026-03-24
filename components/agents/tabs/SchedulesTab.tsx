@@ -35,11 +35,14 @@ interface ScheduleJob {
 
 const CRON_PRESETS = [
   { label: 'Every hour', value: '0 * * * *' },
-  { label: 'Every day at 9am', value: '0 9 * * *' },
-  { label: 'Every Monday at 9am', value: '0 9 * * 1' },
+  { label: 'Every 3 hours', value: '0 */3 * * *' },
   { label: 'Every 6 hours', value: '0 */6 * * *' },
-  { label: 'Every 12 hours', value: '0 */12 * * *' },
-  { label: 'Custom', value: '' },
+  { label: 'Twice a day (9am & 9pm)', value: '0 9,21 * * *' },
+  { label: 'Every morning at 9am', value: '0 9 * * *' },
+  { label: 'Every evening at 6pm', value: '0 18 * * *' },
+  { label: 'Every Monday at 9am', value: '0 9 * * 1' },
+  { label: 'Every weekday at 9am', value: '0 9 * * 1-5' },
+  { label: 'Custom interval', value: '' },
 ];
 
 function cronToHuman(cron: string): string {
@@ -199,7 +202,7 @@ export function SchedulesTab() {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-white">Scheduled Tasks</h3>
-            <p className="text-xs text-[#71717a] mt-0.5">Automate your agent with cron jobs</p>
+            <p className="text-xs text-[#71717a] mt-0.5">Set your agent to run tasks automatically on a schedule</p>
           </div>
           {!showForm && (
             <button
@@ -232,7 +235,7 @@ export function SchedulesTab() {
 
             {/* Schedule Preset */}
             <div>
-              <label className="block text-xs text-[#71717a] mb-1">Schedule</label>
+              <label className="block text-xs text-[#71717a] mb-1">How often?</label>
               <div className="relative">
                 <select
                   value={formPreset}
@@ -241,7 +244,7 @@ export function SchedulesTab() {
                 >
                   {CRON_PRESETS.map(p => (
                     <option key={p.label} value={p.value} className="bg-[#18181b] text-white">
-                      {p.label}{p.value ? ` (${p.value})` : ''}
+                      {p.label}
                     </option>
                   ))}
                 </select>
@@ -249,10 +252,10 @@ export function SchedulesTab() {
               </div>
             </div>
 
-            {/* Custom Cron Input */}
+            {/* Custom Interval */}
             {isCustom && (
               <div>
-                <label className="block text-xs text-[#71717a] mb-1">Cron Expression</label>
+                <label className="block text-xs text-[#71717a] mb-1">Custom Schedule</label>
                 <input
                   type="text"
                   value={formCustomCron}
@@ -260,13 +263,32 @@ export function SchedulesTab() {
                   placeholder="e.g. */30 * * * *"
                   className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.04] border border-white/[0.06] text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#f97316]/50 font-mono"
                 />
-                <p className="text-[10px] text-[#52525b] mt-1">Format: minute hour day-of-month month day-of-week</p>
+                <div className="mt-1.5 space-y-0.5">
+                  <p className="text-[10px] text-[#52525b]">Common patterns:</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      { label: 'Every 30 min', value: '*/30 * * * *' },
+                      { label: 'Every 2 hours', value: '0 */2 * * *' },
+                      { label: 'Daily at noon', value: '0 12 * * *' },
+                      { label: 'Every Sunday', value: '0 9 * * 0' },
+                    ].map(ex => (
+                      <button
+                        key={ex.value}
+                        type="button"
+                        onClick={() => setFormCustomCron(ex.value)}
+                        className="px-2 py-0.5 text-[10px] rounded bg-white/[0.04] border border-white/[0.06] text-[#a1a1aa] hover:border-[#f97316]/40 hover:text-white transition-colors"
+                      >
+                        {ex.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
             {/* Prompt */}
             <div>
-              <label className="block text-xs text-[#71717a] mb-1">Prompt</label>
+              <label className="block text-xs text-[#71717a] mb-1">What should the agent do?</label>
               <textarea
                 value={formPrompt}
                 onChange={e => setFormPrompt(e.target.value)}
