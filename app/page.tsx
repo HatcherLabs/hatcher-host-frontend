@@ -411,6 +411,7 @@ export default function LandingPage() {
           {[...Array(2)].map((_, i) => (
             <div key={i} className="flex items-center shrink-0">
               <MarqueeItem name="OpenClaw" />
+              <MarqueeItem name="Hermes Agent" />
               <MarqueeItem name="ClawHub" />
               <MarqueeItem name="Solana" />
               <MarqueeItem name="Groq" />
@@ -514,7 +515,7 @@ export default function LandingPage() {
               {
                 num: '01',
                 title: 'Configure',
-                desc: 'Pick a template, customize your agent\'s personality and skills. Powered by OpenClaw.',
+                desc: 'Pick a template, customize your agent\'s personality and skills. Powered by OpenClaw & Hermes.',
               },
               {
                 num: '02',

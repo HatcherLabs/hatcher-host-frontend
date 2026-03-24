@@ -590,7 +590,9 @@ const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agen
                     <span className="text-xs text-[#71717a]">{status.label}</span>
                   </span>
 
-                  <span className="fw-tag">OpenClaw</span>
+                  <span className={`fw-tag ${agent.framework === 'hermes' ? 'bg-purple-500/10 text-purple-400 border-purple-500/25' : ''}`}>
+                    {agent.framework === 'hermes' ? 'Hermes' : 'OpenClaw'}
+                  </span>
                 </div>
               </div>
             </div>

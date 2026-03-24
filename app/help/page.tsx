@@ -131,7 +131,7 @@ const QUICK_FAQ = [
   },
   {
     q: 'Can I export my agent configuration?',
-    a: 'Yes. Go to your agent\'s Config tab to view and copy the full JSON configuration. This is portable and can be used with any OpenClaw deployment.',
+    a: 'Yes. Go to your agent\'s Config tab to view and copy the full JSON configuration. This is portable and can be used with any compatible deployment.',
   },
 ];
 

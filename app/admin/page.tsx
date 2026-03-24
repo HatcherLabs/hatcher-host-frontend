@@ -107,8 +107,10 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 // ── Framework tag ────────────────────────────────────────────
-function FrameworkTag() {
-  return <span className="fw-tag">OpenClaw</span>;
+function FrameworkTag({ framework = 'openclaw' }: { framework?: string }) {
+  const label = framework === 'hermes' ? 'Hermes' : 'OpenClaw';
+  const style = framework === 'hermes' ? 'bg-purple-500/10 text-purple-400 border-purple-500/25' : '';
+  return <span className={`fw-tag ${style}`}>{label}</span>;
 }
 
 // ── Admin agent type ─────────────────────────────────────────
@@ -594,7 +596,7 @@ export default function AdminPage() {
 
                             {/* Framework */}
                             <td className="py-3.5 pr-4">
-                              <FrameworkTag />
+                              <FrameworkTag framework={agent.framework} />
                             </td>
 
                             {/* Status */}
