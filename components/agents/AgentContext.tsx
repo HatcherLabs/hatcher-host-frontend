@@ -52,6 +52,8 @@ export interface IntegrationDef {
   pairingChannel?: string;
   /** Additional config fields shown when paired (e.g. allowFrom for WhatsApp) */
   pairingFields?: IntegrationField[];
+  /** Which frameworks support this integration. If omitted, all frameworks. */
+  frameworks?: Array<'openclaw' | 'hermes'>;
 }
 
 export interface AgentStats {
@@ -100,7 +102,28 @@ export const pageEntranceVariants = {
 
 export const FRAMEWORK_BADGE: Record<string, string> = {
   openclaw: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+  hermes: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
 };
+
+/** Root filesystem path inside each framework's container */
+export const FRAMEWORK_ROOT_PATH: Record<string, string> = {
+  openclaw: '/home/node/.openclaw',
+  hermes: '/home/hermes/.hermes',
+};
+
+/** Get integrations filtered by framework */
+export function getIntegrationsForFramework(framework: string): IntegrationDef[] {
+  return OPENCLAW_INTEGRATIONS.filter(
+    (i) => !i.frameworks || i.frameworks.includes(framework as 'openclaw' | 'hermes'),
+  );
+}
+
+/** Get extra integrations filtered by framework */
+export function getExtraIntegrationsForFramework(framework: string): IntegrationDef[] {
+  return EXTRA_PLATFORM_INTEGRATIONS.filter(
+    (i) => !i.frameworks || i.frameworks.includes(framework as 'openclaw' | 'hermes'),
+  );
+}
 
 export const STATUS_STYLES: Record<string, { classes: string; label: string; pulse: boolean; dotColor: string }> = {
   active: { classes: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30', label: 'Active', pulse: true, dotColor: 'bg-emerald-400' },
@@ -178,6 +201,7 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     featureKey: 'openclaw.platform.twitter',
     name: 'X (Twitter)',
     description: 'Post tweets, reply, search, read posts, manage followers, and more via xurl skill.',
+    frameworks: ['openclaw'],
     secretPrefix: 'XURL',
     docsUrl: 'https://docs.hatcher.host/integrations/twitter',
     hasChannelSettings: false,
@@ -202,6 +226,7 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     featureKey: 'openclaw.feature.webhooks',
     name: 'Webhooks',
     description: 'Trigger your agent via external webhook events.',
+    frameworks: ['openclaw'],
     secretPrefix: 'WEBHOOK',
     fields: [
       { key: 'WEBHOOK_URL', label: 'Webhook URL', type: 'text', placeholder: 'https://your-service.com/webhook', helper: 'URL that will send events to your agent', required: true },
@@ -210,7 +235,7 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
   },
 ];
 
-/** Extra platforms — all extra platforms included free */
+/** Extra platforms — all extra platforms included free (OpenClaw only — use npm channel extensions) */
 export const EXTRA_PLATFORM_INTEGRATIONS: IntegrationDef[] = [
   {
     featureKey: 'openclaw.platform.extra',

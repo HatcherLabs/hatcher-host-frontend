@@ -1,7 +1,7 @@
 'use client';
 
 import { useContext, useEffect, useState, useCallback } from 'react';
-import { AgentContext } from '../AgentContext';
+import { AgentContext, FRAMEWORK_ROOT_PATH } from '../AgentContext';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { motion } from 'framer-motion';
@@ -48,12 +48,11 @@ function getFileIcon(name: string, type: string) {
   return <FileText size={16} className="text-[#A5A1C2]" />;
 }
 
-const ROOT_PATH = '/home/node/.openclaw';
-
 export function FilesTab() {
   const ctx = useContext(AgentContext);
   const { user } = useAuth();
   const agentId = ctx?.agent?.id ?? '';
+  const ROOT_PATH = FRAMEWORK_ROOT_PATH[ctx?.agent?.framework ?? 'openclaw'] ?? '/home/node/.openclaw';
 
   const [files, setFiles] = useState<FileEntry[]>([]);
   const [currentPath, setCurrentPath] = useState(ROOT_PATH);

@@ -51,7 +51,7 @@ export interface Agent {
   description: string | null;
   avatarUrl: string | null;
   status: string;
-  framework: 'openclaw';
+  framework: 'openclaw' | 'hermes';
   ownerId?: string;
   ownerUsername?: string;
   ownerAddress?: string;

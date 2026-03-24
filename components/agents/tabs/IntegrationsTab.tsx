@@ -19,8 +19,8 @@ import {
   tabContentVariants,
   GlassCard,
   Skeleton,
-  OPENCLAW_INTEGRATIONS,
-  EXTRA_PLATFORM_INTEGRATIONS,
+  getIntegrationsForFramework,
+  getExtraIntegrationsForFramework,
   CHANNEL_SETTINGS_FIELDS,
   integrationStateKey,
   type IntegrationDef,
@@ -469,6 +469,10 @@ export function IntegrationsTab() {
     integrationSecrets, hasExistingSecret,
   } = ctx;
 
+  const fw = agent?.framework ?? 'openclaw';
+  const mainIntegrations = getIntegrationsForFramework(fw);
+  const extraIntegrations = getExtraIntegrationsForFramework(fw);
+
   return (
     <motion.div key="tab-integrations" className="space-y-6" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
       {featuresLoading ? (
@@ -494,7 +498,7 @@ export function IntegrationsTab() {
               <span className="ml-2 text-emerald-400 normal-case tracking-normal font-normal">Free on all tiers</span>
             </h3>
             <div className="space-y-3">
-              {OPENCLAW_INTEGRATIONS.map((integration) => {
+              {mainIntegrations.map((integration) => {
                 const sk = integrationStateKey(integration);
                 const isExpanded = expandedIntegrations.has(sk);
                 const hasAnyConfigured = integration.fields.some((f) => hasExistingSecret(f.key));
@@ -561,8 +565,8 @@ export function IntegrationsTab() {
             </div>
           </div>
 
-          {/* Other Platforms section — all integrations are free */}
-          <div>
+          {/* Other Platforms section — all integrations are free (OpenClaw only) */}
+          {extraIntegrations.length > 0 && <div>
             <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[#71717a]">
               Other Platforms
             </h3>
@@ -571,7 +575,7 @@ export function IntegrationsTab() {
                 <CheckCircle size={14} className="text-emerald-400" />
                 <span className="text-xs text-emerald-400/80">All platforms included free — configure credentials below</span>
               </div>
-              {EXTRA_PLATFORM_INTEGRATIONS.map((integration) => {
+              {extraIntegrations.map((integration) => {
                 const sk = integrationStateKey(integration);
                 const isExpanded = expandedIntegrations.has(sk);
                 const hasAnyConfigured = integration.fields.some((f) => hasExistingSecret(f.key));
@@ -617,7 +621,7 @@ export function IntegrationsTab() {
                 );
               })}
             </div>
-          </div>
+          </div>}
 
           {/* Note */}
           <p className="text-center text-xs text-[#71717a]">

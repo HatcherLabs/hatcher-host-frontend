@@ -15,12 +15,13 @@ import {
   Shield,
   RefreshCw,
 } from 'lucide-react';
-import { BYOK_PROVIDERS, getBYOKProvider } from '@hatcher/shared';
+import { BYOK_PROVIDERS, getBYOKProvider, FRAMEWORKS } from '@hatcher/shared';
+import type { AgentFramework } from '@hatcher/shared';
 import {
   useAgentContext,
   tabContentVariants,
   GlassCard,
-  OPENCLAW_INTEGRATIONS,
+  getIntegrationsForFramework,
   CHANNEL_SETTINGS_FIELDS,
   integrationStateKey,
 } from '../AgentContext';
@@ -92,13 +93,13 @@ export function ConfigTab() {
         </div>
       </GlassCard>
 
-      {/* OpenClaw Config */}
+      {/* Framework Config */}
       <GlassCard>
         <div className="flex items-center gap-2 mb-4">
-          <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center">
-            <Cpu size={14} className="text-amber-400" />
+          <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${agent?.framework === 'hermes' ? 'bg-purple-500/10' : 'bg-amber-500/10'}`}>
+            <Cpu size={14} className={agent?.framework === 'hermes' ? 'text-purple-400' : 'text-amber-400'} />
           </div>
-          <h3 className="text-sm font-semibold text-[#A5A1C2]">OpenClaw Config</h3>
+          <h3 className="text-sm font-semibold text-[#A5A1C2]">{FRAMEWORKS[(agent?.framework ?? 'openclaw') as AgentFramework]?.name ?? 'Agent'} Config</h3>
         </div>
 
         <div className="space-y-4">
