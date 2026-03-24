@@ -139,32 +139,48 @@ export default function AgentManagePage() {
   const [chatErrorType, setChatErrorType] = useState<'timeout' | 'ratelimit' | 'network' | 'generic' | null>(null);
   const [msgCount, setMsgCount] = useState(0);
 
+  // Track whether history has been loaded from server (to avoid saving during load)
+  const historyLoadedRef = useRef(false);
+  // Track the last saved message count to avoid redundant saves
+  const lastSavedCountRef = useRef(0);
+
   // Load chat history from server on mount
   useEffect(() => {
     if (!id) return;
+    historyLoadedRef.current = false;
     api.getChatHistory(id).then(res => {
       if (res.success && res.data.messages.length > 0) {
-        setMessages(res.data.messages.map((m, i) => ({
+        const loaded = res.data.messages.map((m: { role: string; content: string; ts: number }, i: number) => ({
           id: `hist-${i}`,
           role: m.role as 'user' | 'assistant',
           content: m.content,
           timestamp: new Date(m.ts),
-        })));
+        }));
+        setMessages(loaded);
+        lastSavedCountRef.current = loaded.length;
       }
-    }).catch(() => {});
+      historyLoadedRef.current = true;
+    }).catch(() => {
+      historyLoadedRef.current = true;
+    });
   }, [id]);
 
-  // Save chat to server after each new message (debounced)
+  // Save full chat history to server after new messages arrive (debounced).
+  // Only triggers when new messages are added (not on initial load).
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
     if (messages.length === 0 || !id) return;
+    // Don't save if history hasn't finished loading from server yet
+    if (!historyLoadedRef.current) return;
     // Only save non-streaming complete messages
     const complete = messages.filter(m => !m.streaming && m.content);
     if (complete.length === 0) return;
+    // Skip if no new messages since last save (prevents re-save on load)
+    if (complete.length <= lastSavedCountRef.current) return;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
-      const toSave = complete.slice(-2); // save last 2 (user + assistant)
-      api.saveChatHistory(id, toSave.map(m => ({ role: m.role, content: m.content }))).catch(() => {});
+      lastSavedCountRef.current = complete.length;
+      api.saveChatHistory(id, complete.map(m => ({ role: m.role, content: m.content }))).catch(() => {});
     }, 2000);
   }, [messages, id]);
   const bottomRef = useRef<HTMLDivElement>(null);
