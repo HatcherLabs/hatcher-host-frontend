@@ -26,12 +26,13 @@ import {
 
 // ── Types ────────────────────────────────────────────────────
 
-type Step = 1 | 2 | 3;
+type Step = 1 | 2 | 3 | 4;
 
 const STEP_LABELS: Record<Step, string> = {
-  1: 'Choose a template',
-  2: 'Configure your agent',
-  3: 'Ready to hatch?',
+  1: 'Choose framework',
+  2: 'Choose a template',
+  3: 'Configure your agent',
+  4: 'Ready to hatch?',
 };
 
 type LLMChoice = 'free_groq' | 'byok';
@@ -98,6 +99,7 @@ export default function CreatePage() {
 
   // ── Template state ──
   const [selectedTemplate, setSelectedTemplate] = useState('custom');
+  const [selectedFramework, setSelectedFramework] = useState<'openclaw' | 'hermes'>('openclaw');
 
   // ── OpenClaw form state ──
   const [openclawForm, setOpenclawForm] = useState({
@@ -180,7 +182,7 @@ export default function CreatePage() {
       const payload: Parameters<typeof api.createAgent>[0] = {
         name: openclawForm.name,
         ...(openclawForm.description.trim() ? { description: openclawForm.description.trim() } : {}),
-        framework: 'openclaw',
+        framework: selectedFramework,
         template: selectedTemplate as AgentTemplateId,
         config: {
           model: llm.model ?? 'llama-4-scout-17b',
@@ -287,7 +289,7 @@ export default function CreatePage() {
           <div className="flex items-center justify-center gap-3 mb-3">
             <RobotMascot
               size="sm"
-              mood={step === 1 ? 'happy' : step === 2 ? 'thinking' : 'waving'}
+              mood={step === 1 ? 'happy' : step === 2 ? 'happy' : step === 3 ? 'thinking' : 'waving'}
             />
             <div className="text-left">
               <h1 className="text-3xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Create Your Agent</h1>
@@ -305,13 +307,13 @@ export default function CreatePage() {
                 className="h-full rounded-full"
                 style={{ background: 'linear-gradient(90deg, #fb923c, #f97316, #ea580c)' }}
                 initial={{ width: '0%' }}
-                animate={{ width: step === 1 ? '16%' : step === 2 ? '50%' : '100%' }}
+                animate={{ width: step === 1 ? '10%' : step === 2 ? '33%' : step === 3 ? '66%' : '100%' }}
                 transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
               />
             </div>
           </div>
           <div className="flex items-center justify-center gap-0" role="list" aria-label="Creation steps">
-            {([1, 2, 3] as Step[]).map((s, i) => (
+            {([1, 2, 3, 4] as Step[]).map((s, i) => (
               <div key={s} className="flex items-center" role="listitem" aria-current={s === step ? 'step' : undefined}>
                 {/* Step circle */}
                 <div className="flex flex-col items-center gap-2">
@@ -343,7 +345,7 @@ export default function CreatePage() {
                   </span>
                 </div>
                 {/* Connecting line */}
-                {i < 2 && (
+                {i < 3 && (
                   <div className="relative w-20 sm:w-32 mx-3 mb-6">
                     <div className="h-0.5 rounded-full bg-[var(--border-default)]" />
                     <motion.div
@@ -362,10 +364,97 @@ export default function CreatePage() {
 
         {/* ── Step Content with AnimatePresence ─────────────────── */}
         <AnimatePresence mode="wait">
-          {/* ── STEP 1: TEMPLATE ───────────────────────────────────── */}
+          {/* ── STEP 1: FRAMEWORK ──────────────────────────────────── */}
           {step === 1 && (
             <motion.div
               key="step1"
+              variants={stepVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+            >
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">Choose your framework</h2>
+              <p className="text-[var(--text-muted)] text-sm mb-8 text-center">
+                Select the AI agent framework to power your agent
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                {/* OpenClaw */}
+                <motion.button
+                  whileHover={cardHover}
+                  onClick={() => setSelectedFramework('openclaw')}
+                  className={cn(
+                    'p-6 rounded-xl border text-left transition-all duration-200 relative',
+                    selectedFramework === 'openclaw'
+                      ? 'bg-[#f97316]/10 border-[#f97316] shadow-[0_0_24px_rgba(249,115,22,0.15)]'
+                      : 'bg-[rgba(26,23,48,0.6)] border-[rgba(46,43,74,0.4)] hover:border-[rgba(249,115,22,0.4)]'
+                  )}
+                >
+                  {selectedFramework === 'openclaw' && (
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
+                      className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </motion.div>
+                  )}
+                  <div className="w-12 h-12 rounded-xl bg-[#f97316]/10 flex items-center justify-center mb-4">
+                    <Cpu className="w-6 h-6 text-[#f97316]" />
+                  </div>
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">OpenClaw</h3>
+                  <p className="text-sm text-[var(--text-muted)] mb-3">
+                    Self-hosted AI assistant with 3,200+ community skills and multi-channel messaging.
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['3,200+ skills', 'Browser automation', 'Cron jobs'].map(f => (
+                      <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)]">{f}</span>
+                    ))}
+                  </div>
+                </motion.button>
+
+                {/* Hermes */}
+                <motion.button
+                  whileHover={cardHover}
+                  onClick={() => setSelectedFramework('hermes')}
+                  className={cn(
+                    'p-6 rounded-xl border text-left transition-all duration-200 relative',
+                    selectedFramework === 'hermes'
+                      ? 'bg-[#f97316]/10 border-[#f97316] shadow-[0_0_24px_rgba(249,115,22,0.15)]'
+                      : 'bg-[rgba(26,23,48,0.6)] border-[rgba(46,43,74,0.4)] hover:border-[rgba(249,115,22,0.4)]'
+                  )}
+                >
+                  {selectedFramework === 'hermes' && (
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
+                      className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </motion.div>
+                  )}
+                  <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center mb-4">
+                    <Zap className="w-6 h-6 text-purple-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">Hermes Agent</h3>
+                  <p className="text-sm text-[var(--text-muted)] mb-3">
+                    Autonomous AI agent by Nous Research with persistent memory and learning capabilities.
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['Persistent memory', '40+ tools', 'Skills system'].map(f => (
+                      <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)]">{f}</span>
+                    ))}
+                  </div>
+                </motion.button>
+              </div>
+
+              <div className="mt-8 flex justify-end">
+                <button className="btn-primary" onClick={() => { setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                  Continue
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── STEP 2: TEMPLATE ───────────────────────────────────── */}
+          {step === 2 && (
+            <motion.div
+              key="step2"
               variants={stepVariants}
               initial="enter"
               animate="center"
@@ -375,7 +464,7 @@ export default function CreatePage() {
               <p className="text-[var(--text-muted)] text-sm mb-2 text-center">
                 Pick a starting point for your agent
               </p>
-              <p className="text-xs text-[var(--text-muted)] mb-8 text-center opacity-60">All templates are powered by OpenClaw</p>
+              <p className="text-xs text-[var(--text-muted)] mb-8 text-center opacity-60">{selectedFramework === 'openclaw' ? 'All templates are powered by OpenClaw' : 'All templates are powered by Hermes Agent'}</p>
 
               <motion.div
                 className="space-y-6"
@@ -437,7 +526,7 @@ export default function CreatePage() {
               </motion.div>
 
               <div className="mt-8 flex justify-end">
-                <button className="btn-primary" onClick={() => { applyTemplate(); setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                <button className="btn-primary" onClick={() => { applyTemplate(); setStep(3); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                   Continue
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -445,10 +534,10 @@ export default function CreatePage() {
             </motion.div>
           )}
 
-          {/* ── STEP 2: CONFIGURE ───────────────────────────────────── */}
-          {step === 2 && (
+          {/* ── STEP 3: CONFIGURE ───────────────────────────────────── */}
+          {step === 3 && (
             <motion.div
-              key="step2"
+              key="step3"
               variants={stepVariants}
               initial="enter"
               animate="center"
@@ -729,14 +818,14 @@ export default function CreatePage() {
               </div>
 
               <div className="mt-8 flex justify-between">
-                <button className="btn-secondary" onClick={() => { setStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                <button className="btn-secondary" onClick={() => { setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                   <ChevronLeft className="w-4 h-4" />
                   Back
                 </button>
                 <button
                   className="btn-primary"
                   disabled={!isConfigValid}
-                  onClick={() => { setStep(3); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  onClick={() => { setStep(4); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 >
                   Continue
                   <ChevronRight className="w-4 h-4" />
@@ -745,10 +834,10 @@ export default function CreatePage() {
             </motion.div>
           )}
 
-          {/* ── STEP 3: CONFIRM & LAUNCH ────────────────────────────── */}
-          {step === 3 && (
+          {/* ── STEP 4: CONFIRM & LAUNCH ────────────────────────────── */}
+          {step === 4 && (
             <motion.div
-              key="step3"
+              key="step4"
               variants={stepVariants}
               initial="enter"
               animate="center"
@@ -772,13 +861,13 @@ export default function CreatePage() {
                   </div>
                   <div>
                     <div className="text-lg font-bold text-[#FFFFFF]">{agentName}</div>
-                    <div className="text-sm text-[#71717a]">OpenClaw agent</div>
+                    <div className="text-sm text-[#71717a]">{selectedFramework === 'openclaw' ? 'OpenClaw' : 'Hermes'} agent</div>
                   </div>
                 </div>
 
                 {/* Summary details */}
                 <div className="space-y-3 text-sm">
-                  <SummaryRow label="Framework" value="OpenClaw" />
+                  <SummaryRow label="Framework" value={selectedFramework === 'openclaw' ? 'OpenClaw' : 'Hermes Agent'} />
                   <SummaryRow label="Template" value={AGENT_TEMPLATES.find(t => t.id === selectedTemplate)?.name ?? 'Custom'} />
                   <SummaryRow label="LLM" value={getLLMSummary()} />
 
@@ -819,7 +908,7 @@ export default function CreatePage() {
               <div className="flex justify-between items-center">
                 <button
                   className="btn-secondary"
-                  onClick={() => { setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  onClick={() => { setStep(3); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   disabled={launching || launched}
                 >
                   <ChevronLeft className="w-4 h-4" />

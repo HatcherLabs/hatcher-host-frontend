@@ -215,11 +215,11 @@ export const api = {
   /** Get a single agent */
   getAgent: (id: string) => req<Agent>(`/agents/${id}`),
 
-  /** Create a new OpenClaw agent */
+  /** Create a new agent */
   createAgent: (data: {
     name: string;
     description?: string;
-    framework: 'openclaw';
+    framework: 'openclaw' | 'hermes';
     template?: string;
     config: {
       model?: string;
