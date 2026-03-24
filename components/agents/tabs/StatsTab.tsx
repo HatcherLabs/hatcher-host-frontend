@@ -169,14 +169,14 @@ export function StatsTab() {
         {(() => {
           // Import tier info from auth context
           // tierKey from component scope
-          const tierNames: Record<string, string> = { free: 'Free', unlimited: 'Unlimited', pro: 'Pro' };
+          const tierNames: Record<string, string> = { free: 'Free', basic: 'Basic', pro: 'Pro' };
           const tierName = tierNames[tierKey] ?? 'Free';
           const isPaid = tierKey !== 'free';
 
           const features = [
-            { label: 'Messages', value: isPaid ? 'Unlimited' : '20/day' },
-            { label: 'Resources', value: tierKey === 'pro' ? '2 CPU, 2GB RAM' : tierKey === 'unlimited' ? '1 CPU, 1.5GB RAM' : '0.5 CPU, 1GB RAM' },
-            { label: 'Auto-sleep', value: tierKey === 'pro' ? 'Always-on' : tierKey === 'unlimited' ? '6 hours idle' : '15 min idle' },
+            { label: 'Messages', value: tierKey === 'pro' ? '300/day' : tierKey === 'basic' ? '100/day' : '20/day' },
+            { label: 'Resources', value: tierKey === 'pro' ? '2 CPU, 2GB RAM' : tierKey === 'basic' ? '1 CPU, 1.5GB RAM' : '0.5 CPU, 1GB RAM' },
+            { label: 'Auto-sleep', value: tierKey === 'pro' ? 'Always-on' : tierKey === 'basic' ? '6 hours idle' : '15 min idle' },
             { label: 'File Manager', value: tierKey === 'pro' ? 'Included' : 'Add-on ($9.99)' },
             { label: 'Integrations', value: 'All included' },
           ];
@@ -189,7 +189,7 @@ export function StatsTab() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-white">{tierName} Tier</p>
-                  <p className="text-[10px] text-[#71717a]">{tierKey === 'free' ? 'No charge' : tierKey === 'unlimited' ? '$9.99/mo' : '$19.99/mo'}</p>
+                  <p className="text-[10px] text-[#71717a]">{tierKey === 'free' ? 'No charge' : tierKey === 'basic' ? '$9.99/mo' : '$19.99/mo'}</p>
                 </div>
               </div>
               {features.map((f) => (

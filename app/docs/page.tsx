@@ -243,7 +243,7 @@ export default function DocsPage() {
             {[
               { label: 'How to deploy your first agent', href: '/getting-started#deploy' },
               { label: 'Supported LLM providers', href: '/byok#providers' },
-              { label: 'OpenClaw configuration reference', href: '/agent-configuration#openclaw' },
+              { label: 'Agent framework configuration', href: '/agent-configuration#openclaw' },
               { label: 'Container lifecycle & status codes', href: '/api-reference#containers' },
               { label: 'Setting up Telegram integration', href: '/integrations#telegram' },
               { label: 'Understanding token payments', href: '/billing#hatch-payments' },

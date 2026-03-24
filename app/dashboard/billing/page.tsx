@@ -243,7 +243,7 @@ export default function BillingPage() {
               >
                 {currentTier === 'pro' ? (
                   <Crown className="w-7 h-7 text-[#f97316]" />
-                ) : currentTier === 'unlimited' ? (
+                ) : currentTier === 'basic' ? (
                   <Zap className="w-7 h-7 text-[#f97316]" />
                 ) : (
                   <Rocket className="w-7 h-7 text-green-400" />
@@ -262,7 +262,7 @@ export default function BillingPage() {
                 </div>
                 <p className="text-sm text-[var(--text-muted)]">
                   {tierConfig.usdPrice === 0 ? 'No charge' : `$${tierConfig.usdPrice} / 30 days`}
-                  {tierConfig.messagesPerDay === 0 ? ' -- Unlimited messages' : ` -- ${tierConfig.messagesPerDay} messages/day`}
+                  {` -- ${tierConfig.messagesPerDay} messages/day`}{tierConfig.usdPrice > 0 && ' (BYOK = unlimited)'}
                 </p>
                 {accountData?.subscriptionExpiresAt && (() => {
                   const expires = new Date(accountData.subscriptionExpiresAt);
@@ -401,7 +401,7 @@ export default function BillingPage() {
                     <div className="space-y-1.5 mb-4">
                       <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
                         <Check className="w-3 h-3 text-[#f97316]" />
-                        {tier.includedAgents} agent{tier.includedAgents > 1 ? 's' : ''}, unlimited messages
+                        {tier.includedAgents} agent{tier.includedAgents > 1 ? 's' : ''}, {tier.messagesPerDay} messages/day
                       </p>
                       <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
                         <Check className="w-3 h-3 text-[#f97316]" />

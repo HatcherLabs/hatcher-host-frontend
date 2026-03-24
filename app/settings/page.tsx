@@ -64,7 +64,7 @@ function getTierStyle(tier: string) {
   switch (tier?.toLowerCase()) {
     case 'pro':
       return 'bg-[#f97316]/15 text-[#f97316] border-[#f97316]/30';
-    case 'unlimited':
+    case 'basic':
       return 'bg-purple-500/15 text-purple-400 border-purple-500/30';
     default:
       return 'bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)] border-white/[0.06]';

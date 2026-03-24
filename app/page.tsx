@@ -591,18 +591,18 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            {/* Unlimited */}
+            {/* Basic */}
             <div className="bg-[#111019] border border-white/[0.06] rounded-2xl p-7">
-              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-2">Unlimited</p>
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-2">Basic</p>
               <div className="flex items-baseline gap-1">
                 <p className="text-3xl font-bold text-white">$9.99</p>
                 <span className="text-sm text-[#71717a]">/mo</span>
               </div>
-              <p className="text-sm text-[#A5A1C2] mb-6 mt-1">Unlimited messages, 1 CPU, 1.5GB RAM.</p>
+              <p className="text-sm text-[#A5A1C2] mb-6 mt-1">100 messages/day, 1 CPU, 1.5GB RAM.</p>
               <ul className="space-y-2.5">
                 {[
                   '1 agent included',
-                  'Unlimited messages',
+                  '100 messages/day (BYOK = unlimited)',
                   'All integrations',
                   'BYOK any LLM',
                   '300MB workspace',
@@ -637,7 +637,7 @@ export default function LandingPage() {
               <ul className="space-y-2.5">
                 {[
                   '5 agents included',
-                  'Unlimited messages',
+                  '300 messages/day (BYOK = unlimited)',
                   'Dedicated resources (2 CPU, 2GB)',
                   'File manager',
                   'Full log viewer',

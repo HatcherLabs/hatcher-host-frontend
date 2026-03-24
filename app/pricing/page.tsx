@@ -60,23 +60,24 @@ const displayFont = { fontFamily: 'var(--font-display), system-ui, sans-serif' }
 interface FeatureRow {
   label: string;
   free: string | boolean;
-  unlimited: string | boolean;
+  basic: string | boolean;
   pro: string | boolean;
 }
 
 const FEATURE_ROWS: FeatureRow[] = [
-  { label: 'Agents included',       free: '1',       unlimited: '1',         pro: '5' },
-  { label: 'Messages',              free: '20/day',  unlimited: 'Unlimited', pro: 'Unlimited' },
-  { label: 'CPU',                   free: '0.5',     unlimited: '1',         pro: '2 cores' },
-  { label: 'RAM',                   free: '1 GB',    unlimited: '1.5 GB',    pro: '2 GB' },
-  { label: 'Storage',               free: '150 MB',  unlimited: '300 MB',    pro: '600 MB' },
-  { label: 'File Manager',          free: false,      unlimited: false,       pro: true },
-  { label: 'Full Logs',             free: false,      unlimited: false,       pro: true },
-  { label: 'Auto-sleep',            free: '15 min idle', unlimited: '6h idle', pro: 'Always-on' },
-  { label: 'All integrations',      free: true,       unlimited: true,        pro: true },
-  { label: 'BYOK (own LLM key)',    free: true,       unlimited: true,        pro: true },
-  { label: 'Default LLM (Groq)',    free: true,       unlimited: true,        pro: true },
-  { label: 'Priority support',      free: false,      unlimited: false,       pro: true },
+  { label: 'Agents included',       free: '1',       basic: '1',         pro: '5' },
+  { label: 'Messages',              free: '20/day',  basic: '100/day',   pro: '300/day' },
+  { label: 'BYOK messages',         free: 'Unlimited', basic: 'Unlimited', pro: 'Unlimited' },
+  { label: 'CPU',                   free: '0.5',     basic: '1',         pro: '2 cores' },
+  { label: 'RAM',                   free: '1 GB',    basic: '1.5 GB',    pro: '2 GB' },
+  { label: 'Storage',               free: '150 MB',  basic: '300 MB',    pro: '600 MB' },
+  { label: 'File Manager',          free: false,      basic: false,       pro: true },
+  { label: 'Full Logs',             free: false,      basic: false,       pro: true },
+  { label: 'Auto-sleep',            free: '15 min idle', basic: '6h idle', pro: 'Always-on' },
+  { label: 'All integrations',      free: true,       basic: true,        pro: true },
+  { label: 'BYOK (own LLM key)',    free: true,       basic: true,        pro: true },
+  { label: 'Default LLM (Groq)',    free: true,       basic: true,        pro: true },
+  { label: 'Priority support',      free: false,      basic: false,       pro: true },
 ];
 
 function renderCell(value: string | boolean) {
@@ -88,7 +89,7 @@ function renderCell(value: string | boolean) {
 /* ── Tier card accent colors ─────────────────────────────── */
 const TIER_STYLES: Record<UserTierKey, { accent: string; badge?: string; highlighted?: boolean }> = {
   free: { accent: '#22c55e' },
-  unlimited: { accent: '#f97316' },
+  basic: { accent: '#f97316' },
   pro: { accent: '#f97316', badge: 'Most Popular', highlighted: true },
 };
 
@@ -177,6 +178,11 @@ export default function PricingPage() {
                   <FeatureCheck color={style.accent}>
                     {tier.messagesPerDay === 0 ? 'Unlimited messages' : `${tier.messagesPerDay} messages/day`}
                   </FeatureCheck>
+                  {tierKey !== 'free' && (
+                    <div className="ml-7.5 -mt-1.5">
+                      <span className="text-[10px] font-medium text-green-400/80">Unlimited with your own API key</span>
+                    </div>
+                  )}
                   <FeatureCheck color={style.accent}>
                     {tier.cpuLimit} CPU / {tier.memoryMb >= 1024 ? `${tier.memoryMb / 1024} GB` : `${tier.memoryMb} MB`} RAM
                   </FeatureCheck>
@@ -333,7 +339,7 @@ export default function PricingPage() {
                       <div className="text-lg font-extrabold">$0</div>
                     </th>
                     <th className="text-center p-5 text-[var(--text-primary)] font-semibold">
-                      <div className="text-xs uppercase tracking-wider mb-1">Unlimited</div>
+                      <div className="text-xs uppercase tracking-wider mb-1">Basic</div>
                       <div className="text-lg font-extrabold text-gradient">$9.99<span className="text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
                     </th>
                     <th className="text-center p-5 text-[var(--text-primary)] font-semibold">
@@ -357,7 +363,7 @@ export default function PricingPage() {
                     >
                       <td className="p-4 text-[var(--text-secondary)]">{row.label}</td>
                       <td className="p-4 text-center">{renderCell(row.free)}</td>
-                      <td className="p-4 text-center bg-[#f97316]/[0.02]">{renderCell(row.unlimited)}</td>
+                      <td className="p-4 text-center bg-[#f97316]/[0.02]">{renderCell(row.basic)}</td>
                       <td className="p-4 text-center">{renderCell(row.pro)}</td>
                     </motion.tr>
                   ))}
@@ -547,6 +553,6 @@ const FAQ = [
   },
   {
     q: 'What is auto-sleep?',
-    a: 'Free tier agents automatically sleep after 15 minutes of inactivity to save resources. Unlimited tier agents sleep after 6 hours of inactivity. Both wake up instantly on the next message. Pro tier agents are always-on with no auto-sleep.',
+    a: 'Free tier agents automatically sleep after 15 minutes of inactivity to save resources. Basic tier agents sleep after 6 hours of inactivity. Both wake up instantly on the next message. Pro tier agents are always-on with no auto-sleep.',
   },
 ];

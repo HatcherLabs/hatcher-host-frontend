@@ -11,6 +11,7 @@ import { sendSolPayment, usdToSol } from '@/lib/solana-pay';
 import { useAuth } from '@/lib/auth-context';
 import { getInitials, stringToColor, timeAgo } from '@/lib/utils';
 import { FRAMEWORKS, TIERS, getBYOKProvider } from '@hatcher/shared';
+import type { UserTierKey } from '@hatcher/shared';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
@@ -226,8 +227,9 @@ export default function AgentManagePage() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
-  const hasUnlimitedChat = (user?.tier ?? 'free') !== 'free';
-  const msgLimit = TIERS.free.messagesPerDay;
+  const userTier = (user?.tier ?? 'free') as UserTierKey;
+  const hasUnlimitedChat = false; // All tiers have limits with default LLM; BYOK enforcement is server-side
+  const msgLimit = TIERS[userTier]?.messagesPerDay ?? TIERS.free.messagesPerDay;
 
   // ─── Data loaders ────────────────────────────────────────
 
