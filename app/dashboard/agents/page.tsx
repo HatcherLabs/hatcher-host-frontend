@@ -79,11 +79,17 @@ function StatusBadge({ status }: { status: string }) {
 // ── Framework label ──────────────────────────────────────────
 const FRAMEWORK_BADGE_STYLES: Record<string, string> = {
   openclaw: 'bg-amber-500/10 text-amber-400 border-amber-500/25',
+  hermes: 'bg-purple-500/10 text-purple-400 border-purple-500/25',
+};
+
+const FRAMEWORK_LABELS: Record<string, string> = {
+  openclaw: 'OpenClaw',
+  hermes: 'Hermes',
 };
 
 function FrameworkTag({ framework = 'openclaw' }: { framework?: string }) {
   const style = FRAMEWORK_BADGE_STYLES[framework] ?? 'bg-[var(--accent-glow)] text-[var(--accent-400)] border-[rgba(249,115,22,0.25)]';
-  const label = framework === 'openclaw' ? 'OpenClaw' : framework;
+  const label = FRAMEWORK_LABELS[framework] ?? framework;
   return (
     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${style}`}>
       {label}

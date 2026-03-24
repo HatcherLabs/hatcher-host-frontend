@@ -118,11 +118,11 @@ export function getIntegrationsForFramework(framework: string): IntegrationDef[]
   );
 }
 
-/** Get extra integrations filtered by framework */
+/** Get extra integrations filtered by framework.
+ *  Extra platforms use OpenClaw's npm channel extensions — only available for openclaw. */
 export function getExtraIntegrationsForFramework(framework: string): IntegrationDef[] {
-  return EXTRA_PLATFORM_INTEGRATIONS.filter(
-    (i) => !i.frameworks || i.frameworks.includes(framework as 'openclaw' | 'hermes'),
-  );
+  if (framework !== 'openclaw') return [];
+  return EXTRA_PLATFORM_INTEGRATIONS;
 }
 
 export const STATUS_STYLES: Record<string, { classes: string; label: string; pulse: boolean; dotColor: string }> = {
