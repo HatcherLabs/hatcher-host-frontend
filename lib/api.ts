@@ -51,7 +51,7 @@ export interface Agent {
   description: string | null;
   avatarUrl: string | null;
   status: string;
-  framework: 'openclaw' | 'hermes' | 'elizaos';
+  framework: 'openclaw' | 'hermes' | 'elizaos' | 'milady';
   ownerId?: string;
   ownerUsername?: string;
   ownerAddress?: string;
@@ -257,7 +257,7 @@ export const api = {
   createAgent: (data: {
     name: string;
     description?: string;
-    framework: 'openclaw' | 'hermes' | 'elizaos';
+    framework: 'openclaw' | 'hermes' | 'elizaos' | 'milady';
     template?: string;
     config: {
       model?: string;

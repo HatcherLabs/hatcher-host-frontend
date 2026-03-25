@@ -53,7 +53,7 @@ export interface IntegrationDef {
   /** Additional config fields shown when paired (e.g. allowFrom for WhatsApp) */
   pairingFields?: IntegrationField[];
   /** Which frameworks support this integration. If omitted, all frameworks. */
-  frameworks?: Array<'openclaw' | 'hermes' | 'elizaos'>;
+  frameworks?: Array<'openclaw' | 'hermes' | 'elizaos' | 'milady'>;
 }
 
 export interface AgentStats {
@@ -104,6 +104,7 @@ export const FRAMEWORK_BADGE: Record<string, string> = {
   openclaw: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
   hermes: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
   elizaos: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+  milady: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
 };
 
 /** Root filesystem path inside each framework's container */
@@ -111,12 +112,13 @@ export const FRAMEWORK_ROOT_PATH: Record<string, string> = {
   openclaw: '/home/node/.openclaw',
   hermes: '/home/hermes/.hermes',
   elizaos: '/home/eliza/.eliza',
+  milady: '/data/.milady',
 };
 
 /** Get integrations filtered by framework */
 export function getIntegrationsForFramework(framework: string): IntegrationDef[] {
   return OPENCLAW_INTEGRATIONS.filter(
-    (i) => !i.frameworks || i.frameworks.includes(framework as 'openclaw' | 'hermes' | 'elizaos'),
+    (i) => !i.frameworks || i.frameworks.includes(framework as 'openclaw' | 'hermes' | 'elizaos' | 'milady'),
   );
 }
 

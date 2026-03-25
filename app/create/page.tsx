@@ -99,7 +99,7 @@ export default function CreatePage() {
 
   // ── Template state ──
   const [selectedTemplate, setSelectedTemplate] = useState('custom');
-  const [selectedFramework, setSelectedFramework] = useState<'openclaw' | 'hermes' | 'elizaos'>('openclaw');
+  const [selectedFramework, setSelectedFramework] = useState<'openclaw' | 'hermes' | 'elizaos' | 'milady'>('openclaw');
 
   // ── OpenClaw form state ──
   const [openclawForm, setOpenclawForm] = useState({
@@ -114,6 +114,9 @@ export default function CreatePage() {
   const [elizaBio, setElizaBio] = useState('');
   const [elizaTopics, setElizaTopics] = useState('');
   const [elizaAdjectives, setElizaAdjectives] = useState('');
+
+  // ── Milady-specific form state ──
+  const [miladyPersonality, setMiladyPersonality] = useState<'helpful' | 'tsundere' | 'unhinged' | 'custom'>('helpful');
 
   const agentName = openclawForm.name;
   const agentDesc = openclawForm.description;
@@ -197,6 +200,9 @@ export default function CreatePage() {
             bio: elizaBio.trim() || undefined,
             topics: elizaTopics.split(',').map(s => s.trim()).filter(Boolean),
             adjectives: elizaAdjectives.split(',').map(s => s.trim()).filter(Boolean),
+          } : {}),
+          ...(selectedFramework === 'milady' ? {
+            miladyPersonality,
           } : {}),
           systemPrompt: openclawForm.systemPrompt.trim()
             ? openclawForm.systemPrompt
@@ -477,6 +483,37 @@ export default function CreatePage() {
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {['90+ plugins', 'Vector memory', 'Web3 native'].map(f => (
+                      <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)]">{f}</span>
+                    ))}
+                  </div>
+                </motion.button>
+
+                {/* Milady */}
+                <motion.button
+                  whileHover={cardHover}
+                  onClick={() => setSelectedFramework('milady')}
+                  className={cn(
+                    'p-6 rounded-xl border text-left transition-all duration-200 relative',
+                    selectedFramework === 'milady'
+                      ? 'bg-[#f43f5e]/10 border-[#f43f5e] shadow-[0_0_24px_rgba(244,63,94,0.15)]'
+                      : 'bg-[rgba(26,23,48,0.6)] border-[rgba(46,43,74,0.4)] hover:border-[rgba(244,63,94,0.4)]'
+                  )}
+                >
+                  {selectedFramework === 'milady' && (
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
+                      className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </motion.div>
+                  )}
+                  <div className="w-12 h-12 rounded-xl bg-rose-500/10 flex items-center justify-center mb-4">
+                    <Zap className="w-6 h-6 text-rose-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">Milady</h3>
+                  <p className="text-sm text-[var(--text-muted)] mb-3">
+                    Privacy-first AI runtime with 20+ connectors, VRM avatars, and DeFi integration.
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['20+ connectors', 'Personality presets', 'Privacy-first'].map(f => (
                       <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)]">{f}</span>
                     ))}
                   </div>
@@ -907,6 +944,27 @@ export default function CreatePage() {
                     </div>
                   </>
                 )}
+
+                {/* Milady-specific fields */}
+                {selectedFramework === 'milady' && (
+                  <div>
+                    <label htmlFor="milady-personality" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
+                      Personality Preset
+                    </label>
+                    <p className="text-xs text-[var(--text-muted)] mb-2">Choose a personality vibe for your Milady agent.</p>
+                    <select
+                      id="milady-personality"
+                      className="input"
+                      value={miladyPersonality}
+                      onChange={(e) => setMiladyPersonality(e.target.value as typeof miladyPersonality)}
+                    >
+                      <option value="helpful">Helpful - Friendly and professional</option>
+                      <option value="tsundere">Tsundere - Reluctant but secretly caring</option>
+                      <option value="unhinged">Unhinged - Chaotic and unpredictable</option>
+                      <option value="custom">Custom - Uses your system prompt</option>
+                    </select>
+                  </div>
+                )}
               </div>
 
               <div className="mt-8 flex justify-between">
@@ -954,9 +1012,9 @@ export default function CreatePage() {
                   <div>
                     <div className="text-lg font-bold text-[#FFFFFF]">{agentName}</div>
                     <div className="text-sm text-[#71717a]">
-                      {selectedFramework === 'openclaw' ? 'OpenClaw' : selectedFramework === 'hermes' ? 'Hermes' : 'ElizaOS'} agent
+                      {selectedFramework === 'openclaw' ? 'OpenClaw' : selectedFramework === 'hermes' ? 'Hermes' : selectedFramework === 'milady' ? 'Milady' : 'ElizaOS'} agent
                       <span className="ml-1.5 text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)] align-middle">
-                        {selectedFramework === 'openclaw' ? 'Multi-skill assistant' : selectedFramework === 'hermes' ? 'Autonomous agent' : 'Multi-agent framework'}
+                        {selectedFramework === 'openclaw' ? 'Multi-skill assistant' : selectedFramework === 'hermes' ? 'Autonomous agent' : selectedFramework === 'milady' ? 'Privacy-first runtime' : 'Multi-agent framework'}
                       </span>
                     </div>
                   </div>
@@ -964,7 +1022,7 @@ export default function CreatePage() {
 
                 {/* Summary details */}
                 <div className="space-y-3 text-sm">
-                  <SummaryRow label="Agent Type" value={selectedFramework === 'openclaw' ? 'OpenClaw' : selectedFramework === 'hermes' ? 'Hermes' : 'ElizaOS'} />
+                  <SummaryRow label="Agent Type" value={selectedFramework === 'openclaw' ? 'OpenClaw' : selectedFramework === 'hermes' ? 'Hermes' : selectedFramework === 'milady' ? 'Milady' : 'ElizaOS'} />
                   <SummaryRow label="Template" value={AGENT_TEMPLATES.find(t => t.id === selectedTemplate)?.name ?? 'Custom'} />
                   <SummaryRow label="AI Model" value={getLLMSummary()} />
 
