@@ -50,7 +50,7 @@ export function getInitials(name: string): string {
 export function stringToColor(str: string): string {
   const colors = [
     'from-hatch-500 to-hatch-700',
-    'from-orange-500 to-orange-700',
+    'from-cyan-500 to-cyan-700',
     'from-blue-500 to-blue-700',
     'from-amber-500 to-amber-700',
     'from-green-500 to-green-700',

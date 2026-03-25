@@ -85,7 +85,7 @@ export default function TicketDetailPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-10 h-10 rounded-full border-2 border-[#f97316] border-t-transparent animate-spin" />
+        <div className="w-10 h-10 rounded-full border-2 border-[#06b6d4] border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -156,13 +156,13 @@ export default function TicketDetailPage() {
           {ticket.messages.map((msg, i) => (
             <motion.div
               key={i}
-              className={`card glass-noise p-5 ${(msg.role as string) === 'admin' ? 'border-l-2 border-l-[#f97316]' : ''}`}
+              className={`card glass-noise p-5 ${(msg.role as string) === 'admin' ? 'border-l-2 border-l-[#06b6d4]' : ''}`}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
             >
               <div className="flex items-center gap-2 mb-2">
-                <span className={`text-xs font-semibold ${(msg.role as string) === 'admin' ? 'text-[#f97316]' : 'text-[var(--text-muted)]'}`}>
+                <span className={`text-xs font-semibold ${(msg.role as string) === 'admin' ? 'text-[#06b6d4]' : 'text-[var(--text-muted)]'}`}>
                   {(msg.role as string) === 'admin' ? 'Hatcher Team' : 'You'}
                 </span>
                 <span className="text-[10px] text-[var(--text-muted)]">{timeAgo((msg as any).timestamp ?? msg.createdAt)}</span>
@@ -176,7 +176,7 @@ export default function TicketDetailPage() {
         {ticket.status !== 'resolved' && (
           <div className="card glass-noise p-5">
             <div className="flex items-center gap-2 mb-3">
-              <MessageSquare size={16} className="text-[#f97316]" />
+              <MessageSquare size={16} className="text-[#06b6d4]" />
               <span className="text-sm font-semibold text-[var(--text-primary)]">Reply</span>
             </div>
             <textarea
@@ -184,7 +184,7 @@ export default function TicketDetailPage() {
               onChange={(e) => setReplyText(e.target.value)}
               placeholder="Type your reply..."
               rows={3}
-              className="w-full bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/20 transition-colors resize-y mb-3"
+              className="w-full bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors resize-y mb-3"
             />
             <div className="flex items-center justify-between">
               <button
@@ -196,7 +196,7 @@ export default function TicketDetailPage() {
               <button
                 onClick={handleReply}
                 disabled={!replyText.trim() || replying}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#f97316] hover:bg-[#ea580c] transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#06b6d4] hover:bg-[#0891b2] transition-colors disabled:opacity-50"
               >
                 {replying ? (
                   <div className="w-4 h-4 rounded-full border-2 border-white/80 border-t-transparent animate-spin" />

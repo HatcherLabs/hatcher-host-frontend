@@ -49,7 +49,7 @@ export function LogsTab() {
               onClick={() => setLogFilter(f)}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 ${
                 logFilter === f
-                  ? (filterColors[f] || 'border-[#f97316]/40 bg-[#f97316]/10 text-[#FFFFFF]')
+                  ? (filterColors[f] || 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[#FFFFFF]')
                   : 'border-[rgba(46,43,74,0.4)] text-[#71717a] hover:border-[rgba(46,43,74,0.6)] hover:text-[#A5A1C2]'
               }`}
             >

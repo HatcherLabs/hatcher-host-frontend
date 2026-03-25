@@ -74,7 +74,7 @@ interface MyAgent {
 /* ── Helpers ─────────────────────────────────────────────── */
 function RoleBadge({ role }: { role: string }) {
   const styles: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
-    owner: { bg: 'bg-orange-500/15 border-orange-500/30', text: 'text-orange-400', icon: <Crown className="w-3 h-3" /> },
+    owner: { bg: 'bg-cyan-500/15 border-cyan-500/30', text: 'text-cyan-400', icon: <Crown className="w-3 h-3" /> },
     admin: { bg: 'bg-purple-500/15 border-purple-500/30', text: 'text-purple-400', icon: <Shield className="w-3 h-3" /> },
     member: { bg: 'bg-blue-500/15 border-blue-500/30', text: 'text-blue-400', icon: <User className="w-3 h-3" /> },
     viewer: { bg: 'bg-gray-500/15 border-gray-500/30', text: 'text-gray-400', icon: <Eye className="w-3 h-3" /> },
@@ -288,7 +288,7 @@ export default function TeamPage() {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-orange-400" />
+        <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
       </div>
     );
   }
@@ -297,7 +297,7 @@ export default function TeamPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className={cardClass + ' p-8 text-center max-w-sm'}>
-          <Users className="w-10 h-10 text-orange-400 mx-auto mb-3" />
+          <Users className="w-10 h-10 text-cyan-400 mx-auto mb-3" />
           <p className="text-white font-medium mb-2">Sign in to access Teams</p>
           <p className="text-sm text-[#A5A1C2]">Teams let you collaborate with others on your AI agents.</p>
         </div>
@@ -318,7 +318,7 @@ export default function TeamPage() {
       {/* Header */}
       <motion.div variants={itemVariants} className="mb-8">
         <h1 className="text-2xl font-bold text-white flex items-center gap-3" style={displayFont}>
-          <Users className="w-6 h-6 text-orange-400" />
+          <Users className="w-6 h-6 text-cyan-400" />
           Team Collaboration
         </h1>
         <p className="text-sm text-[#A5A1C2] mt-1">
@@ -335,13 +335,13 @@ export default function TeamPage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-6 h-6 animate-spin text-orange-400" />
+          <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
         </div>
       ) : !team ? (
         /* ── No Team — Create Form ──────────────────────────── */
         <motion.div variants={itemVariants} className={cardClass + ' p-8 max-w-lg mx-auto text-center'}>
-          <div className="w-16 h-16 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center mx-auto mb-5">
-            <Users className="w-8 h-8 text-orange-400" />
+          <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mx-auto mb-5">
+            <Users className="w-8 h-8 text-cyan-400" />
           </div>
           <h2 className="text-lg font-semibold text-white mb-2" style={displayFont}>Create Your Team</h2>
           <p className="text-sm text-[#A5A1C2] mb-6">
@@ -354,13 +354,13 @@ export default function TeamPage() {
               value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleCreateTeam()}
-              className="flex-1 px-4 py-2.5 rounded-lg bg-white/[0.04] border border-white/10 text-white placeholder-[#71717a] text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500/50"
+              className="flex-1 px-4 py-2.5 rounded-lg bg-white/[0.04] border border-white/10 text-white placeholder-[#71717a] text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
               maxLength={50}
             />
             <button
               onClick={handleCreateTeam}
               disabled={creating || !teamName.trim()}
-              className="px-5 py-2.5 rounded-lg bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors flex items-center gap-2"
+              className="px-5 py-2.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors flex items-center gap-2"
             >
               {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
               Create
@@ -374,8 +374,8 @@ export default function TeamPage() {
           <motion.div variants={itemVariants} className={cardClass + ' p-6'}>
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-orange-400" />
+                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-cyan-400" />
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-white" style={displayFont}>{team.name}</h2>
@@ -414,7 +414,7 @@ export default function TeamPage() {
           {/* Members Section */}
           <motion.div variants={itemVariants} className={cardClass + ' p-6'}>
             <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2" style={displayFont}>
-              <User className="w-4 h-4 text-orange-400" />
+              <User className="w-4 h-4 text-cyan-400" />
               Members
             </h3>
             <div className="space-y-2">
@@ -448,7 +448,7 @@ export default function TeamPage() {
                               value={member.role}
                               onChange={(e) => handleUpdateRole(member.id, e.target.value)}
                               disabled={actionLoading === `role-${member.id}`}
-                              className="appearance-none bg-white/[0.04] border border-white/10 rounded-md px-2 py-1 pr-6 text-xs text-[#A5A1C2] focus:outline-none focus:ring-1 focus:ring-orange-500/50 cursor-pointer"
+                              className="appearance-none bg-white/[0.04] border border-white/10 rounded-md px-2 py-1 pr-6 text-xs text-[#A5A1C2] focus:outline-none focus:ring-1 focus:ring-cyan-500/50 cursor-pointer"
                             >
                               {isOwner && <option value="admin">Admin</option>}
                               <option value="member">Member</option>
@@ -498,13 +498,13 @@ export default function TeamPage() {
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
-                    className="flex-1 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/10 text-white placeholder-[#71717a] text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+                    className="flex-1 px-3 py-2 rounded-lg bg-white/[0.04] border border-white/10 text-white placeholder-[#71717a] text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
                   />
                   <div className="relative">
                     <select
                       value={inviteRole}
                       onChange={(e) => setInviteRole(e.target.value as 'admin' | 'member' | 'viewer')}
-                      className="appearance-none h-full bg-white/[0.04] border border-white/10 rounded-lg px-3 pr-7 text-sm text-[#A5A1C2] focus:outline-none focus:ring-2 focus:ring-orange-500/50 cursor-pointer"
+                      className="appearance-none h-full bg-white/[0.04] border border-white/10 rounded-lg px-3 pr-7 text-sm text-[#A5A1C2] focus:outline-none focus:ring-2 focus:ring-cyan-500/50 cursor-pointer"
                     >
                       {isOwner && <option value="admin">Admin</option>}
                       <option value="member">Member</option>
@@ -515,7 +515,7 @@ export default function TeamPage() {
                   <button
                     onClick={handleInvite}
                     disabled={inviting || !inviteEmail.trim()}
-                    className="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors flex items-center gap-1.5"
                   >
                     {inviting ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
                     Invite
@@ -528,7 +528,7 @@ export default function TeamPage() {
           {/* Shared Agents */}
           <motion.div variants={itemVariants} className={cardClass + ' p-6'}>
             <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2" style={displayFont}>
-              <Bot className="w-4 h-4 text-orange-400" />
+              <Bot className="w-4 h-4 text-cyan-400" />
               Shared Agents
             </h3>
 
@@ -592,7 +592,7 @@ export default function TeamPage() {
                           className={`px-3 py-1 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                             isShared
                               ? 'text-amber-400 border border-amber-500/20 hover:bg-amber-500/10'
-                              : 'text-orange-400 border border-orange-500/20 hover:bg-orange-500/10'
+                              : 'text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/10'
                           }`}
                         >
                           {(actionLoading === `share-${agent.id}` || actionLoading === `unshare-${agent.id}`) ? (

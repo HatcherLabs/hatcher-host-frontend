@@ -25,7 +25,7 @@ function getPasswordStrength(pw: string): PasswordStrength {
   const labels: Record<number, { label: string; color: string }> = {
     0: { label: '', color: 'transparent' },
     1: { label: 'Very weak', color: '#ef4444' },
-    2: { label: 'Weak', color: '#f97316' },
+    2: { label: 'Weak', color: '#06b6d4' },
     3: { label: 'Fair', color: '#eab308' },
     4: { label: 'Strong', color: '#22c55e' },
     5: { label: 'Very strong', color: '#10b981' },
@@ -99,7 +99,7 @@ export default function RegisterPage() {
               onChange={(e) => { setEmail(e.target.value); clearError(); setLocalError(null); }}
               required
               autoFocus
-              className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-orange-500/50 focus:outline-none focus:ring-1 focus:ring-orange-500/30 placeholder:text-[#71717a] transition-colors"
+              className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[#71717a] transition-colors"
               placeholder="you@example.com"
             />
           </div>
@@ -117,7 +117,7 @@ export default function RegisterPage() {
               minLength={3}
               maxLength={30}
               pattern="^[a-zA-Z0-9_-]+$"
-              className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-orange-500/50 focus:outline-none focus:ring-1 focus:ring-orange-500/30 placeholder:text-[#71717a] transition-colors"
+              className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[#71717a] transition-colors"
               placeholder="cooluser123"
             />
             <p className="text-[10px] text-[#71717a] mt-1">Letters, numbers, hyphens and underscores only</p>
@@ -134,7 +134,7 @@ export default function RegisterPage() {
               onChange={(e) => { setPassword(e.target.value); clearError(); setLocalError(null); }}
               required
               minLength={8}
-              className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-orange-500/50 focus:outline-none focus:ring-1 focus:ring-orange-500/30 placeholder:text-[#71717a] transition-colors"
+              className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[#71717a] transition-colors"
               placeholder="Min. 8 chars, uppercase, lowercase, number"
             />
 
@@ -194,7 +194,7 @@ export default function RegisterPage() {
               value={confirmPassword}
               onChange={(e) => { setConfirmPassword(e.target.value); setLocalError(null); }}
               required
-              className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-orange-500/50 focus:outline-none focus:ring-1 focus:ring-orange-500/30 placeholder:text-[#71717a] transition-colors"
+              className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[#71717a] transition-colors"
               placeholder="Repeat your password"
             />
           </div>
@@ -208,7 +208,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full h-10 rounded-lg text-sm font-medium text-white bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+            className="w-full h-10 rounded-lg text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
           >
             {isLoading ? (
               <>
@@ -223,7 +223,7 @@ export default function RegisterPage() {
 
         <p className="text-center text-xs text-[#A5A1C2] mt-6">
           Already have an account?{' '}
-          <Link href="/login" className="text-orange-400 hover:text-orange-300 transition-colors">
+          <Link href="/login" className="text-cyan-400 hover:text-cyan-300 transition-colors">
             Sign In
           </Link>
         </p>

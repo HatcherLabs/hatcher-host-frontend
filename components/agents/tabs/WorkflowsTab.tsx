@@ -121,14 +121,14 @@ function WorkflowNodeComponent({ data, selected }: NodeProps<NodeConfig>) {
       className={`
         relative px-4 py-3 rounded-xl border backdrop-blur-md
         ${colors.bg} ${colors.border}
-        ${selected ? 'ring-2 ring-[#f97316] shadow-[0_0_20px_rgba(249,115,22,0.3)]' : ''}
+        ${selected ? 'ring-2 ring-[#06b6d4] shadow-[0_0_20px_rgba(6,182,212,0.3)]' : ''}
         min-w-[180px] transition-shadow duration-200
       `}
     >
       <Handle
         type="target"
         position={Position.Top}
-        className="!w-3 !h-3 !bg-[#A5A1C2] !border-2 !border-[#1a1730] hover:!bg-[#f97316] transition-colors"
+        className="!w-3 !h-3 !bg-[#A5A1C2] !border-2 !border-[#1a1730] hover:!bg-[#06b6d4] transition-colors"
       />
       <div className="flex items-center gap-2.5">
         <div className={`p-1.5 rounded-lg ${colors.bg} ${colors.text}`}>
@@ -146,7 +146,7 @@ function WorkflowNodeComponent({ data, selected }: NodeProps<NodeConfig>) {
       <Handle
         type="source"
         position={Position.Bottom}
-        className="!w-3 !h-3 !bg-[#A5A1C2] !border-2 !border-[#1a1730] hover:!bg-[#f97316] transition-colors"
+        className="!w-3 !h-3 !bg-[#A5A1C2] !border-2 !border-[#1a1730] hover:!bg-[#06b6d4] transition-colors"
       />
     </div>
   );
@@ -196,7 +196,7 @@ function NodeConfigPanel({
             type="text"
             value={d.label}
             onChange={(e) => onUpdate(node.id, { label: e.target.value })}
-            className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 transition-colors"
+            className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 transition-colors"
           />
         </div>
 
@@ -208,7 +208,7 @@ function NodeConfigPanel({
               <select
                 value={(d.channel as string) || 'any'}
                 onChange={(e) => onUpdate(node.id, { channel: e.target.value })}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50"
               >
                 <option value="any">Any Channel</option>
                 <option value="telegram">Telegram</option>
@@ -226,7 +226,7 @@ function NodeConfigPanel({
                 value={(d.keywords as string) || ''}
                 onChange={(e) => onUpdate(node.id, { keywords: e.target.value })}
                 placeholder="e.g. /start, help, price"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a]"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a]"
               />
             </div>
           </>
@@ -241,7 +241,7 @@ function NodeConfigPanel({
               value={(d.cron as string) || ''}
               onChange={(e) => onUpdate(node.id, { cron: e.target.value })}
               placeholder="e.g. 0 */6 * * *"
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a] font-mono"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono"
             />
             <p className="text-[10px] text-[#71717a] mt-1">min hour day month weekday</p>
           </div>
@@ -256,7 +256,7 @@ function NodeConfigPanel({
               value={(d.path as string) || ''}
               onChange={(e) => onUpdate(node.id, { path: e.target.value })}
               placeholder="/my-hook"
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a] font-mono"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono"
             />
           </div>
         )}
@@ -270,7 +270,7 @@ function NodeConfigPanel({
               value={(d.keywords as string) || ''}
               onChange={(e) => onUpdate(node.id, { keywords: e.target.value })}
               placeholder="hello, help, price"
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a]"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a]"
             />
           </div>
         )}
@@ -284,7 +284,7 @@ function NodeConfigPanel({
               onChange={(e) => onUpdate(node.id, { message: e.target.value })}
               placeholder="Hello {{user}}! How can I help?"
               rows={4}
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a] resize-none"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] resize-none"
             />
             <p className="text-[10px] text-[#71717a] mt-1">Use {'{{variable}}'} for dynamic values</p>
           </div>
@@ -300,7 +300,7 @@ function NodeConfigPanel({
                 value={(d.url as string) || ''}
                 onChange={(e) => onUpdate(node.id, { url: e.target.value })}
                 placeholder="https://api.example.com/data"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a] font-mono"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono"
               />
             </div>
             <div>
@@ -308,7 +308,7 @@ function NodeConfigPanel({
               <select
                 value={(d.method as string) || 'GET'}
                 onChange={(e) => onUpdate(node.id, { method: e.target.value })}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50"
               >
                 <option value="GET">GET</option>
                 <option value="POST">POST</option>
@@ -324,7 +324,7 @@ function NodeConfigPanel({
                 onChange={(e) => onUpdate(node.id, { headers: e.target.value })}
                 placeholder='{"Authorization": "Bearer ..."}'
                 rows={2}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a] font-mono resize-none"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono resize-none"
               />
             </div>
             <div>
@@ -334,7 +334,7 @@ function NodeConfigPanel({
                 onChange={(e) => onUpdate(node.id, { body: e.target.value })}
                 placeholder='{"key": "value"}'
                 rows={3}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a] font-mono resize-none"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono resize-none"
               />
             </div>
           </>
@@ -349,7 +349,7 @@ function NodeConfigPanel({
               value={(d.skillName as string) || ''}
               onChange={(e) => onUpdate(node.id, { skillName: e.target.value })}
               placeholder="research, scan-token, etc."
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a]"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a]"
             />
           </div>
         )}
@@ -364,7 +364,7 @@ function NodeConfigPanel({
               onChange={(e) => onUpdate(node.id, { delaySecs: Number(e.target.value) })}
               min={1}
               max={3600}
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50"
             />
           </div>
         )}
@@ -379,7 +379,7 @@ function NodeConfigPanel({
                 value={(d.varName as string) || ''}
                 onChange={(e) => onUpdate(node.id, { varName: e.target.value })}
                 placeholder="my_var"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a] font-mono"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono"
               />
             </div>
             <div>
@@ -389,7 +389,7 @@ function NodeConfigPanel({
                 value={(d.varValue as string) || ''}
                 onChange={(e) => onUpdate(node.id, { varValue: e.target.value })}
                 placeholder="some value or {{expression}}"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a]"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a]"
               />
             </div>
           </>
@@ -405,7 +405,7 @@ function NodeConfigPanel({
                 value={(d.variable as string) || ''}
                 onChange={(e) => onUpdate(node.id, { variable: e.target.value })}
                 placeholder="{{message}}"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a] font-mono"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono"
               />
             </div>
             <div>
@@ -413,7 +413,7 @@ function NodeConfigPanel({
               <select
                 value={(d.operator as string) || 'equals'}
                 onChange={(e) => onUpdate(node.id, { operator: e.target.value })}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50"
               >
                 <option value="equals">Equals</option>
                 <option value="not_equals">Not Equals</option>
@@ -433,7 +433,7 @@ function NodeConfigPanel({
                 value={(d.condValue as string) || ''}
                 onChange={(e) => onUpdate(node.id, { condValue: e.target.value })}
                 placeholder="expected value"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a]"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a]"
               />
             </div>
           </>
@@ -448,7 +448,7 @@ function NodeConfigPanel({
               value={(d.keyword as string) || ''}
               onChange={(e) => onUpdate(node.id, { keyword: e.target.value })}
               placeholder="price, help, etc."
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a]"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a]"
             />
           </div>
         )}
@@ -462,7 +462,7 @@ function NodeConfigPanel({
                 type="time"
                 value={(d.afterTime as string) || '09:00'}
                 onChange={(e) => onUpdate(node.id, { afterTime: e.target.value })}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50"
               />
             </div>
             <div>
@@ -471,7 +471,7 @@ function NodeConfigPanel({
                 type="time"
                 value={(d.beforeTime as string) || '17:00'}
                 onChange={(e) => onUpdate(node.id, { beforeTime: e.target.value })}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50"
               />
             </div>
           </>
@@ -487,7 +487,7 @@ function NodeConfigPanel({
                 value={(d.varName as string) || ''}
                 onChange={(e) => onUpdate(node.id, { varName: e.target.value })}
                 placeholder="my_var"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a] font-mono"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono"
               />
             </div>
             <div>
@@ -497,7 +497,7 @@ function NodeConfigPanel({
                 value={(d.expectedValue as string) || ''}
                 onChange={(e) => onUpdate(node.id, { expectedValue: e.target.value })}
                 placeholder="expected"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a]"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a]"
               />
             </div>
           </>
@@ -512,7 +512,7 @@ function NodeConfigPanel({
               onChange={(e) => onUpdate(node.id, { message: e.target.value })}
               placeholder="The response message..."
               rows={4}
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a] resize-none"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] resize-none"
             />
           </div>
         )}
@@ -526,7 +526,7 @@ function NodeConfigPanel({
               value={(d.filePath as string) || ''}
               onChange={(e) => onUpdate(node.id, { filePath: e.target.value })}
               placeholder="/workspace/report.pdf or https://..."
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a] font-mono"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono"
             />
           </div>
         )}
@@ -540,7 +540,7 @@ function NodeConfigPanel({
               value={(d.emoji as string) || ''}
               onChange={(e) => onUpdate(node.id, { emoji: e.target.value })}
               placeholder="e.g. thumbs_up"
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#f97316]/50 placeholder-[#71717a]"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a]"
             />
           </div>
         )}
@@ -573,7 +573,7 @@ function WorkflowEditor({
     (connection: Connection) => setEdges((eds) => addEdge({
       ...connection,
       animated: true,
-      style: { stroke: '#f97316', strokeWidth: 2 },
+      style: { stroke: '#06b6d4', strokeWidth: 2 },
     }, eds)),
     [setEdges],
   );
@@ -650,7 +650,7 @@ function WorkflowEditor({
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="bg-transparent text-lg font-semibold text-[#FFFFFF] outline-none border-b border-transparent focus:border-[#f97316]/50 transition-colors"
+            className="bg-transparent text-lg font-semibold text-[#FFFFFF] outline-none border-b border-transparent focus:border-[#06b6d4]/50 transition-colors"
             placeholder="Workflow name..."
           />
         </div>
@@ -666,14 +666,14 @@ function WorkflowEditor({
           )}
           <button
             onClick={onCancel}
-            className="px-4 py-1.5 text-xs rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#f97316]/40 transition-all"
+            className="px-4 py-1.5 text-xs rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#06b6d4]/40 transition-all"
           >
             Cancel
           </button>
           <button
             onClick={() => onSave(name, nodes, edges)}
             disabled={saving || !name.trim()}
-            className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs rounded-lg bg-[#f97316] text-white hover:bg-[#ea580c] transition-all disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs rounded-lg bg-[#06b6d4] text-white hover:bg-[#0891b2] transition-all disabled:opacity-40"
           >
             {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
             Save
@@ -750,7 +750,7 @@ function WorkflowEditor({
             proOptions={{ hideAttribution: true }}
             defaultEdgeOptions={{
               animated: true,
-              style: { stroke: '#f97316', strokeWidth: 2 },
+              style: { stroke: '#06b6d4', strokeWidth: 2 },
             }}
           >
             <Background
@@ -905,7 +905,7 @@ export function WorkflowsTab() {
         </div>
         <button
           onClick={() => setEditingWorkflow('new')}
-          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs rounded-lg bg-[#f97316] text-white hover:bg-[#ea580c] transition-all"
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs rounded-lg bg-[#06b6d4] text-white hover:bg-[#0891b2] transition-all"
         >
           <Plus size={14} />
           New Workflow
@@ -922,15 +922,15 @@ export function WorkflowsTab() {
       {/* Loading */}
       {loading && (
         <div className="flex items-center justify-center py-12">
-          <Loader2 size={24} className="animate-spin text-[#f97316]" />
+          <Loader2 size={24} className="animate-spin text-[#06b6d4]" />
         </div>
       )}
 
       {/* Empty State */}
       {!loading && workflows.length === 0 && (
         <GlassCard className="text-center py-12">
-          <div className="mx-auto w-16 h-16 rounded-full bg-[#f97316]/10 flex items-center justify-center mb-4">
-            <GitMerge size={28} className="text-[#f97316]" />
+          <div className="mx-auto w-16 h-16 rounded-full bg-[#06b6d4]/10 flex items-center justify-center mb-4">
+            <GitMerge size={28} className="text-[#06b6d4]" />
           </div>
           <h3 className="text-base font-semibold text-[#FFFFFF] mb-2">No workflows yet</h3>
           <p className="text-sm text-[#71717a] mb-6 max-w-md mx-auto">
@@ -938,7 +938,7 @@ export function WorkflowsTab() {
           </p>
           <button
             onClick={() => setEditingWorkflow('new')}
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 text-sm rounded-lg bg-[#f97316] text-white hover:bg-[#ea580c] transition-all"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 text-sm rounded-lg bg-[#06b6d4] text-white hover:bg-[#0891b2] transition-all"
           >
             <Plus size={16} />
             Create Your First Workflow
@@ -986,7 +986,7 @@ export function WorkflowsTab() {
                   className={`p-1.5 rounded-lg border transition-all ${
                     wf.enabled
                       ? 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
-                      : 'border-[rgba(46,43,74,0.4)] text-[#71717a] hover:border-[#f97316]/40 hover:text-[#A5A1C2]'
+                      : 'border-[rgba(46,43,74,0.4)] text-[#71717a] hover:border-[#06b6d4]/40 hover:text-[#A5A1C2]'
                   } disabled:opacity-40`}
                   title={wf.enabled ? 'Disable' : 'Enable'}
                 >
@@ -1002,7 +1002,7 @@ export function WorkflowsTab() {
                 {/* Edit */}
                 <button
                   onClick={() => setEditingWorkflow(wf)}
-                  className="p-1.5 rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#f97316]/40 hover:text-[#f97316] transition-all"
+                  className="p-1.5 rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#06b6d4]/40 hover:text-[#06b6d4] transition-all"
                   title="Edit workflow"
                 >
                   <Pencil size={14} />

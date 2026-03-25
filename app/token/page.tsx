@@ -45,7 +45,7 @@ const PLANNED_USE_CASES = [
     icon: Zap,
     title: 'Subscriptions & Add-ons',
     description: 'Subscribe to Basic ($9.99/mo) or Pro ($19.99/mo) tiers. Purchase agent add-ons to scale your fleet.',
-    color: '#f97316',
+    color: '#06b6d4',
   },
   {
     icon: CreditCard,
@@ -69,9 +69,9 @@ export default function TokenPage() {
       <section className="relative py-28 md:py-36 px-4 text-center">
         {/* Background glows */}
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[550px] rounded-full bg-gradient-to-br from-[#f97316]/12 via-[#f97316]/6 to-transparent blur-3xl" />
-          <div className="absolute top-20 right-1/4 w-[400px] h-[400px] rounded-full bg-[#ea580c]/5 blur-3xl" />
-          <div className="absolute -bottom-20 left-1/4 w-[300px] h-[300px] rounded-full bg-[#f97316]/4 blur-3xl" />
+          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[550px] rounded-full bg-gradient-to-br from-[#06b6d4]/12 via-[#06b6d4]/6 to-transparent blur-3xl" />
+          <div className="absolute top-20 right-1/4 w-[400px] h-[400px] rounded-full bg-[#0891b2]/5 blur-3xl" />
+          <div className="absolute -bottom-20 left-1/4 w-[300px] h-[300px] rounded-full bg-[#06b6d4]/4 blur-3xl" />
         </div>
 
         <motion.div
@@ -80,14 +80,14 @@ export default function TokenPage() {
           initial="hidden"
           animate="visible"
         >
-          <motion.div variants={fadeUp} className="mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#f97316]/25 bg-[#f97316]/8 text-[#f97316] text-sm font-medium">
+          <motion.div variants={fadeUp} className="mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#06b6d4]/25 bg-[#06b6d4]/8 text-[#06b6d4] text-sm font-medium">
             <Sparkles className="w-3.5 h-3.5" />
             Coming Soon
           </motion.div>
 
           <motion.div
             variants={scaleIn}
-            className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#f97316] to-[#ea580c] flex items-center justify-center text-5xl mx-auto mb-8 shadow-[0_0_60px_rgba(249,115,22,0.35)]"
+            className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#06b6d4] to-[#0891b2] flex items-center justify-center text-5xl mx-auto mb-8 shadow-[0_0_60px_rgba(6,182,212,0.35)]"
             style={{ animation: 'float 3s ease-in-out infinite' }}
           >
             &#x1F95A;
@@ -104,7 +104,7 @@ export default function TokenPage() {
           </motion.p>
 
           <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#1A1730] border border-[rgba(46,43,74,0.6)] text-[var(--text-secondary)] text-sm">
-            <Bell className="w-4 h-4 text-[#f97316]" />
+            <Bell className="w-4 h-4 text-[#06b6d4]" />
             Token launch has not happened yet. Stay tuned for announcements.
           </motion.div>
 
@@ -212,10 +212,10 @@ export default function TokenPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-[#f97316]/15 via-[#f97316]/10 to-[#ea580c]/10" />
-            <div className="absolute inset-0 border border-[#f97316]/20 rounded-3xl" />
-            <div className="absolute -top-12 -right-12 w-64 h-64 rounded-full bg-[#f97316]/10 blur-3xl" />
-            <div className="absolute -bottom-12 -left-12 w-64 h-64 rounded-full bg-[#f97316]/8 blur-3xl" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#06b6d4]/15 via-[#06b6d4]/10 to-[#0891b2]/10" />
+            <div className="absolute inset-0 border border-[#06b6d4]/20 rounded-3xl" />
+            <div className="absolute -top-12 -right-12 w-64 h-64 rounded-full bg-[#06b6d4]/10 blur-3xl" />
+            <div className="absolute -bottom-12 -left-12 w-64 h-64 rounded-full bg-[#06b6d4]/8 blur-3xl" />
 
             <div className="relative text-center px-8 py-16">
               <h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-[var(--text-primary)]">

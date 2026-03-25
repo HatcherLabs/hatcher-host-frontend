@@ -207,7 +207,7 @@ export function SchedulesTab() {
           {!showForm && (
             <button
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-[#f97316] text-white hover:bg-[#ea580c] transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-[#06b6d4] text-white hover:bg-[#0891b2] transition-colors"
             >
               <Plus size={14} />
               New Schedule
@@ -229,7 +229,7 @@ export function SchedulesTab() {
                 value={formName}
                 onChange={e => setFormName(e.target.value)}
                 placeholder="e.g. Morning briefing"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.04] border border-white/[0.06] text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#f97316]/50"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.04] border border-white/[0.06] text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#06b6d4]/50"
               />
             </div>
 
@@ -240,7 +240,7 @@ export function SchedulesTab() {
                 <select
                   value={formPreset}
                   onChange={e => setFormPreset(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.04] border border-white/[0.06] text-white appearance-none focus:outline-none focus:border-[#f97316]/50"
+                  className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.04] border border-white/[0.06] text-white appearance-none focus:outline-none focus:border-[#06b6d4]/50"
                 >
                   {CRON_PRESETS.map(p => (
                     <option key={p.label} value={p.value} className="bg-[#18181b] text-white">
@@ -261,7 +261,7 @@ export function SchedulesTab() {
                   value={formCustomCron}
                   onChange={e => setFormCustomCron(e.target.value)}
                   placeholder="e.g. */30 * * * *"
-                  className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.04] border border-white/[0.06] text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#f97316]/50 font-mono"
+                  className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.04] border border-white/[0.06] text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#06b6d4]/50 font-mono"
                 />
                 <div className="mt-1.5 space-y-0.5">
                   <p className="text-[10px] text-[#52525b]">Common patterns:</p>
@@ -276,7 +276,7 @@ export function SchedulesTab() {
                         key={ex.value}
                         type="button"
                         onClick={() => setFormCustomCron(ex.value)}
-                        className="px-2 py-0.5 text-[10px] rounded bg-white/[0.04] border border-white/[0.06] text-[#a1a1aa] hover:border-[#f97316]/40 hover:text-white transition-colors"
+                        className="px-2 py-0.5 text-[10px] rounded bg-white/[0.04] border border-white/[0.06] text-[#a1a1aa] hover:border-[#06b6d4]/40 hover:text-white transition-colors"
                       >
                         {ex.label}
                       </button>
@@ -294,7 +294,7 @@ export function SchedulesTab() {
                 onChange={e => setFormPrompt(e.target.value)}
                 placeholder="What should the agent do on this schedule?"
                 rows={3}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.04] border border-white/[0.06] text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#f97316]/50 resize-none"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.04] border border-white/[0.06] text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#06b6d4]/50 resize-none"
               />
             </div>
 
@@ -309,7 +309,7 @@ export function SchedulesTab() {
               <button
                 onClick={handleCreate}
                 disabled={creating}
-                className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-lg bg-[#f97316] text-white hover:bg-[#ea580c] transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-lg bg-[#06b6d4] text-white hover:bg-[#0891b2] transition-colors disabled:opacity-50"
               >
                 {creating ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                 Create
@@ -338,11 +338,11 @@ export function SchedulesTab() {
       {error && !loading && (
         <GlassCard>
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <AlertTriangle size={24} className="text-[#f97316] mb-2" />
+            <AlertTriangle size={24} className="text-[#06b6d4] mb-2" />
             <p className="text-xs text-[#a1a1aa]">{error}</p>
             <button
               onClick={loadSchedules}
-              className="mt-3 text-xs text-[#f97316] hover:text-[#fb923c] transition-colors"
+              className="mt-3 text-xs text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
             >
               Retry
             </button>

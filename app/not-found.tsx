@@ -5,7 +5,7 @@ export default function NotFound() {
     <div className="relative flex min-h-[80vh] items-center justify-center px-4 bg-[var(--bg-base)]">
       {/* ambient glow */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-gradient-to-br from-orange-600/10 via-orange-500/5 to-transparent blur-3xl" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-gradient-to-br from-cyan-600/10 via-cyan-500/5 to-transparent blur-3xl" />
       </div>
 
       <div className="card glass-noise text-center max-w-md p-10">

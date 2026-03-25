@@ -291,7 +291,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-full border-2 border-[#f97316] border-t-transparent animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 rounded-full border-2 border-[#06b6d4] border-t-transparent animate-spin mx-auto mb-4" />
           <p className="text-[var(--text-secondary)]">Authenticating...</p>
         </div>
       </div>
@@ -307,8 +307,8 @@ export default function AdminPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <div className="w-20 h-20 rounded-2xl bg-[#f97316]/15 flex items-center justify-center mx-auto mb-6">
-            <Zap size={40} className="text-[#f97316]" />
+          <div className="w-20 h-20 rounded-2xl bg-[#06b6d4]/15 flex items-center justify-center mx-auto mb-6">
+            <Zap size={40} className="text-[#06b6d4]" />
           </div>
           <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">
             Sign In Required
@@ -395,8 +395,8 @@ export default function AdminPage() {
           variants={cardVariants}
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#f97316]/15 flex items-center justify-center flex-shrink-0">
-              <Shield size={20} className="text-[#f97316]" />
+            <div className="w-10 h-10 rounded-xl bg-[#06b6d4]/15 flex items-center justify-center flex-shrink-0">
+              <Shield size={20} className="text-[#06b6d4]" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-[var(--text-primary)]">
@@ -427,7 +427,7 @@ export default function AdminPage() {
                 label="Total Users"
                 value={stats.totalUsers}
                 icon={Users}
-                iconColor="#f97316"
+                iconColor="#06b6d4"
               />
               <StatCard
                 label="Total Agents"
@@ -466,7 +466,7 @@ export default function AdminPage() {
                 label="New Users 7d"
                 value={stats.newUsersLast7d}
                 icon={UserPlus}
-                iconColor="#f97316"
+                iconColor="#06b6d4"
               />
             </div>
           </div>
@@ -483,7 +483,7 @@ export default function AdminPage() {
                   onClick={() => setActiveTab(tab)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-2 ${
                     activeTab === tab
-                      ? 'text-[var(--text-primary)] bg-[#f97316]/20'
+                      ? 'text-[var(--text-primary)] bg-[#06b6d4]/20'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                   }`}
                 >
@@ -514,7 +514,7 @@ export default function AdminPage() {
                         onClick={() => setStatusFilter(f.key)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 ${
                           statusFilter === f.key
-                            ? 'text-[var(--text-primary)] bg-[#f97316]/20'
+                            ? 'text-[var(--text-primary)] bg-[#06b6d4]/20'
                             : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                         }`}
                       >
@@ -524,7 +524,7 @@ export default function AdminPage() {
                   </div>
 
                   {/* Search */}
-                  <div className="flex items-center gap-2 flex-1 sm:flex-initial rounded-xl px-4 py-2.5 bg-[var(--bg-elevated)] border border-[var(--border-default)] transition-all duration-200 focus-within:border-[rgba(249,115,22,0.4)]">
+                  <div className="flex items-center gap-2 flex-1 sm:flex-initial rounded-xl px-4 py-2.5 bg-[var(--bg-elevated)] border border-[var(--border-default)] transition-all duration-200 focus-within:border-[rgba(6,182,212,0.4)]">
                     <Search size={16} className="text-[var(--text-muted)]" />
                     <input
                       type="text"
@@ -573,8 +573,8 @@ export default function AdminPage() {
                             {/* Agent name */}
                             <td className="py-3.5 pr-4">
                               <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-[#f97316]/12 flex items-center justify-center flex-shrink-0">
-                                  <Bot size={14} className="text-[#f97316]" />
+                                <div className="w-8 h-8 rounded-lg bg-[#06b6d4]/12 flex items-center justify-center flex-shrink-0">
+                                  <Bot size={14} className="text-[#06b6d4]" />
                                 </div>
                                 <div className="min-w-0">
                                   <p className="text-sm font-medium truncate max-w-[180px] text-[var(--text-primary)]">
@@ -704,15 +704,15 @@ export default function AdminPage() {
                           {/* User */}
                           <td className="py-3.5 pr-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-[#f97316]/12 flex items-center justify-center flex-shrink-0">
-                                <Users size={14} className="text-[#f97316]" />
+                              <div className="w-8 h-8 rounded-lg bg-[#06b6d4]/12 flex items-center justify-center flex-shrink-0">
+                                <Users size={14} className="text-[#06b6d4]" />
                               </div>
                               <div>
                                 <span className="text-xs font-medium text-[var(--text-primary)] block">{user.username}</span>
                                 <span className="text-[10px] text-[var(--text-muted)]">{user.email}</span>
                               </div>
                               {user.isAdmin && (
-                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-orange-500/15 text-orange-400 uppercase">Admin</span>
+                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-400 uppercase">Admin</span>
                               )}
                             </div>
                           </td>
@@ -782,7 +782,7 @@ export default function AdminPage() {
                         onClick={() => setTicketFilter(f)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 capitalize ${
                           ticketFilter === f
-                            ? 'text-[var(--text-primary)] bg-[#f97316]/20'
+                            ? 'text-[var(--text-primary)] bg-[#06b6d4]/20'
                             : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                         }`}
                       >
@@ -846,7 +846,7 @@ export default function AdminPage() {
                                 href={`/admin/tickets/${ticket.id}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#f97316]/10 text-[#f97316] border border-[#f97316]/20 hover:bg-[#f97316]/20 transition-colors"
+                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#06b6d4]/10 text-[#06b6d4] border border-[#06b6d4]/20 hover:bg-[#06b6d4]/20 transition-colors"
                               >
                                 Open
                                 <ExternalLink size={10} />

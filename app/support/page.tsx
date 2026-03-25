@@ -108,7 +108,7 @@ function SelectField({
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full appearance-none bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/20 transition-colors cursor-pointer"
+          className="w-full appearance-none bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors cursor-pointer"
         >
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -233,9 +233,9 @@ export default function SupportPage() {
           <div className="flex items-center gap-3 mb-1">
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ background: 'rgba(249,115,22,0.12)' }}
+              style={{ background: 'rgba(6,182,212,0.12)' }}
             >
-              <LifeBuoy size={20} className="text-[#f97316]" />
+              <LifeBuoy size={20} className="text-[#06b6d4]" />
             </div>
             <div>
               <h1
@@ -264,21 +264,21 @@ export default function SupportPage() {
               <Wrapper
                 key={link.label}
                 {...(extraProps as any)}
-                className="group flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl p-4 transition-all duration-200 hover:border-[#f97316]/30 hover:bg-white/[0.03]"
+                className="group flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl p-4 transition-all duration-200 hover:border-[#06b6d4]/30 hover:bg-white/[0.03]"
               >
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors"
-                  style={{ background: 'rgba(249,115,22,0.1)' }}
+                  style={{ background: 'rgba(6,182,212,0.1)' }}
                 >
-                  <LinkIcon size={18} className="text-[#f97316]" />
+                  <LinkIcon size={18} className="text-[#06b6d4]" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-sm font-semibold text-[#F0EEFC] group-hover:text-[#f97316] transition-colors">
+                    <span className="text-sm font-semibold text-[#F0EEFC] group-hover:text-[#06b6d4] transition-colors">
                       {link.label}
                     </span>
                     {link.external && (
-                      <ExternalLink size={12} className="text-[#6B6890] group-hover:text-[#f97316]/60 transition-colors" />
+                      <ExternalLink size={12} className="text-[#6B6890] group-hover:text-[#06b6d4]/60 transition-colors" />
                     )}
                   </div>
                   <span className="text-xs text-[#6B6890]">{link.description}</span>
@@ -293,7 +293,7 @@ export default function SupportPage() {
           <div className="rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl overflow-hidden">
             {/* Card header */}
             <div className="flex items-center gap-2.5 px-6 pt-6 pb-4 border-b border-white/[0.04]">
-              <Send size={16} className="text-[#f97316]" />
+              <Send size={16} className="text-[#06b6d4]" />
               <h2
                 className="text-base font-semibold text-[#F0EEFC]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
@@ -417,7 +417,7 @@ export default function SupportPage() {
                           }
                         }}
                         placeholder="Brief description of your issue"
-                        className="w-full bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] placeholder:text-[#6B6890] focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/20 transition-colors"
+                        className="w-full bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] placeholder:text-[#6B6890] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors"
                         maxLength={SUBJECT_MAX}
                       />
                       <div className="flex justify-end mt-1">
@@ -452,7 +452,7 @@ export default function SupportPage() {
                         <select
                           value={agentId}
                           onChange={(e) => setAgentId(e.target.value)}
-                          className="w-full appearance-none bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/20 transition-colors cursor-pointer"
+                          className="w-full appearance-none bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors cursor-pointer"
                         >
                           <option value="">Select an agent...</option>
                           {agents.map((a) => (
@@ -482,7 +482,7 @@ export default function SupportPage() {
                         }}
                         placeholder="Describe your issue in detail..."
                         rows={6}
-                        className="w-full bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] placeholder:text-[#6B6890] focus:outline-none focus:border-[#f97316]/50 focus:ring-1 focus:ring-[#f97316]/20 transition-colors resize-y min-h-[120px]"
+                        className="w-full bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] placeholder:text-[#6B6890] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors resize-y min-h-[120px]"
                         maxLength={MESSAGE_MAX}
                       />
                       <div className="flex justify-end mt-1">
@@ -499,8 +499,8 @@ export default function SupportPage() {
                         disabled={submitting}
                         className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.98]"
                         style={{
-                          background: submitting ? 'rgba(249,115,22,0.7)' : '#f97316',
-                          boxShadow: '0 4px 16px rgba(249,115,22,0.3)',
+                          background: submitting ? 'rgba(6,182,212,0.7)' : '#06b6d4',
+                          boxShadow: '0 4px 16px rgba(6,182,212,0.3)',
                         }}
                       >
                         {submitting ? (
@@ -528,7 +528,7 @@ export default function SupportPage() {
           <div className="rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl overflow-hidden">
             {/* Section header */}
             <div className="flex items-center gap-2.5 px-6 pt-6 pb-4 border-b border-white/[0.04]">
-              <Ticket size={16} className="text-[#f97316]" />
+              <Ticket size={16} className="text-[#06b6d4]" />
               <h2
                 className="text-base font-semibold text-[#F0EEFC]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
@@ -585,7 +585,7 @@ export default function SupportPage() {
                           <StatusIcon size={14} className={sc.color} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[#F0EEFC] truncate group-hover:text-[#f97316] transition-colors">
+                          <p className="text-sm font-medium text-[#F0EEFC] truncate group-hover:text-[#06b6d4] transition-colors">
                             {ticket.subject}
                           </p>
                           <div className="flex items-center gap-2 mt-0.5">

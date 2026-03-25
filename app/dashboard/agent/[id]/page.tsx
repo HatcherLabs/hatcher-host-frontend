@@ -756,14 +756,14 @@ export default function AgentManagePage() {
   if (!agent) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center text-[#FFFFFF]">
-        <div className="text-4xl mb-4 text-[#f97316]">404</div>
+        <div className="text-4xl mb-4 text-[#06b6d4]">404</div>
         <h1 className="text-2xl font-bold mb-3">Agent Not Found</h1>
         <p className="mb-6 text-[#71717a]">
           The agent with ID &quot;{id}&quot; could not be found.
         </p>
         <Link
           href="/dashboard/agents"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#f97316]/40 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#06b6d4]/40 transition-colors"
         >
           <ArrowLeft size={16} /> Back to Agents
         </Link>
@@ -943,7 +943,7 @@ export default function AgentManagePage() {
                   <button
                     onClick={() => handleAction('restart')}
                     disabled={actionLoading === 'restart'}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 text-xs rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#f97316]/40 hover:bg-[#f97316]/10 transition-all disabled:opacity-40"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 text-xs rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#06b6d4]/40 hover:bg-[#06b6d4]/10 transition-all disabled:opacity-40"
                     title="Restart agent"
                   >
                     <RotateCcw size={14} className={actionLoading === 'restart' ? 'animate-spin' : ''} />
@@ -1026,7 +1026,7 @@ export default function AgentManagePage() {
                 onClick={() => { setTab(t.id);  }}
                 className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg text-[10px] transition-all ${
                   tab === t.id
-                    ? 'text-[#f97316] bg-[#f97316]/10'
+                    ? 'text-[#06b6d4] bg-[#06b6d4]/10'
                     : 'text-[#71717a]'
                 }`}
               >
@@ -1053,7 +1053,7 @@ export default function AgentManagePage() {
                 {t.label}
                 {tab === t.id && (
                   <motion.div
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#f97316] to-[#f97316] rounded-full"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#06b6d4] to-[#06b6d4] rounded-full"
                     layoutId="activeTab"
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />

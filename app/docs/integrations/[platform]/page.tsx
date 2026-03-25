@@ -83,7 +83,7 @@ function CopyBlock({ text }: { text: string }) {
       </code>
       <button
         onClick={handleCopy}
-        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-[#6B6890] hover:text-[#f97316] hover:bg-[#f97316]/10 transition-all duration-200 opacity-0 group-hover:opacity-100"
+        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-[#6B6890] hover:text-[#06b6d4] hover:bg-[#06b6d4]/10 transition-all duration-200 opacity-0 group-hover:opacity-100"
         aria-label="Copy"
       >
         {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
@@ -100,14 +100,14 @@ function FAQItem({ q, a }: { q: string; a: string }) {
     <div
       className={cn(
         'card glass-noise overflow-hidden transition-all duration-200',
-        open && 'border-[rgba(249,115,22,0.3)] shadow-[0_0_16px_rgba(249,115,22,0.06)]'
+        open && 'border-[rgba(6,182,212,0.3)] shadow-[0_0_16px_rgba(6,182,212,0.06)]'
       )}
     >
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between p-4 text-left group"
       >
-        <span className="text-sm font-medium text-[#F0EEFC] pr-4 group-hover:text-[#f97316] transition-colors">
+        <span className="text-sm font-medium text-[#F0EEFC] pr-4 group-hover:text-[#06b6d4] transition-colors">
           {q}
         </span>
         <motion.div
@@ -115,10 +115,10 @@ function FAQItem({ q, a }: { q: string; a: string }) {
           transition={{ duration: 0.2 }}
           className={cn(
             'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors',
-            open ? 'bg-[#f97316]/15' : 'bg-white/[0.03]'
+            open ? 'bg-[#06b6d4]/15' : 'bg-white/[0.03]'
           )}
         >
-          <ChevronDown className={cn('w-4 h-4 transition-colors', open ? 'text-[#f97316]' : 'text-[#6B6890]')} />
+          <ChevronDown className={cn('w-4 h-4 transition-colors', open ? 'text-[#06b6d4]' : 'text-[#6B6890]')} />
         </motion.div>
       </button>
       <AnimatePresence initial={false}>
@@ -131,7 +131,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
             className="overflow-hidden"
           >
             <div className="px-4 pb-4 pt-0">
-              <div className="w-full h-px bg-gradient-to-r from-transparent via-[rgba(249,115,22,0.2)] to-transparent mb-3" />
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-[rgba(6,182,212,0.2)] to-transparent mb-3" />
               <p className="text-sm text-[#A5A1C2] leading-relaxed">{a}</p>
             </div>
           </motion.div>
@@ -514,7 +514,7 @@ export default function PlatformGuidePage() {
           </p>
           <Link
             href="/docs/integrations"
-            className="inline-flex items-center gap-2 rounded-xl bg-[#f97316] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#f97316]/20 transition-all duration-200 hover:bg-[#ea580c]"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#06b6d4] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#06b6d4]/20 transition-all duration-200 hover:bg-[#0891b2]"
           >
             <ArrowLeft size={16} />
             All Integrations
@@ -539,7 +539,7 @@ export default function PlatformGuidePage() {
         <motion.div variants={cardVariants} className="mb-8">
           <Link
             href="/docs/integrations"
-            className="inline-flex items-center gap-2 text-sm text-[#6B6890] hover:text-[#f97316] transition-colors duration-200"
+            className="inline-flex items-center gap-2 text-sm text-[#6B6890] hover:text-[#06b6d4] transition-colors duration-200"
           >
             <ArrowLeft size={16} />
             All Integrations
@@ -593,8 +593,8 @@ export default function PlatformGuidePage() {
         <motion.div variants={cardVariants} className="mb-8">
           <div className="card glass-noise p-6">
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-[#f97316]/15 flex items-center justify-center">
-                <Shield size={16} className="text-[#f97316]" />
+              <div className="w-8 h-8 rounded-lg bg-[#06b6d4]/15 flex items-center justify-center">
+                <Shield size={16} className="text-[#06b6d4]" />
               </div>
               <h2
                 className="text-lg font-semibold text-[#F0EEFC]"
@@ -633,8 +633,8 @@ export default function PlatformGuidePage() {
             <motion.div key={i} variants={staggerItem}>
               <div className="card glass-noise p-5">
                 <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 rounded-lg bg-[#f97316]/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-sm font-bold text-[#f97316]">{i + 1}</span>
+                  <div className="w-8 h-8 rounded-lg bg-[#06b6d4]/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-sm font-bold text-[#06b6d4]">{i + 1}</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm font-semibold text-[#F0EEFC] mb-2">{step.title}</h3>
@@ -677,7 +677,7 @@ export default function PlatformGuidePage() {
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-semibold uppercase tracking-wider text-[#6B6890]">{cfg.field}</span>
                   </div>
-                  <code className="text-sm font-[family-name:var(--font-mono)] text-[#f97316]">{cfg.value}</code>
+                  <code className="text-sm font-[family-name:var(--font-mono)] text-[#06b6d4]">{cfg.value}</code>
                   <p className="text-xs text-[#6B6890] mt-1">{cfg.description}</p>
                 </div>
               ))}
@@ -702,7 +702,7 @@ export default function PlatformGuidePage() {
             <ol className="space-y-2">
               {guide.testSteps.map((step, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm text-[#A5A1C2]">
-                  <span className="w-5 h-5 rounded-full bg-[#f97316]/15 flex items-center justify-center flex-shrink-0 mt-0.5 text-[10px] font-bold text-[#f97316]">
+                  <span className="w-5 h-5 rounded-full bg-[#06b6d4]/15 flex items-center justify-center flex-shrink-0 mt-0.5 text-[10px] font-bold text-[#06b6d4]">
                     {i + 1}
                   </span>
                   {step}
@@ -734,23 +734,23 @@ export default function PlatformGuidePage() {
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href="/docs/integrations"
-              className="flex-1 group card glass-noise p-5 flex items-center gap-4 transition-all duration-200 hover:border-[rgba(249,115,22,0.3)] hover:shadow-[0_0_20px_rgba(249,115,22,0.06)]"
+              className="flex-1 group card glass-noise p-5 flex items-center gap-4 transition-all duration-200 hover:border-[rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.06)]"
             >
-              <ArrowLeft size={18} className="text-[#6B6890] group-hover:text-[#f97316] transition-colors" />
+              <ArrowLeft size={18} className="text-[#6B6890] group-hover:text-[#06b6d4] transition-colors" />
               <div>
-                <p className="text-sm font-semibold text-[#F0EEFC] group-hover:text-[#f97316] transition-colors">All Integrations</p>
+                <p className="text-sm font-semibold text-[#F0EEFC] group-hover:text-[#06b6d4] transition-colors">All Integrations</p>
                 <p className="text-xs text-[#6B6890] mt-0.5">Browse other platform guides</p>
               </div>
             </Link>
             <Link
               href="/docs/api"
-              className="flex-1 group card glass-noise p-5 flex items-center gap-4 transition-all duration-200 hover:border-[rgba(249,115,22,0.3)] hover:shadow-[0_0_20px_rgba(249,115,22,0.06)]"
+              className="flex-1 group card glass-noise p-5 flex items-center gap-4 transition-all duration-200 hover:border-[rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.06)]"
             >
               <div className="flex-1">
-                <p className="text-sm font-semibold text-[#F0EEFC] group-hover:text-[#f97316] transition-colors">API Reference</p>
+                <p className="text-sm font-semibold text-[#F0EEFC] group-hover:text-[#06b6d4] transition-colors">API Reference</p>
                 <p className="text-xs text-[#6B6890] mt-0.5">Programmatic control of agents</p>
               </div>
-              <ArrowRight size={18} className="text-[#6B6890] group-hover:text-[#f97316] transition-colors" />
+              <ArrowRight size={18} className="text-[#6B6890] group-hover:text-[#06b6d4] transition-colors" />
             </Link>
           </div>
         </motion.div>

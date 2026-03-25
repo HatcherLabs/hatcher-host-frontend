@@ -88,7 +88,7 @@ const FRAMEWORK_LABELS: Record<string, string> = {
 };
 
 function FrameworkTag({ framework = 'openclaw' }: { framework?: string }) {
-  const style = FRAMEWORK_BADGE_STYLES[framework] ?? 'bg-[var(--accent-glow)] text-[var(--accent-400)] border-[rgba(249,115,22,0.25)]';
+  const style = FRAMEWORK_BADGE_STYLES[framework] ?? 'bg-[var(--accent-glow)] text-[var(--accent-400)] border-[rgba(6,182,212,0.25)]';
   const label = FRAMEWORK_LABELS[framework] ?? framework;
   return (
     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${style}`}>
@@ -206,7 +206,7 @@ export default function MyAgentsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-full border-2 border-[#f97316] border-t-transparent animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 rounded-full border-2 border-[#06b6d4] border-t-transparent animate-spin mx-auto mb-4" />
           <p className="text-[#A5A1C2]">Authenticating...</p>
         </div>
       </div>
@@ -221,8 +221,8 @@ export default function MyAgentsPage() {
         className="min-h-screen flex items-center justify-center"
       >
         <div className="text-center max-w-md px-4">
-          <div className="w-20 h-20 rounded-2xl bg-[#f97316]/15 flex items-center justify-center mx-auto mb-6">
-            <Zap size={40} className="text-[#f97316]" />
+          <div className="w-20 h-20 rounded-2xl bg-[#06b6d4]/15 flex items-center justify-center mx-auto mb-6">
+            <Zap size={40} className="text-[#06b6d4]" />
           </div>
           <h1 className="text-2xl font-bold mb-3 text-[#FFFFFF]">Sign In Required</h1>
           <p className="mb-8 text-sm text-[#A5A1C2]">
@@ -305,8 +305,8 @@ export default function MyAgentsPage() {
               variants={statCardVariants}
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#f97316]/15 flex items-center justify-center">
-                  <Bot size={18} className="text-[#f97316]" />
+                <div className="w-10 h-10 rounded-lg bg-[#06b6d4]/15 flex items-center justify-center">
+                  <Bot size={18} className="text-[#06b6d4]" />
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-[#FFFFFF]">{agents.length}</div>
@@ -343,8 +343,8 @@ export default function MyAgentsPage() {
               variants={statCardVariants}
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-orange-500/15 flex items-center justify-center">
-                  <Layers size={18} className="text-orange-400" />
+                <div className="w-10 h-10 rounded-lg bg-cyan-500/15 flex items-center justify-center">
+                  <Layers size={18} className="text-cyan-400" />
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-[#FFFFFF]">{totalFeatures}</div>
@@ -368,7 +368,7 @@ export default function MyAgentsPage() {
                 onClick={() => setStatusFilter(f.key as StatusFilter)}
                 className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                   statusFilter === f.key
-                    ? 'bg-[#f97316]/15 text-[#FFFFFF] shadow-[0_0_8px_rgba(249,115,22,0.1)]'
+                    ? 'bg-[#06b6d4]/15 text-[#FFFFFF] shadow-[0_0_8px_rgba(6,182,212,0.1)]'
                     : 'text-[#71717a] hover:text-[#FFFFFF]'
                 }`}
               >
@@ -471,7 +471,7 @@ export default function MyAgentsPage() {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <h3 className="text-[#FFFFFF] font-semibold text-sm truncate group-hover:text-[#f97316] transition-colors">
+                        <h3 className="text-[#FFFFFF] font-semibold text-sm truncate group-hover:text-[#06b6d4] transition-colors">
                           {agent.name}
                         </h3>
                         <StatusBadge status={agent.status} />
@@ -510,11 +510,11 @@ export default function MyAgentsPage() {
                         <>
                           <button
                             onClick={(e) => { e.stopPropagation(); api.restartAgent(agent.id).then((res) => { if (res.success) { setAgents((prev) => prev.map((a) => a.id === agent.id ? { ...a, status: 'active' } : a)); setSuccessMsg(`${agent.name} restarted`); setTimeout(() => setSuccessMsg(null), 3000); } else setError(res.error ?? 'Restart failed'); }).catch(() => setError('Failed to restart agent')); }}
-                            className="p-1.5 rounded-lg hover:bg-[#f97316]/10 transition-colors"
+                            className="p-1.5 rounded-lg hover:bg-[#06b6d4]/10 transition-colors"
                             title="Restart"
                             aria-label={`Restart ${agent.name}`}
                           >
-                            <RotateCcw size={13} className="text-[#f97316]" />
+                            <RotateCcw size={13} className="text-[#06b6d4]" />
                           </button>
                           <button
                             onClick={(e) => { e.stopPropagation(); api.stopAgent(agent.id).then((res) => { if (res.success) { setAgents((prev) => prev.map((a) => a.id === agent.id ? { ...a, status: 'paused' } : a)); setSuccessMsg(`${agent.name} stopped`); setTimeout(() => setSuccessMsg(null), 3000); } else setError(res.error ?? 'Stop failed'); }).catch(() => setError('Failed to stop agent')); }}
@@ -535,7 +535,7 @@ export default function MyAgentsPage() {
                           <Play size={13} className="text-emerald-400" />
                         </button>
                       ) : null}
-                      <span className="text-xs text-[#f97316] ml-0.5">
+                      <span className="text-xs text-[#06b6d4] ml-0.5">
                         Details
                       </span>
                     </div>

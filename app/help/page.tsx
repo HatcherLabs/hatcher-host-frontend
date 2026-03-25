@@ -56,14 +56,14 @@ const LINKS = [
     description: 'Guides, API reference, and tutorials',
     href: DOCS_URL,
     icon: BookOpen,
-    color: '#f97316',
+    color: '#06b6d4',
   },
   {
     label: 'FAQ',
     description: 'Frequently asked questions',
     href: `${DOCS_URL}/faq`,
     icon: HelpCircle,
-    color: '#f97316',
+    color: '#06b6d4',
   },
   {
     label: 'X (Twitter)',
@@ -160,10 +160,10 @@ export default function HelpPage() {
       <div className="max-w-3xl mx-auto space-y-8">
         {/* Header */}
         <motion.div variants={cardVariants} className="relative">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(249,115,22,0.06),transparent_60%)] pointer-events-none rounded-2xl" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(6,182,212,0.06),transparent_60%)] pointer-events-none rounded-2xl" />
           <div className="flex items-center gap-3 mb-1">
-            <div className="w-10 h-10 rounded-xl bg-[#f97316]/15 flex items-center justify-center">
-              <LifeBuoy size={20} className="text-[#f97316]" />
+            <div className="w-10 h-10 rounded-xl bg-[#06b6d4]/15 flex items-center justify-center">
+              <LifeBuoy size={20} className="text-[#06b6d4]" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-[var(--text-primary)]">
@@ -186,7 +186,7 @@ export default function HelpPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search frequently asked questions..."
-            className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-[#252240] border border-[rgba(46,43,74,0.6)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#f97316] focus:ring-2 focus:ring-[#f97316]/20 transition-all duration-200"
+            className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-[#252240] border border-[rgba(46,43,74,0.6)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 transition-all duration-200"
           />
           {searchQuery && (
             <button
@@ -201,7 +201,7 @@ export default function HelpPage() {
         {/* Getting Started */}
         <motion.div variants={cardVariants}>
           <div className="flex items-center gap-2.5 mb-4 px-1">
-            <Rocket size={16} className="text-[#f97316]" />
+            <Rocket size={16} className="text-[#06b6d4]" />
             <h2 className="text-lg font-semibold text-[var(--text-primary)]">
               Getting Started
             </h2>
@@ -218,13 +218,13 @@ export default function HelpPage() {
                 <motion.div key={item.title} variants={staggerItem}>
                   <Link
                     href={item.href}
-                    className="group card glass-noise p-5 flex flex-col gap-3 transition-all duration-200 hover:border-[rgba(249,115,22,0.3)] hover:shadow-[0_0_20px_rgba(249,115,22,0.06)] block"
+                    className="group card glass-noise p-5 flex flex-col gap-3 transition-all duration-200 hover:border-[rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.06)] block"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-[#f97316]/10 flex items-center justify-center transition-all duration-200 group-hover:bg-[#f97316]/20 group-hover:scale-105">
-                      <Icon size={20} className="text-[#f97316]" />
+                    <div className="w-10 h-10 rounded-xl bg-[#06b6d4]/10 flex items-center justify-center transition-all duration-200 group-hover:bg-[#06b6d4]/20 group-hover:scale-105">
+                      <Icon size={20} className="text-[#06b6d4]" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-[#f97316] transition-colors">
+                      <p className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-[#06b6d4] transition-colors">
                         {item.title}
                       </p>
                       <p className="text-xs mt-1 text-[var(--text-muted)] leading-relaxed">
@@ -232,10 +232,10 @@ export default function HelpPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-1 mt-auto">
-                      <span className="text-xs text-[#f97316]/70 group-hover:text-[#f97316] transition-colors font-medium">
+                      <span className="text-xs text-[#06b6d4]/70 group-hover:text-[#06b6d4] transition-colors font-medium">
                         Learn more
                       </span>
-                      <ArrowRight size={12} className="text-[#f97316]/70 group-hover:text-[#f97316] transition-all duration-200 group-hover:translate-x-0.5" />
+                      <ArrowRight size={12} className="text-[#06b6d4]/70 group-hover:text-[#06b6d4] transition-all duration-200 group-hover:translate-x-0.5" />
                     </div>
                   </Link>
                 </motion.div>
@@ -267,14 +267,14 @@ export default function HelpPage() {
                     <Icon size={20} style={{ color: link.color }} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[var(--text-primary)] group-hover:text-[#f97316] transition-colors">
+                    <p className="text-sm font-medium text-[var(--text-primary)] group-hover:text-[#06b6d4] transition-colors">
                       {link.label}
                     </p>
                     <p className="text-xs mt-0.5 text-[var(--text-muted)]">
                       {link.description}
                     </p>
                   </div>
-                  <ArrowRight size={14} className="flex-shrink-0 text-[var(--text-muted)] group-hover:text-[#f97316] transition-all duration-200 group-hover:translate-x-1" />
+                  <ArrowRight size={14} className="flex-shrink-0 text-[var(--text-muted)] group-hover:text-[#06b6d4] transition-all duration-200 group-hover:translate-x-1" />
                 </motion.a>
               );
             })}
@@ -284,7 +284,7 @@ export default function HelpPage() {
         {/* Quick FAQ */}
         <motion.div variants={cardVariants}>
           <div className="flex items-center gap-2.5 mb-4 px-1">
-            <Sparkles size={16} className="text-[#f97316]" />
+            <Sparkles size={16} className="text-[#06b6d4]" />
             <h2 className="text-lg font-semibold text-[var(--text-primary)]">
               Quick Answers
             </h2>
@@ -328,10 +328,10 @@ export default function HelpPage() {
 
         {/* Contact */}
         <motion.div className="card glass-noise p-6 relative overflow-hidden" variants={cardVariants}>
-          <div className="absolute top-0 right-0 w-48 h-48 bg-[radial-gradient(circle,rgba(249,115,22,0.06),transparent_70%)] pointer-events-none" />
+          <div className="absolute top-0 right-0 w-48 h-48 bg-[radial-gradient(circle,rgba(6,182,212,0.06),transparent_70%)] pointer-events-none" />
           <div className="flex items-center gap-2.5 mb-4 relative">
-            <div className="w-8 h-8 rounded-lg bg-[#f97316]/15 flex items-center justify-center">
-              <Mail size={16} className="text-[#f97316]" />
+            <div className="w-8 h-8 rounded-lg bg-[#06b6d4]/15 flex items-center justify-center">
+              <Mail size={16} className="text-[#06b6d4]" />
             </div>
             <h2 className="text-lg font-semibold text-[var(--text-primary)]">
               Contact Us
@@ -341,7 +341,7 @@ export default function HelpPage() {
             Need help?{' '}
             <Link
               href="/support"
-              className="font-medium text-[#f97316] hover:text-[#f97316] transition-colors underline decoration-[#f97316]/30 underline-offset-2"
+              className="font-medium text-[#06b6d4] hover:text-[#06b6d4] transition-colors underline decoration-[#06b6d4]/30 underline-offset-2"
             >
               Open a support ticket
             </Link>{' '}
@@ -350,7 +350,7 @@ export default function HelpPage() {
               href="https://x.com/HatcherLabs"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-[#f97316] hover:text-[#f97316] transition-colors underline decoration-[#f97316]/30 underline-offset-2"
+              className="font-medium text-[#06b6d4] hover:text-[#06b6d4] transition-colors underline decoration-[#06b6d4]/30 underline-offset-2"
             >
               X (@HatcherLabs)
             </a>
@@ -362,21 +362,21 @@ export default function HelpPage() {
         <motion.div variants={cardVariants}>
           <Link
             href="/support"
-            className="group card glass-noise p-6 flex items-center gap-5 relative overflow-hidden transition-all duration-200 hover:border-[rgba(249,115,22,0.3)] hover:shadow-[0_0_24px_rgba(249,115,22,0.08)] block"
+            className="group card glass-noise p-6 flex items-center gap-5 relative overflow-hidden transition-all duration-200 hover:border-[rgba(6,182,212,0.3)] hover:shadow-[0_0_24px_rgba(6,182,212,0.08)] block"
           >
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(249,115,22,0.04),transparent_60%)] pointer-events-none" />
-            <div className="w-12 h-12 rounded-xl bg-[#f97316]/10 flex items-center justify-center flex-shrink-0 transition-all duration-200 group-hover:bg-[#f97316]/20 group-hover:scale-105 relative">
-              <LifeBuoy size={24} className="text-[#f97316]" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(6,182,212,0.04),transparent_60%)] pointer-events-none" />
+            <div className="w-12 h-12 rounded-xl bg-[#06b6d4]/10 flex items-center justify-center flex-shrink-0 transition-all duration-200 group-hover:bg-[#06b6d4]/20 group-hover:scale-105 relative">
+              <LifeBuoy size={24} className="text-[#06b6d4]" />
             </div>
             <div className="flex-1 min-w-0 relative">
-              <p className="text-base font-semibold text-[var(--text-primary)] group-hover:text-[#f97316] transition-colors">
+              <p className="text-base font-semibold text-[var(--text-primary)] group-hover:text-[#06b6d4] transition-colors">
                 Still need help?
               </p>
               <p className="text-sm mt-0.5 text-[var(--text-secondary)]">
                 Visit our support page to submit a request or start a conversation.
               </p>
             </div>
-            <ArrowRight size={20} className="flex-shrink-0 text-[var(--text-muted)] group-hover:text-[#f97316] transition-all duration-200 group-hover:translate-x-1 relative" />
+            <ArrowRight size={20} className="flex-shrink-0 text-[var(--text-muted)] group-hover:text-[#06b6d4] transition-all duration-200 group-hover:translate-x-1 relative" />
           </Link>
         </motion.div>
       </div>
@@ -406,7 +406,7 @@ function FAQAccordion({
     const parts = text.split(regex);
     return parts.map((part, i) =>
       regex.test(part) ? (
-        <mark key={i} className="bg-[#f97316]/20 text-[#f97316] rounded-sm px-0.5">
+        <mark key={i} className="bg-[#06b6d4]/20 text-[#06b6d4] rounded-sm px-0.5">
           {part}
         </mark>
       ) : (
@@ -420,7 +420,7 @@ function FAQAccordion({
       layout
       className={cn(
         'card glass-noise overflow-hidden transition-all duration-200',
-        open && 'border-[rgba(249,115,22,0.3)] shadow-[0_0_16px_rgba(249,115,22,0.06)]'
+        open && 'border-[rgba(6,182,212,0.3)] shadow-[0_0_16px_rgba(6,182,212,0.06)]'
       )}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
@@ -431,7 +431,7 @@ function FAQAccordion({
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between p-4 text-left group"
       >
-        <span className="text-sm font-medium text-[var(--text-primary)] pr-4 group-hover:text-[#f97316] transition-colors">
+        <span className="text-sm font-medium text-[var(--text-primary)] pr-4 group-hover:text-[#06b6d4] transition-colors">
           {highlightText(q)}
         </span>
         <motion.div
@@ -439,10 +439,10 @@ function FAQAccordion({
           transition={{ duration: 0.2 }}
           className={cn(
             'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors',
-            open ? 'bg-[#f97316]/15' : 'bg-white/[0.03]'
+            open ? 'bg-[#06b6d4]/15' : 'bg-white/[0.03]'
           )}
         >
-          <ChevronDown className={cn('w-4 h-4 transition-colors', open ? 'text-[#f97316]' : 'text-[var(--text-muted)]')} />
+          <ChevronDown className={cn('w-4 h-4 transition-colors', open ? 'text-[#06b6d4]' : 'text-[var(--text-muted)]')} />
         </motion.div>
       </button>
       <AnimatePresence initial={false}>
@@ -455,7 +455,7 @@ function FAQAccordion({
             className="overflow-hidden"
           >
             <div className="px-4 pb-4 pt-0">
-              <div className="w-full h-px bg-gradient-to-r from-transparent via-[rgba(249,115,22,0.2)] to-transparent mb-3" />
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-[rgba(6,182,212,0.2)] to-transparent mb-3" />
               <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{a}</p>
             </div>
           </motion.div>

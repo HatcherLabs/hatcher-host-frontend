@@ -41,7 +41,7 @@ export function EmptyState({
         <div
           className="absolute inset-0 rounded-full animate-pulse"
           style={{
-            background: 'radial-gradient(circle, rgba(249,115,22,0.2) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 70%)',
             transform: 'scale(1.8)',
           }}
         />
@@ -49,12 +49,12 @@ export function EmptyState({
         <div
           className="relative w-20 h-20 rounded-full flex items-center justify-center"
           style={{
-            background: 'rgba(249,115,22,0.1)',
-            border: '1px solid rgba(249,115,22,0.2)',
-            boxShadow: '0 0 24px rgba(249,115,22,0.15), 0 0 48px rgba(249,115,22,0.05)',
+            background: 'rgba(6,182,212,0.1)',
+            border: '1px solid rgba(6,182,212,0.2)',
+            boxShadow: '0 0 24px rgba(6,182,212,0.15), 0 0 48px rgba(6,182,212,0.05)',
           }}
         >
-          <Icon size={36} style={{ color: '#f97316' }} />
+          <Icon size={36} style={{ color: '#06b6d4' }} />
         </div>
       </motion.div>
 
@@ -94,8 +94,8 @@ export function EmptyState({
           href={actionHref}
           className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
           style={{
-            background: '#f97316',
-            boxShadow: '0 4px 16px rgba(249,115,22,0.3)',
+            background: '#06b6d4',
+            boxShadow: '0 4px 16px rgba(6,182,212,0.3)',
           }}
         >
           {actionLabel}

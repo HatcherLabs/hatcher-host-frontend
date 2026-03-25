@@ -83,8 +83,8 @@ export function AgentCard({ agent, href }: AgentCardProps) {
           border: '1px solid rgba(46, 43, 74, 0.4)',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = 'rgba(249, 115, 22, 0.3)';
-          e.currentTarget.style.boxShadow = '0 0 24px rgba(249, 115, 22, 0.1), 0 4px 24px rgba(0, 0, 0, 0.2)';
+          e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.3)';
+          e.currentTarget.style.boxShadow = '0 0 24px rgba(6, 182, 212, 0.1), 0 4px 24px rgba(0, 0, 0, 0.2)';
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.borderColor = 'rgba(46, 43, 74, 0.4)';
@@ -110,11 +110,11 @@ export function AgentCard({ agent, href }: AgentCardProps) {
           )}
 
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-sm truncate transition-colors duration-200 group-hover:text-[#f97316] text-white">
+            <h3 className="font-semibold text-sm truncate transition-colors duration-200 group-hover:text-[#06b6d4] text-white">
               {agent.name}
             </h3>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(249,115,22,0.1)', color: '#f97316' }}>
+              <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(6,182,212,0.1)', color: '#06b6d4' }}>
                 {agent.framework}
               </span>
               <span className="text-xs font-mono" style={{ color: '#71717a' }}>
@@ -142,7 +142,7 @@ export function AgentCard({ agent, href }: AgentCardProps) {
               <span
                 key={feat}
                 className="text-[10px] px-2 py-0.5 rounded-full"
-                style={{ background: 'rgba(249, 115, 22, 0.06)', color: '#71717a' }}
+                style={{ background: 'rgba(6, 182, 212, 0.06)', color: '#71717a' }}
               >
                 {feat.toLowerCase()}
               </span>

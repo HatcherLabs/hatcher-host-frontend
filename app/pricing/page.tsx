@@ -35,8 +35,8 @@ const sectionVariants = {
 
 const cardHover = {
   scale: 1.02,
-  borderColor: 'rgba(249, 115, 22, 0.4)',
-  boxShadow: '0 0 30px rgba(249, 115, 22, 0.12), 0 8px 40px rgba(0,0,0,0.2)',
+  borderColor: 'rgba(6, 182, 212, 0.4)',
+  boxShadow: '0 0 30px rgba(6, 182, 212, 0.12), 0 8px 40px rgba(0,0,0,0.2)',
 };
 
 const scrollFadeIn = {
@@ -89,8 +89,8 @@ function renderCell(value: string | boolean) {
 /* ── Tier card accent colors ─────────────────────────────── */
 const TIER_STYLES: Record<UserTierKey, { accent: string; badge?: string; highlighted?: boolean }> = {
   free: { accent: '#22c55e' },
-  basic: { accent: '#f97316' },
-  pro: { accent: '#f97316', badge: 'Most Popular', highlighted: true },
+  basic: { accent: '#06b6d4' },
+  pro: { accent: '#06b6d4', badge: 'Most Popular', highlighted: true },
 };
 
 /* ── Page ─────────────────────────────────────────────────── */
@@ -105,9 +105,9 @@ export default function PricingPage() {
       <div className="mx-auto max-w-6xl px-4 py-16">
         {/* HERO */}
         <motion.div className="text-center mb-16 relative" variants={sectionVariants}>
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(249,115,22,0.12),transparent_60%)] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.12),transparent_60%)] pointer-events-none" />
           <motion.div
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#f97316]/10 border border-[#f97316]/20 text-[#f97316] text-xs font-medium mb-6"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#06b6d4]/10 border border-[#06b6d4]/20 text-[#06b6d4] text-xs font-medium mb-6"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
@@ -142,7 +142,7 @@ export default function PricingPage() {
                 key={tierKey}
                 className={cn(
                   'card glass-noise p-8 flex flex-col relative',
-                  style.highlighted && 'border-[#f97316]/40 shadow-[0_0_40px_rgba(249,115,22,0.12)]'
+                  style.highlighted && 'border-[#06b6d4]/40 shadow-[0_0_40px_rgba(6,182,212,0.12)]'
                 )}
                 whileHover={cardHover}
                 variants={staggerItem}
@@ -150,7 +150,7 @@ export default function PricingPage() {
                 {/* Popular badge */}
                 {style.badge && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-[#f97316] to-[#ea580c] text-white text-[11px] font-bold uppercase tracking-wider shadow-[0_0_20px_rgba(249,115,22,0.5)]">
+                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-[#06b6d4] to-[#0891b2] text-white text-[11px] font-bold uppercase tracking-wider shadow-[0_0_20px_rgba(6,182,212,0.5)]">
                       <Crown className="w-3.5 h-3.5" />
                       {style.badge}
                     </span>
@@ -222,8 +222,8 @@ export default function PricingPage() {
                     href="/dashboard/billing"
                     className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-white"
                     style={{
-                      background: '#f97316',
-                      boxShadow: '0 4px 16px rgba(249,115,22,0.3)',
+                      background: '#06b6d4',
+                      boxShadow: '0 4px 16px rgba(6,182,212,0.3)',
                     }}
                   >
                     <Zap className="w-4 h-4" />
@@ -245,7 +245,7 @@ export default function PricingPage() {
         >
           <div className="text-center mb-10">
             <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3" style={displayFont}>
-              <Plus className="w-6 h-6 text-[#f97316]" />
+              <Plus className="w-6 h-6 text-[#06b6d4]" />
               <span className="text-[var(--text-primary)]">Agent Add-ons</span>
             </h2>
             <p className="text-[var(--text-muted)] text-sm max-w-lg mx-auto">
@@ -324,7 +324,7 @@ export default function PricingPage() {
         >
           <div className="text-center mb-10">
             <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3" style={displayFont}>
-              <Shield className="w-6 h-6 text-[#f97316]" />
+              <Shield className="w-6 h-6 text-[#06b6d4]" />
               <span className="text-[var(--text-primary)]">Compare Plans</span>
             </h2>
             <p className="text-[var(--text-muted)] text-sm">See what each tier includes at a glance</p>
@@ -365,7 +365,7 @@ export default function PricingPage() {
                     >
                       <td className="p-4 text-[var(--text-secondary)]">{row.label}</td>
                       <td className="p-4 text-center">{renderCell(row.free)}</td>
-                      <td className="p-4 text-center bg-[#f97316]/[0.02]">{renderCell(row.basic)}</td>
+                      <td className="p-4 text-center bg-[#06b6d4]/[0.02]">{renderCell(row.basic)}</td>
                       <td className="p-4 text-center">{renderCell(row.pro)}</td>
                     </motion.tr>
                   ))}
@@ -385,7 +385,7 @@ export default function PricingPage() {
         >
           <div className="text-center mb-10">
             <h2 className="text-2xl font-bold flex items-center justify-center gap-3" style={displayFont}>
-              <HelpCircle className="w-6 h-6 text-[#f97316]" />
+              <HelpCircle className="w-6 h-6 text-[#06b6d4]" />
               <span className="text-[var(--text-primary)]">Frequently Asked Questions</span>
             </h2>
           </div>
@@ -404,7 +404,7 @@ export default function PricingPage() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
         >
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(249,115,22,0.1),transparent_60%)] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.1),transparent_60%)] pointer-events-none" />
           <RobotMascot size="lg" mood="waving" className="mx-auto mb-6 relative" />
           <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 relative" style={displayFont}>
             <span className="text-gradient">Ready to hatch</span>{' '}
@@ -478,7 +478,7 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
     <motion.div
       className={cn(
         'card glass-noise overflow-hidden transition-all duration-200',
-        open && 'border-[rgba(249,115,22,0.3)] shadow-[0_0_20px_rgba(249,115,22,0.06)]'
+        open && 'border-[rgba(6,182,212,0.3)] shadow-[0_0_20px_rgba(6,182,212,0.06)]'
       )}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
@@ -488,16 +488,16 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between p-5 text-left group"
       >
-        <span className="text-sm font-medium text-[var(--text-primary)] pr-4 group-hover:text-[#f97316] transition-colors">{q}</span>
+        <span className="text-sm font-medium text-[var(--text-primary)] pr-4 group-hover:text-[#06b6d4] transition-colors">{q}</span>
         <motion.div
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: 0.2 }}
           className={cn(
             'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors',
-            open ? 'bg-[#f97316]/15' : 'bg-white/[0.03]'
+            open ? 'bg-[#06b6d4]/15' : 'bg-white/[0.03]'
           )}
         >
-          <ChevronDown className={cn('w-4 h-4 transition-colors', open ? 'text-[#f97316]' : 'text-[var(--text-muted)]')} />
+          <ChevronDown className={cn('w-4 h-4 transition-colors', open ? 'text-[#06b6d4]' : 'text-[var(--text-muted)]')} />
         </motion.div>
       </button>
       <AnimatePresence>
@@ -510,7 +510,7 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
             className="overflow-hidden"
           >
             <div className="px-5 pb-5 pt-0">
-              <div className="w-full h-px bg-gradient-to-r from-transparent via-[rgba(249,115,22,0.2)] to-transparent mb-4" />
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-[rgba(6,182,212,0.2)] to-transparent mb-4" />
               <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{a}</p>
             </div>
           </motion.div>

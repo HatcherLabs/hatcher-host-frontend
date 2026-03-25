@@ -43,7 +43,7 @@ function Toggle({
       onClick={() => onChange(!checked)}
       className={`relative w-11 h-6 rounded-full transition-all duration-300 ${
         checked
-          ? 'bg-[#f97316] shadow-[0_0_12px_rgba(249,115,22,0.3)]'
+          ? 'bg-[#06b6d4] shadow-[0_0_12px_rgba(6,182,212,0.3)]'
           : 'bg-[rgba(46,43,74,0.6)]'
       }`}
       role="switch"
@@ -63,7 +63,7 @@ function Toggle({
 function getTierStyle(tier: string) {
   switch (tier?.toLowerCase()) {
     case 'pro':
-      return 'bg-[#f97316]/15 text-[#f97316] border-[#f97316]/30';
+      return 'bg-[#06b6d4]/15 text-[#06b6d4] border-[#06b6d4]/30';
     case 'basic':
       return 'bg-purple-500/15 text-purple-400 border-purple-500/30';
     default:
@@ -74,7 +74,7 @@ function getTierStyle(tier: string) {
 // ── Avatar background color from username ───────────────────
 function getAvatarColor(name: string) {
   const colors = [
-    '#f97316', '#8b5cf6', '#06b6d4', '#10b981',
+    '#06b6d4', '#8b5cf6', '#06b6d4', '#10b981',
     '#f43f5e', '#6366f1', '#14b8a6', '#eab308',
   ];
   let hash = 0;
@@ -145,7 +145,7 @@ export default function SettingsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-full border-2 border-[#f97316] border-t-transparent animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 rounded-full border-2 border-[#06b6d4] border-t-transparent animate-spin mx-auto mb-4" />
           <p className="text-[var(--text-secondary)]">Authenticating...</p>
         </div>
       </div>
@@ -161,8 +161,8 @@ export default function SettingsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <div className="w-20 h-20 rounded-2xl bg-[#f97316]/15 flex items-center justify-center mx-auto mb-6">
-            <Zap size={40} className="text-[#f97316]" />
+          <div className="w-20 h-20 rounded-2xl bg-[#06b6d4]/15 flex items-center justify-center mx-auto mb-6">
+            <Zap size={40} className="text-[#06b6d4]" />
           </div>
           <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">Sign In Required</h1>
           <p className="mb-8 text-sm text-[var(--text-secondary)]">
@@ -189,7 +189,7 @@ export default function SettingsPage() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse 60% 40% at 30% 0%, rgba(249,115,22,0.05), transparent 60%)',
+            'radial-gradient(ellipse 60% 40% at 30% 0%, rgba(6,182,212,0.05), transparent 60%)',
         }}
       />
 
@@ -212,8 +212,8 @@ export default function SettingsPage() {
             ════════════════════════════════════════════════════ */}
         <motion.div className="card glass-noise p-6" variants={cardVariants}>
           <div className="flex items-center gap-2.5 mb-6">
-            <div className="w-8 h-8 rounded-lg bg-[#f97316]/15 flex items-center justify-center">
-              <User size={16} className="text-[#f97316]" />
+            <div className="w-8 h-8 rounded-lg bg-[#06b6d4]/15 flex items-center justify-center">
+              <User size={16} className="text-[#06b6d4]" />
             </div>
             <h2
               className="text-lg font-semibold text-[var(--text-primary)]"
@@ -263,8 +263,8 @@ export default function SettingsPage() {
             ════════════════════════════════════════════════════ */}
         <motion.div className="card glass-noise p-6" variants={cardVariants}>
           <div className="flex items-center gap-2.5 mb-6">
-            <div className="w-8 h-8 rounded-lg bg-[#f97316]/15 flex items-center justify-center">
-              <Bell size={16} className="text-[#f97316]" />
+            <div className="w-8 h-8 rounded-lg bg-[#06b6d4]/15 flex items-center justify-center">
+              <Bell size={16} className="text-[#06b6d4]" />
             </div>
             <h2
               className="text-lg font-semibold text-[var(--text-primary)]"

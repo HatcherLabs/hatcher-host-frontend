@@ -96,7 +96,7 @@ export default function PublicChatPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0D0B1A] flex items-center justify-center">
-        <Loader2 size={32} className="animate-spin text-[#f97316]" />
+        <Loader2 size={32} className="animate-spin text-[#06b6d4]" />
       </div>
     );
   }
@@ -109,7 +109,7 @@ export default function PublicChatPage() {
         <p className="text-[#A5A1C2] text-sm">Agent not found</p>
         <Link
           href="/"
-          className="text-xs text-[#f97316] hover:text-[#fb923c] transition-colors"
+          className="text-xs text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
         >
           Go to Hatcher
         </Link>
@@ -129,8 +129,8 @@ export default function PublicChatPage() {
               className="w-9 h-9 rounded-full object-cover border border-white/[0.08]"
             />
           ) : (
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#f97316]/20 to-violet-500/20 border border-white/[0.08] flex items-center justify-center">
-              <Bot size={16} className="text-[#f97316]" />
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#06b6d4]/20 to-violet-500/20 border border-white/[0.08] flex items-center justify-center">
+              <Bot size={16} className="text-[#06b6d4]" />
             </div>
           )}
           <div className="flex-1 min-w-0">
@@ -154,8 +154,8 @@ export default function PublicChatPage() {
         <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
           {messages.length === 0 && (
             <div className="text-center py-16 space-y-3">
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-[#f97316]/10 to-violet-500/10 border border-white/[0.06] flex items-center justify-center">
-                <Bot size={28} className="text-[#f97316]/60" />
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-[#06b6d4]/10 to-violet-500/10 border border-white/[0.06] flex items-center justify-center">
+                <Bot size={28} className="text-[#06b6d4]/60" />
               </div>
               <p className="text-sm text-[#A5A1C2]">
                 Start a conversation with <span className="text-white font-medium">{agent.name}</span>
@@ -173,11 +173,11 @@ export default function PublicChatPage() {
             >
               <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center ${
                 msg.role === 'user'
-                  ? 'bg-[#f97316]/10 border border-[#f97316]/20'
+                  ? 'bg-[#06b6d4]/10 border border-[#06b6d4]/20'
                   : 'bg-violet-500/10 border border-violet-500/20'
               }`}>
                 {msg.role === 'user' ? (
-                  <User size={12} className="text-[#f97316]" />
+                  <User size={12} className="text-[#06b6d4]" />
                 ) : (
                   <Bot size={12} className="text-violet-400" />
                 )}
@@ -185,7 +185,7 @@ export default function PublicChatPage() {
               <div
                 className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                   msg.role === 'user'
-                    ? 'bg-[#f97316]/10 border border-[#f97316]/20 text-white rounded-br-md'
+                    ? 'bg-[#06b6d4]/10 border border-[#06b6d4]/20 text-white rounded-br-md'
                     : 'bg-white/[0.04] border border-white/[0.06] text-[#e4e4e7] rounded-bl-md'
                 }`}
               >
@@ -240,12 +240,12 @@ export default function PublicChatPage() {
               }}
               placeholder="Type a message..."
               disabled={sending}
-              className="flex-1 h-10 px-4 rounded-xl text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-[#f97316]/50 focus:outline-none placeholder:text-[#71717a] transition-colors disabled:opacity-50"
+              className="flex-1 h-10 px-4 rounded-xl text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-[#06b6d4]/50 focus:outline-none placeholder:text-[#71717a] transition-colors disabled:opacity-50"
             />
             <button
               onClick={handleSend}
               disabled={sending || !input.trim()}
-              className="h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-[#f97316] hover:bg-[#ea580c] disabled:opacity-40 transition-colors"
+              className="h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-[#06b6d4] hover:bg-[#0891b2] disabled:opacity-40 transition-colors"
             >
               {sending ? (
                 <Loader2 size={16} className="animate-spin text-white" />

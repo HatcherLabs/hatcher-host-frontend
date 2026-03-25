@@ -29,19 +29,19 @@ const config: Config = {
           glow: 'rgba(139,92,246,0.15)',
         },
 
-        // CTA accent (orange)
+        // CTA accent (cyan)
         accent: {
-          400: '#fb923c',
-          500: '#f97316',
-          600: '#ea580c',
-          700: '#c2410c',
-          glow: 'rgba(249,115,22,0.15)',
+          400: '#22d3ee',
+          500: '#06b6d4',
+          600: '#0891b2',
+          700: '#0e7490',
+          glow: 'rgba(6,182,212,0.15)',
         },
 
         // Accent colors
-        orange: {
-          400: '#fb923c',
-          500: '#f97316',
+        cyan: {
+          400: '#22d3ee',
+          500: '#06b6d4',
         },
         amber: {
           400: '#FBBF24',

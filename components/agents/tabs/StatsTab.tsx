@@ -97,7 +97,7 @@ export function StatsTab() {
       <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
-            <BarChart3 size={18} className="text-[#f97316]" />
+            <BarChart3 size={18} className="text-[#06b6d4]" />
             <h3 className="text-base font-semibold text-[#fafafa]">Message Activity</h3>
           </div>
           <span className="text-[10px] text-[#71717a] uppercase tracking-wider">Last 7 days</span>
@@ -128,7 +128,7 @@ export function StatsTab() {
                   <div key={d.date} className="flex-1 flex flex-col items-center gap-1 group relative">
                     {/* Count label */}
                     <span className={`text-[10px] font-medium transition-colors ${
-                      isPeak ? 'text-[#f97316]' : 'text-[#71717a] group-hover:text-[#A5A1C2]'
+                      isPeak ? 'text-[#06b6d4]' : 'text-[#71717a] group-hover:text-[#A5A1C2]'
                     }`}>
                       {d.count > 0 ? d.count : ''}
                     </span>
@@ -136,16 +136,16 @@ export function StatsTab() {
                     <div
                       className={`w-full rounded-t transition-all duration-300 min-h-[2px] ${
                         isToday
-                          ? 'bg-[#f97316]'
+                          ? 'bg-[#06b6d4]'
                           : isPeak
-                          ? 'bg-[#f97316]/80'
-                          : 'bg-[#f97316]/40 group-hover:bg-[#f97316]/60'
+                          ? 'bg-[#06b6d4]/80'
+                          : 'bg-[#06b6d4]/40 group-hover:bg-[#06b6d4]/60'
                       }`}
                       style={{ height: `${Math.max(heightPct, d.count > 0 ? 4 : 1)}%` }}
                     />
                     {/* Date label */}
                     <div className="flex flex-col items-center">
-                      <span className={`text-[9px] ${isToday ? 'text-[#f97316] font-medium' : 'text-[#71717a]'}`}>
+                      <span className={`text-[9px] ${isToday ? 'text-[#06b6d4] font-medium' : 'text-[#71717a]'}`}>
                         {isToday ? 'Today' : formatWeekday(d.date)}
                       </span>
                       <span className="text-[8px] text-[#71717a]/60">
@@ -160,8 +160,8 @@ export function StatsTab() {
             {/* Summary Stats Row */}
             <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/[0.04]">
               <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#f97316]/10">
-                  <Hash size={13} className="text-[#f97316]" />
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#06b6d4]/10">
+                  <Hash size={13} className="text-[#06b6d4]" />
                 </div>
                 <div>
                   <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Total</p>
@@ -169,8 +169,8 @@ export function StatsTab() {
                 </div>
               </div>
               <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#f97316]/10">
-                  <TrendingUp size={13} className="text-[#f97316]" />
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#06b6d4]/10">
+                  <TrendingUp size={13} className="text-[#06b6d4]" />
                 </div>
                 <div>
                   <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Avg/Day</p>
@@ -178,8 +178,8 @@ export function StatsTab() {
                 </div>
               </div>
               <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#f97316]/10">
-                  <Calendar size={13} className="text-[#f97316]" />
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#06b6d4]/10">
+                  <Calendar size={13} className="text-[#06b6d4]" />
                 </div>
                 <div>
                   <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Peak</p>
@@ -196,7 +196,7 @@ export function StatsTab() {
       {/* Agent Info */}
       <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
         <div className="flex items-center gap-2 mb-4">
-          <Settings size={18} className="text-[#f97316]" />
+          <Settings size={18} className="text-[#06b6d4]" />
           <h3 className="text-base font-semibold text-[#fafafa]">Agent Info</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -208,7 +208,7 @@ export function StatsTab() {
           </div>
           <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
             <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Framework</p>
-            <p className="text-sm font-medium text-[#f97316] capitalize">{agent?.framework ?? '--'}</p>
+            <p className="text-sm font-medium text-[#06b6d4] capitalize">{agent?.framework ?? '--'}</p>
           </div>
           <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
             <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Instance ID</p>
@@ -237,7 +237,7 @@ export function StatsTab() {
       {/* Activity Summary */}
       <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
         <div className="flex items-center gap-2 mb-4">
-          <Activity size={18} className="text-[#f97316]" />
+          <Activity size={18} className="text-[#06b6d4]" />
           <h3 className="text-base font-semibold text-[#fafafa]">Activity Summary</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -276,7 +276,7 @@ export function StatsTab() {
       {/* LLM Configuration */}
       <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
         <div className="flex items-center gap-2 mb-4">
-          <Cpu size={18} className="text-[#f97316]" />
+          <Cpu size={18} className="text-[#06b6d4]" />
           <h3 className="text-base font-semibold text-[#fafafa]">AI Model</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -302,7 +302,7 @@ export function StatsTab() {
             <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${
               hasApiKey
                 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                : 'bg-[#f97316]/10 text-[#f97316] border-[#f97316]/20'
+                : 'bg-[#06b6d4]/10 text-[#06b6d4] border-[#06b6d4]/20'
             }`}>
               {hasApiKey ? (
                 <><Shield size={12} /> Your Own Key</>
@@ -317,7 +317,7 @@ export function StatsTab() {
       {/* Your Plan */}
       <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
         <div className="flex items-center gap-2 mb-4">
-          <Zap size={18} className="text-[#f97316]" />
+          <Zap size={18} className="text-[#06b6d4]" />
           <h3 className="text-base font-semibold text-[#fafafa]">Your Plan</h3>
         </div>
         {(() => {
@@ -338,8 +338,8 @@ export function StatsTab() {
           return (
             <div className="space-y-3">
               <div className="flex items-center gap-3 rounded-xl px-4 py-3" style={{ background: 'rgba(46,43,74,0.3)' }}>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isPaid ? 'bg-[#f97316]/15' : 'bg-white/[0.06]'}`}>
-                  <Shield size={16} className={isPaid ? 'text-[#f97316]' : 'text-[#71717a]'} />
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isPaid ? 'bg-[#06b6d4]/15' : 'bg-white/[0.06]'}`}>
+                  <Shield size={16} className={isPaid ? 'text-[#06b6d4]' : 'text-[#71717a]'} />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-white">{tierName} Tier</p>

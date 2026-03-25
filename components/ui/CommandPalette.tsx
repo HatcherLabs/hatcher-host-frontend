@@ -131,7 +131,7 @@ export function CommandPalette() {
             style={{
               background: '#1A1730',
               borderColor: 'rgba(46,43,74,0.6)',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(249,115,22,0.08)',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(6,182,212,0.08)',
             }}
             initial={{ opacity: 0, scale: 0.95, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -180,11 +180,11 @@ export function CommandPalette() {
                           onMouseEnter={() => setSelectedIndex(globalIndex)}
                           className={`w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${
                             isSelected
-                              ? 'bg-[rgba(249,115,22,0.08)] text-white'
+                              ? 'bg-[rgba(6,182,212,0.08)] text-white'
                               : 'text-[#A5A1C2] hover:bg-white/[0.02]'
                           }`}
                         >
-                          <Icon size={16} className={isSelected ? 'text-[#f97316]' : 'text-[#71717a]'} />
+                          <Icon size={16} className={isSelected ? 'text-[#06b6d4]' : 'text-[#71717a]'} />
                           <span className="flex-1">{item.label}</span>
                           {item.shortcut && (
                             <kbd className="text-[10px] font-mono text-[#71717a] bg-white/[0.04] border border-white/[0.06] rounded px-1.5 py-0.5">

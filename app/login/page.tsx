@@ -49,7 +49,7 @@ export default function LoginPage() {
               onChange={(e) => { setEmail(e.target.value); clearError(); }}
               required
               autoFocus
-              className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-orange-500/50 focus:outline-none focus:ring-1 focus:ring-orange-500/30 placeholder:text-[#71717a] transition-colors"
+              className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[#71717a] transition-colors"
               placeholder="you@example.com"
             />
           </div>
@@ -64,7 +64,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => { setPassword(e.target.value); clearError(); }}
               required
-              className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-orange-500/50 focus:outline-none focus:ring-1 focus:ring-orange-500/30 placeholder:text-[#71717a] transition-colors"
+              className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[#71717a] transition-colors"
               placeholder="Enter your password"
             />
           </div>
@@ -78,7 +78,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full h-10 rounded-lg text-sm font-medium text-white bg-orange-600 hover:bg-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+            className="w-full h-10 rounded-lg text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
           >
             {isLoading ? (
               <>
@@ -93,7 +93,7 @@ export default function LoginPage() {
 
         <p className="text-center text-xs text-[#A5A1C2] mt-6">
           Don&apos;t have an account?{' '}
-          <Link href="/register" className="text-orange-400 hover:text-orange-300 transition-colors">
+          <Link href="/register" className="text-cyan-400 hover:text-cyan-300 transition-colors">
             Sign Up
           </Link>
         </p>

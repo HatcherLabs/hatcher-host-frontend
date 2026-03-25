@@ -139,7 +139,7 @@ export default function IntegrationsPage() {
         <motion.div variants={cardVariants} className="mb-8">
           <Link
             href="/docs"
-            className="inline-flex items-center gap-2 text-sm text-[#6B6890] hover:text-[#f97316] transition-colors duration-200"
+            className="inline-flex items-center gap-2 text-sm text-[#6B6890] hover:text-[#06b6d4] transition-colors duration-200"
           >
             <ArrowLeft size={16} />
             Back to Docs
@@ -148,7 +148,7 @@ export default function IntegrationsPage() {
 
         {/* ── Hero ───────────────────────────────────────────── */}
         <motion.div variants={cardVariants} className="mb-12">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#f97316]/20 bg-[#f97316]/5 px-4 py-1.5 text-sm font-medium text-[#f97316]">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#06b6d4]/20 bg-[#06b6d4]/5 px-4 py-1.5 text-sm font-medium text-[#06b6d4]">
             <Plug className="h-4 w-4" />
             Integrations
           </div>
@@ -177,7 +177,7 @@ export default function IntegrationsPage() {
               <motion.div key={platform.id} variants={staggerItem}>
                 <Link
                   href={`/docs/integrations/${platform.id}`}
-                  className="group relative card glass-noise p-6 flex flex-col gap-4 transition-all duration-200 hover:border-[rgba(249,115,22,0.3)] hover:shadow-[0_0_24px_rgba(249,115,22,0.06)] block h-full"
+                  className="group relative card glass-noise p-6 flex flex-col gap-4 transition-all duration-200 hover:border-[rgba(6,182,212,0.3)] hover:shadow-[0_0_24px_rgba(6,182,212,0.06)] block h-full"
                 >
                   {/* Platform icon + name */}
                   <div className="flex items-center gap-3">
@@ -188,7 +188,7 @@ export default function IntegrationsPage() {
                       <Icon size={22} style={{ color: platform.color }} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-semibold text-[#F0EEFC] group-hover:text-[#f97316] transition-colors">
+                      <h3 className="text-base font-semibold text-[#F0EEFC] group-hover:text-[#06b6d4] transition-colors">
                         {platform.name}
                       </h3>
                       <DifficultyBadge level={platform.difficulty} />
@@ -213,7 +213,7 @@ export default function IntegrationsPage() {
                   </div>
 
                   {/* Arrow */}
-                  <div className="flex items-center gap-1 text-xs font-medium text-[#f97316]/70 group-hover:text-[#f97316] transition-colors">
+                  <div className="flex items-center gap-1 text-xs font-medium text-[#06b6d4]/70 group-hover:text-[#06b6d4] transition-colors">
                     View guide
                     <ArrowRight size={12} className="transition-transform duration-200 group-hover:translate-x-0.5" />
                   </div>
@@ -247,13 +247,13 @@ export default function IntegrationsPage() {
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/docs/api"
-                className="inline-flex items-center gap-2 rounded-xl bg-[#f97316] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#f97316]/20 transition-all duration-200 hover:bg-[#ea580c] hover:shadow-[#f97316]/30"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#06b6d4] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#06b6d4]/20 transition-all duration-200 hover:bg-[#0891b2] hover:shadow-[#06b6d4]/30"
               >
                 API Reference
               </Link>
               <Link
                 href="/docs"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/[0.06] bg-[#1A1730] px-5 py-2.5 text-sm font-semibold text-[#A5A1C2] transition-all duration-200 hover:border-[#f97316]/30 hover:text-[#F0EEFC]"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/[0.06] bg-[#1A1730] px-5 py-2.5 text-sm font-semibold text-[#A5A1C2] transition-all duration-200 hover:border-[#06b6d4]/30 hover:text-[#F0EEFC]"
               >
                 All Documentation
               </Link>

@@ -53,7 +53,7 @@ function SkillCard({
             {skill.name}
           </h3>
           {skill.category && skill.category !== 'general' && (
-            <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#f97316]/10 text-[#f97316] border border-[#f97316]/20">
+            <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#06b6d4]/10 text-[#06b6d4] border border-[#06b6d4]/20">
               <Tag size={9} />
               {skill.category}
             </span>
@@ -67,7 +67,7 @@ function SkillCard({
           className={`
             relative flex-shrink-0 w-11 h-6 rounded-full transition-all duration-200
             ${skill.enabled
-              ? 'bg-[#f97316] border border-[#f97316]/60'
+              ? 'bg-[#06b6d4] border border-[#06b6d4]/60'
               : 'bg-white/[0.08] border border-white/[0.12]'
             }
             ${isToggling ? 'opacity-50 cursor-wait' : 'cursor-pointer hover:border-white/[0.2]'}
@@ -244,7 +244,7 @@ export function SkillsTab() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-            <Sparkles size={18} className="text-[#f97316]" />
+            <Sparkles size={18} className="text-[#06b6d4]" />
             Skills Browser
           </h2>
           <p className="text-xs text-[#71717a] mt-0.5">
@@ -265,14 +265,14 @@ export function SkillsTab() {
 
       {/* Restart hint */}
       {restartHint && (
-        <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#f97316]/10 border border-[#f97316]/20">
-          <AlertTriangle size={14} className="text-[#f97316] flex-shrink-0" />
-          <p className="text-xs text-[#f97316]">
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#06b6d4]/10 border border-[#06b6d4]/20">
+          <AlertTriangle size={14} className="text-[#06b6d4] flex-shrink-0" />
+          <p className="text-xs text-[#06b6d4]">
             Restart the agent for skill changes to take effect.
           </p>
           <button
             onClick={() => setRestartHint(false)}
-            className="ml-auto text-[#f97316]/60 hover:text-[#f97316] transition-colors"
+            className="ml-auto text-[#06b6d4]/60 hover:text-[#06b6d4] transition-colors"
           >
             <X size={12} />
           </button>
@@ -313,7 +313,7 @@ export function SkillsTab() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search skills..."
-                className="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-white/[0.04] border border-white/[0.06] text-white placeholder-[#71717a] focus:outline-none focus:border-[#f97316]/40 transition-colors"
+                className="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-white/[0.04] border border-white/[0.06] text-white placeholder-[#71717a] focus:outline-none focus:border-[#06b6d4]/40 transition-colors"
               />
             </div>
 
@@ -323,7 +323,7 @@ export function SkillsTab() {
                   onClick={() => setCategoryFilter(null)}
                   className={`px-2.5 py-1.5 text-[10px] font-medium rounded-lg transition-colors ${
                     !categoryFilter
-                      ? 'bg-[#f97316]/15 text-[#f97316] border border-[#f97316]/30'
+                      ? 'bg-[#06b6d4]/15 text-[#06b6d4] border border-[#06b6d4]/30'
                       : 'bg-white/[0.04] text-[#71717a] border border-white/[0.06] hover:bg-white/[0.08]'
                   }`}
                 >
@@ -335,7 +335,7 @@ export function SkillsTab() {
                     onClick={() => setCategoryFilter(cat === categoryFilter ? null : cat)}
                     className={`px-2.5 py-1.5 text-[10px] font-medium rounded-lg transition-colors capitalize ${
                       categoryFilter === cat
-                        ? 'bg-[#f97316]/15 text-[#f97316] border border-[#f97316]/30'
+                        ? 'bg-[#06b6d4]/15 text-[#06b6d4] border border-[#06b6d4]/30'
                         : 'bg-white/[0.04] text-[#71717a] border border-white/[0.06] hover:bg-white/[0.08]'
                     }`}
                   >
@@ -364,7 +364,7 @@ export function SkillsTab() {
               <p className="text-sm text-[#A5A1C2]">No skills match your search</p>
               <button
                 onClick={() => { setSearch(''); setCategoryFilter(null); }}
-                className="mt-2 text-xs text-[#f97316] hover:text-[#fb923c] transition-colors"
+                className="mt-2 text-xs text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
               >
                 Clear filters
               </button>

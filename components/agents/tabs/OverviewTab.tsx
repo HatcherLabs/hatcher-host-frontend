@@ -192,12 +192,12 @@ function HealthPerformanceSection({ agentId, isActive }: { agentId: string; isAc
     <GlassCard>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Heart size={14} className="text-[#f97316]" />
+          <Heart size={14} className="text-[#06b6d4]" />
           <h3 className="text-sm font-semibold text-[#A5A1C2]">Health & Performance</h3>
         </div>
         <button
           onClick={() => { setLoading(true); fetchMonitoring(); }}
-          className="text-[11px] px-2 py-1 rounded-lg border border-white/10 hover:border-[#f97316]/30 hover:bg-[#f97316]/5 transition-all text-[#71717a] hover:text-[#A5A1C2] flex items-center gap-1"
+          className="text-[11px] px-2 py-1 rounded-lg border border-white/10 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all text-[#71717a] hover:text-[#A5A1C2] flex items-center gap-1"
         >
           <RefreshCw size={10} />
           Refresh
@@ -253,7 +253,7 @@ function HealthPerformanceSection({ agentId, isActive }: { agentId: string; isAc
           value={data.resources.cpuPercent}
           max={100}
           unit="%"
-          color="bg-[#f97316]"
+          color="bg-[#06b6d4]"
         />
         <ResourceBar
           label="Memory"
@@ -268,7 +268,7 @@ function HealthPerformanceSection({ agentId, isActive }: { agentId: string; isAc
       {(data.responseTimes.avg > 0 || data.responseTimes.last > 0) && (
         <div className="border-t border-white/[0.04] pt-3">
           <div className="flex items-center gap-1.5">
-            <Zap size={12} className="text-[#f97316]" />
+            <Zap size={12} className="text-[#06b6d4]" />
             <span className="text-xs text-[#71717a]">Response Times</span>
             <span className="text-[10px] text-[#71717a] ml-auto">Tracking coming soon</span>
           </div>
@@ -312,8 +312,8 @@ export function OverviewTab() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <GlassCard>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#f97316]/15 flex items-center justify-center">
-              <MessageSquare size={18} className="text-[#f97316]" />
+            <div className="w-10 h-10 rounded-lg bg-[#06b6d4]/15 flex items-center justify-center">
+              <MessageSquare size={18} className="text-[#06b6d4]" />
             </div>
             <div className="flex-1">
               <div className="text-2xl font-bold text-[#FFFFFF] tabular-nums">
@@ -325,7 +325,7 @@ export function OverviewTab() {
             {/* Mini bar chart indicator */}
             <div className="flex items-end gap-[2px] h-5 self-end">
               {[0.4, 0.6, 0.3, 0.8, 0.5, 0.9, 0.7].map((h, i) => (
-                <div key={i} className="w-[2px] rounded-full bg-[#f97316]/30" style={{ height: `${h * 20}px` }} />
+                <div key={i} className="w-[2px] rounded-full bg-[#06b6d4]/30" style={{ height: `${h * 20}px` }} />
               ))}
             </div>
           </div>
@@ -454,7 +454,7 @@ export function OverviewTab() {
       <GlassCard className="!p-0 overflow-hidden">
         <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.04]">
           <div className="flex items-center gap-2">
-            <ScrollText size={14} className="text-[#f97316]" />
+            <ScrollText size={14} className="text-[#06b6d4]" />
             <h3 className="text-sm font-semibold text-[#A5A1C2]">Live Logs</h3>
             {isActive && (
               <span className="flex items-center gap-1 text-[9px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">
@@ -465,7 +465,7 @@ export function OverviewTab() {
           </div>
           <button
             onClick={() => setTab('logs')}
-            className="text-[11px] px-3 py-1 rounded-lg border border-white/10 hover:border-[#f97316]/30 hover:bg-[#f97316]/5 transition-all text-[#71717a] hover:text-[#A5A1C2]"
+            className="text-[11px] px-3 py-1 rounded-lg border border-white/10 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all text-[#71717a] hover:text-[#A5A1C2]"
           >
             View All
           </button>
@@ -499,28 +499,28 @@ export function OverviewTab() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <button
           onClick={() => setTab('chat')}
-          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-white/[0.06] hover:border-[#f97316]/30 hover:bg-[#f97316]/5 transition-all duration-200 text-sm text-[#A5A1C2] bg-[rgba(26,23,48,0.6)]"
+          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-white/[0.06] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[#A5A1C2] bg-[rgba(26,23,48,0.6)]"
         >
-          <div className="w-9 h-9 rounded-xl bg-[#f97316]/10 flex items-center justify-center group-hover/btn:bg-[#f97316]/15 transition-colors">
-            <MessageSquare size={16} className="text-[#f97316]" />
+          <div className="w-9 h-9 rounded-xl bg-[#06b6d4]/10 flex items-center justify-center group-hover/btn:bg-[#06b6d4]/15 transition-colors">
+            <MessageSquare size={16} className="text-[#06b6d4]" />
           </div>
           Chat
         </button>
         <button
           onClick={() => setTab('logs')}
-          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-white/[0.06] hover:border-[#f97316]/30 hover:bg-[#f97316]/5 transition-all duration-200 text-sm text-[#A5A1C2] bg-[rgba(26,23,48,0.6)]"
+          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-white/[0.06] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[#A5A1C2] bg-[rgba(26,23,48,0.6)]"
         >
-          <div className="w-9 h-9 rounded-xl bg-[#f97316]/10 flex items-center justify-center group-hover/btn:bg-[#f97316]/15 transition-colors">
-            <ScrollText size={16} className="text-[#f97316]" />
+          <div className="w-9 h-9 rounded-xl bg-[#06b6d4]/10 flex items-center justify-center group-hover/btn:bg-[#06b6d4]/15 transition-colors">
+            <ScrollText size={16} className="text-[#06b6d4]" />
           </div>
           Full Logs
         </button>
         <button
           onClick={() => setTab('config')}
-          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-white/[0.06] hover:border-[#f97316]/30 hover:bg-[#f97316]/5 transition-all duration-200 text-sm text-[#A5A1C2] bg-[rgba(26,23,48,0.6)]"
+          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-white/[0.06] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[#A5A1C2] bg-[rgba(26,23,48,0.6)]"
         >
-          <div className="w-9 h-9 rounded-xl bg-[#f97316]/10 flex items-center justify-center group-hover/btn:bg-[#f97316]/15 transition-colors">
-            <Settings size={16} className="text-[#f97316]" />
+          <div className="w-9 h-9 rounded-xl bg-[#06b6d4]/10 flex items-center justify-center group-hover/btn:bg-[#06b6d4]/15 transition-colors">
+            <Settings size={16} className="text-[#06b6d4]" />
           </div>
           Configure
         </button>

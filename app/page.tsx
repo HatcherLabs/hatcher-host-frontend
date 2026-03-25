@@ -243,14 +243,14 @@ function BentoCard({
       initial={{ opacity: 0, y: 20 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay, ease: [0.25, 0.1, 0.25, 1] }}
-      className={`group relative bg-gradient-to-br from-[rgba(26,23,48,0.6)] to-[rgba(20,18,40,0.8)] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-8 transition-all duration-300 hover:border-[rgba(249,115,22,0.35)] hover:shadow-[0_0_30px_rgba(249,115,22,0.1)] hover:scale-[1.02] active:scale-[0.98] will-change-transform ${className}`}
+      className={`group relative bg-gradient-to-br from-[rgba(26,23,48,0.6)] to-[rgba(20,18,40,0.8)] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-8 transition-all duration-300 hover:border-[rgba(6,182,212,0.35)] hover:shadow-[0_0_30px_rgba(6,182,212,0.1)] hover:scale-[1.02] active:scale-[0.98] will-change-transform ${className}`}
     >
       {/* Gradient border accent on hover */}
-      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(249,115,22,0.08), rgba(6,182,212,0.04))', borderRadius: 'inherit' }} />
+      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(6,182,212,0.08), rgba(6,182,212,0.04))', borderRadius: 'inherit' }} />
       <div className="relative flex flex-col h-full justify-between gap-4">
         <div>
-          <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-6 group-hover:bg-[rgba(249,115,22,0.1)] group-hover:border-[rgba(249,115,22,0.2)] transition-all duration-300">
-            <Icon className="w-5 h-5 text-[#a1a1aa] group-hover:text-[#f97316] transition-colors duration-300" />
+          <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-6 group-hover:bg-[rgba(6,182,212,0.1)] group-hover:border-[rgba(6,182,212,0.2)] transition-all duration-300">
+            <Icon className="w-5 h-5 text-[#a1a1aa] group-hover:text-[#06b6d4] transition-colors duration-300" />
           </div>
           {value && (
             <p className="text-4xl font-bold text-white tracking-tight mb-2">{value}</p>
@@ -297,13 +297,13 @@ export default function LandingPage() {
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse 50% 50% at 65% 35%, rgba(249,115,22,0.12), transparent)',
+            background: 'radial-gradient(ellipse 50% 50% at 65% 35%, rgba(6,182,212,0.12), transparent)',
           }}
         />
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse 40% 40% at 30% 50%, rgba(249,115,22,0.06), transparent)',
+            background: 'radial-gradient(ellipse 40% 40% at 30% 50%, rgba(6,182,212,0.06), transparent)',
           }}
         />
 
@@ -394,7 +394,7 @@ export default function LandingPage() {
               <div
                 className="absolute inset-0 -m-16 pointer-events-none"
                 style={{
-                  background: 'radial-gradient(circle at center, rgba(249,115,22,0.12) 0%, transparent 65%)',
+                  background: 'radial-gradient(circle at center, rgba(6,182,212,0.12) 0%, transparent 65%)',
                 }}
               />
               <div className="relative w-[280px] h-[340px] lg:w-[400px] lg:h-[480px] xl:w-[460px] xl:h-[560px]">
@@ -633,11 +633,11 @@ export default function LandingPage() {
             </div>
 
             {/* Pro */}
-            <div className="bg-[#0e0e14] border border-orange-500/30 rounded-2xl p-7 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="bg-[#0e0e14] border border-cyan-500/30 rounded-2xl p-7 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="flex items-center gap-2 mb-2">
-                <p className="text-xs font-semibold tracking-[0.2em] uppercase text-orange-400">Pro</p>
-                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-400 border border-orange-500/20">POPULAR</span>
+                <p className="text-xs font-semibold tracking-[0.2em] uppercase text-cyan-400">Pro</p>
+                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-400 border border-cyan-500/20">POPULAR</span>
               </div>
               <div className="flex items-baseline gap-1">
                 <p className="text-3xl font-bold text-white">$19.99</p>
@@ -655,7 +655,7 @@ export default function LandingPage() {
                   'Priority support',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-2.5 text-sm text-[#a1a1aa]">
-                    <Check className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                    <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                     {item}
                   </li>
                 ))}
@@ -671,7 +671,7 @@ export default function LandingPage() {
 
           <p className="text-center text-xs text-[#71717a] mt-6">
             Need more agents? Add +3, +5, or +10 with stackable add-ons.{' '}
-            <Link href="/pricing" className="text-[#f97316] hover:underline">See full pricing</Link>
+            <Link href="/pricing" className="text-[#06b6d4] hover:underline">See full pricing</Link>
           </p>
         </div>
       </Section>
@@ -703,7 +703,7 @@ export default function LandingPage() {
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse 50% 60% at 50% 50%, rgba(249,115,22,0.1), transparent)',
+            background: 'radial-gradient(ellipse 50% 60% at 50% 50%, rgba(6,182,212,0.1), transparent)',
           }}
         />
         <div className="relative z-10 max-w-3xl mx-auto text-center">

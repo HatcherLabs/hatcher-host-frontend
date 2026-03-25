@@ -59,7 +59,7 @@ export function Sidebar() {
         {/* Logo */}
         <div className="flex items-center gap-2.5 px-5 h-14 border-b border-white/[0.06] flex-shrink-0">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <svg viewBox="0 0 28 28" width="24" height="24" fill="none" className="drop-shadow-[0_0_8px_rgba(249,115,22,0.25)]">
+            <svg viewBox="0 0 28 28" width="24" height="24" fill="none" className="drop-shadow-[0_0_8px_rgba(6,182,212,0.25)]">
               <defs>
                 <linearGradient id="eggSidebarD" x1="14" y1="3" x2="14" y2="27" gradientUnits="userSpaceOnUse">
                   <stop offset="0%" stopColor="#3D375E" />
@@ -67,14 +67,14 @@ export function Sidebar() {
                   <stop offset="100%" stopColor="#1A1730" />
                 </linearGradient>
                 <radialGradient id="eggGlowSidebarD" cx="50%" cy="40%" r="40%">
-                  <stop offset="0%" stopColor="#f97316" stopOpacity="0.35" />
-                  <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
+                  <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.35" />
+                  <stop offset="100%" stopColor="#06b6d4" stopOpacity="0" />
                 </radialGradient>
               </defs>
-              <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggSidebarD)" stroke="rgba(249,115,22,0.5)" strokeWidth="0.8" />
+              <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggSidebarD)" stroke="rgba(6,182,212,0.5)" strokeWidth="0.8" />
               <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggGlowSidebarD)" />
-              <path d="M10 14.5 L12.5 12.5 L11 10.5 L13.5 9 L12 7" stroke="#f97316" strokeWidth="0.7" strokeLinecap="round" fill="none" opacity="0.6" />
-              <circle cx="12" cy="11" r="1.5" fill="#f97316" opacity="0.3">
+              <path d="M10 14.5 L12.5 12.5 L11 10.5 L13.5 9 L12 7" stroke="#06b6d4" strokeWidth="0.7" strokeLinecap="round" fill="none" opacity="0.6" />
+              <circle cx="12" cy="11" r="1.5" fill="#06b6d4" opacity="0.3">
                 <animate attributeName="opacity" values="0.2;0.45;0.2" dur="3s" repeatCount="indefinite" />
               </circle>
             </svg>
@@ -100,13 +100,13 @@ export function Sidebar() {
                 className={clsx(
                   'relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-200',
                   active
-                    ? 'text-white bg-[rgba(249,115,22,0.1)]'
+                    ? 'text-white bg-[rgba(6,182,212,0.1)]'
                     : 'text-[#A5A1C2] hover:text-white hover:bg-[#2E2B4A]',
                 )}
               >
                 {active && (
                   <motion.div
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#f97316]"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#06b6d4]"
                     layoutId="sidebarActive"
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
@@ -130,7 +130,7 @@ export function Sidebar() {
                 className={clsx(
                   'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors duration-200',
                   active
-                    ? 'text-white bg-[rgba(249,115,22,0.1)]'
+                    ? 'text-white bg-[rgba(6,182,212,0.1)]'
                     : 'text-[#A5A1C2] hover:text-white hover:bg-[#2E2B4A]',
                 )}
               >
@@ -144,7 +144,7 @@ export function Sidebar() {
           {isAuthenticated && displayName && (
             <div className="mt-3 px-3 py-2.5 rounded-xl border border-white/[0.06] bg-white/[0.02]">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#f97316]/30 to-[#f97316]/10 flex items-center justify-center flex-shrink-0">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#06b6d4]/30 to-[#06b6d4]/10 flex items-center justify-center flex-shrink-0">
                   <div className="w-2 h-2 rounded-full bg-[#4ade80] shadow-[0_0_6px_rgba(74,222,128,0.5)]" />
                 </div>
                 <div className="min-w-0">
@@ -170,7 +170,7 @@ export function Sidebar() {
         {/* Logo icon */}
         <div className="flex items-center justify-center h-14 w-full border-b border-white/[0.06] flex-shrink-0">
           <Link href="/" aria-label="Hatcher home">
-            <svg viewBox="0 0 28 28" width="22" height="22" fill="none" className="drop-shadow-[0_0_8px_rgba(249,115,22,0.25)]">
+            <svg viewBox="0 0 28 28" width="22" height="22" fill="none" className="drop-shadow-[0_0_8px_rgba(6,182,212,0.25)]">
               <defs>
                 <linearGradient id="eggSidebarT" x1="14" y1="3" x2="14" y2="27" gradientUnits="userSpaceOnUse">
                   <stop offset="0%" stopColor="#3D375E" />
@@ -178,13 +178,13 @@ export function Sidebar() {
                   <stop offset="100%" stopColor="#1A1730" />
                 </linearGradient>
                 <radialGradient id="eggGlowSidebarT" cx="50%" cy="40%" r="40%">
-                  <stop offset="0%" stopColor="#f97316" stopOpacity="0.35" />
-                  <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
+                  <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.35" />
+                  <stop offset="100%" stopColor="#06b6d4" stopOpacity="0" />
                 </radialGradient>
               </defs>
-              <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggSidebarT)" stroke="rgba(249,115,22,0.5)" strokeWidth="0.8" />
+              <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggSidebarT)" stroke="rgba(6,182,212,0.5)" strokeWidth="0.8" />
               <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggGlowSidebarT)" />
-              <path d="M10 14.5 L12.5 12.5 L11 10.5 L13.5 9 L12 7" stroke="#f97316" strokeWidth="0.7" strokeLinecap="round" fill="none" opacity="0.6" />
+              <path d="M10 14.5 L12.5 12.5 L11 10.5 L13.5 9 L12 7" stroke="#06b6d4" strokeWidth="0.7" strokeLinecap="round" fill="none" opacity="0.6" />
             </svg>
           </Link>
         </div>
@@ -203,13 +203,13 @@ export function Sidebar() {
                 className={clsx(
                   'relative flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-200',
                   active
-                    ? 'text-white bg-[rgba(249,115,22,0.1)]'
+                    ? 'text-white bg-[rgba(6,182,212,0.1)]'
                     : 'text-[#A5A1C2] hover:text-white hover:bg-[#2E2B4A]',
                 )}
               >
                 {active && (
                   <motion.div
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#f97316]"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#06b6d4]"
                     layoutId="sidebarActiveTablet"
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
@@ -233,7 +233,7 @@ export function Sidebar() {
                 className={clsx(
                   'flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-200',
                   active
-                    ? 'text-white bg-[rgba(249,115,22,0.1)]'
+                    ? 'text-white bg-[rgba(6,182,212,0.1)]'
                     : 'text-[#A5A1C2] hover:text-white hover:bg-[#2E2B4A]',
                 )}
               >

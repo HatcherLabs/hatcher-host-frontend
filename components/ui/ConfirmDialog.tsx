@@ -89,7 +89,7 @@ export function ConfirmDialog({
             style={{
               background: '#1A1730',
               borderColor: 'rgba(46,43,74,0.6)',
-              boxShadow: '0 16px 64px rgba(0,0,0,0.4), 0 0 32px rgba(249,115,22,0.08)',
+              boxShadow: '0 16px 64px rgba(0,0,0,0.4), 0 0 32px rgba(6,182,212,0.08)',
             }}
             initial={{ opacity: 0, scale: 0.95, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}

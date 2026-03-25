@@ -42,7 +42,7 @@ function formatBytes(bytes: number): string {
 }
 
 function getFileIcon(name: string, type: string) {
-  if (type === 'directory') return <Folder size={16} className="text-[#f97316]" />;
+  if (type === 'directory') return <Folder size={16} className="text-[#06b6d4]" />;
   if (/\.(png|jpg|jpeg|gif|svg|webp)$/i.test(name)) return <FileImage size={16} className="text-purple-400" />;
   if (/\.(json|js|ts|mjs|cjs)$/i.test(name)) return <FileCode size={16} className="text-blue-400" />;
   return <FileText size={16} className="text-[#A5A1C2]" />;
@@ -203,7 +203,7 @@ export function FilesTab() {
   if (loading && unlocked === null) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 animate-spin text-[#f97316]" />
+        <Loader2 className="w-6 h-6 animate-spin text-[#06b6d4]" />
       </motion.div>
     );
   }
@@ -212,8 +212,8 @@ export function FilesTab() {
   if (unlocked === false) {
     return (
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-16">
-        <div className="w-16 h-16 rounded-2xl bg-[#f97316]/10 border border-[#f97316]/20 flex items-center justify-center mx-auto mb-6">
-          <Lock className="w-8 h-8 text-[#f97316]" />
+        <div className="w-16 h-16 rounded-2xl bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mx-auto mb-6">
+          <Lock className="w-8 h-8 text-[#06b6d4]" />
         </div>
         <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           File Manager
@@ -225,7 +225,7 @@ export function FilesTab() {
           <button
             onClick={handleUnlock}
             disabled={purchasing}
-            className="px-6 py-2.5 rounded-lg text-sm font-medium text-white bg-[#f97316] hover:bg-[#ea580c] disabled:opacity-50 transition-colors flex items-center gap-2"
+            className="px-6 py-2.5 rounded-lg text-sm font-medium text-white bg-[#06b6d4] hover:bg-[#0891b2] disabled:opacity-50 transition-colors flex items-center gap-2"
           >
             {purchasing ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Unlocking...</>
@@ -234,7 +234,7 @@ export function FilesTab() {
             )}
           </button>
           <span className="text-xs text-[#71717a]">One-time purchase for this agent</span>
-          <Link href="/pricing" className="text-xs text-[#f97316] hover:underline">
+          <Link href="/pricing" className="text-xs text-[#06b6d4] hover:underline">
             Or upgrade to Pro for all agents
           </Link>
         </div>
@@ -272,7 +272,7 @@ export function FilesTab() {
             <button
               onClick={handleSave}
               disabled={saving || !isModified}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-[#f97316] hover:bg-[#ea580c] disabled:opacity-30 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-[#06b6d4] hover:bg-[#0891b2] disabled:opacity-30 transition-colors"
             >
               {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
               Save
@@ -287,7 +287,7 @@ export function FilesTab() {
         <textarea
           value={editContent}
           onChange={(e) => setEditContent(e.target.value)}
-          className="w-full h-[500px] px-4 py-3 rounded-xl text-xs font-mono text-white bg-[rgba(13,11,26,0.9)] border border-white/[0.08] focus:border-[#f97316]/50 focus:outline-none resize-none leading-relaxed"
+          className="w-full h-[500px] px-4 py-3 rounded-xl text-xs font-mono text-white bg-[rgba(13,11,26,0.9)] border border-white/[0.08] focus:border-[#06b6d4]/50 focus:outline-none resize-none leading-relaxed"
           spellCheck={false}
         />
       </motion.div>
@@ -330,7 +330,7 @@ export function FilesTab() {
           </button>
           <button
             onClick={() => setCreating(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#f97316] border border-[#f97316]/30 hover:bg-[#f97316]/10 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#06b6d4] border border-[#06b6d4]/30 hover:bg-[#06b6d4]/10 transition-colors"
           >
             <Plus size={12} /> New File
           </button>
@@ -347,14 +347,14 @@ export function FilesTab() {
               onChange={(e) => setNewFileName(e.target.value)}
               placeholder="filename.json"
               autoFocus
-              className="w-full h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-[#f97316]/50 focus:outline-none placeholder:text-[#71717a] font-mono"
+              className="w-full h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-[#06b6d4]/50 focus:outline-none placeholder:text-[#71717a] font-mono"
             />
             <textarea
               value={newFileContent}
               onChange={(e) => setNewFileContent(e.target.value)}
               placeholder="File content (optional)..."
               rows={4}
-              className="w-full px-3 py-2 rounded-lg text-xs font-mono text-white bg-white/[0.04] border border-white/[0.08] focus:border-[#f97316]/50 focus:outline-none placeholder:text-[#71717a]"
+              className="w-full px-3 py-2 rounded-lg text-xs font-mono text-white bg-white/[0.04] border border-white/[0.08] focus:border-[#06b6d4]/50 focus:outline-none placeholder:text-[#71717a]"
             />
             <div className="flex items-center gap-2 justify-end">
               <button onClick={() => { setCreating(false); setNewFileName(''); setNewFileContent(''); }} className="px-3 py-1.5 text-xs text-[#71717a] hover:text-white transition-colors">
@@ -363,7 +363,7 @@ export function FilesTab() {
               <button
                 onClick={handleCreateFile}
                 disabled={creatingFile || !newFileName.trim()}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium text-white bg-[#f97316] hover:bg-[#ea580c] disabled:opacity-50 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium text-white bg-[#06b6d4] hover:bg-[#0891b2] disabled:opacity-50 transition-colors"
               >
                 {creatingFile ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
                 Create

@@ -220,7 +220,7 @@ export function DomainsSection() {
                     <p className="text-xs text-[#A5A1C2]">
                       Point <span className="text-white font-mono">{domain.domain}</span> CNAME to:
                     </p>
-                    <p className="text-sm font-mono text-[#f97316] mt-1 truncate">{domain.cnameTarget}</p>
+                    <p className="text-sm font-mono text-[#06b6d4] mt-1 truncate">{domain.cnameTarget}</p>
                   </div>
                   <button
                     onClick={() => copyToClipboard(domain.cnameTarget, domain.id)}
@@ -264,7 +264,7 @@ export function DomainsSection() {
                 value={domainInput}
                 onChange={(e) => setDomainInput(e.target.value)}
                 placeholder="chat.yourdomain.com"
-                className="w-full h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-orange-500/50 focus:outline-none placeholder:text-[#71717a] transition-colors font-mono"
+                className="w-full h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-cyan-500/50 focus:outline-none placeholder:text-[#71717a] transition-colors font-mono"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleAdd();
                 }}
@@ -276,7 +276,7 @@ export function DomainsSection() {
                 <button
                   onClick={handleAdd}
                   disabled={adding || !domainInput.trim()}
-                  className="px-4 py-2 rounded-lg text-xs font-medium text-white bg-[#f97316] hover:bg-[#ea580c] disabled:opacity-40 transition-colors"
+                  className="px-4 py-2 rounded-lg text-xs font-medium text-white bg-[#06b6d4] hover:bg-[#0891b2] disabled:opacity-40 transition-colors"
                 >
                   {adding ? 'Adding...' : 'Add Domain'}
                 </button>

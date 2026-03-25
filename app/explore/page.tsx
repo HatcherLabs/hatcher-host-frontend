@@ -194,7 +194,7 @@ export default function ExplorePage() {
     <div className="min-h-screen">
       {/* ── Hero Banner ──────────────────────────────────── */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(249,115,22,0.12),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.12),transparent_70%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_30%_at_70%_20%,rgba(6,182,212,0.06),transparent)]" />
         <motion.div
           className="mx-auto max-w-7xl px-4 pt-16 pb-12 relative"
@@ -204,7 +204,7 @@ export default function ExplorePage() {
         >
           <div className="text-center mb-2">
             <motion.div
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#f97316]/10 border border-[#f97316]/20 text-[#f97316] text-xs font-medium mb-4"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#06b6d4]/10 border border-[#06b6d4]/20 text-[#06b6d4] text-xs font-medium mb-4"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
@@ -239,10 +239,10 @@ export default function ExplorePage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               {/* Search */}
               <div className="relative w-full sm:w-80 group/search">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none group-focus-within/search:text-[#f97316] transition-colors duration-200" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none group-focus-within/search:text-[#06b6d4] transition-colors duration-200" />
                 <input
                   type="text"
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[#f97316]/50 focus:shadow-[0_0_16px_rgba(249,115,22,0.12)] transition-all duration-200 backdrop-blur-xl"
+                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[#06b6d4]/50 focus:shadow-[0_0_16px_rgba(6,182,212,0.12)] transition-all duration-200 backdrop-blur-xl"
                   placeholder="Search agents by name or description..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
@@ -250,7 +250,7 @@ export default function ExplorePage() {
                 {searchInput && (
                   <button
                     onClick={() => setSearchInput('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[rgba(249,115,22,0.1)] transition-all duration-150"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[rgba(6,182,212,0.1)] transition-all duration-150"
                     aria-label="Clear search"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -259,7 +259,7 @@ export default function ExplorePage() {
                 {/* Debounce indicator */}
                 {isSearching && (
                   <div className="absolute right-10 top-1/2 -translate-y-1/2">
-                    <Loader2 className="w-3.5 h-3.5 text-[#f97316] animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 text-[#06b6d4] animate-spin" />
                   </div>
                 )}
               </div>
@@ -273,8 +273,8 @@ export default function ExplorePage() {
                     className={cn(
                       'px-3 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium whitespace-nowrap flex items-center gap-1.5',
                       statusFilter === val
-                        ? 'bg-[#f97316] text-white shadow-[0_0_12px_rgba(249,115,22,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[rgba(249,115,22,0.05)]'
+                        ? 'bg-[#06b6d4] text-white shadow-[0_0_12px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
+                        : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[rgba(6,182,212,0.05)]'
                     )}
                   >
                     {val !== 'all' && (
@@ -297,8 +297,8 @@ export default function ExplorePage() {
                     className={cn(
                       'px-4 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium whitespace-nowrap',
                       sort === val
-                        ? 'bg-[#f97316] text-white shadow-[0_0_12px_rgba(249,115,22,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[rgba(249,115,22,0.05)]'
+                        ? 'bg-[#06b6d4] text-white shadow-[0_0_12px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
+                        : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[rgba(6,182,212,0.05)]'
                     )}
                   >
                     {label}
@@ -322,7 +322,7 @@ export default function ExplorePage() {
                     <>
                       Showing <span className="text-[var(--text-secondary)] font-medium">{filtered.length}</span> of{' '}
                       <span className="text-[var(--text-secondary)] font-medium">{agents.length}</span> agents
-                      {isSearching && <span className="text-[#f97316] ml-2">searching...</span>}
+                      {isSearching && <span className="text-[#06b6d4] ml-2">searching...</span>}
                     </>
                   ) : (
                     <>
@@ -339,7 +339,7 @@ export default function ExplorePage() {
 
               {hasActiveFilters && (
                 <motion.button
-                  className="flex items-center gap-1.5 text-xs font-medium text-[#f97316] hover:text-[#fb923c] transition-colors duration-150 px-2.5 py-1 rounded-lg hover:bg-[rgba(249,115,22,0.08)]"
+                  className="flex items-center gap-1.5 text-xs font-medium text-[#06b6d4] hover:text-[#22d3ee] transition-colors duration-150 px-2.5 py-1 rounded-lg hover:bg-[rgba(6,182,212,0.08)]"
                   onClick={clearAllFilters}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -398,8 +398,8 @@ export default function ExplorePage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="w-16 h-16 rounded-2xl bg-[rgba(249,115,22,0.08)] border border-[rgba(249,115,22,0.15)] flex items-center justify-center mx-auto mb-5">
-                <SearchX className="w-8 h-8 text-[#f97316]/60" />
+              <div className="w-16 h-16 rounded-2xl bg-[rgba(6,182,212,0.08)] border border-[rgba(6,182,212,0.15)] flex items-center justify-center mx-auto mb-5">
+                <SearchX className="w-8 h-8 text-[#06b6d4]/60" />
               </div>
               <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">No agents found</h3>
               <p className="text-[var(--text-muted)] text-sm mb-1.5">
@@ -451,7 +451,7 @@ export default function ExplorePage() {
                       'p-2 rounded-xl transition-all duration-200',
                       safePage <= 1
                         ? 'text-[var(--text-muted)]/30 cursor-not-allowed'
-                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[rgba(249,115,22,0.08)]'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[rgba(6,182,212,0.08)]'
                     )}
                     aria-label="Previous page"
                   >
@@ -472,8 +472,8 @@ export default function ExplorePage() {
                           className={cn(
                             'min-w-[36px] h-9 rounded-xl text-sm font-medium transition-all duration-200',
                             safePage === p
-                              ? 'bg-[#f97316] text-white shadow-[0_0_16px_rgba(249,115,22,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
-                              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[rgba(249,115,22,0.08)]'
+                              ? 'bg-[#06b6d4] text-white shadow-[0_0_16px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
+                              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[rgba(6,182,212,0.08)]'
                           )}
                         >
                           {p}
@@ -490,7 +490,7 @@ export default function ExplorePage() {
                       'p-2 rounded-xl transition-all duration-200',
                       safePage >= totalPages
                         ? 'text-[var(--text-muted)]/30 cursor-not-allowed'
-                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[rgba(249,115,22,0.08)]'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[rgba(6,182,212,0.08)]'
                     )}
                     aria-label="Next page"
                   >
@@ -544,17 +544,17 @@ const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agen
       <Link href={`/agent/${agent.id}`} className="block group">
         <div className="relative">
           {/* Gradient border glow on hover */}
-          <div className="absolute -inset-[1px] rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(249,115,22,0.3), rgba(6,182,212,0.15))', borderRadius: '16px' }} />
+          <div className="absolute -inset-[1px] rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(6,182,212,0.3), rgba(6,182,212,0.15))', borderRadius: '16px' }} />
           <motion.div
             className={cn(cardClass, 'p-5 h-full flex flex-col relative')}
             whileHover={{
               y: -4,
-              boxShadow: '0 12px 40px rgba(249, 115, 22, 0.12)',
+              boxShadow: '0 12px 40px rgba(6, 182, 212, 0.12)',
             }}
             transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
             {/* Top accent line */}
-            <div className="absolute top-0 left-4 right-4 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'linear-gradient(90deg, transparent, rgba(249,115,22,0.4), transparent)' }} />
+            <div className="absolute top-0 left-4 right-4 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'linear-gradient(90deg, transparent, rgba(6,182,212,0.4), transparent)' }} />
 
             {/* Header: avatar + name + status */}
             <div className="flex items-start gap-3 mb-3">
@@ -564,18 +564,18 @@ const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agen
                 <img
                   src={agent.avatarUrl}
                   alt={agent.name}
-                  className="w-12 h-12 rounded-full border border-[rgba(46,43,74,0.3)] object-cover flex-shrink-0 group-hover:border-[rgba(249,115,22,0.3)] transition-colors duration-300"
+                  className="w-12 h-12 rounded-full border border-[rgba(46,43,74,0.3)] object-cover flex-shrink-0 group-hover:border-[rgba(6,182,212,0.3)] transition-colors duration-300"
                 />
               ) : (
                 <div
-                  className={`w-12 h-12 rounded-full border border-[rgba(46,43,74,0.3)] bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-bold text-sm flex-shrink-0 group-hover:border-[rgba(249,115,22,0.3)] group-hover:shadow-[0_0_16px_rgba(249,115,22,0.15)] transition-all duration-300`}
+                  className={`w-12 h-12 rounded-full border border-[rgba(46,43,74,0.3)] bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-bold text-sm flex-shrink-0 group-hover:border-[rgba(6,182,212,0.3)] group-hover:shadow-[0_0_16px_rgba(6,182,212,0.15)] transition-all duration-300`}
                 >
                   {initials}
                 </div>
               )}
 
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-[#FFFFFF] truncate group-hover:text-[#f97316] transition-colors duration-200">
+                <h3 className="font-semibold text-[#FFFFFF] truncate group-hover:text-[#06b6d4] transition-colors duration-200">
                   {agent.name}
                 </h3>
 
@@ -603,7 +603,7 @@ const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agen
             </p>
 
             {/* Footer */}
-            <div className="flex items-center justify-between text-xs text-[#71717a] pt-3 border-t border-[rgba(46,43,74,0.3)] group-hover:border-[rgba(249,115,22,0.15)] transition-colors duration-300">
+            <div className="flex items-center justify-between text-xs text-[#71717a] pt-3 border-t border-[rgba(46,43,74,0.3)] group-hover:border-[rgba(6,182,212,0.15)] transition-colors duration-300">
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1">
                   <Layers className="w-3.5 h-3.5" />

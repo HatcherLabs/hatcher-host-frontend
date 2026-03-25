@@ -10,7 +10,7 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
       {/* Skip to content -- accessibility */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[#f97316] focus:text-white focus:text-sm focus:font-semibold focus:outline-none focus:shadow-lg"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[#06b6d4] focus:text-white focus:text-sm focus:font-semibold focus:outline-none focus:shadow-lg"
       >
         Skip to content
       </a>

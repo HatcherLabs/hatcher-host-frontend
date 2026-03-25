@@ -155,7 +155,7 @@ export function AgentPageClient() {
       <motion.div variants={itemVariants} className="mb-6">
         <Link
           href="/explore"
-          className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[#f97316] transition-colors duration-200"
+          className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[#06b6d4] transition-colors duration-200"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Explore
@@ -198,7 +198,7 @@ export function AgentPageClient() {
                 </span>
               )}
               {featureCount > 0 && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#f97316]/10 text-[#f97316] border border-[#f97316]/20">
+                <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#06b6d4]/10 text-[#06b6d4] border border-[#06b6d4]/20">
                   <Layers className="w-3 h-3" />
                   {featureCount} feature{featureCount !== 1 ? 's' : ''}
                 </span>
@@ -244,7 +244,7 @@ export function AgentPageClient() {
           </div>
           <button
             onClick={handleShare}
-            className="inline-flex items-center gap-1.5 text-[var(--text-muted)] hover:text-[#f97316] transition-colors duration-200 border border-[var(--border-default)] rounded-lg px-3 py-1.5 hover:border-[#f97316]/30 hover:bg-[#f97316]/5"
+            className="inline-flex items-center gap-1.5 text-[var(--text-muted)] hover:text-[#06b6d4] transition-colors duration-200 border border-[var(--border-default)] rounded-lg px-3 py-1.5 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5"
           >
             {copied ? (
               <>
@@ -314,7 +314,7 @@ export function AgentPageClient() {
           <div className="mt-5 pt-4 border-t border-[var(--border-default)] text-center">
             <p className="text-xs text-[var(--text-muted)]">
               Powered by Hatcher — deploy your own AI agent at{' '}
-              <Link href="/create" className="text-[#f97316] hover:underline">hatcher.host/create</Link>
+              <Link href="/create" className="text-[#06b6d4] hover:underline">hatcher.host/create</Link>
             </p>
           </div>
         </motion.div>

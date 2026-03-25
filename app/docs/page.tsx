@@ -54,7 +54,7 @@ const QUICK_LINKS = [
     title: 'Getting Started',
     description: 'Set up your first AI agent in under 60 seconds. Quick start guide, prerequisites, and first deploy.',
     href: '/getting-started',
-    color: '#f97316',
+    color: '#06b6d4',
   },
   {
     icon: Bot,
@@ -109,7 +109,7 @@ export default function DocsPage() {
 
         {/* ── Hero ─────────────────────────────────────────── */}
         <motion.div variants={cardVariants} className="mb-12 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#f97316]/20 bg-[#f97316]/5 px-4 py-1.5 text-sm font-medium text-[#f97316]">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#06b6d4]/20 bg-[#06b6d4]/5 px-4 py-1.5 text-sm font-medium text-[#06b6d4]">
             <BookOpen className="h-4 w-4" />
             Documentation
           </div>
@@ -130,7 +130,7 @@ export default function DocsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search documentation..."
-              className="w-full rounded-xl border border-white/[0.06] bg-[#1A1730] py-3 pl-12 pr-4 text-[#F0EEFC] placeholder-[#6B6890] outline-none transition-all duration-200 focus:border-[#f97316]/40 focus:ring-2 focus:ring-[#f97316]/10"
+              className="w-full rounded-xl border border-white/[0.06] bg-[#1A1730] py-3 pl-12 pr-4 text-[#F0EEFC] placeholder-[#6B6890] outline-none transition-all duration-200 focus:border-[#06b6d4]/40 focus:ring-2 focus:ring-[#06b6d4]/10"
             />
             {searchQuery && (
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#6B6890]">
@@ -150,19 +150,19 @@ export default function DocsPage() {
           <motion.div variants={staggerItem}>
             <Link
               href="/docs/api"
-              className="group relative flex items-start gap-4 rounded-2xl border border-[#f97316]/20 bg-[rgba(26,23,48,0.8)] p-6 backdrop-blur-xl transition-all duration-200 hover:border-[#f97316]/40 hover:shadow-[0_0_32px_rgba(249,115,22,0.1)]"
+              className="group relative flex items-start gap-4 rounded-2xl border border-[#06b6d4]/20 bg-[rgba(26,23,48,0.8)] p-6 backdrop-blur-xl transition-all duration-200 hover:border-[#06b6d4]/40 hover:shadow-[0_0_32px_rgba(6,182,212,0.1)]"
             >
-              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-[#f97316]/15">
-                <Code className="h-6 w-6 text-[#f97316]" />
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-[#06b6d4]/15">
+                <Code className="h-6 w-6 text-[#06b6d4]" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="mb-1 text-base font-semibold text-[#F0EEFC] group-hover:text-[#f97316] transition-colors">
+                <h3 className="mb-1 text-base font-semibold text-[#F0EEFC] group-hover:text-[#06b6d4] transition-colors">
                   API Reference
                 </h3>
                 <p className="text-sm leading-relaxed text-[#A5A1C2]">
                   Full endpoint documentation with examples in cURL, JavaScript, and Python. Auth, rate limits, and error codes.
                 </p>
-                <div className="mt-3 flex items-center gap-1 text-xs font-medium text-[#f97316]">
+                <div className="mt-3 flex items-center gap-1 text-xs font-medium text-[#06b6d4]">
                   Explore endpoints
                   <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5" />
                 </div>
@@ -209,7 +209,7 @@ export default function DocsPage() {
                 href={`${DOCS_URL}${link.href}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] p-6 backdrop-blur-xl transition-all duration-200 hover:border-[#f97316]/30 hover:shadow-[0_0_24px_rgba(249,115,22,0.06)]"
+                className="group relative rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] p-6 backdrop-blur-xl transition-all duration-200 hover:border-[#06b6d4]/30 hover:shadow-[0_0_24px_rgba(6,182,212,0.06)]"
               >
                 <div
                   className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl transition-colors duration-200"
@@ -227,7 +227,7 @@ export default function DocsPage() {
                   {link.description}
                 </p>
 
-                <div className="mt-4 flex items-center gap-1 text-xs font-medium text-[#f97316] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                <div className="mt-4 flex items-center gap-1 text-xs font-medium text-[#06b6d4] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                   Read more
                   <ArrowRight className="h-3 w-3" />
                 </div>
@@ -253,9 +253,9 @@ export default function DocsPage() {
                 href={`${DOCS_URL}${topic.href}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center gap-3 rounded-xl border border-white/[0.06] bg-[rgba(26,23,48,0.5)] px-4 py-3 text-sm text-[#A5A1C2] transition-all duration-200 hover:border-[#f97316]/20 hover:bg-[rgba(26,23,48,0.8)] hover:text-[#F0EEFC]"
+                className="group flex items-center gap-3 rounded-xl border border-white/[0.06] bg-[rgba(26,23,48,0.5)] px-4 py-3 text-sm text-[#A5A1C2] transition-all duration-200 hover:border-[#06b6d4]/20 hover:bg-[rgba(26,23,48,0.8)] hover:text-[#F0EEFC]"
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-[#f97316]/60 transition-colors duration-200 group-hover:bg-[#f97316]" />
+                <span className="h-1.5 w-1.5 rounded-full bg-[#06b6d4]/60 transition-colors duration-200 group-hover:bg-[#06b6d4]" />
                 {topic.label}
                 <ExternalLink className="ml-auto h-3.5 w-3.5 text-[#6B6890] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
               </a>
@@ -278,14 +278,14 @@ export default function DocsPage() {
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/support"
-              className="inline-flex items-center gap-2 rounded-xl bg-[#f97316] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#f97316]/20 transition-all duration-200 hover:bg-[#ea580c] hover:shadow-[#f97316]/30"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#06b6d4] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#06b6d4]/20 transition-all duration-200 hover:bg-[#0891b2] hover:shadow-[#06b6d4]/30"
             >
               <LifeBuoy className="h-4 w-4" />
               Contact Support
             </Link>
             <Link
               href="/help"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/[0.06] bg-[#1A1730] px-5 py-2.5 text-sm font-semibold text-[#A5A1C2] transition-all duration-200 hover:border-[#f97316]/30 hover:text-[#F0EEFC]"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/[0.06] bg-[#1A1730] px-5 py-2.5 text-sm font-semibold text-[#A5A1C2] transition-all duration-200 hover:border-[#06b6d4]/30 hover:text-[#F0EEFC]"
             >
               <HelpCircle className="h-4 w-4" />
               Help Center

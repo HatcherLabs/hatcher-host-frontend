@@ -20,7 +20,7 @@ export async function GET() {
           <div style={{ fontSize: 64, fontWeight: 'bold', color: 'white' }}>
             &#x1F95A; Hatcher
           </div>
-          <div style={{ fontSize: 28, color: '#f97316', marginTop: 12 }}>
+          <div style={{ fontSize: 28, color: '#06b6d4', marginTop: 12 }}>
             AI Agent Hosting Platform
           </div>
           <div style={{ fontSize: 18, color: '#71717a', marginTop: 8 }}>

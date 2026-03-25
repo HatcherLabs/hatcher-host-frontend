@@ -20,7 +20,7 @@ function SoundWaveBars({ className = '' }: { className?: string }) {
       {[0, 1, 2, 3].map((i) => (
         <span
           key={i}
-          className="w-[2px] bg-[#f97316] rounded-full"
+          className="w-[2px] bg-[#06b6d4] rounded-full"
           style={{
             animation: `voiceBar 0.8s ease-in-out ${i * 0.15}s infinite alternate`,
           }}
@@ -135,7 +135,7 @@ export function ChatTab() {
             onClick={voice.toggleAutoSpeak}
             className={`group flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border transition-all duration-200 ${
               voice.autoSpeak
-                ? 'border-[#f97316]/40 bg-[#f97316]/10 text-[#f97316]'
+                ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[#06b6d4]'
                 : 'border-[rgba(46,43,74,0.3)] bg-transparent text-[#71717a] hover:border-[#71717a]/40 hover:text-[#A5A1C2]'
             }`}
             title="Auto-read responses"
@@ -157,7 +157,7 @@ export function ChatTab() {
           >
             <RobotMascot size="lg" mood="happy" className="mx-auto mb-4" />
             <p className="text-sm mb-1 text-[#A5A1C2]">
-              Start a conversation with <span className="font-medium text-[#f97316]">{agent.name}</span>
+              Start a conversation with <span className="font-medium text-[#06b6d4]">{agent.name}</span>
             </p>
             <p className="text-xs mb-1 text-[#71717a]">
               Responses appear in real time
@@ -169,7 +169,7 @@ export function ChatTab() {
                 <motion.button
                   key={prompt}
                   onClick={() => sendMessage(prompt)}
-                  className="text-xs px-4 py-2 rounded-full border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#f97316]/30 hover:bg-[#f97316]/5 transition-all"
+                  className="text-xs px-4 py-2 rounded-full border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all"
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 + i * 0.1 }}
@@ -204,7 +204,7 @@ export function ChatTab() {
                   <p className="whitespace-pre-wrap">
                     {msg.content}
                     {msg.streaming && (
-                      <span className="inline-block w-[2px] h-4 ml-0.5 align-text-bottom bg-[#f97316] animate-pulse rounded-full" />
+                      <span className="inline-block w-[2px] h-4 ml-0.5 align-text-bottom bg-[#06b6d4] animate-pulse rounded-full" />
                     )}
                   </p>
                 ) : msg.streaming ? (
@@ -227,7 +227,7 @@ export function ChatTab() {
                     onClick={() => handleSpeakMessage(msg.id, msg.content)}
                     className={`opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-0.5 rounded hover:bg-white/5 ${
                       voice.isSpeaking && speakingMsgIdRef.current === msg.id
-                        ? 'text-[#f97316] opacity-100'
+                        ? 'text-[#06b6d4] opacity-100'
                         : 'text-[#71717a] hover:text-[#A5A1C2]'
                     }`}
                     title={voice.isSpeaking && speakingMsgIdRef.current === msg.id ? 'Stop reading' : 'Read aloud'}
@@ -267,7 +267,7 @@ export function ChatTab() {
                 {voice.isSpeaking && (
                   <>
                     <SoundWaveBars />
-                    <span className="text-[#f97316]">Speaking...</span>
+                    <span className="text-[#06b6d4]">Speaking...</span>
                   </>
                 )}
               </div>
@@ -294,7 +294,7 @@ export function ChatTab() {
               <>
                 Daily limit reached.{' '}
                 <button
-                  className="underline hover:opacity-80 transition-opacity text-[#f97316]"
+                  className="underline hover:opacity-80 transition-opacity text-[#06b6d4]"
                   onClick={() => setTab('integrations')}
                 >
                   Unlock features
@@ -333,7 +333,7 @@ export function ChatTab() {
           <p className="text-sm text-amber-400">
             Daily limit reached.{' '}
             <a
-              className="underline hover:opacity-80 transition-opacity text-[#f97316]"
+              className="underline hover:opacity-80 transition-opacity text-[#06b6d4]"
               href="/dashboard/billing"
             >
               Upgrade your tier
@@ -342,7 +342,7 @@ export function ChatTab() {
         </div>
       ) : (
         <div>
-          <div className="flex gap-2 items-end rounded-2xl p-3 border border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.6)] backdrop-blur-xl focus-within:border-[#f97316]/40 focus-within:shadow-[0_0_20px_rgba(249,115,22,0.06)] transition-all duration-200">
+          <div className="flex gap-2 items-end rounded-2xl p-3 border border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.6)] backdrop-blur-xl focus-within:border-[#06b6d4]/40 focus-within:shadow-[0_0_20px_rgba(6,182,212,0.06)] transition-all duration-200">
             <textarea
               ref={inputRef}
               className="flex-1 bg-transparent border-none outline-none resize-none min-h-[36px] max-h-32 text-sm text-[#FFFFFF] placeholder:text-[#71717a] leading-relaxed"
@@ -383,8 +383,8 @@ export function ChatTab() {
             <button
               className={`h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
                 input.trim() && !sending
-                  ? 'bg-[#f97316] hover:bg-[#ea580c] shadow-[0_0_12px_rgba(249,115,22,0.3)] hover:shadow-[0_0_20px_rgba(249,115,22,0.4)]'
-                  : 'bg-[#f97316]/30 opacity-50 cursor-not-allowed'
+                  ? 'bg-[#06b6d4] hover:bg-[#0891b2] shadow-[0_0_12px_rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]'
+                  : 'bg-[#06b6d4]/30 opacity-50 cursor-not-allowed'
               }`}
               onClick={() => sendMessage()}
               disabled={!input.trim() || sending}

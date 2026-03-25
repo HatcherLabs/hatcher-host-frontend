@@ -58,7 +58,7 @@ function IntegrationFieldsForm({
           href={integration.docsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-xs text-[#f97316] hover:text-[#fb923c] transition-colors"
+          className="inline-flex items-center gap-1 text-xs text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
         >
           How to get your API key &rarr;
         </a>
@@ -79,7 +79,7 @@ function IntegrationFieldsForm({
             )}
             <label htmlFor={`field-${fieldId}`} className="flex items-center gap-1.5 text-xs mb-1.5 text-[#71717a]">
               {field.label}
-              {field.required && <span className="text-[#f97316]">*</span>}
+              {field.required && <span className="text-[#06b6d4]">*</span>}
             </label>
 
             {field.type === 'select' ? (
@@ -164,7 +164,7 @@ function IntegrationFieldsForm({
         <button
           onClick={() => saveIntegrationSecrets(integration)}
           disabled={isSaving}
-          className="px-4 py-2 rounded-lg text-xs font-medium text-white transition-all disabled:opacity-40 hover:opacity-90 bg-[#f97316]"
+          className="px-4 py-2 rounded-lg text-xs font-medium text-white transition-all disabled:opacity-40 hover:opacity-90 bg-[#06b6d4]"
         >
           {isSaving ? 'Saving...' : 'Save Credentials'}
         </button>
@@ -282,7 +282,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             onClick={() => setIntegrationField(sk, allowFromKey, '*')}
             className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
               allowFromValue === '*'
-                ? 'border-[#f97316]/40 bg-[#f97316]/10 text-white'
+                ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-white'
                 : 'border-white/[0.08] text-[#71717a] hover:border-white/[0.15]'
             }`}
           >
@@ -293,8 +293,8 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             onClick={() => { if (allowFromValue === '*') setIntegrationField(sk, allowFromKey, ''); }}
             className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
               allowFromValue !== '*' && allowFromValue !== ''
-                ? 'border-[#f97316]/40 bg-[#f97316]/10 text-white'
-                : allowFromValue === '' ? 'border-[#f97316]/40 bg-[#f97316]/10 text-white' : 'border-white/[0.08] text-[#71717a] hover:border-white/[0.15]'
+                ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-white'
+                : allowFromValue === '' ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-white' : 'border-white/[0.08] text-[#71717a] hover:border-white/[0.15]'
             }`}
           >
             Specific numbers
@@ -307,7 +307,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
               value={allowFromValue}
               onChange={(e) => setIntegrationField(sk, allowFromKey, e.target.value)}
               placeholder="+1234567890, +0987654321"
-              className="flex-1 h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-orange-500/50 focus:outline-none placeholder:text-[#71717a] transition-colors"
+              className="flex-1 h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-cyan-500/50 focus:outline-none placeholder:text-[#71717a] transition-colors"
             />
           </div>
         )}
@@ -315,7 +315,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
           <button
             onClick={handleSaveAllowFrom}
             disabled={savingIntegration === sk || !allowFromValue.trim()}
-            className="px-3 h-8 rounded-lg text-xs font-medium text-white bg-[#f97316] hover:bg-[#ea580c] disabled:opacity-50 transition-colors"
+            className="px-3 h-8 rounded-lg text-xs font-medium text-white bg-[#06b6d4] hover:bg-[#0891b2] disabled:opacity-50 transition-colors"
           >
             {savingIntegration === sk ? 'Saving...' : 'Save'}
           </button>
@@ -383,7 +383,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
           <button
             onClick={handlePair}
             disabled={loading}
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-white transition-all disabled:opacity-40 hover:opacity-90 bg-[#f97316]"
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-white transition-all disabled:opacity-40 hover:opacity-90 bg-[#06b6d4]"
           >
             {loading ? (
               <>
@@ -402,7 +402,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
               href={integration.docsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-center text-xs text-[#71717a] hover:text-[#f97316] transition-colors"
+              className="block text-center text-xs text-[#71717a] hover:text-[#06b6d4] transition-colors"
             >
               How to set up {integration.name} &rarr;
             </a>
@@ -674,7 +674,7 @@ export function IntegrationsTab() {
                             </span>
                           )}
                           {isConfigured && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#f97316]/15 text-[#f97316] border border-[#f97316]/20">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#06b6d4]/15 text-[#06b6d4] border border-[#06b6d4]/20">
                               Configured
                             </span>
                           )}
@@ -736,7 +736,7 @@ export function IntegrationsTab() {
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-[#FFFFFF]">{integration.name}</span>
                           {hasAnyConfigured && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#f97316]/15 text-[#f97316] border border-[#f97316]/20">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#06b6d4]/15 text-[#06b6d4] border border-[#06b6d4]/20">
                               Configured
                             </span>
                           )}

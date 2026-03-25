@@ -63,8 +63,8 @@ export function ConfigTab() {
       {/* Agent basic info */}
       <GlassCard>
         <div className="flex items-center gap-2 mb-4">
-          <div className="w-7 h-7 rounded-lg bg-[#f97316]/10 flex items-center justify-center">
-            <Settings size={14} className="text-[#f97316]" />
+          <div className="w-7 h-7 rounded-lg bg-[#06b6d4]/10 flex items-center justify-center">
+            <Settings size={14} className="text-[#06b6d4]" />
           </div>
           <h3 className="text-sm font-semibold text-[#A5A1C2]">Agent Info</h3>
         </div>
@@ -146,7 +146,7 @@ export function ConfigTab() {
                   {parsedSkills.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {parsedSkills.map((skill, i) => (
-                        <span key={skill} className="text-[10px] px-2 py-0.5 rounded-full border bg-[#f97316]/10 text-[#f97316] border-[#f97316]/20">
+                        <span key={skill} className="text-[10px] px-2 py-0.5 rounded-full border bg-[#06b6d4]/10 text-[#06b6d4] border-[#06b6d4]/20">
                           {skill}
                         </span>
                       ))}
@@ -162,8 +162,8 @@ export function ConfigTab() {
       {/* LLM Configuration */}
       <GlassCard>
         <div className="flex items-center gap-2 mb-4">
-          <div className="w-7 h-7 rounded-lg bg-orange-500/10 flex items-center justify-center">
-            <Zap size={14} className="text-orange-400" />
+          <div className="w-7 h-7 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+            <Zap size={14} className="text-cyan-400" />
           </div>
           <h3 className="text-sm font-semibold text-[#A5A1C2]">AI Model</h3>
         </div>
@@ -181,11 +181,11 @@ export function ConfigTab() {
                 }}
                 className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-left transition-all ${
                   configProvider === 'groq'
-                    ? 'border-[#f97316]/40 bg-[#f97316]/10 text-white'
+                    ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-white'
                     : 'border-white/[0.06] bg-white/[0.02] text-[#71717a] hover:border-white/[0.12]'
                 }`}
               >
-                <Zap size={16} className={configProvider === 'groq' ? 'text-[#f97316]' : ''} />
+                <Zap size={16} className={configProvider === 'groq' ? 'text-[#06b6d4]' : ''} />
                 <div>
                   <p className="text-xs font-medium">Hatcher Platform</p>
                   <p className="text-[10px] opacity-60">Free, no setup needed</p>
@@ -218,9 +218,9 @@ export function ConfigTab() {
 
           {/* Platform mode — show info only */}
           {configProvider === 'groq' && (
-            <div className="rounded-xl p-4 border border-[#f97316]/20 bg-[#f97316]/5">
+            <div className="rounded-xl p-4 border border-[#06b6d4]/20 bg-[#06b6d4]/5">
               <div className="flex items-center gap-2 mb-1">
-                <CheckCircle size={14} className="text-[#f97316]" />
+                <CheckCircle size={14} className="text-[#06b6d4]" />
                 <p className="text-xs font-medium text-white">Platform Model Active</p>
               </div>
               <p className="text-[10px] text-[#A5A1C2] ml-[22px]">
@@ -383,7 +383,7 @@ export function ConfigTab() {
             <button
               onClick={() => saveConfig()}
               disabled={saving}
-              className="mt-3 flex items-center gap-1.5 text-xs font-medium text-white bg-[#f97316] hover:bg-[#ea580c] rounded-xl px-4 py-2 transition-all duration-200 disabled:opacity-40"
+              className="mt-3 flex items-center gap-1.5 text-xs font-medium text-white bg-[#06b6d4] hover:bg-[#0891b2] rounded-xl px-4 py-2 transition-all duration-200 disabled:opacity-40"
             >
               {saving ? (
                 <><div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>

@@ -83,7 +83,7 @@ export const DEFAULT_PROMPTS = ['What can you do?', 'Tell me about yourself', 'H
 export const COLORS = {
   bg: '#0D0B1A',
   card: 'rgba(26,23,48,0.6)',
-  accent: '#f97316',
+  accent: '#06b6d4',
   textPrimary: '#FFFFFF',
   textSecondary: '#A5A1C2',
   textMuted: '#71717a',
