@@ -243,6 +243,7 @@ export const api = {
   updateAgent: (id: string, data: {
     name?: string;
     description?: string;
+    commitMessage?: string;
     config?: { personality?: string; systemPrompt?: string; [key: string]: unknown };
   }) =>
     req<Agent>(`/agents/${id}`, {
@@ -869,6 +870,62 @@ export const api = {
     }),
 
   // ─── Skills Browser ─────────────────────────────────────────
+  // ─── Teams (Collaboration) ──────────────────────────────────
+
+  /** List user's teams */
+  getMyTeams: () => req<Array<{ id: string; name: string; ownerId: string; myRole: string; agentCount: number; members: Array<{ id: string; role: string; user: { id: string; username: string } }>; createdAt: string }>>('/teams'),
+
+  /** Get a single team with members */
+  getTeam: (id: string) => req<{ id: string; name: string; ownerId: string; myRole: string; agentCount: number; members: Array<{ id: string; teamId: string; userId: string; role: string; user: { id: string; username: string; walletAddress: string | null; createdAt: string } }>; createdAt: string; updatedAt: string }>(`/teams/${id}`),
+
+  /** Create a new team */
+  createTeam: (name: string) =>
+    req<{ id: string; name: string; ownerId: string; members: Array<{ id: string; role: string; user: { id: string; username: string } }>; createdAt: string }>('/teams', {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    }),
+
+  /** Update team name */
+  updateTeam: (id: string, name: string) =>
+    req<{ id: string; name: string }>(`/teams/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ name }),
+    }),
+
+  /** Delete a team */
+  deleteTeam: (id: string) =>
+    req<{ deleted: boolean }>(`/teams/${id}`, { method: 'DELETE' }),
+
+  /** Invite a member to a team */
+  inviteTeamMember: (teamId: string, email: string, role: string) =>
+    req<{ id: string; teamId: string; userId: string; role: string; user: { id: string; username: string } }>(`/teams/${teamId}/members`, {
+      method: 'POST',
+      body: JSON.stringify({ email, role }),
+    }),
+
+  /** Update a team member's role */
+  updateTeamMemberRole: (teamId: string, memberId: string, role: string) =>
+    req<{ id: string; role: string; user: { id: string; username: string } }>(`/teams/${teamId}/members/${memberId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ role }),
+    }),
+
+  /** Remove a team member */
+  removeTeamMember: (teamId: string, memberId: string) =>
+    req<{ removed: boolean }>(`/teams/${teamId}/members/${memberId}`, { method: 'DELETE' }),
+
+  /** Share an agent with a team */
+  shareAgentWithTeam: (teamId: string, agentId: string) =>
+    req<{ shared: boolean; agentId: string; teamId: string }>(`/teams/${teamId}/agents/${agentId}`, { method: 'POST' }),
+
+  /** Unshare an agent from a team */
+  unshareAgentFromTeam: (teamId: string, agentId: string) =>
+    req<{ unshared: boolean; agentId: string; teamId: string }>(`/teams/${teamId}/agents/${agentId}`, { method: 'DELETE' }),
+
+  /** List team's shared agents */
+  getTeamAgents: (teamId: string) =>
+    req<Array<{ id: string; name: string; status: string; framework: string; ownerUsername: string; createdAt: string }>>(`/teams/${teamId}/agents`),
+
   /** List available skills for an agent (reads from container) */
   getAgentSkills: (agentId: string) =>
     req<{
@@ -894,4 +951,221 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ enabled }),
     }),
+
+  // ─── Custom Domains ──────────────────────────────────────
+  /** Add a custom domain to an agent */
+  addCustomDomain: (agentId: string, domain: string) =>
+    req<{
+      id: string;
+      agentId: string;
+      domain: string;
+      verified: boolean;
+      sslStatus: string;
+      cnameTarget: string;
+      createdAt: string;
+      updatedAt: string;
+    }>('/domains', {
+      method: 'POST',
+      body: JSON.stringify({ agentId, domain }),
+    }),
+
+  /** List all custom domains for the current user */
+  getMyDomains: () =>
+    req<Array<{
+      id: string;
+      agentId: string;
+      domain: string;
+      verified: boolean;
+      sslStatus: string;
+      cnameTarget: string;
+      createdAt: string;
+      updatedAt: string;
+    }>>('/domains'),
+
+  /** Get a single domain's details */
+  getDomain: (id: string) =>
+    req<{
+      id: string;
+      agentId: string;
+      domain: string;
+      verified: boolean;
+      sslStatus: string;
+      cnameTarget: string;
+      createdAt: string;
+      updatedAt: string;
+    }>(`/domains/${id}`),
+
+  /** Delete a custom domain */
+  deleteDomain: (id: string) =>
+    req<{ deleted: boolean; id: string }>(`/domains/${id}`, { method: 'DELETE' }),
+
+  /** Verify a custom domain's DNS CNAME */
+  verifyDomain: (id: string) =>
+    req<{
+      verified: boolean;
+      domain?: unknown;
+      message?: string;
+      expected?: string;
+      found?: string[];
+    }>(`/domains/${id}/verify`, { method: 'POST' }),
+
+  // ─── Public Chat ──────────────────────────────────────────
+  /** Get public agent info by slug (no auth) */
+  getPublicAgent: (slug: string) =>
+    req<{
+      id: string;
+      name: string;
+      description: string | null;
+      avatarUrl: string | null;
+      framework: string;
+      slug: string;
+      status: string;
+    }>(`/chat/${slug}`),
+
+  /** Send a message to a public agent (no auth) */
+  sendPublicMessage: (slug: string, message: string, history?: Array<{ role: 'user' | 'assistant'; content: string }>) =>
+    req<{ content: string }>(`/chat/${slug}/message`, {
+      method: 'POST',
+      body: JSON.stringify({ message, history }),
+    }),
+
+  // ─── Workflows (Visual Builder) ────────────────────────────
+  /** List all workflows for an agent */
+  getAgentWorkflows: (agentId: string) =>
+    req<Array<{
+      id: string;
+      agentId: string;
+      name: string;
+      enabled: boolean;
+      nodes: unknown[];
+      edges: unknown[];
+      createdAt: string;
+      updatedAt: string;
+    }>>(`/agents/${agentId}/workflows`),
+
+  /** Create a new workflow */
+  createAgentWorkflow: (agentId: string, data: { name: string; nodes?: unknown[]; edges?: unknown[] }) =>
+    req<{
+      id: string;
+      agentId: string;
+      name: string;
+      enabled: boolean;
+      nodes: unknown[];
+      edges: unknown[];
+      createdAt: string;
+      updatedAt: string;
+    }>(`/agents/${agentId}/workflows`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  /** Get a single workflow */
+  getAgentWorkflow: (agentId: string, workflowId: string) =>
+    req<{
+      id: string;
+      agentId: string;
+      name: string;
+      enabled: boolean;
+      nodes: unknown[];
+      edges: unknown[];
+      createdAt: string;
+      updatedAt: string;
+    }>(`/agents/${agentId}/workflows/${workflowId}`),
+
+  /** Update a workflow */
+  updateAgentWorkflow: (agentId: string, workflowId: string, data: {
+    name?: string;
+    nodes?: unknown[];
+    edges?: unknown[];
+    enabled?: boolean;
+  }) =>
+    req<{
+      id: string;
+      agentId: string;
+      name: string;
+      enabled: boolean;
+      nodes: unknown[];
+      edges: unknown[];
+      createdAt: string;
+      updatedAt: string;
+    }>(`/agents/${agentId}/workflows/${workflowId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  /** Delete a workflow */
+  deleteAgentWorkflow: (agentId: string, workflowId: string) =>
+    req<{ deleted: boolean; id: string }>(`/agents/${agentId}/workflows/${workflowId}`, {
+      method: 'DELETE',
+    }),
+
+  /** Toggle workflow enabled/disabled */
+  toggleAgentWorkflow: (agentId: string, workflowId: string) =>
+    req<{ id: string; enabled: boolean }>(`/agents/${agentId}/workflows/${workflowId}/toggle`, {
+      method: 'POST',
+    }),
+
+  // ─── Agent Versioning ──────────────────────────────────────
+
+  /** List versions for an agent (paginated) */
+  getAgentVersions: (agentId: string, limit = 20, offset = 0) =>
+    req<{
+      versions: Array<{
+        id: string;
+        agentId: string;
+        version: number;
+        configSnapshot: string;
+        commitMessage: string | null;
+        createdBy: string | null;
+        createdAt: string;
+      }>;
+      total: number;
+      limit: number;
+      offset: number;
+    }>(`/agents/${agentId}/versions?limit=${limit}&offset=${offset}`),
+
+  /** Get a specific version */
+  getAgentVersion: (agentId: string, version: number) =>
+    req<{
+      id: string;
+      agentId: string;
+      version: number;
+      configSnapshot: string;
+      commitMessage: string | null;
+      createdBy: string | null;
+      createdAt: string;
+    }>(`/agents/${agentId}/versions/${version}`),
+
+  /** Restore agent to a specific version */
+  restoreAgentVersion: (agentId: string, version: number) =>
+    req<{
+      id: string;
+      agentId: string;
+      version: number;
+      configSnapshot: string;
+      commitMessage: string | null;
+      createdBy: string | null;
+      createdAt: string;
+    }>(`/agents/${agentId}/versions/${version}/restore`, {
+      method: 'POST',
+    }),
+
+  /** Get two versions for diffing */
+  diffAgentVersions: (agentId: string, v1: number, v2: number) =>
+    req<{
+      v1: {
+        id: string;
+        version: number;
+        configSnapshot: string;
+        commitMessage: string | null;
+        createdAt: string;
+      };
+      v2: {
+        id: string;
+        version: number;
+        configSnapshot: string;
+        commitMessage: string | null;
+        createdAt: string;
+      };
+    }>(`/agents/${agentId}/versions/diff?v1=${v1}&v2=${v2}`),
 };

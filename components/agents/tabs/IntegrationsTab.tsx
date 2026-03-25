@@ -29,6 +29,7 @@ import {
   type IntegrationDef,
 } from '../AgentContext';
 import { api } from '@/lib/api';
+import { DomainsSection } from './DomainsSection';
 
 function IntegrationFieldsForm({
   integration,
@@ -759,6 +760,9 @@ export function IntegrationsTab() {
               })}
             </div>
           </div>}
+
+          {/* Custom Domains */}
+          <DomainsSection />
 
           {/* Note */}
           <p className="text-center text-xs text-[#71717a]">

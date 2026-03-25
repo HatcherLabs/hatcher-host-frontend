@@ -14,6 +14,7 @@ const NAV_LINKS = [
   { href: '/explore',           label: 'Explore' },
   { href: '/marketplace',       label: 'Marketplace' },
   { href: '/create',            label: 'Create' },
+  { href: '/dashboard/team',    label: 'Team' },
   { href: '/dashboard/billing', label: 'Billing' },
   { href: '/pricing',           label: 'Pricing' },
   { href: '/token',             label: 'Our Token' },

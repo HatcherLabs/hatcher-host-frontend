@@ -30,6 +30,8 @@ import {
   Clock,
   BookOpen,
   Sparkles,
+  GitMerge,
+  History,
 } from 'lucide-react';
 import {
   AgentContext,
@@ -115,6 +117,16 @@ const SkillsTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const WorkflowsTab = dynamic(
+  () => import('@/components/agents/tabs/WorkflowsTab').then(mod => ({ default: mod.WorkflowsTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
+const VersionsTab = dynamic(
+  () => import('@/components/agents/tabs/VersionsTab').then(mod => ({ default: mod.VersionsTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 // ─── Tab definitions ─────────────────────────────────────────
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
@@ -127,6 +139,8 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: 'memory', label: 'Memory', icon: <Brain size={16} /> },
   { id: 'knowledge', label: 'Knowledge', icon: <BookOpen size={16} /> },
   { id: 'schedules', label: 'Schedules', icon: <Clock size={16} /> },
+  { id: 'workflows', label: 'Workflows', icon: <GitMerge size={16} /> },
+  { id: 'versions', label: 'Versions', icon: <History size={16} /> },
   { id: 'chat', label: 'Chat', icon: <MessageSquare size={16} /> },
   { id: 'stats', label: 'Stats', icon: <BarChart3 size={16} /> },
 ];
@@ -144,7 +158,7 @@ export default function AgentManagePage() {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const initialTab = (['overview','config','integrations','skills','files','logs','memory','knowledge','schedules','chat','stats'] as Tab[]).includes(searchParams.get('tab') as Tab)
+  const initialTab = (['overview','config','integrations','skills','files','logs','memory','knowledge','schedules','workflows','versions','chat','stats'] as Tab[]).includes(searchParams.get('tab') as Tab)
     ? (searchParams.get('tab') as Tab)
     : 'overview';
   const [tab, setTab] = useState<Tab>(initialTab);
@@ -575,7 +589,7 @@ export default function AgentManagePage() {
     }
   };
 
-  const saveConfig = async () => {
+  const saveConfig = async (commitMessage?: string) => {
     if (!agent) return;
     const trimmedName = configName.trim() || agent.name;
     if (trimmedName.length < 3 || trimmedName.length > 50) {
@@ -600,6 +614,7 @@ export default function AgentManagePage() {
     const updateData: Record<string, unknown> = {
       name: trimmedName,
       description: configDesc.trim() || undefined,
+      ...(commitMessage?.trim() ? { commitMessage: commitMessage.trim() } : {}),
     };
     updateData.config = {
       systemPrompt: configSystemPrompt,
@@ -1059,6 +1074,8 @@ export default function AgentManagePage() {
           {tab === 'memory' && <MemoryTab />}
           {tab === 'knowledge' && <KnowledgeTab />}
           {tab === 'schedules' && <SchedulesTab />}
+          {tab === 'workflows' && <WorkflowsTab />}
+          {tab === 'versions' && <VersionsTab />}
           {tab === 'chat' && <ChatTab />}
           {tab === 'stats' && <StatsTab />}
         </AnimatePresence>

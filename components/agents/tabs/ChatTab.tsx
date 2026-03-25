@@ -1,16 +1,44 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { Send } from 'lucide-react';
+import { useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Send, Mic, MicOff, Volume2, VolumeX, Square } from 'lucide-react';
 import { FRAMEWORKS } from '@hatcher/shared';
 import { RobotMascot } from '@/components/ui/RobotMascot';
+import { useVoice } from '@/hooks/useVoice';
 import {
   useAgentContext,
   tabContentVariants,
   GlassCard,
   DEFAULT_PROMPTS,
 } from '../AgentContext';
+
+/* ── Animated sound-wave bars (TTS playing indicator) ──────────── */
+function SoundWaveBars({ className = '' }: { className?: string }) {
+  return (
+    <span className={`inline-flex items-end gap-[2px] h-3 ${className}`}>
+      {[0, 1, 2, 3].map((i) => (
+        <span
+          key={i}
+          className="w-[2px] bg-[#f97316] rounded-full"
+          style={{
+            animation: `voiceBar 0.8s ease-in-out ${i * 0.15}s infinite alternate`,
+          }}
+        />
+      ))}
+    </span>
+  );
+}
+
+/* ── Pulsing red dot for recording ─────────────────────────────── */
+function RecordingDot() {
+  return (
+    <span className="relative flex h-2.5 w-2.5">
+      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
+    </span>
+  );
+}
 
 export function ChatTab() {
   const ctx = useAgentContext();
@@ -33,6 +61,10 @@ export function ChatTab() {
 
   const frameworkMeta = FRAMEWORKS[agent.framework];
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const prevMessageCountRef = useRef(messages.length);
+  const speakingMsgIdRef = useRef<string | null>(null);
+
+  const voice = useVoice();
 
   // Scroll chat container to bottom when messages change
   useEffect(() => {
@@ -42,8 +74,78 @@ export function ChatTab() {
     }
   }, [messages]);
 
+  // Auto-speak new assistant messages when autoSpeak is enabled
+  useEffect(() => {
+    if (!voice.autoSpeak || !voice.ttsSupported) return;
+
+    const prevCount = prevMessageCountRef.current;
+    prevMessageCountRef.current = messages.length;
+
+    if (messages.length > prevCount) {
+      const lastMsg = messages[messages.length - 1];
+      // Only speak completed assistant messages (not streaming)
+      if (lastMsg && lastMsg.role === 'assistant' && !lastMsg.streaming && lastMsg.content) {
+        voice.speak(lastMsg.content);
+      }
+    }
+  }, [messages, voice.autoSpeak, voice.ttsSupported, voice.speak]);
+
+  // When transcript changes from STT, update input field
+  useEffect(() => {
+    if (voice.transcript) {
+      setInput(voice.transcript);
+    }
+  }, [voice.transcript, setInput]);
+
+  // Handle mic toggle
+  const handleMicToggle = useCallback(() => {
+    if (voice.isListening) {
+      voice.stopListening();
+    } else {
+      // Clear previous transcript
+      setInput('');
+      voice.startListening((finalText: string) => {
+        // Auto-send after silence
+        if (finalText.trim()) {
+          sendMessage(finalText.trim());
+        }
+      });
+    }
+  }, [voice, setInput, sendMessage]);
+
+  // Handle speak button on a specific message
+  const handleSpeakMessage = useCallback((msgId: string, content: string) => {
+    if (voice.isSpeaking && speakingMsgIdRef.current === msgId) {
+      voice.stopSpeaking();
+      speakingMsgIdRef.current = null;
+    } else {
+      speakingMsgIdRef.current = msgId;
+      voice.speak(content);
+    }
+  }, [voice]);
+
+  const hasVoiceSupport = voice.sttSupported || voice.ttsSupported;
+
   return (
     <motion.div key="tab-chat" className="flex flex-col h-[calc(100vh-300px)] min-h-[400px]" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
+      {/* Chat header with auto-speak toggle */}
+      {voice.ttsSupported && (
+        <div className="flex items-center justify-end mb-2 px-1">
+          <button
+            onClick={voice.toggleAutoSpeak}
+            className={`group flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border transition-all duration-200 ${
+              voice.autoSpeak
+                ? 'border-[#f97316]/40 bg-[#f97316]/10 text-[#f97316]'
+                : 'border-[rgba(46,43,74,0.3)] bg-transparent text-[#71717a] hover:border-[#71717a]/40 hover:text-[#A5A1C2]'
+            }`}
+            title="Auto-read responses"
+          >
+            {voice.autoSpeak ? <Volume2 size={11} /> : <VolumeX size={11} />}
+            <span>Auto-read</span>
+          </button>
+        </div>
+      )}
+
       {/* Messages area */}
       <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overscroll-contain space-y-4 mb-4 pr-1">
         {messages.length === 0 && (
@@ -82,7 +184,7 @@ export function ChatTab() {
         {messages.map((msg) => (
           <motion.div
             key={msg.id}
-            className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`group flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             initial={{ opacity: 0, y: 8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -113,17 +215,76 @@ export function ChatTab() {
                   </div>
                 ) : null}
               </div>
-              {msg.timestamp && !msg.streaming && (
-                <span className={`text-[10px] px-1.5 text-[#71717a] select-none`}>
-                  {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
-              )}
+              <div className="flex items-center gap-1.5">
+                {msg.timestamp && !msg.streaming && (
+                  <span className="text-[10px] px-1.5 text-[#71717a] select-none">
+                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                )}
+                {/* TTS speak button for assistant messages */}
+                {msg.role === 'assistant' && !msg.streaming && msg.content && voice.ttsSupported && (
+                  <button
+                    onClick={() => handleSpeakMessage(msg.id, msg.content)}
+                    className={`opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-0.5 rounded hover:bg-white/5 ${
+                      voice.isSpeaking && speakingMsgIdRef.current === msg.id
+                        ? 'text-[#f97316] opacity-100'
+                        : 'text-[#71717a] hover:text-[#A5A1C2]'
+                    }`}
+                    title={voice.isSpeaking && speakingMsgIdRef.current === msg.id ? 'Stop reading' : 'Read aloud'}
+                  >
+                    {voice.isSpeaking && speakingMsgIdRef.current === msg.id ? (
+                      <SoundWaveBars />
+                    ) : (
+                      <Volume2 size={12} />
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
           </motion.div>
         ))}
 
         <div ref={bottomRef} />
       </div>
+
+      {/* Voice control bar */}
+      <AnimatePresence>
+        {(voice.isListening || voice.isSpeaking) && (
+          <motion.div
+            initial={{ opacity: 0, y: 4, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: 4, height: 0 }}
+            className="mb-2"
+          >
+            <div className="flex items-center justify-between px-3 py-1.5 rounded-lg border border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl">
+              <div className="flex items-center gap-2 text-xs">
+                {voice.isListening && (
+                  <>
+                    <RecordingDot />
+                    <span className="text-red-400">Listening...</span>
+                  </>
+                )}
+                {voice.isSpeaking && (
+                  <>
+                    <SoundWaveBars />
+                    <span className="text-[#f97316]">Speaking...</span>
+                  </>
+                )}
+              </div>
+              <button
+                onClick={() => {
+                  if (voice.isListening) voice.stopListening();
+                  if (voice.isSpeaking) voice.stopSpeaking();
+                }}
+                className="p-1 rounded hover:bg-white/5 text-[#71717a] hover:text-white transition-colors"
+                title="Stop"
+              >
+                <Square size={12} fill="currentColor" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Chat error */}
       {chatError && (
@@ -197,6 +358,28 @@ export function ChatTab() {
               }}
               disabled={sending}
             />
+
+            {/* Mic button */}
+            {voice.sttSupported && (
+              <button
+                onClick={handleMicToggle}
+                className={`h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
+                  voice.isListening
+                    ? 'bg-red-500/20 border border-red-500/40 shadow-[0_0_12px_rgba(239,68,68,0.3)] hover:bg-red-500/30'
+                    : 'bg-[rgba(46,43,74,0.4)] hover:bg-[rgba(46,43,74,0.6)] border border-transparent hover:border-[#71717a]/30'
+                }`}
+                title={voice.isListening ? 'Stop recording' : 'Start voice input'}
+                disabled={sending}
+              >
+                {voice.isListening ? (
+                  <MicOff size={15} className="text-red-400" />
+                ) : (
+                  <Mic size={15} className="text-[#A5A1C2]" />
+                )}
+              </button>
+            )}
+
+            {/* Send button */}
             <button
               className={`h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
                 input.trim() && !sending
@@ -224,6 +407,14 @@ export function ChatTab() {
           </div>
         </div>
       )}
+
+      {/* Keyframe for sound wave bars */}
+      <style jsx global>{`
+        @keyframes voiceBar {
+          0% { height: 3px; }
+          100% { height: 12px; }
+        }
+      `}</style>
     </motion.div>
   );
 }

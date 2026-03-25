@@ -6,7 +6,7 @@ import type { Agent, AgentFeature } from '@/lib/api';
 
 // ─── Types ───────────────────────────────────────────────────
 
-export type Tab = 'overview' | 'config' | 'integrations' | 'skills' | 'files' | 'logs' | 'memory' | 'knowledge' | 'schedules' | 'chat' | 'stats';
+export type Tab = 'overview' | 'config' | 'integrations' | 'skills' | 'files' | 'logs' | 'memory' | 'knowledge' | 'schedules' | 'workflows' | 'chat' | 'stats' | 'versions';
 
 export interface Message {
   id: string;
@@ -473,7 +473,7 @@ export interface AgentContextValue {
   saving: boolean;
   saveMsg: string | null;
   setSaveMsg: (msg: string | null) => void;
-  saveConfig: () => Promise<void>;
+  saveConfig: (commitMessage?: string) => Promise<void>;
 
   // LLM helpers
   llmProvider: string;

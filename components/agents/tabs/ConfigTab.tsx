@@ -56,6 +56,8 @@ export function ConfigTab() {
     setTab,
   } = ctx;
 
+  const [commitMessage, setCommitMessage] = useState('');
+
   return (
     <motion.div key="tab-config" className="max-w-2xl space-y-6" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
       {/* Agent basic info */}
@@ -379,7 +381,7 @@ export function ConfigTab() {
           )}
           {byokKeyInput.trim() && (
             <button
-              onClick={saveConfig}
+              onClick={() => saveConfig()}
               disabled={saving}
               className="mt-3 flex items-center gap-1.5 text-xs font-medium text-white bg-[#f97316] hover:bg-[#ea580c] rounded-xl px-4 py-2 transition-all duration-200 disabled:opacity-40"
             >
@@ -400,19 +402,32 @@ export function ConfigTab() {
       {/* Config History */}
       <ConfigHistory agentId={agent?.id} />
 
-      {/* Save button */}
-      <div className="flex items-center gap-3 pt-2">
-        <button
-          onClick={saveConfig}
-          disabled={saving}
-          className="btn-primary text-sm"
-        >
-          {saving ? (
-            <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
-          ) : (
-            <><CheckCircle size={15} /> Save Configuration</>
-          )}
-        </button>
+      {/* Change note + Save button */}
+      <div className="space-y-3 pt-2">
+        <div>
+          <label htmlFor="commit-message" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Change Note <span className="normal-case font-normal">(optional)</span></label>
+          <input
+            id="commit-message"
+            type="text"
+            className="config-input"
+            value={commitMessage}
+            onChange={(e) => setCommitMessage(e.target.value)}
+            placeholder="e.g. Updated system prompt, changed LLM model..."
+            maxLength={200}
+          />
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => { saveConfig(commitMessage); setCommitMessage(''); }}
+            disabled={saving}
+            className="btn-primary text-sm"
+          >
+            {saving ? (
+              <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
+            ) : (
+              <><CheckCircle size={15} /> Save Configuration</>
+            )}
+          </button>
         {saveMsg && (
           <motion.span
             initial={{ opacity: 0, x: -8 }}
@@ -422,6 +437,7 @@ export function ConfigTab() {
             {saveMsg}
           </motion.span>
         )}
+        </div>
       </div>
     </motion.div>
   );
