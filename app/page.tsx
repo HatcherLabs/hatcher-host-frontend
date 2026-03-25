@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { motion, useInView, useMotionValue, useTransform, animate } from 'framer-motion';
+import { motion, useInView, useMotionValue, useTransform, animate, AnimatePresence } from 'framer-motion';
 import { api } from '@/lib/api';
+import { IntroSplash } from '@/components/landing/IntroSplash';
 
 import {
   ArrowRight,
@@ -272,8 +273,19 @@ function BentoCard({
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
   const [platformStats, setPlatformStats] = useState({ totalAgents: 0, activeAgents: 0 });
+  const [showIntro, setShowIntro] = useState(false);
+  const [introComplete, setIntroComplete] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    // Only show intro once per session (per tab)
+    if (typeof window !== 'undefined' && !sessionStorage.getItem('intro_shown')) {
+      setShowIntro(true);
+      sessionStorage.setItem('intro_shown', 'true');
+    } else {
+      setIntroComplete(true);
+    }
+  }, []);
 
   useEffect(() => {
     api.getPublicStats().then((res) => {
@@ -284,7 +296,18 @@ export default function LandingPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white overflow-x-hidden">
+    <>
+      <AnimatePresence>
+        {showIntro && !introComplete && (
+          <IntroSplash onComplete={() => setIntroComplete(true)} />
+        )}
+      </AnimatePresence>
+      <motion.div
+        className="min-h-screen bg-[#0a0a0f] text-white overflow-x-hidden"
+        initial={{ opacity: introComplete ? 1 : 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: introComplete ? 0 : 0.2, duration: 0.4 }}
+      >
 
       {/* ── HERO ───────────────────────────────────────── */}
       <section id="hero" className="relative min-h-screen flex items-center">
@@ -873,6 +896,7 @@ export default function LandingPage() {
       </section>
 
       {/* Global footer is rendered by LayoutShell */}
-    </div>
+    </motion.div>
+    </>
   );
 }
