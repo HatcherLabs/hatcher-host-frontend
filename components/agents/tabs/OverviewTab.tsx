@@ -320,7 +320,7 @@ export function OverviewTab() {
                 {stats?.messagesProcessed ?? 0}
               </div>
               <div className="text-xs text-[#71717a]">Messages</div>
-              <div className="text-[10px] text-[#6B6890] mt-0.5">Since last restart</div>
+              <div className="text-[10px] text-[#6B6890] mt-0.5">Total</div>
             </div>
             {/* Mini bar chart indicator */}
             <div className="flex items-end gap-[2px] h-5 self-end">
