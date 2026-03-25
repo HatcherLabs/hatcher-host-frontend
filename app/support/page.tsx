@@ -288,6 +288,28 @@ export default function SupportPage() {
           })}
         </motion.div>
 
+        {/* ─── Direct Contact ──────────────────────────────────── */}
+        <motion.div variants={itemVariants}>
+          <div className="rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl p-5">
+            <p className="text-sm text-[#A5A1C2]">
+              Or email us directly at{' '}
+              <a href="mailto:support@hatcher.host" className="text-[#06b6d4] hover:underline font-medium">
+                support@hatcher.host
+              </a>
+              {' '}&middot;{' '}
+              <a
+                href="https://discord.gg/7tY3HjKjMc"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#06b6d4] hover:underline font-medium"
+              >
+                Join our Discord
+              </a>{' '}
+              for community support
+            </p>
+          </div>
+        </motion.div>
+
         {/* ─── Ticket Form / Success State ─────────────────────── */}
         <motion.div variants={itemVariants}>
           <div className="rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl overflow-hidden">

@@ -396,6 +396,26 @@ export default function PricingPage() {
           </div>
         </motion.section>
 
+        {/* NEED HELP */}
+        <motion.div
+          className="text-center mb-20"
+          variants={scrollFadeIn}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          <p className="text-[var(--text-muted)] text-sm">
+            Need help choosing a plan?{' '}
+            <a href="mailto:support@hatcher.host" className="text-[#06b6d4] hover:underline font-medium">
+              Email us
+            </a>
+            {' '}or{' '}
+            <a href="https://discord.gg/7tY3HjKjMc" target="_blank" rel="noopener noreferrer" className="text-[#06b6d4] hover:underline font-medium">
+              ask on Discord
+            </a>
+          </p>
+        </motion.div>
+
         {/* CTA BANNER */}
         <motion.div
           className="card-gradient-border glass-noise p-10 sm:p-14 text-center relative overflow-hidden"

@@ -79,6 +79,13 @@ const LINKS = [
     icon: ExternalLink,
     color: '#fafafa',
   },
+  {
+    label: 'Discord',
+    description: 'Join our community for real-time help',
+    href: 'https://discord.gg/7tY3HjKjMc',
+    icon: MessageCircle,
+    color: '#7289da',
+  },
 ];
 
 const GETTING_STARTED = [
@@ -337,25 +344,32 @@ export default function HelpPage() {
               Contact Us
             </h2>
           </div>
-          <p className="text-sm text-[var(--text-secondary)] leading-relaxed relative">
-            Need help?{' '}
-            <Link
-              href="/support"
-              className="font-medium text-[#06b6d4] hover:text-[#06b6d4] transition-colors underline decoration-[#06b6d4]/30 underline-offset-2"
-            >
-              Open a support ticket
-            </Link>{' '}
-            or find us on{' '}
-            <a
-              href="https://x.com/HatcherLabs"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-[#06b6d4] hover:text-[#06b6d4] transition-colors underline decoration-[#06b6d4]/30 underline-offset-2"
-            >
-              X (@HatcherLabs)
-            </a>
-            .
-          </p>
+          <div className="space-y-3 text-sm text-[var(--text-secondary)] leading-relaxed relative">
+            <p>
+              Need help?{' '}
+              <Link
+                href="/support"
+                className="font-medium text-[#06b6d4] hover:text-[#06b6d4] transition-colors underline decoration-[#06b6d4]/30 underline-offset-2"
+              >
+                Open a support ticket
+              </Link>{' '}
+              or reach out directly:
+            </p>
+            <div className="space-y-2 mt-3">
+              <p>
+                <Mail size={14} className="inline-block mr-1.5 text-[#06b6d4] -mt-0.5" />
+                <a href="mailto:support@hatcher.host" className="font-medium text-[#06b6d4] hover:text-[#06b6d4] transition-colors underline decoration-[#06b6d4]/30 underline-offset-2">support@hatcher.host</a> — technical help &amp; tickets
+              </p>
+              <p>
+                <Mail size={14} className="inline-block mr-1.5 text-[#06b6d4] -mt-0.5" />
+                <a href="mailto:contact@hatcher.host" className="font-medium text-[#06b6d4] hover:text-[#06b6d4] transition-colors underline decoration-[#06b6d4]/30 underline-offset-2">contact@hatcher.host</a> — general inquiries
+              </p>
+              <p>
+                <MessageCircle size={14} className="inline-block mr-1.5 text-[#7289da] -mt-0.5" />
+                <a href="https://discord.gg/7tY3HjKjMc" target="_blank" rel="noopener noreferrer" className="font-medium text-[#06b6d4] hover:text-[#06b6d4] transition-colors underline decoration-[#06b6d4]/30 underline-offset-2">Join our Discord</a> — community support &amp; chat
+              </p>
+            </div>
+          </div>
         </motion.div>
 
         {/* Still need help? */}
