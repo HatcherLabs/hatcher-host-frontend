@@ -11,15 +11,25 @@ const config: Config = {
     extend: {
       colors: {
         // Background palette — layered depth
-        'bg-base': '#0D0B1A',
-        'bg-sidebar': '#0F0D1F',
-        'bg-card': 'rgba(26,23,48,0.8)',
-        'bg-card-solid': '#1A1730',
-        'bg-elevated': '#252240',
-        'bg-hover': '#2E2B4A',
-        'bg-active': '#3D375E',
+        'bg-base': '#0a0a0f',
+        'bg-sidebar': '#0e0e14',
+        'bg-card': 'rgba(255,255,255,0.03)',
+        'bg-card-solid': '#141419',
+        'bg-elevated': '#1a1a22',
+        'bg-hover': '#22222d',
+        'bg-active': '#2a2a38',
 
-        // Accent brand palette (orange)
+        // Brand primary (purple)
+        primary: {
+          DEFAULT: '#8b5cf6',
+          400: '#a78bfa',
+          500: '#8b5cf6',
+          600: '#7c3aed',
+          700: '#6d28d9',
+          glow: 'rgba(139,92,246,0.15)',
+        },
+
+        // CTA accent (orange)
         accent: {
           400: '#fb923c',
           500: '#f97316',
@@ -27,9 +37,6 @@ const config: Config = {
           700: '#c2410c',
           glow: 'rgba(249,115,22,0.15)',
         },
-
-        // Primary alias
-        primary: '#f97316',
 
         // Accent colors
         orange: {
@@ -40,16 +47,21 @@ const config: Config = {
           400: '#FBBF24',
         },
 
+        // Semantic colors
+        success: '#34d399',
+        warning: '#fbbf24',
+        error: '#f87171',
+
         // Text colors
         'text-primary': '#fafafa',
-        'text-secondary': '#A5A1C2',
+        'text-secondary': '#a1a1aa',
         'text-muted': '#71717a',
-        'text-accent': '#f97316',
+        'text-accent': '#8b5cf6',
 
         // Border colors
-        'border-default': 'rgba(46,43,74,0.6)',
-        'border-hover': 'rgba(249,115,22,0.5)',
-        'border-active': '#f97316',
+        'border-default': 'rgba(255,255,255,0.06)',
+        'border-hover': 'rgba(139,92,246,0.3)',
+        'border-active': '#8b5cf6',
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
@@ -109,9 +121,9 @@ const config: Config = {
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'hero-glow':
-          'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(249,115,22,0.12), transparent)',
+          'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(139,92,246,0.12), transparent)',
         'dot-grid':
-          'radial-gradient(circle, rgba(249,115,22,0.04) 1px, transparent 1px)',
+          'radial-gradient(circle, rgba(139,92,246,0.04) 1px, transparent 1px)',
       },
     },
   },

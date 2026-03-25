@@ -37,10 +37,26 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Hatcher — AI Agent Platform on Solana',
-  description:
-    'Create, customize, and run AI agents powered by OpenClaw. Pay for premium features with platform tokens.',
-  keywords: ['AI agents', 'Solana', 'crypto', 'OpenClaw', 'Hatcher'],
+  title: { default: 'Hatcher — AI Agent Hosting Platform', template: '%s | Hatcher' },
+  description: 'Deploy, host, and manage AI agents. Free tier included. Pay with SOL, tokens, or card.',
+  keywords: ['AI agents', 'agent hosting', 'deploy AI', 'Solana', 'hatcher', 'AI bot', 'OpenClaw', 'Hermes'],
+  authors: [{ name: 'Hatcher Labs' }],
+  openGraph: {
+    type: 'website',
+    url: 'https://hatcher.host',
+    siteName: 'Hatcher',
+    title: 'Hatcher — Deploy AI Agents in Minutes',
+    description: 'The managed platform for AI agents. Free tier, BYOK, multi-framework.',
+    images: [{ url: '/og', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Hatcher — AI Agent Hosting',
+    description: 'Deploy and manage AI agents. Free tier included.',
+    images: ['/og'],
+  },
+  robots: { index: true, follow: true },
+  metadataBase: new URL('https://hatcher.host'),
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

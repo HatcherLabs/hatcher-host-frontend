@@ -316,6 +316,20 @@ export const api = {
   cancelSubscription: () =>
     req<{ tier: string }>('/features/cancel', { method: 'POST' }),
 
+  /** Create Stripe checkout session for tier subscription */
+  stripeCheckoutSubscription: (tier: string, returnUrl: string) =>
+    req<{ sessionId: string; url: string }>('/stripe/checkout/subscription', {
+      method: 'POST',
+      body: JSON.stringify({ tier, returnUrl }),
+    }),
+
+  /** Create Stripe checkout session for addon */
+  stripeCheckoutAddon: (addonKey: string, returnUrl: string, agentId?: string) =>
+    req<{ sessionId: string; url: string }>('/stripe/checkout/addon', {
+      method: 'POST',
+      body: JSON.stringify({ addonKey, returnUrl, ...(agentId ? { agentId } : {}) }),
+    }),
+
   /** Refresh JWT token */
   refreshToken: () =>
     req<{ token: string }>('/auth/refresh', { method: 'POST' }),

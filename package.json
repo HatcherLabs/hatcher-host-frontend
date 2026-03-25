@@ -22,6 +22,7 @@
     "@solana/web3.js": "^1.98.0",
     "@splinetool/react-spline": "^4.1.0",
     "@splinetool/runtime": "^1.12.69",
+    "@stripe/stripe-js": "^8.11.0",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

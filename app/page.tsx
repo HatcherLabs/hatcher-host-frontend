@@ -32,45 +32,45 @@ function HeroRobot() {
         {/* Glow behind robot */}
         <defs>
           <radialGradient id="robotGlow" cx="50%" cy="45%" r="45%">
-            <stop offset="0%" stopColor="#f97316" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
+            <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.15" />
+            <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#2E2B4A" />
-            <stop offset="100%" stopColor="#1A1730" />
+            <stop offset="0%" stopColor="#22222d" />
+            <stop offset="100%" stopColor="#141419" />
           </linearGradient>
           <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#f97316" />
-            <stop offset="100%" stopColor="#f97316" />
+            <stop offset="0%" stopColor="#8b5cf6" />
+            <stop offset="100%" stopColor="#8b5cf6" />
           </linearGradient>
           <linearGradient id="screenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#0D0B1A" />
-            <stop offset="100%" stopColor="#1A1730" />
+            <stop offset="0%" stopColor="#0a0a0f" />
+            <stop offset="100%" stopColor="#141419" />
           </linearGradient>
         </defs>
 
         <circle cx="160" cy="180" r="150" fill="url(#robotGlow)" />
 
         {/* Antenna */}
-        <line x1="160" y1="65" x2="160" y2="40" stroke="#f97316" strokeWidth="2.5" strokeLinecap="round">
+        <line x1="160" y1="65" x2="160" y2="40" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round">
           <animate attributeName="y2" values="40;35;40" dur="2s" repeatCount="indefinite" />
         </line>
-        <circle cx="160" cy="35" r="6" fill="#f97316" opacity="0.9">
+        <circle cx="160" cy="35" r="6" fill="#8b5cf6" opacity="0.9">
           <animate attributeName="r" values="6;8;6" dur="2s" repeatCount="indefinite" />
           <animate attributeName="opacity" values="0.9;0.5;0.9" dur="2s" repeatCount="indefinite" />
         </circle>
 
         {/* Head */}
-        <rect x="100" y="65" width="120" height="90" rx="20" fill="url(#bodyGrad)" stroke="#3D375E" strokeWidth="1.5" />
+        <rect x="100" y="65" width="120" height="90" rx="20" fill="url(#bodyGrad)" stroke="#2a2a38" strokeWidth="1.5" />
 
         {/* Face screen */}
-        <rect x="115" y="78" width="90" height="55" rx="12" fill="url(#screenGrad)" stroke="#f97316" strokeWidth="0.5" opacity="0.8" />
+        <rect x="115" y="78" width="90" height="55" rx="12" fill="url(#screenGrad)" stroke="#8b5cf6" strokeWidth="0.5" opacity="0.8" />
 
         {/* Eyes */}
-        <circle cx="140" cy="102" r="8" fill="#f97316" opacity="0.9">
+        <circle cx="140" cy="102" r="8" fill="#8b5cf6" opacity="0.9">
           <animate attributeName="opacity" values="0.9;0.4;0.9" dur="3s" repeatCount="indefinite" />
         </circle>
-        <circle cx="180" cy="102" r="8" fill="#f97316" opacity="0.9">
+        <circle cx="180" cy="102" r="8" fill="#8b5cf6" opacity="0.9">
           <animate attributeName="opacity" values="0.9;0.4;0.9" dur="3s" begin="0.5s" repeatCount="indefinite" />
         </circle>
         {/* Eye highlights */}
@@ -78,16 +78,16 @@ function HeroRobot() {
         <circle cx="183" cy="99" r="3" fill="white" opacity="0.6" />
 
         {/* Mouth — happy arc */}
-        <path d="M142 120 Q160 132 178 120" stroke="#f97316" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.7" />
+        <path d="M142 120 Q160 132 178 120" stroke="#8b5cf6" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.7" />
 
         {/* Neck */}
-        <rect x="148" y="155" width="24" height="15" rx="4" fill="#2E2B4A" stroke="#3D375E" strokeWidth="1" />
+        <rect x="148" y="155" width="24" height="15" rx="4" fill="#22222d" stroke="#2a2a38" strokeWidth="1" />
 
         {/* Body */}
-        <rect x="85" y="170" width="150" height="120" rx="24" fill="url(#bodyGrad)" stroke="#3D375E" strokeWidth="1.5" />
+        <rect x="85" y="170" width="150" height="120" rx="24" fill="url(#bodyGrad)" stroke="#2a2a38" strokeWidth="1.5" />
 
         {/* Chest plate / screen */}
-        <rect x="110" y="190" width="100" height="60" rx="14" fill="url(#screenGrad)" stroke="#f97316" strokeWidth="0.5" opacity="0.6" />
+        <rect x="110" y="190" width="100" height="60" rx="14" fill="url(#screenGrad)" stroke="#8b5cf6" strokeWidth="0.5" opacity="0.6" />
 
         {/* Chest indicator lights */}
         <circle cx="135" cy="210" r="4" fill="#4ADE80" opacity="0.8">
@@ -96,38 +96,38 @@ function HeroRobot() {
         <circle cx="160" cy="210" r="4" fill="#FBBF24" opacity="0.6">
           <animate attributeName="opacity" values="0.6;0.2;0.6" dur="1.8s" repeatCount="indefinite" />
         </circle>
-        <circle cx="185" cy="210" r="4" fill="#f97316" opacity="0.7">
+        <circle cx="185" cy="210" r="4" fill="#8b5cf6" opacity="0.7">
           <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2.1s" repeatCount="indefinite" />
         </circle>
 
         {/* Chest text lines (like code) */}
-        <rect x="125" y="225" width="50" height="3" rx="1.5" fill="#f97316" opacity="0.3" />
-        <rect x="125" y="232" width="70" height="3" rx="1.5" fill="#f97316" opacity="0.2" />
-        <rect x="125" y="239" width="40" height="3" rx="1.5" fill="#f97316" opacity="0.25" />
+        <rect x="125" y="225" width="50" height="3" rx="1.5" fill="#8b5cf6" opacity="0.3" />
+        <rect x="125" y="232" width="70" height="3" rx="1.5" fill="#8b5cf6" opacity="0.2" />
+        <rect x="125" y="239" width="40" height="3" rx="1.5" fill="#8b5cf6" opacity="0.25" />
 
         {/* Left arm */}
-        <rect x="55" y="185" width="26" height="75" rx="13" fill="url(#bodyGrad)" stroke="#3D375E" strokeWidth="1.5">
+        <rect x="55" y="185" width="26" height="75" rx="13" fill="url(#bodyGrad)" stroke="#2a2a38" strokeWidth="1.5">
           <animateTransform attributeName="transform" type="rotate" values="-3,68,220;3,68,220;-3,68,220" dur="3s" repeatCount="indefinite" />
         </rect>
         {/* Left hand */}
-        <circle cx="68" cy="268" r="12" fill="#2E2B4A" stroke="#3D375E" strokeWidth="1.5">
+        <circle cx="68" cy="268" r="12" fill="#22222d" stroke="#2a2a38" strokeWidth="1.5">
           <animateTransform attributeName="transform" type="rotate" values="-3,68,268;3,68,268;-3,68,268" dur="3s" repeatCount="indefinite" />
         </circle>
 
         {/* Right arm — waving */}
         <g>
           <animateTransform attributeName="transform" type="rotate" values="0,252,220;-15,252,185;0,252,220" dur="2s" repeatCount="indefinite" />
-          <rect x="239" y="185" width="26" height="75" rx="13" fill="url(#bodyGrad)" stroke="#3D375E" strokeWidth="1.5" />
-          <circle cx="252" cy="268" r="12" fill="#2E2B4A" stroke="#3D375E" strokeWidth="1.5" />
+          <rect x="239" y="185" width="26" height="75" rx="13" fill="url(#bodyGrad)" stroke="#2a2a38" strokeWidth="1.5" />
+          <circle cx="252" cy="268" r="12" fill="#22222d" stroke="#2a2a38" strokeWidth="1.5" />
         </g>
 
         {/* Legs */}
-        <rect x="115" y="290" width="28" height="55" rx="12" fill="url(#bodyGrad)" stroke="#3D375E" strokeWidth="1.5" />
-        <rect x="177" y="290" width="28" height="55" rx="12" fill="url(#bodyGrad)" stroke="#3D375E" strokeWidth="1.5" />
+        <rect x="115" y="290" width="28" height="55" rx="12" fill="url(#bodyGrad)" stroke="#2a2a38" strokeWidth="1.5" />
+        <rect x="177" y="290" width="28" height="55" rx="12" fill="url(#bodyGrad)" stroke="#2a2a38" strokeWidth="1.5" />
 
         {/* Feet */}
-        <rect x="105" y="340" width="48" height="18" rx="9" fill="#2E2B4A" stroke="#3D375E" strokeWidth="1.5" />
-        <rect x="167" y="340" width="48" height="18" rx="9" fill="#2E2B4A" stroke="#3D375E" strokeWidth="1.5" />
+        <rect x="105" y="340" width="48" height="18" rx="9" fill="#22222d" stroke="#2a2a38" strokeWidth="1.5" />
+        <rect x="167" y="340" width="48" height="18" rx="9" fill="#22222d" stroke="#2a2a38" strokeWidth="1.5" />
 
         {/* Ear pieces */}
         <rect x="88" y="90" width="12" height="25" rx="6" fill="url(#accentGrad)" opacity="0.5" />
@@ -191,7 +191,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   return (
     <button
       onClick={() => setOpen(!open)}
-      className="w-full text-left rounded-xl border border-[rgba(46,43,74,0.6)] bg-[rgba(26,23,48,0.6)] backdrop-blur-sm hover:border-[rgba(249,115,22,0.4)] transition-colors duration-200"
+      className="w-full text-left rounded-xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.03)] backdrop-blur-sm hover:border-[rgba(139,92,246,0.3)] transition-colors duration-200"
     >
       <div className="flex items-center justify-between px-5 py-4">
         <span className="font-medium text-[#fafafa] text-sm sm:text-base pr-4">{question}</span>
@@ -202,7 +202,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
       <div
         className={`overflow-hidden transition-all duration-200 ${open ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
       >
-        <p className="px-5 pb-4 text-sm text-[#A5A1C2] leading-relaxed">{answer}</p>
+        <p className="px-5 pb-4 text-sm text-[#a1a1aa] leading-relaxed">{answer}</p>
       </div>
     </button>
   );
@@ -250,14 +250,14 @@ function BentoCard({
       <div className="relative flex flex-col h-full justify-between gap-4">
         <div>
           <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-6 group-hover:bg-[rgba(249,115,22,0.1)] group-hover:border-[rgba(249,115,22,0.2)] transition-all duration-300">
-            <Icon className="w-5 h-5 text-[#A5A1C2] group-hover:text-[#f97316] transition-colors duration-300" />
+            <Icon className="w-5 h-5 text-[#a1a1aa] group-hover:text-[#f97316] transition-colors duration-300" />
           </div>
           {value && (
             <p className="text-4xl font-bold text-white tracking-tight mb-2">{value}</p>
           )}
           <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
         </div>
-        <p className="text-sm text-[#A5A1C2] leading-relaxed">{description}</p>
+        <p className="text-sm text-[#a1a1aa] leading-relaxed">{description}</p>
       </div>
     </motion.div>
   );
@@ -280,7 +280,7 @@ export default function LandingPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-[#0D0B1A] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#0a0a0f] text-white overflow-x-hidden">
 
       {/* ── HERO ───────────────────────────────────────── */}
       <section id="hero" className="relative min-h-screen flex items-center">
@@ -320,7 +320,7 @@ export default function LandingPage() {
                   <span className="text-white">Hatch</span>
                   <br />
                   <span className="text-white">Your </span>
-                  <span className="bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-purple-400 via-purple-300 to-purple-500 bg-clip-text text-transparent">
                     AI Agent
                   </span>
                 </h1>
@@ -330,7 +330,7 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
-                className="mt-6 sm:mt-8 text-base sm:text-lg md:text-xl text-[#A5A1C2] max-w-lg leading-relaxed mx-auto lg:mx-0"
+                className="mt-6 sm:mt-8 text-base sm:text-lg md:text-xl text-[#a1a1aa] max-w-lg leading-relaxed mx-auto lg:mx-0"
               >
                 Deploy autonomous AI agents across 20+ platforms.
                 Choose your framework, pick a template, and go live in 60 seconds.
@@ -344,13 +344,13 @@ export default function LandingPage() {
               >
                 <Link
                   href="/create"
-                  className="bg-white text-black font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-base hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 shadow-lg shadow-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0D0B1A]"
+                  className="bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-base hover:from-purple-500 hover:to-purple-400 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 shadow-lg shadow-purple-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0f]"
                 >
                   Create Agent
                 </Link>
                 <Link
                   href="/explore"
-                  className="border border-white/20 text-white font-medium px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-base hover:bg-white/5 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0D0B1A]"
+                  className="border border-white/20 text-white font-medium px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-base hover:bg-white/5 hover:border-white/30 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0f]"
                 >
                   Explore
                   <ArrowRight className="w-4 h-4" aria-hidden="true" />
@@ -363,7 +363,7 @@ export default function LandingPage() {
                 transition={{ duration: 1, delay: 0.6 }}
                 className="mt-12"
               >
-                <div className="inline-flex items-center gap-3 sm:gap-6 px-4 sm:px-6 py-3 rounded-full bg-white/[0.03] border border-white/[0.06] text-xs sm:text-sm text-[#A5A1C2]">
+                <div className="inline-flex items-center gap-3 sm:gap-6 px-4 sm:px-6 py-3 rounded-full bg-white/[0.03] border border-white/[0.06] text-xs sm:text-sm text-[#a1a1aa]">
                   {platformStats.totalAgents > 0 ? (
                     <>
                       <span><AnimatedCounter target={platformStats.totalAgents} /> Agents Deployed</span>
@@ -447,7 +447,7 @@ export default function LandingPage() {
             <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">Capabilities</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
               <span className="text-white">Everything your agent</span>{' '}
-              <span className="bg-gradient-to-r from-orange-400 via-amber-300 to-orange-500 bg-clip-text text-transparent">needs</span>
+              <span className="bg-gradient-to-r from-purple-400 via-purple-300 to-purple-500 bg-clip-text text-transparent">needs</span>
             </h2>
           </div>
 
@@ -552,7 +552,7 @@ export default function LandingPage() {
               >
                 <p className="text-6xl font-mono font-bold text-white/[0.07] mb-4 select-none">{step.num}</p>
                 <h3 className="text-xl font-semibold text-white mb-3">{step.title}</h3>
-                <p className="text-sm text-[#A5A1C2] leading-relaxed">{step.desc}</p>
+                <p className="text-sm text-[#a1a1aa] leading-relaxed">{step.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -567,17 +567,17 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
               Start free, scale up
             </h2>
-            <p className="mt-4 text-[#A5A1C2] max-w-lg mx-auto">
+            <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
               All integrations included. BYOK always free. Pay with SOL or platform tokens.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Free */}
-            <div className="bg-[#111019] border border-white/[0.06] rounded-2xl p-7">
+            <div className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7">
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-2">Free</p>
               <p className="text-3xl font-bold text-white mb-1">$0</p>
-              <p className="text-sm text-[#A5A1C2] mb-6">0.5 CPU, 1GB RAM. No credit card.</p>
+              <p className="text-sm text-[#a1a1aa] mb-6">0.5 CPU, 1GB RAM. No credit card.</p>
               <ul className="space-y-2.5">
                 {[
                   '1 agent',
@@ -587,7 +587,7 @@ export default function LandingPage() {
                   '150MB workspace',
                   'Auto-sleep (15 min)',
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2.5 text-sm text-[#A5A1C2]">
+                  <li key={item} className="flex items-center gap-2.5 text-sm text-[#a1a1aa]">
                     <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     {item}
                   </li>
@@ -602,13 +602,13 @@ export default function LandingPage() {
             </div>
 
             {/* Basic */}
-            <div className="bg-[#111019] border border-white/[0.06] rounded-2xl p-7">
+            <div className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7">
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-2">Basic</p>
               <div className="flex items-baseline gap-1">
                 <p className="text-3xl font-bold text-white">$9.99</p>
                 <span className="text-sm text-[#71717a]">/mo</span>
               </div>
-              <p className="text-sm text-[#A5A1C2] mb-6 mt-1">100 messages/day, 1 CPU, 1.5GB RAM.</p>
+              <p className="text-sm text-[#a1a1aa] mb-6 mt-1">100 messages/day, 1 CPU, 1.5GB RAM.</p>
               <ul className="space-y-2.5">
                 {[
                   '1 agent included',
@@ -618,7 +618,7 @@ export default function LandingPage() {
                   '300MB workspace',
                   'Auto-sleep after 6h idle',
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2.5 text-sm text-[#A5A1C2]">
+                  <li key={item} className="flex items-center gap-2.5 text-sm text-[#a1a1aa]">
                     <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     {item}
                   </li>
@@ -633,7 +633,7 @@ export default function LandingPage() {
             </div>
 
             {/* Pro */}
-            <div className="bg-[#111019] border border-orange-500/30 rounded-2xl p-7 relative overflow-hidden">
+            <div className="bg-[#0e0e14] border border-orange-500/30 rounded-2xl p-7 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="flex items-center gap-2 mb-2">
                 <p className="text-xs font-semibold tracking-[0.2em] uppercase text-orange-400">Pro</p>
@@ -643,7 +643,7 @@ export default function LandingPage() {
                 <p className="text-3xl font-bold text-white">$19.99</p>
                 <span className="text-sm text-[#71717a]">/mo</span>
               </div>
-              <p className="text-sm text-[#A5A1C2] mb-6 mt-1">Full power for serious builders.</p>
+              <p className="text-sm text-[#a1a1aa] mb-6 mt-1">Full power for serious builders.</p>
               <ul className="space-y-2.5">
                 {[
                   '5 agents included',
@@ -654,7 +654,7 @@ export default function LandingPage() {
                   '600MB workspace/agent',
                   'Priority support',
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2.5 text-sm text-[#A5A1C2]">
+                  <li key={item} className="flex items-center gap-2.5 text-sm text-[#a1a1aa]">
                     <Check className="w-3.5 h-3.5 text-orange-400 shrink-0" />
                     {item}
                   </li>
@@ -681,7 +681,7 @@ export default function LandingPage() {
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">FAQ</h2>
-            <p className="text-[#A5A1C2]">Common questions about Hatcher</p>
+            <p className="text-[#a1a1aa]">Common questions about Hatcher</p>
           </div>
           <div className="space-y-3">
             {[
@@ -722,7 +722,7 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-lg text-[#A5A1C2] mb-10 max-w-md mx-auto"
+            className="text-lg text-[#a1a1aa] mb-10 max-w-md mx-auto"
           >
             Create your first agent in 60 seconds. Free to start, no credit card required.
           </motion.p>
@@ -734,7 +734,7 @@ export default function LandingPage() {
           >
             <Link
               href="/create"
-              className="inline-flex items-center gap-2 bg-white text-black font-semibold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-base sm:text-lg hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 shadow-lg shadow-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0D0B1A]"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-base sm:text-lg hover:from-purple-500 hover:to-purple-400 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 shadow-lg shadow-purple-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0f]"
             >
               Create Agent
               <ArrowRight className="w-5 h-5" aria-hidden="true" />

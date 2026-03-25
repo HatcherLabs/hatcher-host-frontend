@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import type { Payment } from '@/lib/api';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { TIERS, TIER_ORDER, ADDONS } from '@hatcher/shared';
 import type { UserTierKey, AddonKey } from '@hatcher/shared';
@@ -15,6 +16,7 @@ import {
   Check,
   CheckCircle,
   Clock,
+  CreditCard,
   Crown,
   Loader2,
   Plus,
@@ -22,6 +24,7 @@ import {
   Rocket,
   Shield,
   Users,
+  X,
   Zap,
 } from 'lucide-react';
 
@@ -64,6 +67,85 @@ function formatFeatureKey(key: string) {
   return key.replace(/_/g, ' ').replace(/\./g, ' > ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+/* ── Payment method modal ─────────────────────────────────── */
+interface PaymentModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  price: number;
+  onPayWithSOL: () => void;
+  onPayWithCard: () => void;
+  loading: boolean;
+}
+
+function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithCard, loading }: PaymentModalProps) {
+  if (!isOpen) return null;
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 10 }}
+          transition={{ duration: 0.2 }}
+          className="card glass-noise w-full max-w-md mx-4 overflow-hidden"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
+            <h3 className="font-semibold text-[var(--text-primary)]">Choose Payment Method</h3>
+            <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="p-6 space-y-3">
+            <p className="text-sm text-[var(--text-secondary)] mb-4">
+              {title} — <span className="font-bold text-[var(--text-primary)]">${price}</span>
+            </p>
+
+            {/* Pay with SOL */}
+            <button
+              onClick={onPayWithSOL}
+              disabled={loading}
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#f97316]/30 hover:bg-[#f97316]/[0.03] transition-all disabled:opacity-40"
+            >
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#9945FF] to-[#14F195] flex items-center justify-center flex-shrink-0">
+                <span className="text-white font-bold text-sm">SOL</span>
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with SOL</p>
+                <p className="text-[11px] text-[var(--text-muted)]">Solana wallet payment (mock enabled)</p>
+              </div>
+              {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
+            </button>
+
+            {/* Pay with Card */}
+            <button
+              onClick={onPayWithCard}
+              disabled={loading}
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#f97316]/30 hover:bg-[#f97316]/[0.03] transition-all disabled:opacity-40"
+            >
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#635BFF] to-[#A259FF] flex items-center justify-center flex-shrink-0">
+                <CreditCard className="w-5 h-5 text-white" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with Card</p>
+                <p className="text-[11px] text-[var(--text-muted)]">Credit/debit card via Stripe</p>
+              </div>
+              {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 /* ── Account data shape from new API ─────────────────────── */
 interface AccountFeatures {
   tier: typeof TIERS['free'];  // full tier config object
@@ -77,6 +159,7 @@ interface AccountFeatures {
 /* ── Page ─────────────────────────────────────────────────── */
 export default function BillingPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const searchParams = useSearchParams();
 
   const [accountData, setAccountData] = useState<AccountFeatures | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -86,10 +169,34 @@ export default function BillingPage() {
   const [purchasingAddon, setPurchasingAddon] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  // Payment method modal state
+  const [paymentModal, setPaymentModal] = useState<{
+    isOpen: boolean;
+    type: 'subscription' | 'addon';
+    tierKey?: UserTierKey;
+    addonKey?: AddonKey;
+    title: string;
+    price: number;
+  }>({ isOpen: false, type: 'subscription', title: '', price: 0 });
+  const [paymentLoading, setPaymentLoading] = useState(false);
+
   const showSuccess = (msg: string) => {
     setSuccessMsg(msg);
-    setTimeout(() => setSuccessMsg(null), 4000);
+    setTimeout(() => setSuccessMsg(null), 6000);
   };
+
+  // Handle Stripe redirect success/cancel
+  useEffect(() => {
+    if (searchParams?.get('success') === 'true') {
+      showSuccess('Payment successful! Your account is being upgraded. It may take a moment to reflect.');
+      // Clean up URL params
+      window.history.replaceState({}, '', '/dashboard/billing');
+    }
+    if (searchParams?.get('canceled') === 'true') {
+      setError('Payment was canceled. No charges were made.');
+      window.history.replaceState({}, '', '/dashboard/billing');
+    }
+  }, [searchParams]);
 
   const loadAccountData = useCallback(async () => {
     const res = await api.getAccountFeatures();
@@ -117,10 +224,37 @@ export default function BillingPage() {
     });
   }, [isAuthenticated]);
 
-  /* ── Subscribe to a tier (mock payment) ────────────────── */
-  const handleSubscribe = async (tierKey: UserTierKey) => {
+  /* ── Open payment modal ────────────────────────────────── */
+  const openSubscribeModal = (tierKey: UserTierKey) => {
+    const tier = TIERS[tierKey];
+    setPaymentModal({
+      isOpen: true,
+      type: 'subscription',
+      tierKey,
+      title: `Upgrade to ${tier.name}`,
+      price: tier.usdPrice,
+    });
+  };
+
+  const openAddonModal = (addonKey: AddonKey) => {
+    const addon = ADDONS.find(a => a.key === addonKey);
+    setPaymentModal({
+      isOpen: true,
+      type: 'addon',
+      addonKey,
+      title: addon?.name ?? 'Add-on',
+      price: addon?.usdPrice ?? 0,
+    });
+  };
+
+  /* ── Subscribe to a tier (SOL / mock payment) ──────────── */
+  const handleSubscribeSOL = async () => {
+    const tierKey = paymentModal.tierKey;
+    if (!tierKey) return;
+    setPaymentLoading(true);
     setSubscribing(tierKey);
     setError(null);
+    setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
       const txSignature = `mock-${Date.now()}`;
       const res = await api.subscribe(tierKey, txSignature);
@@ -134,13 +268,41 @@ export default function BillingPage() {
       setError(err instanceof Error ? err.message : 'Subscription failed');
     } finally {
       setSubscribing(null);
+      setPaymentLoading(false);
     }
   };
 
-  /* ── Purchase add-on (mock payment) ────────────────────── */
-  const handlePurchaseAddon = async (addonKey: AddonKey) => {
+  /* ── Subscribe via Stripe ──────────────────────────────── */
+  const handleSubscribeStripe = async () => {
+    const tierKey = paymentModal.tierKey;
+    if (!tierKey) return;
+    setPaymentLoading(true);
+    setError(null);
+    try {
+      const returnUrl = `${window.location.origin}/dashboard/billing`;
+      const res = await api.stripeCheckoutSubscription(tierKey, returnUrl);
+      if (res.success) {
+        window.location.href = res.data.url;
+        return;
+      }
+      setError(res.error ?? 'Failed to create checkout session');
+      setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Checkout failed');
+      setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
+  /* ── Purchase add-on (SOL / mock payment) ──────────────── */
+  const handlePurchaseAddonSOL = async () => {
+    const addonKey = paymentModal.addonKey;
+    if (!addonKey) return;
+    setPaymentLoading(true);
     setPurchasingAddon(addonKey);
     setError(null);
+    setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
       const txSignature = `mock-${Date.now()}`;
       const res = await api.purchaseAddon(addonKey, txSignature);
@@ -155,7 +317,41 @@ export default function BillingPage() {
       setError(err instanceof Error ? err.message : 'Purchase failed');
     } finally {
       setPurchasingAddon(null);
+      setPaymentLoading(false);
     }
+  };
+
+  /* ── Purchase add-on via Stripe ────────────────────────── */
+  const handlePurchaseAddonStripe = async () => {
+    const addonKey = paymentModal.addonKey;
+    if (!addonKey) return;
+    setPaymentLoading(true);
+    setError(null);
+    try {
+      const returnUrl = `${window.location.origin}/dashboard/billing`;
+      const res = await api.stripeCheckoutAddon(addonKey, returnUrl);
+      if (res.success) {
+        window.location.href = res.data.url;
+        return;
+      }
+      setError(res.error ?? 'Failed to create checkout session');
+      setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Checkout failed');
+      setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
+  /* ── Legacy direct subscribe handler (for renew button) ── */
+  const handleSubscribe = async (tierKey: UserTierKey) => {
+    openSubscribeModal(tierKey);
+  };
+
+  /* ── Legacy direct addon handler ───────────────────────── */
+  const handlePurchaseAddon = async (addonKey: AddonKey) => {
+    openAddonModal(addonKey);
   };
 
   /* ── Loading / auth states ─────────────────────────────── */
@@ -568,6 +764,17 @@ export default function BillingPage() {
           </div>
         )}
       </motion.div>
+
+      {/* Payment method modal */}
+      <PaymentMethodModal
+        isOpen={paymentModal.isOpen}
+        onClose={() => setPaymentModal(prev => ({ ...prev, isOpen: false }))}
+        title={paymentModal.title}
+        price={paymentModal.price}
+        onPayWithSOL={paymentModal.type === 'subscription' ? handleSubscribeSOL : handlePurchaseAddonSOL}
+        onPayWithCard={paymentModal.type === 'subscription' ? handleSubscribeStripe : handlePurchaseAddonStripe}
+        loading={paymentLoading}
+      />
 
       {/* Success toast */}
       {successMsg && (

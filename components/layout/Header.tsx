@@ -69,22 +69,22 @@ export function Header() {
             <Link href="/" className="flex items-center gap-2 group">
               <span className="flex items-center gap-2">
                 <span className="relative flex items-center justify-center w-7 h-7">
-                  <svg viewBox="0 0 28 28" width="28" height="28" fill="none" className="drop-shadow-[0_0_8px_rgba(249,115,22,0.25)]">
+                  <svg viewBox="0 0 28 28" width="28" height="28" fill="none" className="drop-shadow-[0_0_8px_rgba(139,92,246,0.25)]">
                     <defs>
                       <linearGradient id="eggShell" x1="14" y1="3" x2="14" y2="27" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stopColor="#3D375E" />
-                        <stop offset="50%" stopColor="#252240" />
-                        <stop offset="100%" stopColor="#1A1730" />
+                        <stop offset="0%" stopColor="#2a2a38" />
+                        <stop offset="50%" stopColor="#1a1a22" />
+                        <stop offset="100%" stopColor="#141419" />
                       </linearGradient>
                       <radialGradient id="eggInnerGlow" cx="50%" cy="40%" r="40%">
-                        <stop offset="0%" stopColor="#f97316" stopOpacity="0.35" />
-                        <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
+                        <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.35" />
+                        <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
                       </radialGradient>
                     </defs>
-                    <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggShell)" stroke="rgba(249,115,22,0.5)" strokeWidth="0.8" />
+                    <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggShell)" stroke="rgba(139,92,246,0.5)" strokeWidth="0.8" />
                     <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggInnerGlow)" />
-                    <path d="M10 14.5 L12.5 12.5 L11 10.5 L13.5 9 L12 7" stroke="#f97316" strokeWidth="0.7" strokeLinecap="round" fill="none" opacity="0.6" />
-                    <circle cx="12" cy="11" r="1.5" fill="#f97316" opacity="0.3">
+                    <path d="M10 14.5 L12.5 12.5 L11 10.5 L13.5 9 L12 7" stroke="#8b5cf6" strokeWidth="0.7" strokeLinecap="round" fill="none" opacity="0.6" />
+                    <circle cx="12" cy="11" r="1.5" fill="#8b5cf6" opacity="0.3">
                       <animate attributeName="opacity" values="0.2;0.45;0.2" dur="3s" repeatCount="indefinite" />
                     </circle>
                     <ellipse cx="11" cy="10" rx="2.5" ry="4" fill="white" opacity="0.04" transform="rotate(-15 11 10)" />
@@ -102,8 +102,8 @@ export function Header() {
                 className={clsx(
                   'flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-colors duration-200',
                   pathname === '/admin'
-                    ? 'bg-orange-500/15 text-orange-400'
-                    : 'text-[#71717a] hover:text-orange-400 hover:bg-orange-500/10'
+                    ? 'bg-purple-500/15 text-purple-400'
+                    : 'text-[#71717a] hover:text-purple-400 hover:bg-purple-500/10'
                 )}
               >
                 <Shield className="w-3.5 h-3.5" />
@@ -123,7 +123,7 @@ export function Header() {
                   aria-current={active ? 'page' : undefined}
                   className={clsx(
                     'relative px-3 py-1.5 text-sm rounded-lg transition-colors duration-200',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-1 focus-visible:ring-offset-black',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1 focus-visible:ring-offset-black',
                     active
                       ? 'text-white'
                       : 'text-[#71717a] hover:text-white'
@@ -132,7 +132,7 @@ export function Header() {
                   {link.label}
                   {active && (
                     <motion.div
-                      className="absolute -bottom-[9px] left-1/2 -translate-x-1/2 w-5 h-0.5 bg-orange-500 rounded-full shadow-[0_0_8px_rgba(249,115,22,0.5)]"
+                      className="absolute -bottom-[9px] left-1/2 -translate-x-1/2 w-5 h-0.5 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(139,92,246,0.5)]"
                       layoutId="headerActiveTab"
                       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                     />
@@ -144,7 +144,7 @@ export function Header() {
               href={DOCS_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-1.5 text-sm rounded-lg transition-colors duration-200 text-[#71717a] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-1 focus-visible:ring-offset-black"
+              className="px-3 py-1.5 text-sm rounded-lg transition-colors duration-200 text-[#71717a] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1 focus-visible:ring-offset-black"
             >
               Docs
             </a>
@@ -158,10 +158,10 @@ export function Header() {
                   onClick={() => setDropdownOpen((o) => !o)}
                   aria-expanded={dropdownOpen}
                   aria-haspopup="menu"
-                  className="h-9 px-3 flex items-center gap-2 rounded-lg border border-orange-500/30 bg-orange-500/10 hover:bg-orange-500/20 transition-all duration-200"
+                  className="h-9 px-3 flex items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 transition-all duration-200"
                 >
                   <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
-                  <span className="text-xs font-medium text-orange-300">{user.username}</span>
+                  <span className="text-xs font-medium text-purple-300">{user.username}</span>
                   <span className="text-xs ml-1" style={{ color: 'rgba(167,139,250,0.6)' }}>&#9662;</span>
                 </button>
 
@@ -169,20 +169,20 @@ export function Header() {
                   <div
                     className="absolute right-0 mt-1 w-48 rounded-xl shadow-xl z-50 overflow-hidden"
                     style={{
-                      background: 'rgba(13, 11, 26, 0.95)',
+                      background: 'rgba(14, 14, 20, 0.95)',
                       backdropFilter: 'blur(24px)',
                       WebkitBackdropFilter: 'blur(24px)',
-                      border: '1px solid rgba(46, 43, 74, 0.4)',
+                      border: '1px solid rgba(255, 255, 255, 0.06)',
                     }}
                   >
                     <div className="px-4 py-2.5 border-b border-white/[0.06]">
                       <p className="text-xs text-white font-medium truncate">{user.username}</p>
-                      <p className="text-[10px] text-[#A5A1C2] truncate">{user.email}</p>
+                      <p className="text-[10px] text-[#a1a1aa] truncate">{user.email}</p>
                     </div>
                     <Link
                       href="/settings"
                       onClick={() => setDropdownOpen(false)}
-                      className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-[#A5A1C2] hover:bg-white/[0.04] transition-colors duration-200 border-b border-white/[0.06]"
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-[#a1a1aa] hover:bg-white/[0.04] transition-colors duration-200 border-b border-white/[0.06]"
                     >
                       <Settings className="w-3 h-3" />
                       Settings
@@ -207,7 +207,7 @@ export function Header() {
                 </Link>
                 <Link
                   href="/register"
-                  className="h-9 px-4 text-white font-medium text-xs rounded-full bg-orange-600 hover:bg-orange-500 transition-all duration-200 flex items-center"
+                  className="h-9 px-4 text-white font-medium text-xs rounded-full bg-purple-600 hover:bg-purple-500 transition-all duration-200 flex items-center"
                 >
                   Sign Up
                 </Link>
@@ -216,7 +216,7 @@ export function Header() {
 
             {/* Hamburger -- mobile/tablet only */}
             <button
-              className="lg:hidden flex flex-col justify-center items-center w-10 h-10 rounded-lg hover:bg-[rgba(249,115,22,0.1)] transition-colors gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+              className="lg:hidden flex flex-col justify-center items-center w-10 h-10 rounded-lg hover:bg-[rgba(139,92,246,0.1)] transition-colors gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
               onClick={() => setMobileOpen((o) => !o)}
               aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={mobileOpen}
@@ -224,19 +224,19 @@ export function Header() {
             >
               <span
                 className={clsx(
-                  'block w-4 h-px bg-[#f97316]/60 transition-transform duration-200',
+                  'block w-4 h-px bg-[#8b5cf6]/60 transition-transform duration-200',
                   mobileOpen && 'translate-y-[5px] rotate-45'
                 )}
               />
               <span
                 className={clsx(
-                  'block w-4 h-px bg-[#f97316]/60 transition-opacity duration-200',
+                  'block w-4 h-px bg-[#8b5cf6]/60 transition-opacity duration-200',
                   mobileOpen && 'opacity-0'
                 )}
               />
               <span
                 className={clsx(
-                  'block w-4 h-px bg-[#f97316]/60 transition-transform duration-200',
+                  'block w-4 h-px bg-[#8b5cf6]/60 transition-transform duration-200',
                   mobileOpen && '-translate-y-[5px] -rotate-45'
                 )}
               />
@@ -304,8 +304,8 @@ export function Header() {
                     className={clsx(
                       'flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-colors duration-200',
                       pathname === '/admin'
-                        ? 'text-orange-400 bg-orange-500/10'
-                        : 'text-[#71717a] hover:text-orange-400'
+                        ? 'text-purple-400 bg-purple-500/10'
+                        : 'text-[#71717a] hover:text-purple-400'
                     )}
                     onClick={() => setMobileOpen(false)}
                   >
