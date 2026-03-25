@@ -243,11 +243,11 @@ export default function MarketplacePage() {
               transition={{ delay: 0.2 }}
             >
               <Store className="w-3.5 h-3.5" />
-              Agent Templates
+              Community Templates
             </motion.div>
             <div className="flex items-center justify-center gap-4 mb-3">
               <h1 className="text-4xl sm:text-5xl font-extrabold text-[var(--text-primary)]">
-                Agent Marketplace
+                Community Templates
               </h1>
             </div>
             <p className="text-[var(--text-muted)] text-lg max-w-xl mx-auto">

@@ -466,7 +466,7 @@ export default function LandingPage() {
               icon={Zap}
               value="2"
               title="Frameworks"
-              description="Choose between OpenClaw (13,700+ skills, plugin marketplace) and Hermes (lightweight, fast, API-focused). Pick the right tool for the job."
+              description="Choose between OpenClaw (13,700+ skills, plugin ecosystem) and Hermes (lightweight, fast, API-focused). Pick the right tool for the job."
               delay={0.1}
             />
 
@@ -686,7 +686,7 @@ export default function LandingPage() {
           <div className="space-y-3">
             {[
               { q: 'Is it really free to start?', a: 'Yes. You get 1 agent, a free LLM (Groq), 20 messages/day, and BYOK — all at zero cost. No credit card or tokens required.' },
-              { q: 'What frameworks are supported?', a: 'Hatcher supports OpenClaw (feature-rich, 13,700+ skills, plugin marketplace) and Hermes (lightweight, fast, API-focused). You choose when creating an agent.' },
+              { q: 'What frameworks are supported?', a: 'Hatcher supports OpenClaw (feature-rich, 13,700+ skills, plugin ecosystem) and Hermes (lightweight, fast, API-focused). You choose when creating an agent.' },
               { q: 'What is BYOK?', a: 'Bring Your Own Key — use your own API keys from OpenAI, Anthropic, Google, Groq, xAI, OpenRouter, or Ollama. Always free, no markup.' },
               { q: 'How do I pay for upgrades?', a: 'All prices are in USD, paid with SOL or platform tokens on Solana. Approve a wallet transaction and the upgrade activates instantly.' },
               { q: 'Can I run multiple agents?', a: 'Free tier includes 1 agent. Basic includes 1. Pro includes 5. Need more? Stack add-ons for +3, +5, or +10 agents.' },

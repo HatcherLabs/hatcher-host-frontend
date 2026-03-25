@@ -12,7 +12,7 @@ import { DOCS_URL } from '@/lib/config';
 const NAV_LINKS = [
   { href: '/dashboard/agents',  label: 'My Agents' },
   { href: '/explore',           label: 'Explore' },
-  { href: '/marketplace',       label: 'Marketplace' },
+  { href: '/marketplace',       label: 'Templates' },
   { href: '/create',            label: 'Create' },
   { href: '/dashboard/team',    label: 'Team' },
   { href: '/dashboard/billing', label: 'Billing' },
