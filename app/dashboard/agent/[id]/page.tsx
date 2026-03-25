@@ -129,21 +129,23 @@ const VersionsTab = dynamic(
 
 // ─── Tab definitions ─────────────────────────────────────────
 
-const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
-  { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={16} /> },
-  { id: 'config', label: 'Config', icon: <Settings size={16} /> },
-  { id: 'integrations', label: 'Integrations', icon: <Puzzle size={16} /> },
-  { id: 'skills', label: 'Skills', icon: <Sparkles size={16} /> },
-  { id: 'files', label: 'Files', icon: <FolderOpen size={16} /> },
-  { id: 'logs', label: 'Logs', icon: <ScrollText size={16} /> },
-  { id: 'memory', label: 'Memory', icon: <Brain size={16} /> },
-  { id: 'knowledge', label: 'Knowledge', icon: <BookOpen size={16} /> },
-  { id: 'schedules', label: 'Schedules', icon: <Clock size={16} /> },
-  { id: 'workflows', label: 'Workflows', icon: <GitMerge size={16} /> },
-  { id: 'versions', label: 'Versions', icon: <History size={16} /> },
-  { id: 'chat', label: 'Chat', icon: <MessageSquare size={16} /> },
-  { id: 'stats', label: 'Stats', icon: <BarChart3 size={16} /> },
-];
+function getTabs(framework?: string): { id: Tab; label: string; icon: React.ReactNode }[] {
+  return [
+    { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={16} /> },
+    { id: 'config', label: 'Config', icon: <Settings size={16} /> },
+    { id: 'integrations', label: 'Integrations', icon: <Puzzle size={16} /> },
+    { id: 'skills', label: framework === 'elizaos' ? 'Plugins' : 'Skills', icon: <Sparkles size={16} /> },
+    { id: 'files', label: 'Files', icon: <FolderOpen size={16} /> },
+    { id: 'logs', label: 'Logs', icon: <ScrollText size={16} /> },
+    { id: 'memory', label: 'Memory', icon: <Brain size={16} /> },
+    { id: 'knowledge', label: 'Knowledge', icon: <BookOpen size={16} /> },
+    { id: 'schedules', label: 'Schedules', icon: <Clock size={16} /> },
+    { id: 'workflows', label: 'Workflows', icon: <GitMerge size={16} /> },
+    { id: 'versions', label: 'Versions', icon: <History size={16} /> },
+    { id: 'chat', label: 'Chat', icon: <MessageSquare size={16} /> },
+    { id: 'stats', label: 'Stats', icon: <BarChart3 size={16} /> },
+  ];
+}
 
 // ─── Main Component ─────────────────────────────────────────
 
@@ -236,6 +238,7 @@ export default function AgentManagePage() {
   const [configLore, setConfigLore] = useState('');
   const [configTopics, setConfigTopics] = useState('');
   const [configStyle, setConfigStyle] = useState('');
+  const [configAdjectives, setConfigAdjectives] = useState('');
   const [configSystemPrompt, setConfigSystemPrompt] = useState('');
   const [configSkills, setConfigSkills] = useState('');
   const [configModel, setConfigModel] = useState('');
@@ -287,6 +290,7 @@ export default function AgentManagePage() {
       setConfigBio((char as Record<string, unknown>).bio as string ?? '');
       setConfigLore(Array.isArray((char as Record<string, unknown>).lore) ? ((char as Record<string, unknown>).lore as string[]).join('\n') : '');
       setConfigTopics(Array.isArray((char as Record<string, unknown>).topics) ? ((char as Record<string, unknown>).topics as string[]).join(', ') : '');
+      setConfigAdjectives(Array.isArray((char as Record<string, unknown>).adjectives) ? ((char as Record<string, unknown>).adjectives as string[]).join(', ') : '');
       setConfigStyle(
         Array.isArray((char as Record<string, unknown>).style?.valueOf())
           ? ''
@@ -621,6 +625,11 @@ export default function AgentManagePage() {
       skills: configSkills.split(',').map((s) => s.trim()).filter(Boolean),
       model: (useCustomModel ? customModelInput.trim() : configModel) || undefined,
       provider: configProvider || undefined,
+      ...(agent.framework === 'elizaos' ? {
+        bio: configBio.trim() || undefined,
+        topics: configTopics.split(',').map(s => s.trim()).filter(Boolean),
+        adjectives: configAdjectives.split(',').map(s => s.trim()).filter(Boolean),
+      } : {}),
       ...(byokKeyInput.trim() ? {
         byok: {
           provider: configProvider as 'openai' | 'anthropic' | 'google' | 'groq' | 'xai' | 'openrouter',
@@ -819,6 +828,7 @@ export default function AgentManagePage() {
     configName, setConfigName, configDesc, setConfigDesc,
     configBio, setConfigBio, configLore, setConfigLore,
     configTopics, setConfigTopics, configStyle, setConfigStyle,
+    configAdjectives, setConfigAdjectives,
     configSystemPrompt, setConfigSystemPrompt,
     configSkills, setConfigSkills,
     configModel, setConfigModel, configProvider, setConfigProvider,
@@ -1018,7 +1028,7 @@ export default function AgentManagePage() {
         <div id="agent-tabs" className="mb-8 border-b border-[rgba(46,43,74,0.3)]" role="tablist">
           {/* Mobile grid */}
           <div className="grid grid-cols-4 gap-1 sm:hidden p-1">
-            {TABS.map((t) => (
+            {getTabs(agent?.framework).map((t) => (
               <button
                 key={t.id}
                 role="tab"
@@ -1037,7 +1047,7 @@ export default function AgentManagePage() {
           </div>
           {/* Desktop row */}
           <div className="hidden sm:flex items-center gap-0 relative">
-            {TABS.map((t) => (
+            {getTabs(agent?.framework).map((t) => (
               <button
                 key={t.id}
                 role="tab"

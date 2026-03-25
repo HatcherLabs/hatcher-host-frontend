@@ -264,12 +264,12 @@ export function SkillsTab() {
         <div>
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             <Sparkles size={18} className="text-[#06b6d4]" />
-            Skills Browser
+            {agent?.framework === 'elizaos' ? 'Plugins' : 'Skills Browser'}
           </h2>
           <p className="text-xs text-[#71717a] mt-0.5">
             {skills.length > 0
               ? `${skills.length} available / ${enabledCount} enabled`
-              : 'Discover and enable skills for your agent'}
+              : agent?.framework === 'elizaos' ? 'Discover and enable plugins for your agent' : 'Discover and enable skills for your agent'}
           </p>
         </div>
         <button
@@ -287,7 +287,7 @@ export function SkillsTab() {
         <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#06b6d4]/10 border border-[#06b6d4]/20">
           <Loader2 size={14} className="text-[#06b6d4] flex-shrink-0 animate-spin" />
           <p className="text-xs text-[#06b6d4]">
-            Restarting agent to apply skill changes...
+            {agent?.framework === 'elizaos' ? 'Restarting agent to apply plugin changes...' : 'Restarting agent to apply skill changes...'}
           </p>
         </div>
       )}
@@ -297,7 +297,7 @@ export function SkillsTab() {
         <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#06b6d4]/10 border border-[#06b6d4]/20">
           <AlertTriangle size={14} className="text-[#06b6d4] flex-shrink-0" />
           <p className="text-xs text-[#06b6d4]">
-            Start the agent for skill changes to take effect.
+            {agent?.framework === 'elizaos' ? 'Start the agent for plugin changes to take effect.' : 'Start the agent for skill changes to take effect.'}
           </p>
           <button
             onClick={() => setRestartHint(false)}
@@ -314,7 +314,7 @@ export function SkillsTab() {
           <AlertTriangle size={32} className="text-[#71717a] mb-3" />
           <p className="text-sm text-[#A5A1C2]">{message}</p>
           <p className="text-xs text-[#71717a] mt-1">
-            Start the agent to browse available skills.
+            {agent?.framework === 'elizaos' ? 'Start the agent to browse available plugins.' : 'Start the agent to browse available skills.'}
           </p>
         </GlassCard>
       )}
@@ -341,7 +341,7 @@ export function SkillsTab() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search skills..."
+                placeholder={agent?.framework === 'elizaos' ? 'Search plugins...' : 'Search skills...'}
                 className="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-white/[0.04] border border-white/[0.06] text-white placeholder-[#71717a] focus:outline-none focus:border-[#06b6d4]/40 transition-colors"
               />
             </div>
@@ -390,7 +390,7 @@ export function SkillsTab() {
           ) : (
             <GlassCard className="flex flex-col items-center justify-center py-8 text-center">
               <Search size={24} className="text-[#71717a] mb-2" />
-              <p className="text-sm text-[#A5A1C2]">No skills match your search</p>
+              <p className="text-sm text-[#A5A1C2]">{agent?.framework === 'elizaos' ? 'No plugins match your search' : 'No skills match your search'}</p>
               <button
                 onClick={() => { setSearch(''); setCategoryFilter(null); }}
                 className="mt-2 text-xs text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
@@ -406,9 +406,11 @@ export function SkillsTab() {
       {!loading && !message && !error && skills.length === 0 && (
         <GlassCard className="flex flex-col items-center justify-center py-10 text-center">
           <Sparkles size={32} className="text-[#71717a] mb-3" />
-          <p className="text-sm text-[#A5A1C2]">No skills found</p>
+          <p className="text-sm text-[#A5A1C2]">{agent?.framework === 'elizaos' ? 'No plugins found' : 'No skills found'}</p>
           <p className="text-xs text-[#71717a] mt-1">
-            This agent&apos;s container does not have any skills installed.
+            {agent?.framework === 'elizaos'
+              ? 'This agent\u2019s container does not have any plugins installed.'
+              : 'This agent\u2019s container does not have any skills installed.'}
           </p>
         </GlassCard>
       )}

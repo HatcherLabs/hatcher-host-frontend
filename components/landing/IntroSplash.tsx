@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 // ─── Egg SVG with optional crack overlay ─────────────────────
 function EggSVG({ cracked }: { cracked: boolean }) {
   return (
-    <svg viewBox="0 0 100 130" width="80" height="104" className="overflow-visible">
+    <svg viewBox="0 0 100 130" width="120" height="156" className="overflow-visible">
       <defs>
         <linearGradient id="intro-egg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" style={{ stopColor: '#8b5cf6' }} />
@@ -29,14 +29,22 @@ function EggSVG({ cracked }: { cracked: boolean }) {
         fill="url(#intro-egg-grad)"
         filter="url(#intro-egg-glow)"
       />
-      {/* Highlight */}
+      {/* Highlight / shine */}
       <ellipse
-        cx="38"
-        cy="45"
-        rx="12"
-        ry="18"
-        fill="rgba(255,255,255,0.15)"
-        transform="rotate(-15 38 45)"
+        cx="36"
+        cy="40"
+        rx="14"
+        ry="22"
+        fill="rgba(255,255,255,0.12)"
+        transform="rotate(-20 36 40)"
+      />
+      <ellipse
+        cx="35"
+        cy="35"
+        rx="6"
+        ry="10"
+        fill="rgba(255,255,255,0.18)"
+        transform="rotate(-20 35 35)"
       />
       {/* Crack lines — appear when cracked */}
       {cracked && (
@@ -75,7 +83,7 @@ function EggSVG({ cracked }: { cracked: boolean }) {
 // ─── Robot SVG ───────────────────────────────────────────────
 function RobotSVG() {
   return (
-    <svg viewBox="0 0 60 60" width="52" height="52">
+    <svg viewBox="0 0 60 60" width="72" height="72">
       {/* Head / body */}
       <rect x="10" y="15" width="40" height="35" rx="8" fill="#8b5cf6" />
       {/* Antenna */}
@@ -126,7 +134,7 @@ function Particles() {
             scale: 0,
             opacity: 0,
           }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
+          transition={{ duration: 0.9, ease: 'easeOut' }}
         />
       ))}
     </>
@@ -169,11 +177,11 @@ export function IntroSplash({ onComplete }: { onComplete: () => void }) {
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase(1), 500),
-      setTimeout(() => setPhase(2), 1200),
-      setTimeout(() => setPhase(3), 1800),
-      setTimeout(() => setPhase(4), 2200),
-      setTimeout(() => handleComplete(), 2500),
+      setTimeout(() => setPhase(1), 1000),   // crack starts
+      setTimeout(() => setPhase(2), 2200),   // egg breaks, robot emerges
+      setTimeout(() => setPhase(3), 3200),   // text appears
+      setTimeout(() => setPhase(4), 4800),   // start fade out
+      setTimeout(() => handleComplete(), 5300), // done
     ];
     return () => timers.forEach(clearTimeout);
   }, [handleComplete]);
@@ -186,7 +194,7 @@ export function IntroSplash({ onComplete }: { onComplete: () => void }) {
           ? { opacity: 0, y: -60 }
           : { opacity: 1, y: 0 }
       }
-      transition={{ duration: 0.3, ease: 'easeInOut' }}
+      transition={{ duration: 0.5, ease: 'easeInOut' }}
     >
       {/* Radial glow background */}
       <motion.div
@@ -224,9 +232,9 @@ export function IntroSplash({ onComplete }: { onComplete: () => void }) {
                 opacity: [1, 0.8, 0],
               }}
               transition={{
-                scale: { duration: 0.5, ease: [0.34, 1.56, 0.64, 1] },
-                opacity: { duration: 0.5 },
-                rotate: { duration: 0.5, ease: 'easeInOut' },
+                scale: { duration: 0.8, ease: [0.34, 1.56, 0.64, 1] },
+                opacity: { duration: 0.8 },
+                rotate: { duration: 0.7, ease: 'easeInOut' },
               }}
             >
               <EggSVG cracked={phase >= 1} />

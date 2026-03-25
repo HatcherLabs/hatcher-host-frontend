@@ -36,6 +36,8 @@ export function ConfigTab() {
     agent,
     configName, setConfigName,
     configDesc, setConfigDesc,
+    configBio, setConfigBio,
+    configTopics, setConfigTopics,
     configSystemPrompt, setConfigSystemPrompt,
     configSkills, setConfigSkills,
     configModel, setConfigModel,
@@ -102,8 +104,8 @@ export function ConfigTab() {
       {/* Framework Config */}
       <GlassCard>
         <div className="flex items-center gap-2 mb-4">
-          <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${agent?.framework === 'hermes' ? 'bg-purple-500/10' : 'bg-amber-500/10'}`}>
-            <Cpu size={14} className={agent?.framework === 'hermes' ? 'text-purple-400' : 'text-amber-400'} />
+          <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${agent?.framework === 'hermes' ? 'bg-purple-500/10' : agent?.framework === 'elizaos' ? 'bg-cyan-500/10' : 'bg-amber-500/10'}`}>
+            <Cpu size={14} className={agent?.framework === 'hermes' ? 'text-purple-400' : agent?.framework === 'elizaos' ? 'text-cyan-400' : 'text-amber-400'} />
           </div>
           <h3 className="text-sm font-semibold text-[#A5A1C2]">{FRAMEWORKS[(agent?.framework ?? 'openclaw') as AgentFramework]?.name ?? 'Agent'} Config</h3>
         </div>
@@ -123,6 +125,48 @@ export function ConfigTab() {
               Tell your agent how to behave, what tone to use, and what it should know. You can write multiple lines.
             </p>
           </div>
+          {/* ElizaOS-specific fields */}
+          {agent?.framework === 'elizaos' && (
+            <>
+              <div>
+                <label htmlFor="config-bio" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Bio</label>
+                <p className="text-[10px] mb-1.5 text-[#71717a]">Define your agent&apos;s personality. One statement per line.</p>
+                <textarea
+                  id="config-bio"
+                  className="config-textarea"
+                  rows={4}
+                  value={configBio}
+                  onChange={(e) => setConfigBio(e.target.value)}
+                  placeholder="A knowledgeable AI assistant specializing in..."
+                />
+              </div>
+              <div>
+                <label htmlFor="config-topics" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Topics</label>
+                <input
+                  id="config-topics"
+                  type="text"
+                  className="config-input"
+                  value={configTopics}
+                  onChange={(e) => setConfigTopics(e.target.value)}
+                  placeholder="technology, AI, crypto, research"
+                />
+                <p className="text-[10px] mt-1 text-[#71717a]">Comma-separated topics your agent knows about</p>
+              </div>
+              <div>
+                <label htmlFor="config-adjectives" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Adjectives</label>
+                <input
+                  id="config-adjectives"
+                  type="text"
+                  className="config-input"
+                  value={ctx.configAdjectives}
+                  onChange={(e) => ctx.setConfigAdjectives(e.target.value)}
+                  placeholder="helpful, analytical, concise"
+                />
+                <p className="text-[10px] mt-1 text-[#71717a]">Personality traits, comma-separated</p>
+              </div>
+            </>
+          )}
+
           <div>
             {(() => {
               const parsedSkills = configSkills ? configSkills.split(',').map((s) => s.trim()).filter(Boolean) : [];

@@ -99,7 +99,7 @@ export default function CreatePage() {
 
   // ── Template state ──
   const [selectedTemplate, setSelectedTemplate] = useState('custom');
-  const [selectedFramework, setSelectedFramework] = useState<'openclaw' | 'hermes'>('openclaw');
+  const [selectedFramework, setSelectedFramework] = useState<'openclaw' | 'hermes' | 'elizaos'>('openclaw');
 
   // ── OpenClaw form state ──
   const [openclawForm, setOpenclawForm] = useState({
@@ -109,6 +109,11 @@ export default function CreatePage() {
   });
   const [showCustomPrompt, setShowCustomPrompt] = useState(false);
   const [openclawSkills, setOpenclawSkills] = useState<string[]>([...OPENCLAW_SKILLS_LIST]);
+
+  // ── ElizaOS-specific form state ──
+  const [elizaBio, setElizaBio] = useState('');
+  const [elizaTopics, setElizaTopics] = useState('');
+  const [elizaAdjectives, setElizaAdjectives] = useState('');
 
   const agentName = openclawForm.name;
   const agentDesc = openclawForm.description;
@@ -188,6 +193,11 @@ export default function CreatePage() {
           model: llm.model ?? 'llama-4-scout-17b',
           provider: llm.modelProvider,
           ...(selectedFramework === 'openclaw' ? { skills: openclawSkills } : {}),
+          ...(selectedFramework === 'elizaos' ? {
+            bio: elizaBio.trim() || undefined,
+            topics: elizaTopics.split(',').map(s => s.trim()).filter(Boolean),
+            adjectives: elizaAdjectives.split(',').map(s => s.trim()).filter(Boolean),
+          } : {}),
           systemPrompt: openclawForm.systemPrompt.trim()
             ? openclawForm.systemPrompt
             : (AGENT_TEMPLATES.find(t => t.id === selectedTemplate)?.defaultSystemPrompt ?? ''),
@@ -378,7 +388,7 @@ export default function CreatePage() {
                 Each style has different strengths -- pick the one that fits your needs
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
                 {/* OpenClaw */}
                 <motion.button
                   whileHover={cardHover}
@@ -436,6 +446,37 @@ export default function CreatePage() {
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {['Long-term memory', '40+ built-in tools', 'Self-improving'].map(f => (
+                      <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)]">{f}</span>
+                    ))}
+                  </div>
+                </motion.button>
+
+                {/* ElizaOS */}
+                <motion.button
+                  whileHover={cardHover}
+                  onClick={() => setSelectedFramework('elizaos')}
+                  className={cn(
+                    'p-6 rounded-xl border text-left transition-all duration-200 relative',
+                    selectedFramework === 'elizaos'
+                      ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
+                      : 'bg-[rgba(26,23,48,0.6)] border-[rgba(46,43,74,0.4)] hover:border-[rgba(6,182,212,0.4)]'
+                  )}
+                >
+                  {selectedFramework === 'elizaos' && (
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
+                      className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </motion.div>
+                  )}
+                  <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center mb-4">
+                    <Bot className="w-6 h-6 text-cyan-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">ElizaOS</h3>
+                  <p className="text-sm text-[var(--text-muted)] mb-3">
+                    Open-source multi-agent framework by ai16z. 90+ plugins, persistent memory, Web3 native.
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['90+ plugins', 'Vector memory', 'Web3 native'].map(f => (
                       <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)]">{f}</span>
                     ))}
                   </div>
@@ -815,6 +856,57 @@ export default function CreatePage() {
                   showCustomPrompt={showCustomPrompt}
                   setShowCustomPrompt={setShowCustomPrompt}
                 />
+
+                {/* ElizaOS-specific fields */}
+                {selectedFramework === 'elizaos' && (
+                  <>
+                    <div>
+                      <label htmlFor="eliza-bio" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
+                        Bio
+                      </label>
+                      <p className="text-xs text-[var(--text-muted)] mb-2">Define your agent&apos;s personality and background. One statement per line.</p>
+                      <textarea
+                        id="eliza-bio"
+                        className="input resize-none"
+                        rows={4}
+                        placeholder="A knowledgeable AI assistant specializing in..."
+                        value={elizaBio}
+                        onChange={(e) => setElizaBio(e.target.value)}
+                        maxLength={2000}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="eliza-topics" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
+                        Topics
+                      </label>
+                      <input
+                        id="eliza-topics"
+                        type="text"
+                        className="input"
+                        placeholder="technology, AI, crypto, research"
+                        value={elizaTopics}
+                        onChange={(e) => setElizaTopics(e.target.value)}
+                        maxLength={500}
+                      />
+                      <p className="text-xs text-[var(--text-muted)] mt-1">Comma-separated topics your agent knows about</p>
+                    </div>
+                    <div>
+                      <label htmlFor="eliza-adjectives" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
+                        Adjectives
+                      </label>
+                      <input
+                        id="eliza-adjectives"
+                        type="text"
+                        className="input"
+                        placeholder="helpful, analytical, concise"
+                        value={elizaAdjectives}
+                        onChange={(e) => setElizaAdjectives(e.target.value)}
+                        maxLength={500}
+                      />
+                      <p className="text-xs text-[var(--text-muted)] mt-1">Personality traits, comma-separated</p>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="mt-8 flex justify-between">
@@ -862,9 +954,9 @@ export default function CreatePage() {
                   <div>
                     <div className="text-lg font-bold text-[#FFFFFF]">{agentName}</div>
                     <div className="text-sm text-[#71717a]">
-                      {selectedFramework === 'openclaw' ? 'OpenClaw' : 'Hermes'} agent
+                      {selectedFramework === 'openclaw' ? 'OpenClaw' : selectedFramework === 'hermes' ? 'Hermes' : 'ElizaOS'} agent
                       <span className="ml-1.5 text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)] align-middle">
-                        {selectedFramework === 'openclaw' ? 'Multi-skill assistant' : 'Autonomous agent'}
+                        {selectedFramework === 'openclaw' ? 'Multi-skill assistant' : selectedFramework === 'hermes' ? 'Autonomous agent' : 'Multi-agent framework'}
                       </span>
                     </div>
                   </div>
@@ -872,7 +964,7 @@ export default function CreatePage() {
 
                 {/* Summary details */}
                 <div className="space-y-3 text-sm">
-                  <SummaryRow label="Agent Type" value={selectedFramework === 'openclaw' ? 'OpenClaw' : 'Hermes'} />
+                  <SummaryRow label="Agent Type" value={selectedFramework === 'openclaw' ? 'OpenClaw' : selectedFramework === 'hermes' ? 'Hermes' : 'ElizaOS'} />
                   <SummaryRow label="Template" value={AGENT_TEMPLATES.find(t => t.id === selectedTemplate)?.name ?? 'Custom'} />
                   <SummaryRow label="AI Model" value={getLLMSummary()} />
 
