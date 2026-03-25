@@ -18,12 +18,14 @@ import {
   Clock,
   CreditCard,
   Crown,
+  DollarSign,
   Loader2,
   Plus,
   Receipt,
   Rocket,
   Shield,
   Users,
+  Wallet,
   X,
   Zap,
 } from 'lucide-react';
@@ -75,11 +77,14 @@ interface PaymentModalProps {
   price: number;
   onPayWithSOL: () => void;
   onPayWithCard: () => void;
+  onPayWithCredits?: () => void;
+  creditBalance: number;
   loading: boolean;
 }
 
-function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithCard, loading }: PaymentModalProps) {
+function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithCard, onPayWithCredits, creditBalance, loading }: PaymentModalProps) {
   if (!isOpen) return null;
+  const canPayWithCredits = creditBalance >= price && price > 0;
   return (
     <AnimatePresence>
       <motion.div
@@ -107,6 +112,24 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
             <p className="text-sm text-[var(--text-secondary)] mb-4">
               {title} — <span className="font-bold text-[var(--text-primary)]">${price}</span>
             </p>
+
+            {/* Pay with Credits */}
+            {canPayWithCredits && onPayWithCredits && (
+              <button
+                onClick={onPayWithCredits}
+                disabled={loading}
+                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-green-500/30 hover:border-green-400/50 hover:bg-green-500/[0.05] transition-all disabled:opacity-40"
+              >
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold text-sm">$</span>
+                </div>
+                <div className="text-left flex-1">
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with Credits</p>
+                  <p className="text-[11px] text-[var(--text-muted)]">${creditBalance.toFixed(2)} available — instant</p>
+                </div>
+                {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
+              </button>
+            )}
 
             {/* Pay with SOL */}
             <button
@@ -168,6 +191,10 @@ export default function BillingPage() {
   const [subscribing, setSubscribing] = useState<string | null>(null);
   const [purchasingAddon, setPurchasingAddon] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [creditBalance, setCreditBalance] = useState(0);
+  const [creditHistory, setCreditHistory] = useState<Array<{
+    id: string; amount: number; balance: number; type: string; description: string | null; createdAt: string;
+  }>>([]);
 
   // Payment method modal state
   const [paymentModal, setPaymentModal] = useState<{
@@ -199,9 +226,15 @@ export default function BillingPage() {
   }, [searchParams]);
 
   const loadAccountData = useCallback(async () => {
-    const res = await api.getAccountFeatures();
-    if (res.success) {
-      setAccountData(res.data as unknown as AccountFeatures);
+    const [acctRes, balRes] = await Promise.all([
+      api.getAccountFeatures(),
+      api.getCreditBalance(),
+    ]);
+    if (acctRes.success) {
+      setAccountData(acctRes.data as unknown as AccountFeatures);
+    }
+    if (balRes.success) {
+      setCreditBalance(balRes.data.balance);
     }
   }, []);
 
@@ -213,9 +246,13 @@ export default function BillingPage() {
     Promise.all([
       api.getAccountFeatures(),
       api.getPayments(),
-    ]).then(([acctRes, payRes]) => {
+      api.getCreditBalance(),
+      api.getCreditHistory(10),
+    ]).then(([acctRes, payRes, balRes, histRes]) => {
       if (acctRes.success) setAccountData(acctRes.data as unknown as AccountFeatures);
       if (payRes.success) setPayments(payRes.data.payments);
+      if (balRes.success) setCreditBalance(balRes.data.balance);
+      if (histRes.success) setCreditHistory(histRes.data.transactions);
       if (!acctRes.success) setError(acctRes.error ?? 'Failed to load account');
       setLoading(false);
     }).catch(() => {
@@ -344,6 +381,60 @@ export default function BillingPage() {
     }
   };
 
+  /* ── Subscribe with Credits ──────────────────────────────── */
+  const handleSubscribeCredits = async () => {
+    const tierKey = paymentModal.tierKey;
+    if (!tierKey) return;
+    setPaymentLoading(true);
+    setSubscribing(tierKey);
+    setError(null);
+    setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    try {
+      const res = await api.subscribeWithCredits(tierKey);
+      if (res.success) {
+        await loadAccountData();
+        // Refresh credit history
+        const histRes = await api.getCreditHistory(10);
+        if (histRes.success) setCreditHistory(histRes.data.transactions);
+        showSuccess(`Subscribed to ${TIERS[tierKey].name} with credits!`);
+      } else {
+        setError(res.error ?? 'Subscription failed');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Subscription failed');
+    } finally {
+      setSubscribing(null);
+      setPaymentLoading(false);
+    }
+  };
+
+  /* ── Purchase add-on with Credits ──────────────────────── */
+  const handlePurchaseAddonCredits = async () => {
+    const addonKey = paymentModal.addonKey;
+    if (!addonKey) return;
+    setPaymentLoading(true);
+    setPurchasingAddon(addonKey);
+    setError(null);
+    setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    try {
+      const res = await api.purchaseAddonWithCredits(addonKey);
+      if (res.success) {
+        await loadAccountData();
+        const histRes = await api.getCreditHistory(10);
+        if (histRes.success) setCreditHistory(histRes.data.transactions);
+        const addon = ADDONS.find(a => a.key === addonKey);
+        showSuccess(`${addon?.name ?? 'Add-on'} purchased with credits!`);
+      } else {
+        setError(res.error ?? 'Purchase failed');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Purchase failed');
+    } finally {
+      setPurchasingAddon(null);
+      setPaymentLoading(false);
+    }
+  };
+
   /* ── Legacy direct subscribe handler (for renew button) ── */
   const handleSubscribe = async (tierKey: UserTierKey) => {
     openSubscribeModal(tierKey);
@@ -417,6 +508,59 @@ export default function BillingPage() {
           {error}
         </motion.div>
       )}
+
+      {/* ── Credits Balance Card ──────────────────────────── */}
+      <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
+        <div className="px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
+          <div className="flex items-center gap-2">
+            <Wallet className="w-4 h-4 text-green-400" />
+            <h2 className="font-semibold text-[var(--text-primary)]">Credits Balance</h2>
+          </div>
+        </div>
+        <div className="p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+            <div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-3xl font-extrabold text-green-400 tabular-nums" style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}>
+                  ${creditBalance.toFixed(2)}
+                </span>
+                <span className="text-sm text-[var(--text-muted)]">USD</span>
+              </div>
+              <p className="text-xs text-[var(--text-muted)] mt-1">
+                Credits can be used for subscriptions, add-ons, and hosted LLM usage.
+              </p>
+            </div>
+          </div>
+
+          {/* Recent credit transactions */}
+          {creditHistory.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-[rgba(46,43,74,0.3)]">
+              <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium mb-3">Recent Transactions</p>
+              <div className="space-y-2">
+                {creditHistory.slice(0, 5).map((tx) => (
+                  <div key={tx.id} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${tx.amount > 0 ? 'bg-green-400' : 'bg-red-400'}`} />
+                      <span className="text-[var(--text-secondary)] text-xs truncate max-w-[200px]">
+                        {tx.description ?? tx.type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className={`text-xs font-semibold tabular-nums ${tx.amount > 0 ? 'text-green-400' : 'text-red-400'}`}
+                        style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}>
+                        {tx.amount > 0 ? '+' : ''}${tx.amount.toFixed(2)}
+                      </span>
+                      <span className="text-[10px] text-[var(--text-muted)] whitespace-nowrap">
+                        {formatDate(tx.createdAt)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </motion.div>
 
       {/* ── Current Tier Card ──────────────────────────────── */}
       <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
@@ -773,6 +917,8 @@ export default function BillingPage() {
         price={paymentModal.price}
         onPayWithSOL={paymentModal.type === 'subscription' ? handleSubscribeSOL : handlePurchaseAddonSOL}
         onPayWithCard={paymentModal.type === 'subscription' ? handleSubscribeStripe : handlePurchaseAddonStripe}
+        onPayWithCredits={paymentModal.type === 'subscription' ? handleSubscribeCredits : handlePurchaseAddonCredits}
+        creditBalance={creditBalance}
         loading={paymentLoading}
       />
 

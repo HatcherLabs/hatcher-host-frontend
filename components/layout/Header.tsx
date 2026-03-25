@@ -4,9 +4,10 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { api } from '@/lib/api';
 import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, LogOut, Settings, User } from 'lucide-react';
+import { Shield, LogOut, Settings, User, Wallet } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
 
@@ -38,6 +39,16 @@ export function Header() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const isAdmin = user?.isAdmin ?? false;
+  const [creditBalance, setCreditBalance] = useState<number | null>(null);
+
+  // Fetch credit balance when user is authenticated and dropdown opens
+  useEffect(() => {
+    if (isAuthenticated && dropdownOpen && creditBalance === null) {
+      api.getCreditBalance().then(res => {
+        if (res.success) setCreditBalance(res.data.balance);
+      });
+    }
+  }, [isAuthenticated, dropdownOpen, creditBalance]);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -184,6 +195,17 @@ export function Header() {
                     <div className="px-4 py-2.5 border-b border-white/[0.06]">
                       <p className="text-xs text-white font-medium truncate">{user.username}</p>
                       <p className="text-[10px] text-[#a1a1aa] truncate">{user.email}</p>
+                      {creditBalance !== null && creditBalance > 0 && (
+                        <Link
+                          href="/dashboard/billing"
+                          onClick={() => setDropdownOpen(false)}
+                          className="mt-1.5 flex items-center gap-1.5 text-[10px] text-green-400 hover:text-green-300 transition-colors"
+                        >
+                          <Wallet className="w-3 h-3" />
+                          <span className="font-semibold">${creditBalance.toFixed(2)}</span>
+                          <span className="text-[#a1a1aa]">credits</span>
+                        </Link>
+                      )}
                     </div>
                     <Link
                       href="/settings"

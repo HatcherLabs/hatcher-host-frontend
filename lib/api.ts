@@ -1244,4 +1244,37 @@ export const api = {
         createdAt: string;
       };
     }>(`/agents/${agentId}/versions/diff?v1=${v1}&v2=${v2}`),
+
+  // ─── Credits ──────────────────────────────────────────────────
+
+  /** Get credit balance */
+  getCreditBalance: () =>
+    req<{ balance: number; currency: string }>('/credits/balance'),
+
+  /** Get credit transaction history */
+  getCreditHistory: (limit = 20) =>
+    req<{
+      transactions: Array<{
+        id: string;
+        amount: number;
+        balance: number;
+        type: string;
+        description: string | null;
+        createdAt: string;
+      }>;
+    }>(`/credits/history?limit=${limit}`),
+
+  /** Subscribe to a tier using credits */
+  subscribeWithCredits: (tier: string) =>
+    req<{ tier: string; expiresAt: string; paidWith: string; amountDeducted: number; remainingBalance: number }>('/features/subscribe-with-credits', {
+      method: 'POST',
+      body: JSON.stringify({ tier }),
+    }),
+
+  /** Purchase an addon using credits */
+  purchaseAddonWithCredits: (addonKey: string, agentId?: string) =>
+    req<{ addonKey: string; paidWith: string; amountDeducted: number; remainingBalance: number }>('/features/addon-with-credits', {
+      method: 'POST',
+      body: JSON.stringify({ addonKey, ...(agentId ? { agentId } : {}) }),
+    }),
 };
