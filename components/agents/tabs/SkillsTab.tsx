@@ -65,21 +65,21 @@ function SkillCard({
           onClick={() => onToggle(skill.id, !skill.enabled)}
           disabled={isToggling}
           className={`
-            relative flex-shrink-0 w-10 h-5.5 rounded-full transition-all duration-200
+            relative flex-shrink-0 w-11 h-6 rounded-full transition-all duration-200
             ${skill.enabled
-              ? 'bg-[#f97316]/80 border border-[#f97316]/40'
-              : 'bg-white/[0.06] border border-white/[0.08]'
+              ? 'bg-[#f97316] border border-[#f97316]/60'
+              : 'bg-white/[0.08] border border-white/[0.12]'
             }
-            ${isToggling ? 'opacity-50 cursor-wait' : 'cursor-pointer hover:border-white/[0.15]'}
+            ${isToggling ? 'opacity-50 cursor-wait' : 'cursor-pointer hover:border-white/[0.2]'}
           `}
           title={skill.enabled ? 'Disable skill' : 'Enable skill'}
         >
           <span
             className={`
-              absolute top-0.5 w-4 h-4 rounded-full transition-all duration-200
+              absolute top-[3px] w-[18px] h-[18px] rounded-full transition-all duration-200 shadow-sm
               ${skill.enabled
-                ? 'left-[22px] bg-white shadow-sm'
-                : 'left-0.5 bg-[#71717a]'
+                ? 'left-[21px] bg-white'
+                : 'left-[3px] bg-[#71717a]'
               }
             `}
           />
