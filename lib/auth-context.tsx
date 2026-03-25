@@ -36,7 +36,7 @@ const AuthContext = createContext<AuthContextValue>({
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authed, setAuthed] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // true until initial auth check completes
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<UserProfile | null>(null);
 
@@ -104,7 +104,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isAuthenticated()) {
       setAuthed(true);
-      // Fetch profile to get user data
       api.getProfile().then((res) => {
         if (res.success) {
           setUser({
@@ -116,11 +115,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             tier: (res.data as any).tier ?? 'free',
           });
         } else {
-          // Token invalid — clear
           clearToken();
           setAuthed(false);
         }
-      });
+      }).finally(() => setIsLoading(false));
+    } else {
+      setIsLoading(false);
     }
   }, []);
 

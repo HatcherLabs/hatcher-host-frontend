@@ -31,7 +31,7 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -152,7 +152,9 @@ export function Header() {
 
           {/* Right side: auth button/user menu + hamburger */}
           <div className="flex items-center gap-3">
-            {isAuthenticated && user ? (
+            {authLoading ? (
+              <div className="h-9 w-24 rounded-lg bg-white/[0.04] animate-pulse" />
+            ) : isAuthenticated && user ? (
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setDropdownOpen((o) => !o)}

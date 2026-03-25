@@ -87,7 +87,7 @@ export function SchedulesTab() {
   const effectiveCron = isCustom ? formCustomCron : formPreset;
 
   const loadSchedules = useCallback(async () => {
-    if (!agentId) return;
+    if (!agentId || agent?.framework !== 'hermes') return;
     setLoading(true);
     setError(null);
     try {
