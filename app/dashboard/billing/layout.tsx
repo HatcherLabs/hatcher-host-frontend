@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Billing — Hatcher',
+  title: 'Billing',
   description: 'Manage payments, subscriptions, credits, and view transaction history.',
 };
 

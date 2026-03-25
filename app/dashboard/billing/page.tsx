@@ -653,7 +653,7 @@ export default function BillingPage() {
           <span className="text-[10px] text-[var(--text-muted)]">Stackable on any tier</span>
         </div>
         <div className="p-6">
-          <div className="grid sm:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {ADDONS.map((addon) => {
               const isBuying = purchasingAddon === addon.key;
               return (
@@ -669,10 +669,10 @@ export default function BillingPage() {
                     <span className="text-2xl font-bold text-gradient tabular-nums">
                       ${addon.usdPrice}
                     </span>
-                    <span className="text-xs text-[var(--text-muted)]">/ 30 days</span>
+                    <span className="text-xs text-[var(--text-muted)]">{addon.type === 'one_time' ? 'one-time' : '/ 30 days'}</span>
                   </div>
                   <p className="text-xs text-[var(--text-secondary)] mb-3">
-                    {addon.extraAgents} additional agent slots
+                    {addon.description}
                   </p>
                   <button
                     onClick={() => handlePurchaseAddon(addon.key as AddonKey)}

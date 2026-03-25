@@ -30,12 +30,12 @@ export async function generateMetadata({
 
   if (!agent) {
     return {
-      title: 'Agent Not Found | Hatcher',
+      title: 'Agent Not Found',
       description: 'This agent does not exist or has been removed.',
     };
   }
 
-  const title = `${agent.name} | Hatcher`;
+  const title = agent.name;
   const description =
     agent.description ?? `${agent.name} — an AI agent powered by ${agent.framework ?? 'OpenClaw'} on Hatcher.`;
 
