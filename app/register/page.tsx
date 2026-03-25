@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { Check, X } from 'lucide-react';
+import { api } from '@/lib/api';
+import { Check, X, Gift } from 'lucide-react';
 
 interface PasswordStrength {
   score: number; // 0-4
@@ -36,6 +37,7 @@ function getPasswordStrength(pw: string): PasswordStrength {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { register, isAuthenticated, isLoading, error, clearError } = useAuth();
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -43,6 +45,20 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
   const strength = useMemo(() => getPasswordStrength(password), [password]);
+
+  // Referral code from URL
+  const refCode = searchParams.get('ref') || '';
+  const [referrerUsername, setReferrerUsername] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (refCode) {
+      api.validateReferralCode(refCode).then((res) => {
+        if (res.success && res.data.valid && res.data.referrerUsername) {
+          setReferrerUsername(res.data.referrerUsername);
+        }
+      });
+    }
+  }, [refCode]);
 
   useEffect(() => {
     if (isAuthenticated) router.push('/dashboard');
@@ -65,7 +81,7 @@ export default function RegisterPage() {
       return;
     }
 
-    await register(email, username, password);
+    await register(email, username, password, refCode || undefined);
   };
 
   const displayError = localError || error;
@@ -86,6 +102,16 @@ export default function RegisterPage() {
           </h1>
           <p className="text-sm text-[#A5A1C2] mt-2">Get started with Hatcher</p>
         </div>
+
+        {/* Referral badge */}
+        {referrerUsername && (
+          <div className="flex items-center gap-2 px-3 py-2 mb-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+            <Gift size={14} className="text-emerald-400 flex-shrink-0" />
+            <p className="text-xs text-emerald-300">
+              Referred by <span className="font-semibold">{referrerUsername}</span> — you both get <span className="font-semibold">$2 credit</span>!
+            </p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

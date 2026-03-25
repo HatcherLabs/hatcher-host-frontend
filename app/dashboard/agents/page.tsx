@@ -25,6 +25,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
 
 import { AGENT_STATUSES, AGENT_STATUS_CONFIG } from '@hatcher/shared';
 
@@ -146,6 +147,7 @@ export default function MyAgentsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [sortOption, setSortOption] = useState<SortOption>('newest');
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // ── Fetch agents ─────────────────────────────────────────
   useEffect(() => {
@@ -164,6 +166,13 @@ export default function MyAgentsPage() {
       }
     });
   }, [isAuthenticated]);
+
+  // ── Onboarding check ───────────────────────────────────
+  useEffect(() => {
+    if (!loading && isAuthenticated && agents.length === 0 && !localStorage.getItem('onboarding_completed')) {
+      setShowOnboarding(true);
+    }
+  }, [loading, isAuthenticated, agents]);
 
   // ── Filtered + sorted agents ─────────────────────────────
   const filteredAgents = useMemo(() => {
@@ -571,6 +580,13 @@ export default function MyAgentsPage() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Onboarding wizard for first-time users */}
+      <AnimatePresence>
+        {showOnboarding && (
+          <OnboardingWizard onClose={() => setShowOnboarding(false)} />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

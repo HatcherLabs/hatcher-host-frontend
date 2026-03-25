@@ -1,0 +1,228 @@
+'use client';
+
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Bell,
+  Server,
+  CreditCard,
+  Plus,
+  Users,
+  DollarSign,
+  MessageSquare,
+  Check,
+  Activity,
+} from 'lucide-react';
+
+interface Notification {
+  id: string;
+  type: string;
+  message: string;
+  timestamp: string;
+}
+
+const ICON_MAP: Record<string, typeof Server> = {
+  agent_started: Server,
+  agent_stopped: Server,
+  agent_created: Plus,
+  subscription: CreditCard,
+  subscription_confirmed: CreditCard,
+  team_member: Users,
+  team_joined: Users,
+  rental: DollarSign,
+  rental_received: DollarSign,
+  support: MessageSquare,
+  support_reply: MessageSquare,
+};
+
+const ICON_COLOR_MAP: Record<string, string> = {
+  agent_started: 'text-emerald-400 bg-emerald-500/15',
+  agent_stopped: 'text-amber-400 bg-amber-500/15',
+  agent_created: 'text-[#06b6d4] bg-[#06b6d4]/15',
+  subscription: 'text-purple-400 bg-purple-500/15',
+  subscription_confirmed: 'text-purple-400 bg-purple-500/15',
+  team_member: 'text-blue-400 bg-blue-500/15',
+  team_joined: 'text-blue-400 bg-blue-500/15',
+  rental: 'text-emerald-400 bg-emerald-500/15',
+  rental_received: 'text-emerald-400 bg-emerald-500/15',
+  support: 'text-[#06b6d4] bg-[#06b6d4]/15',
+  support_reply: 'text-[#06b6d4] bg-[#06b6d4]/15',
+};
+
+const READ_AT_KEY = 'notifications_read_at';
+
+function timeAgo(dateStr: string): string {
+  const now = Date.now();
+  const then = new Date(dateStr).getTime();
+  const diff = Math.max(0, now - then);
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
+
+export function NotificationCenter() {
+  const { isAuthenticated } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [readAt, setReadAt] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Load readAt from localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setReadAt(localStorage.getItem(READ_AT_KEY));
+    }
+  }, []);
+
+  // Fetch notifications
+  const fetchNotifications = useCallback(async () => {
+    if (!isAuthenticated) return;
+    try {
+      const res = await api.getNotifications();
+      if (res.success && Array.isArray(res.data)) {
+        setNotifications(res.data.slice(0, 20));
+      }
+    } catch {
+      // silently fail
+    }
+  }, [isAuthenticated]);
+
+  // Initial fetch + 60s polling
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 60000);
+    return () => clearInterval(interval);
+  }, [fetchNotifications]);
+
+  // Close on outside click / Escape
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, []);
+
+  // Count unread
+  const unreadCount = readAt
+    ? notifications.filter((n) => new Date(n.timestamp).getTime() > new Date(readAt).getTime()).length
+    : notifications.length;
+
+  const markAllRead = () => {
+    const now = new Date().toISOString();
+    localStorage.setItem(READ_AT_KEY, now);
+    setReadAt(now);
+  };
+
+  if (!isAuthenticated) return null;
+
+  return (
+    <div className="relative" ref={containerRef}>
+      {/* Bell button */}
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="relative h-9 w-9 flex items-center justify-center rounded-lg hover:bg-white/[0.06] transition-colors"
+        aria-label="Notifications"
+        aria-expanded={open}
+      >
+        <Bell size={18} className="text-[#a1a1aa]" />
+        {unreadCount > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-purple-600 text-[9px] font-bold text-white px-1">
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </span>
+        )}
+      </button>
+
+      {/* Dropdown */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="absolute right-0 mt-1 w-80 rounded-xl shadow-xl z-50 overflow-hidden"
+            style={{
+              background: 'rgba(14, 14, 20, 0.97)',
+              backdropFilter: 'blur(24px)',
+              WebkitBackdropFilter: 'blur(24px)',
+              border: '1px solid rgba(255, 255, 255, 0.06)',
+            }}
+            initial={{ opacity: 0, y: -8, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+              <h3 className="text-sm font-semibold text-white">Notifications</h3>
+              {unreadCount > 0 && (
+                <button
+                  onClick={markAllRead}
+                  className="flex items-center gap-1 text-[10px] text-purple-400 hover:text-purple-300 transition-colors"
+                >
+                  <Check size={10} />
+                  Mark all read
+                </button>
+              )}
+            </div>
+
+            {/* List */}
+            <div className="max-h-80 overflow-y-auto">
+              {notifications.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-10 px-4">
+                  <Activity size={24} className="text-[#71717a] mb-2" />
+                  <p className="text-xs text-[#71717a]">No notifications yet</p>
+                </div>
+              ) : (
+                notifications.map((n) => {
+                  const isUnread = readAt
+                    ? new Date(n.timestamp).getTime() > new Date(readAt).getTime()
+                    : true;
+                  const Icon = ICON_MAP[n.type] || Activity;
+                  const colorClass = ICON_COLOR_MAP[n.type] || 'text-[#a1a1aa] bg-white/10';
+                  const [iconText, iconBg] = colorClass.split(' ');
+
+                  return (
+                    <div
+                      key={n.id}
+                      className={`flex items-start gap-3 px-4 py-3 border-b border-white/[0.03] transition-colors ${
+                        isUnread ? 'bg-purple-500/[0.03]' : ''
+                      }`}
+                    >
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${iconBg}`}>
+                        <Icon size={14} className={iconText} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-xs leading-relaxed ${isUnread ? 'text-white' : 'text-[#a1a1aa]'}`}>
+                          {n.message}
+                        </p>
+                        <p className="text-[10px] text-[#71717a] mt-0.5">
+                          {timeAgo(n.timestamp)}
+                        </p>
+                      </div>
+                      {isUnread && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500 flex-shrink-0 mt-1.5" />
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

@@ -11,6 +11,7 @@ const PRODUCT_LINKS = [
 
 const RESOURCE_LINKS = [
   { label: 'Documentation', href: DOCS_URL, external: true },
+  { label: 'Blog', href: '/blog' },
   { label: 'Support', href: '/support' },
   { label: 'Help', href: '/help' },
   { label: 'OpenClaw', href: EXTERNAL_LINKS.openclaw, external: true },

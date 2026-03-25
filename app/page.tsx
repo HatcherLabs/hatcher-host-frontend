@@ -16,8 +16,12 @@ import {
   Webhook,
   Users,
   Mic,
+  Terminal,
+  Star,
+  Quote,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
+import { TerminalDemo } from '@/components/landing/TerminalDemo';
 
 // ─── Animated Robot SVG ─────────────────────────────────────────
 function HeroRobot() {
@@ -553,6 +557,130 @@ export default function LandingPage() {
                 <p className="text-6xl font-mono font-bold text-white/[0.07] mb-4 select-none">{step.num}</p>
                 <h3 className="text-xl font-semibold text-white mb-3">{step.title}</h3>
                 <p className="text-sm text-[#a1a1aa] leading-relaxed">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* ── SEE IT IN ACTION ─────────────────────────── */}
+      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="demo">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12 sm:mb-16">
+            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">See it in action</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+              <span className="text-white">Deploy in </span>
+              <span className="bg-gradient-to-r from-cyan-400 via-cyan-300 to-cyan-500 bg-clip-text text-transparent">seconds</span>
+            </h2>
+            <p className="mt-4 text-[#a1a1aa] max-w-md mx-auto">
+              One command. Full agent with integrations. Live across 20+ platforms.
+            </p>
+          </div>
+          <TerminalDemo />
+        </div>
+      </Section>
+
+      {/* ── SOCIAL PROOF ──────────────────────────────── */}
+      <Section className="py-16 sm:py-20 px-4 sm:px-6 border-t border-white/[0.06]" id="social-proof">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center">
+            <div>
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-1">
+                {platformStats.totalAgents > 0 ? <AnimatedCounter target={platformStats.totalAgents} /> : '50+'}
+              </div>
+              <div className="text-sm text-[#71717a]">Agents Deployed</div>
+            </div>
+            <div>
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-1">2</div>
+              <div className="text-sm text-[#71717a]">Frameworks</div>
+            </div>
+            <div>
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-1">20+</div>
+              <div className="text-sm text-[#71717a]">Platforms</div>
+            </div>
+            <div>
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-1">7</div>
+              <div className="text-sm text-[#71717a]">LLM Providers</div>
+            </div>
+          </div>
+
+          {/* Framework logos */}
+          <div className="mt-12 flex items-center justify-center gap-8 sm:gap-12">
+            <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+              <div className="w-8 h-8 rounded-lg bg-purple-500/15 flex items-center justify-center">
+                <Zap className="w-4 h-4 text-purple-400" />
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-white">OpenClaw</div>
+                <div className="text-[10px] text-[#71717a]">13,700+ skills</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+              <div className="w-8 h-8 rounded-lg bg-cyan-500/15 flex items-center justify-center">
+                <Terminal className="w-4 h-4 text-cyan-400" />
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-white">Hermes</div>
+                <div className="text-[10px] text-[#71717a]">Lightweight &amp; fast</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      {/* ── TESTIMONIALS ─────────────────────────────── */}
+      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="testimonials">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12 sm:mb-16">
+            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">Testimonials</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+              Early beta testers love Hatcher
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {[
+              {
+                quote: 'Deployed my first Telegram trading bot in under a minute. The BYOK support means I can use my own API keys with zero markup.',
+                name: 'Alex M.',
+                role: 'DeFi Developer',
+                initials: 'AM',
+                gradient: 'from-purple-500 to-indigo-500',
+              },
+              {
+                quote: 'The multi-platform support is insane. One agent running on Telegram, Discord, and Twitter simultaneously. Hatcher handles all the infra.',
+                name: 'Sarah K.',
+                role: 'Community Manager',
+                initials: 'SK',
+                gradient: 'from-cyan-500 to-blue-500',
+              },
+              {
+                quote: 'I switched from self-hosting to Hatcher and saved 10+ hours a week on DevOps. The cron jobs and webhook integrations are a game changer.',
+                name: 'Mike R.',
+                role: 'AI Builder',
+                initials: 'MR',
+                gradient: 'from-emerald-500 to-teal-500',
+              },
+            ].map((t, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, delay: i * 0.12 }}
+                className="relative bg-[rgba(255,255,255,0.02)] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-7 hover:border-[rgba(139,92,246,0.2)] transition-colors duration-300"
+              >
+                <Quote className="w-8 h-8 text-purple-500/20 mb-4" />
+                <p className="text-sm text-[#a1a1aa] leading-relaxed mb-6">{t.quote}</p>
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.gradient} flex items-center justify-center text-white text-xs font-bold`}>
+                    {t.initials}
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-white">{t.name}</div>
+                    <div className="text-xs text-[#71717a]">{t.role}</div>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>

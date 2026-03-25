@@ -8,6 +8,7 @@ import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, LogOut, Settings, User } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
+import { NotificationCenter } from '@/components/ui/NotificationCenter';
 
 const NAV_LINKS = [
   { href: '/dashboard/agents',  label: 'My Agents' },
@@ -19,6 +20,7 @@ const NAV_LINKS = [
   { href: '/pricing',           label: 'Pricing' },
   { href: '/token',             label: 'Our Token' },
   { href: '/support',           label: 'Support' },
+  { href: '/blog',              label: 'Blog' },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -155,6 +157,8 @@ export function Header() {
             {authLoading ? (
               <div className="h-9 w-24 rounded-lg bg-white/[0.04] animate-pulse" />
             ) : isAuthenticated && user ? (
+              <>
+              <NotificationCenter />
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setDropdownOpen((o) => !o)}
@@ -199,6 +203,7 @@ export function Header() {
                   </div>
                 )}
               </div>
+              </>
             ) : (
               <div className="flex items-center gap-2">
                 <Link

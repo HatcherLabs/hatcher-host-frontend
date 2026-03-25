@@ -160,10 +160,10 @@ async function req<T>(
 // ─── API methods ─────────────────────────────────────────────
 export const api = {
   /** Register a new account */
-  register: (email: string, username: string, password: string) =>
+  register: (email: string, username: string, password: string, referralCode?: string) =>
     req<{ token: string; expiresIn: string; user: { id: string; email: string; username: string } }>('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ email, username, password }),
+      body: JSON.stringify({ email, username, password, ...(referralCode ? { referralCode } : {}) }),
     }),
 
   /** Login with email + password */
@@ -200,6 +200,27 @@ export const api = {
   /** Get recent notifications/activity */
   getNotifications: () => req<Array<{id: string; type: string; message: string; timestamp: string}>>('/auth/notifications'),
 
+  /** Get referral code + share link */
+  getReferralCode: () =>
+    req<{ referralCode: string; shareLink: string; username: string }>('/referrals/my-code'),
+
+  /** Get referral stats */
+  getReferralStats: () =>
+    req<{
+      totalReferred: number;
+      totalEarned: number;
+      rewardPerReferral: number;
+      referrals: Array<{ username: string; date: string; rewardClaimed: boolean }>;
+    }>('/referrals/stats'),
+
+  /** Claim pending referral rewards */
+  claimReferralRewards: () =>
+    req<{ claimed: number; totalCredited: number; message: string }>('/referrals/claim', { method: 'POST' }),
+
+  /** Validate a referral code (public) */
+  validateReferralCode: (code: string) =>
+    req<{ valid: boolean; referrerUsername?: string }>(`/referrals/validate/${code}`),
+
   /** List the current user's agents */
   getMyAgents: () => req<Agent[]>('/agents'),
 
@@ -214,6 +235,23 @@ export const api = {
 
   /** Get a single agent */
   getAgent: (id: string) => req<Agent>(`/agents/${id}`),
+
+  /** Get public stats for an agent (no auth required) */
+  getAgentPublicStats: (id: string) =>
+    req<{
+      name: string;
+      description: string | null;
+      framework: string;
+      template: string | null;
+      ownerUsername: string | null;
+      messagesProcessed: number;
+      daysActive: number;
+      uptimePercent: number;
+      status: string;
+      featureCount: number;
+      createdAt: string;
+      lastActiveAt: string;
+    }>(`/agents/${id}/public-stats`),
 
   /** Create a new agent */
   createAgent: (data: {
@@ -471,6 +509,26 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify({ status }),
     }),
+
+  /** Admin: get system health */
+  adminGetHealth: () =>
+    req<{
+      api: { status: string; uptime: number; memory: { used: number; total: number } };
+      database: { status: string; connectionCount: number };
+      redis: { status: string; usedMemory: string; connectedClients: number };
+      docker: { status: string; containersRunning: number; containersTotal: number };
+      services: Array<{ name: string; status: string; uptime: string; restarts: number }>;
+      disk: { used: string; total: string; percent: number };
+      backup: { lastBackup: string | null; lastSize: string | null };
+    }>('/admin/health'),
+
+  /** Admin: trigger backup now */
+  adminRunBackup: () =>
+    req<{ message: string }>('/admin/backup', { method: 'POST' }),
+
+  /** Admin: list backup files */
+  adminGetBackups: () =>
+    req<{ backups: Array<{ filename: string; size: string; date: string }> }>('/admin/backups'),
 
   /** Run a research task for an agent */
   research: (agentId: string, query: string) =>

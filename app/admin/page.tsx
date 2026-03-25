@@ -26,6 +26,13 @@ import {
   Clock,
   CheckCircle2,
   ExternalLink,
+  HeartPulse,
+  Database,
+  HardDrive,
+  Server,
+  Container,
+  Download,
+  Play,
 } from 'lucide-react';
 
 
@@ -161,13 +168,27 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'agents' | 'users' | 'tickets'>('agents');
+  const [activeTab, setActiveTab] = useState<'agents' | 'users' | 'tickets' | 'health'>('agents');
   const [ticketFilter, setTicketFilter] = useState<'all' | 'open' | 'in_progress' | 'resolved'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
   // Action in-progress tracking
   const [actionInProgress, setActionInProgress] = useState<Record<string, string>>({});
+
+  // Health monitoring state
+  const [health, setHealth] = useState<{
+    api: { status: string; uptime: number; memory: { used: number; total: number } };
+    database: { status: string; connectionCount: number };
+    redis: { status: string; usedMemory: string; connectedClients: number };
+    docker: { status: string; containersRunning: number; containersTotal: number };
+    services: Array<{ name: string; status: string; uptime: string; restarts: number }>;
+    disk: { used: string; total: string; percent: number };
+    backup: { lastBackup: string | null; lastSize: string | null };
+  } | null>(null);
+  const [healthLoading, setHealthLoading] = useState(false);
+  const [backupRunning, setBackupRunning] = useState(false);
+  const [backups, setBackups] = useState<Array<{ filename: string; size: string; date: string }>>([]);
 
   const isAdmin = user?.isAdmin ?? false;
 
@@ -197,6 +218,40 @@ export default function AdminPage() {
         setError('Failed to load admin data');
       });
   }, [isAuthenticated, isAdmin]);
+
+  // ── Fetch health data when Health tab is active ────────────
+  useEffect(() => {
+    if (!isAuthenticated || !isAdmin || activeTab !== 'health') return;
+
+    async function fetchHealth() {
+      setHealthLoading(true);
+      const [healthRes, backupsRes] = await Promise.all([api.adminGetHealth(), api.adminGetBackups()]);
+      if (healthRes.success) setHealth(healthRes.data);
+      if (backupsRes.success) setBackups(backupsRes.data.backups);
+      setHealthLoading(false);
+    }
+
+    fetchHealth();
+    const interval = setInterval(fetchHealth, 30000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated, isAdmin, activeTab]);
+
+  // ── Backup handler ──────────────────────────────────────────
+  async function handleRunBackup() {
+    if (!confirm('Run a database backup now?')) return;
+    setBackupRunning(true);
+    const res = await api.adminRunBackup();
+    setBackupRunning(false);
+    if (res.success) {
+      alert('Backup completed successfully!');
+      // Refresh health + backups
+      const [healthRes, backupsRes] = await Promise.all([api.adminGetHealth(), api.adminGetBackups()]);
+      if (healthRes.success) setHealth(healthRes.data);
+      if (backupsRes.success) setBackups(backupsRes.data.backups);
+    } else {
+      alert(`Backup failed: ${(res as any).error ?? 'Unknown error'}`);
+    }
+  }
 
   // ── Filtered agents ────────────────────────────────────────
   const filteredAgents = useMemo(() => {
@@ -477,7 +532,7 @@ export default function AdminPage() {
           {/* Tab switcher */}
           <div className="flex items-center gap-4 mb-5">
             <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)]">
-              {(['agents', 'users', 'tickets'] as const).map((tab) => (
+              {(['agents', 'users', 'tickets', 'health'] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -487,8 +542,8 @@ export default function AdminPage() {
                       : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                   }`}
                 >
-                  {tab === 'agents' ? <Bot size={14} /> : tab === 'users' ? <Users size={14} /> : <Ticket size={14} />}
-                  {tab === 'agents' ? 'Agents' : tab === 'users' ? 'Users' : `Tickets${tickets.length ? ` (${tickets.length})` : ''}`}
+                  {tab === 'agents' ? <Bot size={14} /> : tab === 'users' ? <Users size={14} /> : tab === 'tickets' ? <Ticket size={14} /> : <HeartPulse size={14} />}
+                  {tab === 'agents' ? 'Agents' : tab === 'users' ? 'Users' : tab === 'tickets' ? `Tickets${tickets.length ? ` (${tickets.length})` : ''}` : 'Health'}
                 </button>
               ))}
             </div>
@@ -859,6 +914,275 @@ export default function AdminPage() {
                   </div>
                 )}
               </>
+            );
+          })()}
+
+          {/* ── Health Tab ──────────────────────────────────── */}
+          {activeTab === 'health' && (() => {
+            const statusDot = (status: string) => (
+              <span className={`w-2.5 h-2.5 rounded-full inline-block ${status === 'healthy' || status === 'online' ? 'bg-green-400' : 'bg-red-400'}`} />
+            );
+
+            if (healthLoading && !health) {
+              return (
+                <div className="flex flex-col items-center justify-center py-16">
+                  <RefreshCw size={24} className="text-[var(--text-muted)] animate-spin mb-3" />
+                  <p className="text-sm text-[var(--text-muted)]">Loading health data...</p>
+                </div>
+              );
+            }
+
+            if (!health) {
+              return (
+                <div className="flex flex-col items-center justify-center py-16">
+                  <HeartPulse size={40} className="text-[var(--text-muted)] mb-3 opacity-40" />
+                  <p className="text-sm text-[var(--text-muted)]">No health data available.</p>
+                </div>
+              );
+            }
+
+            return (
+              <div className="space-y-6">
+                {/* Auto-refresh indicator */}
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-[var(--text-primary)]">System Health</h2>
+                  <span className="text-[10px] text-[var(--text-muted)] flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                    Auto-refreshing every 30s
+                  </span>
+                </div>
+
+                {/* Service status cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* API */}
+                  <div className="rounded-xl border border-[var(--border-default)] p-4 bg-[var(--bg-elevated)]">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Server size={16} className="text-[#06b6d4]" />
+                        <span className="text-sm font-semibold text-[var(--text-primary)]">API</span>
+                      </div>
+                      {statusDot(health.api.status)}
+                    </div>
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-[var(--text-muted)]">Uptime</span>
+                        <span className="text-[var(--text-secondary)]">{Math.floor(health.api.uptime / 3600)}h {Math.floor((health.api.uptime % 3600) / 60)}m</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-[var(--text-muted)]">Memory</span>
+                        <span className="text-[var(--text-secondary)]">{health.api.memory.used}MB / {health.api.memory.total}MB</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Database */}
+                  <div className="rounded-xl border border-[var(--border-default)] p-4 bg-[var(--bg-elevated)]">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Database size={16} className="text-[#60A5FA]" />
+                        <span className="text-sm font-semibold text-[var(--text-primary)]">Database</span>
+                      </div>
+                      {statusDot(health.database.status)}
+                    </div>
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-[var(--text-muted)]">Connections</span>
+                        <span className="text-[var(--text-secondary)]">{health.database.connectionCount}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Redis */}
+                  <div className="rounded-xl border border-[var(--border-default)] p-4 bg-[var(--bg-elevated)]">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Zap size={16} className="text-[#FBBF24]" />
+                        <span className="text-sm font-semibold text-[var(--text-primary)]">Redis</span>
+                      </div>
+                      {statusDot(health.redis.status)}
+                    </div>
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-[var(--text-muted)]">Memory</span>
+                        <span className="text-[var(--text-secondary)]">{health.redis.usedMemory}</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-[var(--text-muted)]">Clients</span>
+                        <span className="text-[var(--text-secondary)]">{health.redis.connectedClients}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Docker */}
+                  <div className="rounded-xl border border-[var(--border-default)] p-4 bg-[var(--bg-elevated)]">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Layers size={16} className="text-[#4ADE80]" />
+                        <span className="text-sm font-semibold text-[var(--text-primary)]">Docker</span>
+                      </div>
+                      {statusDot(health.docker.status)}
+                    </div>
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-[var(--text-muted)]">Running</span>
+                        <span className="text-[var(--text-secondary)]">{health.docker.containersRunning}</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-[var(--text-muted)]">Total</span>
+                        <span className="text-[var(--text-secondary)]">{health.docker.containersTotal}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Disk usage bar */}
+                <div className="rounded-xl border border-[var(--border-default)] p-4 bg-[var(--bg-elevated)]">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <HardDrive size={16} className="text-[var(--text-muted)]" />
+                      <span className="text-sm font-semibold text-[var(--text-primary)]">Disk Usage</span>
+                    </div>
+                    <span className="text-xs text-[var(--text-secondary)]">{health.disk.used} / {health.disk.total}</span>
+                  </div>
+                  <div className="w-full h-3 rounded-full bg-[rgba(46,43,74,0.4)] overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        health.disk.percent > 90 ? 'bg-red-500' : health.disk.percent > 70 ? 'bg-amber-500' : 'bg-[#06b6d4]'
+                      }`}
+                      style={{ width: `${health.disk.percent}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] text-[var(--text-muted)] mt-1.5 block">{health.disk.percent}% used</span>
+                </div>
+
+                {/* Memory bar */}
+                <div className="rounded-xl border border-[var(--border-default)] p-4 bg-[var(--bg-elevated)]">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Activity size={16} className="text-[var(--text-muted)]" />
+                      <span className="text-sm font-semibold text-[var(--text-primary)]">API Memory</span>
+                    </div>
+                    <span className="text-xs text-[var(--text-secondary)]">{health.api.memory.used}MB / {health.api.memory.total}MB</span>
+                  </div>
+                  <div className="w-full h-3 rounded-full bg-[rgba(46,43,74,0.4)] overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-[#60A5FA] transition-all duration-500"
+                      style={{ width: `${health.api.memory.total ? Math.round((health.api.memory.used / health.api.memory.total) * 100) : 0}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] text-[var(--text-muted)] mt-1.5 block">
+                    {health.api.memory.total ? Math.round((health.api.memory.used / health.api.memory.total) * 100) : 0}% used
+                  </span>
+                </div>
+
+                {/* PM2 Process List */}
+                <div className="rounded-xl border border-[var(--border-default)] p-4 bg-[var(--bg-elevated)]">
+                  <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                    <Server size={16} className="text-[var(--text-muted)]" />
+                    PM2 Processes
+                  </h3>
+                  {health.services.length === 0 ? (
+                    <p className="text-xs text-[var(--text-muted)]">No PM2 processes found.</p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left">
+                        <thead>
+                          <tr className="border-b border-[var(--border-default)]">
+                            {['Process', 'Status', 'Uptime', 'Restarts'].map(h => (
+                              <th key={h} className="pb-2 pr-4 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {health.services.map((svc) => (
+                            <tr key={svc.name} className="border-b border-[var(--border-default)] last:border-b-0">
+                              <td className="py-2.5 pr-4">
+                                <span className="text-xs font-medium text-[var(--text-primary)]">{svc.name}</span>
+                              </td>
+                              <td className="py-2.5 pr-4">
+                                <span className="flex items-center gap-1.5">
+                                  {statusDot(svc.status)}
+                                  <span className={`text-xs font-medium capitalize ${svc.status === 'online' ? 'text-green-400' : 'text-red-400'}`}>{svc.status}</span>
+                                </span>
+                              </td>
+                              <td className="py-2.5 pr-4">
+                                <span className="text-xs text-[var(--text-secondary)]">{svc.uptime}</span>
+                              </td>
+                              <td className="py-2.5 pr-4">
+                                <span className={`text-xs font-mono ${svc.restarts > 0 ? 'text-amber-400' : 'text-[var(--text-muted)]'}`}>{svc.restarts}</span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* Backup Section */}
+                <div className="rounded-xl border border-[var(--border-default)] p-4 bg-[var(--bg-elevated)]">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)] flex items-center gap-2">
+                      <Database size={16} className="text-[var(--text-muted)]" />
+                      Database Backups
+                    </h3>
+                    <button
+                      onClick={handleRunBackup}
+                      disabled={backupRunning}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#06b6d4]/10 text-[#06b6d4] border border-[#06b6d4]/20 hover:bg-[#06b6d4]/20 transition-colors disabled:opacity-40"
+                    >
+                      {backupRunning ? <RefreshCw size={12} className="animate-spin" /> : <Play size={12} />}
+                      {backupRunning ? 'Running...' : 'Run Backup Now'}
+                    </button>
+                  </div>
+
+                  {health.backup.lastBackup && (
+                    <div className="flex items-center gap-4 mb-3 text-xs text-[var(--text-secondary)]">
+                      <span className="flex items-center gap-1.5">
+                        <Clock size={12} className="text-[var(--text-muted)]" />
+                        Last: {health.backup.lastBackup}
+                      </span>
+                      {health.backup.lastSize && (
+                        <span className="flex items-center gap-1.5">
+                          <HardDrive size={12} className="text-[var(--text-muted)]" />
+                          Size: {health.backup.lastSize}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {backups.length === 0 ? (
+                    <p className="text-xs text-[var(--text-muted)]">No backups found. Run your first backup above.</p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left">
+                        <thead>
+                          <tr className="border-b border-[var(--border-default)]">
+                            {['Filename', 'Size', 'Date'].map(h => (
+                              <th key={h} className="pb-2 pr-4 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {backups.map((b) => (
+                            <tr key={b.filename} className="border-b border-[var(--border-default)] last:border-b-0">
+                              <td className="py-2 pr-4">
+                                <span className="text-xs font-mono text-[var(--text-primary)]">{b.filename}</span>
+                              </td>
+                              <td className="py-2 pr-4">
+                                <span className="text-xs text-[var(--text-secondary)]">{b.size}</span>
+                              </td>
+                              <td className="py-2 pr-4">
+                                <span className="text-xs text-[var(--text-muted)]">{b.date}</span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </div>
             );
           })()}
         </motion.div>

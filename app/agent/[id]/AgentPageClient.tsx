@@ -21,6 +21,10 @@ import {
   Layers,
   Calendar,
   Cpu,
+  Activity,
+  Clock,
+  BarChart3,
+  Rocket,
 } from 'lucide-react';
 
 
@@ -51,6 +55,14 @@ export function AgentPageClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [publicStats, setPublicStats] = useState<{
+    messagesProcessed: number;
+    daysActive: number;
+    uptimePercent: number;
+    template: string | null;
+    createdAt: string;
+    lastActiveAt: string;
+  } | null>(null);
   const { isAuthenticated: authed, user: authUser } = useAuth();
   const wallet = useWallet();
 
@@ -63,6 +75,11 @@ export function AgentPageClient() {
       setLoading(false);
       setError('Network error — is the API running?');
     });
+
+    // Fetch public stats (no auth needed)
+    api.getAgentPublicStats(id).then((res) => {
+      if (res.success) setPublicStats(res.data);
+    }).catch(() => {/* ignore */});
   }, [id]);
 
   const handleShare = useCallback(() => {
@@ -284,40 +301,95 @@ export function AgentPageClient() {
           </div>
         </motion.div>
       ) : (
-        <motion.div className={`${cardClass} p-6`} variants={itemVariants}>
-          <h2 className="text-lg font-semibold mb-4 text-[var(--text-primary)]">Agent Stats</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
-              <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Status</div>
-              <span className={`inline-flex items-center gap-1.5 text-sm font-semibold ${statusStyle.text}`}>
-                <span className={`w-2 h-2 rounded-full ${statusStyle.dot} ${statusStyle.pulse ? 'animate-pulse' : ''}`} />
-                {statusStyle.label}
-              </span>
+        <>
+          {/* Analytics Section */}
+          <motion.div className={`${cardClass} p-6 mb-6`} variants={itemVariants}>
+            <h2 className="text-lg font-semibold mb-4 text-[var(--text-primary)] flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-[#06b6d4]" />
+              Agent Analytics
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {/* Messages Processed — big stat */}
+              <div className="rounded-xl bg-[var(--bg-elevated)] p-5 text-center col-span-2 sm:col-span-1">
+                <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-2 flex items-center justify-center gap-1">
+                  <MessageSquare className="w-3 h-3" />
+                  Messages
+                </div>
+                <div className="text-3xl font-bold text-[#06b6d4]">
+                  {publicStats ? publicStats.messagesProcessed.toLocaleString() : ((agent as any).messageCount ?? 0).toLocaleString()}
+                </div>
+              </div>
+
+              {/* Days Active */}
+              <div className="rounded-xl bg-[var(--bg-elevated)] p-5 text-center">
+                <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-2 flex items-center justify-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  Days Active
+                </div>
+                <div className="text-3xl font-bold text-white">
+                  {publicStats?.daysActive ?? Math.max(1, Math.floor((Date.now() - new Date(agent.createdAt).getTime()) / (1000 * 60 * 60 * 24)))}
+                </div>
+              </div>
+
+              {/* Uptime */}
+              <div className="rounded-xl bg-[var(--bg-elevated)] p-5 text-center">
+                <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-2 flex items-center justify-center gap-1">
+                  <Activity className="w-3 h-3" />
+                  Uptime
+                </div>
+                <div className="text-3xl font-bold text-emerald-400">
+                  {publicStats ? `${publicStats.uptimePercent}%` : '--'}
+                </div>
+              </div>
+
+              {/* Status */}
+              <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
+                <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Status</div>
+                <span className={`inline-flex items-center gap-1.5 text-sm font-semibold ${statusStyle.text}`}>
+                  <span className={`w-2 h-2 rounded-full ${statusStyle.dot} ${statusStyle.pulse ? 'animate-pulse' : ''}`} />
+                  {statusStyle.label}
+                </span>
+              </div>
+
+              {/* Framework */}
+              <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
+                <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Framework</div>
+                <div className="text-sm font-semibold text-[var(--text-primary)]">{frameworkMeta?.name ?? agent.framework}</div>
+              </div>
+
+              {/* Created */}
+              <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
+                <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Created</div>
+                <div className="text-sm font-semibold text-[var(--text-primary)]">{timeAgo(agent.createdAt)}</div>
+              </div>
             </div>
-            <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
-              <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Framework</div>
-              <div className="text-sm font-semibold text-[var(--text-primary)]">{frameworkMeta?.name ?? agent.framework}</div>
+          </motion.div>
+
+          {/* Deploy CTA */}
+          <motion.div className={`${cardClass} p-6`} variants={itemVariants}>
+            <div className="text-center">
+              <Rocket className="w-8 h-8 text-purple-400 mx-auto mb-3" />
+              <h2 className="text-lg font-semibold mb-2 text-[var(--text-primary)]">
+                Deploy a similar agent
+              </h2>
+              <p className="text-sm mb-5 text-[var(--text-muted)]">
+                Create your own {frameworkMeta?.name ?? agent.framework} agent on Hatcher. Free to start, deploy in 60 seconds.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link
+                  href={`/create${publicStats?.template ? `?template=${publicStats.template}&framework=${agent.framework}` : `?framework=${agent.framework}`}`}
+                  className="btn-primary inline-flex items-center gap-2 justify-center"
+                >
+                  <Rocket className="w-4 h-4" />
+                  Deploy Similar Agent
+                </Link>
+                <Link href="/explore" className="btn-secondary inline-flex items-center gap-2 justify-center">
+                  Browse More Agents
+                </Link>
+              </div>
             </div>
-            <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
-              <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Features</div>
-              <div className="text-sm font-semibold text-[var(--text-primary)]">{featureCount} active</div>
-            </div>
-            <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
-              <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Created</div>
-              <div className="text-sm font-semibold text-[var(--text-primary)]">{timeAgo(agent.createdAt)}</div>
-            </div>
-            <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center col-span-2 sm:col-span-2">
-              <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Owner</div>
-              <div className="text-sm font-semibold text-[var(--text-primary)]">{ownerDisplay}</div>
-            </div>
-          </div>
-          <div className="mt-5 pt-4 border-t border-[var(--border-default)] text-center">
-            <p className="text-xs text-[var(--text-muted)]">
-              Powered by Hatcher — deploy your own AI agent at{' '}
-              <Link href="/create" className="text-[#06b6d4] hover:underline">hatcher.host/create</Link>
-            </p>
-          </div>
-        </motion.div>
+          </motion.div>
+        </>
       )}
     </motion.div>
   );
