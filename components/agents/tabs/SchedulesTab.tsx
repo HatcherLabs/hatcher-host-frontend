@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
   Trash2,
@@ -11,6 +11,10 @@ import {
   Loader2,
   AlertTriangle,
   ChevronDown,
+  FileText,
+  CheckCircle,
+  XCircle,
+  X,
 } from 'lucide-react';
 import {
   useAgentContext,
@@ -29,6 +33,14 @@ interface ScheduleJob {
   status: 'active' | 'paused';
   nextRun?: string;
   lastRun?: string;
+  runCount?: number;
+}
+
+interface LogEntry {
+  timestamp: string;
+  success: boolean;
+  response?: string;
+  error?: string;
 }
 
 // ─── Cron Presets ────────────────────────────────────────────
@@ -58,9 +70,81 @@ function cronToHuman(cron: string): string {
   if (min === '0' && hour !== '*' && dom === '*' && mon === '*' && dow === '*') return `Daily at ${hour}:00`;
   if (min !== '*' && hour !== '*' && dom === '*' && mon === '*' && dow !== '*') {
     const days: Record<string, string> = { '0': 'Sun', '1': 'Mon', '2': 'Tue', '3': 'Wed', '4': 'Thu', '5': 'Fri', '6': 'Sat' };
-    return `${days[dow] ?? `Day ${dow}`} at ${hour}:${min.padStart(2, '0')}`;
+    return `${days[dow!] ?? `Day ${dow}`} at ${hour}:${min!.padStart(2, '0')}`;
   }
   return cron;
+}
+
+// ─── Log Viewer ──────────────────────────────────────────────
+
+function LogViewer({ agentId, jobId, onClose }: { agentId: string; jobId: string; onClose: () => void }) {
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api.getAgentScheduleLogs(agentId, jobId);
+        if (res.success && res.data?.logs) {
+          setLogs(res.data.logs);
+        }
+      } catch { /* ignore */ }
+      setLoading(false);
+    })();
+  }, [agentId, jobId]);
+
+  return (
+    <GlassCard>
+      <div className="flex items-center justify-between mb-3">
+        <h4 className="text-sm font-medium text-white">Execution Logs</h4>
+        <button onClick={onClose} className="p-1 text-[#71717a] hover:text-white transition-colors">
+          <X size={14} />
+        </button>
+      </div>
+
+      {loading && (
+        <div className="flex items-center justify-center py-6">
+          <Loader2 size={16} className="animate-spin text-[#71717a]" />
+        </div>
+      )}
+
+      {!loading && logs.length === 0 && (
+        <p className="text-xs text-[#52525b] text-center py-4">No execution logs yet.</p>
+      )}
+
+      {!loading && logs.length > 0 && (
+        <div className="space-y-2 max-h-60 overflow-y-auto">
+          {logs.map((log, i) => (
+            <div
+              key={i}
+              className={`px-3 py-2 rounded-lg text-xs border ${
+                log.success
+                  ? 'bg-emerald-500/5 border-emerald-500/10'
+                  : 'bg-red-500/5 border-red-500/10'
+              }`}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                {log.success ? (
+                  <CheckCircle size={12} className="text-emerald-400" />
+                ) : (
+                  <XCircle size={12} className="text-red-400" />
+                )}
+                <span className="text-[#71717a]">
+                  {new Date(log.timestamp).toLocaleString()}
+                </span>
+              </div>
+              {log.response && (
+                <p className="text-[#a1a1aa] line-clamp-3 mt-1">{log.response}</p>
+              )}
+              {log.error && (
+                <p className="text-red-400 mt-1">{log.error}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </GlassCard>
+  );
 }
 
 // ─── Component ───────────────────────────────────────────────
@@ -74,6 +158,7 @@ export function SchedulesTab() {
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [viewingLogs, setViewingLogs] = useState<string | null>(null);
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -87,13 +172,12 @@ export function SchedulesTab() {
   const effectiveCron = isCustom ? formCustomCron : formPreset;
 
   const loadSchedules = useCallback(async () => {
-    if (!agentId || agent?.framework !== 'hermes') return;
+    if (!agentId) return;
     setLoading(true);
     setError(null);
     try {
       const res = await api.getAgentSchedules(agentId);
       if (res.success) {
-        // The container returns an array of jobs (or an object with jobs array)
         const data = res.data as ScheduleJob[] | { jobs: ScheduleJob[] };
         const jobList = Array.isArray(data) ? data : (data?.jobs ?? []);
         setJobs(jobList);
@@ -178,22 +262,6 @@ export function SchedulesTab() {
     } catch { /* ignore */ }
     setActionLoading(null);
   };
-
-  // Unsupported framework
-  if (agent && agent.framework !== 'hermes') {
-    return (
-      <motion.div key="schedules" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit">
-        <GlassCard>
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <AlertTriangle size={32} className="text-[#71717a] mb-3" />
-            <p className="text-sm text-[#a1a1aa]">
-              Scheduled tasks are not available for {agent.framework} agents.
-            </p>
-          </div>
-        </GlassCard>
-      </motion.div>
-    );
-  }
 
   return (
     <motion.div key="schedules" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit" className="space-y-4">
@@ -365,62 +433,97 @@ export function SchedulesTab() {
       {!loading && !error && jobs.length > 0 && (
         <div className="space-y-2">
           {jobs.map(job => (
-            <GlassCard key={job.id}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-sm font-medium text-white truncate">{job.name}</h4>
-                    <span className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded-full ${
-                      job.status === 'active'
-                        ? 'bg-emerald-500/10 text-emerald-400'
-                        : 'bg-yellow-500/10 text-yellow-400'
-                    }`}>
-                      {job.status}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3 mt-1">
-                    <span className="text-xs text-[#71717a] font-mono">{job.schedule}</span>
-                    <span className="text-[10px] text-[#52525b]">{cronToHuman(job.schedule)}</span>
-                  </div>
-                  <p className="text-xs text-[#a1a1aa] mt-1.5 line-clamp-2">{job.prompt}</p>
-                  {job.nextRun && (
-                    <p className="text-[10px] text-[#52525b] mt-1">Next run: {new Date(job.nextRun).toLocaleString()}</p>
-                  )}
-                </div>
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  {actionLoading === job.id ? (
-                    <Loader2 size={14} className="animate-spin text-[#71717a]" />
-                  ) : (
-                    <>
-                      {job.status === 'active' ? (
-                        <button
-                          onClick={() => handlePause(job.id)}
-                          title="Pause"
-                          className="p-1.5 rounded-md text-[#71717a] hover:text-yellow-400 hover:bg-white/[0.04] transition-colors"
-                        >
-                          <Pause size={14} />
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleResume(job.id)}
-                          title="Resume"
-                          className="p-1.5 rounded-md text-[#71717a] hover:text-emerald-400 hover:bg-white/[0.04] transition-colors"
-                        >
-                          <Play size={14} />
-                        </button>
+            <div key={job.id} className="space-y-2">
+              <GlassCard>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-sm font-medium text-white truncate">{job.name}</h4>
+                      <span className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded-full ${
+                        job.status === 'active'
+                          ? 'bg-emerald-500/10 text-emerald-400'
+                          : 'bg-yellow-500/10 text-yellow-400'
+                      }`}>
+                        {job.status}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="text-xs text-[#71717a] font-mono">{job.schedule}</span>
+                      <span className="text-[10px] text-[#52525b]">{cronToHuman(job.schedule)}</span>
+                    </div>
+                    <p className="text-xs text-[#a1a1aa] mt-1.5 line-clamp-2">{job.prompt}</p>
+                    <div className="flex items-center gap-4 mt-1">
+                      {job.nextRun && (
+                        <p className="text-[10px] text-[#52525b]">Next: {new Date(job.nextRun).toLocaleString()}</p>
                       )}
-                      <button
-                        onClick={() => handleDelete(job.id)}
-                        title="Delete"
-                        className="p-1.5 rounded-md text-[#71717a] hover:text-red-400 hover:bg-white/[0.04] transition-colors"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </>
-                  )}
+                      {job.lastRun && (
+                        <p className="text-[10px] text-[#52525b]">Last: {new Date(job.lastRun).toLocaleString()}</p>
+                      )}
+                      {(job.runCount ?? 0) > 0 && (
+                        <p className="text-[10px] text-[#52525b]">Runs: {job.runCount}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    {actionLoading === job.id ? (
+                      <Loader2 size={14} className="animate-spin text-[#71717a]" />
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => setViewingLogs(viewingLogs === job.id ? null : job.id)}
+                          title="View logs"
+                          className={`p-1.5 rounded-md transition-colors ${
+                            viewingLogs === job.id
+                              ? 'text-[#06b6d4] bg-[#06b6d4]/10'
+                              : 'text-[#71717a] hover:text-[#06b6d4] hover:bg-white/[0.04]'
+                          }`}
+                        >
+                          <FileText size={14} />
+                        </button>
+                        {job.status === 'active' ? (
+                          <button
+                            onClick={() => handlePause(job.id)}
+                            title="Pause"
+                            className="p-1.5 rounded-md text-[#71717a] hover:text-yellow-400 hover:bg-white/[0.04] transition-colors"
+                          >
+                            <Pause size={14} />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleResume(job.id)}
+                            title="Resume"
+                            className="p-1.5 rounded-md text-[#71717a] hover:text-emerald-400 hover:bg-white/[0.04] transition-colors"
+                          >
+                            <Play size={14} />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDelete(job.id)}
+                          title="Delete"
+                          className="p-1.5 rounded-md text-[#71717a] hover:text-red-400 hover:bg-white/[0.04] transition-colors"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </GlassCard>
+              </GlassCard>
+
+              {/* Logs viewer (inline below job card) */}
+              <AnimatePresence>
+                {viewingLogs === job.id && agentId && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <LogViewer agentId={agentId} jobId={job.id} onClose={() => setViewingLogs(null)} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           ))}
         </div>
       )}

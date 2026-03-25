@@ -186,6 +186,8 @@ export function SkillsTab() {
     loadSkills();
   }, [loadSkills]);
 
+  const [restarting, setRestarting] = useState(false);
+
   const handleToggle = useCallback(async (skillId: string, enabled: boolean) => {
     if (!agent) return;
     setToggling(skillId);
@@ -195,9 +197,26 @@ export function SkillsTab() {
       setSkills(prev =>
         prev.map(s => (s.id === skillId ? { ...s, enabled } : s))
       );
-      setRestartHint(true);
+
+      // Auto-restart if agent container is running
+      if (agent.status === 'active') {
+        setRestarting(true);
+        setRestartHint(false);
+        try {
+          await api.restartAgent(agent.id);
+          // Wait for container to come back up, then reload skills
+          await new Promise(r => setTimeout(r, 10_000));
+          await loadSkills();
+        } catch {
+          setRestartHint(true);
+        } finally {
+          setRestarting(false);
+        }
+      } else {
+        setRestartHint(true);
+      }
     }
-  }, [agent]);
+  }, [agent, loadSkills]);
 
   // Extract unique categories
   const categories = useMemo(() => {
@@ -263,12 +282,22 @@ export function SkillsTab() {
         </button>
       </div>
 
-      {/* Restart hint */}
-      {restartHint && (
+      {/* Restarting indicator */}
+      {restarting && (
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#06b6d4]/10 border border-[#06b6d4]/20">
+          <Loader2 size={14} className="text-[#06b6d4] flex-shrink-0 animate-spin" />
+          <p className="text-xs text-[#06b6d4]">
+            Restarting agent to apply skill changes...
+          </p>
+        </div>
+      )}
+
+      {/* Restart hint (only when agent is not running) */}
+      {restartHint && !restarting && (
         <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#06b6d4]/10 border border-[#06b6d4]/20">
           <AlertTriangle size={14} className="text-[#06b6d4] flex-shrink-0" />
           <p className="text-xs text-[#06b6d4]">
-            Restart the agent for skill changes to take effect.
+            Start the agent for skill changes to take effect.
           </p>
           <button
             onClick={() => setRestartHint(false)}

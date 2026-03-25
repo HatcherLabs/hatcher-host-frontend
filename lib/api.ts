@@ -780,6 +780,10 @@ export const api = {
       method: 'POST',
     }),
 
+  /** Get execution logs for a scheduled task */
+  getAgentScheduleLogs: (agentId: string, jobId: string) =>
+    req<{ logs: Array<{ timestamp: string; success: boolean; response?: string; error?: string }> }>(`/agents/${agentId}/schedules/${jobId}/logs`),
+
   // ─── Knowledge Base ──────────────────────────────────────────
 
   /** List knowledge files for an agent */
