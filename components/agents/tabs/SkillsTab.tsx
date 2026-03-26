@@ -12,6 +12,12 @@ import {
   Zap,
   ChevronDown,
   ChevronRight,
+  ShoppingBag,
+  Download,
+  Check,
+  Trash2,
+  Package,
+  Store,
 } from 'lucide-react';
 import {
   useAgentContext,
@@ -358,6 +364,61 @@ const POPULAR_SKILL_IDS = SKILL_CATEGORIES.flatMap(c =>
   c.skills.filter(s => s.popular).map(s => s.id)
 );
 
+// ─── Marketplace Catalog ────────────────────────────────────
+
+interface MarketplaceItem {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+}
+
+const ELIZAOS_MARKETPLACE: MarketplaceItem[] = [
+  { id: '@elizaos/plugin-image', name: 'Image Generation', description: 'Generate images with DALL-E, Stable Diffusion, etc.', category: 'Creative' },
+  { id: '@elizaos/plugin-video', name: 'Video Generation', description: 'Generate and process videos', category: 'Creative' },
+  { id: '@elizaos/plugin-tts', name: 'Text to Speech', description: 'Convert text to natural speech', category: 'Voice' },
+  { id: '@elizaos/plugin-twitter', name: 'Twitter/X', description: 'Post, reply, and engage on X/Twitter', category: 'Social' },
+  { id: '@elizaos/plugin-discord', name: 'Discord', description: 'Discord bot integration', category: 'Social' },
+  { id: '@elizaos/plugin-telegram', name: 'Telegram', description: 'Telegram bot integration', category: 'Social' },
+  { id: '@elizaos/plugin-solana', name: 'Solana', description: 'Solana blockchain interactions, token transfers', category: 'Crypto' },
+  { id: '@elizaos/plugin-evm', name: 'EVM Chains', description: 'Ethereum, Polygon, Arbitrum, Base interactions', category: 'Crypto' },
+  { id: '@elizaos/plugin-coinbase', name: 'Coinbase', description: 'Coinbase trading and wallet integration', category: 'Crypto' },
+  { id: '@elizaos/plugin-farcaster', name: 'Farcaster', description: 'Farcaster social protocol integration', category: 'Social' },
+  { id: '@elizaos/plugin-slack', name: 'Slack', description: 'Slack workspace integration', category: 'Social' },
+  { id: '@elizaos/plugin-github', name: 'GitHub', description: 'GitHub repo management and automation', category: 'Dev' },
+  { id: '@elizaos/plugin-pdf', name: 'PDF Reader', description: 'Read and extract content from PDF files', category: 'Files' },
+  { id: '@elizaos/plugin-whatsapp', name: 'WhatsApp', description: 'WhatsApp messaging integration', category: 'Social' },
+];
+
+const OPENCLAW_MARKETPLACE: MarketplaceItem[] = [
+  { id: 'web-search', name: 'Web Search', description: 'Search the internet with Brave, Google, or DuckDuckGo', category: 'Web' },
+  { id: 'github-pr', name: 'GitHub PR Assistant', description: 'Review PRs, manage issues, and automate workflows', category: 'Dev' },
+  { id: 'docker-manager', name: 'Docker Manager', description: 'Monitor containers, auto-restart failing services', category: 'DevOps' },
+  { id: 'blog-writer', name: 'Blog Writer', description: 'Research and write SEO-optimized blog posts', category: 'Content' },
+  { id: 'social-poster', name: 'Social Media Poster', description: 'Schedule and post across Twitter, LinkedIn, Instagram', category: 'Social' },
+  { id: 'email-assistant', name: 'Email Assistant', description: 'Read, compose, and manage emails', category: 'Productivity' },
+  { id: 'calendar', name: 'Calendar Manager', description: 'Schedule meetings, set reminders, manage events', category: 'Productivity' },
+  { id: 'crypto-tracker', name: 'Crypto Tracker', description: 'Monitor token prices, portfolio tracking, alerts', category: 'Crypto' },
+  { id: 'home-assistant', name: 'Home Automation', description: 'Control smart devices via Home Assistant', category: 'IoT' },
+  { id: 'qmd-memory', name: 'QMD Memory', description: 'Advanced memory with MMR diversity re-ranking', category: 'AI' },
+];
+
+function getMarketplaceItems(framework: string): MarketplaceItem[] {
+  if (framework === 'elizaos' || framework === 'milady') return ELIZAOS_MARKETPLACE;
+  if (framework === 'openclaw') return OPENCLAW_MARKETPLACE;
+  return [];
+}
+
+function getInstallSource(framework: string): 'npm' | 'clawhub' {
+  if (framework === 'elizaos' || framework === 'milady') return 'npm';
+  return 'clawhub';
+}
+
+function getMarketplaceCategories(items: MarketplaceItem[]): string[] {
+  const cats = new Set(items.map(i => i.category));
+  return ['All', ...Array.from(cats).sort()];
+}
+
 // ─── Toggle Switch ──────────────────────────────────────────
 
 function ToggleSwitch({
@@ -548,6 +609,299 @@ function CategorySection({
   );
 }
 
+// ─── Marketplace Card ───────────────────────────────────────
+
+function MarketplaceCard({
+  item,
+  isInstalled,
+  isInstalling,
+  onInstall,
+  onUninstall,
+}: {
+  item: MarketplaceItem;
+  isInstalled: boolean;
+  isInstalling: boolean;
+  onInstall: (id: string) => void;
+  onUninstall: (id: string) => void;
+}) {
+  const categoryColors: Record<string, string> = {
+    Creative: 'bg-purple-500/15 text-purple-400 border-purple-500/25',
+    Voice: 'bg-pink-500/15 text-pink-400 border-pink-500/25',
+    Social: 'bg-blue-500/15 text-blue-400 border-blue-500/25',
+    Crypto: 'bg-amber-500/15 text-amber-400 border-amber-500/25',
+    Dev: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25',
+    DevOps: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25',
+    Files: 'bg-orange-500/15 text-orange-400 border-orange-500/25',
+    Web: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/25',
+    Content: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/25',
+    Productivity: 'bg-teal-500/15 text-teal-400 border-teal-500/25',
+    IoT: 'bg-rose-500/15 text-rose-400 border-rose-500/25',
+    AI: 'bg-violet-500/15 text-violet-400 border-violet-500/25',
+  };
+  const badgeClass = categoryColors[item.category] ?? 'bg-white/10 text-[#A5A1C2] border-white/10';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <div
+        className={`
+          relative p-4 rounded-xl border transition-all duration-300
+          ${isInstalled
+            ? 'bg-emerald-500/[0.04] border-emerald-500/20'
+            : 'bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.1]'
+          }
+        `}
+      >
+        <div className="flex items-start gap-3">
+          {/* Icon */}
+          <div className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center bg-white/[0.05]">
+            <Package size={16} className="text-[#A5A1C2]" />
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <h3 className="text-sm font-semibold text-white truncate leading-tight">
+                {item.name}
+              </h3>
+              <span className={`px-1.5 py-0.5 rounded text-[9px] font-semibold border ${badgeClass}`}>
+                {item.category}
+              </span>
+            </div>
+            <p className="text-[11px] text-[#71717a] line-clamp-2 leading-relaxed">
+              {item.description}
+            </p>
+            <p className="text-[10px] text-[#52525b] mt-1 font-mono truncate">
+              {item.id}
+            </p>
+          </div>
+
+          {/* Action */}
+          <div className="flex-shrink-0 pt-0.5">
+            {isInstalling ? (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+                <Loader2 size={12} className="animate-spin text-[#06b6d4]" />
+                <span className="text-[10px] text-[#A5A1C2]">Installing...</span>
+              </div>
+            ) : isInstalled ? (
+              <div className="flex items-center gap-1">
+                <span className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-semibold text-emerald-400">
+                  <Check size={10} />
+                  Installed
+                </span>
+                <button
+                  onClick={() => onUninstall(item.id)}
+                  className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#52525b] hover:text-red-400 transition-colors"
+                  title="Uninstall"
+                >
+                  <Trash2 size={12} />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => onInstall(item.id)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#06b6d4]/10 border border-[#06b6d4]/20 text-[#06b6d4] hover:bg-[#06b6d4]/20 transition-colors text-xs font-medium"
+              >
+                <Download size={12} />
+                Install
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Marketplace Section ────────────────────────────────────
+
+function MarketplaceSection({
+  framework,
+  installedSkillIds,
+  onInstall,
+  onUninstall,
+  installing,
+}: {
+  framework: string;
+  installedSkillIds: Set<string>;
+  onInstall: (packageName: string) => void;
+  onUninstall: (packageName: string) => void;
+  installing: string | null;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [marketSearch, setMarketSearch] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('All');
+
+  const items = useMemo(() => getMarketplaceItems(framework), [framework]);
+  const categories = useMemo(() => getMarketplaceCategories(items), [items]);
+
+  // Hermes special case
+  if (framework === 'hermes') {
+    return (
+      <GlassCard className="mt-4">
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="flex items-center gap-2.5 w-full text-left"
+        >
+          <Store size={16} className="text-[#06b6d4]" />
+          <span className="text-sm font-semibold text-white flex-1">Browse Marketplace</span>
+          <span className="text-[#71717a]">
+            {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          </span>
+        </button>
+        <AnimatePresence>
+          {expanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-4 flex items-center gap-2 px-4 py-3 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+                <Sparkles size={14} className="text-[#06b6d4] flex-shrink-0" />
+                <p className="text-xs text-[#A5A1C2]">
+                  Hermes skills are managed via the Skills Hub. New skills appear automatically when installed through the Hermes CLI.
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </GlassCard>
+    );
+  }
+
+  if (items.length === 0) return null;
+
+  const filtered = items.filter(item => {
+    if (categoryFilter !== 'All' && item.category !== categoryFilter) return false;
+    if (marketSearch) {
+      const q = marketSearch.toLowerCase();
+      const hay = `${item.name} ${item.description} ${item.id} ${item.category}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  return (
+    <GlassCard className="mt-4">
+      {/* Toggle Header */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center gap-2.5 w-full text-left"
+      >
+        <Store size={16} className="text-[#06b6d4]" />
+        <span className="text-sm font-semibold text-white flex-1">
+          Browse Marketplace
+        </span>
+        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#06b6d4]/15 text-[#06b6d4] border border-[#06b6d4]/25">
+          {items.length} packages
+        </span>
+        <span className="text-[#71717a]">
+          {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        </span>
+      </button>
+
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+          >
+            <div className="mt-4 space-y-4">
+              {/* Search + Category Filters */}
+              <div className="space-y-3">
+                {/* Search Bar */}
+                <div className="relative">
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]" />
+                  <input
+                    type="text"
+                    value={marketSearch}
+                    onChange={(e) => setMarketSearch(e.target.value)}
+                    placeholder="Search marketplace..."
+                    className="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-white/[0.04] border border-white/[0.06] text-white placeholder-[#71717a] focus:outline-none focus:border-[#06b6d4]/40 transition-colors"
+                  />
+                  {marketSearch && (
+                    <button
+                      onClick={() => setMarketSearch('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#71717a] hover:text-white transition-colors"
+                    >
+                      <X size={12} />
+                    </button>
+                  )}
+                </div>
+
+                {/* Category Chips */}
+                <div className="flex flex-wrap gap-1.5">
+                  {categories.map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => setCategoryFilter(cat)}
+                      className={`
+                        px-2.5 py-1 rounded-full text-[10px] font-medium border transition-all
+                        ${categoryFilter === cat
+                          ? 'bg-[#06b6d4]/15 text-[#06b6d4] border-[#06b6d4]/30'
+                          : 'bg-white/[0.03] text-[#71717a] border-white/[0.06] hover:bg-white/[0.06] hover:text-[#A5A1C2]'
+                        }
+                      `}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Marketplace Grid */}
+              {filtered.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {filtered.map(item => (
+                    <MarketplaceCard
+                      key={item.id}
+                      item={item}
+                      isInstalled={installedSkillIds.has(item.id)}
+                      isInstalling={installing === item.id}
+                      onInstall={onInstall}
+                      onUninstall={onUninstall}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <Search size={20} className="text-[#71717a] mb-2" />
+                  <p className="text-xs text-[#A5A1C2]">No packages match your search</p>
+                  <button
+                    onClick={() => { setMarketSearch(''); setCategoryFilter('All'); }}
+                    className="mt-1.5 text-[10px] text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
+                  >
+                    Clear filters
+                  </button>
+                </div>
+              )}
+
+              {/* Source info */}
+              <div className="flex items-center gap-1.5 text-[10px] text-[#52525b]">
+                <ShoppingBag size={10} />
+                <span>
+                  {framework === 'elizaos' || framework === 'milady'
+                    ? 'Packages installed via npm from the ElizaOS registry'
+                    : 'Skills installed from ClawHub marketplace'
+                  }
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </GlassCard>
+  );
+}
+
 // ─── Loading Skeleton ───────────────────────────────────────
 
 function SkillsSkeleton() {
@@ -591,6 +945,9 @@ export function SkillsTab() {
   const [toggling, setToggling] = useState<string | null>(null);
   const [restartHint, setRestartHint] = useState(false);
   const [restarting, setRestarting] = useState(false);
+  const [installing, setInstalling] = useState<string | null>(null);
+  const [installError, setInstallError] = useState<string | null>(null);
+  const [installSuccess, setInstallSuccess] = useState<string | null>(null);
 
   const isEliza = agent?.framework === 'elizaos';
   const label = isEliza ? 'Plugins' : 'Skills';
@@ -778,6 +1135,64 @@ export function SkillsTab() {
     }
   }, [agent, skills, loadSkills]);
 
+  // Build a set of installed skill IDs for the marketplace
+  const installedSkillIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const s of skills) {
+      ids.add(s.id);
+      // Also add normalized form so marketplace items match
+      ids.add(normalizeSkillId(s.id));
+    }
+    return ids;
+  }, [skills]);
+
+  // Install a package from the marketplace
+  const handleInstallPackage = useCallback(async (packageName: string) => {
+    if (!agent) return;
+    setInstalling(packageName);
+    setInstallError(null);
+    setInstallSuccess(null);
+
+    const source = getInstallSource(agent.framework ?? 'openclaw');
+    const res = await api.installAgentSkill(agent.id, packageName, source);
+    setInstalling(null);
+
+    if (res.success) {
+      setInstallSuccess(`${packageName} installed successfully.`);
+      setTimeout(() => setInstallSuccess(null), 5000);
+      // Wait for container to restart then reload skills
+      setRestarting(true);
+      await new Promise(r => setTimeout(r, 12_000));
+      await loadSkills();
+      setRestarting(false);
+    } else {
+      setInstallError(res.error ?? 'Failed to install package');
+      setTimeout(() => setInstallError(null), 8000);
+    }
+  }, [agent, loadSkills]);
+
+  // Uninstall a package
+  const handleUninstallPackage = useCallback(async (packageName: string) => {
+    if (!agent) return;
+    setInstalling(packageName);
+    setInstallError(null);
+    setInstallSuccess(null);
+
+    const res = await api.uninstallAgentSkill(agent.id, packageName);
+    setInstalling(null);
+
+    if (res.success) {
+      setInstallSuccess(`${packageName} removed.`);
+      setTimeout(() => setInstallSuccess(null), 5000);
+      // Reload skills list
+      await loadSkills();
+      setRestartHint(true);
+    } else {
+      setInstallError(res.error ?? 'Failed to uninstall package');
+      setTimeout(() => setInstallError(null), 8000);
+    }
+  }, [agent, loadSkills]);
+
   if (!agent) return null;
 
   return (
@@ -946,6 +1361,45 @@ export function SkillsTab() {
             This agent&apos;s container does not have any {labelLower} installed.
           </p>
         </GlassCard>
+      )}
+
+      {/* Install success message */}
+      {installSuccess && (
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+          <Check size={14} className="text-emerald-400 flex-shrink-0" />
+          <p className="text-xs text-emerald-400">{installSuccess}</p>
+          <button
+            onClick={() => setInstallSuccess(null)}
+            className="ml-auto text-emerald-400/60 hover:text-emerald-400 transition-colors"
+          >
+            <X size={12} />
+          </button>
+        </div>
+      )}
+
+      {/* Install error message */}
+      {installError && (
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-red-500/10 border border-red-500/20">
+          <AlertTriangle size={14} className="text-red-400 flex-shrink-0" />
+          <p className="text-xs text-red-400">{installError}</p>
+          <button
+            onClick={() => setInstallError(null)}
+            className="ml-auto text-red-400/60 hover:text-red-400 transition-colors"
+          >
+            <X size={12} />
+          </button>
+        </div>
+      )}
+
+      {/* Marketplace Section */}
+      {!loading && agent && (
+        <MarketplaceSection
+          framework={agent.framework ?? 'openclaw'}
+          installedSkillIds={installedSkillIds}
+          onInstall={handleInstallPackage}
+          onUninstall={handleUninstallPackage}
+          installing={installing}
+        />
       )}
     </motion.div>
   );

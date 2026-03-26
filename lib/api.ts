@@ -1055,6 +1055,32 @@ export const api = {
       body: JSON.stringify({ enabled }),
     }),
 
+  /** Install a skill/plugin into the agent container */
+  installAgentSkill: (agentId: string, packageName: string, source: 'npm' | 'clawhub' | 'url') =>
+    req<{
+      packageName: string;
+      source: string;
+      installed: boolean;
+      restarted: boolean;
+      output: string;
+      note: string;
+    }>(`/agents/${agentId}/skills/install`, {
+      method: 'POST',
+      body: JSON.stringify({ packageName, source }),
+    }),
+
+  /** Uninstall a skill/plugin from the agent container */
+  uninstallAgentSkill: (agentId: string, packageName: string) =>
+    req<{
+      packageName: string;
+      uninstalled: boolean;
+      output: string;
+      note: string;
+    }>(`/agents/${agentId}/skills/uninstall`, {
+      method: 'POST',
+      body: JSON.stringify({ packageName }),
+    }),
+
   // ─── Custom Domains ──────────────────────────────────────
   /** Add a custom domain to an agent */
   addCustomDomain: (agentId: string, domain: string) =>
