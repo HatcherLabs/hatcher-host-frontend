@@ -367,7 +367,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <tr><td><strong>OpenAI</strong></td><td>GPT-4o, GPT-4 Turbo, GPT-4o-mini</td><td>General purpose, coding, creative writing</td></tr>
 <tr><td><strong>Anthropic</strong></td><td>Claude 3.5 Sonnet, Claude 3 Opus</td><td>Analysis, research, long-form writing, safety</td></tr>
 <tr><td><strong>Google</strong></td><td>Gemini 2.0 Flash, Gemini Pro</td><td>Multimodal tasks, fast inference, large context</td></tr>
-<tr><td><strong>Groq</strong></td><td>Llama 3.3 70B, Mixtral 8x7B</td><td>Speed-critical applications, low-latency responses</td></tr>
+<tr><td><strong>Groq</strong></td><td>Llama 4 Scout, Llama 3.3 70B, Mixtral 8x7B</td><td>Speed-critical applications, low-latency responses</td></tr>
 <tr><td><strong>xAI</strong></td><td>Grok-2, Grok-3</td><td>Real-time information, X/Twitter integration</td></tr>
 <tr><td><strong>OpenRouter</strong></td><td>Any model (routes to best provider)</td><td>Model switching, fallback routing, cost optimization</td></tr>
 </tbody>
@@ -385,7 +385,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <h3>BYOK on the Free Tier</h3>
 <ul>
 <li>Hatcher cost: <strong>$0/mo</strong> (free tier)</li>
-<li>Groq API cost for 200 messages/day (Llama 3.3 70B, avg 500 tokens in + 300 tokens out): approximately <strong>$1.80/mo</strong></li>
+<li>Groq API cost for 200 messages/day (Llama 4 Scout, avg 500 tokens in + 300 tokens out): approximately <strong>$1.80/mo</strong></li>
 <li><strong>Total: ~$1.80/mo</strong></li>
 </ul>
 <h3>BYOK with OpenAI on the Free Tier</h3>
