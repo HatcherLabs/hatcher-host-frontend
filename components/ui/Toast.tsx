@@ -132,9 +132,9 @@ export function Toast({ toast, onDismiss }: ToastProps) {
   return (
     <motion.div
       layout
-      initial={{ x: 400, opacity: 0, scale: 0.95 }}
-      animate={{ x: 0, opacity: 1, scale: 1 }}
-      exit={{ x: 400, opacity: 0, scale: 0.95 }}
+      initial={{ y: -60, opacity: 0, scale: 0.95 }}
+      animate={{ y: 0, opacity: 1, scale: 1 }}
+      exit={{ y: -60, opacity: 0, scale: 0.95 }}
       transition={{ type: 'spring', stiffness: 500, damping: 35, mass: 0.8 }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}

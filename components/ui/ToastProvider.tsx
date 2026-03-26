@@ -99,9 +99,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     <ToastContext.Provider value={{ toast }}>
       {children}
 
-      {/* Toast container -- fixed bottom-right */}
+      {/* Toast container -- fixed top-center */}
       <div
-        className="pointer-events-none fixed bottom-6 right-6 z-50 flex flex-col-reverse gap-3"
+        className="pointer-events-none fixed top-20 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3 items-center w-full max-w-md px-4"
         aria-live="polite"
         aria-label="Notifications"
       >

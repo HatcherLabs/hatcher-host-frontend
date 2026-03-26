@@ -13,6 +13,7 @@ import { getInitials, stringToColor, timeAgo } from '@/lib/utils';
 import { FRAMEWORKS, TIERS, getBYOKProvider } from '@hatcher/shared';
 import type { UserTierKey } from '@hatcher/shared';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useToast } from '@/components/ui/ToastProvider';
 import {
   ArrowLeft,
   Play,
@@ -155,6 +156,7 @@ export default function AgentManagePage() {
   const { isAuthenticated, user } = useAuth();
   const wallet = useWallet();
   const { connection } = useConnection();
+  const { toast } = useToast();
 
   // Core state
   const [agent, setAgent] = useState<Agent | null>(null);
@@ -432,16 +434,13 @@ export default function AgentManagePage() {
       else if (action === 'stop') res = await api.stopAgent(id);
       else if (action === 'restart') res = await api.restartAgent(id);
       if (res && !res.success) {
-        setActionError(`Failed to ${action} agent: ${res.error ?? 'Unknown error'}`);
-        setTimeout(() => setActionError(null), 5000);
+        toast.error(`Failed to ${action} agent: ${res.error ?? 'Unknown error'}`);
       } else if (res?.success) {
         const labels = { start: 'started', stop: 'stopped', restart: 'restarted' };
-        setActionSuccess(`Agent ${labels[action]} successfully`);
-        setTimeout(() => setActionSuccess(null), 3000);
+        toast.success(`Agent ${labels[action]} successfully`);
       }
     } catch {
-      setActionError(`Failed to ${action} agent. Check your connection.`);
-      setTimeout(() => setActionError(null), 5000);
+      toast.error(`Failed to ${action} agent. Check your connection.`);
     }
     await loadAgent();
     setActionLoading(null);
@@ -1006,19 +1005,8 @@ export default function AgentManagePage() {
             {deleteError && (
               <p className="text-xs text-red-400 mt-2">{deleteError}</p>
             )}
-            {actionError && (
-              <div className="mt-3 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
-                <p className="text-xs text-red-400">{actionError}</p>
-              </div>
-            )}
-            {actionSuccess && (
-              <motion.div
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-3 p-3 rounded-xl bg-green-500/10 border border-green-500/20"
-              >
-                <p className="text-xs text-green-400">{actionSuccess}</p>
-              </motion.div>
+            {deleteError && (
+              <p className="text-xs text-red-400 mt-2">{deleteError}</p>
             )}
           </div>
         </div>
