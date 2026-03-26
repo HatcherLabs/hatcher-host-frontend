@@ -1,9 +1,8 @@
 name: Deploy - Frontend
 
 on:
-  workflow_dispatch:  # Manual only — add SSH secrets then switch to push trigger
-  # push:
-  #   branches: [main]
+  push:
+    branches: [main]
 
 concurrency:
   group: deploy-frontend
