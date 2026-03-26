@@ -7,21 +7,17 @@ import {
   X,
   ChevronRight,
   ChevronLeft,
-  Zap,
-  Bot,
-  Cpu,
-  Sparkles,
-  Key,
-  Check,
-  Rocket,
-  Globe,
   MessageSquare,
-  Code,
-  Briefcase,
-  Search,
+  TrendingUp,
+  Headphones,
+  Sparkles,
+  Rocket,
+  Zap,
+  Send,
+  Wrench,
 } from 'lucide-react';
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 3;
 
 const stepVariants = {
   enter: (dir: number) => ({ opacity: 0, x: dir > 0 ? 80 : -80 }),
@@ -53,19 +49,21 @@ export function OnboardingWizard({ onClose }: Props) {
   }, [step]);
 
   const complete = useCallback((path: string) => {
+    localStorage.setItem('onboarding_dismissed', 'true');
     localStorage.setItem('onboarding_completed', 'true');
     onClose();
     router.push(path);
   }, [onClose, router]);
 
   const dismiss = useCallback(() => {
+    localStorage.setItem('onboarding_dismissed', 'true');
     localStorage.setItem('onboarding_completed', 'true');
     onClose();
   }, [onClose]);
 
   return (
     <motion.div
-      className="fixed inset-0 z-[100] flex items-center justify-center"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -78,7 +76,7 @@ export function OnboardingWizard({ onClose }: Props) {
 
       {/* Card */}
       <motion.div
-        className="relative w-full max-w-lg mx-4 rounded-2xl border border-white/[0.08] overflow-hidden"
+        className="relative w-full max-w-lg rounded-2xl border border-white/[0.08] overflow-hidden"
         style={{
           background: 'linear-gradient(135deg, rgba(20, 16, 40, 0.97), rgba(10, 8, 24, 0.98))',
           boxShadow: '0 0 80px rgba(139, 92, 246, 0.15), 0 0 40px rgba(6, 182, 212, 0.08)',
@@ -117,11 +115,9 @@ export function OnboardingWizard({ onClose }: Props) {
               exit="exit"
               className="flex-1 flex flex-col"
             >
-              {step === 1 && <StepWelcome />}
-              {step === 2 && <StepFramework />}
-              {step === 3 && <StepTemplates />}
-              {step === 4 && <StepLLM />}
-              {step === 5 && <StepReady onComplete={complete} />}
+              {step === 1 && <StepWelcome onNext={next} />}
+              {step === 2 && <StepChoose onComplete={complete} />}
+              {step === 3 && <StepTips onComplete={complete} />}
             </motion.div>
           </AnimatePresence>
 
@@ -145,7 +141,7 @@ export function OnboardingWizard({ onClose }: Props) {
 
             {/* Nav buttons */}
             <div className="flex items-center gap-2">
-              {step > 1 && step < 5 && (
+              {step > 1 && (
                 <button
                   onClick={prev}
                   className="h-9 px-3 flex items-center gap-1 text-xs text-[#a1a1aa] hover:text-white rounded-lg border border-white/[0.08] hover:bg-white/[0.04] transition-all"
@@ -154,7 +150,7 @@ export function OnboardingWizard({ onClose }: Props) {
                   Back
                 </button>
               )}
-              {step < 5 && (
+              {step < TOTAL_STEPS && step !== 1 && (
                 <button
                   onClick={next}
                   className="h-9 px-4 flex items-center gap-1 text-xs font-medium text-white rounded-lg bg-purple-600 hover:bg-purple-500 transition-all"
@@ -171,196 +167,182 @@ export function OnboardingWizard({ onClose }: Props) {
   );
 }
 
-/* ─── Step 1: Welcome ──────────────────────────────────── */
-function StepWelcome() {
+/* ---- Step 1: Welcome ----------------------------------------- */
+function StepWelcome({ onNext }: { onNext: () => void }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center text-center py-6">
-      <div className="text-5xl mb-5">&#129370;</div>
+      <motion.div
+        className="relative mb-5"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        <div
+          className="absolute inset-0 rounded-full animate-pulse"
+          style={{
+            background: 'radial-gradient(circle, rgba(139,92,246,0.25) 0%, transparent 70%)',
+            transform: 'scale(2)',
+          }}
+        />
+        <div className="relative w-20 h-20 rounded-2xl bg-purple-500/15 flex items-center justify-center ring-1 ring-purple-500/30">
+          <Rocket size={40} className="text-purple-400" />
+        </div>
+      </motion.div>
+
       <h2 className="text-2xl font-bold text-white mb-3">
         Welcome to Hatcher!
       </h2>
-      <p className="text-sm text-[#a1a1aa] max-w-sm leading-relaxed">
-        Let&apos;s get your first AI agent up and running in 60 seconds.
-        We&apos;ll walk you through the basics.
-      </p>
-    </div>
-  );
-}
-
-/* ─── Step 2: Framework ────────────────────────────────── */
-function StepFramework() {
-  return (
-    <div className="flex-1 flex flex-col py-4">
-      <h2 className="text-xl font-bold text-white mb-2 text-center">Pick Your Framework</h2>
-      <p className="text-xs text-[#a1a1aa] mb-5 text-center">
-        Choose the engine that powers your agent.
-      </p>
-
-      <div className="grid grid-cols-2 gap-3">
-        {/* OpenClaw */}
-        <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.04] p-4 hover:bg-amber-500/[0.08] transition-colors">
-          <div className="w-10 h-10 rounded-lg bg-amber-500/15 flex items-center justify-center mb-3">
-            <Cpu size={20} className="text-amber-400" />
-          </div>
-          <h3 className="text-sm font-semibold text-white mb-1">OpenClaw</h3>
-          <p className="text-[11px] text-[#a1a1aa] leading-relaxed">
-            Full-featured with 13K+ skills. Rich integrations, web search, code execution, and more.
-          </p>
-          <div className="flex flex-wrap gap-1 mt-2">
-            <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300">13K+ skills</span>
-            <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300">Feature-rich</span>
-          </div>
-        </div>
-
-        {/* Hermes */}
-        <div className="rounded-xl border border-purple-500/20 bg-purple-500/[0.04] p-4 hover:bg-purple-500/[0.08] transition-colors">
-          <div className="w-10 h-10 rounded-lg bg-purple-500/15 flex items-center justify-center mb-3">
-            <Zap size={20} className="text-purple-400" />
-          </div>
-          <h3 className="text-sm font-semibold text-white mb-1">Hermes</h3>
-          <p className="text-[11px] text-[#a1a1aa] leading-relaxed">
-            Fast and lightweight. Optimized for speed. Perfect for focused tasks and quick responses.
-          </p>
-          <div className="flex flex-wrap gap-1 mt-2">
-            <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300">Lightning fast</span>
-            <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300">Lightweight</span>
-          </div>
-        </div>
-      </div>
-
-      <p className="text-[10px] text-[#71717a] mt-3 text-center">
-        You can change your framework anytime when creating an agent.
-      </p>
-    </div>
-  );
-}
-
-/* ─── Step 3: Templates ────────────────────────────────── */
-const POPULAR_TEMPLATES = [
-  { icon: Briefcase, label: 'Marketing Strategist', desc: 'Content & growth automation' },
-  { icon: Code, label: 'Code Assistant', desc: 'Write, review & debug code' },
-  { icon: MessageSquare, label: 'Customer Support', desc: 'Handle tickets & FAQs' },
-  { icon: Search, label: 'Research Analyst', desc: 'Deep research & summaries' },
-  { icon: Globe, label: 'Social Media Bot', desc: 'Manage Twitter, Discord & more' },
-];
-
-function StepTemplates() {
-  return (
-    <div className="flex-1 flex flex-col py-4">
-      <h2 className="text-xl font-bold text-white mb-2 text-center">Choose a Template</h2>
-      <p className="text-xs text-[#a1a1aa] mb-4 text-center">
-        Start with a pre-built template or create from scratch.
-      </p>
-
-      <div className="space-y-2">
-        {POPULAR_TEMPLATES.map((t) => (
-          <div
-            key={t.label}
-            className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition-colors cursor-default"
-          >
-            <div className="w-9 h-9 rounded-lg bg-[#06b6d4]/10 flex items-center justify-center flex-shrink-0">
-              <t.icon size={16} className="text-[#06b6d4]" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-white">{t.label}</p>
-              <p className="text-[11px] text-[#71717a]">{t.desc}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <p className="text-[10px] text-[#71717a] mt-3 text-center">
-        Or start from scratch &mdash; full creative freedom.
-      </p>
-    </div>
-  );
-}
-
-/* ─── Step 4: LLM ─────────────────────────────────────── */
-function StepLLM() {
-  return (
-    <div className="flex-1 flex flex-col py-4">
-      <h2 className="text-xl font-bold text-white mb-2 text-center">Connect Your LLM</h2>
-      <p className="text-xs text-[#a1a1aa] mb-5 text-center">
-        Every agent needs a brain. Pick how you want to power yours.
-      </p>
-
-      <div className="space-y-3">
-        {/* Free Groq */}
-        <div className="flex items-start gap-3 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04]">
-          <div className="w-10 h-10 rounded-lg bg-emerald-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <Check size={20} className="text-emerald-400" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-white">Free: Groq (included)</h3>
-              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 font-medium">
-                Included
-              </span>
-            </div>
-            <p className="text-[11px] text-[#a1a1aa] mt-1 leading-relaxed">
-              We provide a Groq API key at no cost. 20 messages/day on Free tier,
-              100 on Basic, 300 on Pro.
-            </p>
-          </div>
-        </div>
-
-        {/* BYOK */}
-        <div className="flex items-start gap-3 p-4 rounded-xl border border-purple-500/20 bg-purple-500/[0.04]">
-          <div className="w-10 h-10 rounded-lg bg-purple-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <Key size={20} className="text-purple-400" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-white">BYOK: Bring Your Own Key</h3>
-              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-purple-500/15 text-purple-300 font-medium">
-                Unlimited
-              </span>
-            </div>
-            <p className="text-[11px] text-[#a1a1aa] mt-1 leading-relaxed">
-              Use your own OpenAI, Anthropic, Groq, or other API key.
-              Always free, unlimited messages.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <p className="text-[10px] text-[#71717a] mt-4 text-center">
-        Both options are always free to use. You can switch anytime.
-      </p>
-    </div>
-  );
-}
-
-/* ─── Step 5: Ready ────────────────────────────────────── */
-function StepReady({ onComplete }: { onComplete: (path: string) => void }) {
-  return (
-    <div className="flex-1 flex flex-col items-center justify-center text-center py-6">
-      <div className="w-16 h-16 rounded-2xl bg-purple-500/15 flex items-center justify-center mb-5 ring-1 ring-purple-500/30">
-        <Rocket size={32} className="text-purple-400" />
-      </div>
-      <h2 className="text-2xl font-bold text-white mb-2">
-        You&apos;re Ready!
-      </h2>
-      <p className="text-sm text-[#a1a1aa] max-w-xs mb-8 leading-relaxed">
-        Your first AI agent is just one click away.
-        Let&apos;s hatch something amazing.
+      <p className="text-sm text-[#a1a1aa] max-w-sm leading-relaxed mb-8">
+        Let&apos;s deploy your first AI agent in under 2 minutes.
       </p>
 
       <button
-        onClick={() => onComplete('/create')}
+        onClick={onNext}
         className="h-11 px-8 flex items-center gap-2 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 transition-all shadow-lg shadow-purple-500/20"
       >
         <Sparkles size={16} />
-        Create My First Agent
+        Get Started
       </button>
+    </div>
+  );
+}
 
-      <button
-        onClick={() => onComplete('/explore')}
-        className="mt-3 text-xs text-[#a1a1aa] hover:text-white transition-colors underline underline-offset-2"
-      >
-        Explore agents first
-      </button>
+/* ---- Step 2: Choose What You Want ----------------------------- */
+const QUICK_PICKS = [
+  {
+    icon: MessageSquare,
+    label: 'Chat Bot',
+    desc: 'Conversational AI for any platform',
+    color: 'cyan',
+    href: '/create?template=chatbot',
+    borderClass: 'border-cyan-500/20 hover:border-cyan-500/40',
+    bgClass: 'bg-cyan-500/[0.04] hover:bg-cyan-500/[0.08]',
+    iconBgClass: 'bg-cyan-500/15',
+    iconClass: 'text-cyan-400',
+  },
+  {
+    icon: TrendingUp,
+    label: 'Trading Bot',
+    desc: 'Market analysis and trading signals',
+    color: 'emerald',
+    href: '/create?template=trading-analyst',
+    borderClass: 'border-emerald-500/20 hover:border-emerald-500/40',
+    bgClass: 'bg-emerald-500/[0.04] hover:bg-emerald-500/[0.08]',
+    iconBgClass: 'bg-emerald-500/15',
+    iconClass: 'text-emerald-400',
+  },
+  {
+    icon: Headphones,
+    label: 'Support Agent',
+    desc: 'Handle tickets and answer FAQs',
+    color: 'amber',
+    href: '/create?template=customer-support',
+    borderClass: 'border-amber-500/20 hover:border-amber-500/40',
+    bgClass: 'bg-amber-500/[0.04] hover:bg-amber-500/[0.08]',
+    iconBgClass: 'bg-amber-500/15',
+    iconClass: 'text-amber-400',
+  },
+  {
+    icon: Sparkles,
+    label: 'Custom',
+    desc: 'Build from scratch, full freedom',
+    color: 'purple',
+    href: '/create',
+    borderClass: 'border-purple-500/20 hover:border-purple-500/40',
+    bgClass: 'bg-purple-500/[0.04] hover:bg-purple-500/[0.08]',
+    iconBgClass: 'bg-purple-500/15',
+    iconClass: 'text-purple-400',
+  },
+];
+
+function StepChoose({ onComplete }: { onComplete: (path: string) => void }) {
+  return (
+    <div className="flex-1 flex flex-col py-4">
+      <h2 className="text-xl font-bold text-white mb-2 text-center">
+        What do you want your agent to do?
+      </h2>
+      <p className="text-xs text-[#a1a1aa] mb-5 text-center">
+        Pick a starting point. You can always customize everything later.
+      </p>
+
+      <div className="grid grid-cols-2 gap-3">
+        {QUICK_PICKS.map((pick) => (
+          <button
+            key={pick.label}
+            onClick={() => onComplete(pick.href)}
+            className={`rounded-xl border p-4 text-left transition-all duration-200 cursor-pointer ${pick.borderClass} ${pick.bgClass}`}
+          >
+            <div className={`w-10 h-10 rounded-lg ${pick.iconBgClass} flex items-center justify-center mb-3`}>
+              <pick.icon size={20} className={pick.iconClass} />
+            </div>
+            <h3 className="text-sm font-semibold text-white mb-1">{pick.label}</h3>
+            <p className="text-[11px] text-[#a1a1aa] leading-relaxed">{pick.desc}</p>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---- Step 3: Quick Tips --------------------------------------- */
+const TIPS = [
+  {
+    icon: Zap,
+    text: 'Start with the free Groq model \u2014 upgrade to BYOK anytime',
+    iconClass: 'text-emerald-400',
+    bgClass: 'bg-emerald-500/10',
+  },
+  {
+    icon: Send,
+    text: 'Add Telegram first \u2014 it\'s the easiest platform to test with',
+    iconClass: 'text-cyan-400',
+    bgClass: 'bg-cyan-500/10',
+  },
+  {
+    icon: Wrench,
+    text: 'Check the Skills tab to add web search, calculator, and more',
+    iconClass: 'text-purple-400',
+    bgClass: 'bg-purple-500/10',
+  },
+];
+
+function StepTips({ onComplete }: { onComplete: (path: string) => void }) {
+  return (
+    <div className="flex-1 flex flex-col py-4">
+      <h2 className="text-xl font-bold text-white mb-2 text-center">
+        Pro tips for getting started
+      </h2>
+      <p className="text-xs text-[#a1a1aa] mb-5 text-center">
+        A few things to know before you dive in.
+      </p>
+
+      <div className="space-y-3 mb-8">
+        {TIPS.map((tip, i) => (
+          <motion.div
+            key={i}
+            className="flex items-start gap-3 p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, delay: i * 0.1 }}
+          >
+            <div className={`w-9 h-9 rounded-lg ${tip.bgClass} flex items-center justify-center flex-shrink-0`}>
+              <tip.icon size={16} className={tip.iconClass} />
+            </div>
+            <p className="text-sm text-[#d4d4d8] leading-relaxed pt-1.5">{tip.text}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="flex flex-col items-center mt-auto">
+        <button
+          onClick={() => onComplete('/create')}
+          className="h-11 px-8 flex items-center gap-2 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 transition-all shadow-lg shadow-purple-500/20"
+        >
+          <Rocket size={16} />
+          Create My First Agent
+          <ChevronRight size={16} />
+        </button>
+      </div>
     </div>
   );
 }

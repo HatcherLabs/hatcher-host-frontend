@@ -1,0 +1,55 @@
+name: Deploy - Frontend
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Deploy to production
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+            cd /home/deploy/hatcher/apps/frontend
+
+            echo "==> Pulling latest code..."
+            git pull origin main
+
+            echo "==> Checking if dependencies changed..."
+            if git diff HEAD~1 --name-only | grep -q 'package-lock.json'; then
+              echo "==> Installing dependencies..."
+              npm ci
+            fi
+
+            echo "==> Building frontend..."
+            npx next build
+
+            echo "==> Restarting PM2..."
+            pm2 restart hatcher-web
+
+            echo "==> Health check..."
+            sleep 3
+            if curl -sf http://localhost:3000 > /dev/null 2>&1; then
+              echo "Frontend health check passed"
+            else
+              echo "WARNING: Frontend health check failed"
+              pm2 logs hatcher-web --lines 20 --nostream
+            fi
+
+            echo "==> Deploy complete at $(date '+%Y-%m-%d %H:%M:%S')"
+            echo "$(date '+%Y-%m-%d %H:%M:%S') | frontend | $(git rev-parse --short HEAD) | $(git log -1 --pretty=%s)" >> /home/deploy/hatcher/logs/deploys.log

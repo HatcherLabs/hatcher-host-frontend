@@ -1026,34 +1026,34 @@ export default function AgentManagePage() {
         {/* ─── Tab Bar ──────────────────────────────────────── */}
         {/* Desktop: horizontal row. Mobile: 2-row grid with icons */}
         <div id="agent-tabs" className="mb-8 border-b border-[rgba(46,43,74,0.3)]" role="tablist">
-          {/* Mobile grid */}
-          <div className="grid grid-cols-4 gap-1 sm:hidden p-1">
+          {/* Mobile: horizontal scroll */}
+          <div className="flex sm:hidden overflow-x-auto gap-0.5 px-1 py-1 -mx-1 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {getTabs(agent?.framework).map((t) => (
               <button
                 key={t.id}
                 role="tab"
                 aria-selected={tab === t.id}
                 onClick={() => { setTab(t.id);  }}
-                className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg text-[10px] transition-all ${
+                className={`flex flex-col items-center gap-0.5 py-2 px-3 rounded-lg text-[10px] transition-all flex-shrink-0 min-w-[56px] ${
                   tab === t.id
                     ? 'text-[#06b6d4] bg-[#06b6d4]/10'
                     : 'text-[#71717a]'
                 }`}
               >
                 {t.icon}
-                {t.label}
+                <span className="whitespace-nowrap">{t.label}</span>
               </button>
             ))}
           </div>
-          {/* Desktop row */}
-          <div className="hidden sm:flex items-center gap-0 relative">
+          {/* Desktop: 2-row wrapped grid */}
+          <div className="hidden sm:flex flex-wrap items-center gap-0 relative">
             {getTabs(agent?.framework).map((t) => (
               <button
                 key={t.id}
                 role="tab"
                 aria-selected={tab === t.id}
                 onClick={() => { setTab(t.id);  }}
-                className={`relative flex items-center gap-2 px-5 py-3 text-sm transition-all duration-300 -mb-px ${
+                className={`relative flex items-center gap-1.5 px-3 lg:px-4 py-2.5 text-xs lg:text-sm transition-all duration-300 ${
                   tab === t.id
                     ? 'text-[#FFFFFF]'
                     : 'text-[#71717a] hover:text-[#A5A1C2]'

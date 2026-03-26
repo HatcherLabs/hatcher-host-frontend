@@ -198,7 +198,10 @@ export const api = {
     req<{ apiKey: string }>('/auth/api-key/regenerate', { method: 'POST' }),
 
   /** Get recent notifications/activity */
-  getNotifications: () => req<Array<{id: string; type: string; message: string; timestamp: string}>>('/auth/notifications'),
+  getNotifications: () => req<{ items: Array<{id: string; type: string; message: string; timestamp: string}>; readAt: string | null }>('/auth/notifications'),
+
+  /** Mark all notifications as read (persists server-side) */
+  markNotificationsRead: () => req<{ readAt: string }>('/auth/notifications/read', { method: 'PATCH' }),
 
   /** Get referral code + share link */
   getReferralCode: () =>
@@ -264,6 +267,7 @@ export const api = {
       provider?: string;
       skills?: string[];
       systemPrompt?: string;
+      personality?: string;
       bio?: string;
       topics?: string[];
       adjectives?: string[];
@@ -273,6 +277,19 @@ export const api = {
         model?: string;
         baseUrl?: string;
       };
+      platforms?: string[];
+      platformSecrets?: Record<string, Record<string, string>>;
+      sessionScope?: string;
+      webSearch?: { provider: string } | undefined;
+      tts?: { provider: string } | undefined;
+      enableMemory?: boolean;
+      approvalMode?: string;
+      dbBackend?: string;
+      enableImageGen?: boolean;
+      enableVoice?: boolean;
+      miladyPersonality?: string;
+      localFirst?: boolean;
+      [key: string]: unknown;
     };
   }) =>
     req<Agent>('/agents', {
@@ -307,6 +324,13 @@ export const api = {
   /** Restart an agent container (server-side stop + start) */
   restartAgent: (id: string) =>
     req<{ status: string; containerId?: string }>(`/agents/${id}/restart`, { method: 'POST' }),
+
+  /** Test chat — real LLM call to preview agent personality before deploying */
+  testChat: (message: string, systemPrompt: string, model?: string, provider?: string) =>
+    req<{ text: string }>('/agents/test-chat', {
+      method: 'POST',
+      body: JSON.stringify({ message, systemPrompt, ...(model ? { model } : {}), ...(provider ? { provider } : {}) }),
+    }),
 
   /** Chat with an agent (non-streaming) */
   chat: (agentId: string, message: string, history?: Array<{ role: 'user' | 'assistant'; content: string }>) =>

@@ -33,6 +33,9 @@ import {
   Container,
   Download,
   Play,
+  BarChart3,
+  TrendingUp,
+  PieChart,
 } from 'lucide-react';
 
 
@@ -114,10 +117,16 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 // ── Framework tag ────────────────────────────────────────────
+const FRAMEWORK_META: Record<string, { label: string; color: string; style: string }> = {
+  openclaw: { label: 'OpenClaw', color: '#06b6d4', style: '' },
+  hermes: { label: 'Hermes', color: '#A855F7', style: 'bg-purple-500/10 text-purple-400 border-purple-500/25' },
+  elizaos: { label: 'ElizaOS', color: '#F97316', style: 'bg-orange-500/10 text-orange-400 border-orange-500/25' },
+  milady: { label: 'Milady', color: '#EC4899', style: 'bg-pink-500/10 text-pink-400 border-pink-500/25' },
+};
+
 function FrameworkTag({ framework = 'openclaw' }: { framework?: string }) {
-  const label = framework === 'hermes' ? 'Hermes' : 'OpenClaw';
-  const style = framework === 'hermes' ? 'bg-purple-500/10 text-purple-400 border-purple-500/25' : '';
-  return <span className={`fw-tag ${style}`}>{label}</span>;
+  const meta = FRAMEWORK_META[framework] ?? FRAMEWORK_META.openclaw;
+  return <span className={`fw-tag ${meta.style}`}>{meta.label}</span>;
 }
 
 // ── Admin agent type ─────────────────────────────────────────
@@ -145,6 +154,7 @@ export default function AdminPage() {
     email: string;
     username: string;
     walletAddress: string | null;
+    tier: string;
     isAdmin: boolean;
     agentCount: number;
     paymentCount: number;
@@ -274,6 +284,40 @@ export default function AdminPage() {
 
     return result;
   }, [agents, statusFilter, searchQuery]);
+
+  // ── Analytics computations ──────────────────────────────────
+  const frameworkDistribution = useMemo(() => {
+    const counts: Record<string, number> = {};
+    agents.forEach((a) => {
+      const fw = a.framework || 'openclaw';
+      counts[fw] = (counts[fw] || 0) + 1;
+    });
+    const total = agents.length || 1;
+    return Object.entries(FRAMEWORK_META).map(([key, meta]) => ({
+      key,
+      label: meta.label,
+      color: meta.color,
+      count: counts[key] || 0,
+      percent: Math.round(((counts[key] || 0) / total) * 100),
+    }));
+  }, [agents]);
+
+  const tierDistribution = useMemo(() => {
+    const counts: Record<string, number> = { free: 0, basic: 0, pro: 0 };
+    users.forEach((u) => {
+      const t = (u.tier || 'free').toLowerCase();
+      counts[t] = (counts[t] || 0) + 1;
+    });
+    const total = users.length || 1;
+    return [
+      { key: 'free', label: 'Free', color: '#6B7280', count: counts.free, percent: Math.round((counts.free / total) * 100) },
+      { key: 'basic', label: 'Basic', color: '#60A5FA', count: counts.basic, percent: Math.round((counts.basic / total) * 100) },
+      { key: 'pro', label: 'Pro', color: '#FBBF24', count: counts.pro, percent: Math.round((counts.pro / total) * 100) },
+    ];
+  }, [users]);
+
+  const recentAgents = useMemo(() => agents.slice(0, 10), [agents]);
+  const recentUsers = useMemo(() => users.slice(0, 10), [users]);
 
   // ── Action handlers ────────────────────────────────────────
   async function handleKill(agentId: string) {
@@ -523,6 +567,198 @@ export default function AdminPage() {
                 icon={UserPlus}
                 iconColor="#06b6d4"
               />
+            </div>
+          </div>
+        )}
+
+        {/* ── Analytics Dashboard ─────────────────────────────── */}
+        {stats && agents.length + users.length > 0 && (
+          <div className="space-y-4">
+            {/* ROW 2 — Framework + Tier Distribution */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Framework Distribution */}
+              <motion.div className="card glass-noise p-5" variants={cardVariants}>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 rounded-lg bg-[#06b6d4]/12 flex items-center justify-center flex-shrink-0">
+                    <BarChart3 size={16} className="text-[#06b6d4]" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Framework Distribution</h3>
+                    <p className="text-[10px] text-[var(--text-muted)]">{agents.length} total agents</p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {frameworkDistribution.map((fw) => (
+                    <div key={fw.key}>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: fw.color }}
+                          />
+                          <span className="text-xs font-medium text-[var(--text-primary)]">{fw.label}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-mono text-[var(--text-secondary)]">{fw.count}</span>
+                          <span className="text-[10px] text-[var(--text-muted)] w-8 text-right">{fw.percent}%</span>
+                        </div>
+                      </div>
+                      <div className="w-full h-2 rounded-full bg-[rgba(46,43,74,0.4)] overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-700 ease-out"
+                          style={{ width: `${fw.percent}%`, backgroundColor: fw.color, minWidth: fw.count > 0 ? '4px' : '0' }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Tier Distribution */}
+              <motion.div className="card glass-noise p-5" variants={cardVariants}>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 rounded-lg bg-[#FBBF24]/12 flex items-center justify-center flex-shrink-0">
+                    <PieChart size={16} className="text-[#FBBF24]" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Tier Distribution</h3>
+                    <p className="text-[10px] text-[var(--text-muted)]">{users.length} total users</p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {tierDistribution.map((tier) => (
+                    <div key={tier.key}>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: tier.color }}
+                          />
+                          <span className="text-xs font-medium text-[var(--text-primary)]">{tier.label}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-mono text-[var(--text-secondary)]">{tier.count}</span>
+                          <span className="text-[10px] text-[var(--text-muted)] w-8 text-right">{tier.percent}%</span>
+                        </div>
+                      </div>
+                      <div className="w-full h-2 rounded-full bg-[rgba(46,43,74,0.4)] overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-700 ease-out"
+                          style={{ width: `${tier.percent}%`, backgroundColor: tier.color, minWidth: tier.count > 0 ? '4px' : '0' }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Stacked overview bar */}
+                <div className="mt-4 pt-3 border-t border-[var(--border-default)]">
+                  <p className="text-[10px] text-[var(--text-muted)] mb-2 uppercase tracking-wider font-semibold">Overview</p>
+                  <div className="w-full h-4 rounded-full bg-[rgba(46,43,74,0.4)] overflow-hidden flex">
+                    {tierDistribution.map((tier) => (
+                      tier.count > 0 && (
+                        <div
+                          key={tier.key}
+                          className="h-full transition-all duration-700 ease-out first:rounded-l-full last:rounded-r-full"
+                          style={{ width: `${tier.percent}%`, backgroundColor: tier.color, minWidth: '4px' }}
+                          title={`${tier.label}: ${tier.count} (${tier.percent}%)`}
+                        />
+                      )
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* ROW 3 — Recent Activity */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Recent Agent Creates */}
+              <motion.div className="card glass-noise p-5" variants={cardVariants}>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 rounded-lg bg-[#4ADE80]/12 flex items-center justify-center flex-shrink-0">
+                    <TrendingUp size={16} className="text-[#4ADE80]" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Recent Agents</h3>
+                    <p className="text-[10px] text-[var(--text-muted)]">Last 10 created</p>
+                  </div>
+                </div>
+                {recentAgents.length === 0 ? (
+                  <p className="text-xs text-[var(--text-muted)] py-4 text-center">No agents yet.</p>
+                ) : (
+                  <div className="space-y-0">
+                    {recentAgents.map((agent, i) => (
+                      <div
+                        key={agent.id}
+                        className={`flex items-center justify-between py-2.5 ${i < recentAgents.length - 1 ? 'border-b border-[var(--border-default)]' : ''}`}
+                      >
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className="w-7 h-7 rounded-lg bg-[#06b6d4]/10 flex items-center justify-center flex-shrink-0">
+                            <Bot size={12} className="text-[#06b6d4]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-medium text-[var(--text-primary)] truncate">{agent.name}</p>
+                            <p className="text-[10px] text-[var(--text-muted)]">
+                              by {agent.ownerUsername || 'unknown'}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                          <FrameworkTag framework={agent.framework} />
+                          <span className="text-[10px] text-[var(--text-muted)] w-16 text-right">{timeAgo(agent.createdAt)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+
+              {/* Recent User Signups */}
+              <motion.div className="card glass-noise p-5" variants={cardVariants}>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 rounded-lg bg-[#A855F7]/12 flex items-center justify-center flex-shrink-0">
+                    <UserPlus size={16} className="text-[#A855F7]" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Recent Signups</h3>
+                    <p className="text-[10px] text-[var(--text-muted)]">Last 10 users</p>
+                  </div>
+                </div>
+                {recentUsers.length === 0 ? (
+                  <p className="text-xs text-[var(--text-muted)] py-4 text-center">No users yet.</p>
+                ) : (
+                  <div className="space-y-0">
+                    {recentUsers.map((u, i) => (
+                      <div
+                        key={u.id}
+                        className={`flex items-center justify-between py-2.5 ${i < recentUsers.length - 1 ? 'border-b border-[var(--border-default)]' : ''}`}
+                      >
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className="w-7 h-7 rounded-lg bg-[#A855F7]/10 flex items-center justify-center flex-shrink-0">
+                            <Users size={12} className="text-[#A855F7]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-medium text-[var(--text-primary)] truncate">{u.username}</p>
+                            <p className="text-[10px] text-[var(--text-muted)] truncate">{u.email}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border uppercase ${
+                            u.tier === 'pro'
+                              ? 'text-amber-400 bg-amber-500/10 border-amber-500/20'
+                              : u.tier === 'basic'
+                              ? 'text-blue-400 bg-blue-500/10 border-blue-500/20'
+                              : 'text-[var(--text-muted)] bg-[rgba(46,43,74,0.3)] border-[var(--border-default)]'
+                          }`}>
+                            {u.tier || 'free'}
+                          </span>
+                          <span className="text-[10px] text-[var(--text-muted)] w-16 text-right">{timeAgo(u.createdAt)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
             </div>
           </div>
         )}

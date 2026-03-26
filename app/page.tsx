@@ -20,6 +20,10 @@ import {
   Terminal,
   Star,
   Quote,
+  Shield,
+  KeyRound,
+  Lock,
+  Code,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 import { TerminalDemo } from '@/components/landing/TerminalDemo';
@@ -295,8 +299,28 @@ export default function LandingPage() {
 
   if (!mounted) return null;
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Hatcher',
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'Web',
+    url: 'https://hatcher.host',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+    description: 'Deploy autonomous AI agents across 20+ platforms in 60 seconds.',
+    aggregateRating: undefined,
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <AnimatePresence>
         {showIntro && !introComplete && (
           <IntroSplash onComplete={() => setIntroComplete(true)} />
@@ -449,7 +473,8 @@ export default function LandingPage() {
             <div key={i} className="flex items-center shrink-0">
               <MarqueeItem name="OpenClaw" />
               <MarqueeItem name="Hermes" />
-              <MarqueeItem name="Multi-Framework" />
+              <MarqueeItem name="ElizaOS" />
+              <MarqueeItem name="Milady" />
               <MarqueeItem name="Solana" />
               <MarqueeItem name="Groq" />
               <MarqueeItem name="Anthropic" />
@@ -491,9 +516,9 @@ export default function LandingPage() {
             <BentoCard
               className="lg:col-span-2 lg:row-span-2"
               icon={Zap}
-              value="2"
+              value="4"
               title="Frameworks"
-              description="Choose between OpenClaw (13,700+ skills, plugin ecosystem) and Hermes (lightweight, fast, API-focused). Pick the right tool for the job."
+              description="OpenClaw, Hermes, ElizaOS, and Milady. Each with unique strengths — from 13,700+ skills to blockchain-native multi-agent systems."
               delay={0.1}
             />
 
@@ -586,6 +611,139 @@ export default function LandingPage() {
         </div>
       </Section>
 
+      {/* ── USE CASES ──────────────────────────────────── */}
+      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="use-cases">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12 sm:mb-16">
+            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">Use Cases</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+              <span className="text-white">What will you </span>
+              <span className="bg-gradient-to-r from-purple-400 via-purple-300 to-purple-500 bg-clip-text text-transparent">build?</span>
+            </h2>
+            <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
+              Real use cases from our community
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              {
+                icon: '\u{1F4B0}',
+                title: 'Trading & DeFi Bot',
+                description: 'Monitor prices, execute trades, track portfolios, and get real-time alerts on Telegram or Discord.',
+                platforms: ['Telegram', 'Discord'],
+                example: '"Alert me when SOL drops below $120 and auto-buy $50 worth"',
+                color: '#22c55e',
+              },
+              {
+                icon: '\u{1F3AF}',
+                title: 'Customer Support Agent',
+                description: 'Answer FAQs, handle tickets, escalate complex issues. Works 24/7 across all your channels.',
+                platforms: ['WhatsApp', 'Slack', 'Discord'],
+                example: '"Handle tier-1 support tickets and only escalate billing issues to humans"',
+                color: '#06b6d4',
+              },
+              {
+                icon: '\u{1F465}',
+                title: 'Community Manager',
+                description: 'Moderate chats, welcome new members, answer questions, run polls, and keep engagement high.',
+                platforms: ['Telegram', 'Discord'],
+                example: '"Welcome new members, answer project FAQs, and ban spam in our Telegram group"',
+                color: '#8b5cf6',
+              },
+              {
+                icon: '\u{1F4CA}',
+                title: 'Research & Analytics',
+                description: 'Monitor news, analyze data, summarize reports, and deliver daily briefings automatically.',
+                platforms: ['Telegram', 'Slack', 'Email'],
+                example: '"Send me a daily summary of AI news and competitor updates every morning at 9am"',
+                color: '#f59e0b',
+              },
+              {
+                icon: '\u{1F6E0}\u{FE0F}',
+                title: 'Dev Assistant',
+                description: 'Review PRs, manage GitHub issues, run CI/CD checks, and assist with coding questions.',
+                platforms: ['Discord', 'Slack'],
+                example: '"Watch our GitHub repo, summarize new PRs, and auto-label issues by category"',
+                color: '#ef4444',
+              },
+              {
+                icon: '\u{1F4F1}',
+                title: 'Personal AI Assistant',
+                description: 'Manage emails, schedule meetings, set reminders, control smart home \u2014 your digital twin.',
+                platforms: ['WhatsApp', 'Telegram', 'Signal'],
+                example: '"Check my email every hour, filter spam, and forward important ones to WhatsApp"',
+                color: '#ec4899',
+              },
+            ].map((useCase, i) => (
+              <motion.div
+                key={useCase.title}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+                className="group relative bg-[rgba(255,255,255,0.02)] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 hover:shadow-[0_0_30px_rgba(139,92,246,0.08)] transition-all duration-300 overflow-hidden"
+                style={{ borderLeftWidth: '3px', borderLeftColor: useCase.color }}
+              >
+                {/* Hover glow */}
+                <div
+                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{ background: `radial-gradient(ellipse at 30% 20%, ${useCase.color}10, transparent 70%)` }}
+                />
+
+                <div className="relative">
+                  {/* Icon */}
+                  <span className="text-3xl mb-4 block" role="img">{useCase.icon}</span>
+
+                  {/* Title */}
+                  <h3 className="text-lg font-semibold text-white mb-2">{useCase.title}</h3>
+
+                  {/* Description */}
+                  <p className="text-sm text-[#a1a1aa] leading-relaxed mb-4 line-clamp-2">{useCase.description}</p>
+
+                  {/* Example quote */}
+                  <div className="rounded-lg px-3.5 py-2.5 mb-4 border border-white/[0.04]" style={{ background: `linear-gradient(135deg, ${useCase.color}08, ${useCase.color}04)` }}>
+                    <p className="text-xs text-[#c4b5fd] italic leading-relaxed">{useCase.example}</p>
+                  </div>
+
+                  {/* Platform badges */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {useCase.platforms.map((platform) => (
+                      <span
+                        key={platform}
+                        className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium tracking-wide bg-white/[0.04] border border-white/[0.06] text-[#a1a1aa]"
+                      >
+                        {platform}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="text-center mt-12"
+          >
+            <p className="text-sm text-[#a1a1aa] mb-5">
+              Have a different idea? Start with a blank template and build anything.
+            </p>
+            <Link
+              href="/create"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold px-6 py-3 rounded-full text-sm hover:from-purple-500 hover:to-purple-400 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 shadow-lg shadow-purple-500/20"
+            >
+              Create Custom Agent
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </motion.div>
+        </div>
+      </Section>
+
       {/* ── SEE IT IN ACTION ─────────────────────────── */}
       <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="demo">
         <div className="max-w-5xl mx-auto">
@@ -614,7 +772,7 @@ export default function LandingPage() {
               <div className="text-sm text-[#71717a]">Agents Deployed</div>
             </div>
             <div>
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-1">2</div>
+              <div className="text-3xl sm:text-4xl font-bold text-white mb-1">4</div>
               <div className="text-sm text-[#71717a]">Frameworks</div>
             </div>
             <div>
@@ -628,23 +786,41 @@ export default function LandingPage() {
           </div>
 
           {/* Framework logos */}
-          <div className="mt-12 flex items-center justify-center gap-8 sm:gap-12">
-            <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-              <div className="w-8 h-8 rounded-lg bg-purple-500/15 flex items-center justify-center">
-                <Zap className="w-4 h-4 text-purple-400" />
+          <div className="mt-12 flex items-center justify-center flex-wrap gap-4 sm:gap-6">
+            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+              <div className="w-7 h-7 rounded-lg bg-amber-500/15 flex items-center justify-center">
+                <Zap className="w-3.5 h-3.5 text-amber-400" />
               </div>
               <div>
-                <div className="text-sm font-semibold text-white">OpenClaw</div>
-                <div className="text-[10px] text-[#71717a]">13,700+ skills</div>
+                <div className="text-xs font-semibold text-white">OpenClaw</div>
+                <div className="text-[9px] text-[#71717a]">13,700+ skills</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-              <div className="w-8 h-8 rounded-lg bg-cyan-500/15 flex items-center justify-center">
-                <Terminal className="w-4 h-4 text-cyan-400" />
+            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+              <div className="w-7 h-7 rounded-lg bg-purple-500/15 flex items-center justify-center">
+                <Terminal className="w-3.5 h-3.5 text-purple-400" />
               </div>
               <div>
-                <div className="text-sm font-semibold text-white">Hermes</div>
-                <div className="text-[10px] text-[#71717a]">Lightweight &amp; fast</div>
+                <div className="text-xs font-semibold text-white">Hermes</div>
+                <div className="text-[9px] text-[#71717a]">40+ tools</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+              <div className="w-7 h-7 rounded-lg bg-cyan-500/15 flex items-center justify-center">
+                <Brain className="w-3.5 h-3.5 text-cyan-400" />
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-white">ElizaOS</div>
+                <div className="text-[9px] text-[#71717a]">350+ plugins</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+              <div className="w-7 h-7 rounded-lg bg-rose-500/15 flex items-center justify-center">
+                <Zap className="w-3.5 h-3.5 text-rose-400" />
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-white">Milady</div>
+                <div className="text-[9px] text-[#71717a]">29 connectors</div>
               </div>
             </div>
           </div>
@@ -704,6 +880,58 @@ export default function LandingPage() {
                     <div className="text-xs text-[#71717a]">{t.role}</div>
                   </div>
                 </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* ── SECURITY TRUST BADGES ────────────────────────── */}
+      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="security">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10 sm:mb-16">
+            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">Security First</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+              Built for <span className="bg-gradient-to-r from-purple-400 via-purple-300 to-purple-500 bg-clip-text text-transparent">Trust</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              {
+                icon: Lock,
+                title: 'AES-256-GCM Encrypted',
+                description: 'Your API keys are encrypted at rest with military-grade encryption',
+              },
+              {
+                icon: KeyRound,
+                title: 'Zero-Knowledge Keys',
+                description: 'Your LLM keys never touch our servers when using BYOK',
+              },
+              {
+                icon: Shield,
+                title: 'Container Isolation',
+                description: 'Each agent runs in its own isolated Docker container',
+              },
+              {
+                icon: Code,
+                title: 'Open Source',
+                description: 'Fully auditable. Built on open-source frameworks',
+              },
+            ].map((badge, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="group relative bg-[rgba(255,255,255,0.02)] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 text-center hover:border-[rgba(139,92,246,0.3)] hover:shadow-[0_0_24px_rgba(139,92,246,0.08)] transition-all duration-300"
+              >
+                <div className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mx-auto mb-4 group-hover:bg-[rgba(139,92,246,0.1)] group-hover:border-[rgba(139,92,246,0.2)] transition-all duration-300">
+                  <badge.icon className="w-6 h-6 text-[#a1a1aa] group-hover:text-purple-400 transition-colors duration-300" />
+                </div>
+                <h3 className="text-sm font-semibold text-white mb-2">{badge.title}</h3>
+                <p className="text-xs text-[#a1a1aa] leading-relaxed">{badge.description}</p>
               </motion.div>
             ))}
           </div>
@@ -837,7 +1065,7 @@ export default function LandingPage() {
           <div className="space-y-3">
             {[
               { q: 'Is it really free to start?', a: 'Yes. You get 1 agent, a free LLM (Groq), 20 messages/day, and BYOK — all at zero cost. No credit card or tokens required.' },
-              { q: 'What frameworks are supported?', a: 'Hatcher supports OpenClaw (feature-rich, 13,700+ skills, plugin ecosystem) and Hermes (lightweight, fast, API-focused). You choose when creating an agent.' },
+              { q: 'What frameworks are supported?', a: 'Hatcher supports 4 frameworks: OpenClaw (13,700+ skills, plugin ecosystem), Hermes (lightweight, persistent memory, 40+ tools), ElizaOS (multi-agent, 350+ plugins, blockchain-native), and Milady (privacy-first, 29 connectors). You choose when creating an agent.' },
               { q: 'What is BYOK?', a: 'Bring Your Own Key — use your own API keys from OpenAI, Anthropic, Google, Groq, xAI, OpenRouter, or Ollama. Always free, no markup.' },
               { q: 'How do I pay for upgrades?', a: 'All prices are in USD, paid with SOL or platform tokens on Solana. Approve a wallet transaction and the upgrade activates instantly.' },
               { q: 'Can I run multiple agents?', a: 'Free tier includes 1 agent. Basic includes 1. Pro includes 5. Need more? Stack add-ons for +3, +5, or +10 agents.' },

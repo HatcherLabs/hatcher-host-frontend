@@ -7,21 +7,20 @@ import {
   BookOpen,
   MessageCircle,
   HelpCircle,
-  ExternalLink,
   Mail,
-  Send,
   ChevronDown,
-  Sparkles,
   LifeBuoy,
   ArrowRight,
   Search,
   Rocket,
-  Plug,
-  Key,
-  Compass,
+  Settings,
+  CreditCard,
+  AlertTriangle,
+  Ticket,
+  X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { DOCS_URL, SOCIAL_LINKS } from '@/lib/config';
+import { DOCS_URL } from '@/lib/config';
 
 // ── Animation variants ─────────────────────────────────────────
 
@@ -35,127 +34,216 @@ const cardVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const } },
 };
 
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
-  },
-};
+// ── Quick Links ────────────────────────────────────────────────
 
-const staggerItem = {
-  hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const } },
-};
-
-// ── Data ────────────────────────────────────────────────────────
-
-const LINKS = [
+const QUICK_LINKS = [
   {
     label: 'Documentation',
-    description: 'Guides, API reference, and tutorials',
     href: DOCS_URL,
     icon: BookOpen,
+    emoji: '\uD83D\uDCD6',
     color: '#06b6d4',
+    external: true,
   },
   {
-    label: 'FAQ',
-    description: 'Frequently asked questions',
-    href: `${DOCS_URL}/faq`,
-    icon: HelpCircle,
-    color: '#06b6d4',
-  },
-  {
-    label: 'X (Twitter)',
-    description: 'Follow us for updates and announcements',
-    href: SOCIAL_LINKS.twitter,
-    icon: ExternalLink,
-    color: '#fafafa',
-  },
-  {
-    label: 'GitHub',
-    description: 'Source code and issue tracking',
-    href: SOCIAL_LINKS.github,
-    icon: ExternalLink,
-    color: '#fafafa',
-  },
-  {
-    label: 'Discord',
-    description: 'Join our community for real-time help',
+    label: 'Discord Community',
     href: 'https://discord.gg/7tY3HjKjMc',
     icon: MessageCircle,
+    emoji: '\uD83D\uDCAC',
     color: '#7289da',
+    external: true,
+  },
+  {
+    label: 'Submit Ticket',
+    href: '/support',
+    icon: Ticket,
+    emoji: '\uD83C\uDFAB',
+    color: '#f59e0b',
+    external: false,
+  },
+  {
+    label: 'Email Support',
+    href: 'mailto:support@hatcher.host',
+    icon: Mail,
+    emoji: '\u2709\uFE0F',
+    color: '#10b981',
+    external: true,
   },
 ];
 
-const GETTING_STARTED = [
+// ── FAQ Sections ───────────────────────────────────────────────
+
+interface FAQItem {
+  q: string;
+  a: string;
+}
+
+interface FAQSection {
+  title: string;
+  icon: typeof Rocket;
+  items: FAQItem[];
+}
+
+const FAQ_SECTIONS: FAQSection[] = [
   {
-    title: 'Create Agent',
-    description: 'Pick a template, set a personality, and deploy in 60 seconds.',
+    title: 'Getting Started',
     icon: Rocket,
-    href: '/create',
+    items: [
+      {
+        q: 'How do I create my first agent?',
+        a: 'Click "Create Agent" from the dashboard or the navigation bar. Choose a framework (OpenClaw, Hermes, ElizaOS), pick a template or start from scratch, configure the agent personality and system prompt, then click Deploy. Your agent will be live in about 60 seconds. You can start chatting with it immediately from the dashboard.',
+      },
+      {
+        q: 'What frameworks are available?',
+        a: 'Hatcher currently supports three frameworks: OpenClaw (general-purpose conversational AI), Hermes (task-oriented autonomous agent), and ElizaOS (social media and community management). Each framework comes with multiple templates optimized for different use cases. You can pick the one that best fits your needs when creating an agent.',
+      },
+      {
+        q: 'How does the free tier work?',
+        a: 'Every account starts with a free tier that includes 1 agent. Free agents get 20 messages per day using our hosted Groq LLM key, with a 24-hour rolling reset. You get access to all integrations (Telegram, Discord, Twitter, WhatsApp, Slack). Free agents run on shared resources (0.5 CPU, 1GB RAM) and auto-sleep after 15 minutes of inactivity. If you bring your own API key (BYOK), messages are always unlimited and free.',
+      },
+      {
+        q: 'What is BYOK (Bring Your Own Key)?',
+        a: 'BYOK stands for "Bring Your Own Key." Instead of using Hatcher\'s hosted LLM key (which has daily message limits), you can provide your own API key from any supported provider (OpenAI, Anthropic, Google, Groq, etc.). With BYOK, you pay the provider directly and get unlimited messages on Hatcher at no extra cost. Configure your key in the agent\'s Config tab under the model settings.',
+      },
+      {
+        q: 'How do I connect Telegram or Discord?',
+        a: 'Navigate to your agent\'s dashboard and open the Integrations tab. Select the platform you want to connect (Telegram, Discord, WhatsApp, Slack, or Twitter). Enter the required credentials (e.g., Telegram bot token from @BotFather, Discord bot token from the Discord Developer Portal). Save and restart the agent. The connection will be established automatically. All integrations are available on every tier, including free.',
+      },
+    ],
   },
   {
-    title: 'Connect Platforms',
-    description: 'Link Telegram, Discord, WhatsApp, and 20+ messaging platforms.',
-    icon: Plug,
-    href: 'https://docs.hatcher.host/integrations',
+    title: 'Agent Management',
+    icon: Settings,
+    items: [
+      {
+        q: 'How do I configure my agent?',
+        a: 'From the dashboard, click on your agent to open its detail view. Use the Config tab to edit the JSON configuration directly, or use the individual tabs (Personality, Integrations, Skills) for a guided experience. Changes are saved when you click Save, and take effect after restarting the agent.',
+      },
+      {
+        q: 'How do I add integrations?',
+        a: 'Open your agent\'s Integrations tab. You\'ll see all available platforms listed. Click on the one you want to add, provide the required API tokens or credentials, and save. The integration will activate on the next agent restart. You can add multiple integrations to a single agent \u2014 for example, the same agent can respond on Telegram and Discord simultaneously.',
+      },
+      {
+        q: 'How do I use skills and plugins?',
+        a: 'Skills extend your agent\'s capabilities beyond basic conversation. Go to the Skills tab in your agent\'s dashboard to browse available skills (web search, image generation, code execution, etc.). Enable the ones you want, configure any required API keys, and save. Skills are framework-dependent \u2014 each framework supports a different set of plugins.',
+      },
+      {
+        q: 'What is the system prompt?',
+        a: 'The system prompt defines your agent\'s personality, behavior, and instructions. It tells the AI who it is, how to respond, what topics to focus on, and any rules to follow. You can edit it in the Personality tab or directly in the Config tab. A well-crafted system prompt is the most important factor in your agent\'s quality. Be specific and detailed about the behavior you want.',
+      },
+      {
+        q: 'How do I change the AI model?',
+        a: 'Open your agent\'s Config tab and look for the model settings section. If you\'re using Hatcher\'s hosted key, you\'ll use the default Groq model. If you have BYOK configured, you can select from any model supported by your provider (e.g., GPT-4o, Claude 3.5, Gemini Pro). Change the model identifier, save, and restart.',
+      },
+      {
+        q: 'How do I start, stop, or restart my agent?',
+        a: 'Use the controls at the top of your agent\'s dashboard page. The Start button deploys the agent container and makes it active. Stop shuts it down. Restart performs a stop followed by a start, which is useful after configuration changes. You can also manage agent lifecycle from the main dashboard grid using the action menu on each agent card.',
+      },
+    ],
   },
   {
-    title: 'Add BYOK Key',
-    description: 'Bring your own API key from any LLM provider — always free.',
-    icon: Key,
-    href: '/settings',
+    title: 'Billing & Plans',
+    icon: CreditCard,
+    items: [
+      {
+        q: 'What plans are available?',
+        a: 'Hatcher offers three tiers. Free: 1 agent, 20 messages/day, shared resources, auto-sleep after 15 min. Basic ($9.99/mo): 1 agent, 100 messages/day, better resources (1 CPU, 1.5GB RAM), auto-sleep after 6 hours. Pro ($19.99/mo): 5 agents, 300 messages/day per agent, dedicated resources (2 CPU, 2GB RAM), file manager, full log viewer, and priority support. All tiers include all integrations and BYOK is always unlimited.',
+      },
+      {
+        q: 'How do add-ons work?',
+        a: 'Add-ons let you expand beyond your plan\'s included agent slots. You can stack multiple add-ons: +3 agents ($4.99/mo), +5 agents ($7.99/mo), or +10 agents ($14.99/mo). Add-ons are stackable and apply to your account. There\'s also a one-time File Manager add-on ($9.99/agent) that gives non-Pro users access to the file manager for a specific agent permanently.',
+      },
+      {
+        q: 'How do I upgrade or downgrade?',
+        a: 'Go to Settings or the Billing page in your dashboard. Select the plan you want and complete the payment. Upgrades take effect immediately. Downgrades take effect at the end of your current billing period. If you downgrade and have more agents than your new plan allows, excess agents will be stopped but not deleted \u2014 you can choose which ones to keep active.',
+      },
+      {
+        q: 'What payment methods are accepted?',
+        a: 'Hatcher accepts payments in SOL (Solana) or platform tokens. Prices are listed in USD and converted to the equivalent token amount using the live Jupiter Price API rate at the time of purchase. You\'ll sign a Solana transaction from your connected wallet, and the feature is unlocked once the transaction is confirmed on-chain. Stripe (credit card) support is also available.',
+      },
+      {
+        q: 'Do I need crypto to use Hatcher?',
+        a: 'No. The free tier requires no payment at all. For paid plans, Hatcher supports both crypto payments (SOL or platform tokens via your Solana wallet) and traditional payments through Stripe (credit/debit card). You can use Hatcher without ever touching cryptocurrency. Connecting a wallet is optional and only needed for crypto-based payments.',
+      },
+    ],
   },
   {
-    title: 'Explore Agents',
-    description: 'Browse community agents for inspiration and templates.',
-    icon: Compass,
-    href: '/explore',
+    title: 'Troubleshooting',
+    icon: AlertTriangle,
+    items: [
+      {
+        q: 'My agent is not responding',
+        a: 'First, check if your agent is running (status should show "running" on the dashboard). If it\'s stopped or sleeping, start it. If it\'s running but not responding: check that your integrations are properly configured with valid tokens, verify your daily message limit hasn\'t been reached (Free: 20/day, Basic: 100/day, Pro: 300/day), and check the Logs tab for errors. If using BYOK, confirm your API key is valid and has credits with the provider.',
+      },
+      {
+        q: 'My agent keeps restarting',
+        a: 'Automatic restarts usually indicate a crash loop. Hatcher restarts crashed containers up to 3 times within a 5-minute window. Common causes: invalid configuration JSON, missing required environment variables or API keys, out-of-memory errors (try reducing your agent\'s workload), or incompatible skill configurations. Check the Logs tab for the specific error message causing the crash.',
+      },
+      {
+        q: 'How do I check logs?',
+        a: 'Open your agent\'s dashboard and click the Logs tab. Free and Basic users see recent log entries. Pro users have access to the full log viewer with search and filtering. Logs show agent startup, incoming messages, LLM calls, errors, and integration events. If your agent is crashing, the last few log lines before the crash will usually explain why.',
+      },
+      {
+        q: 'My integration is not working',
+        a: 'Verify that the bot token or API credentials are correct and haven\'t expired. For Telegram: make sure the bot token from @BotFather is valid and the bot hasn\'t been revoked. For Discord: check that the bot has been invited to your server with the correct permissions. For Twitter: ensure your API keys have read/write access. After updating credentials, restart your agent. Check the Logs tab for specific connection errors.',
+      },
+      {
+        q: 'I am getting rate limited',
+        a: 'Rate limiting means you\'ve hit your daily message quota. Free tier: 20 messages/day, Basic: 100/day, Pro: 300/day. The limit resets on a 24-hour rolling window. Solutions: upgrade your plan for a higher limit, switch to BYOK (your own API key) for unlimited messages, or wait for the limit to reset. The 429 error in logs confirms rate limiting. BYOK always bypasses Hatcher\'s message limits.',
+      },
+    ],
   },
 ];
 
-const QUICK_FAQ = [
-  {
-    q: 'How do I create my first agent?',
-    a: 'Click "Create Agent" from the dashboard or navigation. Choose a template or start from scratch, configure your agent personality, and click deploy. Your agent will be live in about 60 seconds.',
-  },
-  {
-    q: 'What is BYOK and is it really free?',
-    a: 'BYOK stands for "Bring Your Own Key." You can use your own API key from any supported LLM provider (OpenAI, Anthropic, Google, etc.) at zero cost from Hatcher. You only pay the provider directly.',
-  },
-  {
-    q: 'How do I connect my agent to Telegram or Discord?',
-    a: 'Navigate to your agent\'s Integrations tab, configure the platform you want (e.g., Telegram) — all integrations are free. Enter your bot token and the agent will automatically connect on the next deploy.',
-  },
-  {
-    q: 'What happens when my agent crashes?',
-    a: 'Hatcher automatically restarts crashed containers up to 3 times within a 5-minute window. If the issue persists, the agent will be marked as errored and you will be notified. Check the logs for error details.',
-  },
-  {
-    q: 'How do payments work?',
-    a: 'Feature prices are listed in USD. When you purchase, the equivalent token amount is calculated using the live Jupiter Price API rate. You sign a Solana transaction, and once confirmed, the feature is unlocked.',
-  },
-  {
-    q: 'Can I export my agent configuration?',
-    a: 'Yes. Go to your agent\'s Config tab to view and copy the full JSON configuration. This is portable and can be used with any compatible deployment.',
-  },
-];
+// Flatten all FAQ items for search
+const ALL_FAQ_ITEMS = FAQ_SECTIONS.flatMap((section) =>
+  section.items.map((item) => ({
+    ...item,
+    sectionTitle: section.title,
+  }))
+);
 
 // ── Page Component ──────────────────────────────────────────────
 
 export default function HelpPage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
-  const filteredFAQ = useMemo(() => {
-    if (!searchQuery.trim()) return QUICK_FAQ;
+  const toggleItem = (key: string) => {
+    setOpenItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const isSearching = searchQuery.trim().length > 0;
+
+  const filteredItems = useMemo(() => {
+    if (!isSearching) return [];
     const query = searchQuery.toLowerCase();
-    return QUICK_FAQ.filter(
+    return ALL_FAQ_ITEMS.filter(
       (item) =>
         item.q.toLowerCase().includes(query) ||
         item.a.toLowerCase().includes(query)
     );
-  }, [searchQuery]);
+  }, [searchQuery, isSearching]);
+
+  // Group filtered items back by section for display
+  const filteredSections = useMemo(() => {
+    if (!isSearching) return FAQ_SECTIONS;
+    const grouped = new Map<string, FAQItem[]>();
+    for (const item of filteredItems) {
+      const existing = grouped.get(item.sectionTitle) || [];
+      existing.push({ q: item.q, a: item.a });
+      grouped.set(item.sectionTitle, existing);
+    }
+    return FAQ_SECTIONS.filter((s) => grouped.has(s.title)).map((s) => ({
+      ...s,
+      items: grouped.get(s.title)!,
+    }));
+  }, [filteredItems, isSearching]);
 
   return (
     <motion.div
@@ -164,7 +252,7 @@ export default function HelpPage() {
       initial="hidden"
       animate="visible"
     >
-      <div className="max-w-3xl mx-auto space-y-8">
+      <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <motion.div variants={cardVariants} className="relative">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(6,182,212,0.06),transparent_60%)] pointer-events-none rounded-2xl" />
@@ -174,12 +262,51 @@ export default function HelpPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-[var(--text-primary)]">
-                Help & Support
+                Help Center
               </h1>
               <p className="text-sm mt-0.5 text-[var(--text-secondary)]">
-                Find answers and get in touch with the team
+                Find answers, browse guides, and get in touch with support
               </p>
             </div>
+          </div>
+        </motion.div>
+
+        {/* Quick Links */}
+        <motion.div variants={cardVariants}>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {QUICK_LINKS.map((link, index) => {
+              const inner = (
+                <motion.div
+                  className="group card glass-noise p-4 flex flex-col items-center gap-2.5 text-center transition-all duration-200 hover:border-[rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.06)] cursor-pointer"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.06 }}
+                >
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
+                    style={{ background: link.color + '18' }}
+                  >
+                    <link.icon size={20} style={{ color: link.color }} />
+                  </div>
+                  <span className="text-xs font-medium text-[var(--text-primary)] group-hover:text-[#06b6d4] transition-colors leading-tight">
+                    {link.label}
+                  </span>
+                </motion.div>
+              );
+
+              if (link.external) {
+                return (
+                  <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer">
+                    {inner}
+                  </a>
+                );
+              }
+              return (
+                <Link key={link.label} href={link.href}>
+                  {inner}
+                </Link>
+              );
+            })}
           </div>
         </motion.div>
 
@@ -192,148 +319,96 @@ export default function HelpPage() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search frequently asked questions..."
-            className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-[#252240] border border-[rgba(46,43,74,0.6)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 transition-all duration-200"
+            placeholder="Search all questions... e.g. &quot;BYOK&quot;, &quot;rate limit&quot;, &quot;Telegram&quot;"
+            className="w-full pl-11 pr-20 py-3.5 rounded-xl bg-[#252240] border border-[rgba(46,43,74,0.6)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 transition-all duration-200"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute inset-y-0 right-4 flex items-center text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+              className="absolute inset-y-0 right-4 flex items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
             >
-              <span className="text-xs">Clear</span>
+              <span className="text-xs text-[var(--text-secondary)]">
+                {filteredItems.length} {filteredItems.length === 1 ? 'result' : 'results'}
+              </span>
+              <X size={14} />
             </button>
           )}
         </motion.div>
 
-        {/* Getting Started */}
-        <motion.div variants={cardVariants}>
-          <div className="flex items-center gap-2.5 mb-4 px-1">
-            <Rocket size={16} className="text-[#06b6d4]" />
-            <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-              Getting Started
-            </h2>
-          </div>
-          <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-          >
-            {GETTING_STARTED.map((item) => {
-              const Icon = item.icon;
+        {/* FAQ Sections */}
+        <AnimatePresence mode="popLayout">
+          {filteredSections.length > 0 ? (
+            filteredSections.map((section, sectionIndex) => {
+              const SectionIcon = section.icon;
               return (
-                <motion.div key={item.title} variants={staggerItem}>
-                  <Link
-                    href={item.href}
-                    className="group card glass-noise p-5 flex flex-col gap-3 transition-all duration-200 hover:border-[rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.06)] block"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-[#06b6d4]/10 flex items-center justify-center transition-all duration-200 group-hover:bg-[#06b6d4]/20 group-hover:scale-105">
-                      <Icon size={20} className="text-[#06b6d4]" />
+                <motion.div
+                  key={section.title}
+                  variants={cardVariants}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8, transition: { duration: 0.2 } }}
+                  transition={{ delay: sectionIndex * 0.05 }}
+                >
+                  <div className="flex items-center gap-2.5 mb-4 px-1">
+                    <div className="w-7 h-7 rounded-lg bg-[#06b6d4]/10 flex items-center justify-center">
+                      <SectionIcon size={14} className="text-[#06b6d4]" />
                     </div>
-                    <div>
-                      <p className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-[#06b6d4] transition-colors">
-                        {item.title}
-                      </p>
-                      <p className="text-xs mt-1 text-[var(--text-muted)] leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1 mt-auto">
-                      <span className="text-xs text-[#06b6d4]/70 group-hover:text-[#06b6d4] transition-colors font-medium">
-                        Learn more
+                    <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+                      {section.title}
+                    </h2>
+                    {isSearching && (
+                      <span className="text-xs text-[var(--text-muted)] ml-auto">
+                        {section.items.length} {section.items.length === 1 ? 'match' : 'matches'}
                       </span>
-                      <ArrowRight size={12} className="text-[#06b6d4]/70 group-hover:text-[#06b6d4] transition-all duration-200 group-hover:translate-x-0.5" />
-                    </div>
-                  </Link>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    {section.items.map((item, itemIndex) => {
+                      const itemKey = `${section.title}::${item.q}`;
+                      const isOpen = openItems.has(itemKey);
+                      return (
+                        <FAQAccordion
+                          key={itemKey}
+                          q={item.q}
+                          a={item.a}
+                          index={itemIndex}
+                          searchQuery={searchQuery}
+                          isOpen={isOpen}
+                          onToggle={() => toggleItem(itemKey)}
+                        />
+                      );
+                    })}
+                  </div>
                 </motion.div>
               );
-            })}
-          </motion.div>
-        </motion.div>
-
-        {/* Quick Links */}
-        <motion.div className="card glass-noise p-2" variants={cardVariants}>
-          <div className="space-y-0.5">
-            {LINKS.map((link, index) => {
-              const Icon = link.icon;
-              return (
-                <motion.a
-                  key={link.label}
-                  href={link.href}
+            })
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              className="card glass-noise p-10 text-center"
+            >
+              <HelpCircle size={36} className="mx-auto text-[var(--text-muted)] mb-3" />
+              <p className="text-sm text-[var(--text-secondary)]">
+                No matching questions found for &ldquo;{searchQuery}&rdquo;
+              </p>
+              <p className="text-xs text-[var(--text-muted)] mt-2">
+                Try different keywords or browse the{' '}
+                <a
+                  href={DOCS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-4 p-4 rounded-xl transition-all duration-200 hover:bg-white/[0.03] group"
-                  initial={{ opacity: 0, x: -12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.06 }}
+                  className="text-[#06b6d4] hover:underline"
                 >
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 group-hover:scale-105"
-                    style={{ background: link.color + '18' }}
-                  >
-                    <Icon size={20} style={{ color: link.color }} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[var(--text-primary)] group-hover:text-[#06b6d4] transition-colors">
-                      {link.label}
-                    </p>
-                    <p className="text-xs mt-0.5 text-[var(--text-muted)]">
-                      {link.description}
-                    </p>
-                  </div>
-                  <ArrowRight size={14} className="flex-shrink-0 text-[var(--text-muted)] group-hover:text-[#06b6d4] transition-all duration-200 group-hover:translate-x-1" />
-                </motion.a>
-              );
-            })}
-          </div>
-        </motion.div>
+                  documentation
+                </a>
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Quick FAQ */}
-        <motion.div variants={cardVariants}>
-          <div className="flex items-center gap-2.5 mb-4 px-1">
-            <Sparkles size={16} className="text-[#06b6d4]" />
-            <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-              Quick Answers
-            </h2>
-            {searchQuery && (
-              <span className="text-xs text-[var(--text-muted)] ml-auto">
-                {filteredFAQ.length} {filteredFAQ.length === 1 ? 'result' : 'results'}
-              </span>
-            )}
-          </div>
-          <div className="space-y-2">
-            <AnimatePresence mode="popLayout">
-              {filteredFAQ.length > 0 ? (
-                filteredFAQ.map((item, index) => (
-                  <FAQAccordion
-                    key={item.q}
-                    q={item.q}
-                    a={item.a}
-                    index={index}
-                    searchQuery={searchQuery}
-                  />
-                ))
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  className="card glass-noise p-8 text-center"
-                >
-                  <HelpCircle size={32} className="mx-auto text-[var(--text-muted)] mb-3" />
-                  <p className="text-sm text-[var(--text-secondary)]">
-                    No matching questions found for &ldquo;{searchQuery}&rdquo;
-                  </p>
-                  <p className="text-xs text-[var(--text-muted)] mt-1">
-                    Try different keywords or check the documentation
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.div>
-
-        {/* Contact */}
+        {/* Contact Section */}
         <motion.div className="card glass-noise p-6 relative overflow-hidden" variants={cardVariants}>
           <div className="absolute top-0 right-0 w-48 h-48 bg-[radial-gradient(circle,rgba(6,182,212,0.06),transparent_70%)] pointer-events-none" />
           <div className="flex items-center gap-2.5 mb-4 relative">
@@ -346,7 +421,7 @@ export default function HelpPage() {
           </div>
           <div className="space-y-3 text-sm text-[var(--text-secondary)] leading-relaxed relative">
             <p>
-              Need help?{' '}
+              Can&apos;t find what you&apos;re looking for?{' '}
               <Link
                 href="/support"
                 className="font-medium text-[#06b6d4] hover:text-[#06b6d4] transition-colors underline decoration-[#06b6d4]/30 underline-offset-2"
@@ -355,24 +430,44 @@ export default function HelpPage() {
               </Link>{' '}
               or reach out directly:
             </p>
-            <div className="space-y-2 mt-3">
-              <p>
-                <Mail size={14} className="inline-block mr-1.5 text-[#06b6d4] -mt-0.5" />
-                <a href="mailto:support@hatcher.host" className="font-medium text-[#06b6d4] hover:text-[#06b6d4] transition-colors underline decoration-[#06b6d4]/30 underline-offset-2">support@hatcher.host</a> — technical help &amp; tickets
-              </p>
-              <p>
-                <Mail size={14} className="inline-block mr-1.5 text-[#06b6d4] -mt-0.5" />
-                <a href="mailto:contact@hatcher.host" className="font-medium text-[#06b6d4] hover:text-[#06b6d4] transition-colors underline decoration-[#06b6d4]/30 underline-offset-2">contact@hatcher.host</a> — general inquiries
-              </p>
-              <p>
-                <MessageCircle size={14} className="inline-block mr-1.5 text-[#7289da] -mt-0.5" />
-                <a href="https://discord.gg/7tY3HjKjMc" target="_blank" rel="noopener noreferrer" className="font-medium text-[#06b6d4] hover:text-[#06b6d4] transition-colors underline decoration-[#06b6d4]/30 underline-offset-2">Join our Discord</a> — community support &amp; chat
-              </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+              <a
+                href="mailto:support@hatcher.host"
+                className="flex items-center gap-2.5 p-3 rounded-lg bg-white/[0.02] hover:bg-white/[0.04] transition-colors group"
+              >
+                <Mail size={14} className="text-[#06b6d4] flex-shrink-0" />
+                <div>
+                  <p className="text-xs font-medium text-[var(--text-primary)] group-hover:text-[#06b6d4] transition-colors">support@hatcher.host</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">Technical help</p>
+                </div>
+              </a>
+              <a
+                href="mailto:contact@hatcher.host"
+                className="flex items-center gap-2.5 p-3 rounded-lg bg-white/[0.02] hover:bg-white/[0.04] transition-colors group"
+              >
+                <Mail size={14} className="text-[#10b981] flex-shrink-0" />
+                <div>
+                  <p className="text-xs font-medium text-[var(--text-primary)] group-hover:text-[#06b6d4] transition-colors">contact@hatcher.host</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">General inquiries</p>
+                </div>
+              </a>
+              <a
+                href="https://discord.gg/7tY3HjKjMc"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2.5 p-3 rounded-lg bg-white/[0.02] hover:bg-white/[0.04] transition-colors group"
+              >
+                <MessageCircle size={14} className="text-[#7289da] flex-shrink-0" />
+                <div>
+                  <p className="text-xs font-medium text-[var(--text-primary)] group-hover:text-[#06b6d4] transition-colors">Discord</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">Community support</p>
+                </div>
+              </a>
             </div>
           </div>
         </motion.div>
 
-        {/* Still need help? */}
+        {/* Still need help CTA */}
         <motion.div variants={cardVariants}>
           <Link
             href="/support"
@@ -387,7 +482,7 @@ export default function HelpPage() {
                 Still need help?
               </p>
               <p className="text-sm mt-0.5 text-[var(--text-secondary)]">
-                Visit our support page to submit a request or start a conversation.
+                Submit a support ticket and our team will get back to you within 24 hours.
               </p>
             </div>
             <ArrowRight size={20} className="flex-shrink-0 text-[var(--text-muted)] group-hover:text-[#06b6d4] transition-all duration-200 group-hover:translate-x-1 relative" />
@@ -405,18 +500,21 @@ function FAQAccordion({
   a,
   index,
   searchQuery,
+  isOpen,
+  onToggle,
 }: {
   q: string;
   a: string;
   index: number;
   searchQuery: string;
+  isOpen: boolean;
+  onToggle: () => void;
 }) {
-  const [open, setOpen] = useState(false);
-
-  // Highlight matching text in the question
+  // Highlight matching text
   const highlightText = (text: string) => {
     if (!searchQuery.trim()) return text;
-    const regex = new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    const escaped = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escaped})`, 'gi');
     const parts = text.split(regex);
     return parts.map((part, i) =>
       regex.test(part) ? (
@@ -434,33 +532,33 @@ function FAQAccordion({
       layout
       className={cn(
         'card glass-noise overflow-hidden transition-all duration-200',
-        open && 'border-[rgba(6,182,212,0.3)] shadow-[0_0_16px_rgba(6,182,212,0.06)]'
+        isOpen && 'border-[rgba(6,182,212,0.3)] shadow-[0_0_16px_rgba(6,182,212,0.06)]'
       )}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8, transition: { duration: 0.2 } }}
-      transition={{ delay: index * 0.04 }}
+      transition={{ delay: index * 0.03 }}
     >
       <button
-        onClick={() => setOpen(!open)}
+        onClick={onToggle}
         className="w-full flex items-center justify-between p-4 text-left group"
       >
         <span className="text-sm font-medium text-[var(--text-primary)] pr-4 group-hover:text-[#06b6d4] transition-colors">
           {highlightText(q)}
         </span>
         <motion.div
-          animate={{ rotate: open ? 180 : 0 }}
+          animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
           className={cn(
             'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors',
-            open ? 'bg-[#06b6d4]/15' : 'bg-white/[0.03]'
+            isOpen ? 'bg-[#06b6d4]/15' : 'bg-white/[0.03]'
           )}
         >
-          <ChevronDown className={cn('w-4 h-4 transition-colors', open ? 'text-[#06b6d4]' : 'text-[var(--text-muted)]')} />
+          <ChevronDown className={cn('w-4 h-4 transition-colors', isOpen ? 'text-[#06b6d4]' : 'text-[var(--text-muted)]')} />
         </motion.div>
       </button>
       <AnimatePresence initial={false}>
-        {open && (
+        {isOpen && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
@@ -470,7 +568,9 @@ function FAQAccordion({
           >
             <div className="px-4 pb-4 pt-0">
               <div className="w-full h-px bg-gradient-to-r from-transparent via-[rgba(6,182,212,0.2)] to-transparent mb-3" />
-              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{a}</p>
+              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                {highlightText(a)}
+              </p>
             </div>
           </motion.div>
         )}

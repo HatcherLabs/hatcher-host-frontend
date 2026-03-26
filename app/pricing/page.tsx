@@ -330,23 +330,23 @@ export default function PricingPage() {
             <p className="text-[var(--text-muted)] text-sm">See what each tier includes at a glance</p>
           </div>
 
-          <div className="card glass-noise p-0">
+          <div className="card glass-noise p-0 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-[rgba(46,43,74,0.4)]">
-                    <th className="text-left p-5 text-[var(--text-muted)] font-medium text-xs uppercase tracking-wider w-[40%]">Feature</th>
-                    <th className="text-center p-5 text-green-400 font-semibold">
-                      <div className="text-xs uppercase tracking-wider mb-1">Free</div>
-                      <div className="text-lg font-extrabold">$0</div>
+                    <th className="text-left px-2.5 py-3 sm:p-5 text-[var(--text-muted)] font-medium text-[10px] sm:text-xs uppercase tracking-wider">Feature</th>
+                    <th className="text-center px-2 py-3 sm:p-5 text-green-400 font-semibold">
+                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Free</div>
+                      <div className="text-sm sm:text-lg font-extrabold">$0</div>
                     </th>
-                    <th className="text-center p-5 text-[var(--text-primary)] font-semibold">
-                      <div className="text-xs uppercase tracking-wider mb-1">Basic</div>
-                      <div className="text-lg font-extrabold text-gradient">$9.99<span className="text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                    <th className="text-center px-2 py-3 sm:p-5 text-[var(--text-primary)] font-semibold">
+                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Basic</div>
+                      <div className="text-sm sm:text-lg font-extrabold text-gradient">$9.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
                     </th>
-                    <th className="text-center p-5 text-[var(--text-primary)] font-semibold">
-                      <div className="text-xs uppercase tracking-wider mb-1">Pro</div>
-                      <div className="text-lg font-extrabold text-gradient">$19.99<span className="text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                    <th className="text-center px-2 py-3 sm:p-5 text-[var(--text-primary)] font-semibold">
+                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Pro</div>
+                      <div className="text-sm sm:text-lg font-extrabold text-gradient">$19.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
                     </th>
                   </tr>
                 </thead>
@@ -363,10 +363,10 @@ export default function PricingPage() {
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.03 }}
                     >
-                      <td className="p-4 text-[var(--text-secondary)]">{row.label}</td>
-                      <td className="p-4 text-center">{renderCell(row.free)}</td>
-                      <td className="p-4 text-center bg-[#06b6d4]/[0.02]">{renderCell(row.basic)}</td>
-                      <td className="p-4 text-center">{renderCell(row.pro)}</td>
+                      <td className="px-2.5 py-3 sm:p-4 text-[var(--text-secondary)] text-xs sm:text-sm">{row.label}</td>
+                      <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.free)}</td>
+                      <td className="px-2 py-3 sm:p-4 text-center bg-[#06b6d4]/[0.02]">{renderCell(row.basic)}</td>
+                      <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.pro)}</td>
                     </motion.tr>
                   ))}
                 </tbody>
@@ -547,7 +547,7 @@ const FAQ = [
   },
   {
     q: 'What frameworks are supported?',
-    a: 'Hatcher supports OpenClaw and Hermes. OpenClaw offers 13,700+ skills and a rich plugin ecosystem. Hermes is lightweight and API-focused. You pick your framework when creating an agent -- all tiers support both.',
+    a: 'Hatcher supports 4 frameworks: OpenClaw (13,700+ skills, plugin ecosystem), Hermes (lightweight, persistent memory, 40+ tools), ElizaOS (multi-agent, 350+ plugins, blockchain-native), and Milady (privacy-first, 29 connectors). All tiers support all frameworks.',
   },
   {
     q: 'What is BYOK (Bring Your Own Key)?',

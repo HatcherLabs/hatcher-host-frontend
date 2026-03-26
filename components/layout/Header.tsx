@@ -113,7 +113,7 @@ export function Header() {
               <Link
                 href="/admin"
                 className={clsx(
-                  'flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-colors duration-200',
+                  'hidden lg:flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-colors duration-200',
                   pathname === '/admin'
                     ? 'bg-purple-500/15 text-purple-400'
                     : 'text-[#71717a] hover:text-purple-400 hover:bg-purple-500/10'
@@ -165,83 +165,86 @@ export function Header() {
 
           {/* Right side: auth button/user menu + hamburger */}
           <div className="flex items-center gap-3">
-            {authLoading ? (
-              <div className="h-9 w-24 rounded-lg bg-white/[0.04] animate-pulse" />
-            ) : isAuthenticated && user ? (
-              <>
-              <NotificationCenter />
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setDropdownOpen((o) => !o)}
-                  aria-expanded={dropdownOpen}
-                  aria-haspopup="menu"
-                  className="h-9 px-3 flex items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 transition-all duration-200"
-                >
-                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
-                  <span className="text-xs font-medium text-purple-300">{user.username}</span>
-                  <span className="text-xs ml-1" style={{ color: 'rgba(167,139,250,0.6)' }}>&#9662;</span>
-                </button>
-
-                {dropdownOpen && (
-                  <div
-                    className="absolute right-0 mt-1 w-48 rounded-xl shadow-xl z-50 overflow-hidden"
-                    style={{
-                      background: 'rgba(14, 14, 20, 0.95)',
-                      backdropFilter: 'blur(24px)',
-                      WebkitBackdropFilter: 'blur(24px)',
-                      border: '1px solid rgba(255, 255, 255, 0.06)',
-                    }}
+            {/* Desktop only: auth buttons / user menu */}
+            <div className="hidden lg:flex items-center gap-3">
+              {authLoading ? (
+                <div className="h-9 w-24 rounded-lg bg-white/[0.04] animate-pulse" />
+              ) : isAuthenticated && user ? (
+                <>
+                <NotificationCenter />
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setDropdownOpen((o) => !o)}
+                    aria-expanded={dropdownOpen}
+                    aria-haspopup="menu"
+                    className="h-9 px-3 flex items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 transition-all duration-200"
                   >
-                    <div className="px-4 py-2.5 border-b border-white/[0.06]">
-                      <p className="text-xs text-white font-medium truncate">{user.username}</p>
-                      <p className="text-[10px] text-[#a1a1aa] truncate">{user.email}</p>
-                      {creditBalance !== null && creditBalance > 0 && (
-                        <Link
-                          href="/dashboard/billing"
-                          onClick={() => setDropdownOpen(false)}
-                          className="mt-1.5 flex items-center gap-1.5 text-[10px] text-green-400 hover:text-green-300 transition-colors"
-                        >
-                          <Wallet className="w-3 h-3" />
-                          <span className="font-semibold">${creditBalance.toFixed(2)}</span>
-                          <span className="text-[#a1a1aa]">credits</span>
-                        </Link>
-                      )}
+                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
+                    <span className="text-xs font-medium text-purple-300">{user.username}</span>
+                    <span className="text-xs ml-1" style={{ color: 'rgba(167,139,250,0.6)' }}>&#9662;</span>
+                  </button>
+
+                  {dropdownOpen && (
+                    <div
+                      className="absolute right-0 mt-1 w-48 rounded-xl shadow-xl z-50 overflow-hidden"
+                      style={{
+                        background: 'rgba(14, 14, 20, 0.95)',
+                        backdropFilter: 'blur(24px)',
+                        WebkitBackdropFilter: 'blur(24px)',
+                        border: '1px solid rgba(255, 255, 255, 0.06)',
+                      }}
+                    >
+                      <div className="px-4 py-2.5 border-b border-white/[0.06]">
+                        <p className="text-xs text-white font-medium truncate">{user.username}</p>
+                        <p className="text-[10px] text-[#a1a1aa] truncate">{user.email}</p>
+                        {creditBalance !== null && creditBalance > 0 && (
+                          <Link
+                            href="/dashboard/billing"
+                            onClick={() => setDropdownOpen(false)}
+                            className="mt-1.5 flex items-center gap-1.5 text-[10px] text-green-400 hover:text-green-300 transition-colors"
+                          >
+                            <Wallet className="w-3 h-3" />
+                            <span className="font-semibold">${creditBalance.toFixed(2)}</span>
+                            <span className="text-[#a1a1aa]">credits</span>
+                          </Link>
+                        )}
+                      </div>
+                      <Link
+                        href="/settings"
+                        onClick={() => setDropdownOpen(false)}
+                        className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-[#a1a1aa] hover:bg-white/[0.04] transition-colors duration-200 border-b border-white/[0.06]"
+                      >
+                        <Settings className="w-3 h-3" />
+                        Settings
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2 text-left px-4 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors duration-200"
+                      >
+                        <LogOut className="w-3 h-3" />
+                        Sign Out
+                      </button>
                     </div>
-                    <Link
-                      href="/settings"
-                      onClick={() => setDropdownOpen(false)}
-                      className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-[#a1a1aa] hover:bg-white/[0.04] transition-colors duration-200 border-b border-white/[0.06]"
-                    >
-                      <Settings className="w-3 h-3" />
-                      Settings
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-2 text-left px-4 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors duration-200"
-                    >
-                      <LogOut className="w-3 h-3" />
-                      Sign Out
-                    </button>
-                  </div>
-                )}
-              </div>
-              </>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/login"
-                  className="h-9 px-4 text-white font-medium text-xs rounded-full border border-white/20 bg-transparent hover:bg-white/[0.04] transition-all duration-200 flex items-center"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/register"
-                  className="h-9 px-4 text-white font-medium text-xs rounded-full bg-purple-600 hover:bg-purple-500 transition-all duration-200 flex items-center"
-                >
-                  Sign Up
-                </Link>
-              </div>
-            )}
+                  )}
+                </div>
+                </>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/login"
+                    className="h-9 px-4 text-white font-medium text-xs rounded-full border border-white/20 bg-transparent hover:bg-white/[0.04] transition-all duration-200 flex items-center"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="h-9 px-4 text-white font-medium text-xs rounded-full bg-purple-600 hover:bg-purple-500 transition-all duration-200 flex items-center"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
+            </div>
 
             {/* Hamburger -- mobile/tablet only */}
             <button
@@ -343,6 +346,56 @@ export function Header() {
                   </Link>
                 </motion.div>
               )}
+
+              {/* Mobile auth section */}
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: (NAV_LINKS.length + 2) * 0.04 }}
+                className="mt-2 pt-3 border-t border-white/[0.06]"
+              >
+                {isAuthenticated && user ? (
+                  <div className="space-y-1">
+                    <div className="px-3 py-2 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
+                      <span className="text-sm font-medium text-purple-300">{user.username}</span>
+                      <span className="text-[10px] text-[#a1a1aa] ml-auto">{user.email}</span>
+                    </div>
+                    <Link
+                      href="/settings"
+                      className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[#71717a] hover:text-white transition-colors duration-200"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <Settings className="w-4 h-4" />
+                      Settings
+                    </Link>
+                    <button
+                      onClick={() => { handleLogout(); setMobileOpen(false); }}
+                      className="w-full flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-red-400 hover:bg-red-500/10 transition-colors duration-200"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 px-3">
+                    <Link
+                      href="/login"
+                      className="flex-1 h-10 text-white font-medium text-sm rounded-lg border border-white/20 bg-transparent hover:bg-white/[0.04] transition-all duration-200 flex items-center justify-center"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/register"
+                      className="flex-1 h-10 text-white font-medium text-sm rounded-lg bg-purple-600 hover:bg-purple-500 transition-all duration-200 flex items-center justify-center"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Sign Up
+                    </Link>
+                  </div>
+                )}
+              </motion.div>
             </nav>
           </motion.div>
         )}

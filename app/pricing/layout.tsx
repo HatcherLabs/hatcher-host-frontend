@@ -1,14 +1,29 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Pricing',
+  title: 'Pricing — Free Tier, Basic & Pro Plans',
   description:
-    'Hatcher agent hosting pricing — free tier with Groq, BYOK always free, and premium features unlockable with platform tokens on Solana.',
+    'Hatcher pricing plans: Free tier with 20 msgs/day, Basic $9.99/mo (100 msgs/day), Pro $19.99/mo (300 msgs/day). BYOK any LLM for unlimited messages. Pay with SOL or card.',
+  keywords: [
+    'AI agent pricing',
+    'agent hosting plans',
+    'free AI hosting',
+    'BYOK pricing',
+    'Hatcher plans',
+    'Solana payments',
+  ],
   openGraph: {
-    title: 'Pricing',
+    title: 'Pricing — Free Tier, Basic & Pro Plans | Hatcher',
     description:
-      'Hatcher agent hosting pricing — free tier included, premium features unlockable with platform tokens.',
+      'Deploy AI agents free. Upgrade for more messages, dedicated resources, and file management. BYOK any LLM for unlimited usage.',
+    url: 'https://hatcher.host/pricing',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Hatcher Pricing — Free Tier Included',
+    description: 'Deploy AI agents free. Upgrade for more messages and dedicated resources.',
+  },
+  alternates: { canonical: 'https://hatcher.host/pricing' },
 };
 
 export default function PricingLayout({ children }: { children: React.ReactNode }) {

@@ -84,7 +84,7 @@ export function Footer() {
               <span className="text-base font-bold text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Hatcher</span>
             </div>
             <p className="text-xs text-[#A5A1C2] leading-relaxed max-w-[200px]">
-              Deploy autonomous AI agents across 20+ platforms. Powered by OpenClaw &amp; Hermes.
+              Deploy autonomous AI agents across 20+ platforms. Powered by OpenClaw, Hermes, ElizaOS &amp; Milady.
             </p>
             {/* Social icons */}
             <div className="flex items-center gap-1.5 mt-4">
@@ -170,6 +170,10 @@ export function Footer() {
             <span className="font-medium text-[#A5A1C2]">OpenClaw</span>
             <span>&middot;</span>
             <span className="font-medium text-[#A5A1C2]">Hermes</span>
+            <span>&middot;</span>
+            <span className="font-medium text-[#A5A1C2]">ElizaOS</span>
+            <span>&middot;</span>
+            <span className="font-medium text-[#A5A1C2]">Milady</span>
             <span>&middot;</span>
             <span className="font-medium text-[#A5A1C2]">Solana</span>
           </div>

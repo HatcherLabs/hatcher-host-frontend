@@ -51,8 +51,6 @@ const ICON_COLOR_MAP: Record<string, string> = {
   support_reply: 'text-[#06b6d4] bg-[#06b6d4]/15',
 };
 
-const READ_AT_KEY = 'notifications_read_at';
-
 function timeAgo(dateStr: string): string {
   const now = Date.now();
   const then = new Date(dateStr).getTime();
@@ -73,20 +71,16 @@ export function NotificationCenter() {
   const [readAt, setReadAt] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Load readAt from localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setReadAt(localStorage.getItem(READ_AT_KEY));
-    }
-  }, []);
-
-  // Fetch notifications
+  // Fetch notifications + server-side readAt
   const fetchNotifications = useCallback(async () => {
     if (!isAuthenticated) return;
     try {
       const res = await api.getNotifications();
-      if (res.success && Array.isArray(res.data)) {
-        setNotifications(res.data.slice(0, 20));
+      if (res.success && res.data) {
+        setNotifications((res.data.items ?? []).slice(0, 20));
+        // Initialise readAt from server (only if we don't already have a local value,
+        // so that a just-clicked "mark all read" isn't overwritten by a stale fetch)
+        setReadAt((prev) => prev ?? res.data.readAt ?? null);
       }
     } catch {
       // silently fail
@@ -123,10 +117,19 @@ export function NotificationCenter() {
     ? notifications.filter((n) => new Date(n.timestamp).getTime() > new Date(readAt).getTime()).length
     : notifications.length;
 
-  const markAllRead = () => {
+  const markAllRead = async () => {
+    // Optimistic UI update
     const now = new Date().toISOString();
-    localStorage.setItem(READ_AT_KEY, now);
     setReadAt(now);
+    // Persist server-side so it survives reloads / other browsers
+    try {
+      const res = await api.markNotificationsRead();
+      if (res.success) {
+        setReadAt(res.data.readAt);
+      }
+    } catch {
+      // local state already updated — worst case the server catches up next time
+    }
   };
 
   if (!isAuthenticated) return null;

@@ -1,14 +1,21 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Login',
+  title: 'Sign In',
   description:
-    'Sign in to your Hatcher account to manage your AI agents, view analytics, and configure integrations.',
+    'Sign in to your Hatcher account to manage your AI agents, view analytics, configure integrations, and monitor performance.',
   openGraph: {
-    title: 'Login',
-    description:
-      'Sign in to your Hatcher account to manage your AI agents.',
+    title: 'Sign In | Hatcher',
+    description: 'Sign in to manage your AI agents on Hatcher.',
+    url: 'https://hatcher.host/login',
   },
+  twitter: {
+    card: 'summary',
+    title: 'Sign In | Hatcher',
+    description: 'Sign in to manage your AI agents on Hatcher.',
+  },
+  robots: { index: false, follow: true },
+  alternates: { canonical: 'https://hatcher.host/login' },
 };
 
 export default function LoginLayout({ children }: { children: React.ReactNode }) {

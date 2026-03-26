@@ -111,7 +111,7 @@ export const FRAMEWORK_BADGE: Record<string, string> = {
 export const FRAMEWORK_ROOT_PATH: Record<string, string> = {
   openclaw: '/home/node/.openclaw',
   hermes: '/home/hermes/.hermes',
-  elizaos: '/home/eliza/.eliza',
+  elizaos: '/data',
   milady: '/data/.milady',
 };
 
@@ -123,10 +123,19 @@ export function getIntegrationsForFramework(framework: string): IntegrationDef[]
 }
 
 /** Get extra integrations filtered by framework.
- *  Extra platforms use OpenClaw's npm channel extensions — only available for openclaw. */
+ *  Extra platforms use OpenClaw's npm channel extensions — available for openclaw, milady, and hermes (subset). */
 export function getExtraIntegrationsForFramework(framework: string): IntegrationDef[] {
-  if (framework !== 'openclaw') return [];
-  return EXTRA_PLATFORM_INTEGRATIONS;
+  if (framework === 'openclaw') return EXTRA_PLATFORM_INTEGRATIONS;
+  if (framework === 'milady') {
+    // Milady supports most extra channels too (built on elizaOS with 29 connectors)
+    const miladySupported = ['extra.twitch', 'extra.mattermost', 'extra.line', 'extra.matrix', 'extra.nostr', 'extra.feishu', 'extra.bluebubbles'];
+    return EXTRA_PLATFORM_INTEGRATIONS.filter(i => i.stateKey && miladySupported.includes(i.stateKey));
+  }
+  if (framework === 'hermes') {
+    const hermesSupported = ['extra.mattermost', 'extra.matrix'];
+    return EXTRA_PLATFORM_INTEGRATIONS.filter(i => i.stateKey && hermesSupported.includes(i.stateKey));
+  }
+  return [];
 }
 
 export const STATUS_STYLES: Record<string, { classes: string; label: string; pulse: boolean; dotColor: string }> = {
@@ -162,6 +171,7 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     secretPrefix: 'TELEGRAM',
     docsUrl: 'https://docs.hatcher.host/integrations/telegram',
     hasChannelSettings: true,
+    frameworks: ['openclaw', 'hermes', 'elizaos', 'milady'],
     fields: [
       { key: 'TELEGRAM_BOT_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'Bot token from @BotFather', helper: 'Message @BotFather on Telegram to create a bot and get the token', required: true },
     ],
@@ -173,6 +183,7 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     secretPrefix: 'DISCORD',
     docsUrl: 'https://docs.hatcher.host/integrations/discord',
     hasChannelSettings: true,
+    frameworks: ['openclaw', 'hermes', 'elizaos', 'milady'],
     fields: [
       { key: 'DISCORD_BOT_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'Discord bot token', helper: 'From Discord Developer Portal > Bot > Token', required: true },
       { key: 'DISCORD_APPLICATION_ID', label: 'Application ID', type: 'text', placeholder: 'e.g. 123456789012345678', helper: 'From Discord Developer Portal > General Information' },
@@ -185,6 +196,7 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     secretPrefix: 'WHATSAPP',
     docsUrl: 'https://docs.hatcher.host/integrations/whatsapp',
     hasChannelSettings: false,
+    frameworks: ['openclaw', 'hermes', 'milady'],
     pairingRequired: true,
     pairingFields: [
       { key: 'WHATSAPP_ALLOW_FROM', label: 'Allowed Phone Numbers', type: 'text', placeholder: '+1234567890, +0987654321', helper: 'Comma-separated phone numbers (E.164 format). Only these numbers can chat with your agent. Leave empty for everyone.' },
@@ -199,12 +211,13 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     secretPrefix: 'SIGNAL',
     docsUrl: 'https://docs.hatcher.host/integrations/signal',
     hasChannelSettings: false,
+    frameworks: ['openclaw', 'hermes', 'milady'],
     fields: [],
   },
   {
     featureKey: 'openclaw.platform.twitter',
     name: 'X (Twitter)',
-    description: 'Post tweets, reply, search, read posts, manage followers, and more via xurl skill.',
+    description: 'Post tweets, reply, search, read posts, manage followers, and more via xurl.',
     frameworks: ['openclaw'],
     secretPrefix: 'XURL',
     docsUrl: 'https://docs.hatcher.host/integrations/twitter',
@@ -215,12 +228,32 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     ],
   },
   {
+    featureKey: 'openclaw.platform.twitter',
+    stateKey: 'elizaos.twitter',
+    name: 'X (Twitter)',
+    description: 'Post tweets, reply, and engage on X via the Twitter plugin.',
+    frameworks: ['elizaos', 'milady'],
+    secretPrefix: 'TWITTER',
+    docsUrl: 'https://docs.hatcher.host/integrations/twitter',
+    hasChannelSettings: false,
+    fields: [
+      { key: 'TWITTER_USERNAME', label: 'Username', type: 'text', placeholder: '@youragent', helper: 'Your X/Twitter account username (without @)', required: true },
+      { key: 'TWITTER_PASSWORD', label: 'Password', type: 'password', placeholder: 'Account password', helper: 'Password for the Twitter account (cookie-based auth)', required: true },
+      { key: 'TWITTER_EMAIL', label: 'Email', type: 'text', placeholder: 'email@example.com', helper: 'Email associated with the Twitter account (needed for login verification)' },
+      { key: 'TWITTER_API_KEY', label: 'API Key (optional)', type: 'password', placeholder: 'API Key from X Developer Portal', helper: 'Alternative to cookie auth — use X API v1 keys instead of username/password' },
+      { key: 'TWITTER_API_SECRET', label: 'API Secret (optional)', type: 'password', placeholder: 'API Secret', helper: 'API Secret Key from X Developer Portal' },
+      { key: 'TWITTER_ACCESS_TOKEN', label: 'Access Token (optional)', type: 'password', placeholder: 'Access Token', helper: 'OAuth 1.0a Access Token from X Developer Portal' },
+      { key: 'TWITTER_ACCESS_TOKEN_SECRET', label: 'Access Token Secret (optional)', type: 'password', placeholder: 'Access Token Secret', helper: 'OAuth 1.0a Access Token Secret' },
+    ],
+  },
+  {
     featureKey: 'openclaw.platform.slack',
     name: 'Slack',
     description: 'Deploy your agent in Slack workspaces.',
     secretPrefix: 'SLACK',
     docsUrl: 'https://docs.hatcher.host/integrations/slack',
     hasChannelSettings: true,
+    frameworks: ['openclaw', 'hermes', 'elizaos', 'milady'],
     fields: [
       { key: 'SLACK_BOT_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'xoxb-...', helper: 'Bot User OAuth Token from Slack API', required: true },
       { key: 'SLACK_APP_TOKEN', label: 'App Token', type: 'password', placeholder: 'xapp-...', helper: 'App-Level Token for Socket Mode (from Slack API > Basic Information)' },
@@ -230,7 +263,7 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     featureKey: 'openclaw.feature.webhooks',
     name: 'Webhooks',
     description: 'Trigger your agent via external webhook events.',
-    frameworks: ['openclaw'],
+    frameworks: ['openclaw', 'hermes'],
     secretPrefix: 'WEBHOOK',
     fields: [
       { key: 'WEBHOOK_URL', label: 'Webhook URL', type: 'text', placeholder: 'https://your-service.com/webhook', helper: 'URL that will send events to your agent', required: true },

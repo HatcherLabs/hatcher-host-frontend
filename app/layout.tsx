@@ -37,26 +37,55 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://hatcher.host'),
   title: { default: 'Hatcher — AI Agent Hosting Platform', template: '%s | Hatcher' },
-  description: 'Deploy, host, and manage AI agents. Free tier included. Pay with SOL, tokens, or card.',
-  keywords: ['AI agents', 'agent hosting', 'deploy AI', 'Solana', 'hatcher', 'AI bot', 'OpenClaw', 'Hermes'],
+  description:
+    'Deploy autonomous AI agents across 20+ platforms in 60 seconds. Free tier included. OpenClaw, Hermes, ElizaOS, Milady frameworks. BYOK any LLM.',
+  keywords: [
+    'AI agents',
+    'agent hosting',
+    'OpenClaw',
+    'Hermes',
+    'ElizaOS',
+    'deploy AI',
+    'Telegram bot',
+    'Discord bot',
+    'BYOK',
+    'Solana',
+    'AI bot hosting',
+    'autonomous agents',
+    'LLM hosting',
+  ],
   authors: [{ name: 'Hatcher Labs' }],
+  creator: 'Hatcher Labs',
+  publisher: 'Hatcher Labs',
   openGraph: {
     type: 'website',
     url: 'https://hatcher.host',
     siteName: 'Hatcher',
-    title: 'Hatcher — Deploy AI Agents in Minutes',
-    description: 'The managed platform for AI agents. Free tier, BYOK, multi-framework.',
-    images: [{ url: '/og', width: 1200, height: 630 }],
+    title: 'Hatcher — AI Agent Hosting Platform',
+    description:
+      'Deploy autonomous AI agents across 20+ platforms in 60 seconds. Free tier included. OpenClaw, Hermes, ElizaOS, Milady frameworks. BYOK any LLM.',
+    images: [{ url: '/og', width: 1200, height: 630, alt: 'Hatcher — AI Agent Hosting Platform' }],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Hatcher — AI Agent Hosting',
-    description: 'Deploy and manage AI agents. Free tier included.',
-    images: ['/og'],
+    site: '@HatcherLabs',
+    creator: '@HatcherLabs',
+    title: 'Hatcher — AI Agent Hosting Platform',
+    description:
+      'Deploy autonomous AI agents across 20+ platforms in 60 seconds. Free tier included. BYOK any LLM.',
+    images: [{ url: '/og', alt: 'Hatcher — AI Agent Hosting Platform' }],
   },
-  robots: { index: true, follow: true },
-  metadataBase: new URL('https://hatcher.host'),
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
+  alternates: { canonical: 'https://hatcher.host' },
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+  },
+  category: 'technology',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

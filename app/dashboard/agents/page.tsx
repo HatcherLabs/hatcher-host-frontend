@@ -169,7 +169,13 @@ export default function MyAgentsPage() {
 
   // ── Onboarding check ───────────────────────────────────
   useEffect(() => {
-    if (!loading && isAuthenticated && agents.length === 0 && !localStorage.getItem('onboarding_completed')) {
+    if (
+      !loading &&
+      isAuthenticated &&
+      agents.length === 0 &&
+      !localStorage.getItem('onboarding_dismissed') &&
+      !localStorage.getItem('onboarding_completed')
+    ) {
       setShowOnboarding(true);
     }
   }, [loading, isAuthenticated, agents]);

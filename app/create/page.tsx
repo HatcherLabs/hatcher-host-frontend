@@ -17,10 +17,16 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   Cpu,
+  Eye,
+  EyeOff,
   Key,
   Loader2,
+  MessageCircle,
   Rocket,
+  Send,
+  Settings2,
   Zap,
 } from 'lucide-react';
 
@@ -44,6 +50,61 @@ type LLMChoice = 'free_groq' | 'byok';
 const CATEGORY_ORDER = ['business', 'development', 'crypto', 'research', 'support', 'custom'] as const;
 
 const OPENCLAW_SKILLS_LIST = ['web_search', 'calculator', 'weather', 'code_interpreter', 'file_manager', 'image_gen'];
+
+// ── Platform definitions ────────────────────────────────────
+
+const PLATFORMS = [
+  {
+    id: 'telegram',
+    name: 'Telegram',
+    icon: '\u2708\uFE0F',
+    description: 'Deploy as a Telegram bot',
+    frameworks: ['openclaw', 'hermes', 'elizaos', 'milady'],
+    fields: [
+      { key: 'TELEGRAM_BOT_TOKEN', label: 'Bot Token', placeholder: 'Token from @BotFather', helper: 'Message @BotFather on Telegram \u2192 /newbot \u2192 copy the token', required: true },
+    ],
+  },
+  {
+    id: 'discord',
+    name: 'Discord',
+    icon: '\uD83C\uDFAE',
+    description: 'Deploy as a Discord bot',
+    frameworks: ['openclaw', 'hermes', 'elizaos', 'milady'],
+    fields: [
+      { key: 'DISCORD_BOT_TOKEN', label: 'Bot Token', placeholder: 'Discord bot token', helper: 'Discord Developer Portal \u2192 New Application \u2192 Bot \u2192 Copy Token', required: true },
+    ],
+  },
+  {
+    id: 'whatsapp',
+    name: 'WhatsApp',
+    icon: '\uD83D\uDCAC',
+    description: 'Connect via QR code',
+    frameworks: ['openclaw', 'hermes', 'milady'],
+    fields: [],
+    note: 'QR pairing will be available after deployment',
+  },
+  {
+    id: 'slack',
+    name: 'Slack',
+    icon: '\uD83D\uDCBC',
+    description: 'Deploy in Slack workspace',
+    frameworks: ['openclaw', 'hermes', 'elizaos', 'milady'],
+    fields: [
+      { key: 'SLACK_BOT_TOKEN', label: 'Bot Token', placeholder: 'xoxb-...', helper: 'Slack API \u2192 Create App \u2192 OAuth & Permissions \u2192 Bot Token', required: true },
+    ],
+  },
+  {
+    id: 'twitter',
+    name: 'X (Twitter)',
+    icon: '\uD835\uDD4F',
+    description: 'Post, reply and engage on X',
+    frameworks: ['openclaw', 'elizaos', 'milady'],
+    fields: [
+      { key: 'XURL_CLIENT_ID', label: 'OAuth2 Client ID', placeholder: 'Client ID from X Developer Portal', required: true },
+      { key: 'XURL_CLIENT_SECRET', label: 'OAuth2 Client Secret', placeholder: 'Client Secret', required: true },
+    ],
+  },
+];
 
 // ── Animation variants ───────────────────────────────────────
 
@@ -118,6 +179,32 @@ export default function CreatePage() {
   // ── Milady-specific form state ──
   const [miladyPersonality, setMiladyPersonality] = useState<'helpful' | 'tsundere' | 'unhinged' | 'custom'>('helpful');
 
+  // ── Advanced create options ──
+  const [enableWebSearch, setEnableWebSearch] = useState(false);
+  const [searchProvider, setSearchProvider] = useState('brave');
+  const [enableTTS, setEnableTTS] = useState(false);
+  const [ttsProvider, setTtsProvider] = useState('elevenlabs');
+  const [sessionScope, setSessionScope] = useState('per-peer');
+  const [enableMemory, setEnableMemory] = useState(true);
+  const [dbBackend, setDbBackend] = useState('pglite');
+  const [hermesPersonality, setHermesPersonality] = useState('default');
+  const [approvalMode, setApprovalMode] = useState('auto');
+  const [showMoreOptions, setShowMoreOptions] = useState(false);
+  const [enableImageGen, setEnableImageGen] = useState(false);
+  const [enableVoice, setEnableVoice] = useState(false);
+  const [localFirst, setLocalFirst] = useState(true);
+
+  // ── Platform selection state ──
+  const [platformsEnabled, setPlatformsEnabled] = useState<Record<string, boolean>>({});
+  const [platformSecrets, setPlatformSecrets] = useState<Record<string, Record<string, string>>>({});
+  const [platformSecretVisibility, setPlatformSecretVisibility] = useState<Record<string, boolean>>({});
+
+  // ── Test chat state ──
+  const [testMessages, setTestMessages] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
+  const [testInput, setTestInput] = useState('');
+  const [testLoading, setTestLoading] = useState(false);
+  const [showTestChat, setShowTestChat] = useState(false);
+
   const agentName = openclawForm.name;
   const agentDesc = openclawForm.description;
 
@@ -179,6 +266,43 @@ export default function CreatePage() {
     return `Your key: ${prov?.name ?? byokProvider}${byokModel ? ` / ${byokModel}` : ''}`;
   }
 
+  // ── Test Chat ──
+
+  async function handleTestChat() {
+    if (!testInput.trim() || testLoading) return;
+    const userMsg = testInput.trim();
+    setTestInput('');
+    setTestMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    setTestLoading(true);
+
+    const systemPrompt = openclawForm.systemPrompt || `You are ${openclawForm.name || 'a helpful AI agent'}.`;
+    const llmConfig = getLLMConfig();
+
+    try {
+      const res = await api.testChat(userMsg, systemPrompt, llmConfig.model, llmConfig.modelProvider);
+      if (res.success && res.data?.text) {
+        setTestMessages(prev => [...prev, { role: 'assistant', content: res.data.text }]);
+      } else {
+        // Fallback: show simulated preview if API returns an error
+        const name = openclawForm.name || 'Your Agent';
+        const promptSnippet = systemPrompt.substring(0, 100);
+        setTestMessages(prev => [...prev, {
+          role: 'assistant',
+          content: `Hi! I'm ${name}. This is a preview of how I'll respond. Deploy me to start real conversations!\n\nYou said: "${userMsg}"\n\nMy personality is defined by: ${promptSnippet}${promptSnippet.length >= 100 ? '...' : ''}`,
+        }]);
+      }
+    } catch {
+      // Fallback: simulated preview on network/unexpected error
+      const name = openclawForm.name || 'Your Agent';
+      const promptSnippet = systemPrompt.substring(0, 100);
+      setTestMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `Hi! I'm ${name}. This is a preview of how I'll respond. Deploy me to start real conversations!\n\nYou said: "${userMsg}"\n\nMy personality is defined by: ${promptSnippet}${promptSnippet.length >= 100 ? '...' : ''}`,
+      }]);
+    }
+    setTestLoading(false);
+  }
+
   // ── Launch ──
 
   const handleLaunch = async () => {
@@ -186,6 +310,15 @@ export default function CreatePage() {
 
     try {
       const llm = getLLMConfig();
+
+      // Gather enabled platforms and their secrets
+      const enabledPlatforms = Object.entries(platformsEnabled)
+        .filter(([, enabled]) => enabled)
+        .map(([id]) => id);
+
+      const filteredPlatformSecrets = Object.fromEntries(
+        Object.entries(platformSecrets).filter(([key]) => platformsEnabled[key])
+      );
 
       const payload: Parameters<typeof api.createAgent>[0] = {
         name: openclawForm.name,
@@ -209,6 +342,31 @@ export default function CreatePage() {
             : (AGENT_TEMPLATES.find(t => t.id === selectedTemplate)?.defaultSystemPrompt ?? ''),
           // BYOK config -- backend reads agentConfig['byok']
           ...(llm.byok ? { byok: llm.byok } : {}),
+          // Platform integrations
+          ...(enabledPlatforms.length > 0 ? {
+            platforms: enabledPlatforms,
+            platformSecrets: filteredPlatformSecrets,
+          } : {}),
+          // Advanced options (framework-specific)
+          ...(selectedFramework === 'openclaw' && {
+            sessionScope,
+            webSearch: enableWebSearch ? { provider: searchProvider } : undefined,
+            tts: enableTTS ? { provider: ttsProvider } : undefined,
+          }),
+          ...(selectedFramework === 'hermes' && {
+            personality: hermesPersonality,
+            enableMemory,
+            approvalMode,
+          }),
+          ...(selectedFramework === 'elizaos' && {
+            dbBackend,
+            enableImageGen,
+            enableVoice,
+          }),
+          ...(selectedFramework === 'milady' && {
+            dbBackend,
+            localFirst,
+          }),
         },
       };
 
@@ -240,8 +398,9 @@ export default function CreatePage() {
       setTimeout(() => {
         router.push(`/dashboard/agent/${res.data.id}?new=1`);
       }, 2000);
-    } catch {
-      toast('error', 'Network error — please check your connection and try again.');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Unknown error';
+      toast('error', `Failed to create agent: ${msg}`);
       setLaunching(false);
     }
   };
@@ -284,7 +443,8 @@ export default function CreatePage() {
   // ── Validation ──
 
   const selectedByokProvider = getBYOKProvider(byokProvider);
-  const isConfigValid = openclawForm.name.trim().length >= 3
+  const nameValid = openclawForm.name.trim().length >= 3 && /^[a-zA-Z0-9 \-]+$/.test(openclawForm.name.trim());
+  const isConfigValid = nameValid
     && (llmChoice !== 'byok' || !selectedByokProvider?.requiresApiKey || byokApiKey.trim().length > 0);
 
   return (
@@ -639,8 +799,7 @@ export default function CreatePage() {
                     type="text"
                     className={cn(
                       'input',
-                      openclawForm.name.length > 0 && openclawForm.name.trim().length < 3 && 'border-[#F87171]/50 focus:border-[#F87171]/70 focus:ring-[#F87171]/20',
-                      openclawForm.name.trim().length === 0 && openclawForm.name !== '' && 'border-[#F87171]/50'
+                      openclawForm.name.length > 0 && !nameValid && 'border-[#F87171]/50 focus:border-[#F87171]/70 focus:ring-[#F87171]/20',
                     )}
                     placeholder="e.g. AlphaResearcher, TweetLord..."
                     value={openclawForm.name}
@@ -655,13 +814,15 @@ export default function CreatePage() {
                   />
                   <p id="agent-name-hint" className={cn(
                     'text-xs mt-1.5 ml-1',
-                    openclawForm.name.length > 0 && openclawForm.name.trim().length < 3
+                    openclawForm.name.length > 0 && (!nameValid && openclawForm.name.trim().length > 0)
                       ? 'text-[#F87171]'
                       : 'text-[var(--text-muted)]'
                   )}>
                     {openclawForm.name.length > 0 && openclawForm.name.trim().length < 3
                       ? 'Name must be at least 3 characters'
-                      : `${openclawForm.name.trim().length}/50 characters`}
+                      : openclawForm.name.trim().length > 0 && !/^[a-zA-Z0-9 \-]+$/.test(openclawForm.name.trim())
+                        ? 'Only letters, numbers, spaces, and hyphens allowed'
+                        : `${openclawForm.name.trim().length}/50 characters`}
                   </p>
                 </div>
 
@@ -684,6 +845,122 @@ export default function CreatePage() {
                     <p id="agent-desc-hint" className="text-xs text-[var(--text-muted)]">Brief tagline for your agent</p>
                     <span className="text-xs text-[var(--text-muted)]">{openclawForm.description.length}/140</span>
                   </div>
+                </div>
+
+                {/* ── Connect Your Platforms ── */}
+                <div>
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-2">
+                      <Rocket className="w-4 h-4 text-[var(--accent-400)]" />
+                      Where should your agent live?
+                    </h3>
+                    <p className="text-xs text-[var(--text-muted)] mt-1">
+                      Select platforms and add your API keys. You can add more later in Settings.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {PLATFORMS.filter(p => p.frameworks.includes(selectedFramework)).map((platform) => {
+                      const isEnabled = !!platformsEnabled[platform.id];
+                      const secrets = platformSecrets[platform.id] ?? {};
+                      return (
+                        <div
+                          key={platform.id}
+                          className={cn(
+                            'rounded-xl border transition-all duration-200 overflow-hidden',
+                            isEnabled
+                              ? 'bg-[#06b6d4]/5 border-[#06b6d4]/40 shadow-[0_0_12px_rgba(6,182,212,0.08)]'
+                              : 'bg-[rgba(26,23,48,0.6)] border-[rgba(46,43,74,0.4)] hover:border-[rgba(46,43,74,0.7)]'
+                          )}
+                        >
+                          {/* Platform header with toggle */}
+                          <button
+                            type="button"
+                            onClick={() => setPlatformsEnabled(prev => ({ ...prev, [platform.id]: !prev[platform.id] }))}
+                            className="w-full flex items-center justify-between px-4 py-3 text-left"
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <span className="text-xl leading-none shrink-0" aria-hidden="true">{platform.icon}</span>
+                              <div className="min-w-0">
+                                <div className="text-sm font-medium text-[var(--text-primary)]">{platform.name}</div>
+                                <div className="text-[11px] text-[var(--text-muted)] truncate">{platform.description}</div>
+                              </div>
+                            </div>
+                            <div className="shrink-0 ml-3">
+                              <ToggleSwitch checked={isEnabled} onChange={(v) => setPlatformsEnabled(prev => ({ ...prev, [platform.id]: v }))} />
+                            </div>
+                          </button>
+
+                          {/* Expanded credential fields */}
+                          <AnimatePresence>
+                            {isEnabled && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="overflow-hidden"
+                              >
+                                <div className="px-4 pb-4 pt-1 space-y-3 border-t border-[rgba(46,43,74,0.3)]">
+                                  {platform.fields.length > 0 ? (
+                                    platform.fields.map((field) => {
+                                      const fieldVisKey = `${platform.id}_${field.key}`;
+                                      const isVisible = !!platformSecretVisibility[fieldVisKey];
+                                      return (
+                                        <div key={field.key}>
+                                          <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
+                                            {field.label}
+                                            {field.required && <span className="text-[var(--accent-600)] ml-0.5">*</span>}
+                                          </label>
+                                          <div className="relative">
+                                            <input
+                                              type={isVisible ? 'text' : 'password'}
+                                              className="input w-full pr-10 text-sm"
+                                              placeholder={field.placeholder}
+                                              value={secrets[field.key] ?? ''}
+                                              onChange={(e) => {
+                                                setPlatformSecrets(prev => ({
+                                                  ...prev,
+                                                  [platform.id]: { ...(prev[platform.id] ?? {}), [field.key]: e.target.value },
+                                                }));
+                                              }}
+                                              autoComplete="off"
+                                            />
+                                            <button
+                                              type="button"
+                                              onClick={() => setPlatformSecretVisibility(prev => ({ ...prev, [fieldVisKey]: !prev[fieldVisKey] }))}
+                                              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-[rgba(46,43,74,0.4)] transition-colors"
+                                              aria-label={isVisible ? 'Hide value' : 'Show value'}
+                                            >
+                                              {isVisible ? <EyeOff size={14} className="text-[#71717a]" /> : <Eye size={14} className="text-[#71717a]" />}
+                                            </button>
+                                          </div>
+                                          {'helper' in field && field.helper && (
+                                            <p className="text-[10px] text-[var(--text-muted)] mt-1 leading-relaxed">{field.helper}</p>
+                                          )}
+                                        </div>
+                                      );
+                                    })
+                                  ) : (
+                                    'note' in platform && platform.note && (
+                                      <p className="text-xs text-[var(--text-muted)] py-1 flex items-center gap-1.5">
+                                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#06b6d4]/60 shrink-0" />
+                                        {platform.note}
+                                      </p>
+                                    )
+                                  )}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <p className="text-[11px] text-[var(--text-muted)] mt-3 text-center opacity-70">
+                    No platforms selected? No problem -- add them anytime from your agent&apos;s Settings tab.
+                  </p>
                 </div>
 
                 {/* LLM Choice */}
@@ -965,6 +1242,247 @@ export default function CreatePage() {
                     </select>
                   </div>
                 )}
+
+                {/* ── More Options (collapsible, framework-specific) ── */}
+                <div className="border border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.4)] rounded-xl overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setShowMoreOptions((v) => !v)}
+                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-[rgba(46,43,74,0.2)] transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Settings2 className="w-4 h-4 text-[var(--accent-400)]" />
+                      <span className="text-sm font-medium text-[var(--text-primary)]">More Options</span>
+                      <span className="text-xs text-[var(--text-muted)]">
+                        {selectedFramework === 'openclaw' ? 'Search, voice, sessions' :
+                         selectedFramework === 'hermes' ? 'Personality, memory, approvals' :
+                         selectedFramework === 'elizaos' ? 'Database, image gen, voice' :
+                         'Database, privacy, presets'}
+                      </span>
+                    </div>
+                    {showMoreOptions
+                      ? <ChevronUp className="w-4 h-4 text-[var(--text-muted)]" />
+                      : <ChevronDown className="w-4 h-4 text-[var(--text-muted)]" />
+                    }
+                  </button>
+
+                  <AnimatePresence>
+                    {showMoreOptions && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-4 pb-5 pt-2 space-y-5 border-t border-[rgba(46,43,74,0.3)]">
+
+                          {/* ── OpenClaw options ── */}
+                          {selectedFramework === 'openclaw' && (
+                            <>
+                              {/* Session Scope */}
+                              <OptionRow
+                                label="Session Scope"
+                                hint="How conversation context is shared between users"
+                              >
+                                <OptionSelect
+                                  value={sessionScope}
+                                  onChange={setSessionScope}
+                                  options={[
+                                    { value: 'per-peer', label: 'Per User' },
+                                    { value: 'global', label: 'Global' },
+                                  ]}
+                                />
+                              </OptionRow>
+
+                              {/* Web Search */}
+                              <OptionRow
+                                label="Enable Web Search"
+                                hint="Allow your agent to search the web for real-time info"
+                              >
+                                <ToggleSwitch checked={enableWebSearch} onChange={setEnableWebSearch} />
+                              </OptionRow>
+
+                              {enableWebSearch && (
+                                <OptionRow
+                                  label="Search Provider"
+                                  hint="Which search API to use"
+                                  indent
+                                >
+                                  <OptionSelect
+                                    value={searchProvider}
+                                    onChange={setSearchProvider}
+                                    options={[
+                                      { value: 'brave', label: 'Brave' },
+                                      { value: 'gemini', label: 'Gemini' },
+                                      { value: 'grok', label: 'Grok' },
+                                      { value: 'perplexity', label: 'Perplexity' },
+                                    ]}
+                                  />
+                                </OptionRow>
+                              )}
+
+                              {/* TTS */}
+                              <OptionRow
+                                label="Enable Voice (TTS)"
+                                hint="Text-to-speech output for voice replies"
+                              >
+                                <ToggleSwitch checked={enableTTS} onChange={setEnableTTS} />
+                              </OptionRow>
+
+                              {enableTTS && (
+                                <OptionRow
+                                  label="TTS Provider"
+                                  hint="Voice synthesis engine"
+                                  indent
+                                >
+                                  <OptionSelect
+                                    value={ttsProvider}
+                                    onChange={setTtsProvider}
+                                    options={[
+                                      { value: 'elevenlabs', label: 'ElevenLabs' },
+                                      { value: 'openai', label: 'OpenAI' },
+                                    ]}
+                                  />
+                                </OptionRow>
+                              )}
+                            </>
+                          )}
+
+                          {/* ── Hermes options ── */}
+                          {selectedFramework === 'hermes' && (
+                            <>
+                              {/* Personality */}
+                              <OptionRow
+                                label="Personality"
+                                hint="Conversation tone and style"
+                              >
+                                <OptionSelect
+                                  value={hermesPersonality}
+                                  onChange={setHermesPersonality}
+                                  options={[
+                                    { value: 'default', label: 'Default' },
+                                    { value: 'helpful', label: 'Helpful' },
+                                    { value: 'technical', label: 'Technical' },
+                                    { value: 'creative', label: 'Creative' },
+                                    { value: 'concise', label: 'Concise' },
+                                  ]}
+                                />
+                              </OptionRow>
+
+                              {/* Memory */}
+                              <OptionRow
+                                label="Enable Memory"
+                                hint="Persist context across conversations"
+                              >
+                                <ToggleSwitch checked={enableMemory} onChange={setEnableMemory} />
+                              </OptionRow>
+
+                              {/* Approval Mode */}
+                              <OptionRow
+                                label="Approval Mode"
+                                hint="How actions are authorized before execution"
+                              >
+                                <OptionSelect
+                                  value={approvalMode}
+                                  onChange={setApprovalMode}
+                                  options={[
+                                    { value: 'auto', label: 'Auto' },
+                                    { value: 'ask', label: 'Ask Before Actions' },
+                                    { value: 'manual', label: 'Manual' },
+                                  ]}
+                                />
+                              </OptionRow>
+                            </>
+                          )}
+
+                          {/* ── ElizaOS options ── */}
+                          {selectedFramework === 'elizaos' && (
+                            <>
+                              {/* Database */}
+                              <OptionRow
+                                label="Database"
+                                hint="Storage backend for agent state and memory"
+                              >
+                                <OptionSelect
+                                  value={dbBackend}
+                                  onChange={setDbBackend}
+                                  options={[
+                                    { value: 'pglite', label: 'PGLite (default)' },
+                                    { value: 'postgresql', label: 'PostgreSQL' },
+                                    { value: 'sqlite', label: 'SQLite' },
+                                  ]}
+                                />
+                              </OptionRow>
+
+                              {/* Image Generation */}
+                              <OptionRow
+                                label="Enable Image Generation"
+                                hint="Allow the agent to generate images"
+                              >
+                                <ToggleSwitch checked={enableImageGen} onChange={setEnableImageGen} />
+                              </OptionRow>
+
+                              {/* Voice */}
+                              <OptionRow
+                                label="Enable Voice"
+                                hint="Speech-to-text and text-to-speech capabilities"
+                              >
+                                <ToggleSwitch checked={enableVoice} onChange={setEnableVoice} />
+                              </OptionRow>
+                            </>
+                          )}
+
+                          {/* ── Milady options ── */}
+                          {selectedFramework === 'milady' && (
+                            <>
+                              {/* Personality (already selected above, show summary) */}
+                              <OptionRow
+                                label="Personality Preset"
+                                hint="Selected above -- controls agent tone"
+                              >
+                                <OptionSelect
+                                  value={miladyPersonality}
+                                  onChange={(v) => setMiladyPersonality(v as typeof miladyPersonality)}
+                                  options={[
+                                    { value: 'helpful', label: 'Helpful' },
+                                    { value: 'tsundere', label: 'Tsundere' },
+                                    { value: 'unhinged', label: 'Unhinged' },
+                                    { value: 'custom', label: 'Professional' },
+                                  ]}
+                                />
+                              </OptionRow>
+
+                              {/* Database */}
+                              <OptionRow
+                                label="Database"
+                                hint="Storage backend for agent state"
+                              >
+                                <OptionSelect
+                                  value={dbBackend}
+                                  onChange={setDbBackend}
+                                  options={[
+                                    { value: 'pglite', label: 'PGLite (default)' },
+                                    { value: 'postgresql', label: 'PostgreSQL' },
+                                  ]}
+                                />
+                              </OptionRow>
+
+                              {/* Local-First Mode */}
+                              <OptionRow
+                                label="Local-First Mode"
+                                hint="Process data locally before syncing"
+                              >
+                                <ToggleSwitch checked={localFirst} onChange={setLocalFirst} />
+                              </OptionRow>
+                            </>
+                          )}
+
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
 
               <div className="mt-8 flex justify-between">
@@ -1028,6 +1546,13 @@ export default function CreatePage() {
 
                   {agentDesc && <SummaryRow label="Description" value={agentDesc} />}
 
+                  {(() => {
+                    const enabled = Object.entries(platformsEnabled).filter(([, v]) => v).map(([id]) => id);
+                    if (enabled.length === 0) return null;
+                    const names = enabled.map(id => PLATFORMS.find(p => p.id === id)?.name ?? id).join(', ');
+                    return <SummaryRow label="Platforms" value={names} highlight />;
+                  })()}
+
                   <SummaryRow
                     label="Personality"
                     value={openclawForm.systemPrompt.trim() ? 'Custom instructions' : 'Template default'}
@@ -1046,6 +1571,167 @@ export default function CreatePage() {
                     />
                   </div>
                 </div>
+              </motion.div>
+
+              {/* ── Test Chat Preview ─────────────────────────── */}
+              <motion.div
+                className="mb-6"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setShowTestChat(!showTestChat)}
+                  className={cn(
+                    'w-full flex items-center justify-between gap-3 px-5 py-3.5 rounded-xl border transition-all duration-200',
+                    showTestChat
+                      ? 'bg-[rgba(6,182,212,0.08)] border-[#06b6d4]/40 shadow-[0_0_20px_rgba(6,182,212,0.1)]'
+                      : 'bg-[rgba(26,23,48,0.6)] border-[rgba(46,43,74,0.4)] hover:border-[rgba(6,182,212,0.3)] hover:bg-[rgba(26,23,48,0.8)]'
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-[#06b6d4]/10 flex items-center justify-center">
+                      <MessageCircle className="w-5 h-5 text-[#06b6d4]" />
+                    </div>
+                    <div className="text-left">
+                      <span className="text-sm font-semibold text-[var(--text-primary)]">Test Your Agent</span>
+                      <p className="text-xs text-[var(--text-muted)]">Preview how your agent will respond</p>
+                    </div>
+                  </div>
+                  <motion.div
+                    animate={{ rotate: showTestChat ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ChevronDown className="w-5 h-5 text-[var(--text-muted)]" />
+                  </motion.div>
+                </button>
+
+                <AnimatePresence>
+                  {showTestChat && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      className="overflow-hidden"
+                    >
+                      <div className={cn(cardClass, 'mt-3 p-0 overflow-hidden card-glow-border')}>
+                        {/* Header */}
+                        <div className="px-4 py-3 border-b border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.4)]">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full bg-[#06b6d4]/20 flex items-center justify-center">
+                              <Bot className="w-3.5 h-3.5 text-[#06b6d4]" />
+                            </div>
+                            <span className="text-xs font-medium text-[var(--text-secondary)]">
+                              Chat Preview &mdash; {openclawForm.name || 'Your Agent'}
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-[var(--text-muted)] mt-1 ml-8">
+                            This is a simulated preview. Deploy your agent for real conversations.
+                          </p>
+                        </div>
+
+                        {/* Messages area */}
+                        <div className="h-64 overflow-y-auto px-4 py-3 space-y-3 scroll-smooth" id="test-chat-messages">
+                          {testMessages.length === 0 && (
+                            <div className="h-full flex flex-col items-center justify-center text-center py-6">
+                              <div className="w-12 h-12 rounded-full bg-[rgba(46,43,74,0.4)] flex items-center justify-center mb-3">
+                                <MessageCircle className="w-6 h-6 text-[var(--text-muted)]" />
+                              </div>
+                              <p className="text-sm text-[var(--text-muted)]">Send a message to preview your agent</p>
+                              <p className="text-xs text-[var(--text-muted)] mt-1 opacity-60">Try &quot;Hello&quot; or &quot;What can you do?&quot;</p>
+                            </div>
+                          )}
+
+                          {testMessages.map((msg, i) => (
+                            <motion.div
+                              key={i}
+                              initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              transition={{ duration: 0.25 }}
+                              className={cn('flex', msg.role === 'user' ? 'justify-end' : 'justify-start')}
+                            >
+                              <div
+                                className={cn(
+                                  'max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
+                                  msg.role === 'user'
+                                    ? 'bg-gradient-to-br from-[#7c3aed] to-[#6d28d9] text-white rounded-br-md'
+                                    : 'bg-[rgba(46,43,74,0.6)] text-[var(--text-secondary)] border border-[rgba(46,43,74,0.4)] rounded-bl-md'
+                                )}
+                              >
+                                {msg.role === 'assistant' && (
+                                  <span className="block text-[10px] font-semibold text-[#06b6d4] mb-1">
+                                    {openclawForm.name || 'Agent'}
+                                  </span>
+                                )}
+                                <span className="whitespace-pre-wrap">{msg.content}</span>
+                              </div>
+                            </motion.div>
+                          ))}
+
+                          {testLoading && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 8 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="flex justify-start"
+                            >
+                              <div className="bg-[rgba(46,43,74,0.6)] border border-[rgba(46,43,74,0.4)] rounded-2xl rounded-bl-md px-4 py-3">
+                                <span className="block text-[10px] font-semibold text-[#06b6d4] mb-1">
+                                  {openclawForm.name || 'Agent'}
+                                </span>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="w-2 h-2 rounded-full bg-[var(--text-muted)] animate-bounce" style={{ animationDelay: '0ms' }} />
+                                  <span className="w-2 h-2 rounded-full bg-[var(--text-muted)] animate-bounce" style={{ animationDelay: '150ms' }} />
+                                  <span className="w-2 h-2 rounded-full bg-[var(--text-muted)] animate-bounce" style={{ animationDelay: '300ms' }} />
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </div>
+
+                        {/* Input area */}
+                        <div className="px-4 py-3 border-t border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.3)]">
+                          <form
+                            onSubmit={(e) => {
+                              e.preventDefault();
+                              handleTestChat();
+                              // Scroll to bottom after sending
+                              setTimeout(() => {
+                                const el = document.getElementById('test-chat-messages');
+                                if (el) el.scrollTop = el.scrollHeight;
+                              }, 100);
+                            }}
+                            className="flex items-center gap-2"
+                          >
+                            <input
+                              type="text"
+                              value={testInput}
+                              onChange={(e) => setTestInput(e.target.value)}
+                              placeholder="Type a message..."
+                              disabled={testLoading}
+                              className="flex-1 bg-[rgba(46,43,74,0.4)] border border-[rgba(46,43,74,0.5)] rounded-xl px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-all disabled:opacity-50"
+                            />
+                            <motion.button
+                              type="submit"
+                              disabled={!testInput.trim() || testLoading}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className={cn(
+                                'w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200',
+                                testInput.trim() && !testLoading
+                                  ? 'bg-[#06b6d4] text-white shadow-[0_0_12px_rgba(6,182,212,0.3)]'
+                                  : 'bg-[rgba(46,43,74,0.4)] text-[var(--text-muted)]'
+                              )}
+                            >
+                              <Send className="w-4 h-4" />
+                            </motion.button>
+                          </form>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
 
               {launched && (
@@ -1250,5 +1936,93 @@ function OpenClawFields({
       />
 
     </>
+  );
+}
+
+// ── Toggle Switch ───────────────────────────────────────────
+
+function ToggleSwitch({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={(e) => { e.stopPropagation(); onChange(!checked); }}
+      className={cn(
+        'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#06b6d4] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0D0B1A]',
+        checked ? 'bg-[#06b6d4]' : 'bg-[rgba(46,43,74,0.8)]'
+      )}
+    >
+      <span
+        className={cn(
+          'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ease-in-out',
+          checked ? 'translate-x-5' : 'translate-x-0'
+        )}
+      />
+    </button>
+  );
+}
+
+// ── Option Select Dropdown ──────────────────────────────────
+
+function OptionSelect({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <div className="relative">
+      <select
+        className="input w-full appearance-none pr-8 cursor-pointer text-sm py-1.5"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        {options.map((o) => (
+          <option key={o.value} value={o.value} style={{ background: '#0D0B1A' }}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+    </div>
+  );
+}
+
+// ── Option Row ──────────────────────────────────────────────
+
+function OptionRow({
+  label,
+  hint,
+  indent,
+  children,
+}: {
+  label: string;
+  hint: string;
+  indent?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={cn(
+      'flex items-center justify-between gap-4',
+      indent && 'ml-6 pl-3 border-l-2 border-[rgba(6,182,212,0.2)]'
+    )}>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-medium text-[var(--text-primary)]">{label}</p>
+        <p className="text-xs text-[var(--text-muted)] mt-0.5">{hint}</p>
+      </div>
+      <div className="shrink-0 w-40">
+        {children}
+      </div>
+    </div>
   );
 }
