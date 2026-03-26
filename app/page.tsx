@@ -200,7 +200,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   return (
     <button
       onClick={() => setOpen(!open)}
-      className="w-full text-left rounded-xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.03)] backdrop-blur-sm hover:border-[rgba(139,92,246,0.3)] transition-colors duration-200"
+      className="w-full text-left clay-faq backdrop-blur-sm"
     >
       <div className="flex items-center justify-between px-5 py-4">
         <span className="font-medium text-[#fafafa] text-sm sm:text-base pr-4">{question}</span>
@@ -252,7 +252,7 @@ function BentoCard({
       initial={{ opacity: 0, y: 20 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay, ease: [0.25, 0.1, 0.25, 1] }}
-      className={`group relative bg-gradient-to-br from-[rgba(26,23,48,0.6)] to-[rgba(20,18,40,0.8)] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-8 transition-all duration-300 hover:border-[rgba(6,182,212,0.35)] hover:shadow-[0_0_30px_rgba(6,182,212,0.1)] hover:scale-[1.02] active:scale-[0.98] will-change-transform ${className}`}
+      className={`group relative clay-card backdrop-blur-xl p-8 hover:border-[rgba(6,182,212,0.2)] hover:scale-[1.02] active:scale-[0.98] will-change-transform ${className}`}
     >
       {/* Gradient border accent on hover */}
       <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(6,182,212,0.08), rgba(6,182,212,0.04))', borderRadius: 'inherit' }} />
@@ -327,7 +327,7 @@ export default function LandingPage() {
         )}
       </AnimatePresence>
       <motion.div
-        className="min-h-screen bg-[#0a0a0f] text-white overflow-x-hidden"
+        className="min-h-screen bg-[var(--bg-base)] text-white overflow-x-hidden"
         initial={{ opacity: introComplete ? 1 : 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: introComplete ? 0 : 0.2, duration: 0.4 }}
@@ -395,13 +395,13 @@ export default function LandingPage() {
               >
                 <Link
                   href="/create"
-                  className="bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-base hover:from-purple-500 hover:to-purple-400 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 shadow-lg shadow-purple-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0f]"
+                  className="clay-button text-white font-semibold px-6 sm:px-8 py-3.5 sm:py-4 text-base hover:scale-[1.03] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
                 >
                   Create Agent
                 </Link>
                 <Link
                   href="/explore"
-                  className="border border-white/20 text-white font-medium px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-base hover:bg-white/5 hover:border-white/30 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0f]"
+                  className="clay-button-secondary text-white font-medium px-6 sm:px-8 py-3.5 sm:py-4 text-base hover:scale-[1.02] active:scale-[0.97] flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
                 >
                   Explore
                   <ArrowRight className="w-4 h-4" aria-hidden="true" />
@@ -414,7 +414,7 @@ export default function LandingPage() {
                 transition={{ duration: 1, delay: 0.6 }}
                 className="mt-12"
               >
-                <div className="inline-flex items-center gap-3 sm:gap-6 px-4 sm:px-6 py-3 rounded-full bg-white/[0.03] border border-white/[0.06] text-xs sm:text-sm text-[#a1a1aa]">
+                <div className="inline-flex items-center gap-3 sm:gap-6 px-4 sm:px-6 py-3 rounded-full clay-badge text-xs sm:text-sm text-[#a1a1aa]">
                   {platformStats.totalAgents > 0 ? (
                     <>
                       <span><AnimatedCounter target={platformStats.totalAgents} /> Agents Deployed</span>
@@ -601,6 +601,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.5, delay: i * 0.12 }}
+                className="clay-card p-6"
               >
                 <p className="text-6xl font-mono font-bold text-white/[0.07] mb-4 select-none">{step.num}</p>
                 <h3 className="text-xl font-semibold text-white mb-3">{step.title}</h3>
@@ -682,7 +683,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="group relative bg-[rgba(255,255,255,0.02)] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 hover:shadow-[0_0_30px_rgba(139,92,246,0.08)] transition-all duration-300 overflow-hidden"
+                className="group relative clay-card backdrop-blur-xl p-6 overflow-hidden"
                 style={{ borderLeftWidth: '3px', borderLeftColor: useCase.color }}
               >
                 {/* Hover glow */}
@@ -735,7 +736,7 @@ export default function LandingPage() {
             </p>
             <Link
               href="/create"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold px-6 py-3 rounded-full text-sm hover:from-purple-500 hover:to-purple-400 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 shadow-lg shadow-purple-500/20"
+              className="inline-flex items-center gap-2 clay-button text-white font-semibold px-6 py-3 text-sm hover:scale-[1.03] active:scale-[0.97]"
             >
               Create Custom Agent
               <ArrowRight className="w-4 h-4" />
@@ -765,21 +766,21 @@ export default function LandingPage() {
       <Section className="py-16 sm:py-20 px-4 sm:px-6 border-t border-white/[0.06]" id="social-proof">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center">
-            <div>
+            <div className="clay-badge px-4 py-5">
               <div className="text-3xl sm:text-4xl font-bold text-white mb-1">
                 {platformStats.totalAgents > 0 ? <AnimatedCounter target={platformStats.totalAgents} /> : '50+'}
               </div>
               <div className="text-sm text-[#71717a]">Agents Deployed</div>
             </div>
-            <div>
+            <div className="clay-badge px-4 py-5">
               <div className="text-3xl sm:text-4xl font-bold text-white mb-1">4</div>
               <div className="text-sm text-[#71717a]">Frameworks</div>
             </div>
-            <div>
+            <div className="clay-badge px-4 py-5">
               <div className="text-3xl sm:text-4xl font-bold text-white mb-1">20+</div>
               <div className="text-sm text-[#71717a]">Platforms</div>
             </div>
-            <div>
+            <div className="clay-badge px-4 py-5">
               <div className="text-3xl sm:text-4xl font-bold text-white mb-1">7</div>
               <div className="text-sm text-[#71717a]">LLM Providers</div>
             </div>
@@ -787,7 +788,7 @@ export default function LandingPage() {
 
           {/* Framework logos */}
           <div className="mt-12 flex items-center justify-center flex-wrap gap-4 sm:gap-6">
-            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+            <div className="flex items-center gap-3 px-4 py-2.5 clay-badge">
               <div className="w-7 h-7 rounded-lg bg-amber-500/15 flex items-center justify-center">
                 <Zap className="w-3.5 h-3.5 text-amber-400" />
               </div>
@@ -796,7 +797,7 @@ export default function LandingPage() {
                 <div className="text-[9px] text-[#71717a]">13,700+ skills</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+            <div className="flex items-center gap-3 px-4 py-2.5 clay-badge">
               <div className="w-7 h-7 rounded-lg bg-purple-500/15 flex items-center justify-center">
                 <Terminal className="w-3.5 h-3.5 text-purple-400" />
               </div>
@@ -805,7 +806,7 @@ export default function LandingPage() {
                 <div className="text-[9px] text-[#71717a]">40+ tools</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+            <div className="flex items-center gap-3 px-4 py-2.5 clay-badge">
               <div className="w-7 h-7 rounded-lg bg-cyan-500/15 flex items-center justify-center">
                 <Brain className="w-3.5 h-3.5 text-cyan-400" />
               </div>
@@ -814,7 +815,7 @@ export default function LandingPage() {
                 <div className="text-[9px] text-[#71717a]">350+ plugins</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+            <div className="flex items-center gap-3 px-4 py-2.5 clay-badge">
               <div className="w-7 h-7 rounded-lg bg-rose-500/15 flex items-center justify-center">
                 <Zap className="w-3.5 h-3.5 text-rose-400" />
               </div>
@@ -867,7 +868,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.5, delay: i * 0.12 }}
-                className="relative bg-[rgba(255,255,255,0.02)] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-7 hover:border-[rgba(139,92,246,0.2)] transition-colors duration-300"
+                className="relative clay-card backdrop-blur-xl p-7"
               >
                 <Quote className="w-8 h-8 text-purple-500/20 mb-4" />
                 <p className="text-sm text-[#a1a1aa] leading-relaxed mb-6">{t.quote}</p>
@@ -925,7 +926,7 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="group relative bg-[rgba(255,255,255,0.02)] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 text-center hover:border-[rgba(139,92,246,0.3)] hover:shadow-[0_0_24px_rgba(139,92,246,0.08)] transition-all duration-300"
+                className="group relative clay-card backdrop-blur-xl p-6 text-center"
               >
                 <div className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mx-auto mb-4 group-hover:bg-[rgba(139,92,246,0.1)] group-hover:border-[rgba(139,92,246,0.2)] transition-all duration-300">
                   <badge.icon className="w-6 h-6 text-[#a1a1aa] group-hover:text-purple-400 transition-colors duration-300" />
@@ -953,7 +954,7 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Free */}
-            <div className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7">
+            <div className="clay-card-pricing p-7">
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-2">Free</p>
               <p className="text-3xl font-bold text-white mb-1">$0</p>
               <p className="text-sm text-[#a1a1aa] mb-6">0.5 CPU, 1GB RAM. No credit card.</p>
@@ -974,14 +975,14 @@ export default function LandingPage() {
               </ul>
               <Link
                 href="/register"
-                className="mt-7 block text-center border border-white/20 text-white font-medium px-6 py-2.5 rounded-full hover:bg-white/5 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 text-sm"
+                className="mt-7 block text-center clay-button-secondary text-white font-medium px-6 py-2.5 hover:scale-[1.02] active:scale-[0.97] text-sm"
               >
                 Get Started
               </Link>
             </div>
 
             {/* Basic */}
-            <div className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7">
+            <div className="clay-card-pricing p-7">
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-2">Basic</p>
               <div className="flex items-baseline gap-1">
                 <p className="text-3xl font-bold text-white">$9.99</p>
@@ -1005,14 +1006,14 @@ export default function LandingPage() {
               </ul>
               <Link
                 href="/pricing"
-                className="mt-7 block text-center border border-white/20 text-white font-medium px-6 py-2.5 rounded-full hover:bg-white/5 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 text-sm"
+                className="mt-7 block text-center clay-button-secondary text-white font-medium px-6 py-2.5 hover:scale-[1.02] active:scale-[0.97] text-sm"
               >
                 Subscribe
               </Link>
             </div>
 
             {/* Pro */}
-            <div className="bg-[#0e0e14] border border-cyan-500/30 rounded-2xl p-7 relative overflow-hidden">
+            <div className="clay-card-pricing-pro p-7 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="flex items-center gap-2 mb-2">
                 <p className="text-xs font-semibold tracking-[0.2em] uppercase text-cyan-400">Pro</p>
@@ -1041,7 +1042,7 @@ export default function LandingPage() {
               </ul>
               <Link
                 href="/pricing"
-                className="mt-7 block text-center bg-white text-black font-semibold px-6 py-2.5 rounded-full hover:bg-white/90 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 text-sm"
+                className="mt-7 block text-center clay-button text-white font-semibold px-6 py-2.5 hover:scale-[1.02] active:scale-[0.97] text-sm"
               >
                 Go Pro
               </Link>
@@ -1078,7 +1079,7 @@ export default function LandingPage() {
       </Section>
 
       {/* ── CTA ────────────────────────────────────────── */}
-      <section className="relative py-20 sm:py-32 md:py-40 px-4 sm:px-6 border-t border-white/[0.06]">
+      <section className="relative py-20 sm:py-32 md:py-40 px-4 sm:px-6 border-t border-white/[0.06] clay-surface">
         {/* Radial glow */}
         <div
           className="absolute inset-0 pointer-events-none"
@@ -1114,7 +1115,7 @@ export default function LandingPage() {
           >
             <Link
               href="/create"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-base sm:text-lg hover:from-purple-500 hover:to-purple-400 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 shadow-lg shadow-purple-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0f]"
+              className="inline-flex items-center gap-2 clay-button text-white font-semibold px-8 sm:px-10 py-3.5 sm:py-4 text-base sm:text-lg hover:scale-[1.03] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
             >
               Create Agent
               <ArrowRight className="w-5 h-5" aria-hidden="true" />

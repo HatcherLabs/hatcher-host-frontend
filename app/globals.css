@@ -9,7 +9,7 @@
 /* ── CSS Custom Properties ─────────────────────────── */
 :root {
   /* Backgrounds — layered depth system */
-  --bg-base: #0a0a0f;
+  --bg-base: #0e0d14;
   --bg-sidebar: #0e0e14;
   --bg-card: rgba(255, 255, 255, 0.03);
   --bg-card-solid: #141419;
@@ -220,23 +220,27 @@
 @layer components {
   /* ── Cards ───────────────────────────────────────── */
   .card {
-    background: rgba(255, 255, 255, 0.03);
+    background: linear-gradient(135deg, rgba(40, 36, 62, 0.5), rgba(255, 255, 255, 0.03));
     backdrop-filter: blur(40px) saturate(150%);
     -webkit-backdrop-filter: blur(40px) saturate(150%);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 16px;
+    border-radius: 18px;
     box-shadow:
-      0 4px 24px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      4px 4px 12px rgba(0, 0, 0, 0.25),
+      -2px -2px 8px rgba(80, 70, 120, 0.06),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.04),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.1);
     transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
   }
 
   .card:hover {
     border-color: rgba(139, 92, 246, 0.3);
-    background: rgba(255, 255, 255, 0.05);
+    background: linear-gradient(135deg, rgba(40, 36, 62, 0.6), rgba(255, 255, 255, 0.05));
     box-shadow:
-      0 8px 40px rgba(139, 92, 246, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      6px 6px 16px rgba(0, 0, 0, 0.3),
+      -3px -3px 10px rgba(80, 70, 120, 0.1),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.06),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.1),
       0 0 20px var(--primary-glow);
     transform: translateY(-1px);
   }
@@ -615,6 +619,9 @@
   /* ── Glass noise texture overlay ─────────────────── */
   .glass-noise {
     position: relative;
+    box-shadow:
+      inset 1px 1px 2px rgba(255, 255, 255, 0.03),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.08);
   }
   .glass-noise::after {
     content: '';
@@ -646,6 +653,152 @@
   }
   .marquee-track:hover {
     animation-play-state: paused;
+  }
+
+  /* ── Claymorphism ─────────────────────────────────── */
+  .clay-card {
+    background: linear-gradient(135deg, rgba(40, 36, 62, 0.8), rgba(30, 27, 50, 0.9));
+    border-radius: 20px;
+    box-shadow:
+      8px 8px 16px rgba(0, 0, 0, 0.4),
+      -4px -4px 12px rgba(80, 70, 120, 0.15),
+      inset 2px 2px 4px rgba(255, 255, 255, 0.05),
+      inset -1px -1px 3px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: all 0.3s ease;
+  }
+
+  .clay-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      10px 10px 20px rgba(0, 0, 0, 0.5),
+      -5px -5px 15px rgba(80, 70, 120, 0.2),
+      inset 2px 2px 4px rgba(255, 255, 255, 0.07),
+      inset -1px -1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  .clay-button {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(109, 62, 216, 0.9));
+    border-radius: 14px;
+    box-shadow:
+      4px 4px 10px rgba(0, 0, 0, 0.3),
+      -2px -2px 8px rgba(139, 92, 246, 0.2),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.15),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.15);
+    border: none;
+    transition: all 0.2s ease;
+  }
+
+  .clay-button:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      6px 6px 14px rgba(0, 0, 0, 0.4),
+      -3px -3px 10px rgba(139, 92, 246, 0.25),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.2),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.15);
+  }
+
+  .clay-button-secondary {
+    background: linear-gradient(135deg, rgba(40, 36, 62, 0.8), rgba(30, 27, 50, 0.9));
+    border-radius: 14px;
+    box-shadow:
+      4px 4px 10px rgba(0, 0, 0, 0.3),
+      -2px -2px 8px rgba(80, 70, 120, 0.12),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.08),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.2s ease;
+  }
+
+  .clay-button-secondary:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      6px 6px 14px rgba(0, 0, 0, 0.4),
+      -3px -3px 10px rgba(80, 70, 120, 0.18),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.1),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.15);
+  }
+
+  .clay-badge {
+    background: linear-gradient(135deg, rgba(50, 45, 75, 0.9), rgba(40, 36, 62, 0.95));
+    border-radius: 12px;
+    box-shadow:
+      3px 3px 8px rgba(0, 0, 0, 0.3),
+      -2px -2px 6px rgba(80, 70, 120, 0.1),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+  }
+
+  .clay-surface {
+    background: linear-gradient(135deg, rgba(30, 27, 46, 0.6), rgba(22, 20, 38, 0.7));
+    box-shadow:
+      6px 6px 12px rgba(0, 0, 0, 0.3),
+      -3px -3px 10px rgba(80, 70, 120, 0.08),
+      inset 1px 1px 3px rgba(255, 255, 255, 0.03),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.15);
+  }
+
+  .clay-card-pricing {
+    background: linear-gradient(135deg, rgba(36, 32, 56, 0.85), rgba(26, 24, 44, 0.95));
+    border-radius: 20px;
+    box-shadow:
+      8px 8px 16px rgba(0, 0, 0, 0.4),
+      -4px -4px 12px rgba(80, 70, 120, 0.12),
+      inset 2px 2px 4px rgba(255, 255, 255, 0.04),
+      inset -1px -1px 3px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: all 0.3s ease;
+  }
+
+  .clay-card-pricing:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      12px 12px 24px rgba(0, 0, 0, 0.5),
+      -6px -6px 18px rgba(80, 70, 120, 0.18),
+      inset 2px 2px 4px rgba(255, 255, 255, 0.06),
+      inset -1px -1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  .clay-card-pricing-pro {
+    background: linear-gradient(135deg, rgba(36, 32, 56, 0.85), rgba(26, 24, 44, 0.95));
+    border-radius: 20px;
+    box-shadow:
+      8px 8px 16px rgba(0, 0, 0, 0.4),
+      -4px -4px 12px rgba(6, 182, 212, 0.1),
+      inset 2px 2px 4px rgba(255, 255, 255, 0.06),
+      inset -1px -1px 3px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(6, 182, 212, 0.25);
+    transition: all 0.3s ease;
+  }
+
+  .clay-card-pricing-pro:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      12px 12px 24px rgba(0, 0, 0, 0.5),
+      -6px -6px 18px rgba(6, 182, 212, 0.15),
+      inset 2px 2px 4px rgba(255, 255, 255, 0.08),
+      inset -1px -1px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  .clay-faq {
+    background: linear-gradient(135deg, rgba(40, 36, 62, 0.7), rgba(30, 27, 50, 0.85));
+    border-radius: 16px;
+    box-shadow:
+      6px 6px 12px rgba(0, 0, 0, 0.35),
+      -3px -3px 10px rgba(80, 70, 120, 0.1),
+      inset 1px 1px 3px rgba(255, 255, 255, 0.04),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: all 0.25s ease;
+  }
+
+  .clay-faq:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      8px 8px 16px rgba(0, 0, 0, 0.4),
+      -4px -4px 12px rgba(80, 70, 120, 0.15),
+      inset 1px 1px 3px rgba(255, 255, 255, 0.06),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.15);
   }
 
 }
