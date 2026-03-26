@@ -457,7 +457,7 @@ function SkillCard({
             <h3 className="text-sm font-semibold text-white truncate leading-tight">
               {skill.name}
             </h3>
-            <p className="text-[11px] text-[#71717a] mt-0.5 line-clamp-1 leading-relaxed">
+            <p className="text-[11px] text-[#71717a] mt-0.5 line-clamp-2 leading-relaxed">
               {skill.description || 'No description available'}
             </p>
           </div>
