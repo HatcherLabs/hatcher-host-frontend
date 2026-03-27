@@ -295,7 +295,7 @@ export function ConfigTab() {
   }, [agent, buildAdvancedConfig, saveConfig]);
 
   return (
-    <motion.div key="tab-config" className="max-w-2xl space-y-6" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
+    <motion.div key="tab-config" className="w-full max-w-2xl space-y-6 px-1 sm:px-0" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
       {/* Config Import / Export */}
       <div className="flex items-center gap-2">
         <input

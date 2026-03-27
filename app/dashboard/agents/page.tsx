@@ -376,7 +376,7 @@ export default function MyAgentsPage() {
           variants={cardVariants}
         >
           {/* Status filters */}
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] overflow-x-auto flex-nowrap [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] overflow-x-auto flex-nowrap w-full sm:w-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {STATUS_FILTERS.map((f) => (
               <button
                 key={f.key}
@@ -393,7 +393,7 @@ export default function MyAgentsPage() {
           </div>
 
           {/* Search */}
-          <div className="flex items-center gap-2 flex-1 sm:flex-initial bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] backdrop-blur-xl rounded-xl">
+          <div className="flex items-center gap-2 w-full sm:w-auto sm:flex-initial bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] backdrop-blur-xl rounded-xl">
             <Search size={16} className="text-[#71717a] ml-3" />
             <input
               type="text"

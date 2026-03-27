@@ -12,6 +12,7 @@ import {
   GlassCard,
   DEFAULT_PROMPTS,
 } from '../AgentContext';
+import ReactMarkdown from 'react-markdown';
 
 /* ── Animated sound-wave bars (TTS playing indicator) ──────────── */
 function SoundWaveBars({ className = '' }: { className?: string }) {
@@ -201,12 +202,18 @@ export function ChatTab() {
                 }`}
               >
                 {msg.content ? (
-                  <p className="whitespace-pre-wrap">
-                    {msg.content}
-                    {msg.streaming && (
-                      <span className="inline-block w-[2px] h-4 ml-0.5 align-text-bottom bg-[#06b6d4] animate-pulse rounded-full" />
-                    )}
-                  </p>
+                  msg.role === 'assistant' ? (
+                    <div className="markdown-body">
+                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      {msg.streaming && (
+                        <span className="inline-block w-[2px] h-4 ml-0.5 align-text-bottom bg-[#06b6d4] animate-pulse rounded-full" />
+                      )}
+                    </div>
+                  ) : (
+                    <p className="whitespace-pre-wrap">
+                      {msg.content}
+                    </p>
+                  )
                 ) : msg.streaming ? (
                   <div className="flex gap-2 items-center h-5 px-1">
                     <span className="typing-dot" />
@@ -413,6 +420,110 @@ export function ChatTab() {
         @keyframes voiceBar {
           0% { height: 3px; }
           100% { height: 12px; }
+        }
+        .markdown-body {
+          line-height: 1.6;
+          word-wrap: break-word;
+        }
+        .markdown-body p {
+          margin: 0.25em 0;
+        }
+        .markdown-body p:first-child {
+          margin-top: 0;
+        }
+        .markdown-body p:last-child {
+          margin-bottom: 0;
+        }
+        .markdown-body strong {
+          font-weight: 700;
+          color: #FFFFFF;
+        }
+        .markdown-body em {
+          font-style: italic;
+          color: #d4d0f0;
+        }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3,
+        .markdown-body h4, .markdown-body h5, .markdown-body h6 {
+          font-weight: 600;
+          margin: 0.75em 0 0.25em;
+          color: #FFFFFF;
+        }
+        .markdown-body h1 { font-size: 1.25em; }
+        .markdown-body h2 { font-size: 1.15em; }
+        .markdown-body h3 { font-size: 1.05em; }
+        .markdown-body ul, .markdown-body ol {
+          margin: 0.4em 0;
+          padding-left: 1.5em;
+        }
+        .markdown-body ul {
+          list-style-type: disc;
+        }
+        .markdown-body ol {
+          list-style-type: decimal;
+        }
+        .markdown-body li {
+          margin: 0.15em 0;
+        }
+        .markdown-body code {
+          background: rgba(6, 182, 212, 0.1);
+          border: 1px solid rgba(6, 182, 212, 0.2);
+          border-radius: 4px;
+          padding: 0.1em 0.35em;
+          font-size: 0.88em;
+          font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+          color: #06b6d4;
+        }
+        .markdown-body pre {
+          background: rgba(0, 0, 0, 0.3);
+          border: 1px solid rgba(46, 43, 74, 0.4);
+          border-radius: 8px;
+          padding: 0.75em 1em;
+          margin: 0.5em 0;
+          overflow-x: auto;
+        }
+        .markdown-body pre code {
+          background: none;
+          border: none;
+          padding: 0;
+          font-size: 0.85em;
+          color: #e2e8f0;
+        }
+        .markdown-body blockquote {
+          border-left: 3px solid #06b6d4;
+          margin: 0.5em 0;
+          padding: 0.25em 0.75em;
+          color: #A5A1C2;
+          background: rgba(6, 182, 212, 0.05);
+          border-radius: 0 4px 4px 0;
+        }
+        .markdown-body a {
+          color: #06b6d4;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
+        .markdown-body a:hover {
+          color: #22d3ee;
+        }
+        .markdown-body hr {
+          border: none;
+          border-top: 1px solid rgba(46, 43, 74, 0.4);
+          margin: 0.75em 0;
+        }
+        .markdown-body table {
+          border-collapse: collapse;
+          margin: 0.5em 0;
+          width: 100%;
+        }
+        .markdown-body th, .markdown-body td {
+          border: 1px solid rgba(46, 43, 74, 0.4);
+          padding: 0.35em 0.6em;
+          text-align: left;
+          font-size: 0.9em;
+        }
+        .markdown-body th {
+          background: rgba(6, 182, 212, 0.08);
+          font-weight: 600;
+          color: #FFFFFF;
         }
       `}</style>
     </motion.div>

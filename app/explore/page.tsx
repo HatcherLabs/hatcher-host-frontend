@@ -212,9 +212,9 @@ export default function ExplorePage() {
               <Sparkles className="w-3.5 h-3.5" />
               Community Agents
             </motion.div>
-            <div className="flex items-center justify-center gap-4 mb-3">
+            <div className="flex items-center justify-center gap-3 sm:gap-4 mb-3">
               <RobotMascot size="md" mood="happy" />
-              <h1 className="text-4xl sm:text-5xl font-extrabold text-[var(--text-primary)]">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-[var(--text-primary)]">
                 Discover AI Agents
               </h1>
             </div>
@@ -265,7 +265,7 @@ export default function ExplorePage() {
               </div>
 
               {/* Status filter */}
-              <div className="flex gap-1 bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto flex-nowrap [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="flex gap-1 w-full sm:w-auto bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto flex-nowrap [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {(Object.entries(STATUS_FILTER_LABELS) as [StatusFilter, string][]).map(([val, label]) => (
                   <button
                     key={val}
@@ -289,7 +289,7 @@ export default function ExplorePage() {
               </div>
 
               {/* Sort */}
-              <div className="flex gap-1 bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto flex-nowrap [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="flex gap-1 w-full sm:w-auto bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto flex-nowrap [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {(Object.entries(SORT_LABELS) as [SortOption, string][]).map(([val, label]) => (
                   <button
                     key={val}
@@ -356,7 +356,7 @@ export default function ExplorePage() {
         {/* Content */}
         <div ref={gridRef} className="scroll-mt-8">
           {loading ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({ length: PAGE_SIZE }, (_, i) => (
                 <AgentSkeleton key={i} />
               ))}
@@ -423,7 +423,7 @@ export default function ExplorePage() {
               <AnimatePresence mode="wait">
                 <motion.div
                   key={`page-${safePage}-${search}-${statusFilter}-${sort}`}
-                  className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
                   variants={pageVariants}
                   initial="hidden"
                   animate="visible"

@@ -758,7 +758,7 @@ export default function AgentManagePage() {
           </div>
         </div>
         <Skeleton className="w-full h-10 mb-8" />
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
           {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-24" />)}
         </div>
         <Skeleton className="w-full h-48" />
@@ -951,7 +951,7 @@ export default function AgentManagePage() {
             </div>
 
             {/* Action buttons */}
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
               {isActive && (
                 <>
                   <button
