@@ -14,6 +14,8 @@ import {
   MessageSquare,
   Check,
   Activity,
+  X,
+  Trash2,
 } from 'lucide-react';
 
 interface Notification {
@@ -29,26 +31,32 @@ const ICON_MAP: Record<string, typeof Server> = {
   agent_created: Plus,
   subscription: CreditCard,
   subscription_confirmed: CreditCard,
+  payment: CreditCard,
   team_member: Users,
   team_joined: Users,
   rental: DollarSign,
   rental_received: DollarSign,
   support: MessageSquare,
   support_reply: MessageSquare,
+  feature: Activity,
+  agent: Server,
 };
 
 const ICON_COLOR_MAP: Record<string, string> = {
   agent_started: 'text-emerald-400 bg-emerald-500/15',
   agent_stopped: 'text-amber-400 bg-amber-500/15',
   agent_created: 'text-[#06b6d4] bg-[#06b6d4]/15',
+  agent: 'text-emerald-400 bg-emerald-500/15',
   subscription: 'text-purple-400 bg-purple-500/15',
   subscription_confirmed: 'text-purple-400 bg-purple-500/15',
+  payment: 'text-purple-400 bg-purple-500/15',
   team_member: 'text-blue-400 bg-blue-500/15',
   team_joined: 'text-blue-400 bg-blue-500/15',
   rental: 'text-emerald-400 bg-emerald-500/15',
   rental_received: 'text-emerald-400 bg-emerald-500/15',
   support: 'text-[#06b6d4] bg-[#06b6d4]/15',
   support_reply: 'text-[#06b6d4] bg-[#06b6d4]/15',
+  feature: 'text-amber-400 bg-amber-500/15',
 };
 
 function timeAgo(dateStr: string): string {
@@ -64,22 +72,47 @@ function timeAgo(dateStr: string): string {
   return `${days}d ago`;
 }
 
+// Persist dismissed notification IDs in localStorage
+const DISMISSED_KEY = 'hatcher:dismissed-notifications';
+
+function getDismissed(): Set<string> {
+  try {
+    const raw = localStorage.getItem(DISMISSED_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+function saveDismissed(ids: Set<string>) {
+  try {
+    // Keep only last 100 to prevent unbounded growth
+    const arr = [...ids].slice(-100);
+    localStorage.setItem(DISMISSED_KEY, JSON.stringify(arr));
+  } catch {
+    // localStorage full — ignore
+  }
+}
+
 export function NotificationCenter() {
   const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [readAt, setReadAt] = useState<string | null>(null);
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Fetch notifications + server-side readAt
+  // Load dismissed IDs from localStorage
+  useEffect(() => {
+    setDismissed(getDismissed());
+  }, []);
+
   const fetchNotifications = useCallback(async () => {
     if (!isAuthenticated) return;
     try {
       const res = await api.getNotifications();
       if (res.success && res.data) {
         setNotifications((res.data.items ?? []).slice(0, 20));
-        // Initialise readAt from server (only if we don't already have a local value,
-        // so that a just-clicked "mark all read" isn't overwritten by a stale fetch)
         setReadAt((prev) => prev ?? res.data.readAt ?? null);
       }
     } catch {
@@ -87,14 +120,12 @@ export function NotificationCenter() {
     }
   }, [isAuthenticated]);
 
-  // Initial fetch + 60s polling
   useEffect(() => {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 60000);
     return () => clearInterval(interval);
   }, [fetchNotifications]);
 
-  // Close on outside click / Escape
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -112,31 +143,42 @@ export function NotificationCenter() {
     };
   }, []);
 
-  // Count unread
+  // Filter out dismissed notifications
+  const visibleNotifications = notifications.filter(n => !dismissed.has(n.id));
+
+  // Count unread (only visible ones)
   const unreadCount = readAt
-    ? notifications.filter((n) => new Date(n.timestamp).getTime() > new Date(readAt).getTime()).length
-    : notifications.length;
+    ? visibleNotifications.filter((n) => new Date(n.timestamp).getTime() > new Date(readAt).getTime()).length
+    : visibleNotifications.length;
 
   const markAllRead = async () => {
-    // Optimistic UI update
     const now = new Date().toISOString();
     setReadAt(now);
-    // Persist server-side so it survives reloads / other browsers
     try {
       const res = await api.markNotificationsRead();
-      if (res.success) {
-        setReadAt(res.data.readAt);
-      }
-    } catch {
-      // local state already updated — worst case the server catches up next time
-    }
+      if (res.success) setReadAt(res.data.readAt);
+    } catch {}
+  };
+
+  const dismissOne = (id: string) => {
+    const next = new Set(dismissed);
+    next.add(id);
+    setDismissed(next);
+    saveDismissed(next);
+  };
+
+  const clearAll = () => {
+    const next = new Set(dismissed);
+    for (const n of notifications) next.add(n.id);
+    setDismissed(next);
+    saveDismissed(next);
+    markAllRead();
   };
 
   if (!isAuthenticated) return null;
 
   return (
     <div className="relative" ref={containerRef}>
-      {/* Bell button */}
       <button
         onClick={() => setOpen((o) => !o)}
         className="relative h-9 w-9 flex items-center justify-center rounded-lg hover:bg-white/[0.06] transition-colors"
@@ -151,7 +193,6 @@ export function NotificationCenter() {
         )}
       </button>
 
-      {/* Dropdown */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -170,26 +211,37 @@ export function NotificationCenter() {
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
               <h3 className="text-sm font-semibold text-white">Notifications</h3>
-              {unreadCount > 0 && (
-                <button
-                  onClick={markAllRead}
-                  className="flex items-center gap-1 text-[10px] text-purple-400 hover:text-purple-300 transition-colors"
-                >
-                  <Check size={10} />
-                  Mark all read
-                </button>
-              )}
+              <div className="flex items-center gap-2">
+                {unreadCount > 0 && (
+                  <button
+                    onClick={markAllRead}
+                    className="flex items-center gap-1 text-[10px] text-purple-400 hover:text-purple-300 transition-colors"
+                  >
+                    <Check size={10} />
+                    Mark read
+                  </button>
+                )}
+                {visibleNotifications.length > 0 && (
+                  <button
+                    onClick={clearAll}
+                    className="flex items-center gap-1 text-[10px] text-[#71717a] hover:text-red-400 transition-colors"
+                  >
+                    <Trash2 size={10} />
+                    Clear
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* List */}
             <div className="max-h-80 overflow-y-auto">
-              {notifications.length === 0 ? (
+              {visibleNotifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 px-4">
                   <Activity size={24} className="text-[#71717a] mb-2" />
-                  <p className="text-xs text-[#71717a]">No notifications yet</p>
+                  <p className="text-xs text-[#71717a]">No notifications</p>
                 </div>
               ) : (
-                notifications.map((n) => {
+                visibleNotifications.map((n) => {
                   const isUnread = readAt
                     ? new Date(n.timestamp).getTime() > new Date(readAt).getTime()
                     : true;
@@ -200,7 +252,7 @@ export function NotificationCenter() {
                   return (
                     <div
                       key={n.id}
-                      className={`flex items-start gap-3 px-4 py-3 border-b border-white/[0.03] transition-colors ${
+                      className={`group flex items-start gap-3 px-4 py-3 border-b border-white/[0.03] transition-colors ${
                         isUnread ? 'bg-purple-500/[0.03]' : ''
                       }`}
                     >
@@ -215,9 +267,13 @@ export function NotificationCenter() {
                           {timeAgo(n.timestamp)}
                         </p>
                       </div>
-                      {isUnread && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500 flex-shrink-0 mt-1.5" />
-                      )}
+                      <button
+                        onClick={() => dismissOne(n.id)}
+                        className="opacity-0 group-hover:opacity-100 flex-shrink-0 mt-0.5 p-1 rounded hover:bg-white/[0.06] transition-all"
+                        aria-label="Dismiss"
+                      >
+                        <X size={12} className="text-[#71717a]" />
+                      </button>
                     </div>
                   );
                 })

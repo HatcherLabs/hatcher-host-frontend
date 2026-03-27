@@ -417,7 +417,7 @@ export default function LandingPage() {
                 <div className="inline-flex items-center gap-3 sm:gap-6 px-4 sm:px-6 py-3 rounded-full bg-white/[0.03] border border-white/[0.06] text-xs sm:text-sm text-[#a1a1aa]">
                   {platformStats.totalAgents > 0 ? (
                     <>
-                      <span><AnimatedCounter target={platformStats.totalAgents} /> Agents Deployed</span>
+                      <span><AnimatedCounter target={platformStats.totalAgents} /> Agents Created</span>
                       <span className="w-px h-4 bg-white/10" aria-hidden="true" />
                       <span><AnimatedCounter target={platformStats.activeAgents} /> Active Now</span>
                     </>
@@ -769,7 +769,7 @@ export default function LandingPage() {
               <div className="text-3xl sm:text-4xl font-bold text-white mb-1">
                 {platformStats.totalAgents > 0 ? <AnimatedCounter target={platformStats.totalAgents} /> : '50+'}
               </div>
-              <div className="text-sm text-[#71717a]">Agents Deployed</div>
+              <div className="text-sm text-[#71717a]">Agents Created</div>
             </div>
             <div>
               <div className="text-3xl sm:text-4xl font-bold text-white mb-1">4</div>

@@ -91,11 +91,11 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'How do I create my first agent?',
-        a: 'Click "Create Agent" from the dashboard or the navigation bar. Choose a framework (OpenClaw, Hermes, ElizaOS), pick a template or start from scratch, configure the agent personality and system prompt, then click Deploy. Your agent will be live in about 60 seconds. You can start chatting with it immediately from the dashboard.',
+        a: 'Click "Create Agent" from the dashboard or the navigation bar. Choose a framework (OpenClaw, Hermes, ElizaOS, or Milady), pick a template or start from scratch, configure the agent personality and system prompt, then click Deploy. Your agent will be live in about 60 seconds. You can start chatting with it immediately from the dashboard.',
       },
       {
         q: 'What frameworks are available?',
-        a: 'Hatcher currently supports three frameworks: OpenClaw (general-purpose conversational AI), Hermes (task-oriented autonomous agent), and ElizaOS (social media and community management). Each framework comes with multiple templates optimized for different use cases. You can pick the one that best fits your needs when creating an agent.',
+        a: 'Hatcher supports four frameworks: OpenClaw (general-purpose conversational AI, 13,700+ skills), Hermes (task-oriented autonomous agent, 40+ tools), ElizaOS (multi-agent, 350+ plugins, blockchain-native), and Milady (privacy-first, 29 connectors). Each framework comes with multiple templates optimized for different use cases. Pick the one that best fits your needs when creating an agent.',
       },
       {
         q: 'How does the free tier work?',

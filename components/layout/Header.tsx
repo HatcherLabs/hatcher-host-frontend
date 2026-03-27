@@ -7,21 +7,49 @@ import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, LogOut, Settings, User, Wallet } from 'lucide-react';
+import {
+  Shield, LogOut, Settings, User, Wallet, ChevronDown,
+  BookOpen, HelpCircle, CreditCard, Users, Coins, Newspaper,
+} from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
 
-const NAV_LINKS = [
-  { href: '/dashboard/agents',  label: 'My Agents' },
-  { href: '/explore',           label: 'Explore' },
-  { href: '/marketplace',       label: 'Templates' },
-  { href: '/create',            label: 'Create' },
-  { href: '/dashboard/team',    label: 'Team' },
-  { href: '/dashboard/billing', label: 'Billing' },
-  { href: '/pricing',           label: 'Pricing' },
-  { href: '/token',             label: 'Our Token' },
-  { href: '/support',           label: 'Support' },
-  { href: '/blog',              label: 'Blog' },
+// ── Primary nav (always visible in header) ──
+const PRIMARY_LINKS = [
+  { href: '/dashboard/agents', label: 'My Agents' },
+  { href: '/explore',          label: 'Explore' },
+  { href: '/create',           label: 'Create' },
+];
+
+// ── Resources dropdown ──
+const RESOURCE_LINKS = [
+  { href: '/marketplace',       label: 'Templates',    icon: BookOpen },
+  { href: '/pricing',           label: 'Pricing',      icon: CreditCard },
+  { href: '/token',             label: 'Our Token',    icon: Coins },
+  { href: '/blog',              label: 'Blog',         icon: Newspaper },
+  { href: '/support',           label: 'Support',      icon: HelpCircle },
+  { href: DOCS_URL,             label: 'Docs',         icon: BookOpen, external: true },
+];
+
+// ── User dropdown extra links (authenticated only) ──
+const USER_EXTRA_LINKS = [
+  { href: '/dashboard/team',    label: 'Team',    icon: Users },
+  { href: '/dashboard/billing', label: 'Billing', icon: CreditCard },
+  { href: '/settings',          label: 'Settings', icon: Settings },
+];
+
+// ── All links for mobile ──
+const ALL_MOBILE_LINKS = [
+  { href: '/dashboard/agents', label: 'My Agents' },
+  { href: '/explore',          label: 'Explore' },
+  { href: '/create',           label: 'Create' },
+  { href: '/marketplace',      label: 'Templates' },
+  { href: '/dashboard/team',   label: 'Team' },
+  { href: '/dashboard/billing',label: 'Billing' },
+  { href: '/pricing',          label: 'Pricing' },
+  { href: '/token',            label: 'Our Token' },
+  { href: '/support',          label: 'Support' },
+  { href: '/blog',             label: 'Blog' },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -36,12 +64,13 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { isAuthenticated, isLoading: authLoading, user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [resourcesOpen, setResourcesOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const resourcesRef = useRef<HTMLDivElement>(null);
 
   const isAdmin = user?.isAdmin ?? false;
   const [creditBalance, setCreditBalance] = useState<number | null>(null);
 
-  // Fetch credit balance when user is authenticated and dropdown opens
   useEffect(() => {
     if (isAuthenticated && dropdownOpen && creditBalance === null) {
       api.getCreditBalance().then(res => {
@@ -55,9 +84,12 @@ export function Header() {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
       }
+      if (resourcesRef.current && !resourcesRef.current.contains(e.target as Node)) {
+        setResourcesOpen(false);
+      }
     }
     function handleKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setDropdownOpen(false);
+      if (e.key === 'Escape') { setDropdownOpen(false); setResourcesOpen(false); }
     }
     document.addEventListener('mousedown', handleClick);
     document.addEventListener('keydown', handleKey);
@@ -125,9 +157,9 @@ export function Header() {
             )}
           </div>
 
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-0.5 relative" aria-label="Main navigation">
-            {NAV_LINKS.map((link) => {
+          {/* Desktop Nav — simplified: 3 primary + Resources dropdown */}
+          <nav className="hidden lg:flex items-center gap-1 relative" aria-label="Main navigation">
+            {PRIMARY_LINKS.map((link) => {
               const active = isActive(pathname, link.href);
               return (
                 <Link
@@ -136,10 +168,8 @@ export function Header() {
                   aria-current={active ? 'page' : undefined}
                   className={clsx(
                     'relative px-3 py-1.5 text-sm rounded-lg transition-colors duration-200',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1 focus-visible:ring-offset-black',
-                    active
-                      ? 'text-white'
-                      : 'text-[#71717a] hover:text-white'
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500',
+                    active ? 'text-white' : 'text-[#71717a] hover:text-white'
                   )}
                 >
                   {link.label}
@@ -153,125 +183,181 @@ export function Header() {
                 </Link>
               );
             })}
-            <a
-              href={DOCS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 py-1.5 text-sm rounded-lg transition-colors duration-200 text-[#71717a] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1 focus-visible:ring-offset-black"
-            >
-              Docs
-            </a>
+
+            {/* Resources dropdown */}
+            <div className="relative" ref={resourcesRef}>
+              <button
+                onClick={() => setResourcesOpen(o => !o)}
+                className={clsx(
+                  'flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg transition-colors duration-200',
+                  resourcesOpen || RESOURCE_LINKS.some(l => !l.external && isActive(pathname, l.href))
+                    ? 'text-white'
+                    : 'text-[#71717a] hover:text-white'
+                )}
+              >
+                Resources
+                <ChevronDown className={clsx('w-3.5 h-3.5 transition-transform duration-200', resourcesOpen && 'rotate-180')} />
+              </button>
+              <AnimatePresence>
+                {resourcesOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute top-full left-0 mt-1 w-48 rounded-xl shadow-xl z-50 overflow-hidden py-1"
+                    style={{
+                      background: 'rgba(14, 14, 20, 0.95)',
+                      backdropFilter: 'blur(24px)',
+                      border: '1px solid rgba(255, 255, 255, 0.06)',
+                    }}
+                  >
+                    {RESOURCE_LINKS.map((link) => {
+                      const Icon = link.icon;
+                      const active = !link.external && isActive(pathname, link.href);
+                      const Comp = link.external ? 'a' : Link;
+                      const extraProps = link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+                      return (
+                        <Comp
+                          key={link.href}
+                          href={link.href}
+                          {...extraProps as Record<string, string>}
+                          onClick={() => setResourcesOpen(false)}
+                          className={clsx(
+                            'flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium transition-colors duration-200',
+                            active ? 'text-white bg-white/[0.04]' : 'text-[#a1a1aa] hover:text-white hover:bg-white/[0.04]'
+                          )}
+                        >
+                          <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                          {link.label}
+                          {link.external && <span className="text-[#71717a] ml-auto text-[10px]">&nearr;</span>}
+                        </Comp>
+                      );
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </nav>
 
-          {/* Right side: auth button/user menu + hamburger */}
-          <div className="flex items-center gap-3">
-            {/* Desktop only: auth buttons / user menu */}
-            <div className="hidden lg:flex items-center gap-3">
+          {/* Right side: notifications + user menu + hamburger */}
+          <div className="flex items-center gap-2">
+            {/* Desktop auth */}
+            <div className="hidden lg:flex items-center gap-2">
               {authLoading ? (
                 <div className="h-9 w-24 rounded-lg bg-white/[0.04] animate-pulse" />
               ) : isAuthenticated && user ? (
                 <>
-                <NotificationCenter />
-                <div className="relative" ref={dropdownRef}>
-                  <button
-                    onClick={() => setDropdownOpen((o) => !o)}
-                    aria-expanded={dropdownOpen}
-                    aria-haspopup="menu"
-                    className="h-9 px-3 flex items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 transition-all duration-200"
-                  >
-                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
-                    <span className="text-xs font-medium text-purple-300">{user.username}</span>
-                    <span className="text-xs ml-1" style={{ color: 'rgba(167,139,250,0.6)' }}>&#9662;</span>
-                  </button>
-
-                  {dropdownOpen && (
-                    <div
-                      className="absolute right-0 mt-1 w-48 rounded-xl shadow-xl z-50 overflow-hidden"
-                      style={{
-                        background: 'rgba(14, 14, 20, 0.95)',
-                        backdropFilter: 'blur(24px)',
-                        WebkitBackdropFilter: 'blur(24px)',
-                        border: '1px solid rgba(255, 255, 255, 0.06)',
-                      }}
+                  <NotificationCenter />
+                  <div className="relative" ref={dropdownRef}>
+                    <button
+                      onClick={() => setDropdownOpen(o => !o)}
+                      aria-expanded={dropdownOpen}
+                      aria-haspopup="menu"
+                      className="h-9 px-3 flex items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 transition-all duration-200"
                     >
-                      <div className="px-4 py-2.5 border-b border-white/[0.06]">
-                        <p className="text-xs text-white font-medium truncate">{user.username}</p>
-                        <p className="text-[10px] text-[#a1a1aa] truncate">{user.email}</p>
-                        {creditBalance !== null && creditBalance > 0 && (
-                          <Link
-                            href="/dashboard/billing"
-                            onClick={() => setDropdownOpen(false)}
-                            className="mt-1.5 flex items-center gap-1.5 text-[10px] text-green-400 hover:text-green-300 transition-colors"
-                          >
-                            <Wallet className="w-3 h-3" />
-                            <span className="font-semibold">${creditBalance.toFixed(2)}</span>
-                            <span className="text-[#a1a1aa]">credits</span>
-                          </Link>
-                        )}
-                      </div>
-                      <Link
-                        href="/settings"
-                        onClick={() => setDropdownOpen(false)}
-                        className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-medium text-[#a1a1aa] hover:bg-white/[0.04] transition-colors duration-200 border-b border-white/[0.06]"
-                      >
-                        <Settings className="w-3 h-3" />
-                        Settings
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-2 text-left px-4 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors duration-200"
-                      >
-                        <LogOut className="w-3 h-3" />
-                        Sign Out
-                      </button>
-                    </div>
-                  )}
-                </div>
+                      <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
+                      <span className="text-xs font-medium text-purple-300">{user.username}</span>
+                      <ChevronDown className={clsx('w-3 h-3 text-purple-400/60 transition-transform duration-200', dropdownOpen && 'rotate-180')} />
+                    </button>
+
+                    <AnimatePresence>
+                      {dropdownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -4 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute right-0 mt-1 w-52 rounded-xl shadow-xl z-50 overflow-hidden"
+                          style={{
+                            background: 'rgba(14, 14, 20, 0.95)',
+                            backdropFilter: 'blur(24px)',
+                            border: '1px solid rgba(255, 255, 255, 0.06)',
+                          }}
+                        >
+                          {/* User info */}
+                          <div className="px-4 py-2.5 border-b border-white/[0.06]">
+                            <p className="text-xs text-white font-medium truncate">{user.username}</p>
+                            <p className="text-[10px] text-[#a1a1aa] truncate">{user.email}</p>
+                            {creditBalance !== null && creditBalance > 0 && (
+                              <Link
+                                href="/dashboard/billing"
+                                onClick={() => setDropdownOpen(false)}
+                                className="mt-1.5 flex items-center gap-1.5 text-[10px] text-green-400 hover:text-green-300 transition-colors"
+                              >
+                                <Wallet className="w-3 h-3" />
+                                <span className="font-semibold">${creditBalance.toFixed(2)}</span>
+                                <span className="text-[#a1a1aa]">credits</span>
+                              </Link>
+                            )}
+                          </div>
+
+                          {/* Extra nav links */}
+                          {USER_EXTRA_LINKS.map((link) => {
+                            const Icon = link.icon;
+                            return (
+                              <Link
+                                key={link.href}
+                                href={link.href}
+                                onClick={() => setDropdownOpen(false)}
+                                className={clsx(
+                                  'flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium transition-colors duration-200',
+                                  isActive(pathname, link.href)
+                                    ? 'text-white bg-white/[0.04]'
+                                    : 'text-[#a1a1aa] hover:text-white hover:bg-white/[0.04]'
+                                )}
+                              >
+                                <Icon className="w-3.5 h-3.5" />
+                                {link.label}
+                              </Link>
+                            );
+                          })}
+
+                          {/* Sign out */}
+                          <div className="border-t border-white/[0.06]">
+                            <button
+                              onClick={handleLogout}
+                              className="w-full flex items-center gap-2.5 text-left px-4 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors duration-200"
+                            >
+                              <LogOut className="w-3.5 h-3.5" />
+                              Sign Out
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Link
-                    href="/login"
-                    className="h-9 px-4 text-white font-medium text-xs rounded-full border border-white/20 bg-transparent hover:bg-white/[0.04] transition-all duration-200 flex items-center"
-                  >
+                  <Link href="/login" className="h-9 px-4 text-white font-medium text-xs rounded-full border border-white/20 bg-transparent hover:bg-white/[0.04] transition-all duration-200 flex items-center">
                     Sign In
                   </Link>
-                  <Link
-                    href="/register"
-                    className="h-9 px-4 text-white font-medium text-xs rounded-full bg-purple-600 hover:bg-purple-500 transition-all duration-200 flex items-center"
-                  >
+                  <Link href="/register" className="h-9 px-4 text-white font-medium text-xs rounded-full bg-purple-600 hover:bg-purple-500 transition-all duration-200 flex items-center">
                     Sign Up
                   </Link>
                 </div>
               )}
             </div>
 
-            {/* Hamburger -- mobile/tablet only */}
+            {/* Mobile notification bell */}
+            {isAuthenticated && user && (
+              <div className="lg:hidden">
+                <NotificationCenter />
+              </div>
+            )}
+
+            {/* Hamburger -- mobile only */}
             <button
               className="lg:hidden flex flex-col justify-center items-center w-10 h-10 rounded-lg hover:bg-[rgba(139,92,246,0.1)] transition-colors gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
-              onClick={() => setMobileOpen((o) => !o)}
+              onClick={() => setMobileOpen(o => !o)}
               aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav-menu"
             >
-              <span
-                className={clsx(
-                  'block w-4 h-px bg-[#8b5cf6]/60 transition-transform duration-200',
-                  mobileOpen && 'translate-y-[5px] rotate-45'
-                )}
-              />
-              <span
-                className={clsx(
-                  'block w-4 h-px bg-[#8b5cf6]/60 transition-opacity duration-200',
-                  mobileOpen && 'opacity-0'
-                )}
-              />
-              <span
-                className={clsx(
-                  'block w-4 h-px bg-[#8b5cf6]/60 transition-transform duration-200',
-                  mobileOpen && '-translate-y-[5px] -rotate-45'
-                )}
-              />
+              <span className={clsx('block w-4 h-px bg-[#8b5cf6]/60 transition-transform duration-200', mobileOpen && 'translate-y-[5px] rotate-45')} />
+              <span className={clsx('block w-4 h-px bg-[#8b5cf6]/60 transition-opacity duration-200', mobileOpen && 'opacity-0')} />
+              <span className={clsx('block w-4 h-px bg-[#8b5cf6]/60 transition-transform duration-200', mobileOpen && '-translate-y-[5px] -rotate-45')} />
             </button>
           </div>
         </div>
@@ -289,20 +375,13 @@ export function Header() {
             transition={{ duration: 0.2, ease: 'easeInOut' }}
           >
             <nav className="mx-auto max-w-7xl px-4 py-3 flex flex-col gap-0.5" aria-label="Mobile navigation">
-              {NAV_LINKS.map((link, i) => (
-                <motion.div
-                  key={link.href}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.04 }}
-                >
+              {ALL_MOBILE_LINKS.map((link, i) => (
+                <motion.div key={link.href} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}>
                   <Link
                     href={link.href}
                     className={clsx(
                       'block px-3 py-2.5 text-sm rounded-lg transition-colors duration-200',
-                      isActive(pathname, link.href)
-                        ? 'text-white bg-white/[0.04]'
-                        : 'text-[#71717a] hover:text-white'
+                      isActive(pathname, link.href) ? 'text-white bg-white/[0.04]' : 'text-[#71717a] hover:text-white'
                     )}
                     onClick={() => setMobileOpen(false)}
                   >
@@ -310,15 +389,8 @@ export function Header() {
                   </Link>
                 </motion.div>
               ))}
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: NAV_LINKS.length * 0.04 }}
-              >
-                <a
-                  href={DOCS_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
+              <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: ALL_MOBILE_LINKS.length * 0.03 }}>
+                <a href={DOCS_URL} target="_blank" rel="noopener noreferrer"
                   className="block px-3 py-2.5 text-sm rounded-lg transition-colors duration-200 text-[#71717a] hover:text-white"
                   onClick={() => setMobileOpen(false)}
                 >
@@ -326,34 +398,15 @@ export function Header() {
                 </a>
               </motion.div>
               {isAdmin && (
-                <motion.div
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: (NAV_LINKS.length + 1) * 0.04 }}
-                >
-                  <Link
-                    href="/admin"
-                    className={clsx(
-                      'flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-colors duration-200',
-                      pathname === '/admin'
-                        ? 'text-purple-400 bg-purple-500/10'
-                        : 'text-[#71717a] hover:text-purple-400'
-                    )}
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <Shield className="w-4 h-4" />
-                    Admin Panel
+                <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: (ALL_MOBILE_LINKS.length + 1) * 0.03 }}>
+                  <Link href="/admin" className={clsx('flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-colors', pathname === '/admin' ? 'text-purple-400 bg-purple-500/10' : 'text-[#71717a] hover:text-purple-400')} onClick={() => setMobileOpen(false)}>
+                    <Shield className="w-4 h-4" /> Admin Panel
                   </Link>
                 </motion.div>
               )}
 
-              {/* Mobile auth section */}
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: (NAV_LINKS.length + 2) * 0.04 }}
-                className="mt-2 pt-3 border-t border-white/[0.06]"
-              >
+              {/* Mobile auth */}
+              <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: (ALL_MOBILE_LINKS.length + 2) * 0.03 }} className="mt-2 pt-3 border-t border-white/[0.06]">
                 {isAuthenticated && user ? (
                   <div className="space-y-1">
                     <div className="px-3 py-2 flex items-center gap-2">
@@ -361,38 +414,17 @@ export function Header() {
                       <span className="text-sm font-medium text-purple-300">{user.username}</span>
                       <span className="text-[10px] text-[#a1a1aa] ml-auto">{user.email}</span>
                     </div>
-                    <Link
-                      href="/settings"
-                      className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[#71717a] hover:text-white transition-colors duration-200"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      <Settings className="w-4 h-4" />
-                      Settings
+                    <Link href="/settings" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[#71717a] hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
+                      <Settings className="w-4 h-4" /> Settings
                     </Link>
-                    <button
-                      onClick={() => { handleLogout(); setMobileOpen(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-red-400 hover:bg-red-500/10 transition-colors duration-200"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Sign Out
+                    <button onClick={() => { handleLogout(); setMobileOpen(false); }} className="w-full flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-red-400 hover:bg-red-500/10 transition-colors">
+                      <LogOut className="w-4 h-4" /> Sign Out
                     </button>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 px-3">
-                    <Link
-                      href="/login"
-                      className="flex-1 h-10 text-white font-medium text-sm rounded-lg border border-white/20 bg-transparent hover:bg-white/[0.04] transition-all duration-200 flex items-center justify-center"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      Sign In
-                    </Link>
-                    <Link
-                      href="/register"
-                      className="flex-1 h-10 text-white font-medium text-sm rounded-lg bg-purple-600 hover:bg-purple-500 transition-all duration-200 flex items-center justify-center"
-                      onClick={() => setMobileOpen(false)}
-                    >
-                      Sign Up
-                    </Link>
+                    <Link href="/login" className="flex-1 h-10 text-white font-medium text-sm rounded-lg border border-white/20 flex items-center justify-center" onClick={() => setMobileOpen(false)}>Sign In</Link>
+                    <Link href="/register" className="flex-1 h-10 text-white font-medium text-sm rounded-lg bg-purple-600 hover:bg-purple-500 flex items-center justify-center" onClick={() => setMobileOpen(false)}>Sign Up</Link>
                   </div>
                 )}
               </motion.div>

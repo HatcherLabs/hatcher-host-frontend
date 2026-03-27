@@ -265,7 +265,7 @@ export default function ExplorePage() {
               </div>
 
               {/* Status filter */}
-              <div className="flex gap-1 bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto">
+              <div className="flex gap-1 bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto flex-nowrap [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {(Object.entries(STATUS_FILTER_LABELS) as [StatusFilter, string][]).map(([val, label]) => (
                   <button
                     key={val}
@@ -289,7 +289,7 @@ export default function ExplorePage() {
               </div>
 
               {/* Sort */}
-              <div className="flex gap-1 bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto">
+              <div className="flex gap-1 bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto flex-nowrap [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {(Object.entries(SORT_LABELS) as [SortOption, string][]).map(([val, label]) => (
                   <button
                     key={val}
@@ -590,16 +590,31 @@ const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agen
                     <span className="text-xs text-[#71717a]">{status.label}</span>
                   </span>
 
-                  <span className={`fw-tag ${agent.framework === 'hermes' ? 'bg-purple-500/10 text-purple-400 border-purple-500/25' : ''}`}>
-                    {agent.framework === 'hermes' ? 'Hermes' : 'OpenClaw'}
+                  <span className={`fw-tag ${
+                    agent.framework === 'hermes' ? 'bg-purple-500/10 text-purple-400 border-purple-500/25' :
+                    agent.framework === 'elizaos' ? 'bg-orange-500/10 text-orange-400 border-orange-500/25' :
+                    agent.framework === 'milady' ? 'bg-pink-500/10 text-pink-400 border-pink-500/25' :
+                    ''
+                  }`}>
+                    {agent.framework === 'hermes' ? 'Hermes' :
+                     agent.framework === 'elizaos' ? 'ElizaOS' :
+                     agent.framework === 'milady' ? 'Milady' :
+                     'OpenClaw'}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Description (2 lines) */}
+            {/* Description (2 lines) — sanitize to prevent system prompt leaks */}
             <p className="text-sm text-[#A5A1C2] leading-relaxed mb-4 flex-1 line-clamp-2">
-              {agent.description ?? 'No description'}
+              {(() => {
+                const desc = agent.description ?? '';
+                // Hide descriptions that look like leaked system prompts
+                if (!desc || /you are (a|an) (fully )?autonomous|system prompt|IMPORTANT.*SECURITY|NEVER (reveal|override)|stay in character/i.test(desc)) {
+                  return 'No description';
+                }
+                return desc;
+              })()}
             </p>
 
             {/* Footer */}

@@ -1553,10 +1553,11 @@ export default function CreatePage() {
                     return <SummaryRow label="Platforms" value={names} highlight />;
                   })()}
 
-                  <SummaryRow
-                    label="Personality"
-                    value={openclawForm.systemPrompt.trim() ? 'Custom instructions' : 'Template default'}
-                    highlight={!!openclawForm.systemPrompt.trim()}
+                  <PersonalitySummary
+                    framework={selectedFramework}
+                    miladyPersonality={miladyPersonality}
+                    hermesPersonality={hermesPersonality}
+                    systemPrompt={openclawForm.systemPrompt}
                   />
 
                   <div className="pt-3 border-t border-[rgba(46,43,74,0.3)]">
@@ -1876,6 +1877,24 @@ function SystemPromptSection({
       )}
     </div>
   );
+}
+
+// ── Personality Summary ───────────────────────────────────────
+
+function PersonalitySummary({ framework, miladyPersonality, hermesPersonality, systemPrompt }: {
+  framework: string;
+  miladyPersonality: string;
+  hermesPersonality: string;
+  systemPrompt: string;
+}) {
+  const isMiladyCustom = framework === 'milady' && miladyPersonality !== 'helpful';
+  const isHermesCustom = framework === 'hermes' && hermesPersonality !== 'default';
+  const hasCustomPrompt = systemPrompt.trim();
+  let label = 'Template default';
+  if (isMiladyCustom) label = miladyPersonality.charAt(0).toUpperCase() + miladyPersonality.slice(1);
+  else if (isHermesCustom) label = hermesPersonality.charAt(0).toUpperCase() + hermesPersonality.slice(1);
+  else if (hasCustomPrompt) label = 'Custom instructions';
+  return <SummaryRow label="Personality" value={label} highlight={!!hasCustomPrompt || isMiladyCustom || isHermesCustom} />;
 }
 
 // ── Summary Row ─────────────────────────────────────────────

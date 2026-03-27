@@ -872,10 +872,10 @@ export default function BillingPage() {
             <table className="w-full payment-table">
               <thead>
                 <tr className="border-b border-[var(--border-default)]">
-                  <th className="text-left text-[10px] font-bold uppercase tracking-[0.08em] px-6 py-3.5 text-[var(--text-muted)]">Date</th>
-                  <th className="text-left text-[10px] font-bold uppercase tracking-[0.08em] px-6 py-3.5 text-[var(--text-muted)]">Item</th>
-                  <th className="text-right text-[10px] font-bold uppercase tracking-[0.08em] px-6 py-3.5 text-[var(--text-muted)]">Amount</th>
-                  <th className="text-right text-[10px] font-bold uppercase tracking-[0.08em] px-6 py-3.5 text-[var(--text-muted)]">Status</th>
+                  <th className="text-left text-[10px] font-bold uppercase tracking-[0.08em] px-3 sm:px-6 py-3.5 text-[var(--text-muted)]">Date</th>
+                  <th className="text-left text-[10px] font-bold uppercase tracking-[0.08em] px-3 sm:px-6 py-3.5 text-[var(--text-muted)]">Item</th>
+                  <th className="text-right text-[10px] font-bold uppercase tracking-[0.08em] px-3 sm:px-6 py-3.5 text-[var(--text-muted)]">Amount</th>
+                  <th className="text-right text-[10px] font-bold uppercase tracking-[0.08em] px-3 sm:px-6 py-3.5 text-[var(--text-muted)]">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -887,18 +887,18 @@ export default function BillingPage() {
                     transition={{ delay: index * 0.03, duration: 0.25 }}
                     className="hover:bg-[#06b6d4]/[0.03] transition-colors duration-150 border-b border-[var(--border-default)] last:border-b-0"
                   >
-                    <td className="px-6 py-4 text-sm whitespace-nowrap text-[var(--text-secondary)]">
+                    <td className="px-3 sm:px-6 py-4 text-sm whitespace-nowrap text-[var(--text-secondary)]">
                       {formatDate(payment.createdAt)}
                     </td>
-                    <td className="px-6 py-4 text-sm whitespace-nowrap text-[var(--text-primary)]">
+                    <td className="px-3 sm:px-6 py-4 text-sm whitespace-nowrap text-[var(--text-primary)]">
                       {formatFeatureKey(payment.featureKey)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-right whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-4 text-sm text-right whitespace-nowrap">
                       <span className="text-[var(--text-secondary)] tabular-nums" style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}>
                         ${Number(payment.usdAmount).toFixed(2)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-4 text-right whitespace-nowrap">
                       <StatusBadge status={payment.status} />
                     </td>
                   </motion.tr>

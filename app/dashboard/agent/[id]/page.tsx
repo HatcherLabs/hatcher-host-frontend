@@ -33,6 +33,7 @@ import {
   Sparkles,
   GitMerge,
   History,
+  ChevronDown,
 } from 'lucide-react';
 import {
   AgentContext,
@@ -50,6 +51,7 @@ import {
   FRAMEWORK_BADGE,
   pageEntranceVariants,
 } from '@/components/agents/AgentContext';
+import { AgentTabBar } from '@/components/agents/AgentTabBar';
 import dynamic from 'next/dynamic';
 
 // Dynamically import tab components — only the active tab JS is loaded
@@ -130,21 +132,24 @@ const VersionsTab = dynamic(
 
 // ─── Tab definitions ─────────────────────────────────────────
 
+// Core tabs always visible
+const CORE_TABS: Tab[] = ['overview', 'chat', 'config', 'logs', 'stats'];
+
 function getTabs(framework?: string): { id: Tab; label: string; icon: React.ReactNode }[] {
   return [
     { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={16} /> },
+    { id: 'chat', label: 'Chat', icon: <MessageSquare size={16} /> },
     { id: 'config', label: 'Config', icon: <Settings size={16} /> },
+    { id: 'logs', label: 'Logs', icon: <ScrollText size={16} /> },
+    { id: 'stats', label: 'Stats', icon: <BarChart3 size={16} /> },
     { id: 'integrations', label: 'Integrations', icon: <Puzzle size={16} /> },
     { id: 'skills', label: framework === 'elizaos' ? 'Plugins' : 'Skills', icon: <Sparkles size={16} /> },
-    { id: 'files', label: 'Files', icon: <FolderOpen size={16} /> },
-    { id: 'logs', label: 'Logs', icon: <ScrollText size={16} /> },
     { id: 'memory', label: 'Memory', icon: <Brain size={16} /> },
     { id: 'knowledge', label: 'Knowledge', icon: <BookOpen size={16} /> },
+    { id: 'files', label: 'Files', icon: <FolderOpen size={16} /> },
     { id: 'schedules', label: 'Schedules', icon: <Clock size={16} /> },
     { id: 'workflows', label: 'Workflows', icon: <GitMerge size={16} /> },
     { id: 'versions', label: 'Versions', icon: <History size={16} /> },
-    { id: 'chat', label: 'Chat', icon: <MessageSquare size={16} /> },
-    { id: 'stats', label: 'Stats', icon: <BarChart3 size={16} /> },
   ];
 }
 
@@ -1012,54 +1017,7 @@ export default function AgentManagePage() {
         </div>
 
         {/* ─── Tab Bar ──────────────────────────────────────── */}
-        {/* Desktop: horizontal row. Mobile: 2-row grid with icons */}
-        <div id="agent-tabs" className="mb-8 border-b border-[rgba(46,43,74,0.3)]" role="tablist">
-          {/* Mobile: horizontal scroll */}
-          <div className="flex sm:hidden overflow-x-auto gap-0.5 px-1 py-1 -mx-1 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            {getTabs(agent?.framework).map((t) => (
-              <button
-                key={t.id}
-                role="tab"
-                aria-selected={tab === t.id}
-                onClick={() => { setTab(t.id);  }}
-                className={`flex flex-col items-center gap-0.5 py-2 px-3 rounded-lg text-[10px] transition-all flex-shrink-0 min-w-[56px] ${
-                  tab === t.id
-                    ? 'text-[#06b6d4] bg-[#06b6d4]/10'
-                    : 'text-[#71717a]'
-                }`}
-              >
-                {t.icon}
-                <span className="whitespace-nowrap">{t.label}</span>
-              </button>
-            ))}
-          </div>
-          {/* Desktop: 2-row wrapped grid */}
-          <div className="hidden sm:flex flex-wrap items-center gap-0 relative">
-            {getTabs(agent?.framework).map((t) => (
-              <button
-                key={t.id}
-                role="tab"
-                aria-selected={tab === t.id}
-                onClick={() => { setTab(t.id);  }}
-                className={`relative flex items-center gap-1.5 px-3 lg:px-4 py-2.5 text-xs lg:text-sm transition-all duration-300 ${
-                  tab === t.id
-                    ? 'text-[#FFFFFF]'
-                    : 'text-[#71717a] hover:text-[#A5A1C2]'
-                }`}
-              >
-                {t.icon}
-                {t.label}
-                {tab === t.id && (
-                  <motion.div
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#06b6d4] to-[#06b6d4] rounded-full"
-                    layoutId="activeTab"
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
+        <AgentTabBar tabs={getTabs(agent?.framework)} activeTab={tab} onTabChange={setTab} />
 
         {/* ─── Tab Content ──────────────────────────────────── */}
         <AnimatePresence mode="wait">

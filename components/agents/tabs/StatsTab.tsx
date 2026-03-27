@@ -243,8 +243,8 @@ export function StatsTab() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
             <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Messages</p>
-            {stats?.messagesProcessed && stats.messagesProcessed > 0 ? (
-              <p className="text-2xl font-bold text-[#fafafa]">{stats.messagesProcessed.toLocaleString()}</p>
+            {(analytics?.totalMessages ?? stats?.messagesProcessed ?? 0) > 0 ? (
+              <p className="text-2xl font-bold text-[#fafafa]">{(analytics?.totalMessages ?? stats?.messagesProcessed ?? 0).toLocaleString()}</p>
             ) : (
               <p className="text-sm text-[#6B6890] mt-1">No messages yet</p>
             )}

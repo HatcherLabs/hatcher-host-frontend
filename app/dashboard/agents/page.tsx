@@ -376,7 +376,7 @@ export default function MyAgentsPage() {
           variants={cardVariants}
         >
           {/* Status filters */}
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)]">
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] overflow-x-auto flex-nowrap [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {STATUS_FILTERS.map((f) => (
               <button
                 key={f.key}
