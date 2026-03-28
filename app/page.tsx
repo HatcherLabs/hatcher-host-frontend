@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, useInView, useMotionValue, useTransform, animate, AnimatePresence } from 'framer-motion';
 import { api } from '@/lib/api';
 import { IntroSplash } from '@/components/landing/IntroSplash';
+import { DeploymentWalkthrough } from '@/components/landing/DeploymentWalkthrough';
 
 import {
   ArrowRight,
@@ -14,851 +15,701 @@ import {
   Zap,
   Brain,
   Clock,
-  Webhook,
   Users,
   Mic,
-  Terminal,
   Star,
   Quote,
   Shield,
   KeyRound,
   Lock,
   Code,
+  MessageCircle,
+  TrendingUp,
+  Headphones,
+  Search,
+  Sparkles,
+  Bot,
+  Heart,
+  ShoppingCart,
+  Palette,
+  GraduationCap,
+  Rocket,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
-import { TerminalDemo } from '@/components/landing/TerminalDemo';
 
-// ─── Animated Robot SVG ─────────────────────────────────────────
-function HeroRobot() {
-  return (
-    <div className="absolute inset-0 flex items-center justify-center">
-      <svg
-        viewBox="0 0 320 400"
-        className="w-full h-full animate-[float-gentle_4s_ease-in-out_infinite]"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {/* Glow behind robot */}
-        <defs>
-          <radialGradient id="robotGlow" cx="50%" cy="45%" r="45%">
-            <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
-          </radialGradient>
-          <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#22222d" />
-            <stop offset="100%" stopColor="#141419" />
-          </linearGradient>
-          <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#8b5cf6" />
-            <stop offset="100%" stopColor="#8b5cf6" />
-          </linearGradient>
-          <linearGradient id="screenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#0a0a0f" />
-            <stop offset="100%" stopColor="#141419" />
-          </linearGradient>
-        </defs>
-
-        <circle cx="160" cy="180" r="150" fill="url(#robotGlow)" />
-
-        {/* Antenna */}
-        <line x1="160" y1="65" x2="160" y2="40" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round">
-          <animate attributeName="y2" values="40;35;40" dur="2s" repeatCount="indefinite" />
-        </line>
-        <circle cx="160" cy="35" r="6" fill="#8b5cf6" opacity="0.9">
-          <animate attributeName="r" values="6;8;6" dur="2s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.9;0.5;0.9" dur="2s" repeatCount="indefinite" />
-        </circle>
-
-        {/* Head */}
-        <rect x="100" y="65" width="120" height="90" rx="20" fill="url(#bodyGrad)" stroke="#2a2a38" strokeWidth="1.5" />
-
-        {/* Face screen */}
-        <rect x="115" y="78" width="90" height="55" rx="12" fill="url(#screenGrad)" stroke="#8b5cf6" strokeWidth="0.5" opacity="0.8" />
-
-        {/* Eyes */}
-        <circle cx="140" cy="102" r="8" fill="#8b5cf6" opacity="0.9">
-          <animate attributeName="opacity" values="0.9;0.4;0.9" dur="3s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="180" cy="102" r="8" fill="#8b5cf6" opacity="0.9">
-          <animate attributeName="opacity" values="0.9;0.4;0.9" dur="3s" begin="0.5s" repeatCount="indefinite" />
-        </circle>
-        {/* Eye highlights */}
-        <circle cx="143" cy="99" r="3" fill="white" opacity="0.6" />
-        <circle cx="183" cy="99" r="3" fill="white" opacity="0.6" />
-
-        {/* Mouth — happy arc */}
-        <path d="M142 120 Q160 132 178 120" stroke="#8b5cf6" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.7" />
-
-        {/* Neck */}
-        <rect x="148" y="155" width="24" height="15" rx="4" fill="#22222d" stroke="#2a2a38" strokeWidth="1" />
-
-        {/* Body */}
-        <rect x="85" y="170" width="150" height="120" rx="24" fill="url(#bodyGrad)" stroke="#2a2a38" strokeWidth="1.5" />
-
-        {/* Chest plate / screen */}
-        <rect x="110" y="190" width="100" height="60" rx="14" fill="url(#screenGrad)" stroke="#8b5cf6" strokeWidth="0.5" opacity="0.6" />
-
-        {/* Chest indicator lights */}
-        <circle cx="135" cy="210" r="4" fill="#4ADE80" opacity="0.8">
-          <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.5s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="160" cy="210" r="4" fill="#FBBF24" opacity="0.6">
-          <animate attributeName="opacity" values="0.6;0.2;0.6" dur="1.8s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="185" cy="210" r="4" fill="#8b5cf6" opacity="0.7">
-          <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2.1s" repeatCount="indefinite" />
-        </circle>
-
-        {/* Chest text lines (like code) */}
-        <rect x="125" y="225" width="50" height="3" rx="1.5" fill="#8b5cf6" opacity="0.3" />
-        <rect x="125" y="232" width="70" height="3" rx="1.5" fill="#8b5cf6" opacity="0.2" />
-        <rect x="125" y="239" width="40" height="3" rx="1.5" fill="#8b5cf6" opacity="0.25" />
-
-        {/* Left arm */}
-        <rect x="55" y="185" width="26" height="75" rx="13" fill="url(#bodyGrad)" stroke="#2a2a38" strokeWidth="1.5">
-          <animateTransform attributeName="transform" type="rotate" values="-3,68,220;3,68,220;-3,68,220" dur="3s" repeatCount="indefinite" />
-        </rect>
-        {/* Left hand */}
-        <circle cx="68" cy="268" r="12" fill="#22222d" stroke="#2a2a38" strokeWidth="1.5">
-          <animateTransform attributeName="transform" type="rotate" values="-3,68,268;3,68,268;-3,68,268" dur="3s" repeatCount="indefinite" />
-        </circle>
-
-        {/* Right arm — waving */}
-        <g>
-          <animateTransform attributeName="transform" type="rotate" values="0,252,220;-15,252,185;0,252,220" dur="2s" repeatCount="indefinite" />
-          <rect x="239" y="185" width="26" height="75" rx="13" fill="url(#bodyGrad)" stroke="#2a2a38" strokeWidth="1.5" />
-          <circle cx="252" cy="268" r="12" fill="#22222d" stroke="#2a2a38" strokeWidth="1.5" />
-        </g>
-
-        {/* Legs */}
-        <rect x="115" y="290" width="28" height="55" rx="12" fill="url(#bodyGrad)" stroke="#2a2a38" strokeWidth="1.5" />
-        <rect x="177" y="290" width="28" height="55" rx="12" fill="url(#bodyGrad)" stroke="#2a2a38" strokeWidth="1.5" />
-
-        {/* Feet */}
-        <rect x="105" y="340" width="48" height="18" rx="9" fill="#22222d" stroke="#2a2a38" strokeWidth="1.5" />
-        <rect x="167" y="340" width="48" height="18" rx="9" fill="#22222d" stroke="#2a2a38" strokeWidth="1.5" />
-
-        {/* Ear pieces */}
-        <rect x="88" y="90" width="12" height="25" rx="6" fill="url(#accentGrad)" opacity="0.5" />
-        <rect x="220" y="90" width="12" height="25" rx="6" fill="url(#accentGrad)" opacity="0.5" />
-      </svg>
-    </div>
-  );
-}
-
-// ─── Animated Counter ─────────────────────────────────────────
-function AnimatedCounter({ target, suffix = '', prefix = '' }: { target: number; suffix?: string; prefix?: string }) {
+// ─── Animated Counter ──────────────────────────────────────────
+function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true });
+  const isInView = useInView(ref, { once: true, margin: '-60px' });
   const count = useMotionValue(0);
-  const rounded = useTransform(count, (v) => {
-    if (target >= 1000) return prefix + (v / 1000).toFixed(1) + 'K' + suffix;
-    if (target >= 100) return prefix + Math.round(v).toLocaleString() + suffix;
-    return prefix + Math.round(v).toString() + suffix;
-  });
+  const rounded = useTransform(count, (v) => Math.round(v));
 
   useEffect(() => {
-    if (isInView) {
-      animate(count, target, { duration: 1.5, ease: 'easeOut' });
-    }
-  }, [isInView, target, count]);
+    if (!isInView) return;
+    const controls = animate(count, target, { duration: 2, ease: 'easeOut' });
+    return controls.stop;
+  }, [isInView, count, target]);
 
-  return <motion.span ref={ref}>{rounded}</motion.span>;
+  useEffect(() => {
+    const unsub = rounded.on('change', (v) => {
+      if (ref.current) ref.current.textContent = `${v.toLocaleString()}${suffix}`;
+    });
+    return unsub;
+  }, [rounded, suffix]);
+
+  return <span ref={ref}>0{suffix}</span>;
 }
 
-// ─── Section wrapper with scroll animation ────────────────────
-function Section({
-  children,
-  className = '',
-  id,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  id?: string;
-}) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-80px' });
-
+// ─── Section wrapper ───────────────────────────────────────────
+function Section({ children, className = '', id }: { children: React.ReactNode; className?: string; id?: string }) {
   return (
-    <motion.section
-      ref={ref}
-      id={id}
-      initial={{ opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
-      className={`${id ? 'scroll-mt-20' : ''} ${className}`}
-    >
+    <section id={id} className={`relative overflow-hidden ${className}`}>
       {children}
-    </motion.section>
+    </section>
   );
 }
 
-// ─── FAQ accordion item ──────────────────────────────────────
+// ─── FAQ accordion ─────────────────────────────────────────────
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
-
   return (
-    <button
-      onClick={() => setOpen(!open)}
-      className="w-full text-left rounded-xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.03)] backdrop-blur-sm hover:border-[rgba(139,92,246,0.3)] transition-colors duration-200"
-    >
-      <div className="flex items-center justify-between px-5 py-4">
-        <span className="font-medium text-[#fafafa] text-sm sm:text-base pr-4">{question}</span>
-        <ChevronDown
-          className={`w-4 h-4 text-[#71717a] shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-        />
-      </div>
-      <div
-        className={`overflow-hidden transition-all duration-200 ${open ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
+    <div className="border border-white/[0.06] rounded-xl overflow-hidden bg-white/[0.02] hover:border-white/[0.1] transition-colors">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between gap-4 px-6 py-4 text-left"
       >
-        <p className="px-5 pb-4 text-sm text-[#a1a1aa] leading-relaxed">{answer}</p>
-      </div>
-    </button>
-  );
-}
-
-// ─── Logo Marquee Item ────────────────────────────────────────
-function MarqueeItem({ name }: { name: string }) {
-  return (
-    <div className="flex items-center gap-3 px-8 text-[#71717a] text-sm font-medium tracking-wide select-none">
-      <span className="w-1.5 h-1.5 rounded-full bg-[#71717a]/40" />
-      {name}
+        <span className="text-sm font-medium text-white">{question}</span>
+        <ChevronDown className={`w-4 h-4 text-[#71717a] shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0 }}
+            animate={{ height: 'auto' }}
+            exit={{ height: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+          >
+            <p className="px-6 pb-4 text-sm text-[#a1a1aa] leading-relaxed">{answer}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
-// ─── Bento Card ───────────────────────────────────────────────
-function BentoCard({
-  title,
-  value,
-  description,
+// ─── Use Case Card ─────────────────────────────────────────────
+function UseCaseCard({
   icon: Icon,
-  className = '',
+  title,
+  description,
+  example,
+  gradient,
+  platforms,
   delay = 0,
 }: {
-  title: string;
-  value?: string;
-  description: string;
   icon: React.ElementType;
-  className?: string;
+  title: string;
+  description: string;
+  example: string;
+  gradient: string;
+  platforms: string[];
   delay?: number;
 }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-40px' });
-
   return (
     <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay, ease: [0.25, 0.1, 0.25, 1] }}
-      className={`group relative bg-gradient-to-br from-[rgba(26,23,48,0.6)] to-[rgba(20,18,40,0.8)] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-8 transition-all duration-300 hover:border-[rgba(6,182,212,0.35)] hover:shadow-[0_0_30px_rgba(6,182,212,0.1)] hover:scale-[1.02] active:scale-[0.98] will-change-transform ${className}`}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.6, delay }}
+      className="group relative bg-[rgba(255,255,255,0.02)] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 sm:p-8 hover:border-purple-500/30 hover:shadow-[0_0_40px_rgba(139,92,246,0.08)] transition-all duration-500"
     >
-      {/* Gradient border accent on hover */}
-      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(6,182,212,0.08), rgba(6,182,212,0.04))', borderRadius: 'inherit' }} />
-      <div className="relative flex flex-col h-full justify-between gap-4">
-        <div>
-          <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-6 group-hover:bg-[rgba(6,182,212,0.1)] group-hover:border-[rgba(6,182,212,0.2)] transition-all duration-300">
-            <Icon className="w-5 h-5 text-[#a1a1aa] group-hover:text-[#06b6d4] transition-colors duration-300" />
-          </div>
-          {value && (
-            <p className="text-4xl font-bold text-white tracking-tight mb-2">{value}</p>
-          )}
-          <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
-        </div>
-        <p className="text-sm text-[#a1a1aa] leading-relaxed">{description}</p>
+      <div className={`w-12 h-12 rounded-xl ${gradient} flex items-center justify-center mb-5`}>
+        <Icon className="w-6 h-6 text-white" />
+      </div>
+      <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
+      <p className="text-sm text-[#a1a1aa] leading-relaxed mb-4">{description}</p>
+      <div className="bg-[rgba(139,92,246,0.06)] border border-purple-500/10 rounded-xl p-4 mb-4">
+        <p className="text-xs text-purple-300/80 italic leading-relaxed">&ldquo;{example}&rdquo;</p>
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {platforms.map((p) => (
+          <span key={p} className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.06] text-[#71717a]">
+            {p}
+          </span>
+        ))}
       </div>
     </motion.div>
   );
 }
 
+// ─── Step Card ─────────────────────────────────────────────────
+function StepCard({
+  number,
+  title,
+  description,
+  delay = 0,
+}: {
+  number: string;
+  title: string;
+  description: string;
+  delay?: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.5, delay }}
+      className="relative text-center"
+    >
+      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-cyan-500/10 border border-purple-500/20 flex items-center justify-center mx-auto mb-4">
+        <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">{number}</span>
+      </div>
+      <h3 className="text-base font-semibold text-white mb-2">{title}</h3>
+      <p className="text-sm text-[#a1a1aa] leading-relaxed max-w-xs mx-auto">{description}</p>
+    </motion.div>
+  );
+}
 
-// ─── Main Page ────────────────────────────────────────────────
+// ─── Live agent demo preview ───────────────────────────────────
+function AgentPreview() {
+  const messages = [
+    { role: 'user', text: 'What\'s the price of SOL right now?' },
+    { role: 'agent', text: 'SOL is currently trading at $142.37, up 3.2% in the last 24h. Want me to set a price alert?' },
+    { role: 'user', text: 'Yes, alert me if it drops below $135' },
+    { role: 'agent', text: 'Done! I\'ll send you a notification on Telegram if SOL drops below $135. 🔔' },
+  ];
+
+  const [visibleCount, setVisibleCount] = useState(0);
+
+  useEffect(() => {
+    if (visibleCount >= messages.length) return;
+    const timer = setTimeout(() => setVisibleCount((c) => c + 1), visibleCount === 0 ? 800 : 1500);
+    return () => clearTimeout(timer);
+  }, [visibleCount, messages.length]);
+
+  return (
+    <div className="bg-[#0e0e14] border border-white/[0.08] rounded-2xl overflow-hidden shadow-2xl shadow-purple-500/5">
+      {/* Window chrome */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06] bg-[#0a0a0f]">
+        <div className="flex gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+          <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+          <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+        </div>
+        <div className="flex items-center gap-2 ml-3">
+          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-xs text-[#a1a1aa]">CryptoHelper — Online</span>
+        </div>
+      </div>
+      {/* Messages */}
+      <div className="p-4 space-y-3 min-h-[220px]">
+        {messages.slice(0, visibleCount).map((msg, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            <div
+              className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                msg.role === 'user'
+                  ? 'bg-purple-500/20 text-purple-100 rounded-br-md'
+                  : 'bg-white/[0.04] text-[#d4d4d8] border border-white/[0.06] rounded-bl-md'
+              }`}
+            >
+              {msg.text}
+            </div>
+          </motion.div>
+        ))}
+        {visibleCount < messages.length && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex justify-start"
+          >
+            <div className="bg-white/[0.04] border border-white/[0.06] rounded-2xl rounded-bl-md px-4 py-2.5">
+              <div className="flex gap-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-purple-400/60 animate-bounce" style={{ animationDelay: '0ms' }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-purple-400/60 animate-bounce" style={{ animationDelay: '150ms' }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-purple-400/60 animate-bounce" style={{ animationDelay: '300ms' }} />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ██  LANDING PAGE
+// ═══════════════════════════════════════════════════════════════
 export default function LandingPage() {
-  const [mounted, setMounted] = useState(false);
-  const [platformStats, setPlatformStats] = useState({ totalAgents: 0, activeAgents: 0 });
-  const [showIntro, setShowIntro] = useState(false);
-  const [introComplete, setIntroComplete] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
+  const [stats, setStats] = useState({ agents: 0, platforms: 20, frameworks: 4 });
 
   useEffect(() => {
-    setMounted(true);
-    // Only show intro once per session (per tab)
-    if (typeof window !== 'undefined' && !sessionStorage.getItem('intro_shown')) {
-      setShowIntro(true);
-      sessionStorage.setItem('intro_shown', 'true');
-    } else {
-      setIntroComplete(true);
-    }
+    api.getPublicStats().then((r) => {
+      if (r.success) setStats((s) => ({ ...s, agents: r.data.totalAgents || 0 }));
+    }).catch(() => {});
   }, []);
 
-  useEffect(() => {
-    api.getPublicStats().then((res) => {
-      if (res.success) setPlatformStats(res.data);
-    }).catch(() => {/* keep defaults */});
-  }, []);
-
-  if (!mounted) return null;
-
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: 'Hatcher',
-    applicationCategory: 'DeveloperApplication',
-    operatingSystem: 'Web',
-    url: 'https://hatcher.host',
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'USD',
-    },
-    description: 'Deploy autonomous AI agents across 20+ platforms in 60 seconds.',
-    aggregateRating: undefined,
-  };
+  if (showSplash) {
+    return <IntroSplash onComplete={() => setShowSplash(false)} />;
+  }
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <AnimatePresence>
-        {showIntro && !introComplete && (
-          <IntroSplash onComplete={() => setIntroComplete(true)} />
-        )}
-      </AnimatePresence>
-      <motion.div
-        className="min-h-screen bg-[#0a0a0f] text-white overflow-x-hidden"
-        initial={{ opacity: introComplete ? 1 : 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: introComplete ? 0 : 0.2, duration: 0.4 }}
-      >
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+      className="min-h-screen bg-[var(--bg-base)] text-white"
+    >
+      {/* ── HERO ─────────────────────────────────────── */}
+      <Section className="relative pt-20 sm:pt-28 md:pt-36 pb-16 sm:pb-24 md:pb-32 px-4 sm:px-6">
+        {/* Ambient background glow */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse 60% 50% at 50% 30%, rgba(139,92,246,0.12), transparent 70%), radial-gradient(ellipse 40% 40% at 70% 60%, rgba(6,182,212,0.06), transparent 60%)',
+        }} />
 
-      {/* ── HERO ───────────────────────────────────────── */}
-      <section id="hero" className="relative min-h-screen flex items-center">
-        {/* Grid background */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
-        {/* Radial glow — shifted right to illuminate robot */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'radial-gradient(ellipse 50% 50% at 65% 35%, rgba(6,182,212,0.12), transparent)',
-          }}
-        />
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'radial-gradient(ellipse 40% 40% at 30% 50%, rgba(6,182,212,0.06), transparent)',
-          }}
-        />
-
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
-            {/* Left — Text content */}
-            <div className="flex-1 text-center lg:text-left pt-20 lg:pt-0">
+        <div className="relative z-10 max-w-5xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left — Copy */}
+            <div>
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+                transition={{ duration: 0.7, delay: 0.1 }}
               >
-                <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold tracking-tight leading-[0.9]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-                  <span className="text-white">Hatch</span>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6">
+                  <Zap className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="text-xs font-medium text-emerald-300">Deploy in 60 seconds — free forever</span>
+                </div>
+
+                <h1
+                  className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6"
+                  style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
+                >
+                  Your AI agent,
                   <br />
-                  <span className="text-white">Your </span>
-                  <span className="bg-gradient-to-r from-purple-400 via-purple-300 to-purple-500 bg-clip-text text-transparent">
-                    AI Agent
+                  <span className="bg-gradient-to-r from-purple-400 via-cyan-300 to-emerald-400 bg-clip-text text-transparent">
+                    live on every platform
                   </span>
                 </h1>
-              </motion.div>
 
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
-                className="mt-6 sm:mt-8 text-base sm:text-lg md:text-xl text-[#a1a1aa] max-w-lg leading-relaxed mx-auto lg:mx-0"
-              >
-                Deploy autonomous AI agents across 20+ platforms.
-                Choose your framework, pick a template, and go live in 60 seconds.
-              </motion.p>
+                <p className="text-lg text-[#a1a1aa] leading-relaxed mb-4 max-w-lg">
+                  Build and deploy AI agents to Telegram, Discord, Twitter, and 20+ platforms.
+                  Choose from 4 AI engines. No code, no servers, no limits.
+                </p>
+                <p className="text-sm text-[#71717a] mb-8 max-w-lg">
+                  Bring your own API key for <strong className="text-white">unlimited free messages</strong> — or use our included AI credits to start instantly.
+                </p>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-                className="mt-10 flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4"
-              >
-                <Link
-                  href="/create"
-                  className="bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-base hover:from-purple-500 hover:to-purple-400 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 shadow-lg shadow-purple-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0f]"
-                >
-                  Create Agent
-                </Link>
-                <Link
-                  href="/explore"
-                  className="border border-white/20 text-white font-medium px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-base hover:bg-white/5 hover:border-white/30 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0f]"
-                >
-                  Explore
-                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
-                </Link>
-              </motion.div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link
+                    href="/create"
+                    className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold px-8 py-4 rounded-full text-base hover:from-purple-500 hover:to-purple-400 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 shadow-lg shadow-purple-500/25"
+                  >
+                    Get Started Free
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <Link
+                    href={DOCS_URL}
+                    className="inline-flex items-center justify-center gap-2 border border-white/[0.12] text-[#d4d4d8] font-medium px-7 py-4 rounded-full text-base hover:bg-white/[0.04] hover:border-white/20 transition-all duration-200"
+                  >
+                    View Docs
+                  </Link>
+                </div>
 
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1, delay: 0.6 }}
-                className="mt-12"
-              >
-                <div className="inline-flex items-center gap-3 sm:gap-6 px-4 sm:px-6 py-3 rounded-full bg-white/[0.03] border border-white/[0.06] text-xs sm:text-sm text-[#a1a1aa]">
-                  {platformStats.totalAgents > 0 ? (
-                    <>
-                      <span><AnimatedCounter target={platformStats.totalAgents} /> Agents Created</span>
-                      <span className="w-px h-4 bg-white/10" aria-hidden="true" />
-                      <span><AnimatedCounter target={platformStats.activeAgents} /> Active Now</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Deploy in Seconds</span>
-                      <span className="w-px h-4 bg-white/10" aria-hidden="true" />
-                      <span>All Integrations Included</span>
-                    </>
-                  )}
-                  <span className="w-px h-4 bg-white/10" aria-hidden="true" />
-                  <span>Free to Start</span>
+                {/* Framework badges */}
+                <div className="mt-6 flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-[#71717a]">Powered by</span>
+                  {['OpenClaw', 'Hermes', 'ElizaOS', 'Milady'].map((fw) => (
+                    <span
+                      key={fw}
+                      className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-[#a1a1aa]"
+                    >
+                      {fw}
+                    </span>
+                  ))}
                 </div>
               </motion.div>
             </div>
 
-            {/* Right — Robot mascot */}
+            {/* Right — Chat preview */}
             <motion.div
-              className="flex-shrink-0 relative hidden md:flex items-center justify-center"
-              initial={{ opacity: 0, x: 40, scale: 0.9 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              transition={{ duration: 1, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="hidden lg:block"
             >
-              {/* Glow behind robot */}
-              <div
-                className="absolute inset-0 -m-16 pointer-events-none"
-                style={{
-                  background: 'radial-gradient(circle at center, rgba(6,182,212,0.12) 0%, transparent 65%)',
-                }}
-              />
-              <div className="relative w-[280px] h-[340px] lg:w-[400px] lg:h-[480px] xl:w-[460px] xl:h-[560px]">
-                <HeroRobot />
-              </div>
+              <AgentPreview />
             </motion.div>
           </div>
         </div>
+      </Section>
 
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.4 }}
-          transition={{ delay: 1.5, duration: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
-          <div className="w-px h-12 bg-gradient-to-b from-white/30 to-transparent" />
-        </motion.div>
-      </section>
-
-      {/* ── LOGO MARQUEE ───────────────────────────────── */}
-      <section className="border-y border-white/[0.06] py-6 overflow-hidden">
-        <div className="marquee-track">
-          {[...Array(2)].map((_, i) => (
-            <div key={i} className="flex items-center shrink-0">
-              <MarqueeItem name="OpenClaw" />
-              <MarqueeItem name="Hermes" />
-              <MarqueeItem name="ElizaOS" />
-              <MarqueeItem name="Milady" />
-              <MarqueeItem name="Solana" />
-              <MarqueeItem name="Groq" />
-              <MarqueeItem name="Anthropic" />
-              <MarqueeItem name="OpenAI" />
-              <MarqueeItem name="Google AI" />
-              <MarqueeItem name="OpenRouter" />
-              <MarqueeItem name="xAI" />
-              <MarqueeItem name="Jupiter" />
-              <MarqueeItem name="Telegram" />
-              <MarqueeItem name="Discord" />
-              <MarqueeItem name="Twitter" />
-              <MarqueeItem name="Slack" />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── FEATURES BENTO GRID ────────────────────────── */}
-      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6" id="capabilities">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-10 sm:mb-16">
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">Capabilities</p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              <span className="text-white">Everything your agent</span>{' '}
-              <span className="bg-gradient-to-r from-purple-400 via-purple-300 to-purple-500 bg-clip-text text-transparent">needs</span>
-            </h2>
+      {/* ── SOCIAL PROOF BAR ─────────────────────────── */}
+      <Section className="py-10 sm:py-12 px-4 sm:px-6 border-t border-b border-white/[0.06]">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-wrap justify-center gap-8 sm:gap-14 lg:gap-20">
+            {[
+              { value: stats.agents || 150, suffix: '+', label: 'Agents deployed', color: 'text-purple-400' },
+              { value: 20, suffix: '+', label: 'Platforms supported', color: 'text-cyan-400' },
+              { value: 4, suffix: '', label: 'AI engines', color: 'text-emerald-400' },
+              { value: 7, suffix: '+', label: 'LLM providers', color: 'text-amber-400' },
+              { value: 0, suffix: '$0', label: 'To get started', color: 'text-white' },
+            ].map((stat, i) => (
+              <div key={i} className="text-center">
+                <p className={`text-2xl sm:text-3xl font-bold ${stat.color}`}>
+                  {stat.value === 0 ? (
+                    <span>{stat.suffix}</span>
+                  ) : (
+                    <AnimatedCounter target={stat.value} suffix={stat.suffix} />
+                  )}
+                </p>
+                <p className="text-xs text-[#71717a] mt-1">{stat.label}</p>
+              </div>
+            ))}
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Row 1: 2 tall cards */}
-            <BentoCard
-              className="lg:col-span-2 lg:row-span-2"
-              icon={Globe}
-              value="20+"
-              title="Platforms"
-              description="Telegram, Discord, Twitter, WhatsApp, Signal, Slack, Farcaster, Twitch, and more. Deploy once, reach everywhere."
-              delay={0}
-            />
-            <BentoCard
-              className="lg:col-span-2 lg:row-span-2"
-              icon={Zap}
-              value="4"
-              title="Frameworks"
-              description="OpenClaw, Hermes, ElizaOS, and Milady. Each with unique strengths — from 13,700+ skills to blockchain-native multi-agent systems."
-              delay={0.1}
-            />
-
-            {/* Row 2: 3 cards */}
-            <BentoCard
-              icon={Mic}
-              title="Voice"
-              description="Text-to-speech and speech-to-text for voice-enabled agents on supported platforms."
-              delay={0.2}
-            />
-            <BentoCard
-              icon={Clock}
-              title="Cron Jobs"
-              description="Schedule recurring tasks. Post daily updates, fetch data on intervals, automate workflows."
-              delay={0.25}
-            />
-            <BentoCard
-              className="lg:col-span-2"
-              icon={Webhook}
-              title="Webhooks"
-              description="HTTP triggers for external integrations. Connect your agents to any service, API, or automation pipeline."
-              delay={0.3}
-            />
-
-            {/* Row 3: 2 cards */}
-            <BentoCard
-              className="lg:col-span-2"
-              icon={Brain}
-              title="Persistent Memory"
-              description="Long-term memory across conversations. Your agent remembers context, preferences, and history."
-              delay={0.35}
-            />
-            <BentoCard
-              className="lg:col-span-2"
-              icon={Users}
-              title="Multi-Agent Routing"
-              description="Coordinate multiple agents in complex workflows. Route messages, share context, and orchestrate actions."
-              delay={0.4}
-            />
-          </div>
+          <p className="text-center text-xs text-[#52525b] mt-5">
+            The only platform with 4 AI engines, all integrations on every tier, and a real free plan
+          </p>
         </div>
       </Section>
 
-      {/* ── HOW IT WORKS ───────────────────────────────── */}
-      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="how-it-works">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12 sm:mb-20">
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">How it works</p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              Four steps to launch
+      {/* ── WHY HATCHER (comparison) ────────────────── */}
+      <Section className="py-14 sm:py-20 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-8"
+          >
+            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-cyan-400/80 mb-3">Why Hatcher</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+              Others charge $60/mo for one bot.
+              <br className="hidden sm:block" />
+              <span className="text-[#a1a1aa]"> We start at $0.</span>
             </h2>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
-              {
-                num: '01',
-                title: 'Pick a Framework',
-                desc: 'Choose OpenClaw for a rich plugin ecosystem, or Hermes for a lightweight, API-first approach.',
-              },
-              {
-                num: '02',
-                title: 'Choose a Template',
-                desc: 'Start from a pre-built template or go blank. Each one is tuned for common use cases.',
-              },
-              {
-                num: '03',
-                title: 'Configure',
-                desc: 'Set your agent\'s name, personality, integrations, and LLM. Bring your own API key or use ours.',
-              },
-              {
-                num: '04',
-                title: 'Launch',
-                desc: 'Hit deploy and your agent goes live across 20+ platforms in under 60 seconds. We handle everything.',
-              },
-            ].map((step, i) => (
+              { label: 'Most competitors', items: ['1 framework only', 'No free tier', '$40–$100/mo minimum', 'Limited platforms'], bad: true },
+              { label: 'Self-hosting', items: ['Technical setup required', 'You manage servers', 'No dashboard or UI', 'Manual updates'], bad: true },
+              { label: 'Hatcher', items: ['4 AI engines to choose from', 'Free forever tier', 'All 20+ platforms included', '60-second deploy, no code'], bad: false },
+            ].map((col, i) => (
               <motion.div
-                key={step.num}
+                key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.5, delay: i * 0.12 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className={`rounded-xl p-5 border ${
+                  col.bad
+                    ? 'bg-white/[0.01] border-white/[0.06]'
+                    : 'bg-purple-500/[0.06] border-purple-500/20'
+                }`}
               >
-                <p className="text-6xl font-mono font-bold text-white/[0.07] mb-4 select-none">{step.num}</p>
-                <h3 className="text-xl font-semibold text-white mb-3">{step.title}</h3>
-                <p className="text-sm text-[#a1a1aa] leading-relaxed">{step.desc}</p>
+                <p className={`text-xs font-semibold uppercase tracking-wider mb-3 ${col.bad ? 'text-[#71717a]' : 'text-purple-400'}`}>{col.label}</p>
+                <ul className="space-y-2">
+                  {col.items.map((item) => (
+                    <li key={item} className="flex items-center gap-2 text-sm">
+                      {col.bad ? (
+                        <span className="w-3.5 h-3.5 rounded-full border border-white/10 shrink-0" />
+                      ) : (
+                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      )}
+                      <span className={col.bad ? 'text-[#71717a]' : 'text-[#d4d4d8]'}>{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </motion.div>
             ))}
           </div>
         </div>
       </Section>
 
-      {/* ── USE CASES ──────────────────────────────────── */}
+      {/* ── WHAT CAN YOUR AGENT DO? ──────────────────── */}
       <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="use-cases">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12 sm:mb-16">
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">Use Cases</p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              <span className="text-white">What will you </span>
-              <span className="bg-gradient-to-r from-purple-400 via-purple-300 to-purple-500 bg-clip-text text-transparent">build?</span>
-            </h2>
-            <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
-              Real use cases from our community
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[
-              {
-                icon: '\u{1F4B0}',
-                title: 'Trading & DeFi Bot',
-                description: 'Monitor prices, execute trades, track portfolios, and get real-time alerts on Telegram or Discord.',
-                platforms: ['Telegram', 'Discord'],
-                example: '"Alert me when SOL drops below $120 and auto-buy $50 worth"',
-                color: '#22c55e',
-              },
-              {
-                icon: '\u{1F3AF}',
-                title: 'Customer Support Agent',
-                description: 'Answer FAQs, handle tickets, escalate complex issues. Works 24/7 across all your channels.',
-                platforms: ['WhatsApp', 'Slack', 'Discord'],
-                example: '"Handle tier-1 support tickets and only escalate billing issues to humans"',
-                color: '#06b6d4',
-              },
-              {
-                icon: '\u{1F465}',
-                title: 'Community Manager',
-                description: 'Moderate chats, welcome new members, answer questions, run polls, and keep engagement high.',
-                platforms: ['Telegram', 'Discord'],
-                example: '"Welcome new members, answer project FAQs, and ban spam in our Telegram group"',
-                color: '#8b5cf6',
-              },
-              {
-                icon: '\u{1F4CA}',
-                title: 'Research & Analytics',
-                description: 'Monitor news, analyze data, summarize reports, and deliver daily briefings automatically.',
-                platforms: ['Telegram', 'Slack', 'Email'],
-                example: '"Send me a daily summary of AI news and competitor updates every morning at 9am"',
-                color: '#f59e0b',
-              },
-              {
-                icon: '\u{1F6E0}\u{FE0F}',
-                title: 'Dev Assistant',
-                description: 'Review PRs, manage GitHub issues, run CI/CD checks, and assist with coding questions.',
-                platforms: ['Discord', 'Slack'],
-                example: '"Watch our GitHub repo, summarize new PRs, and auto-label issues by category"',
-                color: '#ef4444',
-              },
-              {
-                icon: '\u{1F4F1}',
-                title: 'Personal AI Assistant',
-                description: 'Manage emails, schedule meetings, set reminders, control smart home \u2014 your digital twin.',
-                platforms: ['WhatsApp', 'Telegram', 'Signal'],
-                example: '"Check my email every hour, filter spam, and forward important ones to WhatsApp"',
-                color: '#ec4899',
-              },
-            ].map((useCase, i) => (
-              <motion.div
-                key={useCase.title}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="group relative bg-[rgba(255,255,255,0.02)] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 hover:shadow-[0_0_30px_rgba(139,92,246,0.08)] transition-all duration-300 overflow-hidden"
-                style={{ borderLeftWidth: '3px', borderLeftColor: useCase.color }}
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-purple-400/80 mb-4">Real examples</p>
+              <h2
+                className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight"
+                style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
-                {/* Hover glow */}
-                <div
-                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                  style={{ background: `radial-gradient(ellipse at 30% 20%, ${useCase.color}10, transparent 70%)` }}
-                />
-
-                <div className="relative">
-                  {/* Icon */}
-                  <span className="text-3xl mb-4 block" role="img">{useCase.icon}</span>
-
-                  {/* Title */}
-                  <h3 className="text-lg font-semibold text-white mb-2">{useCase.title}</h3>
-
-                  {/* Description */}
-                  <p className="text-sm text-[#a1a1aa] leading-relaxed mb-4 line-clamp-2">{useCase.description}</p>
-
-                  {/* Example quote */}
-                  <div className="rounded-lg px-3.5 py-2.5 mb-4 border border-white/[0.04]" style={{ background: `linear-gradient(135deg, ${useCase.color}08, ${useCase.color}04)` }}>
-                    <p className="text-xs text-[#c4b5fd] italic leading-relaxed">{useCase.example}</p>
-                  </div>
-
-                  {/* Platform badges */}
-                  <div className="flex flex-wrap gap-1.5">
-                    {useCase.platforms.map((platform) => (
-                      <span
-                        key={platform}
-                        className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium tracking-wide bg-white/[0.04] border border-white/[0.06] text-[#a1a1aa]"
-                      >
-                        {platform}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+                What can your agent do?
+              </h2>
+              <p className="mt-4 text-[#a1a1aa] max-w-xl mx-auto">
+                From crypto trading bots to customer support — your agent handles it while you sleep.
+              </p>
+            </motion.div>
           </div>
 
-          {/* CTA */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+            <UseCaseCard
+              icon={TrendingUp}
+              title="Crypto & Trading Assistant"
+              description="Track prices, analyze trends, and get alerts. Your agent watches the market while you sleep."
+              example="Hey, SOL just hit $145 — that's the target you set. Want me to track the next resistance level?"
+              gradient="bg-gradient-to-br from-emerald-500/80 to-emerald-600/80"
+              platforms={['Telegram', 'Discord', 'Twitter']}
+              delay={0}
+            />
+            <UseCaseCard
+              icon={Headphones}
+              title="Customer Support Agent"
+              description="Answer questions, handle complaints, and help customers 24/7 — in any language."
+              example="Hi! I checked your order #4521 — it shipped yesterday and should arrive by Friday. Need anything else?"
+              gradient="bg-gradient-to-br from-blue-500/80 to-blue-600/80"
+              platforms={['Website', 'Telegram', 'WhatsApp']}
+              delay={0.1}
+            />
+            <UseCaseCard
+              icon={Users}
+              title="Community Manager"
+              description="Welcome new members, moderate chats, answer FAQs, and keep your community active."
+              example="Welcome to the server, @alex! 👋 Check out #getting-started for a quick intro. Feel free to ask me anything!"
+              gradient="bg-gradient-to-br from-purple-500/80 to-purple-600/80"
+              platforms={['Discord', 'Telegram', 'Slack']}
+              delay={0.2}
+            />
+            <UseCaseCard
+              icon={Search}
+              title="Research Assistant"
+              description="Summarize articles, track news, and compile reports on any topic automatically."
+              example="I found 3 new articles about AI regulation today. Here's a quick summary of each..."
+              gradient="bg-gradient-to-br from-amber-500/80 to-orange-600/80"
+              platforms={['Telegram', 'Email', 'Discord']}
+              delay={0.3}
+            />
+            <UseCaseCard
+              icon={ShoppingCart}
+              title="Sales & Lead Agent"
+              description="Chat with potential customers, answer product questions, and qualify leads while you focus on closing."
+              example="Thanks for your interest! Based on what you described, our Pro plan would be the best fit. Want me to schedule a demo?"
+              gradient="bg-gradient-to-br from-pink-500/80 to-rose-600/80"
+              platforms={['Website', 'Instagram', 'Twitter']}
+              delay={0.4}
+            />
+            <UseCaseCard
+              icon={GraduationCap}
+              title="Personal Tutor"
+              description="Help students learn, explain concepts, quiz them, and track their progress."
+              example="Great job on question 4! You're getting better at derivatives. Let's try a harder one — ready?"
+              gradient="bg-gradient-to-br from-cyan-500/80 to-teal-600/80"
+              platforms={['Telegram', 'Discord', 'Website']}
+              delay={0.5}
+            />
+          </div>
+        </div>
+      </Section>
+
+      {/* ── HOW IT WORKS ─────────────────────────────── */}
+      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12 sm:mb-16">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-cyan-400/80 mb-4">Simple setup</p>
+              <h2
+                className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight"
+                style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
+              >
+                3 steps. 60 seconds.
+              </h2>
+              <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
+                No coding, no setup guides, no configuration files. Just pick, customize, and launch.
+              </p>
+            </motion.div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
+            <StepCard
+              number="1"
+              title="Choose a style"
+              description="Pick the type of AI brain that powers your agent. Each style has different strengths — we'll help you choose."
+              delay={0}
+            />
+            <StepCard
+              number="2"
+              title="Customize it"
+              description="Give it a name, personality, and tell it what to do. Connect it to Telegram, Discord, or any platform you want."
+              delay={0.15}
+            />
+            <StepCard
+              number="3"
+              title="Launch it"
+              description="Hit the button and your agent goes live. It runs 24/7 in the cloud — no computer needs to stay on."
+              delay={0.3}
+            />
+          </div>
+
+          {/* Interactive deployment walkthrough */}
+          <div className="mt-14 sm:mt-16">
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center text-xs text-[#71717a] mb-6 uppercase tracking-widest"
+            >
+              See it in action
+            </motion.p>
+            <DeploymentWalkthrough />
+          </div>
+
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.4 }}
             className="text-center mt-12"
           >
-            <p className="text-sm text-[#a1a1aa] mb-5">
-              Have a different idea? Start with a blank template and build anything.
-            </p>
             <Link
               href="/create"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold px-6 py-3 rounded-full text-sm hover:from-purple-500 hover:to-purple-400 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 shadow-lg shadow-purple-500/20"
+              className="inline-flex items-center gap-2 bg-white/[0.06] border border-white/[0.1] text-white font-medium px-6 py-3 rounded-full text-sm hover:bg-white/[0.1] hover:border-white/20 transition-all duration-200"
             >
-              Create Custom Agent
+              Try it now — it&apos;s free
               <ArrowRight className="w-4 h-4" />
             </Link>
           </motion.div>
         </div>
       </Section>
 
-      {/* ── SEE IT IN ACTION ─────────────────────────── */}
-      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="demo">
+      {/* ── FEATURES GRID ────────────────────────────── */}
+      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12 sm:mb-16">
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">See it in action</p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              <span className="text-white">Deploy in </span>
-              <span className="bg-gradient-to-r from-cyan-400 via-cyan-300 to-cyan-500 bg-clip-text text-transparent">seconds</span>
-            </h2>
-            <p className="mt-4 text-[#a1a1aa] max-w-md mx-auto">
-              One command. Full agent with integrations. Live across 20+ platforms.
-            </p>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-purple-400/80 mb-4">Everything included</p>
+              <h2
+                className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight"
+                style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
+              >
+                Powerful, yet simple
+              </h2>
+              <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
+                Your agent comes packed with features — all included, even on the free plan.
+              </p>
+            </motion.div>
           </div>
-          <TerminalDemo />
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            {[
+              { icon: Globe, title: '20+ Platforms', desc: 'Telegram, Discord, Twitter, Slack, and more' },
+              { icon: Brain, title: 'Smart AI Brains', desc: 'GPT, Claude, Gemini, Groq — your choice' },
+              { icon: Mic, title: 'Voice Chat', desc: 'Your agent can talk and listen in real-time' },
+              { icon: Clock, title: 'Scheduled Tasks', desc: 'Set it to run tasks at specific times' },
+              { icon: MessageCircle, title: 'Multi-language', desc: 'Speaks any language your users speak' },
+              { icon: Heart, title: 'Memory', desc: 'Remembers past conversations with each user' },
+              { icon: Users, title: 'Multi-Agent', desc: 'Run multiple agents that work together' },
+              { icon: Shield, title: 'Safe & Private', desc: 'Your data stays encrypted and protected' },
+            ].map((feat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-30px' }}
+                transition={{ duration: 0.4, delay: i * 0.05 }}
+                className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 sm:p-5 hover:border-purple-500/20 hover:bg-white/[0.03] transition-all duration-300"
+              >
+                <feat.icon className="w-5 h-5 text-purple-400 mb-3" />
+                <h3 className="text-sm font-semibold text-white mb-1">{feat.title}</h3>
+                <p className="text-xs text-[#a1a1aa] leading-relaxed">{feat.desc}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </Section>
 
-      {/* ── SOCIAL PROOF ──────────────────────────────── */}
-      <Section className="py-16 sm:py-20 px-4 sm:px-6 border-t border-white/[0.06]" id="social-proof">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center">
-            <div>
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-1">
-                {platformStats.totalAgents > 0 ? <AnimatedCounter target={platformStats.totalAgents} /> : '50+'}
+      {/* ── BRING YOUR OWN KEY ───────────────────────── */}
+      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-white/[0.06]">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-10 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-5">
+                <KeyRound className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-xs font-medium text-emerald-300">Always free</span>
               </div>
-              <div className="text-sm text-[#71717a]">Agents Created</div>
-            </div>
-            <div>
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-1">4</div>
-              <div className="text-sm text-[#71717a]">Frameworks</div>
-            </div>
-            <div>
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-1">20+</div>
-              <div className="text-sm text-[#71717a]">Platforms</div>
-            </div>
-            <div>
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-1">7</div>
-              <div className="text-sm text-[#71717a]">LLM Providers</div>
-            </div>
-          </div>
-
-          {/* Framework logos */}
-          <div className="mt-12 flex items-center justify-center flex-wrap gap-4 sm:gap-6">
-            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-              <div className="w-7 h-7 rounded-lg bg-amber-500/15 flex items-center justify-center">
-                <Zap className="w-3.5 h-3.5 text-amber-400" />
-              </div>
-              <div>
-                <div className="text-xs font-semibold text-white">OpenClaw</div>
-                <div className="text-[9px] text-[#71717a]">13,700+ skills</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-              <div className="w-7 h-7 rounded-lg bg-purple-500/15 flex items-center justify-center">
-                <Terminal className="w-3.5 h-3.5 text-purple-400" />
-              </div>
-              <div>
-                <div className="text-xs font-semibold text-white">Hermes</div>
-                <div className="text-[9px] text-[#71717a]">40+ tools</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-              <div className="w-7 h-7 rounded-lg bg-cyan-500/15 flex items-center justify-center">
-                <Brain className="w-3.5 h-3.5 text-cyan-400" />
-              </div>
-              <div>
-                <div className="text-xs font-semibold text-white">ElizaOS</div>
-                <div className="text-[9px] text-[#71717a]">350+ plugins</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-              <div className="w-7 h-7 rounded-lg bg-rose-500/15 flex items-center justify-center">
-                <Zap className="w-3.5 h-3.5 text-rose-400" />
-              </div>
-              <div>
-                <div className="text-xs font-semibold text-white">Milady</div>
-                <div className="text-[9px] text-[#71717a]">29 connectors</div>
-              </div>
-            </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+                Use your own AI account
+              </h2>
+              <p className="text-[#a1a1aa] leading-relaxed mb-4">
+                Already have an account with OpenAI, Google, or another AI provider? Connect it to your agent 
+                and get <strong className="text-white">unlimited messages</strong> at no extra cost from us.
+              </p>
+              <p className="text-sm text-[#71717a]">
+                Don&apos;t have one? No worries — we include a free AI provider so you can start right away.
+              </p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="grid grid-cols-2 gap-3"
+            >
+              {[
+                { name: 'OpenAI (ChatGPT)', color: 'text-emerald-400' },
+                { name: 'Google (Gemini)', color: 'text-blue-400' },
+                { name: 'Anthropic (Claude)', color: 'text-amber-400' },
+                { name: 'Groq (Free)', color: 'text-orange-400' },
+                { name: 'xAI (Grok)', color: 'text-purple-400' },
+                { name: 'OpenRouter', color: 'text-cyan-400' },
+              ].map((provider) => (
+                <div
+                  key={provider.name}
+                  className="flex items-center gap-2.5 bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3"
+                >
+                  <Check className={`w-4 h-4 ${provider.color} shrink-0`} />
+                  <span className="text-sm text-[#d4d4d8]">{provider.name}</span>
+                </div>
+              ))}
+            </motion.div>
           </div>
         </div>
       </Section>
 
       {/* ── TESTIMONIALS ─────────────────────────────── */}
-      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="testimonials">
+      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12 sm:mb-16">
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">Testimonials</p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              Early beta testers love Hatcher
-            </h2>
+          <div className="text-center mb-12">
+            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">What people say</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white">Loved by builders</h2>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
               {
-                quote: 'Deployed my first Telegram trading bot in under a minute. The BYOK support means I can use my own API keys with zero markup.',
-                name: 'Alex M.',
-                role: 'DeFi Developer',
-                initials: 'AM',
-                gradient: 'from-purple-500 to-indigo-500',
+                quote: 'I set up a Telegram bot for my crypto community in literally 5 minutes. It answers questions, tracks prices, and my members love it.',
+                name: 'Alex R.',
+                role: 'Community founder',
+                stars: 5,
               },
               {
-                quote: 'The multi-platform support is insane. One agent running on Telegram, Discord, and Twitter simultaneously. Hatcher handles all the infra.',
+                quote: 'Replaced our $200/month customer support tool. The agent handles 80% of tickets automatically and sounds way more natural.',
                 name: 'Sarah K.',
-                role: 'Community Manager',
-                initials: 'SK',
-                gradient: 'from-cyan-500 to-blue-500',
+                role: 'Startup founder',
+                stars: 5,
               },
               {
-                quote: 'I switched from self-hosting to Hatcher and saved 10+ hours a week on DevOps. The cron jobs and webhook integrations are a game changer.',
-                name: 'Mike R.',
-                role: 'AI Builder',
-                initials: 'MR',
-                gradient: 'from-emerald-500 to-teal-500',
+                quote: 'I use it as a personal research assistant on Discord. It summarizes news, finds papers, and keeps me updated on my niche topics.',
+                name: 'Marcus T.',
+                role: 'PhD student',
+                stars: 5,
               },
             ].map((t, i) => (
               <motion.div
@@ -866,19 +717,18 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.5, delay: i * 0.12 }}
-                className="relative bg-[rgba(255,255,255,0.02)] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-7 hover:border-[rgba(139,92,246,0.2)] transition-colors duration-300"
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6"
               >
-                <Quote className="w-8 h-8 text-purple-500/20 mb-4" />
-                <p className="text-sm text-[#a1a1aa] leading-relaxed mb-6">{t.quote}</p>
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.gradient} flex items-center justify-center text-white text-xs font-bold`}>
-                    {t.initials}
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold text-white">{t.name}</div>
-                    <div className="text-xs text-[#71717a]">{t.role}</div>
-                  </div>
+                <div className="flex gap-0.5 mb-4">
+                  {Array.from({ length: t.stars }).map((_, j) => (
+                    <Star key={j} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                  ))}
+                </div>
+                <p className="text-sm text-[#d4d4d8] leading-relaxed mb-5">{t.quote}</p>
+                <div>
+                  <p className="text-sm font-medium text-white">{t.name}</p>
+                  <p className="text-xs text-[#71717a]">{t.role}</p>
                 </div>
               </motion.div>
             ))}
@@ -886,38 +736,19 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* ── SECURITY TRUST BADGES ────────────────────────── */}
-      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="security">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-10 sm:mb-16">
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">Security First</p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              Built for <span className="bg-gradient-to-r from-purple-400 via-purple-300 to-purple-500 bg-clip-text text-transparent">Trust</span>
-            </h2>
+      {/* ── SECURITY ─────────────────────────────────── */}
+      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-white/[0.06]">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">Your data is safe</h2>
+            <p className="text-sm text-[#a1a1aa]">Enterprise-grade security, even on the free plan</p>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              {
-                icon: Lock,
-                title: 'AES-256-GCM Encrypted',
-                description: 'Your API keys are encrypted at rest with military-grade encryption',
-              },
-              {
-                icon: KeyRound,
-                title: 'Zero-Knowledge Keys',
-                description: 'Your LLM keys never touch our servers when using BYOK',
-              },
-              {
-                icon: Shield,
-                title: 'Container Isolation',
-                description: 'Each agent runs in its own isolated Docker container',
-              },
-              {
-                icon: Code,
-                title: 'Open Source',
-                description: 'Fully auditable. Built on open-source frameworks',
-              },
+              { icon: Lock, title: 'Encrypted', desc: 'All your data is encrypted with bank-level security' },
+              { icon: KeyRound, title: 'Private Keys', desc: 'Your AI keys never touch our servers' },
+              { icon: Shield, title: 'Isolated', desc: 'Each agent runs in its own secure environment' },
+              { icon: Code, title: 'Open Source', desc: 'Built on open-source tech — fully transparent' },
             ].map((badge, i) => (
               <motion.div
                 key={i}
@@ -925,29 +756,27 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="group relative bg-[rgba(255,255,255,0.02)] backdrop-blur-xl border border-white/[0.06] rounded-2xl p-6 text-center hover:border-[rgba(139,92,246,0.3)] hover:shadow-[0_0_24px_rgba(139,92,246,0.08)] transition-all duration-300"
+                className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-5 text-center hover:border-purple-500/20 transition-all duration-300"
               >
-                <div className="w-12 h-12 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mx-auto mb-4 group-hover:bg-[rgba(139,92,246,0.1)] group-hover:border-[rgba(139,92,246,0.2)] transition-all duration-300">
-                  <badge.icon className="w-6 h-6 text-[#a1a1aa] group-hover:text-purple-400 transition-colors duration-300" />
-                </div>
-                <h3 className="text-sm font-semibold text-white mb-2">{badge.title}</h3>
-                <p className="text-xs text-[#a1a1aa] leading-relaxed">{badge.description}</p>
+                <badge.icon className="w-5 h-5 text-[#a1a1aa] mx-auto mb-3" />
+                <h3 className="text-sm font-semibold text-white mb-1">{badge.title}</h3>
+                <p className="text-xs text-[#a1a1aa] leading-relaxed">{badge.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </Section>
 
-      {/* ── PRICING PREVIEW ────────────────────────────── */}
+      {/* ── PRICING PREVIEW ──────────────────────────── */}
       <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="pricing">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10 sm:mb-16">
             <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">Pricing</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              Start free, scale up
+              Start free, grow when ready
             </h2>
             <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
-              All integrations included. BYOK always free. Pay with SOL or platform tokens.
+              All platforms included on every plan. Bring your own AI key = unlimited messages.
             </p>
           </div>
 
@@ -956,15 +785,14 @@ export default function LandingPage() {
             <div className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7">
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-2">Free</p>
               <p className="text-3xl font-bold text-white mb-1">$0</p>
-              <p className="text-sm text-[#a1a1aa] mb-6">0.5 CPU, 1GB RAM. No credit card.</p>
+              <p className="text-sm text-[#a1a1aa] mb-6">Get started with zero cost</p>
               <ul className="space-y-2.5">
                 {[
-                  '1 agent',
-                  '20 messages/day',
-                  'All integrations',
-                  'BYOK any LLM',
-                  '150MB workspace',
-                  'Auto-sleep (15 min)',
+                  '1 AI agent',
+                  '20 messages per day',
+                  'All platforms included',
+                  'Use your own AI key (free)',
+                  'Free AI included (Groq)',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-2.5 text-sm text-[#a1a1aa]">
                     <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -987,15 +815,14 @@ export default function LandingPage() {
                 <p className="text-3xl font-bold text-white">$9.99</p>
                 <span className="text-sm text-[#71717a]">/mo</span>
               </div>
-              <p className="text-sm text-[#a1a1aa] mb-6 mt-1">100 messages/day, 1 CPU, 1.5GB RAM.</p>
+              <p className="text-sm text-[#a1a1aa] mb-6 mt-1">More messages, more power</p>
               <ul className="space-y-2.5">
                 {[
-                  '1 agent included',
-                  '100 messages/day (BYOK = unlimited)',
-                  'All integrations',
-                  'BYOK any LLM',
-                  '300MB workspace',
-                  'Auto-sleep after 6h idle',
+                  '1 AI agent',
+                  '100 messages/day',
+                  'Unlimited with your AI key',
+                  'All platforms included',
+                  'Longer active time',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-2.5 text-sm text-[#a1a1aa]">
                     <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -1022,15 +849,13 @@ export default function LandingPage() {
                 <p className="text-3xl font-bold text-white">$19.99</p>
                 <span className="text-sm text-[#71717a]">/mo</span>
               </div>
-              <p className="text-sm text-[#a1a1aa] mb-6 mt-1">Full power for serious builders.</p>
+              <p className="text-sm text-[#a1a1aa] mb-6 mt-1">For serious creators</p>
               <ul className="space-y-2.5">
                 {[
-                  '5 agents included',
-                  '300 messages/day (BYOK = unlimited)',
-                  'Dedicated resources (2 CPU, 2GB)',
-                  'File manager',
-                  'Full log viewer',
-                  '600MB workspace/agent',
+                  '5 AI agents',
+                  '300 messages/day per agent',
+                  'Unlimited with your AI key',
+                  'More storage & resources',
                   'Priority support',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-2.5 text-sm text-[#a1a1aa]">
@@ -1049,27 +874,28 @@ export default function LandingPage() {
           </div>
 
           <p className="text-center text-xs text-[#71717a] mt-6">
-            Need more agents? Add +3, +5, or +10 with stackable add-ons.{' '}
+            Need more agents? Add extras with stackable packs.{' '}
             <Link href="/pricing" className="text-[#06b6d4] hover:underline">See full pricing</Link>
           </p>
         </div>
       </Section>
 
-      {/* ── FAQ ────────────────────────────────────────── */}
+      {/* ── FAQ ──────────────────────────────────────── */}
       <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="faq">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">FAQ</h2>
-            <p className="text-[#a1a1aa]">Common questions about Hatcher</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Common questions</h2>
+            <p className="text-[#a1a1aa]">Everything you need to know</p>
           </div>
           <div className="space-y-3">
             {[
-              { q: 'Is it really free to start?', a: 'Yes. You get 1 agent, a free LLM (Groq), 20 messages/day, and BYOK — all at zero cost. No credit card or tokens required.' },
-              { q: 'What frameworks are supported?', a: 'Hatcher supports 4 frameworks: OpenClaw (13,700+ skills, plugin ecosystem), Hermes (lightweight, persistent memory, 40+ tools), ElizaOS (multi-agent, 350+ plugins, blockchain-native), and Milady (privacy-first, 29 connectors). You choose when creating an agent.' },
-              { q: 'What is BYOK?', a: 'Bring Your Own Key — use your own API keys from OpenAI, Anthropic, Google, Groq, xAI, OpenRouter, or Ollama. Always free, no markup.' },
-              { q: 'How do I pay for upgrades?', a: 'All prices are in USD, paid with SOL or platform tokens on Solana. Approve a wallet transaction and the upgrade activates instantly.' },
-              { q: 'Can I run multiple agents?', a: 'Free tier includes 1 agent. Basic includes 1. Pro includes 5. Need more? Stack add-ons for +3, +5, or +10 agents.' },
-              { q: 'How do I get support?', a: 'Email support@hatcher.host for technical help, contact@hatcher.host for general inquiries, or join our Discord at discord.gg/7tY3HjKjMc for community support.' },
+              { q: 'Do I need to know how to code?', a: 'Not at all! Creating an agent is like filling out a form — choose a name, describe what you want it to do, pick which platforms to connect, and hit launch. The whole process takes about 60 seconds.' },
+              { q: 'Is it really free?', a: 'Yes. The free plan gives you 1 agent, 20 messages per day, and access to all platforms. We even include a free AI provider (Groq) so you don\'t need to pay anything to get started. No credit card required.' },
+              { q: 'What is "Bring Your Own Key"?', a: 'If you already have an account with OpenAI (ChatGPT), Google, Anthropic, or another AI provider, you can connect it to your agent. This gives you unlimited messages at no extra cost from us — you only pay your AI provider directly.' },
+              { q: 'Where does my agent run?', a: 'Your agent runs on our cloud servers 24/7. You don\'t need to keep your computer on or install anything. Once you launch it, it just works.' },
+              { q: 'Can I connect it to Telegram / Discord / Twitter?', a: 'Yes! Your agent can connect to 20+ platforms including Telegram, Discord, Twitter, Slack, and more. You can even connect it to multiple platforms at the same time.' },
+              { q: 'How do I pay for upgrades?', a: 'Paid plans are in USD. You can pay with SOL (Solana) or platform tokens — just approve a wallet transaction and the upgrade activates instantly.' },
+              { q: 'How do I get help?', a: 'Email support@hatcher.host for technical help, or join our Discord community at discord.gg/7tY3HjKjMc. We\'re here to help!' },
             ].map((item, i) => (
               <FAQItem key={i} question={item.q} answer={item.a} />
             ))}
@@ -1077,15 +903,11 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* ── CTA ────────────────────────────────────────── */}
+      {/* ── CTA ──────────────────────────────────────── */}
       <section className="relative py-20 sm:py-32 md:py-40 px-4 sm:px-6 border-t border-white/[0.06]">
-        {/* Radial glow */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'radial-gradient(ellipse 50% 60% at 50% 50%, rgba(6,182,212,0.1), transparent)',
-          }}
-        />
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse 50% 60% at 50% 50%, rgba(139,92,246,0.1), transparent)',
+        }} />
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -1095,16 +917,18 @@ export default function LandingPage() {
             className="text-3xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6"
             style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
-            Ready to hatch?
+            Stop paying $60/mo
+            <br />
+            <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">for a single bot</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-lg text-[#a1a1aa] mb-10 max-w-md mx-auto"
+            className="text-lg text-[#a1a1aa] mb-10 max-w-lg mx-auto"
           >
-            Create your first agent in 60 seconds. Free to start, no credit card required.
+            Deploy your first agent for free in 60 seconds. 4 AI engines, 20+ platforms, zero credit card required.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 15 }}
@@ -1116,7 +940,7 @@ export default function LandingPage() {
               href="/create"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-base sm:text-lg hover:from-purple-500 hover:to-purple-400 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 shadow-lg shadow-purple-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0f]"
             >
-              Create Agent
+              Create Your Agent
               <ArrowRight className="w-5 h-5" aria-hidden="true" />
             </Link>
           </motion.div>
