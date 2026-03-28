@@ -22,6 +22,7 @@ import {
 import { FRAMEWORKS } from '@hatcher/shared';
 import { timeAgo } from '@/lib/utils';
 import { api } from '@/lib/api';
+import { ResourceChart, ResourceAlertBadge } from '@/components/agents/ResourceChart';
 import {
   useAgentContext,
   tabContentVariants,
@@ -97,6 +98,7 @@ interface MonitoringData {
   resources: { cpuPercent: number; memoryUsageMb: number; memoryLimitMb: number };
   responseTimes: { avg: number; p95: number; last: number };
   errors: { last24h: number; lastError: string | null };
+  history: Array<{ ts: number; cpu: number; mem: number }>;
 }
 
 // ─── Health & Performance section ──────────────────────────────
@@ -194,6 +196,12 @@ function HealthPerformanceSection({ agentId, isActive }: { agentId: string; isAc
         <div className="flex items-center gap-2">
           <Heart size={14} className="text-[#06b6d4]" />
           <h3 className="text-sm font-semibold text-[#A5A1C2]">Health & Performance</h3>
+          {data && (
+            <ResourceAlertBadge
+              cpuPercent={data.resources.cpuPercent}
+              memPercent={data.resources.memoryLimitMb > 0 ? (data.resources.memoryUsageMb / data.resources.memoryLimitMb) * 100 : 0}
+            />
+          )}
         </div>
         <button
           onClick={() => { setLoading(true); fetchMonitoring(); }}
@@ -263,6 +271,14 @@ function HealthPerformanceSection({ agentId, isActive }: { agentId: string; isAc
           color="bg-blue-500"
         />
       </div>
+
+      {/* Historical sparkline charts */}
+      <ResourceChart
+        history={data.history ?? []}
+        currentCpu={data.resources.cpuPercent}
+        currentMem={data.resources.memoryUsageMb}
+        memLimitMb={data.resources.memoryLimitMb}
+      />
 
       {/* Response times — hidden until actual duration tracking is implemented */}
       {(data.responseTimes.avg > 0 || data.responseTimes.last > 0) && (

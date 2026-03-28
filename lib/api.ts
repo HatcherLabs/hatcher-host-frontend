@@ -488,6 +488,7 @@ export const api = {
       resources: { cpuPercent: number; memoryUsageMb: number; memoryLimitMb: number };
       responseTimes: { avg: number; p95: number; last: number };
       errors: { last24h: number; lastError: string | null };
+      history: Array<{ ts: number; cpu: number; mem: number }>;
     }>(`/agents/${id}/monitoring`),
 
   /** Get agent stats (messages processed, uptime, last active) */
