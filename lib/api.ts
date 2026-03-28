@@ -395,6 +395,17 @@ export const api = {
       body: JSON.stringify({ addonKey, returnUrl, ...(agentId ? { agentId } : {}) }),
     }),
 
+  /** Cancel Stripe subscription (cancels at end of billing period) */
+  stripeCancelSubscription: () =>
+    req<{ message: string }>('/stripe/cancel-subscription', { method: 'POST' }),
+
+  /** Open Stripe customer portal for billing management */
+  stripePortal: (returnUrl: string) =>
+    req<{ url: string }>('/stripe/portal', {
+      method: 'POST',
+      body: JSON.stringify({ returnUrl }),
+    }),
+
   /** Refresh JWT token */
   refreshToken: () =>
     req<{ token: string }>('/auth/refresh', { method: 'POST' }),
