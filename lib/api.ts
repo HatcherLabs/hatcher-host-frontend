@@ -479,6 +479,19 @@ export const api = {
       framework: string;
     }>(`/agents/${id}/analytics`),
 
+  /** Get account-level analytics across all agents */
+  getAccountAnalytics: () =>
+    req<{
+      totalAgents: number;
+      activeAgents: number;
+      totalMessages: number;
+      statusBreakdown: Record<string, number>;
+      frameworkBreakdown: Record<string, number>;
+      agentMessageBreakdown: Array<{ id: string; name: string; framework: string; count: number }>;
+      dailyVolume: Array<{ date: string; count: number }>;
+      tokenSummary: { inputTokens: number; outputTokens: number; totalTokens: number; usdCost: number };
+    }>('/analytics/overview'),
+
   /** Get agent activity logs */
   getAgentLogs: (id: string) =>
     req<{

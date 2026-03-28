@@ -16,9 +16,10 @@ import { NotificationCenter } from '@/components/ui/NotificationCenter';
 
 // ── Nav links when logged IN ──
 const AUTH_NAV_LINKS = [
-  { href: '/dashboard/agents', label: 'My Agents' },
-  { href: '/explore',          label: 'Explore' },
-  { href: '/create',           label: 'Create' },
+  { href: '/dashboard/agents',    label: 'My Agents' },
+  { href: '/dashboard/analytics', label: 'Analytics' },
+  { href: '/explore',             label: 'Explore' },
+  { href: '/create',              label: 'Create' },
 ];
 
 // ── Auxiliary links (visible in both states, after a divider) ──
@@ -36,10 +37,11 @@ const USER_EXTRA_LINKS = [
 
 // ── Mobile links (when logged in) ──
 const MOBILE_AUTH_LINKS = [
-  { href: '/dashboard/agents', label: 'My Agents' },
-  { href: '/explore',          label: 'Explore' },
-  { href: '/create',           label: 'Create' },
-  { href: '/pricing',          label: 'Pricing' },
+  { href: '/dashboard/agents',    label: 'My Agents' },
+  { href: '/dashboard/analytics', label: 'Analytics' },
+  { href: '/explore',             label: 'Explore' },
+  { href: '/create',              label: 'Create' },
+  { href: '/pricing',             label: 'Pricing' },
 ];
 
 // ── Mobile links (when logged out) ──

@@ -20,6 +20,7 @@ import {
   X,
   ChevronLeft,
   Activity,
+  TrendingUp,
 } from 'lucide-react';
 import type { Tab } from './AgentContext';
 import { STATUS_STYLES, FRAMEWORK_BADGE } from './AgentContext';
@@ -44,6 +45,7 @@ function getTabs(framework?: string): TabDef[] {
     { id: 'skills', label: framework === 'elizaos' ? 'Plugins' : 'Skills', icon: <Sparkles size={18} />, group: 'configure' },
     { id: 'logs', label: 'Logs', icon: <ScrollText size={18} />, group: 'data' },
     { id: 'stats', label: 'Stats', icon: <BarChart3 size={18} />, group: 'data' },
+    { id: 'analytics', label: 'Analytics', icon: <TrendingUp size={18} />, group: 'data' },
     { id: 'usage', label: 'Usage', icon: <Activity size={18} />, group: 'data' },
     { id: 'memory', label: 'Memory', icon: <Brain size={18} />, group: 'data' },
     { id: 'knowledge', label: 'Knowledge', icon: <BookOpen size={18} />, group: 'data' },
@@ -143,7 +145,7 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
                       onTabChange(t.id);
                       setMobileOpen(false);
                     }}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150 relative ${
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150 relative cursor-pointer ${
                       isActive
                         ? 'text-[#FFFFFF] bg-[#06b6d4]/10'
                         : 'text-[#71717a] hover:text-[#A5A1C2] hover:bg-white/[0.03]'
@@ -173,7 +175,7 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
       {/* Mobile toggle button */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg border border-[rgba(46,43,74,0.4)] bg-[#0a0a12]/90 backdrop-blur-sm text-[#A5A1C2] hover:text-white transition-colors"
+        className="lg:hidden fixed top-[72px] left-4 z-40 p-2 rounded-lg border border-[rgba(46,43,74,0.4)] bg-[#0a0a12]/90 backdrop-blur-sm text-[#A5A1C2] hover:text-white transition-colors cursor-pointer"
         aria-label="Open navigation"
       >
         <Menu size={20} />
