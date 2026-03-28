@@ -1,6 +1,6 @@
 // ============================================================
 // Web API client tests
-// Tests: api.getAgent, api.createAgent, api.unlockFeature, etc.
+// Tests: api.getAgent, api.createAgent, api.subscribe, etc.
 // All fetch calls are mocked.
 // ============================================================
 
@@ -183,42 +183,20 @@ describe('api.deleteAgent', () => {
   });
 });
 
-// ─── api.unlockFeature ───────────────────────────────────────
+// ─── api.subscribe ──────────────────────────────────────────
 
-describe('api.unlockFeature', () => {
-  it('calls POST /features/unlock with agentId, featureKey, amount, txSignature', async () => {
-    mockFetchOk({ id: 'feat-1', featureKey: 'openclaw.feature.unlimited_chat', type: 'subscription', expiresAt: null });
+describe('api.subscribe', () => {
+  it('calls POST /features/subscribe with tier and txSignature', async () => {
+    mockFetchOk({ tier: 'basic', expiresAt: '2026-04-28' });
     const { api } = await import('../lib/api.js');
-    await api.unlockFeature('agent-123', 'openclaw.feature.unlimited_chat', {
-      paymentToken: 'sol',
-      amount: 0.05,
-      txSignature: 'real-tx-sig-abc123',
-    });
+    await api.subscribe('basic', 'real-tx-sig-abc123');
 
     const [url, opts] = fetchSpy.mock.calls[0] as [string, RequestInit];
-    expect(url).toContain('/features/unlock');
+    expect(url).toContain('/features/subscribe');
     expect(opts.method).toBe('POST');
-    const body = JSON.parse(opts.body as string) as { agentId: string; featureKey: string; solAmount: number; txSignature: string; paymentToken: string };
-    expect(body.agentId).toBe('agent-123');
-    expect(body.featureKey).toBe('openclaw.feature.unlimited_chat');
-    expect(body.solAmount).toBe(0.05);
+    const body = JSON.parse(opts.body as string) as { tier: string; txSignature: string };
+    expect(body.tier).toBe('basic');
     expect(body.txSignature).toBe('real-tx-sig-abc123');
-    expect(body.paymentToken).toBe('sol');
-  });
-
-  it('sends correct paymentToken and txSignature', async () => {
-    mockFetchOk({ id: 'feat-2', featureKey: 'openclaw.resources.dedicated' });
-    const { api } = await import('../lib/api.js');
-    await api.unlockFeature('agent-456', 'openclaw.resources.dedicated', {
-      paymentToken: 'hatch',
-      amount: 500,
-      txSignature: 'tx-hatch-456',
-    });
-
-    const [, opts] = fetchSpy.mock.calls[0] as [string, RequestInit];
-    const body = JSON.parse(opts.body as string) as { txSignature: string; paymentToken: string };
-    expect(body.txSignature).toBe('tx-hatch-456');
-    expect(body.paymentToken).toBe('hatch');
   });
 });
 
