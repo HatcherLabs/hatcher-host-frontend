@@ -14,18 +14,26 @@ import {
   Coins,
   HelpCircle,
   Zap,
+  Clock,
+  Play,
+  Square,
 } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context';
+import { api } from '@/lib/api';
+import type { Agent } from '@/lib/api';
 
 interface CommandItem {
   id: string;
   label: string;
   icon: typeof Search;
-  href: string;
+  href?: string;
+  action?: () => void;
   shortcut?: string;
   section: string;
+  meta?: string;
 }
 
-const COMMANDS: CommandItem[] = [
+const STATIC_COMMANDS: CommandItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard', shortcut: 'D', section: 'Navigation' },
   { id: 'agents', label: 'My Agents', icon: Bot, href: '/dashboard/agents', shortcut: 'A', section: 'Navigation' },
   { id: 'create', label: 'Create Agent', icon: PlusCircle, href: '/create', shortcut: 'C', section: 'Actions' },
@@ -37,22 +45,111 @@ const COMMANDS: CommandItem[] = [
   { id: 'help', label: 'Help & Support', icon: HelpCircle, href: '/support', section: 'Navigation' },
 ];
 
+const RECENT_KEY = 'cmd_palette_recent';
+const MAX_RECENT = 5;
+
+function getRecent(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(RECENT_KEY) ?? '[]');
+  } catch {
+    return [];
+  }
+}
+
+function pushRecent(id: string) {
+  try {
+    const prev = getRecent().filter((r) => r !== id);
+    localStorage.setItem(RECENT_KEY, JSON.stringify([id, ...prev].slice(0, MAX_RECENT)));
+  } catch {
+    // ignore
+  }
+}
+
+function fuzzyMatch(text: string, query: string): boolean {
+  if (!query) return true;
+  const t = text.toLowerCase();
+  const q = query.toLowerCase();
+  let qi = 0;
+  for (let i = 0; i < t.length && qi < q.length; i++) {
+    if (t[i] === q[qi]) qi++;
+  }
+  return qi === q.length;
+}
+
 export function CommandPalette() {
   const router = useRouter();
   const pathname = usePathname();
+  const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [recentIds, setRecentIds] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Fetch agents when authenticated
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    api.getMyAgents().then((res) => {
+      if (res.success) setAgents(res.data);
+    });
+  }, [isAuthenticated]);
+
+  // Load recent on open
+  useEffect(() => {
+    if (open) setRecentIds(getRecent());
+  }, [open]);
+
+  // Build full command list
+  const allCommands: CommandItem[] = [
+    ...STATIC_COMMANDS,
+    ...agents.map((a) => ({
+      id: `agent-${a.id}`,
+      label: a.name,
+      icon: Bot,
+      href: `/dashboard/agent/${a.id}`,
+      section: 'Agents',
+      meta: a.status,
+    })),
+    ...agents
+      .filter((a) => a.status === 'active')
+      .map((a) => ({
+        id: `stop-${a.id}`,
+        label: `Stop ${a.name}`,
+        icon: Square,
+        action: () => api.stopAgent(a.id),
+        section: 'Actions',
+        meta: 'agent action',
+      })),
+    ...agents
+      .filter((a) => a.status !== 'active')
+      .map((a) => ({
+        id: `start-${a.id}`,
+        label: `Start ${a.name}`,
+        icon: Play,
+        action: () => api.startAgent(a.id),
+        section: 'Actions',
+        meta: 'agent action',
+      })),
+  ];
+
+  // Filtered commands
   const filtered = query
-    ? COMMANDS.filter((c) =>
-        c.label.toLowerCase().includes(query.toLowerCase())
-      )
-    : COMMANDS;
+    ? allCommands.filter((c) => fuzzyMatch(c.label, query) || (c.meta && fuzzyMatch(c.meta, query)))
+    : allCommands;
+
+  // Recent section (prepended when no query)
+  const recentItems: CommandItem[] = !query
+    ? recentIds
+        .map((id) => allCommands.find((c) => c.id === id))
+        .filter(Boolean)
+        .map((c) => ({ ...c!, section: 'Recent', icon: Clock }))
+    : [];
+
+  const combined = [...recentItems, ...filtered.filter((c) => !recentIds.includes(c.id) || query)];
 
   // Group by section
-  const sections = filtered.reduce<Record<string, CommandItem[]>>((acc, item) => {
+  const sections = combined.reduce<Record<string, CommandItem[]>>((acc, item) => {
     (acc[item.section] ??= []).push(item);
     return acc;
   }, {});
@@ -88,11 +185,16 @@ export function CommandPalette() {
     setSelectedIndex(0);
   }, [query]);
 
-  const navigate = useCallback(
-    (href: string) => {
+  const execute = useCallback(
+    (item: CommandItem) => {
       setOpen(false);
       setQuery('');
-      if (href !== pathname) router.push(href);
+      pushRecent(item.id);
+      if (item.action) {
+        item.action();
+      } else if (item.href && item.href !== pathname) {
+        router.push(item.href);
+      }
     },
     [router, pathname],
   );
@@ -105,7 +207,7 @@ export function CommandPalette() {
       e.preventDefault();
       setSelectedIndex((i) => (i - 1 + flatItems.length) % flatItems.length);
     } else if (e.key === 'Enter' && flatItems[selectedIndex]) {
-      navigate(flatItems[selectedIndex].href);
+      execute(flatItems[selectedIndex]);
     }
   }
 
@@ -139,18 +241,21 @@ export function CommandPalette() {
             transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
             role="dialog"
             aria-label="Command palette"
+            aria-modal="true"
           >
             {/* Search input */}
             <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[rgba(46,43,74,0.6)]">
-              <Search size={18} className="text-[#71717a] flex-shrink-0" />
+              <Search size={18} className="text-[#71717a] flex-shrink-0" aria-hidden="true" />
               <input
                 ref={inputRef}
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Search commands..."
+                placeholder="Search commands, agents..."
                 className="flex-1 bg-transparent outline-none text-sm text-[#fafafa] placeholder:text-[#71717a]"
+                aria-label="Command search"
+                autoComplete="off"
               />
               <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-[#71717a] bg-white/[0.04] border border-white/[0.06] rounded">
                 ESC
@@ -158,7 +263,7 @@ export function CommandPalette() {
             </div>
 
             {/* Results */}
-            <div className="max-h-[320px] overflow-y-auto py-2">
+            <div className="max-h-[320px] overflow-y-auto py-2" role="listbox" aria-label="Command results">
               {flatItems.length === 0 ? (
                 <div className="px-4 py-8 text-center text-sm text-[#71717a]">
                   No commands found
@@ -176,18 +281,23 @@ export function CommandPalette() {
                       return (
                         <button
                           key={item.id}
-                          onClick={() => navigate(item.href)}
+                          onClick={() => execute(item)}
                           onMouseEnter={() => setSelectedIndex(globalIndex)}
-                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${
+                          role="option"
+                          aria-selected={isSelected}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors cursor-pointer ${
                             isSelected
                               ? 'bg-[rgba(6,182,212,0.08)] text-white'
                               : 'text-[#A5A1C2] hover:bg-white/[0.02]'
                           }`}
                         >
-                          <Icon size={16} className={isSelected ? 'text-[#06b6d4]' : 'text-[#71717a]'} />
-                          <span className="flex-1">{item.label}</span>
+                          <Icon size={16} className={isSelected ? 'text-[#06b6d4]' : 'text-[#71717a]'} aria-hidden="true" />
+                          <span className="flex-1 truncate">{item.label}</span>
+                          {item.meta && !item.meta.includes('action') && (
+                            <span className="text-[10px] text-[#71717a] font-mono shrink-0">{item.meta}</span>
+                          )}
                           {item.shortcut && (
-                            <kbd className="text-[10px] font-mono text-[#71717a] bg-white/[0.04] border border-white/[0.06] rounded px-1.5 py-0.5">
+                            <kbd className="text-[10px] font-mono text-[#71717a] bg-white/[0.04] border border-white/[0.06] rounded px-1.5 py-0.5 shrink-0">
                               {item.shortcut}
                             </kbd>
                           )}
