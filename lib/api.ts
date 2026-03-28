@@ -929,6 +929,25 @@ export const api = {
       method: 'POST',
     }),
 
+  // ─── Agent Environment Variables ──────────────────────────
+
+  /** List env var keys for an agent (values are always masked) */
+  getEnvVars: (agentId: string) =>
+    req<{ envVars: Array<{ key: string; hasValue: boolean }> }>(`/agents/${agentId}/env-vars`),
+
+  /** Upsert a single env var */
+  setEnvVar: (agentId: string, key: string, value: string) =>
+    req<{ key: string; hasValue: boolean }>(`/agents/${agentId}/env-vars/${encodeURIComponent(key)}`, {
+      method: 'POST',
+      body: JSON.stringify({ value }),
+    }),
+
+  /** Delete a single env var */
+  deleteEnvVar: (agentId: string, key: string) =>
+    req<{ deleted: boolean; key: string }>(`/agents/${agentId}/env-vars/${encodeURIComponent(key)}`, {
+      method: 'DELETE',
+    }),
+
   // ─── Scheduled Tasks (Cron Jobs) ──────────────────────────
   /** List all scheduled tasks for an agent */
   getAgentSchedules: (agentId: string) =>

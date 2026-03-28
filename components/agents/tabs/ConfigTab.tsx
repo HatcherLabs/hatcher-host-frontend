@@ -1332,6 +1332,9 @@ export function ConfigTab() {
 
       {/* Integrations hint — all integrations are free */}
 
+      {/* Environment Variables */}
+      <EnvVarsEditor agentId={agent?.id} />
+
       {/* Config History */}
       <ConfigHistory agentId={agent?.id} />
 
@@ -1451,6 +1454,304 @@ function SliderInput({ label, value, onChange, min, max, helper }: {
       </div>
       {helper && <p className="text-[10px] mt-0.5 text-[#71717a]">{helper}</p>}
     </div>
+  );
+}
+
+// ─── Environment Variables Editor ────────────────────────────
+
+const ENV_KEY_REGEX = /^[A-Z][A-Z0-9_]*$/;
+const MAX_ENV_VARS = 50;
+
+interface EnvVarEntry {
+  key: string;
+  hasValue: boolean;
+  editing: boolean;
+  newValue: string;
+  visible: boolean;
+}
+
+function EnvVarsEditor({ agentId }: { agentId?: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [vars, setVars] = useState<EnvVarEntry[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [newKey, setNewKey] = useState('');
+  const [newValue, setNewValue] = useState('');
+  const [showNewValue, setShowNewValue] = useState(false);
+  const [saving, setSaving] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  const loadVars = useCallback(async () => {
+    if (!agentId) return;
+    setLoading(true);
+    try {
+      const res = await api.getEnvVars(agentId);
+      if (res.success) {
+        setVars(res.data.envVars.map(v => ({ ...v, editing: false, newValue: '', visible: false })));
+      }
+    } catch {
+      // ignore
+    } finally {
+      setLoading(false);
+    }
+  }, [agentId]);
+
+  useEffect(() => {
+    if (expanded && agentId) loadVars();
+  }, [expanded, agentId, loadVars]);
+
+  function flash(msg: string, isError = false) {
+    if (isError) { setError(msg); setTimeout(() => setError(null), 4000); }
+    else { setSuccessMsg(msg); setTimeout(() => setSuccessMsg(null), 3000); }
+  }
+
+  async function handleAdd() {
+    if (!agentId) return;
+    const key = newKey.trim().toUpperCase();
+    if (!ENV_KEY_REGEX.test(key)) {
+      flash('Key must be uppercase letters, digits, and underscores, starting with a letter (e.g. MY_VAR)', true);
+      return;
+    }
+    if (vars.length >= MAX_ENV_VARS) {
+      flash(`Maximum ${MAX_ENV_VARS} environment variables allowed`, true);
+      return;
+    }
+    setSaving('__new__');
+    setError(null);
+    try {
+      const res = await api.setEnvVar(agentId, key, newValue);
+      if (res.success) {
+        setNewKey('');
+        setNewValue('');
+        setShowNewValue(false);
+        await loadVars();
+        flash('Variable added');
+      } else {
+        flash((res as { error?: string }).error ?? 'Failed to add variable', true);
+      }
+    } catch {
+      flash('Network error', true);
+    } finally {
+      setSaving(null);
+    }
+  }
+
+  async function handleUpdate(key: string, value: string) {
+    if (!agentId) return;
+    setSaving(key);
+    setError(null);
+    try {
+      const res = await api.setEnvVar(agentId, key, value);
+      if (res.success) {
+        setVars(prev => prev.map(v => v.key === key ? { ...v, editing: false, newValue: '', hasValue: true } : v));
+        flash('Variable updated');
+      } else {
+        flash((res as { error?: string }).error ?? 'Failed to update variable', true);
+      }
+    } catch {
+      flash('Network error', true);
+    } finally {
+      setSaving(null);
+    }
+  }
+
+  async function handleDelete(key: string) {
+    if (!agentId) return;
+    setDeleting(key);
+    setError(null);
+    try {
+      const res = await api.deleteEnvVar(agentId, key);
+      if (res.success) {
+        setVars(prev => prev.filter(v => v.key !== key));
+        flash('Variable deleted');
+      } else {
+        flash((res as { error?: string }).error ?? 'Failed to delete variable', true);
+      }
+    } catch {
+      flash('Network error', true);
+    } finally {
+      setDeleting(null);
+    }
+  }
+
+  return (
+    <GlassCard>
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center justify-between w-full"
+      >
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+            <Lock size={14} className="text-emerald-400" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-[#A5A1C2]">Environment Variables</h3>
+            {vars.length > 0 && !expanded && (
+              <p className="text-[10px] text-[#71717a] mt-0.5">{vars.length} variable{vars.length !== 1 ? 's' : ''} set</p>
+            )}
+          </div>
+        </div>
+        {expanded ? <ChevronUp size={16} className="text-[#71717a]" /> : <ChevronDown size={16} className="text-[#71717a]" />}
+      </button>
+
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="mt-4 space-y-3">
+              <p className="text-[10px] text-[#71717a]">
+                Inject secrets and config into your agent container at startup. Values are encrypted at rest with AES-256-GCM and never exposed after saving.
+              </p>
+
+              {loading && (
+                <div className="flex items-center gap-2 py-2">
+                  <div className="w-3 h-3 border-2 border-white/20 border-t-emerald-400 rounded-full animate-spin" />
+                  <span className="text-xs text-[#71717a]">Loading...</span>
+                </div>
+              )}
+
+              {!loading && vars.length === 0 && (
+                <p className="text-xs text-[#71717a] py-1">No environment variables set yet.</p>
+              )}
+
+              {!loading && vars.map(v => (
+                <div key={v.key} className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono font-medium text-[#A5A1C2]">{v.key}</span>
+                    <div className="flex items-center gap-2">
+                      {!v.editing && (
+                        <button
+                          type="button"
+                          onClick={() => setVars(prev => prev.map(x => x.key === v.key ? { ...x, editing: true, newValue: '' } : x))}
+                          className="text-[10px] text-[#A78BFA] hover:text-[#c4b5fd] transition-colors font-medium"
+                        >
+                          Update
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(v.key)}
+                        disabled={deleting === v.key}
+                        className="text-[10px] text-red-400 hover:text-red-300 transition-colors disabled:opacity-40 font-medium"
+                      >
+                        {deleting === v.key ? 'Removing...' : 'Remove'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {!v.editing && (
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="flex-1 text-xs font-mono text-[#71717a] bg-white/[0.03] rounded px-2 py-1 border border-white/[0.04] cursor-pointer select-none"
+                        onClick={() => setVars(prev => prev.map(x => x.key === v.key ? { ...x, visible: !x.visible } : x))}
+                        title="Click to reveal/hide"
+                      >
+                        {v.visible ? <span className="text-[#A5A1C2]">value set</span> : '••••••••••••'}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setVars(prev => prev.map(x => x.key === v.key ? { ...x, visible: !x.visible } : x))}
+                        className="text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+                        title={v.visible ? 'Hide' : 'Reveal indicator'}
+                      >
+                        {v.visible ? <EyeOff size={13} /> : <Eye size={13} />}
+                      </button>
+                    </div>
+                  )}
+
+                  {v.editing && (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="password"
+                        autoFocus
+                        placeholder="New value..."
+                        value={v.newValue}
+                        onChange={e => setVars(prev => prev.map(x => x.key === v.key ? { ...x, newValue: e.target.value } : x))}
+                        onKeyDown={e => { if (e.key === 'Enter') handleUpdate(v.key, v.newValue); if (e.key === 'Escape') setVars(prev => prev.map(x => x.key === v.key ? { ...x, editing: false, newValue: '' } : x)); }}
+                        className="flex-1 text-xs font-mono config-input py-1.5"
+                        maxLength={2000}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleUpdate(v.key, v.newValue)}
+                        disabled={saving === v.key || !v.newValue}
+                        className="text-[10px] font-medium text-emerald-400 hover:text-emerald-300 disabled:opacity-40 transition-colors"
+                      >
+                        {saving === v.key ? 'Saving...' : 'Save'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setVars(prev => prev.map(x => x.key === v.key ? { ...x, editing: false, newValue: '' } : x))}
+                        className="text-[10px] font-medium text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {/* Add new variable */}
+              {vars.length < MAX_ENV_VARS && (
+                <div className="rounded-lg border border-dashed border-white/[0.08] bg-white/[0.01] p-3 space-y-2">
+                  <p className="text-[10px] font-medium uppercase tracking-wider text-[#71717a]">Add Variable</p>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      placeholder="KEY_NAME"
+                      value={newKey}
+                      onChange={e => setNewKey(e.target.value.toUpperCase().replace(/[^A-Z0-9_]/g, ''))}
+                      onKeyDown={e => { if (e.key === 'Enter') handleAdd(); }}
+                      className="w-36 text-xs font-mono config-input py-1.5"
+                      maxLength={100}
+                    />
+                    <div className="relative flex-1">
+                      <input
+                        type={showNewValue ? 'text' : 'password'}
+                        placeholder="value"
+                        value={newValue}
+                        onChange={e => setNewValue(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') handleAdd(); }}
+                        className="w-full text-xs font-mono config-input py-1.5 pr-8"
+                        maxLength={2000}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewValue(!showNewValue)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+                      >
+                        {showNewValue ? <EyeOff size={12} /> : <Eye size={12} />}
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAdd}
+                      disabled={saving === '__new__' || !newKey || !newValue}
+                      className="text-[10px] font-medium text-emerald-400 hover:text-emerald-300 disabled:opacity-40 transition-colors whitespace-nowrap"
+                    >
+                      {saving === '__new__' ? 'Adding...' : '+ Add'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {(error || successMsg) && (
+                <p className={`text-xs font-medium ${error ? 'text-red-400' : 'text-emerald-400'}`}>
+                  {error ?? successMsg}
+                </p>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </GlassCard>
   );
 }
 
