@@ -248,7 +248,10 @@ function AgentPreview() {
 // ██  LANDING PAGE
 // ═══════════════════════════════════════════════════════════════
 export default function LandingPage() {
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return !sessionStorage.getItem('hatcher_splash_seen');
+  });
   const [stats, setStats] = useState({ agents: 0, platforms: 20, frameworks: 4 });
 
   useEffect(() => {
@@ -258,7 +261,10 @@ export default function LandingPage() {
   }, []);
 
   if (showSplash) {
-    return <IntroSplash onComplete={() => setShowSplash(false)} />;
+    return <IntroSplash onComplete={() => {
+      sessionStorage.setItem('hatcher_splash_seen', '1');
+      setShowSplash(false);
+    }} />;
   }
 
   return (
