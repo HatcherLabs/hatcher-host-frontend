@@ -548,16 +548,26 @@ export const api = {
     req<{
       users: Array<{
         id: string;
-        walletAddress: string;
+        email: string;
+        username: string;
+        walletAddress: string | null;
+        tier: string;
+        isAdmin: boolean;
         agentCount: number;
         paymentCount: number;
         hatchCredits: number;
         createdAt: string;
       }>;
-      total: number;
-      skip: number;
-      take: number;
-    }>(`/admin/users?skip=${skip}&take=${take}`),
+      pagination: { total: number; limit: number; offset: number; hasMore: boolean };
+    }>(`/admin/users?limit=${take}&offset=${skip}`),
+
+  /** Admin: ban a user (sets tier to 'banned') */
+  adminBanUser: (userId: string) =>
+    req<{ banned: boolean; userId: string }>(`/admin/users/${userId}/ban`, { method: 'POST' }),
+
+  /** Admin: unban a user */
+  adminUnbanUser: (userId: string) =>
+    req<{ unbanned: boolean; userId: string }>(`/admin/users/${userId}/unban`, { method: 'POST' }),
 
   /** Admin: list all support tickets */
   adminGetTickets: () =>
