@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { BYOK_PROVIDERS, getBYOKProvider, AGENT_TEMPLATES } from '@hatcher/shared';
@@ -159,8 +159,11 @@ export default function CreatePage() {
   const [byokBaseUrl, setByokBaseUrl] = useState('');
   // Credits model removed — using Groq free or BYOK only
 
-  // ── Template state ──
-  const [selectedTemplate, setSelectedTemplate] = useState('custom');
+  // ── Template state (pre-select via ?template= URL param) ──
+  const searchParams = useSearchParams();
+  const preselectedTemplate = searchParams.get('template') ?? 'custom';
+  const validPreselect = AGENT_TEMPLATES.some(t => t.id === preselectedTemplate) ? preselectedTemplate : 'custom';
+  const [selectedTemplate, setSelectedTemplate] = useState(validPreselect);
   const [selectedFramework, setSelectedFramework] = useState<'openclaw' | 'hermes' | 'elizaos' | 'milady'>('openclaw');
 
   // ── OpenClaw form state ──
