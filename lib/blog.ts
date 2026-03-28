@@ -791,6 +791,116 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: '4 min',
     coverImageDescription: 'A digital marketplace storefront with AI agent icons displayed as products, featuring a purple-tinted cyberpunk aesthetic',
   },
+  {
+    slug: 'byok-explained-free-ai-agents',
+    title: 'BYOK Explained: How to Run AI Agents for $0 with Your Own API Key',
+    excerpt:
+      'Bring Your Own Key (BYOK) lets you run unlimited AI agent messages for free. Here is how it works and why it changes everything about AI agent hosting costs.',
+    content: `<p>The biggest barrier to running AI agents is not deployment — it is cost. Most platforms charge $30-60/month per bot, and that is before you pay for LLM tokens. But there is a better way: <strong>BYOK (Bring Your Own Key)</strong>.</p>
+
+<h2>What Is BYOK?</h2>
+<p>BYOK means you plug your own LLM API key into your agent instead of using the platform's built-in credits. On Hatcher, this unlocks <strong>unlimited messages at no extra cost</strong> — on any tier, including the free tier.</p>
+<p>Your agent sends requests directly through your API key. You pay the LLM provider directly (often at much lower rates than middleman platforms charge), and Hatcher handles everything else: hosting, platform integrations, container management, auto-restart, and logs.</p>
+
+<h2>Why BYOK Changes the Economics</h2>
+<p>Let us compare the real costs:</p>
+
+<h3>Without BYOK (typical platform)</h3>
+<ul>
+<li>Platform fee: $30-60/month</li>
+<li>Included tokens: usually limited (500-1000 messages)</li>
+<li>Overage charges: $0.01-0.05 per message</li>
+<li><strong>Monthly cost for an active bot: $50-150+</strong></li>
+</ul>
+
+<h3>With BYOK on Hatcher</h3>
+<ul>
+<li>Platform fee: $0 (free tier) or $9.99/month (Basic)</li>
+<li>LLM cost: depends on your provider</li>
+<li>Groq (Llama 4 Scout): <strong>free tier available</strong></li>
+<li>OpenRouter: from $0.10 per million tokens</li>
+<li>Together AI: competitive rates with free credits</li>
+<li><strong>Monthly cost for an active bot: $0-5</strong></li>
+</ul>
+
+<p>The difference is staggering. BYOK removes the platform markup on tokens entirely.</p>
+
+<h2>How to Set Up BYOK on Hatcher</h2>
+<p>Setting up BYOK takes about 30 seconds:</p>
+<ol>
+<li><strong>Get an API key</strong> from your preferred LLM provider. We support Groq, OpenAI, Anthropic, OpenRouter, Together AI, Google Gemini, Mistral, and more.</li>
+<li><strong>Go to your agent's Config tab</strong> on the Hatcher dashboard.</li>
+<li><strong>Select your BYOK provider</strong> from the dropdown menu.</li>
+<li><strong>Paste your API key</strong> — it is encrypted with AES-256-GCM and never exposed.</li>
+<li><strong>Choose your model</strong> — each provider offers different models at different price points.</li>
+<li><strong>Save and restart</strong> your agent. Done.</li>
+</ol>
+<p>Your agent now uses your API key for all LLM requests. The daily message limit disappears — you get unlimited messages.</p>
+
+<h2>Best BYOK Providers for AI Agents</h2>
+<p>Here is our recommendation based on cost and quality:</p>
+
+<h3>Groq (Best Free Option)</h3>
+<p>Groq offers free access to Llama 4 Scout with generous rate limits. For most personal and small-scale agents, you will never hit the ceiling. This is the genuine $0 setup.</p>
+
+<h3>OpenRouter (Best Variety)</h3>
+<p>OpenRouter aggregates 100+ models from multiple providers. You can switch between GPT-4, Claude, Llama, Mistral, and others without changing your API key. Great for experimentation.</p>
+
+<h3>OpenAI (Best for GPT Models)</h3>
+<p>If you want GPT-4o or the latest OpenAI models, going direct gives you the best rates. The API is pay-per-token with no minimum spend.</p>
+
+<h3>Anthropic (Best for Claude)</h3>
+<p>Claude excels at nuanced conversation, coding tasks, and long-context work. If your agent handles complex queries, Claude through BYOK is a strong choice.</p>
+
+<h3>Together AI (Best for Open Models)</h3>
+<p>Together runs open-source models at competitive rates with frequent free credit promotions. Good for Llama, Mixtral, and other open models.</p>
+
+<h2>Security: Your Key Is Safe</h2>
+<p>A common concern with BYOK is key security. On Hatcher:</p>
+<ul>
+<li>Your API key is <strong>encrypted with AES-256-GCM</strong> before storage</li>
+<li>Keys are <strong>never stored in plain text</strong> in the database</li>
+<li>Keys are <strong>never exposed in the container</strong> — the LLM proxy handles decryption at request time</li>
+<li>Your key is never visible in logs, API responses, or the dashboard after initial entry</li>
+</ul>
+<p>You can rotate your key at any time by updating it in the Config tab.</p>
+
+<h2>BYOK + Free Tier = Genuinely Free AI Agents</h2>
+<p>Here is the math that matters:</p>
+<ul>
+<li>Hatcher free tier: $0/month — includes 1 agent, all integrations, all frameworks</li>
+<li>Groq free API key: $0/month — includes Llama 4 Scout with generous limits</li>
+<li>Telegram/Discord bot tokens: free to create</li>
+<li><strong>Total: $0/month for a fully functional AI agent</strong></li>
+</ul>
+<p>This is not a trial. This is not a 14-day offer. This is the permanent free tier. Your agent runs 24/7 with auto-restart, connects to any platform, and handles unlimited messages through BYOK.</p>
+
+<h2>When to Upgrade from Free</h2>
+<p>The free tier is genuinely sufficient for most individual use cases. Consider upgrading when:</p>
+<ul>
+<li>You need <strong>more than one agent</strong> — Basic includes 1, Pro includes 5, plus add-on packs</li>
+<li>You want <strong>dedicated resources</strong> — Pro gives 2 CPU, 2GB RAM per agent instead of shared</li>
+<li>You need <strong>file manager access</strong> — browse and edit your agent's workspace files</li>
+<li>You want <strong>longer idle time</strong> — free agents auto-sleep after 15 minutes, Basic after 6 hours, Pro stays on</li>
+</ul>
+<p>But for a single agent with BYOK? Free works indefinitely.</p>
+
+<h2>Get Started</h2>
+<p>The fastest path to a $0 AI agent:</p>
+<ol>
+<li>Sign up at <a href="https://hatcher.host/register">hatcher.host</a> (free, no credit card)</li>
+<li>Create an agent with any framework</li>
+<li>Get a free Groq API key at <a href="https://console.groq.com">console.groq.com</a></li>
+<li>Add the key in your agent's Config tab</li>
+<li>Deploy — your agent is live with unlimited messages</li>
+</ol>
+<p>Stop paying middleman markup on AI tokens. Bring your own key and keep your costs at zero.</p>`,
+    author: 'Hatcher Labs',
+    date: '2026-03-28',
+    category: 'Tutorial',
+    readTime: '6 min',
+    coverImageDescription: 'A glowing API key floating above an open padlock, with connecting lines to various LLM provider logos, on a dark gradient background with purple accents',
+  },
 ];
 
 export function getBlogPost(slug: string): BlogPost | undefined {
