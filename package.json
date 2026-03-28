@@ -20,8 +20,6 @@
     "@solana/wallet-adapter-react-ui": "^0.9.38",
     "@solana/wallet-adapter-solflare": "^0.6.31",
     "@solana/web3.js": "^1.98.0",
-    "@splinetool/react-spline": "^4.1.0",
-    "@splinetool/runtime": "^1.12.69",
     "@stripe/stripe-js": "^8.11.0",
     "@tailwindcss/typography": "^0.5.19",
     "canvas-confetti": "^1.9.4",
