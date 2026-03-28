@@ -8,48 +8,43 @@ import { api } from '@/lib/api';
 import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Shield, LogOut, Settings, User, Wallet, ChevronDown,
-  BookOpen, HelpCircle, CreditCard, Users, Coins, Newspaper,
+  Shield, LogOut, Settings, ChevronDown,
+  CreditCard, Users, Wallet,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
 
-// ── Primary nav (always visible in header) ──
-const PRIMARY_LINKS = [
+// ── Nav links when logged IN ──
+const AUTH_NAV_LINKS = [
   { href: '/dashboard/agents', label: 'My Agents' },
   { href: '/explore',          label: 'Explore' },
   { href: '/create',           label: 'Create' },
 ];
 
-// ── Resources dropdown ──
-const RESOURCE_LINKS = [
-  { href: '/marketplace',       label: 'Templates',    icon: BookOpen },
-  { href: '/pricing',           label: 'Pricing',      icon: CreditCard },
-  { href: '/token',             label: 'Our Token',    icon: Coins },
-  { href: '/blog',              label: 'Blog',         icon: Newspaper },
-  { href: '/support',           label: 'Support',      icon: HelpCircle },
-  { href: DOCS_URL,             label: 'Docs',         icon: BookOpen, external: true },
+// ── Auxiliary links (visible in both states, after a divider) ──
+const AUX_LINKS = [
+  { href: '/pricing', label: 'Pricing' },
+  { href: DOCS_URL,   label: 'Docs', external: true },
 ];
 
-// ── User dropdown extra links (authenticated only) ──
+// ── User dropdown links ──
 const USER_EXTRA_LINKS = [
   { href: '/dashboard/team',    label: 'Team',    icon: Users },
   { href: '/dashboard/billing', label: 'Billing', icon: CreditCard },
   { href: '/settings',          label: 'Settings', icon: Settings },
 ];
 
-// ── All links for mobile ──
-const ALL_MOBILE_LINKS = [
+// ── Mobile links (when logged in) ──
+const MOBILE_AUTH_LINKS = [
   { href: '/dashboard/agents', label: 'My Agents' },
   { href: '/explore',          label: 'Explore' },
   { href: '/create',           label: 'Create' },
-  { href: '/marketplace',      label: 'Templates' },
-  { href: '/dashboard/team',   label: 'Team' },
-  { href: '/dashboard/billing',label: 'Billing' },
   { href: '/pricing',          label: 'Pricing' },
-  { href: '/token',            label: 'Our Token' },
-  { href: '/support',          label: 'Support' },
-  { href: '/blog',             label: 'Blog' },
+];
+
+// ── Mobile links (when logged out) ──
+const MOBILE_GUEST_LINKS = [
+  { href: '/pricing', label: 'Pricing' },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -64,10 +59,7 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { isAuthenticated, isLoading: authLoading, user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [resourcesOpen, setResourcesOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const resourcesRef = useRef<HTMLDivElement>(null);
-
   const isAdmin = user?.isAdmin ?? false;
   const [creditBalance, setCreditBalance] = useState<number | null>(null);
 
@@ -84,12 +76,9 @@ export function Header() {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
       }
-      if (resourcesRef.current && !resourcesRef.current.contains(e.target as Node)) {
-        setResourcesOpen(false);
-      }
     }
     function handleKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') { setDropdownOpen(false); setResourcesOpen(false); }
+      if (e.key === 'Escape') setDropdownOpen(false);
     }
     document.addEventListener('mousedown', handleClick);
     document.addEventListener('keydown', handleKey);
@@ -105,10 +94,15 @@ export function Header() {
     router.push('/');
   };
 
+  // Desktop nav links depend on auth state
+  const primaryLinks = isAuthenticated ? AUTH_NAV_LINKS : [];
+  const mobileLinks = isAuthenticated ? MOBILE_AUTH_LINKS : MOBILE_GUEST_LINKS;
+
   return (
     <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-black/50 backdrop-blur-xl">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between">
+
           {/* Left: Logo + Admin */}
           <div className="flex items-center gap-3 flex-shrink-0">
             <Link href="/" className="flex items-center gap-2 group">
@@ -157,9 +151,10 @@ export function Header() {
             )}
           </div>
 
-          {/* Desktop Nav — simplified: 3 primary + Resources dropdown */}
+          {/* Desktop Nav — flat links, no dropdown */}
           <nav className="hidden lg:flex items-center gap-1 relative" aria-label="Main navigation">
-            {PRIMARY_LINKS.map((link) => {
+            {/* Primary links (auth-only) */}
+            {primaryLinks.map((link) => {
               const active = isActive(pathname, link.href);
               return (
                 <Link
@@ -184,65 +179,44 @@ export function Header() {
               );
             })}
 
-            {/* Resources dropdown */}
-            <div className="relative" ref={resourcesRef}>
-              <button
-                onClick={() => setResourcesOpen(o => !o)}
-                className={clsx(
-                  'flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg transition-colors duration-200',
-                  resourcesOpen || RESOURCE_LINKS.some(l => !l.external && isActive(pathname, l.href))
-                    ? 'text-white'
-                    : 'text-[#71717a] hover:text-white'
-                )}
-              >
-                Resources
-                <ChevronDown className={clsx('w-3.5 h-3.5 transition-transform duration-200', resourcesOpen && 'rotate-180')} />
-              </button>
-              <AnimatePresence>
-                {resourcesOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute top-full left-0 mt-1 w-48 rounded-xl shadow-xl z-50 overflow-hidden py-1"
-                    style={{
-                      background: 'rgba(14, 14, 20, 0.95)',
-                      backdropFilter: 'blur(24px)',
-                      border: '1px solid rgba(255, 255, 255, 0.06)',
-                    }}
-                  >
-                    {RESOURCE_LINKS.map((link) => {
-                      const Icon = link.icon;
-                      const active = !link.external && isActive(pathname, link.href);
-                      const Comp = link.external ? 'a' : Link;
-                      const extraProps = link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
-                      return (
-                        <Comp
-                          key={link.href}
-                          href={link.href}
-                          {...extraProps as Record<string, string>}
-                          onClick={() => setResourcesOpen(false)}
-                          className={clsx(
-                            'flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium transition-colors duration-200',
-                            active ? 'text-white bg-white/[0.04]' : 'text-[#a1a1aa] hover:text-white hover:bg-white/[0.04]'
-                          )}
-                        >
-                          <Icon className="w-3.5 h-3.5 flex-shrink-0" />
-                          {link.label}
-                          {link.external && <span className="text-[#71717a] ml-auto text-[10px]">&nearr;</span>}
-                        </Comp>
-                      );
-                    })}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            {/* Divider between primary and auxiliary (only when logged in) */}
+            {isAuthenticated && !authLoading && (
+              <span className="w-px h-4 bg-white/[0.08] mx-1" aria-hidden="true" />
+            )}
+
+            {/* Auxiliary links: Pricing + Docs (always visible) */}
+            {AUX_LINKS.map((link) => {
+              const active = !link.external && isActive(pathname, link.href);
+              const Comp = link.external ? 'a' : Link;
+              const extraProps = link.external
+                ? { href: link.href, target: '_blank', rel: 'noopener noreferrer' }
+                : { href: link.href };
+              return (
+                <Comp
+                  key={link.href}
+                  {...extraProps}
+                  aria-current={active ? 'page' : undefined}
+                  className={clsx(
+                    'relative px-3 py-1.5 text-sm rounded-lg transition-colors duration-200',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500',
+                    active ? 'text-white' : 'text-[#71717a] hover:text-white'
+                  )}
+                >
+                  {link.label}
+                  {active && (
+                    <motion.div
+                      className="absolute -bottom-[9px] left-1/2 -translate-x-1/2 w-5 h-0.5 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(139,92,246,0.5)]"
+                      layoutId="headerActiveTab"
+                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                </Comp>
+              );
+            })}
           </nav>
 
           {/* Right side: notifications + user menu + hamburger */}
           <div className="flex items-center gap-2">
-            {/* Desktop auth */}
             <div className="hidden lg:flex items-center gap-2">
               {authLoading ? (
                 <div className="h-9 w-24 rounded-lg bg-white/[0.04] animate-pulse" />
@@ -375,13 +349,13 @@ export function Header() {
             transition={{ duration: 0.2, ease: 'easeInOut' }}
           >
             <nav className="mx-auto max-w-7xl px-4 py-3 flex flex-col gap-0.5" aria-label="Mobile navigation">
-              {ALL_MOBILE_LINKS.map((link, i) => (
+              {mobileLinks.map((link, i) => (
                 <motion.div key={link.href} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}>
                   <Link
                     href={link.href}
                     className={clsx(
                       'block px-3 py-2.5 text-sm rounded-lg transition-colors duration-200',
-                      isActive(pathname, link.href) ? 'text-white bg-white/[0.06] border-l-2 border-[#06b6d4]' : 'text-[#71717a] hover:text-white border-l-2 border-transparent'
+                      isActive(pathname, link.href) ? 'text-white bg-white/[0.06] border-l-2 border-purple-500' : 'text-[#71717a] hover:text-white border-l-2 border-transparent'
                     )}
                     onClick={() => setMobileOpen(false)}
                   >
@@ -389,24 +363,39 @@ export function Header() {
                   </Link>
                 </motion.div>
               ))}
-              <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: ALL_MOBILE_LINKS.length * 0.03 }}>
-                <a href={DOCS_URL} target="_blank" rel="noopener noreferrer"
-                  className="block px-3 py-2.5 text-sm rounded-lg transition-colors duration-200 text-[#71717a] hover:text-white"
+
+              {/* Docs link */}
+              <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: mobileLinks.length * 0.03 }}>
+                <a
+                  href={DOCS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block px-3 py-2.5 text-sm rounded-lg transition-colors duration-200 text-[#71717a] hover:text-white border-l-2 border-transparent"
                   onClick={() => setMobileOpen(false)}
                 >
                   Docs
                 </a>
               </motion.div>
+
               {isAdmin && (
-                <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: (ALL_MOBILE_LINKS.length + 1) * 0.03 }}>
-                  <Link href="/admin" className={clsx('flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-colors', pathname === '/admin' ? 'text-purple-400 bg-purple-500/10' : 'text-[#71717a] hover:text-purple-400')} onClick={() => setMobileOpen(false)}>
+                <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: (mobileLinks.length + 1) * 0.03 }}>
+                  <Link
+                    href="/admin"
+                    className={clsx('flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-colors border-l-2', pathname === '/admin' ? 'text-purple-400 bg-purple-500/10 border-purple-500' : 'text-[#71717a] hover:text-purple-400 border-transparent')}
+                    onClick={() => setMobileOpen(false)}
+                  >
                     <Shield className="w-4 h-4" /> Admin Panel
                   </Link>
                 </motion.div>
               )}
 
               {/* Mobile auth */}
-              <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: (ALL_MOBILE_LINKS.length + 2) * 0.03 }} className="mt-2 pt-3 border-t border-white/[0.06]">
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: (mobileLinks.length + 2) * 0.03 }}
+                className="mt-2 pt-3 border-t border-white/[0.06]"
+              >
                 {isAuthenticated && user ? (
                   <div className="space-y-1">
                     <div className="px-3 py-2 flex items-center gap-2">
@@ -414,10 +403,19 @@ export function Header() {
                       <span className="text-sm font-medium text-purple-300">{user.username}</span>
                       <span className="text-[10px] text-[#a1a1aa] ml-auto">{user.email}</span>
                     </div>
+                    <Link href="/dashboard/team" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[#71717a] hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
+                      <Users className="w-4 h-4" /> Team
+                    </Link>
+                    <Link href="/dashboard/billing" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[#71717a] hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
+                      <CreditCard className="w-4 h-4" /> Billing
+                    </Link>
                     <Link href="/settings" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[#71717a] hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
                       <Settings className="w-4 h-4" /> Settings
                     </Link>
-                    <button onClick={() => { handleLogout(); setMobileOpen(false); }} className="w-full flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-red-400 hover:bg-red-500/10 transition-colors">
+                    <button
+                      onClick={() => { handleLogout(); setMobileOpen(false); }}
+                      className="w-full flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
+                    >
                       <LogOut className="w-4 h-4" /> Sign Out
                     </button>
                   </div>
