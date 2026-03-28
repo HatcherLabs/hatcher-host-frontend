@@ -115,6 +115,11 @@ const VersionsTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const UsageTab = dynamic(
+  () => import('@/components/agents/tabs/UsageTab').then(mod => ({ default: mod.UsageTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 // ─── Tab definitions ─────────────────────────────────────────
 
 // ─── Main Component ─────────────────────────────────────────
@@ -131,7 +136,7 @@ export default function AgentManagePage() {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const initialTab = (['overview','config','integrations','skills','files','logs','memory','knowledge','schedules','workflows','versions','chat','stats'] as Tab[]).includes(searchParams.get('tab') as Tab)
+  const initialTab = (['overview','config','integrations','skills','files','logs','memory','knowledge','schedules','workflows','versions','chat','stats','usage'] as Tab[]).includes(searchParams.get('tab') as Tab)
     ? (searchParams.get('tab') as Tab)
     : 'overview';
   const [tab, setTab] = useState<Tab>(initialTab);
@@ -995,6 +1000,7 @@ export default function AgentManagePage() {
               {tab === 'versions' && <VersionsTab />}
               {tab === 'chat' && <ChatTab />}
               {tab === 'stats' && <StatsTab />}
+              {tab === 'usage' && <UsageTab />}
             </AnimatePresence>
           </div>
         </div>
