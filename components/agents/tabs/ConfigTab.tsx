@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Settings,
@@ -73,6 +73,13 @@ export function ConfigTab() {
   } = ctx;
 
   const [commitMessage, setCommitMessage] = useState('');
+
+  // Memoize BYOK provider list (static array — only recomputed if BYOK_PROVIDERS changes)
+  const byokProvidersFiltered = useMemo(
+    () => BYOK_PROVIDERS.filter((p) => p.key !== 'groq'),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   // ─── Config Import/Export ───────────────────────────────────
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1182,7 +1189,7 @@ export function ConfigTab() {
                       setConfigModel(meta?.models[0]?.id ?? '');
                     }}
                   >
-                    {BYOK_PROVIDERS.filter(p => p.key !== 'groq').map((p) => (
+                    {byokProvidersFiltered.map((p) => (
                       <option key={p.key} value={p.key} style={{ background: '#0D0B1A' }}>{p.name} — {p.description}</option>
                     ))}
                   </select>

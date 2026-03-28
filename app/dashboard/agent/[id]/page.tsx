@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -781,9 +781,13 @@ export default function AgentManagePage() {
 
   const remaining = !hasUnlimitedChat ? Math.max(0, msgLimit - msgCount) : null;
   const isLimitReached = !hasUnlimitedChat && remaining !== null && remaining === 0;
-  const filteredLogs = logs
-    .filter((l) => logFilter === 'all' || l.level === logFilter)
-    .filter((l) => !logSearch || l.message.toLowerCase().includes(logSearch.toLowerCase()));
+  const filteredLogs = useMemo(
+    () =>
+      logs
+        .filter((l) => logFilter === 'all' || l.level === logFilter)
+        .filter((l) => !logSearch || l.message.toLowerCase().includes(logSearch.toLowerCase())),
+    [logs, logFilter, logSearch],
+  );
 
   const llmProvider = configProvider || (() => {
     const char = agent.config ?? {};
@@ -806,7 +810,8 @@ export default function AgentManagePage() {
 
   // ─── Build context value ───────────────────────────────────
 
-  const contextValue: AgentContextValue = {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const contextValue: AgentContextValue = useMemo(() => ({
     agent, id, stats, isActive, isNotActive, statusInfo, frameworkMeta,
     tab, setTab,
     logs, logsLoading, logFilter, setLogFilter, logSearch, setLogSearch, autoScroll, setAutoScroll, filteredLogs, logsEndRef, loadLogs,
@@ -839,7 +844,16 @@ export default function AgentManagePage() {
     deleteConfirm, setDeleteConfirm, deleting, deleteError, setDeleteError,
     loadAgent, loadFeatures,
     isAuthenticated, wallet, connection,
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [id, agent, stats, tab, logs, logsLoading, logFilter, logSearch, autoScroll, filteredLogs,
+    messages, input, sending, chatError, chatErrorType, msgCount, msgLimit, remaining, isLimitReached,
+    configName, configDesc, configBio, configLore, configTopics, configStyle, configAdjectives,
+    configSystemPrompt, configSkills, configModel, configProvider, customModelInput, useCustomModel,
+    byokKeyInput, showByokKey, saving, saveMsg, integrationSecrets, expandedIntegrations,
+    visibleFields, savingIntegration, integrationSaveMsg, activeFeatures, activeFeatureKeys,
+    featuresLoading, deleteConfirm, deleting, deleteError, actionLoading, actionError, actionSuccess,
+    llmProvider, currentProviderMeta, providerModels, hasApiKey, displayUptime, isLiveUptime,
+    isActive, isNotActive, statusInfo, frameworkMeta, isAuthenticated, wallet, connection]);
 
   // ─── Render ────────────────────────────────────────────────
 

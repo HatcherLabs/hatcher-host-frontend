@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, memo, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Mic, MicOff, Volume2, VolumeX, Square } from 'lucide-react';
 import { FRAMEWORKS } from '@hatcher/shared';
@@ -41,6 +41,77 @@ function RecordingDot() {
   );
 }
 
+const MESSAGES_WINDOW = 50;
+
+interface ChatMessageProps {
+  msg: { id: string; role: 'user' | 'assistant'; content: string; streaming?: boolean; timestamp?: Date };
+  isSpeakingThis: boolean;
+  ttsSupported: boolean;
+  onSpeak: (id: string, content: string) => void;
+}
+
+const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupported, onSpeak }: ChatMessageProps) {
+  return (
+    <motion.div
+      key={msg.id}
+      className={`group flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+      initial={{ opacity: 0, y: 8, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+    >
+      {msg.role === 'assistant' && (
+        <div className="flex-shrink-0 mt-1">
+          <RobotMascot size="sm" mood={msg.streaming ? 'thinking' : 'happy'} animate={false} />
+        </div>
+      )}
+      <div className={`flex flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start'}`} style={{ maxWidth: '75%' }}>
+        <div
+          className={`chat-bubble text-[#FFFFFF] ${
+            msg.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-assistant'
+          }`}
+        >
+          {msg.content ? (
+            msg.role === 'assistant' ? (
+              <div className="markdown-body">
+                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                {msg.streaming && (
+                  <span className="inline-block w-[2px] h-4 ml-0.5 align-text-bottom bg-[#06b6d4] animate-pulse rounded-full" />
+                )}
+              </div>
+            ) : (
+              <p className="whitespace-pre-wrap">{msg.content}</p>
+            )
+          ) : msg.streaming ? (
+            <div className="flex gap-2 items-center h-5 px-1">
+              <span className="typing-dot" />
+              <span className="typing-dot" />
+              <span className="typing-dot" />
+            </div>
+          ) : null}
+        </div>
+        <div className="flex items-center gap-1.5">
+          {msg.timestamp && !msg.streaming && (
+            <span className="text-[10px] px-1.5 text-[#71717a] select-none">
+              {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          )}
+          {msg.role === 'assistant' && !msg.streaming && msg.content && ttsSupported && (
+            <button
+              onClick={() => onSpeak(msg.id, msg.content)}
+              className={`opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 p-0.5 rounded hover:bg-white/5 cursor-pointer ${
+                isSpeakingThis ? 'text-[#06b6d4] !opacity-100' : 'text-[#71717a] hover:text-[#A5A1C2]'
+              }`}
+              title={isSpeakingThis ? 'Stop reading' : 'Read aloud'}
+            >
+              {isSpeakingThis ? <SoundWaveBars /> : <Volume2 size={12} />}
+            </button>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+});
+
 export function ChatTab() {
   const ctx = useAgentContext();
   const {
@@ -65,7 +136,19 @@ export function ChatTab() {
   const prevMessageCountRef = useRef(messages.length);
   const speakingMsgIdRef = useRef<string | null>(null);
 
+  // Virtual windowing: only render the last N messages for performance
+  const [extraLoaded, setExtraLoaded] = useState(0);
+  const windowStart = useMemo(
+    () => Math.max(0, messages.length - MESSAGES_WINDOW - extraLoaded),
+    [messages.length, extraLoaded],
+  );
+  const visibleMessages = useMemo(() => messages.slice(windowStart), [messages, windowStart]);
+  const hasMore = windowStart > 0;
+
   const voice = useVoice();
+
+  // Reset extra-loaded window when switching agents
+  useEffect(() => { setExtraLoaded(0); }, [agent.id]);
 
   // Scroll chat container to bottom when messages change
   useEffect(() => {
@@ -182,73 +265,24 @@ export function ChatTab() {
           </motion.div>
         )}
 
-        {messages.map((msg) => (
-          <motion.div
+        {hasMore && (
+          <div className="flex justify-center py-2">
+            <button
+              onClick={() => setExtraLoaded((n) => n + MESSAGES_WINDOW)}
+              className="text-xs px-3 py-1.5 rounded-lg border border-[rgba(46,43,74,0.4)] text-[#71717a] hover:text-[#A5A1C2] hover:border-[#71717a]/40 transition-all"
+            >
+              Load earlier messages ({windowStart} older)
+            </button>
+          </div>
+        )}
+        {visibleMessages.map((msg) => (
+          <ChatMessage
             key={msg.id}
-            className={`group flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            initial={{ opacity: 0, y: 8, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-          >
-            {msg.role === 'assistant' && (
-              <div className="flex-shrink-0 mt-1">
-                <RobotMascot size="sm" mood={msg.streaming ? 'thinking' : 'happy'} animate={false} />
-              </div>
-            )}
-            <div className={`flex flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start'}`} style={{ maxWidth: '75%' }}>
-              <div
-                className={`chat-bubble text-[#FFFFFF] ${
-                  msg.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-assistant'
-                }`}
-              >
-                {msg.content ? (
-                  msg.role === 'assistant' ? (
-                    <div className="markdown-body">
-                      <ReactMarkdown>{msg.content}</ReactMarkdown>
-                      {msg.streaming && (
-                        <span className="inline-block w-[2px] h-4 ml-0.5 align-text-bottom bg-[#06b6d4] animate-pulse rounded-full" />
-                      )}
-                    </div>
-                  ) : (
-                    <p className="whitespace-pre-wrap">
-                      {msg.content}
-                    </p>
-                  )
-                ) : msg.streaming ? (
-                  <div className="flex gap-2 items-center h-5 px-1">
-                    <span className="typing-dot" />
-                    <span className="typing-dot" />
-                    <span className="typing-dot" />
-                  </div>
-                ) : null}
-              </div>
-              <div className="flex items-center gap-1.5">
-                {msg.timestamp && !msg.streaming && (
-                  <span className="text-[10px] px-1.5 text-[#71717a] select-none">
-                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                )}
-                {/* TTS speak button for assistant messages */}
-                {msg.role === 'assistant' && !msg.streaming && msg.content && voice.ttsSupported && (
-                  <button
-                    onClick={() => handleSpeakMessage(msg.id, msg.content)}
-                    className={`opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 p-0.5 rounded hover:bg-white/5 cursor-pointer ${
-                      voice.isSpeaking && speakingMsgIdRef.current === msg.id
-                        ? 'text-[#06b6d4] !opacity-100'
-                        : 'text-[#71717a] hover:text-[#A5A1C2]'
-                    }`}
-                    title={voice.isSpeaking && speakingMsgIdRef.current === msg.id ? 'Stop reading' : 'Read aloud'}
-                  >
-                    {voice.isSpeaking && speakingMsgIdRef.current === msg.id ? (
-                      <SoundWaveBars />
-                    ) : (
-                      <Volume2 size={12} />
-                    )}
-                  </button>
-                )}
-              </div>
-            </div>
-          </motion.div>
+            msg={msg}
+            isSpeakingThis={voice.isSpeaking && speakingMsgIdRef.current === msg.id}
+            ttsSupported={voice.ttsSupported}
+            onSpeak={handleSpeakMessage}
+          />
         ))}
 
         <div ref={bottomRef} />
