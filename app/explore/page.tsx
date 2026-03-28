@@ -4,7 +4,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
-import { cn, timeAgo, getInitials, stringToColor } from '@/lib/utils';
+import { cn, timeAgo } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RobotMascot } from '@/components/ui/RobotMascot';
 import {
@@ -23,6 +23,8 @@ import {
   Sparkles,
   X,
 } from 'lucide-react';
+import { FRAMEWORKS } from '@hatcher/shared';
+import type { AgentFramework } from '@hatcher/shared';
 
 type SortOption = 'newest' | 'most_messages' | 'name_az';
 type StatusFilter = 'all' | 'active' | 'sleeping' | 'paused' | 'error';
@@ -56,6 +58,111 @@ const cardClass = 'card glass-noise';
 import { AGENT_STATUS_CONFIG, type AgentStatus } from '@hatcher/shared';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; pulse: boolean }> = AGENT_STATUS_CONFIG;
+
+// ── Framework visual config ──────────────────────────────────
+const FRAMEWORK_COLORS: Record<string, { border: string; glow: string; badge: string; icon: string }> = {
+  openclaw: {
+    border: 'rgba(6,182,212,0.35)',
+    glow: 'rgba(6,182,212,0.12)',
+    badge: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/25',
+    icon: '#06b6d4',
+  },
+  hermes: {
+    border: 'rgba(168,85,247,0.35)',
+    glow: 'rgba(168,85,247,0.12)',
+    badge: 'bg-purple-500/10 text-purple-400 border-purple-500/25',
+    icon: '#a855f7',
+  },
+  elizaos: {
+    border: 'rgba(249,115,22,0.35)',
+    glow: 'rgba(249,115,22,0.12)',
+    badge: 'bg-orange-500/10 text-orange-400 border-orange-500/25',
+    icon: '#f97316',
+  },
+  milady: {
+    border: 'rgba(236,72,153,0.35)',
+    glow: 'rgba(236,72,153,0.12)',
+    badge: 'bg-pink-500/10 text-pink-400 border-pink-500/25',
+    icon: '#ec4899',
+  },
+};
+
+// ── Framework SVG avatars ────────────────────────────────────
+function FrameworkAvatar({ framework, size = 48 }: { framework: string; size?: number }) {
+  const color = FRAMEWORK_COLORS[framework]?.icon ?? '#06b6d4';
+  const s = size;
+
+  if (framework === 'hermes') {
+    return (
+      <svg width={s} height={s} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="48" height="48" rx="50%" fill={color} fillOpacity="0.12" />
+        {/* Hermes wing */}
+        <ellipse cx="24" cy="28" rx="7" ry="10" stroke={color} strokeWidth="2" fill="none" />
+        <path d="M17 22 Q10 14 16 10 Q18 16 24 18" stroke={color} strokeWidth="2" fill={color} fillOpacity="0.3" strokeLinejoin="round" />
+        <path d="M31 22 Q38 14 32 10 Q30 16 24 18" stroke={color} strokeWidth="2" fill={color} fillOpacity="0.3" strokeLinejoin="round" />
+        <circle cx="24" cy="28" r="3" fill={color} />
+        <line x1="24" y1="31" x2="24" y2="38" stroke={color} strokeWidth="2" strokeLinecap="round" />
+        <line x1="21" y1="36" x2="24" y2="38" stroke={color} strokeWidth="2" strokeLinecap="round" />
+        <line x1="27" y1="36" x2="24" y2="38" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  if (framework === 'elizaos') {
+    return (
+      <svg width={s} height={s} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="48" height="48" rx="50%" fill={color} fillOpacity="0.12" />
+        {/* Neural brain */}
+        <path d="M16 26 Q12 22 14 17 Q16 11 22 12 Q23 9 26 9 Q32 9 33 14 Q37 14 37 19 Q38 24 34 27 Q33 32 28 33 Q26 37 24 37 Q22 37 20 33 Q15 32 16 26Z" stroke={color} strokeWidth="1.8" fill={color} fillOpacity="0.15" />
+        <circle cx="20" cy="20" r="1.5" fill={color} />
+        <circle cx="28" cy="18" r="1.5" fill={color} />
+        <circle cx="24" cy="26" r="1.5" fill={color} />
+        <circle cx="31" cy="25" r="1.5" fill={color} />
+        <circle cx="18" cy="28" r="1.5" fill={color} />
+        <line x1="20" y1="20" x2="28" y2="18" stroke={color} strokeWidth="1" strokeOpacity="0.6" />
+        <line x1="28" y1="18" x2="31" y2="25" stroke={color} strokeWidth="1" strokeOpacity="0.6" />
+        <line x1="20" y1="20" x2="24" y2="26" stroke={color} strokeWidth="1" strokeOpacity="0.6" />
+        <line x1="24" y1="26" x2="31" y2="25" stroke={color} strokeWidth="1" strokeOpacity="0.6" />
+        <line x1="24" y1="26" x2="18" y2="28" stroke={color} strokeWidth="1" strokeOpacity="0.6" />
+      </svg>
+    );
+  }
+
+  if (framework === 'milady') {
+    return (
+      <svg width={s} height={s} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="48" height="48" rx="50%" fill={color} fillOpacity="0.12" />
+        {/* Gem / diamond */}
+        <polygon points="24,10 36,20 24,38 12,20" stroke={color} strokeWidth="2" fill={color} fillOpacity="0.2" strokeLinejoin="round" />
+        <polygon points="24,10 36,20 24,22 12,20" stroke={color} strokeWidth="1.5" fill={color} fillOpacity="0.35" strokeLinejoin="round" />
+        <line x1="24" y1="10" x2="24" y2="22" stroke={color} strokeWidth="1.5" strokeOpacity="0.7" />
+        <line x1="12" y1="20" x2="36" y2="20" stroke={color} strokeWidth="1.5" strokeOpacity="0.5" />
+      </svg>
+    );
+  }
+
+  // openclaw (default) — robot claw
+  return (
+    <svg width={s} height={s} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="48" height="48" rx="50%" fill={color} fillOpacity="0.12" />
+      {/* Robot head */}
+      <rect x="13" y="14" width="22" height="16" rx="4" stroke={color} strokeWidth="2" fill={color} fillOpacity="0.15" />
+      <circle cx="19" cy="22" r="3" fill={color} fillOpacity="0.8" />
+      <circle cx="29" cy="22" r="3" fill={color} fillOpacity="0.8" />
+      <rect x="21" y="26" width="6" height="2" rx="1" fill={color} />
+      {/* Antenna */}
+      <line x1="24" y1="14" x2="24" y2="10" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <circle cx="24" cy="9" r="2" fill={color} />
+      {/* Claw arms */}
+      <line x1="13" y1="26" x2="8" y2="32" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <line x1="8" y1="32" x2="6" y2="36" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <line x1="8" y1="32" x2="10" y2="37" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <line x1="35" y1="26" x2="40" y2="32" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <line x1="40" y1="32" x2="38" y2="36" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <line x1="40" y1="32" x2="42" y2="37" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 // ── Debounce hook ────────────────────────────────────────────
 function useDebounce<T>(value: T, delay: number): T {
@@ -145,6 +252,13 @@ export default function ExplorePage() {
 
   const filtered = useMemo(() => {
     let result = [...agents];
+
+    // Hide obvious test/debug agents that have no real description
+    result = result.filter((a) => {
+      const isTestName = /^(test|debug|demo)\s*(agent)?$/i.test(a.name.trim());
+      const hasNoDesc = !a.description || a.description.trim() === '' || a.description === 'No description provided';
+      return !(isTestName && hasNoDesc);
+    });
 
     // Status filter
     if (statusFilter !== 'all') {
@@ -535,52 +649,71 @@ function generatePageNumbers(current: number, total: number): (number | '...')[]
 // ── Explore Agent Card ──────────────────────────────────────
 
 const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agent }) {
-  const gradient = stringToColor(agent.id);
-  const initials = getInitials(agent.name);
-  const status = STATUS_CONFIG[agent.status] ?? STATUS_CONFIG['paused']!
+  const status = STATUS_CONFIG[agent.status] ?? STATUS_CONFIG['paused']!;
+  const fw = agent.framework as AgentFramework;
+  const fwConfig = FRAMEWORK_COLORS[fw] ?? FRAMEWORK_COLORS['openclaw']!;
+  const fwMeta = FRAMEWORKS[fw];
+  const messageCount = (agent as Agent & { messageCount?: number }).messageCount ?? 0;
+
+  const description = (() => {
+    const desc = agent.description ?? '';
+    if (!desc || /you are (a|an) (fully )?autonomous|system prompt|IMPORTANT.*SECURITY|NEVER (reveal|override)|stay in character/i.test(desc)) {
+      return fwMeta?.description ?? 'An AI agent on Hatcher.';
+    }
+    return desc;
+  })();
+
+  const isNewAgent = messageCount === 0;
 
   return (
     <motion.div variants={cardVariants}>
       <Link href={`/agent/${agent.id}`} className="block group">
         <div className="relative">
-          {/* Gradient border glow on hover */}
-          <div className="absolute -inset-[1px] rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(6,182,212,0.3), rgba(6,182,212,0.15))', borderRadius: '16px' }} />
+          {/* Framework-colored border glow on hover */}
+          <div
+            className="absolute -inset-[1px] rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none"
+            style={{ background: `linear-gradient(135deg, ${fwConfig.border}, transparent 70%)`, borderRadius: '16px' }}
+          />
           <motion.div
             className={cn(cardClass, 'p-5 h-full flex flex-col relative')}
             whileHover={{
               y: -4,
-              boxShadow: '0 12px 40px rgba(6, 182, 212, 0.12)',
+              boxShadow: `0 12px 40px ${fwConfig.glow}`,
             }}
             transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
-            {/* Top accent line */}
-            <div className="absolute top-0 left-4 right-4 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'linear-gradient(90deg, transparent, rgba(6,182,212,0.4), transparent)' }} />
+            {/* Top accent line — framework color */}
+            <div
+              className="absolute top-0 left-4 right-4 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{ background: `linear-gradient(90deg, transparent, ${fwConfig.border}, transparent)` }}
+            />
 
             {/* Header: avatar + name + status */}
             <div className="flex items-start gap-3 mb-3">
-              {/* Avatar circle */}
+              {/* Avatar — real image or framework SVG icon */}
               {agent.avatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={agent.avatarUrl}
                   alt={agent.name}
-                  className="w-12 h-12 rounded-full border border-[rgba(46,43,74,0.3)] object-cover flex-shrink-0 group-hover:border-[rgba(6,182,212,0.3)] transition-colors duration-300"
+                  className="w-12 h-12 rounded-full border border-[rgba(46,43,74,0.3)] object-cover flex-shrink-0 transition-all duration-300"
+                  style={{ ['--tw-ring-color' as string]: fwConfig.border }}
                 />
               ) : (
-                <div
-                  className={`w-12 h-12 rounded-full border border-[rgba(46,43,74,0.3)] bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-bold text-sm flex-shrink-0 group-hover:border-[rgba(6,182,212,0.3)] group-hover:shadow-[0_0_16px_rgba(6,182,212,0.15)] transition-all duration-300`}
-                >
-                  {initials}
+                <div className="flex-shrink-0 transition-all duration-300 group-hover:scale-105">
+                  <FrameworkAvatar framework={fw} size={48} />
                 </div>
               )}
 
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-[#FFFFFF] truncate group-hover:text-[#06b6d4] transition-colors duration-200">
-                  {agent.name}
+                <h3 className="font-semibold text-[#FFFFFF] truncate group-hover:transition-colors duration-200" style={{}}>
+                  <span className="group-hover:text-[var(--fw-color,#06b6d4)] transition-colors duration-200" style={{ ['--fw-color' as string]: fwConfig.icon }}>
+                    {agent.name}
+                  </span>
                 </h3>
 
-                {/* Status badge */}
-                <div className="flex items-center gap-2 mt-1">
+                {/* Status + framework badge */}
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <span className="flex items-center gap-1.5">
                     <span className={cn(
                       'w-2 h-2 rounded-full',
@@ -590,44 +723,40 @@ const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agen
                     <span className="text-xs text-[#71717a]">{status.label}</span>
                   </span>
 
-                  <span className={`fw-tag ${
-                    agent.framework === 'hermes' ? 'bg-purple-500/10 text-purple-400 border-purple-500/25' :
-                    agent.framework === 'elizaos' ? 'bg-orange-500/10 text-orange-400 border-orange-500/25' :
-                    agent.framework === 'milady' ? 'bg-pink-500/10 text-pink-400 border-pink-500/25' :
-                    ''
-                  }`}>
-                    {agent.framework === 'hermes' ? 'Hermes' :
-                     agent.framework === 'elizaos' ? 'ElizaOS' :
-                     agent.framework === 'milady' ? 'Milady' :
-                     'OpenClaw'}
+                  <span className={cn('fw-tag', fwConfig.badge)}>
+                    {fwMeta?.name ?? fw}
                   </span>
+
+                  {isNewAgent && (
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      New
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Description (2 lines) — sanitize to prevent system prompt leaks */}
+            {/* Description (2 lines) — fall back to framework description */}
             <p className="text-sm text-[#A5A1C2] leading-relaxed mb-4 flex-1 line-clamp-2">
-              {(() => {
-                const desc = agent.description ?? '';
-                // Hide descriptions that look like leaked system prompts
-                if (!desc || /you are (a|an) (fully )?autonomous|system prompt|IMPORTANT.*SECURITY|NEVER (reveal|override)|stay in character/i.test(desc)) {
-                  return 'No description';
-                }
-                return desc;
-              })()}
+              {description}
             </p>
 
             {/* Footer */}
-            <div className="flex items-center justify-between text-xs text-[#71717a] pt-3 border-t border-[rgba(46,43,74,0.3)] group-hover:border-[rgba(6,182,212,0.15)] transition-colors duration-300">
+            <div
+              className="flex items-center justify-between text-xs text-[#71717a] pt-3 border-t border-[rgba(46,43,74,0.3)] transition-colors duration-300"
+              style={{ ['--hover-border' as string]: fwConfig.border }}
+            >
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1">
                   <Layers className="w-3.5 h-3.5" />
                   {agent.features?.length ?? 0}
                 </span>
-                <span className="flex items-center gap-1">
-                  <MessageSquare className="w-3.5 h-3.5" />
-                  {(agent as Agent & { messageCount?: number }).messageCount ?? 0}
-                </span>
+                {messageCount > 0 && (
+                  <span className="flex items-center gap-1">
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    {messageCount}
+                  </span>
+                )}
               </div>
               <span className="flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5" />
