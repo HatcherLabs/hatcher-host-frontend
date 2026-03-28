@@ -479,15 +479,6 @@ export const api = {
       framework: string;
     }>(`/agents/${id}/analytics`),
 
-  /** Get agent usage (messages today, chart, container resources, storage) */
-  getAgentUsage: (id: string) =>
-    req<{
-      messages: { today: number; limit: number; isByok: boolean; chart: Array<{ date: string; count: number }> };
-      uptime: { seconds: number; since: string | null; percent: number; daysActive: number; status: string };
-      resources: { cpuPercent: number; memoryUsageMb: number; memoryLimitMb: number; cpuLimit: number };
-      storage: { usedMb: number; limitMb: number };
-    }>(`/agents/${id}/usage`),
-
   /** Get agent activity logs */
   getAgentLogs: (id: string) =>
     req<{
