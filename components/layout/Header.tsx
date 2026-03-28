@@ -13,6 +13,9 @@ import {
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
+import { hasRecentChangelog } from '@/lib/changelog';
+
+const CHANGELOG_IS_NEW = hasRecentChangelog(14);
 
 // ── Nav links when logged IN ──
 const AUTH_NAV_LINKS = [
@@ -24,15 +27,16 @@ const AUTH_NAV_LINKS = [
 
 // ── Auxiliary links (visible in both states, after a divider) ──
 const AUX_LINKS = [
-  { href: '/pricing', label: 'Pricing' },
-  { href: DOCS_URL,   label: 'Docs', external: true },
+  { href: '/pricing',   label: 'Pricing',   external: false, badge: null },
+  { href: '/changelog', label: 'Changelog', external: false, badge: CHANGELOG_IS_NEW ? 'New' : null },
+  { href: DOCS_URL,     label: 'Docs',      external: true,  badge: null },
 ];
 
 // ── User dropdown links ──
 const USER_EXTRA_LINKS = [
   { href: '/dashboard/team',    label: 'Team',    icon: Users },
   { href: '/dashboard/billing', label: 'Billing', icon: CreditCard },
-  { href: '/settings',          label: 'Settings', icon: Settings },
+  { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
 
 // ── Mobile links (when logged in) ──
