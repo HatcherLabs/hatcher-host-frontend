@@ -66,7 +66,7 @@ export const metadata: Metadata = {
     title: 'Hatcher — AI Agent Hosting Platform',
     description:
       'Deploy autonomous AI agents across 20+ platforms in 60 seconds. Free tier included. OpenClaw, Hermes, ElizaOS, Milady frameworks. BYOK any LLM.',
-    images: [{ url: '/og', width: 1200, height: 630, alt: 'Hatcher — AI Agent Hosting Platform' }],
+    images: [{ url: 'https://hatcher.host/og?title=Hatcher&subtitle=Deploy+autonomous+AI+agents+across+20%2B+platforms+in+60+seconds.+Free+tier+included.&tag=AI+Agent+Hosting', width: 1200, height: 630, alt: 'Hatcher — AI Agent Hosting Platform' }],
     locale: 'en_US',
   },
   twitter: {
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
     title: 'Hatcher — AI Agent Hosting Platform',
     description:
       'Deploy autonomous AI agents across 20+ platforms in 60 seconds. Free tier included. BYOK any LLM.',
-    images: [{ url: '/og', alt: 'Hatcher — AI Agent Hosting Platform' }],
+    images: ['https://hatcher.host/og?title=Hatcher&subtitle=Deploy+autonomous+AI+agents+across+20%2B+platforms+in+60+seconds.+Free+tier+included.&tag=AI+Agent+Hosting'],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   alternates: { canonical: 'https://hatcher.host' },
@@ -111,6 +111,45 @@ const websiteJsonLd = {
   },
 };
 
+const softwareApplicationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Hatcher',
+  url: 'https://hatcher.host',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Web',
+  description:
+    'Managed AI agent hosting platform. Deploy autonomous AI agents across 20+ platforms in 60 seconds. OpenClaw, Hermes, ElizaOS, Milady frameworks. BYOK any LLM.',
+  offers: [
+    {
+      '@type': 'Offer',
+      name: 'Free Tier',
+      price: '0',
+      priceCurrency: 'USD',
+      description: '1 agent, 20 messages/day with hosted LLM, all integrations.',
+    },
+    {
+      '@type': 'Offer',
+      name: 'Basic Plan',
+      price: '9.99',
+      priceCurrency: 'USD',
+      description: '1 agent, 100 messages/day, 1 CPU/1.5GB RAM.',
+    },
+    {
+      '@type': 'Offer',
+      name: 'Pro Plan',
+      price: '19.99',
+      priceCurrency: 'USD',
+      description: '5 agents, 300 messages/day, dedicated resources, file manager.',
+    },
+  ],
+  creator: {
+    '@type': 'Organization',
+    name: 'Hatcher Labs',
+    url: 'https://hatcher.host',
+  },
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`dark scroll-smooth ${inter.variable} ${jetbrainsMono.variable} ${sora.variable}`}>
@@ -122,6 +161,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationJsonLd) }}
         />
       </head>
       <body>
