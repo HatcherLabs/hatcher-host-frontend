@@ -1,382 +1,229 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  X,
-  ChevronRight,
-  ChevronLeft,
-  MessageSquare,
-  TrendingUp,
-  Headphones,
-  Sparkles,
-  Rocket,
-  Zap,
-  Send,
-  Wrench,
-} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { X, ArrowRight, ArrowLeft, Rocket, Bot, Cpu, Sparkles, Check } from 'lucide-react';
 
-const TOTAL_STEPS = 3;
+const FRAMEWORKS = [
+  {
+    id: 'openclaw',
+    name: 'OpenClaw',
+    description: 'Full-featured agent with tools, memory, and web search. Best for most use cases.',
+    color: 'from-purple-500 to-violet-600',
+    badge: 'Recommended',
+  },
+  {
+    id: 'hermes',
+    name: 'Hermes',
+    description: 'Ultra-fast responses with function calling. Great for real-time chat bots.',
+    color: 'from-cyan-500 to-blue-600',
+    badge: 'Fast',
+  },
+  {
+    id: 'elizaos',
+    name: 'ElizaOS',
+    description: 'Multi-agent system with advanced personality. Best for complex interactions.',
+    color: 'from-emerald-500 to-teal-600',
+    badge: 'Advanced',
+  },
+  {
+    id: 'milady',
+    name: 'Milady',
+    description: 'Personality-driven agent with unique character traits. Best for social media.',
+    color: 'from-pink-500 to-rose-600',
+    badge: 'Creative',
+  },
+];
 
-const stepVariants = {
-  enter: (dir: number) => ({ opacity: 0, x: dir > 0 ? 80 : -80 }),
-  center: { opacity: 1, x: 0, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const } },
-  exit: (dir: number) => ({ opacity: 0, x: dir > 0 ? -80 : 80, transition: { duration: 0.2 } }),
-};
+const STEPS = ['Welcome', 'Framework', 'Ready'];
 
-interface Props {
-  onClose: () => void;
-}
-
-export function OnboardingWizard({ onClose }: Props) {
+export function OnboardingWizard({ onClose }: { onClose: () => void }) {
   const router = useRouter();
-  const [step, setStep] = useState(1);
-  const [direction, setDirection] = useState(1);
-  const dialogRef = useRef<HTMLDivElement>(null);
-  const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  const [step, setStep] = useState(0);
+  const [selectedFramework, setSelectedFramework] = useState('openclaw');
 
-  // Focus trap
-  useEffect(() => {
-    const el = dialogRef.current;
-    if (!el) return;
-    const focusable = el.querySelectorAll<HTMLElement>(FOCUSABLE);
-    focusable[0]?.focus();
-    function trap(e: KeyboardEvent) {
-      if (e.key !== 'Tab') return;
-      const all = el!.querySelectorAll<HTMLElement>(FOCUSABLE);
-      const first = all[0];
-      const last = all[all.length - 1];
-      if (e.shiftKey ? document.activeElement === first : document.activeElement === last) {
-        e.preventDefault();
-        (e.shiftKey ? last : first).focus();
-      }
-    }
-    function onEsc(e: KeyboardEvent) {
-      if (e.key === 'Escape') dismiss();
-    }
-    document.addEventListener('keydown', trap);
-    document.addEventListener('keydown', onEsc);
-    return () => {
-      document.removeEventListener('keydown', trap);
-      document.removeEventListener('keydown', onEsc);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const next = useCallback(() => {
-    if (step < TOTAL_STEPS) {
-      setDirection(1);
-      setStep((s) => s + 1);
-    }
-  }, [step]);
-
-  const prev = useCallback(() => {
-    if (step > 1) {
-      setDirection(-1);
-      setStep((s) => s - 1);
-    }
-  }, [step]);
-
-  const complete = useCallback((path: string) => {
+  const dismiss = () => {
     localStorage.setItem('onboarding_dismissed', 'true');
+    onClose();
+  };
+
+  const complete = () => {
     localStorage.setItem('onboarding_completed', 'true');
     onClose();
-    router.push(path);
-  }, [onClose, router]);
-
-  const dismiss = useCallback(() => {
-    localStorage.setItem('onboarding_dismissed', 'true');
-    localStorage.setItem('onboarding_completed', 'true');
-    onClose();
-  }, [onClose]);
+    router.push(`/create?framework=${selectedFramework}`);
+  };
 
   return (
     <motion.div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+      onClick={(e) => e.target === e.currentTarget && dismiss()}
     >
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-        onClick={dismiss}
-      />
-
-      {/* Card */}
       <motion.div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="onboarding-title"
-        className="relative w-full max-w-lg rounded-2xl border border-white/[0.08] overflow-hidden"
-        style={{
-          background: 'linear-gradient(135deg, rgba(20, 16, 40, 0.97), rgba(10, 8, 24, 0.98))',
-          boxShadow: '0 0 80px rgba(139, 92, 246, 0.15), 0 0 40px rgba(6, 182, 212, 0.08)',
-        }}
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
         transition={{ duration: 0.3 }}
+        className="relative w-full max-w-lg bg-[#0e0e14] border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden"
       >
-        {/* Top bar */}
-        <div className="flex items-center justify-between px-6 pt-5">
-          <button
-            onClick={dismiss}
-            className="text-xs text-[#71717a] hover:text-white transition-colors"
-          >
-            Skip
-          </button>
-          <button
-            onClick={dismiss}
-            className="p-1.5 rounded-lg hover:bg-white/[0.06] transition-colors"
-            aria-label="Close"
-          >
-            <X size={16} className="text-[#71717a]" />
-          </button>
+        {/* Close button */}
+        <button onClick={dismiss} className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-white/[0.06] text-[#71717a] hover:text-white transition-colors z-10">
+          <X className="w-4 h-4" />
+        </button>
+
+        {/* Progress dots */}
+        <div className="flex justify-center gap-2 pt-6 pb-2">
+          {STEPS.map((_, i) => (
+            <div
+              key={i}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                i === step ? 'w-8 bg-purple-500' : i < step ? 'w-4 bg-purple-500/40' : 'w-4 bg-white/[0.08]'
+              }`}
+            />
+          ))}
         </div>
 
-        {/* Steps content */}
-        <div className="px-6 pb-6 min-h-[380px] flex flex-col">
-          <AnimatePresence mode="wait" custom={direction}>
-            <motion.div
-              key={step}
-              custom={direction}
-              variants={stepVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              className="flex-1 flex flex-col"
-            >
-              {step === 1 && <StepWelcome onNext={next} />}
-              {step === 2 && <StepChoose onComplete={complete} />}
-              {step === 3 && <StepTips onComplete={complete} />}
-            </motion.div>
+        <div className="p-6 sm:p-8">
+          <AnimatePresence mode="wait">
+            {/* Step 0: Welcome */}
+            {step === 0 && (
+              <motion.div key="welcome" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}>
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/20 to-cyan-500/10 border border-purple-500/20 flex items-center justify-center mx-auto mb-5">
+                    <Rocket className="w-8 h-8 text-purple-400" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-white mb-2">Welcome to Hatcher!</h2>
+                  <p className="text-sm text-[#a1a1aa] leading-relaxed">
+                    Deploy your first AI agent in under 60 seconds. Pick a framework, name your agent, and you&apos;re live.
+                  </p>
+                </div>
+
+                <div className="space-y-3 mb-6">
+                  {[
+                    { icon: Bot, text: '4 AI frameworks to choose from' },
+                    { icon: Cpu, text: 'Deploy to Telegram, Discord, Twitter & more' },
+                    { icon: Sparkles, text: 'Free tier — no credit card required' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-3 text-sm text-[#d4d4d8]">
+                      <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center shrink-0">
+                        <item.icon className="w-4 h-4 text-purple-400" />
+                      </div>
+                      {item.text}
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setStep(1)}
+                  className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium py-3 rounded-xl text-sm hover:from-purple-500 hover:to-purple-400 transition-all"
+                >
+                  Get Started <ArrowRight className="w-4 h-4" />
+                </button>
+              </motion.div>
+            )}
+
+            {/* Step 1: Pick Framework */}
+            {step === 1 && (
+              <motion.div key="framework" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}>
+                <h2 className="text-xl font-bold text-white mb-1">Choose your engine</h2>
+                <p className="text-sm text-[#a1a1aa] mb-5">Each framework has different strengths. You can always change later.</p>
+
+                <div className="grid grid-cols-2 gap-2.5 mb-6">
+                  {FRAMEWORKS.map((fw) => (
+                    <button
+                      key={fw.id}
+                      onClick={() => setSelectedFramework(fw.id)}
+                      className={`relative text-left p-3.5 rounded-xl border transition-all duration-200 ${
+                        selectedFramework === fw.id
+                          ? 'border-purple-500/50 bg-purple-500/[0.08] shadow-[0_0_20px_rgba(139,92,246,0.1)]'
+                          : 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]'
+                      }`}
+                    >
+                      {selectedFramework === fw.id && (
+                        <div className="absolute top-2.5 right-2.5">
+                          <Check className="w-4 h-4 text-purple-400" />
+                        </div>
+                      )}
+                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${fw.color} flex items-center justify-center mb-2`}>
+                        <Bot className="w-4 h-4 text-white" />
+                      </div>
+                      <p className="text-sm font-semibold text-white">{fw.name}</p>
+                      <p className="text-[11px] text-[#71717a] mt-0.5 leading-snug">{fw.description}</p>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex gap-2.5">
+                  <button
+                    onClick={() => setStep(0)}
+                    className="flex items-center justify-center gap-1.5 border border-white/[0.1] text-[#a1a1aa] font-medium py-3 px-5 rounded-xl text-sm hover:bg-white/[0.04] transition-all"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> Back
+                  </button>
+                  <button
+                    onClick={() => setStep(2)}
+                    className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium py-3 rounded-xl text-sm hover:from-purple-500 hover:to-purple-400 transition-all"
+                  >
+                    Continue <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Step 2: Ready to create */}
+            {step === 2 && (
+              <motion.div key="ready" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}>
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-5">
+                    <Sparkles className="w-8 h-8 text-emerald-400" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-white mb-2">You&apos;re all set!</h2>
+                  <p className="text-sm text-[#a1a1aa] leading-relaxed">
+                    We&apos;ll take you to the agent creator where you can name your agent, configure integrations, and deploy in one click.
+                  </p>
+                </div>
+
+                <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${FRAMEWORKS.find(f => f.id === selectedFramework)?.color} flex items-center justify-center`}>
+                      <Bot className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">{FRAMEWORKS.find(f => f.id === selectedFramework)?.name}</p>
+                      <p className="text-xs text-[#71717a]">Free tier — 20 messages/day</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2.5">
+                  <button
+                    onClick={() => setStep(1)}
+                    className="flex items-center justify-center gap-1.5 border border-white/[0.1] text-[#a1a1aa] font-medium py-3 px-5 rounded-xl text-sm hover:bg-white/[0.04] transition-all"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> Back
+                  </button>
+                  <button
+                    onClick={complete}
+                    className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-medium py-3 rounded-xl text-sm hover:from-emerald-500 hover:to-emerald-400 transition-all"
+                  >
+                    <Rocket className="w-4 h-4" /> Create My Agent
+                  </button>
+                </div>
+              </motion.div>
+            )}
           </AnimatePresence>
+        </div>
 
-          {/* Bottom: progress dots + nav buttons */}
-          <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/[0.06]">
-            {/* Progress dots */}
-            <div className="flex items-center gap-2">
-              {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    i + 1 === step
-                      ? 'w-6 bg-purple-500'
-                      : i + 1 < step
-                        ? 'w-1.5 bg-purple-500/50'
-                        : 'w-1.5 bg-white/10'
-                  }`}
-                />
-              ))}
-            </div>
-
-            {/* Nav buttons */}
-            <div className="flex items-center gap-2">
-              {step > 1 && (
-                <button
-                  onClick={prev}
-                  className="h-9 px-3 flex items-center gap-1 text-xs text-[#a1a1aa] hover:text-white rounded-lg border border-white/[0.08] hover:bg-white/[0.04] transition-all"
-                >
-                  <ChevronLeft size={14} />
-                  Back
-                </button>
-              )}
-              {step < TOTAL_STEPS && step !== 1 && (
-                <button
-                  onClick={next}
-                  className="h-9 px-4 flex items-center gap-1 text-xs font-medium text-white rounded-lg bg-purple-600 hover:bg-purple-500 transition-all"
-                >
-                  Next
-                  <ChevronRight size={14} />
-                </button>
-              )}
-            </div>
-          </div>
+        {/* Skip link */}
+        <div className="text-center pb-5">
+          <button onClick={dismiss} className="text-xs text-[#52525b] hover:text-[#a1a1aa] transition-colors">
+            Skip for now
+          </button>
         </div>
       </motion.div>
     </motion.div>
-  );
-}
-
-/* ---- Step 1: Welcome ----------------------------------------- */
-function StepWelcome({ onNext }: { onNext: () => void }) {
-  return (
-    <div className="flex-1 flex flex-col items-center justify-center text-center py-6">
-      <motion.div
-        className="relative mb-5"
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-      >
-        <div
-          className="absolute inset-0 rounded-full animate-pulse"
-          style={{
-            background: 'radial-gradient(circle, rgba(139,92,246,0.25) 0%, transparent 70%)',
-            transform: 'scale(2)',
-          }}
-        />
-        <div className="relative w-20 h-20 rounded-2xl bg-purple-500/15 flex items-center justify-center ring-1 ring-purple-500/30">
-          <Rocket size={40} className="text-purple-400" />
-        </div>
-      </motion.div>
-
-      <h2 id="onboarding-title" className="text-2xl font-bold text-white mb-3">
-        Welcome to Hatcher!
-      </h2>
-      <p className="text-sm text-[#a1a1aa] max-w-sm leading-relaxed mb-8">
-        Let&apos;s deploy your first AI agent in under 2 minutes.
-      </p>
-
-      <button
-        onClick={onNext}
-        className="h-11 px-8 flex items-center gap-2 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 transition-all shadow-lg shadow-purple-500/20"
-      >
-        <Sparkles size={16} />
-        Get Started
-      </button>
-    </div>
-  );
-}
-
-/* ---- Step 2: Choose What You Want ----------------------------- */
-const QUICK_PICKS = [
-  {
-    icon: MessageSquare,
-    label: 'Chat Bot',
-    desc: 'Conversational AI for any platform',
-    color: 'cyan',
-    href: '/create?template=chatbot',
-    borderClass: 'border-cyan-500/20 hover:border-cyan-500/40',
-    bgClass: 'bg-cyan-500/[0.04] hover:bg-cyan-500/[0.08]',
-    iconBgClass: 'bg-cyan-500/15',
-    iconClass: 'text-cyan-400',
-  },
-  {
-    icon: TrendingUp,
-    label: 'Trading Bot',
-    desc: 'Market analysis and trading signals',
-    color: 'emerald',
-    href: '/create?template=trading-analyst',
-    borderClass: 'border-emerald-500/20 hover:border-emerald-500/40',
-    bgClass: 'bg-emerald-500/[0.04] hover:bg-emerald-500/[0.08]',
-    iconBgClass: 'bg-emerald-500/15',
-    iconClass: 'text-emerald-400',
-  },
-  {
-    icon: Headphones,
-    label: 'Support Agent',
-    desc: 'Handle tickets and answer FAQs',
-    color: 'amber',
-    href: '/create?template=customer-support',
-    borderClass: 'border-amber-500/20 hover:border-amber-500/40',
-    bgClass: 'bg-amber-500/[0.04] hover:bg-amber-500/[0.08]',
-    iconBgClass: 'bg-amber-500/15',
-    iconClass: 'text-amber-400',
-  },
-  {
-    icon: Sparkles,
-    label: 'Custom',
-    desc: 'Build from scratch, full freedom',
-    color: 'purple',
-    href: '/create',
-    borderClass: 'border-purple-500/20 hover:border-purple-500/40',
-    bgClass: 'bg-purple-500/[0.04] hover:bg-purple-500/[0.08]',
-    iconBgClass: 'bg-purple-500/15',
-    iconClass: 'text-purple-400',
-  },
-];
-
-function StepChoose({ onComplete }: { onComplete: (path: string) => void }) {
-  return (
-    <div className="flex-1 flex flex-col py-4">
-      <h2 id="onboarding-title" className="text-xl font-bold text-white mb-2 text-center">
-        What do you want your agent to do?
-      </h2>
-      <p className="text-xs text-[#a1a1aa] mb-5 text-center">
-        Pick a starting point. You can always customize everything later.
-      </p>
-
-      <div className="grid grid-cols-2 gap-3">
-        {QUICK_PICKS.map((pick) => (
-          <button
-            key={pick.label}
-            onClick={() => onComplete(pick.href)}
-            className={`rounded-xl border p-4 text-left transition-all duration-200 cursor-pointer ${pick.borderClass} ${pick.bgClass}`}
-          >
-            <div className={`w-10 h-10 rounded-lg ${pick.iconBgClass} flex items-center justify-center mb-3`}>
-              <pick.icon size={20} className={pick.iconClass} />
-            </div>
-            <h3 className="text-sm font-semibold text-white mb-1">{pick.label}</h3>
-            <p className="text-[11px] text-[#a1a1aa] leading-relaxed">{pick.desc}</p>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ---- Step 3: Quick Tips --------------------------------------- */
-const TIPS = [
-  {
-    icon: Zap,
-    text: 'Start with the free Groq model \u2014 upgrade to BYOK anytime',
-    iconClass: 'text-emerald-400',
-    bgClass: 'bg-emerald-500/10',
-  },
-  {
-    icon: Send,
-    text: 'Add Telegram first \u2014 it\'s the easiest platform to test with',
-    iconClass: 'text-cyan-400',
-    bgClass: 'bg-cyan-500/10',
-  },
-  {
-    icon: Wrench,
-    text: 'Check the Skills tab to add web search, calculator, and more',
-    iconClass: 'text-purple-400',
-    bgClass: 'bg-purple-500/10',
-  },
-];
-
-function StepTips({ onComplete }: { onComplete: (path: string) => void }) {
-  return (
-    <div className="flex-1 flex flex-col py-4">
-      <h2 id="onboarding-title" className="text-xl font-bold text-white mb-2 text-center">
-        Pro tips for getting started
-      </h2>
-      <p className="text-xs text-[#a1a1aa] mb-5 text-center">
-        A few things to know before you dive in.
-      </p>
-
-      <div className="space-y-3 mb-8">
-        {TIPS.map((tip, i) => (
-          <motion.div
-            key={i}
-            className="flex items-start gap-3 p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3, delay: i * 0.1 }}
-          >
-            <div className={`w-9 h-9 rounded-lg ${tip.bgClass} flex items-center justify-center flex-shrink-0`}>
-              <tip.icon size={16} className={tip.iconClass} />
-            </div>
-            <p className="text-sm text-[#d4d4d8] leading-relaxed pt-1.5">{tip.text}</p>
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="flex flex-col items-center mt-auto">
-        <button
-          onClick={() => onComplete('/create')}
-          className="h-11 px-8 flex items-center gap-2 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 transition-all shadow-lg shadow-purple-500/20"
-        >
-          <Rocket size={16} />
-          Create My First Agent
-          <ChevronRight size={16} />
-        </button>
-      </div>
-    </div>
   );
 }
