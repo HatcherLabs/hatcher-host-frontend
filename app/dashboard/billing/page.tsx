@@ -192,6 +192,8 @@ export default function BillingPage() {
   const [purchasingAddon, setPurchasingAddon] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [creditBalance, setCreditBalance] = useState(0);
+  const [cancellingSubscription, setCancellingSubscription] = useState(false);
+  const [openingPortal, setOpeningPortal] = useState(false);
   const [creditHistory, setCreditHistory] = useState<Array<{
     id: string; amount: number; balance: number; type: string; description: string | null; createdAt: string;
   }>>([]);
@@ -435,6 +437,45 @@ export default function BillingPage() {
     }
   };
 
+  /* ── Cancel Stripe subscription ──────────────────────────── */
+  const handleCancelSubscription = async () => {
+    if (!confirm('Are you sure you want to cancel your subscription? You will keep access until the end of your billing period.')) return;
+    setCancellingSubscription(true);
+    setError(null);
+    try {
+      const res = await api.stripeCancelSubscription();
+      if (res.success) {
+        await loadAccountData();
+        showSuccess('Subscription cancelled. You will keep access until the end of your billing period.');
+      } else {
+        setError(res.error ?? 'Failed to cancel subscription');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to cancel subscription');
+    } finally {
+      setCancellingSubscription(false);
+    }
+  };
+
+  /* ── Open Stripe billing portal ────────────────────────── */
+  const handleOpenPortal = async () => {
+    setOpeningPortal(true);
+    setError(null);
+    try {
+      const returnUrl = `${window.location.origin}/dashboard/billing`;
+      const res = await api.stripePortal(returnUrl);
+      if (res.success) {
+        window.location.href = res.data.url;
+        return;
+      }
+      setError(res.error ?? 'Failed to open billing portal');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to open billing portal');
+    } finally {
+      setOpeningPortal(false);
+    }
+  };
+
   /* ── Legacy direct subscribe handler (for renew button) ── */
   const handleSubscribe = async (tierKey: UserTierKey) => {
     openSubscribeModal(tierKey);
@@ -635,6 +676,27 @@ export default function BillingPage() {
               </div>
             </div>
 
+            {/* Subscription management buttons for paid users */}
+            {currentTier !== 'free' && (
+              <div className="flex flex-col sm:flex-row gap-2 sm:items-start">
+                <button
+                  onClick={handleOpenPortal}
+                  disabled={openingPortal}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border border-[#06b6d4]/30 text-[#06b6d4] hover:bg-[#06b6d4]/10 disabled:opacity-50 transition-colors"
+                >
+                  {openingPortal ? <Loader2 className="w-3 h-3 animate-spin" /> : <CreditCard className="w-3 h-3" />}
+                  Manage Billing
+                </button>
+                <button
+                  onClick={handleCancelSubscription}
+                  disabled={cancellingSubscription}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border border-red-500/20 text-red-400 hover:bg-red-500/10 disabled:opacity-50 transition-colors"
+                >
+                  {cancellingSubscription ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
+                  Cancel Plan
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </motion.div>
