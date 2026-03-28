@@ -381,7 +381,7 @@ export function Header() {
                     href={link.href}
                     className={clsx(
                       'block px-3 py-2.5 text-sm rounded-lg transition-colors duration-200',
-                      isActive(pathname, link.href) ? 'text-white bg-white/[0.04]' : 'text-[#71717a] hover:text-white'
+                      isActive(pathname, link.href) ? 'text-white bg-white/[0.06] border-l-2 border-[#06b6d4]' : 'text-[#71717a] hover:text-white border-l-2 border-transparent'
                     )}
                     onClick={() => setMobileOpen(false)}
                   >
