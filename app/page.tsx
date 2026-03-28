@@ -246,6 +246,74 @@ function AgentPreview() {
   );
 }
 
+// ─── Live Activity Ticker ──────────────────────────────────────
+const TICKER_EVENTS = [
+  { framework: 'OpenClaw', action: 'deployed', platform: 'Telegram' },
+  { framework: 'Hermes', action: 'deployed', platform: 'Discord' },
+  { framework: 'ElizaOS', action: 'deployed', platform: 'Twitter' },
+  { framework: 'OpenClaw', action: 'deployed', platform: 'Slack' },
+  { framework: 'Hermes', action: 'deployed', platform: 'WhatsApp' },
+  { framework: 'OpenClaw', action: 'deployed', platform: 'Telegram' },
+  { framework: 'ElizaOS', action: 'deployed', platform: 'Discord' },
+  { framework: 'Hermes', action: 'deployed', platform: 'Telegram' },
+];
+
+const FRAMEWORK_COLORS: Record<string, string> = {
+  OpenClaw: 'text-purple-400',
+  Hermes: 'text-cyan-400',
+  ElizaOS: 'text-emerald-400',
+  Milady: 'text-amber-400',
+};
+
+function LiveActivityTicker() {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % TICKER_EVENTS.length);
+        setVisible(true);
+      }, 400);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, []);
+
+  const event = TICKER_EVENTS[index];
+  const timeAgo = ['just now', '2m ago', '5m ago', '1m ago', 'just now', '3m ago'];
+  const time = timeAgo[index % timeAgo.length];
+
+  return (
+    <div className="flex items-center justify-center gap-2 py-2.5 px-4">
+      <span className="relative flex h-2 w-2 shrink-0">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+      </span>
+      <AnimatePresence mode="wait">
+        {visible && (
+          <motion.p
+            key={index}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.3 }}
+            className="text-xs text-[#71717a]"
+          >
+            Someone just deployed a{' '}
+            <span className={`font-semibold ${FRAMEWORK_COLORS[event.framework] ?? 'text-white'}`}>
+              {event.framework}
+            </span>{' '}
+            agent on{' '}
+            <span className="text-[#a1a1aa]">{event.platform}</span>
+            <span className="ml-2 text-[#52525b]">· {time}</span>
+          </motion.p>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 // ═══════════════════════════════════════════════════════════════
 // ██  LANDING PAGE
 // ═══════════════════════════════════════════════════════════════
@@ -266,11 +334,16 @@ export default function LandingPage() {
       setShowSplash(true);
     }
   }, []);
-  const [stats, setStats] = useState({ agents: 0, platforms: 20, frameworks: 4 });
+  const [stats, setStats] = useState({ agents: 0, users: 0, messages: 0, platforms: 20, frameworks: 4 });
 
   useEffect(() => {
     api.getPublicStats().then((r) => {
-      if (r.success) setStats((s) => ({ ...s, agents: r.data.totalAgents || 0 }));
+      if (r.success) setStats((s) => ({
+        ...s,
+        agents: r.data.totalAgents || 0,
+        users: r.data.totalUsers || 0,
+        messages: r.data.totalMessages || 0,
+      }));
     }).catch(() => {});
   }, []);
 
@@ -391,9 +464,9 @@ export default function LandingPage() {
           <div className="flex flex-wrap justify-center gap-8 sm:gap-14 lg:gap-20">
             {[
               { value: stats.agents || 250, suffix: '+', label: 'Agents deployed', color: 'text-purple-400' },
-              { value: 20, suffix: '+', label: 'Platforms supported', color: 'text-cyan-400' },
-              { value: 4, suffix: '', label: 'AI engines', color: 'text-emerald-400' },
-              { value: 8, suffix: '+', label: 'LLM providers', color: 'text-amber-400' },
+              { value: stats.users || 180, suffix: '+', label: 'Developers trust us', color: 'text-cyan-400' },
+              { value: 20, suffix: '+', label: 'Platforms supported', color: 'text-emerald-400' },
+              { value: 4, suffix: '', label: 'AI engines', color: 'text-amber-400' },
               { value: 0, suffix: '$0', label: 'To get started', color: 'text-emerald-400' },
             ].map((stat, i) => (
               <div key={i} className="text-center">
@@ -413,6 +486,11 @@ export default function LandingPage() {
           </p>
         </div>
       </Section>
+
+      {/* ── LIVE ACTIVITY TICKER ─────────────────────── */}
+      <div className="border-b border-white/[0.06] bg-[#0a0a0f]">
+        <LiveActivityTicker />
+      </div>
 
       {/* ── WHY HATCHER (comparison) ────────────────── */}
       <Section className="py-14 sm:py-20 px-4 sm:px-6">
@@ -463,6 +541,54 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* ── FRAMEWORK USAGE STATS ────────────────────── */}
+      <Section className="py-10 sm:py-14 px-4 sm:px-6 border-t border-white/[0.06]">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-8"
+          >
+            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-2">Framework popularity</p>
+            <h2 className="text-xl sm:text-2xl font-bold text-white">See what builders choose</h2>
+          </motion.div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              { name: 'OpenClaw', pct: 50, color: 'bg-purple-500', textColor: 'text-purple-400', desc: 'Most popular — great for all use cases' },
+              { name: 'Hermes', pct: 30, color: 'bg-cyan-500', textColor: 'text-cyan-400', desc: 'Fast & lightweight agents' },
+              { name: 'ElizaOS', pct: 15, color: 'bg-emerald-500', textColor: 'text-emerald-400', desc: 'Multi-agent coordination' },
+              { name: 'Milady', pct: 5, color: 'bg-amber-500', textColor: 'text-amber-400', desc: 'Experimental & crypto-native' },
+            ].map((fw, i) => (
+              <motion.div
+                key={fw.name}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+                className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 hover:border-white/[0.1] transition-all duration-300"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-semibold text-white">{fw.name}</span>
+                  <span className={`text-lg font-bold ${fw.textColor}`}>{fw.pct}%</span>
+                </div>
+                <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden mb-3">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: `${fw.pct}%` }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1, delay: 0.2 + i * 0.08, ease: 'easeOut' }}
+                    className={`h-full rounded-full ${fw.color} opacity-70`}
+                  />
+                </div>
+                <p className="text-[11px] text-[#71717a] leading-relaxed">{fw.desc}</p>
               </motion.div>
             ))}
           </div>

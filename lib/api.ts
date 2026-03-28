@@ -557,10 +557,9 @@ export const api = {
   adminGetAgents: () =>
     req<Array<Agent & { ownerWallet: string }>>('/admin/agents'),
 
-  /** Admin: get platform-wide stats */
   /** Get public platform stats (no auth required) */
   getPublicStats: () =>
-    req<{ totalAgents: number; activeAgents: number }>('/admin/public-stats'),
+    req<{ totalAgents: number; activeAgents: number; totalUsers: number; totalMessages: number }>('/admin/public-stats'),
 
   adminGetStats: () =>
     req<{
