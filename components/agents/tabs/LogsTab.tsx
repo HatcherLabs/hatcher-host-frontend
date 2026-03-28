@@ -47,7 +47,7 @@ export function LogsTab() {
             <button
               key={f}
               onClick={() => setLogFilter(f)}
-              className={`text-xs px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 ${
+              className={`text-xs px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
                 logFilter === f
                   ? (filterColors[f] || 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[#FFFFFF]')
                   : 'border-[rgba(46,43,74,0.4)] text-[#71717a] hover:border-[rgba(46,43,74,0.6)] hover:text-[#A5A1C2]'
@@ -73,7 +73,7 @@ export function LogsTab() {
         <button
           onClick={loadLogs}
           disabled={logsLoading}
-          className="ml-auto text-xs px-3 py-1.5 rounded-lg border border-[rgba(46,43,74,0.4)] text-[#71717a] hover:border-[rgba(46,43,74,0.6)] hover:text-[#A5A1C2] transition-all flex items-center gap-1.5"
+          className="ml-auto text-xs px-3 py-1.5 rounded-lg border border-[rgba(46,43,74,0.4)] text-[#71717a] hover:border-[rgba(46,43,74,0.6)] hover:text-[#A5A1C2] transition-all flex items-center gap-1.5 cursor-pointer"
         >
           <RotateCcw size={12} className={logsLoading ? 'animate-spin' : ''} />
           {logsLoading ? 'Loading...' : 'Refresh'}

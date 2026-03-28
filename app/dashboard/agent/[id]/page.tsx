@@ -120,6 +120,11 @@ const UsageTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const AnalyticsTab = dynamic(
+  () => import('@/components/agents/tabs/AnalyticsTab').then(mod => ({ default: mod.AnalyticsTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 // ─── Tab definitions ─────────────────────────────────────────
 
 // ─── Main Component ─────────────────────────────────────────
@@ -136,7 +141,7 @@ export default function AgentManagePage() {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const initialTab = (['overview','config','integrations','skills','files','logs','memory','knowledge','schedules','workflows','versions','chat','stats','usage'] as Tab[]).includes(searchParams.get('tab') as Tab)
+  const initialTab = (['overview','config','integrations','skills','files','logs','memory','knowledge','schedules','workflows','versions','chat','stats','usage','analytics'] as Tab[]).includes(searchParams.get('tab') as Tab)
     ? (searchParams.get('tab') as Tab)
     : 'overview';
   const [tab, setTab] = useState<Tab>(initialTab);
@@ -845,7 +850,7 @@ export default function AgentManagePage() {
         {/* ─── Main Content ─────────────────────────────────── */}
         <div className="flex-1 min-w-0 flex flex-col">
           {/* Top action bar */}
-          <div className="px-4 sm:px-6 py-3 border-b border-[rgba(46,43,74,0.3)] flex items-center gap-3 flex-wrap">
+          <div className="pl-14 pr-4 sm:px-6 py-3 border-b border-[rgba(46,43,74,0.3)] flex items-center gap-3 flex-wrap lg:pl-6">
             {/* Avatar with upload */}
             <div className="relative group flex-shrink-0 hidden sm:block">
               {agent.avatarUrl ? (
@@ -1001,6 +1006,7 @@ export default function AgentManagePage() {
               {tab === 'chat' && <ChatTab />}
               {tab === 'stats' && <StatsTab />}
               {tab === 'usage' && <UsageTab />}
+              {tab === 'analytics' && <AnalyticsTab />}
             </AnimatePresence>
           </div>
         </div>

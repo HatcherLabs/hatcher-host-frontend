@@ -232,9 +232,9 @@ export function ChatTab() {
                 {msg.role === 'assistant' && !msg.streaming && msg.content && voice.ttsSupported && (
                   <button
                     onClick={() => handleSpeakMessage(msg.id, msg.content)}
-                    className={`opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-0.5 rounded hover:bg-white/5 ${
+                    className={`opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 p-0.5 rounded hover:bg-white/5 cursor-pointer ${
                       voice.isSpeaking && speakingMsgIdRef.current === msg.id
-                        ? 'text-[#06b6d4] opacity-100'
+                        ? 'text-[#06b6d4] !opacity-100'
                         : 'text-[#71717a] hover:text-[#A5A1C2]'
                     }`}
                     title={voice.isSpeaking && speakingMsgIdRef.current === msg.id ? 'Stop reading' : 'Read aloud'}
@@ -408,7 +408,7 @@ export function ChatTab() {
             <span className="text-[10px] text-[#71717a]">
               Powered by {llmProvider}
             </span>
-            <span className="text-[10px] text-[#71717a]">
+            <span className="hidden sm:block text-[10px] text-[#71717a]">
               Enter to send, Shift+Enter for new line
             </span>
           </div>

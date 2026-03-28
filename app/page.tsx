@@ -2,8 +2,10 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, useInView, useMotionValue, useTransform, animate, AnimatePresence } from 'framer-motion';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 import { IntroSplash } from '@/components/landing/IntroSplash';
 import { DeploymentWalkthrough } from '@/components/landing/DeploymentWalkthrough';
 
@@ -248,7 +250,16 @@ function AgentPreview() {
 // ██  LANDING PAGE
 // ═══════════════════════════════════════════════════════════════
 export default function LandingPage() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [showSplash, setShowSplash] = useState(false);
+
+  // Redirect logged-in users to their dashboard
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.replace('/dashboard/agents');
+    }
+  }, [isAuthenticated, authLoading, router]);
 
   useEffect(() => {
     if (!sessionStorage.getItem('hatcher_splash_seen')) {
@@ -262,6 +273,11 @@ export default function LandingPage() {
       if (r.success) setStats((s) => ({ ...s, agents: r.data.totalAgents || 0 }));
     }).catch(() => {});
   }, []);
+
+  // While auth is resolving, render nothing to avoid flash of landing for authed users
+  if (authLoading || isAuthenticated) {
+    return <div className="min-h-screen bg-[var(--bg-base)]" />;
+  }
 
   if (showSplash) {
     return <IntroSplash onComplete={() => {
@@ -283,6 +299,13 @@ export default function LandingPage() {
         {/* Ambient background glow */}
         <div className="absolute inset-0 pointer-events-none" style={{
           background: 'radial-gradient(ellipse 60% 50% at 50% 30%, rgba(139,92,246,0.12), transparent 70%), radial-gradient(ellipse 40% 40% at 70% 60%, rgba(6,182,212,0.06), transparent 60%)',
+        }} />
+        <div className="absolute inset-0 pointer-events-none" style={{
+          backgroundImage: 'radial-gradient(circle, rgba(139,92,246,0.15) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+          opacity: 0.3,
+          maskImage: 'radial-gradient(ellipse 70% 50% at 50% 30%, black, transparent)',
+          WebkitMaskImage: 'radial-gradient(ellipse 70% 50% at 50% 30%, black, transparent)',
         }} />
 
         <div className="relative z-10 max-w-5xl mx-auto">
@@ -340,7 +363,7 @@ export default function LandingPage() {
                   {['OpenClaw', 'Hermes', 'ElizaOS', 'Milady'].map((fw) => (
                     <span
                       key={fw}
-                      className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-[#a1a1aa]"
+                      className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-[#a1a1aa] hover:bg-white/[0.08] hover:border-white/[0.12] transition-all duration-200 cursor-default"
                     >
                       {fw}
                     </span>
@@ -367,11 +390,11 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-wrap justify-center gap-8 sm:gap-14 lg:gap-20">
             {[
-              { value: stats.agents || 150, suffix: '+', label: 'Agents deployed', color: 'text-purple-400' },
+              { value: stats.agents || 250, suffix: '+', label: 'Agents deployed', color: 'text-purple-400' },
               { value: 20, suffix: '+', label: 'Platforms supported', color: 'text-cyan-400' },
               { value: 4, suffix: '', label: 'AI engines', color: 'text-emerald-400' },
-              { value: 7, suffix: '+', label: 'LLM providers', color: 'text-amber-400' },
-              { value: 0, suffix: '$0', label: 'To get started', color: 'text-white' },
+              { value: 8, suffix: '+', label: 'LLM providers', color: 'text-amber-400' },
+              { value: 0, suffix: '$0', label: 'To get started', color: 'text-emerald-400' },
             ].map((stat, i) => (
               <div key={i} className="text-center">
                 <p className={`text-2xl sm:text-3xl font-bold ${stat.color}`}>
@@ -707,18 +730,21 @@ export default function LandingPage() {
                 name: 'Alex R.',
                 role: 'Community founder',
                 stars: 5,
+                gradient: 'bg-gradient-to-br from-purple-500 to-violet-600',
               },
               {
                 quote: 'Replaced our $200/month customer support tool. The agent handles 80% of tickets automatically and sounds way more natural.',
                 name: 'Sarah K.',
                 role: 'Startup founder',
                 stars: 5,
+                gradient: 'bg-gradient-to-br from-cyan-500 to-blue-600',
               },
               {
                 quote: 'I use it as a personal research assistant on Discord. It summarizes news, finds papers, and keeps me updated on my niche topics.',
                 name: 'Marcus T.',
                 role: 'PhD student',
                 stars: 5,
+                gradient: 'bg-gradient-to-br from-amber-500 to-orange-600',
               },
             ].map((t, i) => (
               <motion.div
@@ -727,18 +753,24 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6"
+                className="relative bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6"
               >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white ${t.gradient}`}>
+                    {t.name[0]}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-white">{t.name}</p>
+                    <p className="text-xs text-[#71717a]">{t.role}</p>
+                  </div>
+                </div>
+                <Quote className="w-5 h-5 text-white/[0.06] absolute top-5 right-5" />
                 <div className="flex gap-0.5 mb-4">
                   {Array.from({ length: t.stars }).map((_, j) => (
                     <Star key={j} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                   ))}
                 </div>
-                <p className="text-sm text-[#d4d4d8] leading-relaxed mb-5">{t.quote}</p>
-                <div>
-                  <p className="text-sm font-medium text-white">{t.name}</p>
-                  <p className="text-xs text-[#71717a]">{t.role}</p>
-                </div>
+                <p className="text-sm text-[#d4d4d8] leading-relaxed">{t.quote}</p>
               </motion.div>
             ))}
           </div>
@@ -746,18 +778,21 @@ export default function LandingPage() {
       </Section>
 
       {/* ── SECURITY ─────────────────────────────────── */}
-      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-white/[0.06]">
-        <div className="max-w-4xl mx-auto">
+      <Section className="relative py-16 sm:py-24 px-4 sm:px-6 border-t border-white/[0.06]">
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse 50% 40% at 50% 30%, rgba(139,92,246,0.06), transparent)',
+        }} />
+        <div className="relative z-10 max-w-4xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">Your data is safe</h2>
             <p className="text-sm text-[#a1a1aa]">Enterprise-grade security, even on the free plan</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { icon: Lock, title: 'Encrypted', desc: 'All your data is encrypted with bank-level security' },
-              { icon: KeyRound, title: 'Private Keys', desc: 'Your AI keys never touch our servers' },
-              { icon: Shield, title: 'Isolated', desc: 'Each agent runs in its own secure environment' },
-              { icon: Code, title: 'Open Source', desc: 'Built on open-source tech — fully transparent' },
+              { icon: Lock, title: 'Encrypted', desc: 'All your data is encrypted with bank-level security', color: 'text-emerald-400' },
+              { icon: KeyRound, title: 'Private Keys', desc: 'Your AI keys never touch our servers', color: 'text-amber-400' },
+              { icon: Shield, title: 'Isolated', desc: 'Each agent runs in its own secure environment', color: 'text-purple-400' },
+              { icon: Code, title: 'Open Source', desc: 'Built on open-source tech — fully transparent', color: 'text-cyan-400' },
             ].map((badge, i) => (
               <motion.div
                 key={i}
@@ -767,7 +802,7 @@ export default function LandingPage() {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-5 text-center hover:border-purple-500/20 transition-all duration-300"
               >
-                <badge.icon className="w-5 h-5 text-[#a1a1aa] mx-auto mb-3" />
+                <badge.icon className={`w-5 h-5 ${badge.color} mx-auto mb-3`} />
                 <h3 className="text-sm font-semibold text-white mb-1">{badge.title}</h3>
                 <p className="text-xs text-[#a1a1aa] leading-relaxed">{badge.desc}</p>
               </motion.div>
@@ -791,10 +826,11 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Free */}
-            <div className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7">
-              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-2">Free</p>
-              <p className="text-3xl font-bold text-white mb-1">$0</p>
-              <p className="text-sm text-[#a1a1aa] mb-6">Get started with zero cost</p>
+            <div className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7 hover:border-white/[0.12] hover:translate-y-[-2px] transition-all duration-300">
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-emerald-400 mb-2">Free</p>
+              <p className="text-3xl font-bold text-emerald-400 mb-1">$0</p>
+              <p className="text-sm text-[#a1a1aa] mb-1">Get started with zero cost</p>
+              <p className="text-xs text-emerald-400/70 mb-5">No credit card required</p>
               <ul className="space-y-2.5">
                 {[
                   '1 AI agent',
@@ -818,8 +854,8 @@ export default function LandingPage() {
             </div>
 
             {/* Basic */}
-            <div className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7">
-              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-2">Basic</p>
+            <div className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7 hover:border-white/[0.12] hover:translate-y-[-2px] transition-all duration-300">
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-purple-400 mb-2">Basic</p>
               <div className="flex items-baseline gap-1">
                 <p className="text-3xl font-bold text-white">$9.99</p>
                 <span className="text-sm text-[#71717a]">/mo</span>
@@ -848,7 +884,7 @@ export default function LandingPage() {
             </div>
 
             {/* Pro */}
-            <div className="bg-[#0e0e14] border border-cyan-500/30 rounded-2xl p-7 relative overflow-hidden">
+            <div className="bg-[#0e0e14] border border-cyan-500/30 rounded-2xl p-7 relative overflow-hidden hover:translate-y-[-2px] transition-all duration-300">
               <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="flex items-center gap-2 mb-2">
                 <p className="text-xs font-semibold tracking-[0.2em] uppercase text-cyan-400">Pro</p>
@@ -914,9 +950,10 @@ export default function LandingPage() {
 
       {/* ── CTA ──────────────────────────────────────── */}
       <section className="relative py-20 sm:py-32 md:py-40 px-4 sm:px-6 border-t border-white/[0.06]">
-        <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'radial-gradient(ellipse 50% 60% at 50% 50%, rgba(139,92,246,0.1), transparent)',
-        }} />
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full bg-purple-500/10 blur-[100px]" />
+          <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] rounded-full bg-cyan-500/8 blur-[80px]" />
+        </div>
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}

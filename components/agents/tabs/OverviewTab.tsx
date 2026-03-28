@@ -197,7 +197,7 @@ function HealthPerformanceSection({ agentId, isActive }: { agentId: string; isAc
         </div>
         <button
           onClick={() => { setLoading(true); fetchMonitoring(); }}
-          className="text-[11px] px-2 py-1 rounded-lg border border-white/10 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all text-[#71717a] hover:text-[#A5A1C2] flex items-center gap-1"
+          className="text-[11px] px-2 py-1 rounded-lg border border-white/10 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all text-[#71717a] hover:text-[#A5A1C2] flex items-center gap-1 cursor-pointer"
         >
           <RefreshCw size={10} />
           Refresh

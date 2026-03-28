@@ -113,7 +113,7 @@ function IntegrationFieldsForm({
                   <button
                     type="button"
                     onClick={() => toggleFieldVisibility(fieldId)}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-white/5 rounded transition-colors"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-white/5 rounded transition-colors cursor-pointer"
                   >
                     {isVisible
                       ? <EyeOff size={14} className="text-[#71717a]" />
@@ -503,7 +503,7 @@ function WebhookSection() {
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
-          className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition-colors"
+          className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition-colors cursor-pointer"
         >
           <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-violet-500/10 border border-violet-500/20">
             <Webhook size={14} className="text-violet-400" />
@@ -651,7 +651,7 @@ export function IntegrationsTab() {
                     <button
                       type="button"
                       onClick={() => toggleIntegrationExpanded(sk)}
-                      className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition-colors"
+                      className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition-colors cursor-pointer"
                     >
                       <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${isConfigured ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-white/5 border border-white/[0.06]'}`}>
                         {isConfigured ? (
@@ -723,7 +723,7 @@ export function IntegrationsTab() {
                     <button
                       type="button"
                       onClick={() => toggleIntegrationExpanded(sk)}
-                      className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition-colors"
+                      className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition-colors cursor-pointer"
                     >
                       <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${hasAnyConfigured ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-white/5 border border-white/[0.06]'}`}>
                         {hasAnyConfigured ? (
