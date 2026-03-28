@@ -173,6 +173,8 @@ export default function CreatePage() {
 
   // ── ElizaOS-specific form state ──
   const [elizaBio, setElizaBio] = useState('');
+  const [elizaLore, setElizaLore] = useState('');
+  const [elizaStyle, setElizaStyle] = useState('');
   const [elizaTopics, setElizaTopics] = useState('');
   const [elizaAdjectives, setElizaAdjectives] = useState('');
 
@@ -331,8 +333,12 @@ export default function CreatePage() {
           ...(selectedFramework === 'openclaw' ? { skills: openclawSkills } : {}),
           ...(selectedFramework === 'elizaos' ? {
             bio: elizaBio.trim() || undefined,
+            lore: elizaLore.trim() || undefined,
             topics: elizaTopics.split(',').map(s => s.trim()).filter(Boolean),
             adjectives: elizaAdjectives.split(',').map(s => s.trim()).filter(Boolean),
+            style: elizaStyle.trim() ? {
+              all: elizaStyle.split('\n').map(s => s.trim()).filter(Boolean),
+            } : undefined,
           } : {}),
           ...(selectedFramework === 'milady' ? {
             miladyPersonality,
@@ -1187,6 +1193,36 @@ export default function CreatePage() {
                         value={elizaBio}
                         onChange={(e) => setElizaBio(e.target.value)}
                         maxLength={2000}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="eliza-lore" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
+                        Lore
+                      </label>
+                      <p className="text-xs text-[var(--text-muted)] mb-2">Background knowledge and history for your agent. One fact per line.</p>
+                      <textarea
+                        id="eliza-lore"
+                        className="input resize-none"
+                        rows={3}
+                        placeholder={"Was created to help developers build AI applications\nHas extensive knowledge of blockchain technology\nSpeaks three languages fluently"}
+                        value={elizaLore}
+                        onChange={(e) => setElizaLore(e.target.value)}
+                        maxLength={2000}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="eliza-style" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
+                        Style Instructions
+                      </label>
+                      <p className="text-xs text-[var(--text-muted)] mb-2">How your agent should communicate. One instruction per line.</p>
+                      <textarea
+                        id="eliza-style"
+                        className="input resize-none"
+                        rows={3}
+                        placeholder={"Be concise and direct\nUse technical terminology when appropriate\nAlways provide examples"}
+                        value={elizaStyle}
+                        onChange={(e) => setElizaStyle(e.target.value)}
+                        maxLength={1000}
                       />
                     </div>
                     <div>
