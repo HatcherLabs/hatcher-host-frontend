@@ -851,6 +851,8 @@ export function WorkflowsTab() {
       setWorkflows((prev) =>
         prev.map((w) => (w.id === workflowId ? { ...w, enabled: res.data.enabled } : w)),
       );
+    } else {
+      setError('Failed to toggle workflow');
     }
   };
 
@@ -860,6 +862,8 @@ export function WorkflowsTab() {
     setDeletingId(null);
     if (res.success) {
       setWorkflows((prev) => prev.filter((w) => w.id !== workflowId));
+    } else {
+      setError('Failed to delete workflow');
     }
   };
 

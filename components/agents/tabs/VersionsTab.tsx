@@ -125,7 +125,7 @@ export function VersionsTab() {
         setTotal(res.data.total);
       }
     } catch {
-      // ignore
+      setMessage({ text: 'Failed to load versions', type: 'error' });
     } finally {
       setLoading(false);
     }
