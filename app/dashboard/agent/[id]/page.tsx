@@ -298,12 +298,11 @@ export default function AgentManagePage() {
       setConfigLore(Array.isArray((char as Record<string, unknown>).lore) ? ((char as Record<string, unknown>).lore as string[]).join('\n') : '');
       setConfigTopics(Array.isArray((char as Record<string, unknown>).topics) ? ((char as Record<string, unknown>).topics as string[]).join(', ') : '');
       setConfigAdjectives(Array.isArray((char as Record<string, unknown>).adjectives) ? ((char as Record<string, unknown>).adjectives as string[]).join(', ') : '');
+      const styleObj = (char as Record<string, unknown>).style as Record<string, string[]> | undefined;
       setConfigStyle(
-        Array.isArray((char as Record<string, unknown>).style?.valueOf())
-          ? ''
-          : ((char as Record<string, unknown>).style as Record<string, unknown>)?.chat
-            ? (((char as Record<string, unknown>).style as Record<string, unknown>).chat as string[]).join('\n')
-            : ''
+        styleObj?.all?.length ? styleObj.all.join('\n')
+          : styleObj?.chat?.length ? styleObj.chat.join('\n')
+          : ''
       );
       setConfigSystemPrompt((char as Record<string, unknown>).systemPrompt as string ?? '');
       setConfigSkills(Array.isArray((char as Record<string, unknown>).skills) ? ((char as Record<string, unknown>).skills as string[]).join(', ') : '');
@@ -631,8 +630,12 @@ export default function AgentManagePage() {
       provider: configProvider || undefined,
       ...(agent.framework === 'elizaos' ? {
         bio: configBio.trim() || undefined,
+        lore: configLore.trim() || undefined,
         topics: configTopics.split(',').map(s => s.trim()).filter(Boolean),
         adjectives: configAdjectives.split(',').map(s => s.trim()).filter(Boolean),
+        style: configStyle.trim() ? {
+          all: configStyle.split('\n').map(s => s.trim()).filter(Boolean),
+        } : undefined,
       } : {}),
       ...(byokKeyInput.trim() ? {
         byok: {

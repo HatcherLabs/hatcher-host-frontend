@@ -49,7 +49,9 @@ export function ConfigTab() {
     configName, setConfigName,
     configDesc, setConfigDesc,
     configBio, setConfigBio,
+    configLore, setConfigLore,
     configTopics, setConfigTopics,
+    configStyle, setConfigStyle,
     configSystemPrompt, setConfigSystemPrompt,
     configSkills, setConfigSkills,
     configModel, setConfigModel,
@@ -88,8 +90,10 @@ export function ConfigTab() {
     };
     if (agent?.framework === 'elizaos') {
       config.bio = configBio;
+      config.lore = configLore;
       config.topics = configTopics?.split(',').map(s => s.trim()).filter(Boolean);
       config.adjectives = ctx.configAdjectives?.split(',').map((s: string) => s.trim()).filter(Boolean);
+      config.style = configStyle;
     }
     const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -112,8 +116,10 @@ export function ConfigTab() {
         if (config.systemPrompt) setConfigSystemPrompt(config.systemPrompt);
         if (config.skills) setConfigSkills(Array.isArray(config.skills) ? config.skills.join(', ') : config.skills);
         if (config.bio) setConfigBio(config.bio);
+        if (config.lore) setConfigLore(typeof config.lore === 'string' ? config.lore : Array.isArray(config.lore) ? config.lore.join('\n') : '');
         if (config.topics) setConfigTopics(Array.isArray(config.topics) ? config.topics.join(', ') : config.topics);
         if (config.adjectives) ctx.setConfigAdjectives(Array.isArray(config.adjectives) ? config.adjectives.join(', ') : config.adjectives);
+        if (config.style) setConfigStyle(typeof config.style === 'string' ? config.style : Array.isArray(config.style?.all) ? config.style.all.join('\n') : '');
         setImportMsg('Config imported successfully');
         setTimeout(() => setImportMsg(null), 3000);
       } catch {
@@ -518,6 +524,30 @@ export function ConfigTab() {
                   value={configBio}
                   onChange={(e) => setConfigBio(e.target.value)}
                   placeholder="A knowledgeable AI assistant specializing in..."
+                />
+              </div>
+              <div>
+                <label htmlFor="config-lore" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Lore</label>
+                <p className="text-[10px] mb-1.5 text-[#71717a]">Background knowledge and history for your agent. One fact per line.</p>
+                <textarea
+                  id="config-lore"
+                  className="config-textarea"
+                  rows={4}
+                  value={configLore}
+                  onChange={(e) => setConfigLore(e.target.value)}
+                  placeholder="Was created to help developers build AI applications&#10;Has extensive knowledge of blockchain technology&#10;Speaks three languages fluently"
+                />
+              </div>
+              <div>
+                <label htmlFor="config-style" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Style Instructions</label>
+                <p className="text-[10px] mb-1.5 text-[#71717a]">How your agent should communicate. One instruction per line.</p>
+                <textarea
+                  id="config-style"
+                  className="config-textarea"
+                  rows={3}
+                  value={configStyle}
+                  onChange={(e) => setConfigStyle(e.target.value)}
+                  placeholder="Be concise and direct&#10;Use technical terminology when appropriate&#10;Always provide examples"
                 />
               </div>
               <div>
