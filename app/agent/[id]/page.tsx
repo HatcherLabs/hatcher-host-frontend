@@ -35,9 +35,10 @@ export async function generateMetadata({
     };
   }
 
-  const title = agent.name;
+  const title = agent.name ?? 'AI Agent';
   const description =
-    agent.description ?? `${agent.name} — an AI agent powered by ${agent.framework ?? 'OpenClaw'} on Hatcher.`;
+    agent.description ?? `${title} — an AI agent powered by ${agent.framework ?? 'OpenClaw'} on Hatcher.`;
+  const ogImage = `https://hatcher.host/og?title=${encodeURIComponent(title)}&subtitle=${encodeURIComponent(description.slice(0, 120))}&tag=${encodeURIComponent(agent.framework ?? 'AI Agent')}`;
 
   return {
     title,
@@ -45,14 +46,18 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
+      url: `https://hatcher.host/agent/${id}`,
       siteName: 'Hatcher',
       type: 'website',
+      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title,
       description,
+      images: [ogImage],
     },
+    alternates: { canonical: `https://hatcher.host/agent/${id}` },
   };
 }
 
