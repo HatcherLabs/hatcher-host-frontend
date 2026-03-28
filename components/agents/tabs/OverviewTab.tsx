@@ -465,7 +465,7 @@ export function OverviewTab() {
           </div>
           <button
             onClick={() => setTab('logs')}
-            className="text-[11px] px-3 py-1 rounded-lg border border-white/10 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all text-[#71717a] hover:text-[#A5A1C2]"
+            className="text-[11px] px-3 py-1 rounded-lg border border-white/10 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all text-[#71717a] hover:text-[#A5A1C2] cursor-pointer"
           >
             View All
           </button>
@@ -499,7 +499,7 @@ export function OverviewTab() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <button
           onClick={() => setTab('chat')}
-          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-white/[0.06] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[#A5A1C2] bg-[rgba(26,23,48,0.6)]"
+          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-white/[0.06] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[#A5A1C2] bg-[rgba(26,23,48,0.6)] cursor-pointer"
         >
           <div className="w-9 h-9 rounded-xl bg-[#06b6d4]/10 flex items-center justify-center group-hover/btn:bg-[#06b6d4]/15 transition-colors">
             <MessageSquare size={16} className="text-[#06b6d4]" />
@@ -508,7 +508,7 @@ export function OverviewTab() {
         </button>
         <button
           onClick={() => setTab('logs')}
-          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-white/[0.06] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[#A5A1C2] bg-[rgba(26,23,48,0.6)]"
+          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-white/[0.06] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[#A5A1C2] bg-[rgba(26,23,48,0.6)] cursor-pointer"
         >
           <div className="w-9 h-9 rounded-xl bg-[#06b6d4]/10 flex items-center justify-center group-hover/btn:bg-[#06b6d4]/15 transition-colors">
             <ScrollText size={16} className="text-[#06b6d4]" />
@@ -517,7 +517,7 @@ export function OverviewTab() {
         </button>
         <button
           onClick={() => setTab('config')}
-          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-white/[0.06] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[#A5A1C2] bg-[rgba(26,23,48,0.6)]"
+          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-white/[0.06] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[#A5A1C2] bg-[rgba(26,23,48,0.6)] cursor-pointer"
         >
           <div className="w-9 h-9 rounded-xl bg-[#06b6d4]/10 flex items-center justify-center group-hover/btn:bg-[#06b6d4]/15 transition-colors">
             <Settings size={16} className="text-[#06b6d4]" />

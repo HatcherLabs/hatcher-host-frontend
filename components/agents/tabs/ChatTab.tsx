@@ -134,7 +134,7 @@ export function ChatTab() {
         <div className="flex items-center justify-end mb-2 px-1">
           <button
             onClick={voice.toggleAutoSpeak}
-            className={`group flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border transition-all duration-200 ${
+            className={`group flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border transition-all duration-200 cursor-pointer ${
               voice.autoSpeak
                 ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[#06b6d4]'
                 : 'border-[rgba(46,43,74,0.3)] bg-transparent text-[#71717a] hover:border-[#71717a]/40 hover:text-[#A5A1C2]'
@@ -170,7 +170,7 @@ export function ChatTab() {
                 <motion.button
                   key={prompt}
                   onClick={() => sendMessage(prompt)}
-                  className="text-xs px-4 py-2 rounded-full border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all"
+                  className="text-xs px-4 py-2 rounded-full border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all cursor-pointer"
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 + i * 0.1 }}
