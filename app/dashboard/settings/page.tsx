@@ -168,12 +168,20 @@ export default function SettingsPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [savingPassword, setSavingPassword] = useState(false);
 
-  // ── API key state ─────────────────────────────────────────
-  const [apiKey, setApiKey] = useState('');
+  // ── API key state (multi-key) ─────────────────────────────
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [showApiKey, setShowApiKey] = useState(false);
-  const [regeneratingKey, setRegeneratingKey] = useState(false);
-  const [showRegenConfirm, setShowRegenConfirm] = useState(false);
+  const [apiKeys, setApiKeys] = useState<Array<{
+    id: string; label: string; prefix: string;
+    lastUsedAt: string | null; revokedAt: string | null; createdAt: string;
+    requestsToday: number; requestsThisWeek: number;
+  }>>([]);
+  const [apiKeysLoading, setApiKeysLoading] = useState(false);
+  const [newKeyLabel, setNewKeyLabel] = useState('');
+  const [creatingKey, setCreatingKey] = useState(false);
+  const [newlyCreatedKey, setNewlyCreatedKey] = useState<{ id: string; key: string; label: string } | null>(null);
+  const [revokingKeyId, setRevokingKeyId] = useState<string | null>(null);
+  const [editingKeyId, setEditingKeyId] = useState<string | null>(null);
+  const [editingLabel, setEditingLabel] = useState('');
 
   // ── Notification prefs (localStorage) ────────────────────
   const [notifPush, setNotifPush] = useState(true);
@@ -206,12 +214,20 @@ export default function SettingsPage() {
     }
   }, [user]);
 
+  // ── Load API keys ─────────────────────────────────────────
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    setApiKeysLoading(true);
+    api.listApiKeys().then((res) => {
+      if (res.success) setApiKeys(res.data.filter((k) => !k.revokedAt));
+    }).finally(() => setApiKeysLoading(false));
+  }, [isAuthenticated]);
+
   // ── Load full profile + referral data ─────────────────────
   useEffect(() => {
     if (!isAuthenticated) return;
     api.getProfile().then((res) => {
       if (res.success) {
-        setApiKey(res.data.apiKey ?? '');
         setProfile({
           tier: res.data.tier,
           hatchCredits: res.data.hatchCredits,
@@ -288,17 +304,6 @@ export default function SettingsPage() {
       }
     } catch { toast('error', 'Failed to change password'); }
     finally { setSavingPassword(false); }
-  }
-
-  // ── Regen API key ──────────────────────────────────────────
-  async function handleRegenKey() {
-    setRegeneratingKey(true);
-    try {
-      const res = await api.regenerateApiKey();
-      if (res.success) { setApiKey(res.data.apiKey); toast('success', 'API key regenerated'); }
-      else toast('error', (res as any).error || 'Failed to regenerate key');
-    } catch { toast('error', 'Failed to regenerate key'); }
-    finally { setRegeneratingKey(false); setShowRegenConfirm(false); }
   }
 
   // ── Delete account ────────────────────────────────────────
@@ -532,42 +537,182 @@ export default function SettingsPage() {
                       </div>
                     </Section>
 
-                    {/* API Key */}
-                    <Section title="API Key" icon={<Key size={16} />}>
+                    {/* API Keys (multi-key) */}
+                    <Section title="API Keys" icon={<Key size={16} />}>
                       <p className="text-sm text-[var(--text-secondary)] mb-5 leading-relaxed">
-                        Use this key for programmatic access to the Hatcher API. Prefix: <code className="font-mono text-xs bg-white/[0.05] px-1.5 py-0.5 rounded text-cyan-400">hk_</code>
+                        Create multiple API keys for programmatic access. Each key uses the <code className="font-mono text-xs bg-white/[0.05] px-1.5 py-0.5 rounded text-cyan-400">hk_</code> prefix.
+                        The full key is shown <span className="text-amber-400 font-medium">only once</span> at creation.
                       </p>
-                      <div className="mb-4">
-                        <label className="text-xs font-medium text-[var(--text-muted)] mb-1.5 block">Your API Key</label>
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-10 px-3 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center font-mono text-xs tracking-wider text-[var(--text-secondary)] overflow-hidden">
-                            {showApiKey ? apiKey : apiKey ? '•'.repeat(Math.min(apiKey.length, 40)) : 'Loading...'}
+
+                      {/* Newly created key — one-time reveal */}
+                      {newlyCreatedKey && (
+                        <div className="mb-5 p-4 rounded-xl bg-emerald-500/[0.08] border border-emerald-500/20">
+                          <p className="text-xs font-semibold text-emerald-400 mb-2 uppercase tracking-wider">New key created — copy it now!</p>
+                          <p className="text-xs text-[var(--text-muted)] mb-2">{newlyCreatedKey.label}</p>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-9 px-3 rounded-lg bg-white/[0.06] border border-emerald-500/20 flex items-center font-mono text-xs tracking-wider text-white overflow-hidden">
+                              {newlyCreatedKey.key}
+                            </div>
+                            <button
+                              onClick={() => copy(newlyCreatedKey.key, 'newKey')}
+                              className="h-9 w-9 rounded-lg border border-emerald-500/20 bg-white/[0.04] hover:bg-white/[0.08] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
+                            >
+                              {copiedField === 'newKey' ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} className="text-emerald-400" />}
+                            </button>
+                            <button
+                              onClick={() => setNewlyCreatedKey(null)}
+                              className="h-9 w-9 rounded-lg border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
+                              title="Dismiss"
+                            >
+                              <Trash2 size={13} className="text-[var(--text-muted)]" />
+                            </button>
                           </div>
-                          <button
-                            onClick={() => setShowApiKey((s) => !s)}
-                            className="h-10 w-10 rounded-lg border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
-                            title={showApiKey ? 'Hide key' : 'Reveal key'}
-                          >
-                            {showApiKey ? <EyeOff size={14} className="text-[var(--text-muted)]" /> : <Eye size={14} className="text-[var(--text-muted)]" />}
-                          </button>
-                          <button
-                            onClick={() => copy(apiKey, 'apiKey')}
-                            disabled={!apiKey}
-                            className="h-10 w-10 rounded-lg border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0 disabled:opacity-40"
-                            title="Copy API key"
-                          >
-                            {copiedField === 'apiKey' ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
-                          </button>
                         </div>
+                      )}
+
+                      {/* Existing keys list */}
+                      {apiKeysLoading ? (
+                        <div className="flex items-center gap-2 py-4 text-[var(--text-muted)] text-sm">
+                          <Loader2 size={14} className="animate-spin" />Loading keys...
+                        </div>
+                      ) : apiKeys.length === 0 ? (
+                        <p className="text-sm text-[var(--text-muted)] py-3 mb-4">No API keys yet. Create one below.</p>
+                      ) : (
+                        <div className="space-y-2 mb-5">
+                          {apiKeys.map((k) => (
+                            <div key={k.id} className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-3">
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="min-w-0 flex-1">
+                                  {editingKeyId === k.id ? (
+                                    <div className="flex items-center gap-2">
+                                      <input
+                                        className="input h-7 px-2 text-xs flex-1"
+                                        value={editingLabel}
+                                        onChange={(e) => setEditingLabel(e.target.value)}
+                                        onKeyDown={async (e) => {
+                                          if (e.key === 'Enter') {
+                                            const res = await api.renameApiKey(k.id, editingLabel);
+                                            if (res.success) {
+                                              setApiKeys((prev) => prev.map((x) => x.id === k.id ? { ...x, label: editingLabel } : x));
+                                              toast('success', 'Key renamed');
+                                            }
+                                            setEditingKeyId(null);
+                                          } else if (e.key === 'Escape') {
+                                            setEditingKeyId(null);
+                                          }
+                                        }}
+                                        autoFocus
+                                      />
+                                      <button
+                                        onClick={async () => {
+                                          const res = await api.renameApiKey(k.id, editingLabel);
+                                          if (res.success) {
+                                            setApiKeys((prev) => prev.map((x) => x.id === k.id ? { ...x, label: editingLabel } : x));
+                                            toast('success', 'Key renamed');
+                                          }
+                                          setEditingKeyId(null);
+                                        }}
+                                        className="h-7 px-2 text-xs rounded-lg bg-cyan-500/15 text-cyan-400 hover:bg-cyan-500/25 transition-colors cursor-pointer"
+                                      >Save</button>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={() => { setEditingKeyId(k.id); setEditingLabel(k.label); }}
+                                      className="text-sm font-medium text-[var(--text-primary)] hover:text-cyan-400 transition-colors text-left cursor-pointer"
+                                      title="Click to rename"
+                                    >{k.label}</button>
+                                  )}
+                                  <div className="flex items-center gap-3 mt-1 flex-wrap">
+                                    <code className="text-[11px] font-mono text-[var(--text-muted)]">{k.prefix}</code>
+                                    <span className="text-[11px] text-[var(--text-muted)]">
+                                      {k.requestsToday} req today · {k.requestsThisWeek} this week
+                                    </span>
+                                    {k.lastUsedAt && (
+                                      <span className="text-[11px] text-[var(--text-muted)]">
+                                        Last used {new Date(k.lastUsedAt).toLocaleDateString()}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-1 flex-shrink-0">
+                                  <button
+                                    onClick={() => copy(k.prefix, `key-${k.id}`)}
+                                    className="h-7 w-7 rounded-lg border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.07] flex items-center justify-center transition-colors cursor-pointer"
+                                    title="Copy prefix"
+                                  >
+                                    {copiedField === `key-${k.id}` ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} className="text-[var(--text-muted)]" />}
+                                  </button>
+                                  <button
+                                    disabled={revokingKeyId === k.id}
+                                    onClick={async () => {
+                                      setRevokingKeyId(k.id);
+                                      try {
+                                        const res = await api.revokeApiKey(k.id);
+                                        if (res.success) {
+                                          setApiKeys((prev) => prev.filter((x) => x.id !== k.id));
+                                          toast('success', 'API key revoked');
+                                        } else toast('error', 'Failed to revoke key');
+                                      } catch { toast('error', 'Failed to revoke key'); }
+                                      finally { setRevokingKeyId(null); }
+                                    }}
+                                    className="h-7 w-7 rounded-lg border border-red-500/20 bg-red-500/[0.04] hover:bg-red-500/[0.12] flex items-center justify-center transition-colors cursor-pointer disabled:opacity-40"
+                                    title="Revoke key"
+                                  >
+                                    {revokingKeyId === k.id ? <Loader2 size={12} className="animate-spin text-red-400" /> : <Trash2 size={12} className="text-red-400" />}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Create new key */}
+                      <div className="flex items-center gap-2">
+                        <input
+                          className="input h-9 px-3 text-sm flex-1"
+                          placeholder='Label (e.g. "Production")'
+                          value={newKeyLabel}
+                          onChange={(e) => setNewKeyLabel(e.target.value)}
+                          onKeyDown={async (e) => {
+                            if (e.key !== 'Enter' || !newKeyLabel.trim() || creatingKey) return;
+                            setCreatingKey(true);
+                            try {
+                              const res = await api.createApiKey(newKeyLabel.trim());
+                              if (res.success) {
+                                setNewlyCreatedKey({ id: res.data.id, key: res.data.key, label: res.data.label });
+                                setApiKeys((prev) => [{ id: res.data.id, label: res.data.label, prefix: res.data.prefix, lastUsedAt: null, revokedAt: null, createdAt: res.data.createdAt, requestsToday: 0, requestsThisWeek: 0 }, ...prev]);
+                                setNewKeyLabel('');
+                                toast('success', 'API key created');
+                              } else toast('error', (res as any).error || 'Failed to create key');
+                            } catch { toast('error', 'Failed to create key'); }
+                            finally { setCreatingKey(false); }
+                          }}
+                          maxLength={64}
+                        />
+                        <button
+                          disabled={creatingKey}
+                          onClick={async () => {
+                            if (!newKeyLabel.trim()) { toast('error', 'Enter a label for this key'); return; }
+                            setCreatingKey(true);
+                            try {
+                              const res = await api.createApiKey(newKeyLabel.trim());
+                              if (res.success) {
+                                setNewlyCreatedKey({ id: res.data.id, key: res.data.key, label: res.data.label });
+                                setApiKeys((prev) => [{ id: res.data.id, label: res.data.label, prefix: res.data.prefix, lastUsedAt: null, revokedAt: null, createdAt: res.data.createdAt, requestsToday: 0, requestsThisWeek: 0 }, ...prev]);
+                                setNewKeyLabel('');
+                                toast('success', 'API key created');
+                              } else toast('error', (res as any).error || 'Failed to create key');
+                            } catch { toast('error', 'Failed to create key'); }
+                            finally { setCreatingKey(false); }
+                          }}
+                          className="clay-btn-primary flex items-center gap-1.5 px-4 py-2 text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                        >
+                          {creatingKey ? <Loader2 size={13} className="animate-spin" /> : <Key size={13} />}
+                          {creatingKey ? 'Creating...' : 'Create Key'}
+                        </button>
                       </div>
-                      <button
-                        onClick={() => setShowRegenConfirm(true)}
-                        className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer"
-                      >
-                        <RefreshCw size={14} />
-                        Regenerate Key
-                      </button>
-                      <p className="text-[11px] text-[var(--text-muted)] mt-2">Regenerating invalidates the current key immediately.</p>
+                      <p className="text-[11px] text-[var(--text-muted)] mt-2">Up to 10 active keys. Each key has full API access.</p>
                     </Section>
                   </>
                 )}
@@ -676,17 +821,6 @@ export default function SettingsPage() {
       </div>
 
       {/* ── Dialogs ────────────────────────────────────────────── */}
-      <ConfirmDialog
-        open={showRegenConfirm}
-        title="Regenerate API Key?"
-        description="Your current API key will be immediately invalidated. Any integrations using it will stop working until updated."
-        confirmLabel={regeneratingKey ? 'Regenerating...' : 'Regenerate'}
-        variant="danger"
-        loading={regeneratingKey}
-        onCancel={() => setShowRegenConfirm(false)}
-        onConfirm={handleRegenKey}
-      />
-
       <ConfirmDialog
         open={showDeleteConfirm}
         title="Delete Your Account?"

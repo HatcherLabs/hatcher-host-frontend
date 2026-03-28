@@ -203,9 +203,33 @@ export const api = {
   /** Delete current user account */
   deleteAccount: () => req<{deleted: boolean}>('/auth/me', { method: 'DELETE' }),
 
-  /** Regenerate API key */
+  /** Regenerate API key (legacy single-key) */
   regenerateApiKey: () =>
     req<{ apiKey: string }>('/auth/api-key/regenerate', { method: 'POST' }),
+
+  /** List all named API keys */
+  listApiKeys: () =>
+    req<Array<{
+      id: string; label: string; prefix: string;
+      lastUsedAt: string | null; revokedAt: string | null; createdAt: string;
+      requestsToday: number; requestsThisWeek: number;
+    }>>('/auth/api-keys'),
+
+  /** Create a new named API key (full key returned once) */
+  createApiKey: (label: string) =>
+    req<{ id: string; label: string; key: string; prefix: string; createdAt: string }>(
+      '/auth/api-keys', { method: 'POST', body: JSON.stringify({ label }) }
+    ),
+
+  /** Revoke a named API key */
+  revokeApiKey: (id: string) =>
+    req<{ revoked: boolean }>(`/auth/api-keys/${id}`, { method: 'DELETE' }),
+
+  /** Rename a named API key */
+  renameApiKey: (id: string, label: string) =>
+    req<{ id: string; label: string }>(`/auth/api-keys/${id}`, {
+      method: 'PATCH', body: JSON.stringify({ label }),
+    }),
 
   /** Get recent notifications/activity */
   getNotifications: () => req<{ items: Array<{id: string; type: string; message: string; timestamp: string}>; readAt: string | null }>('/auth/notifications'),
