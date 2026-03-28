@@ -17,11 +17,20 @@ export const metadata: Metadata = {
     description:
       'Pick a template, configure platforms, and hatch your autonomous AI agent in 60 seconds. 23+ templates available.',
     url: 'https://hatcher.host/create',
+    images: [
+      {
+        url: 'https://hatcher.host/og?title=Create+Your+AI+Agent&subtitle=Pick+a+template%2C+configure+platforms%2C+and+deploy+in+60+seconds.+23%2B+templates+available.&tag=Get+Started',
+        width: 1200,
+        height: 630,
+        alt: 'Create an AI Agent on Hatcher',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Create an AI Agent in 60 Seconds',
     description: 'Pick a template, configure platforms, and deploy. 23+ templates on Hatcher.',
+    images: ['https://hatcher.host/og?title=Create+Your+AI+Agent&subtitle=Pick+a+template%2C+configure+platforms%2C+and+deploy+in+60+seconds.+23%2B+templates+available.&tag=Get+Started'],
   },
   alternates: { canonical: 'https://hatcher.host/create' },
 };

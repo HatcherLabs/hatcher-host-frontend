@@ -15,6 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = getBlogPost(slug);
   if (!post) return { title: 'Not Found — Hatcher Blog' };
+  const ogImageUrl = `https://hatcher.host/og?title=${encodeURIComponent(post.title)}&subtitle=${encodeURIComponent(post.excerpt)}&tag=${encodeURIComponent(post.category)}`;
   return {
     title: `${post.title} — Hatcher Blog`,
     description: post.excerpt,
@@ -26,7 +27,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: 'article',
       publishedTime: post.date,
       authors: [post.author],
+      images: [{ url: ogImageUrl, width: 1200, height: 630, alt: post.title }],
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+      images: [ogImageUrl],
+    },
+    alternates: { canonical: `https://hatcher.host/blog/${post.slug}` },
   };
 }
 
@@ -37,8 +46,30 @@ export default async function BlogArticlePage({ params }: Props) {
 
   const related = getRelatedPosts(slug, 3);
 
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.excerpt,
+    author: { '@type': 'Organization', name: post.author },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Hatcher',
+      url: 'https://hatcher.host',
+      logo: { '@type': 'ImageObject', url: 'https://hatcher.host/icon.svg' },
+    },
+    datePublished: post.date,
+    url: `https://hatcher.host/blog/${post.slug}`,
+    image: `https://hatcher.host/og?title=${encodeURIComponent(post.title)}&subtitle=${encodeURIComponent(post.excerpt)}&tag=${encodeURIComponent(post.category)}`,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `https://hatcher.host/blog/${post.slug}` },
+  };
+
   return (
     <div className="min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <article className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         {/* Back link */}
         <Link

@@ -88,9 +88,42 @@ export const metadata: Metadata = {
   category: 'technology',
 };
 
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Hatcher',
+  url: 'https://hatcher.host',
+  logo: 'https://hatcher.host/icon.svg',
+  description: 'Deploy autonomous AI agents across 20+ platforms in 60 seconds. Free tier included.',
+  sameAs: ['https://twitter.com/HatcherLabs'],
+};
+
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Hatcher',
+  url: 'https://hatcher.host',
+  description: 'AI Agent Hosting Platform',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: 'https://hatcher.host/explore?q={search_term_string}',
+    'query-input': 'required name=search_term_string',
+  },
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`dark scroll-smooth ${inter.variable} ${jetbrainsMono.variable} ${sora.variable}`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
+      </head>
       <body>
         <AuthProvider>
           <WalletProvider>

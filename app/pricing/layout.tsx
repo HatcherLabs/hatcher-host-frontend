@@ -17,11 +17,20 @@ export const metadata: Metadata = {
     description:
       'Deploy AI agents free. Upgrade for more messages, dedicated resources, and file management. BYOK any LLM for unlimited usage.',
     url: 'https://hatcher.host/pricing',
+    images: [
+      {
+        url: 'https://hatcher.host/og?title=Hatcher+Pricing&subtitle=Free+tier+included.+Basic+%249.99%2Fmo.+Pro+%2419.99%2Fmo.+BYOK+for+unlimited+messages.&tag=Pricing',
+        width: 1200,
+        height: 630,
+        alt: 'Hatcher Pricing Plans',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Hatcher Pricing — Free Tier Included',
     description: 'Deploy AI agents free. Upgrade for more messages and dedicated resources.',
+    images: ['https://hatcher.host/og?title=Hatcher+Pricing&subtitle=Free+tier+included.+Basic+%249.99%2Fmo.+Pro+%2419.99%2Fmo.+BYOK+for+unlimited+messages.&tag=Pricing'],
   },
   alternates: { canonical: 'https://hatcher.host/pricing' },
 };

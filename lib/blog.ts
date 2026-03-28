@@ -453,6 +453,292 @@ export const BLOG_POSTS: BlogPost[] = [
     coverImageDescription: 'A golden key hovering over a digital keyhole, surrounded by logos of LLM providers (OpenAI, Anthropic, Google, Groq) connected by glowing lines',
   },
   {
+    slug: 'introducing-hatcher',
+    title: 'Introducing Hatcher: Deploy AI Agents in 60 Seconds',
+    excerpt:
+      'We built the platform we always wanted — one-click AI agent hosting with zero DevOps, free tier included, and BYOK for unlimited scale.',
+    content: `<p>Today we are launching <strong>Hatcher</strong> — the easiest way to deploy autonomous AI agents across any platform, starting in under 60 seconds.</p>
+
+<p>We built Hatcher because we were tired of the same problem: you want to run an AI agent, but first you need to provision a server, write a Dockerfile, wire up environment variables, configure auto-restarts, manage uptime, and debug networking issues before your agent even sends its first message. That's hours of yak-shaving before you even know if your idea works.</p>
+
+<h2>What Hatcher Does</h2>
+<p>Hatcher is a managed hosting platform for AI agents. You pick a framework, configure your agent, and we handle everything else:</p>
+<ul>
+<li><strong>Docker containers per agent</strong> — full isolation, dedicated resources</li>
+<li><strong>20+ platform integrations</strong> — Telegram, Discord, Twitter, WhatsApp, Slack, and more, all wired up out of the box</li>
+<li><strong>4 frameworks</strong> — OpenClaw, Hermes, ElizaOS, and Milady, each with their own strengths and tooling</li>
+<li><strong>Auto-sleep and auto-wake</strong> — idle agents sleep to save resources, wake instantly on incoming messages</li>
+<li><strong>LLM proxy with rate limiting</strong> — use our hosted Groq models or bring your own key for unlimited messages</li>
+</ul>
+
+<h2>Free Tier, No Strings</h2>
+<p>Every account includes a free tier with one agent, 20 messages per day on our hosted LLM, and all integrations enabled. No credit card required. No trial period. Just sign up and deploy.</p>
+<p>If you bring your own LLM key (BYOK), messages are unlimited — even on the free tier. We made this choice deliberately: we believe you should be able to build and run a production agent without paying us anything, as long as you are willing to provide your own compute.</p>
+
+<h2>The Stack</h2>
+<p>Under the hood, Hatcher runs each agent in its own Docker container with resource limits appropriate to your tier. The orchestrator monitors heartbeats, auto-sleeps idle containers, and wakes them on incoming messages — all transparently. You see a live dashboard with message counts, status, and logs.</p>
+<p>Payments for premium tiers are handled in SOL or our platform token, priced in USD and converted at the live Jupiter rate. We built on Solana because the transaction costs and speed make micropayments practical in a way that EVM chains still do not.</p>
+
+<h2>23 Templates to Get Started</h2>
+<p>We ship 23 pre-built agent templates covering the most common use cases:</p>
+<ul>
+<li>Community Manager — moderates Discord servers, answers FAQs, onboards new members</li>
+<li>Trading Assistant — monitors markets, sends alerts, tracks on-chain activity</li>
+<li>Customer Support — handles first-line support with escalation rules</li>
+<li>Content Creator — writes tweets, newsletters, and blog posts on a schedule</li>
+<li>Research Agent — crawls the web, summarizes findings, compiles reports</li>
+</ul>
+<p>Templates are fully customizable after deployment. They are starting points, not restrictions.</p>
+
+<h2>hatcher.markets</h2>
+<p>Alongside the hosting platform, we are launching <a href="https://hatcher.markets">hatcher.markets</a> — a marketplace where agent creators can list their agents for rent. If you build something useful, you can earn revenue from it. If you need a specialized agent fast, you can rent one instead of building from scratch.</p>
+
+<h2>What's Next</h2>
+<p>We are a small team and we ship fast. The roadmap includes multi-agent workflows, visual workflow editors, custom domain routing for public-facing agents, and a lot more integrations. We will be posting updates here as we go.</p>
+<p>Sign up at <a href="https://hatcher.host/register">hatcher.host/register</a> — it takes 30 seconds, no credit card required. Your first agent is free.</p>`,
+    author: 'Hatcher Labs',
+    date: '2026-03-28',
+    category: 'Product',
+    readTime: '5 min',
+    coverImageDescription: 'A glowing egg hatching open with a small robot emerging, surrounded by floating platform logos (Telegram, Discord, Twitter), purple neon on dark background',
+  },
+  {
+    slug: 'telegram-bot-ai-2-minutes',
+    title: 'How to Deploy a Telegram Bot with AI in Under 2 Minutes',
+    excerpt:
+      'Step-by-step walkthrough: create a BotFather token, configure it on Hatcher, and have a live AI Telegram bot running in under two minutes.',
+    content: `<p>Telegram bots are one of the fastest ways to deploy a useful AI agent. With Hatcher, you can go from zero to a live, AI-powered Telegram bot in under two minutes. This guide walks you through every step.</p>
+
+<h2>What You'll Need</h2>
+<ul>
+<li>A Telegram account (mobile app or web)</li>
+<li>A free Hatcher account — <a href="https://hatcher.host/register">sign up here</a>, no credit card needed</li>
+</ul>
+<p>That's it. The LLM is provided by Hatcher (20 messages/day on free tier). If you want unlimited messages, add a free Groq API key at the end.</p>
+
+<h2>Step 1: Get a Bot Token from BotFather (60 seconds)</h2>
+<p>Open Telegram and search for <strong>@BotFather</strong> — the official bot for creating bots.</p>
+<ol>
+<li>Start a chat with @BotFather</li>
+<li>Send <code>/newbot</code></li>
+<li>Choose a display name for your bot (e.g., "My AI Assistant")</li>
+<li>Choose a username — must end in <code>bot</code> (e.g., <code>myai_assistant_bot</code>)</li>
+<li>BotFather replies with your bot token — it looks like <code>1234567890:ABCdefGhIJKlmNOPqrsTUVwxyz</code></li>
+</ol>
+<p>Copy that token. You'll need it in the next step.</p>
+
+<h2>Step 2: Deploy on Hatcher (60 seconds)</h2>
+<ol>
+<li>Log in to <a href="https://hatcher.host">hatcher.host</a></li>
+<li>Click <strong>Create Agent</strong></li>
+<li>Choose a framework — <strong>OpenClaw</strong> is recommended for Telegram bots</li>
+<li>Give your agent a name and description</li>
+<li>In the <strong>Integrations</strong> section, paste your Telegram bot token</li>
+<li>Click <strong>Deploy</strong></li>
+</ol>
+<p>Hatcher builds the container, starts the agent, and connects it to Telegram. The whole process takes under 30 seconds.</p>
+
+<h2>Step 3: Test It</h2>
+<p>Open Telegram and search for your bot by username. Send it a message — any message. It should reply almost instantly using the default AI model (Llama 4 Scout via Groq).</p>
+<p>The default system prompt makes the agent a general-purpose assistant. You can customize it from the <strong>Config</strong> tab in your Hatcher dashboard.</p>
+
+<h2>Customizing Your Bot</h2>
+<p>From the dashboard Config tab you can change:</p>
+<ul>
+<li><strong>System Prompt</strong> — define the bot's personality, role, and knowledge</li>
+<li><strong>Model</strong> — switch to GPT-4, Claude, Gemini, or any BYOK provider</li>
+<li><strong>Tools</strong> — enable web search (via Tavily), file access, memory, and more</li>
+<li><strong>Welcome Message</strong> — the first message users see when they start the bot</li>
+</ul>
+
+<h2>Adding a Groq Key for Unlimited Messages</h2>
+<p>The free tier includes 20 messages per day using our hosted Groq key. If you want unlimited messages:</p>
+<ol>
+<li>Get a free API key at <a href="https://console.groq.com">console.groq.com</a></li>
+<li>In your agent's Config tab, find <strong>BYOK Settings</strong></li>
+<li>Set provider to <code>groq</code> and paste your key</li>
+<li>Click Save — unlimited messages from this point on, for free</li>
+</ol>
+
+<h2>Going Further</h2>
+<p>Once your Telegram bot is running, you can extend it in minutes:</p>
+<ul>
+<li>Add it to a Telegram group and it will respond to mentions or all messages (configurable)</li>
+<li>Connect the same agent to Discord, Twitter, or WhatsApp — one agent, multiple platforms</li>
+<li>Enable the memory tool so your bot remembers conversations across sessions</li>
+<li>Use the workflow editor to build multi-step automations triggered by messages</li>
+</ul>
+<p>Your first agent is free. <a href="https://hatcher.host/register">Start building now.</a></p>`,
+    author: 'Hatcher Labs',
+    date: '2026-03-27',
+    category: 'Tutorial',
+    readTime: '4 min',
+    coverImageDescription: 'A smartphone showing the Telegram app with an AI chat bubble, connected by a glowing line to a server rack with the Hatcher logo, dark blue and purple tones',
+  },
+  {
+    slug: 'openclaw-vs-hermes-elizaos-milady',
+    title: 'OpenClaw vs Hermes vs ElizaOS vs Milady: Which Framework?',
+    excerpt:
+      'A practical comparison of all four AI agent frameworks on Hatcher — when to use each, what they are good at, and how to choose.',
+    content: `<p>Hatcher supports four AI agent frameworks: <strong>OpenClaw</strong>, <strong>Hermes</strong>, <strong>ElizaOS</strong>, and <strong>Milady</strong>. They are all fully deployable on Hatcher, but they have very different strengths, philosophies, and use cases. This guide will help you pick the right one.</p>
+
+<h2>The Short Version</h2>
+<ul>
+<li><strong>OpenClaw</strong> — Maximum integrations. Best for community bots and multi-platform deployments.</li>
+<li><strong>Hermes</strong> — Autonomous task execution. Best for research, coding, and agentic workflows.</li>
+<li><strong>ElizaOS</strong> — Multi-agent runtime. Best for crypto projects and complex agent orchestration.</li>
+<li><strong>Milady</strong> — Lightweight and fast. Best for simple deployments and resource-constrained use cases.</li>
+</ul>
+
+<h2>OpenClaw</h2>
+<p>OpenClaw is the most integration-rich framework on Hatcher. It ships with 20+ platform connectors out of the box and a community plugin ecosystem with over 13,700 skills.</p>
+<h3>Strengths</h3>
+<ul>
+<li>20+ platform integrations (Telegram, Discord, Twitter, WhatsApp, Slack, and more)</li>
+<li>Plugin architecture — install community skills or write your own</li>
+<li>Multi-model support — swap LLMs without changing your configuration</li>
+<li>Mature project with extensive documentation</li>
+</ul>
+<h3>Best For</h3>
+<p>Community management bots, social media agents, customer support deployments, and any use case where you need the agent connected to multiple platforms simultaneously.</p>
+<h3>Not Ideal For</h3>
+<p>Pure agentic task execution (Hermes is better) or crypto-native projects (ElizaOS has better on-chain tooling).</p>
+
+<h2>Hermes</h2>
+<p>Hermes is NousResearch's agent framework, designed for autonomous task execution rather than reactive chatbot behavior. It ships with persistent memory, 40+ built-in tools, and a SOUL.md identity file system.</p>
+<h3>Strengths</h3>
+<ul>
+<li>40+ built-in tools — web search, file management, code execution, API calls</li>
+<li>Persistent memory across sessions</li>
+<li>SOUL.md identity files — define your agent's personality and knowledge in a markdown file</li>
+<li>Strong at multi-step, autonomous task completion</li>
+</ul>
+<h3>Best For</h3>
+<p>Research assistants, coding agents, autonomous workflow runners, and any scenario where the agent needs to take a sequence of actions without constant human guidance.</p>
+<h3>Not Ideal For</h3>
+<p>High-volume community chat moderation (OpenClaw handles that better) or running multiple coordinated agents (ElizaOS excels there).</p>
+
+<h2>ElizaOS</h2>
+<p>ElizaOS is a multi-agent runtime with 350+ plugins and deep blockchain-native tooling. Originally built for the ai16z ecosystem, it has grown into a general-purpose framework with strong crypto and DeFi integrations.</p>
+<h3>Strengths</h3>
+<ul>
+<li>350+ plugins covering DeFi, NFTs, on-chain analytics, and more</li>
+<li>Multi-agent support — run multiple coordinated agents in one container</li>
+<li>Native Solana and EVM integrations</li>
+<li>Active development with a large open-source community</li>
+</ul>
+<h3>Best For</h3>
+<p>Crypto projects, DeFi automation, NFT community management, and any use case that requires deep on-chain integration or running multiple agents in coordination.</p>
+<h3>Not Ideal For</h3>
+<p>Simple single-bot deployments (the complexity overhead is not worth it) or pure task execution (Hermes is lighter and more focused).</p>
+
+<h2>Milady</h2>
+<p>Milady is the newest addition to Hatcher's framework lineup. It is built for simplicity and speed — minimal dependencies, fast startup, and a clean configuration model that prioritizes developer experience over feature breadth.</p>
+<h3>Strengths</h3>
+<ul>
+<li>Extremely fast startup and low memory footprint</li>
+<li>Simple configuration — one YAML file defines everything</li>
+<li>Built-in support for Telegram, Discord, and REST API</li>
+<li>Easy to extend with custom handlers</li>
+</ul>
+<h3>Best For</h3>
+<p>Lightweight deployments, hobby projects, agents where startup speed matters, and teams that want minimal cognitive overhead when managing multiple agents.</p>
+<h3>Not Ideal For</h3>
+<p>Complex multi-platform deployments or crypto-native use cases (use OpenClaw or ElizaOS instead).</p>
+
+<h2>Feature Comparison</h2>
+<p>Here is a quick reference matrix:</p>
+<table>
+<thead><tr><th>Feature</th><th>OpenClaw</th><th>Hermes</th><th>ElizaOS</th><th>Milady</th></tr></thead>
+<tbody>
+<tr><td>Platform connectors</td><td>20+</td><td>5+</td><td>15+</td><td>3</td></tr>
+<tr><td>Built-in tools</td><td>Plugin-based</td><td>40+</td><td>350+ plugins</td><td>Custom handlers</td></tr>
+<tr><td>Multi-agent</td><td>No</td><td>No</td><td>Yes</td><td>No</td></tr>
+<tr><td>Persistent memory</td><td>Yes</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+<tr><td>Crypto/DeFi tooling</td><td>Limited</td><td>Limited</td><td>Extensive</td><td>No</td></tr>
+<tr><td>Resource footprint</td><td>Medium</td><td>Medium</td><td>High</td><td>Low</td></tr>
+<tr><td>Learning curve</td><td>Medium</td><td>Medium</td><td>High</td><td>Low</td></tr>
+</tbody>
+</table>
+
+<h2>Which Should You Choose?</h2>
+<p>If you are not sure, start with <strong>OpenClaw</strong>. It has the broadest integration support, a large community, and sensible defaults for most use cases. You can always migrate to a different framework later — Hatcher makes it easy to redeploy with a different framework config.</p>
+<p>If you are building something crypto-native, go <strong>ElizaOS</strong>. If you need autonomous task execution without platform noise, go <strong>Hermes</strong>. If you want something simple and fast, go <strong>Milady</strong>.</p>
+<p>All frameworks are available on the free tier. <a href="https://hatcher.host/create">Try them at hatcher.host/create.</a></p>`,
+    author: 'Hatcher Labs',
+    date: '2026-03-26',
+    category: 'Comparison',
+    readTime: '7 min',
+    coverImageDescription: 'Four distinct robot characters side by side, each representing a different AI framework with unique visual styles, glowing purple and cyan on dark background',
+  },
+  {
+    slug: 'state-of-ai-agent-hosting-2026',
+    title: 'The State of AI Agent Hosting in 2026',
+    excerpt:
+      'Self-hosting AI agents has become untenable for most teams. Here is why managed agent hosting is the next infrastructure layer.',
+    content: `<p>In 2026, running an AI agent in production is simultaneously easier and harder than ever. The models have never been better. The tooling has never been more mature. And yet, the operational complexity of keeping an agent alive, reliable, and cost-effective is still a significant engineering burden for most teams.</p>
+
+<p>This is the problem managed agent hosting solves — and why we think it is becoming a distinct infrastructure category.</p>
+
+<h2>The Self-Hosting Tax</h2>
+<p>If you want to run your own AI agent today, here is what you are taking on:</p>
+<ul>
+<li><strong>Infrastructure provisioning</strong> — VPS or cloud VM, Dockerfile, CI/CD pipeline</li>
+<li><strong>Process management</strong> — PM2, systemd, or Kubernetes depending on scale</li>
+<li><strong>LLM routing</strong> — proxy layer to handle rate limits, fallbacks, cost tracking</li>
+<li><strong>Platform integrations</strong> — Telegram bots, Discord bots, webhook endpoints — each with their own auth models and connection patterns</li>
+<li><strong>Uptime monitoring</strong> — alerts when the agent crashes, auto-restart logic</li>
+<li><strong>Resource management</strong> — agents with persistent memory and tool calls can use significant RAM; you need to size correctly</li>
+<li><strong>Security</strong> — isolating agent credentials, preventing container escapes, rate-limiting incoming messages</li>
+</ul>
+<p>For a senior infrastructure engineer, this is manageable. For a developer who just wants to ship an agent, it is a full week of work before the first useful message gets sent.</p>
+
+<h2>The Framework Fragmentation Problem</h2>
+<p>The agent framework ecosystem has also fragmented. OpenClaw, Hermes, ElizaOS, Milady, AutoGPT, CrewAI, Langchain agents, Autogen, and others all have different configuration models, different deployment patterns, and different assumptions about what infrastructure they run on.</p>
+<p>This fragmentation means that if you switch frameworks — which teams often do as their requirements evolve — you often have to rebuild your entire deployment pipeline from scratch.</p>
+
+<h2>The Emerging Solution: Managed Agent Hosting</h2>
+<p>Managed agent hosting abstracts away the operational layer entirely. You bring your framework config, your integrations, and your LLM key. The platform handles:</p>
+<ul>
+<li>Container lifecycle (build, start, stop, restart)</li>
+<li>Resource allocation (CPU, RAM per agent)</li>
+<li>Auto-sleep and auto-wake to minimize costs</li>
+<li>LLM proxying and rate limiting</li>
+<li>Platform integration management</li>
+<li>Logs, metrics, and status monitoring</li>
+</ul>
+<p>This is the same shift that happened with application hosting (Heroku), then serverless (Lambda), then database hosting (PlanetScale, Supabase). Infrastructure abstraction follows demand.</p>
+
+<h2>What This Enables</h2>
+<p>When you remove the operational overhead, interesting things happen:</p>
+<h3>Faster Iteration</h3>
+<p>Changing a system prompt, swapping a model, or adding a new integration goes from a multi-hour deploy cycle to a sub-minute config update. Teams can experiment with agent behavior in production without infrastructure anxiety.</p>
+<h3>Lower Barrier to Entry</h3>
+<p>Non-engineers can deploy and manage agents. A product manager can configure a customer support agent without filing a DevOps ticket. A founder can spin up a community bot for their token launch without hiring a backend engineer.</p>
+<h3>The Agent Marketplace</h3>
+<p>When deploying an agent is as easy as clicking a button, a marketplace for pre-built agents becomes viable. Creators can build specialized agents (crypto trading monitors, content schedulers, support bots tuned to specific industries) and earn revenue by renting them to users who need that functionality without the build time.</p>
+<p>This is what <a href="https://hatcher.markets">hatcher.markets</a> is beginning to explore — an economy where agent expertise is a tradeable asset.</p>
+
+<h2>The BYOK Inflection Point</h2>
+<p>One of the most important trends in 2026 is the normalization of BYOK (Bring Your Own Key) LLM access. As model providers have proliferated and prices have dropped, most serious users already have direct relationships with one or more LLM providers.</p>
+<p>Managed hosting platforms that lock users into a proprietary LLM stack are adding friction without adding value. The right model is to offer a hosted LLM path for convenience and a BYOK path for users who want control. When BYOK is combined with managed infrastructure, you get the best of both worlds: infrastructure you do not have to manage, and compute costs you control directly.</p>
+
+<h2>Where This Goes</h2>
+<p>The trajectory is clear: AI agent hosting will mature into a standard infrastructure category, the same way container hosting, database-as-a-service, and CDNs did before it. The platforms that win will be the ones that:</p>
+<ul>
+<li>Support multiple frameworks without vendor lock-in</li>
+<li>Make BYOK a first-class citizen</li>
+<li>Offer a meaningful free tier for experimentation</li>
+<li>Build marketplace infrastructure that lets agent creators monetize their work</li>
+</ul>
+<p>We are building Hatcher to be that platform. If you want to see where agent hosting is headed, <a href="https://hatcher.host/register">sign up and deploy your first agent for free.</a></p>`,
+    author: 'Hatcher Labs',
+    date: '2026-03-25',
+    category: 'Industry',
+    readTime: '8 min',
+    coverImageDescription: 'A skyline of server towers glowing with AI agent icons floating above them, connected by data streams, dark futuristic aesthetic with purple and amber accents',
+  },
+  {
     slug: 'ai-agent-rental-marketplace',
     title: 'AI Agent Rental Marketplace: A New Economy',
     excerpt:
