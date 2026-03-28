@@ -46,11 +46,13 @@ const MOBILE_AUTH_LINKS = [
   { href: '/explore',             label: 'Explore' },
   { href: '/create',              label: 'Create' },
   { href: '/pricing',             label: 'Pricing' },
+  { href: '/changelog',           label: 'Changelog' },
 ];
 
 // ── Mobile links (when logged out) ──
 const MOBILE_GUEST_LINKS = [
-  { href: '/pricing', label: 'Pricing' },
+  { href: '/pricing',   label: 'Pricing' },
+  { href: '/changelog', label: 'Changelog' },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -190,7 +192,7 @@ export function Header() {
               <span className="w-px h-4 bg-white/[0.08] mx-1" aria-hidden="true" />
             )}
 
-            {/* Auxiliary links: Pricing + Docs (always visible) */}
+            {/* Auxiliary links: Pricing + Changelog + Docs (always visible) */}
             {AUX_LINKS.map((link) => {
               const active = !link.external && isActive(pathname, link.href);
               const Comp = link.external ? 'a' : Link;
@@ -203,12 +205,17 @@ export function Header() {
                   {...extraProps}
                   aria-current={active ? 'page' : undefined}
                   className={clsx(
-                    'relative px-3 py-1.5 text-sm rounded-lg transition-colors duration-200',
+                    'relative flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg transition-colors duration-200',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500',
                     active ? 'text-white' : 'text-[#71717a] hover:text-white'
                   )}
                 >
                   {link.label}
+                  {link.badge && (
+                    <span className="px-1.5 py-px text-[9px] font-semibold uppercase tracking-wider rounded-full bg-purple-500/15 text-purple-400 border border-purple-500/30">
+                      {link.badge}
+                    </span>
+                  )}
                   {active && (
                     <motion.div
                       className="absolute -bottom-[9px] left-1/2 -translate-x-1/2 w-5 h-0.5 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(139,92,246,0.5)]"
