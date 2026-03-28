@@ -403,7 +403,7 @@ export function Header() {
                     <div className="px-3 py-2 flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
                       <span className="text-sm font-medium text-purple-300">{user.username}</span>
-                      <span className="text-[10px] text-[#a1a1aa] ml-auto">{user.email}</span>
+                      <span className="text-[10px] text-[#a1a1aa] ml-auto truncate max-w-[150px]">{user.email}</span>
                     </div>
                     <Link href="/dashboard/team" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[#71717a] hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
                       <Users className="w-4 h-4" /> Team

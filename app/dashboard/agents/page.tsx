@@ -381,7 +381,7 @@ export default function MyAgentsPage() {
               <button
                 key={f.key}
                 onClick={() => setStatusFilter(f.key as StatusFilter)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                className={`px-3.5 py-2 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer ${
                   statusFilter === f.key
                     ? 'bg-purple-500/15 text-white shadow-[0_0_8px_rgba(139,92,246,0.15)]'
                     : 'text-[#71717a] hover:text-white'

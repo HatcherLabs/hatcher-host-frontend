@@ -175,7 +175,7 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
       {/* Mobile toggle button */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-[72px] left-4 z-40 p-2 rounded-lg border border-[rgba(46,43,74,0.4)] bg-[#0a0a12]/90 backdrop-blur-sm text-[#A5A1C2] hover:text-white transition-colors cursor-pointer"
+        className="lg:hidden fixed top-[68px] left-3 z-40 w-11 h-11 flex items-center justify-center rounded-lg border border-[rgba(46,43,74,0.4)] bg-[#0a0a12]/90 backdrop-blur-sm text-[#A5A1C2] hover:text-white transition-colors cursor-pointer"
         aria-label="Open navigation"
       >
         <Menu size={20} />

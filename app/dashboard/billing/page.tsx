@@ -580,18 +580,18 @@ export default function BillingPage() {
               <div className="space-y-2">
                 {creditHistory.slice(0, 5).map((tx) => (
                   <div key={tx.id} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
                       <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${tx.amount > 0 ? 'bg-green-400' : 'bg-red-400'}`} />
-                      <span className="text-[var(--text-secondary)] text-xs truncate max-w-[200px]">
+                      <span className="text-[var(--text-secondary)] text-xs truncate">
                         {tx.description ?? tx.type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                       </span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 flex-shrink-0 ml-2">
                       <span className={`text-xs font-semibold tabular-nums ${tx.amount > 0 ? 'text-green-400' : 'text-red-400'}`}
                         style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}>
                         {tx.amount > 0 ? '+' : ''}${tx.amount.toFixed(2)}
                       </span>
-                      <span className="text-[10px] text-[var(--text-muted)] whitespace-nowrap">
+                      <span className="text-[10px] text-[var(--text-muted)] whitespace-nowrap hidden sm:inline">
                         {formatDate(tx.createdAt)}
                       </span>
                     </div>
