@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none">
+  <defs>
+    <linearGradient id="shell" x1="16" y1="3" x2="16" y2="29" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2a2a38"/>
+      <stop offset="50%" stop-color="#1a1a22"/>
+      <stop offset="100%" stop-color="#141419"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="40%" r="45%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="32" height="32" rx="7" fill="#0a0a0f"/>
+  <path d="M16 5 C10 5, 6 11.5, 6 17 C6 23, 10.5 28, 16 28 C21.5 28, 26 23, 26 17 C26 11.5, 22 5, 16 5Z" fill="url(#shell)" stroke="#8b5cf6" stroke-opacity="0.6" stroke-width="1"/>
+  <path d="M16 5 C10 5, 6 11.5, 6 17 C6 23, 10.5 28, 16 28 C21.5 28, 26 23, 26 17 C26 11.5, 22 5, 16 5Z" fill="url(#glow)"/>
+  <path d="M12 16 L14 14 L12.5 12 L15 10 L13.5 8" stroke="#8b5cf6" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.7"/>
+  <circle cx="13.5" cy="12.5" r="2" fill="#8b5cf6" opacity="0.35"/>
+</svg>
