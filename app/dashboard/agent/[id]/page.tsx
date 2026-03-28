@@ -7,9 +7,8 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { api, getToken } from '@/lib/api';
 import type { Agent, AgentFeature } from '@/lib/api';
-import { sendSolPayment, usdToSol } from '@/lib/solana-pay';
 import { useAuth } from '@/lib/auth-context';
-import { getInitials, stringToColor, timeAgo } from '@/lib/utils';
+import { getInitials, stringToColor } from '@/lib/utils';
 import { FRAMEWORKS, TIERS, getBYOKProvider } from '@hatcher/shared';
 import type { UserTierKey } from '@hatcher/shared';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -20,20 +19,7 @@ import {
   Square,
   RotateCcw,
   Trash2,
-  MessageSquare,
   Settings,
-  Puzzle,
-  ScrollText,
-  LayoutDashboard,
-  BarChart3,
-  FolderOpen,
-  Brain,
-  Clock,
-  BookOpen,
-  Sparkles,
-  GitMerge,
-  History,
-  ChevronDown,
 } from 'lucide-react';
 import {
   AgentContext,
@@ -48,10 +34,9 @@ import {
   integrationStateKey,
   Skeleton,
   STATUS_STYLES,
-  FRAMEWORK_BADGE,
   pageEntranceVariants,
 } from '@/components/agents/AgentContext';
-import { AgentTabBar } from '@/components/agents/AgentTabBar';
+import { AgentSidebar } from '@/components/agents/AgentSidebar';
 import dynamic from 'next/dynamic';
 
 // Dynamically import tab components — only the active tab JS is loaded
@@ -131,27 +116,6 @@ const VersionsTab = dynamic(
 );
 
 // ─── Tab definitions ─────────────────────────────────────────
-
-// Core tabs always visible
-const CORE_TABS: Tab[] = ['overview', 'chat', 'config', 'logs', 'stats'];
-
-function getTabs(framework?: string): { id: Tab; label: string; icon: React.ReactNode }[] {
-  return [
-    { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={16} /> },
-    { id: 'chat', label: 'Chat', icon: <MessageSquare size={16} /> },
-    { id: 'config', label: 'Config', icon: <Settings size={16} /> },
-    { id: 'logs', label: 'Logs', icon: <ScrollText size={16} /> },
-    { id: 'stats', label: 'Stats', icon: <BarChart3 size={16} /> },
-    { id: 'integrations', label: 'Integrations', icon: <Puzzle size={16} /> },
-    { id: 'skills', label: framework === 'elizaos' ? 'Plugins' : 'Skills', icon: <Sparkles size={16} /> },
-    { id: 'memory', label: 'Memory', icon: <Brain size={16} /> },
-    { id: 'knowledge', label: 'Knowledge', icon: <BookOpen size={16} /> },
-    { id: 'files', label: 'Files', icon: <FolderOpen size={16} /> },
-    { id: 'schedules', label: 'Schedules', icon: <Clock size={16} /> },
-    { id: 'workflows', label: 'Workflows', icon: <GitMerge size={16} /> },
-    { id: 'versions', label: 'Versions', icon: <History size={16} /> },
-  ];
-}
 
 // ─── Main Component ─────────────────────────────────────────
 
@@ -864,43 +828,40 @@ export default function AgentManagePage() {
   return (
     <AgentContext.Provider value={contextValue}>
       <motion.div
-        className="mx-auto max-w-5xl px-4 py-8 min-h-screen"
+        className="flex"
+        style={{ minHeight: 'calc(100vh - 64px)' }}
         variants={pageEntranceVariants}
         initial="hidden"
         animate="visible"
       >
-        {/* ─── Header Area ──────────────────────────────────── */}
-        <div className="mb-8">
-          <Link
-            href="/dashboard/agents"
-            className="inline-flex items-center gap-1.5 text-sm mb-5 text-[#A5A1C2] transition-colors hover:text-[#FFFFFF]"
-          >
-            <ArrowLeft size={16} />
-            Back to Agents
-          </Link>
+        {/* ─── Sidebar ──────────────────────────────────────── */}
+        <AgentSidebar agent={agent} activeTab={tab} onTabChange={setTab} />
 
-          <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-            {/* Avatar */}
-            <div className="relative group flex-shrink-0">
+        {/* ─── Main Content ─────────────────────────────────── */}
+        <div className="flex-1 min-w-0 flex flex-col">
+          {/* Top action bar */}
+          <div className="px-4 sm:px-6 py-3 border-b border-[rgba(46,43,74,0.3)] flex items-center gap-3 flex-wrap">
+            {/* Avatar with upload */}
+            <div className="relative group flex-shrink-0 hidden sm:block">
               {agent.avatarUrl ? (
                 <img
                   src={agent.avatarUrl}
                   alt={agent.name}
-                  className="w-16 h-16 rounded-full object-cover border border-[rgba(46,43,74,0.3)]"
+                  className="w-7 h-7 rounded-full object-cover border border-[rgba(46,43,74,0.3)]"
                 />
               ) : (
                 <div
-                  className={`w-16 h-16 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-bold text-xl border border-[rgba(46,43,74,0.3)]`}
+                  className={`w-7 h-7 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-bold text-[10px] border border-[rgba(46,43,74,0.3)]`}
                 >
                   {initials}
                 </div>
               )}
               <label
                 htmlFor="avatar-upload"
-                className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                className="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                 title="Change avatar"
               >
-                <Settings size={18} className="text-white" />
+                <Settings size={10} className="text-white" />
               </label>
               <input
                 id="avatar-upload"
@@ -930,54 +891,48 @@ export default function AgentManagePage() {
               />
             </div>
 
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-3 mb-1">
-                <h1 className="text-2xl font-bold text-[#FFFFFF]">{agent.name}</h1>
-                <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border ${statusInfo.classes}`}>
-                  {statusInfo.pulse && (
-                    <span className="relative flex h-2 w-2">
-                      <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${statusInfo.dotColor} opacity-75`} />
-                      <span className={`relative inline-flex rounded-full h-2 w-2 ${statusInfo.dotColor}`} />
-                    </span>
-                  )}
-                  {statusInfo.label}
+            {/* Agent name */}
+            <h1 className="text-sm font-semibold text-[#FFFFFF] truncate max-w-[160px] sm:max-w-xs">{agent.name}</h1>
+
+            {/* Status badge */}
+            <span className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border flex-shrink-0 ${statusInfo.classes}`}>
+              {statusInfo.pulse && (
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${statusInfo.dotColor} opacity-75`} />
+                  <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${statusInfo.dotColor}`} />
                 </span>
-                <span className={`text-xs px-2.5 py-1 rounded-full border ${FRAMEWORK_BADGE[agent.framework] ?? 'bg-slate-500/15 text-slate-400 border-slate-500/30'}`}>
-                  {frameworkMeta?.name ?? agent.framework}
-                </span>
-              </div>
-              {agent.description && (
-                <p className="text-sm mt-1 text-[#A5A1C2]">{agent.description}</p>
               )}
-              <p className="text-xs mt-1.5 text-[#71717a]">Created {timeAgo(agent.createdAt)}</p>
-            </div>
+              {statusInfo.label}
+            </span>
+
+            {/* Spacer */}
+            <div className="flex-1" />
 
             {/* Action buttons */}
-            <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
+            <div className="flex items-center gap-2 flex-shrink-0">
               {isActive && (
                 <>
                   <button
                     onClick={() => handleAction('restart')}
                     disabled={actionLoading === 'restart'}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 text-xs rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#06b6d4]/40 hover:bg-[#06b6d4]/10 transition-all disabled:opacity-40"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#06b6d4]/40 hover:bg-[#06b6d4]/10 transition-all disabled:opacity-40"
                     title="Restart agent"
                   >
-                    <RotateCcw size={14} className={actionLoading === 'restart' ? 'animate-spin' : ''} />
-                    {actionLoading === 'restart' ? 'Restarting...' : 'Restart'}
+                    <RotateCcw size={13} className={actionLoading === 'restart' ? 'animate-spin' : ''} />
+                    <span className="hidden sm:inline">{actionLoading === 'restart' ? 'Restarting...' : 'Restart'}</span>
                   </button>
                   <button
                     onClick={() => handleAction('stop')}
                     disabled={actionLoading === 'stop'}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 text-xs rounded-lg border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 transition-all disabled:opacity-40"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 transition-all disabled:opacity-40"
                     title="Stop agent"
                   >
                     {actionLoading === 'stop' ? (
-                      <div className="w-3.5 h-3.5 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
+                      <div className="w-3 h-3 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
                     ) : (
-                      <Square size={14} />
+                      <Square size={13} />
                     )}
-                    {actionLoading === 'stop' ? 'Stopping...' : 'Stop'}
+                    <span className="hidden sm:inline">{actionLoading === 'stop' ? 'Stopping...' : 'Stop'}</span>
                   </button>
                 </>
               )}
@@ -985,29 +940,29 @@ export default function AgentManagePage() {
                 <button
                   onClick={() => handleAction('start')}
                   disabled={actionLoading === 'start'}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 text-xs rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-all disabled:opacity-40"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-all disabled:opacity-40"
                   title="Start agent"
                 >
                   {actionLoading === 'start' ? (
-                    <div className="w-3.5 h-3.5 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
+                    <div className="w-3 h-3 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
                   ) : (
-                    <Play size={14} />
+                    <Play size={13} />
                   )}
-                  {actionLoading === 'start' ? 'Starting...' : 'Start'}
+                  <span className="hidden sm:inline">{actionLoading === 'start' ? 'Starting...' : 'Start'}</span>
                 </button>
               )}
               <button
                 onClick={handleDelete}
                 disabled={deleting}
-                className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs rounded-lg border transition-all disabled:opacity-40 ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border transition-all disabled:opacity-40 ${
                   deleteConfirm
                     ? 'bg-red-500 text-white border-red-500 hover:bg-red-600'
                     : 'border-red-500/30 text-red-400 hover:bg-red-500/10'
                 }`}
                 title="Delete agent"
               >
-                <Trash2 size={14} />
-                {deleting ? 'Deleting...' : deleteConfirm ? 'Confirm Delete' : 'Delete'}
+                <Trash2 size={13} />
+                <span className="hidden sm:inline">{deleting ? 'Deleting...' : deleteConfirm ? 'Confirm' : 'Delete'}</span>
               </button>
               {deleteConfirm && !deleting && (
                 <button
@@ -1018,34 +973,31 @@ export default function AgentManagePage() {
                 </button>
               )}
             </div>
-            {deleteError && (
-              <p className="text-xs text-red-400 mt-2">{deleteError}</p>
-            )}
-            {deleteError && (
-              <p className="text-xs text-red-400 mt-2">{deleteError}</p>
-            )}
+          </div>
+
+          {deleteError && (
+            <p className="text-xs text-red-400 px-6 py-2 border-b border-[rgba(46,43,74,0.2)]">{deleteError}</p>
+          )}
+
+          {/* ─── Tab Content ──────────────────────────────────── */}
+          <div className="flex-1 px-4 sm:px-6 py-6 min-w-0">
+            <AnimatePresence mode="wait">
+              {tab === 'overview' && <OverviewTab />}
+              {tab === 'config' && <ConfigTab />}
+              {tab === 'integrations' && <IntegrationsTab />}
+              {tab === 'skills' && <SkillsTab />}
+              {tab === 'files' && <FilesTab />}
+              {tab === 'logs' && <LogsTab />}
+              {tab === 'memory' && <MemoryTab />}
+              {tab === 'knowledge' && <KnowledgeTab />}
+              {tab === 'schedules' && <SchedulesTab />}
+              {tab === 'workflows' && <WorkflowsTab />}
+              {tab === 'versions' && <VersionsTab />}
+              {tab === 'chat' && <ChatTab />}
+              {tab === 'stats' && <StatsTab />}
+            </AnimatePresence>
           </div>
         </div>
-
-        {/* ─── Tab Bar ──────────────────────────────────────── */}
-        <AgentTabBar tabs={getTabs(agent?.framework)} activeTab={tab} onTabChange={setTab} />
-
-        {/* ─── Tab Content ──────────────────────────────────── */}
-        <AnimatePresence mode="wait">
-          {tab === 'overview' && <OverviewTab />}
-          {tab === 'config' && <ConfigTab />}
-          {tab === 'integrations' && <IntegrationsTab />}
-          {tab === 'skills' && <SkillsTab />}
-          {tab === 'files' && <FilesTab />}
-          {tab === 'logs' && <LogsTab />}
-          {tab === 'memory' && <MemoryTab />}
-          {tab === 'knowledge' && <KnowledgeTab />}
-          {tab === 'schedules' && <SchedulesTab />}
-          {tab === 'workflows' && <WorkflowsTab />}
-          {tab === 'versions' && <VersionsTab />}
-          {tab === 'chat' && <ChatTab />}
-          {tab === 'stats' && <StatsTab />}
-        </AnimatePresence>
       </motion.div>
     </AgentContext.Provider>
   );
