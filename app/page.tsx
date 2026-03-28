@@ -321,14 +321,14 @@ export default function LandingPage() {
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Link
                     href="/create"
-                    className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold px-8 py-4 rounded-full text-base hover:from-purple-500 hover:to-purple-400 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 shadow-lg shadow-purple-500/25"
+                    className="clay-btn-primary clay-btn-lg text-base"
                   >
                     Get Started Free
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                   <Link
                     href={DOCS_URL}
-                    className="inline-flex items-center justify-center gap-2 border border-white/[0.12] text-[#d4d4d8] font-medium px-7 py-4 rounded-full text-base hover:bg-white/[0.04] hover:border-white/20 transition-all duration-200"
+                    className="inline-flex items-center justify-center gap-2 border border-white/[0.12] text-[#d4d4d8] font-medium px-7 py-4 rounded-[20px] text-base hover:bg-white/[0.04] hover:border-white/20 transition-all duration-200"
                   >
                     View Docs
                   </Link>
@@ -947,7 +947,7 @@ export default function LandingPage() {
           >
             <Link
               href="/create"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-base sm:text-lg hover:from-purple-500 hover:to-purple-400 hover:scale-[1.03] active:scale-[0.97] transition-all duration-200 shadow-lg shadow-purple-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0f]"
+              className="clay-btn-primary clay-btn-lg text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
             >
               Create Your Agent
               <ArrowRight className="w-5 h-5" aria-hidden="true" />
