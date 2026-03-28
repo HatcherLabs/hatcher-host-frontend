@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { Inter, JetBrains_Mono, Sora } from 'next/font/google';
 import '@solana/wallet-adapter-react-ui/styles.css';
 import './globals.css';
@@ -34,6 +35,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
+  themeColor: '#8b5cf6',
 };
 
 export const metadata: Metadata = {
@@ -83,9 +85,20 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
     ],
   },
+  manifest: '/manifest.json',
   category: 'technology',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Hatcher',
+  },
 };
 
 const organizationJsonLd = {
@@ -170,6 +183,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
+        <Script src="/register-sw.js" strategy="afterInteractive" />
         <AuthProvider>
           <WalletProvider>
             <ToastProvider>
