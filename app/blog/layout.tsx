@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Blog — AI Agents, Deployment & More',
+  title: 'Blog',
   description:
     'Guides, tutorials, and insights about AI agents, deployment, and the Hatcher platform.',
   keywords: ['AI agent blog', 'agent deployment guide', 'LLM hosting', 'Hatcher tutorials', 'AI bot development'],

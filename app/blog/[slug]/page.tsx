@@ -14,7 +14,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = getBlogPost(slug);
-  if (!post) return { title: 'Post Not Found' };
+  if (!post) return { title: 'Not Found' };
   const ogImageUrl = `https://hatcher.host/og?title=${encodeURIComponent(post.title)}&subtitle=${encodeURIComponent(post.excerpt)}&tag=${encodeURIComponent(post.category)}`;
   return {
     title: post.title,

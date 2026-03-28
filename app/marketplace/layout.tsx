@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Templates — Browse AI Agent Templates',
+  title: 'Templates',
   description:
     'Browse and deploy pre-built AI agent templates on Hatcher. OpenClaw, Hermes, ElizaOS, and Milady templates ready to deploy in 60 seconds.',
   keywords: [
