@@ -421,10 +421,22 @@ export function SchedulesTab() {
       {/* Empty State */}
       {!loading && !error && jobs.length === 0 && (
         <GlassCard>
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <Clock size={32} className="text-[#71717a] mb-3" />
-            <p className="text-sm text-[#a1a1aa]">No scheduled tasks.</p>
-            <p className="text-xs text-[#52525b] mt-1">Create one to automate your agent.</p>
+          <div className="flex flex-col items-center justify-center py-14 text-center">
+            <div className="w-16 h-16 rounded-full bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mb-4">
+              <Clock size={28} className="text-[#06b6d4]" />
+            </div>
+            <p className="text-base font-semibold text-white mb-1">No scheduled tasks</p>
+            <p className="text-sm text-[#71717a] max-w-xs mb-5">
+              Automate your agent with scheduled tasks — send messages, run commands, or trigger workflows on a cron schedule.
+            </p>
+            <button
+              onClick={() => setShowForm(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
+              style={{ background: '#06b6d4', boxShadow: '0 4px 16px rgba(6,182,212,0.3)' }}
+            >
+              <Plus size={16} />
+              Create Your First Schedule
+            </button>
           </div>
         </GlassCard>
       )}

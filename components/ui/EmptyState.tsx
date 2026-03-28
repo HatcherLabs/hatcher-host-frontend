@@ -8,8 +8,9 @@ interface EmptyStateProps {
   icon: LucideIcon;
   title: string;
   description: string;
-  actionLabel: string;
-  actionHref: string;
+  actionLabel?: string;
+  actionHref?: string;
+  onAction?: () => void;
   secondaryLabel?: string;
   secondaryHref?: string;
 }
@@ -20,6 +21,7 @@ export function EmptyState({
   description,
   actionLabel,
   actionHref,
+  onAction,
   secondaryLabel,
   secondaryHref,
 }: EmptyStateProps) {
@@ -84,37 +86,52 @@ export function EmptyState({
       </motion.p>
 
       {/* Action buttons */}
-      <motion.div
-        className="flex items-center gap-3"
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.4 }}
-      >
-        <Link
-          href={actionHref}
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
-          style={{
-            background: '#06b6d4',
-            boxShadow: '0 4px 16px rgba(6,182,212,0.3)',
-          }}
+      {(actionLabel && (actionHref || onAction)) && (
+        <motion.div
+          className="flex items-center gap-3"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.4 }}
         >
-          {actionLabel}
-        </Link>
+          {actionHref ? (
+            <Link
+              href={actionHref}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
+              style={{
+                background: '#06b6d4',
+                boxShadow: '0 4px 16px rgba(6,182,212,0.3)',
+              }}
+            >
+              {actionLabel}
+            </Link>
+          ) : onAction ? (
+            <button
+              onClick={onAction}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
+              style={{
+                background: '#06b6d4',
+                boxShadow: '0 4px 16px rgba(6,182,212,0.3)',
+              }}
+            >
+              {actionLabel}
+            </button>
+          ) : null}
 
-        {secondaryLabel && secondaryHref && (
-          <Link
-            href={secondaryHref}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all hover:opacity-80 border"
-            style={{
-              color: '#A5A1C2',
-              borderColor: 'rgba(46,43,74,0.6)',
-              background: 'rgba(255,255,255,0.02)',
-            }}
-          >
-            {secondaryLabel}
-          </Link>
-        )}
-      </motion.div>
+          {secondaryLabel && secondaryHref && (
+            <Link
+              href={secondaryHref}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all hover:opacity-80 border"
+              style={{
+                color: '#A5A1C2',
+                borderColor: 'rgba(46,43,74,0.6)',
+                background: 'rgba(255,255,255,0.02)',
+              }}
+            >
+              {secondaryLabel}
+            </Link>
+          )}
+        </motion.div>
+      )}
     </motion.div>
   );
 }
