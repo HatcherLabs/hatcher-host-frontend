@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { FileQuestion, Bot } from 'lucide-react';
 
 export default function NotFound() {
   return (
@@ -9,8 +10,8 @@ export default function NotFound() {
       </div>
 
       <div className="card glass-noise text-center max-w-md p-10">
-        <div className="text-6xl mb-6">
-          &#x1F95A;
+        <div className="w-20 h-20 rounded-2xl bg-[#06b6d4]/10 flex items-center justify-center mx-auto mb-6">
+          <FileQuestion className="w-10 h-10 text-[#06b6d4]" />
         </div>
 
         <div className="font-semibold text-sm tracking-widest mb-3 uppercase text-[var(--accent-400)]">
@@ -33,10 +34,11 @@ export default function NotFound() {
             Go Home
           </Link>
           <Link
-            href="/explore"
-            className="btn-secondary px-6 py-3"
+            href="/dashboard/agents"
+            className="btn-secondary px-6 py-3 inline-flex items-center gap-2"
           >
-            Explore Agents
+            <Bot size={16} />
+            My Agents
           </Link>
         </div>
       </div>
