@@ -95,6 +95,8 @@ const TIER_STYLES: Record<UserTierKey, { accent: string; badge?: string; highlig
 
 /* ── Page ─────────────────────────────────────────────────── */
 export default function PricingPage() {
+  const [isAnnual, setIsAnnual] = useState(false);
+
   return (
     <motion.div
       className="min-h-screen"
@@ -123,6 +125,40 @@ export default function PricingPage() {
             Start free with any framework. Scale when you are ready.
             All integrations included. BYOK always free. Pay with SOL or platform tokens.
           </p>
+
+          {/* Monthly / Annual toggle */}
+          <motion.div
+            className="inline-flex items-center gap-3 mt-8 p-1 rounded-full bg-white/[0.04] border border-white/[0.06]"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+          >
+            <button
+              onClick={() => setIsAnnual(false)}
+              className={cn(
+                'px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200',
+                !isAnnual
+                  ? 'bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
+              )}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setIsAnnual(true)}
+              className={cn(
+                'px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-2',
+                isAnnual
+                  ? 'bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
+              )}
+            >
+              Annual
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-green-500/15 text-green-400 text-[10px] font-bold leading-none">
+                -20%
+              </span>
+            </button>
+          </motion.div>
         </motion.div>
 
         {/* TIER CARDS */}
@@ -136,6 +172,11 @@ export default function PricingPage() {
           {TIER_ORDER.map((tierKey) => {
             const tier = TIERS[tierKey];
             const style = TIER_STYLES[tierKey];
+            const monthlyPrice = tier.usdPrice;
+            const annualMonthlyPrice = monthlyPrice === 0 ? 0 : parseFloat((monthlyPrice * 0.8).toFixed(2));
+            const displayPrice = isAnnual ? annualMonthlyPrice : monthlyPrice;
+            const annualTotal = isAnnual && monthlyPrice > 0 ? parseFloat((annualMonthlyPrice * 12).toFixed(2)) : null;
+            const billingParam = isAnnual ? 'annual' : 'monthly';
 
             return (
               <motion.div
@@ -161,13 +202,41 @@ export default function PricingPage() {
                 <div className="mb-6">
                   <h3 className="text-xl font-bold text-[var(--text-primary)] mb-1">{tier.name}</h3>
                   <div className="flex items-baseline gap-1.5">
-                    <span className="text-4xl font-extrabold" style={{ color: style.accent }}>
-                      {tier.usdPrice === 0 ? 'Free' : `$${tier.usdPrice}`}
-                    </span>
-                    {tier.usdPrice > 0 && (
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={`${tierKey}-price-${isAnnual}`}
+                        className="text-4xl font-extrabold"
+                        style={{ color: style.accent }}
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 8 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {displayPrice === 0 ? 'Free' : `$${displayPrice}`}
+                      </motion.span>
+                    </AnimatePresence>
+                    {displayPrice > 0 && (
                       <span className="text-sm text-[var(--text-muted)]">/mo</span>
                     )}
                   </div>
+                  {annualTotal && (
+                    <motion.p
+                      className="text-[10px] text-[var(--text-muted)] mt-1"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                    >
+                      ${annualTotal} billed annually
+                      {' '}
+                      <span className="text-green-400 font-semibold">
+                        (save ${(monthlyPrice * 12 - annualTotal).toFixed(2)})
+                      </span>
+                    </motion.p>
+                  )}
+                  {!isAnnual && monthlyPrice > 0 && (
+                    <p className="text-[10px] text-[var(--text-muted)] mt-1">
+                      Switch to annual and save 20%
+                    </p>
+                  )}
                 </div>
 
                 {/* Feature list */}
@@ -211,15 +280,15 @@ export default function PricingPage() {
                 {/* CTA */}
                 {tierKey === 'free' ? (
                   <Link
-                    href="/register"
+                    href={`/register?tier=free`}
                     className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all border border-green-500/30 text-green-400 hover:bg-green-500/10"
                   >
                     <Rocket className="w-4 h-4" />
-                    Get Started
+                    Get Started Free
                   </Link>
                 ) : (
                   <Link
-                    href="/dashboard/billing"
+                    href={`/register?tier=${tierKey}&billing=${billingParam}`}
                     className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-white"
                     style={{
                       background: '#06b6d4',
@@ -227,7 +296,7 @@ export default function PricingPage() {
                     }}
                   >
                     <Zap className="w-4 h-4" />
-                    Subscribe
+                    Get {tier.name}
                   </Link>
                 )}
               </motion.div>
