@@ -961,7 +961,7 @@ export default function AgentManagePage() {
                     title="Restart agent"
                   >
                     <RotateCcw size={14} className={actionLoading === 'restart' ? 'animate-spin' : ''} />
-                    Restart
+                    {actionLoading === 'restart' ? 'Restarting...' : 'Restart'}
                   </button>
                   <button
                     onClick={() => handleAction('stop')}
@@ -969,8 +969,12 @@ export default function AgentManagePage() {
                     className="inline-flex items-center gap-1.5 px-3 py-2 text-xs rounded-lg border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 transition-all disabled:opacity-40"
                     title="Stop agent"
                   >
-                    <Square size={14} />
-                    Stop
+                    {actionLoading === 'stop' ? (
+                      <div className="w-3.5 h-3.5 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
+                    ) : (
+                      <Square size={14} />
+                    )}
+                    {actionLoading === 'stop' ? 'Stopping...' : 'Stop'}
                   </button>
                 </>
               )}
@@ -981,8 +985,12 @@ export default function AgentManagePage() {
                   className="inline-flex items-center gap-1.5 px-3 py-2 text-xs rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-all disabled:opacity-40"
                   title="Start agent"
                 >
-                  <Play size={14} />
-                  Start
+                  {actionLoading === 'start' ? (
+                    <div className="w-3.5 h-3.5 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
+                  ) : (
+                    <Play size={14} />
+                  )}
+                  {actionLoading === 'start' ? 'Starting...' : 'Start'}
                 </button>
               )}
               <button

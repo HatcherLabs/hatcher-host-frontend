@@ -271,11 +271,13 @@ export function VersionsTab() {
 
         {/* Empty state */}
         {!loading && versions.length === 0 && (
-          <div className="text-center py-12">
-            <History size={32} className="text-[#71717a] mx-auto mb-3 opacity-40" />
-            <p className="text-sm text-[#71717a] mb-1">No versions yet</p>
-            <p className="text-xs text-[#71717a]/60">
-              Versions are created automatically when you save config changes.
+          <div className="flex flex-col items-center justify-center py-14 text-center">
+            <div className="w-16 h-16 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-4">
+              <History size={28} className="text-purple-400" />
+            </div>
+            <p className="text-base font-semibold text-white mb-1">No versions yet</p>
+            <p className="text-sm text-[#71717a] max-w-xs">
+              Versions are created automatically when you save configuration changes. Edit your agent&apos;s config to create the first snapshot.
             </p>
           </div>
         )}

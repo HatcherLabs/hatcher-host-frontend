@@ -107,10 +107,13 @@ export function MemoryTab() {
         </GlassCard>
       ) : isEmpty ? (
         <GlassCard>
-          <div className="flex flex-col items-center justify-center py-12 gap-3">
-            <Brain size={32} className="text-purple-400/30" />
-            <p className="text-sm text-[#71717a] text-center max-w-xs">
-              Your agent hasn&apos;t formed any memories yet. Chat with it to build context.
+          <div className="flex flex-col items-center justify-center py-14 text-center">
+            <div className="w-16 h-16 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-4">
+              <Brain size={28} className="text-purple-400" />
+            </div>
+            <p className="text-base font-semibold text-white mb-1">No memories yet</p>
+            <p className="text-sm text-[#71717a] max-w-xs">
+              Your agent builds memory by chatting with users. Start a conversation and it will remember context across sessions.
             </p>
           </div>
         </GlassCard>
