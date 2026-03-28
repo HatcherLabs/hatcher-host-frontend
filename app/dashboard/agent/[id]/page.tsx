@@ -153,6 +153,8 @@ export default function AgentManagePage() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [logsLoading, setLogsLoading] = useState(false);
   const [logFilter, setLogFilter] = useState<LogFilter>('all');
+  const [logSearch, setLogSearch] = useState('');
+  const [autoScroll, setAutoScroll] = useState(true);
   const logsEndRef = useRef<HTMLDivElement>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
 
@@ -396,8 +398,12 @@ export default function AgentManagePage() {
     }
   }, [tab, loading, agent]);
 
-  // Auto-scroll logs
-  // Removed: auto-scroll to end of logs was scrolling entire page down
+  // Auto-scroll logs — only scroll within the log viewer container, not the page
+  useEffect(() => {
+    if (!autoScroll || tab !== 'logs') return;
+    const el = logsEndRef.current;
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [logs.length, autoScroll, tab]);
 
   // ─── Actions ─────────────────────────────────────────────
 
@@ -775,7 +781,9 @@ export default function AgentManagePage() {
 
   const remaining = !hasUnlimitedChat ? Math.max(0, msgLimit - msgCount) : null;
   const isLimitReached = !hasUnlimitedChat && remaining !== null && remaining === 0;
-  const filteredLogs = logFilter === 'all' ? logs : logs.filter((l) => l.level === logFilter);
+  const filteredLogs = logs
+    .filter((l) => logFilter === 'all' || l.level === logFilter)
+    .filter((l) => !logSearch || l.message.toLowerCase().includes(logSearch.toLowerCase()));
 
   const llmProvider = configProvider || (() => {
     const char = agent.config ?? {};
@@ -801,7 +809,7 @@ export default function AgentManagePage() {
   const contextValue: AgentContextValue = {
     agent, id, stats, isActive, isNotActive, statusInfo, frameworkMeta,
     tab, setTab,
-    logs, logsLoading, logFilter, setLogFilter, filteredLogs, logsEndRef, loadLogs,
+    logs, logsLoading, logFilter, setLogFilter, logSearch, setLogSearch, autoScroll, setAutoScroll, filteredLogs, logsEndRef, loadLogs,
     messages, setMessages, input, setInput, sending,
     chatError, setChatError, chatErrorType, setChatErrorType,
     msgCount, hasUnlimitedChat, msgLimit, remaining, isLimitReached,

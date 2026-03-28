@@ -454,6 +454,10 @@ export interface AgentContextValue {
   logsLoading: boolean;
   logFilter: LogFilter;
   setLogFilter: (filter: LogFilter) => void;
+  logSearch: string;
+  setLogSearch: (value: string) => void;
+  autoScroll: boolean;
+  setAutoScroll: (value: boolean) => void;
   filteredLogs: LogEntry[];
   logsEndRef: React.RefObject<HTMLDivElement | null>;
   loadLogs: () => Promise<void>;
