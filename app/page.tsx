@@ -248,10 +248,13 @@ function AgentPreview() {
 // ██  LANDING PAGE
 // ═══════════════════════════════════════════════════════════════
 export default function LandingPage() {
-  const [showSplash, setShowSplash] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return !sessionStorage.getItem('hatcher_splash_seen');
-  });
+  const [showSplash, setShowSplash] = useState(false);
+
+  useEffect(() => {
+    if (!sessionStorage.getItem('hatcher_splash_seen')) {
+      setShowSplash(true);
+    }
+  }, []);
   const [stats, setStats] = useState({ agents: 0, platforms: 20, frameworks: 4 });
 
   useEffect(() => {

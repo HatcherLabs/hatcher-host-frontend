@@ -27,6 +27,7 @@ import {
   Rocket,
   Send,
   Settings2,
+  Gem,
   Zap,
 } from 'lucide-react';
 
@@ -560,7 +561,7 @@ export default function CreatePage() {
                 Each style has different strengths -- pick the one that fits your needs
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
                 {/* OpenClaw */}
                 <motion.button
                   whileHover={cardHover}
@@ -672,7 +673,7 @@ export default function CreatePage() {
                     </motion.div>
                   )}
                   <div className="w-12 h-12 rounded-xl bg-rose-500/10 flex items-center justify-center mb-4">
-                    <Zap className="w-6 h-6 text-rose-400" />
+                    <Gem className="w-6 h-6 text-rose-400" />
                   </div>
                   <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">Milady</h3>
                   <p className="text-sm text-[var(--text-muted)] mb-3">
