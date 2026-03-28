@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  compress: true,
   transpilePackages: ['@hatcher/shared'],
   images: {
     remotePatterns: [
@@ -7,6 +8,10 @@ const nextConfig = {
       { protocol: 'https', hostname: 'arweave.net' },
       { protocol: 'https', hostname: 'raw.githubusercontent.com' },
     ],
+    formats: ['image/avif', 'image/webp'],
+  },
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts'],
   },
 };
 
