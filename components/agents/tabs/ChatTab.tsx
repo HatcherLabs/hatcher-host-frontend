@@ -128,7 +128,7 @@ export function ChatTab() {
   const hasVoiceSupport = voice.sttSupported || voice.ttsSupported;
 
   return (
-    <motion.div key="tab-chat" className="flex flex-col h-[calc(100vh-300px)] min-h-[400px]" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
+    <motion.div key="tab-chat" className="flex flex-col h-[calc(100vh-300px)] min-h-[300px] sm:min-h-[400px]" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
       {/* Chat header with auto-speak toggle */}
       {voice.ttsSupported && (
         <div className="flex items-center justify-end mb-2 px-1">

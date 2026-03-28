@@ -91,7 +91,7 @@ export function LogsTab() {
             {agent.name} -- {filteredLogs.length} entries
           </span>
         </div>
-        <div className="log-viewer overflow-y-auto max-h-[calc(100vh-340px)] min-h-[400px] py-2">
+        <div className="log-viewer overflow-y-auto max-h-[calc(100vh-340px)] min-h-[300px] sm:min-h-[400px] py-2">
           {logsLoading ? (
             <div className="space-y-2 p-4">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => <Skeleton key={i} className="h-4 w-full" />)}

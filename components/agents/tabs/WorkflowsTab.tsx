@@ -44,6 +44,7 @@ import {
   SmilePlus,
   ChevronRight,
   GitMerge,
+  Monitor,
 } from 'lucide-react';
 import {
   useAgentContext,
@@ -636,6 +637,14 @@ function WorkflowEditor({
   }, []);
 
   return (
+    <>
+      {/* Mobile notice — workflow editor requires drag-and-drop which isn't usable on touch */}
+      <div className="lg:hidden p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 mb-4 flex items-start gap-3">
+        <Monitor size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
+        <p className="text-xs text-amber-300">
+          The workflow editor is best used on a desktop browser. Viewing is supported, but editing requires drag-and-drop.
+        </p>
+      </div>
     <div className="relative flex flex-col h-[calc(100vh-280px)] min-h-[500px]">
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(46,43,74,0.3)] bg-[#0D0B1A]/80 backdrop-blur-sm">
@@ -785,6 +794,7 @@ function WorkflowEditor({
         </AnimatePresence>
       </div>
     </div>
+    </>
   );
 }
 

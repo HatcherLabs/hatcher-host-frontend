@@ -434,7 +434,7 @@ export default function PricingPage() {
             Pick your framework, choose a template, and deploy in seconds.
             Start free with a built-in LLM. Upgrade when you need more power.
           </p>
-          <div className="flex items-center justify-center gap-4 relative">
+          <div className="flex flex-wrap items-center justify-center gap-4 relative">
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
               <Link href="/create" className="btn-primary px-10 py-4 text-base font-bold">
                 <Rocket className="w-5 h-5" />
