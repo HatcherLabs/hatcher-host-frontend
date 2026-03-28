@@ -48,10 +48,13 @@ export interface AgentFeature {
 export interface Agent {
   id: string;
   name: string;
+  slug?: string | null;
   description: string | null;
   avatarUrl: string | null;
   status: string;
   framework: 'openclaw' | 'hermes' | 'elizaos' | 'milady';
+  isPublic?: boolean;
+  messageCount?: number;
   ownerId?: string;
   ownerUsername?: string;
   ownerAddress?: string;
@@ -239,6 +242,31 @@ export const api = {
   /** Get a single agent */
   getAgent: (id: string) => req<Agent>(`/agents/${id}`),
 
+  /** Get usage analytics for an agent */
+  getAgentUsage: (id: string) =>
+    req<{
+      messages: {
+        today: number;
+        limit: number;
+        isByok: boolean;
+        chart: Array<{ date: string; count: number }>;
+      };
+      uptime: {
+        seconds: number;
+        since: string | null;
+        percent: number;
+        daysActive: number;
+        status: string;
+      };
+      resources: {
+        cpuPercent: number;
+        memoryUsageMb: number;
+        memoryLimitMb: number;
+        cpuLimit: number;
+      };
+      storage: { usedMb: number; limitMb: number };
+    }>(`/agents/${id}/usage`),
+
   /** Get public stats for an agent (no auth required) */
   getAgentPublicStats: (id: string) =>
     req<{
@@ -301,6 +329,7 @@ export const api = {
   updateAgent: (id: string, data: {
     name?: string;
     description?: string;
+    isPublic?: boolean;
     commitMessage?: string;
     config?: { personality?: string; systemPrompt?: string; [key: string]: unknown };
   }) =>
@@ -449,6 +478,15 @@ export const api = {
       peakDay: string | null;
       framework: string;
     }>(`/agents/${id}/analytics`),
+
+  /** Get agent usage (messages today, chart, container resources, storage) */
+  getAgentUsage: (id: string) =>
+    req<{
+      messages: { today: number; limit: number; isByok: boolean; chart: Array<{ date: string; count: number }> };
+      uptime: { seconds: number; since: string | null; percent: number; daysActive: number; status: string };
+      resources: { cpuPercent: number; memoryUsageMb: number; memoryLimitMb: number; cpuLimit: number };
+      storage: { usedMb: number; limitMb: number };
+    }>(`/agents/${id}/usage`),
 
   /** Get agent activity logs */
   getAgentLogs: (id: string) =>
@@ -1160,6 +1198,8 @@ export const api = {
       framework: string;
       slug: string;
       status: string;
+      isPublic: boolean;
+      messageCount: number;
     }>(`/chat/${slug}`),
 
   /** Send a message to a public agent (no auth) */
