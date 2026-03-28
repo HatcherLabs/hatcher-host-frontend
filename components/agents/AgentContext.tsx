@@ -145,6 +145,7 @@ export const STATUS_STYLES: Record<string, { classes: string; label: string; pul
   error: { classes: 'bg-red-500/15 text-red-400 border-red-500/30', label: 'Error', pulse: false, dotColor: 'bg-red-400' },
   killed: { classes: 'bg-red-500/15 text-red-400 border-red-500/30', label: 'Killed', pulse: false, dotColor: 'bg-red-400' },
   restarting: { classes: 'bg-amber-500/15 text-amber-400 border-amber-500/30', label: 'Restarting', pulse: true, dotColor: 'bg-amber-400' },
+  stopping: { classes: 'bg-orange-500/15 text-orange-400 border-orange-500/30', label: 'Stopping', pulse: true, dotColor: 'bg-orange-400' },
 };
 
 export const LOG_LEVEL_COLORS: Record<string, string> = {

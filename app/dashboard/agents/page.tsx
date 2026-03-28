@@ -66,11 +66,12 @@ function StatusBadge({ status }: { status: string }) {
     error: 'badge-error',
     killed: 'badge-error',
     restarting: 'bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-0.5 rounded-full text-[11px] font-semibold inline-flex items-center',
+    stopping: 'bg-orange-500/10 text-orange-400 border border-orange-500/20 px-2.5 py-0.5 rounded-full text-[11px] font-semibold inline-flex items-center',
   };
   return (
     <span className={classes[status] ?? 'badge-paused'}>
-      {(status === 'active' || status === 'restarting') && (
-        <span className={`w-1.5 h-1.5 rounded-full mr-1.5 animate-pulse inline-block ${status === 'restarting' ? 'bg-amber-400' : 'bg-green-400'}`} />
+      {(status === 'active' || status === 'restarting' || status === 'stopping') && (
+        <span className={`w-1.5 h-1.5 rounded-full mr-1.5 animate-pulse inline-block ${status === 'stopping' ? 'bg-orange-400' : status === 'restarting' ? 'bg-amber-400' : 'bg-green-400'}`} />
       )}
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
