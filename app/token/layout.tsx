@@ -17,11 +17,20 @@ export const metadata: Metadata = {
     description:
       'The Solana SPL token powering the Hatcher AI agent hosting platform. Use tokens to unlock features and pay for services.',
     url: 'https://hatcher.host/token',
+    images: [
+      {
+        url: 'https://hatcher.host/og?title=Hatcher+Platform+Token&subtitle=Solana+SPL+token+powering+AI+agent+hosting.+Use+tokens+to+unlock+features+and+pay+for+subscriptions.&tag=Solana',
+        width: 1200,
+        height: 630,
+        alt: 'Hatcher Platform Token on Solana',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Hatcher Platform Token on Solana',
     description: 'The SPL token powering the Hatcher AI agent hosting platform.',
+    images: ['https://hatcher.host/og?title=Hatcher+Platform+Token&subtitle=Solana+SPL+token+powering+AI+agent+hosting.+Use+tokens+to+unlock+features+and+pay+for+subscriptions.&tag=Solana'],
   },
   alternates: { canonical: 'https://hatcher.host/token' },
 };
