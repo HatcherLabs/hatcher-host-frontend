@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -33,6 +33,36 @@ export function OnboardingWizard({ onClose }: Props) {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState(1);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+  // Focus trap
+  useEffect(() => {
+    const el = dialogRef.current;
+    if (!el) return;
+    const focusable = el.querySelectorAll<HTMLElement>(FOCUSABLE);
+    focusable[0]?.focus();
+    function trap(e: KeyboardEvent) {
+      if (e.key !== 'Tab') return;
+      const all = el!.querySelectorAll<HTMLElement>(FOCUSABLE);
+      const first = all[0];
+      const last = all[all.length - 1];
+      if (e.shiftKey ? document.activeElement === first : document.activeElement === last) {
+        e.preventDefault();
+        (e.shiftKey ? last : first).focus();
+      }
+    }
+    function onEsc(e: KeyboardEvent) {
+      if (e.key === 'Escape') dismiss();
+    }
+    document.addEventListener('keydown', trap);
+    document.addEventListener('keydown', onEsc);
+    return () => {
+      document.removeEventListener('keydown', trap);
+      document.removeEventListener('keydown', onEsc);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const next = useCallback(() => {
     if (step < TOTAL_STEPS) {
@@ -76,6 +106,10 @@ export function OnboardingWizard({ onClose }: Props) {
 
       {/* Card */}
       <motion.div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="onboarding-title"
         className="relative w-full max-w-lg rounded-2xl border border-white/[0.08] overflow-hidden"
         style={{
           background: 'linear-gradient(135deg, rgba(20, 16, 40, 0.97), rgba(10, 8, 24, 0.98))',
@@ -189,7 +223,7 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
         </div>
       </motion.div>
 
-      <h2 className="text-2xl font-bold text-white mb-3">
+      <h2 id="onboarding-title" className="text-2xl font-bold text-white mb-3">
         Welcome to Hatcher!
       </h2>
       <p className="text-sm text-[#a1a1aa] max-w-sm leading-relaxed mb-8">
@@ -258,7 +292,7 @@ const QUICK_PICKS = [
 function StepChoose({ onComplete }: { onComplete: (path: string) => void }) {
   return (
     <div className="flex-1 flex flex-col py-4">
-      <h2 className="text-xl font-bold text-white mb-2 text-center">
+      <h2 id="onboarding-title" className="text-xl font-bold text-white mb-2 text-center">
         What do you want your agent to do?
       </h2>
       <p className="text-xs text-[#a1a1aa] mb-5 text-center">
@@ -309,7 +343,7 @@ const TIPS = [
 function StepTips({ onComplete }: { onComplete: (path: string) => void }) {
   return (
     <div className="flex-1 flex flex-col py-4">
-      <h2 className="text-xl font-bold text-white mb-2 text-center">
+      <h2 id="onboarding-title" className="text-xl font-bold text-white mb-2 text-center">
         Pro tips for getting started
       </h2>
       <p className="text-xs text-[#a1a1aa] mb-5 text-center">

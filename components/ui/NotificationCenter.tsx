@@ -182,12 +182,13 @@ export function NotificationCenter() {
       <button
         onClick={() => setOpen((o) => !o)}
         className="relative h-9 w-9 flex items-center justify-center rounded-lg hover:bg-white/[0.06] transition-colors"
-        aria-label="Notifications"
+        aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'}
         aria-expanded={open}
+        aria-haspopup="true"
       >
-        <Bell size={18} className="text-[#a1a1aa]" />
+        <Bell size={18} className="text-[#a1a1aa]" aria-hidden="true" />
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-purple-600 text-[9px] font-bold text-white px-1">
+          <span aria-hidden="true" className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-purple-600 text-[9px] font-bold text-white px-1">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -215,18 +216,20 @@ export function NotificationCenter() {
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllRead}
+                    aria-label="Mark all notifications as read"
                     className="flex items-center gap-1 text-[10px] text-purple-400 hover:text-purple-300 transition-colors"
                   >
-                    <Check size={10} />
+                    <Check size={10} aria-hidden="true" />
                     Mark read
                   </button>
                 )}
                 {visibleNotifications.length > 0 && (
                   <button
                     onClick={clearAll}
+                    aria-label="Clear all notifications"
                     className="flex items-center gap-1 text-[10px] text-[#71717a] hover:text-red-400 transition-colors"
                   >
-                    <Trash2 size={10} />
+                    <Trash2 size={10} aria-hidden="true" />
                     Clear
                   </button>
                 )}
@@ -269,10 +272,10 @@ export function NotificationCenter() {
                       </div>
                       <button
                         onClick={() => dismissOne(n.id)}
-                        className="opacity-0 group-hover:opacity-100 flex-shrink-0 mt-0.5 p-1 rounded hover:bg-white/[0.06] transition-all"
-                        aria-label="Dismiss"
+                        className="opacity-0 group-hover:opacity-100 flex-shrink-0 mt-0.5 p-1 rounded hover:bg-white/[0.06] transition-all focus:opacity-100"
+                        aria-label={`Dismiss notification: ${n.message}`}
                       >
-                        <X size={12} className="text-[#71717a]" />
+                        <X size={12} className="text-[#71717a]" aria-hidden="true" />
                       </button>
                     </div>
                   );

@@ -263,7 +263,12 @@ export function CommandPalette() {
             </div>
 
             {/* Results */}
-            <div className="max-h-[320px] overflow-y-auto py-2" role="listbox" aria-label="Command results">
+            <div
+              className="max-h-[320px] overflow-y-auto py-2"
+              role="listbox"
+              aria-label="Command results"
+              aria-activedescendant={flatItems[selectedIndex] ? `cmd-item-${flatItems[selectedIndex].id}` : undefined}
+            >
               {flatItems.length === 0 ? (
                 <div className="px-4 py-8 text-center text-sm text-[#71717a]">
                   No commands found
@@ -281,6 +286,7 @@ export function CommandPalette() {
                       return (
                         <button
                           key={item.id}
+                          id={`cmd-item-${item.id}`}
                           onClick={() => execute(item)}
                           onMouseEnter={() => setSelectedIndex(globalIndex)}
                           role="option"

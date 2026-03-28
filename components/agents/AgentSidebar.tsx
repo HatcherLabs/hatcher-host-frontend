@@ -80,7 +80,7 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
   const groups = ['main', 'configure', 'data', 'advanced'] as const;
 
   const navContent = (
-    <nav className="flex flex-col h-full">
+    <nav className="flex flex-col h-full" aria-label="Agent navigation">
       {/* Agent identity */}
       <div className="p-4 border-b border-[rgba(46,43,74,0.3)]">
         <Link
@@ -107,9 +107,13 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
           <div className="min-w-0">
             <h2 className="text-sm font-semibold text-[#FFFFFF] truncate">{agent.name}</h2>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full border ${statusInfo.classes}`}>
+              <span
+                role="status"
+                aria-label={`Agent status: ${statusInfo.label}`}
+                className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full border ${statusInfo.classes}`}
+              >
                 {statusInfo.pulse && (
-                  <span className="relative flex h-1.5 w-1.5">
+                  <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
                     <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${statusInfo.dotColor} opacity-75`} />
                     <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${statusInfo.dotColor}`} />
                   </span>
@@ -145,6 +149,7 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
                       onTabChange(t.id);
                       setMobileOpen(false);
                     }}
+                    aria-current={isActive ? 'page' : undefined}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150 relative cursor-pointer ${
                       isActive
                         ? 'text-[#FFFFFF] bg-[#06b6d4]/10'
