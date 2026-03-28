@@ -3,6 +3,7 @@ import { DOCS_URL, SOCIAL_LINKS, EXTERNAL_LINKS } from '@/lib/config';
 
 const PRODUCT_LINKS = [
   { label: 'Create Agent', href: '/create' },
+  { label: 'Templates', href: '/templates' },
   { label: 'Explore', href: '/explore' },
   { label: 'Dashboard', href: '/dashboard' },
   { label: 'Pricing', href: '/pricing' },
