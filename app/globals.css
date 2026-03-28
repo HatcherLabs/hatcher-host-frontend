@@ -972,3 +972,256 @@ button, a, [role="tab"] {
   touch-action: manipulation;
 }
 
+/* ── Claymorphism Utilities ────────────────────────────────────
+   A clay-inspired design layer on top of the dark theme.
+   Characteristics: multi-layer shadows, inset highlights,
+   heavy border radius, subtle gradient surfaces, colored glow.
+   ─────────────────────────────────────────────────────────── */
+
+@layer utilities {
+  /* Base clay card — neutral dark */
+  .clay {
+    border-radius: 20px;
+    background: linear-gradient(145deg, #1e1e28, #16161f);
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.45),
+      0 8px 16px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .clay:hover {
+    box-shadow:
+      0 24px 48px rgba(0, 0, 0, 0.5),
+      0 10px 20px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  /* Purple clay card — primary brand */
+  .clay-primary {
+    border-radius: 20px;
+    background: linear-gradient(145deg, #2d1f52, #1e1535);
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.45),
+      0 8px 16px rgba(0, 0, 0, 0.3),
+      0 0 40px rgba(139, 92, 246, 0.12),
+      inset 0 1px 0 rgba(167, 139, 250, 0.15),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+  }
+
+  .clay-primary:hover {
+    box-shadow:
+      0 24px 48px rgba(0, 0, 0, 0.5),
+      0 10px 20px rgba(0, 0, 0, 0.35),
+      0 0 60px rgba(139, 92, 246, 0.2),
+      inset 0 1px 0 rgba(167, 139, 250, 0.2),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  /* Cyan clay card — accent */
+  .clay-accent {
+    border-radius: 20px;
+    background: linear-gradient(145deg, #0e2c35, #091e26);
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.45),
+      0 8px 16px rgba(0, 0, 0, 0.3),
+      0 0 40px rgba(6, 182, 212, 0.1),
+      inset 0 1px 0 rgba(34, 211, 238, 0.12),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+  }
+
+  .clay-accent:hover {
+    box-shadow:
+      0 24px 48px rgba(0, 0, 0, 0.5),
+      0 10px 20px rgba(0, 0, 0, 0.35),
+      0 0 60px rgba(6, 182, 212, 0.18),
+      inset 0 1px 0 rgba(34, 211, 238, 0.18),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  /* Success clay (green) */
+  .clay-success {
+    border-radius: 20px;
+    background: linear-gradient(145deg, #0e2820, #091a14);
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.45),
+      0 8px 16px rgba(0, 0, 0, 0.3),
+      0 0 40px rgba(52, 211, 153, 0.1),
+      inset 0 1px 0 rgba(52, 211, 153, 0.12),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(52, 211, 153, 0.2);
+  }
+
+  /* ── Clay Buttons ───────────────────────────────── */
+  .clay-btn {
+    @apply relative inline-flex items-center justify-center gap-2
+           font-semibold transition-all duration-200 active:scale-95
+           disabled:opacity-40 disabled:cursor-not-allowed
+           select-none cursor-pointer;
+    padding: 0.625rem 1.5rem;
+    border-radius: 16px;
+  }
+
+  .clay-btn-primary {
+    @apply clay-btn;
+    background: linear-gradient(145deg, #a78bfa, #7c3aed);
+    color: #ffffff;
+    box-shadow:
+      0 8px 24px rgba(139, 92, 246, 0.5),
+      0 4px 8px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transform: translateY(0);
+  }
+
+  .clay-btn-primary:hover:not(:disabled) {
+    background: linear-gradient(145deg, #c4b5fd, #8b5cf6);
+    box-shadow:
+      0 12px 32px rgba(139, 92, 246, 0.65),
+      0 6px 12px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      inset 0 -3px 0 rgba(0, 0, 0, 0.25);
+    transform: translateY(-2px);
+  }
+
+  .clay-btn-primary:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow:
+      0 4px 12px rgba(139, 92, 246, 0.4),
+      0 2px 4px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .clay-btn-accent {
+    @apply clay-btn;
+    background: linear-gradient(145deg, #22d3ee, #0891b2);
+    color: #ffffff;
+    box-shadow:
+      0 8px 24px rgba(6, 182, 212, 0.5),
+      0 4px 8px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transform: translateY(0);
+  }
+
+  .clay-btn-accent:hover:not(:disabled) {
+    background: linear-gradient(145deg, #67e8f9, #06b6d4);
+    box-shadow:
+      0 12px 32px rgba(6, 182, 212, 0.65),
+      0 6px 12px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      inset 0 -3px 0 rgba(0, 0, 0, 0.25);
+    transform: translateY(-2px);
+  }
+
+  .clay-btn-accent:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow:
+      0 4px 12px rgba(6, 182, 212, 0.4),
+      0 2px 4px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  /* Large clay button variant */
+  .clay-btn-lg {
+    padding: 0.875rem 2rem;
+    border-radius: 20px;
+    font-size: 1rem;
+  }
+
+  /* ── Clay Badges / Pill Tags ────────────────────── */
+  .clay-badge {
+    @apply inline-flex items-center gap-1.5 text-xs font-semibold select-none;
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+  }
+
+  .clay-badge-primary {
+    @apply clay-badge;
+    background: linear-gradient(135deg, #3b1f72, #2a1550);
+    color: #c4b5fd;
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      0 0 20px rgba(139, 92, 246, 0.15),
+      inset 0 1px 0 rgba(167, 139, 250, 0.2),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(139, 92, 246, 0.25);
+  }
+
+  .clay-badge-accent {
+    @apply clay-badge;
+    background: linear-gradient(135deg, #0e3040, #071e2a);
+    color: #67e8f9;
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      0 0 20px rgba(6, 182, 212, 0.12),
+      inset 0 1px 0 rgba(34, 211, 238, 0.18),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+  }
+
+  /* ── Clay Icon Container ─────────────────────────── */
+  .clay-icon {
+    @apply flex items-center justify-center flex-shrink-0;
+    border-radius: 14px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .clay-icon-primary {
+    @apply clay-icon;
+    background: linear-gradient(145deg, #3b1f72, #1e1040);
+    box-shadow:
+      0 6px 16px rgba(0, 0, 0, 0.4),
+      0 0 24px rgba(139, 92, 246, 0.2),
+      inset 0 1px 0 rgba(167, 139, 250, 0.2),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    color: #a78bfa;
+  }
+
+  .clay-icon-accent {
+    @apply clay-icon;
+    background: linear-gradient(145deg, #0e3040, #071e2a);
+    box-shadow:
+      0 6px 16px rgba(0, 0, 0, 0.4),
+      0 0 24px rgba(6, 182, 212, 0.15),
+      inset 0 1px 0 rgba(34, 211, 238, 0.15),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    color: #22d3ee;
+  }
+
+  /* ── Clay input field ─────────────────────────────── */
+  .clay-input {
+    @apply w-full text-sm placeholder-[#71717a]
+           focus:outline-none transition-all duration-200;
+    padding: 0.75rem 1rem;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #131318, #0f0f14);
+    color: var(--text-primary);
+    box-shadow:
+      inset 0 2px 8px rgba(0, 0, 0, 0.4),
+      inset 0 1px 2px rgba(0, 0, 0, 0.3),
+      0 1px 0 rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .clay-input:focus {
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow:
+      inset 0 2px 8px rgba(0, 0, 0, 0.4),
+      inset 0 1px 2px rgba(0, 0, 0, 0.3),
+      0 0 0 3px rgba(139, 92, 246, 0.15),
+      0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+}
+
