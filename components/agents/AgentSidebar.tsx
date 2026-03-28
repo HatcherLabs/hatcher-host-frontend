@@ -19,6 +19,7 @@ import {
   Menu,
   X,
   ChevronLeft,
+  Activity,
 } from 'lucide-react';
 import type { Tab } from './AgentContext';
 import { STATUS_STYLES, FRAMEWORK_BADGE } from './AgentContext';
@@ -43,6 +44,7 @@ function getTabs(framework?: string): TabDef[] {
     { id: 'skills', label: framework === 'elizaos' ? 'Plugins' : 'Skills', icon: <Sparkles size={18} />, group: 'configure' },
     { id: 'logs', label: 'Logs', icon: <ScrollText size={18} />, group: 'data' },
     { id: 'stats', label: 'Stats', icon: <BarChart3 size={18} />, group: 'data' },
+    { id: 'usage', label: 'Usage', icon: <Activity size={18} />, group: 'data' },
     { id: 'memory', label: 'Memory', icon: <Brain size={18} />, group: 'data' },
     { id: 'knowledge', label: 'Knowledge', icon: <BookOpen size={18} />, group: 'data' },
     { id: 'files', label: 'Files', icon: <FolderOpen size={18} />, group: 'data' },
