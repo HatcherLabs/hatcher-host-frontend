@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   compress: true,
+  poweredByHeader: false,
   transpilePackages: ['@hatcher/shared'],
   images: {
     remotePatterns: [
@@ -9,9 +10,18 @@ const nextConfig = {
       { protocol: 'https', hostname: 'raw.githubusercontent.com' },
     ],
     formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 3600,
   },
   experimental: {
-    optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts'],
+    optimizePackageImports: [
+      'lucide-react',
+      'framer-motion',
+      'recharts',
+      'reactflow',
+      'sonner',
+      'cmdk',
+      '@solana/web3.js',
+    ],
   },
 };
 
