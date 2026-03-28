@@ -383,8 +383,8 @@ export default function MyAgentsPage() {
                 onClick={() => setStatusFilter(f.key as StatusFilter)}
                 className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                   statusFilter === f.key
-                    ? 'bg-[#06b6d4]/15 text-[#FFFFFF] shadow-[0_0_8px_rgba(6,182,212,0.1)]'
-                    : 'text-[#71717a] hover:text-[#FFFFFF]'
+                    ? 'bg-purple-500/15 text-white shadow-[0_0_8px_rgba(139,92,246,0.15)]'
+                    : 'text-[#71717a] hover:text-white'
                 }`}
               >
                 {f.label}
