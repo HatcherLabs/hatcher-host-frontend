@@ -547,51 +547,150 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* ── FRAMEWORK USAGE STATS ────────────────────── */}
-      <Section className="py-10 sm:py-14 px-4 sm:px-6 border-t border-white/[0.06]">
-        <div className="max-w-4xl mx-auto">
+      {/* ── FRAMEWORK SHOWCASE ───────────────────────── */}
+      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="frameworks">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12 sm:mb-16">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-purple-400/80 mb-4">4 AI engines</p>
+              <h2
+                className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight"
+                style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
+              >
+                Choose your engine
+              </h2>
+              <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
+                Each framework has a different personality. Pick the one that fits your use case — or try them all.
+              </p>
+            </motion.div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            {[
+              {
+                icon: Bot,
+                name: 'OpenClaw',
+                badge: 'Most popular',
+                badgeColor: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
+                tagline: 'The all-rounder',
+                desc: 'Powerful, flexible, and battle-tested. OpenClaw handles everything from simple Q&A bots to complex multi-tool agents with memory and web search.',
+                features: ['Web search & browsing', 'Long-term memory', 'File management', 'All 20+ platforms'],
+                accentColor: 'border-purple-500/20 hover:border-purple-500/40',
+                bgAccent: 'bg-purple-500/[0.04]',
+                iconBg: 'bg-purple-500/15',
+                iconColor: 'text-purple-400',
+                barColor: 'bg-purple-500',
+                pct: 50,
+              },
+              {
+                icon: Zap,
+                name: 'Hermes',
+                badge: 'Fastest',
+                badgeColor: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20',
+                tagline: 'Speed-first design',
+                desc: 'Built for low-latency responses and minimal overhead. Hermes is ideal when your users need instant replies and you want the leanest possible agent.',
+                features: ['Sub-second responses', 'Lightweight footprint', 'Real-time streaming', 'Telegram & Discord native'],
+                accentColor: 'border-cyan-500/20 hover:border-cyan-500/40',
+                bgAccent: 'bg-cyan-500/[0.04]',
+                iconBg: 'bg-cyan-500/15',
+                iconColor: 'text-cyan-400',
+                barColor: 'bg-cyan-500',
+                pct: 30,
+              },
+              {
+                icon: Users,
+                name: 'ElizaOS',
+                badge: 'Multi-agent',
+                badgeColor: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+                tagline: 'Team of agents',
+                desc: 'Coordinate multiple AI agents that collaborate on complex tasks. ElizaOS lets you build agent networks where each bot specializes in one thing.',
+                features: ['Agent-to-agent messaging', 'Role-based coordination', 'Shared memory pool', 'Parallel task execution'],
+                accentColor: 'border-emerald-500/20 hover:border-emerald-500/40',
+                bgAccent: 'bg-emerald-500/[0.04]',
+                iconBg: 'bg-emerald-500/15',
+                iconColor: 'text-emerald-400',
+                barColor: 'bg-emerald-500',
+                pct: 15,
+              },
+              {
+                icon: Sparkles,
+                name: 'Milady',
+                badge: 'Crypto-native',
+                badgeColor: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+                tagline: 'Built for web3',
+                desc: 'Designed for the crypto-native builder. Milady has on-chain awareness, wallet integrations, and fits right into DeFi, NFT, and token communities.',
+                features: ['On-chain data access', 'Wallet & token aware', 'DeFi protocol hooks', 'Crypto community tone'],
+                accentColor: 'border-amber-500/20 hover:border-amber-500/40',
+                bgAccent: 'bg-amber-500/[0.04]',
+                iconBg: 'bg-amber-500/15',
+                iconColor: 'text-amber-400',
+                barColor: 'bg-amber-500',
+                pct: 5,
+              },
+            ].map((fw, i) => (
+              <motion.div
+                key={fw.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-30px' }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className={`rounded-2xl border p-6 transition-all duration-300 ${fw.accentColor} ${fw.bgAccent}`}
+              >
+                {/* Header */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-11 h-11 rounded-xl ${fw.iconBg} flex items-center justify-center flex-shrink-0`}>
+                      <fw.icon size={22} className={fw.iconColor} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-white">{fw.name}</h3>
+                      <p className="text-xs text-[#71717a]">{fw.tagline}</p>
+                    </div>
+                  </div>
+                  <span className={`text-[10px] font-semibold px-2 py-1 rounded-full border ${fw.badgeColor}`}>
+                    {fw.badge}
+                  </span>
+                </div>
+
+                {/* Description */}
+                <p className="text-sm text-[#a1a1aa] leading-relaxed mb-4">{fw.desc}</p>
+
+                {/* Features */}
+                <ul className="space-y-1.5 mb-5">
+                  {fw.features.map((feat) => (
+                    <li key={feat} className="flex items-center gap-2 text-xs text-[#d4d4d8]">
+                      <Check className={`w-3 h-3 ${fw.iconColor} shrink-0`} />
+                      {feat}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Popularity bar */}
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-1 bg-white/[0.06] rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${fw.pct}%` }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.2, delay: 0.3 + i * 0.1, ease: 'easeOut' }}
+                      className={`h-full rounded-full ${fw.barColor} opacity-60`}
+                    />
+                  </div>
+                  <span className={`text-xs font-semibold ${fw.iconColor} shrink-0 tabular-nums`}>{fw.pct}% of agents</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-8"
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="text-center mt-10"
           >
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-2">Framework popularity</p>
-            <h2 className="text-xl sm:text-2xl font-bold text-white">See what builders choose</h2>
+            <p className="text-xs text-[#71717a]">Not sure which to pick? Start with OpenClaw — you can switch anytime.</p>
           </motion.div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[
-              { name: 'OpenClaw', pct: 50, color: 'bg-purple-500', textColor: 'text-purple-400', desc: 'Most popular — great for all use cases' },
-              { name: 'Hermes', pct: 30, color: 'bg-cyan-500', textColor: 'text-cyan-400', desc: 'Fast & lightweight agents' },
-              { name: 'ElizaOS', pct: 15, color: 'bg-emerald-500', textColor: 'text-emerald-400', desc: 'Multi-agent coordination' },
-              { name: 'Milady', pct: 5, color: 'bg-amber-500', textColor: 'text-amber-400', desc: 'Experimental & crypto-native' },
-            ].map((fw, i) => (
-              <motion.div
-                key={fw.name}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 hover:border-white/[0.1] transition-all duration-300"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-semibold text-white">{fw.name}</span>
-                  <span className={`text-lg font-bold ${fw.textColor}`}>{fw.pct}%</span>
-                </div>
-                <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden mb-3">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    whileInView={{ width: `${fw.pct}%` }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1, delay: 0.2 + i * 0.08, ease: 'easeOut' }}
-                    className={`h-full rounded-full ${fw.color} opacity-70`}
-                  />
-                </div>
-                <p className="text-[11px] text-[#71717a] leading-relaxed">{fw.desc}</p>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </Section>
 
