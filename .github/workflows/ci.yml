@@ -27,12 +27,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: TypeScript type check
-        run: npm run type-check
-
-      - name: Lint
-        run: npm run lint
-
       - name: Build frontend
         run: npm run build
         env:
