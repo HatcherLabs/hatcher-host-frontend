@@ -824,57 +824,76 @@ export function ConfigTab() {
                 {/* ── Hermes Advanced ── */}
                 {agent?.framework === 'hermes' && (
                   <>
-                    {/* Personality */}
+                    {/* ── Personality & Behavior ── */}
                     <div className="space-y-3">
-                      <div className="flex items-center gap-1.5">
-                        <Brain size={12} className="text-purple-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Personality</span>
-                      </div>
-
-                      <div>
-                        <label className="block text-[11px] font-medium mb-1.5 text-[#71717a]">Personality Preset</label>
-                        <div className="relative">
-                          <select
-                            className="config-input text-sm appearance-none pr-8 cursor-pointer"
-                            value={hmPersonality}
-                            onChange={(e) => setHmPersonality(e.target.value)}
-                          >
-                            <option value="default" style={{ background: '#0D0B1A' }}>Default</option>
-                            <option value="helpful" style={{ background: '#0D0B1A' }}>Helpful Assistant</option>
-                            <option value="technical" style={{ background: '#0D0B1A' }}>Technical Expert</option>
-                            <option value="creative" style={{ background: '#0D0B1A' }}>Creative Writer</option>
-                            <option value="concise" style={{ background: '#0D0B1A' }}>Concise Responder</option>
-                          </select>
-                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                          <Brain size={13} className="text-purple-400" />
                         </div>
-                        <p className="text-[10px] mt-1 text-[#71717a]">Quick personality template. Combine with behavior instructions for best results.</p>
+                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Personality & Behavior</span>
                       </div>
+
+                      <label className="block text-[11px] font-medium mb-1 text-[#71717a]">Personality Preset</label>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {([
+                          { key: 'default', name: 'Default', desc: 'Balanced and versatile', icon: Sliders, color: 'purple' as const },
+                          { key: 'helpful', name: 'Helpful', desc: 'Friendly and supportive', icon: Heart, color: 'emerald' as const },
+                          { key: 'technical', name: 'Technical', desc: 'Precise and analytical', icon: Cpu, color: 'blue' as const },
+                          { key: 'creative', name: 'Creative', desc: 'Imaginative and expressive', icon: Sparkles, color: 'amber' as const },
+                          { key: 'concise', name: 'Concise', desc: 'Brief and to the point', icon: Zap, color: 'cyan' as const },
+                        ]).map((preset) => {
+                          const isSelected = hmPersonality === preset.key;
+                          const colorMap = {
+                            purple: { border: 'border-purple-500/40', bg: 'bg-purple-500/[0.06]', icon: 'text-purple-400', iconBg: 'bg-purple-500/15', ring: 'ring-purple-500/30' },
+                            emerald: { border: 'border-emerald-500/40', bg: 'bg-emerald-500/[0.06]', icon: 'text-emerald-400', iconBg: 'bg-emerald-500/15', ring: 'ring-emerald-500/30' },
+                            blue: { border: 'border-blue-500/40', bg: 'bg-blue-500/[0.06]', icon: 'text-blue-400', iconBg: 'bg-blue-500/15', ring: 'ring-blue-500/30' },
+                            amber: { border: 'border-amber-500/40', bg: 'bg-amber-500/[0.06]', icon: 'text-amber-400', iconBg: 'bg-amber-500/15', ring: 'ring-amber-500/30' },
+                            cyan: { border: 'border-cyan-500/40', bg: 'bg-cyan-500/[0.06]', icon: 'text-cyan-400', iconBg: 'bg-cyan-500/15', ring: 'ring-cyan-500/30' },
+                          };
+                          const colors = colorMap[preset.color];
+                          const Icon = preset.icon;
+
+                          return (
+                            <button
+                              key={preset.key}
+                              type="button"
+                              onClick={() => setHmPersonality(preset.key)}
+                              className={`group relative flex flex-col items-center gap-1.5 w-full text-center rounded-xl px-3 py-3 border transition-all duration-200 ${
+                                isSelected
+                                  ? `${colors.border} ${colors.bg} ring-1 ${colors.ring}`
+                                  : 'border-white/[0.06] bg-[#18181b]/80 hover:border-white/[0.12] hover:bg-[#18181b]'
+                              }`}
+                            >
+                              <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors duration-200 ${
+                                isSelected ? colors.iconBg : 'bg-white/[0.04]'
+                              }`}>
+                                <Icon size={14} className={`transition-colors duration-200 ${isSelected ? colors.icon : 'text-[#71717a]'}`} />
+                              </div>
+                              <div>
+                                <div className="flex items-center justify-center gap-1">
+                                  <span className={`text-[12px] font-medium transition-colors duration-200 ${isSelected ? 'text-white' : 'text-[#A5A1C2]'}`}>
+                                    {preset.name}
+                                  </span>
+                                  {isSelected && <CheckCircle size={11} className={colors.icon} />}
+                                </div>
+                                <p className="text-[10px] text-[#71717a] mt-0.5 leading-snug">{preset.desc}</p>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <p className="text-[10px] text-[#71717a]">Quick personality template. Combine with behavior instructions for best results.</p>
                     </div>
 
                     <div className="border-t border-white/[0.06]" />
 
-                    {/* Memory */}
+                    {/* ── Security ── */}
                     <div className="space-y-3">
-                      <div className="flex items-center gap-1.5">
-                        <Database size={12} className="text-purple-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Memory</span>
-                      </div>
-
-                      <ToggleSwitch
-                        label="Enable Persistent Memory"
-                        checked={hmPersistentMemory}
-                        onChange={setHmPersistentMemory}
-                        helper="Agent remembers conversations across restarts. Disable for stateless mode."
-                      />
-                    </div>
-
-                    <div className="border-t border-white/[0.06]" />
-
-                    {/* Security */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-1.5">
-                        <ShieldCheck size={12} className="text-purple-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Security</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                          <ShieldCheck size={13} className="text-purple-400" />
+                        </div>
+                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Security</span>
                       </div>
 
                       <div>
@@ -897,11 +916,56 @@ export function ConfigTab() {
 
                     <div className="border-t border-white/[0.06]" />
 
-                    {/* Voice */}
+                    {/* ── Memory & Learning ── */}
                     <div className="space-y-3">
-                      <div className="flex items-center gap-1.5">
-                        <Mic size={12} className="text-purple-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Voice</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                          <Database size={13} className="text-purple-400" />
+                        </div>
+                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Memory & Learning</span>
+                      </div>
+
+                      <ToggleSwitch
+                        label="Enable Persistent Memory"
+                        checked={hmPersistentMemory}
+                        onChange={setHmPersistentMemory}
+                        helper="Agent remembers conversations across restarts. Disable for stateless mode."
+                      />
+
+                      <AnimatePresence>
+                        {hmPersistentMemory && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="flex items-start gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] px-3.5 py-3">
+                              <div className="flex-shrink-0 mt-0.5">
+                                <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.6)]" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[12px] font-medium text-emerald-300/90">Persistent Memory Active</p>
+                                <p className="text-[10px] text-[#71717a] mt-0.5 leading-relaxed">
+                                  Your agent learns from conversations and remembers across restarts. Powered by ChromaDB.
+                                </p>
+                              </div>
+                              <Database size={14} className="flex-shrink-0 text-emerald-400/50 mt-0.5" />
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    <div className="border-t border-white/[0.06]" />
+
+                    {/* ── Voice & Speech ── */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                          <Volume2 size={13} className="text-purple-400" />
+                        </div>
+                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Voice & Speech</span>
                       </div>
 
                       <ToggleSwitch
@@ -911,39 +975,41 @@ export function ConfigTab() {
                         helper="Enable speech-to-text and text-to-speech capabilities."
                       />
 
-                      {hmVoice && (
-                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-3">
-                          <div>
-                            <label className="block text-[11px] font-medium mb-1.5 text-[#71717a]">STT Provider</label>
-                            <div className="relative">
-                              <select
-                                className="config-input text-sm appearance-none pr-8 cursor-pointer"
-                                value={hmSttProvider}
-                                onChange={(e) => setHmSttProvider(e.target.value)}
-                              >
-                                <option value="whisper" style={{ background: '#0D0B1A' }}>Whisper</option>
-                                <option value="deepgram" style={{ background: '#0D0B1A' }}>Deepgram</option>
-                              </select>
-                              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                      <AnimatePresence>
+                        {hmVoice && (
+                          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-3 overflow-hidden">
+                            <div>
+                              <label className="block text-[11px] font-medium mb-1.5 text-[#71717a]">STT Provider</label>
+                              <div className="relative">
+                                <select
+                                  className="config-input text-sm appearance-none pr-8 cursor-pointer"
+                                  value={hmSttProvider}
+                                  onChange={(e) => setHmSttProvider(e.target.value)}
+                                >
+                                  <option value="whisper" style={{ background: '#0D0B1A' }}>Whisper</option>
+                                  <option value="deepgram" style={{ background: '#0D0B1A' }}>Deepgram</option>
+                                </select>
+                                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                              </div>
                             </div>
-                          </div>
-                          <div>
-                            <label className="block text-[11px] font-medium mb-1.5 text-[#71717a]">TTS Provider</label>
-                            <div className="relative">
-                              <select
-                                className="config-input text-sm appearance-none pr-8 cursor-pointer"
-                                value={hmTtsProvider}
-                                onChange={(e) => setHmTtsProvider(e.target.value)}
-                              >
-                                <option value="elevenlabs" style={{ background: '#0D0B1A' }}>ElevenLabs</option>
-                                <option value="openai" style={{ background: '#0D0B1A' }}>OpenAI</option>
-                                <option value="kokoro" style={{ background: '#0D0B1A' }}>Kokoro</option>
-                              </select>
-                              <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                            <div>
+                              <label className="block text-[11px] font-medium mb-1.5 text-[#71717a]">TTS Provider</label>
+                              <div className="relative">
+                                <select
+                                  className="config-input text-sm appearance-none pr-8 cursor-pointer"
+                                  value={hmTtsProvider}
+                                  onChange={(e) => setHmTtsProvider(e.target.value)}
+                                >
+                                  <option value="elevenlabs" style={{ background: '#0D0B1A' }}>ElevenLabs</option>
+                                  <option value="openai" style={{ background: '#0D0B1A' }}>OpenAI</option>
+                                  <option value="kokoro" style={{ background: '#0D0B1A' }}>Kokoro</option>
+                                </select>
+                                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                              </div>
                             </div>
-                          </div>
-                        </motion.div>
-                      )}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   </>
                 )}
