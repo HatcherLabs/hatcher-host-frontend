@@ -204,6 +204,7 @@ export function ChatTab() {
     bottomRef, inputRef,
     sendMessage, handleKeyDown,
     setTab,
+    wsConnected,
   } = ctx;
 
   const frameworkMeta = FRAMEWORKS[agent.framework];
@@ -294,6 +295,12 @@ export function ChatTab() {
             <Bot size={10} />
             {frameworkMeta?.name ?? agent.framework}
           </span>
+          {wsConnected && (
+            <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 text-emerald-400 font-medium" title="Real-time streaming via WebSocket">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Live
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2">
           {voice.ttsSupported && (

@@ -534,6 +534,18 @@ export const api = {
       };
     }>(`/agents/${id}/analytics?range=${range}`),
 
+  /** Get deep analytics for an agent (hourly patterns, response times, errors, topics) */
+  getAgentDeepAnalytics: (id: string, range: '7d' | '30d' = '7d') =>
+    req<{
+      range: string;
+      rangeDays: number;
+      hourlyDistribution: Array<{ hour: number; count: number }>;
+      responseTimes: { avgMs: number; p50Ms: number; p95Ms: number; totalPairs: number };
+      dailyResponseTimes: Record<string, number>;
+      errorRate: { total: number; errors: number; successful: number; rate: number };
+      topTopics: Array<{ word: string; count: number }>;
+    }>(`/agents/${id}/analytics/deep?range=${range}`),
+
   /** Get account-level analytics across all agents */
   getAccountAnalytics: () =>
     req<{
@@ -927,7 +939,7 @@ export const api = {
     req<{ messages: Array<{ role: string; content: string; ts: number }> }>(`/agents/${agentId}/chat/history`),
 
   /** Save chat messages to history */
-  saveChatHistory: (agentId: string, messages: Array<{ role: string; content: string }>) =>
+  saveChatHistory: (agentId: string, messages: Array<{ role: string; content: string; ts?: number }>) =>
     req<{ saved: number }>(`/agents/${agentId}/chat/history`, {
       method: 'POST',
       body: JSON.stringify({ messages }),

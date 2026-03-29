@@ -8,6 +8,7 @@ import { useConnection } from '@solana/wallet-adapter-react';
 import { api, getToken } from '@/lib/api';
 import type { Agent, AgentFeature } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { useWebSocketChat } from '@/hooks/useWebSocketChat';
 import { FRAMEWORKS, TIERS, getBYOKProvider } from '@hatcher/shared';
 import type { UserTierKey } from '@hatcher/shared';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -219,6 +220,63 @@ export default function AgentManagePage() {
   }, [messages, id]);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // ─── WebSocket streaming chat ──────────────────────────────
+  // Refs used by WS callbacks to avoid stale closures
+  const wsStreamingMsgRef = useRef(false);
+
+  const wsChat = useWebSocketChat({
+    agentId: id,
+    enabled: isAuthenticated && !!id,
+    onToken: (token) => {
+      setMessages((prev) => {
+        const updated = [...prev];
+        const last = updated[updated.length - 1];
+        if (last?.streaming) {
+          updated[updated.length - 1] = { ...last, content: last.content + token };
+        }
+        return updated;
+      });
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    },
+    onDone: (_content, _model) => {
+      wsStreamingMsgRef.current = false;
+      setMessages((prev) => {
+        const updated = [...prev];
+        const last = updated[updated.length - 1];
+        if (last?.streaming) {
+          updated[updated.length - 1] = { ...last, streaming: false };
+        }
+        return updated;
+      });
+      setSending(false);
+    },
+    onError: (errMsg) => {
+      wsStreamingMsgRef.current = false;
+      const lower = errMsg.toLowerCase();
+      if (lower.includes('429') || lower.includes('rate limit') || lower.includes('daily limit')) {
+        setChatErrorType('ratelimit');
+        setChatError('Daily message limit reached. Upgrade to Pro for more, or bring your own key for unlimited.');
+        toast.warning('Daily limit reached. Upgrade to Pro or bring your own API key for unlimited.');
+      } else if (lower.includes('content policy') || lower.includes('filtered')) {
+        setChatErrorType('generic');
+        setChatError('Agent response was blocked by content policy.');
+      } else {
+        setChatErrorType('generic');
+        setChatError(errMsg);
+      }
+      setMessages((prev) => prev.filter((m) => !(m.streaming && m.content === '')));
+      setSending(false);
+    },
+    onRateLimit: (error, _limit, _used) => {
+      wsStreamingMsgRef.current = false;
+      setChatErrorType('ratelimit');
+      setChatError(error);
+      toast.warning('Daily limit reached. Upgrade to Pro or bring your own API key for unlimited.');
+      setMessages((prev) => prev.filter((m) => !(m.streaming && m.content === '')));
+      setSending(false);
+    },
+  });
 
   // Config state
   const [configName, setConfigName] = useState('');
@@ -742,6 +800,20 @@ export default function AgentManagePage() {
       .slice(-40)
       .map((m) => ({ role: m.role, content: m.content }));
     setMessages((prev) => [...prev, { id: genId(), role: 'assistant', content: '', streaming: true, timestamp: new Date() }]);
+
+    // Try WebSocket first (real-time streaming), fall back to HTTP SSE
+    if (wsChat.isConnected) {
+      wsStreamingMsgRef.current = true;
+      const sent = wsChat.send(text, history);
+      if (sent) {
+        // WS callbacks (onToken, onDone, onError) handle the rest
+        return;
+      }
+      // WS send failed — fall through to HTTP SSE
+      wsStreamingMsgRef.current = false;
+    }
+
+    // HTTP SSE fallback
     try {
       await api.chatStream(
         id,
@@ -856,6 +928,7 @@ export default function AgentManagePage() {
       chatError, setChatError, chatErrorType, setChatErrorType,
       msgCount, hasUnlimitedChat, msgLimit, remaining, isLimitReached,
       bottomRef, inputRef, sendMessage, handleKeyDown, sendCooldown,
+      wsConnected: wsChat.isConnected,
       configName, setConfigName, configDesc, setConfigDesc,
       configBio, setConfigBio, configLore, setConfigLore,
       configTopics, setConfigTopics, configStyle, setConfigStyle,

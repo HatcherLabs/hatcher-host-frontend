@@ -483,6 +483,7 @@ export interface AgentContextValue {
   sendMessage: (overrideText?: string) => Promise<void>;
   handleKeyDown: (e: React.KeyboardEvent) => void;
   sendCooldown: boolean;
+  wsConnected: boolean;
 
   // Config
   configName: string;

@@ -4,9 +4,20 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  CartesianGrid,
+  Cell,
+} from 'recharts';
+import {
   BarChart3,
   TrendingUp,
-  TrendingDown,
   Calendar,
   Hash,
   ExternalLink,
@@ -18,11 +29,15 @@ import {
   ArrowDownRight,
   Minus,
   Clock,
+  AlertTriangle,
+  CheckCircle,
+  MessageSquare,
+  Tag,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAgentContext, GlassCard } from '../AgentContext';
 
-type Range = '7d' | '30d' | '90d';
+type Range = '7d' | '30d';
 
 interface AnalyticsData {
   range: string;
@@ -39,6 +54,16 @@ interface AnalyticsData {
     totalCost: number;
     hasByok: boolean;
   };
+}
+
+interface DeepAnalytics {
+  range: string;
+  rangeDays: number;
+  hourlyDistribution: Array<{ hour: number; count: number }>;
+  responseTimes: { avgMs: number; p50Ms: number; p95Ms: number; totalPairs: number };
+  dailyResponseTimes: Record<string, number>;
+  errorRate: { total: number; errors: number; successful: number; rate: number };
+  topTopics: Array<{ word: string; count: number }>;
 }
 
 /* ── Framework color themes ─────────────────────────────────── */
@@ -98,10 +123,20 @@ function formatTokens(n: number): string {
   return String(n);
 }
 
+function formatMs(ms: number): string {
+  if (ms < 1000) return `${ms}ms`;
+  return `${(ms / 1000).toFixed(1)}s`;
+}
+
+function formatHour(hour: number): string {
+  if (hour === 0) return '12am';
+  if (hour === 12) return '12pm';
+  return hour < 12 ? `${hour}am` : `${hour - 12}pm`;
+}
+
 const RANGES: { value: Range; label: string }[] = [
-  { value: '7d', label: '7D' },
-  { value: '30d', label: '30D' },
-  { value: '90d', label: '90D' },
+  { value: '7d', label: '7 Days' },
+  { value: '30d', label: '30 Days' },
 ];
 
 /* ── Trend calculation helper ───────────────────────────────── */
@@ -118,7 +153,7 @@ function calcTrend(data: Array<{ count: number }>): { pct: number; direction: 'u
   return { pct: Math.abs(pct), direction: pct > 0 ? 'up' : pct < 0 ? 'down' : 'flat' };
 }
 
-function TrendBadge({ pct, direction, theme }: { pct: number; direction: 'up' | 'down' | 'flat'; theme: typeof DEFAULT_THEME }) {
+function TrendBadge({ pct, direction }: { pct: number; direction: 'up' | 'down' | 'flat' }) {
   if (direction === 'flat') {
     return (
       <span className="inline-flex items-center gap-0.5 text-[10px] text-[#71717a]">
@@ -139,11 +174,28 @@ function TrendBadge({ pct, direction, theme }: { pct: number; direction: 'up' | 
   );
 }
 
+/* ── Custom Recharts tooltip ─────────────────────────────────── */
+function ChartTooltipContent({ active, payload, label, theme }: any) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="rounded-lg border border-white/10 px-3 py-2 text-xs shadow-lg" style={{ background: '#1a1730' }}>
+      <p className="font-medium text-white mb-1">{label}</p>
+      {payload.map((p: any, i: number) => (
+        <p key={i} style={{ color: p.color || theme?.primary || '#71717a' }}>
+          {p.name}: {typeof p.value === 'number' ? p.value.toLocaleString() : p.value}
+        </p>
+      ))}
+    </div>
+  );
+}
+
 export function AnalyticsTab() {
   const { agent } = useAgentContext();
   const [range, setRange] = useState<Range>('7d');
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [deep, setDeep] = useState<DeepAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [deepLoading, setDeepLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const framework = (agent?.framework ?? 'elizaos').toLowerCase();
@@ -168,15 +220,27 @@ export function AnalyticsTab() {
     }
   }, [agent?.id, range]);
 
+  const fetchDeep = useCallback(async () => {
+    if (!agent?.id) return;
+    setDeepLoading(true);
+    try {
+      const res = await api.getAgentDeepAnalytics(agent.id, range);
+      if (res.success) {
+        setDeep(res.data);
+      }
+    } catch {
+      // Deep analytics is optional, fail silently
+    } finally {
+      setDeepLoading(false);
+    }
+  }, [agent?.id, range]);
+
   useEffect(() => {
     fetchAnalytics();
-  }, [fetchAnalytics]);
+    fetchDeep();
+  }, [fetchAnalytics, fetchDeep]);
 
-  const maxCount = analytics ? Math.max(...analytics.messagesPerDay.map(d => d.count), 1) : 1;
   const today = new Date().toISOString().slice(0, 10);
-
-  // Show every Nth x-axis label to avoid crowding on 30d
-  const labelStep = range === '30d' ? 5 : 1;
 
   // Trend calculations
   const msgTrend = useMemo(() => {
@@ -188,6 +252,55 @@ export function AnalyticsTab() {
     if (!analytics) return { pct: 0, direction: 'flat' as const };
     return calcTrend(analytics.messagesPerDay.map(d => ({ count: d.inputTokens + d.outputTokens })));
   }, [analytics]);
+
+  // Chart data for message volume
+  const chartData = useMemo(() => {
+    if (!analytics) return [];
+    return analytics.messagesPerDay.map(d => ({
+      date: formatChartDate(d.date),
+      rawDate: d.date,
+      messages: d.count,
+      tokens: d.inputTokens + d.outputTokens,
+    }));
+  }, [analytics]);
+
+  // Hourly chart data with peak detection
+  const hourlyData = useMemo(() => {
+    if (!deep) return [];
+    const maxCount = Math.max(...deep.hourlyDistribution.map(h => h.count), 1);
+    return deep.hourlyDistribution.map(h => ({
+      hour: formatHour(h.hour),
+      rawHour: h.hour,
+      count: h.count,
+      isPeak: h.count === maxCount && h.count > 0,
+    }));
+  }, [deep]);
+
+  // Response time chart data
+  const responseTimeData = useMemo(() => {
+    if (!analytics || !deep?.dailyResponseTimes) return [];
+    return analytics.messagesPerDay.map(d => ({
+      date: formatChartDate(d.date),
+      avgMs: deep.dailyResponseTimes[d.date] ?? 0,
+    })).filter(d => d.avgMs > 0);
+  }, [analytics, deep]);
+
+  // Peak hour
+  const peakHour = useMemo(() => {
+    if (!deep) return null;
+    const peak = deep.hourlyDistribution.reduce((max, h) => h.count > max.count ? h : max, deep.hourlyDistribution[0]!);
+    return peak.count > 0 ? peak : null;
+  }, [deep]);
+
+  const shimmerBars = (count: number) => (
+    <div className="flex items-end gap-0.5 h-36">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="flex-1 flex flex-col items-center gap-1">
+          <div className="w-full rounded-t bg-white/[0.04] animate-pulse" style={{ height: `${20 + (i * 13) % 60}%` }} />
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <motion.div
@@ -211,17 +324,63 @@ export function AnalyticsTab() {
         </div>
       </div>
 
-      {/* Message Activity Chart */}
+      {/* ── KPI Summary Row ────────────────────────────────────── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          {
+            icon: Hash,
+            label: 'Total Messages',
+            value: analytics ? analytics.totalMessages.toLocaleString() : '--',
+            trend: analytics ? msgTrend : null,
+          },
+          {
+            icon: TrendingUp,
+            label: 'Avg / Day',
+            value: analytics ? String(analytics.avgPerDay) : '--',
+            trend: null,
+          },
+          {
+            icon: Clock,
+            label: 'Avg Response',
+            value: deep ? formatMs(deep.responseTimes.avgMs) : '--',
+            trend: null,
+          },
+          {
+            icon: deep && deep.errorRate.rate > 5 ? AlertTriangle : CheckCircle,
+            label: 'Success Rate',
+            value: deep ? `${(100 - deep.errorRate.rate).toFixed(1)}%` : '--',
+            trend: null,
+            color: deep ? (deep.errorRate.rate > 5 ? '#ef4444' : '#22c55e') : undefined,
+          },
+        ].map(({ icon: Icon, label, value, trend, color }) => (
+          <div
+            key={label}
+            className="rounded-xl border p-3.5 relative overflow-hidden"
+            style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}
+          >
+            <div className="absolute top-0 left-0 w-full h-[2px]" style={{ background: color || theme.primary }} />
+            <div className="flex items-center gap-1.5 mb-2">
+              <Icon size={12} style={{ color: color || theme.primary }} />
+              <span className="text-[10px] text-[#71717a] uppercase tracking-wider">{label}</span>
+            </div>
+            <div className="flex items-end gap-1.5">
+              <span className="text-xl font-bold text-[#fafafa]">{value}</span>
+              {trend && <TrendBadge pct={trend.pct} direction={trend.direction} />}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Message Volume Chart ───────────────────────────────── */}
       <GlassCard>
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
             <BarChart3 size={18} style={{ color: theme.primary }} />
-            <h3 className="text-base font-semibold text-[#fafafa]">Message Activity</h3>
+            <h3 className="text-base font-semibold text-[#fafafa]">Message Volume</h3>
             {analytics && (
-              <TrendBadge pct={msgTrend.pct} direction={msgTrend.direction} theme={theme} />
+              <TrendBadge pct={msgTrend.pct} direction={msgTrend.direction} />
             )}
           </div>
-          {/* Range selector */}
           <div className="flex items-center gap-1 rounded-lg p-0.5" style={{ background: 'rgba(46,43,74,0.5)' }}>
             {RANGES.map(r => (
               <button
@@ -240,93 +399,293 @@ export function AnalyticsTab() {
           </div>
         </div>
 
-        {loading ? (
-          <div className="flex items-end gap-0.5 h-36">
-            {Array.from({ length: range === '7d' ? 7 : range === '30d' ? 30 : 90 }).map((_, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                <div className="w-full rounded-t bg-white/[0.04] animate-pulse" style={{ height: `${20 + (i * 13) % 60}%` }} />
-              </div>
-            ))}
-          </div>
-        ) : error ? (
-          <div className="h-36 flex items-center justify-center">
+        {loading ? shimmerBars(range === '7d' ? 7 : 30) : error ? (
+          <div className="h-44 flex items-center justify-center">
             <p className="text-sm text-[#6B6890]">{error}</p>
           </div>
-        ) : analytics ? (
+        ) : analytics && chartData.length > 0 ? (
           <>
-            <div className="flex items-end gap-0.5 h-36 mb-2">
-              {analytics.messagesPerDay.map((d, i) => {
-                const heightPct = maxCount > 0 ? (d.count / maxCount) * 100 : 0;
-                const isToday = d.date === today;
-                const isPeak = d.date === analytics.peakDay && d.count > 0;
-                const showLabel = i % labelStep === 0 || isToday;
-                return (
-                  <div key={d.date} className="flex-1 flex flex-col items-center gap-0.5 group relative">
-                    {/* Hover tooltip */}
-                    <div className="absolute bottom-full mb-1 opacity-0 group-hover:opacity-100 transition-opacity bg-[#1a1730] border border-white/10 rounded-lg px-2 py-1.5 text-xs text-white whitespace-nowrap z-10 pointer-events-none left-1/2 -translate-x-1/2">
-                      <div className="font-medium">{formatChartDate(d.date)}</div>
-                      <div className="text-[#71717a]">{d.count} msg</div>
-                      {d.inputTokens > 0 && (
-                        <div style={{ color: theme.primary }}>{formatTokens(d.inputTokens + d.outputTokens)} tokens</div>
-                      )}
-                    </div>
-                    <div
-                      className="w-full rounded-t transition-all duration-300 min-h-[2px]"
-                      style={{
-                        height: `${Math.max(heightPct, d.count > 0 ? 4 : 1)}%`,
-                        background: isToday
-                          ? theme.primary
-                          : isPeak
-                            ? `${theme.primary}bf`
-                            : theme.primaryDim,
-                      }}
-                    />
-                    {showLabel && (
-                      <span
-                        className="text-[8px] leading-none mt-0.5"
-                        style={{ color: isToday ? theme.primary : 'rgba(113,113,122,0.6)' }}
-                      >
-                        {isToday ? 'Now' : formatChartDate(d.date).replace(/[A-Za-z]+ /, '')}
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fill: '#71717a', fontSize: 10 }}
+                    tickLine={false}
+                    axisLine={{ stroke: 'rgba(255,255,255,0.06)' }}
+                    interval={range === '30d' ? 4 : 0}
+                  />
+                  <YAxis
+                    tick={{ fill: '#71717a', fontSize: 10 }}
+                    tickLine={false}
+                    axisLine={false}
+                    allowDecimals={false}
+                  />
+                  <RechartsTooltip
+                    content={(props: any) => <ChartTooltipContent {...props} theme={theme} />}
+                    cursor={{ fill: 'rgba(255,255,255,0.03)' }}
+                  />
+                  <Bar dataKey="messages" radius={[4, 4, 0, 0]} maxBarSize={40}>
+                    {chartData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={
+                          entry.rawDate === today
+                            ? theme.primary
+                            : entry.rawDate === analytics.peakDay
+                              ? `${theme.primary}bf`
+                              : theme.primaryDim
+                        }
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
 
             {/* Summary stats */}
             <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/[0.04]">
               {[
-                { icon: Hash, label: 'Total', value: analytics.totalMessages.toLocaleString(), trend: msgTrend },
-                { icon: TrendingUp, label: 'Avg/Day', value: String(analytics.avgPerDay), trend: null },
-                { icon: Calendar, label: 'Peak Day', value: analytics.peakDay ? formatChartDate(analytics.peakDay) : '--', trend: null },
-              ].map(({ icon: Icon, label, value, trend }) => (
+                { icon: Hash, label: 'Total', value: analytics.totalMessages.toLocaleString() },
+                { icon: TrendingUp, label: 'Avg/Day', value: String(analytics.avgPerDay) },
+                { icon: Calendar, label: 'Peak Day', value: analytics.peakDay ? formatChartDate(analytics.peakDay) : '--' },
+              ].map(({ icon: Icon, label, value }) => (
                 <div key={label} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
                   <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: theme.primaryBg }}>
                     <Icon size={13} style={{ color: theme.primary }} />
                   </div>
                   <div>
                     <p className="text-[10px] text-[#71717a] uppercase tracking-wider">{label}</p>
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-sm font-bold text-[#fafafa]">{value}</p>
-                      {trend && <TrendBadge pct={trend.pct} direction={trend.direction} theme={theme} />}
-                    </div>
+                    <p className="text-sm font-bold text-[#fafafa]">{value}</p>
                   </div>
                 </div>
               ))}
             </div>
           </>
-        ) : null}
+        ) : (
+          <div className="h-44 flex items-center justify-center">
+            <p className="text-sm text-[#6B6890]">No message data yet</p>
+          </div>
+        )}
       </GlassCard>
 
-      {/* Token Usage -- only shown if there's token data */}
+      {/* ── Hourly Activity Pattern ────────────────────────────── */}
+      <GlassCard>
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2">
+            <Clock size={18} style={{ color: theme.primary }} />
+            <h3 className="text-base font-semibold text-[#fafafa]">Activity by Hour</h3>
+          </div>
+          {peakHour && (
+            <span className="text-[10px] text-[#71717a]">
+              Peak: <span style={{ color: theme.primary }} className="font-medium">{formatHour(peakHour.hour)}</span>
+            </span>
+          )}
+        </div>
+
+        {deepLoading ? shimmerBars(24) : deep ? (
+          <div className="h-40">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={hourlyData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                <XAxis
+                  dataKey="hour"
+                  tick={{ fill: '#71717a', fontSize: 9 }}
+                  tickLine={false}
+                  axisLine={{ stroke: 'rgba(255,255,255,0.06)' }}
+                  interval={2}
+                />
+                <YAxis
+                  tick={{ fill: '#71717a', fontSize: 10 }}
+                  tickLine={false}
+                  axisLine={false}
+                  allowDecimals={false}
+                />
+                <RechartsTooltip
+                  content={(props: any) => <ChartTooltipContent {...props} theme={theme} />}
+                  cursor={{ fill: 'rgba(255,255,255,0.03)' }}
+                />
+                <Bar dataKey="count" name="Messages" radius={[3, 3, 0, 0]} maxBarSize={20}>
+                  {hourlyData.map((entry, index) => (
+                    <Cell
+                      key={`hcell-${index}`}
+                      fill={entry.isPeak ? theme.primary : theme.primaryDim}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <div className="h-40 flex items-center justify-center">
+            <p className="text-sm text-[#6B6890]">No hourly data available</p>
+          </div>
+        )}
+      </GlassCard>
+
+      {/* ── Response Time ──────────────────────────────────────── */}
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-5">
+          <Activity size={18} style={{ color: theme.primary }} />
+          <h3 className="text-base font-semibold text-[#fafafa]">Response Time</h3>
+        </div>
+
+        {deepLoading ? (
+          <div className="h-32 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full border-2 border-white/10 border-t-white/40 animate-spin" />
+          </div>
+        ) : deep && deep.responseTimes.totalPairs > 0 ? (
+          <>
+            {/* Response time KPIs */}
+            <div className="grid grid-cols-3 gap-3 mb-5">
+              {[
+                { label: 'Average', value: formatMs(deep.responseTimes.avgMs) },
+                { label: 'Median (P50)', value: formatMs(deep.responseTimes.p50Ms) },
+                { label: '95th Percentile', value: formatMs(deep.responseTimes.p95Ms) },
+              ].map(({ label, value }) => (
+                <div key={label} className="rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+                  <p className="text-[10px] text-[#71717a] uppercase tracking-wider">{label}</p>
+                  <p className="text-lg font-bold text-[#fafafa]">{value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Response time trend line */}
+            {responseTimeData.length > 1 && (
+              <div className="h-36">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={responseTimeData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="rtGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={theme.primary} stopOpacity={0.3} />
+                        <stop offset="100%" stopColor={theme.primary} stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                    <XAxis
+                      dataKey="date"
+                      tick={{ fill: '#71717a', fontSize: 10 }}
+                      tickLine={false}
+                      axisLine={{ stroke: 'rgba(255,255,255,0.06)' }}
+                    />
+                    <YAxis
+                      tick={{ fill: '#71717a', fontSize: 10 }}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(v: number) => formatMs(v)}
+                    />
+                    <RechartsTooltip
+                      content={(props: any) => {
+                        if (!props.active || !props.payload?.length) return null;
+                        return (
+                          <div className="rounded-lg border border-white/10 px-3 py-2 text-xs shadow-lg" style={{ background: '#1a1730' }}>
+                            <p className="font-medium text-white mb-1">{props.label}</p>
+                            <p style={{ color: theme.primary }}>
+                              Avg: {formatMs(props.payload[0].value)}
+                            </p>
+                          </div>
+                        );
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="avgMs"
+                      stroke={theme.primary}
+                      strokeWidth={2}
+                      fill="url(#rtGradient)"
+                      name="Avg Response"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+
+            <p className="text-[10px] text-[#71717a] mt-3">
+              Based on {deep.responseTimes.totalPairs.toLocaleString()} user-assistant message pairs
+            </p>
+          </>
+        ) : (
+          <div className="h-24 flex items-center justify-center">
+            <p className="text-sm text-[#6B6890]">No response time data yet. Chat with your agent to generate data.</p>
+          </div>
+        )}
+      </GlassCard>
+
+      {/* ── Error Rate ─────────────────────────────────────────── */}
+      {deep && deep.errorRate.total > 0 && (
+        <GlassCard>
+          <div className="flex items-center gap-2 mb-5">
+            <AlertTriangle size={18} style={{ color: deep.errorRate.rate > 5 ? '#ef4444' : theme.primary }} />
+            <h3 className="text-base font-semibold text-[#fafafa]">Reliability</h3>
+          </div>
+
+          {/* Success/Error bar */}
+          <div className="mb-4">
+            <div className="flex justify-between text-[10px] text-[#71717a] mb-1.5">
+              <span>Successful ({deep.errorRate.successful.toLocaleString()})</span>
+              <span>Failed ({deep.errorRate.errors.toLocaleString()})</span>
+            </div>
+            <div className="flex h-3 rounded-full overflow-hidden bg-white/[0.04]">
+              <div
+                className="transition-all rounded-l-full"
+                style={{
+                  width: `${deep.errorRate.total > 0 ? ((deep.errorRate.successful / deep.errorRate.total) * 100) : 100}%`,
+                  background: '#22c55e',
+                }}
+              />
+              {deep.errorRate.errors > 0 && (
+                <div
+                  className="transition-all rounded-r-full"
+                  style={{
+                    width: `${(deep.errorRate.errors / deep.errorRate.total) * 100}%`,
+                    background: '#ef4444',
+                  }}
+                />
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-emerald-500/10">
+                <CheckCircle size={13} className="text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Success</p>
+                <p className="text-sm font-bold text-[#fafafa]">{(100 - deep.errorRate.rate).toFixed(1)}%</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-red-500/10">
+                <AlertTriangle size={13} className="text-red-400" />
+              </div>
+              <div>
+                <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Error Rate</p>
+                <p className="text-sm font-bold text-[#fafafa]">{deep.errorRate.rate.toFixed(1)}%</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: theme.primaryBg }}>
+                <MessageSquare size={13} style={{ color: theme.primary }} />
+              </div>
+              <div>
+                <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Total</p>
+                <p className="text-sm font-bold text-[#fafafa]">{deep.errorRate.total.toLocaleString()}</p>
+              </div>
+            </div>
+          </div>
+        </GlassCard>
+      )}
+
+      {/* ── Token Usage ────────────────────────────────────────── */}
       {analytics && analytics.tokens.totalTokens > 0 && (
         <GlassCard>
           <div className="flex items-center gap-2 mb-5">
             <Zap size={16} style={{ color: theme.primary }} />
             <h3 className="text-sm font-semibold text-[#fafafa]">Token Usage</h3>
             {tokenTrend.direction !== 'flat' && (
-              <TrendBadge pct={tokenTrend.pct} direction={tokenTrend.direction} theme={theme} />
+              <TrendBadge pct={tokenTrend.pct} direction={tokenTrend.direction} />
             )}
             <span className="ml-auto text-[10px] text-[#71717a] uppercase tracking-wider">
               {analytics.tokens.hasByok ? 'BYOK' : 'Hatcher Key'}
@@ -384,7 +743,43 @@ export function AnalyticsTab() {
         </GlassCard>
       )}
 
-      {/* Today summary */}
+      {/* ── Top Topics ─────────────────────────────────────────── */}
+      {deep && deep.topTopics.length > 0 && (
+        <GlassCard>
+          <div className="flex items-center gap-2 mb-5">
+            <Tag size={18} style={{ color: theme.primary }} />
+            <h3 className="text-base font-semibold text-[#fafafa]">Top Topics</h3>
+            <span className="text-[10px] text-[#71717a] ml-auto">From recent conversations</span>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {deep.topTopics.map((topic, i) => {
+              const maxCount = deep.topTopics[0]!.count;
+              const opacity = 0.3 + (topic.count / maxCount) * 0.7;
+              return (
+                <div
+                  key={topic.word}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 border transition-all"
+                  style={{
+                    background: `${theme.primary}${Math.round(opacity * 25).toString(16).padStart(2, '0')}`,
+                    borderColor: `${theme.primary}${Math.round(opacity * 40).toString(16).padStart(2, '0')}`,
+                  }}
+                >
+                  <span
+                    className="text-xs font-medium capitalize"
+                    style={{ color: theme.primary, opacity: 0.6 + opacity * 0.4 }}
+                  >
+                    {topic.word}
+                  </span>
+                  <span className="text-[10px] text-[#71717a]">{topic.count}</span>
+                </div>
+              );
+            })}
+          </div>
+        </GlassCard>
+      )}
+
+      {/* ── Today Summary ──────────────────────────────────────── */}
       {analytics && (
         <GlassCard>
           <div className="flex items-center gap-2 mb-4">
@@ -426,7 +821,7 @@ export function AnalyticsTab() {
               <p className="text-[10px] text-[#71717a] uppercase tracking-wider mb-1">{analytics.rangeDays ?? range.replace('d', '')}D Total</p>
               <div className="flex items-baseline gap-2">
                 <p className="text-2xl font-bold text-[#fafafa]">{analytics.totalMessages.toLocaleString()}</p>
-                <TrendBadge pct={msgTrend.pct} direction={msgTrend.direction} theme={theme} />
+                <TrendBadge pct={msgTrend.pct} direction={msgTrend.direction} />
               </div>
             </div>
           </div>
