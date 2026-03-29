@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { motion } from 'framer-motion';
 import {
   Users,
@@ -116,6 +117,9 @@ export default function TeamPage() {
   // Action states
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
+  // Confirm dialog state
+  const [confirmDialog, setConfirmDialog] = useState<'leave' | 'delete' | null>(null);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -206,7 +210,7 @@ export default function TeamPage() {
     if (!team || !user) return;
     const myMembership = team.members.find((m) => m.userId === user.id);
     if (!myMembership) return;
-    if (!confirm('Are you sure you want to leave this team?')) return;
+    setConfirmDialog(null);
     setActionLoading('leave');
     try {
       const res = await api.removeTeamMember(team.id, myMembership.id);
@@ -225,7 +229,7 @@ export default function TeamPage() {
 
   const handleDeleteTeam = async () => {
     if (!team) return;
-    if (!confirm('Are you sure you want to permanently delete this team? All shared agents will be unshared.')) return;
+    setConfirmDialog(null);
     setActionLoading('delete');
     try {
       const res = await api.deleteTeam(team.id);
@@ -389,7 +393,7 @@ export default function TeamPage() {
               <div className="flex items-center gap-2">
                 {!isOwner && (
                   <button
-                    onClick={handleLeaveTeam}
+                    onClick={() => setConfirmDialog('leave')}
                     disabled={actionLoading === 'leave'}
                     className="px-3 py-1.5 rounded-lg text-xs font-medium text-amber-400 border border-amber-500/20 hover:bg-amber-500/10 transition-colors flex items-center gap-1.5"
                   >
@@ -399,7 +403,7 @@ export default function TeamPage() {
                 )}
                 {isOwner && (
                   <button
-                    onClick={handleDeleteTeam}
+                    onClick={() => setConfirmDialog('delete')}
                     disabled={actionLoading === 'delete'}
                     className="px-3 py-1.5 rounded-lg text-xs font-medium text-red-400 border border-red-500/20 hover:bg-red-500/10 transition-colors flex items-center gap-1.5"
                   >
@@ -611,6 +615,27 @@ export default function TeamPage() {
           </motion.div>
         </div>
       )}
+      {/* Confirm Dialogs */}
+      <ConfirmDialog
+        open={confirmDialog === 'leave'}
+        title="Leave Team"
+        description="Are you sure you want to leave this team? You will lose access to all shared agents."
+        confirmLabel="Leave Team"
+        variant="warning"
+        loading={actionLoading === 'leave'}
+        onCancel={() => setConfirmDialog(null)}
+        onConfirm={handleLeaveTeam}
+      />
+      <ConfirmDialog
+        open={confirmDialog === 'delete'}
+        title="Delete Team"
+        description="Are you sure you want to permanently delete this team? All shared agents will be unshared."
+        confirmLabel="Delete Team"
+        variant="danger"
+        loading={actionLoading === 'delete'}
+        onCancel={() => setConfirmDialog(null)}
+        onConfirm={handleDeleteTeam}
+      />
     </motion.div>
   );
 }
