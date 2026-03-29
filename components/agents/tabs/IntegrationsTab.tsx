@@ -16,12 +16,17 @@ import {
   Webhook,
   Copy,
   Check,
+  Star,
+  Zap,
+  Clock,
+  Shield,
 } from 'lucide-react';
 import {
   useAgentContext,
   tabContentVariants,
   GlassCard,
   Skeleton,
+  FRAMEWORK_BADGE,
   getIntegrationsForFramework,
   getExtraIntegrationsForFramework,
   CHANNEL_SETTINGS_FIELDS,
@@ -30,6 +35,112 @@ import {
 } from '../AgentContext';
 import { api } from '@/lib/api';
 import { DomainsSection } from './DomainsSection';
+
+// ─── Framework compatibility metadata ────────────────────────
+// Defines how well each integration works with each framework
+
+type CompatLevel = 'native' | 'community' | 'planned';
+
+const FRAMEWORK_COMPAT: Record<string, Record<string, CompatLevel>> = {
+  openclaw: {
+    'openclaw.platform.telegram': 'native',
+    'openclaw.platform.discord': 'native',
+    'openclaw.platform.whatsapp': 'native',
+    'openclaw.platform.signal': 'planned',
+    'openclaw.platform.twitter': 'native',
+    'openclaw.platform.slack': 'native',
+    'openclaw.feature.webhooks': 'native',
+    'extra.twitch': 'community',
+    'extra.irc': 'community',
+    'extra.googlechat': 'community',
+    'extra.msteams': 'community',
+    'extra.mattermost': 'community',
+    'extra.line': 'community',
+    'extra.matrix': 'community',
+    'extra.nostr': 'community',
+    'extra.feishu': 'community',
+    'extra.zalo': 'community',
+    'extra.nextcloud': 'community',
+    'extra.bluebubbles': 'community',
+  },
+  hermes: {
+    'openclaw.platform.telegram': 'native',
+    'openclaw.platform.discord': 'native',
+    'openclaw.platform.whatsapp': 'native',
+    'openclaw.platform.signal': 'planned',
+    'openclaw.platform.slack': 'native',
+    'openclaw.feature.webhooks': 'native',
+  },
+  elizaos: {
+    'openclaw.platform.telegram': 'native',
+    'openclaw.platform.discord': 'native',
+    'elizaos.twitter': 'native',
+    'openclaw.platform.slack': 'community',
+  },
+  milady: {
+    'openclaw.platform.telegram': 'native',
+    'openclaw.platform.discord': 'native',
+    'openclaw.platform.whatsapp': 'native',
+    'elizaos.twitter': 'native',
+    'openclaw.platform.slack': 'native',
+    'extra.twitch': 'community',
+    'extra.mattermost': 'community',
+    'extra.line': 'community',
+    'extra.matrix': 'community',
+    'extra.nostr': 'community',
+    'extra.feishu': 'community',
+    'extra.bluebubbles': 'community',
+  },
+};
+
+// Recommended integrations per framework (best-supported, highlighted)
+const FRAMEWORK_RECOMMENDED: Record<string, string[]> = {
+  openclaw: ['openclaw.platform.telegram', 'openclaw.platform.discord', 'openclaw.platform.twitter'],
+  hermes: ['openclaw.platform.telegram', 'openclaw.platform.discord'],
+  elizaos: ['openclaw.platform.telegram', 'openclaw.platform.discord', 'elizaos.twitter'],
+  milady: ['openclaw.platform.telegram', 'openclaw.platform.discord', 'elizaos.twitter'],
+};
+
+// Quick Setup = only needs API token(s), no OAuth flow, no pairing, no complex setup
+const QUICK_SETUP_KEYS = new Set([
+  'openclaw.platform.telegram',
+  'openclaw.platform.slack',
+  'extra.mattermost',
+  'extra.zalo',
+  'extra.nostr',
+]);
+
+const COMPAT_BADGE: Record<CompatLevel, { label: string; className: string }> = {
+  native: {
+    label: 'Native',
+    className: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  },
+  community: {
+    label: 'Community',
+    className: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+  },
+  planned: {
+    label: 'Planned',
+    className: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
+  },
+};
+
+function getCompatLevel(framework: string, integration: IntegrationDef): CompatLevel {
+  const sk = integrationStateKey(integration);
+  return FRAMEWORK_COMPAT[framework]?.[sk] ?? 'community';
+}
+
+function isRecommended(framework: string, integration: IntegrationDef): boolean {
+  const sk = integrationStateKey(integration);
+  return FRAMEWORK_RECOMMENDED[framework]?.includes(sk) ?? false;
+}
+
+function isQuickSetup(integration: IntegrationDef): boolean {
+  const sk = integrationStateKey(integration);
+  return QUICK_SETUP_KEYS.has(sk);
+}
+
+// ─── Integration Fields Form ─────────────────────────────────
 
 function IntegrationFieldsForm({
   integration,
@@ -595,18 +706,169 @@ function WebhookSection() {
   );
 }
 
+// ─── Integration Card ────────────────────────────────────────
+// Shared card component with enhanced visual hierarchy
+
+function IntegrationCard({
+  integration,
+  framework,
+  fieldIdPrefix,
+}: {
+  integration: IntegrationDef;
+  framework: string;
+  fieldIdPrefix: string;
+}) {
+  const { expandedIntegrations, toggleIntegrationExpanded, hasExistingSecret } = useAgentContext();
+  const sk = integrationStateKey(integration);
+  const isExpanded = expandedIntegrations.has(sk);
+  const hasAnyConfigured = integration.fields.some((f) => hasExistingSecret(f.key));
+  const isPairing = !!integration.pairingRequired;
+  const isConfigured = hasAnyConfigured;
+
+  const compat = getCompatLevel(framework, integration);
+  const recommended = isRecommended(framework, integration);
+  const quickSetup = isQuickSetup(integration);
+  const compatBadge = COMPAT_BADGE[compat];
+  const isPlanned = compat === 'planned';
+
+  // Framework accent color for the recommended glow
+  const fwBadge = FRAMEWORK_BADGE[framework] ?? 'bg-slate-500/15 text-slate-400 border-slate-500/30';
+
+  // Visual hierarchy: configured > recommended > default > planned
+  const cardBorder = isConfigured
+    ? 'border-emerald-500/30 shadow-[0_0_15px_-3px_rgba(16,185,129,0.15)]'
+    : recommended
+      ? 'border-white/[0.10] hover:border-white/[0.15]'
+      : isPlanned
+        ? 'border-white/[0.04] opacity-60'
+        : '';
+
+  const cardBg = isConfigured
+    ? 'bg-emerald-500/[0.03]'
+    : '';
+
+  return (
+    <GlassCard className={`!p-0 transition-all duration-200 ${cardBorder} ${cardBg}`}>
+      <button
+        type="button"
+        onClick={() => !isPlanned && toggleIntegrationExpanded(sk)}
+        className={`w-full flex items-center gap-3 p-4 text-left transition-colors ${isPlanned ? 'cursor-default' : 'hover:bg-white/[0.02] cursor-pointer'}`}
+        disabled={isPlanned}
+      >
+        {/* Icon */}
+        <div className={`flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+          isConfigured
+            ? 'bg-emerald-500/15 border border-emerald-500/25'
+            : recommended
+              ? 'bg-white/[0.06] border border-white/[0.10]'
+              : 'bg-white/[0.03] border border-white/[0.06]'
+        }`}>
+          {isConfigured ? (
+            <CheckCircle size={15} className="text-emerald-400" />
+          ) : isPairing ? (
+            <Smartphone size={15} className={recommended ? 'text-white/70' : 'text-[#71717a]'} />
+          ) : isPlanned ? (
+            <Clock size={15} className="text-zinc-500" />
+          ) : (
+            <Settings size={15} className={recommended ? 'text-white/70' : 'text-[#71717a]'} />
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className={`text-sm font-medium ${isPlanned ? 'text-zinc-500' : isConfigured ? 'text-white' : 'text-[#FFFFFF]'}`}>
+              {integration.name}
+            </span>
+
+            {/* Recommended badge */}
+            {recommended && !isConfigured && (
+              <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                <Star size={8} className="fill-amber-400" />
+                Recommended
+              </span>
+            )}
+
+            {/* Framework compatibility badge */}
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${compatBadge.className}`}>
+              {compatBadge.label}
+            </span>
+
+            {/* Quick Setup badge */}
+            {quickSetup && !isConfigured && !isPlanned && (
+              <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                <Zap size={8} />
+                Quick Setup
+              </span>
+            )}
+
+            {/* Pairing badge */}
+            {isPairing && !isPlanned && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
+                QR Pairing
+              </span>
+            )}
+
+            {/* Free badge */}
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              Free
+            </span>
+
+            {/* Configured badge */}
+            {isConfigured && (
+              <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                <Shield size={8} />
+                Connected
+              </span>
+            )}
+          </div>
+          <p className={`text-xs mt-0.5 truncate ${isPlanned ? 'text-zinc-600' : 'text-[#71717a]'}`}>
+            {integration.description}
+          </p>
+        </div>
+
+        {/* Expand/collapse */}
+        {!isPlanned && (
+          isExpanded
+            ? <ChevronUp size={16} className="text-[#71717a] flex-shrink-0" />
+            : <ChevronDown size={16} className="text-[#71717a] flex-shrink-0" />
+        )}
+      </button>
+
+      {isExpanded && !isPlanned && (
+        isPairing ? (
+          <PairingPanel integration={integration} />
+        ) : (
+          <IntegrationFieldsForm
+            integration={integration}
+            fieldIdPrefix={fieldIdPrefix}
+          />
+        )
+      )}
+    </GlassCard>
+  );
+}
+
+// ─── Main Tab ────────────────────────────────────────────────
+
 export function IntegrationsTab() {
   const ctx = useAgentContext();
   const {
     agent,
     activeFeatures, featuresLoading,
-    expandedIntegrations, toggleIntegrationExpanded,
-    integrationSecrets, hasExistingSecret,
   } = ctx;
 
   const fw = agent?.framework ?? 'openclaw';
   const mainIntegrations = getIntegrationsForFramework(fw);
   const extraIntegrations = getExtraIntegrationsForFramework(fw);
+  const fwBadge = FRAMEWORK_BADGE[fw] ?? 'bg-slate-500/15 text-slate-400 border-slate-500/30';
+  const fwLabel = fw === 'elizaos' ? 'ElizaOS' : fw.charAt(0).toUpperCase() + fw.slice(1);
+
+  // Count configured
+  const configuredCount = [...mainIntegrations, ...extraIntegrations].filter(
+    (i) => i.fields.some((f) => ctx.hasExistingSecret(f.key))
+  ).length;
+  const totalCount = mainIntegrations.length + extraIntegrations.length;
 
   return (
     <motion.div key="tab-integrations" className="space-y-6" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
@@ -616,6 +878,29 @@ export function IntegrationsTab() {
         </div>
       ) : (
         <>
+          {/* Framework context bar */}
+          <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+            <div className="flex items-center gap-2.5">
+              <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${fwBadge}`}>
+                {fwLabel}
+              </span>
+              <span className="text-xs text-[#71717a]">
+                Showing integrations compatible with {fwLabel}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-[#71717a]">
+                {configuredCount}/{totalCount} connected
+              </span>
+              <div className="w-16 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-emerald-500/60 transition-all duration-500"
+                  style={{ width: totalCount > 0 ? `${(configuredCount / totalCount) * 100}%` : '0%' }}
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Security note shown when any features are unlocked */}
           {activeFeatures.length > 0 && (
             <div className="flex items-start gap-2.5 p-3 rounded-lg border border-amber-500/20 bg-amber-500/5">
@@ -636,70 +921,14 @@ export function IntegrationsTab() {
               <span className="ml-2 text-emerald-400 normal-case tracking-normal font-normal">Free on all tiers</span>
             </h3>
             <div className="space-y-3">
-              {mainIntegrations.map((integration) => {
-                const sk = integrationStateKey(integration);
-                const isExpanded = expandedIntegrations.has(sk);
-                const hasAnyConfigured = integration.fields.some((f) => hasExistingSecret(f.key));
-                const isPairing = !!integration.pairingRequired;
-                // For pairing integrations, check if pairing marker exists in config
-                const pairingKey = integration.pairingChannel === 'whatsapp' ? 'WHATSAPP_PAIRING' : integration.pairingChannel === 'signal' ? 'SIGNAL_PAIRING' : '';
-                // Don't show static "Paired" badge — live status is shown inside PairingPanel
-                const isConfigured = hasAnyConfigured;
-
-                return (
-                  <GlassCard key={sk} className={`!p-0 ${isConfigured ? 'border-emerald-500/20' : ''}`}>
-                    <button
-                      type="button"
-                      onClick={() => toggleIntegrationExpanded(sk)}
-                      className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition-colors cursor-pointer"
-                    >
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${isConfigured ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-white/5 border border-white/[0.06]'}`}>
-                        {isConfigured ? (
-                          <CheckCircle size={14} className="text-emerald-400" />
-                        ) : isPairing ? (
-                          <Smartphone size={14} className="text-[#71717a]" />
-                        ) : (
-                          <Settings size={14} className="text-[#71717a]" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-[#FFFFFF]">{integration.name}</span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                            Free
-                          </span>
-                          {isPairing && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
-                              QR Pairing
-                            </span>
-                          )}
-                          {isConfigured && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#06b6d4]/15 text-[#06b6d4] border border-[#06b6d4]/20">
-                              Configured
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-xs mt-0.5 truncate text-[#71717a]">{integration.description}</p>
-                      </div>
-                      {isExpanded
-                        ? <ChevronUp size={16} className="text-[#71717a]" />
-                        : <ChevronDown size={16} className="text-[#71717a]" />
-                      }
-                    </button>
-
-                    {isExpanded && (
-                      isPairing ? (
-                        <PairingPanel integration={integration} />
-                      ) : (
-                        <IntegrationFieldsForm
-                          integration={integration}
-                          fieldIdPrefix="integrations-tab"
-                        />
-                      )
-                    )}
-                  </GlassCard>
-                );
-              })}
+              {mainIntegrations.map((integration) => (
+                <IntegrationCard
+                  key={integrationStateKey(integration)}
+                  integration={integration}
+                  framework={fw}
+                  fieldIdPrefix="integrations-tab"
+                />
+              ))}
             </div>
           </div>
 
@@ -707,62 +936,38 @@ export function IntegrationsTab() {
           {extraIntegrations.length > 0 && <div>
             <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[#71717a]">
               Other Platforms
+              <span className="ml-2 text-blue-400 normal-case tracking-normal font-normal">Community extensions</span>
             </h3>
             <div className="space-y-3">
               <div className="flex items-center gap-2 mb-1">
                 <CheckCircle size={14} className="text-emerald-400" />
                 <span className="text-xs text-emerald-400/80">All platforms included free — configure credentials below</span>
               </div>
-              {extraIntegrations.map((integration) => {
-                const sk = integrationStateKey(integration);
-                const isExpanded = expandedIntegrations.has(sk);
-                const hasAnyConfigured = integration.fields.some((f) => hasExistingSecret(f.key));
-
-                return (
-                  <GlassCard key={sk} className={`!p-0 ${hasAnyConfigured ? 'border-emerald-500/20' : ''}`}>
-                    <button
-                      type="button"
-                      onClick={() => toggleIntegrationExpanded(sk)}
-                      className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition-colors cursor-pointer"
-                    >
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${hasAnyConfigured ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-white/5 border border-white/[0.06]'}`}>
-                        {hasAnyConfigured ? (
-                          <CheckCircle size={14} className="text-emerald-400" />
-                        ) : (
-                          <Settings size={14} className="text-[#71717a]" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-[#FFFFFF]">{integration.name}</span>
-                          {hasAnyConfigured && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#06b6d4]/15 text-[#06b6d4] border border-[#06b6d4]/20">
-                              Configured
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-xs mt-0.5 truncate text-[#71717a]">{integration.description}</p>
-                      </div>
-                      {isExpanded
-                        ? <ChevronUp size={16} className="text-[#71717a]" />
-                        : <ChevronDown size={16} className="text-[#71717a]" />
-                      }
-                    </button>
-
-                    {isExpanded && (
-                      <IntegrationFieldsForm
-                        integration={integration}
-                        fieldIdPrefix="extra"
-                      />
-                    )}
-                  </GlassCard>
-                );
-              })}
+              {extraIntegrations.map((integration) => (
+                <IntegrationCard
+                  key={integrationStateKey(integration)}
+                  integration={integration}
+                  framework={fw}
+                  fieldIdPrefix="extra"
+                />
+              ))}
             </div>
           </div>}
 
           {/* Custom Domains */}
           <DomainsSection />
+
+          {/* Legend */}
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 pt-2 border-t border-white/[0.04]">
+            {(['native', 'community', 'planned'] as CompatLevel[]).map((level) => (
+              <span key={level} className="flex items-center gap-1.5 text-[10px] text-[#71717a]">
+                <span className={`inline-block w-1.5 h-1.5 rounded-full ${
+                  level === 'native' ? 'bg-emerald-400' : level === 'community' ? 'bg-blue-400' : 'bg-zinc-500'
+                }`} />
+                {level === 'native' ? 'Native — built-in support' : level === 'community' ? 'Community — npm extensions' : 'Planned — coming soon'}
+              </span>
+            ))}
+          </div>
 
           {/* Note */}
           <p className="text-center text-xs text-[#71717a]">
