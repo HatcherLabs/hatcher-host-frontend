@@ -566,6 +566,9 @@ export interface AgentContextValue {
   isAuthenticated: boolean;
   wallet: ReturnType<typeof import('@solana/wallet-adapter-react').useWallet>;
   connection: ReturnType<typeof import('@solana/wallet-adapter-react').useConnection>['connection'];
+
+  // Tier
+  userTier: string;
 }
 
 export const AgentContext = createContext<AgentContextValue | null>(null);

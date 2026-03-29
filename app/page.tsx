@@ -8,6 +8,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { IntroSplash } from '@/components/landing/IntroSplash';
 import { DeploymentWalkthrough } from '@/components/landing/DeploymentWalkthrough';
+import { DemoChat } from '@/components/demo/DemoChat';
 
 import {
   ArrowRight,
@@ -938,6 +939,20 @@ export default function LandingPage() {
               ))}
             </motion.div>
           </div>
+        </div>
+      </Section>
+
+      {/* ── INTERACTIVE DEMO ────────────────────────────── */}
+      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">Try it now</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Chat with a live agent</h2>
+            <p className="text-[#a1a1aa] max-w-lg mx-auto">
+              This is a real Hatcher agent running on our platform. Ask it anything — no signup required.
+            </p>
+          </div>
+          <DemoChat />
         </div>
       </Section>
 

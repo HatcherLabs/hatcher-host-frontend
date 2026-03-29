@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import {
   Download,
   Filter,
+  Lock,
   RotateCcw,
   ScrollText,
   Search,
@@ -35,7 +36,10 @@ export function LogsTab() {
     filteredLogs,
     logsEndRef,
     loadLogs,
+    userTier,
   } = ctx;
+
+  const isPro = userTier === 'pro';
 
   const handleDownload = () => {
     const text = logs
@@ -84,14 +88,20 @@ export function LogsTab() {
           );
         })}
 
-        {/* SSE live indicator */}
-        {isActive && tab === 'logs' && (
+        {/* SSE live indicator — Pro only */}
+        {isActive && tab === 'logs' && isPro && (
           <span className="flex items-center gap-1.5 ml-2 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20">
             <span className="relative flex h-1.5 w-1.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
             </span>
             Live
+          </span>
+        )}
+        {!isPro && (
+          <span className="flex items-center gap-1.5 ml-2 text-[10px] text-[#8b5cf6] bg-[#8b5cf6]/10 px-2 py-1 rounded-full border border-[#8b5cf6]/20">
+            <Lock size={10} />
+            Pro
           </span>
         )}
 
