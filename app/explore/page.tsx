@@ -1,14 +1,16 @@
 'use client';
 
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
 import { cn, timeAgo } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
-import { RobotMascot } from '@/components/ui/RobotMascot';
+
+import { useAuth } from '@/lib/auth-context';
 import {
   AlertTriangle,
+  ArrowRight,
+  Bot,
   Calendar,
   ChevronLeft,
   ChevronRight,
@@ -20,7 +22,6 @@ import {
   RefreshCw,
   Search,
   SearchX,
-  Sparkles,
   X,
 } from 'lucide-react';
 import { FRAMEWORKS } from '@hatcher/shared';
@@ -174,17 +175,6 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
-// ── Animation variants ───────────────────────────────────────
-const pageVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.4, staggerChildren: 0.06 } },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const } },
-};
-
 function AgentSkeleton() {
   return (
     <div className={cn(cardClass, 'p-5 animate-pulse')}>
@@ -220,6 +210,7 @@ export default function ExplorePage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [page, setPage] = useState(1);
   const gridRef = useRef<HTMLDivElement>(null);
+  const { isAuthenticated } = useAuth();
 
   // Debounce search input by 300ms
   const search = useDebounce(searchInput, 300);
@@ -307,49 +298,23 @@ export default function ExplorePage() {
   return (
     <div className="min-h-screen">
       {/* ── Hero Banner ──────────────────────────────────── */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.12),transparent_70%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_30%_at_70%_20%,rgba(6,182,212,0.06),transparent)]" />
-        <motion.div
-          className="mx-auto max-w-7xl px-4 pt-16 pb-12 relative"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="text-center mb-2">
-            <motion.div
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#06b6d4]/10 border border-[#06b6d4]/20 text-[#06b6d4] text-xs font-medium mb-4"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              Community Agents
-            </motion.div>
-            <div className="flex items-center justify-center gap-3 sm:gap-4 mb-3">
-              <RobotMascot size="md" mood="happy" />
-              <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-[var(--text-primary)]">
-                Discover AI Agents
-              </h1>
-            </div>
-            <p className="text-[var(--text-muted)] text-lg max-w-xl mx-auto">
-              {loading
-                ? 'Loading agents...'
-                : `${agents.length} agent${agents.length !== 1 ? 's' : ''} on Hatcher${activeCount > 0 ? ` — ${activeCount} live` : ''}`}
-            </p>
-          </div>
-        </motion.div>
+      <div className="mx-auto max-w-7xl px-4 pt-16 pb-10">
+        <div className="text-center">
+          <h1 className="text-2xl sm:text-4xl font-bold text-[var(--text-primary)] mb-3">
+            Explore Agents
+          </h1>
+          <p className="text-[var(--text-muted)] text-base max-w-md mx-auto">
+            {loading
+              ? 'Loading agents...'
+              : `${agents.length} agent${agents.length !== 1 ? 's' : ''} deployed on Hatcher${activeCount > 0 ? ` — ${activeCount} live` : ''}`}
+          </p>
+        </div>
       </div>
 
       <div className="mx-auto max-w-7xl px-4 pb-12">
         {/* ── Search + Filter Bar ────────────────────────── */}
         {!loading && !error && agents.length > 0 && (
-          <motion.div
-            className="flex flex-col gap-4 mb-8"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.4 }}
-          >
+          <div className="flex flex-col gap-4 mb-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               {/* Search */}
               <div className="relative w-full sm:w-80 group/search">
@@ -423,15 +388,7 @@ export default function ExplorePage() {
 
             {/* Results summary bar */}
             <div className="flex items-center justify-between">
-              <AnimatePresence mode="wait">
-                <motion.p
-                  key={`${filtered.length}-${search}-${statusFilter}`}
-                  className="text-sm text-[var(--text-muted)]"
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  transition={{ duration: 0.2 }}
-                >
+                <p className="text-sm text-[var(--text-muted)]">
                   {hasActiveFilters ? (
                     <>
                       Showing <span className="text-[var(--text-secondary)] font-medium">{filtered.length}</span> of{' '}
@@ -448,23 +405,19 @@ export default function ExplorePage() {
                       )}
                     </>
                   )}
-                </motion.p>
-              </AnimatePresence>
+                </p>
 
               {hasActiveFilters && (
-                <motion.button
+                <button
                   className="flex items-center gap-1.5 text-xs font-medium text-[#06b6d4] hover:text-[#22d3ee] transition-colors duration-150 px-2.5 py-1 rounded-lg hover:bg-[rgba(6,182,212,0.08)]"
                   onClick={clearAllFilters}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
                 >
                   <X className="w-3 h-3" />
                   Clear all filters
-                </motion.button>
+                </button>
               )}
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Content */}
@@ -489,14 +442,12 @@ export default function ExplorePage() {
               </button>
             </div>
           ) : agents.length === 0 ? (
-            <motion.div
-              className={cn(cardClass, 'p-16 text-center')}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <RobotMascot size="lg" mood="confused" className="mx-auto mb-6" />
+            <div className={cn(cardClass, 'p-16 text-center')}>
+              <div className="w-14 h-14 rounded-2xl bg-[rgba(6,182,212,0.08)] border border-[rgba(6,182,212,0.15)] flex items-center justify-center mx-auto mb-5">
+                <Bot className="w-7 h-7 text-[#06b6d4]/60" />
+              </div>
               <h3 className="text-xl font-medium text-[var(--text-primary)] mb-2">No agents yet</h3>
-              <p className="text-[var(--text-muted)] mb-6">Be the first to hatch an agent!</p>
+              <p className="text-[var(--text-muted)] mb-6">Be the first to deploy an agent on Hatcher.</p>
               <Link
                 href="/create"
                 className="btn-primary"
@@ -504,14 +455,9 @@ export default function ExplorePage() {
                 <Plus className="w-4 h-4" />
                 Create Agent
               </Link>
-            </motion.div>
+            </div>
           ) : filtered.length === 0 ? (
-            <motion.div
-              className={cn(cardClass, 'p-16 text-center max-w-lg mx-auto')}
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-            >
+            <div className={cn(cardClass, 'p-16 text-center max-w-lg mx-auto')}>
               <div className="w-16 h-16 rounded-2xl bg-[rgba(6,182,212,0.08)] border border-[rgba(6,182,212,0.15)] flex items-center justify-center mx-auto mb-5">
                 <SearchX className="w-8 h-8 text-[#06b6d4]/60" />
               </div>
@@ -531,32 +477,38 @@ export default function ExplorePage() {
                 <Filter className="w-3.5 h-3.5" />
                 Clear all filters
               </button>
-            </motion.div>
+            </div>
           ) : (
             <>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={`page-${safePage}-${search}-${statusFilter}-${sort}`}
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                  variants={pageVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit={{ opacity: 0, transition: { duration: 0.15 } }}
-                >
-                  {paginatedAgents.map((agent) => (
-                    <ExploreAgentCard key={agent.id} agent={agent} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {paginatedAgents.map((agent, idx) => (
+                    <React.Fragment key={agent.id}>
+                      {/* CTA card at position 4 for logged-out users */}
+                      {idx === 3 && !isAuthenticated && safePage === 1 && (
+                        <Link
+                          href="/register"
+                          className={cn(cardClass, 'p-5 flex flex-col items-center justify-center text-center gap-3 border-dashed border-[rgba(6,182,212,0.25)] hover:border-[rgba(6,182,212,0.5)] transition-colors duration-200')}
+                        >
+                          <div className="w-10 h-10 rounded-xl bg-[rgba(6,182,212,0.08)] flex items-center justify-center">
+                            <Plus className="w-5 h-5 text-[#06b6d4]" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-[var(--text-primary)] mb-1">Like what you see?</p>
+                            <p className="text-xs text-[var(--text-muted)]">Create your own agent in minutes</p>
+                          </div>
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#06b6d4]">
+                            Get started <ArrowRight className="w-3.5 h-3.5" />
+                          </span>
+                        </Link>
+                      )}
+                      <ExploreAgentCard agent={agent} />
+                    </React.Fragment>
                   ))}
-                </motion.div>
-              </AnimatePresence>
+              </div>
 
               {/* ── Pagination ──────────────────────────── */}
               {totalPages > 1 && (
-                <motion.div
-                  className="flex items-center justify-center gap-2 mt-10"
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
+                <div className="flex items-center justify-center gap-2 mt-10">
                   {/* Previous */}
                   <button
                     onClick={() => goToPage(safePage - 1)}
@@ -610,7 +562,7 @@ export default function ExplorePage() {
                   >
                     <ChevronRight className="w-5 h-5" />
                   </button>
-                </motion.div>
+                </div>
               )}
             </>
           )}
@@ -666,27 +618,11 @@ const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agen
   const isNewAgent = messageCount === 0;
 
   return (
-    <motion.div variants={cardVariants}>
+    <div>
       <Link href={`/agent/${agent.id}`} className="block group">
-        <div className="relative">
-          {/* Framework-colored border glow on hover */}
-          <div
-            className="absolute -inset-[1px] rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none"
-            style={{ background: `linear-gradient(135deg, ${fwConfig.border}, transparent 70%)`, borderRadius: '16px' }}
-          />
-          <motion.div
-            className={cn(cardClass, 'p-5 h-full flex flex-col relative')}
-            whileHover={{
-              y: -4,
-              boxShadow: `0 12px 40px ${fwConfig.glow}`,
-            }}
-            transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
-          >
-            {/* Top accent line — framework color */}
-            <div
-              className="absolute top-0 left-4 right-4 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-              style={{ background: `linear-gradient(90deg, transparent, ${fwConfig.border}, transparent)` }}
-            />
+        <div
+          className={cn(cardClass, 'p-5 h-full flex flex-col relative hover:-translate-y-1 transition-transform duration-200')}
+        >
 
             {/* Header: avatar + name + status */}
             <div className="flex items-start gap-3 mb-3">
@@ -700,7 +636,7 @@ const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agen
                   style={{ ['--tw-ring-color' as string]: fwConfig.border }}
                 />
               ) : (
-                <div className="flex-shrink-0 transition-all duration-300 group-hover:scale-105">
+                <div className="flex-shrink-0">
                   <FrameworkAvatar framework={fw} size={48} />
                 </div>
               )}
@@ -763,9 +699,8 @@ const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agen
                 {timeAgo(agent.createdAt)}
               </span>
             </div>
-          </motion.div>
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 });

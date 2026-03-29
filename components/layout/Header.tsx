@@ -118,7 +118,7 @@ export function Header() {
             <Link href="/" className="flex items-center gap-2 group">
               <span className="flex items-center gap-2">
                 <span className="relative flex items-center justify-center w-7 h-7">
-                  <svg viewBox="0 0 28 28" width="28" height="28" fill="none" className="drop-shadow-[0_0_8px_rgba(139,92,246,0.25)]">
+                  <svg viewBox="0 0 28 28" width="28" height="28" fill="none">
                     <defs>
                       <linearGradient id="eggShell" x1="14" y1="3" x2="14" y2="27" gradientUnits="userSpaceOnUse">
                         <stop offset="0%" stopColor="#2a2a38" />
@@ -133,9 +133,7 @@ export function Header() {
                     <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggShell)" stroke="rgba(139,92,246,0.5)" strokeWidth="0.8" />
                     <path d="M14 4 C8.5 4, 5 10, 5 15.5 C5 21, 9 26, 14 26 C19 26, 23 21, 23 15.5 C23 10, 19.5 4, 14 4Z" fill="url(#eggInnerGlow)" />
                     <path d="M10 14.5 L12.5 12.5 L11 10.5 L13.5 9 L12 7" stroke="#8b5cf6" strokeWidth="0.7" strokeLinecap="round" fill="none" opacity="0.6" />
-                    <circle cx="12" cy="11" r="1.5" fill="#8b5cf6" opacity="0.3">
-                      <animate attributeName="opacity" values="0.2;0.45;0.2" dur="3s" repeatCount="indefinite" />
-                    </circle>
+                    <circle cx="12" cy="11" r="1.5" fill="#8b5cf6" opacity="0.3" />
                     <ellipse cx="11" cy="10" rx="2.5" ry="4" fill="white" opacity="0.04" transform="rotate(-15 11 10)" />
                   </svg>
                 </span>
@@ -180,7 +178,7 @@ export function Header() {
                   {link.label}
                   {active && (
                     <motion.div
-                      className="absolute -bottom-[9px] left-1/2 -translate-x-1/2 w-5 h-0.5 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(139,92,246,0.5)]"
+                      className="absolute -bottom-[9px] left-1/2 -translate-x-1/2 w-5 h-0.5 bg-purple-500 rounded-full"
                       layoutId="headerActiveTab"
                       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                     />
@@ -220,7 +218,7 @@ export function Header() {
                   )}
                   {active && (
                     <motion.div
-                      className="absolute -bottom-[9px] left-1/2 -translate-x-1/2 w-5 h-0.5 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(139,92,246,0.5)]"
+                      className="absolute -bottom-[9px] left-1/2 -translate-x-1/2 w-5 h-0.5 bg-purple-500 rounded-full"
                       layoutId="headerActiveTab"
                       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                     />

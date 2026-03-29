@@ -57,13 +57,13 @@ const SOCIAL_ICONS = [
 export function Footer() {
   return (
     <footer className="mt-auto">
-      <div className="h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
+      <div className="h-px bg-white/[0.06]" />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-3">
-              <svg viewBox="0 0 28 28" width="22" height="22" fill="none" className="drop-shadow-[0_0_6px_rgba(6,182,212,0.2)]">
+              <svg viewBox="0 0 28 28" width="22" height="22" fill="none">
                 <defs>
                   <linearGradient id="eggShellF" x1="14" y1="3" x2="14" y2="27" gradientUnits="userSpaceOnUse">
                     <stop offset="0%" stopColor="#3D375E" />
@@ -83,7 +83,7 @@ export function Footer() {
               <span className="text-base font-bold text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Hatcher</span>
             </div>
             <p className="text-xs text-[#A5A1C2] leading-relaxed max-w-[200px]">
-              Deploy autonomous AI agents across 20+ platforms. Powered by OpenClaw, Hermes, ElizaOS &amp; Milady.
+              Deploy AI agents on 20+ platforms. One click, any framework.
             </p>
             {/* Social icons */}
             <div className="flex items-center gap-1.5 mt-4">
@@ -164,17 +164,10 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/[0.06] pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <span className="text-xs text-[#71717a]">&copy; {new Date().getFullYear()} HatcherLabs. All rights reserved.</span>
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-2 gap-y-1 text-xs text-[#71717a]">
-            <span>Powered by</span>
-            <span className="font-medium text-[#A5A1C2]">OpenClaw</span>
-            <span className="text-white/20">&middot;</span>
-            <span className="font-medium text-[#A5A1C2]/90">Hermes</span>
-            <span className="text-white/20">&middot;</span>
-            <span className="font-medium text-[#A5A1C2]/80">ElizaOS</span>
-            <span className="text-white/20">&middot;</span>
-            <span className="font-medium text-[#A5A1C2]/80">Milady</span>
-            <span className="text-white/20">&middot;</span>
-            <span className="font-medium text-[#A5A1C2]/70">Solana</span>
+          <div className="flex items-center gap-4 text-xs text-[#71717a]">
+            <Link href="/pricing" className="hover:text-white transition-colors duration-200">Pricing</Link>
+            <Link href="/support" className="hover:text-white transition-colors duration-200">Support</Link>
+            <a href={DOCS_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-200">Docs</a>
           </div>
         </div>
       </div>

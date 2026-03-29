@@ -2,11 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { TIERS, TIER_ORDER, ADDONS } from '@hatcher/shared';
 import type { UserTierKey } from '@hatcher/shared';
-import { RobotMascot } from '@/components/ui/RobotMascot';
 import {
   ArrowRight,
   Check,
@@ -21,40 +20,6 @@ import {
   X,
   Zap,
 } from 'lucide-react';
-
-/* ── Animation variants ──────────────────────────────────── */
-const pageVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.4, staggerChildren: 0.08 } },
-};
-
-const sectionVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const } },
-};
-
-const cardHover = {
-  scale: 1.02,
-  borderColor: 'rgba(6, 182, 212, 0.4)',
-  boxShadow: '0 0 30px rgba(6, 182, 212, 0.12), 0 8px 40px rgba(0,0,0,0.2)',
-};
-
-const scrollFadeIn = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] as const } },
-};
-
-const staggerGrid = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.07 } },
-};
-
-const staggerItem = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const } },
-};
-
-const displayFont = { fontFamily: 'var(--font-display), system-ui, sans-serif' };
 
 /* ── Feature comparison data ─────────────────────────────── */
 interface FeatureRow {
@@ -98,28 +63,17 @@ export default function PricingPage() {
   const [isAnnual, setIsAnnual] = useState(false);
 
   return (
-    <motion.div
-      className="min-h-screen"
-      variants={pageVariants}
-      initial="hidden"
-      animate="visible"
-    >
+    <div className="min-h-screen">
       <div className="mx-auto max-w-6xl px-4 py-16">
         {/* HERO */}
-        <motion.div className="text-center mb-16 relative" variants={sectionVariants}>
+        <div className="text-center mb-16 relative">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.12),transparent_60%)] pointer-events-none" />
-          <motion.div
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#06b6d4]/10 border border-[#06b6d4]/20 text-[#06b6d4] text-xs font-medium mb-6"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-          >
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#06b6d4]/10 border border-[#06b6d4]/20 text-[#06b6d4] text-xs font-medium mb-6">
             <Sparkles className="w-3.5 h-3.5" />
             Simple Pricing
-          </motion.div>
-          <h1 className="text-4xl sm:text-5xl font-extrabold mb-5 relative" style={displayFont}>
-            <span className="text-gradient">Choose Your</span>{' '}
-            <span className="text-[var(--text-primary)]">Plan</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-extrabold mb-5 relative text-white">
+            Choose Your Plan
           </h1>
           <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto leading-relaxed relative">
             Start free with any framework. Scale when you are ready.
@@ -127,12 +81,7 @@ export default function PricingPage() {
           </p>
 
           {/* Monthly / Annual toggle */}
-          <motion.div
-            className="inline-flex items-center gap-3 mt-8 p-1 rounded-full bg-white/[0.04] border border-white/[0.06]"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35 }}
-          >
+          <div className="inline-flex items-center gap-3 mt-8 p-1 rounded-full bg-white/[0.04] border border-white/[0.06]">
             <button
               onClick={() => setIsAnnual(false)}
               className={cn(
@@ -158,17 +107,11 @@ export default function PricingPage() {
                 -20%
               </span>
             </button>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* TIER CARDS */}
-        <motion.div
-          className="grid md:grid-cols-3 gap-6 mb-20"
-          variants={staggerGrid}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-        >
+        <div className="grid md:grid-cols-3 gap-6 mb-20">
           {TIER_ORDER.map((tierKey) => {
             const tier = TIERS[tierKey];
             const style = TIER_STYLES[tierKey];
@@ -179,14 +122,12 @@ export default function PricingPage() {
             const billingParam = isAnnual ? 'annual' : 'monthly';
 
             return (
-              <motion.div
+              <div
                 key={tierKey}
                 className={cn(
                   'card glass-noise p-8 flex flex-col relative',
                   style.highlighted && 'border-[#06b6d4]/40 shadow-[0_0_40px_rgba(6,182,212,0.12)]'
                 )}
-                whileHover={cardHover}
-                variants={staggerItem}
               >
                 {/* Popular badge */}
                 {style.badge && (
@@ -205,8 +146,7 @@ export default function PricingPage() {
                     <AnimatePresence mode="wait">
                       <motion.span
                         key={`${tierKey}-price-${isAnnual}`}
-                        className="text-4xl font-extrabold"
-                        style={{ color: style.accent }}
+                        className="text-4xl font-extrabold text-white"
                         initial={{ opacity: 0, y: -8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 8 }}
@@ -220,17 +160,13 @@ export default function PricingPage() {
                     )}
                   </div>
                   {annualTotal && (
-                    <motion.p
-                      className="text-[10px] text-[var(--text-muted)] mt-1"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                    >
+                    <p className="text-[10px] text-[var(--text-muted)] mt-1">
                       ${annualTotal} billed annually
                       {' '}
                       <span className="text-green-400 font-semibold">
                         (save ${(monthlyPrice * 12 - annualTotal).toFixed(2)})
                       </span>
-                    </motion.p>
+                    </p>
                   )}
                   {!isAnnual && monthlyPrice > 0 && (
                     <p className="text-[10px] text-[var(--text-muted)] mt-1">
@@ -299,21 +235,15 @@ export default function PricingPage() {
                     Get {tier.name}
                   </Link>
                 )}
-              </motion.div>
+              </div>
             );
           })}
-        </motion.div>
+        </div>
 
         {/* ADD-ONS SECTION */}
-        <motion.section
-          className="mb-20"
-          variants={scrollFadeIn}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.15 }}
-        >
+        <section className="mb-20">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3" style={displayFont}>
+            <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3">
               <Plus className="w-6 h-6 text-[#06b6d4]" />
               <span className="text-[var(--text-primary)]">Agent Add-ons</span>
             </h2>
@@ -322,23 +252,15 @@ export default function PricingPage() {
             </p>
           </div>
 
-          <motion.div
-            className="grid sm:grid-cols-3 gap-5 max-w-3xl mx-auto"
-            variants={staggerGrid}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.1 }}
-          >
+          <div className="grid sm:grid-cols-3 gap-5 max-w-3xl mx-auto">
             {ADDONS.map((addon) => (
-              <motion.div
+              <div
                 key={addon.key}
                 className="card glass-noise p-6 text-center"
-                whileHover={cardHover}
-                variants={staggerItem}
               >
                 <h3 className="font-bold text-[var(--text-primary)] text-lg mb-2">{addon.name}</h3>
-                <div className="text-3xl font-extrabold mb-1">
-                  <span className="text-gradient">${addon.usdPrice}</span>
+                <div className="text-3xl font-extrabold mb-1 text-white">
+                  ${addon.usdPrice}
                 </div>
                 <p className="text-[var(--text-muted)] text-xs mb-3">
                   {addon.type === 'one_time' ? 'one-time' : '/month'}
@@ -346,19 +268,13 @@ export default function PricingPage() {
                 <p className="text-sm text-[var(--text-secondary)]">
                   {addon.extraAgents ? `${addon.extraAgents} extra agent slots` : addon.description}
                 </p>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
-        </motion.section>
+          </div>
+        </section>
 
         {/* FREE INTEGRATIONS CALLOUT */}
-        <motion.section
-          className="mb-20"
-          variants={scrollFadeIn}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.15 }}
-        >
+        <section className="mb-20">
           <div className="card-gradient-border glass-noise p-8 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-[radial-gradient(circle,rgba(34,197,94,0.06),transparent_70%)] pointer-events-none" />
             <div className="flex items-center gap-3 mb-6">
@@ -381,18 +297,12 @@ export default function PricingPage() {
               Google, xAI, or Groq API key without any Hatcher markup.
             </p>
           </div>
-        </motion.section>
+        </section>
 
         {/* COMPARE PLANS TABLE */}
-        <motion.section
-          className="mb-20"
-          variants={scrollFadeIn}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-        >
+        <section className="mb-20">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3" style={displayFont}>
+            <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3">
               <Shield className="w-6 h-6 text-[#06b6d4]" />
               <span className="text-[var(--text-primary)]">Compare Plans</span>
             </h2>
@@ -411,68 +321,52 @@ export default function PricingPage() {
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[var(--text-primary)] font-semibold">
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Basic</div>
-                      <div className="text-sm sm:text-lg font-extrabold text-gradient">$9.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                      <div className="text-sm sm:text-lg font-extrabold text-white">$9.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[var(--text-primary)] font-semibold">
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Pro</div>
-                      <div className="text-sm sm:text-lg font-extrabold text-gradient">$19.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                      <div className="text-sm sm:text-lg font-extrabold text-white">$19.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {FEATURE_ROWS.map((row, i) => (
-                    <motion.tr
+                    <tr
                       key={row.label}
                       className={cn(
                         'border-b border-[rgba(46,43,74,0.2)] transition-colors hover:bg-white/[0.02]',
                         i % 2 === 0 && 'bg-white/[0.01]'
                       )}
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.03 }}
                     >
                       <td className="px-2.5 py-3 sm:p-4 text-[var(--text-secondary)] text-xs sm:text-sm">{row.label}</td>
                       <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.free)}</td>
                       <td className="px-2 py-3 sm:p-4 text-center bg-[#06b6d4]/[0.02]">{renderCell(row.basic)}</td>
                       <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.pro)}</td>
-                    </motion.tr>
+                    </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* FAQ */}
-        <motion.section
-          className="mb-20"
-          variants={scrollFadeIn}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-        >
+        <section className="mb-20">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold flex items-center justify-center gap-3" style={displayFont}>
+            <h2 className="text-2xl font-bold flex items-center justify-center gap-3">
               <HelpCircle className="w-6 h-6 text-[#06b6d4]" />
               <span className="text-[var(--text-primary)]">Frequently Asked Questions</span>
             </h2>
           </div>
           <div className="max-w-3xl mx-auto space-y-3">
-            {FAQ.map((item, index) => (
-              <FAQItem key={item.q} q={item.q} a={item.a} index={index} />
+            {FAQ.map((item) => (
+              <FAQItem key={item.q} q={item.q} a={item.a} />
             ))}
           </div>
-        </motion.section>
+        </section>
 
         {/* NEED HELP */}
-        <motion.div
-          className="text-center mb-20"
-          variants={scrollFadeIn}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-        >
+        <div className="text-center mb-20">
           <p className="text-[var(--text-muted)] text-sm">
             Need help choosing a plan?{' '}
             <a href="mailto:support@hatcher.host" className="text-[#06b6d4] hover:underline font-medium">
@@ -483,51 +377,39 @@ export default function PricingPage() {
               ask on Discord
             </a>
           </p>
-        </motion.div>
+        </div>
 
         {/* CTA BANNER */}
-        <motion.div
-          className="card-gradient-border glass-noise p-10 sm:p-14 text-center relative overflow-hidden"
-          variants={scrollFadeIn}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-        >
+        <div className="card-gradient-border glass-noise p-10 sm:p-14 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.1),transparent_60%)] pointer-events-none" />
-          <RobotMascot size="lg" mood="waving" className="mx-auto mb-6 relative" />
-          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 relative" style={displayFont}>
-            <span className="text-gradient">Ready to hatch</span>{' '}
-            <span className="text-[var(--text-primary)]">your agent?</span>
+          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 relative text-white">
+            Ready to hatch your agent?
           </h2>
           <p className="text-[var(--text-secondary)] text-base max-w-lg mx-auto mb-8 leading-relaxed relative">
             Pick your framework, choose a template, and deploy in seconds.
             Start free with a built-in LLM. Upgrade when you need more power.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 relative">
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
-              <Link href="/create" className="btn-primary px-10 py-4 text-base font-bold">
-                <Rocket className="w-5 h-5" />
-                Create Agent
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
-              <Link
-                href="/explore"
-                className="inline-flex items-center gap-2 px-6 py-4 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-              >
-                Browse Agents
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </motion.div>
+            <Link href="/create" className="btn-primary px-10 py-4 text-base font-bold">
+              <Rocket className="w-5 h-5" />
+              Create Agent
+            </Link>
+            <Link
+              href="/explore"
+              className="inline-flex items-center gap-2 px-6 py-4 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              Browse Agents
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
-        </motion.div>
+        </div>
 
         {/* FOOTER NOTE */}
         <p className="text-center text-xs text-[var(--text-muted)] mt-10">
           All prices in USD. Pay with SOL or platform tokens.
         </p>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -560,34 +442,29 @@ function FeatureMissing({ children }: { children: React.ReactNode }) {
 
 /* ── FAQ Accordion ───────────────────────────────────────── */
 
-function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
+function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <motion.div
+    <div
       className={cn(
         'card glass-noise overflow-hidden transition-all duration-200',
         open && 'border-[rgba(6,182,212,0.3)] shadow-[0_0_20px_rgba(6,182,212,0.06)]'
       )}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
     >
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between p-5 text-left group"
       >
         <span className="text-sm font-medium text-[var(--text-primary)] pr-4 group-hover:text-[#06b6d4] transition-colors">{q}</span>
-        <motion.div
-          animate={{ rotate: open ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
+        <div
           className={cn(
             'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors',
             open ? 'bg-[#06b6d4]/15' : 'bg-white/[0.03]'
           )}
         >
-          <ChevronDown className={cn('w-4 h-4 transition-colors', open ? 'text-[#06b6d4]' : 'text-[var(--text-muted)]')} />
-        </motion.div>
+          <ChevronDown className={cn('w-4 h-4 transition-all duration-200', open ? 'text-[#06b6d4] rotate-180' : 'text-[var(--text-muted)]')} />
+        </div>
       </button>
       <AnimatePresence>
         {open && (
@@ -605,34 +482,18 @@ function FAQItem({ q, a, index }: { q: string; a: string; index: number }) {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }
 
 const FAQ = [
   {
-    q: 'Do I need a wallet to use Hatcher?',
-    a: 'No. You can register with email and create a free agent immediately. You only need to connect a Solana wallet when purchasing a paid subscription with SOL or platform tokens.',
-  },
-  {
-    q: 'What frameworks are supported?',
-    a: 'Hatcher supports 4 frameworks: OpenClaw (13,700+ skills, plugin ecosystem), Hermes (lightweight, persistent memory, 40+ tools), ElizaOS (multi-agent, 350+ plugins, blockchain-native), and Milady (privacy-first, 29 connectors). All tiers support all frameworks.',
-  },
-  {
     q: 'What is BYOK (Bring Your Own Key)?',
-    a: 'BYOK lets you use your own API key for any LLM provider (OpenAI, Anthropic, Google, xAI, Groq, OpenRouter). This is always free on all tiers -- you pay the provider directly, no Hatcher markup. Works with both frameworks.',
-  },
-  {
-    q: 'Are integrations really free?',
-    a: 'Yes. Telegram, Discord, WhatsApp, Slack, Signal, iMessage, and 14+ more platforms are included at no extra charge on all tiers, including Free.',
+    a: 'BYOK lets you use your own API key for any LLM provider (OpenAI, Anthropic, Google, xAI, Groq, OpenRouter). This is always free on all tiers -- you pay the provider directly, no Hatcher markup.',
   },
   {
     q: 'How do add-ons work?',
     a: 'Add-ons are stackable. For example, if you are on the Free tier (1 agent) and purchase a +5 Agents add-on, you can run 6 agents total. Add-ons work on any tier and you can combine multiple.',
-  },
-  {
-    q: 'How is the token price determined?',
-    a: 'All prices are listed in USD. The equivalent token amount is calculated at payment time using live rates.',
   },
   {
     q: 'What payment methods are accepted?',
