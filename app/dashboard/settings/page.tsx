@@ -539,10 +539,18 @@ export default function SettingsPage() {
 
                     {/* API Keys (multi-key) */}
                     <Section title="API Keys" icon={<Key size={16} />}>
-                      <p className="text-sm text-[var(--text-secondary)] mb-5 leading-relaxed">
-                        Create multiple API keys for programmatic access. Each key uses the <code className="font-mono text-xs bg-white/[0.05] px-1.5 py-0.5 rounded text-cyan-400">hk_</code> prefix.
-                        The full key is shown <span className="text-amber-400 font-medium">only once</span> at creation.
-                      </p>
+                      <div className="flex items-start justify-between gap-4 mb-5">
+                        <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                          Create multiple API keys for programmatic access. Each key uses the <code className="font-mono text-xs bg-white/[0.05] px-1.5 py-0.5 rounded text-cyan-400">hk_</code> prefix.
+                          The full key is shown <span className="text-amber-400 font-medium">only once</span> at creation.
+                        </p>
+                        <Link
+                          href="/dashboard/settings/api-keys"
+                          className="inline-flex items-center gap-1.5 text-xs font-medium text-cyan-400 hover:text-cyan-300 transition-colors whitespace-nowrap flex-shrink-0"
+                        >
+                          Manage keys <ArrowRight size={12} />
+                        </Link>
+                      </div>
 
                       {/* Newly created key — one-time reveal */}
                       {newlyCreatedKey && (
