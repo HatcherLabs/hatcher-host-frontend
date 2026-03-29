@@ -764,6 +764,97 @@ export default function AgentManagePage() {
     }
   };
 
+  // ─── Derived values (must be before early returns to respect Rules of Hooks) ──
+
+  const gradient = agent ? stringToColor(agent.id) : '';
+  const initials = agent ? getInitials(agent.name) : '';
+  const statusInfo = agent ? (STATUS_STYLES[agent.status] ?? STATUS_STYLES.paused) : STATUS_STYLES.paused;
+  const frameworkMeta = agent ? FRAMEWORKS[agent.framework] : undefined;
+  const isActive = agent?.status === 'active';
+  const isNotActive = agent?.status === 'paused' || agent?.status === 'sleeping' || agent?.status === 'error';
+
+  const activeFeatureKeys = new Set(activeFeatures.map((f) => f.featureKey));
+
+  const remaining = !hasUnlimitedChat ? Math.max(0, msgLimit - msgCount) : null;
+  const isLimitReached = !hasUnlimitedChat && remaining !== null && remaining === 0;
+  const filteredLogs = useMemo(
+    () =>
+      logs
+        .filter((l) => logFilter === 'all' || l.level === logFilter)
+        .filter((l) => !logSearch || l.message.toLowerCase().includes(logSearch.toLowerCase())),
+    [logs, logFilter, logSearch],
+  );
+
+  const llmProvider = configProvider || (() => {
+    const char = agent?.config ?? {};
+    const settings = (char as Record<string, unknown>).settings as Record<string, unknown> | undefined;
+    return (settings?.modelProvider as string) ?? (char as Record<string, unknown>).provider as string ?? 'groq';
+  })();
+  const currentProviderMeta = getBYOKProvider(llmProvider);
+  const providerModels = currentProviderMeta?.models ?? [];
+
+  const hasApiKey = (() => {
+    const char = agent?.config ?? {};
+    const secrets = (char as Record<string, unknown>).secrets as Record<string, unknown> | undefined;
+    return !!(secrets && Object.keys(secrets).length > 0);
+  })();
+
+  const displayUptime = stats?.uptimeSecs && stats.uptimeSecs > 0
+    ? stats.uptimeSecs
+    : (agent?.createdAt ? Math.floor((Date.now() - new Date(agent.createdAt).getTime()) / 1000) : 0);
+  const isLiveUptime = !!(stats?.uptimeSecs && stats.uptimeSecs > 0);
+
+  // ─── Build context value ───────────────────────────────────
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const contextValue: AgentContextValue | null = useMemo(() => {
+    if (!agent) return null;
+    return {
+      agent, id, stats, isActive, isNotActive, statusInfo, frameworkMeta,
+      tab, setTab,
+      logs, logsLoading, logFilter, setLogFilter, logSearch, setLogSearch, autoScroll, setAutoScroll, filteredLogs, logsEndRef, loadLogs,
+      messages, setMessages, input, setInput, sending,
+      chatError, setChatError, chatErrorType, setChatErrorType,
+      msgCount, hasUnlimitedChat, msgLimit, remaining, isLimitReached,
+      bottomRef, inputRef, sendMessage, handleKeyDown,
+      configName, setConfigName, configDesc, setConfigDesc,
+      configBio, setConfigBio, configLore, setConfigLore,
+      configTopics, setConfigTopics, configStyle, setConfigStyle,
+      configAdjectives, setConfigAdjectives,
+      configSystemPrompt, setConfigSystemPrompt,
+      configSkills, setConfigSkills,
+      configModel, setConfigModel, configProvider, setConfigProvider,
+      customModelInput, setCustomModelInput,
+      useCustomModel, setUseCustomModel,
+      byokKeyInput, setByokKeyInput,
+      showByokKey, setShowByokKey,
+      saving, saveMsg, setSaveMsg, saveConfig,
+      llmProvider, currentProviderMeta, providerModels, hasApiKey,
+      displayUptime, isLiveUptime,
+      activeFeatures, activeFeatureKeys, featuresLoading,
+      unlocking: null, handleUnlockFeature: async () => {},
+      integrationSecrets, expandedIntegrations, visibleFields,
+      savingIntegration, integrationSaveMsg,
+      toggleIntegrationExpanded, toggleFieldVisibility,
+      setIntegrationField, saveIntegrationSecrets, hasExistingSecret,
+      actionLoading, actionError, actionSuccess, setActionError,
+      handleAction, handleDelete,
+      deleteConfirm, setDeleteConfirm, deleting, deleteError, setDeleteError,
+      loadAgent, loadFeatures,
+      isAuthenticated, wallet, connection,
+      userTier,
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, agent, stats, tab, logs, logsLoading, logFilter, logSearch, autoScroll, filteredLogs,
+    messages, input, sending, chatError, chatErrorType, msgCount, msgLimit, remaining, isLimitReached,
+    configName, configDesc, configBio, configLore, configTopics, configStyle, configAdjectives,
+    configSystemPrompt, configSkills, configModel, configProvider, customModelInput, useCustomModel,
+    byokKeyInput, showByokKey, saving, saveMsg, integrationSecrets, expandedIntegrations,
+    visibleFields, savingIntegration, integrationSaveMsg, activeFeatures, activeFeatureKeys,
+    featuresLoading, deleteConfirm, deleting, deleteError, actionLoading, actionError, actionSuccess,
+    llmProvider, currentProviderMeta, providerModels, hasApiKey, displayUptime, isLiveUptime,
+    isActive, isNotActive, statusInfo, frameworkMeta, isAuthenticated, wallet, connection, userTier]);
+
   // ─── Loading state ───────────────────────────────────────
 
   if (loading) {
@@ -807,99 +898,10 @@ export default function AgentManagePage() {
     );
   }
 
-  // ─── Derived values ────────────────────────────────────────
-
-  const gradient = stringToColor(agent.id);
-  const initials = getInitials(agent.name);
-  const statusInfo = STATUS_STYLES[agent.status] ?? STATUS_STYLES.paused;
-  const frameworkMeta = FRAMEWORKS[agent.framework];
-  const isActive = agent.status === 'active';
-  const isNotActive = agent.status === 'paused' || agent.status === 'sleeping' || agent.status === 'error';
-
-  const activeFeatureKeys = new Set(activeFeatures.map((f) => f.featureKey));
-  // Feature catalog and bundles removed — using tier-based model now
-
-  const remaining = !hasUnlimitedChat ? Math.max(0, msgLimit - msgCount) : null;
-  const isLimitReached = !hasUnlimitedChat && remaining !== null && remaining === 0;
-  const filteredLogs = useMemo(
-    () =>
-      logs
-        .filter((l) => logFilter === 'all' || l.level === logFilter)
-        .filter((l) => !logSearch || l.message.toLowerCase().includes(logSearch.toLowerCase())),
-    [logs, logFilter, logSearch],
-  );
-
-  const llmProvider = configProvider || (() => {
-    const char = agent.config ?? {};
-    const settings = (char as Record<string, unknown>).settings as Record<string, unknown> | undefined;
-    return (settings?.modelProvider as string) ?? (char as Record<string, unknown>).provider as string ?? 'groq';
-  })();
-  const currentProviderMeta = getBYOKProvider(llmProvider);
-  const providerModels = currentProviderMeta?.models ?? [];
-
-  const hasApiKey = (() => {
-    const char = agent.config ?? {};
-    const secrets = (char as Record<string, unknown>).secrets as Record<string, unknown> | undefined;
-    return !!(secrets && Object.keys(secrets).length > 0);
-  })();
-
-  const displayUptime = stats?.uptimeSecs && stats.uptimeSecs > 0
-    ? stats.uptimeSecs
-    : (agent.createdAt ? Math.floor((Date.now() - new Date(agent.createdAt).getTime()) / 1000) : 0);
-  const isLiveUptime = !!(stats?.uptimeSecs && stats.uptimeSecs > 0);
-
-  // ─── Build context value ───────────────────────────────────
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const contextValue: AgentContextValue = useMemo(() => ({
-    agent, id, stats, isActive, isNotActive, statusInfo, frameworkMeta,
-    tab, setTab,
-    logs, logsLoading, logFilter, setLogFilter, logSearch, setLogSearch, autoScroll, setAutoScroll, filteredLogs, logsEndRef, loadLogs,
-    messages, setMessages, input, setInput, sending,
-    chatError, setChatError, chatErrorType, setChatErrorType,
-    msgCount, hasUnlimitedChat, msgLimit, remaining, isLimitReached,
-    bottomRef, inputRef, sendMessage, handleKeyDown,
-    configName, setConfigName, configDesc, setConfigDesc,
-    configBio, setConfigBio, configLore, setConfigLore,
-    configTopics, setConfigTopics, configStyle, setConfigStyle,
-    configAdjectives, setConfigAdjectives,
-    configSystemPrompt, setConfigSystemPrompt,
-    configSkills, setConfigSkills,
-    configModel, setConfigModel, configProvider, setConfigProvider,
-    customModelInput, setCustomModelInput,
-    useCustomModel, setUseCustomModel,
-    byokKeyInput, setByokKeyInput,
-    showByokKey, setShowByokKey,
-    saving, saveMsg, setSaveMsg, saveConfig,
-    llmProvider, currentProviderMeta, providerModels, hasApiKey,
-    displayUptime, isLiveUptime,
-    activeFeatures, activeFeatureKeys, featuresLoading,
-    unlocking: null, handleUnlockFeature: async () => {},
-    integrationSecrets, expandedIntegrations, visibleFields,
-    savingIntegration, integrationSaveMsg,
-    toggleIntegrationExpanded, toggleFieldVisibility,
-    setIntegrationField, saveIntegrationSecrets, hasExistingSecret,
-    actionLoading, actionError, actionSuccess, setActionError,
-    handleAction, handleDelete,
-    deleteConfirm, setDeleteConfirm, deleting, deleteError, setDeleteError,
-    loadAgent, loadFeatures,
-    isAuthenticated, wallet, connection,
-    userTier,
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [id, agent, stats, tab, logs, logsLoading, logFilter, logSearch, autoScroll, filteredLogs,
-    messages, input, sending, chatError, chatErrorType, msgCount, msgLimit, remaining, isLimitReached,
-    configName, configDesc, configBio, configLore, configTopics, configStyle, configAdjectives,
-    configSystemPrompt, configSkills, configModel, configProvider, customModelInput, useCustomModel,
-    byokKeyInput, showByokKey, saving, saveMsg, integrationSecrets, expandedIntegrations,
-    visibleFields, savingIntegration, integrationSaveMsg, activeFeatures, activeFeatureKeys,
-    featuresLoading, deleteConfirm, deleting, deleteError, actionLoading, actionError, actionSuccess,
-    llmProvider, currentProviderMeta, providerModels, hasApiKey, displayUptime, isLiveUptime,
-    isActive, isNotActive, statusInfo, frameworkMeta, isAuthenticated, wallet, connection, userTier]);
-
   // ─── Render ────────────────────────────────────────────────
 
   return (
-    <AgentContext.Provider value={contextValue}>
+    <AgentContext.Provider value={contextValue!}>
       <motion.div
         className="flex flex-col lg:flex-row"
         style={{ minHeight: 'calc(100vh - 64px)' }}
