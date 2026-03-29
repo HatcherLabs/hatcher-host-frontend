@@ -1141,14 +1141,20 @@ export function ConfigTab() {
                                   setConfigSystemPrompt(preset.prompt);
                                 }
                               }}
-                              className={\${colors.border} \${colors.bg} ring-1 \${colors.ring}\}
+                              className={`group relative flex items-start gap-3 w-full text-left rounded-xl px-3.5 py-3 border transition-all duration-200 ${
+                                isSelected
+                                  ? `${colors.border} ${colors.bg} ring-1 ${colors.ring}`
+                                  : 'border-white/[0.06] bg-[#18181b]/80 hover:border-white/[0.12] hover:bg-[#18181b]'
+                              }`}
                             >
-                              <div className={\}>
-                                <Icon size={15} className={\} />
+                              <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ${
+                                isSelected ? colors.iconBg : 'bg-white/[0.04]'
+                              }`}>
+                                <Icon size={15} className={`transition-colors duration-200 ${isSelected ? colors.icon : 'text-[#71717a]'}`} />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
-                                  <span className={\}>
+                                  <span className={`text-[13px] font-medium transition-colors duration-200 ${isSelected ? 'text-white' : 'text-[#A5A1C2]'}`}>
                                     {preset.name}
                                   </span>
                                   {isSelected && (
