@@ -362,14 +362,14 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* ── 3. SOCIAL PROOF / STATS ──────────────────────── */}
+      {/* ── 3. PLATFORM HIGHLIGHTS ──────────────────────── */}
       <Section className="py-12 sm:py-16 px-4 sm:px-6 border-t border-white/[0.06]">
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12">
-            <AnimatedStat value={1200} suffix="+" label="Agents deployed" />
-            <AnimatedStat value={580000} suffix="+" label="Messages processed" />
             <AnimatedStat value={4} label="AI frameworks" />
+            <AnimatedStat value={20} suffix="+" label="Platforms supported" />
             <AnimatedStat value={23} label="Ready templates" />
+            <AnimatedStat value={60} suffix="s" label="Deploy time" />
           </div>
         </div>
       </Section>
