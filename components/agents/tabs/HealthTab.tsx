@@ -12,9 +12,11 @@ import {
   CheckCircle2,
   XCircle,
   RefreshCw,
+  RotateCcw,
+  Server,
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { useAgentContext } from '../AgentContext';
+import { useAgentContext, FRAMEWORK_BADGE } from '../AgentContext';
 
 interface MonitoringData {
   health: 'healthy' | 'unhealthy' | 'stopped';
@@ -40,27 +42,78 @@ function formatMs(ms: number): string {
   return `${(ms / 1000).toFixed(2)}s`;
 }
 
-const HEALTH_STYLES: Record<string, { bg: string; text: string; dot: string; label: string }> = {
-  healthy: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', dot: 'bg-emerald-400', label: 'Healthy' },
-  unhealthy: { bg: 'bg-amber-500/10', text: 'text-amber-400', dot: 'bg-amber-400', label: 'Unhealthy' },
-  stopped: { bg: 'bg-zinc-500/10', text: 'text-zinc-400', dot: 'bg-zinc-400', label: 'Stopped' },
+// ─── Framework theme colors ────────────────────────────────
+const FRAMEWORK_COLORS: Record<string, { primary: string; hex: string; hexLight: string; bg: string; border: string; text: string; label: string; runtime: string }> = {
+  openclaw: {
+    primary: 'amber',
+    hex: '#f59e0b',
+    hexLight: '#fbbf24',
+    bg: 'bg-amber-500/8',
+    border: 'border-amber-500/20',
+    text: 'text-amber-400',
+    label: 'OpenClaw',
+    runtime: 'Node.js runtime with npm channel extensions. Monitors HTTP health endpoint and Docker container stats.',
+  },
+  hermes: {
+    primary: 'purple',
+    hex: '#a855f7',
+    hexLight: '#c084fc',
+    bg: 'bg-purple-500/8',
+    border: 'border-purple-500/20',
+    text: 'text-purple-400',
+    label: 'Hermes',
+    runtime: 'Python runtime with FastAPI. Monitors uvicorn process health and container resource usage.',
+  },
+  elizaos: {
+    primary: 'cyan',
+    hex: '#06b6d4',
+    hexLight: '#22d3ee',
+    bg: 'bg-cyan-500/8',
+    border: 'border-cyan-500/20',
+    text: 'text-cyan-400',
+    label: 'ElizaOS',
+    runtime: 'TypeScript runtime on Bun. Monitors agent process heartbeat and plugin connectivity.',
+  },
+  milady: {
+    primary: 'rose',
+    hex: '#f43f5e',
+    hexLight: '#fb7185',
+    bg: 'bg-rose-500/8',
+    border: 'border-rose-500/20',
+    text: 'text-rose-400',
+    label: 'Milady',
+    runtime: 'ElizaOS-based runtime with 29 connectors. Monitors multi-connector health and memory usage.',
+  },
 };
 
-function StatCard({ icon, label, value, sub, color }: {
+const HEALTH_STYLES: Record<string, { bg: string; text: string; dot: string; ring: string; label: string }> = {
+  healthy: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', dot: 'bg-emerald-400', ring: 'ring-emerald-400/30', label: 'Healthy' },
+  unhealthy: { bg: 'bg-amber-500/10', text: 'text-amber-400', dot: 'bg-amber-400', ring: 'ring-amber-400/30', label: 'Unhealthy' },
+  stopped: { bg: 'bg-zinc-500/10', text: 'text-zinc-400', dot: 'bg-zinc-500', ring: 'ring-zinc-500/30', label: 'Stopped' },
+};
+
+function StatCard({ icon, label, value, sub, accentHex }: {
   icon: React.ReactNode;
   label: string;
   value: string;
   sub?: string;
-  color?: string;
+  accentHex?: string;
 }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-white/[0.06] bg-[#18181b]/80 p-4"
+      className="rounded-xl border border-white/[0.06] bg-[#18181b]/80 p-4 relative overflow-hidden"
     >
+      {/* Accent top bar */}
+      {accentHex && (
+        <div
+          className="absolute top-0 left-0 right-0 h-[2px]"
+          style={{ background: `linear-gradient(90deg, ${accentHex}80, ${accentHex}20)` }}
+        />
+      )}
       <div className="flex items-center gap-2 mb-2">
-        <div className={color || 'text-zinc-400'}>{icon}</div>
+        <div style={{ color: accentHex || '#a1a1aa' }}>{icon}</div>
         <span className="text-xs text-zinc-500 uppercase tracking-wider">{label}</span>
       </div>
       <p className="text-2xl font-bold text-white">{value}</p>
@@ -69,34 +122,124 @@ function StatCard({ icon, label, value, sub, color }: {
   );
 }
 
-function MiniChart({ data, dataKey, color, height = 60 }: {
+function MiniChart({ data, dataKey, accentHex, height = 80 }: {
   data: Array<{ ts: number; cpu: number; mem: number }>;
   dataKey: 'cpu' | 'mem';
-  color: string;
+  accentHex: string;
   height?: number;
 }) {
   if (!data.length) return <div className="text-zinc-600 text-xs">No data yet</div>;
 
   const values = data.map(d => d[dataKey]);
   const max = Math.max(...values, 1);
-  const w = 100 / data.length;
+  const points = values.map((v, i) => {
+    const x = (i / (values.length - 1 || 1)) * 100;
+    const y = 100 - (v / max) * 100;
+    return { x, y };
+  });
+
+  // Build SVG path
+  const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+  const areaD = `${pathD} L 100 100 L 0 100 Z`;
+
+  const gradientId = `grad-${dataKey}-${accentHex.replace('#', '')}`;
 
   return (
-    <div className="flex items-end gap-[1px]" style={{ height }}>
-      {values.map((v, i) => (
-        <div
-          key={i}
-          className="rounded-t-sm transition-all"
-          style={{
-            width: `${w}%`,
-            height: `${Math.max((v / max) * 100, 2)}%`,
-            backgroundColor: color,
-            opacity: 0.3 + (i / data.length) * 0.7,
-          }}
-          title={`${dataKey === 'cpu' ? v.toFixed(1) + '%' : v.toFixed(0) + 'MB'}`}
+    <div style={{ height }} className="w-full">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full">
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={accentHex} stopOpacity="0.35" />
+            <stop offset="100%" stopColor={accentHex} stopOpacity="0.02" />
+          </linearGradient>
+        </defs>
+        {/* Gradient fill area */}
+        <path d={areaD} fill={`url(#${gradientId})`} />
+        {/* Line */}
+        <path
+          d={pathD}
+          fill="none"
+          stroke={accentHex}
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
         />
-      ))}
+        {/* Current value dot */}
+        {points.length > 0 && (
+          <circle
+            cx={points[points.length - 1].x}
+            cy={points[points.length - 1].y}
+            r="2"
+            fill={accentHex}
+            stroke="#18181b"
+            strokeWidth="1"
+            vectorEffect="non-scaling-stroke"
+          />
+        )}
+      </svg>
     </div>
+  );
+}
+
+function RestartIndicator({ restarts, accentHex }: { restarts: number; accentHex: string }) {
+  const isHigh = restarts >= 5;
+  const isWarning = restarts >= 3;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={`rounded-xl border p-4 relative overflow-hidden ${
+        isHigh
+          ? 'border-red-500/20 bg-red-500/5'
+          : isWarning
+            ? 'border-amber-500/15 bg-amber-500/5'
+            : 'border-white/[0.06] bg-[#18181b]/80'
+      }`}
+    >
+      {/* Accent top bar */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[2px]"
+        style={{ background: isHigh ? 'linear-gradient(90deg, #ef444480, #ef444420)' : `linear-gradient(90deg, ${accentHex}80, ${accentHex}20)` }}
+      />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <RotateCcw size={16} className={isHigh ? 'text-red-400' : isWarning ? 'text-amber-400' : 'text-zinc-400'} />
+          <span className="text-xs text-zinc-500 uppercase tracking-wider">Restarts</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className={`text-2xl font-bold ${isHigh ? 'text-red-400' : isWarning ? 'text-amber-400' : 'text-white'}`}>
+            {restarts}
+          </span>
+          {isHigh && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/15 border border-red-500/25"
+            >
+              <AlertTriangle size={10} className="text-red-400" />
+              <span className="text-[10px] font-medium text-red-400">HIGH</span>
+            </motion.div>
+          )}
+          {isWarning && !isHigh && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/25"
+            >
+              <AlertTriangle size={10} className="text-amber-400" />
+              <span className="text-[10px] font-medium text-amber-400">WARN</span>
+            </motion.div>
+          )}
+        </div>
+      </div>
+      {isHigh && (
+        <p className="text-[10px] text-red-400/70 mt-2">
+          High restart count may indicate a crash loop. Check logs for errors.
+        </p>
+      )}
+    </motion.div>
   );
 }
 
@@ -106,6 +249,9 @@ export function HealthTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  const framework = agent?.framework || 'openclaw';
+  const fwColors = FRAMEWORK_COLORS[framework] || FRAMEWORK_COLORS.openclaw;
 
   const fetchData = useCallback(async () => {
     if (!agent?.id) return;
@@ -174,18 +320,51 @@ export function HealthTab() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${style.bg}`}>
-            <div className={`w-2 h-2 rounded-full ${style.dot} ${data.health === 'healthy' ? 'animate-pulse' : ''}`} />
-            <span className={`text-sm font-medium ${style.text}`}>{style.label}</span>
-          </div>
-          {data.uptime.since && (
-            <span className="text-xs text-zinc-500">
-              Up since {new Date(data.uptime.since).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+      {/* Framework Context Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`rounded-xl border ${fwColors.border} ${fwColors.bg} px-4 py-3 flex items-start gap-3`}
+      >
+        <Server size={16} className={`${fwColors.text} mt-0.5 shrink-0`} />
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className={`text-xs font-semibold ${fwColors.text}`}>{fwColors.label} Agent</span>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-md border ${FRAMEWORK_BADGE[framework] || ''}`}>
+              {framework}
             </span>
-          )}
+          </div>
+          <p className="text-[11px] text-zinc-400 leading-relaxed">{fwColors.runtime}</p>
+        </div>
+      </motion.div>
+
+      {/* Header — Health Badge */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          {/* Prominent health status */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-xl ${style.bg} ring-1 ${style.ring}`}
+          >
+            <div className="relative">
+              <div className={`w-3.5 h-3.5 rounded-full ${style.dot}`} />
+              {data.health === 'healthy' && (
+                <div className={`absolute inset-0 w-3.5 h-3.5 rounded-full ${style.dot} animate-ping opacity-40`} />
+              )}
+              {data.health === 'unhealthy' && (
+                <div className={`absolute inset-0 w-3.5 h-3.5 rounded-full ${style.dot} animate-pulse opacity-50`} />
+              )}
+            </div>
+            <div>
+              <span className={`text-sm font-semibold ${style.text}`}>{style.label}</span>
+              {data.uptime.since && (
+                <p className="text-[10px] text-zinc-500">
+                  Since {new Date(data.uptime.since).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </p>
+              )}
+            </div>
+          </motion.div>
         </div>
         <button
           onClick={refresh}
@@ -203,50 +382,53 @@ export function HealthTab() {
           icon={<Clock size={16} />}
           label="Uptime"
           value={formatUptime(data.uptime.seconds)}
-          color="text-emerald-400"
+          accentHex={fwColors.hex}
         />
         <StatCard
           icon={<Zap size={16} />}
           label="Avg Response"
           value={formatMs(data.responseTimes.avg)}
           sub={`P95: ${formatMs(data.responseTimes.p95)}`}
-          color="text-cyan-400"
+          accentHex={fwColors.hex}
         />
         <StatCard
           icon={<Cpu size={16} />}
           label="CPU"
           value={`${data.resources.cpuPercent.toFixed(1)}%`}
-          color="text-purple-400"
+          accentHex={fwColors.hex}
         />
         <StatCard
           icon={<MemoryStick size={16} />}
           label="Memory"
           value={`${data.resources.memoryUsageMb.toFixed(0)} MB`}
           sub={`${memPercent}% of ${data.resources.memoryLimitMb} MB`}
-          color="text-amber-400"
+          accentHex={fwColors.hex}
         />
       </div>
 
-      {/* Charts + Errors */}
+      {/* Charts + Restarts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* CPU History */}
-        <div className="rounded-xl border border-white/[0.06] bg-[#18181b]/80 p-4">
+        <div className={`rounded-xl border ${fwColors.border} bg-[#18181b]/80 p-4`}>
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-zinc-500 uppercase tracking-wider">CPU History</span>
-            <span className="text-xs text-purple-400">{data.resources.cpuPercent.toFixed(1)}%</span>
+            <span className={`text-xs ${fwColors.text}`}>{data.resources.cpuPercent.toFixed(1)}%</span>
           </div>
-          <MiniChart data={data.history} dataKey="cpu" color="#a855f7" height={80} />
+          <MiniChart data={data.history} dataKey="cpu" accentHex={fwColors.hex} height={80} />
         </div>
 
         {/* Memory History */}
-        <div className="rounded-xl border border-white/[0.06] bg-[#18181b]/80 p-4">
+        <div className={`rounded-xl border ${fwColors.border} bg-[#18181b]/80 p-4`}>
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-zinc-500 uppercase tracking-wider">Memory History</span>
-            <span className="text-xs text-amber-400">{memPercent}%</span>
+            <span className={`text-xs ${fwColors.text}`}>{memPercent}%</span>
           </div>
-          <MiniChart data={data.history} dataKey="mem" color="#f59e0b" height={80} />
+          <MiniChart data={data.history} dataKey="mem" accentHex={fwColors.hexLight} height={80} />
         </div>
       </div>
+
+      {/* Restart Count Indicator */}
+      <RestartIndicator restarts={data.restarts} accentHex={fwColors.hex} />
 
       {/* Errors Section */}
       <div className="rounded-xl border border-white/[0.06] bg-[#18181b]/80 p-4">
@@ -275,19 +457,19 @@ export function HealthTab() {
       </div>
 
       {/* Response Time Details */}
-      <div className="rounded-xl border border-white/[0.06] bg-[#18181b]/80 p-4">
+      <div className={`rounded-xl border ${fwColors.border} bg-[#18181b]/80 p-4`}>
         <div className="flex items-center gap-2 mb-4">
-          <Zap size={16} className="text-cyan-400" />
+          <Zap size={16} className={fwColors.text} />
           <span className="text-xs text-zinc-500 uppercase tracking-wider">Response Times</span>
         </div>
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: 'Average', value: data.responseTimes.avg, color: 'text-cyan-400' },
-            { label: 'P95', value: data.responseTimes.p95, color: 'text-purple-400' },
-            { label: 'Last', value: data.responseTimes.last, color: 'text-emerald-400' },
+            { label: 'Average', value: data.responseTimes.avg },
+            { label: 'P95', value: data.responseTimes.p95 },
+            { label: 'Last', value: data.responseTimes.last },
           ].map(rt => (
             <div key={rt.label} className="text-center">
-              <p className={`text-lg font-bold ${rt.color}`}>{formatMs(rt.value)}</p>
+              <p className="text-lg font-bold" style={{ color: fwColors.hex }}>{formatMs(rt.value)}</p>
               <p className="text-xs text-zinc-500">{rt.label}</p>
             </div>
           ))}
