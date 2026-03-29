@@ -11,9 +11,13 @@ import {
   Clock,
   TrendingUp,
   Infinity,
+  Info,
+  Key,
+  Shield,
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { useAgentContext } from '../AgentContext';
+import { useAgentContext, FRAMEWORK_BADGE } from '../AgentContext';
+import { useAuth } from '@/lib/auth-context';
 
 interface UsageData {
   messages: {
@@ -60,17 +64,71 @@ function formatChartDate(dateStr: string): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+/* ── Framework context banners ── */
+const FRAMEWORK_CONTEXT: Record<string, { text: string; accent: string; accentBg: string; accentBorder: string }> = {
+  openclaw: {
+    text: 'OpenClaw agents use Groq for LLM inference. Messages are counted per 24h rolling window. Tools like web search, memory, and file operations do not count toward your message limit.',
+    accent: 'text-amber-400',
+    accentBg: 'bg-amber-500/[0.06]',
+    accentBorder: 'border-amber-500/20',
+  },
+  hermes: {
+    text: 'Hermes agents use Groq for LLM inference. Each conversation turn counts as one message. Plugin calls (Twitter, Discord) are bundled with the triggering message.',
+    accent: 'text-purple-400',
+    accentBg: 'bg-purple-500/[0.06]',
+    accentBorder: 'border-purple-500/20',
+  },
+  elizaos: {
+    text: 'ElizaOS agents use Groq for LLM inference. Plugins may consume additional resources and memory. Each plugin interaction counts as one message toward your daily limit.',
+    accent: 'text-cyan-400',
+    accentBg: 'bg-cyan-500/[0.06]',
+    accentBorder: 'border-cyan-500/20',
+  },
+  milady: {
+    text: 'Milady agents use Groq for LLM inference. Multi-modal interactions (image generation, voice) consume more resources but each still counts as a single message.',
+    accent: 'text-rose-400',
+    accentBg: 'bg-rose-500/[0.06]',
+    accentBorder: 'border-rose-500/20',
+  },
+};
+
+/* ── Tier badge styles ── */
+const TIER_BADGE: Record<string, { label: string; className: string }> = {
+  free: {
+    label: 'Free',
+    className: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30',
+  },
+  basic: {
+    label: 'Basic',
+    className: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
+  },
+  pro: {
+    label: 'Pro',
+    className: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+  },
+};
+
+/* ── Color-coded progress bar ── */
 interface ProgressBarProps {
   value: number;
   max: number;
   color?: string;
   label?: string;
+  colorCoded?: boolean;
 }
 
-function ProgressBar({ value, max, color = '#06b6d4', label }: ProgressBarProps) {
+function ProgressBar({ value, max, color = '#06b6d4', label, colorCoded }: ProgressBarProps) {
   const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
-  const isHigh = pct > 80;
-  const barColor = isHigh ? '#f59e0b' : color;
+
+  let barColor = color;
+  if (colorCoded) {
+    if (pct >= 80) barColor = '#ef4444';      // red
+    else if (pct >= 50) barColor = '#f59e0b';  // amber
+    else barColor = '#22c55e';                 // green
+  } else {
+    // legacy fallback — amber if high
+    if (pct > 80) barColor = '#f59e0b';
+  }
 
   return (
     <div className="w-full">
@@ -93,11 +151,57 @@ function ProgressBar({ value, max, color = '#06b6d4', label }: ProgressBarProps)
   );
 }
 
+/* ── Message usage progress bar (color-coded) ── */
+function MessageProgressBar({ used, limit }: { used: number; limit: number }) {
+  const pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
+
+  let barColor = '#22c55e'; // green
+  let bgGlow = 'shadow-green-500/10';
+  if (pct >= 80) {
+    barColor = '#ef4444'; // red
+    bgGlow = 'shadow-red-500/10';
+  } else if (pct >= 50) {
+    barColor = '#f59e0b'; // amber
+    bgGlow = 'shadow-amber-500/10';
+  }
+
+  return (
+    <div className="w-full">
+      <div className="flex justify-between items-center mb-2">
+        <span className="text-[11px] text-[#71717a]">Daily usage</span>
+        <span className="text-xs font-medium" style={{ color: barColor }}>
+          {pct.toFixed(0)}%
+        </span>
+      </div>
+      <div className={`h-2.5 rounded-full bg-white/[0.06] overflow-hidden ${bgGlow}`}>
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className="h-full rounded-full"
+          style={{ background: `linear-gradient(90deg, ${barColor}cc, ${barColor})` }}
+        />
+      </div>
+      <div className="flex justify-between items-center mt-1.5">
+        <span className="text-[10px] text-[#71717a]">{used} used</span>
+        <span className="text-[10px] text-[#71717a]">{limit} limit</span>
+      </div>
+    </div>
+  );
+}
+
 export function UsageTab() {
   const { agent } = useAgentContext();
+  const { user } = useAuth();
   const [data, setData] = useState<UsageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const framework = agent?.framework ?? 'openclaw';
+  const tier = (user as any)?.tier ?? 'free';
+  const fwCtx = FRAMEWORK_CONTEXT[framework] ?? FRAMEWORK_CONTEXT.openclaw;
+  const fwBadge = FRAMEWORK_BADGE[framework] ?? 'bg-slate-500/15 text-slate-400 border-slate-500/30';
+  const tierBadge = TIER_BADGE[tier] ?? TIER_BADGE.free;
 
   const fetchUsage = useCallback(async () => {
     if (!agent?.id) return;
@@ -146,6 +250,27 @@ export function UsageTab() {
         </div>
       ) : data ? (
         <>
+          {/* ── Framework Context Banner ── */}
+          <div className={`rounded-xl border p-4 ${fwCtx.accentBg} ${fwCtx.accentBorder}`}>
+            <div className="flex items-start gap-3">
+              <Info size={14} className={`${fwCtx.accent} mt-0.5 shrink-0`} />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${fwBadge}`}>
+                    {framework.charAt(0).toUpperCase() + framework.slice(1)}
+                  </span>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${tierBadge.className}`}>
+                    <Shield size={8} className="inline mr-0.5 -mt-px" />
+                    {tierBadge.label} Tier
+                  </span>
+                </div>
+                <p className={`text-[11px] leading-relaxed text-[#A5A1C2]`}>
+                  {fwCtx.text}
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* ── Messages Today ── */}
           <div className="rounded-2xl border p-5" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
             <div className="flex items-center justify-between mb-4">
@@ -153,12 +278,22 @@ export function UsageTab() {
                 <MessageSquare size={16} className="text-[#06b6d4]" />
                 <h3 className="text-sm font-semibold text-[#fafafa]">Messages Today</h3>
               </div>
-              {data.messages.isByok && (
-                <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/30 text-emerald-400 bg-emerald-500/5">
-                  <Infinity size={10} />
-                  BYOK — Unlimited
-                </span>
-              )}
+              <div className="flex items-center gap-2">
+                {data.messages.isByok ? (
+                  <span className="inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-emerald-500/30 text-emerald-400 bg-emerald-500/10 font-medium">
+                    <Key size={10} />
+                    BYOK
+                    <span className="inline-flex items-center gap-0.5 ml-0.5 px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[9px] font-bold uppercase tracking-wider">
+                      <Infinity size={9} />
+                      Unlimited
+                    </span>
+                  </span>
+                ) : (
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${tierBadge.className}`}>
+                    {tierBadge.label}
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="flex items-end gap-3 mb-4">
@@ -166,15 +301,29 @@ export function UsageTab() {
               {!data.messages.isByok && data.messages.limit > 0 && (
                 <span className="text-base text-[#71717a] mb-1">/ {data.messages.limit} daily</span>
               )}
+              {data.messages.isByok && (
+                <span className="text-base text-emerald-400/60 mb-1">messages sent</span>
+              )}
             </div>
 
-            {!data.messages.isByok && data.messages.limit > 0 && (
-              <ProgressBar
-                value={data.messages.today}
-                max={data.messages.limit}
-                label="Daily limit"
-              />
-            )}
+            {data.messages.isByok ? (
+              /* BYOK — show unlimited indicator instead of progress bar */
+              <div className="rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] p-3 flex items-center gap-3">
+                <div className="h-2.5 flex-1 rounded-full bg-white/[0.04] overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: '100%' }}
+                    transition={{ duration: 1.2, ease: 'easeOut' }}
+                    className="h-full rounded-full"
+                    style={{ background: 'linear-gradient(90deg, #22c55e40, #22c55e80, #22c55e40)' }}
+                  />
+                </div>
+                <span className="text-[10px] text-emerald-400/80 whitespace-nowrap">No daily cap</span>
+              </div>
+            ) : data.messages.limit > 0 ? (
+              /* Standard tier — color-coded progress bar */
+              <MessageProgressBar used={data.messages.today} limit={data.messages.limit} />
+            ) : null}
           </div>
 
           {/* ── 7-day Message Chart ── */}

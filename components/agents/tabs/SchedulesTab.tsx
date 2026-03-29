@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
@@ -15,6 +15,11 @@ import {
   CheckCircle,
   XCircle,
   X,
+  CalendarClock,
+  Timer,
+  Info,
+  Zap,
+  CalendarDays,
 } from 'lucide-react';
 import {
   useAgentContext,
@@ -42,6 +47,24 @@ interface LogEntry {
   response?: string;
   error?: string;
 }
+
+// ─── Framework Colors ────────────────────────────────────────
+
+const FRAMEWORK_COLORS: Record<string, { accent: string; glow: string; label: string }> = {
+  openclaw: { accent: '#f59e0b', glow: 'rgba(245,158,11,0.15)', label: 'OpenClaw' },
+  hermes:   { accent: '#a855f7', glow: 'rgba(168,85,247,0.15)', label: 'Hermes' },
+  elizaos:  { accent: '#06b6d4', glow: 'rgba(6,182,212,0.15)',  label: 'ElizaOS' },
+  milady:   { accent: '#f43f5e', glow: 'rgba(244,63,94,0.15)',  label: 'Milady' },
+};
+
+// ─── Framework Compatibility ─────────────────────────────────
+
+const FRAMEWORK_SCHEDULE_SUPPORT: Record<string, { native: boolean; method: string; note: string }> = {
+  openclaw: { native: true,  method: 'Built-in cron scheduler', note: 'Full native cron support — schedules run inside the container with direct access to agent memory and tools.' },
+  hermes:   { native: true,  method: 'Built-in task scheduler', note: 'Native scheduled tasks via Hermes task system — supports recurring prompts with full context.' },
+  elizaos:  { native: false, method: 'External cron trigger',   note: 'Schedules are triggered externally via the Hatcher orchestrator. The agent receives the prompt as a new message at each interval.' },
+  milady:   { native: false, method: 'External cron trigger',   note: 'Schedules are triggered externally via the Hatcher orchestrator. The agent receives the prompt as a new message at each interval.' },
+};
 
 // ─── Cron Presets ────────────────────────────────────────────
 
@@ -73,6 +96,74 @@ function cronToHuman(cron: string): string {
     return `${days[dow!] ?? `Day ${dow}`} at ${hour}:${min!.padStart(2, '0')}`;
   }
   return cron;
+}
+
+// ─── Next Run Times Calculator ───────────────────────────────
+
+function getNextCronRuns(cronExpr: string, count: number = 3): Date[] {
+  const parts = cronExpr.split(' ');
+  if (parts.length !== 5) return [];
+
+  const [minPart, hourPart, domPart, monPart, dowPart] = parts;
+  const results: Date[] = [];
+  const now = new Date();
+  const candidate = new Date(now);
+  candidate.setSeconds(0);
+  candidate.setMilliseconds(0);
+  candidate.setMinutes(candidate.getMinutes() + 1);
+
+  const maxIterations = 60 * 24 * 8; // up to 8 days of minutes
+
+  for (let i = 0; i < maxIterations && results.length < count; i++) {
+    if (matchesCronField(candidate.getMinutes(), minPart!) &&
+        matchesCronField(candidate.getHours(), hourPart!) &&
+        matchesCronField(candidate.getDate(), domPart!) &&
+        matchesCronField(candidate.getMonth() + 1, monPart!) &&
+        matchesCronField(candidate.getDay(), dowPart!)) {
+      results.push(new Date(candidate));
+    }
+    candidate.setMinutes(candidate.getMinutes() + 1);
+  }
+
+  return results;
+}
+
+function matchesCronField(value: number, field: string): boolean {
+  if (field === '*') return true;
+
+  return field.split(',').some(part => {
+    if (part.includes('/')) {
+      const [base, stepStr] = part.split('/');
+      const step = parseInt(stepStr!, 10);
+      if (isNaN(step) || step === 0) return false;
+      if (base === '*') return value % step === 0;
+      const start = parseInt(base!, 10);
+      if (isNaN(start)) return false;
+      return value >= start && (value - start) % step === 0;
+    }
+    if (part.includes('-')) {
+      const [lo, hi] = part.split('-').map(Number);
+      return value >= lo! && value <= hi!;
+    }
+    return parseInt(part, 10) === value;
+  });
+}
+
+function formatNextRun(date: Date): string {
+  const now = new Date();
+  const diff = date.getTime() - now.getTime();
+  const mins = Math.floor(diff / 60000);
+  const hours = Math.floor(mins / 60);
+
+  const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const dateStr = date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+
+  let relative = '';
+  if (mins < 60) relative = `in ${mins}m`;
+  else if (hours < 24) relative = `in ${hours}h ${mins % 60}m`;
+  else relative = `in ${Math.floor(hours / 24)}d ${hours % 24}h`;
+
+  return `${dateStr} ${timeStr} (${relative})`;
 }
 
 // ─── Log Viewer ──────────────────────────────────────────────
@@ -147,11 +238,41 @@ function LogViewer({ agentId, jobId, onClose }: { agentId: string; jobId: string
   );
 }
 
+// ─── Next Runs Preview ───────────────────────────────────────
+
+function NextRunsPreview({ cronExpr }: { cronExpr: string }) {
+  const runs = useMemo(() => getNextCronRuns(cronExpr, 3), [cronExpr]);
+
+  if (runs.length === 0) return null;
+
+  return (
+    <div className="mt-2 pt-2 border-t border-white/[0.04]">
+      <div className="flex items-center gap-1.5 mb-1.5">
+        <CalendarDays size={11} className="text-[#52525b]" />
+        <span className="text-[10px] font-medium text-[#52525b] uppercase tracking-wider">Next runs</span>
+      </div>
+      <div className="space-y-0.5">
+        {runs.map((run, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <div className={`w-1 h-1 rounded-full ${i === 0 ? 'bg-emerald-400' : 'bg-[#3f3f46]'}`} />
+            <span className={`text-[10px] font-mono ${i === 0 ? 'text-[#a1a1aa]' : 'text-[#52525b]'}`}>
+              {formatNextRun(run)}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Component ───────────────────────────────────────────────
 
 export function SchedulesTab() {
   const { agent } = useAgentContext();
   const agentId = agent?.id;
+  const framework = agent?.framework ?? 'openclaw';
+  const fwColor = FRAMEWORK_COLORS[framework] ?? FRAMEWORK_COLORS.openclaw!;
+  const fwSupport = FRAMEWORK_SCHEDULE_SUPPORT[framework] ?? FRAMEWORK_SCHEDULE_SUPPORT.openclaw!;
 
   const [jobs, setJobs] = useState<ScheduleJob[]>([]);
   const [loading, setLoading] = useState(true);
@@ -162,7 +283,7 @@ export function SchedulesTab() {
 
   // Form state
   const [formName, setFormName] = useState('');
-  const [formPreset, setFormPreset] = useState(CRON_PRESETS[0].value);
+  const [formPreset, setFormPreset] = useState(CRON_PRESETS[0]!.value);
   const [formCustomCron, setFormCustomCron] = useState('');
   const [formPrompt, setFormPrompt] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
@@ -212,7 +333,7 @@ export function SchedulesTab() {
       });
       if (res.success) {
         setFormName('');
-        setFormPreset(CRON_PRESETS[0].value);
+        setFormPreset(CRON_PRESETS[0]!.value);
         setFormCustomCron('');
         setFormPrompt('');
         setShowForm(false);
@@ -263,6 +384,27 @@ export function SchedulesTab() {
     setActionLoading(null);
   };
 
+  // Status-based border/glow styles
+  const getStatusStyles = (status: string) => {
+    switch (status) {
+      case 'active':
+        return {
+          borderLeft: '3px solid #22c55e',
+          boxShadow: '0 0 12px rgba(34,197,94,0.08), inset 0 0 12px rgba(34,197,94,0.03)',
+        };
+      case 'paused':
+        return {
+          borderLeft: '3px solid #f59e0b',
+          boxShadow: '0 0 12px rgba(245,158,11,0.08), inset 0 0 12px rgba(245,158,11,0.03)',
+        };
+      default:
+        return {
+          borderLeft: '3px solid #3f3f46',
+          boxShadow: 'none',
+        };
+    }
+  };
+
   return (
     <motion.div key="schedules" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit" className="space-y-4">
       {/* Header */}
@@ -281,6 +423,45 @@ export function SchedulesTab() {
               New Schedule
             </button>
           )}
+        </div>
+      </GlassCard>
+
+      {/* Framework Compatibility Note */}
+      <GlassCard className="!p-3.5">
+        <div className="flex items-start gap-3">
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+            style={{ backgroundColor: fwColor.glow, border: `1px solid ${fwColor.accent}25` }}
+          >
+            {fwSupport.native ? (
+              <Zap size={14} style={{ color: fwColor.accent }} />
+            ) : (
+              <Timer size={14} style={{ color: fwColor.accent }} />
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-xs font-medium text-white">{fwColor.label}</span>
+              <span
+                className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded-full"
+                style={{
+                  backgroundColor: fwSupport.native ? 'rgba(34,197,94,0.1)' : 'rgba(245,158,11,0.1)',
+                  color: fwSupport.native ? '#4ade80' : '#fbbf24',
+                }}
+              >
+                {fwSupport.native ? 'Native Support' : 'External Cron'}
+              </span>
+            </div>
+            <p className="text-[11px] text-[#71717a] leading-relaxed">{fwSupport.note}</p>
+            <div className="flex items-center gap-1 mt-1.5">
+              <Info size={10} className="text-[#52525b]" />
+              <span className="text-[10px] text-[#52525b]">
+                {fwSupport.native
+                  ? 'Schedules persist across container restarts.'
+                  : 'Schedules are managed by the Hatcher platform and trigger the agent externally.'}
+              </span>
+            </div>
+          </div>
         </div>
       </GlassCard>
 
@@ -354,6 +535,20 @@ export function SchedulesTab() {
               </div>
             )}
 
+            {/* Cron expression explainer in form */}
+            {effectiveCron.trim() && (
+              <div className="rounded-lg bg-white/[0.02] border border-white/[0.04] px-3 py-2.5">
+                <div className="flex items-center gap-2 mb-2">
+                  <CalendarClock size={12} className="text-[#06b6d4]" />
+                  <span className="text-[11px] font-medium text-[#a1a1aa]">
+                    {cronToHuman(effectiveCron.trim())}
+                  </span>
+                  <span className="text-[10px] font-mono text-[#52525b] ml-auto">{effectiveCron.trim()}</span>
+                </div>
+                <NextRunsPreview cronExpr={effectiveCron.trim()} />
+              </div>
+            )}
+
             {/* Prompt */}
             <div>
               <label className="block text-xs text-[#71717a] mb-1">What should the agent do?</label>
@@ -422,13 +617,55 @@ export function SchedulesTab() {
       {!loading && !error && jobs.length === 0 && (
         <GlassCard>
           <div className="flex flex-col items-center justify-center py-14 text-center">
-            <div className="w-16 h-16 rounded-full bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mb-4">
-              <Clock size={28} className="text-[#06b6d4]" />
+            {/* Illustration */}
+            <div className="relative mb-6">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#06b6d4]/10 to-[#06b6d4]/5 border border-[#06b6d4]/15 flex items-center justify-center">
+                <CalendarClock size={32} className="text-[#06b6d4]/60" />
+              </div>
+              {/* Decorative orbiting dots */}
+              <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              </div>
+              <div className="absolute -bottom-1 -left-1 w-3 h-3 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                <div className="w-1 h-1 rounded-full bg-amber-400" />
+              </div>
+              <div className="absolute top-1/2 -right-3 w-2.5 h-2.5 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                <div className="w-1 h-1 rounded-full bg-purple-400" />
+              </div>
             </div>
-            <p className="text-base font-semibold text-white mb-1">No scheduled tasks</p>
-            <p className="text-sm text-[#71717a] max-w-xs mb-5">
+            <p className="text-base font-semibold text-white mb-1">No scheduled tasks yet</p>
+            <p className="text-sm text-[#71717a] max-w-sm mb-2">
               Automate your agent with scheduled tasks — send messages, run commands, or trigger workflows on a cron schedule.
             </p>
+
+            {/* Suggestion cards */}
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-6 max-w-md">
+              {[
+                { icon: Clock, label: 'Morning briefing at 9am', cron: '0 9 * * *' },
+                { icon: Timer, label: 'Check metrics every 3h', cron: '0 */3 * * *' },
+                { icon: CalendarDays, label: 'Weekly report on Monday', cron: '0 9 * * 1' },
+              ].map((suggestion) => (
+                <button
+                  key={suggestion.cron}
+                  onClick={() => {
+                    setShowForm(true);
+                    setFormName(suggestion.label);
+                    const preset = CRON_PRESETS.find(p => p.value === suggestion.cron);
+                    if (preset) {
+                      setFormPreset(preset.value);
+                    } else {
+                      setFormPreset('');
+                      setFormCustomCron(suggestion.cron);
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-lg bg-white/[0.03] border border-white/[0.06] text-[#71717a] hover:text-white hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all"
+                >
+                  <suggestion.icon size={12} />
+                  {suggestion.label}
+                </button>
+              ))}
+            </div>
+
             <button
               onClick={() => setShowForm(true)}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
@@ -446,78 +683,107 @@ export function SchedulesTab() {
         <div className="space-y-2">
           {jobs.map(job => (
             <div key={job.id} className="space-y-2">
-              <GlassCard>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h4 className="text-sm font-medium text-white truncate">{job.name}</h4>
-                      <span className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded-full ${
-                        job.status === 'active'
-                          ? 'bg-emerald-500/10 text-emerald-400'
-                          : 'bg-yellow-500/10 text-yellow-400'
-                      }`}>
-                        {job.status}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3 mt-1">
-                      <span className="text-xs text-[#71717a] font-mono">{job.schedule}</span>
-                      <span className="text-[10px] text-[#52525b]">{cronToHuman(job.schedule)}</span>
-                    </div>
-                    <p className="text-xs text-[#a1a1aa] mt-1.5 line-clamp-2">{job.prompt}</p>
-                    <div className="flex items-center gap-4 mt-1">
-                      {job.nextRun && (
-                        <p className="text-[10px] text-[#52525b]">Next: {new Date(job.nextRun).toLocaleString()}</p>
-                      )}
-                      {job.lastRun && (
-                        <p className="text-[10px] text-[#52525b]">Last: {new Date(job.lastRun).toLocaleString()}</p>
-                      )}
-                      {(job.runCount ?? 0) > 0 && (
-                        <p className="text-[10px] text-[#52525b]">Runs: {job.runCount}</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    {actionLoading === job.id ? (
-                      <Loader2 size={14} className="animate-spin text-[#71717a]" />
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => setViewingLogs(viewingLogs === job.id ? null : job.id)}
-                          title="View logs"
-                          className={`p-1.5 rounded-md transition-colors ${
-                            viewingLogs === job.id
-                              ? 'text-[#06b6d4] bg-[#06b6d4]/10'
-                              : 'text-[#71717a] hover:text-[#06b6d4] hover:bg-white/[0.04]'
-                          }`}
-                        >
-                          <FileText size={14} />
-                        </button>
-                        {job.status === 'active' ? (
-                          <button
-                            onClick={() => handlePause(job.id)}
-                            title="Pause"
-                            className="p-1.5 rounded-md text-[#71717a] hover:text-yellow-400 hover:bg-white/[0.04] transition-colors"
-                          >
-                            <Pause size={14} />
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleResume(job.id)}
-                            title="Resume"
-                            className="p-1.5 rounded-md text-[#71717a] hover:text-emerald-400 hover:bg-white/[0.04] transition-colors"
-                          >
-                            <Play size={14} />
-                          </button>
+              <GlassCard className="!pl-0 overflow-hidden">
+                <div
+                  className="pl-5"
+                  style={getStatusStyles(job.status)}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-sm font-medium text-white truncate">{job.name}</h4>
+                        <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium rounded-full ${
+                          job.status === 'active'
+                            ? 'bg-emerald-500/10 text-emerald-400'
+                            : 'bg-amber-500/10 text-amber-400'
+                        }`}>
+                          <div className={`w-1.5 h-1.5 rounded-full ${
+                            job.status === 'active' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+                          }`} />
+                          {job.status}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-3 mt-1.5">
+                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.04]">
+                          <Clock size={10} className="text-[#52525b]" />
+                          <span className="text-[11px] text-[#a1a1aa] font-mono">{job.schedule}</span>
+                        </div>
+                        <span className="text-[11px] text-[#71717a]">{cronToHuman(job.schedule)}</span>
+                      </div>
+
+                      <p className="text-xs text-[#a1a1aa] mt-2 line-clamp-2 leading-relaxed">{job.prompt}</p>
+
+                      <div className="flex items-center gap-4 mt-2">
+                        {job.nextRun && (
+                          <p className="text-[10px] text-[#52525b] flex items-center gap-1">
+                            <CalendarClock size={10} />
+                            Next: {new Date(job.nextRun).toLocaleString()}
+                          </p>
                         )}
-                        <button
-                          onClick={() => handleDelete(job.id)}
-                          title="Delete"
-                          className="p-1.5 rounded-md text-[#71717a] hover:text-red-400 hover:bg-white/[0.04] transition-colors"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </>
-                    )}
+                        {job.lastRun && (
+                          <p className="text-[10px] text-[#52525b] flex items-center gap-1">
+                            <CheckCircle size={10} />
+                            Last: {new Date(job.lastRun).toLocaleString()}
+                          </p>
+                        )}
+                        {(job.runCount ?? 0) > 0 && (
+                          <p className="text-[10px] text-[#52525b] flex items-center gap-1">
+                            <Zap size={10} />
+                            {job.runCount} runs
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Next run times preview */}
+                      {job.status === 'active' && (
+                        <NextRunsPreview cronExpr={job.schedule} />
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      {actionLoading === job.id ? (
+                        <Loader2 size={14} className="animate-spin text-[#71717a]" />
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => setViewingLogs(viewingLogs === job.id ? null : job.id)}
+                            title="View logs"
+                            className={`p-1.5 rounded-md transition-colors ${
+                              viewingLogs === job.id
+                                ? 'text-[#06b6d4] bg-[#06b6d4]/10'
+                                : 'text-[#71717a] hover:text-[#06b6d4] hover:bg-white/[0.04]'
+                            }`}
+                          >
+                            <FileText size={14} />
+                          </button>
+                          {job.status === 'active' ? (
+                            <button
+                              onClick={() => handlePause(job.id)}
+                              title="Pause"
+                              className="p-1.5 rounded-md text-[#71717a] hover:text-amber-400 hover:bg-white/[0.04] transition-colors"
+                            >
+                              <Pause size={14} />
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleResume(job.id)}
+                              title="Resume"
+                              className="p-1.5 rounded-md text-[#71717a] hover:text-emerald-400 hover:bg-white/[0.04] transition-colors"
+                            >
+                              <Play size={14} />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDelete(job.id)}
+                            title="Delete"
+                            className="p-1.5 rounded-md text-[#71717a] hover:text-red-400 hover:bg-white/[0.04] transition-colors"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               </GlassCard>
