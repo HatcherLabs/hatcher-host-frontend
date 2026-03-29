@@ -1,9 +1,9 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { api } from '@/lib/api';
-import { getInitials, stringToColor } from '@/lib/utils';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { API_URL } from '@/lib/config';
+import { FRAMEWORKS } from '@hatcher/shared';
+import type { AgentFramework } from '@hatcher/shared';
+import { Activity, Calendar, MessageSquare, Clock, ExternalLink } from 'lucide-react';
 
 interface PublicStats {
   name: string;
@@ -20,175 +20,330 @@ interface PublicStats {
   lastActiveAt: string;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; dot: string }> = {
-  active: { label: 'Online', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30', dot: 'bg-emerald-400' },
-  sleeping: { label: 'Sleeping', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30', dot: 'bg-amber-400' },
-  paused: { label: 'Offline', color: 'text-zinc-400', bg: 'bg-zinc-500/10 border-zinc-500/30', dot: 'bg-zinc-400' },
-  error: { label: 'Error', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/30', dot: 'bg-red-400' },
-  killed: { label: 'Stopped', color: 'text-zinc-500', bg: 'bg-zinc-500/10 border-zinc-500/30', dot: 'bg-zinc-500' },
+interface AgentBasic {
+  avatarUrl?: string | null;
+}
+
+async function fetchPublicStats(id: string): Promise<PublicStats | null> {
+  try {
+    const res = await fetch(`${API_URL}/agents/${id}/public-stats`, {
+      next: { revalidate: 30 },
+    });
+    if (!res.ok) return null;
+    const json = await res.json() as { success: boolean; data?: PublicStats };
+    return json.success ? (json.data ?? null) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchAgentBasic(id: string): Promise<AgentBasic | null> {
+  try {
+    const res = await fetch(`${API_URL}/agents/${id}`, { next: { revalidate: 60 } });
+    if (!res.ok) return null;
+    const json = await res.json() as { success: boolean; data?: AgentBasic };
+    return json.success ? (json.data ?? null) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const stats = await fetchPublicStats(id);
+
+  if (!stats) return { title: 'Agent Status — Hatcher' };
+
+  const statusLabel = stats.status === 'active' ? 'Online' : stats.status === 'sleeping' ? 'Sleeping' : 'Offline';
+  const title = `${stats.name} — Status`;
+  const description = `${stats.name} is ${statusLabel} · ${stats.uptimePercent}% uptime · ${stats.messagesProcessed.toLocaleString()} messages processed`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `https://hatcher.host/agent/${id}/status`,
+      siteName: 'Hatcher',
+      type: 'website',
+    },
+    twitter: { card: 'summary', title, description },
+    alternates: { canonical: `https://hatcher.host/agent/${id}/status` },
+  };
+}
+
+const STATUS_CONFIG: Record<string, {
+  label: string;
+  color: string;
+  bg: string;
+  border: string;
+  dotColor: string;
+  glowColor: string;
+  pulse: boolean;
+}> = {
+  active: {
+    label: 'Online',
+    color: 'text-green-400',
+    bg: 'bg-green-500/10',
+    border: 'border-green-500/25',
+    dotColor: 'bg-green-400',
+    glowColor: 'rgba(74,222,128,0.4)',
+    pulse: true,
+  },
+  sleeping: {
+    label: 'Sleeping',
+    color: 'text-blue-400',
+    bg: 'bg-blue-500/10',
+    border: 'border-blue-500/25',
+    dotColor: 'bg-blue-400',
+    glowColor: 'rgba(99,102,241,0.3)',
+    pulse: false,
+  },
+  paused: {
+    label: 'Paused',
+    color: 'text-amber-400',
+    bg: 'bg-amber-500/10',
+    border: 'border-amber-500/25',
+    dotColor: 'bg-amber-400',
+    glowColor: 'rgba(245,158,11,0.3)',
+    pulse: false,
+  },
+  error: {
+    label: 'Error',
+    color: 'text-red-400',
+    bg: 'bg-red-500/10',
+    border: 'border-red-500/25',
+    dotColor: 'bg-red-400',
+    glowColor: 'rgba(239,68,68,0.3)',
+    pulse: false,
+  },
+  killed: {
+    label: 'Stopped',
+    color: 'text-zinc-400',
+    bg: 'bg-zinc-500/10',
+    border: 'border-zinc-500/25',
+    dotColor: 'bg-zinc-500',
+    glowColor: 'rgba(99,102,241,0.2)',
+    pulse: false,
+  },
+  restarting: {
+    label: 'Restarting',
+    color: 'text-amber-400',
+    bg: 'bg-amber-500/10',
+    border: 'border-amber-500/25',
+    dotColor: 'bg-amber-400',
+    glowColor: 'rgba(245,158,11,0.3)',
+    pulse: true,
+  },
 };
 
 function UptimeBar({ percent }: { percent: number }) {
-  // Simulate 24 segments for a 24h uptime bar
   const segments = 24;
-  const filledSegments = Math.round((percent / 100) * segments);
+  const filled = Math.round((percent / 100) * segments);
+  const color = percent >= 90 ? 'bg-green-500/80' : percent >= 70 ? 'bg-amber-500/80' : 'bg-red-500/80';
+  const textColor = percent >= 90 ? 'text-green-400' : percent >= 70 ? 'text-amber-400' : 'text-red-400';
+
   return (
-    <div className="flex gap-0.5">
-      {Array.from({ length: segments }, (_, i) => (
-        <div
-          key={i}
-          className={`h-6 flex-1 rounded-sm ${
-            i < filledSegments ? 'bg-emerald-500' : 'bg-zinc-700'
-          }`}
-          title={`${i < filledSegments ? 'Up' : 'Down'}`}
-        />
-      ))}
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider">24h uptime</span>
+        <span className={`text-sm font-bold tabular-nums ${textColor}`}>{percent}%</span>
+      </div>
+      <div className="flex gap-1" role="meter" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label="Uptime bar">
+        {Array.from({ length: segments }, (_, i) => (
+          <div
+            key={i}
+            className={`flex-1 h-5 rounded-sm transition-colors ${i < filled ? color : 'bg-[rgba(255,255,255,0.05)]'}`}
+          />
+        ))}
+      </div>
     </div>
   );
 }
 
-export default function AgentStatusPage() {
-  const { id } = useParams<{ id: string }>();
-  const [stats, setStats] = useState<PublicStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default async function AgentStatusPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const [stats, agent] = await Promise.all([fetchPublicStats(id), fetchAgentBasic(id)]);
 
-  useEffect(() => {
-    if (!id) return;
-    api.getAgentPublicStats(id).then((res) => {
-      if (res.success) {
-        setStats(res.data);
-      } else {
-        setError('Agent not found');
-      }
-      setLoading(false);
-    }).catch(() => {
-      setError('Failed to load agent status');
-      setLoading(false);
-    });
-  }, [id]);
-
-  if (loading) {
+  if (!stats) {
     return (
-      <div className="min-h-screen bg-[#0a0a12] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#06b6d4]/30 border-t-[#06b6d4] rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (error || !stats) {
-    return (
-      <div className="min-h-screen bg-[#0a0a12] flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-lg text-zinc-400 mb-2">{error ?? 'Agent not found'}</p>
-          <a href="/" className="text-sm text-[#06b6d4] hover:underline">Back to Hatcher</a>
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="card glass-noise p-10 text-center max-w-sm w-full">
+          <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
+            <span className="w-3 h-3 rounded-full bg-red-400" />
+          </div>
+          <h1 className="text-lg font-semibold text-[var(--text-primary)] mb-2">Agent Not Found</h1>
+          <p className="text-sm text-[var(--text-muted)] mb-6">
+            This agent does not exist or is not publicly visible.
+          </p>
+          <Link href="/explore" className="btn-secondary text-sm inline-flex items-center gap-2 justify-center">
+            Browse Agents
+          </Link>
         </div>
       </div>
     );
   }
 
-  const statusConfig = STATUS_CONFIG[stats.status] ?? STATUS_CONFIG.paused;
+  const statusCfg = STATUS_CONFIG[stats.status] ?? STATUS_CONFIG['paused']!;
+  const frameworkMeta = FRAMEWORKS[stats.framework as AgentFramework];
+  const avatarUrl = agent?.avatarUrl;
   const isOnline = stats.status === 'active';
-  const gradient = stringToColor(id);
-  const initials = getInitials(stats.name);
   const lastActive = stats.lastActiveAt ? new Date(stats.lastActiveAt) : null;
   const createdAt = new Date(stats.createdAt);
 
   return (
-    <div className="min-h-screen bg-[#0a0a12] text-white">
-      <div className="max-w-xl mx-auto px-4 py-12">
-        {/* Agent identity */}
-        <div className="text-center mb-8">
-          <div
-            className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-bold text-xl border border-[rgba(46,43,74,0.3)] mx-auto mb-4`}
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
+      {/* Ambient glow — SSR-safe via inline style */}
+      <div
+        className="fixed inset-0 pointer-events-none overflow-hidden"
+        aria-hidden="true"
+      >
+        <div
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full opacity-20 blur-[120px]"
+          style={{ background: `radial-gradient(circle, ${statusCfg.glowColor}, transparent 70%)` }}
+        />
+      </div>
+
+      <div className="w-full max-w-md relative">
+        {/* Powered-by link */}
+        <div className="flex items-center justify-center mb-6">
+          <Link
+            href={`/agent/${id}`}
+            className="inline-flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors duration-200"
           >
-            {initials}
-          </div>
-          <h1 className="text-2xl font-bold mb-1">{stats.name}</h1>
-          {stats.description && (
-            <p className="text-sm text-zinc-400 max-w-md mx-auto">{stats.description}</p>
-          )}
-          <div className="flex items-center justify-center gap-2 mt-3">
-            <span className={`text-[10px] px-2 py-0.5 rounded-full border ${statusConfig.bg} font-medium`}>
-              {stats.framework}
-            </span>
-            {stats.ownerUsername && (
-              <span className="text-[10px] text-zinc-500">by @{stats.ownerUsername}</span>
-            )}
-          </div>
+            Powered by
+            <span className="font-semibold text-[var(--text-secondary)]">Hatcher</span>
+            <ExternalLink className="w-3 h-3" />
+          </Link>
         </div>
 
-        {/* Status indicator */}
-        <div className="rounded-2xl border border-[rgba(46,43,74,0.4)] bg-[rgba(26,23,48,0.6)] p-6 mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <span className="relative flex h-3 w-3">
-                {isOnline && (
-                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${statusConfig.dot} opacity-75`} />
-                )}
-                <span className={`relative inline-flex rounded-full h-3 w-3 ${statusConfig.dot}`} />
-              </span>
-              <span className={`text-lg font-semibold ${statusConfig.color}`}>
-                {statusConfig.label}
-              </span>
+        {/* Main card */}
+        <div className="card glass-noise p-8 mb-4">
+          {/* Avatar + identity */}
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className="relative mb-4">
+              {avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={avatarUrl}
+                  alt={stats.name}
+                  className="w-20 h-20 rounded-2xl object-cover border border-[var(--border-default)]"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#8b5cf6]/30 to-[#06b6d4]/30 border border-white/10 flex items-center justify-center">
+                  <span className="text-3xl font-bold text-white/80" aria-hidden="true">
+                    {stats.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
+              {/* Online ring */}
+              {isOnline && (
+                <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 border-2 border-[var(--bg-base)] flex items-center justify-center" aria-hidden="true">
+                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                </span>
+              )}
             </div>
-            <span className="text-3xl font-bold text-[#06b6d4]">
-              {stats.uptimePercent.toFixed(1)}%
+
+            <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-1">{stats.name}</h1>
+
+            {stats.ownerUsername && (
+              <p className="text-xs text-[var(--text-muted)] mb-3">by {stats.ownerUsername}</p>
+            )}
+
+            {/* Status badge */}
+            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border ${statusCfg.bg} ${statusCfg.color} ${statusCfg.border}`}>
+              <span className={`w-2 h-2 rounded-full ${statusCfg.dotColor} ${statusCfg.pulse ? 'animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.6)]' : ''}`} aria-hidden="true" />
+              {statusCfg.label}
             </span>
           </div>
 
           {/* Uptime bar */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-zinc-500">24-hour uptime</span>
-              <span className="text-xs text-zinc-500">now</span>
-            </div>
+          <div className="mb-6">
             <UptimeBar percent={stats.uptimePercent} />
           </div>
-        </div>
 
-        {/* Stats grid */}
-        <div className="grid grid-cols-3 gap-3 mb-8">
-          <div className="rounded-xl border border-[rgba(46,43,74,0.4)] bg-[rgba(26,23,48,0.6)] p-4 text-center">
-            <div className="text-xl font-bold text-white">{stats.messagesProcessed.toLocaleString()}</div>
-            <div className="text-[10px] text-zinc-500 mt-1">Messages</div>
-          </div>
-          <div className="rounded-xl border border-[rgba(46,43,74,0.4)] bg-[rgba(26,23,48,0.6)] p-4 text-center">
-            <div className="text-xl font-bold text-white">{stats.daysActive}</div>
-            <div className="text-[10px] text-zinc-500 mt-1">Days Active</div>
-          </div>
-          <div className="rounded-xl border border-[rgba(46,43,74,0.4)] bg-[rgba(26,23,48,0.6)] p-4 text-center">
-            <div className="text-xl font-bold text-white">{stats.featureCount}</div>
-            <div className="text-[10px] text-zinc-500 mt-1">Integrations</div>
-          </div>
-        </div>
-
-        {/* Timeline */}
-        <div className="rounded-xl border border-[rgba(46,43,74,0.4)] bg-[rgba(26,23,48,0.6)] p-4 mb-8">
-          <div className="flex justify-between text-xs text-zinc-400">
-            <div>
-              <span className="text-zinc-600">Created</span>
-              <br />
-              {createdAt.toLocaleDateString()}
+          {/* Stats grid */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
+              <div className="flex items-center justify-center gap-1 text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-2">
+                <MessageSquare className="w-3 h-3" aria-hidden="true" />
+                Messages
+              </div>
+              <div className="text-xl font-bold text-[#06b6d4] tabular-nums">
+                {stats.messagesProcessed >= 1000
+                  ? `${(stats.messagesProcessed / 1000).toFixed(1)}k`
+                  : stats.messagesProcessed.toLocaleString()}
+              </div>
             </div>
-            {lastActive && (
-              <div className="text-right">
-                <span className="text-zinc-600">Last Active</span>
-                <br />
-                {lastActive.toLocaleDateString()} {lastActive.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+
+            <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
+              <div className="flex items-center justify-center gap-1 text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-2">
+                <Clock className="w-3 h-3" aria-hidden="true" />
+                Days
+              </div>
+              <div className="text-xl font-bold text-[var(--text-primary)] tabular-nums">
+                {stats.daysActive}
+              </div>
+            </div>
+
+            <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
+              <div className="flex items-center justify-center gap-1 text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-2">
+                <Calendar className="w-3 h-3" aria-hidden="true" />
+                Since
+              </div>
+              <div className="text-xl font-bold text-[var(--text-primary)]">
+                {createdAt.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Framework + description card */}
+        {(frameworkMeta || stats.description) && (
+          <div className="card glass-noise p-5 mb-4">
+            {frameworkMeta && (
+              <div className="flex items-center gap-2 mb-3">
+                <span className="fw-tag">{frameworkMeta.name}</span>
+                <span className="text-xs text-[var(--text-muted)]">framework</span>
               </div>
             )}
+            {stats.description && (
+              <p className="text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-3">
+                {stats.description}
+              </p>
+            )}
+            {lastActive && (
+              <p className="text-[10px] text-[var(--text-muted)] mt-3">
+                Last active: {lastActive.toLocaleDateString()} at{' '}
+                {lastActive.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </p>
+            )}
           </div>
-        </div>
+        )}
 
-        {/* Footer */}
-        <div className="text-center">
-          <a
-            href="https://hatcher.host"
-            className="inline-flex items-center gap-2 text-xs text-zinc-500 hover:text-[#06b6d4] transition-colors"
-          >
-            Powered by Hatcher
-          </a>
+        {/* Footer nav */}
+        <div className="flex items-center justify-center gap-4 text-xs text-[var(--text-muted)]">
+          <Link href={`/agent/${id}`} className="hover:text-[var(--text-secondary)] transition-colors flex items-center gap-1">
+            <Activity className="w-3 h-3" aria-hidden="true" />
+            View Profile
+          </Link>
+          <span aria-hidden="true">·</span>
+          <Link href="/explore" className="hover:text-[var(--text-secondary)] transition-colors">
+            Explore
+          </Link>
+          <span aria-hidden="true">·</span>
+          <Link href="/" className="hover:text-[var(--text-secondary)] transition-colors">
+            Hatcher
+          </Link>
         </div>
       </div>
     </div>
