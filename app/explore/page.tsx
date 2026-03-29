@@ -2,6 +2,7 @@
 
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
 import { cn, timeAgo } from '@/lib/utils';
@@ -300,14 +301,24 @@ export default function ExplorePage() {
       {/* ── Hero Banner ──────────────────────────────────── */}
       <div className="mx-auto max-w-7xl px-4 pt-16 pb-10">
         <div className="text-center">
-          <h1 className="text-2xl sm:text-4xl font-bold text-[var(--text-primary)] mb-3">
+          <motion.h1
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="text-2xl sm:text-4xl font-bold text-[var(--text-primary)] mb-3"
+          >
             Explore Agents
-          </h1>
-          <p className="text-[var(--text-muted)] text-base max-w-md mx-auto">
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="text-[var(--text-muted)] text-base max-w-md mx-auto"
+          >
             {loading
               ? 'Loading agents...'
               : `${agents.length} agent${agents.length !== 1 ? 's' : ''} deployed on Hatcher${activeCount > 0 ? ` — ${activeCount} live` : ''}`}
-          </p>
+          </motion.p>
         </div>
       </div>
 
@@ -618,10 +629,10 @@ const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agen
   const isNewAgent = messageCount === 0;
 
   return (
-    <div>
+    <motion.div whileHover={{ y: -3 }} transition={{ duration: 0.2 }}>
       <Link href={`/agent/${agent.id}`} className="block group">
         <div
-          className={cn(cardClass, 'p-5 h-full flex flex-col relative hover:-translate-y-1 transition-transform duration-200')}
+          className={cn(cardClass, 'p-5 h-full flex flex-col relative transition-shadow duration-200')}
         >
 
             {/* Header: avatar + name + status */}
@@ -701,6 +712,6 @@ const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agen
             </div>
         </div>
       </Link>
-    </div>
+    </motion.div>
   );
 });

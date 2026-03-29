@@ -41,7 +41,7 @@ function TemplateCard({ template, index }: { template: typeof AGENT_TEMPLATES[nu
   return (
     <motion.div
       variants={cardVariants}
-      whileHover={{ y: -2, transition: { duration: 0.2 } }}
+      whileHover={{ y: -3, transition: { duration: 0.2 } }}
       className="group relative flex flex-col rounded-2xl border border-white/[0.06] bg-[rgba(14,14,20,0.7)] backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-white/[0.12]"
       style={{
         boxShadow: '0 0 0 0 transparent',

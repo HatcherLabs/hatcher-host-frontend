@@ -120,7 +120,7 @@ const stepVariants = {
 };
 
 const cardHover = {
-  scale: 1.03,
+  y: -3,
   transition: { duration: 0.2 },
 };
 

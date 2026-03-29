@@ -237,13 +237,8 @@ const ALL_FEATURES = [
 // ── Animation variants ────────────────────────────────────────
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const } },
-};
-
-const stagger = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
+  hidden: { opacity: 0, y: 14 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const } },
 };
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -294,16 +289,11 @@ export default function FrameworksPage() {
   const activeFramework = FRAMEWORKS.find((f) => f.key === activeCode)!;
 
   return (
-    <motion.div
-      variants={stagger}
-      initial="hidden"
-      animate="visible"
-      className="min-h-screen px-4 py-12 sm:px-6 lg:px-8"
-    >
+    <div className="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl space-y-20">
 
         {/* ── Hero ──────────────────────────────────────────────── */}
-        <motion.div variants={fadeUp} className="text-center">
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} className="text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#06b6d4]/20 bg-[#06b6d4]/5 px-4 py-1.5 text-sm font-medium text-[#06b6d4]">
             <Layers className="h-4 w-4" />
             Framework Comparison
@@ -335,15 +325,22 @@ export default function FrameworksPage() {
         </motion.div>
 
         {/* ── Framework cards overview ───────────────────────── */}
-        <motion.section variants={stagger}>
-          <motion.h2 variants={fadeUp} className="mb-6 text-xl font-bold text-[#F0EEFC]">
+        <section>
+          <motion.h2
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.3 }}
+            className="mb-6 text-xl font-bold text-[#F0EEFC]"
+          >
             At a glance
           </motion.h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {FRAMEWORKS.map((fw) => (
               <motion.div
                 key={fw.key}
-                variants={fadeUp}
+                whileHover={{ y: -3 }}
+                transition={{ duration: 0.2 }}
                 className={cn(
                   'group relative flex flex-col rounded-2xl border bg-[rgba(14,14,20,0.8)] p-5 backdrop-blur-sm transition-all duration-300 hover:shadow-lg cursor-default',
                   fw.border
@@ -393,11 +390,19 @@ export default function FrameworksPage() {
               </motion.div>
             ))}
           </div>
-        </motion.section>
+        </section>
 
         {/* ── Feature matrix ──────────────────────────────────── */}
-        <motion.section variants={fadeUp}>
-          <h2 className="mb-6 text-xl font-bold text-[#F0EEFC]">Feature matrix</h2>
+        <section>
+          <motion.h2
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.3 }}
+            className="mb-6 text-xl font-bold text-[#F0EEFC]"
+          >
+            Feature matrix
+          </motion.h2>
           <div className="overflow-x-auto rounded-2xl border border-white/[0.06]">
             <table className="w-full text-sm">
               <thead>
@@ -437,21 +442,28 @@ export default function FrameworksPage() {
               </tbody>
             </table>
           </div>
-        </motion.section>
+        </section>
 
         {/* ── Use case recommendations ─────────────────────── */}
-        <motion.section variants={stagger}>
-          <motion.h2 variants={fadeUp} className="mb-2 text-xl font-bold text-[#F0EEFC]">
+        <section>
+          <motion.h2
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.3 }}
+            className="mb-2 text-xl font-bold text-[#F0EEFC]"
+          >
             Best for...
           </motion.h2>
-          <motion.p variants={fadeUp} className="mb-6 text-sm text-[#A5A1C2]">
+          <p className="mb-6 text-sm text-[#A5A1C2]">
             Not sure which framework to pick? Match your use case.
-          </motion.p>
+          </p>
           <div className="grid gap-4 sm:grid-cols-2">
             {FRAMEWORKS.map((fw) => (
               <motion.div
                 key={fw.key}
-                variants={fadeUp}
+                whileHover={{ y: -3 }}
+                transition={{ duration: 0.2 }}
                 className={cn(
                   'rounded-2xl border p-5 transition-colors duration-200',
                   fw.border,
@@ -492,11 +504,19 @@ export default function FrameworksPage() {
               </motion.div>
             ))}
           </div>
-        </motion.section>
+        </section>
 
         {/* ── Performance benchmarks ───────────────────────── */}
-        <motion.section variants={fadeUp}>
-          <h2 className="mb-2 text-xl font-bold text-[#F0EEFC]">Performance benchmarks</h2>
+        <section>
+          <motion.h2
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.3 }}
+            className="mb-2 text-xl font-bold text-[#F0EEFC]"
+          >
+            Performance benchmarks
+          </motion.h2>
           <p className="mb-6 text-sm text-[#A5A1C2]">
             Cold-start time and baseline memory usage on Hatcher shared infrastructure. Actual values vary by config.
           </p>
@@ -551,11 +571,19 @@ export default function FrameworksPage() {
               {' '}<span className="font-semibold text-[#06b6d4]">🦞 OpenClaw</span> packs the most tools but needs more resources.
             </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* ── Code examples ─────────────────────────────────── */}
-        <motion.section variants={fadeUp}>
-          <h2 className="mb-2 text-xl font-bold text-[#F0EEFC]">Configuration examples</h2>
+        <section>
+          <motion.h2
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.3 }}
+            className="mb-2 text-xl font-bold text-[#F0EEFC]"
+          >
+            Configuration examples
+          </motion.h2>
           <p className="mb-6 text-sm text-[#A5A1C2]">
             Each framework has its own config format. Here&apos;s what a typical setup looks like.
           </p>
@@ -608,11 +636,19 @@ export default function FrameworksPage() {
               </a>
             </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* ── LLM support ───────────────────────────────────── */}
-        <motion.section variants={fadeUp}>
-          <h2 className="mb-2 text-xl font-bold text-[#F0EEFC]">LLM support</h2>
+        <section>
+          <motion.h2
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.3 }}
+            className="mb-2 text-xl font-bold text-[#F0EEFC]"
+          >
+            LLM support
+          </motion.h2>
           <p className="mb-6 text-sm text-[#A5A1C2]">
             All frameworks support BYOK (Bring Your Own Key) for unlimited messages. Free-tier agents use our hosted Groq key.
           </p>
@@ -642,10 +678,10 @@ export default function FrameworksPage() {
               View BYOK setup guide →
             </Link>
           </p>
-        </motion.section>
+        </section>
 
         {/* ── Decision guide ────────────────────────────────── */}
-        <motion.section variants={fadeUp}>
+        <section>
           <div className="rounded-2xl border border-[#06b6d4]/20 bg-gradient-to-br from-[#06b6d4]/5 to-[#a78bfa]/5 p-8">
             <h2 className="mb-6 text-xl font-bold text-[#F0EEFC]">Quick decision guide</h2>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -702,10 +738,10 @@ export default function FrameworksPage() {
               ))}
             </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* ── CTA ───────────────────────────────────────────── */}
-        <motion.section variants={fadeUp} className="text-center">
+        <section className="text-center">
           <div className="rounded-2xl border border-white/[0.06] bg-[rgba(14,14,20,0.7)] p-10">
             <Bot className="mx-auto mb-4 h-10 w-10 text-[#6B6890]" />
             <h2 className="mb-2 text-2xl font-bold text-[#F0EEFC]">Ready to deploy?</h2>
@@ -729,9 +765,9 @@ export default function FrameworksPage() {
               </Link>
             </div>
           </div>
-        </motion.section>
+        </section>
 
       </div>
-    </motion.div>
+    </div>
   );
 }

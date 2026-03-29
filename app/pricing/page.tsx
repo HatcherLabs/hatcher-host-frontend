@@ -72,13 +72,23 @@ export default function PricingPage() {
             <Sparkles className="w-3.5 h-3.5" />
             Simple Pricing
           </div>
-          <h1 className="text-4xl sm:text-5xl font-extrabold mb-5 relative text-white">
+          <motion.h1
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="text-4xl sm:text-5xl font-extrabold mb-5 relative text-white"
+          >
             Choose Your Plan
-          </h1>
-          <p className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto leading-relaxed relative">
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto leading-relaxed relative"
+          >
             Start free with any framework. Scale when you are ready.
             All integrations included. BYOK always free. Pay with SOL or platform tokens.
-          </p>
+          </motion.p>
 
           {/* Monthly / Annual toggle */}
           <div className="inline-flex items-center gap-3 mt-8 p-1 rounded-full bg-white/[0.04] border border-white/[0.06]">
@@ -122,8 +132,10 @@ export default function PricingPage() {
             const billingParam = isAnnual ? 'annual' : 'monthly';
 
             return (
-              <div
+              <motion.div
                 key={tierKey}
+                whileHover={{ y: -3 }}
+                transition={{ duration: 0.2 }}
                 className={cn(
                   'card glass-noise p-8 flex flex-col relative',
                   style.highlighted && 'border-[#06b6d4]/40 shadow-[0_0_40px_rgba(6,182,212,0.12)]'
@@ -235,7 +247,7 @@ export default function PricingPage() {
                     Get {tier.name}
                   </Link>
                 )}
-              </div>
+              </motion.div>
             );
           })}
         </div>
@@ -243,10 +255,16 @@ export default function PricingPage() {
         {/* ADD-ONS SECTION */}
         <section className="mb-20">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3">
+            <motion.h2
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.3 }}
+              className="text-2xl font-bold mb-3 flex items-center justify-center gap-3"
+            >
               <Plus className="w-6 h-6 text-[#06b6d4]" />
               <span className="text-[var(--text-primary)]">Agent Add-ons</span>
-            </h2>
+            </motion.h2>
             <p className="text-[var(--text-muted)] text-sm max-w-lg mx-auto">
               Need more agents? Stack add-ons on any tier. Mix and match as needed.
             </p>
@@ -254,8 +272,10 @@ export default function PricingPage() {
 
           <div className="grid sm:grid-cols-3 gap-5 max-w-3xl mx-auto">
             {ADDONS.map((addon) => (
-              <div
+              <motion.div
                 key={addon.key}
+                whileHover={{ y: -3 }}
+                transition={{ duration: 0.2 }}
                 className="card glass-noise p-6 text-center"
               >
                 <h3 className="font-bold text-[var(--text-primary)] text-lg mb-2">{addon.name}</h3>
@@ -268,7 +288,7 @@ export default function PricingPage() {
                 <p className="text-sm text-[var(--text-secondary)]">
                   {addon.extraAgents ? `${addon.extraAgents} extra agent slots` : addon.description}
                 </p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </section>
@@ -302,10 +322,16 @@ export default function PricingPage() {
         {/* COMPARE PLANS TABLE */}
         <section className="mb-20">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold mb-3 flex items-center justify-center gap-3">
+            <motion.h2
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.3 }}
+              className="text-2xl font-bold mb-3 flex items-center justify-center gap-3"
+            >
               <Shield className="w-6 h-6 text-[#06b6d4]" />
               <span className="text-[var(--text-primary)]">Compare Plans</span>
-            </h2>
+            </motion.h2>
             <p className="text-[var(--text-muted)] text-sm">See what each tier includes at a glance</p>
           </div>
 
@@ -353,10 +379,16 @@ export default function PricingPage() {
         {/* FAQ */}
         <section className="mb-20">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold flex items-center justify-center gap-3">
+            <motion.h2
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.3 }}
+              className="text-2xl font-bold flex items-center justify-center gap-3"
+            >
               <HelpCircle className="w-6 h-6 text-[#06b6d4]" />
               <span className="text-[var(--text-primary)]">Frequently Asked Questions</span>
-            </h2>
+            </motion.h2>
           </div>
           <div className="max-w-3xl mx-auto space-y-3">
             {FAQ.map((item) => (

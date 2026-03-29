@@ -171,25 +171,33 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left — Copy */}
             <div>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
+                className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6 text-white"
+                style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
+              >
+                Your AI agent,
+                <br />
+                <span className="text-cyan-400">live on every platform</span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
+                className="text-lg text-[#a1a1aa] leading-relaxed mb-8 max-w-lg"
+              >
+                Build and deploy AI agents to Telegram, Discord, Twitter, and 20+ platforms.
+                No code, no servers — free to start.
+              </motion.p>
+
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.1 }}
+                transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
               >
-                <h1
-                  className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6 text-white"
-                  style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
-                >
-                  Your AI agent,
-                  <br />
-                  <span className="text-cyan-400">live on every platform</span>
-                </h1>
-
-                <p className="text-lg text-[#a1a1aa] leading-relaxed mb-8 max-w-lg">
-                  Build and deploy AI agents to Telegram, Discord, Twitter, and 20+ platforms.
-                  No code, no servers — free to start.
-                </p>
-
                 <Link
                   href="/create"
                   className="clay-btn-primary clay-btn-lg text-base"
@@ -213,19 +221,16 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* ── 2. SOCIAL PROOF ─────────────────────────────── */}
-      <Section className="py-10 sm:py-12 px-4 sm:px-6 border-t border-b border-white/[0.06]">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-center text-sm text-[#a1a1aa]">
-            Trusted by <span className="text-white font-medium">500+ developers</span> · <span className="text-white font-medium">1,200+ agents deployed</span> · <span className="text-white font-medium">99.9% uptime</span>
-          </p>
-        </div>
-      </Section>
-
-      {/* ── 3. HOW IT WORKS ─────────────────────────────── */}
+      {/* ── 2. HOW IT WORKS ─────────────────────────────── */}
       <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12 sm:mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="text-center mb-12 sm:mb-16"
+          >
             <h2
               className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white"
               style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
@@ -235,7 +240,7 @@ export default function LandingPage() {
             <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
               No coding, no setup guides, no configuration files. Just pick, customize, and launch.
             </p>
-          </div>
+          </motion.div>
 
           {/* Setup walkthrough + live demo side by side */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
@@ -264,7 +269,13 @@ export default function LandingPage() {
       {/* ── 4. FRAMEWORK SHOWCASE ───────────────────────── */}
       <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="frameworks">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12 sm:mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="text-center mb-12 sm:mb-16"
+          >
             <h2
               className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white"
               style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
@@ -274,7 +285,7 @@ export default function LandingPage() {
             <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
               Each framework has a different personality. Pick the one that fits your use case — or try them all.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             {[
@@ -303,8 +314,10 @@ export default function LandingPage() {
                 href: `${DOCS_URL}/frameworks/milady`,
               },
             ].map((fw) => (
-              <div
+              <motion.div
                 key={fw.name}
+                whileHover={{ y: -4 }}
+                transition={{ duration: 0.2 }}
                 className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 hover:border-white/[0.12] transition-colors duration-200"
               >
                 <div className="flex items-center gap-3 mb-3">
@@ -317,7 +330,7 @@ export default function LandingPage() {
                 <Link href={fw.href} className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors">
                   Learn more &rarr;
                 </Link>
-              </div>
+              </motion.div>
             ))}
           </div>
 
@@ -330,18 +343,24 @@ export default function LandingPage() {
       {/* ── 5. PRICING PREVIEW ──────────────────────────── */}
       <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="pricing">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-10 sm:mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="text-center mb-10 sm:mb-16"
+          >
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
               Start free, grow when ready
             </h2>
             <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
               All platforms included on every plan. Bring your own AI key = unlimited messages.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Free */}
-            <div className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7 hover:border-white/[0.12] hover:translate-y-[-2px] transition-all duration-300">
+            <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7 hover:border-white/[0.12] transition-colors duration-200">
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-emerald-400 mb-2">Free</p>
               <p className="text-3xl font-bold text-white mb-1">$0</p>
               <p className="text-sm text-[#a1a1aa] mb-1">Get started with zero cost</p>
@@ -366,10 +385,10 @@ export default function LandingPage() {
               >
                 Get Started
               </Link>
-            </div>
+            </motion.div>
 
             {/* Basic */}
-            <div className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7 hover:border-white/[0.12] hover:translate-y-[-2px] transition-all duration-300">
+            <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7 hover:border-white/[0.12] transition-colors duration-200">
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-purple-400 mb-2">Basic</p>
               <div className="flex items-baseline gap-1">
                 <p className="text-3xl font-bold text-white">$9.99</p>
@@ -396,10 +415,10 @@ export default function LandingPage() {
               >
                 Subscribe
               </Link>
-            </div>
+            </motion.div>
 
             {/* Pro */}
-            <div className="bg-[#0e0e14] border border-cyan-500/30 rounded-2xl p-7 relative overflow-hidden hover:translate-y-[-2px] transition-all duration-300">
+            <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="bg-[#0e0e14] border border-cyan-500/30 rounded-2xl p-7 relative overflow-hidden transition-colors duration-200">
               <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="flex items-center gap-2 mb-2">
                 <p className="text-xs font-semibold tracking-[0.2em] uppercase text-cyan-400">Pro</p>
@@ -430,7 +449,7 @@ export default function LandingPage() {
               >
                 Go Pro
               </Link>
-            </div>
+            </motion.div>
           </div>
 
           <p className="text-center text-xs text-[#71717a] mt-6">
@@ -443,10 +462,16 @@ export default function LandingPage() {
       {/* ── 6. FAQ ──────────────────────────────────────── */}
       <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="faq">
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="text-center mb-12"
+          >
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Common questions</h2>
             <p className="text-[#a1a1aa]">Everything you need to know</p>
-          </div>
+          </motion.div>
           <div className="space-y-3">
             {[
               { q: 'Is it really free?', a: 'Yes. The free plan gives you 1 agent, 20 messages per day, and access to all platforms. We even include a free AI provider (Groq) so you don\'t need to pay anything to get started. No credit card required.' },
@@ -466,7 +491,13 @@ export default function LandingPage() {
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full bg-purple-500/10 blur-[100px]" />
         </div>
-        <div className="relative z-10 max-w-3xl mx-auto text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
+          className="relative z-10 max-w-3xl mx-auto text-center"
+        >
           <h2
             className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-6"
             style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
@@ -476,14 +507,16 @@ export default function LandingPage() {
           <p className="text-lg text-[#a1a1aa] mb-10 max-w-lg mx-auto">
             4 AI engines, 20+ platforms, zero credit card required. Ready in 60 seconds.
           </p>
-          <Link
-            href="/create"
-            className="clay-btn-primary clay-btn-lg text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
-          >
-            Create Your Agent
-            <ArrowRight className="w-5 h-5" aria-hidden="true" />
-          </Link>
-        </div>
+          <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }} className="inline-block">
+            <Link
+              href="/create"
+              className="clay-btn-primary clay-btn-lg text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+            >
+              Create Your Agent
+              <ArrowRight className="w-5 h-5" aria-hidden="true" />
+            </Link>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Global footer is rendered by LayoutShell */}

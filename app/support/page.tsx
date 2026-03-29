@@ -264,7 +264,7 @@ export default function SupportPage() {
               <Wrapper
                 key={link.label}
                 {...(extraProps as any)}
-                className="group flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl p-4 transition-all duration-200 hover:border-[#06b6d4]/30 hover:bg-white/[0.03]"
+                className="group flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl p-4 transition-all duration-200 hover:border-[#06b6d4]/30 hover:bg-white/[0.03] hover:-translate-y-[3px]"
               >
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors"
@@ -601,7 +601,7 @@ export default function SupportPage() {
                       <Link
                         key={ticket.id}
                         href={`/support/${ticket.id}`}
-                        className="flex items-center gap-3 px-6 py-4 transition-colors hover:bg-white/[0.02] group"
+                        className="flex items-center gap-3 px-6 py-4 transition-all duration-200 hover:bg-white/[0.02] hover:-translate-y-[2px] group"
                       >
                         <div className={`w-8 h-8 rounded-lg ${sc.bg} flex items-center justify-center flex-shrink-0`}>
                           <StatusIcon size={14} className={sc.color} />

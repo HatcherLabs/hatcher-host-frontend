@@ -577,10 +577,10 @@ function TemplateCard({
         <motion.div
           className={cn(cardClass, 'p-5 h-full flex flex-col relative')}
           whileHover={{
-            y: -4,
+            y: -3,
             boxShadow: '0 12px 40px rgba(6, 182, 212, 0.12)',
           }}
-          transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+          transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
           {/* Top accent line */}
           <div className="absolute top-0 left-4 right-4 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'linear-gradient(90deg, transparent, rgba(6,182,212,0.4), transparent)' }} />

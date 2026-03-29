@@ -13,31 +13,8 @@ import {
 } from 'lucide-react';
 import { SOCIAL_LINKS } from '@/lib/config';
 
-/* ── Animation variants ─────────────────────────────────── */
-const stagger = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.1, delayChildren: 0.15 },
-  },
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const },
-  },
-};
-
-const scaleIn = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const },
-  },
-};
+/* ── Animation helpers ──────────────────────────────────── */
+const fadeUpTransition = { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const };
 
 /* ── What the token will power ──────────────────────────── */
 const PLANNED_USE_CASES = [
@@ -74,41 +51,50 @@ export default function TokenPage() {
           <div className="absolute -bottom-20 left-1/4 w-[300px] h-[300px] rounded-full bg-[#06b6d4]/4 blur-3xl" />
         </div>
 
-        <motion.div
-          className="mx-auto max-w-4xl"
-          variants={stagger}
-          initial="hidden"
-          animate="visible"
-        >
-          <motion.div variants={fadeUp} className="mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#06b6d4]/25 bg-[#06b6d4]/8 text-[#06b6d4] text-sm font-medium">
+        <div className="mx-auto max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={fadeUpTransition}
+            className="mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#06b6d4]/25 bg-[#06b6d4]/8 text-[#06b6d4] text-sm font-medium"
+          >
             <Sparkles className="w-3.5 h-3.5" />
             Coming Soon
           </motion.div>
 
-          <motion.div
-            variants={scaleIn}
+          <div
             className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#06b6d4] to-[#0891b2] flex items-center justify-center text-5xl mx-auto mb-8 shadow-[0_0_60px_rgba(6,182,212,0.35)]"
             style={{ animation: 'float 3s ease-in-out infinite' }}
           >
             &#x1F95A;
-          </motion.div>
+          </div>
 
-          <motion.h1 variants={fadeUp} className="text-5xl md:text-7xl font-extrabold mb-5 tracking-tight">
+          <motion.h1
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...fadeUpTransition, delay: 0.06 }}
+            className="text-5xl md:text-7xl font-extrabold mb-5 tracking-tight"
+          >
             <span className="text-white">Platform</span>{' '}
             <span className="text-[var(--text-primary)]">Token</span>
           </motion.h1>
 
-          <motion.p variants={fadeUp} className="text-lg md:text-xl mb-6 max-w-2xl mx-auto leading-relaxed text-[var(--text-secondary)]">
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...fadeUpTransition, delay: 0.12 }}
+            className="text-lg md:text-xl mb-6 max-w-2xl mx-auto leading-relaxed text-[var(--text-secondary)]"
+          >
             The native token of the Hatcher platform. It will power tier subscriptions,
             agent add-ons, and platform governance on Solana.
           </motion.p>
 
-          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#1A1730] border border-[rgba(46,43,74,0.6)] text-[var(--text-secondary)] text-sm">
+          <div className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#1A1730] border border-[rgba(46,43,74,0.6)] text-[var(--text-secondary)] text-sm">
             <Bell className="w-4 h-4 text-[#06b6d4]" />
             Token launch has not happened yet. Stay tuned for announcements.
-          </motion.div>
+          </div>
 
-          <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
             <Link href="/create" className="btn-primary text-base px-8 py-3.5 inline-flex items-center gap-2">
               Create Free Agent
               <Rocket className="w-4 h-4" />
@@ -117,25 +103,28 @@ export default function TokenPage() {
               View Pricing
               <ArrowRight className="w-4 h-4" />
             </Link>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </section>
 
       {/* ── PLANNED USE CASES ──────────────────────────────── */}
-      <motion.section
-        className="py-20 px-4"
-        variants={stagger}
-        initial="hidden"
-        animate="visible"
-      >
+      <section className="py-20 px-4">
         <div className="mx-auto max-w-6xl">
-          <motion.div variants={fadeUp} className="text-center mb-12">
+          <div className="text-center mb-12">
             <div className="section-label mb-3">Planned Utility</div>
-            <h2 className="text-4xl font-bold mb-4 text-[var(--text-primary)]">What the Token Will Power</h2>
+            <motion.h2
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.3 }}
+              className="text-4xl font-bold mb-4 text-[var(--text-primary)]"
+            >
+              What the Token Will Power
+            </motion.h2>
             <p className="text-[var(--text-secondary)] max-w-lg mx-auto">
               When launched, the platform token will be the native currency of the Hatcher ecosystem.
             </p>
-          </motion.div>
+          </div>
 
           <div className="grid md:grid-cols-3 gap-6">
             {PLANNED_USE_CASES.map((item) => {
@@ -144,7 +133,8 @@ export default function TokenPage() {
                 <motion.div
                   key={item.title}
                   className="card glass-noise p-8 group"
-                  variants={fadeUp}
+                  whileHover={{ y: -3 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <div
                     className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
@@ -159,18 +149,21 @@ export default function TokenPage() {
             })}
           </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* ── KEY DETAILS ──────────────────────────────────────── */}
-      <motion.section
-        className="py-16 px-4"
-        variants={stagger}
-        initial="hidden"
-        animate="visible"
-      >
+      <section className="py-16 px-4">
         <div className="mx-auto max-w-4xl">
-          <motion.div variants={fadeUp} className="card glass-noise p-8">
-            <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)]">Key Details</h2>
+          <div className="card glass-noise p-8">
+            <motion.h2
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.3 }}
+              className="text-2xl font-bold mb-6 text-[var(--text-primary)]"
+            >
+              Key Details
+            </motion.h2>
             <div className="grid gap-5">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pb-5 border-b border-[rgba(46,43,74,0.6)]">
                 <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">Network</span>
@@ -196,19 +189,14 @@ export default function TokenPage() {
                 <span className="text-[var(--text-primary)] font-medium">Free tier available now &mdash; token enables paid tiers &amp; add-ons</span>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* ── STAY UPDATED CTA ─────────────────────────────────── */}
       <section className="py-20 px-4">
         <div className="mx-auto max-w-4xl">
-          <motion.div
-            className="relative rounded-3xl overflow-hidden"
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-          >
+          <div className="relative rounded-3xl overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-[#06b6d4]/15 via-[#06b6d4]/10 to-[#0891b2]/10" />
             <div className="absolute inset-0 border border-[#06b6d4]/20 rounded-3xl" />
             <div className="absolute -top-12 -right-12 w-64 h-64 rounded-full bg-[#06b6d4]/10 blur-3xl" />
@@ -237,7 +225,7 @@ export default function TokenPage() {
                 </a>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>

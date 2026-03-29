@@ -280,6 +280,7 @@ export default function HelpPage() {
                   className="group card glass-noise p-4 flex flex-col items-center gap-2.5 text-center transition-all duration-200 hover:border-[rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.06)] cursor-pointer"
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
+                  whileHover={{ y: -3 }}
                   transition={{ delay: index * 0.06 }}
                 >
                   <div
