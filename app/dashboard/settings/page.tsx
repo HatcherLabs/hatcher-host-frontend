@@ -205,6 +205,8 @@ export default function SettingsPage() {
   // ── Danger state ──────────────────────────────────────────
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [showDeletePassword, setShowDeletePassword] = useState(false);
 
   // ── Initialise from user context ─────────────────────────
   useEffect(() => {
@@ -308,12 +310,13 @@ export default function SettingsPage() {
 
   // ── Delete account ────────────────────────────────────────
   async function handleDeleteAccount() {
+    if (!deletePassword) { toast('error', 'Enter your password to confirm'); return; }
     setDeleting(true);
     try {
-      const res = await api.deleteAccount();
+      const res = await api.deleteAccount(deletePassword);
       if (res.success) { clearToken(); logout(); router.push('/'); }
-      else { toast('error', (res as any).error || 'Failed to delete account'); setDeleting(false); setShowDeleteConfirm(false); }
-    } catch { toast('error', 'Failed to delete account. Please try again.'); setDeleting(false); setShowDeleteConfirm(false); }
+      else { toast('error', (res as any).error || 'Failed to delete account'); setDeleting(false); }
+    } catch { toast('error', 'Failed to delete account. Please try again.'); setDeleting(false); }
   }
 
   // ── Auth guards ───────────────────────────────────────────
@@ -828,17 +831,79 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* ── Dialogs ────────────────────────────────────────────── */}
-      <ConfirmDialog
-        open={showDeleteConfirm}
-        title="Delete Your Account?"
-        description="This will permanently remove all your agents, data, and payment history. This action cannot be undone."
-        confirmLabel={deleting ? 'Deleting...' : 'Delete Account'}
-        variant="danger"
-        loading={deleting}
-        onCancel={() => setShowDeleteConfirm(false)}
-        onConfirm={handleDeleteAccount}
-      />
+      {/* ── Delete Account Dialog ──────────────────────────────── */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <motion.div className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={deleting ? undefined : () => { setShowDeleteConfirm(false); setDeletePassword(''); }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            />
+            <motion.div
+              className="relative w-full max-w-md rounded-2xl border p-6"
+              style={{ background: '#1A1730', borderColor: 'rgba(239,68,68,0.25)', boxShadow: '0 16px 64px rgba(0,0,0,0.4)' }}
+              initial={{ opacity: 0, scale: 0.95, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 8 }} transition={{ duration: 0.2 }}
+              role="alertdialog" aria-modal="true"
+            >
+              <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4">
+                <AlertTriangle size={24} className="text-red-400" />
+              </div>
+              <h2 className="text-lg font-semibold text-white mb-2">Delete Your Account?</h2>
+              <p className="text-sm text-[#A5A1C2] leading-relaxed mb-5">
+                This will permanently remove all your agents, data, and payment history. This action <strong className="text-white">cannot be undone</strong>.
+              </p>
+              <div className="mb-5">
+                <label className="block text-xs font-medium text-[#71717a] uppercase tracking-wider mb-1.5">
+                  Confirm your password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showDeletePassword ? 'text' : 'password'}
+                    value={deletePassword}
+                    onChange={e => setDeletePassword(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter' && !deleting) handleDeleteAccount(); }}
+                    placeholder="Your current password"
+                    disabled={deleting}
+                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5 pr-10 text-sm text-white placeholder-[#52525b] focus:outline-none focus:border-red-500/50 disabled:opacity-50"
+                    autoFocus
+                  />
+                  <button type="button" onClick={() => setShowDeletePassword(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] hover:text-white transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showDeletePassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 justify-end">
+                <button
+                  onClick={() => { setShowDeleteConfirm(false); setDeletePassword(''); }}
+                  disabled={deleting}
+                  className="px-4 py-2.5 text-sm font-medium rounded-xl text-[#A5A1C2] hover:text-white hover:bg-white/5 transition-all disabled:opacity-40"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={deleting || !deletePassword}
+                  className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-red-500 hover:bg-red-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-red-500/20"
+                >
+                  {deleting ? (
+                    <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Deleting...</>
+                  ) : (
+                    <><Trash2 size={14} /> Delete Account</>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

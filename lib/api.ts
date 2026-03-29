@@ -214,8 +214,8 @@ export const api = {
       body: JSON.stringify(data),
     }),
 
-  /** Delete current user account */
-  deleteAccount: () => req<{deleted: boolean}>('/auth/me', { method: 'DELETE' }),
+  /** Delete current user account (requires password confirmation) */
+  deleteAccount: (password: string) => req<{deleted: boolean}>('/auth/me', { method: 'DELETE', body: JSON.stringify({ password }) }),
 
   /** Regenerate API key (legacy single-key) */
   regenerateApiKey: () =>
