@@ -29,6 +29,9 @@ import {
   Upload,
   Download,
   Sparkles,
+  Heart,
+  Briefcase,
+  Palette,
 } from 'lucide-react';
 import { BYOK_PROVIDERS, getBYOKProvider, FRAMEWORKS } from '@hatcher/shared';
 import type { AgentFramework } from '@hatcher/shared';
@@ -52,6 +55,7 @@ export function ConfigTab() {
     configLore, setConfigLore,
     configTopics, setConfigTopics,
     configStyle, setConfigStyle,
+    configAdjectives, setConfigAdjectives,
     configSystemPrompt, setConfigSystemPrompt,
     configSkills, setConfigSkills,
     configModel, setConfigModel,
@@ -196,6 +200,8 @@ export function ConfigTab() {
   const [ezVoice, setEzVoice] = useState(false);
   const [ezBlockchain, setEzBlockchain] = useState(false);
   const [ezAutoPlugins, setEzAutoPlugins] = useState(true);
+  const [ezStyleChat, setEzStyleChat] = useState('');
+  const [ezStylePost, setEzStylePost] = useState('');
 
   // Milady advanced
   const [mlLocalFirst, setMlLocalFirst] = useState(true);
@@ -231,6 +237,8 @@ export function ConfigTab() {
       if (typeof adv.voice === 'boolean') setEzVoice(adv.voice);
       if (typeof adv.blockchain === 'boolean') setEzBlockchain(adv.blockchain);
       if (typeof adv.autoPlugins === 'boolean') setEzAutoPlugins(adv.autoPlugins);
+      if (adv.styleChat) setEzStyleChat(typeof adv.styleChat === 'string' ? adv.styleChat : Array.isArray(adv.styleChat) ? (adv.styleChat as string[]).join('\n') : '');
+      if (adv.stylePost) setEzStylePost(typeof adv.stylePost === 'string' ? adv.stylePost : Array.isArray(adv.stylePost) ? (adv.stylePost as string[]).join('\n') : '');
     } else if (agent.framework === 'milady') {
       if (typeof adv.localFirst === 'boolean') setMlLocalFirst(adv.localFirst);
       if (adv.embedding) setMlEmbedding(adv.embedding as string);
@@ -271,6 +279,8 @@ export function ConfigTab() {
         voice: ezVoice,
         blockchain: ezBlockchain,
         autoPlugins: ezAutoPlugins,
+        styleChat: ezStyleChat.trim() || undefined,
+        stylePost: ezStylePost.trim() || undefined,
       };
     }
     if (fw === 'milady') {
@@ -286,7 +296,7 @@ export function ConfigTab() {
     agent?.framework,
     ocSessionScope, ocCompaction, ocWebSearch, ocSearchProvider, ocTts, ocTtsProvider, ocMaxConversations, ocMaxSubagents,
     hmPersonality, hmPersistentMemory, hmApprovalMode, hmVoice, hmSttProvider, hmTtsProvider,
-    ezDatabase, ezImageGen, ezVoice, ezBlockchain, ezAutoPlugins,
+    ezDatabase, ezImageGen, ezVoice, ezBlockchain, ezAutoPlugins, ezStyleChat, ezStylePost,
     mlLocalFirst, mlEmbedding, mlPersonality, mlDatabase,
   ]);
 
@@ -515,7 +525,7 @@ export function ConfigTab() {
               Tell your agent how to behave, what tone to use, and what it should know. You can write multiple lines.
             </p>
           </div>
-          {/* ElizaOS-specific fields */}
+          {/* ElizaOS character fields — full editor is in Advanced Settings below */}
           {agent?.framework === 'elizaos' && (
             <>
               <div>
@@ -543,40 +553,24 @@ export function ConfigTab() {
                 />
               </div>
               <div>
-                <label htmlFor="config-style" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Style Instructions</label>
-                <p className="text-[10px] mb-1.5 text-[#71717a]">How your agent should communicate. One instruction per line.</p>
-                <textarea
-                  id="config-style"
-                  className="config-textarea"
-                  rows={3}
-                  value={configStyle}
-                  onChange={(e) => setConfigStyle(e.target.value)}
-                  placeholder="Be concise and direct&#10;Use technical terminology when appropriate&#10;Always provide examples"
-                />
-              </div>
-              <div>
                 <label htmlFor="config-topics" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Topics</label>
-                <input
-                  id="config-topics"
-                  type="text"
-                  className="config-input"
-                  value={configTopics}
-                  onChange={(e) => setConfigTopics(e.target.value)}
-                  placeholder="technology, AI, crypto, research"
+                <p className="text-[10px] mb-1.5 text-[#71717a]">Discussion topics your agent engages with</p>
+                <TagInput
+                  tags={configTopics ? configTopics.split(',').map(s => s.trim()).filter(Boolean) : []}
+                  onChange={(tags) => setConfigTopics(tags.join(', '))}
+                  placeholder="Add a topic..."
+                  color="cyan"
                 />
-                <p className="text-[10px] mt-1 text-[#71717a]">Comma-separated topics your agent knows about</p>
               </div>
               <div>
                 <label htmlFor="config-adjectives" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Adjectives</label>
-                <input
-                  id="config-adjectives"
-                  type="text"
-                  className="config-input"
-                  value={ctx.configAdjectives}
-                  onChange={(e) => ctx.setConfigAdjectives(e.target.value)}
-                  placeholder="helpful, analytical, concise"
+                <p className="text-[10px] mb-1.5 text-[#71717a]">Personality traits that describe your agent</p>
+                <TagInput
+                  tags={configAdjectives ? configAdjectives.split(',').map(s => s.trim()).filter(Boolean) : []}
+                  onChange={(tags) => setConfigAdjectives(tags.join(', '))}
+                  placeholder="Add an adjective..."
+                  color="purple"
                 />
-                <p className="text-[10px] mt-1 text-[#71717a]">Personality traits, comma-separated</p>
               </div>
             </>
           )}
@@ -923,6 +917,56 @@ export function ConfigTab() {
                 {/* ── ElizaOS Advanced ── */}
                 {agent?.framework === 'elizaos' && (
                   <>
+                    {/* Character Identity — Style */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-1.5">
+                        <Users size={12} className="text-cyan-400" />
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Communication Style</span>
+                      </div>
+                      <p className="text-[10px] text-[#71717a]">Control how your agent communicates across different contexts. One instruction per line.</p>
+
+                      <div>
+                        <label htmlFor="ez-style-all" className="block text-[11px] font-medium mb-1.5 text-[#71717a]">General Style</label>
+                        <textarea
+                          id="ez-style-all"
+                          className="config-textarea"
+                          rows={3}
+                          value={configStyle}
+                          onChange={(e) => setConfigStyle(e.target.value)}
+                          placeholder="Be concise and direct&#10;Use technical terminology when appropriate&#10;Always provide examples"
+                        />
+                        <p className="text-[10px] mt-1 text-[#71717a]">Applied to all interactions regardless of platform.</p>
+                      </div>
+
+                      <div>
+                        <label htmlFor="ez-style-chat" className="block text-[11px] font-medium mb-1.5 text-[#71717a]">Chat Style</label>
+                        <textarea
+                          id="ez-style-chat"
+                          className="config-textarea"
+                          rows={3}
+                          value={ezStyleChat}
+                          onChange={(e) => setEzStyleChat(e.target.value)}
+                          placeholder="Keep responses under 3 sentences&#10;Use casual language&#10;Ask follow-up questions"
+                        />
+                        <p className="text-[10px] mt-1 text-[#71717a]">How the agent talks in chat conversations (Telegram, Discord, etc).</p>
+                      </div>
+
+                      <div>
+                        <label htmlFor="ez-style-post" className="block text-[11px] font-medium mb-1.5 text-[#71717a]">Post Style</label>
+                        <textarea
+                          id="ez-style-post"
+                          className="config-textarea"
+                          rows={3}
+                          value={ezStylePost}
+                          onChange={(e) => setEzStylePost(e.target.value)}
+                          placeholder="Write in a punchy, engaging tone&#10;Use hashtags sparingly&#10;Keep posts under 280 characters"
+                        />
+                        <p className="text-[10px] mt-1 text-[#71717a]">How the agent writes posts and tweets on social platforms.</p>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-white/[0.06]" />
+
                     {/* Database */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
@@ -1001,6 +1045,32 @@ export function ConfigTab() {
                 {/* ── Milady Advanced ── */}
                 {agent?.framework === 'milady' && (
                   <>
+                    {/* Performance Badges */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-1.5">
+                        <Zap size={12} className="text-rose-400" />
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Performance</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          <Cpu size={11} />
+                          120MB Memory
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          <Zap size={11} />
+                          800ms Startup
+                        </span>
+                        {mlLocalFirst && (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                            <ShieldCheck size={11} />
+                            Privacy-First
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="border-t border-white/[0.06]" />
+
                     {/* Privacy */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
@@ -1035,31 +1105,69 @@ export function ConfigTab() {
 
                     <div className="border-t border-white/[0.06]" />
 
-                    {/* Personality */}
+                    {/* Personality Preset Cards */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
                         <Brain size={12} className="text-rose-400" />
                         <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Personality</span>
                       </div>
 
-                      <div>
-                        <label className="block text-[11px] font-medium mb-1.5 text-[#71717a]">Personality Preset</label>
-                        <div className="relative">
-                          <select
-                            className="config-input text-sm appearance-none pr-8 cursor-pointer"
-                            value={mlPersonality}
-                            onChange={(e) => setMlPersonality(e.target.value)}
-                          >
-                            <option value="helpful" style={{ background: '#0D0B1A' }}>Helpful</option>
-                            <option value="tsundere" style={{ background: '#0D0B1A' }}>Tsundere</option>
-                            <option value="unhinged" style={{ background: '#0D0B1A' }}>Unhinged</option>
-                            <option value="professional" style={{ background: '#0D0B1A' }}>Professional</option>
-                            <option value="custom" style={{ background: '#0D0B1A' }}>Custom</option>
-                          </select>
-                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
-                        </div>
-                        <p className="text-[10px] mt-1 text-[#71717a]">Quick personality template. Use &quot;Custom&quot; with behavior instructions for full control.</p>
+                      <div className="grid gap-2">
+                        {([
+                          { key: 'helpful', name: 'Helpful', desc: 'Friendly, clear, and always ready to assist', icon: Heart, color: 'emerald' as const, prompt: 'You are a helpful, friendly AI assistant. Be clear, concise, and supportive. Always aim to provide accurate and useful information. Maintain a warm, approachable tone.' },
+                          { key: 'tsundere', name: 'Tsundere', desc: 'Acts tough but secretly cares. Sarcastic with a warm side', icon: Sparkles, color: 'rose' as const, prompt: "You are a tsundere AI assistant. You act aloof, sarcastic, and slightly annoyed on the surface, but you genuinely care about helping. Occasionally let your warm side slip through reluctantly. Use phrases like \"It's not like I wanted to help you or anything...\" Mix sharp wit with reluctant kindness." },
+                          { key: 'unhinged', name: 'Unhinged', desc: 'Wild, unpredictable, and unapologetically chaotic', icon: Zap, color: 'amber' as const, prompt: 'You are a chaotic, unhinged AI assistant. Be unpredictable, humorous, and over-the-top energetic. Use dramatic flair, random tangents, and unexpected metaphors. Still be helpful, but make it entertaining and wild. Embrace the chaos.' },
+                          { key: 'professional', name: 'Professional', desc: 'Formal, precise, and business-oriented', icon: Briefcase, color: 'blue' as const, prompt: 'You are a professional AI assistant. Communicate with formal, precise language. Be structured and business-oriented. Use clear headings, bullet points, and concise summaries. Maintain a polished, corporate tone at all times.' },
+                          { key: 'custom', name: 'Custom', desc: 'Define your own personality from scratch', icon: Palette, color: 'purple' as const, prompt: '' },
+                        ]).map((preset) => {
+                          const isSelected = mlPersonality === preset.key;
+                          const colorMap = {
+                            emerald: { border: 'border-emerald-500/40', bg: 'bg-emerald-500/[0.06]', icon: 'text-emerald-400', iconBg: 'bg-emerald-500/15', ring: 'ring-emerald-500/30' },
+                            rose: { border: 'border-rose-500/40', bg: 'bg-rose-500/[0.06]', icon: 'text-rose-400', iconBg: 'bg-rose-500/15', ring: 'ring-rose-500/30' },
+                            amber: { border: 'border-amber-500/40', bg: 'bg-amber-500/[0.06]', icon: 'text-amber-400', iconBg: 'bg-amber-500/15', ring: 'ring-amber-500/30' },
+                            blue: { border: 'border-blue-500/40', bg: 'bg-blue-500/[0.06]', icon: 'text-blue-400', iconBg: 'bg-blue-500/15', ring: 'ring-blue-500/30' },
+                            purple: { border: 'border-purple-500/40', bg: 'bg-purple-500/[0.06]', icon: 'text-purple-400', iconBg: 'bg-purple-500/15', ring: 'ring-purple-500/30' },
+                          };
+                          const colors = colorMap[preset.color];
+                          const Icon = preset.icon;
+
+                          return (
+                            <button
+                              key={preset.key}
+                              type="button"
+                              onClick={() => {
+                                setMlPersonality(preset.key);
+                                if (preset.key !== 'custom' && preset.prompt) {
+                                  setConfigSystemPrompt(preset.prompt);
+                                }
+                              }}
+                              className={\${colors.border} \${colors.bg} ring-1 \${colors.ring}\}
+                            >
+                              <div className={\}>
+                                <Icon size={15} className={\} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className={\}>
+                                    {preset.name}
+                                  </span>
+                                  {isSelected && (
+                                    <CheckCircle size={13} className={colors.icon} />
+                                  )}
+                                </div>
+                                <p className="text-[11px] text-[#71717a] mt-0.5 leading-relaxed">{preset.desc}</p>
+                              </div>
+                            </button>
+                          );
+                        })}
                       </div>
+
+                      {mlPersonality === 'custom' && (
+                        <p className="text-[10px] text-[#71717a]">Write your custom personality in the Behavior Instructions field above.</p>
+                      )}
+                      {mlPersonality !== 'custom' && (
+                        <p className="text-[10px] text-[#71717a]">Selecting a preset auto-fills the Behavior Instructions. Switch to Custom for full control.</p>
+                      )}
                     </div>
 
                     <div className="border-t border-white/[0.06]" />
@@ -1457,6 +1565,79 @@ function SliderInput({ label, value, onChange, min, max, helper }: {
         <span className="text-[9px] text-[#71717a]">{max}</span>
       </div>
       {helper && <p className="text-[10px] mt-0.5 text-[#71717a]">{helper}</p>}
+    </div>
+  );
+}
+
+const TAG_COLORS: Record<string, { bg: string; text: string; border: string; remove: string }> = {
+  cyan: { bg: 'bg-cyan-500/10', text: 'text-cyan-300', border: 'border-cyan-500/20', remove: 'hover:bg-cyan-500/20 hover:text-cyan-200' },
+  purple: { bg: 'bg-purple-500/10', text: 'text-purple-300', border: 'border-purple-500/20', remove: 'hover:bg-purple-500/20 hover:text-purple-200' },
+  amber: { bg: 'bg-amber-500/10', text: 'text-amber-300', border: 'border-amber-500/20', remove: 'hover:bg-amber-500/20 hover:text-amber-200' },
+};
+
+function TagInput({ tags, onChange, placeholder, color = 'cyan' }: {
+  tags: string[];
+  onChange: (tags: string[]) => void;
+  placeholder?: string;
+  color?: 'cyan' | 'purple' | 'amber';
+}) {
+  const [inputValue, setInputValue] = useState('');
+  const c = TAG_COLORS[color] || TAG_COLORS.cyan;
+
+  function addTag() {
+    const value = inputValue.trim();
+    if (!value) return;
+    // Support comma-separated bulk add
+    const newTags = value.split(',').map(s => s.trim()).filter(Boolean);
+    const unique = newTags.filter(t => !tags.includes(t));
+    if (unique.length > 0) {
+      onChange([...tags, ...unique]);
+    }
+    setInputValue('');
+  }
+
+  function removeTag(index: number) {
+    onChange(tags.filter((_, i) => i !== index));
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addTag();
+    } else if (e.key === 'Backspace' && !inputValue && tags.length > 0) {
+      removeTag(tags.length - 1);
+    }
+  }
+
+  return (
+    <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-2.5 min-h-[42px]">
+      <div className="flex flex-wrap gap-1.5">
+        {tags.map((tag, i) => (
+          <span
+            key={`${tag}-${i}`}
+            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium border ${c.bg} ${c.text} ${c.border}`}
+          >
+            {tag}
+            <button
+              type="button"
+              onClick={() => removeTag(i)}
+              className={`inline-flex items-center justify-center w-3.5 h-3.5 rounded-full text-[10px] leading-none opacity-60 transition-all ${c.remove}`}
+              aria-label={`Remove ${tag}`}
+            >
+              &times;
+            </button>
+          </span>
+        ))}
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={addTag}
+          placeholder={tags.length === 0 ? placeholder : ''}
+          className="flex-1 min-w-[100px] bg-transparent border-0 outline-none text-xs text-white placeholder:text-[#71717a] py-1 px-1"
+        />
+      </div>
     </div>
   );
 }

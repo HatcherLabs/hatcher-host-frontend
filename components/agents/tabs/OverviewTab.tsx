@@ -493,6 +493,51 @@ function ActivityFeedSection({ agentId, agent }: { agentId: string; agent: impor
   );
 }
 
+// ─── Framework capability constants ──────────────────────────
+const FRAMEWORK_CAPABILITIES: Record<string, string[]> = {
+  openclaw: ['Web Search', 'Browser', 'Memory', 'File Mgmt', 'Cron Jobs', 'Sub-agents', 'Voice/TTS', '20+ Platforms', '3200+ Skills'],
+  hermes: ['Persistent Memory', 'Multi-Provider LLM', '40+ Tools', 'Voice', 'Learning Agent', 'Research Mode'],
+  elizaos: ['Character Personas', 'Plugin System', 'Social Media Native', 'Image Gen', 'Blockchain', 'Multi-Client'],
+  milady: ['Personality Presets', 'Lightweight (120MB)', 'Fast Start (800ms)', 'Privacy-First', 'Cultural Awareness'],
+};
+
+const FRAMEWORK_CAP_STYLE: Record<string, string> = {
+  openclaw: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+  hermes: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+  elizaos: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  milady: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+};
+
+const FRAMEWORK_STAT_COLOR: Record<string, string> = {
+  openclaw: 'text-purple-400',
+  hermes: 'text-cyan-400',
+  elizaos: 'text-emerald-400',
+  milady: 'text-rose-400',
+};
+
+const FRAMEWORK_STATS: Record<string, { label: string; value: string }[]> = {
+  openclaw: [
+    { label: 'Startup Time', value: '~4s' },
+    { label: 'Memory', value: '~380MB' },
+    { label: 'Platforms', value: '20+' },
+  ],
+  hermes: [
+    { label: 'Startup Time', value: '~3s' },
+    { label: 'Memory', value: '~290MB' },
+    { label: 'Platforms', value: '8' },
+  ],
+  elizaos: [
+    { label: 'Startup Time', value: '~2s' },
+    { label: 'Memory', value: '~250MB' },
+    { label: 'Platforms', value: '10+' },
+  ],
+  milady: [
+    { label: 'Startup Time', value: '~800ms' },
+    { label: 'Memory', value: '~120MB' },
+    { label: 'Platforms', value: '7' },
+  ],
+};
+
 export function OverviewTab() {
   const ctx = useAgentContext();
   const {
@@ -620,6 +665,41 @@ export function OverviewTab() {
 
       {/* Activity Feed */}
       <ActivityFeedSection agentId={agent.id} agent={agent} />
+
+      {/* Framework Capabilities */}
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-4">
+          <Zap size={14} className="text-[#06b6d4]" />
+          <h3 className="text-sm font-semibold text-[#A5A1C2]">Framework Capabilities</h3>
+          <span className={`text-[10px] px-2 py-0.5 rounded-full border ${FRAMEWORK_BADGE[agent.framework] ?? 'bg-white/5 text-white/60 border-white/10'}`}>
+            {frameworkMeta?.name ?? agent.framework}
+          </span>
+        </div>
+
+        {/* Capability badges */}
+        <div className="flex flex-wrap gap-2 mb-5">
+          {(FRAMEWORK_CAPABILITIES[agent.framework] ?? []).map((cap) => (
+            <span
+              key={cap}
+              className={`text-[11px] px-2.5 py-1 rounded-lg border font-medium ${FRAMEWORK_CAP_STYLE[agent.framework] ?? 'bg-white/5 text-white/60 border-white/10'}`}
+            >
+              {cap}
+            </span>
+          ))}
+        </div>
+
+        {/* Framework stats */}
+        <div className="grid grid-cols-3 gap-3">
+          {(FRAMEWORK_STATS[agent.framework] ?? []).map((stat) => (
+            <div key={stat.label} className="rounded-xl px-3 py-2.5 bg-white/[0.03] border border-white/[0.06]">
+              <div className={`text-sm font-semibold tabular-nums ${FRAMEWORK_STAT_COLOR[agent.framework] ?? 'text-white'}`}>
+                {stat.value}
+              </div>
+              <div className="text-[10px] text-[#71717a] mt-0.5">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </GlassCard>
 
       {/* Agent info */}
       <GlassCard>

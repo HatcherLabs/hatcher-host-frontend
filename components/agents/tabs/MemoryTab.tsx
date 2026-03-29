@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Brain, RotateCcw, ChevronDown, ChevronRight } from 'lucide-react';
+import { Brain, RotateCcw, ChevronDown, ChevronRight, Database, Clock, Hash, CircleDot, Info } from 'lucide-react';
 import { api } from '@/lib/api';
 import {
   useAgentContext,
@@ -15,6 +15,37 @@ interface DailyLog {
   date: string;
   content: string;
 }
+
+const FRAMEWORK_MEMORY_INFO: Record<string, { description: string; color: string; borderColor: string; bgColor: string; iconColor: string }> = {
+  openclaw: {
+    description: 'OpenClaw uses conversation-scoped memory with compaction. Memories are organized by session and automatically summarized.',
+    color: 'text-amber-400',
+    borderColor: 'border-amber-500/20',
+    bgColor: 'bg-amber-500/[0.06]',
+    iconColor: 'text-amber-400/70',
+  },
+  hermes: {
+    description: 'Hermes features persistent memory powered by ChromaDB. Your agent learns and remembers across conversations and restarts.',
+    color: 'text-purple-400',
+    borderColor: 'border-purple-500/20',
+    bgColor: 'bg-purple-500/[0.06]',
+    iconColor: 'text-purple-400/70',
+  },
+  elizaos: {
+    description: 'ElizaOS stores memories in its database. Memories are associated with character identity and persist across sessions.',
+    color: 'text-cyan-400',
+    borderColor: 'border-cyan-500/20',
+    bgColor: 'bg-cyan-500/[0.06]',
+    iconColor: 'text-cyan-400/70',
+  },
+  milady: {
+    description: 'Milady uses lightweight memory with optional local-first storage for privacy-conscious deployments.',
+    color: 'text-rose-400',
+    borderColor: 'border-rose-500/20',
+    bgColor: 'bg-rose-500/[0.06]',
+    iconColor: 'text-rose-400/70',
+  },
+};
 
 export function MemoryTab() {
   const { agent } = useAgentContext();
@@ -65,6 +96,24 @@ export function MemoryTab() {
 
   const isEmpty = !memoryMd && dailyLogs.length === 0;
 
+  const frameworkInfo = FRAMEWORK_MEMORY_INFO[agent?.framework] || FRAMEWORK_MEMORY_INFO.openclaw;
+
+  // Check if Hermes persistent memory is enabled
+  const hermesPersistentMemory = useMemo(() => {
+    if (agent?.framework !== 'hermes') return false;
+    const config = agent?.config as Record<string, unknown> | undefined;
+    const adv = config?.advanced as Record<string, unknown> | undefined;
+    return adv?.persistentMemory !== false; // defaults to true for Hermes
+  }, [agent?.framework, agent?.config]);
+
+  // Memory stats
+  const memoryStats = useMemo(() => {
+    const totalMemories = dailyLogs.length + (memoryMd ? 1 : 0);
+    const totalSize = dailyLogs.reduce((acc, log) => acc + log.content.length, 0) + memoryMd.length;
+    const lastDate = dailyLogs.length > 0 ? dailyLogs[0].date : null;
+    return { totalMemories, totalSize, lastDate };
+  }, [dailyLogs, memoryMd]);
+
   return (
     <motion.div
       key="tab-memory"
@@ -89,6 +138,66 @@ export function MemoryTab() {
           {loading ? 'Loading...' : 'Refresh'}
         </button>
       </div>
+
+      {/* Framework info banner */}
+      <div className={`rounded-lg border ${frameworkInfo.borderColor} ${frameworkInfo.bgColor} px-4 py-3 flex items-start gap-3`}>
+        <Info size={16} className={`${frameworkInfo.iconColor} mt-0.5 shrink-0`} />
+        <p className={`text-xs leading-relaxed ${frameworkInfo.color}`}>
+          {frameworkInfo.description}
+        </p>
+      </div>
+
+      {/* Hermes persistent memory indicator */}
+      {agent?.framework === 'hermes' && (
+        <div className="flex items-center gap-2 px-1">
+          <CircleDot size={14} className={hermesPersistentMemory ? 'text-emerald-400' : 'text-[#71717a]'} />
+          <span className="text-xs font-medium text-[#A5A1C2]">
+            Persistent Memory:
+          </span>
+          <span className={`text-xs font-semibold ${hermesPersistentMemory ? 'text-emerald-400' : 'text-[#71717a]'}`}>
+            {hermesPersistentMemory ? 'Active' : 'Disabled'}
+          </span>
+          {hermesPersistentMemory && (
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Memory stats row */}
+      {!loading && !error && !isEmpty && (
+        <div className="grid grid-cols-3 gap-3">
+          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 flex items-center gap-2.5">
+            <Hash size={14} className="text-purple-400/60" />
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[#71717a]">Memories</p>
+              <p className="text-sm font-semibold text-white">{memoryStats.totalMemories}</p>
+            </div>
+          </div>
+          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 flex items-center gap-2.5">
+            <Database size={14} className="text-purple-400/60" />
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[#71717a]">Size</p>
+              <p className="text-sm font-semibold text-white">
+                {memoryStats.totalSize < 1024
+                  ? `${memoryStats.totalSize} B`
+                  : `${(memoryStats.totalSize / 1024).toFixed(1)} KB`}
+              </p>
+            </div>
+          </div>
+          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 flex items-center gap-2.5">
+            <Clock size={14} className="text-purple-400/60" />
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-[#71717a]">Latest</p>
+              <p className="text-sm font-semibold text-white">
+                {memoryStats.lastDate || '--'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <GlassCard>
