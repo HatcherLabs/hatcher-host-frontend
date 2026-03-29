@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import {
   MessageSquare,
   Settings,
@@ -16,8 +16,6 @@ import {
   Sparkles,
   GitMerge,
   History,
-  Menu,
-  X,
   ChevronLeft,
   Activity,
   TrendingUp,
@@ -72,7 +70,6 @@ interface AgentSidebarProps {
 }
 
 export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProps) {
-  const [mobileOpen, setMobileOpen] = useState(false);
   const tabs = getTabs(agent.framework);
   const statusInfo = STATUS_STYLES[agent.status] ?? STATUS_STYLES.paused;
   const frameworkMeta = FRAMEWORKS[agent.framework];
@@ -147,10 +144,7 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
                 return (
                   <button
                     key={t.id}
-                    onClick={() => {
-                      onTabChange(t.id);
-                      setMobileOpen(false);
-                    }}
+                    onClick={() => onTabChange(t.id)}
                     aria-current={isActive ? 'page' : undefined}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150 relative cursor-pointer ${
                       isActive
@@ -189,30 +183,93 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
 
   return (
     <>
-      {/* Mobile horizontal scrolling tabs — replaces hamburger on small screens */}
-      <div className="lg:hidden sticky top-0 z-40 border-b border-[rgba(46,43,74,0.4)] bg-[#0a0a12]/95 backdrop-blur-md">
+      {/* Mobile: sticky horizontal tab bar — replaces hamburger on small screens */}
+      <div className="lg:hidden sticky top-14 z-30 border-b border-[rgba(46,43,74,0.3)] bg-[#0a0a12]/95 backdrop-blur-sm">
+        {/* Agent identity strip */}
+        <div className="flex items-center gap-2 px-3 py-2 border-b border-[rgba(46,43,74,0.15)]">
+          <Link
+            href="/dashboard/agents"
+            className="flex-shrink-0 text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+            aria-label="Back to all agents"
+          >
+            <ChevronLeft size={16} />
+          </Link>
+          {agent.avatarUrl ? (
+            <img
+              src={agent.avatarUrl}
+              alt={agent.name}
+              className="w-5 h-5 rounded-full object-cover border border-[rgba(46,43,74,0.3)] flex-shrink-0"
+            />
+          ) : (
+            <div
+              className={`w-5 h-5 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-bold text-[8px] border border-[rgba(46,43,74,0.3)] flex-shrink-0`}
+            >
+              {initials}
+            </div>
+          )}
+          <span className="text-xs font-semibold text-white truncate min-w-0">{agent.name}</span>
+          <div className="ml-auto flex items-center gap-1.5 flex-shrink-0">
+            <span
+              role="status"
+              aria-label={`Agent status: ${statusInfo.label}`}
+              className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full border ${statusInfo.classes}`}
+            >
+              {statusInfo.pulse && (
+                <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${statusInfo.dotColor} opacity-75`} />
+                  <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${statusInfo.dotColor}`} />
+                </span>
+              )}
+              {statusInfo.label}
+            </span>
+            <span className={`hidden sm:inline-flex text-[10px] px-1.5 py-0.5 rounded-full border ${FRAMEWORK_BADGE[agent.framework] ?? 'bg-slate-500/15 text-slate-400 border-slate-500/30'}`}>
+              {frameworkMeta?.name ?? agent.framework}
+            </span>
+          </div>
+        </div>
+
+        {/* Horizontal scrolling tab list with group dividers */}
         <div
           ref={mobileTabsRef}
-          className="flex overflow-x-auto scrollbar-hide gap-0.5 px-2 py-1.5"
-          style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory' }}
+          className="flex overflow-x-auto scrollbar-hide"
+          role="tablist"
+          aria-label="Agent navigation"
+          style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          {tabs.map((t) => {
-            const isActive = activeTab === t.id;
+          {groups.map((group, groupIndex) => {
+            const groupTabs = tabs.filter((t) => t.group === group);
+            if (groupTabs.length === 0) return null;
             return (
-              <button
-                key={t.id}
-                data-active={isActive}
-                onClick={() => onTabChange(t.id)}
-                className={`flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-lg text-[10px] font-medium whitespace-nowrap flex-shrink-0 transition-all cursor-pointer ${
-                  isActive
-                    ? 'text-[#06b6d4] bg-[#06b6d4]/10'
-                    : 'text-[#71717a] hover:text-[#A5A1C2] hover:bg-white/[0.03]'
-                }`}
-                style={{ scrollSnapAlign: 'center' }}
-              >
-                <span className={isActive ? 'text-[#06b6d4]' : ''}>{t.icon}</span>
-                <span>{t.label}</span>
-              </button>
+              <div key={group} className="flex flex-shrink-0 items-stretch">
+                {groupIndex > 0 && (
+                  <div className="w-px bg-[rgba(46,43,74,0.5)] my-1.5 flex-shrink-0" aria-hidden="true" />
+                )}
+                {groupTabs.map((t) => {
+                  const isActive = activeTab === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      role="tab"
+                      aria-selected={isActive}
+                      data-active={isActive}
+                      onClick={() => onTabChange(t.id)}
+                      className={`relative flex flex-col items-center gap-0.5 px-3 py-2 min-w-[58px] flex-shrink-0 cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#06b6d4]/50 focus-visible:ring-inset ${
+                        isActive ? 'text-[#06b6d4]' : 'text-[#52506b] hover:text-[#A5A1C2]'
+                      }`}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="mobileTabUnderline"
+                          className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-[#06b6d4]"
+                          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                        />
+                      )}
+                      <span aria-hidden="true">{t.icon}</span>
+                      <span className="text-[9px] font-medium leading-tight whitespace-nowrap">{t.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             );
           })}
         </div>
