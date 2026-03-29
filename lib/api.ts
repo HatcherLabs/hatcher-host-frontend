@@ -533,6 +533,18 @@ export const api = {
       tokenSummary: { inputTokens: number; outputTokens: number; totalTokens: number; usdCost: number };
     }>('/analytics/overview'),
 
+  /** Get agent activity feed (lifecycle events timeline) */
+  getAgentActivity: (id: string) =>
+    req<{
+      events: Array<{
+        id: string;
+        type: 'started' | 'stopped' | 'restarted' | 'config_updated' | 'error' | 'message_burst' | 'version_deployed' | 'created';
+        message: string;
+        timestamp: string;
+        meta?: Record<string, unknown>;
+      }>;
+    }>(`/agents/${id}/activity`),
+
   /** Get agent activity logs */
   getAgentLogs: (id: string) =>
     req<{
