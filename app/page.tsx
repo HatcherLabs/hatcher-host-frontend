@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/auth-context';
@@ -14,6 +14,15 @@ import {
   Sparkles,
   Cpu,
   Brain,
+  Globe,
+  Key,
+  Moon,
+  FolderOpen,
+  Shield,
+  Zap,
+  MessageSquare,
+  Server,
+  BarChart3,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 
@@ -127,6 +136,83 @@ function AgentPreview() {
   );
 }
 
+// ─── Animated counter ─────────────────────────────────────────
+function AnimatedStat({ value, suffix = '', label }: { value: number; suffix?: string; label: string }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const hasAnimated = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting && !hasAnimated.current) {
+          hasAnimated.current = true;
+          const duration = 1800;
+          const steps = 60;
+          const increment = value / steps;
+          let current = 0;
+          const timer = setInterval(() => {
+            current += increment;
+            if (current >= value) {
+              setCount(value);
+              clearInterval(timer);
+            } else {
+              setCount(Math.floor(current));
+            }
+          }, duration / steps);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [value]);
+
+  const formatted = count >= 1000 ? `${(count / 1000).toFixed(count >= 10000 ? 0 : 1)}k` : count.toString();
+
+  return (
+    <div ref={ref} className="text-center">
+      <p className="text-3xl sm:text-4xl font-extrabold text-white tabular-nums">
+        {formatted}{suffix}
+      </p>
+      <p className="text-sm text-[#71717a] mt-1">{label}</p>
+    </div>
+  );
+}
+
+// ─── Feature card ─────────────────────────────────────────────
+function FeatureCard({ icon: Icon, title, description, accentColor = 'purple' }: {
+  icon: React.ElementType;
+  title: string;
+  description: string;
+  accentColor?: string;
+}) {
+  const colorMap: Record<string, { icon: string; iconBg: string; border: string }> = {
+    purple: { icon: 'text-purple-400', iconBg: 'bg-purple-500/10', border: 'hover:border-purple-500/20' },
+    cyan: { icon: 'text-cyan-400', iconBg: 'bg-cyan-500/10', border: 'hover:border-cyan-500/20' },
+    emerald: { icon: 'text-emerald-400', iconBg: 'bg-emerald-500/10', border: 'hover:border-emerald-500/20' },
+    amber: { icon: 'text-amber-400', iconBg: 'bg-amber-500/10', border: 'hover:border-amber-500/20' },
+    rose: { icon: 'text-rose-400', iconBg: 'bg-rose-500/10', border: 'hover:border-rose-500/20' },
+  };
+  const c = colorMap[accentColor] || colorMap.purple;
+
+  return (
+    <motion.div
+      whileHover={{ y: -3 }}
+      transition={{ duration: 0.2 }}
+      className={`rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 ${c.border} transition-colors duration-200`}
+    >
+      <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-3`}>
+        <Icon className={`w-4.5 h-4.5 ${c.icon}`} size={18} />
+      </div>
+      <h3 className="text-sm font-semibold text-white mb-1.5">{title}</h3>
+      <p className="text-xs text-[#a1a1aa] leading-relaxed">{description}</p>
+    </motion.div>
+  );
+}
+
 // ═══════════════════════════════════════════════════════════════
 // ██  LANDING PAGE
 // ═══════════════════════════════════════════════════════════════
@@ -171,6 +257,18 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left — Copy */}
             <div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                className="mb-5"
+              >
+                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-medium text-purple-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+                  4 AI frameworks, 20+ platforms
+                </span>
+              </motion.div>
+
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -178,9 +276,9 @@ export default function LandingPage() {
                 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6 text-white"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
-                Your AI agent,
+                Deploy AI agents
                 <br />
-                <span className="text-cyan-400">live on every platform</span>
+                <span className="text-cyan-400">in 60 seconds</span>
               </motion.h1>
 
               <motion.p
@@ -189,14 +287,15 @@ export default function LandingPage() {
                 transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
                 className="text-lg text-[#a1a1aa] leading-relaxed mb-8 max-w-lg"
               >
-                Build and deploy AI agents to Telegram, Discord, Twitter, and 20+ platforms.
-                No code, no servers — free to start.
+                Pick a framework, configure your agent, connect to Telegram, Discord, Twitter or any platform.
+                No code, no servers, no credit card.
               </motion.p>
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
+                className="flex flex-wrap items-center gap-4"
               >
                 <Link
                   href="/create"
@@ -204,6 +303,13 @@ export default function LandingPage() {
                 >
                   Get Started Free
                   <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  href={DOCS_URL}
+                  className="text-sm text-[#a1a1aa] hover:text-white transition-colors flex items-center gap-1.5"
+                >
+                  Read the docs
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </motion.div>
             </div>
@@ -252,6 +358,18 @@ export default function LandingPage() {
               Try it now — it&apos;s free
               <ArrowRight className="w-4 h-4" />
             </Link>
+          </div>
+        </div>
+      </Section>
+
+      {/* ── 3. SOCIAL PROOF / STATS ──────────────────────── */}
+      <Section className="py-12 sm:py-16 px-4 sm:px-6 border-t border-white/[0.06]">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12">
+            <AnimatedStat value={1200} suffix="+" label="Agents deployed" />
+            <AnimatedStat value={580000} suffix="+" label="Messages processed" />
+            <AnimatedStat value={4} label="AI frameworks" />
+            <AnimatedStat value={23} label="Ready templates" />
           </div>
         </div>
       </Section>
@@ -355,7 +473,87 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* ── 5. PRICING PREVIEW ──────────────────────────── */}
+      {/* ── 5. FEATURES GRID ─────────────────────────────── */}
+      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-white/[0.06]" id="features">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="text-center mb-10 sm:mb-14"
+          >
+            <h2
+              className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white"
+              style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
+            >
+              Everything you need to ship
+            </h2>
+            <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
+              From free AI to enterprise features — all included, no hidden costs.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <FeatureCard
+              icon={Globe}
+              title="20+ Platforms"
+              description="Telegram, Discord, Twitter, WhatsApp, Slack, and more. Connect your agent everywhere your users are."
+              accentColor="cyan"
+            />
+            <FeatureCard
+              icon={Key}
+              title="Bring Your Own Key"
+              description="Use your OpenAI, Anthropic, Google, or Groq key for unlimited messages. Or use our free AI — no key needed."
+              accentColor="amber"
+            />
+            <FeatureCard
+              icon={Zap}
+              title="Free AI Included"
+              description="Every agent gets free AI via Groq (Llama 4 Scout). Start building immediately, upgrade when you want."
+              accentColor="emerald"
+            />
+            <FeatureCard
+              icon={Moon}
+              title="Smart Auto-Sleep"
+              description="Agents sleep when idle and wake instantly on new messages. You only use resources when you need them."
+              accentColor="purple"
+            />
+            <FeatureCard
+              icon={FolderOpen}
+              title="File Manager"
+              description="Browse, edit, and download your agent's config and workspace files directly from the dashboard."
+              accentColor="rose"
+            />
+            <FeatureCard
+              icon={Shield}
+              title="Isolated Containers"
+              description="Each agent runs in its own Docker container with dedicated resources. Your data never touches other agents."
+              accentColor="cyan"
+            />
+            <FeatureCard
+              icon={MessageSquare}
+              title="Real-Time Chat"
+              description="Test your agent live from the dashboard. WebSocket streaming with typing indicators and full history."
+              accentColor="purple"
+            />
+            <FeatureCard
+              icon={Server}
+              title="24/7 Cloud Hosting"
+              description="No servers to manage. Your agent runs on Hatcher Cloud with automatic restarts and health monitoring."
+              accentColor="emerald"
+            />
+            <FeatureCard
+              icon={BarChart3}
+              title="Usage Analytics"
+              description="Track messages, uptime, and resource usage per agent. Know exactly how your agents are performing."
+              accentColor="amber"
+            />
+          </div>
+        </div>
+      </Section>
+
+      {/* ── 6. PRICING PREVIEW ─────────────────────────── */}
       <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-white/[0.06]" id="pricing">
         <div className="max-w-5xl mx-auto">
           <motion.div
@@ -474,7 +672,7 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* ── 6. FAQ ──────────────────────────────────────── */}
+      {/* ── 7. FAQ ──────────────────────────────────────── */}
       <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-white/[0.06]" id="faq">
         <div className="max-w-3xl mx-auto">
           <motion.div
@@ -501,10 +699,11 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* ── 7. FINAL CTA ────────────────────────────────── */}
+      {/* ── FINAL CTA ────────────────────────────────── */}
       <section className="relative py-20 sm:py-28 px-4 sm:px-6 border-t border-white/[0.06]">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full bg-purple-500/10 blur-[100px]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full bg-purple-500/8 blur-[120px]" />
+          <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] rounded-full bg-cyan-500/5 blur-[80px]" />
         </div>
         <motion.div
           initial={{ opacity: 0, y: 15 }}
@@ -514,23 +713,37 @@ export default function LandingPage() {
           className="relative z-10 max-w-3xl mx-auto text-center"
         >
           <h2
-            className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-6"
+            className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4"
             style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
-            Deploy your first AI agent for free
+            Your AI agent is 60 seconds away
           </h2>
           <p className="text-lg text-[#a1a1aa] mb-10 max-w-lg mx-auto">
-            4 AI engines, 20+ platforms, zero credit card required. Ready in 60 seconds.
+            Pick a framework, describe what you want, and launch. Free forever on the free plan.
           </p>
-          <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }} className="inline-block">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
+              <Link
+                href="/create"
+                className="clay-btn-primary clay-btn-lg text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+              >
+                Create Your Agent
+                <ArrowRight className="w-5 h-5" aria-hidden="true" />
+              </Link>
+            </motion.div>
             <Link
-              href="/create"
-              className="clay-btn-primary clay-btn-lg text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+              href="/pricing"
+              className="text-sm text-[#a1a1aa] hover:text-white transition-colors"
             >
-              Create Your Agent
-              <ArrowRight className="w-5 h-5" aria-hidden="true" />
+              Compare plans &rarr;
             </Link>
-          </motion.div>
+          </div>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[#52525b]">
+            <span className="flex items-center gap-1.5"><Check className="w-3 h-3 text-emerald-400" /> No credit card</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3 h-3 text-emerald-400" /> Free AI included</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3 h-3 text-emerald-400" /> Deploy in 60s</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3 h-3 text-emerald-400" /> All platforms</span>
+          </div>
         </motion.div>
       </section>
 
