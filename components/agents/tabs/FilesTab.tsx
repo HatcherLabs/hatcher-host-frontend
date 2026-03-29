@@ -1,7 +1,7 @@
 'use client';
 
-import { useContext, useEffect, useState, useCallback } from 'react';
-import { AgentContext, FRAMEWORK_ROOT_PATH } from '../AgentContext';
+import { useContext, useEffect, useState, useCallback, useMemo } from 'react';
+import { AgentContext, FRAMEWORK_ROOT_PATH, FRAMEWORK_BADGE, GlassCard } from '../AgentContext';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { motion } from 'framer-motion';
@@ -11,7 +11,6 @@ import {
   FolderOpen,
   ChevronRight,
   ArrowLeft,
-  Download,
   Trash2,
   Plus,
   Lock,
@@ -23,6 +22,13 @@ import {
   Save,
   X,
   AlertCircle,
+  Info,
+  ShieldAlert,
+  Home,
+  Crown,
+  FileJson,
+  Settings,
+  HardDrive,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -36,23 +42,77 @@ interface FileEntry {
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B';
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB'];
+  const sizes = ['B', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i] ?? 'B'}`;
 }
 
+/** Framework-specific accent color */
+const FRAMEWORK_ACCENT: Record<string, { color: string; border: string; bg: string; text: string }> = {
+  openclaw: { color: '#f59e0b', border: 'border-amber-500/30', bg: 'bg-amber-500/10', text: 'text-amber-400' },
+  hermes:   { color: '#a855f7', border: 'border-purple-500/30', bg: 'bg-purple-500/10', text: 'text-purple-400' },
+  elizaos:  { color: '#06b6d4', border: 'border-cyan-500/20', bg: 'bg-cyan-500/10', text: 'text-cyan-400' },
+  milady:   { color: '#f43f5e', border: 'border-rose-500/20', bg: 'bg-rose-500/10', text: 'text-rose-400' },
+};
+
+const FRAMEWORK_FS_INFO: Record<string, { label: string; description: string }> = {
+  openclaw: {
+    label: 'OpenClaw Workspace',
+    description: 'Config and data live in /home/node/.openclaw. Edit settings.json to change behavior, personality, and integrations.',
+  },
+  hermes: {
+    label: 'Hermes Workspace',
+    description: 'Agent files are stored in /home/hermes/.hermes. Modify character.json and plugin configs here.',
+  },
+  elizaos: {
+    label: 'ElizaOS Data Directory',
+    description: 'ElizaOS stores agent data in /data. Character files, memories, and plugin state live here.',
+  },
+  milady: {
+    label: 'Milady Workspace',
+    description: 'Milady agent files in /data/.milady. Character config, connectors, and runtime state are managed here.',
+  },
+};
+
 function getFileIcon(name: string, type: string) {
-  if (type === 'directory') return <Folder size={16} className="text-[#06b6d4]" />;
+  if (type === 'directory') return <Folder size={16} className="text-amber-400" />;
+  // .env files — red with warning connotation
+  if (/^\.env/i.test(name)) return <ShieldAlert size={16} className="text-red-400" />;
+  // JSON
+  if (/\.json$/i.test(name)) return <FileJson size={16} className="text-yellow-400" />;
+  // TypeScript / JavaScript
+  if (/\.(ts|tsx|js|jsx|mjs|cjs)$/i.test(name)) return <FileCode size={16} className="text-blue-400" />;
+  // Python
+  if (/\.py$/i.test(name)) return <FileCode size={16} className="text-green-400" />;
+  // Markdown
+  if (/\.md$/i.test(name)) return <FileText size={16} className="text-zinc-400" />;
+  // Config files
+  if (/\.(ya?ml|toml|ini|cfg|conf)$/i.test(name)) return <Settings size={16} className="text-slate-400" />;
+  // Images
   if (/\.(png|jpg|jpeg|gif|svg|webp)$/i.test(name)) return <FileImage size={16} className="text-purple-400" />;
-  if (/\.(json|js|ts|mjs|cjs)$/i.test(name)) return <FileCode size={16} className="text-blue-400" />;
   return <FileText size={16} className="text-[#A5A1C2]" />;
+}
+
+/** Small colored dot for file-type hint in the list */
+function getFileTypeTag(name: string): { label: string; color: string } | null {
+  if (/^\.env/i.test(name)) return { label: 'ENV', color: 'text-red-400 bg-red-500/10 border-red-500/20' };
+  if (/\.json$/i.test(name)) return { label: 'JSON', color: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20' };
+  if (/\.(ts|tsx)$/i.test(name)) return { label: 'TS', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20' };
+  if (/\.(js|jsx|mjs|cjs)$/i.test(name)) return { label: 'JS', color: 'text-blue-300 bg-blue-400/10 border-blue-400/20' };
+  if (/\.py$/i.test(name)) return { label: 'PY', color: 'text-green-400 bg-green-500/10 border-green-500/20' };
+  return null;
 }
 
 export function FilesTab() {
   const ctx = useContext(AgentContext);
   const { user } = useAuth();
   const agentId = ctx?.agent?.id ?? '';
-  const ROOT_PATH = FRAMEWORK_ROOT_PATH[ctx?.agent?.framework ?? 'openclaw'] ?? '/home/node/.openclaw';
+  const framework = ctx?.agent?.framework ?? 'openclaw';
+  const ROOT_PATH = FRAMEWORK_ROOT_PATH[framework] ?? '/home/node/.openclaw';
+  const accent = FRAMEWORK_ACCENT[framework] ?? FRAMEWORK_ACCENT.openclaw;
+  const fsInfo = FRAMEWORK_FS_INFO[framework] ?? FRAMEWORK_FS_INFO.openclaw;
+  const userTier = (user as any)?.tier ?? 'free';
+  const isPro = userTier === 'pro';
 
   const [files, setFiles] = useState<FileEntry[]>([]);
   const [currentPath, setCurrentPath] = useState(ROOT_PATH);
@@ -62,6 +122,7 @@ export function FilesTab() {
   const [agentStopped, setAgentStopped] = useState(false);
   const [stoppedMessage, setStoppedMessage] = useState('');
   const [purchasing, setPurchasing] = useState(false);
+  const [showInfoBanner, setShowInfoBanner] = useState(true);
 
   // Editor state
   const [editingFile, setEditingFile] = useState<{ path: string; name: string; content: string } | null>(null);
@@ -196,36 +257,76 @@ export function FilesTab() {
     setPurchasing(false);
   };
 
-  // Breadcrumbs
-  const pathParts = currentPath.replace(ROOT_PATH, '~').split('/').filter(Boolean);
+  // Breadcrumb segments
+  const breadcrumbs = useMemo(() => {
+    const relative = currentPath.startsWith(ROOT_PATH)
+      ? currentPath.slice(ROOT_PATH.length)
+      : currentPath;
+    const segments = relative.split('/').filter(Boolean);
+    const crumbs: { label: string; path: string }[] = [
+      { label: '~', path: ROOT_PATH },
+    ];
+    segments.forEach((seg, i) => {
+      crumbs.push({
+        label: seg,
+        path: ROOT_PATH + '/' + segments.slice(0, i + 1).join('/'),
+      });
+    });
+    return crumbs;
+  }, [currentPath, ROOT_PATH]);
+
+  // Total size of files in current directory
+  const totalSize = useMemo(() => {
+    return files.reduce((sum, f) => sum + (f.type === 'file' ? f.size : 0), 0);
+  }, [files]);
+
+  const dirCount = files.filter(f => f.type === 'directory').length;
+  const fileCount = files.filter(f => f.type === 'file').length;
 
   // ── Loading ──
   if (loading && unlocked === null) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 animate-spin text-[#06b6d4]" />
+        <Loader2 className="w-6 h-6 animate-spin" style={{ color: accent.color }} />
       </motion.div>
     );
   }
 
-  // ── Locked ──
+  // ── Locked (not Pro and no addon) ──
   if (unlocked === false) {
     return (
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-16">
-        <div className="w-16 h-16 rounded-2xl bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mx-auto mb-6">
-          <Lock className="w-8 h-8 text-[#06b6d4]" />
+        <div
+          className={`w-16 h-16 rounded-2xl ${accent.bg} ${accent.border} border flex items-center justify-center mx-auto mb-6`}
+        >
+          <Lock className={`w-8 h-8 ${accent.text}`} />
         </div>
         <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           File Manager
         </h3>
+
+        {/* Pro badge */}
+        {!isPro && (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 mb-4">
+            <Crown size={12} className="text-amber-400" />
+            <span className="text-[11px] font-medium text-amber-400">Pro Feature</span>
+          </div>
+        )}
+
         <p className="text-sm text-[#A5A1C2] mb-6 max-w-sm mx-auto">
           Browse, edit, and download your agent&apos;s configuration and workspace files.
+          {!isPro && (
+            <span className="block mt-1 text-xs text-[#71717a]">
+              Included with Pro plan, or unlock per-agent as an add-on.
+            </span>
+          )}
         </p>
         <div className="flex flex-col items-center gap-3">
           <button
             onClick={handleUnlock}
             disabled={purchasing}
-            className="px-6 py-2.5 rounded-lg text-sm font-medium text-white bg-[#06b6d4] hover:bg-[#0891b2] disabled:opacity-50 transition-colors flex items-center gap-2"
+            className="px-6 py-2.5 rounded-xl text-sm font-medium text-white transition-colors flex items-center gap-2 disabled:opacity-50"
+            style={{ backgroundColor: accent.color }}
           >
             {purchasing ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Unlocking...</>
@@ -234,7 +335,7 @@ export function FilesTab() {
             )}
           </button>
           <span className="text-xs text-[#71717a]">One-time purchase for this agent</span>
-          <Link href="/pricing" className="text-xs text-[#06b6d4] hover:underline">
+          <Link href="/pricing" className="text-xs hover:underline transition-colors" style={{ color: accent.color }}>
             Or upgrade to Pro for all agents
           </Link>
         </div>
@@ -255,6 +356,7 @@ export function FilesTab() {
   // ── File Editor ──
   if (editingFile) {
     const isModified = editContent !== editingFile.content;
+    const isEnvFile = /^\.env/i.test(editingFile.name);
     return (
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         {/* Editor header */}
@@ -263,16 +365,22 @@ export function FilesTab() {
             <button onClick={() => setEditingFile(null)} className="p-1.5 rounded-lg text-[#71717a] hover:text-white hover:bg-white/[0.04] transition-colors">
               <ArrowLeft size={16} />
             </button>
-            <FileCode size={16} className="text-blue-400" />
+            {getFileIcon(editingFile.name, 'file')}
             <span className="text-sm font-medium text-white font-mono">{editingFile.name}</span>
             {isModified && <span className="text-[10px] text-amber-400 ml-1">Modified</span>}
+            {isEnvFile && (
+              <span className="text-[10px] text-red-400 bg-red-500/10 border border-red-500/20 rounded px-1.5 py-0.5 ml-1">
+                Sensitive
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             {saveMsg && <span className="text-xs text-green-400">{saveMsg}</span>}
             <button
               onClick={handleSave}
               disabled={saving || !isModified}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-[#06b6d4] hover:bg-[#0891b2] disabled:opacity-30 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white disabled:opacity-30 transition-colors"
+              style={{ backgroundColor: isModified ? accent.color : undefined }}
             >
               {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
               Save
@@ -282,12 +390,23 @@ export function FilesTab() {
             </button>
           </div>
         </div>
-        <p className="text-[10px] text-[#71717a] mb-2 font-mono">{editingFile.path}</p>
+
+        {/* Breadcrumb path for editor */}
+        <div className="flex items-center gap-1 text-[10px] text-[#71717a] mb-3 font-mono overflow-x-auto">
+          {editingFile.path.split('/').filter(Boolean).map((seg, i, arr) => (
+            <span key={i} className="flex items-center gap-1 flex-shrink-0">
+              {i > 0 && <ChevronRight size={8} className="text-[#52525b]" />}
+              <span className={i === arr.length - 1 ? 'text-white' : ''}>{seg}</span>
+            </span>
+          ))}
+        </div>
+
         {error && <div className="mb-3 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</div>}
         <textarea
           value={editContent}
           onChange={(e) => setEditContent(e.target.value)}
-          className="w-full h-[500px] px-4 py-3 rounded-xl text-xs font-mono text-white bg-[rgba(13,11,26,0.9)] border border-white/[0.08] focus:border-[#06b6d4]/50 focus:outline-none resize-none leading-relaxed"
+          className="w-full h-[500px] px-4 py-3 rounded-xl text-xs font-mono text-white bg-[rgba(13,11,26,0.9)] border border-white/[0.08] focus:outline-none resize-none leading-relaxed"
+          style={{ borderColor: isModified ? accent.color + '40' : undefined }}
           spellCheck={false}
         />
       </motion.div>
@@ -297,49 +416,91 @@ export function FilesTab() {
   // ── File Browser ──
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-      {error && <div className="mb-4 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</div>}
+      {error && <div className="mb-4 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2">{error}</div>}
 
+      {/* Framework info banner */}
+      {showInfoBanner && (
+        <div className={`mb-4 rounded-xl border ${accent.border} ${accent.bg} px-4 py-3 flex items-start gap-3`}>
+          <Info size={16} className={`${accent.text} flex-shrink-0 mt-0.5`} />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className={`text-xs font-semibold ${accent.text}`}>{fsInfo.label}</span>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded border font-mono ${FRAMEWORK_BADGE[framework] ?? ''}`}>
+                {ROOT_PATH}
+              </span>
+            </div>
+            <p className="text-[11px] text-[#A5A1C2] leading-relaxed">{fsInfo.description}</p>
+          </div>
+          <button
+            onClick={() => setShowInfoBanner(false)}
+            className="p-0.5 rounded text-[#71717a] hover:text-white transition-colors flex-shrink-0"
+          >
+            <X size={12} />
+          </button>
+        </div>
+      )}
 
-
-      {/* Header: breadcrumbs + actions */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-1 text-xs overflow-x-auto">
-          {currentPath !== ROOT_PATH && (
-            <button onClick={goUp} className="p-1 rounded text-[#71717a] hover:text-white transition-colors flex-shrink-0">
-              <ArrowLeft size={14} />
-            </button>
-          )}
-          {pathParts.map((part, i) => {
-            const fullPath = part === '~' ? ROOT_PATH : ROOT_PATH + '/' + pathParts.slice(1, i + 1).join('/');
-            return (
+      {/* Breadcrumb path navigator */}
+      <div className="mb-4 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1 text-xs overflow-x-auto flex-1 min-w-0">
+            {currentPath !== ROOT_PATH && (
+              <button onClick={goUp} className="p-1 rounded-md text-[#71717a] hover:text-white hover:bg-white/[0.06] transition-colors flex-shrink-0">
+                <ArrowLeft size={14} />
+              </button>
+            )}
+            {breadcrumbs.map((crumb, i) => (
               <span key={i} className="flex items-center gap-1 flex-shrink-0">
-                {i > 0 && <ChevronRight size={10} className="text-[#71717a]" />}
+                {i > 0 && <ChevronRight size={10} className="text-[#52525b]" />}
                 <button
-                  onClick={() => navigateTo(fullPath)}
-                  className="text-[#A5A1C2] hover:text-white transition-colors font-mono"
+                  onClick={() => navigateTo(crumb.path)}
+                  className={`px-1.5 py-0.5 rounded-md font-mono transition-colors ${
+                    i === breadcrumbs.length - 1
+                      ? `${accent.text} ${accent.bg}`
+                      : 'text-[#A5A1C2] hover:text-white hover:bg-white/[0.04]'
+                  }`}
                 >
-                  {part}
+                  {crumb.label === '~' ? (
+                    <span className="flex items-center gap-1">
+                      <Home size={11} />
+                      <span className="hidden sm:inline">root</span>
+                    </span>
+                  ) : crumb.label}
                 </button>
               </span>
-            );
-          })}
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <button onClick={() => loadFiles()} className="p-1.5 rounded-lg text-[#71717a] hover:text-white hover:bg-white/[0.04] transition-colors" title="Refresh">
-            {loading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
-          </button>
-          <button
-            onClick={() => setCreating(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#06b6d4] border border-[#06b6d4]/30 hover:bg-[#06b6d4]/10 transition-colors"
-          >
-            <Plus size={12} /> New File
-          </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+            {/* Stats summary */}
+            {files.length > 0 && (
+              <div className="hidden sm:flex items-center gap-2 text-[10px] text-[#71717a] mr-1">
+                {dirCount > 0 && <span>{dirCount} folder{dirCount !== 1 ? 's' : ''}</span>}
+                {fileCount > 0 && <span>{fileCount} file{fileCount !== 1 ? 's' : ''}</span>}
+                {totalSize > 0 && (
+                  <span className="flex items-center gap-0.5">
+                    <HardDrive size={9} />
+                    {formatBytes(totalSize)}
+                  </span>
+                )}
+              </div>
+            )}
+            <button onClick={() => loadFiles()} className="p-1.5 rounded-lg text-[#71717a] hover:text-white hover:bg-white/[0.04] transition-colors" title="Refresh">
+              {loading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+            </button>
+            <button
+              onClick={() => setCreating(true)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium ${accent.text} border ${accent.border} hover:${accent.bg} transition-colors`}
+            >
+              <Plus size={12} /> New File
+            </button>
+          </div>
         </div>
       </div>
 
       {/* New file form */}
       {creating && (
-        <div className="mb-4 p-4 rounded-xl border" style={{ background: 'rgba(13, 11, 26, 0.8)', border: '1px solid rgba(46, 43, 74, 0.4)' }}>
+        <div className="mb-4 p-4 rounded-xl border border-white/[0.06] bg-[rgba(13,11,26,0.8)]">
           <div className="space-y-3">
             <input
               type="text"
@@ -347,14 +508,16 @@ export function FilesTab() {
               onChange={(e) => setNewFileName(e.target.value)}
               placeholder="filename.json"
               autoFocus
-              className="w-full h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-[#06b6d4]/50 focus:outline-none placeholder:text-[#71717a] font-mono"
+              className="w-full h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:outline-none placeholder:text-[#71717a] font-mono"
+              style={{ borderColor: newFileName ? accent.color + '50' : undefined }}
             />
             <textarea
               value={newFileContent}
               onChange={(e) => setNewFileContent(e.target.value)}
               placeholder="File content (optional)..."
               rows={4}
-              className="w-full px-3 py-2 rounded-lg text-xs font-mono text-white bg-white/[0.04] border border-white/[0.08] focus:border-[#06b6d4]/50 focus:outline-none placeholder:text-[#71717a]"
+              className="w-full px-3 py-2 rounded-lg text-xs font-mono text-white bg-white/[0.04] border border-white/[0.08] focus:outline-none placeholder:text-[#71717a]"
+              style={{ borderColor: newFileContent ? accent.color + '30' : undefined }}
             />
             <div className="flex items-center gap-2 justify-end">
               <button onClick={() => { setCreating(false); setNewFileName(''); setNewFileContent(''); }} className="px-3 py-1.5 text-xs text-[#71717a] hover:text-white transition-colors">
@@ -363,7 +526,8 @@ export function FilesTab() {
               <button
                 onClick={handleCreateFile}
                 disabled={creatingFile || !newFileName.trim()}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium text-white bg-[#06b6d4] hover:bg-[#0891b2] disabled:opacity-50 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium text-white disabled:opacity-50 transition-colors"
+                style={{ backgroundColor: accent.color }}
               >
                 {creatingFile ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
                 Create
@@ -380,35 +544,63 @@ export function FilesTab() {
           <p className="text-sm text-[#71717a]">This directory is empty.</p>
         </div>
       ) : (
-        <div className="rounded-xl border overflow-hidden" style={{ background: 'rgba(13, 11, 26, 0.6)', border: '1px solid rgba(46, 43, 74, 0.3)' }}>
-          {files.map((entry) => (
-            <div
-              key={entry.path}
-              className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.03] last:border-0 hover:bg-white/[0.02] transition-colors group cursor-pointer"
-              onClick={() => openFile(entry)}
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                {getFileIcon(entry.name, entry.type)}
-                <span className="text-sm text-white truncate font-mono">{entry.name}</span>
-                {entry.type === 'directory' && <ChevronRight size={12} className="text-[#71717a]" />}
+        <div className="rounded-xl border border-white/[0.06] overflow-hidden" style={{ background: 'rgba(13, 11, 26, 0.6)' }}>
+          {files.map((entry) => {
+            const tag = entry.type === 'file' ? getFileTypeTag(entry.name) : null;
+            const isEnvFile = /^\.env/i.test(entry.name);
+            return (
+              <div
+                key={entry.path}
+                className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.03] last:border-0 hover:bg-white/[0.02] transition-colors group cursor-pointer"
+                onClick={() => openFile(entry)}
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  {getFileIcon(entry.name, entry.type)}
+                  <span className="text-sm text-white truncate font-mono">{entry.name}</span>
+                  {entry.type === 'directory' && <ChevronRight size={12} className="text-[#71717a]" />}
+                  {tag && (
+                    <span className={`text-[9px] px-1.5 py-0.5 rounded border font-medium tracking-wide ${tag.color}`}>
+                      {tag.label}
+                    </span>
+                  )}
+                  {isEnvFile && (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded border text-red-400 bg-red-500/10 border-red-500/20 font-medium">
+                      SENSITIVE
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  {entry.type === 'file' && (
+                    <span className="text-[10px] text-[#71717a] tabular-nums">{formatBytes(entry.size)}</span>
+                  )}
+                  {entry.type === 'directory' && (
+                    <span className="text-[10px] text-[#52525b]">DIR</span>
+                  )}
+                  {entry.type === 'file' && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDelete(entry); }}
+                      disabled={deleting === entry.path}
+                      className="p-1 rounded text-[#71717a] hover:text-red-400 hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100"
+                      title="Delete"
+                    >
+                      {deleting === entry.path ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                    </button>
+                  )}
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                {entry.type === 'file' && (
-                  <span className="text-[10px] text-[#71717a]">{formatBytes(entry.size)}</span>
-                )}
-                {entry.type === 'file' && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleDelete(entry); }}
-                    disabled={deleting === entry.path}
-                    className="p-1 rounded text-[#71717a] hover:text-red-400 hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100"
-                    title="Delete"
-                  >
-                    {deleting === entry.path ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
+        </div>
+      )}
+
+      {/* Pro tier hint for non-pro users */}
+      {!isPro && (
+        <div className="mt-4 flex items-center justify-center gap-2 text-[11px] text-[#71717a]">
+          <Crown size={12} className="text-amber-400" />
+          <span>File Manager add-on active.</span>
+          <Link href="/pricing" className="hover:underline transition-colors" style={{ color: accent.color }}>
+            Upgrade to Pro for all agents
+          </Link>
         </div>
       )}
     </motion.div>

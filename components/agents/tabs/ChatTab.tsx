@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useCallback, memo, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Mic, MicOff, Volume2, VolumeX, Square, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Send, Mic, MicOff, Volume2, VolumeX, Square, ThumbsUp, ThumbsDown, MessageSquare, Bot } from 'lucide-react';
 import { FRAMEWORKS } from '@hatcher/shared';
 import { RobotMascot } from '@/components/ui/RobotMascot';
 import { useVoice } from '@/hooks/useVoice';
@@ -12,6 +12,7 @@ import {
   tabContentVariants,
   GlassCard,
   DEFAULT_PROMPTS,
+  FRAMEWORK_BADGE,
 } from '../AgentContext';
 import ReactMarkdown from 'react-markdown';
 
@@ -44,6 +45,39 @@ function RecordingDot() {
 
 const MESSAGES_WINDOW = 50;
 
+/* ── Framework accent colors for assistant bubbles ──────────── */
+const FRAMEWORK_BUBBLE: Record<string, { bg: string; border: string }> = {
+  openclaw: { bg: 'linear-gradient(135deg, rgba(245,158,11,0.10) 0%, rgba(217,119,6,0.06) 100%)', border: 'rgba(245,158,11,0.18)' },
+  hermes:   { bg: 'linear-gradient(135deg, rgba(168,85,247,0.10) 0%, rgba(139,92,246,0.06) 100%)', border: 'rgba(168,85,247,0.18)' },
+  elizaos:  { bg: 'linear-gradient(135deg, rgba(6,182,212,0.10) 0%, rgba(8,145,178,0.06) 100%)', border: 'rgba(6,182,212,0.18)' },
+  milady:   { bg: 'linear-gradient(135deg, rgba(244,63,94,0.10) 0%, rgba(225,29,72,0.06) 100%)', border: 'rgba(244,63,94,0.18)' },
+};
+
+const FRAMEWORK_DOT_COLOR: Record<string, string> = {
+  openclaw: 'bg-amber-400',
+  hermes: 'bg-purple-400',
+  elizaos: 'bg-cyan-400',
+  milady: 'bg-rose-400',
+};
+
+/* ── Typing indicator with framework-colored bouncing dots ──── */
+function TypingIndicator({ framework }: { framework: string }) {
+  const dotColor = FRAMEWORK_DOT_COLOR[framework] ?? 'bg-cyan-400';
+  return (
+    <div className="flex gap-1.5 items-center h-5 px-1">
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className={`w-1.5 h-1.5 rounded-full ${dotColor}`}
+          style={{
+            animation: `typingBounce 1.4s ease-in-out ${i * 0.16}s infinite`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 interface ChatMessageProps {
   msg: { id: string; role: 'user' | 'assistant'; content: string; streaming?: boolean; timestamp?: Date };
   isSpeakingThis: boolean;
@@ -51,9 +85,10 @@ interface ChatMessageProps {
   onSpeak: (id: string, content: string) => void;
   agentId: string;
   isAuthenticated: boolean;
+  framework: string;
 }
 
-const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupported, onSpeak, agentId, isAuthenticated }: ChatMessageProps) {
+const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupported, onSpeak, agentId, isAuthenticated, framework }: ChatMessageProps) {
   const [vote, setVote] = useState<'up' | 'down' | null>(null);
 
   const handleVote = useCallback(async (rating: 'up' | 'down') => {
@@ -78,10 +113,18 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
         </div>
       )}
       <div className={`flex flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start'}`} style={{ maxWidth: '75%' }}>
+        {/* User bubble: subtle gradient; Assistant bubble: framework accent color */}
         <div
           className={`chat-bubble text-[#FFFFFF] ${
             msg.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-assistant'
           }`}
+          style={
+            msg.role === 'assistant' && FRAMEWORK_BUBBLE[framework]
+              ? { background: FRAMEWORK_BUBBLE[framework].bg, borderColor: FRAMEWORK_BUBBLE[framework].border }
+              : msg.role === 'user'
+              ? { background: 'linear-gradient(135deg, rgba(99,102,241,0.18) 0%, rgba(6,182,212,0.14) 100%)', borderColor: 'rgba(99,102,241,0.22)' }
+              : undefined
+          }
         >
           {msg.content ? (
             msg.role === 'assistant' ? (
@@ -95,11 +138,7 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
               <p className="whitespace-pre-wrap">{msg.content}</p>
             )
           ) : msg.streaming ? (
-            <div className="flex gap-2 items-center h-5 px-1">
-              <span className="typing-dot" />
-              <span className="typing-dot" />
-              <span className="typing-dot" />
-            </div>
+            <TypingIndicator framework={framework} />
           ) : null}
         </div>
         <div className="flex items-center gap-1.5">
@@ -247,23 +286,31 @@ export function ChatTab() {
 
   return (
     <motion.div key="tab-chat" className="flex flex-col h-[calc(100vh-300px)] min-h-[300px] sm:min-h-[400px]" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
-      {/* Chat header with auto-speak toggle */}
-      {voice.ttsSupported && (
-        <div className="flex items-center justify-end mb-2 px-1">
-          <button
-            onClick={voice.toggleAutoSpeak}
-            className={`group flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border transition-all duration-200 cursor-pointer ${
-              voice.autoSpeak
-                ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[#06b6d4]'
-                : 'border-[rgba(46,43,74,0.3)] bg-transparent text-[#71717a] hover:border-[#71717a]/40 hover:text-[#A5A1C2]'
-            }`}
-            title="Auto-read responses"
-          >
-            {voice.autoSpeak ? <Volume2 size={11} /> : <VolumeX size={11} />}
-            <span>Auto-read</span>
-          </button>
+      {/* Chat header with framework badge + auto-speak toggle */}
+      <div className="flex items-center justify-between mb-2 px-1">
+        <div className="flex items-center gap-2">
+          <span className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-full border font-medium ${FRAMEWORK_BADGE[agent.framework] ?? 'bg-slate-500/15 text-slate-400 border-slate-500/30'}`}>
+            <Bot size={10} />
+            {frameworkMeta?.name ?? agent.framework}
+          </span>
         </div>
-      )}
+        <div className="flex items-center gap-2">
+          {voice.ttsSupported && (
+            <button
+              onClick={voice.toggleAutoSpeak}
+              className={`group flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border transition-all duration-200 cursor-pointer ${
+                voice.autoSpeak
+                  ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[#06b6d4]'
+                  : 'border-[rgba(46,43,74,0.3)] bg-transparent text-[#71717a] hover:border-[#71717a]/40 hover:text-[#A5A1C2]'
+              }`}
+              title="Auto-read responses"
+            >
+              {voice.autoSpeak ? <Volume2 size={11} /> : <VolumeX size={11} />}
+              <span>Auto-read</span>
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* Messages area */}
       <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overscroll-contain space-y-4 mb-4 pr-1">
@@ -319,6 +366,7 @@ export function ChatTab() {
             onSpeak={handleSpeakMessage}
             agentId={agent.id}
             isAuthenticated={isAuthenticated}
+            framework={agent.framework}
           />
         ))}
 
@@ -516,18 +564,43 @@ export function ChatTab() {
             <span className="text-[10px] text-[#71717a]">
               Powered by {llmProvider}
             </span>
-            <span className="hidden sm:block text-[10px] text-[#71717a]">
-              Enter to send, Shift+Enter for new line
-            </span>
+            <div className="flex items-center gap-3">
+              {isAuthenticated && !hasUnlimitedChat && msgLimit > 0 && (
+                <span className="inline-flex items-center gap-1 text-[10px] text-[#71717a]">
+                  <MessageSquare size={9} />
+                  <span className={`font-medium ${
+                    remaining === null || remaining / msgLimit > 0.5
+                      ? 'text-emerald-400'
+                      : remaining / msgLimit > 0.25
+                      ? 'text-amber-400'
+                      : 'text-red-400'
+                  }`}>{msgCount}/{msgLimit}</span>
+                  today
+                </span>
+              )}
+              {isAuthenticated && hasUnlimitedChat && (
+                <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400/70">
+                  <MessageSquare size={9} />
+                  unlimited
+                </span>
+              )}
+              <span className="hidden sm:block text-[10px] text-[#71717a]">
+                Enter to send, Shift+Enter for new line
+              </span>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Keyframe for sound wave bars */}
+      {/* Keyframe for sound wave bars + typing bounce */}
       <style jsx global>{`
         @keyframes voiceBar {
           0% { height: 3px; }
           100% { height: 12px; }
+        }
+        @keyframes typingBounce {
+          0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+          30% { transform: translateY(-5px); opacity: 1; }
         }
         .markdown-body {
           line-height: 1.6;

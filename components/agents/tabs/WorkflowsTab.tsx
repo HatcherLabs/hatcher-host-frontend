@@ -45,13 +45,29 @@ import {
   ChevronRight,
   GitMerge,
   Monitor,
+  Info,
+  Boxes,
+  ArrowRight,
+  Play,
+  AlertTriangle,
+  Hash,
 } from 'lucide-react';
 import {
   useAgentContext,
   tabContentVariants,
   GlassCard,
+  FRAMEWORK_BADGE,
 } from '../AgentContext';
 import { api } from '@/lib/api';
+
+// ─── Framework Workflow Compatibility ─────────────────────────
+
+const FRAMEWORK_WORKFLOW_SUPPORT: Record<string, { level: 'full' | 'partial' | 'planned'; note: string; color: string }> = {
+  openclaw: { level: 'full', note: 'Full workflow support — triggers, conditions, and all action nodes', color: 'amber' },
+  hermes: { level: 'full', note: 'Full workflow support with native tool-chain integration', color: 'purple' },
+  elizaos: { level: 'partial', note: 'Partial support — trigger and response nodes only, conditions coming soon', color: 'cyan' },
+  milady: { level: 'planned', note: 'Workflow support planned — manual config required for now', color: 'rose' },
+};
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -60,6 +76,9 @@ interface WorkflowData {
   agentId: string;
   name: string;
   enabled: boolean;
+  status?: 'active' | 'paused' | 'error';
+  lastRunAt?: string | null;
+  runCount?: number;
   nodes: Node[];
   edges: Edge[];
   createdAt: string;
@@ -899,6 +918,30 @@ export function WorkflowsTab() {
     );
   }
 
+  // ─── Helpers ──
+  const framework = agent?.framework || 'openclaw';
+  const fwSupport = FRAMEWORK_WORKFLOW_SUPPORT[framework] || FRAMEWORK_WORKFLOW_SUPPORT.openclaw;
+  const fwBadge = FRAMEWORK_BADGE[framework] || FRAMEWORK_BADGE.openclaw;
+
+  const formatTimeAgo = (dateStr: string | null | undefined) => {
+    if (!dateStr) return null;
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d ago`;
+    return new Date(dateStr).toLocaleDateString();
+  };
+
+  const getStatusConfig = (wf: WorkflowData) => {
+    if (!wf.enabled) return { label: 'Paused', dotClass: 'bg-amber-400', ringClass: '', badgeClass: 'bg-amber-500/10 text-amber-400 border-amber-500/30', iconBg: 'bg-amber-500/15 text-amber-400' };
+    if (wf.status === 'error') return { label: 'Error', dotClass: 'bg-red-400', ringClass: '', badgeClass: 'bg-red-500/10 text-red-400 border-red-500/30', iconBg: 'bg-red-500/15 text-red-400' };
+    return { label: 'Active', dotClass: 'bg-emerald-400', ringClass: 'animate-ping', badgeClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30', iconBg: 'bg-emerald-500/15 text-emerald-400' };
+  };
+
   // ─── List View ──
   return (
     <motion.div
@@ -926,6 +969,29 @@ export function WorkflowsTab() {
         </button>
       </div>
 
+      {/* Framework Compatibility Banner */}
+      <div className={`flex items-start gap-3 px-4 py-3 rounded-xl border border-white/[0.06] bg-zinc-900/50`}>
+        <div className={`p-1.5 rounded-lg border ${fwBadge} flex-shrink-0 mt-0.5`}>
+          <Info size={14} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-medium text-[#FFFFFF]">Workflow Compatibility</span>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full border ${fwBadge} capitalize`}>
+              {framework}
+            </span>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+              fwSupport.level === 'full' ? 'bg-emerald-500/10 text-emerald-400' :
+              fwSupport.level === 'partial' ? 'bg-amber-500/10 text-amber-400' :
+              'bg-zinc-500/10 text-zinc-400'
+            }`}>
+              {fwSupport.level === 'full' ? 'Full Support' : fwSupport.level === 'partial' ? 'Partial' : 'Planned'}
+            </span>
+          </div>
+          <p className="text-[11px] text-[#71717a] leading-relaxed">{fwSupport.note}</p>
+        </div>
+      </div>
+
       {/* Error */}
       {error && (
         <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20">
@@ -942,17 +1008,46 @@ export function WorkflowsTab() {
 
       {/* Empty State */}
       {!loading && workflows.length === 0 && (
-        <GlassCard className="text-center py-12">
-          <div className="mx-auto w-16 h-16 rounded-full bg-[#06b6d4]/10 flex items-center justify-center mb-4">
-            <GitMerge size={28} className="text-[#06b6d4]" />
+        <GlassCard className="text-center py-16 px-6">
+          {/* Illustration */}
+          <div className="relative mx-auto w-28 h-28 mb-6">
+            {/* Background glow */}
+            <div className="absolute inset-0 rounded-full bg-[#06b6d4]/5 blur-xl" />
+            {/* Outer ring */}
+            <div className="absolute inset-0 rounded-full border border-dashed border-[#06b6d4]/20 animate-[spin_20s_linear_infinite]" />
+            {/* Middle ring */}
+            <div className="absolute inset-3 rounded-full border border-white/[0.06]" />
+            {/* Center icon */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="relative">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#06b6d4]/20 to-[#06b6d4]/5 border border-[#06b6d4]/30 flex items-center justify-center">
+                  <GitMerge size={24} className="text-[#06b6d4]" />
+                </div>
+                {/* Floating nodes */}
+                <div className="absolute -top-2 -right-3 w-5 h-5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
+                  <Zap size={10} className="text-emerald-400" />
+                </div>
+                <div className="absolute -bottom-2 -left-3 w-5 h-5 rounded-lg bg-purple-500/20 border border-purple-500/40 flex items-center justify-center">
+                  <Boxes size={10} className="text-purple-400" />
+                </div>
+              </div>
+            </div>
           </div>
-          <h3 className="text-base font-semibold text-[#FFFFFF] mb-2">No workflows yet</h3>
-          <p className="text-sm text-[#71717a] mb-6 max-w-md mx-auto">
-            Create visual automation flows to define how your agent responds to triggers, processes data, and takes actions.
+
+          <h3 className="text-base font-semibold text-[#FFFFFF] mb-2">Create your first workflow</h3>
+          <p className="text-sm text-[#71717a] mb-2 max-w-sm mx-auto leading-relaxed">
+            Build visual automation pipelines that define how your agent responds to triggers, processes data, and executes actions.
           </p>
+          <div className="flex items-center justify-center gap-4 text-[11px] text-[#52525b] mb-6">
+            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Triggers</span>
+            <ArrowRight size={10} className="text-[#3f3f46]" />
+            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-yellow-400" /> Conditions</span>
+            <ArrowRight size={10} className="text-[#3f3f46]" />
+            <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-blue-400" /> Actions</span>
+          </div>
           <button
             onClick={() => setEditingWorkflow('new')}
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 text-sm rounded-lg bg-[#06b6d4] text-white hover:bg-[#0891b2] transition-all"
+            className="inline-flex items-center gap-2 px-6 py-2.5 text-sm rounded-xl bg-[#06b6d4] text-white hover:bg-[#0891b2] transition-all shadow-lg shadow-[#06b6d4]/20"
           >
             <Plus size={16} />
             Create Your First Workflow
@@ -962,83 +1057,160 @@ export function WorkflowsTab() {
 
       {/* Workflow List */}
       <AnimatePresence>
-        {workflows.map((wf, i) => (
-          <motion.div
-            key={wf.id}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ delay: i * 0.05 }}
-          >
-            <GlassCard className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className={`p-2 rounded-lg ${wf.enabled ? 'bg-emerald-500/15 text-emerald-400' : 'bg-[#71717a]/15 text-[#71717a]'}`}>
-                  <GitMerge size={18} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-medium text-[#FFFFFF] truncate">{wf.name}</h3>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full border ${
-                      wf.enabled
-                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                        : 'bg-[#71717a]/10 text-[#71717a] border-[#71717a]/30'
-                    }`}>
-                      {wf.enabled ? 'Active' : 'Disabled'}
-                    </span>
+        {workflows.map((wf, i) => {
+          const statusCfg = getStatusConfig(wf);
+          const nodeCount = wf.nodes?.length || 0;
+          const edgeCount = wf.edges?.length || 0;
+          const triggerCount = wf.nodes?.filter(n => (n.data as NodeConfig)?.category === 'trigger').length || 0;
+          const actionCount = wf.nodes?.filter(n => (n.data as NodeConfig)?.category === 'action').length || 0;
+          const conditionCount = wf.nodes?.filter(n => (n.data as NodeConfig)?.category === 'condition').length || 0;
+          const lastRun = formatTimeAgo(wf.lastRunAt);
+
+          return (
+            <motion.div
+              key={wf.id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ delay: i * 0.05 }}
+            >
+              <GlassCard className="group hover:border-white/[0.1] transition-all duration-200">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    {/* Status icon with pulse */}
+                    <div className={`relative p-2 rounded-xl ${statusCfg.iconBg}`}>
+                      <GitMerge size={18} />
+                      {/* Pulse indicator */}
+                      <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
+                        {wf.enabled && wf.status !== 'error' && (
+                          <span className={`absolute inline-flex h-full w-full rounded-full ${statusCfg.dotClass} opacity-40 ${statusCfg.ringClass}`} />
+                        )}
+                        <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${statusCfg.dotClass}`} />
+                      </span>
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="text-sm font-medium text-[#FFFFFF] truncate">{wf.name}</h3>
+                        {/* Status badge */}
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full border ${statusCfg.badgeClass}`}>
+                          {statusCfg.label}
+                        </span>
+                        {/* Node count badge */}
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/[0.04] text-[#71717a] border border-white/[0.06] flex items-center gap-1">
+                          <Hash size={8} />
+                          {nodeCount} step{nodeCount !== 1 ? 's' : ''}
+                        </span>
+                      </div>
+
+                      {/* Metadata row */}
+                      <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                        {/* Node breakdown mini badges */}
+                        {triggerCount > 0 && (
+                          <span className="text-[10px] text-emerald-400/70 flex items-center gap-1">
+                            <span className="w-1 h-1 rounded-full bg-emerald-400" />
+                            {triggerCount} trigger{triggerCount !== 1 ? 's' : ''}
+                          </span>
+                        )}
+                        {conditionCount > 0 && (
+                          <span className="text-[10px] text-yellow-400/70 flex items-center gap-1">
+                            <span className="w-1 h-1 rounded-full bg-yellow-400" />
+                            {conditionCount} condition{conditionCount !== 1 ? 's' : ''}
+                          </span>
+                        )}
+                        {actionCount > 0 && (
+                          <span className="text-[10px] text-blue-400/70 flex items-center gap-1">
+                            <span className="w-1 h-1 rounded-full bg-blue-400" />
+                            {actionCount} action{actionCount !== 1 ? 's' : ''}
+                          </span>
+                        )}
+                        <span className="text-[10px] text-[#52525b]">&middot;</span>
+                        <span className="text-[10px] text-[#52525b]">
+                          {edgeCount} connection{edgeCount !== 1 ? 's' : ''}
+                        </span>
+
+                        {/* Last run & run count */}
+                        {lastRun && (
+                          <>
+                            <span className="text-[10px] text-[#52525b]">&middot;</span>
+                            <span className="text-[10px] text-[#71717a] flex items-center gap-1">
+                              <Play size={8} className="text-[#52525b]" />
+                              Last run {lastRun}
+                            </span>
+                          </>
+                        )}
+                        {(wf.runCount ?? 0) > 0 && (
+                          <>
+                            <span className="text-[10px] text-[#52525b]">&middot;</span>
+                            <span className="text-[10px] text-[#71717a]">
+                              {wf.runCount} run{wf.runCount !== 1 ? 's' : ''}
+                            </span>
+                          </>
+                        )}
+
+                        {/* Error indicator */}
+                        {wf.status === 'error' && (
+                          <>
+                            <span className="text-[10px] text-[#52525b]">&middot;</span>
+                            <span className="text-[10px] text-red-400 flex items-center gap-1">
+                              <AlertTriangle size={9} />
+                              Needs attention
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-xs text-[#71717a] mt-0.5">
-                    {(wf.nodes?.length || 0)} node{(wf.nodes?.length || 0) !== 1 ? 's' : ''} &middot; {(wf.edges?.length || 0)} connection{(wf.edges?.length || 0) !== 1 ? 's' : ''}
-                  </p>
+
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {/* Toggle */}
+                    <button
+                      onClick={() => handleToggle(wf.id)}
+                      disabled={togglingId === wf.id}
+                      className={`p-1.5 rounded-lg border transition-all ${
+                        wf.enabled
+                          ? 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
+                          : 'border-[rgba(46,43,74,0.4)] text-[#71717a] hover:border-[#06b6d4]/40 hover:text-[#A5A1C2]'
+                      } disabled:opacity-40`}
+                      title={wf.enabled ? 'Disable' : 'Enable'}
+                    >
+                      {togglingId === wf.id ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : wf.enabled ? (
+                        <Power size={14} />
+                      ) : (
+                        <PowerOff size={14} />
+                      )}
+                    </button>
+
+                    {/* Edit */}
+                    <button
+                      onClick={() => setEditingWorkflow(wf)}
+                      className="p-1.5 rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#06b6d4]/40 hover:text-[#06b6d4] transition-all"
+                      title="Edit workflow"
+                    >
+                      <Pencil size={14} />
+                    </button>
+
+                    {/* Delete */}
+                    <button
+                      onClick={() => handleDelete(wf.id)}
+                      disabled={deletingId === wf.id}
+                      className="p-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-40"
+                      title="Delete workflow"
+                    >
+                      {deletingId === wf.id ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <Trash2 size={14} />
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </div>
-
-              <div className="flex items-center gap-2 flex-shrink-0">
-                {/* Toggle */}
-                <button
-                  onClick={() => handleToggle(wf.id)}
-                  disabled={togglingId === wf.id}
-                  className={`p-1.5 rounded-lg border transition-all ${
-                    wf.enabled
-                      ? 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
-                      : 'border-[rgba(46,43,74,0.4)] text-[#71717a] hover:border-[#06b6d4]/40 hover:text-[#A5A1C2]'
-                  } disabled:opacity-40`}
-                  title={wf.enabled ? 'Disable' : 'Enable'}
-                >
-                  {togglingId === wf.id ? (
-                    <Loader2 size={14} className="animate-spin" />
-                  ) : wf.enabled ? (
-                    <Power size={14} />
-                  ) : (
-                    <PowerOff size={14} />
-                  )}
-                </button>
-
-                {/* Edit */}
-                <button
-                  onClick={() => setEditingWorkflow(wf)}
-                  className="p-1.5 rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#06b6d4]/40 hover:text-[#06b6d4] transition-all"
-                  title="Edit workflow"
-                >
-                  <Pencil size={14} />
-                </button>
-
-                {/* Delete */}
-                <button
-                  onClick={() => handleDelete(wf.id)}
-                  disabled={deletingId === wf.id}
-                  className="p-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-40"
-                  title="Delete workflow"
-                >
-                  {deletingId === wf.id ? (
-                    <Loader2 size={14} className="animate-spin" />
-                  ) : (
-                    <Trash2 size={14} />
-                  )}
-                </button>
-              </div>
-            </GlassCard>
-          </motion.div>
-        ))}
+              </GlassCard>
+            </motion.div>
+          );
+        })}
       </AnimatePresence>
     </motion.div>
   );
