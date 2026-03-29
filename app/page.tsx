@@ -164,7 +164,7 @@ function AnimatedStat({ value, suffix = '', label }: { value: number; suffix?: s
           }, duration / steps);
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.1 }
     );
     observer.observe(el);
     return () => observer.disconnect();
