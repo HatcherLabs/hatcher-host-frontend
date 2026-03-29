@@ -49,15 +49,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!res.success) throw new Error(res.error);
 
       setToken(res.data.token);
-      setUser({
-        id: res.data.user.id,
-        email: res.data.user.email,
-        username: res.data.user.username,
-        walletAddress: res.data.user.walletAddress ?? null,
-        isAdmin: res.data.user.isAdmin ?? false,
-        tier: (res.data.user as any).tier ?? 'free',
-      });
       setAuthed(true);
+
+      // Login response may not include tier — fetch full profile to get it
+      const profile = await api.getProfile();
+      if (profile.success) {
+        setUser({
+          id: profile.data.id,
+          email: profile.data.email,
+          username: profile.data.username,
+          walletAddress: profile.data.walletAddress ?? null,
+          isAdmin: profile.data.isAdmin ?? false,
+          tier: (profile.data as any).tier ?? 'free',
+        });
+      } else {
+        // Fallback: use login response data (tier may default to 'free')
+        setUser({
+          id: res.data.user.id,
+          email: res.data.user.email,
+          username: res.data.user.username,
+          walletAddress: res.data.user.walletAddress ?? null,
+          isAdmin: res.data.user.isAdmin ?? false,
+          tier: (res.data.user as any).tier ?? 'free',
+        });
+      }
     } catch (e) {
       setError((e as Error).message);
       setAuthed(false);

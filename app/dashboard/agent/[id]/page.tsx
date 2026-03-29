@@ -260,8 +260,32 @@ export default function AgentManagePage() {
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
   const userTier = (user?.tier ?? 'free') as UserTierKey;
-  const hasUnlimitedChat = false; // All tiers have limits with default LLM; BYOK enforcement is server-side
-  const msgLimit = TIERS[userTier]?.messagesPerDay ?? TIERS.free.messagesPerDay;
+  const [hasUnlimitedChat, setHasUnlimitedChat] = useState(false);
+  const [msgLimit, setMsgLimit] = useState(TIERS[userTier]?.messagesPerDay ?? TIERS.free.messagesPerDay);
+
+  // Keep msgLimit in sync with userTier when it changes (e.g. after profile loads)
+  useEffect(() => {
+    const tierLimit = TIERS[userTier]?.messagesPerDay ?? TIERS.free.messagesPerDay;
+    setMsgLimit(tierLimit);
+  }, [userTier]);
+
+  // Fetch actual usage data from the usage endpoint (authoritative source for limits + BYOK)
+  const loadUsage = useCallback(async () => {
+    try {
+      const res = await api.getAgentUsage(id);
+      if (res.success) {
+        setMsgCount(res.data.messages.today);
+        if (res.data.messages.isByok) {
+          setHasUnlimitedChat(true);
+        } else if (res.data.messages.limit > 0) {
+          setMsgLimit(res.data.messages.limit);
+          setHasUnlimitedChat(false);
+        }
+      }
+    } catch {
+      // Usage endpoint failed — fall back to tier-based limit from user profile
+    }
+  }, [id]);
 
   // ─── Data loaders ────────────────────────────────────────
 
@@ -270,7 +294,17 @@ export default function AgentManagePage() {
     setLoading(false);
     if (res.success) {
       setAgent(res.data);
-      setMsgCount((res.data as any).chatUsedToday ?? 0);
+      // Use chat usage/limit from the agent response if available
+      const agentData = res.data as any;
+      if (typeof agentData.chatUsedToday === 'number') {
+        setMsgCount(agentData.chatUsedToday);
+      }
+      if (agentData.isByok) {
+        setHasUnlimitedChat(true);
+      } else if (typeof agentData.chatLimit === 'number' && agentData.chatLimit > 0) {
+        setMsgLimit(agentData.chatLimit);
+        setHasUnlimitedChat(false);
+      }
       setConfigName(res.data.name);
       setConfigDesc(res.data.description ?? '');
       const char = res.data.config ?? {};
@@ -332,7 +366,7 @@ export default function AgentManagePage() {
   }, [id]);
 
   // Initial load
-  useEffect(() => { loadAgent(); }, [loadAgent]);
+  useEffect(() => { loadAgent(); loadUsage(); }, [loadAgent, loadUsage]);
 
   const agentStatus = agent?.status;
 
@@ -849,7 +883,7 @@ export default function AgentManagePage() {
     visibleFields, savingIntegration, integrationSaveMsg, activeFeatures, activeFeatureKeys,
     featuresLoading, deleteConfirm, deleting, deleteError, actionLoading, actionError, actionSuccess,
     llmProvider, currentProviderMeta, providerModels, hasApiKey, displayUptime, isLiveUptime,
-    isActive, isNotActive, statusInfo, frameworkMeta, isAuthenticated, wallet, connection, userTier]);
+    isActive, isNotActive, statusInfo, frameworkMeta, isAuthenticated, wallet, connection, userTier, hasUnlimitedChat]);
 
   // ─── Loading state ───────────────────────────────────────
 
