@@ -542,9 +542,11 @@ export default function SettingsPage() {
         loading={deleting}
         onCancel={() => setShowDeleteConfirm(false)}
         onConfirm={async () => {
+          const pw = window.prompt('Enter your password to confirm account deletion:');
+          if (!pw) { setShowDeleteConfirm(false); return; }
           setDeleting(true);
           try {
-            const res = await api.deleteAccount();
+            const res = await api.deleteAccount(pw);
             if (res.success) {
               clearToken();
               logout();
