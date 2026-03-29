@@ -4,7 +4,14 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
-import { Send, Loader2, AlertTriangle, Bot, User } from 'lucide-react';
+import { Send, Loader2, AlertTriangle, Bot, Brain, Cpu, Sparkles, User } from 'lucide-react';
+
+const FRAMEWORK_AVATAR: Record<string, { gradient: string; icon: React.ComponentType<{ className?: string }> }> = {
+  openclaw: { gradient: 'from-amber-600 to-amber-400', icon: Cpu },
+  hermes:   { gradient: 'from-purple-600 to-purple-400', icon: Brain },
+  elizaos:  { gradient: 'from-cyan-600 to-cyan-400', icon: Bot },
+  milady:   { gradient: 'from-rose-600 to-rose-400', icon: Sparkles },
+};
 
 interface AgentInfo {
   id: string;
@@ -117,6 +124,9 @@ export default function PublicChatPage() {
     );
   }
 
+  const fwAvatar = FRAMEWORK_AVATAR[agent.framework] ?? { gradient: 'from-slate-600 to-slate-400', icon: Bot };
+  const FwIcon = fwAvatar.icon;
+
   return (
     <div className="min-h-screen bg-[#0D0B1A] flex flex-col">
       {/* Header */}
@@ -129,8 +139,8 @@ export default function PublicChatPage() {
               className="w-9 h-9 rounded-full object-cover border border-white/[0.08]"
             />
           ) : (
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#06b6d4]/20 to-violet-500/20 border border-white/[0.08] flex items-center justify-center">
-              <Bot size={16} className="text-[#06b6d4]" />
+            <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${fwAvatar.gradient} border border-white/10 flex items-center justify-center`}>
+              <FwIcon className="w-4 h-4 text-white" />
             </div>
           )}
           <div className="flex-1 min-w-0">
@@ -154,8 +164,8 @@ export default function PublicChatPage() {
         <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
           {messages.length === 0 && (
             <div className="text-center py-16 space-y-3">
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-[#06b6d4]/10 to-violet-500/10 border border-white/[0.06] flex items-center justify-center">
-                <Bot size={28} className="text-[#06b6d4]/60" />
+              <div className={`w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br ${fwAvatar.gradient} border border-white/10 flex items-center justify-center`}>
+                <FwIcon className="w-7 h-7 text-white" />
               </div>
               <p className="text-sm text-[#A5A1C2]">
                 Start a conversation with <span className="text-white font-medium">{agent.name}</span>
@@ -171,17 +181,15 @@ export default function PublicChatPage() {
               key={msg.id}
               className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
             >
-              <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center ${
-                msg.role === 'user'
-                  ? 'bg-[#06b6d4]/10 border border-[#06b6d4]/20'
-                  : 'bg-violet-500/10 border border-violet-500/20'
-              }`}>
-                {msg.role === 'user' ? (
+              {msg.role === 'user' ? (
+                <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center bg-[#06b6d4]/10 border border-[#06b6d4]/20">
                   <User size={12} className="text-[#06b6d4]" />
-                ) : (
-                  <Bot size={12} className="text-violet-400" />
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className={`flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br ${fwAvatar.gradient} flex items-center justify-center`}>
+                  <FwIcon className="w-3 h-3 text-white" />
+                </div>
+              )}
               <div
                 className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                   msg.role === 'user'
@@ -196,8 +204,8 @@ export default function PublicChatPage() {
 
           {sending && (
             <div className="flex gap-3">
-              <div className="flex-shrink-0 w-7 h-7 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
-                <Bot size={12} className="text-violet-400" />
+              <div className={`flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br ${fwAvatar.gradient} flex items-center justify-center`}>
+                <FwIcon className="w-3 h-3 text-white" />
               </div>
               <div className="px-4 py-2.5 rounded-2xl rounded-bl-md bg-white/[0.04] border border-white/[0.06]">
                 <div className="flex gap-1">

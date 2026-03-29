@@ -180,18 +180,62 @@ export function useVoice() {
       .replace(/\*([^*]+)\*/g, '$1')
       .replace(/#{1,6}\s/g, '')
       .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-      .replace(/!\[([^\]]*)\]\([^)]+\)/g, 'image: $1');
+      .replace(/!\[([^\]]*)\]\([^)]+\)/g, 'image: $1')
+      .trim();
 
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = 'en-US';
-    utterance.rate = 1;
-    utterance.pitch = 1;
+    if (!cleanText) return;
 
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
+    const doSpeak = () => {
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.lang = 'en-US';
+      utterance.rate = 1;
+      utterance.pitch = 1;
 
-    window.speechSynthesis.speak(utterance);
+      // Pick a voice explicitly — Chrome sometimes has no default
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v => v.lang.startsWith('en') && v.default)
+        || voices.find(v => v.lang.startsWith('en'))
+        || voices[0];
+      if (preferred) utterance.voice = preferred;
+
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        if (resumeTimer) clearInterval(resumeTimer);
+      };
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        if (resumeTimer) clearInterval(resumeTimer);
+      };
+
+      window.speechSynthesis.speak(utterance);
+
+      // Chrome bug: speechSynthesis pauses after ~15s. Keep it alive.
+      const resumeTimer = setInterval(() => {
+        if (!window.speechSynthesis.speaking) {
+          clearInterval(resumeTimer);
+        } else {
+          window.speechSynthesis.pause();
+          window.speechSynthesis.resume();
+        }
+      }, 10000);
+    };
+
+    // Voices may not be loaded yet (Chrome async loading)
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+      doSpeak();
+    } else {
+      // Wait for voices to load
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.onvoiceschanged = null;
+        doSpeak();
+      };
+      // Fallback if onvoiceschanged never fires (some browsers)
+      setTimeout(() => {
+        if (!window.speechSynthesis.speaking) doSpeak();
+      }, 300);
+    }
   }, []);
 
   const stopSpeaking = useCallback(() => {

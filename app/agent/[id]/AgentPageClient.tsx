@@ -7,13 +7,14 @@ import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { getInitials, stringToColor, shortenAddress, timeAgo } from '@/lib/utils';
+import { shortenAddress, timeAgo } from '@/lib/utils';
 import { FRAMEWORKS } from '@hatcher/shared';
 import type { AgentFramework } from '@hatcher/shared';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
   Bot,
+  Brain,
   Check,
   MessageSquare,
   Settings,
@@ -25,7 +26,15 @@ import {
   Clock,
   BarChart3,
   Rocket,
+  Sparkles,
 } from 'lucide-react';
+
+const FRAMEWORK_AVATAR: Record<string, { gradient: string; icon: React.ComponentType<{ className?: string }> }> = {
+  openclaw: { gradient: 'from-amber-600 to-amber-400', icon: Cpu },
+  hermes:   { gradient: 'from-purple-600 to-purple-400', icon: Brain },
+  elizaos:  { gradient: 'from-cyan-600 to-cyan-400', icon: Bot },
+  milady:   { gradient: 'from-rose-600 to-rose-400', icon: Sparkles },
+};
 
 
 const STATUS_STYLES: Record<string, { bg: string; text: string; border: string; dot: string; pulse: boolean; label: string }> = {
@@ -153,8 +162,8 @@ export function AgentPageClient() {
     );
   }
 
-  const gradient = stringToColor(agent.id);
-  const initials = getInitials(agent.name);
+  const fwAvatar = FRAMEWORK_AVATAR[agent.framework] ?? { gradient: 'from-slate-600 to-slate-400', icon: Bot };
+  const FwIcon = fwAvatar.icon;
   const ownerUsername = agent.ownerUsername ?? agent.owner?.username;
   const ownerAddress = agent.ownerAddress ?? agent.owner?.walletAddress ?? '';
   const ownerDisplay = ownerUsername ?? (ownerAddress ? shortenAddress(ownerAddress) : 'Unknown');
@@ -194,9 +203,9 @@ export function AgentPageClient() {
             />
           ) : (
             <div
-              className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-bold text-2xl flex-shrink-0 border border-white/10`}
+              className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${fwAvatar.gradient} flex items-center justify-center text-white flex-shrink-0 border border-white/10`}
             >
-              {initials}
+              <FwIcon className="w-9 h-9" />
             </div>
           )}
 

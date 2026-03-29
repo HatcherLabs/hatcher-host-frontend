@@ -4,8 +4,14 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
-import { getInitials, stringToColor } from '@/lib/utils';
-import { Send, Loader2, Bot, User, Zap } from 'lucide-react';
+import { Send, Loader2, Bot, Brain, Cpu, Sparkles, User, Zap } from 'lucide-react';
+
+const FRAMEWORK_AVATAR: Record<string, { gradient: string; icon: React.ComponentType<{ className?: string }> }> = {
+  openclaw: { gradient: 'from-amber-600 to-amber-400', icon: Cpu },
+  hermes:   { gradient: 'from-purple-600 to-purple-400', icon: Brain },
+  elizaos:  { gradient: 'from-cyan-600 to-cyan-400', icon: Bot },
+  milady:   { gradient: 'from-rose-600 to-rose-400', icon: Sparkles },
+};
 
 interface AgentInfo {
   id: string;
@@ -90,8 +96,8 @@ export default function EmbedPage() {
     }
   };
 
-  const avatarBg = agent ? stringToColor(agent.name) : '#6366f1';
-  const initials = agent ? getInitials(agent.name) : '';
+  const fwAvatar = agent ? (FRAMEWORK_AVATAR[agent.framework] ?? { gradient: 'from-slate-600 to-slate-400', icon: Bot }) : { gradient: 'from-slate-600 to-slate-400', icon: Bot };
+  const FwIcon = fwAvatar.icon;
 
   if (loading) {
     return (
@@ -114,17 +120,14 @@ export default function EmbedPage() {
     <div className="h-screen bg-[#0a0a0f] flex flex-col overflow-hidden">
       {/* Mini header */}
       <div className="px-3 py-2.5 border-b border-white/5 flex items-center gap-2.5 shrink-0">
-        <div
-          className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white overflow-hidden shrink-0"
-          style={{ background: agent.avatarUrl ? undefined : avatarBg }}
-        >
-          {agent.avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={agent.avatarUrl} alt="" className="w-full h-full object-cover" />
-          ) : (
-            initials
-          )}
-        </div>
+        {agent.avatarUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={agent.avatarUrl} alt="" className="w-7 h-7 rounded-lg object-cover shrink-0" />
+        ) : (
+          <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${fwAvatar.gradient} flex items-center justify-center shrink-0`}>
+            <FwIcon className="w-4 h-4 text-white" />
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold text-white truncate">{agent.name}</p>
         </div>
@@ -151,17 +154,14 @@ export default function EmbedPage() {
         {messages.map((msg) => (
           <div key={msg.id} className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
-              <div
-                className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold text-white shrink-0 mt-0.5 overflow-hidden"
-                style={{ background: agent.avatarUrl ? undefined : avatarBg }}
-              >
-                {agent.avatarUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={agent.avatarUrl} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <Bot className="w-3.5 h-3.5 text-white" />
-                )}
-              </div>
+              agent.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={agent.avatarUrl} alt="" className="w-6 h-6 rounded-md object-cover shrink-0 mt-0.5" />
+              ) : (
+                <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${fwAvatar.gradient} flex items-center justify-center shrink-0 mt-0.5`}>
+                  <FwIcon className="w-3.5 h-3.5 text-white" />
+                </div>
+              )
             )}
             <div
               className={`max-w-[85%] rounded-xl px-3 py-2 text-xs leading-relaxed ${
@@ -182,8 +182,8 @@ export default function EmbedPage() {
 
         {sending && (
           <div className="flex gap-2">
-            <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ background: avatarBg }}>
-              <Bot className="w-3.5 h-3.5 text-white" />
+            <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${fwAvatar.gradient} flex items-center justify-center shrink-0`}>
+              <FwIcon className="w-3.5 h-3.5 text-white" />
             </div>
             <div className="bg-white/5 rounded-xl rounded-bl-sm px-3 py-2.5">
               <div className="flex gap-1">

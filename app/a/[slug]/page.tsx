@@ -4,12 +4,14 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
-import { getInitials, stringToColor } from '@/lib/utils';
 import { ShareModal } from '@/components/agents/ShareModal';
 import {
   Send,
   Loader2,
   Bot,
+  Brain,
+  Cpu,
+  Sparkles,
   User,
   ExternalLink,
   Share2,
@@ -18,6 +20,13 @@ import {
   Zap,
   Globe,
 } from 'lucide-react';
+
+const FRAMEWORK_AVATAR: Record<string, { gradient: string; icon: React.ComponentType<{ className?: string }> }> = {
+  openclaw: { gradient: 'from-amber-600 to-amber-400', icon: Cpu },
+  hermes:   { gradient: 'from-purple-600 to-purple-400', icon: Brain },
+  elizaos:  { gradient: 'from-cyan-600 to-cyan-400', icon: Bot },
+  milady:   { gradient: 'from-rose-600 to-rose-400', icon: Sparkles },
+};
 
 interface AgentInfo {
   id: string;
@@ -149,8 +158,8 @@ export default function AgentPublicProfilePage() {
     : '';
 
   const statusInfo = agent ? (STATUS_STYLES[agent.status] ?? STATUS_STYLES.sleeping) : null;
-  const avatarBg = agent ? stringToColor(agent.name) : '#6366f1';
-  const initials = agent ? getInitials(agent.name) : '';
+  const fwAvatar = agent ? (FRAMEWORK_AVATAR[agent.framework] ?? { gradient: 'from-slate-600 to-slate-400', icon: Bot }) : { gradient: 'from-slate-600 to-slate-400', icon: Bot };
+  const FwIcon = fwAvatar.icon;
 
   if (loading) {
     return (
@@ -220,17 +229,14 @@ export default function AgentPublicProfilePage() {
         {/* Agent profile card */}
         <div className="bg-[#12121a] border border-white/8 rounded-2xl p-6 flex flex-col sm:flex-row items-start gap-5">
           {/* Avatar */}
-          <div
-            className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-bold text-white shrink-0 overflow-hidden"
-            style={{ background: agent.avatarUrl ? undefined : avatarBg }}
-          >
-            {agent.avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={agent.avatarUrl} alt={agent.name} className="w-full h-full object-cover" />
-            ) : (
-              initials
-            )}
-          </div>
+          {agent.avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={agent.avatarUrl} alt={agent.name} className="w-20 h-20 rounded-2xl object-cover shrink-0" />
+          ) : (
+            <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${fwAvatar.gradient} flex items-center justify-center text-white shrink-0 border border-white/10`}>
+              <FwIcon className="w-9 h-9" />
+            </div>
+          )}
 
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2 mb-1">
@@ -283,17 +289,14 @@ export default function AgentPublicProfilePage() {
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full gap-3 text-center py-12">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold text-white"
-                  style={{ background: agent.avatarUrl ? undefined : avatarBg }}
-                >
-                  {agent.avatarUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={agent.avatarUrl} alt={agent.name} className="w-full h-full object-cover rounded-xl" />
-                  ) : (
-                    initials
-                  )}
-                </div>
+                {agent.avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={agent.avatarUrl} alt={agent.name} className="w-12 h-12 rounded-xl object-cover" />
+                ) : (
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${fwAvatar.gradient} flex items-center justify-center text-white border border-white/10`}>
+                    <FwIcon className="w-6 h-6" />
+                  </div>
+                )}
                 <p className="text-zinc-400 text-sm">
                   Say hello to <span className="text-white font-medium">{agent.name}</span>
                 </p>
@@ -306,17 +309,14 @@ export default function AgentPublicProfilePage() {
                 className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.role === 'assistant' && (
-                  <div
-                    className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white shrink-0 mt-0.5 overflow-hidden"
-                    style={{ background: agent.avatarUrl ? undefined : avatarBg }}
-                  >
-                    {agent.avatarUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={agent.avatarUrl} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <Bot className="w-4 h-4 text-white" />
-                    )}
-                  </div>
+                  agent.avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={agent.avatarUrl} alt="" className="w-7 h-7 rounded-lg object-cover shrink-0 mt-0.5" />
+                  ) : (
+                    <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${fwAvatar.gradient} flex items-center justify-center shrink-0 mt-0.5`}>
+                      <FwIcon className="w-4 h-4 text-white" />
+                    </div>
+                  )
                 )}
 
                 <div
@@ -339,11 +339,8 @@ export default function AgentPublicProfilePage() {
 
             {sending && (
               <div className="flex gap-3 justify-start">
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
-                  style={{ background: avatarBg }}
-                >
-                  <Bot className="w-4 h-4 text-white" />
+                <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${fwAvatar.gradient} flex items-center justify-center shrink-0 mt-0.5`}>
+                  <FwIcon className="w-4 h-4 text-white" />
                 </div>
                 <div className="bg-white/5 rounded-2xl rounded-bl-sm px-4 py-3">
                   <div className="flex gap-1">

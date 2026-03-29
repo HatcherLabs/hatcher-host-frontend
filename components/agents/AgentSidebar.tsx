@@ -20,11 +20,13 @@ import {
   Activity,
   TrendingUp,
   HeartPulse,
+  Bot,
+  Cpu,
 } from 'lucide-react';
 import type { Tab } from './AgentContext';
 import { STATUS_STYLES, FRAMEWORK_BADGE } from './AgentContext';
 import { FRAMEWORKS } from '@hatcher/shared';
-import { getInitials, stringToColor } from '@/lib/utils';
+import type { LucideIcon } from 'lucide-react';
 import type { Agent } from '@/lib/api';
 import Link from 'next/link';
 
@@ -56,6 +58,21 @@ function getTabs(framework?: string): TabDef[] {
   ];
 }
 
+const FRAMEWORK_AVATAR_COLORS: Record<string, { bg: string; text: string }> = {
+  openclaw: { bg: 'from-amber-600 to-amber-400', text: 'text-amber-100' },
+  hermes: { bg: 'from-purple-600 to-purple-400', text: 'text-purple-100' },
+  elizaos: { bg: 'from-cyan-600 to-cyan-400', text: 'text-cyan-100' },
+  milady: { bg: 'from-rose-600 to-rose-400', text: 'text-rose-100' },
+};
+const DEFAULT_AVATAR = { bg: 'from-slate-600 to-slate-400', text: 'text-slate-100' };
+
+const FRAMEWORK_ICONS: Record<string, LucideIcon> = {
+  openclaw: Cpu,
+  hermes: Brain,
+  elizaos: Bot,
+  milady: Sparkles,
+};
+
 const GROUP_LABELS: Record<string, string> = {
   main: '',
   configure: 'Configure',
@@ -73,8 +90,8 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
   const tabs = getTabs(agent.framework);
   const statusInfo = STATUS_STYLES[agent.status] ?? STATUS_STYLES.paused;
   const frameworkMeta = FRAMEWORKS[agent.framework];
-  const gradient = stringToColor(agent.id);
-  const initials = getInitials(agent.name);
+  const avatarColors = FRAMEWORK_AVATAR_COLORS[agent.framework] ?? DEFAULT_AVATAR;
+  const FrameworkIcon = FRAMEWORK_ICONS[agent.framework] ?? Bot;
 
   const groups = ['main', 'configure', 'data', 'advanced'] as const;
 
@@ -98,9 +115,9 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
             />
           ) : (
             <div
-              className={`w-10 h-10 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-bold text-sm border border-[rgba(46,43,74,0.3)] flex-shrink-0`}
+              className={`w-10 h-10 rounded-full bg-gradient-to-br ${avatarColors.bg} flex items-center justify-center ${avatarColors.text} border border-[rgba(46,43,74,0.3)] flex-shrink-0`}
             >
-              {initials}
+              <FrameworkIcon size={18} />
             </div>
           )}
           <div className="min-w-0">
@@ -202,9 +219,9 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
             />
           ) : (
             <div
-              className={`w-5 h-5 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-bold text-[8px] border border-[rgba(46,43,74,0.3)] flex-shrink-0`}
+              className={`w-5 h-5 rounded-full bg-gradient-to-br ${avatarColors.bg} flex items-center justify-center ${avatarColors.text} border border-[rgba(46,43,74,0.3)] flex-shrink-0`}
             >
-              {initials}
+              <FrameworkIcon size={10} />
             </div>
           )}
           <span className="text-xs font-semibold text-white truncate min-w-0">{agent.name}</span>
