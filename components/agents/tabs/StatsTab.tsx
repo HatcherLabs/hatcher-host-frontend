@@ -14,6 +14,9 @@ import {
   TrendingUp,
   Calendar,
   Hash,
+  ThumbsUp,
+  ThumbsDown,
+  MessageSquare,
 } from 'lucide-react';
 import { timeAgo } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
@@ -59,6 +62,8 @@ export function StatsTab() {
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
   const [analyticsError, setAnalyticsError] = useState<string | null>(null);
 
+  const [feedback, setFeedback] = useState<{ upCount: number; downCount: number; total: number; score: number | null } | null>(null);
+
   const fetchAnalytics = useCallback(async () => {
     if (!agent?.id) return;
     setAnalyticsLoading(true);
@@ -80,6 +85,13 @@ export function StatsTab() {
   useEffect(() => {
     fetchAnalytics();
   }, [fetchAnalytics]);
+
+  useEffect(() => {
+    if (!agent?.id) return;
+    api.getAgentFeedbackSummary(agent.id).then((res) => {
+      if (res.success) setFeedback(res.data);
+    }).catch(() => {});
+  }, [agent?.id]);
 
   const maxCount = analytics
     ? Math.max(...analytics.messagesPerDay.map(d => d.count), 1)
@@ -193,6 +205,45 @@ export function StatsTab() {
         ) : null}
       </div>
 
+      {/* User Feedback */}
+      {feedback && feedback.total > 0 && (
+        <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
+          <div className="flex items-center gap-2 mb-5">
+            <MessageSquare size={18} className="text-[#06b6d4]" />
+            <h3 className="text-base font-semibold text-[#fafafa]">User Feedback</h3>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-emerald-500/10">
+                <ThumbsUp size={13} className="text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Positive</p>
+                <p className="text-sm font-bold text-[#fafafa]">{feedback.upCount}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-red-500/10">
+                <ThumbsDown size={13} className="text-red-400" />
+              </div>
+              <div>
+                <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Negative</p>
+                <p className="text-sm font-bold text-[#fafafa]">{feedback.downCount}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-[#06b6d4]/10">
+                <TrendingUp size={13} className="text-[#06b6d4]" />
+              </div>
+              <div>
+                <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Score</p>
+                <p className="text-sm font-bold text-[#fafafa]">{feedback.score !== null ? `${feedback.score}%` : '--'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Agent Info */}
       <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
         <div className="flex items-center gap-2 mb-4">
@@ -272,6 +323,45 @@ export function StatsTab() {
           </div>
         </div>
       </div>
+
+      {/* Feedback Summary */}
+      {feedback !== null && (
+        <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
+          <div className="flex items-center gap-2 mb-4">
+            <MessageSquare size={18} className="text-[#06b6d4]" />
+            <h3 className="text-base font-semibold text-[#fafafa]">Response Feedback</h3>
+          </div>
+          {feedback.total === 0 ? (
+            <p className="text-sm text-[#6B6890]">No feedback yet. Users can rate responses in the chat.</p>
+          ) : (
+            <div className="grid grid-cols-3 gap-4">
+              <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <ThumbsUp size={13} className="text-emerald-400" />
+                  <p className="text-xs text-[#71717a] uppercase tracking-wider">Positive</p>
+                </div>
+                <p className="text-2xl font-bold text-emerald-400">{feedback.upCount}</p>
+              </div>
+              <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <ThumbsDown size={13} className="text-red-400" />
+                  <p className="text-xs text-[#71717a] uppercase tracking-wider">Negative</p>
+                </div>
+                <p className="text-2xl font-bold text-red-400">{feedback.downCount}</p>
+              </div>
+              <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
+                <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Score</p>
+                <p className={`text-2xl font-bold ${
+                  feedback.score !== null && feedback.score >= 70 ? 'text-emerald-400' :
+                  feedback.score !== null && feedback.score >= 40 ? 'text-amber-400' : 'text-red-400'
+                }`}>
+                  {feedback.score !== null ? `${feedback.score}%` : '--'}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* LLM Configuration */}
       <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>

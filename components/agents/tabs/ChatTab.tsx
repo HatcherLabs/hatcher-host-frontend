@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useCallback, memo, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Mic, MicOff, Volume2, VolumeX, Square } from 'lucide-react';
+import { Send, Mic, MicOff, Volume2, VolumeX, Square, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { FRAMEWORKS } from '@hatcher/shared';
 import { RobotMascot } from '@/components/ui/RobotMascot';
 import { useVoice } from '@/hooks/useVoice';
+import { api } from '@/lib/api';
 import {
   useAgentContext,
   tabContentVariants,
@@ -48,9 +49,21 @@ interface ChatMessageProps {
   isSpeakingThis: boolean;
   ttsSupported: boolean;
   onSpeak: (id: string, content: string) => void;
+  agentId: string;
+  isAuthenticated: boolean;
 }
 
-const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupported, onSpeak }: ChatMessageProps) {
+const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupported, onSpeak, agentId, isAuthenticated }: ChatMessageProps) {
+  const [vote, setVote] = useState<'up' | 'down' | null>(null);
+
+  const handleVote = useCallback(async (rating: 'up' | 'down') => {
+    const next = vote === rating ? null : rating;
+    setVote(next);
+    if (next) {
+      await api.submitFeedback(agentId, msg.id, next);
+    }
+  }, [vote, agentId, msg.id]);
+
   return (
     <motion.div
       key={msg.id}
@@ -105,6 +118,28 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
             >
               {isSpeakingThis ? <SoundWaveBars /> : <Volume2 size={12} />}
             </button>
+          )}
+          {msg.role === 'assistant' && !msg.streaming && msg.content && isAuthenticated && (
+            <>
+              <button
+                onClick={() => handleVote('up')}
+                className={`opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 p-0.5 rounded hover:bg-white/5 cursor-pointer ${
+                  vote === 'up' ? 'text-emerald-400 !opacity-100' : 'text-[#71717a] hover:text-emerald-400'
+                }`}
+                title="Good response"
+              >
+                <ThumbsUp size={12} />
+              </button>
+              <button
+                onClick={() => handleVote('down')}
+                className={`opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 p-0.5 rounded hover:bg-white/5 cursor-pointer ${
+                  vote === 'down' ? 'text-red-400 !opacity-100' : 'text-[#71717a] hover:text-red-400'
+                }`}
+                title="Bad response"
+              >
+                <ThumbsDown size={12} />
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -282,6 +317,8 @@ export function ChatTab() {
             isSpeakingThis={voice.isSpeaking && speakingMsgIdRef.current === msg.id}
             ttsSupported={voice.ttsSupported}
             onSpeak={handleSpeakMessage}
+            agentId={agent.id}
+            isAuthenticated={isAuthenticated}
           />
         ))}
 

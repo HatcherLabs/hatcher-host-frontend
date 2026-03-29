@@ -1474,4 +1474,15 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ addonKey, ...(agentId ? { agentId } : {}) }),
     }),
+
+  /** Submit thumbs up/down feedback for a message */
+  submitFeedback: (agentId: string, messageId: string, rating: 'up' | 'down') =>
+    req<{ success: true }>(`/agents/${agentId}/feedback`, {
+      method: 'POST',
+      body: JSON.stringify({ messageId, rating }),
+    }),
+
+  /** Get feedback summary for an agent (owner only) */
+  getAgentFeedbackSummary: (agentId: string) =>
+    req<{ upCount: number; downCount: number; total: number; score: number | null }>(`/agents/${agentId}/feedback/summary`),
 };
