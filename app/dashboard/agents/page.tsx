@@ -18,14 +18,13 @@ import {
   Zap,
   Layers,
   Calendar,
-  Activity,
-  MessageSquare,
   Play,
   Square,
   RotateCcw,
 } from 'lucide-react';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
+import { QuickStats } from '@/components/dashboard/QuickStats';
 
 import { AGENT_STATUSES, AGENT_STATUS_CONFIG } from '@hatcher/shared';
 
@@ -50,11 +49,6 @@ const pageVariants = {
 const cardVariants = {
   hidden: { opacity: 0, y: 16 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const } },
-};
-
-const statCardVariants = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] as const } },
 };
 
 // ── Status badge component ───────────────────────────────────
@@ -215,7 +209,6 @@ export default function MyAgentsPage() {
 
   // ── Stats ──────────────────────────────────────────────────
   const activeCount = agents.filter((a) => a.status === 'active').length;
-  const totalFeatures = agents.reduce((sum, a) => sum + (a.features?.length ?? 0), 0);
 
   // ── Unauthenticated states ───────────────────────────────
   if (authLoading) {
@@ -321,60 +314,7 @@ export default function MyAgentsPage() {
 
         {/* ── Stat Cards ──────────────────────────────────── */}
         {agents.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <motion.div
-              className="card glass-noise p-5"
-              variants={statCardVariants}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-[#06b6d4]/15 flex items-center justify-center">
-                  <Bot size={18} className="text-[#06b6d4]" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-[#FFFFFF]">{agents.length}</div>
-                  <div className="text-xs text-[#71717a]">Total Agents</div>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              className="card glass-noise p-5"
-              variants={statCardVariants}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-500/15 flex items-center justify-center">
-                  <Activity size={18} className="text-emerald-400" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-[#FFFFFF] flex items-center gap-2">
-                    {activeCount}
-                    {activeCount > 0 && (
-                      <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-xs text-[#71717a]">Active Now</div>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              className="card glass-noise p-5"
-              variants={statCardVariants}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-cyan-500/15 flex items-center justify-center">
-                  <Layers size={18} className="text-cyan-400" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-[#FFFFFF]">{totalFeatures}</div>
-                  <div className="text-xs text-[#71717a]">Features Unlocked</div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
+          <QuickStats agentCount={agents.length} activeCount={activeCount} />
         )}
 
         {/* ── Filter / Search / Sort bar ──────────────────── */}
