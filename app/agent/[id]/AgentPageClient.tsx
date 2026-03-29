@@ -11,9 +11,9 @@ import { getInitials, stringToColor, shortenAddress, timeAgo } from '@/lib/utils
 import { FRAMEWORKS } from '@hatcher/shared';
 import type { AgentFramework } from '@hatcher/shared';
 import { motion } from 'framer-motion';
-import { RobotMascot } from '@/components/ui/RobotMascot';
 import {
   ArrowLeft,
+  Bot,
   Check,
   MessageSquare,
   Settings,
@@ -129,7 +129,9 @@ export function AgentPageClient() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4 }}
         >
-          <RobotMascot size="lg" mood="confused" className="mx-auto mb-6" />
+          <div className="w-16 h-16 rounded-2xl bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mx-auto mb-6">
+            <Bot size={32} className="text-[#06b6d4]" />
+          </div>
           <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">{title}</h1>
           <p className="mb-6 text-[var(--text-secondary)]">
             {error || "This agent doesn't exist or has been removed."}

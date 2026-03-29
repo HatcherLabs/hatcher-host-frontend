@@ -63,10 +63,10 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; pulse: boole
 // ── Framework visual config ──────────────────────────────────
 const FRAMEWORK_COLORS: Record<string, { border: string; glow: string; badge: string; icon: string }> = {
   openclaw: {
-    border: 'rgba(6,182,212,0.35)',
-    glow: 'rgba(6,182,212,0.12)',
-    badge: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/25',
-    icon: '#06b6d4',
+    border: 'rgba(245,158,11,0.35)',
+    glow: 'rgba(245,158,11,0.12)',
+    badge: 'bg-amber-500/10 text-amber-400 border-amber-500/25',
+    icon: '#f59e0b',
   },
   hermes: {
     border: 'rgba(168,85,247,0.35)',
@@ -75,16 +75,16 @@ const FRAMEWORK_COLORS: Record<string, { border: string; glow: string; badge: st
     icon: '#a855f7',
   },
   elizaos: {
-    border: 'rgba(249,115,22,0.35)',
-    glow: 'rgba(249,115,22,0.12)',
-    badge: 'bg-orange-500/10 text-orange-400 border-orange-500/25',
-    icon: '#f97316',
+    border: 'rgba(6,182,212,0.35)',
+    glow: 'rgba(6,182,212,0.12)',
+    badge: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/25',
+    icon: '#06b6d4',
   },
   milady: {
-    border: 'rgba(236,72,153,0.35)',
-    glow: 'rgba(236,72,153,0.12)',
-    badge: 'bg-pink-500/10 text-pink-400 border-pink-500/25',
-    icon: '#ec4899',
+    border: 'rgba(244,63,94,0.35)',
+    glow: 'rgba(244,63,94,0.12)',
+    badge: 'bg-rose-500/10 text-rose-400 border-rose-500/25',
+    icon: '#f43f5e',
   },
 };
 

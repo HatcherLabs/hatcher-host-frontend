@@ -9,7 +9,6 @@ import type { BYOKProvider, AgentTemplateId } from '@hatcher/shared';
 import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RobotMascot } from '@/components/ui/RobotMascot';
 import { useToast } from '@/components/ui/ToastProvider';
 import {
   Bot,
@@ -473,10 +472,9 @@ export default function CreatePage() {
           transition={{ duration: 0.4, delay: 0.1 }}
         >
           <div className="flex items-center justify-center gap-3 mb-3">
-            <RobotMascot
-              size="sm"
-              mood={step === 1 ? 'happy' : step === 2 ? 'happy' : step === 3 ? 'thinking' : 'waving'}
-            />
+            <div className="w-10 h-10 rounded-xl bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center">
+              <Bot size={20} className="text-[#06b6d4]" />
+            </div>
             <div className="text-left">
               <h1 className="text-3xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Create Your Agent</h1>
               <p className="text-[var(--text-muted)] text-sm">Launch a free AI agent in under 2 minutes</p>
@@ -1612,7 +1610,7 @@ export default function CreatePage() {
               </p>
 
               <motion.div
-                className={cn(cardClass, 'p-6 sm:p-8 mb-6 card-glow-border')}
+                className={cn(cardClass, 'p-6 sm:p-8 mb-6')}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
@@ -1712,7 +1710,7 @@ export default function CreatePage() {
                       transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
                       className="overflow-hidden"
                     >
-                      <div className={cn(cardClass, 'mt-3 p-0 overflow-hidden card-glow-border')}>
+                      <div className={cn(cardClass, 'mt-3 p-0 overflow-hidden')}>
                         {/* Header */}
                         <div className="px-4 py-3 border-b border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.4)]">
                           <div className="flex items-center gap-2">

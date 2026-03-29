@@ -502,16 +502,16 @@ const FRAMEWORK_CAPABILITIES: Record<string, string[]> = {
 };
 
 const FRAMEWORK_CAP_STYLE: Record<string, string> = {
-  openclaw: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-  hermes: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
-  elizaos: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  openclaw: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+  hermes: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+  elizaos: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
   milady: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
 };
 
 const FRAMEWORK_STAT_COLOR: Record<string, string> = {
-  openclaw: 'text-purple-400',
-  hermes: 'text-cyan-400',
-  elizaos: 'text-emerald-400',
+  openclaw: 'text-amber-400',
+  hermes: 'text-purple-400',
+  elizaos: 'text-cyan-400',
   milady: 'text-rose-400',
 };
 

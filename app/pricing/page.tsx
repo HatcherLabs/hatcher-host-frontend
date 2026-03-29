@@ -275,7 +275,7 @@ export default function PricingPage() {
 
         {/* FREE INTEGRATIONS CALLOUT */}
         <section className="mb-20">
-          <div className="card-gradient-border glass-noise p-8 relative overflow-hidden">
+          <div className="card glass-noise p-8 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-[radial-gradient(circle,rgba(34,197,94,0.06),transparent_70%)] pointer-events-none" />
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
@@ -380,7 +380,7 @@ export default function PricingPage() {
         </div>
 
         {/* CTA BANNER */}
-        <div className="card-gradient-border glass-noise p-10 sm:p-14 text-center relative overflow-hidden">
+        <div className="card glass-noise p-10 sm:p-14 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.1),transparent_60%)] pointer-events-none" />
           <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 relative text-white">
             Ready to hatch your agent?

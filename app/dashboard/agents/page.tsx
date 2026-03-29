@@ -8,7 +8,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getInitials, stringToColor, timeAgo } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RobotMascot } from '@/components/ui/RobotMascot';
 import {
   Search,
   PlusCircle,
@@ -94,15 +93,19 @@ function StatusBadge({ status }: { status: string }) {
 const FRAMEWORK_BADGE_STYLES: Record<string, string> = {
   openclaw: 'bg-amber-500/10 text-amber-400 border-amber-500/25',
   hermes: 'bg-purple-500/10 text-purple-400 border-purple-500/25',
+  elizaos: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/25',
+  milady: 'bg-rose-500/10 text-rose-400 border-rose-500/25',
 };
 
 const FRAMEWORK_LABELS: Record<string, string> = {
   openclaw: 'OpenClaw',
   hermes: 'Hermes',
+  elizaos: 'ElizaOS',
+  milady: 'Milady',
 };
 
 function FrameworkTag({ framework = 'openclaw' }: { framework?: string }) {
-  const style = FRAMEWORK_BADGE_STYLES[framework] ?? 'bg-[var(--accent-glow)] text-[var(--accent-400)] border-[rgba(6,182,212,0.25)]';
+  const style = FRAMEWORK_BADGE_STYLES[framework] ?? 'bg-slate-500/10 text-slate-400 border-slate-500/25';
   const label = FRAMEWORK_LABELS[framework] ?? framework;
   return (
     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${style}`}>
@@ -452,11 +455,9 @@ export default function MyAgentsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <RobotMascot
-                size="lg"
-                mood="thinking"
-                className="mb-6"
-              />
+              <div className="w-16 h-16 rounded-2xl bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mx-auto mb-6">
+                <Bot size={32} className="text-[#06b6d4]" />
+              </div>
               <h2 className="text-xl font-semibold text-[#FFFFFF] mb-2">
                 No matching agents
               </h2>

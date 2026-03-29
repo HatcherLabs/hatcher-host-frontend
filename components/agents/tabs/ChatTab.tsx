@@ -4,7 +4,6 @@ import { useEffect, useRef, useCallback, memo, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Mic, MicOff, Volume2, VolumeX, Square, ThumbsUp, ThumbsDown, MessageSquare, Bot } from 'lucide-react';
 import { FRAMEWORKS } from '@hatcher/shared';
-import { RobotMascot } from '@/components/ui/RobotMascot';
 import { useVoice } from '@/hooks/useVoice';
 import { api } from '@/lib/api';
 import {
@@ -109,7 +108,9 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
     >
       {msg.role === 'assistant' && (
         <div className="flex-shrink-0 mt-1">
-          <RobotMascot size="sm" mood={msg.streaming ? 'thinking' : 'happy'} animate={false} />
+          <div className="w-7 h-7 rounded-lg bg-[#06b6d4]/15 border border-[#06b6d4]/25 flex items-center justify-center">
+            <Bot size={14} className="text-[#06b6d4]" />
+          </div>
         </div>
       )}
       <div className={`flex flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start'}`} style={{ maxWidth: '75%' }}>
@@ -321,7 +322,9 @@ export function ChatTab() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <RobotMascot size="lg" mood="happy" className="mx-auto mb-4" />
+            <div className="w-16 h-16 rounded-2xl bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mx-auto mb-4">
+              <Bot size={32} className="text-[#06b6d4]" />
+            </div>
             <p className="text-sm mb-1 text-[#A5A1C2]">
               Start a conversation with <span className="font-medium text-[#06b6d4]">{agent.name}</span>
             </p>

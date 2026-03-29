@@ -94,7 +94,7 @@ export default function TokenPage() {
           </motion.div>
 
           <motion.h1 variants={fadeUp} className="text-5xl md:text-7xl font-extrabold mb-5 tracking-tight">
-            <span className="text-gradient">Platform</span>{' '}
+            <span className="text-white">Platform</span>{' '}
             <span className="text-[var(--text-primary)]">Token</span>
           </motion.h1>
 
@@ -126,8 +126,7 @@ export default function TokenPage() {
         className="py-20 px-4"
         variants={stagger}
         initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-80px' }}
+        animate="visible"
       >
         <div className="mx-auto max-w-6xl">
           <motion.div variants={fadeUp} className="text-center mb-12">
@@ -167,8 +166,7 @@ export default function TokenPage() {
         className="py-16 px-4"
         variants={stagger}
         initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-80px' }}
+        animate="visible"
       >
         <div className="mx-auto max-w-4xl">
           <motion.div variants={fadeUp} className="card glass-noise p-8">
@@ -208,8 +206,7 @@ export default function TokenPage() {
           <motion.div
             className="relative rounded-3xl overflow-hidden"
             initial={{ opacity: 0, scale: 0.98 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-[#06b6d4]/15 via-[#06b6d4]/10 to-[#0891b2]/10" />
