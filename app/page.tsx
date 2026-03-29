@@ -11,9 +11,9 @@ import {
   Check,
   ChevronDown,
   Bot,
-  Zap,
-  Users,
   Sparkles,
+  Cpu,
+  Brain,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 
@@ -222,14 +222,14 @@ export default function LandingPage() {
       </Section>
 
       {/* ── 2. HOW IT WORKS ─────────────────────────────── */}
-      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6">
-        <div className="max-w-5xl mx-auto">
+      <Section className="py-16 sm:py-24 px-4 sm:px-6">
+        <div className="max-w-3xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4 }}
-            className="text-center mb-12 sm:mb-16"
+            className="text-center mb-10 sm:mb-12"
           >
             <h2
               className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white"
@@ -242,22 +242,12 @@ export default function LandingPage() {
             </p>
           </motion.div>
 
-          {/* Setup walkthrough + live demo side by side */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-            <div>
-              <p className="text-xs text-[#71717a] uppercase tracking-wider mb-3 text-center lg:text-left">Setup</p>
-              <DeploymentWalkthrough />
-            </div>
-            <div>
-              <p className="text-xs text-[#71717a] uppercase tracking-wider mb-3 text-center lg:text-left">Result</p>
-              <AgentPreview />
-            </div>
-          </div>
+          <DeploymentWalkthrough />
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-10">
             <Link
               href="/create"
-              className="inline-flex items-center gap-2 bg-white/[0.06] border border-white/[0.1] text-white font-medium px-6 py-3 rounded-full text-sm hover:bg-white/[0.1] hover:border-white/20 transition-all duration-200"
+              className="clay-btn-primary text-sm"
             >
               Try it now — it&apos;s free
               <ArrowRight className="w-4 h-4" />
@@ -267,14 +257,14 @@ export default function LandingPage() {
       </Section>
 
       {/* ── 4. FRAMEWORK SHOWCASE ───────────────────────── */}
-      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="frameworks">
+      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-white/[0.06]" id="frameworks">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4 }}
-            className="text-center mb-12 sm:mb-16"
+            className="text-center mb-10 sm:mb-12"
           >
             <h2
               className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white"
@@ -290,58 +280,83 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             {[
               {
-                icon: Bot,
+                icon: Cpu,
                 name: 'OpenClaw',
                 tagline: 'The all-rounder — powerful, flexible, and battle-tested.',
                 href: `${DOCS_URL}/frameworks/openclaw`,
+                color: 'text-amber-400',
+                iconBg: 'bg-amber-500/15 border-amber-500/20',
+                hoverBorder: 'hover:border-amber-500/30',
+                badge: 'ADVANCED',
+                badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
               },
               {
-                icon: Zap,
+                icon: Brain,
                 name: 'Hermes',
                 tagline: 'Speed-first design for sub-second, low-latency responses.',
                 href: `${DOCS_URL}/frameworks/hermes`,
+                color: 'text-purple-400',
+                iconBg: 'bg-purple-500/15 border-purple-500/20',
+                hoverBorder: 'hover:border-purple-500/30',
+                badge: 'INTERMEDIATE',
+                badgeColor: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
               },
               {
-                icon: Users,
+                icon: Bot,
                 name: 'ElizaOS',
                 tagline: 'Multi-agent coordination — build teams of specialized bots.',
                 href: `${DOCS_URL}/frameworks/elizaos`,
+                color: 'text-cyan-400',
+                iconBg: 'bg-cyan-500/15 border-cyan-500/20',
+                hoverBorder: 'hover:border-cyan-500/30',
+                badge: 'INTERMEDIATE',
+                badgeColor: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
               },
               {
                 icon: Sparkles,
                 name: 'Milady',
                 tagline: 'Crypto-native with on-chain awareness and wallet integrations.',
                 href: `${DOCS_URL}/frameworks/milady`,
+                color: 'text-rose-400',
+                iconBg: 'bg-rose-500/15 border-rose-500/20',
+                hoverBorder: 'hover:border-rose-500/30',
+                badge: 'BEGINNER',
+                badgeColor: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
               },
             ].map((fw) => (
               <motion.div
                 key={fw.name}
                 whileHover={{ y: -4 }}
                 transition={{ duration: 0.2 }}
-                className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 hover:border-white/[0.12] transition-colors duration-200"
+                className={`rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 ${fw.hoverBorder} transition-colors duration-200`}
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-white/[0.06] flex items-center justify-center">
-                    <fw.icon size={20} className="text-white" />
+                  <div className={`w-10 h-10 rounded-xl ${fw.iconBg} border flex items-center justify-center`}>
+                    <fw.icon size={20} className={fw.color} />
                   </div>
-                  <h3 className="text-base font-bold text-white">{fw.name}</h3>
+                  <div>
+                    <h3 className="text-base font-bold text-white">{fw.name}</h3>
+                    <span className={`text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded border ${fw.badgeColor}`}>
+                      {fw.badge}
+                    </span>
+                  </div>
                 </div>
                 <p className="text-sm text-[#a1a1aa] leading-relaxed mb-4">{fw.tagline}</p>
-                <Link href={fw.href} className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors">
+                <Link href={fw.href} className={`text-sm ${fw.color} hover:brightness-125 transition-all`}>
                   Learn more &rarr;
                 </Link>
               </motion.div>
             ))}
           </div>
 
-          <div className="text-center mt-10">
+          <div className="text-center mt-8">
             <p className="text-xs text-[#71717a]">Not sure which to pick? Start with OpenClaw — you can switch anytime.</p>
           </div>
         </div>
       </Section>
 
       {/* ── 5. PRICING PREVIEW ──────────────────────────── */}
-      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="pricing">
+      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-white/[0.06]" id="pricing">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
@@ -460,7 +475,7 @@ export default function LandingPage() {
       </Section>
 
       {/* ── 6. FAQ ──────────────────────────────────────── */}
-      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]" id="faq">
+      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-white/[0.06]" id="faq">
         <div className="max-w-3xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
