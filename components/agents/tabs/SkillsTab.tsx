@@ -18,12 +18,14 @@ import {
   Trash2,
   Package,
   Store,
+  Puzzle,
 } from 'lucide-react';
 import {
   useAgentContext,
   tabContentVariants,
   GlassCard,
   Skeleton,
+  FRAMEWORK_BADGE,
 } from '../AgentContext';
 import { api } from '@/lib/api';
 
@@ -902,6 +904,66 @@ function MarketplaceSection({
   );
 }
 
+// ─── Framework Info Banner ───────────────────────────────────
+
+const FRAMEWORK_SKILL_INFO: Record<string, { description: string; icon: typeof Sparkles; accentBorder: string; accentBg: string; accentText: string }> = {
+  openclaw: {
+    description: 'OpenClaw supports 3,200+ community skills. Skills extend your agent with web search, file management, code execution, and more.',
+    icon: Sparkles,
+    accentBorder: 'border-amber-500/25',
+    accentBg: 'bg-amber-500/[0.06]',
+    accentText: 'text-amber-400',
+  },
+  hermes: {
+    description: 'Hermes has 40+ built-in tools covering web search, file management, memory, code execution, and more.',
+    icon: Sparkles,
+    accentBorder: 'border-purple-500/25',
+    accentBg: 'bg-purple-500/[0.06]',
+    accentText: 'text-purple-400',
+  },
+  elizaos: {
+    description: 'ElizaOS uses a plugin architecture. Plugins add capabilities like Discord integration, image generation, blockchain access, and more.',
+    icon: Puzzle,
+    accentBorder: 'border-cyan-500/20',
+    accentBg: 'bg-cyan-500/[0.06]',
+    accentText: 'text-cyan-400',
+  },
+  milady: {
+    description: 'Milady includes core capabilities like web search, memory, file management, and shell access. Lightweight by design.',
+    icon: Sparkles,
+    accentBorder: 'border-rose-500/20',
+    accentBg: 'bg-rose-500/[0.06]',
+    accentText: 'text-rose-400',
+  },
+};
+
+function FrameworkInfoBanner({ framework }: { framework: string }) {
+  const info = FRAMEWORK_SKILL_INFO[framework];
+  if (!info) return null;
+
+  const Icon = info.icon;
+  const badgeClass = FRAMEWORK_BADGE[framework] ?? 'bg-white/10 text-[#A5A1C2] border-white/10';
+  const frameworkLabel = framework === 'elizaos' ? 'ElizaOS' : framework.charAt(0).toUpperCase() + framework.slice(1);
+
+  return (
+    <div className={`flex items-start gap-3 px-4 py-3.5 rounded-xl border ${info.accentBorder} ${info.accentBg} transition-all`}>
+      <div className={`flex-shrink-0 mt-0.5 ${info.accentText}`}>
+        <Icon size={16} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1">
+          <span className={`px-2 py-0.5 rounded-md text-[10px] font-semibold border ${badgeClass}`}>
+            {frameworkLabel}
+          </span>
+        </div>
+        <p className="text-xs text-[#A5A1C2] leading-relaxed">
+          {info.description}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Loading Skeleton ───────────────────────────────────────
 
 function SkillsSkeleton() {
@@ -1204,12 +1266,20 @@ export function SkillsTab() {
       exit="exit"
       className="space-y-5"
     >
+      {/* Framework Info Banner */}
+      <FrameworkInfoBanner framework={agent.framework ?? 'openclaw'} />
+
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             <Sparkles size={18} className="text-[#06b6d4]" />
             {isEliza ? 'Plugins' : 'Skills Browser'}
+            {enabledCount > 0 && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+                {enabledCount} active
+              </span>
+            )}
           </h2>
           <p className="text-xs text-[#71717a] mt-0.5">
             {totalCount > 0

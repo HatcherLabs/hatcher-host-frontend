@@ -32,6 +32,8 @@ import {
   Heart,
   Briefcase,
   Palette,
+  Search,
+  Layers,
 } from 'lucide-react';
 import { BYOK_PROVIDERS, getBYOKProvider, FRAMEWORKS } from '@hatcher/shared';
 import type { AgentFramework } from '@hatcher/shared';
@@ -646,11 +648,11 @@ export function ConfigTab() {
                 {/* ── OpenClaw Advanced ── */}
                 {agent?.framework === 'openclaw' && (
                   <>
-                    {/* Memory & Sessions */}
+                    {/* Session & Memory */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
                         <Brain size={12} className="text-amber-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Memory &amp; Sessions</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Session &amp; Memory</span>
                       </div>
 
                       <div>
@@ -666,7 +668,20 @@ export function ConfigTab() {
                           </select>
                           <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
                         </div>
-                        <p className="text-[10px] mt-1 text-[#71717a]">Per User keeps conversations separate for each person. Global shares memory across all users.</p>
+                        <div className="mt-2 space-y-1">
+                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocSessionScope === 'per_user' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-white/[0.02]'}`}>
+                            <Users size={11} className={`mt-0.5 shrink-0 ${ocSessionScope === 'per_user' ? 'text-amber-400' : 'text-[#52525b]'}`} />
+                            <p className={`text-[10px] leading-relaxed ${ocSessionScope === 'per_user' ? 'text-[#A5A1C2]' : 'text-[#52525b]'}`}>
+                              <span className="font-medium">Per User</span> — Each user has their own conversation thread
+                            </p>
+                          </div>
+                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocSessionScope === 'global' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-white/[0.02]'}`}>
+                            <Globe size={11} className={`mt-0.5 shrink-0 ${ocSessionScope === 'global' ? 'text-amber-400' : 'text-[#52525b]'}`} />
+                            <p className={`text-[10px] leading-relaxed ${ocSessionScope === 'global' ? 'text-[#A5A1C2]' : 'text-[#52525b]'}`}>
+                              <span className="font-medium">Global</span> — All users share a single conversation
+                            </p>
+                          </div>
+                        </div>
                       </div>
 
                       <div>
@@ -683,17 +698,36 @@ export function ConfigTab() {
                           </select>
                           <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
                         </div>
-                        <p className="text-[10px] mt-1 text-[#71717a]">Controls how conversation history is compressed. Safeguard preserves important context.</p>
+                        <div className="mt-2 space-y-1">
+                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocCompaction === 'safeguard' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-white/[0.02]'}`}>
+                            <Shield size={11} className={`mt-0.5 shrink-0 ${ocCompaction === 'safeguard' ? 'text-amber-400' : 'text-[#52525b]'}`} />
+                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'safeguard' ? 'text-[#A5A1C2]' : 'text-[#52525b]'}`}>
+                              <span className="font-medium">Safeguard</span> — Preserves full conversation history, uses more memory
+                            </p>
+                          </div>
+                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocCompaction === 'aggressive' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-white/[0.02]'}`}>
+                            <Zap size={11} className={`mt-0.5 shrink-0 ${ocCompaction === 'aggressive' ? 'text-amber-400' : 'text-[#52525b]'}`} />
+                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'aggressive' ? 'text-[#A5A1C2]' : 'text-[#52525b]'}`}>
+                              <span className="font-medium">Aggressive</span> — Summarizes older messages to save memory
+                            </p>
+                          </div>
+                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocCompaction === 'off' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-white/[0.02]'}`}>
+                            <History size={11} className={`mt-0.5 shrink-0 ${ocCompaction === 'off' ? 'text-amber-400' : 'text-[#52525b]'}`} />
+                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'off' ? 'text-[#A5A1C2]' : 'text-[#52525b]'}`}>
+                              <span className="font-medium">Off</span> — No compaction, conversation grows unbounded
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
                     <div className="border-t border-white/[0.06]" />
 
-                    {/* Web Search */}
+                    {/* Tools & Search */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
-                        <Globe size={12} className="text-amber-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Web Search</span>
+                        <Search size={12} className="text-amber-400" />
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Tools &amp; Search</span>
                       </div>
 
                       <ToggleSwitch
@@ -725,11 +759,11 @@ export function ConfigTab() {
 
                     <div className="border-t border-white/[0.06]" />
 
-                    {/* Voice */}
+                    {/* Voice & TTS */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
-                        <Volume2 size={12} className="text-amber-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Voice</span>
+                        <Mic size={12} className="text-amber-400" />
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Voice &amp; TTS</span>
                       </div>
 
                       <ToggleSwitch
@@ -759,11 +793,11 @@ export function ConfigTab() {
 
                     <div className="border-t border-white/[0.06]" />
 
-                    {/* Agent Behavior */}
+                    {/* Limits */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
-                        <Users size={12} className="text-amber-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Agent Behavior</span>
+                        <Layers size={12} className="text-amber-400" />
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Limits</span>
                       </div>
 
                       <SliderInput
