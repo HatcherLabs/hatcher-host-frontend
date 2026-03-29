@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
@@ -25,6 +25,8 @@ import {
 import { EmptyState } from '@/components/ui/EmptyState';
 import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
 import { QuickStats } from '@/components/dashboard/QuickStats';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { ShortcutHelpModal } from '@/components/ui/ShortcutHelpModal';
 
 import { AGENT_STATUSES, AGENT_STATUS_CONFIG } from '@hatcher/shared';
 
@@ -143,6 +145,17 @@ export default function MyAgentsPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [sortOption, setSortOption] = useState<SortOption>('newest');
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useKeyboardShortcuts({
+    onHelp: () => setShowShortcuts((v) => !v),
+    onSearch: () => searchInputRef.current?.focus(),
+    onAgentSelect: (index) => {
+      const sorted = filteredAgents;
+      if (sorted[index]) router.push(`/dashboard/agent/${sorted[index].id}`);
+    },
+  });
 
   // ── Fetch agents ─────────────────────────────────────────
   useEffect(() => {
@@ -343,8 +356,9 @@ export default function MyAgentsPage() {
           <div className="flex items-center gap-2 w-full sm:w-auto sm:flex-initial bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] backdrop-blur-xl rounded-xl">
             <Search size={16} className="text-[#71717a] ml-3" />
             <input
+              ref={searchInputRef}
               type="text"
-              placeholder="Search agents..."
+              placeholder="Search agents... ( / )"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-transparent outline-none text-sm w-full sm:w-48 text-[#FFFFFF] placeholder:text-[#71717a] px-2 py-2.5"
@@ -540,6 +554,8 @@ export default function MyAgentsPage() {
           <OnboardingWizard onClose={() => setShowOnboarding(false)} />
         )}
       </AnimatePresence>
+
+      <ShortcutHelpModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
     </motion.div>
   );
 }
