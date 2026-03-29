@@ -19,8 +19,6 @@ import {
   Clock,
   Users,
   Mic,
-  Star,
-  Quote,
   Shield,
   KeyRound,
   Lock,
@@ -328,6 +326,11 @@ export default function LandingPage() {
     if (!sessionStorage.getItem('hatcher_splash_seen')) {
       setShowSplash(true);
     }
+    // Prevent browser from restoring previous scroll position
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
   }, []);
   const [stats, setStats] = useState({ agents: 0, users: 0, messages: 0, platforms: 20, frameworks: 4 });
 
@@ -351,6 +354,7 @@ export default function LandingPage() {
     return <IntroSplash onComplete={() => {
       sessionStorage.setItem('hatcher_splash_seen', '1');
       setShowSplash(false);
+      window.scrollTo(0, 0);
     }} />;
   }
 
@@ -947,67 +951,6 @@ export default function LandingPage() {
             </p>
           </div>
           <DemoChat />
-        </div>
-      </Section>
-
-      {/* ── TESTIMONIALS ─────────────────────────────── */}
-      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">What people say</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white">Loved by builders</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              {
-                quote: 'I set up a Telegram bot for my crypto community in literally 5 minutes. It answers questions, tracks prices, and my members love it.',
-                name: 'Alex R.',
-                role: 'Community founder',
-                stars: 5,
-                gradient: 'bg-gradient-to-br from-purple-500 to-violet-600',
-              },
-              {
-                quote: 'Replaced our $200/month customer support tool. The agent handles 80% of tickets automatically and sounds way more natural.',
-                name: 'Sarah K.',
-                role: 'Startup founder',
-                stars: 5,
-                gradient: 'bg-gradient-to-br from-cyan-500 to-blue-600',
-              },
-              {
-                quote: 'I use it as a personal research assistant on Discord. It summarizes news, finds papers, and keeps me updated on my niche topics.',
-                name: 'Marcus T.',
-                role: 'PhD student',
-                stars: 5,
-                gradient: 'bg-gradient-to-br from-amber-500 to-orange-600',
-              },
-            ].map((t, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="relative bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6"
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white ${t.gradient}`}>
-                    {t.name[0]}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-white">{t.name}</p>
-                    <p className="text-xs text-[#71717a]">{t.role}</p>
-                  </div>
-                </div>
-                <Quote className="w-5 h-5 text-white/[0.06] absolute top-5 right-5" />
-                <div className="flex gap-0.5 mb-4">
-                  {Array.from({ length: t.stars }).map((_, j) => (
-                    <Star key={j} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                  ))}
-                </div>
-                <p className="text-sm text-[#d4d4d8] leading-relaxed">{t.quote}</p>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </Section>
 
