@@ -22,9 +22,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const res = await fetch(`${API_URL}/agents/explore`, { next: { revalidate: 3600 } });
     if (res.ok) {
-      const json = (await res.json()) as { success: boolean; data?: { agents: ExploreAgent[] } };
-      if (json.success && json.data?.agents) {
-        agentEntries = json.data.agents.map((agent) => ({
+      const json = (await res.json()) as { agents: ExploreAgent[] };
+      if (json.agents?.length) {
+        agentEntries = json.agents.map((agent) => ({
           url: `https://hatcher.host/agent/${agent.id}`,
           lastModified: agent.updatedAt ? new Date(agent.updatedAt) : now,
           changeFrequency: 'daily' as const,
