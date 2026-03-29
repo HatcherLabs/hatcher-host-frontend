@@ -21,6 +21,7 @@ import {
   ChevronLeft,
   Activity,
   TrendingUp,
+  HeartPulse,
 } from 'lucide-react';
 import type { Tab } from './AgentContext';
 import { STATUS_STYLES, FRAMEWORK_BADGE } from './AgentContext';
@@ -47,6 +48,7 @@ function getTabs(framework?: string): TabDef[] {
     { id: 'stats', label: 'Stats', icon: <BarChart3 size={18} />, group: 'data' },
     { id: 'analytics', label: 'Analytics', icon: <TrendingUp size={18} />, group: 'data' },
     { id: 'usage', label: 'Usage', icon: <Activity size={18} />, group: 'data' },
+    { id: 'health', label: 'Health', icon: <HeartPulse size={18} />, group: 'data' },
     { id: 'memory', label: 'Memory', icon: <Brain size={18} />, group: 'data' },
     { id: 'knowledge', label: 'Knowledge', icon: <BookOpen size={18} />, group: 'data' },
     { id: 'files', label: 'Files', icon: <FolderOpen size={18} />, group: 'data' },

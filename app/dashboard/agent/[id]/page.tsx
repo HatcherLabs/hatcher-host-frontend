@@ -126,6 +126,11 @@ const AnalyticsTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const HealthTab = dynamic(
+  () => import('@/components/agents/tabs/HealthTab').then(mod => ({ default: mod.HealthTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 // ─── Tab definitions ─────────────────────────────────────────
 
 // ─── Main Component ─────────────────────────────────────────
@@ -1078,6 +1083,7 @@ export default function AgentManagePage() {
               {tab === 'stats' && <StatsTab />}
               {tab === 'usage' && <UsageTab />}
               {tab === 'analytics' && <AnalyticsTab />}
+              {tab === 'health' && <HealthTab />}
             </AnimatePresence>
           </div>
         </div>
