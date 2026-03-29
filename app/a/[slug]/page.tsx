@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { getInitials, stringToColor } from '@/lib/utils';
+import { ShareModal } from '@/components/agents/ShareModal';
 import {
   Send,
   Loader2,
@@ -67,6 +68,7 @@ export default function AgentPublicProfilePage() {
   const [rateLimited, setRateLimited] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showEmbed, setShowEmbed] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -192,11 +194,11 @@ export default function AgentPublicProfilePage() {
               Embed
             </button>
             <button
-              onClick={handleShare}
+              onClick={() => setShowShareModal(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
             >
               <Share2 className="w-3.5 h-3.5" />
-              {copied ? 'Copied!' : 'Share'}
+              Share
             </button>
           </div>
         </div>
@@ -402,6 +404,15 @@ export default function AgentPublicProfilePage() {
           </div>
         </div>
       </div>
+
+      {agent && (
+        <ShareModal
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          agentName={agent.name}
+          agentSlug={agent.slug}
+        />
+      )}
     </div>
   );
 }
