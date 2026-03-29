@@ -14,13 +14,13 @@ import {
   PlusCircle,
   Bot,
   Cpu,
-  ArrowUpDown,
   Zap,
   Layers,
   Calendar,
   Play,
   Square,
   RotateCcw,
+  X,
 } from 'lucide-react';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
@@ -40,7 +40,23 @@ const STATUS_FILTERS = [
 ];
 
 type StatusFilter = 'all' | 'active' | 'sleeping' | 'paused' | 'error' | 'restarting';
-type SortOption = 'newest' | 'az';
+type FrameworkFilter = 'all' | 'openclaw' | 'hermes' | 'elizaos' | 'milady';
+type SortOption = 'newest' | 'az' | 'messages' | 'active';
+
+const FRAMEWORK_FILTERS = [
+  { key: 'all', label: 'All Frameworks' },
+  { key: 'openclaw', label: 'OpenClaw' },
+  { key: 'hermes', label: 'Hermes' },
+  { key: 'elizaos', label: 'ElizaOS' },
+  { key: 'milady', label: 'Milady' },
+];
+
+const SORT_OPTIONS = [
+  { key: 'newest', label: 'Newest' },
+  { key: 'az', label: 'A-Z' },
+  { key: 'messages', label: 'Most Messages' },
+  { key: 'active', label: 'Last Active' },
+];
 
 // ── Animation variants ───────────────────────────────────────
 const pageVariants = {
@@ -143,6 +159,7 @@ export default function MyAgentsPage() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [frameworkFilter, setFrameworkFilter] = useState<FrameworkFilter>('all');
   const [sortOption, setSortOption] = useState<SortOption>('newest');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -197,6 +214,11 @@ export default function MyAgentsPage() {
       result = result.filter((a) => a.status === statusFilter);
     }
 
+    // Framework filter
+    if (frameworkFilter !== 'all') {
+      result = result.filter((a) => a.framework === frameworkFilter);
+    }
+
     // Search
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -209,16 +231,22 @@ export default function MyAgentsPage() {
     }
 
     // Sort
-    if (sortOption === 'newest') {
-      result = [...result].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-    } else {
-      result = [...result].sort((a, b) => a.name.localeCompare(b.name));
-    }
+    result = [...result].sort((a, b) => {
+      switch (sortOption) {
+        case 'az':
+          return a.name.localeCompare(b.name);
+        case 'messages':
+          return (b.messageCount ?? 0) - (a.messageCount ?? 0);
+        case 'active':
+          return new Date(b.updatedAt ?? b.createdAt).getTime() - new Date(a.updatedAt ?? a.createdAt).getTime();
+        case 'newest':
+        default:
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+    });
 
     return result;
-  }, [agents, statusFilter, searchQuery, sortOption]);
+  }, [agents, statusFilter, frameworkFilter, searchQuery, sortOption]);
 
   // ── Stats ──────────────────────────────────────────────────
   const activeCount = agents.filter((a) => a.status === 'active').length;
@@ -352,6 +380,18 @@ export default function MyAgentsPage() {
             ))}
           </div>
 
+          {/* Framework filter */}
+          <select
+            value={frameworkFilter}
+            onChange={(e) => setFrameworkFilter(e.target.value as FrameworkFilter)}
+            className="px-3 py-2.5 rounded-xl text-xs font-medium bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] text-[#A5A1C2] outline-none cursor-pointer appearance-none pr-7"
+            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center' }}
+          >
+            {FRAMEWORK_FILTERS.map((f) => (
+              <option key={f.key} value={f.key}>{f.label}</option>
+            ))}
+          </select>
+
           {/* Search */}
           <div className="flex items-center gap-2 w-full sm:w-auto sm:flex-initial bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] backdrop-blur-xl rounded-xl">
             <Search size={16} className="text-[#71717a] ml-3" />
@@ -366,13 +406,27 @@ export default function MyAgentsPage() {
           </div>
 
           {/* Sort */}
-          <button
-            onClick={() => setSortOption((prev) => (prev === 'newest' ? 'az' : 'newest'))}
-            className="btn-ghost text-xs gap-1.5"
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value as SortOption)}
+            className="px-3 py-2.5 rounded-xl text-xs font-medium bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] text-[#A5A1C2] outline-none cursor-pointer appearance-none pr-7"
+            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center' }}
           >
-            <ArrowUpDown size={14} />
-            {sortOption === 'newest' ? 'Newest' : 'A-Z'}
-          </button>
+            {SORT_OPTIONS.map((s) => (
+              <option key={s.key} value={s.key}>{s.label}</option>
+            ))}
+          </select>
+
+          {/* Clear filters */}
+          {(statusFilter !== 'all' || frameworkFilter !== 'all' || searchQuery.trim()) && (
+            <button
+              onClick={() => { setStatusFilter('all'); setFrameworkFilter('all'); setSearchQuery(''); }}
+              className="flex items-center gap-1 px-2.5 py-2 rounded-xl text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+            >
+              <X size={12} />
+              Clear
+            </button>
+          )}
         </motion.div>
 
         {/* ── Agent Grid ──────────────────────────────────── */}
