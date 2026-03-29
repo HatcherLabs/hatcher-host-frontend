@@ -20,6 +20,7 @@ import {
   RotateCcw,
   Trash2,
   Settings,
+  Copy,
 } from 'lucide-react';
 import {
   AgentContext,
@@ -156,7 +157,7 @@ export default function AgentManagePage() {
   const [logSearch, setLogSearch] = useState('');
   const [autoScroll, setAutoScroll] = useState(true);
   const logsEndRef = useRef<HTMLDivElement>(null);
-  const eventSourceRef = useRef<EventSource | null>(null);
+  const wsLogsRef = useRef<WebSocket | null>(null);
 
   // Chat state — restore from localStorage so history survives tab switches and soft navs
   const chatKey = `hatcher-chat-${id}`;
@@ -340,48 +341,65 @@ export default function AgentManagePage() {
     });
   }, [agent, id]);
 
-  // Load logs: SSE streaming when agent is active, static fetch otherwise
+  // Load logs: WebSocket streaming when agent is active + Pro, static fetch otherwise
   useEffect(() => {
     if (!(tab === 'logs' || tab === 'overview') || !agentStatus) return;
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
+    if (wsLogsRef.current) {
+      wsLogsRef.current.close();
+      wsLogsRef.current = null;
     }
     const isActiveStatus = agentStatus === 'active';
-    const wantsStream = tab === 'logs' && isActiveStatus;
+    const wantsStream = tab === 'logs' && isActiveStatus && userTier === 'pro';
     if (wantsStream) {
       const token = getToken();
       const apiBase = process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001';
-      const url = `${apiBase}/agents/${id}/logs?stream=true${token ? `&token=${token}` : ''}`;
+      const wsBase = apiBase.replace(/^http/, 'ws');
+      const url = `${wsBase}/agents/${id}/logs/ws${token ? `?token=${encodeURIComponent(token)}` : ''}`;
       setLogsLoading(true);
-      const es = new EventSource(url);
-      eventSourceRef.current = es;
-      es.onopen = () => { setLogsLoading(false); };
-      es.onmessage = (event) => {
+      const ws = new WebSocket(url);
+      wsLogsRef.current = ws;
+      ws.onopen = () => { /* auth sent via query param */ };
+      ws.onmessage = (event) => {
         try {
-          const entry: LogEntry = JSON.parse(event.data);
-          setLogs((prev) => {
-            const next = [...prev, entry];
-            return next.length > 200 ? next.slice(next.length - 200) : next;
-          });
-        } catch { /* Ignore unparseable events */ }
+          const msg = JSON.parse(event.data as string) as { type: string; timestamp?: string; level?: string; message?: string };
+          if (msg.type === 'connected') {
+            setLogsLoading(false);
+          } else if (msg.type === 'log' && msg.timestamp && msg.message) {
+            const entry: LogEntry = {
+              timestamp: msg.timestamp,
+              level: (msg.level as LogEntry['level']) ?? 'info',
+              message: msg.message,
+            };
+            setLogs((prev) => {
+              const next = [...prev, entry];
+              return next.length > 200 ? next.slice(next.length - 200) : next;
+            });
+          } else if (msg.type === 'disconnected') {
+            setLogsLoading(false);
+          } else if (msg.type === 'error') {
+            setLogsLoading(false);
+          }
+        } catch { /* Ignore unparseable messages */ }
       };
-      es.onerror = () => {
+      ws.onerror = () => {
         setLogsLoading(false);
-        es.close();
-        eventSourceRef.current = null;
+        wsLogsRef.current = null;
         loadLogs();
+      };
+      ws.onclose = () => {
+        setLogsLoading(false);
+        wsLogsRef.current = null;
       };
     } else {
       loadLogs();
     }
     return () => {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
+      if (wsLogsRef.current) {
+        wsLogsRef.current.close();
+        wsLogsRef.current = null;
       }
     };
-  }, [tab, agentStatus, id, loadLogs]);
+  }, [tab, agentStatus, id, loadLogs, userTier]);
 
   // Load features when integrations or config tab
   useEffect(() => {
@@ -442,6 +460,23 @@ export default function AgentManagePage() {
       setDeleteConfirm(false);
       setDeleteError(res.error ?? 'Failed to delete agent. Please try again.');
     }
+  };
+
+  const [cloning, setCloning] = useState(false);
+  const handleClone = async () => {
+    setCloning(true);
+    try {
+      const res = await api.cloneAgent(id);
+      if (res.success) {
+        toast.success(`Agent cloned as "${res.data.name}"`);
+        router.push(`/dashboard/agent/${res.data.id}`);
+      } else {
+        toast.error(res.error ?? 'Failed to clone agent');
+      }
+    } catch {
+      toast.error('Failed to clone agent. Check your connection.');
+    }
+    setCloning(false);
   };
 
   // handleUnlockFeature removed — features are now tier-based
@@ -844,6 +879,7 @@ export default function AgentManagePage() {
     deleteConfirm, setDeleteConfirm, deleting, deleteError, setDeleteError,
     loadAgent, loadFeatures,
     isAuthenticated, wallet, connection,
+    userTier,
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }), [id, agent, stats, tab, logs, logsLoading, logFilter, logSearch, autoScroll, filteredLogs,
     messages, input, sending, chatError, chatErrorType, msgCount, msgLimit, remaining, isLimitReached,
@@ -853,7 +889,7 @@ export default function AgentManagePage() {
     visibleFields, savingIntegration, integrationSaveMsg, activeFeatures, activeFeatureKeys,
     featuresLoading, deleteConfirm, deleting, deleteError, actionLoading, actionError, actionSuccess,
     llmProvider, currentProviderMeta, providerModels, hasApiKey, displayUptime, isLiveUptime,
-    isActive, isNotActive, statusInfo, frameworkMeta, isAuthenticated, wallet, connection]);
+    isActive, isNotActive, statusInfo, frameworkMeta, isAuthenticated, wallet, connection, userTier]);
 
   // ─── Render ────────────────────────────────────────────────
 
@@ -983,6 +1019,19 @@ export default function AgentManagePage() {
                   <span className="hidden sm:inline">{actionLoading === 'start' ? 'Starting...' : 'Start'}</span>
                 </button>
               )}
+              <button
+                onClick={handleClone}
+                disabled={cloning}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-violet-500/40 hover:bg-violet-500/10 transition-all disabled:opacity-40"
+                title="Clone agent"
+              >
+                {cloning ? (
+                  <div className="w-3 h-3 border-2 border-[#A5A1C2]/30 border-t-[#A5A1C2] rounded-full animate-spin" />
+                ) : (
+                  <Copy size={13} />
+                )}
+                <span className="hidden sm:inline">{cloning ? 'Cloning...' : 'Clone'}</span>
+              </button>
               <button
                 onClick={handleDelete}
                 disabled={deleting}
