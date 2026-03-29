@@ -9,7 +9,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
   deploy:
+    needs: ci
     runs-on: ubuntu-latest
     environment: production
 
@@ -49,6 +53,7 @@ jobs:
             else
               echo "WARNING: Frontend health check failed"
               pm2 logs hatcher-web --lines 20 --nostream
+              exit 1
             fi
 
             echo "==> Deploy complete at $(date '+%Y-%m-%d %H:%M:%S')"

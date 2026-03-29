@@ -1,8 +1,11 @@
 name: CI - Frontend
 
 on:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
+  workflow_call:
 
 jobs:
   typecheck-and-build:
@@ -26,6 +29,9 @@ jobs:
 
       - name: TypeScript type check
         run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
 
       - name: Build frontend
         run: npm run build
