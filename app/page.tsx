@@ -7,7 +7,6 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { IntroSplash } from '@/components/landing/IntroSplash';
 import { DeploymentWalkthrough } from '@/components/landing/DeploymentWalkthrough';
-import { DemoChat } from '@/components/demo/DemoChat';
 
 import {
   ArrowRight,
@@ -491,6 +490,86 @@ export default function LandingPage() {
         <LiveActivityTicker />
       </div>
 
+      {/* ── HOW IT WORKS ─────────────────────────────── */}
+      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12 sm:mb-16">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-cyan-400/80 mb-4">Simple setup</p>
+              <h2
+                className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight"
+                style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
+              >
+                3 steps. 60 seconds.
+              </h2>
+              <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
+                No coding, no setup guides, no configuration files. Just pick, customize, and launch.
+              </p>
+            </motion.div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
+            <StepCard
+              number="1"
+              title="Choose a style"
+              description="Pick the type of AI brain that powers your agent. Each style has different strengths — we'll help you choose."
+              delay={0}
+            />
+            <StepCard
+              number="2"
+              title="Customize it"
+              description="Give it a name, personality, and tell it what to do. Connect it to Telegram, Discord, or any platform you want."
+              delay={0.15}
+            />
+            <StepCard
+              number="3"
+              title="Launch it"
+              description="Hit the button and your agent goes live. It runs 24/7 in the cloud — no computer needs to stay on."
+              delay={0.3}
+            />
+          </div>
+
+          {/* Setup walkthrough + live demo side by side */}
+          <div className="mt-14 sm:mt-16">
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center text-xs text-[#71717a] mb-6 uppercase tracking-widest"
+            >
+              See it in action
+            </motion.p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+              <div>
+                <p className="text-xs text-[#71717a] uppercase tracking-wider mb-3 text-center lg:text-left">Setup</p>
+                <DeploymentWalkthrough />
+              </div>
+              <div>
+                <p className="text-xs text-[#71717a] uppercase tracking-wider mb-3 text-center lg:text-left">Result</p>
+                <AgentPreview />
+              </div>
+            </div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="text-center mt-12"
+          >
+            <Link
+              href="/create"
+              className="inline-flex items-center gap-2 bg-white/[0.06] border border-white/[0.1] text-white font-medium px-6 py-3 rounded-full text-sm hover:bg-white/[0.1] hover:border-white/20 transition-all duration-200"
+            >
+              Try it now — it&apos;s free
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </motion.div>
+        </div>
+      </Section>
+
       {/* ── WHY HATCHER (comparison) ────────────────── */}
       <Section className="py-14 sm:py-20 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
@@ -770,77 +849,6 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* ── HOW IT WORKS ─────────────────────────────── */}
-      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12 sm:mb-16">
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-cyan-400/80 mb-4">Simple setup</p>
-              <h2
-                className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight"
-                style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
-              >
-                3 steps. 60 seconds.
-              </h2>
-              <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
-                No coding, no setup guides, no configuration files. Just pick, customize, and launch.
-              </p>
-            </motion.div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
-            <StepCard
-              number="1"
-              title="Choose a style"
-              description="Pick the type of AI brain that powers your agent. Each style has different strengths — we'll help you choose."
-              delay={0}
-            />
-            <StepCard
-              number="2"
-              title="Customize it"
-              description="Give it a name, personality, and tell it what to do. Connect it to Telegram, Discord, or any platform you want."
-              delay={0.15}
-            />
-            <StepCard
-              number="3"
-              title="Launch it"
-              description="Hit the button and your agent goes live. It runs 24/7 in the cloud — no computer needs to stay on."
-              delay={0.3}
-            />
-          </div>
-
-          {/* Interactive deployment walkthrough */}
-          <div className="mt-14 sm:mt-16">
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-center text-xs text-[#71717a] mb-6 uppercase tracking-widest"
-            >
-              See it in action
-            </motion.p>
-            <DeploymentWalkthrough />
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="text-center mt-12"
-          >
-            <Link
-              href="/create"
-              className="inline-flex items-center gap-2 bg-white/[0.06] border border-white/[0.1] text-white font-medium px-6 py-3 rounded-full text-sm hover:bg-white/[0.1] hover:border-white/20 transition-all duration-200"
-            >
-              Try it now — it&apos;s free
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </motion.div>
-        </div>
-      </Section>
-
       {/* ── FEATURES GRID ────────────────────────────── */}
       <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]">
         <div className="max-w-5xl mx-auto">
@@ -937,20 +945,6 @@ export default function LandingPage() {
               ))}
             </motion.div>
           </div>
-        </div>
-      </Section>
-
-      {/* ── INTERACTIVE DEMO ────────────────────────────── */}
-      <Section className="py-16 sm:py-24 md:py-32 px-4 sm:px-6 border-t border-white/[0.06]">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#71717a] mb-4">Try it now</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Chat with a live agent</h2>
-            <p className="text-[#a1a1aa] max-w-lg mx-auto">
-              This is a real Hatcher agent running on our platform. Ask it anything — no signup required.
-            </p>
-          </div>
-          <DemoChat />
         </div>
       </Section>
 
