@@ -176,6 +176,20 @@ export const api = {
       body: JSON.stringify({ email, password }),
     }),
 
+  /** Request password reset email */
+  forgotPassword: (email: string) =>
+    req<{ message: string }>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }),
+
+  /** Reset password with token */
+  resetPassword: (token: string, password: string) =>
+    req<{ message: string }>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, password }),
+    }),
+
   /** Get a sign challenge for wallet linking */
   challenge: (walletAddress: string) =>
     req<{ message: string; nonce: string }>('/auth/challenge', {
