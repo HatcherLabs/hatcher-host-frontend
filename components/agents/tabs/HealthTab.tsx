@@ -19,7 +19,8 @@ import { useAgentContext } from '../AgentContext';
 interface MonitoringData {
   health: 'healthy' | 'unhealthy' | 'stopped';
   uptime: { seconds: number; since: string | null };
-  resources: { cpuPercent: number; memoryMb: number; memoryLimitMb: number };
+  restarts: number;
+  resources: { cpuPercent: number; memoryUsageMb: number; memoryLimitMb: number };
   responseTimes: { avg: number; p95: number; last: number };
   errors: { last24h: number; lastError: string | null };
   history: Array<{ ts: number; cpu: number; mem: number }>;
@@ -110,8 +111,13 @@ export function HealthTab() {
     if (!agent?.id) return;
     try {
       const res = await api.getAgentMonitoring(agent.id);
-      setData(res);
-      setError(null);
+      if ('success' in res && !res.success) {
+        setError((res as { error: string }).error);
+      } else {
+        const monData = 'data' in res ? res.data : res;
+        setData(monData as MonitoringData);
+        setError(null);
+      }
     } catch (e: any) {
       setError(e.message || 'Failed to load health data');
     } finally {
@@ -163,7 +169,7 @@ export function HealthTab() {
 
   const style = HEALTH_STYLES[data.health] || HEALTH_STYLES.stopped;
   const memPercent = data.resources.memoryLimitMb > 0
-    ? ((data.resources.memoryMb / data.resources.memoryLimitMb) * 100).toFixed(0)
+    ? ((data.resources.memoryUsageMb / data.resources.memoryLimitMb) * 100).toFixed(0)
     : '0';
 
   return (
@@ -215,7 +221,7 @@ export function HealthTab() {
         <StatCard
           icon={<MemoryStick size={16} />}
           label="Memory"
-          value={`${data.resources.memoryMb.toFixed(0)} MB`}
+          value={`${data.resources.memoryUsageMb.toFixed(0)} MB`}
           sub={`${memPercent}% of ${data.resources.memoryLimitMb} MB`}
           color="text-amber-400"
         />
