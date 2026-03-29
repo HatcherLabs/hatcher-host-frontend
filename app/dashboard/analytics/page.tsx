@@ -48,10 +48,10 @@ function formatNumber(n: number): string {
 }
 
 const FRAMEWORK_COLORS: Record<string, string> = {
-  openclaw: '#8b5cf6',
-  hermes: '#06b6d4',
-  elizaos: '#f59e0b',
-  milady: '#ec4899',
+  openclaw: '#f59e0b',
+  hermes: '#a855f7',
+  elizaos: '#06b6d4',
+  milady: '#f43f5e',
 };
 
 const STATUS_COLORS: Record<string, string> = {

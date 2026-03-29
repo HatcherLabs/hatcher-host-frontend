@@ -18,7 +18,6 @@ import {
   Clock,
   CreditCard,
   Crown,
-  DollarSign,
   Loader2,
   Plus,
   Receipt,
@@ -142,7 +141,7 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
               </div>
               <div className="text-left">
                 <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with SOL</p>
-                <p className="text-[11px] text-[var(--text-muted)]">Solana wallet payment (mock enabled)</p>
+                <p className="text-[11px] text-[var(--text-muted)]">Solana wallet payment</p>
               </div>
               {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
             </button>
@@ -287,7 +286,7 @@ export default function BillingPage() {
     });
   };
 
-  /* ── Subscribe to a tier (SOL / mock payment) ──────────── */
+  /* ── Subscribe to a tier (SOL payment) ────────────────── */
   const handleSubscribeSOL = async () => {
     const tierKey = paymentModal.tierKey;
     if (!tierKey) return;
@@ -335,7 +334,7 @@ export default function BillingPage() {
     }
   };
 
-  /* ── Purchase add-on (SOL / mock payment) ──────────────── */
+  /* ── Purchase add-on (SOL payment) ────────────────────── */
   const handlePurchaseAddonSOL = async () => {
     const addonKey = paymentModal.addonKey;
     if (!addonKey) return;

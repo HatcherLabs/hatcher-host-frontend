@@ -24,7 +24,6 @@ import {
   Loader2,
   Gift,
   Users,
-  ExternalLink,
   Lock,
   Save,
   ArrowRight,

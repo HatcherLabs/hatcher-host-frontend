@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { Metadata } from 'next';
 import {
   CHANGELOG_ENTRIES,
   CHANGELOG_CATEGORIES,
