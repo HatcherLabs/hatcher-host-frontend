@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { motion, useInView, useMotionValue, useTransform, animate, AnimatePresence } from 'framer-motion';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
@@ -319,16 +318,11 @@ function LiveActivityTicker() {
 // ██  LANDING PAGE
 // ═══════════════════════════════════════════════════════════════
 export default function LandingPage() {
-  const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isLoading: authLoading } = useAuth();
   const [showSplash, setShowSplash] = useState(false);
 
-  // Redirect logged-in users to their dashboard
-  useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      router.replace('/dashboard/agents');
-    }
-  }, [isAuthenticated, authLoading, router]);
+  // No auto-redirect — logged-in users can still see the landing page
+  // They can navigate to dashboard via the navbar
 
   useEffect(() => {
     if (!sessionStorage.getItem('hatcher_splash_seen')) {
@@ -348,8 +342,8 @@ export default function LandingPage() {
     }).catch(() => {});
   }, []);
 
-  // While auth is resolving, render nothing to avoid flash of landing for authed users
-  if (authLoading || isAuthenticated) {
+  // While auth is resolving, render nothing to avoid flash
+  if (authLoading) {
     return <div className="min-h-screen bg-[var(--bg-base)]" />;
   }
 
