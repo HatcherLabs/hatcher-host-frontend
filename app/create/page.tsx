@@ -484,6 +484,61 @@ export default function CreatePage() {
           </div>
         </motion.div>
 
+        {/* ── QUICK START — Featured Templates ─────────────────── */}
+        {step === 1 && (
+          <motion.div
+            className="mb-10"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.15 }}
+          >
+            <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider text-center mb-4">Quick Start — Popular Templates</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto">
+              {[
+                { id: 'community-manager', framework: 'openclaw' as const, badge: 'OpenClaw' },
+                { id: 'crypto-analyst', framework: 'openclaw' as const, badge: 'OpenClaw' },
+                { id: 'personal-assistant', framework: 'hermes' as const, badge: 'Hermes' },
+                { id: 'knowledge-base', framework: 'openclaw' as const, badge: 'OpenClaw' },
+              ].map((feat) => {
+                const tpl = AGENT_TEMPLATES.find((t) => t.id === feat.id);
+                if (!tpl) return null;
+                return (
+                  <motion.button
+                    key={feat.id}
+                    whileHover={{ scale: 1.03, y: -2 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => {
+                      setSelectedFramework(feat.framework);
+                      setSelectedTemplate(feat.id);
+                      // Pre-fill form from template
+                      setOpenclawForm((prev) => ({
+                        ...prev,
+                        name: prev.name.trim() ? prev.name : tpl.name,
+                        description: prev.description.trim() ? prev.description : tpl.description,
+                      }));
+                      setStep(3);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="group p-4 rounded-xl border border-[rgba(46,43,74,0.4)] bg-[rgba(26,23,48,0.6)] hover:border-[#06b6d4]/40 hover:shadow-[0_0_20px_rgba(6,182,212,0.08)] text-left transition-all duration-200 cursor-pointer"
+                  >
+                    <div className="text-2xl mb-2">{tpl.icon}</div>
+                    <div className="text-sm font-semibold text-[var(--text-primary)] mb-1 truncate">{tpl.name}</div>
+                    <div className="text-[10px] text-[#71717a] mb-2 line-clamp-2 leading-relaxed">{tpl.description}</div>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#06b6d4]/10 text-[#06b6d4] border border-[#06b6d4]/20 font-medium">
+                      {feat.badge}
+                    </span>
+                  </motion.button>
+                );
+              })}
+            </div>
+            <div className="text-center mt-3">
+              <a href="/dashboard/templates" className="text-xs text-[#06b6d4] hover:underline">
+                Browse all templates →
+              </a>
+            </div>
+          </motion.div>
+        )}
+
         {/* ── STEP INDICATOR ─────────────────────────────────────── */}
         <div className="mb-12">
           {/* Progress bar */}
