@@ -495,10 +495,10 @@ export default function CreatePage() {
             <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider text-center mb-4">Quick Start — Popular Templates</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto">
               {[
-                { id: 'community-manager', framework: 'openclaw' as const, badge: 'OpenClaw' },
-                { id: 'crypto-analyst', framework: 'openclaw' as const, badge: 'OpenClaw' },
-                { id: 'personal-assistant', framework: 'hermes' as const, badge: 'Hermes' },
-                { id: 'knowledge-base', framework: 'openclaw' as const, badge: 'OpenClaw' },
+                { id: 'dev-assistant', framework: 'openclaw' as const, badge: 'OpenClaw' },
+                { id: 'hermes-crypto-analyst', framework: 'hermes' as const, badge: 'Hermes' },
+                { id: 'research-assistant', framework: 'openclaw' as const, badge: 'OpenClaw' },
+                { id: 'customer-support', framework: 'openclaw' as const, badge: 'OpenClaw' },
               ].map((feat) => {
                 const tpl = AGENT_TEMPLATES.find((t) => t.id === feat.id);
                 if (!tpl) return null;
