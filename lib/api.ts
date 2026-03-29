@@ -193,6 +193,14 @@ export const api = {
       body: JSON.stringify({ token, password }),
     }),
 
+  /** Verify email with token from link */
+  verifyEmail: (token: string) =>
+    req<{ message: string }>(`/auth/verify-email?token=${encodeURIComponent(token)}`),
+
+  /** Resend email verification link */
+  resendVerification: () =>
+    req<{ message: string }>('/auth/resend-verification', { method: 'POST' }),
+
   /** Get a sign challenge for wallet linking */
   challenge: (walletAddress: string) =>
     req<{ message: string; nonce: string }>('/auth/challenge', {

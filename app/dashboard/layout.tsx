@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { EmailVerificationBanner } from '@/components/ui/EmailVerificationBanner';
 
 export const metadata: Metadata = {
   title: 'Dashboard',
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <ErrorBoundary>
+      <EmailVerificationBanner />
       {children}
     </ErrorBoundary>
   );
