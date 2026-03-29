@@ -501,15 +501,24 @@ export const api = {
       status: string;
     }>(`/agents/${id}/stats`),
 
-  /** Get agent analytics (message activity over last 7 days) */
-  getAgentAnalytics: (id: string) =>
+  /** Get agent analytics (message activity + token usage) */
+  getAgentAnalytics: (id: string, range: '7d' | '30d' | '90d' = '7d') =>
     req<{
-      messagesPerDay: Array<{ date: string; count: number }>;
+      range: string;
+      rangeDays: number;
+      messagesPerDay: Array<{ date: string; count: number; inputTokens: number; outputTokens: number; usdCost: number }>;
       totalMessages: number;
       avgPerDay: number;
       peakDay: string | null;
       framework: string;
-    }>(`/agents/${id}/analytics`),
+      tokens: {
+        inputTokens: number;
+        outputTokens: number;
+        totalTokens: number;
+        totalCost: number;
+        hasByok: boolean;
+      };
+    }>(`/agents/${id}/analytics?range=${range}`),
 
   /** Get account-level analytics across all agents */
   getAccountAnalytics: () =>
@@ -1078,6 +1087,10 @@ export const api = {
     req<{ agentId: string; name: string }>(`/marketplace/templates/${templateId}/clone`, {
       method: 'POST',
     }),
+
+  /** Clone an existing agent (own or public) — creates a "(Copy)" with all config preserved */
+  cloneAgent: (agentId: string) =>
+    req<Agent>(`/agents/${agentId}/clone`, { method: 'POST' }),
 
   /** Delete a marketplace template (owner only) */
   deleteMarketplaceTemplate: (id: string) =>
