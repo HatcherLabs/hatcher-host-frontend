@@ -8,7 +8,6 @@ import { useConnection } from '@solana/wallet-adapter-react';
 import { api, getToken } from '@/lib/api';
 import type { Agent, AgentFeature } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { getInitials, stringToColor } from '@/lib/utils';
 import { FRAMEWORKS, TIERS, getBYOKProvider } from '@hatcher/shared';
 import type { UserTierKey } from '@hatcher/shared';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,7 +18,6 @@ import {
   Square,
   RotateCcw,
   Trash2,
-  Settings,
   Copy,
 } from 'lucide-react';
 import {
@@ -766,8 +764,6 @@ export default function AgentManagePage() {
 
   // ─── Derived values (must be before early returns to respect Rules of Hooks) ──
 
-  const gradient = agent ? stringToColor(agent.id) : '';
-  const initials = agent ? getInitials(agent.name) : '';
   const statusInfo = agent ? (STATUS_STYLES[agent.status] ?? STATUS_STYLES.paused) : STATUS_STYLES.paused;
   const frameworkMeta = agent ? FRAMEWORKS[agent.framework] : undefined;
   const isActive = agent?.status === 'active';
@@ -916,59 +912,6 @@ export default function AgentManagePage() {
         <div className="flex-1 min-w-0 flex flex-col">
           {/* Top action bar */}
           <div className="px-4 sm:px-6 py-3 border-b border-[rgba(46,43,74,0.3)] flex items-center gap-3 flex-wrap">
-            {/* Avatar with upload */}
-            <div className="relative group flex-shrink-0 hidden sm:block">
-              {agent.avatarUrl ? (
-                <img
-                  src={agent.avatarUrl}
-                  alt={agent.name}
-                  className="w-7 h-7 rounded-full object-cover border border-[rgba(46,43,74,0.3)]"
-                />
-              ) : (
-                <div
-                  className={`w-7 h-7 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-bold text-[10px] border border-[rgba(46,43,74,0.3)]`}
-                >
-                  {initials}
-                </div>
-              )}
-              <label
-                htmlFor="avatar-upload"
-                className="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                title="Change avatar"
-              >
-                <Settings size={10} className="text-white" />
-              </label>
-              <input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (!file || file.size > 2 * 1024 * 1024) {
-                    setSaveMsg(file ? 'Error: Avatar must be under 2MB' : null);
-                    return;
-                  }
-                  const reader = new FileReader();
-                  reader.onload = async () => {
-                    const dataUrl = reader.result as string;
-                    const res = await api.updateAgent(id, { avatarUrl: dataUrl } as Parameters<typeof api.updateAgent>[1]);
-                    if (res.success) {
-                      setAgent(res.data);
-                      setSaveMsg('Avatar updated');
-                      setTimeout(() => setSaveMsg(null), 3000);
-                    } else {
-                      setSaveMsg('Error: ' + res.error);
-                    }
-                  };
-                  reader.readAsDataURL(file);
-                }}
-              />
-            </div>
-
-            {/* Agent name */}
-            <h1 className="text-sm font-semibold text-[#FFFFFF] truncate max-w-[160px] sm:max-w-xs">{agent.name}</h1>
-
             {/* Status badge */}
             <span className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border flex-shrink-0 ${statusInfo.classes}`}>
               {statusInfo.pulse && (

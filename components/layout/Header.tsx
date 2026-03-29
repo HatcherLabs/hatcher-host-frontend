@@ -13,9 +13,6 @@ import {
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
-import { hasRecentChangelog } from '@/lib/changelog';
-
-const CHANGELOG_IS_NEW = hasRecentChangelog(14);
 
 // ── Nav links when logged IN ──
 const AUTH_NAV_LINKS = [
@@ -28,7 +25,6 @@ const AUTH_NAV_LINKS = [
 // ── Auxiliary links (visible in both states, after a divider) ──
 const AUX_LINKS = [
   { href: '/pricing',   label: 'Pricing',   external: false, badge: null },
-  { href: '/changelog', label: 'Changelog', external: false, badge: CHANGELOG_IS_NEW ? 'New' : null },
   { href: DOCS_URL,     label: 'Docs',      external: true,  badge: null },
 ];
 
@@ -46,13 +42,11 @@ const MOBILE_AUTH_LINKS = [
   { href: '/explore',             label: 'Explore' },
   { href: '/create',              label: 'Create' },
   { href: '/pricing',             label: 'Pricing' },
-  { href: '/changelog',           label: 'Changelog' },
 ];
 
 // ── Mobile links (when logged out) ──
 const MOBILE_GUEST_LINKS = [
   { href: '/pricing',   label: 'Pricing' },
-  { href: '/changelog', label: 'Changelog' },
 ];
 
 function isActive(pathname: string, href: string) {

@@ -38,6 +38,29 @@ declare global {
 
 const LS_AUTO_SPEAK_KEY = 'hatcher-voice-auto-speak';
 
+// Shared voice-readiness promise — resolves once voices are loaded
+let voicesReady: Promise<SpeechSynthesisVoice[]> | null = null;
+
+function getVoicesReady(): Promise<SpeechSynthesisVoice[]> {
+  if (voicesReady) return voicesReady;
+  voicesReady = new Promise((resolve) => {
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+      resolve(voices);
+      return;
+    }
+    // Chrome loads voices async
+    const handler = () => {
+      window.speechSynthesis.removeEventListener('voiceschanged', handler);
+      resolve(window.speechSynthesis.getVoices());
+    };
+    window.speechSynthesis.addEventListener('voiceschanged', handler);
+    // Safety fallback — some browsers never fire voiceschanged
+    setTimeout(() => resolve(window.speechSynthesis.getVoices()), 500);
+  });
+  return voicesReady;
+}
+
 export function useVoice() {
   // STT state
   const [isListening, setIsListening] = useState(false);
@@ -53,12 +76,18 @@ export function useVoice() {
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onFinalResultRef = useRef<((text: string) => void) | null>(null);
+  const resumeTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Check browser support on mount
+  // Check browser support on mount + warm up voices
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     setSttSupported(!!SpeechRecognition);
-    setTtsSupported(typeof window !== 'undefined' && 'speechSynthesis' in window);
+
+    const hasTTS = 'speechSynthesis' in window;
+    setTtsSupported(hasTTS);
+
+    // Warm up: trigger voice loading early
+    if (hasTTS) getVoicesReady();
 
     // Restore autoSpeak preference
     try {
@@ -67,13 +96,11 @@ export function useVoice() {
     } catch { /* localStorage unavailable */ }
 
     return () => {
-      // Cleanup on unmount
       if (recognitionRef.current) {
         try { recognitionRef.current.abort(); } catch { /* ignore */ }
       }
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      if (hasTTS) window.speechSynthesis.cancel();
+      if (resumeTimerRef.current) clearInterval(resumeTimerRef.current);
     };
   }, []);
 
@@ -81,10 +108,8 @@ export function useVoice() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return;
 
-    // Store callback
     onFinalResultRef.current = onFinalResult ?? null;
 
-    // Abort any existing session
     if (recognitionRef.current) {
       try { recognitionRef.current.abort(); } catch { /* ignore */ }
     }
@@ -94,9 +119,7 @@ export function useVoice() {
     recognition.interimResults = true;
     recognition.lang = 'en-US';
 
-    recognition.onstart = () => {
-      setIsListening(true);
-    };
+    recognition.onstart = () => setIsListening(true);
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let interimTranscript = '';
@@ -113,25 +136,20 @@ export function useVoice() {
 
       if (finalTranscript) {
         setTranscript(finalTranscript.trim());
-        // Reset silence timer for auto-send
         if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
         silenceTimerRef.current = setTimeout(() => {
-          // Auto-send after 1.5s of silence following final result
           if (onFinalResultRef.current) {
             onFinalResultRef.current(finalTranscript.trim());
           }
-          // Stop listening after auto-send
           try { recognition.stop(); } catch { /* ignore */ }
         }, 1500);
       } else if (interimTranscript) {
         setTranscript(interimTranscript);
-        // Reset silence timer if still getting interim results
         if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
       }
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      // 'no-speech' and 'aborted' are non-critical
       if (event.error !== 'no-speech' && event.error !== 'aborted') {
         console.warn('SpeechRecognition error:', event.error);
       }
@@ -166,11 +184,15 @@ export function useVoice() {
     setIsListening(false);
   }, []);
 
-  const speak = useCallback((text: string) => {
+  const speak = useCallback(async (text: string) => {
     if (!('speechSynthesis' in window)) return;
 
     // Cancel any ongoing speech
     window.speechSynthesis.cancel();
+    if (resumeTimerRef.current) {
+      clearInterval(resumeTimerRef.current);
+      resumeTimerRef.current = null;
+    }
 
     // Strip markdown-like formatting for cleaner speech
     const cleanText = text
@@ -185,62 +207,64 @@ export function useVoice() {
 
     if (!cleanText) return;
 
-    const doSpeak = () => {
-      const utterance = new SpeechSynthesisUtterance(cleanText);
-      utterance.lang = 'en-US';
-      utterance.rate = 1;
-      utterance.pitch = 1;
+    // Wait for voices to be ready
+    const voices = await getVoicesReady();
 
-      // Pick a voice explicitly — Chrome sometimes has no default
-      const voices = window.speechSynthesis.getVoices();
-      const preferred = voices.find(v => v.lang.startsWith('en') && v.default)
-        || voices.find(v => v.lang.startsWith('en'))
-        || voices[0];
-      if (preferred) utterance.voice = preferred;
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = 'en-US';
+    utterance.rate = 1;
+    utterance.pitch = 1;
 
-      utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => {
-        setIsSpeaking(false);
-        if (resumeTimer) clearInterval(resumeTimer);
-      };
-      utterance.onerror = () => {
-        setIsSpeaking(false);
-        if (resumeTimer) clearInterval(resumeTimer);
-      };
+    // Pick a voice explicitly — Chrome sometimes has no default
+    const preferred = voices.find(v => v.lang.startsWith('en') && v.default)
+      || voices.find(v => v.lang.startsWith('en'))
+      || voices[0];
+    if (preferred) utterance.voice = preferred;
 
-      window.speechSynthesis.speak(utterance);
-
-      // Chrome bug: speechSynthesis pauses after ~15s. Keep it alive.
-      const resumeTimer = setInterval(() => {
-        if (!window.speechSynthesis.speaking) {
-          clearInterval(resumeTimer);
-        } else {
-          window.speechSynthesis.pause();
-          window.speechSynthesis.resume();
-        }
-      }, 10000);
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      if (resumeTimerRef.current) {
+        clearInterval(resumeTimerRef.current);
+        resumeTimerRef.current = null;
+      }
+    };
+    utterance.onerror = (e) => {
+      // 'interrupted' fires when we cancel — not a real error
+      if (e.error !== 'interrupted') {
+        console.warn('SpeechSynthesis error:', e.error);
+      }
+      setIsSpeaking(false);
+      if (resumeTimerRef.current) {
+        clearInterval(resumeTimerRef.current);
+        resumeTimerRef.current = null;
+      }
     };
 
-    // Voices may not be loaded yet (Chrome async loading)
-    const voices = window.speechSynthesis.getVoices();
-    if (voices.length > 0) {
-      doSpeak();
-    } else {
-      // Wait for voices to load
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.onvoiceschanged = null;
-        doSpeak();
-      };
-      // Fallback if onvoiceschanged never fires (some browsers)
-      setTimeout(() => {
-        if (!window.speechSynthesis.speaking) doSpeak();
-      }, 300);
-    }
+    window.speechSynthesis.speak(utterance);
+
+    // Chrome bug workaround: speech pauses after ~15s.
+    // Periodic pause/resume keeps it alive.
+    resumeTimerRef.current = setInterval(() => {
+      if (!window.speechSynthesis.speaking) {
+        if (resumeTimerRef.current) {
+          clearInterval(resumeTimerRef.current);
+          resumeTimerRef.current = null;
+        }
+      } else {
+        window.speechSynthesis.pause();
+        window.speechSynthesis.resume();
+      }
+    }, 10000);
   }, []);
 
   const stopSpeaking = useCallback(() => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
+    }
+    if (resumeTimerRef.current) {
+      clearInterval(resumeTimerRef.current);
+      resumeTimerRef.current = null;
     }
     setIsSpeaking(false);
   }, []);
