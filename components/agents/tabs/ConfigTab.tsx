@@ -85,30 +85,21 @@ export function ConfigTab() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importMsg, setImportMsg] = useState<string | null>(null);
 
-  function handleExport() {
-    const config: Record<string, unknown> = {
-      name: configName,
-      description: configDesc,
-      framework: agent?.framework,
-      systemPrompt: configSystemPrompt,
-      model: configModel,
-      provider: configProvider,
-      skills: configSkills?.split(',').map(s => s.trim()).filter(Boolean),
-    };
-    if (agent?.framework === 'elizaos') {
-      config.bio = configBio;
-      config.lore = configLore;
-      config.topics = configTopics?.split(',').map(s => s.trim()).filter(Boolean);
-      config.adjectives = ctx.configAdjectives?.split(',').map((s: string) => s.trim()).filter(Boolean);
-      config.style = configStyle;
+  async function handleExport() {
+    if (!agent?.id) return;
+    try {
+      const result = await api.exportAgent(agent.id);
+      const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${result.name || configName || 'agent'}-config.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setImportMsg('Error: Failed to export config');
+      setTimeout(() => setImportMsg(null), 3000);
     }
-    const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${configName || 'agent'}-config.json`;
-    a.click();
-    URL.revokeObjectURL(url);
   }
 
   function handleImport(e: React.ChangeEvent<HTMLInputElement>) {

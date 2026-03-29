@@ -1104,6 +1104,10 @@ export const api = {
   cloneAgent: (agentId: string) =>
     req<Agent>(`/agents/${agentId}/clone`, { method: 'POST' }),
 
+  /** Export agent config as sanitized JSON (no secrets) */
+  exportAgent: (agentId: string) =>
+    req<{ exportVersion: number; exportedAt: string; name: string; description?: string; framework: string; template: string; config: Record<string, unknown> }>(`/agents/${agentId}/export`),
+
   /** Delete a marketplace template (owner only) */
   deleteMarketplaceTemplate: (id: string) =>
     req<{ deleted: boolean; id: string }>(`/marketplace/templates/${id}`, {
