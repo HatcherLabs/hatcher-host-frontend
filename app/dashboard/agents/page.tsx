@@ -307,10 +307,16 @@ export default function MyAgentsPage() {
                 : `${agents.length} agent${agents.length !== 1 ? 's' : ''} total, ${activeCount} active`}
             </p>
           </div>
-          <Link href="/create" className="btn-primary text-sm">
-            <PlusCircle size={16} />
-            Create Agent
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard/templates" className="btn-ghost text-sm">
+              <Layers size={15} />
+              Templates
+            </Link>
+            <Link href="/create" className="btn-primary text-sm">
+              <PlusCircle size={16} />
+              Create Agent
+            </Link>
+          </div>
         </motion.div>
 
         {/* ── Stat Cards ──────────────────────────────────── */}

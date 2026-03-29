@@ -21,6 +21,7 @@ const CHANGELOG_IS_NEW = hasRecentChangelog(14);
 const AUTH_NAV_LINKS = [
   { href: '/dashboard/agents',    label: 'My Agents' },
   { href: '/dashboard/analytics', label: 'Analytics' },
+  { href: '/dashboard/templates', label: 'Templates' },
   { href: '/explore',             label: 'Explore' },
   { href: '/create',              label: 'Create' },
 ];
@@ -43,6 +44,7 @@ const USER_EXTRA_LINKS = [
 const MOBILE_AUTH_LINKS = [
   { href: '/dashboard/agents',    label: 'My Agents' },
   { href: '/dashboard/analytics', label: 'Analytics' },
+  { href: '/dashboard/templates', label: 'Templates' },
   { href: '/explore',             label: 'Explore' },
   { href: '/create',              label: 'Create' },
   { href: '/pricing',             label: 'Pricing' },
