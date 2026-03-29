@@ -901,19 +901,19 @@ export default function AgentManagePage() {
   return (
     <AgentContext.Provider value={contextValue}>
       <motion.div
-        className="flex"
+        className="flex flex-col lg:flex-row"
         style={{ minHeight: 'calc(100vh - 64px)' }}
         variants={pageEntranceVariants}
         initial="hidden"
         animate="visible"
       >
-        {/* ─── Sidebar ──────────────────────────────────────── */}
+        {/* ─── Sidebar (desktop) / Horizontal tabs (mobile) ── */}
         <AgentSidebar agent={agent} activeTab={tab} onTabChange={setTab} />
 
         {/* ─── Main Content ─────────────────────────────────── */}
         <div className="flex-1 min-w-0 flex flex-col">
           {/* Top action bar */}
-          <div className="pl-14 pr-4 sm:px-6 py-3 border-b border-[rgba(46,43,74,0.3)] flex items-center gap-3 flex-wrap lg:pl-6">
+          <div className="px-4 sm:px-6 py-3 border-b border-[rgba(46,43,74,0.3)] flex items-center gap-3 flex-wrap">
             {/* Avatar with upload */}
             <div className="relative group flex-shrink-0 hidden sm:block">
               {agent.avatarUrl ? (

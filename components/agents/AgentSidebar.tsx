@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   MessageSquare,
@@ -177,52 +177,51 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
     </nav>
   );
 
+  // Mobile horizontal tab strip — scroll active tab into view
+  const mobileTabsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!mobileTabsRef.current) return;
+    const activeEl = mobileTabsRef.current.querySelector('[data-active="true"]');
+    if (activeEl) {
+      activeEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, [activeTab]);
+
   return (
     <>
-      {/* Mobile toggle button */}
-      <button
-        onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-[68px] left-3 z-40 w-11 h-11 flex items-center justify-center rounded-lg border border-[rgba(46,43,74,0.4)] bg-[#0a0a12]/90 backdrop-blur-sm text-[#A5A1C2] hover:text-white transition-colors cursor-pointer"
-        aria-label="Open navigation"
-      >
-        <Menu size={20} />
-      </button>
+      {/* Mobile horizontal scrolling tabs — replaces hamburger on small screens */}
+      <div className="lg:hidden sticky top-0 z-40 border-b border-[rgba(46,43,74,0.4)] bg-[#0a0a12]/95 backdrop-blur-md">
+        <div
+          ref={mobileTabsRef}
+          className="flex overflow-x-auto scrollbar-hide gap-0.5 px-2 py-1.5"
+          style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory' }}
+        >
+          {tabs.map((t) => {
+            const isActive = activeTab === t.id;
+            return (
+              <button
+                key={t.id}
+                data-active={isActive}
+                onClick={() => onTabChange(t.id)}
+                className={`flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-lg text-[10px] font-medium whitespace-nowrap flex-shrink-0 transition-all cursor-pointer ${
+                  isActive
+                    ? 'text-[#06b6d4] bg-[#06b6d4]/10'
+                    : 'text-[#71717a] hover:text-[#A5A1C2] hover:bg-white/[0.03]'
+                }`}
+                style={{ scrollSnapAlign: 'center' }}
+              >
+                <span className={isActive ? 'text-[#06b6d4]' : ''}>{t.icon}</span>
+                <span>{t.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex flex-col w-56 xl:w-60 flex-shrink-0 border-r border-[rgba(46,43,74,0.3)] bg-[#0a0a12]/50 min-h-screen sticky top-0 max-h-screen overflow-hidden">
         {navContent}
       </aside>
-
-      {/* Mobile overlay sidebar */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-              onClick={() => setMobileOpen(false)}
-            />
-            <motion.aside
-              initial={{ x: -280 }}
-              animate={{ x: 0 }}
-              exit={{ x: -280 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="lg:hidden fixed top-0 left-0 bottom-0 z-50 w-[280px] bg-[#0a0a12] border-r border-[rgba(46,43,74,0.3)] flex flex-col"
-            >
-              <button
-                onClick={() => setMobileOpen(false)}
-                className="absolute top-4 right-4 p-1.5 rounded-lg text-[#71717a] hover:text-white transition-colors"
-                aria-label="Close navigation"
-              >
-                <X size={18} />
-              </button>
-              {navContent}
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
     </>
   );
 }
