@@ -482,6 +482,7 @@ export interface AgentContextValue {
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
   sendMessage: (overrideText?: string) => Promise<void>;
   handleKeyDown: (e: React.KeyboardEvent) => void;
+  sendCooldown: boolean;
 
   // Config
   configName: string;

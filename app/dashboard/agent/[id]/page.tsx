@@ -167,6 +167,8 @@ export default function AgentManagePage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
+  const [sendCooldown, setSendCooldown] = useState(false);
+  const sendCooldownRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [chatError, setChatError] = useState<string | null>(null);
   const [chatErrorType, setChatErrorType] = useState<'timeout' | 'ratelimit' | 'network' | 'generic' | null>(null);
   const [msgCount, setMsgCount] = useState(0);
@@ -212,7 +214,7 @@ export default function AgentManagePage() {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
       lastSavedCountRef.current = complete.length;
-      api.saveChatHistory(id, complete.map(m => ({ role: m.role, content: m.content }))).catch(() => {});
+      api.saveChatHistory(id, complete.map(m => ({ role: m.role, content: m.content, ts: m.timestamp?.getTime() }))).catch(() => {});
     }, 2000);
   }, [messages, id]);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -716,15 +718,21 @@ export default function AgentManagePage() {
 
   const sendMessage = async (overrideText?: string) => {
     const text = (overrideText ?? input).trim();
-    if (!text || sending) return;
+    if (!text || sending || sendCooldown) return;
     if (!hasUnlimitedChat && msgCount >= msgLimit) {
       setChatErrorType('ratelimit');
-      setChatError('Daily message limit reached. Unlock more features with tokens.');
+      setChatError('Daily message limit reached. Upgrade to Pro for more, or bring your own key for unlimited.');
+      toast.warning('Daily limit reached. Upgrade to Pro or bring your own API key for unlimited.');
       return;
     }
     setInput('');
     setChatError(null);
     setChatErrorType(null);
+
+    // 2-second send cooldown to prevent rapid-fire
+    setSendCooldown(true);
+    if (sendCooldownRef.current) clearTimeout(sendCooldownRef.current);
+    sendCooldownRef.current = setTimeout(() => setSendCooldown(false), 2000);
     const userMsg: Message = { id: genId(), role: 'user', content: text, timestamp: new Date() };
     setMessages((prev) => [...prev, userMsg]);
     setSending(true);
@@ -765,7 +773,8 @@ export default function AgentManagePage() {
           const lower = errMsg.toLowerCase();
           if (lower.includes('429') || lower.includes('rate limit') || lower.includes('daily limit')) {
             setChatErrorType('ratelimit');
-            setChatError('Daily limit reached. Unlock more features with tokens.');
+            setChatError('Daily message limit reached. Upgrade to Pro for more, or bring your own key for unlimited.');
+            toast.warning('Daily limit reached. Upgrade to Pro or bring your own API key for unlimited.');
           } else if (lower.includes('timeout') || lower.includes('504') || lower.includes('502')) {
             setChatErrorType('timeout');
             setChatError('Agent had trouble thinking. Try again.');
@@ -846,7 +855,7 @@ export default function AgentManagePage() {
       messages, setMessages, input, setInput, sending,
       chatError, setChatError, chatErrorType, setChatErrorType,
       msgCount, hasUnlimitedChat, msgLimit, remaining, isLimitReached,
-      bottomRef, inputRef, sendMessage, handleKeyDown,
+      bottomRef, inputRef, sendMessage, handleKeyDown, sendCooldown,
       configName, setConfigName, configDesc, setConfigDesc,
       configBio, setConfigBio, configLore, setConfigLore,
       configTopics, setConfigTopics, configStyle, setConfigStyle,
@@ -876,7 +885,7 @@ export default function AgentManagePage() {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, agent, stats, tab, logs, logsLoading, logFilter, logSearch, autoScroll, filteredLogs,
-    messages, input, sending, chatError, chatErrorType, msgCount, msgLimit, remaining, isLimitReached,
+    messages, input, sending, sendCooldown, chatError, chatErrorType, msgCount, msgLimit, remaining, isLimitReached,
     configName, configDesc, configBio, configLore, configTopics, configStyle, configAdjectives,
     configSystemPrompt, configSkills, configModel, configProvider, customModelInput, useCustomModel,
     byokKeyInput, showByokKey, saving, saveMsg, integrationSecrets, expandedIntegrations,

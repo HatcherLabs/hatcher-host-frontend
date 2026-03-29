@@ -195,7 +195,7 @@ export function ChatTab() {
     llmProvider,
     messages, setMessages,
     input, setInput,
-    sending,
+    sending, sendCooldown,
     chatError, setChatError,
     chatErrorType, setChatErrorType,
     msgCount, msgLimit,
@@ -421,13 +421,14 @@ export function ChatTab() {
           <span className="flex-1">
             {chatErrorType === 'ratelimit' ? (
               <>
-                Daily limit reached.{' '}
-                <button
+                Daily message limit reached.{' '}
+                <a
                   className="underline hover:opacity-80 transition-opacity text-[#06b6d4]"
-                  onClick={() => setTab('integrations')}
+                  href="/dashboard/billing"
                 >
-                  Unlock features
-                </button>
+                  Upgrade to Pro
+                </a>
+                {' '}for more, or bring your own key for unlimited.
               </>
             ) : chatError}
           </span>
@@ -497,13 +498,14 @@ export function ChatTab() {
       ) : isLimitReached ? (
         <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-4 py-3 text-center">
           <p className="text-sm text-amber-400">
-            Daily limit reached.{' '}
+            Daily message limit reached.{' '}
             <a
               className="underline hover:opacity-80 transition-opacity text-[#06b6d4]"
               href="/dashboard/billing"
             >
-              Upgrade your tier
+              Upgrade to Pro
             </a>
+            {' '}for more, or bring your own key for unlimited.
           </p>
         </div>
       ) : (
@@ -522,7 +524,7 @@ export function ChatTab() {
                 el.style.height = 'auto';
                 el.style.height = el.scrollHeight + 'px';
               }}
-              disabled={sending}
+              disabled={sending || sendCooldown}
             />
 
             {/* Mic button */}
@@ -535,7 +537,7 @@ export function ChatTab() {
                     : 'bg-[rgba(46,43,74,0.4)] hover:bg-[rgba(46,43,74,0.6)] border border-transparent hover:border-[#71717a]/30'
                 }`}
                 title={voice.isListening ? 'Stop recording' : 'Start voice input'}
-                disabled={sending}
+                disabled={sending || sendCooldown}
               >
                 {voice.isListening ? (
                   <MicOff size={15} className="text-red-400" />
@@ -548,12 +550,12 @@ export function ChatTab() {
             {/* Send button */}
             <button
               className={`h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
-                input.trim() && !sending
+                input.trim() && !sending && !sendCooldown
                   ? 'bg-[#06b6d4] hover:bg-[#0891b2] shadow-[0_0_12px_rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]'
                   : 'bg-[#06b6d4]/30 opacity-50 cursor-not-allowed'
               }`}
               onClick={() => sendMessage()}
-              disabled={!input.trim() || sending}
+              disabled={!input.trim() || sending || sendCooldown}
             >
               {sending ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
