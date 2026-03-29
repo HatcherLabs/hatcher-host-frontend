@@ -1,7 +1,13 @@
 import { MetadataRoute } from 'next';
 import { BLOG_POSTS } from '@/lib/blog';
+import { API_URL } from '@/lib/config';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+interface ExploreAgent {
+  id: string;
+  updatedAt?: string;
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   const blogPostEntries: MetadataRoute.Sitemap = BLOG_POSTS.map((post) => ({
@@ -10,6 +16,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: 'monthly' as const,
     priority: 0.6,
   }));
+
+  // Fetch public agents for dynamic pages
+  let agentEntries: MetadataRoute.Sitemap = [];
+  try {
+    const res = await fetch(`${API_URL}/agents/explore`, { next: { revalidate: 3600 } });
+    if (res.ok) {
+      const json = (await res.json()) as { success: boolean; data?: { agents: ExploreAgent[] } };
+      if (json.success && json.data?.agents) {
+        agentEntries = json.data.agents.map((agent) => ({
+          url: `https://hatcher.host/agent/${agent.id}`,
+          lastModified: agent.updatedAt ? new Date(agent.updatedAt) : now,
+          changeFrequency: 'daily' as const,
+          priority: 0.5,
+        }));
+      }
+    }
+  } catch {
+    // Skip dynamic pages if API is unavailable
+  }
 
   return [
     { url: 'https://hatcher.host', lastModified: now, changeFrequency: 'daily', priority: 1.0 },
@@ -24,8 +49,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: 'https://hatcher.host/help', lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
     { url: 'https://hatcher.host/blog', lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
     { url: 'https://hatcher.host/changelog', lastModified: now, changeFrequency: 'weekly', priority: 0.6 },
+    { url: 'https://hatcher.host/frameworks', lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: 'https://hatcher.host/register', lastModified: now, changeFrequency: 'monthly', priority: 0.4 },
     { url: 'https://hatcher.host/login', lastModified: now, changeFrequency: 'monthly', priority: 0.3 },
     ...blogPostEntries,
+    ...agentEntries,
   ];
 }
