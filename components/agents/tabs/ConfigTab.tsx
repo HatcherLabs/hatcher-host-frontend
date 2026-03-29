@@ -89,11 +89,17 @@ export function ConfigTab() {
     if (!agent?.id) return;
     try {
       const result = await api.exportAgent(agent.id);
-      const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
+      if ('success' in result && !result.success) {
+        setImportMsg('Error: ' + (result as { error: string }).error);
+        setTimeout(() => setImportMsg(null), 3000);
+        return;
+      }
+      const data = 'data' in result ? result.data : result;
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${result.name || configName || 'agent'}-config.json`;
+      a.download = `${(data as Record<string, unknown>).name || configName || 'agent'}-config.json`;
       a.click();
       URL.revokeObjectURL(url);
     } catch {
