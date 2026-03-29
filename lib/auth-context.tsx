@@ -10,7 +10,6 @@ interface UserProfile {
   walletAddress: string | null;
   isAdmin: boolean;
   tier: string;
-  emailVerified: boolean;
 }
 
 interface AuthContextValue {
@@ -57,7 +56,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         walletAddress: res.data.user.walletAddress ?? null,
         isAdmin: res.data.user.isAdmin ?? false,
         tier: (res.data.user as any).tier ?? 'free',
-        emailVerified: (res.data.user as any).emailVerified ?? false,
       });
       setAuthed(true);
     } catch (e) {
@@ -84,7 +82,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         walletAddress: null,
         isAdmin: false,
         tier: 'free',
-        emailVerified: false,
       });
       setAuthed(true);
     } catch (e) {
@@ -116,7 +113,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             walletAddress: res.data.walletAddress ?? null,
             isAdmin: res.data.isAdmin ?? false,
             tier: (res.data as any).tier ?? 'free',
-            emailVerified: (res.data as any).emailVerified ?? false,
           });
         } else {
           clearToken();

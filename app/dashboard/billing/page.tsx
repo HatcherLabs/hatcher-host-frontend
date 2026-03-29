@@ -171,7 +171,8 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
 
 /* ── Account data shape from new API ─────────────────────── */
 interface AccountFeatures {
-  tier: typeof TIERS['free'];  // full tier config object
+  tier: string;  // tier key string (e.g. 'free', 'basic', 'pro')
+  tierConfig?: typeof TIERS['free'];  // full tier config object (optional)
   activeAddons: Array<{ key: AddonKey; name: string; expiresAt: string | null }>;
   agentLimit: number;
   agentCount: number;
@@ -516,8 +517,8 @@ export default function BillingPage() {
     );
   }
 
-  const tierConfig = accountData?.tier ?? TIERS.free;
-  const currentTier = (tierConfig.key ?? 'free') as UserTierKey;
+  const currentTier = (accountData?.tier ?? 'free') as UserTierKey;
+  const tierConfig = accountData?.tierConfig ?? TIERS[currentTier] ?? TIERS.free;
   const agentCount = accountData?.agentCount ?? 0;
   const agentLimit = accountData?.agentLimit ?? 1;
   const activeAddons = accountData?.activeAddons ?? [];

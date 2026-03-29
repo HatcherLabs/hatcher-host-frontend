@@ -14,12 +14,9 @@ export function getToken(): string | null {
 }
 export function setToken(token: string) {
   localStorage.setItem(TOKEN_KEY, token);
-  // Set a flag cookie so Next.js middleware can detect auth state
-  document.cookie = 'hatcher_auth=1; path=/; max-age=604800; SameSite=Lax';
 }
 export function clearToken() {
   localStorage.removeItem(TOKEN_KEY);
-  document.cookie = 'hatcher_auth=; path=/; max-age=0';
 }
 export function isAuthenticated(): boolean {
   return !!getToken();
@@ -192,14 +189,6 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ token, password }),
     }),
-
-  /** Verify email with token from link */
-  verifyEmail: (token: string) =>
-    req<{ message: string }>(`/auth/verify-email?token=${encodeURIComponent(token)}`),
-
-  /** Resend email verification link */
-  resendVerification: () =>
-    req<{ message: string }>('/auth/resend-verification', { method: 'POST' }),
 
   /** Get a sign challenge for wallet linking */
   challenge: (walletAddress: string) =>
