@@ -14,9 +14,12 @@ export function getToken(): string | null {
 }
 export function setToken(token: string) {
   localStorage.setItem(TOKEN_KEY, token);
+  // Set a flag cookie so Next.js middleware can detect auth state
+  document.cookie = 'hatcher_auth=1; path=/; max-age=604800; SameSite=Lax';
 }
 export function clearToken() {
   localStorage.removeItem(TOKEN_KEY);
+  document.cookie = 'hatcher_auth=; path=/; max-age=0';
 }
 export function isAuthenticated(): boolean {
   return !!getToken();
