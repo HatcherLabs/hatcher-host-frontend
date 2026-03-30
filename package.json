@@ -17,6 +17,7 @@
   "dependencies": {
     "@hatcher/shared": "github:HatcherLabs/hatcher-shared",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@sentry/nextjs": "^10.46.0",
     "@solana/wallet-adapter-base": "^0.9.25",
     "@solana/wallet-adapter-phantom": "^0.9.25",
     "@solana/wallet-adapter-react": "^0.15.38",

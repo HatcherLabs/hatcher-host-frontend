@@ -10,6 +10,7 @@ import { LayoutShell } from '@/components/layout/LayoutShell';
 import { ToastProvider } from '@/components/ui/ToastProvider';
 import { CommandPalette } from '@/components/ui/CommandPalette';
 import { PosthogProvider } from '@/components/providers/PosthogProvider';
+import { CookieConsent } from '@/components/ui/CookieConsent';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -206,6 +207,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </AuthProvider>
           </ThemeProvider>
         </PosthogProvider>
+        <CookieConsent />
       </body>
     </html>
   );

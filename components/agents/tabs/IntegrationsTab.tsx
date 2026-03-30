@@ -20,6 +20,8 @@ import {
   Zap,
   Clock,
   Shield,
+  Code2,
+  ExternalLink,
 } from 'lucide-react';
 import {
   useAgentContext,
@@ -849,6 +851,81 @@ function IntegrationCard({
   );
 }
 
+// ─── Embed Widget Section ───────────────────────────────────
+
+function EmbedWidgetSection({ slug }: { slug?: string }) {
+  const [copied, setCopied] = useState<string | null>(null);
+
+  if (!slug) return null;
+
+  const baseUrl = 'https://hatcher.host';
+  const scriptTag = `<script src="${baseUrl}/widget.js" data-agent="${slug}"></script>`;
+  const iframeTag = `<iframe src="${baseUrl}/embed/${slug}" width="400" height="600" style="border:none;border-radius:12px;" allow="microphone"></iframe>`;
+
+  const copy = (text: string, key: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(key);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  return (
+    <div>
+      <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[#71717a]">
+        Embed on Your Website
+        <span className="ml-2 text-violet-400 normal-case tracking-normal font-normal">Widget &amp; iframe</span>
+      </h3>
+      <GlassCard className="p-5 space-y-4">
+        <p className="text-xs text-[#A5A1C2] leading-relaxed">
+          Add a floating chat widget or embed the chat directly into any website. Your agent must be set to <span className="text-white font-medium">public</span> for the embed to work.
+        </p>
+
+        {/* Script tag (widget) */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Code2 size={14} className="text-violet-400" />
+            <span className="text-xs font-medium text-white">Chat Widget</span>
+            <span className="text-[10px] text-zinc-500">Floating button + popup</span>
+          </div>
+          <div className="relative group">
+            <pre className="bg-black/40 border border-white/[0.06] rounded-lg p-3 text-[11px] text-emerald-400 font-mono overflow-x-auto whitespace-pre-wrap break-all leading-relaxed">
+              {scriptTag}
+            </pre>
+            <button
+              onClick={() => copy(scriptTag, 'script')}
+              className="absolute top-2 right-2 p-1.5 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 transition-colors opacity-0 group-hover:opacity-100"
+            >
+              {copied === 'script' ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} className="text-zinc-400" />}
+            </button>
+          </div>
+          <p className="text-[10px] text-zinc-500 mt-1.5 leading-relaxed">
+            Options: <code className="text-zinc-400">data-position=&quot;left&quot;</code> or <code className="text-zinc-400">&quot;right&quot;</code> (default) &middot; <code className="text-zinc-400">data-color=&quot;#7c3aed&quot;</code> for brand color
+          </p>
+        </div>
+
+        {/* Iframe tag */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <ExternalLink size={14} className="text-cyan-400" />
+            <span className="text-xs font-medium text-white">Inline Embed</span>
+            <span className="text-[10px] text-zinc-500">Fixed-size iframe</span>
+          </div>
+          <div className="relative group">
+            <pre className="bg-black/40 border border-white/[0.06] rounded-lg p-3 text-[11px] text-cyan-400 font-mono overflow-x-auto whitespace-pre-wrap break-all leading-relaxed">
+              {iframeTag}
+            </pre>
+            <button
+              onClick={() => copy(iframeTag, 'iframe')}
+              className="absolute top-2 right-2 p-1.5 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 transition-colors opacity-0 group-hover:opacity-100"
+            >
+              {copied === 'iframe' ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} className="text-zinc-400" />}
+            </button>
+          </div>
+        </div>
+      </GlassCard>
+    </div>
+  );
+}
+
 // ─── Main Tab ────────────────────────────────────────────────
 
 export function IntegrationsTab() {
@@ -956,6 +1033,9 @@ export function IntegrationsTab() {
 
           {/* Custom Domains */}
           <DomainsSection />
+
+          {/* Embed Widget */}
+          <EmbedWidgetSection slug={agent?.slug ?? undefined} />
 
           {/* Legend */}
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 pt-2 border-t border-white/[0.04]">

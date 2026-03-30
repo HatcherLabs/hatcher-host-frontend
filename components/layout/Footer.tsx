@@ -168,6 +168,8 @@ export function Footer() {
             <Link href="/pricing" className="hover:text-[var(--text-primary)] transition-colors duration-200">Pricing</Link>
             <Link href="/support" className="hover:text-[var(--text-primary)] transition-colors duration-200">Support</Link>
             <a href={DOCS_URL} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--text-primary)] transition-colors duration-200">Docs</a>
+            <Link href="/terms" className="hover:text-[var(--text-primary)] transition-colors duration-200">Terms</Link>
+            <Link href="/privacy" className="hover:text-[var(--text-primary)] transition-colors duration-200">Privacy</Link>
           </div>
         </div>
       </div>
