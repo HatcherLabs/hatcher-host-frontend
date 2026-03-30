@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
+import { OnboardingDemo } from '@/components/onboarding/OnboardingDemo';
 import { QuickStats } from '@/components/dashboard/QuickStats';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ShortcutHelpModal } from '@/components/ui/ShortcutHelpModal';
@@ -492,6 +493,8 @@ export default function MyAgentsPage() {
         {filteredAgents.length === 0 ? (
           agents.length === 0 ? (
             /* True empty state — no agents created yet */
+            <>
+            <OnboardingDemo />
             <div className="card glass-noise">
               <EmptyState
                 icon={Cpu}
@@ -503,6 +506,7 @@ export default function MyAgentsPage() {
                 secondaryHref="/explore"
               />
             </div>
+            </>
           ) : (
             /* Filter/search returned no results */
             <motion.div
