@@ -800,7 +800,7 @@ export default function BillingPage() {
                           </span>
                         )}
                       </div>
-                      <span className="text-xl font-extrabold text-white">${tier.usdPrice}<span className="text-xs text-[var(--text-muted)] font-normal"> / 30 days</span></span>
+                      <span className="text-xl font-extrabold text-[var(--text-primary)]">${tier.usdPrice}<span className="text-xs text-[var(--text-muted)] font-normal"> / 30 days</span></span>
                     </div>
                     <div className="space-y-1.5 mb-4">
                       <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
@@ -874,7 +874,7 @@ export default function BillingPage() {
                     <span className="text-sm font-semibold text-[var(--text-primary)]">{addon.name}</span>
                   </div>
                   <div className="flex items-baseline gap-1 mb-1">
-                    <span className="text-2xl font-bold text-white tabular-nums">
+                    <span className="text-2xl font-bold text-[var(--text-primary)] tabular-nums">
                       ${addon.usdPrice}
                     </span>
                     <span className="text-xs text-[var(--text-muted)]">{addon.type === 'one_time' ? 'one-time' : '/ 30 days'}</span>

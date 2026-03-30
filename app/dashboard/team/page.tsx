@@ -302,7 +302,7 @@ export default function TeamPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className={cardClass + ' p-8 text-center max-w-sm'}>
           <Users className="w-10 h-10 text-cyan-400 mx-auto mb-3" />
-          <p className="text-white font-medium mb-2">Sign in to access Teams</p>
+          <p className="text-[var(--text-primary)] font-medium mb-2">Sign in to access Teams</p>
           <p className="text-sm text-[#A5A1C2]">Teams let you collaborate with others on your AI agents.</p>
         </div>
       </div>
@@ -321,7 +321,7 @@ export default function TeamPage() {
     >
       {/* Header */}
       <motion.div variants={itemVariants} className="mb-8">
-        <h1 className="text-2xl font-bold text-white flex items-center gap-3" style={displayFont}>
+        <h1 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-3" style={displayFont}>
           <Users className="w-6 h-6 text-cyan-400" />
           Team Collaboration
         </h1>
@@ -347,7 +347,7 @@ export default function TeamPage() {
           <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mx-auto mb-5">
             <Users className="w-8 h-8 text-cyan-400" />
           </div>
-          <h2 className="text-lg font-semibold text-white mb-2" style={displayFont}>Create Your Team</h2>
+          <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2" style={displayFont}>Create Your Team</h2>
           <p className="text-sm text-[#A5A1C2] mb-6">
             Start collaborating by creating a team. You can then invite members and share your agents.
           </p>
@@ -382,7 +382,7 @@ export default function TeamPage() {
                   <Users className="w-5 h-5 text-cyan-400" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-white" style={displayFont}>{team.name}</h2>
+                  <h2 className="text-lg font-semibold text-[var(--text-primary)]" style={displayFont}>{team.name}</h2>
                   <div className="flex items-center gap-3 mt-0.5">
                     <span className="text-xs text-[#A5A1C2]">{team.members.length} member{team.members.length !== 1 ? 's' : ''}</span>
                     <span className="text-xs text-[#A5A1C2]">{team.agentCount} agent{team.agentCount !== 1 ? 's' : ''} shared</span>
@@ -417,7 +417,7 @@ export default function TeamPage() {
 
           {/* Members Section */}
           <motion.div variants={itemVariants} className={cardClass + ' p-6'}>
-            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2" style={displayFont}>
+            <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2" style={displayFont}>
               <User className="w-4 h-4 text-cyan-400" />
               Members
             </h3>
@@ -439,7 +439,7 @@ export default function TeamPage() {
                           {member.user.username.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <span className="text-sm text-white font-medium">
+                          <span className="text-sm text-[var(--text-primary)] font-medium">
                             {member.user.username}
                             {isSelf && <span className="text-[#A5A1C2] font-normal ml-1">(you)</span>}
                           </span>
@@ -531,7 +531,7 @@ export default function TeamPage() {
 
           {/* Shared Agents */}
           <motion.div variants={itemVariants} className={cardClass + ' p-6'}>
-            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2" style={displayFont}>
+            <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2" style={displayFont}>
               <Bot className="w-4 h-4 text-cyan-400" />
               Shared Agents
             </h3>
@@ -548,7 +548,7 @@ export default function TeamPage() {
                     <div className="flex items-center gap-3">
                       <StatusDot status={agent.status} />
                       <div>
-                        <span className="text-sm text-white font-medium">{agent.name}</span>
+                        <span className="text-sm text-[var(--text-primary)] font-medium">{agent.name}</span>
                         <span className="text-xs text-[#71717a] ml-2">by {agent.ownerUsername}</span>
                       </div>
                     </div>

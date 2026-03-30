@@ -286,7 +286,7 @@ export default function PricingPage() {
                     <AnimatePresence mode="wait">
                       <motion.span
                         key={`${tier.key}-price-${isAnnual}`}
-                        className="text-3xl font-extrabold text-white"
+                        className="text-3xl font-extrabold text-[var(--text-primary)]"
                         initial={{ opacity: 0, y: -8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 8 }}
@@ -396,7 +396,7 @@ export default function PricingPage() {
                 className="card glass-noise p-5 text-center"
               >
                 <h3 className="font-bold text-[var(--text-primary)] text-base mb-2">{addon.name}</h3>
-                <div className="text-2xl font-extrabold mb-0.5 text-white">
+                <div className="text-2xl font-extrabold mb-0.5 text-[var(--text-primary)]">
                   {addon.price}
                 </div>
                 <p className="text-[var(--text-muted)] text-[10px] mb-3 font-medium">
@@ -463,15 +463,15 @@ export default function PricingPage() {
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[#06b6d4] font-semibold">
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Starter</div>
-                      <div className="text-sm sm:text-lg font-extrabold text-white">$4.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$4.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[#8b5cf6] font-semibold">
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Pro</div>
-                      <div className="text-sm sm:text-lg font-extrabold text-white">$14.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$14.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[#f59e0b] font-semibold">
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Business</div>
-                      <div className="text-sm sm:text-lg font-extrabold text-white">$39.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$39.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
                     </th>
                   </tr>
                 </thead>
@@ -535,7 +535,7 @@ export default function PricingPage() {
         {/* CTA BANNER */}
         <div className="card glass-noise p-10 sm:p-14 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.1),transparent_60%)] pointer-events-none" />
-          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 relative text-white">
+          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 relative text-[var(--text-primary)]">
             Ready to hatch your agent?
           </h2>
           <p className="text-[var(--text-secondary)] text-base max-w-lg mx-auto mb-8 leading-relaxed relative">

@@ -26,7 +26,7 @@ export default function LoginPage() {
       {/* Left panel — value propositions (hidden on mobile) */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-16 bg-white/[0.02] border-r border-white/[0.06]">
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-2">Hatcher</h2>
+          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Hatcher</h2>
           <p className="text-sm text-[var(--text-muted)]">Managed AI agent hosting platform</p>
         </div>
 
@@ -36,7 +36,7 @@ export default function LoginPage() {
               <Rocket className="w-5 h-5 text-[#06b6d4]" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-white mb-1">Deploy AI agents in 60 seconds</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Deploy AI agents in 60 seconds</h3>
               <p className="text-xs text-[var(--text-muted)] leading-relaxed">Pick a framework, configure your agent, and launch. No infrastructure to manage.</p>
             </div>
           </div>
@@ -46,7 +46,7 @@ export default function LoginPage() {
               <Layers className="w-5 h-5 text-[#06b6d4]" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-white mb-1">4 frameworks, 20+ platforms</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">4 frameworks, 20+ platforms</h3>
               <p className="text-xs text-[var(--text-muted)] leading-relaxed">OpenClaw, Hermes, ElizaOS, and more. Connect to Telegram, Discord, WhatsApp, Slack, and others.</p>
             </div>
           </div>
@@ -56,7 +56,7 @@ export default function LoginPage() {
               <Zap className="w-5 h-5 text-green-400" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-white mb-1">Free tier available</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Free tier available</h3>
               <p className="text-xs text-[var(--text-muted)] leading-relaxed">Start with a free agent. Bring your own LLM key for unlimited messages at no extra cost.</p>
             </div>
           </div>

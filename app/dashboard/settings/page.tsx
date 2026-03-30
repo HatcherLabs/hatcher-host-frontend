@@ -853,9 +853,9 @@ export default function SettingsPage() {
               <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4">
                 <AlertTriangle size={24} className="text-red-400" />
               </div>
-              <h2 className="text-lg font-semibold text-white mb-2">Delete Your Account?</h2>
+              <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">Delete Your Account?</h2>
               <p className="text-sm text-[#A5A1C2] leading-relaxed mb-5">
-                This will permanently remove all your agents, data, and payment history. This action <strong className="text-white">cannot be undone</strong>.
+                This will permanently remove all your agents, data, and payment history. This action <strong className="text-[var(--text-primary)]">cannot be undone</strong>.
               </p>
               <div className="mb-5">
                 <label className="block text-xs font-medium text-[#71717a] uppercase tracking-wider mb-1.5">
@@ -873,7 +873,7 @@ export default function SettingsPage() {
                     autoFocus
                   />
                   <button type="button" onClick={() => setShowDeletePassword(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] hover:text-white transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] hover:text-[var(--text-primary)] transition-colors"
                     tabIndex={-1}
                   >
                     {showDeletePassword ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -884,7 +884,7 @@ export default function SettingsPage() {
                 <button
                   onClick={() => { setShowDeleteConfirm(false); setDeletePassword(''); }}
                   disabled={deleting}
-                  className="px-4 py-2.5 text-sm font-medium rounded-xl text-[#A5A1C2] hover:text-white hover:bg-white/5 transition-all disabled:opacity-40"
+                  className="px-4 py-2.5 text-sm font-medium rounded-xl text-[#A5A1C2] hover:text-[var(--text-primary)] hover:bg-white/5 transition-all disabled:opacity-40"
                 >
                   Cancel
                 </button>

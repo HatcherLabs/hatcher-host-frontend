@@ -44,7 +44,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between gap-4 px-6 py-4 text-left"
       >
-        <span className="text-sm font-medium text-white">{question}</span>
+        <span className="text-sm font-medium text-[var(--text-primary)]">{question}</span>
         <ChevronDown className={`w-4 h-4 text-[#71717a] shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>
       <AnimatePresence initial={false}>
@@ -174,7 +174,7 @@ function AnimatedStat({ value, suffix = '', label }: { value: number; suffix?: s
 
   return (
     <div ref={ref} className="text-center">
-      <p className="text-3xl sm:text-4xl font-extrabold text-white tabular-nums">
+      <p className="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)] tabular-nums">
         {formatted}{suffix}
       </p>
       <p className="text-sm text-[#71717a] mt-1">{label}</p>
@@ -207,7 +207,7 @@ function FeatureCard({ icon: Icon, title, description, accentColor = 'purple' }:
       <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-3`}>
         <Icon className={`w-4.5 h-4.5 ${c.icon}`} size={18} />
       </div>
-      <h3 className="text-sm font-semibold text-white mb-1.5">{title}</h3>
+      <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1.5">{title}</h3>
       <p className="text-xs text-[#a1a1aa] leading-relaxed">{description}</p>
     </motion.div>
   );
@@ -237,7 +237,7 @@ export default function LandingPage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
-      className="min-h-screen bg-[var(--bg-base)] text-white"
+      className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)]"
     >
       {/* ── 1. HERO ─────────────────────────────────────── */}
       <Section className="relative pt-20 sm:pt-28 md:pt-36 pb-16 sm:pb-24 md:pb-32 px-4 sm:px-6">
@@ -273,7 +273,7 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: 'easeOut' }}
-                className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6 text-white"
+                className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6 text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
                 Deploy AI agents
@@ -306,7 +306,7 @@ export default function LandingPage() {
                 </Link>
                 <Link
                   href={DOCS_URL}
-                  className="text-sm text-[#a1a1aa] hover:text-white transition-colors flex items-center gap-1.5"
+                  className="text-sm text-[#a1a1aa] hover:text-[var(--text-primary)] transition-colors flex items-center gap-1.5"
                 >
                   Read the docs
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -338,7 +338,7 @@ export default function LandingPage() {
             className="text-center mb-10 sm:mb-12"
           >
             <h2
-              className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white"
+              className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]"
               style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
             >
               3 steps. 60 seconds.
@@ -385,7 +385,7 @@ export default function LandingPage() {
             className="text-center mb-10 sm:mb-12"
           >
             <h2
-              className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white"
+              className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]"
               style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
             >
               Choose your engine
@@ -453,7 +453,7 @@ export default function LandingPage() {
                     <fw.icon size={20} className={fw.color} />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-white">{fw.name}</h3>
+                    <h3 className="text-base font-bold text-[var(--text-primary)]">{fw.name}</h3>
                     <span className={`text-[9px] font-bold tracking-wider px-1.5 py-0.5 rounded border ${fw.badgeColor}`}>
                       {fw.badge}
                     </span>
@@ -484,7 +484,7 @@ export default function LandingPage() {
             className="text-center mb-10 sm:mb-14"
           >
             <h2
-              className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white"
+              className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]"
               style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
             >
               Everything you need to ship
@@ -563,7 +563,7 @@ export default function LandingPage() {
             transition={{ duration: 0.4 }}
             className="text-center mb-10 sm:mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
               Start free, grow when ready
             </h2>
             <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
@@ -575,7 +575,7 @@ export default function LandingPage() {
             {/* Free */}
             <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7 hover:border-white/[0.12] transition-colors duration-200">
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-emerald-400 mb-2">Free</p>
-              <p className="text-3xl font-bold text-white mb-1">$0</p>
+              <p className="text-3xl font-bold text-[var(--text-primary)] mb-1">$0</p>
               <p className="text-sm text-[#a1a1aa] mb-1">Get started with zero cost</p>
               <p className="text-xs text-emerald-400/70 mb-5">No credit card required</p>
               <ul className="space-y-2.5">
@@ -604,7 +604,7 @@ export default function LandingPage() {
             <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7 hover:border-white/[0.12] transition-colors duration-200">
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-purple-400 mb-2">Starter</p>
               <div className="flex items-baseline gap-1">
-                <p className="text-3xl font-bold text-white">$4.99</p>
+                <p className="text-3xl font-bold text-[var(--text-primary)]">$4.99</p>
                 <span className="text-sm text-[#71717a]">/mo</span>
               </div>
               <p className="text-sm text-[#a1a1aa] mb-6 mt-1">More messages, more power</p>
@@ -638,7 +638,7 @@ export default function LandingPage() {
                 <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-400 border border-cyan-500/20">POPULAR</span>
               </div>
               <div className="flex items-baseline gap-1">
-                <p className="text-3xl font-bold text-white">$14.99</p>
+                <p className="text-3xl font-bold text-[var(--text-primary)]">$14.99</p>
                 <span className="text-sm text-[#71717a]">/mo</span>
               </div>
               <p className="text-sm text-[#a1a1aa] mb-6 mt-1">For serious creators</p>
@@ -669,7 +669,7 @@ export default function LandingPage() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-amber-400 mb-2">Business</p>
               <div className="flex items-baseline gap-1">
-                <p className="text-3xl font-bold text-white">$39.99</p>
+                <p className="text-3xl font-bold text-[var(--text-primary)]">$39.99</p>
                 <span className="text-sm text-[#71717a]">/mo</span>
               </div>
               <p className="text-sm text-[#a1a1aa] mb-6 mt-1">Scale your AI fleet</p>
@@ -713,7 +713,7 @@ export default function LandingPage() {
             transition={{ duration: 0.4 }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Common questions</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-4">Common questions</h2>
             <p className="text-[#a1a1aa]">Everything you need to know</p>
           </motion.div>
           <div className="space-y-3">
@@ -744,7 +744,7 @@ export default function LandingPage() {
           className="relative z-10 max-w-3xl mx-auto text-center"
         >
           <h2
-            className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4"
+            className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] mb-4"
             style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
             Your AI agent is 60 seconds away
@@ -764,7 +764,7 @@ export default function LandingPage() {
             </motion.div>
             <Link
               href="/pricing"
-              className="text-sm text-[#a1a1aa] hover:text-white transition-colors"
+              className="text-sm text-[#a1a1aa] hover:text-[var(--text-primary)] transition-colors"
             >
               Compare plans &rarr;
             </Link>

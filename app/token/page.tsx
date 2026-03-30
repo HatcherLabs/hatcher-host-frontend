@@ -75,7 +75,7 @@ export default function TokenPage() {
             transition={{ ...fadeUpTransition, delay: 0.06 }}
             className="text-5xl md:text-7xl font-extrabold mb-5 tracking-tight"
           >
-            <span className="text-white">Platform</span>{' '}
+            <span className="text-[var(--text-primary)]">Platform</span>{' '}
             <span className="text-[var(--text-primary)]">Token</span>
           </motion.h1>
 

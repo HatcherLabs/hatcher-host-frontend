@@ -165,7 +165,7 @@ export function Header() {
                   className={clsx(
                     'relative px-3 py-1.5 text-sm rounded-lg transition-colors duration-200',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500',
-                    active ? 'text-white' : 'text-[#71717a] hover:text-white'
+                    active ? 'text-[var(--text-primary)]' : 'text-[#71717a] hover:text-[var(--text-primary)]'
                   )}
                 >
                   {link.label}
@@ -200,7 +200,7 @@ export function Header() {
                   className={clsx(
                     'relative flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg transition-colors duration-200',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500',
-                    active ? 'text-white' : 'text-[#71717a] hover:text-white'
+                    active ? 'text-[var(--text-primary)]' : 'text-[#71717a] hover:text-[var(--text-primary)]'
                   )}
                 >
                   {link.label}
@@ -258,7 +258,7 @@ export function Header() {
                         >
                           {/* User info */}
                           <div className="px-4 py-2.5 border-b border-white/[0.06]">
-                            <p className="text-xs text-white font-medium truncate">{user.username}</p>
+                            <p className="text-xs text-[var(--text-primary)] font-medium truncate">{user.username}</p>
                             <p className="text-[10px] text-[#a1a1aa] truncate">{user.email}</p>
                             {creditBalance !== null && creditBalance > 0 && (
                               <Link
@@ -284,8 +284,8 @@ export function Header() {
                                 className={clsx(
                                   'flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium transition-colors duration-200',
                                   isActive(pathname, link.href)
-                                    ? 'text-white bg-white/[0.04]'
-                                    : 'text-[#a1a1aa] hover:text-white hover:bg-white/[0.04]'
+                                    ? 'text-[var(--text-primary)] bg-white/[0.04]'
+                                    : 'text-[#a1a1aa] hover:text-[var(--text-primary)] hover:bg-white/[0.04]'
                                 )}
                               >
                                 <Icon className="w-3.5 h-3.5" />
@@ -311,7 +311,7 @@ export function Header() {
                 </>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Link href="/login" className="h-9 px-4 text-white font-medium text-xs rounded-full border border-white/20 bg-transparent hover:bg-white/[0.04] transition-all duration-200 flex items-center">
+                  <Link href="/login" className="h-9 px-4 text-[var(--text-primary)] font-medium text-xs rounded-full border border-[var(--border-default)] bg-transparent hover:bg-white/[0.04] transition-all duration-200 flex items-center">
                     Sign In
                   </Link>
                   <Link href="/register" className="h-9 px-4 text-white font-medium text-xs rounded-full bg-purple-600 hover:bg-purple-500 transition-all duration-200 flex items-center">
@@ -365,7 +365,7 @@ export function Header() {
                     href={link.href}
                     className={clsx(
                       'block px-3 py-2.5 text-sm rounded-lg transition-colors duration-200',
-                      isActive(pathname, link.href) ? 'text-white bg-white/[0.06] border-l-2 border-purple-500' : 'text-[#71717a] hover:text-white border-l-2 border-transparent'
+                      isActive(pathname, link.href) ? 'text-[var(--text-primary)] bg-white/[0.06] border-l-2 border-purple-500' : 'text-[#71717a] hover:text-[var(--text-primary)] border-l-2 border-transparent'
                     )}
                     onClick={() => setMobileOpen(false)}
                   >
@@ -380,7 +380,7 @@ export function Header() {
                   href={DOCS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block px-3 py-2.5 text-sm rounded-lg transition-colors duration-200 text-[#71717a] hover:text-white border-l-2 border-transparent"
+                  className="block px-3 py-2.5 text-sm rounded-lg transition-colors duration-200 text-[#71717a] hover:text-[var(--text-primary)] border-l-2 border-transparent"
                   onClick={() => setMobileOpen(false)}
                 >
                   Docs
@@ -413,13 +413,13 @@ export function Header() {
                       <span className="text-sm font-medium text-purple-300">{user.username}</span>
                       <span className="text-[10px] text-[#a1a1aa] ml-auto truncate max-w-[150px]">{user.email}</span>
                     </div>
-                    <Link href="/dashboard/team" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[#71717a] hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
+                    <Link href="/dashboard/team" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[#71717a] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
                       <Users className="w-4 h-4" /> Team
                     </Link>
-                    <Link href="/dashboard/billing" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[#71717a] hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
+                    <Link href="/dashboard/billing" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[#71717a] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
                       <CreditCard className="w-4 h-4" /> Billing
                     </Link>
-                    <Link href="/settings" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[#71717a] hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
+                    <Link href="/settings" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[#71717a] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
                       <Settings className="w-4 h-4" /> Settings
                     </Link>
                     <button
@@ -431,7 +431,7 @@ export function Header() {
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 px-3">
-                    <Link href="/login" className="flex-1 h-10 text-white font-medium text-sm rounded-lg border border-white/20 flex items-center justify-center" onClick={() => setMobileOpen(false)}>Sign In</Link>
+                    <Link href="/login" className="flex-1 h-10 text-[var(--text-primary)] font-medium text-sm rounded-lg border border-[var(--border-default)] flex items-center justify-center" onClick={() => setMobileOpen(false)}>Sign In</Link>
                     <Link href="/register" className="flex-1 h-10 text-white font-medium text-sm rounded-lg bg-purple-600 hover:bg-purple-500 flex items-center justify-center" onClick={() => setMobileOpen(false)}>Sign Up</Link>
                   </div>
                 )}
