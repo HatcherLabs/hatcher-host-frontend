@@ -217,6 +217,17 @@ export const api = {
   /** Delete current user account (requires password confirmation) */
   deleteAccount: (password: string) => req<{deleted: boolean}>('/auth/me', { method: 'DELETE', body: JSON.stringify({ password }) }),
 
+  /** GDPR data export — downloads all user data as JSON */
+  exportData: async (): Promise<Blob> => {
+    const token = getToken();
+    const res = await fetch(`${API_BASE}/auth/export-data`, {
+      method: 'POST',
+      headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}), 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) throw new Error('Export failed');
+    return res.blob();
+  },
+
   /** Regenerate API key (legacy single-key) */
   regenerateApiKey: () =>
     req<{ apiKey: string }>('/auth/api-key/regenerate', { method: 'POST' }),

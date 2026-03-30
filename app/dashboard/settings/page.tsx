@@ -27,6 +27,7 @@ import {
   Lock,
   Save,
   ArrowRight,
+  Download,
 } from 'lucide-react';
 
 // ── Animation variants ──────────────────────────────────────
@@ -206,6 +207,7 @@ export default function SettingsPage() {
   const [deleting, setDeleting] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
   const [showDeletePassword, setShowDeletePassword] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   // ── Initialise from user context ─────────────────────────
   useEffect(() => {
@@ -807,6 +809,44 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="space-y-4">
+                      {/* ── Export Data (GDPR) ──────────────────────────── */}
+                      <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
+                        <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Export My Data</h3>
+                        <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
+                          Download a JSON file containing all your account data: profile, agents, chat history, payments, referrals, support tickets, and more.
+                        </p>
+                        <button
+                          disabled={exporting}
+                          onClick={async () => {
+                            setExporting(true);
+                            try {
+                              const blob = await api.exportData();
+                              const url = URL.createObjectURL(blob);
+                              const a = document.createElement('a');
+                              a.href = url;
+                              a.download = `hatcher-data-export.json`;
+                              document.body.appendChild(a);
+                              a.click();
+                              a.remove();
+                              URL.revokeObjectURL(url);
+                              toast('success', 'Data export downloaded successfully');
+                            } catch {
+                              toast('error', 'Failed to export data. Please try again.');
+                            } finally {
+                              setExporting(false);
+                            }
+                          }}
+                          className="flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/20 hover:border-cyan-500/40 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        >
+                          {exporting ? (
+                            <><span className="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" /> Exporting...</>
+                          ) : (
+                            <><Download size={14} /> Export My Data</>
+                          )}
+                        </button>
+                      </div>
+
+                      {/* ── Delete Account ──────────────────────────────── */}
                       <div className="rounded-xl border border-red-500/15 bg-red-500/[0.03] p-4">
                         <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Delete Account</h3>
                         <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
