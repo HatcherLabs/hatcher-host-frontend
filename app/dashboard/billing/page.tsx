@@ -170,7 +170,7 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
 
 /* ── Account data shape from new API ─────────────────────── */
 interface AccountFeatures {
-  tier: string;  // tier key string (e.g. 'free', 'basic', 'pro')
+  tier: string;  // tier key string (e.g. 'free', 'starter', 'pro', 'business')
   tierConfig?: typeof TIERS['free'];  // full tier config object (optional)
   activeAddons: Array<{ key: AddonKey; name: string; expiresAt: string | null }>;
   agentLimit: number;
@@ -624,7 +624,9 @@ export default function BillingPage() {
               >
                 {currentTier === 'pro' ? (
                   <Crown className="w-7 h-7 text-[#06b6d4]" />
-                ) : currentTier === 'basic' ? (
+                ) : currentTier === 'business' ? (
+                  <Crown className="w-7 h-7 text-[#ec4899]" />
+                ) : currentTier === 'starter' ? (
                   <Zap className="w-7 h-7 text-[#06b6d4]" />
                 ) : (
                   <Rocket className="w-7 h-7 text-green-400" />

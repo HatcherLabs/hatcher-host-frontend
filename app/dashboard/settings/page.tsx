@@ -768,9 +768,10 @@ export default function SettingsPage() {
                           </div>
                           <p className="text-2xl font-bold text-[var(--text-primary)] capitalize" style={displayFont}>{profile.tier}</p>
                           <p className="text-sm text-[var(--text-muted)] mt-0.5">
-                            {profile.tier === 'free' ? 'Free — up to 1 agent, 20 messages/day' :
-                             profile.tier === 'basic' ? '$9.99/mo — 100 messages/day per agent' :
-                             '$19.99/mo — 300 messages/day, dedicated resources'}
+                            {profile.tier === 'free' ? 'Free — 1 agent, 10 messages/day' :
+                             profile.tier === 'starter' ? '$4.99/mo — 50 messages/day per agent' :
+                             profile.tier === 'pro' ? '$14.99/mo — 200 messages/day, dedicated resources' :
+                             '$39.99/mo — 500 messages/day, always-on, priority support'}
                           </p>
                         </div>
 

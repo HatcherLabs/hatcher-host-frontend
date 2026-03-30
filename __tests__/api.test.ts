@@ -187,15 +187,15 @@ describe('api.deleteAgent', () => {
 
 describe('api.subscribe', () => {
   it('calls POST /features/subscribe with tier and txSignature', async () => {
-    mockFetchOk({ tier: 'basic', expiresAt: '2026-04-28' });
+    mockFetchOk({ tier: 'starter', expiresAt: '2026-04-28' });
     const { api } = await import('../lib/api.js');
-    await api.subscribe('basic', 'real-tx-sig-abc123');
+    await api.subscribe('starter', 'real-tx-sig-abc123');
 
     const [url, opts] = fetchSpy.mock.calls[0] as [string, RequestInit];
     expect(url).toContain('/features/subscribe');
     expect(opts.method).toBe('POST');
     const body = JSON.parse(opts.body as string) as { tier: string; txSignature: string };
-    expect(body.tier).toBe('basic');
+    expect(body.tier).toBe('starter');
     expect(body.txSignature).toBe('real-tx-sig-abc123');
   });
 });

@@ -562,7 +562,7 @@ export default function AdminDashboardPage() {
                 />
               </div>
               <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)]">
-                {['all', 'free', 'basic', 'pro', 'banned'].map(t => (
+                {['all', 'free', 'starter', 'pro', 'business', 'banned'].map(t => (
                   <button
                     key={t}
                     onClick={() => { setUserTierFilter(t); setUserPage(0); }}

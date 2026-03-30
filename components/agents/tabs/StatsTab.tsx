@@ -598,15 +598,15 @@ export function StatsTab() {
           <h3 className="text-base font-semibold text-[#fafafa]">Your Plan</h3>
         </div>
         {(() => {
-          const tierNames: Record<string, string> = { free: 'Free', basic: 'Basic', pro: 'Pro' };
+          const tierNames: Record<string, string> = { free: 'Free', starter: 'Starter', pro: 'Pro', business: 'Business' };
           const tierName = tierNames[tierKey] ?? 'Free';
           const isPaid = tierKey !== 'free';
 
           const features = [
-            { label: 'Messages', value: tierKey === 'pro' ? '300/day' : tierKey === 'basic' ? '100/day' : '20/day' },
-            { label: 'Resources', value: tierKey === 'pro' ? '2 CPU, 2GB RAM' : tierKey === 'basic' ? '1 CPU, 1.5GB RAM' : '0.5 CPU, 1GB RAM' },
-            { label: 'Auto-sleep', value: tierKey === 'pro' ? 'Always-on' : tierKey === 'basic' ? '6 hours idle' : '15 min idle' },
-            { label: 'File Manager', value: tierKey === 'pro' ? 'Included' : 'Add-on ($9.99)' },
+            { label: 'Messages', value: tierKey === 'business' ? '500/day' : tierKey === 'pro' ? '200/day' : tierKey === 'starter' ? '50/day' : '10/day' },
+            { label: 'Resources', value: tierKey === 'business' ? '2 CPU, 3GB RAM' : tierKey === 'pro' ? '1.5 CPU, 2GB RAM' : tierKey === 'starter' ? '1 CPU, 1.5GB RAM' : '0.5 CPU, 1GB RAM' },
+            { label: 'Auto-sleep', value: tierKey === 'business' ? 'Always-on' : tierKey === 'pro' ? 'Always-on' : tierKey === 'starter' ? '2 hours idle' : '10 min idle' },
+            { label: 'File Manager', value: tierKey === 'business' ? 'Included' : tierKey === 'pro' ? 'Add-on ($9.99)' : 'Not available' },
             { label: 'Integrations', value: 'All included' },
           ];
 
@@ -618,7 +618,7 @@ export function StatsTab() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-white">{tierName} Tier</p>
-                  <p className="text-[10px] text-[#71717a]">{tierKey === 'free' ? 'No charge' : tierKey === 'basic' ? '$9.99/mo' : '$19.99/mo'}</p>
+                  <p className="text-[10px] text-[#71717a]">{tierKey === 'free' ? 'No charge' : tierKey === 'starter' ? '$4.99/mo' : tierKey === 'pro' ? '$14.99/mo' : '$39.99/mo'}</p>
                 </div>
               </div>
               {features.map((f) => (

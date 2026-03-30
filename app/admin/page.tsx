@@ -303,7 +303,7 @@ export default function AdminPage() {
   }, [agents]);
 
   const tierDistribution = useMemo(() => {
-    const counts: Record<string, number> = { free: 0, basic: 0, pro: 0 };
+    const counts: Record<string, number> = { free: 0, starter: 0, pro: 0, business: 0 };
     users.forEach((u) => {
       const t = (u.tier || 'free').toLowerCase();
       counts[t] = (counts[t] || 0) + 1;
@@ -311,8 +311,9 @@ export default function AdminPage() {
     const total = users.length || 1;
     return [
       { key: 'free', label: 'Free', color: '#6B7280', count: counts.free, percent: Math.round((counts.free / total) * 100) },
-      { key: 'basic', label: 'Basic', color: '#60A5FA', count: counts.basic, percent: Math.round((counts.basic / total) * 100) },
+      { key: 'starter', label: 'Starter', color: '#60A5FA', count: counts.starter, percent: Math.round((counts.starter / total) * 100) },
       { key: 'pro', label: 'Pro', color: '#FBBF24', count: counts.pro, percent: Math.round((counts.pro / total) * 100) },
+      { key: 'business', label: 'Business', color: '#F472B6', count: counts.business, percent: Math.round((counts.business / total) * 100) },
     ];
   }, [users]);
 
@@ -746,7 +747,9 @@ export default function AdminPage() {
                           <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border uppercase ${
                             u.tier === 'pro'
                               ? 'text-amber-400 bg-amber-500/10 border-amber-500/20'
-                              : u.tier === 'basic'
+                              : u.tier === 'business'
+                              ? 'text-pink-400 bg-pink-500/10 border-pink-500/20'
+                              : u.tier === 'starter'
                               ? 'text-blue-400 bg-blue-500/10 border-blue-500/20'
                               : 'text-[var(--text-muted)] bg-[rgba(46,43,74,0.3)] border-[var(--border-default)]'
                           }`}>

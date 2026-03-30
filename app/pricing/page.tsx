@@ -4,45 +4,174 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { TIERS, TIER_ORDER, ADDONS } from '@hatcher/shared';
-import type { UserTierKey } from '@hatcher/shared';
 import {
   ArrowRight,
+  Building2,
   Check,
   ChevronDown,
   Crown,
+  Globe,
   HelpCircle,
   MessageSquare,
   Plus,
   Rocket,
   Shield,
   Sparkles,
+  Users,
   X,
   Zap,
 } from 'lucide-react';
 
+/* ── Tier definitions ────────────────────────────────────── */
+
+interface TierDef {
+  key: string;
+  name: string;
+  price: number;
+  icon: React.ReactNode;
+  accent: string;
+  badge?: string;
+  highlighted?: boolean;
+  agents: string;
+  messages: string;
+  cpu: string;
+  ram: string;
+  storage: string;
+  sleep: string;
+  features: string[];
+  missing: string[];
+}
+
+const TIERS_DATA: TierDef[] = [
+  {
+    key: 'free',
+    name: 'Free',
+    price: 0,
+    icon: <Rocket className="w-5 h-5" />,
+    accent: '#22c55e',
+    agents: '1 agent included',
+    messages: '10 messages/day',
+    cpu: '0.5 CPU',
+    ram: '1 GB RAM',
+    storage: '100 MB workspace',
+    sleep: 'Auto-sleep after 10 min idle',
+    features: [
+      'Groq Llama 4 Scout',
+      'BYOK = unlimited messages',
+      'All integrations (Telegram, Discord, Twitter, etc)',
+    ],
+    missing: ['No full logs', 'No file manager', 'No custom domains'],
+  },
+  {
+    key: 'starter',
+    name: 'Starter',
+    price: 4.99,
+    icon: <Zap className="w-5 h-5" />,
+    accent: '#06b6d4',
+    agents: '1 agent included',
+    messages: '50 messages/day',
+    cpu: '1 CPU',
+    ram: '1.5 GB RAM',
+    storage: '200 MB workspace',
+    sleep: 'Auto-sleep after 2h idle',
+    features: [
+      'BYOK = unlimited messages',
+      'All integrations',
+    ],
+    missing: ['No full logs', 'No file manager', 'No custom domains'],
+  },
+  {
+    key: 'pro',
+    name: 'Pro',
+    price: 14.99,
+    icon: <Crown className="w-5 h-5" />,
+    accent: '#8b5cf6',
+    badge: 'Most Popular',
+    highlighted: true,
+    agents: '3 agents included',
+    messages: '200 messages/day per agent',
+    cpu: '1.5 CPU',
+    ram: '2 GB RAM',
+    storage: '500 MB workspace',
+    sleep: 'Always-on (no auto-sleep)',
+    features: [
+      'BYOK = unlimited messages',
+      'Dedicated resources',
+      'Full logs',
+      'Custom domains + SSL',
+      'All integrations',
+    ],
+    missing: [],
+  },
+  {
+    key: 'business',
+    name: 'Business',
+    price: 39.99,
+    icon: <Building2 className="w-5 h-5" />,
+    accent: '#f59e0b',
+    agents: '10 agents included',
+    messages: '500 messages/day per agent',
+    cpu: '2 CPU',
+    ram: '3 GB RAM',
+    storage: '1 GB workspace',
+    sleep: 'Always-on',
+    features: [
+      'BYOK = unlimited messages',
+      'Dedicated resources',
+      'File manager included',
+      'Full logs',
+      'Priority support',
+      'Team collaboration',
+      'All integrations',
+    ],
+    missing: [],
+  },
+];
+
+/* ── Add-on definitions ──────────────────────────────────── */
+
+interface AddonDef {
+  name: string;
+  price: string;
+  period: string;
+  description: string;
+}
+
+const ADDONS_DATA: AddonDef[] = [
+  { name: '+3 Agents', price: '$3.99', period: '/mo', description: 'Add 3 extra agent slots' },
+  { name: '+10 Agents', price: '$9.99', period: '/mo', description: 'Add 10 extra agent slots' },
+  { name: 'Always-on', price: '$4.99', period: '/mo per agent', description: 'Keep any agent running 24/7' },
+  { name: '+200 msg/day', price: '$2.99', period: '/mo per agent', description: 'Extra daily messages per agent' },
+  { name: 'File Manager', price: '$4.99', period: 'one-time per agent', description: 'Browse, edit, download files' },
+];
+
 /* ── Feature comparison data ─────────────────────────────── */
+
 interface FeatureRow {
   label: string;
   free: string | boolean;
-  basic: string | boolean;
+  starter: string | boolean;
   pro: string | boolean;
+  business: string | boolean;
 }
 
 const FEATURE_ROWS: FeatureRow[] = [
-  { label: 'Agents included',       free: '1',       basic: '1',         pro: '5' },
-  { label: 'Messages',              free: '20/day',  basic: '100/day',   pro: '300/day' },
-  { label: 'BYOK messages',         free: 'Unlimited', basic: 'Unlimited', pro: 'Unlimited' },
-  { label: 'CPU',                   free: '0.5',     basic: '1',         pro: '2 cores' },
-  { label: 'RAM',                   free: '1 GB',    basic: '1.5 GB',    pro: '2 GB' },
-  { label: 'Storage',               free: '150 MB',  basic: '300 MB',    pro: '600 MB' },
-  { label: 'File Manager',          free: false,      basic: false,       pro: true },
-  { label: 'Full Logs',             free: false,      basic: false,       pro: true },
-  { label: 'Auto-sleep',            free: '15 min idle', basic: '6h idle', pro: 'Always-on' },
-  { label: 'All integrations',      free: true,       basic: true,        pro: true },
-  { label: 'BYOK (own LLM key)',    free: true,       basic: true,        pro: true },
-  { label: 'Default LLM (Groq)',    free: true,       basic: true,        pro: true },
-  { label: 'Priority support',      free: false,      basic: false,       pro: true },
+  { label: 'Agents included',       free: '1',       starter: '1',         pro: '3',           business: '10' },
+  { label: 'Messages/day',          free: '10',      starter: '50',        pro: '200/agent',   business: '500/agent' },
+  { label: 'BYOK messages',         free: 'Unlimited', starter: 'Unlimited', pro: 'Unlimited', business: 'Unlimited' },
+  { label: 'CPU',                   free: '0.5',     starter: '1',         pro: '1.5',         business: '2' },
+  { label: 'RAM',                   free: '1 GB',    starter: '1.5 GB',    pro: '2 GB',        business: '3 GB' },
+  { label: 'Storage',               free: '100 MB',  starter: '200 MB',    pro: '500 MB',      business: '1 GB' },
+  { label: 'Resources',             free: 'Shared',  starter: 'Shared',    pro: 'Dedicated',   business: 'Dedicated' },
+  { label: 'Auto-sleep',            free: '10 min',  starter: '2 hours',   pro: 'Always-on',   business: 'Always-on' },
+  { label: 'File Manager',          free: false,      starter: false,       pro: false,         business: true },
+  { label: 'Full Logs',             free: false,      starter: false,       pro: true,          business: true },
+  { label: 'Custom domains + SSL',  free: false,      starter: false,       pro: true,          business: true },
+  { label: 'Team collaboration',    free: false,      starter: false,       pro: false,         business: true },
+  { label: 'Priority support',      free: false,      starter: false,       pro: false,         business: true },
+  { label: 'All integrations',      free: true,       starter: true,        pro: true,          business: true },
+  { label: 'BYOK (own LLM key)',    free: true,       starter: true,        pro: true,          business: true },
+  { label: 'Default LLM (Groq)',    free: true,       starter: true,        pro: true,          business: true },
 ];
 
 function renderCell(value: string | boolean) {
@@ -51,26 +180,19 @@ function renderCell(value: string | boolean) {
   return <span className="text-[var(--text-secondary)] text-xs font-medium">{value}</span>;
 }
 
-/* ── Tier card accent colors ─────────────────────────────── */
-const TIER_STYLES: Record<UserTierKey, { accent: string; badge?: string; highlighted?: boolean }> = {
-  free: { accent: '#22c55e' },
-  basic: { accent: '#06b6d4' },
-  pro: { accent: '#06b6d4', badge: 'Most Popular', highlighted: true },
-};
-
 /* ── Page ─────────────────────────────────────────────────── */
 export default function PricingPage() {
   const [isAnnual, setIsAnnual] = useState(false);
 
   return (
     <div className="min-h-screen">
-      <div className="mx-auto max-w-6xl px-4 py-16">
+      <div className="mx-auto max-w-7xl px-4 py-16">
         {/* HERO */}
         <div className="text-center mb-16 relative">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.12),transparent_60%)] pointer-events-none" />
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#06b6d4]/10 border border-[#06b6d4]/20 text-[#06b6d4] text-xs font-medium mb-6">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.12),transparent_60%)] pointer-events-none" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#8b5cf6]/10 border border-[#8b5cf6]/20 text-[#8b5cf6] text-xs font-medium mb-6">
             <Sparkles className="w-3.5 h-3.5" />
-            Simple Pricing
+            Simple, Transparent Pricing
           </div>
           <motion.h1
             initial={{ opacity: 0, y: 14 }}
@@ -87,7 +209,7 @@ export default function PricingPage() {
             className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto leading-relaxed relative"
           >
             Start free with any framework. Scale when you are ready.
-            All integrations included. BYOK always free. Pay with SOL or platform tokens.
+            All integrations included on every tier. BYOK always unlimited.
           </motion.p>
 
           {/* Monthly / Annual toggle */}
@@ -121,11 +243,9 @@ export default function PricingPage() {
         </div>
 
         {/* TIER CARDS */}
-        <div className="grid md:grid-cols-3 gap-6 mb-20">
-          {TIER_ORDER.map((tierKey) => {
-            const tier = TIERS[tierKey];
-            const style = TIER_STYLES[tierKey];
-            const monthlyPrice = tier.usdPrice;
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-20">
+          {TIERS_DATA.map((tier) => {
+            const monthlyPrice = tier.price;
             const annualMonthlyPrice = monthlyPrice === 0 ? 0 : parseFloat((monthlyPrice * 0.8).toFixed(2));
             const displayPrice = isAnnual ? annualMonthlyPrice : monthlyPrice;
             const annualTotal = isAnnual && monthlyPrice > 0 ? parseFloat((annualMonthlyPrice * 12).toFixed(2)) : null;
@@ -133,32 +253,40 @@ export default function PricingPage() {
 
             return (
               <motion.div
-                key={tierKey}
-                whileHover={{ y: -3 }}
+                key={tier.key}
+                whileHover={{ y: -4 }}
                 transition={{ duration: 0.2 }}
                 className={cn(
-                  'card glass-noise p-8 flex flex-col relative',
-                  style.highlighted && 'border-[#06b6d4]/40 shadow-[0_0_40px_rgba(6,182,212,0.12)]'
+                  'card glass-noise p-7 flex flex-col relative',
+                  tier.highlighted && 'border-[#8b5cf6]/40 shadow-[0_0_40px_rgba(139,92,246,0.15)]'
                 )}
               >
                 {/* Popular badge */}
-                {style.badge && (
+                {tier.badge && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-[#06b6d4] to-[#0891b2] text-white text-[11px] font-bold uppercase tracking-wider shadow-[0_0_20px_rgba(6,182,212,0.5)]">
+                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-[#8b5cf6] to-[#7c3aed] text-white text-[11px] font-bold uppercase tracking-wider shadow-[0_0_20px_rgba(139,92,246,0.5)]">
                       <Crown className="w-3.5 h-3.5" />
-                      {style.badge}
+                      {tier.badge}
                     </span>
                   </div>
                 )}
 
                 {/* Header */}
                 <div className="mb-6">
-                  <h3 className="text-xl font-bold text-[var(--text-primary)] mb-1">{tier.name}</h3>
+                  <div className="flex items-center gap-2.5 mb-2">
+                    <div
+                      className="w-9 h-9 rounded-lg flex items-center justify-center"
+                      style={{ background: tier.accent + '15', border: `1px solid ${tier.accent}30` }}
+                    >
+                      <div style={{ color: tier.accent }}>{tier.icon}</div>
+                    </div>
+                    <h3 className="text-lg font-bold text-[var(--text-primary)]">{tier.name}</h3>
+                  </div>
                   <div className="flex items-baseline gap-1.5">
                     <AnimatePresence mode="wait">
                       <motion.span
-                        key={`${tierKey}-price-${isAnnual}`}
-                        className="text-4xl font-extrabold text-white"
+                        key={`${tier.key}-price-${isAnnual}`}
+                        className="text-3xl font-extrabold text-white"
                         initial={{ opacity: 0, y: -8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 8 }}
@@ -187,60 +315,49 @@ export default function PricingPage() {
                   )}
                 </div>
 
-                {/* Feature list */}
-                <div className="space-y-3 flex-1 mb-8">
-                  <FeatureCheck color={style.accent}>
-                    {tier.includedAgents} agent{tier.includedAgents > 1 ? 's' : ''} included
-                  </FeatureCheck>
-                  <FeatureCheck color={style.accent}>
-                    {tier.messagesPerDay === 0 ? 'Unlimited messages' : `${tier.messagesPerDay} messages/day`}
-                  </FeatureCheck>
-                  {tierKey !== 'free' && (
-                    <div className="ml-7.5 -mt-1.5">
-                      <span className="text-[10px] font-medium text-green-400/80">Unlimited with your own API key</span>
-                    </div>
-                  )}
-                  <FeatureCheck color={style.accent}>
-                    {tier.cpuLimit} CPU / {tier.memoryMb >= 1024 ? `${tier.memoryMb / 1024} GB` : `${tier.memoryMb} MB`} RAM
-                  </FeatureCheck>
-                  <FeatureCheck color={style.accent}>
-                    {tier.storageMb >= 1024 ? `${tier.storageMb / 1024} GB` : `${tier.storageMb} MB`} storage
-                  </FeatureCheck>
-                  {tier.fileManager ? (
-                    <FeatureCheck color={style.accent}>File Manager</FeatureCheck>
-                  ) : (
-                    <FeatureMissing>No File Manager</FeatureMissing>
-                  )}
-                  {tier.fullLogs ? (
-                    <FeatureCheck color={style.accent}>Full logs</FeatureCheck>
-                  ) : (
-                    <FeatureMissing>No full logs</FeatureMissing>
-                  )}
-                  {tier.autoSleep ? (
-                    <FeatureMissing>Auto-sleep after {tier.autoSleepMinutes >= 60 ? `${Math.round(tier.autoSleepMinutes / 60)}h` : `${tier.autoSleepMinutes} min`} idle</FeatureMissing>
-                  ) : (
-                    <FeatureCheck color={style.accent}>No auto-sleep</FeatureCheck>
-                  )}
-                  <FeatureCheck color={style.accent}>All integrations (free)</FeatureCheck>
-                  <FeatureCheck color={style.accent}>BYOK always free</FeatureCheck>
+                {/* Highlights */}
+                <div className="space-y-2.5 flex-1 mb-7">
+                  <FeatureCheck color={tier.accent}>{tier.agents}</FeatureCheck>
+                  <FeatureCheck color={tier.accent}>{tier.messages}</FeatureCheck>
+                  <FeatureCheck color={tier.accent}>{tier.cpu} / {tier.ram}</FeatureCheck>
+                  <FeatureCheck color={tier.accent}>{tier.storage}</FeatureCheck>
+                  <FeatureCheck color={tier.accent}>{tier.sleep}</FeatureCheck>
+                  {tier.features.map((f) => (
+                    <FeatureCheck key={f} color={tier.accent}>{f}</FeatureCheck>
+                  ))}
+                  {tier.missing.map((f) => (
+                    <FeatureMissing key={f}>{f}</FeatureMissing>
+                  ))}
                 </div>
 
                 {/* CTA */}
-                {tierKey === 'free' ? (
+                {tier.key === 'free' ? (
                   <Link
-                    href={`/register?tier=free`}
-                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all border border-green-500/30 text-green-400 hover:bg-green-500/10"
+                    href="/register?tier=free"
+                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all border border-green-500/30 text-green-400 hover:bg-green-500/10"
                   >
                     <Rocket className="w-4 h-4" />
                     Get Started Free
                   </Link>
+                ) : tier.highlighted ? (
+                  <Link
+                    href={`/register?tier=${tier.key}&billing=${billingParam}`}
+                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all text-white"
+                    style={{
+                      background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                      boxShadow: '0 4px 16px rgba(139,92,246,0.35)',
+                    }}
+                  >
+                    <Zap className="w-4 h-4" />
+                    Get {tier.name}
+                  </Link>
                 ) : (
                   <Link
-                    href={`/register?tier=${tierKey}&billing=${billingParam}`}
-                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold transition-all text-white"
+                    href={`/register?tier=${tier.key}&billing=${billingParam}`}
+                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all text-white"
                     style={{
-                      background: '#06b6d4',
-                      boxShadow: '0 4px 16px rgba(6,182,212,0.3)',
+                      background: tier.accent,
+                      boxShadow: `0 4px 16px ${tier.accent}40`,
                     }}
                   >
                     <Zap className="w-4 h-4" />
@@ -262,38 +379,38 @@ export default function PricingPage() {
               transition={{ duration: 0.3 }}
               className="text-2xl font-bold mb-3 flex items-center justify-center gap-3"
             >
-              <Plus className="w-6 h-6 text-[#06b6d4]" />
-              <span className="text-[var(--text-primary)]">Agent Add-ons</span>
+              <Plus className="w-6 h-6 text-[#8b5cf6]" />
+              <span className="text-[var(--text-primary)]">Add-ons</span>
             </motion.h2>
             <p className="text-[var(--text-muted)] text-sm max-w-lg mx-auto">
-              Need more agents? Stack add-ons on any tier. Mix and match as needed.
+              Customize your plan. Stack add-ons on any tier. Mix and match as needed.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-3 gap-5 max-w-3xl mx-auto">
-            {ADDONS.map((addon) => (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
+            {ADDONS_DATA.map((addon) => (
               <motion.div
-                key={addon.key}
+                key={addon.name}
                 whileHover={{ y: -3 }}
                 transition={{ duration: 0.2 }}
-                className="card glass-noise p-6 text-center"
+                className="card glass-noise p-5 text-center"
               >
-                <h3 className="font-bold text-[var(--text-primary)] text-lg mb-2">{addon.name}</h3>
-                <div className="text-3xl font-extrabold mb-1 text-white">
-                  ${addon.usdPrice}
+                <h3 className="font-bold text-[var(--text-primary)] text-base mb-2">{addon.name}</h3>
+                <div className="text-2xl font-extrabold mb-0.5 text-white">
+                  {addon.price}
                 </div>
-                <p className="text-[var(--text-muted)] text-xs mb-3">
-                  {addon.type === 'one_time' ? 'one-time' : '/month'}
+                <p className="text-[var(--text-muted)] text-[10px] mb-3 font-medium">
+                  {addon.period}
                 </p>
-                <p className="text-sm text-[var(--text-secondary)]">
-                  {addon.extraAgents ? `${addon.extraAgents} extra agent slots` : addon.description}
+                <p className="text-xs text-[var(--text-secondary)]">
+                  {addon.description}
                 </p>
               </motion.div>
             ))}
           </div>
         </section>
 
-        {/* FREE INTEGRATIONS CALLOUT */}
+        {/* BYOK + INTEGRATIONS CALLOUT */}
         <section className="mb-20">
           <div className="card glass-noise p-8 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-[radial-gradient(circle,rgba(34,197,94,0.06),transparent_70%)] pointer-events-none" />
@@ -312,9 +429,8 @@ export default function PricingPage() {
               Telegram, Discord, WhatsApp, Slack, Signal, iMessage, and 14+ more platforms
               are included free on all tiers. No extra charge, ever.
             </p>
-            <p className="text-[var(--text-muted)] text-sm">
-              BYOK (Bring Your Own Key) is also always free -- use your own OpenAI, Anthropic,
-              Google, xAI, or Groq API key without any Hatcher markup.
+            <p className="text-[var(--text-secondary)] text-sm font-medium p-4 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+              All prices in USD, payable in SOL or platform tokens. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier.
             </p>
           </div>
         </section>
@@ -329,7 +445,7 @@ export default function PricingPage() {
               transition={{ duration: 0.3 }}
               className="text-2xl font-bold mb-3 flex items-center justify-center gap-3"
             >
-              <Shield className="w-6 h-6 text-[#06b6d4]" />
+              <Shield className="w-6 h-6 text-[#8b5cf6]" />
               <span className="text-[var(--text-primary)]">Compare Plans</span>
             </motion.h2>
             <p className="text-[var(--text-muted)] text-sm">See what each tier includes at a glance</p>
@@ -345,13 +461,17 @@ export default function PricingPage() {
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Free</div>
                       <div className="text-sm sm:text-lg font-extrabold">$0</div>
                     </th>
-                    <th className="text-center px-2 py-3 sm:p-5 text-[var(--text-primary)] font-semibold">
-                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Basic</div>
-                      <div className="text-sm sm:text-lg font-extrabold text-white">$9.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                    <th className="text-center px-2 py-3 sm:p-5 text-[#06b6d4] font-semibold">
+                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Starter</div>
+                      <div className="text-sm sm:text-lg font-extrabold text-white">$4.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
                     </th>
-                    <th className="text-center px-2 py-3 sm:p-5 text-[var(--text-primary)] font-semibold">
+                    <th className="text-center px-2 py-3 sm:p-5 text-[#8b5cf6] font-semibold">
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Pro</div>
-                      <div className="text-sm sm:text-lg font-extrabold text-white">$19.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                      <div className="text-sm sm:text-lg font-extrabold text-white">$14.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                    </th>
+                    <th className="text-center px-2 py-3 sm:p-5 text-[#f59e0b] font-semibold">
+                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Business</div>
+                      <div className="text-sm sm:text-lg font-extrabold text-white">$39.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
                     </th>
                   </tr>
                 </thead>
@@ -366,8 +486,9 @@ export default function PricingPage() {
                     >
                       <td className="px-2.5 py-3 sm:p-4 text-[var(--text-secondary)] text-xs sm:text-sm">{row.label}</td>
                       <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.free)}</td>
-                      <td className="px-2 py-3 sm:p-4 text-center bg-[#06b6d4]/[0.02]">{renderCell(row.basic)}</td>
-                      <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.pro)}</td>
+                      <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.starter)}</td>
+                      <td className="px-2 py-3 sm:p-4 text-center bg-[#8b5cf6]/[0.03]">{renderCell(row.pro)}</td>
+                      <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.business)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -386,7 +507,7 @@ export default function PricingPage() {
               transition={{ duration: 0.3 }}
               className="text-2xl font-bold flex items-center justify-center gap-3"
             >
-              <HelpCircle className="w-6 h-6 text-[#06b6d4]" />
+              <HelpCircle className="w-6 h-6 text-[#8b5cf6]" />
               <span className="text-[var(--text-primary)]">Frequently Asked Questions</span>
             </motion.h2>
           </div>
@@ -401,11 +522,11 @@ export default function PricingPage() {
         <div className="text-center mb-20">
           <p className="text-[var(--text-muted)] text-sm">
             Need help choosing a plan?{' '}
-            <a href="mailto:support@hatcher.host" className="text-[#06b6d4] hover:underline font-medium">
+            <a href="mailto:support@hatcher.host" className="text-[#8b5cf6] hover:underline font-medium">
               Email us
             </a>
             {' '}or{' '}
-            <a href="https://discord.gg/7tY3HjKjMc" target="_blank" rel="noopener noreferrer" className="text-[#06b6d4] hover:underline font-medium">
+            <a href="https://discord.gg/7tY3HjKjMc" target="_blank" rel="noopener noreferrer" className="text-[#8b5cf6] hover:underline font-medium">
               ask on Discord
             </a>
           </p>
@@ -413,7 +534,7 @@ export default function PricingPage() {
 
         {/* CTA BANNER */}
         <div className="card glass-noise p-10 sm:p-14 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.1),transparent_60%)] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.1),transparent_60%)] pointer-events-none" />
           <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 relative text-white">
             Ready to hatch your agent?
           </h2>
@@ -437,8 +558,8 @@ export default function PricingPage() {
         </div>
 
         {/* FOOTER NOTE */}
-        <p className="text-center text-xs text-[var(--text-muted)] mt-10">
-          All prices in USD. Pay with SOL or platform tokens.
+        <p className="text-center text-xs text-[var(--text-muted)] mt-10 max-w-xl mx-auto leading-relaxed">
+          All prices in USD, payable in SOL or platform tokens. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier.
         </p>
       </div>
     </div>
@@ -481,21 +602,21 @@ function FAQItem({ q, a }: { q: string; a: string }) {
     <div
       className={cn(
         'card glass-noise overflow-hidden transition-all duration-200',
-        open && 'border-[rgba(6,182,212,0.3)] shadow-[0_0_20px_rgba(6,182,212,0.06)]'
+        open && 'border-[rgba(139,92,246,0.3)] shadow-[0_0_20px_rgba(139,92,246,0.06)]'
       )}
     >
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between p-5 text-left group"
       >
-        <span className="text-sm font-medium text-[var(--text-primary)] pr-4 group-hover:text-[#06b6d4] transition-colors">{q}</span>
+        <span className="text-sm font-medium text-[var(--text-primary)] pr-4 group-hover:text-[#8b5cf6] transition-colors">{q}</span>
         <div
           className={cn(
             'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors',
-            open ? 'bg-[#06b6d4]/15' : 'bg-white/[0.03]'
+            open ? 'bg-[#8b5cf6]/15' : 'bg-white/[0.03]'
           )}
         >
-          <ChevronDown className={cn('w-4 h-4 transition-all duration-200', open ? 'text-[#06b6d4] rotate-180' : 'text-[var(--text-muted)]')} />
+          <ChevronDown className={cn('w-4 h-4 transition-all duration-200', open ? 'text-[#8b5cf6] rotate-180' : 'text-[var(--text-muted)]')} />
         </div>
       </button>
       <AnimatePresence>
@@ -508,7 +629,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
             className="overflow-hidden"
           >
             <div className="px-5 pb-5 pt-0">
-              <div className="w-full h-px bg-gradient-to-r from-transparent via-[rgba(6,182,212,0.2)] to-transparent mb-4" />
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-[rgba(139,92,246,0.2)] to-transparent mb-4" />
               <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{a}</p>
             </div>
           </motion.div>
@@ -521,22 +642,30 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 const FAQ = [
   {
     q: 'What is BYOK (Bring Your Own Key)?',
-    a: 'BYOK lets you use your own API key for any LLM provider (OpenAI, Anthropic, Google, xAI, Groq, OpenRouter). This is always free on all tiers -- you pay the provider directly, no Hatcher markup.',
+    a: 'BYOK lets you use your own API key for any LLM provider (OpenAI, Anthropic, Google, xAI, Groq, OpenRouter). This is always free on all tiers -- you pay the provider directly, no Hatcher markup. Messages with your own key are unlimited.',
   },
   {
     q: 'How do add-ons work?',
-    a: 'Add-ons are stackable. For example, if you are on the Free tier (1 agent) and purchase a +5 Agents add-on, you can run 6 agents total. Add-ons work on any tier and you can combine multiple.',
+    a: 'Add-ons are stackable on any tier. For example, if you are on the Starter tier (1 agent) and purchase a +3 Agents add-on, you can run 4 agents total. You can stack multiple add-ons.',
+  },
+  {
+    q: 'What is the difference between shared and dedicated resources?',
+    a: 'Shared resources mean your agent shares CPU and RAM with others on the same server -- still performant but may vary under load. Dedicated resources (Pro and Business) give your agent guaranteed CPU and RAM that no one else can use.',
   },
   {
     q: 'What payment methods are accepted?',
-    a: 'You can pay with SOL or our platform token. Prices are listed in USD and converted at live rates.',
+    a: 'You can pay with SOL or our platform token. Prices are listed in USD and converted at live rates via Jupiter.',
   },
   {
     q: 'Can I downgrade my tier?',
-    a: 'Yes. You can cancel your subscription at any time and your tier will revert to Free at the end of the billing period. Your agents beyond the free limit will be paused.',
+    a: 'Yes. You can cancel your subscription at any time and your tier will revert to Free at the end of the billing period. Agents beyond your free limit will be paused.',
   },
   {
     q: 'What is auto-sleep?',
-    a: 'Free tier agents automatically sleep after 15 minutes of inactivity to save resources. Basic tier agents sleep after 6 hours of inactivity. Both wake up instantly on the next message. Pro tier agents are always-on with no auto-sleep.',
+    a: 'Free agents automatically sleep after 10 minutes of inactivity, Starter agents after 2 hours. They wake instantly on the next message. Pro and Business agents are always-on with no auto-sleep. You can also add always-on to any agent for $4.99/mo.',
+  },
+  {
+    q: 'What LLM do I get with the free tier?',
+    a: 'All tiers include Groq Llama 4 Scout as the default LLM. Free tier gets 10 messages/day, Starter gets 50, Pro gets 200 per agent, and Business gets 500 per agent. BYOK bypasses all limits.',
   },
 ];
