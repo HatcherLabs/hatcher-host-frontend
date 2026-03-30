@@ -59,6 +59,56 @@
   --radius-xl: 1rem;
 }
 
+/* ── Light Theme Overrides ────────────────────────── */
+.light {
+  /* Backgrounds */
+  --bg-base: #f8f8fc;
+  --bg-surface: #ffffff;
+  --bg-sidebar: #f0f0f6;
+  --bg-card: rgba(0, 0, 0, 0.02);
+  --bg-card-solid: #ffffff;
+  --bg-elevated: #f0f0f6;
+  --bg-hover: #e8e8f0;
+  --bg-active: #dcdce8;
+
+  /* Brand — keep same purples */
+  --primary-400: #a78bfa;
+  --primary-500: #8b5cf6;
+  --primary-600: #7c3aed;
+  --primary-700: #6d28d9;
+  --primary-glow: rgba(139, 92, 246, 0.1);
+
+  /* CTA — accent (cyan) */
+  --accent-400: #06b6d4;
+  --accent-500: #0891b2;
+  --accent-600: #0e7490;
+  --accent-700: #155e75;
+  --accent-glow: rgba(6, 182, 212, 0.08);
+
+  /* Accents */
+  --cyan-400: #06b6d4;
+  --cyan-500: #0891b2;
+  --amber-400: #d97706;
+
+  /* Text */
+  --text-primary: #1a1a2e;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
+  --text-dim: #a1a1aa;
+  --text-accent: #7c3aed;
+
+  /* Borders */
+  --border-default: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(139, 92, 246, 0.25);
+  --border-active: #8b5cf6;
+
+  /* Gradients */
+  --gradient-card-border: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(6,182,212,0.08));
+  --gradient-bg-subtle: radial-gradient(ellipse at top, rgba(139,92,246,0.05), transparent 70%);
+
+  color-scheme: light;
+}
+
 /* ── Keyframe Animations ───────────────────────────── */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -755,6 +805,107 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ── Light theme component overrides ───────────────── */
+.light .card {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.light .card:hover {
+  border-color: rgba(139, 92, 246, 0.25);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 4px 24px rgba(139, 92, 246, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.light .glass {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+}
+
+.light .stat-card {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.light .stat-card:hover {
+  border-color: rgba(139, 92, 246, 0.25);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.06);
+}
+
+.light .input {
+  background: var(--bg-elevated);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+}
+
+.light .config-input {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  color: var(--text-primary);
+}
+
+.light .config-input:focus {
+  border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.06);
+}
+
+.light .config-textarea {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  color: var(--text-primary);
+}
+
+.light .config-textarea:focus {
+  border-color: rgba(6, 182, 212, 0.4);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.06);
+}
+
+.light .toast {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: var(--text-primary);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+.light .shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-elevated) 25%,
+    var(--bg-hover) 50%,
+    var(--bg-elevated) 75%
+  );
+  background-size: 200% 100%;
+}
+
+.light .chat-bubble-user {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(6, 182, 212, 0.06) 100%);
+  border-color: rgba(6, 182, 212, 0.2);
+}
+
+.light .chat-bubble-assistant {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.06) 0%, rgba(139, 92, 246, 0.03) 100%);
+  border-color: rgba(139, 92, 246, 0.12);
+}
+
+.light ::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.2);
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.35);
 }
 
 /* ── Solana Wallet Adapter overrides ───────────────── */

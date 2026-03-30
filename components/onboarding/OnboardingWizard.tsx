@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { X, ArrowRight, ArrowLeft, Rocket, Bot, Cpu, Sparkles, Check } from 'lucide-react';
+import { X, ArrowRight, ArrowLeft, Rocket, Bot, Cpu, Sparkles, Check, MessageSquare, Plug, BarChart3, Key } from 'lucide-react';
 
 const FRAMEWORKS = [
   {
@@ -36,7 +36,38 @@ const FRAMEWORKS = [
   },
 ];
 
-const STEPS = ['Welcome', 'Framework', 'Ready'];
+const DASHBOARD_FEATURES = [
+  {
+    icon: MessageSquare,
+    title: 'Chat with your agent',
+    description: 'Test your agent\'s responses in real-time',
+    color: 'text-purple-400',
+    bg: 'bg-purple-500/10 border-purple-500/20',
+  },
+  {
+    icon: Plug,
+    title: 'Configure integrations',
+    description: 'Connect Telegram, Discord, Twitter & more',
+    color: 'text-cyan-400',
+    bg: 'bg-cyan-500/10 border-cyan-500/20',
+  },
+  {
+    icon: BarChart3,
+    title: 'Monitor performance',
+    description: 'View analytics, usage stats, and logs',
+    color: 'text-emerald-400',
+    bg: 'bg-emerald-500/10 border-emerald-500/20',
+  },
+  {
+    icon: Key,
+    title: 'Bring Your Own Key',
+    description: 'Use your own LLM API key for unlimited messages',
+    color: 'text-amber-400',
+    bg: 'bg-amber-500/10 border-amber-500/20',
+  },
+];
+
+const STEPS = ['Welcome', 'Framework', 'Features', 'Ready'];
 
 export function OnboardingWizard({ onClose }: { onClose: () => void }) {
   const router = useRouter();
@@ -173,8 +204,48 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
               </motion.div>
             )}
 
-            {/* Step 2: Ready to create */}
+            {/* Step 2: Dashboard Features */}
             {step === 2 && (
+              <motion.div key="features" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}>
+                <h2 className="text-xl font-bold text-white mb-1">What you can do</h2>
+                <p className="text-sm text-[#a1a1aa] mb-5">Your dashboard gives you full control over every agent.</p>
+
+                <div className="space-y-2.5 mb-6">
+                  {DASHBOARD_FEATURES.map((feat, i) => (
+                    <div
+                      key={i}
+                      className={`flex items-start gap-3.5 p-3.5 rounded-xl border ${feat.bg} transition-all`}
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center shrink-0 mt-0.5">
+                        <feat.icon className={`w-4.5 h-4.5 ${feat.color}`} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-white">{feat.title}</p>
+                        <p className="text-xs text-[#71717a] mt-0.5 leading-snug">{feat.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex gap-2.5">
+                  <button
+                    onClick={() => setStep(1)}
+                    className="flex items-center justify-center gap-1.5 border border-white/[0.1] text-[#a1a1aa] font-medium py-3 px-5 rounded-xl text-sm hover:bg-white/[0.04] transition-all"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> Back
+                  </button>
+                  <button
+                    onClick={() => setStep(3)}
+                    className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium py-3 rounded-xl text-sm hover:from-purple-500 hover:to-purple-400 transition-all"
+                  >
+                    Continue <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Step 3: Ready to create */}
+            {step === 3 && (
               <motion.div key="ready" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}>
                 <div className="text-center mb-6">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-5">
@@ -193,14 +264,14 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-white">{FRAMEWORKS.find(f => f.id === selectedFramework)?.name}</p>
-                      <p className="text-xs text-[#71717a]">Free tier — 20 messages/day</p>
+                      <p className="text-xs text-[#71717a]">Free tier — 10 messages/day</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex gap-2.5">
                   <button
-                    onClick={() => setStep(1)}
+                    onClick={() => setStep(2)}
                     className="flex items-center justify-center gap-1.5 border border-white/[0.1] text-[#a1a1aa] font-medium py-3 px-5 rounded-xl text-sm hover:bg-white/[0.04] transition-all"
                   >
                     <ArrowLeft className="w-4 h-4" /> Back

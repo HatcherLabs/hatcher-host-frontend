@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 // ── Nav links when logged IN ──
 const AUTH_NAV_LINKS = [
@@ -101,7 +102,7 @@ export function Header() {
   const mobileLinks = isAuthenticated ? MOBILE_AUTH_LINKS : MOBILE_GUEST_LINKS;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-black/50 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-[var(--border-default)] backdrop-blur-xl" style={{ backgroundColor: 'color-mix(in srgb, var(--bg-base) 80%, transparent)' }}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between">
 
@@ -129,7 +130,7 @@ export function Header() {
                     <ellipse cx="11" cy="10" rx="2.5" ry="4" fill="white" opacity="0.04" transform="rotate(-15 11 10)" />
                   </svg>
                 </span>
-                <span className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+                <span className="text-lg font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
                   Hatcher
                 </span>
               </span>
@@ -223,6 +224,7 @@ export function Header() {
           {/* Right side: notifications + user menu + hamburger */}
           <div className="flex items-center gap-2">
             <div className="hidden lg:flex items-center gap-2">
+              <ThemeToggle />
               {authLoading ? (
                 <div className="h-9 w-24 rounded-lg bg-white/[0.04] animate-pulse" />
               ) : isAuthenticated && user ? (
@@ -249,9 +251,9 @@ export function Header() {
                           transition={{ duration: 0.15 }}
                           className="absolute right-0 mt-1 w-52 rounded-xl shadow-xl z-50 overflow-hidden"
                           style={{
-                            background: 'rgba(14, 14, 20, 0.95)',
+                            background: 'color-mix(in srgb, var(--bg-surface) 95%, transparent)',
                             backdropFilter: 'blur(24px)',
-                            border: '1px solid rgba(255, 255, 255, 0.06)',
+                            border: '1px solid var(--border-default)',
                           }}
                         >
                           {/* User info */}
@@ -319,7 +321,10 @@ export function Header() {
               )}
             </div>
 
-            {/* Mobile notification bell */}
+            {/* Mobile theme toggle + notification bell */}
+            <div className="lg:hidden">
+              <ThemeToggle />
+            </div>
             {isAuthenticated && user && (
               <div className="lg:hidden">
                 <NotificationCenter />
@@ -347,7 +352,7 @@ export function Header() {
         {mobileOpen && (
           <motion.div
             id="mobile-nav-menu"
-            className="lg:hidden border-t border-white/[0.06] bg-black/80 backdrop-blur-xl"
+            className="lg:hidden border-t border-[var(--border-default)] backdrop-blur-xl" style={{ backgroundColor: 'color-mix(in srgb, var(--bg-base) 90%, transparent)' }}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
