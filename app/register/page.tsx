@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
+import { track } from '@/lib/analytics';
 import { Check, X, Gift, Zap, Layers, Rocket } from 'lucide-react';
 
 interface PasswordStrength {
@@ -44,6 +45,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
+  const didSubmit = useRef(false);
   const strength = useMemo(() => getPasswordStrength(password), [password]);
 
   // Referral code from URL
@@ -61,7 +63,10 @@ export default function RegisterPage() {
   }, [refCode]);
 
   useEffect(() => {
-    if (isAuthenticated) router.push('/dashboard');
+    if (isAuthenticated) {
+      if (didSubmit.current) track.register();
+      router.push('/dashboard');
+    }
   }, [isAuthenticated, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,6 +86,7 @@ export default function RegisterPage() {
       return;
     }
 
+    didSubmit.current = true;
     await register(email, username, password, refCode || undefined);
   };
 

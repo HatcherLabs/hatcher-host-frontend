@@ -9,6 +9,7 @@ import { AuthProvider } from '@/lib/auth-context';
 import { LayoutShell } from '@/components/layout/LayoutShell';
 import { ToastProvider } from '@/components/ui/ToastProvider';
 import { CommandPalette } from '@/components/ui/CommandPalette';
+import { PosthogProvider } from '@/components/providers/PosthogProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -193,16 +194,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <Script src="/register-sw.js" strategy="afterInteractive" />
-        <ThemeProvider>
-          <AuthProvider>
-            <WalletProvider>
-              <ToastProvider>
-                <LayoutShell>{children}</LayoutShell>
-                <CommandPalette />
-              </ToastProvider>
-            </WalletProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <PosthogProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <WalletProvider>
+                <ToastProvider>
+                  <LayoutShell>{children}</LayoutShell>
+                  <CommandPalette />
+                </ToastProvider>
+              </WalletProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </PosthogProvider>
       </body>
     </html>
   );

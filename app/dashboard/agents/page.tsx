@@ -26,6 +26,7 @@ import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
 import { QuickStats } from '@/components/dashboard/QuickStats';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ShortcutHelpModal } from '@/components/ui/ShortcutHelpModal';
+import { AgentCardSkeleton, SkeletonStat } from '@/components/ui/Skeleton';
 
 import { AGENT_STATUSES, AGENT_STATUS_CONFIG } from '@hatcher/shared';
 import type { AgentFramework } from '@hatcher/shared';
@@ -204,29 +205,6 @@ function getStatusGlowClass(status: string): string {
   }
 }
 
-// ── Skeleton card for loading state ──────────────────────────
-function SkeletonCard() {
-  return (
-    <div className="card glass-noise p-5">
-      <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-xl shimmer flex-shrink-0" />
-        <div className="flex-1 space-y-3">
-          <div className="h-4 w-32 rounded shimmer" />
-          <div className="h-3 w-full rounded shimmer" />
-          <div className="h-3 w-2/3 rounded shimmer" />
-        </div>
-      </div>
-      <div className="flex items-center gap-2 mt-4">
-        <div className="h-5 w-16 rounded-full shimmer" />
-        <div className="h-5 w-14 rounded-full shimmer" />
-      </div>
-      <div className="flex items-center justify-between mt-4 pt-3 border-t border-[rgba(46,43,74,0.3)]">
-        <div className="h-3 w-20 rounded shimmer" />
-        <div className="h-3 w-16 rounded shimmer" />
-      </div>
-    </div>
-  );
-}
 
 // ═════════════════════════════════════════════════════════════
 // My Agents Page
@@ -385,16 +363,13 @@ export default function MyAgentsPage() {
           {/* Stat cards skeleton */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="card glass-noise p-5">
-                <div className="h-4 w-24 rounded shimmer mb-3" />
-                <div className="h-8 w-16 rounded shimmer" />
-              </div>
+              <SkeletonStat key={i} />
             ))}
           </div>
-          {/* Cards skeleton */}
+          {/* Agent cards skeleton */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <SkeletonCard key={i} />
+              <AgentCardSkeleton key={i} />
             ))}
           </div>
         </div>

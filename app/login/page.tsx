@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { track } from '@/lib/analytics';
 import { Zap, Layers, Rocket } from 'lucide-react';
 
 export default function LoginPage() {
@@ -11,13 +12,18 @@ export default function LoginPage() {
   const { login, isAuthenticated, isLoading, error, clearError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const didSubmit = useRef(false);
 
   useEffect(() => {
-    if (isAuthenticated) router.push('/dashboard');
+    if (isAuthenticated) {
+      if (didSubmit.current) track.login();
+      router.push('/dashboard');
+    }
   }, [isAuthenticated, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    didSubmit.current = true;
     await login(email, password);
   };
 

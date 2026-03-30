@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
+import { track } from '@/lib/analytics';
 import { BYOK_PROVIDERS, getBYOKProvider, AGENT_TEMPLATES } from '@hatcher/shared';
 import type { BYOKProvider, AgentTemplateId } from '@hatcher/shared';
 import { cn } from '@/lib/utils';
@@ -395,6 +396,7 @@ export default function CreatePage() {
       }
 
       // Success -- confetti!
+      track.createAgent(selectedFramework);
       setLaunching(false);
       setLaunched(true);
       confetti({
