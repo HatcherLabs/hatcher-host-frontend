@@ -189,7 +189,7 @@ export default function AgentManagePage() {
           id: `hist-${i}`,
           role: m.role as 'user' | 'assistant',
           content: m.content,
-          timestamp: new Date(m.ts),
+          timestamp: m.ts ? new Date(m.ts) : new Date(),
         }));
         setMessages(loaded);
         lastSavedCountRef.current = loaded.length;
