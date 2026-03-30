@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { API_URL } from '@/lib/config';
+import { generateAgentAvatar } from '@/lib/avatar-generator';
 import { FRAMEWORKS } from '@hatcher/shared';
 import type { AgentFramework } from '@hatcher/shared';
 import { Activity, Calendar, MessageSquare, Clock, ExternalLink } from 'lucide-react';
@@ -231,20 +232,12 @@ export default async function AgentStatusPage({
           {/* Avatar + identity */}
           <div className="flex flex-col items-center text-center mb-8">
             <div className="relative mb-4">
-              {avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={avatarUrl}
-                  alt={stats.name}
-                  className="w-20 h-20 rounded-2xl object-cover border border-[var(--border-default)]"
-                />
-              ) : (
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#8b5cf6]/30 to-[#06b6d4]/30 border border-white/10 flex items-center justify-center">
-                  <span className="text-3xl font-bold text-white/80" aria-hidden="true">
-                    {stats.name.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-              )}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={avatarUrl || generateAgentAvatar(stats.name, stats.framework)}
+                alt={stats.name}
+                className="w-20 h-20 rounded-2xl object-cover border border-[var(--border-default)]"
+              />
               {/* Online ring */}
               {isOnline && (
                 <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-500 border-2 border-[var(--bg-base)] flex items-center justify-center" aria-hidden="true">

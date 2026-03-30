@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
 import { cn, timeAgo } from '@/lib/utils';
+import { generateAgentAvatar } from '@/lib/avatar-generator';
 
 import { useAuth } from '@/lib/auth-context';
 import {
@@ -638,19 +639,13 @@ const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agen
             {/* Header: avatar + name + status */}
             <div className="flex items-start gap-3 mb-3">
               {/* Avatar — real image or framework SVG icon */}
-              {agent.avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={agent.avatarUrl}
-                  alt={agent.name}
-                  className="w-12 h-12 rounded-full border border-[rgba(46,43,74,0.3)] object-cover flex-shrink-0 transition-all duration-300"
-                  style={{ ['--tw-ring-color' as string]: fwConfig.border }}
-                />
-              ) : (
-                <div className="flex-shrink-0">
-                  <FrameworkAvatar framework={fw} size={48} />
-                </div>
-              )}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={agent.avatarUrl || generateAgentAvatar(agent.name, fw)}
+                alt={agent.name}
+                className="w-12 h-12 rounded-full border border-[rgba(46,43,74,0.3)] object-cover flex-shrink-0 transition-all duration-300"
+                style={{ ['--tw-ring-color' as string]: fwConfig.border }}
+              />
 
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-[#FFFFFF] truncate group-hover:transition-colors duration-200" style={{}}>

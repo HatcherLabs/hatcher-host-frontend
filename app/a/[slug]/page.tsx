@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { generateAgentAvatar } from '@/lib/avatar-generator';
 import { ShareModal } from '@/components/agents/ShareModal';
 import {
   Send,
@@ -229,14 +230,8 @@ export default function AgentPublicProfilePage() {
         {/* Agent profile card */}
         <div className="bg-[#12121a] border border-white/8 rounded-2xl p-6 flex flex-col sm:flex-row items-start gap-5">
           {/* Avatar */}
-          {agent.avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={agent.avatarUrl} alt={agent.name} className="w-20 h-20 rounded-2xl object-cover shrink-0" />
-          ) : (
-            <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${fwAvatar.gradient} flex items-center justify-center text-white shrink-0 border border-white/10`}>
-              <FwIcon className="w-9 h-9" />
-            </div>
-          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)} alt={agent.name} className="w-20 h-20 rounded-2xl object-cover shrink-0" />
 
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2 mb-1">
@@ -289,14 +284,8 @@ export default function AgentPublicProfilePage() {
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full gap-3 text-center py-12">
-                {agent.avatarUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={agent.avatarUrl} alt={agent.name} className="w-12 h-12 rounded-xl object-cover" />
-                ) : (
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${fwAvatar.gradient} flex items-center justify-center text-white border border-white/10`}>
-                    <FwIcon className="w-6 h-6" />
-                  </div>
-                )}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)} alt={agent.name} className="w-12 h-12 rounded-xl object-cover" />
                 <p className="text-zinc-400 text-sm">
                   Say hello to <span className="text-white font-medium">{agent.name}</span>
                 </p>
@@ -309,14 +298,8 @@ export default function AgentPublicProfilePage() {
                 className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.role === 'assistant' && (
-                  agent.avatarUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={agent.avatarUrl} alt="" className="w-7 h-7 rounded-lg object-cover shrink-0 mt-0.5" />
-                  ) : (
-                    <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${fwAvatar.gradient} flex items-center justify-center shrink-0 mt-0.5`}>
-                      <FwIcon className="w-4 h-4 text-white" />
-                    </div>
-                  )
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)} alt="" className="w-7 h-7 rounded-lg object-cover shrink-0 mt-0.5" />
                 )}
 
                 <div

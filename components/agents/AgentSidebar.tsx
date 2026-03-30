@@ -29,6 +29,7 @@ import { FRAMEWORKS } from '@hatcher/shared';
 import type { LucideIcon } from 'lucide-react';
 import type { Agent } from '@/lib/api';
 import Link from 'next/link';
+import { generateAgentAvatar } from '@/lib/avatar-generator';
 
 interface TabDef {
   id: Tab;
@@ -107,19 +108,11 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
           All Agents
         </Link>
         <div className="flex items-center gap-3">
-          {agent.avatarUrl ? (
-            <img
-              src={agent.avatarUrl}
-              alt={agent.name}
-              className="w-10 h-10 rounded-full object-cover border border-[rgba(46,43,74,0.3)] flex-shrink-0"
-            />
-          ) : (
-            <div
-              className={`w-10 h-10 rounded-full bg-gradient-to-br ${avatarColors.bg} flex items-center justify-center ${avatarColors.text} border border-[rgba(46,43,74,0.3)] flex-shrink-0`}
-            >
-              <FrameworkIcon size={18} />
-            </div>
-          )}
+          <img
+            src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)}
+            alt={agent.name}
+            className="w-10 h-10 rounded-full object-cover border border-[rgba(46,43,74,0.3)] flex-shrink-0"
+          />
           <div className="min-w-0">
             <h2 className="text-sm font-semibold text-[#FFFFFF] truncate">{agent.name}</h2>
             <div className="flex items-center gap-2 mt-0.5">
@@ -211,19 +204,11 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
           >
             <ChevronLeft size={16} />
           </Link>
-          {agent.avatarUrl ? (
-            <img
-              src={agent.avatarUrl}
-              alt={agent.name}
-              className="w-5 h-5 rounded-full object-cover border border-[rgba(46,43,74,0.3)] flex-shrink-0"
-            />
-          ) : (
-            <div
-              className={`w-5 h-5 rounded-full bg-gradient-to-br ${avatarColors.bg} flex items-center justify-center ${avatarColors.text} border border-[rgba(46,43,74,0.3)] flex-shrink-0`}
-            >
-              <FrameworkIcon size={10} />
-            </div>
-          )}
+          <img
+            src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)}
+            alt={agent.name}
+            className="w-5 h-5 rounded-full object-cover border border-[rgba(46,43,74,0.3)] flex-shrink-0"
+          />
           <span className="text-xs font-semibold text-white truncate min-w-0">{agent.name}</span>
           <div className="ml-auto flex items-center gap-1.5 flex-shrink-0">
             <span

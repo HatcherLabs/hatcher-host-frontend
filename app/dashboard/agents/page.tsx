@@ -27,6 +27,7 @@ import { QuickStats } from '@/components/dashboard/QuickStats';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ShortcutHelpModal } from '@/components/ui/ShortcutHelpModal';
 import { AgentCardSkeleton, SkeletonStat } from '@/components/ui/Skeleton';
+import { generateAgentAvatar } from '@/lib/avatar-generator';
 
 import { AGENT_STATUSES, AGENT_STATUS_CONFIG } from '@hatcher/shared';
 import type { AgentFramework } from '@hatcher/shared';
@@ -539,17 +540,11 @@ export default function MyAgentsPage() {
                   {/* Top: Avatar + Name + Status */}
                   <div className="flex items-start gap-3.5">
                     {/* Avatar */}
-                    {agent.avatarUrl ? (
-                      <img
-                        src={agent.avatarUrl}
-                        alt={agent.name}
-                        className="w-12 h-12 rounded-xl object-cover flex-shrink-0 ring-1 ring-white/10"
-                      />
-                    ) : (
-                      <div className="flex-shrink-0">
-                        <FrameworkAvatar framework={agent.framework} size={48} />
-                      </div>
-                    )}
+                    <img
+                      src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)}
+                      alt={agent.name}
+                      className="w-12 h-12 rounded-xl object-cover flex-shrink-0 ring-1 ring-white/10"
+                    />
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">

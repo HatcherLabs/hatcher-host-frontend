@@ -8,6 +8,7 @@ import type { Agent } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { shortenAddress, timeAgo } from '@/lib/utils';
+import { generateAgentAvatar } from '@/lib/avatar-generator';
 import { FRAMEWORKS } from '@hatcher/shared';
 import type { AgentFramework } from '@hatcher/shared';
 import { motion } from 'framer-motion';
@@ -194,20 +195,12 @@ export function AgentPageClient() {
       <motion.div className={`${cardClass} p-8 mb-6`} variants={itemVariants}>
         {/* Avatar + Name */}
         <div className="flex items-start gap-5 mb-6">
-          {agent.avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={agent.avatarUrl}
-              alt={agent.name}
-              className="w-20 h-20 rounded-2xl object-cover flex-shrink-0 border border-[var(--border-default)]"
-            />
-          ) : (
-            <div
-              className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${fwAvatar.gradient} flex items-center justify-center text-white flex-shrink-0 border border-white/10`}
-            >
-              <FwIcon className="w-9 h-9" />
-            </div>
-          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)}
+            alt={agent.name}
+            className="w-20 h-20 rounded-2xl object-cover flex-shrink-0 border border-[var(--border-default)]"
+          />
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 flex-wrap mb-2">

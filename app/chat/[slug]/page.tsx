@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { generateAgentAvatar } from '@/lib/avatar-generator';
 import { Send, Loader2, AlertTriangle, Bot, Brain, Cpu, Sparkles, User } from 'lucide-react';
 
 const FRAMEWORK_AVATAR: Record<string, { gradient: string; icon: React.ComponentType<{ className?: string }> }> = {
@@ -132,17 +133,11 @@ export default function PublicChatPage() {
       {/* Header */}
       <header className="flex-shrink-0 border-b border-white/[0.06] bg-[#0F0D1F]/80 backdrop-blur-xl">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
-          {agent.avatarUrl ? (
-            <img
-              src={agent.avatarUrl}
-              alt={agent.name}
-              className="w-9 h-9 rounded-full object-cover border border-white/[0.08]"
-            />
-          ) : (
-            <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${fwAvatar.gradient} border border-white/10 flex items-center justify-center`}>
-              <FwIcon className="w-4 h-4 text-white" />
-            </div>
-          )}
+          <img
+            src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)}
+            alt={agent.name}
+            className="w-9 h-9 rounded-full object-cover border border-white/[0.08]"
+          />
           <div className="flex-1 min-w-0">
             <h1 className="text-sm font-semibold text-white truncate">{agent.name}</h1>
             {agent.description && (
