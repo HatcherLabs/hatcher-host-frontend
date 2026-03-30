@@ -198,7 +198,7 @@ export default function PricingPage() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="text-4xl sm:text-5xl font-extrabold mb-5 relative text-white"
+            className="text-4xl sm:text-5xl font-extrabold mb-5 relative text-[var(--text-primary)]"
           >
             Choose Your Plan
           </motion.h1>
