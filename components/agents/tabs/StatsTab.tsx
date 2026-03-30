@@ -606,7 +606,7 @@ export function StatsTab() {
             { label: 'Messages', value: tierKey === 'business' ? '500/day' : tierKey === 'pro' ? '200/day' : tierKey === 'starter' ? '50/day' : '10/day' },
             { label: 'Resources', value: tierKey === 'business' ? '2 CPU, 3GB RAM' : tierKey === 'pro' ? '1.5 CPU, 2GB RAM' : tierKey === 'starter' ? '1 CPU, 1.5GB RAM' : '0.5 CPU, 1GB RAM' },
             { label: 'Auto-sleep', value: tierKey === 'business' ? 'Always-on' : tierKey === 'pro' ? 'Always-on' : tierKey === 'starter' ? '2 hours idle' : '10 min idle' },
-            { label: 'File Manager', value: tierKey === 'business' ? 'Included' : tierKey === 'pro' ? 'Add-on ($9.99)' : 'Not available' },
+            { label: 'File Manager', value: tierKey === 'business' ? 'Included' : tierKey === 'pro' ? 'Add-on ($4.99)' : 'Not available' },
             { label: 'Integrations', value: 'All included' },
           ];
 

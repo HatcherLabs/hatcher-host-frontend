@@ -76,7 +76,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>If you do not have platform tokens yet, don't worry — we cover how to get them below.</p>
 
 <h2>Step 1: Create Your Free Account</h2>
-<p>Head to <a href="https://hatcher.host/register">hatcher.host/register</a> and create a free account. All you need is an email and password. No credit card required. Every free account includes <strong>one agent</strong> with <strong>20 messages per day</strong> using our hosted Groq models.</p>
+<p>Head to <a href="https://hatcher.host/register">hatcher.host/register</a> and create a free account. All you need is an email and password. No credit card required. Every free account includes <strong>one agent</strong> with <strong>10 messages per day</strong> using our hosted Groq models.</p>
 
 <h2>Step 2: Pick Your Framework</h2>
 <p>From your dashboard, click <strong>Create Agent</strong>. You will see the available frameworks:</p>
@@ -122,7 +122,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>You can also connect <strong>Twitter/X</strong>, <strong>WhatsApp</strong>, and <strong>Slack</strong> — each requires its own API credentials from the respective platform.</p>
 
 <h2>Step 6: Choose Your LLM</h2>
-<p>Every free account includes 20 messages per day using our hosted Groq models — no API key needed. If you want <strong>unlimited messages</strong>, enable <strong>BYOK</strong> (Bring Your Own Key) and connect your own API key from OpenAI, Anthropic, Google, Groq, xAI, or OpenRouter. BYOK is free to use on every plan — you only pay your provider's API costs.</p>
+<p>Every free account includes 10 messages per day using our hosted Groq models — no API key needed. If you want <strong>unlimited messages</strong>, enable <strong>BYOK</strong> (Bring Your Own Key) and connect your own API key from OpenAI, Anthropic, Google, Groq, xAI, or OpenRouter. BYOK is free to use on every plan — you only pay your provider's API costs.</p>
 
 <h2>Step 7: Deploy</h2>
 <p>Click <strong>Deploy</strong>. Hatcher builds your agent's isolated Docker container, injects your encrypted configuration, connects to the LLM proxy, and starts the agent process. Within seconds, your agent is live and responding on every platform you configured.</p>
@@ -154,7 +154,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <ul>
 <li><strong>Be specific in your system prompt</strong> — Tell the agent exactly what it should and should not do</li>
 <li><strong>Start with one platform</strong> — Get it working on Telegram first, then expand</li>
-<li><strong>Use BYOK for production</strong> — The free 20 messages/day is great for testing, but BYOK gives you unlimited messages</li>
+<li><strong>Use BYOK for production</strong> — The free 10 messages/day is great for testing, but BYOK gives you unlimited messages</li>
 <li><strong>Monitor your logs</strong> — Check the dashboard regularly to see how your agent is performing</li>
 </ul>
 <p>Welcome to the future of AI deployment. Your first agent is live.</p>`,
@@ -221,7 +221,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <tr><td>Resource usage</td><td>Moderate</td><td>Low</td><td>Moderate-High</td></tr>
 <tr><td>Best LLM pairing</td><td>Any (Groq, OpenAI, Anthropic)</td><td>Hermes-tuned, OpenAI, Anthropic</td><td>Any (OpenAI, Anthropic, Groq)</td></tr>
 <tr><td>Setup complexity</td><td>Low (GUI config)</td><td>Low (GUI config)</td><td>Low (GUI config)</td></tr>
-<tr><td>Ideal tier</td><td>Any</td><td>Any (runs well on Free)</td><td>Basic or Pro</td></tr>
+<tr><td>Ideal tier</td><td>Any</td><td>Any (runs well on Free)</td><td>Starter or Pro</td></tr>
 </tbody>
 </table>
 
@@ -238,7 +238,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>If your agent needs to interact with smart contracts, execute trades, or manage token-gated communities, <strong>ElizaOS</strong> is purpose-built for this.</p>
 
 <h3>Are you resource-constrained?</h3>
-<p>On the free tier (0.5 CPU, 1GB RAM), <strong>Hermes</strong> runs most efficiently. OpenClaw and ElizaOS work but benefit from Basic or Pro tier resources.</p>
+<p>On the free tier (0.5 CPU, 1GB RAM), <strong>Hermes</strong> runs most efficiently. OpenClaw and ElizaOS work but benefit from Starter or Pro tier resources.</p>
 
 <h2>Can I Switch Later?</h2>
 <p>Absolutely. You can create multiple agents on Hatcher, each with a different framework. Free accounts include one agent, but you can purchase add-on agent slots to run all three side by side. Your platform tokens and LLM keys are stored at the account level, so switching frameworks does not require reconfiguring integrations from scratch.</p>
@@ -334,8 +334,8 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>Use <strong>Hermes</strong> with the <strong>Personal Assistant</strong> template. Its persistent memory means it learns your preferences and frequently-referenced information over time. Connect it to Telegram for always-available mobile access. BYOK with Groq gives you fast responses, or use Anthropic's Claude for more nuanced writing assistance.</p>
 
 <h2>Getting Started</h2>
-<p>All five of these agents can be deployed on Hatcher's <strong>free tier</strong> with 20 messages per day. That is enough to test and validate the workflow. When you are ready for production, enable <strong>BYOK</strong> for unlimited messages or upgrade to a paid plan for more resources and multiple agents.</p>
-<p>The math is simple: if an agent saves you even 10 hours per week at a conservative $25/hour value, that is $1,000/month in recovered productivity. Hatcher's Pro plan costs $19.99/month. The ROI is immediate.</p>
+<p>All five of these agents can be deployed on Hatcher's <strong>free tier</strong> with 10 messages per day. That is enough to test and validate the workflow. When you are ready for production, enable <strong>BYOK</strong> for unlimited messages or upgrade to a paid plan for more resources and multiple agents.</p>
+<p>The math is simple: if an agent saves you even 10 hours per week at a conservative $25/hour value, that is $1,000/month in recovered productivity. Hatcher's Pro plan costs $14.99/month. The ROI is immediate.</p>
 <p>Deploy your first agent at <a href="https://hatcher.host">hatcher.host</a> and start reclaiming your time today.</p>`,
     author: 'HatcherLabs Team',
     date: '2026-03-20',
@@ -353,9 +353,9 @@ export const BLOG_POSTS: BlogPost[] = [
 <h2>What Is BYOK?</h2>
 <p>BYOK stands for <strong>Bring Your Own Key</strong>. When you create an agent on Hatcher, it needs access to a large language model (LLM) to think and respond. By default, Hatcher provides a hosted Groq LLM with daily message limits based on your plan:</p>
 <ul>
-<li><strong>Free:</strong> 20 messages per day per agent</li>
-<li><strong>Basic ($9.99/mo):</strong> 100 messages per day per agent</li>
-<li><strong>Pro ($19.99/mo):</strong> 300 messages per day per agent</li>
+<li><strong>Free:</strong> 10 messages per day per agent</li>
+<li><strong>Starter ($4.99/mo):</strong> 50 messages per day per agent</li>
+<li><strong>Pro ($14.99/mo):</strong> 200 messages per day per agent</li>
 </ul>
 <p>With BYOK, you bypass these limits entirely. You provide your own API key from a supported LLM provider, and your agent sends requests directly to that provider. No daily caps, no throttling, no restrictions. You pay your provider directly at their published rates.</p>
 
@@ -378,9 +378,9 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>Let's compare the real costs for a community management agent that handles approximately 200 messages per day:</p>
 <h3>Managed (Hatcher's Hosted LLM)</h3>
 <ul>
-<li>Free tier: 20 messages/day — far below the 200 needed. <strong>Not viable.</strong></li>
-<li>Basic ($9.99/mo): 100 messages/day — still insufficient. <strong>Not viable.</strong></li>
-<li>Pro ($19.99/mo): 300 messages/day — works, but you are paying $19.99/mo for the plan.</li>
+<li>Free tier: 10 messages/day — far below the 200 needed. <strong>Not viable.</strong></li>
+<li>Starter ($4.99/mo): 50 messages/day — still insufficient. <strong>Not viable.</strong></li>
+<li>Pro ($14.99/mo): 200 messages/day — works, but you are paying $14.99/mo for the plan.</li>
 </ul>
 <h3>BYOK on the Free Tier</h3>
 <ul>
@@ -399,8 +399,8 @@ export const BLOG_POSTS: BlogPost[] = [
 <h2>When Should You NOT Use BYOK?</h2>
 <p>BYOK is not always the right choice:</p>
 <ul>
-<li><strong>Testing and prototyping:</strong> The free 20 messages/day is plenty to test your agent. Do not bother with BYOK until you are ready for production.</li>
-<li><strong>Very low usage:</strong> If your agent handles fewer than 20 messages/day, the managed LLM on the free tier covers you at zero cost.</li>
+<li><strong>Testing and prototyping:</strong> The free 10 messages/day is plenty to test your agent. Do not bother with BYOK until you are ready for production.</li>
+<li><strong>Very low usage:</strong> If your agent handles fewer than 10 messages/day, the managed LLM on the free tier covers you at zero cost.</li>
 <li><strong>Simplicity:</strong> BYOK requires you to manage your own API key, monitor usage, and handle billing with your LLM provider. If you prefer a fully managed experience, the paid plans are simpler.</li>
 </ul>
 
@@ -472,7 +472,7 @@ export const BLOG_POSTS: BlogPost[] = [
 </ul>
 
 <h2>Free Tier, No Strings</h2>
-<p>Every account includes a free tier with one agent, 20 messages per day on our hosted LLM, and all integrations enabled. No credit card required. No trial period. Just sign up and deploy.</p>
+<p>Every account includes a free tier with one agent, 10 messages per day on our hosted LLM, and all integrations enabled. No credit card required. No trial period. Just sign up and deploy.</p>
 <p>If you bring your own LLM key (BYOK), messages are unlimited — even on the free tier. We made this choice deliberately: we believe you should be able to build and run a production agent without paying us anything, as long as you are willing to provide your own compute.</p>
 
 <h2>The Stack</h2>
@@ -514,7 +514,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <li>A Telegram account (mobile app or web)</li>
 <li>A free Hatcher account — <a href="https://hatcher.host/register">sign up here</a>, no credit card needed</li>
 </ul>
-<p>That's it. The LLM is provided by Hatcher (20 messages/day on free tier). If you want unlimited messages, add a free Groq API key at the end.</p>
+<p>That's it. The LLM is provided by Hatcher (10 messages/day on free tier). If you want unlimited messages, add a free Groq API key at the end.</p>
 
 <h2>Step 1: Get a Bot Token from BotFather (60 seconds)</h2>
 <p>Open Telegram and search for <strong>@BotFather</strong> — the official bot for creating bots.</p>
@@ -552,7 +552,7 @@ export const BLOG_POSTS: BlogPost[] = [
 </ul>
 
 <h2>Adding a Groq Key for Unlimited Messages</h2>
-<p>The free tier includes 20 messages per day using our hosted Groq key. If you want unlimited messages:</p>
+<p>The free tier includes 10 messages per day using our hosted Groq key. If you want unlimited messages:</p>
 <ol>
 <li>Get a free API key at <a href="https://console.groq.com">console.groq.com</a></li>
 <li>In your agent's Config tab, find <strong>BYOK Settings</strong></li>
@@ -815,7 +815,7 @@ export const BLOG_POSTS: BlogPost[] = [
 
 <h3>With BYOK on Hatcher</h3>
 <ul>
-<li>Platform fee: $0 (free tier) or $9.99/month (Basic)</li>
+<li>Platform fee: $0 (free tier) or $4.99/month (Starter)</li>
 <li>LLM cost: depends on your provider</li>
 <li>Groq (Llama 4 Scout): <strong>free tier available</strong></li>
 <li>OpenRouter: from $0.10 per million tokens</li>
@@ -878,10 +878,10 @@ export const BLOG_POSTS: BlogPost[] = [
 <h2>When to Upgrade from Free</h2>
 <p>The free tier is genuinely sufficient for most individual use cases. Consider upgrading when:</p>
 <ul>
-<li>You need <strong>more than one agent</strong> — Basic includes 1, Pro includes 5, plus add-on packs</li>
+<li>You need <strong>more than one agent</strong> — Starter includes 1, Pro includes 3, plus add-on packs</li>
 <li>You want <strong>dedicated resources</strong> — Pro gives 2 CPU, 2GB RAM per agent instead of shared</li>
 <li>You need <strong>file manager access</strong> — browse and edit your agent's workspace files</li>
-<li>You want <strong>longer idle time</strong> — free agents auto-sleep after 15 minutes, Basic after 6 hours, Pro stays on</li>
+<li>You want <strong>longer idle time</strong> — free agents auto-sleep after 10 minutes, Starter after 2 hours, Pro stays on</li>
 </ul>
 <p>But for a single agent with BYOK? Free works indefinitely.</p>
 
@@ -971,10 +971,10 @@ export const BLOG_POSTS: BlogPost[] = [
 <h3>True Monthly Cost</h3>
 <table>
 <tr><th>Tier</th><th>Cost</th><th>What You Get</th></tr>
-<tr><td>Free</td><td>$0</td><td>1 agent, 20 msg/day, all integrations</td></tr>
+<tr><td>Free</td><td>$0</td><td>1 agent, 10 msg/day, all integrations</td></tr>
 <tr><td>Free + BYOK</td><td>$0</td><td>1 agent, unlimited messages</td></tr>
-<tr><td>Basic</td><td>$9.99/mo</td><td>1 agent, 100 msg/day, better resources</td></tr>
-<tr><td>Pro</td><td>$19.99/mo</td><td>5 agents, 300 msg/day, file manager, full logs</td></tr>
+<tr><td>Starter</td><td>$4.99/mo</td><td>1 agent, 50 msg/day, better resources</td></tr>
+<tr><td>Pro</td><td>$14.99/mo</td><td>3 agents, 200 msg/day, file manager, full logs</td></tr>
 </table>
 
 <h2>The Comparison</h2>
@@ -983,7 +983,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <tr><th>Factor</th><th>Self-Hosting</th><th>Managed (Hatcher)</th></tr>
 <tr><td>Setup time</td><td>4–12 hours</td><td>60 seconds</td></tr>
 <tr><td>Technical skill needed</td><td>Docker, Linux, networking</td><td>None</td></tr>
-<tr><td>Monthly cost (1 agent)</td><td>$13–76 + time</td><td>$0–9.99</td></tr>
+<tr><td>Monthly cost (1 agent)</td><td>$13–76 + time</td><td>$0–4.99</td></tr>
 <tr><td>Uptime management</td><td>You handle it</td><td>Automatic</td></tr>
 <tr><td>Multi-platform support</td><td>You code each integration</td><td>20+ built-in</td></tr>
 <tr><td>Scaling to 5+ agents</td><td>Bigger VPS, more config</td><td>Upgrade tier</td></tr>

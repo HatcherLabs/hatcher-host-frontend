@@ -99,7 +99,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'How does the free tier work?',
-        a: 'Every account starts with a free tier that includes 1 agent. Free agents get 20 messages per day using our hosted Groq LLM key, with a 24-hour rolling reset. You get access to all integrations (Telegram, Discord, Twitter, WhatsApp, Slack). Free agents run on shared resources (0.5 CPU, 1GB RAM) and auto-sleep after 15 minutes of inactivity. If you bring your own API key (BYOK), messages are always unlimited and free.',
+        a: 'Every account starts with a free tier that includes 1 agent. Free agents get 10 messages per day using our hosted Groq LLM key, with a 24-hour rolling reset. You get access to all integrations (Telegram, Discord, Twitter, WhatsApp, Slack). Free agents run on shared resources (0.5 CPU, 1GB RAM) and auto-sleep after 10 minutes of inactivity. If you bring your own API key (BYOK), messages are always unlimited and free.',
       },
       {
         q: 'What is BYOK (Bring Your Own Key)?',
@@ -147,11 +147,11 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'What plans are available?',
-        a: 'Hatcher offers three tiers. Free: 1 agent, 20 messages/day, shared resources, auto-sleep after 15 min. Basic ($9.99/mo): 1 agent, 100 messages/day, better resources (1 CPU, 1.5GB RAM), auto-sleep after 6 hours. Pro ($19.99/mo): 5 agents, 300 messages/day per agent, dedicated resources (2 CPU, 2GB RAM), file manager, full log viewer, and priority support. All tiers include all integrations and BYOK is always unlimited.',
+        a: 'Hatcher offers four tiers. Free: 1 agent, 10 messages/day, shared resources, auto-sleep after 10 min. Starter ($4.99/mo): 1 agent, 50 messages/day, better resources (1 CPU, 1.5GB RAM), auto-sleep after 2 hours. Pro ($14.99/mo): 3 agents, 200 messages/day per agent, dedicated resources (2 CPU, 2GB RAM), file manager, full log viewer. Business ($39.99/mo): 10 agents, 500 messages/day per agent, always-on, priority support. All tiers include all integrations and BYOK is always unlimited.',
       },
       {
         q: 'How do add-ons work?',
-        a: 'Add-ons let you expand beyond your plan\'s included agent slots. You can stack multiple add-ons: +3 agents ($4.99/mo), +5 agents ($7.99/mo), or +10 agents ($14.99/mo). Add-ons are stackable and apply to your account. There\'s also a one-time File Manager add-on ($9.99/agent) that gives non-Pro users access to the file manager for a specific agent permanently.',
+        a: 'Add-ons let you expand beyond your plan\'s included agent slots. You can stack multiple add-ons: +3 agents ($3.99/mo) or +10 agents ($9.99/mo). Add-ons are stackable and apply to your account. There\'s also a one-time File Manager add-on ($4.99/agent) that gives non-Pro users access to the file manager for a specific agent permanently.',
       },
       {
         q: 'How do I upgrade or downgrade?',
@@ -173,7 +173,7 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'My agent is not responding',
-        a: 'First, check if your agent is running (status should show "running" on the dashboard). If it\'s stopped or sleeping, start it. If it\'s running but not responding: check that your integrations are properly configured with valid tokens, verify your daily message limit hasn\'t been reached (Free: 20/day, Basic: 100/day, Pro: 300/day), and check the Logs tab for errors. If using BYOK, confirm your API key is valid and has credits with the provider.',
+        a: 'First, check if your agent is running (status should show "running" on the dashboard). If it\'s stopped or sleeping, start it. If it\'s running but not responding: check that your integrations are properly configured with valid tokens, verify your daily message limit hasn\'t been reached (Free: 10/day, Starter: 50/day, Pro: 200/day, Business: 500/day), and check the Logs tab for errors. If using BYOK, confirm your API key is valid and has credits with the provider.',
       },
       {
         q: 'My agent keeps restarting',
@@ -181,7 +181,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'How do I check logs?',
-        a: 'Open your agent\'s dashboard and click the Logs tab. Free and Basic users see recent log entries. Pro users have access to the full log viewer with search and filtering. Logs show agent startup, incoming messages, LLM calls, errors, and integration events. If your agent is crashing, the last few log lines before the crash will usually explain why.',
+        a: 'Open your agent\'s dashboard and click the Logs tab. Free and Starter users see recent log entries. Pro and Business users have access to the full log viewer with search and filtering. Logs show agent startup, incoming messages, LLM calls, errors, and integration events. If your agent is crashing, the last few log lines before the crash will usually explain why.',
       },
       {
         q: 'My integration is not working',
@@ -189,7 +189,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'I am getting rate limited',
-        a: 'Rate limiting means you\'ve hit your daily message quota. Free tier: 20 messages/day, Basic: 100/day, Pro: 300/day. The limit resets on a 24-hour rolling window. Solutions: upgrade your plan for a higher limit, switch to BYOK (your own API key) for unlimited messages, or wait for the limit to reset. The 429 error in logs confirms rate limiting. BYOK always bypasses Hatcher\'s message limits.',
+        a: 'Rate limiting means you\'ve hit your daily message quota. Free tier: 10 messages/day, Starter: 50/day, Pro: 200/day, Business: 500/day. The limit resets on a 24-hour rolling window. Solutions: upgrade your plan for a higher limit, switch to BYOK (your own API key) for unlimited messages, or wait for the limit to reset. The 429 error in logs confirms rate limiting. BYOK always bypasses Hatcher\'s message limits.',
       },
     ],
   },

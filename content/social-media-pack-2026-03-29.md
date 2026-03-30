@@ -118,7 +118,7 @@ we're not trying to be premium. we're trying to be inevitable.
 2. community manager (Discord — welcomes, moderates, engages)
 3. content assistant (summarizes research, drafts responses)
 
-total cost with Hatcher + BYOK: $0 to $9.99/mo for all three.
+total cost with Hatcher + BYOK: $0 to $4.99/mo for all three.
 
 **Tweet 2 (Afternoon — Thread):**
 thread: how to set up a free crypto monitoring agent on Telegram 🧵
@@ -202,19 +202,19 @@ Curious if anyone here is running agents on local models — what's your setup?
 **Title:** We priced our AI agent hosting at $0 (free tier) — here's why and how the unit economics work
 
 **Body:**
-Building Hatcher — a managed hosting platform for AI agents. Our free tier gives users 1 agent with all 20+ integrations and 20 messages/day using our hosted LLM.
+Building Hatcher — a managed hosting platform for AI agents. Our free tier gives users 1 agent with all 20+ integrations and 10 messages/day using our hosted LLM.
 
 "How do you make money if it's free?"
 
 The key insight: our biggest cost is LLM inference, not infrastructure. A Docker container sitting idle costs almost nothing. So:
 
-1. **Free tier** uses our Groq key (free Llama 4) with a 20 msg/day cap. Cost to us: ~$0 per user.
+1. **Free tier** uses our Groq key (free Llama 4) with a 10 msg/day cap. Cost to us: ~$0 per user.
 2. **BYOK users** bring their own API key — we route their requests but pay nothing for inference. Cost to us: container overhead only (~$0.50/mo).
-3. **Paid tiers** ($9.99/$19.99) give more messages, more agents, dedicated resources. This is where margin lives.
+3. **Paid tiers** ($4.99/$14.99) give more messages, more agents, dedicated resources. This is where margin lives.
 
-The free tier is a real product, not a trial. It converts because people hit the 20 msg/day limit and either upgrade or add BYOK (which keeps them on the platform and generates word-of-mouth).
+The free tier is a real product, not a trial. It converts because people hit the 10 msg/day limit and either upgrade or add BYOK (which keeps them on the platform and generates word-of-mouth).
 
-Auto-sleep helps too — free agents sleep after 15 min idle, wake on message. So most free containers are stopped most of the time.
+Auto-sleep helps too — free agents sleep after 10 min idle, wake on message. So most free containers are stopped most of the time.
 
 Would love feedback on this model from other SaaS founders.
 
@@ -259,4 +259,4 @@ we solved this at Hatcher — deploy one agent and connect it to Telegram, Disco
 we actually run all 4 major ones (OpenClaw, Hermes, ElizaOS, Milady) on the same platform so you can try each without setup. wrote a comparison: hatcher.host/blog/openclaw-vs-hermes-vs-elizaos — tl;dr: OpenClaw for multi-platform, Hermes for autonomy, ElizaOS for crypto.
 
 **When someone mentions high AI SaaS prices:**
-yeah the AI tooling pricing is wild right now. we built Hatcher specifically to undercut — free tier with BYOK = $0, paid starts at $9.99. most competitors charge $30-60 for a single bot. hatcher.host
+yeah the AI tooling pricing is wild right now. we built Hatcher specifically to undercut — free tier with BYOK = $0, paid starts at $4.99. most competitors charge $30-60 for a single bot. hatcher.host

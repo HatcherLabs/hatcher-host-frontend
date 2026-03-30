@@ -331,7 +331,7 @@ export function FilesTab() {
             {purchasing ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Unlocking...</>
             ) : (
-              <><FolderOpen className="w-4 h-4" /> Unlock File Manager — $9.99</>
+              <><FolderOpen className="w-4 h-4" /> Unlock File Manager — $4.99</>
             )}
           </button>
           <span className="text-xs text-[#71717a]">One-time purchase for this agent</span>

@@ -122,7 +122,7 @@ export default function ClayDemoPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-text-primary mb-1">Pro Plan</h3>
-                <p className="text-text-muted text-sm">5 agents · $19.99/mo</p>
+                <p className="text-text-muted text-sm">3 agents · $14.99/mo</p>
               </div>
               <button className="clay-btn-primary text-sm w-full justify-center">
                 Upgrade

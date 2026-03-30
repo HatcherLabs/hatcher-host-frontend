@@ -98,7 +98,7 @@ export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
       { category: 'Feature', text: 'Full BYOK support for OpenAI, Anthropic, Google, Groq, xAI, OpenRouter, Ollama — always free, unlimited messages' },
       { category: 'Feature', text: 'LLMProxyService: hosted credits with 2.5× markup, supports Haiku 4.5, GPT-4o mini, Gemini 2.0 Flash' },
       { category: 'Feature', text: 'TierService: per-tier feature validation, subscription expiry, agent limits, container start checks' },
-      { category: 'Feature', text: 'Free (20 msg/day), Basic $9.99 (100 msg/day), Pro $19.99 (300 msg/day) — BYOK always unlimited' },
+      { category: 'Feature', text: 'Free (10 msg/day), Starter $4.99 (50 msg/day), Pro $14.99 (200 msg/day) — BYOK always unlimited' },
       { category: 'Feature', text: 'Agent creation wizard with LLM selection (Groq free / BYOK / Hosted Credits)' },
       { category: 'Feature', text: 'Pricing page with a la carte feature catalog, bundles, and credit packs' },
       { category: 'Security', text: 'On-chain Solana transaction verification via @solana/web3.js before feature unlock' },

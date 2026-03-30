@@ -21,7 +21,7 @@ const PLANNED_USE_CASES = [
   {
     icon: Zap,
     title: 'Subscriptions & Add-ons',
-    description: 'Subscribe to Basic ($9.99/mo) or Pro ($19.99/mo) tiers. Purchase agent add-ons to scale your fleet.',
+    description: 'Subscribe to Starter ($4.99/mo), Pro ($14.99/mo), or Business ($39.99/mo) tiers. Purchase agent add-ons to scale your fleet.',
     color: '#06b6d4',
   },
   {

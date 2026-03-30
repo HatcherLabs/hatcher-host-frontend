@@ -571,7 +571,7 @@ export default function LandingPage() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Free */}
             <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7 hover:border-white/[0.12] transition-colors duration-200">
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-emerald-400 mb-2">Free</p>
@@ -581,7 +581,7 @@ export default function LandingPage() {
               <ul className="space-y-2.5">
                 {[
                   '1 AI agent',
-                  '20 messages per day',
+                  '10 messages per day',
                   'All platforms included',
                   'Use your own AI key (free)',
                   'Free AI included (Groq)',
@@ -600,18 +600,18 @@ export default function LandingPage() {
               </Link>
             </motion.div>
 
-            {/* Basic */}
+            {/* Starter */}
             <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7 hover:border-white/[0.12] transition-colors duration-200">
-              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-purple-400 mb-2">Basic</p>
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-purple-400 mb-2">Starter</p>
               <div className="flex items-baseline gap-1">
-                <p className="text-3xl font-bold text-white">$9.99</p>
+                <p className="text-3xl font-bold text-white">$4.99</p>
                 <span className="text-sm text-[#71717a]">/mo</span>
               </div>
               <p className="text-sm text-[#a1a1aa] mb-6 mt-1">More messages, more power</p>
               <ul className="space-y-2.5">
                 {[
                   '1 AI agent',
-                  '100 messages/day',
+                  '50 messages/day',
                   'Unlimited with your AI key',
                   'All platforms included',
                   'Longer active time',
@@ -638,14 +638,14 @@ export default function LandingPage() {
                 <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-400 border border-cyan-500/20">POPULAR</span>
               </div>
               <div className="flex items-baseline gap-1">
-                <p className="text-3xl font-bold text-white">$19.99</p>
+                <p className="text-3xl font-bold text-white">$14.99</p>
                 <span className="text-sm text-[#71717a]">/mo</span>
               </div>
               <p className="text-sm text-[#a1a1aa] mb-6 mt-1">For serious creators</p>
               <ul className="space-y-2.5">
                 {[
-                  '5 AI agents',
-                  '300 messages/day per agent',
+                  '3 AI agents',
+                  '200 messages/day per agent',
                   'Unlimited with your AI key',
                   'More storage & resources',
                   'Priority support',
@@ -661,6 +661,37 @@ export default function LandingPage() {
                 className="mt-7 block text-center bg-white text-black font-semibold px-6 py-2.5 rounded-full hover:bg-white/90 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 text-sm"
               >
                 Go Pro
+              </Link>
+            </motion.div>
+
+            {/* Business */}
+            <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="bg-[#0e0e14] border border-amber-500/20 rounded-2xl p-7 relative overflow-hidden transition-colors duration-200">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-amber-400 mb-2">Business</p>
+              <div className="flex items-baseline gap-1">
+                <p className="text-3xl font-bold text-white">$39.99</p>
+                <span className="text-sm text-[#71717a]">/mo</span>
+              </div>
+              <p className="text-sm text-[#a1a1aa] mb-6 mt-1">Scale your AI fleet</p>
+              <ul className="space-y-2.5">
+                {[
+                  '10 AI agents',
+                  '500 messages/day per agent',
+                  'Always-on containers',
+                  'Dedicated resources',
+                  'Priority support',
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2.5 text-sm text-[#a1a1aa]">
+                    <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/pricing"
+                className="mt-7 block text-center border border-amber-500/30 text-amber-400 font-semibold px-6 py-2.5 rounded-full hover:bg-amber-500/10 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 text-sm"
+              >
+                Go Business
               </Link>
             </motion.div>
           </div>
@@ -687,7 +718,7 @@ export default function LandingPage() {
           </motion.div>
           <div className="space-y-3">
             {[
-              { q: 'Is it really free?', a: 'Yes. The free plan gives you 1 agent, 20 messages per day, and access to all platforms. We even include a free AI provider (Groq) so you don\'t need to pay anything to get started. No credit card required.' },
+              { q: 'Is it really free?', a: 'Yes. The free plan gives you 1 agent, 10 messages per day, and access to all platforms. We even include a free AI provider (Groq) so you don\'t need to pay anything to get started. No credit card required.' },
               { q: 'Do I need to know how to code?', a: 'Not at all! Creating an agent is like filling out a form — choose a name, describe what you want it to do, pick which platforms to connect, and hit launch. The whole process takes about 60 seconds.' },
               { q: 'What is "Bring Your Own Key"?', a: 'If you already have an account with OpenAI (ChatGPT), Google, Anthropic, or another AI provider, you can connect it to your agent. This gives you unlimited messages at no extra cost from us — you only pay your AI provider directly.' },
               { q: 'Where does my agent run?', a: 'Your agent runs on our cloud servers 24/7. You don\'t need to keep your computer on or install anything. Once you launch it, it just works.' },

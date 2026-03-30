@@ -38,7 +38,7 @@ that's it. your agent is live.
 "but what about LLM costs?"
 
 two options:
-- use our free credits (20 messages/day on free tier)
+- use our free credits (10 messages/day on free tier)
 - bring your own API key (Groq, OpenAI, Anthropic, etc.) = unlimited messages, always free
 
 BYOK is the real cheat code. Groq gives free Llama 4 access. you're literally running an AI agent for $0.
@@ -197,9 +197,9 @@ I've been building Hatcher (hatcher.host) — a managed hosting platform for AI 
 - Deploy in one click
 
 **Pricing that doesn't suck:**
-- Free tier: 1 agent, all integrations, 20 messages/day with our LLM
+- Free tier: 1 agent, all integrations, 10 messages/day with our LLM
 - BYOK (Bring Your Own Key): Plug in your Groq/OpenAI/Anthropic key = unlimited messages, always free
-- Paid tiers ($9.99/$19.99/mo): more agents, more daily messages, dedicated resources
+- Paid tiers ($4.99/$14.99/mo): more agents, more daily messages, dedicated resources
 
 The BYOK model is key — Groq gives free access to Llama 4, so you can legitimately run an AI agent for $0 total.
 
@@ -258,7 +258,7 @@ Built Hatcher (hatcher.host) for the crypto community specifically. It's a manag
 3. Research agents that summarize governance proposals
 4. DeFi position monitors that alert on liquidation risks
 
-**Free tier** gives you 1 agent with all integrations. BYOK with Groq (free Llama 4) = genuinely $0.
+**Free tier** gives you 1 agent with all integrations and 10 msg/day. BYOK with Groq (free Llama 4) = genuinely $0.
 
 Payments accepted in SOL — prices in USD, converted live via Jupiter.
 
@@ -290,9 +290,9 @@ I built Hatcher (hatcher.host) to make this painless:
 Your agent gets its own container with auto-restart, logging, file management.
 
 **Cost breakdown:**
-- Free tier: 1 agent, 20 messages/day using our LLM
+- Free tier: 1 agent, 10 messages/day using our LLM
 - BYOK: Plug in your own API key (Groq is free) = unlimited messages for $0
-- Paid: $9.99/mo for more agents + higher limits
+- Paid: $4.99/mo for more agents + higher limits
 
 **Pro tip for this sub:** If you're using ChatGPT's API anyway, you can plug your OpenAI key into Hatcher as BYOK and get a fully managed bot deployment without paying hosting fees on top.
 

@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Sign Up — Create Free Account',
   description:
-    'Create a free Hatcher account and deploy your first AI agent in minutes. No credit card required. Free tier includes 20 messages/day and access to all platforms.',
+    'Create a free Hatcher account and deploy your first AI agent in minutes. No credit card required. Free tier includes 10 messages/day and access to all platforms.',
   keywords: ['create account', 'sign up AI agent', 'free AI hosting', 'deploy AI bot free'],
   openGraph: {
     title: 'Sign Up — Create Free Account | Hatcher',
