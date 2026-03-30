@@ -209,8 +209,8 @@ export function ChatTab() {
 
   const frameworkMeta = FRAMEWORKS[agent.framework];
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const prevMessageCountRef = useRef(messages.length);
   const speakingMsgIdRef = useRef<string | null>(null);
+  const lastAutoSpokenIdRef = useRef<string | null>(null);
 
   // Virtual windowing: only render the last N messages for performance
   const [extraLoaded, setExtraLoaded] = useState(0);
@@ -234,19 +234,21 @@ export function ChatTab() {
     }
   }, [messages]);
 
-  // Auto-speak new assistant messages when autoSpeak is enabled
+  // Auto-speak new assistant messages when autoSpeak is enabled.
+  // Triggers when a message finishes streaming (streaming → false with content).
   useEffect(() => {
     if (!voice.autoSpeak || !voice.ttsSupported) return;
 
-    const prevCount = prevMessageCountRef.current;
-    prevMessageCountRef.current = messages.length;
-
-    if (messages.length > prevCount) {
-      const lastMsg = messages[messages.length - 1];
-      // Only speak completed assistant messages (not streaming)
-      if (lastMsg && lastMsg.role === 'assistant' && !lastMsg.streaming && lastMsg.content) {
-        voice.speak(lastMsg.content);
-      }
+    const lastMsg = messages[messages.length - 1];
+    if (
+      lastMsg &&
+      lastMsg.role === 'assistant' &&
+      !lastMsg.streaming &&
+      lastMsg.content &&
+      lastMsg.id !== lastAutoSpokenIdRef.current
+    ) {
+      lastAutoSpokenIdRef.current = lastMsg.id;
+      voice.speak(lastMsg.content);
     }
   }, [messages, voice.autoSpeak, voice.ttsSupported, voice.speak]);
 
