@@ -948,7 +948,7 @@ export default function AgentManagePage() {
   const statusInfo = agent ? (STATUS_STYLES[agent.status] ?? STATUS_STYLES.paused) : STATUS_STYLES.paused;
   const frameworkMeta = agent ? FRAMEWORKS[agent.framework] : undefined;
   const isActive = agent?.status === 'active';
-  const isNotActive = agent?.status === 'paused' || agent?.status === 'sleeping' || agent?.status === 'error';
+  const isNotActive = agent?.status === 'paused' || agent?.status === 'sleeping' || agent?.status === 'error' || agent?.status === 'stopped';
 
   const activeFeatureKeys = new Set(activeFeatures.map((f) => f.featureKey));
 
