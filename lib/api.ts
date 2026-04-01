@@ -645,6 +645,18 @@ export const api = {
       newUsersLast7d: number;
     }>('/admin/stats'),
 
+  /** Admin: server resource stats */
+  adminGetServerStats: () =>
+    req<{
+      cpu: { cores: number; model: string; usagePercent: number; loadAvg: { '1m': number; '5m': number; '15m': number } };
+      memory: { totalBytes: number; usedBytes: number; freeBytes: number; usagePercent: number };
+      disk: { total: number; used: number; available: number; usePercent: number };
+      uptime: number;
+      platform: string;
+      hostname: string;
+      containers: { running: number; total: number };
+    }>('/admin/server-stats'),
+
   /** Admin: list all users with agent/payment counts */
   adminGetUsers: (skip = 0, take = 50) =>
     req<{

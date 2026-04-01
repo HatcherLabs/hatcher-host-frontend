@@ -196,6 +196,7 @@ export default function AdminDashboardPage() {
 
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [stats, setStats] = useState<AdminStats | null>(null);
+  const [serverStats, setServerStats] = useState<{ cpu: { cores: number; usagePercent: number; model: string; loadAvg: { '1m': number; '5m': number; '15m': number } }; memory: { totalBytes: number; usedBytes: number; usagePercent: number }; disk: { total: number; used: number; usePercent: number }; uptime: number; containers: { running: number; total: number } } | null>(null);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [agents, setAgents] = useState<AdminAgent[]>([]);
   const [tickets, setTickets] = useState<AdminTicket[]>([]);
@@ -245,6 +246,7 @@ export default function AdminDashboardPage() {
       if (ticketsRes.success) setTickets((ticketsRes.data as any).tickets ?? []);
       setLoading(false);
     });
+    api.adminGetServerStats().then(res => { if (res.success) setServerStats(res.data); });
   }, [user]);
 
   // ── Load health when System tab is shown ─────────────────
@@ -454,6 +456,47 @@ export default function AdminDashboardPage() {
               <StatCard icon={MessageSquare} label="Total Messages" value={stats.totalMessages.toLocaleString()} color="emerald" />
               <StatCard icon={DollarSign} label="Revenue (USD)" value={`$${stats.totalRevenueUsd.toFixed(2)}`} sub={`${stats.totalPayments} payments`} color="amber" />
             </div>
+
+            {/* Server Stats */}
+            {serverStats && (
+              <div className="card glass-noise p-5 space-y-4">
+                <h3 className="text-sm font-semibold text-[var(--text-primary)] flex items-center gap-2">
+                  <Server size={14} className="text-cyan-400" />
+                  Server Resources
+                </h3>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">CPU</p>
+                    <p className="text-lg font-bold text-[var(--text-primary)]">{serverStats.cpu.usagePercent}%</p>
+                    <p className="text-[10px] text-[var(--text-muted)]">{serverStats.cpu.cores} cores — load {serverStats.cpu.loadAvg['1m'].toFixed(1)}</p>
+                    <div className="h-1.5 rounded-full bg-[var(--bg-hover)] mt-1 overflow-hidden">
+                      <div className="h-full rounded-full transition-all" style={{ width: `${serverStats.cpu.usagePercent}%`, background: serverStats.cpu.usagePercent > 80 ? '#ef4444' : serverStats.cpu.usagePercent > 50 ? '#f59e0b' : '#22c55e' }} />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">RAM</p>
+                    <p className="text-lg font-bold text-[var(--text-primary)]">{serverStats.memory.usagePercent}%</p>
+                    <p className="text-[10px] text-[var(--text-muted)]">{(serverStats.memory.usedBytes / 1073741824).toFixed(1)} / {(serverStats.memory.totalBytes / 1073741824).toFixed(1)} GB</p>
+                    <div className="h-1.5 rounded-full bg-[var(--bg-hover)] mt-1 overflow-hidden">
+                      <div className="h-full rounded-full transition-all" style={{ width: `${serverStats.memory.usagePercent}%`, background: serverStats.memory.usagePercent > 85 ? '#ef4444' : serverStats.memory.usagePercent > 60 ? '#f59e0b' : '#22c55e' }} />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Disk</p>
+                    <p className="text-lg font-bold text-[var(--text-primary)]">{serverStats.disk.usePercent}%</p>
+                    <p className="text-[10px] text-[var(--text-muted)]">{(serverStats.disk.used / 1073741824).toFixed(0)} / {(serverStats.disk.total / 1073741824).toFixed(0)} GB</p>
+                    <div className="h-1.5 rounded-full bg-[var(--bg-hover)] mt-1 overflow-hidden">
+                      <div className="h-full rounded-full transition-all" style={{ width: `${serverStats.disk.usePercent}%`, background: serverStats.disk.usePercent > 90 ? '#ef4444' : serverStats.disk.usePercent > 70 ? '#f59e0b' : '#22c55e' }} />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Containers</p>
+                    <p className="text-lg font-bold text-[var(--text-primary)]">{serverStats.containers.running} <span className="text-sm font-normal text-[var(--text-muted)]">/ {serverStats.containers.total}</span></p>
+                    <p className="text-[10px] text-[var(--text-muted)]">Uptime: {Math.floor(serverStats.uptime / 86400)}d {Math.floor((serverStats.uptime % 86400) / 3600)}h</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Agent breakdown + User tier breakdown */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
