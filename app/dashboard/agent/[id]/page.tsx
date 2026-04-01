@@ -145,11 +145,31 @@ export default function AgentManagePage() {
   // Core state
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
+  const validTabs: Tab[] = ['overview','config','integrations','skills','files','logs','memory','knowledge','versions','chat','usage','analytics'];
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const initialTab = (['overview','config','integrations','skills','files','logs','memory','knowledge','schedules','workflows','versions','chat','stats','usage','analytics'] as Tab[]).includes(searchParams.get('tab') as Tab)
+  const initialTab = validTabs.includes(searchParams.get('tab') as Tab)
     ? (searchParams.get('tab') as Tab)
     : 'overview';
   const [tab, setTab] = useState<Tab>(initialTab);
+
+  // Reset tab when agent ID changes (fixes navigation between agents keeping stale tab)
+  const prevIdRef = useRef(id);
+  useEffect(() => {
+    if (prevIdRef.current !== id) {
+      prevIdRef.current = id;
+      const params = new URLSearchParams(window.location.search);
+      const urlTab = params.get('tab') as Tab;
+      setTab(validTabs.includes(urlTab) ? urlTab : 'overview');
+      // Reset chat and other per-agent state
+      setMessages([]);
+      setLogs([]);
+      setStats(null);
+      setAgent(null);
+      setLoading(true);
+      historyLoadedRef.current = false;
+      lastSavedCountRef.current = 0;
+    }
+  }, [id]);
 
   // Stats
   const [stats, setStats] = useState<AgentStats | null>(null);
@@ -185,7 +205,15 @@ export default function AgentManagePage() {
     historyLoadedRef.current = false;
     api.getChatHistory(id).then(res => {
       if (res.success && res.data.messages.length > 0) {
-        const loaded = res.data.messages.map((m: { role: string; content: string; ts: number }, i: number) => ({
+        // Deduplicate: skip consecutive messages with same role+content
+        const raw = res.data.messages as { role: string; content: string; ts: number }[];
+        const deduped: typeof raw = [];
+        for (const m of raw) {
+          const prev = deduped[deduped.length - 1];
+          if (prev && prev.role === m.role && prev.content === m.content) continue;
+          deduped.push(m);
+        }
+        const loaded = deduped.map((m, i) => ({
           id: `hist-${i}`,
           role: m.role as 'user' | 'assistant',
           content: m.content,
@@ -215,7 +243,15 @@ export default function AgentManagePage() {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
       lastSavedCountRef.current = complete.length;
-      api.saveChatHistory(id, complete.map(m => ({ role: m.role, content: m.content, ts: m.timestamp?.getTime() }))).catch(() => {});
+      // Deduplicate before saving: skip consecutive same role+content
+      const toSave = complete.map(m => ({ role: m.role, content: m.content, ts: m.timestamp?.getTime() }));
+      const deduped: typeof toSave = [];
+      for (const m of toSave) {
+        const prev = deduped[deduped.length - 1];
+        if (prev && prev.role === m.role && prev.content === m.content) continue;
+        deduped.push(m);
+      }
+      api.saveChatHistory(id, deduped).catch(() => {});
     }, 2000);
   }, [messages, id]);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -427,6 +463,36 @@ export default function AgentManagePage() {
 
   // Initial load
   useEffect(() => { loadAgent(); loadUsage(); }, [loadAgent, loadUsage]);
+
+  // Guided onboarding for newly created agents (?new=1 query param)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !id) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('new') !== '1') return;
+    const onboardKey = `hatcher-onboarded-${id}`;
+    if (localStorage.getItem(onboardKey)) return;
+
+    // Switch to chat tab and inject welcome message
+    setTab('chat');
+    setMessages((prev) => {
+      if (prev.some((m) => m.id === 'onboard-welcome')) return prev;
+      return [
+        ...prev,
+        {
+          id: 'onboard-welcome',
+          role: 'assistant' as const,
+          content: '\uD83D\uDC4B Welcome! Your agent is starting up. Try sending a message to test it out!',
+          timestamp: new Date(),
+        },
+      ];
+    });
+
+    // Mark as onboarded and clean URL
+    localStorage.setItem(onboardKey, '1');
+    const url = new URL(window.location.href);
+    url.searchParams.delete('new');
+    window.history.replaceState({}, '', url.pathname + (url.search || ''));
+  }, [id]);
 
   const agentStatus = agent?.status;
 
@@ -994,15 +1060,15 @@ export default function AgentManagePage() {
 
   if (!agent) {
     return (
-      <div className="mx-auto max-w-md px-4 py-24 text-center text-[#FFFFFF]">
+      <div className="mx-auto max-w-md px-4 py-24 text-center text-[var(--text-primary)]">
         <div className="text-4xl mb-4 text-[#06b6d4]">404</div>
         <h1 className="text-2xl font-bold mb-3">Agent Not Found</h1>
-        <p className="mb-6 text-[#71717a]">
+        <p className="mb-6 text-[var(--text-muted)]">
           The agent with ID &quot;{id}&quot; could not be found.
         </p>
         <Link
           href="/dashboard/agents"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#06b6d4]/40 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[#06b6d4]/40 transition-colors"
         >
           <ArrowLeft size={16} /> Back to Agents
         </Link>
@@ -1027,7 +1093,7 @@ export default function AgentManagePage() {
         {/* ─── Main Content ─────────────────────────────────── */}
         <div className="flex-1 min-w-0 flex flex-col">
           {/* Top action bar */}
-          <div className="px-4 sm:px-6 py-3 border-b border-[rgba(46,43,74,0.3)] flex items-center gap-3 flex-wrap">
+          <div className="px-4 sm:px-6 py-3 border-b border-[var(--border-default)] flex items-center gap-3 flex-wrap">
             {/* Status badge */}
             <span className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border flex-shrink-0 ${statusInfo.classes}`}>
               {statusInfo.pulse && (
@@ -1049,7 +1115,7 @@ export default function AgentManagePage() {
                   <button
                     onClick={() => handleAction('restart')}
                     disabled={actionLoading === 'restart'}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#06b6d4]/40 hover:bg-[#06b6d4]/10 transition-all disabled:opacity-40"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[#06b6d4]/40 hover:bg-[#06b6d4]/10 transition-all disabled:opacity-40"
                     title="Restart agent"
                   >
                     <RotateCcw size={13} className={actionLoading === 'restart' ? 'animate-spin' : ''} />
@@ -1088,7 +1154,7 @@ export default function AgentManagePage() {
               <button
                 onClick={handleClone}
                 disabled={cloning}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-violet-500/40 hover:bg-violet-500/10 transition-all disabled:opacity-40"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-violet-500/40 hover:bg-violet-500/10 transition-all disabled:opacity-40"
                 title="Clone agent"
               >
                 {cloning ? (
@@ -1114,7 +1180,7 @@ export default function AgentManagePage() {
               {deleteConfirm && !deleting && (
                 <button
                   onClick={() => { setDeleteConfirm(false); setDeleteError(null); }}
-                  className="text-xs px-2 py-1 transition-colors text-[#71717a] hover:text-[#A5A1C2]"
+                  className="text-xs px-2 py-1 transition-colors text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
                 >
                   Cancel
                 </button>
@@ -1137,11 +1203,9 @@ export default function AgentManagePage() {
               {tab === 'logs' && <LogsTab />}
               {tab === 'memory' && <MemoryTab />}
               {tab === 'knowledge' && <KnowledgeTab />}
-              {tab === 'schedules' && <SchedulesTab />}
-              {tab === 'workflows' && <WorkflowsTab />}
+              {/* schedules and workflows hidden from public for now */}
               {tab === 'versions' && <VersionsTab />}
               {tab === 'chat' && <ChatTab />}
-              {tab === 'stats' && <StatsTab />}
               {tab === 'usage' && <UsageTab />}
               {tab === 'analytics' && <AnalyticsTab />}
               {tab === 'health' && <HealthTab />}

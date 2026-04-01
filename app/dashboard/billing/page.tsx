@@ -575,7 +575,7 @@ export default function BillingPage() {
 
           {/* Recent credit transactions */}
           {creditHistory.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-[rgba(46,43,74,0.3)]">
+            <div className="mt-4 pt-4 border-t border-[var(--border-default)]">
               <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium mb-3">Recent Transactions</p>
               <div className="space-y-2">
                 {creditHistory.slice(0, 5).map((tx) => (
@@ -716,8 +716,10 @@ export default function BillingPage() {
             <span className="text-sm text-[var(--text-secondary)]">
               {agentCount} of {agentLimit} agents used
             </span>
-            <span className="text-xs text-[var(--text-muted)]">
-              {agentLimit - agentCount} slot{agentLimit - agentCount !== 1 ? 's' : ''} remaining
+            <span className={`text-xs ${agentCount > agentLimit ? 'text-red-400' : 'text-[var(--text-muted)]'}`}>
+              {agentCount > agentLimit
+                ? `${agentCount - agentLimit} over limit`
+                : `${agentLimit - agentCount} slot${agentLimit - agentCount !== 1 ? 's' : ''} remaining`}
             </span>
           </div>
           <div className="w-full h-2.5 bg-white/5 rounded-full overflow-hidden">
@@ -734,7 +736,7 @@ export default function BillingPage() {
 
           {/* Active add-ons */}
           {activeAddons.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-[rgba(46,43,74,0.3)]">
+            <div className="mt-4 pt-4 border-t border-[var(--border-default)]">
               <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium mb-2">Active Add-ons</p>
               <div className="space-y-2">
                 {activeAddons.map((addon, i) => (
@@ -755,7 +757,7 @@ export default function BillingPage() {
           )}
 
           {/* Need more agents? */}
-          <div className="mt-4 pt-4 border-t border-[rgba(46,43,74,0.3)]">
+          <div className="mt-4 pt-4 border-t border-[var(--border-default)]">
             <a href="#addons" className="text-xs text-[#06b6d4] hover:text-[#fed7aa] transition-colors flex items-center gap-1">
               <Plus className="w-3 h-3" />
               Need more agents? Purchase an add-on
@@ -862,7 +864,7 @@ export default function BillingPage() {
         </div>
         <div className="p-6">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {ADDONS.map((addon) => {
+            {ADDONS.filter(a => a.key !== 'addon.file_manager').map((addon) => {
               const isBuying = purchasingAddon === addon.key;
               return (
                 <div

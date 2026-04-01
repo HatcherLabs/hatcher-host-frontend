@@ -23,15 +23,21 @@ const AUTH_NAV_LINKS = [
   { href: '/create',              label: 'Create' },
 ];
 
+// ── Nav links when logged OUT ──
+const GUEST_NAV_LINKS = [
+  { href: '/explore',             label: 'Explore' },
+  { href: '/templates',           label: 'Templates' },
+];
+
 // ── Auxiliary links (visible in both states, after a divider) ──
 const AUX_LINKS = [
   { href: '/pricing',   label: 'Pricing',   external: false, badge: null },
+  { href: '/support',   label: 'Support',   external: false, badge: null },
   { href: DOCS_URL,     label: 'Docs',      external: true,  badge: null },
 ];
 
 // ── User dropdown links ──
 const USER_EXTRA_LINKS = [
-  { href: '/dashboard/team',    label: 'Team',    icon: Users },
   { href: '/dashboard/billing', label: 'Billing', icon: CreditCard },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
@@ -47,6 +53,8 @@ const MOBILE_AUTH_LINKS = [
 
 // ── Mobile links (when logged out) ──
 const MOBILE_GUEST_LINKS = [
+  { href: '/explore',   label: 'Explore' },
+  { href: '/templates', label: 'Templates' },
   { href: '/pricing',   label: 'Pricing' },
 ];
 
@@ -98,7 +106,7 @@ export function Header() {
   };
 
   // Desktop nav links depend on auth state
-  const primaryLinks = isAuthenticated ? AUTH_NAV_LINKS : [];
+  const primaryLinks = isAuthenticated ? AUTH_NAV_LINKS : GUEST_NAV_LINKS;
   const mobileLinks = isAuthenticated ? MOBILE_AUTH_LINKS : MOBILE_GUEST_LINKS;
 
   return (
@@ -115,8 +123,8 @@ export function Header() {
                     <defs>
                       <linearGradient id="eggShell" x1="14" y1="3" x2="14" y2="27" gradientUnits="userSpaceOnUse">
                         <stop offset="0%" stopColor="#2a2a38" />
-                        <stop offset="50%" stopColor="#1a1a22" />
-                        <stop offset="100%" stopColor="#141419" />
+                        <stop offset="50%" stopColor="var(--bg-elevated)" />
+                        <stop offset="100%" stopColor="var(--bg-card-solid)" />
                       </linearGradient>
                       <radialGradient id="eggInnerGlow" cx="50%" cy="40%" r="40%">
                         <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.35" />
@@ -143,7 +151,7 @@ export function Header() {
                   'hidden lg:flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-colors duration-200',
                   pathname === '/admin'
                     ? 'bg-purple-500/15 text-purple-400'
-                    : 'text-[#71717a] hover:text-purple-400 hover:bg-purple-500/10'
+                    : 'text-[var(--text-muted)] hover:text-purple-400 hover:bg-purple-500/10'
                 )}
               >
                 <Shield className="w-3.5 h-3.5" />
@@ -165,7 +173,7 @@ export function Header() {
                   className={clsx(
                     'relative px-3 py-1.5 text-sm rounded-lg transition-colors duration-200',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500',
-                    active ? 'text-[var(--text-primary)]' : 'text-[#71717a] hover:text-[var(--text-primary)]'
+                    active ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                   )}
                 >
                   {link.label}
@@ -182,7 +190,7 @@ export function Header() {
 
             {/* Divider between primary and auxiliary (only when logged in) */}
             {isAuthenticated && !authLoading && (
-              <span className="w-px h-4 bg-white/[0.08] mx-1" aria-hidden="true" />
+              <span className="w-px h-4 bg-[var(--border-default)] mx-1" aria-hidden="true" />
             )}
 
             {/* Auxiliary links: Pricing + Changelog + Docs (always visible) */}
@@ -200,7 +208,7 @@ export function Header() {
                   className={clsx(
                     'relative flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg transition-colors duration-200',
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500',
-                    active ? 'text-[var(--text-primary)]' : 'text-[#71717a] hover:text-[var(--text-primary)]'
+                    active ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                   )}
                 >
                   {link.label}
@@ -226,7 +234,7 @@ export function Header() {
             <div className="hidden lg:flex items-center gap-2">
               <ThemeToggle />
               {authLoading ? (
-                <div className="h-9 w-24 rounded-lg bg-white/[0.04] animate-pulse" />
+                <div className="h-9 w-24 rounded-lg bg-[var(--bg-card)] animate-pulse" />
               ) : isAuthenticated && user ? (
                 <>
                   <NotificationCenter />
@@ -257,9 +265,9 @@ export function Header() {
                           }}
                         >
                           {/* User info */}
-                          <div className="px-4 py-2.5 border-b border-white/[0.06]">
+                          <div className="px-4 py-2.5 border-b border-[var(--border-default)]">
                             <p className="text-xs text-[var(--text-primary)] font-medium truncate">{user.username}</p>
-                            <p className="text-[10px] text-[#a1a1aa] truncate">{user.email}</p>
+                            <p className="text-[10px] text-[var(--text-secondary)] truncate">{user.email}</p>
                             {creditBalance !== null && creditBalance > 0 && (
                               <Link
                                 href="/dashboard/billing"
@@ -268,7 +276,7 @@ export function Header() {
                               >
                                 <Wallet className="w-3 h-3" />
                                 <span className="font-semibold">${creditBalance.toFixed(2)}</span>
-                                <span className="text-[#a1a1aa]">credits</span>
+                                <span className="text-[var(--text-secondary)]">credits</span>
                               </Link>
                             )}
                           </div>
@@ -284,8 +292,8 @@ export function Header() {
                                 className={clsx(
                                   'flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium transition-colors duration-200',
                                   isActive(pathname, link.href)
-                                    ? 'text-[var(--text-primary)] bg-white/[0.04]'
-                                    : 'text-[#a1a1aa] hover:text-[var(--text-primary)] hover:bg-white/[0.04]'
+                                    ? 'text-[var(--text-primary)] bg-[var(--bg-card)]'
+                                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)]'
                                 )}
                               >
                                 <Icon className="w-3.5 h-3.5" />
@@ -295,7 +303,7 @@ export function Header() {
                           })}
 
                           {/* Sign out */}
-                          <div className="border-t border-white/[0.06]">
+                          <div className="border-t border-[var(--border-default)]">
                             <button
                               onClick={handleLogout}
                               className="w-full flex items-center gap-2.5 text-left px-4 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors duration-200"
@@ -311,7 +319,7 @@ export function Header() {
                 </>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Link href="/login" className="h-9 px-4 text-[var(--text-primary)] font-medium text-xs rounded-full border border-[var(--border-default)] bg-transparent hover:bg-white/[0.04] transition-all duration-200 flex items-center">
+                  <Link href="/login" className="h-9 px-4 text-[var(--text-primary)] font-medium text-xs rounded-full border border-[var(--border-default)] bg-transparent hover:bg-[var(--bg-card)] transition-all duration-200 flex items-center">
                     Sign In
                   </Link>
                   <Link href="/register" className="h-9 px-4 text-white font-medium text-xs rounded-full bg-purple-600 hover:bg-purple-500 transition-all duration-200 flex items-center">
@@ -365,7 +373,7 @@ export function Header() {
                     href={link.href}
                     className={clsx(
                       'block px-3 py-2.5 text-sm rounded-lg transition-colors duration-200',
-                      isActive(pathname, link.href) ? 'text-[var(--text-primary)] bg-white/[0.06] border-l-2 border-purple-500' : 'text-[#71717a] hover:text-[var(--text-primary)] border-l-2 border-transparent'
+                      isActive(pathname, link.href) ? 'text-[var(--text-primary)] bg-[var(--bg-card)] border-l-2 border-purple-500' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] border-l-2 border-transparent'
                     )}
                     onClick={() => setMobileOpen(false)}
                   >
@@ -380,7 +388,7 @@ export function Header() {
                   href={DOCS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block px-3 py-2.5 text-sm rounded-lg transition-colors duration-200 text-[#71717a] hover:text-[var(--text-primary)] border-l-2 border-transparent"
+                  className="block px-3 py-2.5 text-sm rounded-lg transition-colors duration-200 text-[var(--text-muted)] hover:text-[var(--text-primary)] border-l-2 border-transparent"
                   onClick={() => setMobileOpen(false)}
                 >
                   Docs
@@ -391,7 +399,7 @@ export function Header() {
                 <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: (mobileLinks.length + 1) * 0.03 }}>
                   <Link
                     href="/admin"
-                    className={clsx('flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-colors border-l-2', pathname === '/admin' ? 'text-purple-400 bg-purple-500/10 border-purple-500' : 'text-[#71717a] hover:text-purple-400 border-transparent')}
+                    className={clsx('flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-colors border-l-2', pathname === '/admin' ? 'text-purple-400 bg-purple-500/10 border-purple-500' : 'text-[var(--text-muted)] hover:text-purple-400 border-transparent')}
                     onClick={() => setMobileOpen(false)}
                   >
                     <Shield className="w-4 h-4" /> Admin Panel
@@ -404,22 +412,19 @@ export function Header() {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: (mobileLinks.length + 2) * 0.03 }}
-                className="mt-2 pt-3 border-t border-white/[0.06]"
+                className="mt-2 pt-3 border-t border-[var(--border-default)]"
               >
                 {isAuthenticated && user ? (
                   <div className="space-y-1">
                     <div className="px-3 py-2 flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
                       <span className="text-sm font-medium text-purple-300">{user.username}</span>
-                      <span className="text-[10px] text-[#a1a1aa] ml-auto truncate max-w-[150px]">{user.email}</span>
+                      <span className="text-[10px] text-[var(--text-secondary)] ml-auto truncate max-w-[150px]">{user.email}</span>
                     </div>
-                    <Link href="/dashboard/team" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[#71717a] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
-                      <Users className="w-4 h-4" /> Team
-                    </Link>
-                    <Link href="/dashboard/billing" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[#71717a] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
+                    <Link href="/dashboard/billing" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
                       <CreditCard className="w-4 h-4" /> Billing
                     </Link>
-                    <Link href="/settings" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[#71717a] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
+                    <Link href="/settings" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
                       <Settings className="w-4 h-4" /> Settings
                     </Link>
                     <button

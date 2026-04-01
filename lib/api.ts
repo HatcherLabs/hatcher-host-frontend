@@ -176,6 +176,20 @@ export const api = {
       body: JSON.stringify({ email, password }),
     }),
 
+  /** Verify email with token */
+  verifyEmail: (token: string) =>
+    req<{ verified: boolean }>('/auth/verify-email', {
+      method: 'POST',
+      body: JSON.stringify({ token }),
+    }),
+
+  /** Resend verification email */
+  resendVerification: (email: string) =>
+    req<{ sent: boolean }>('/auth/resend-verification', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }),
+
   /** Request password reset email */
   forgotPassword: (email: string) =>
     req<{ message: string }>('/auth/forgot-password', {
@@ -288,6 +302,9 @@ export const api = {
 
   /** Alias for getMyAgents */
   listAgents: () => req<Agent[]>('/agents'),
+
+  /** Public platform stats (no auth required) */
+  getPublicStats: () => req<{ totalAgents: number; activeAgents: number; totalUsers: number; totalMessages: number; frameworks: Record<string, number> }>('/stats'),
 
   /** Browse all public agents */
   getExploreAgents: () => req<{ agents: Agent[]; pagination: { total: number; limit: number; offset: number; hasMore: boolean } }>('/agents/explore'),
@@ -614,11 +631,7 @@ export const api = {
 
   /** Admin: list all agents across all users */
   adminGetAgents: () =>
-    req<Array<Agent & { ownerWallet: string }>>('/admin/agents'),
-
-  /** Get public platform stats (no auth required) */
-  getPublicStats: () =>
-    req<{ totalAgents: number; activeAgents: number; totalUsers: number; totalMessages: number }>('/admin/public-stats'),
+    req<Array<Agent & { ownerWallet: string }>>('/admin/agents?limit=200&offset=0'),
 
   adminGetStats: () =>
     req<{
@@ -673,7 +686,7 @@ export const api = {
         createdAt: string;
         updatedAt: string;
       }>;
-    }>('/admin/tickets'),
+    }>('/admin/tickets?limit=200&offset=0'),
 
   /** Admin: reply to a ticket */
   adminReplyTicket: (ticketId: string, message: string) =>

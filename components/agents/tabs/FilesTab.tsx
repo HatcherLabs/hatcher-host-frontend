@@ -29,8 +29,10 @@ import {
   FileJson,
   Settings,
   HardDrive,
+  CreditCard,
 } from 'lucide-react';
 import Link from 'next/link';
+import { AnimatePresence } from 'framer-motion';
 
 interface FileEntry {
   name: string;
@@ -90,7 +92,7 @@ function getFileIcon(name: string, type: string) {
   if (/\.(ya?ml|toml|ini|cfg|conf)$/i.test(name)) return <Settings size={16} className="text-slate-400" />;
   // Images
   if (/\.(png|jpg|jpeg|gif|svg|webp)$/i.test(name)) return <FileImage size={16} className="text-purple-400" />;
-  return <FileText size={16} className="text-[#A5A1C2]" />;
+  return <FileText size={16} className="text-[var(--text-secondary)]" />;
 }
 
 /** Small colored dot for file-type hint in the list */
@@ -122,6 +124,7 @@ export function FilesTab() {
   const [agentStopped, setAgentStopped] = useState(false);
   const [stoppedMessage, setStoppedMessage] = useState('');
   const [purchasing, setPurchasing] = useState(false);
+  const [showPayModal, setShowPayModal] = useState(false);
   const [showInfoBanner, setShowInfoBanner] = useState(true);
 
   // Editor state
@@ -244,15 +247,55 @@ export function FilesTab() {
     setDeleting(null);
   };
 
-  const handleUnlock = async () => {
+  const handleUnlockStripe = async () => {
     setPurchasing(true);
-    const txSignature = `mock-${Date.now()}`;
-    const res = await api.purchaseAddon('addon.file_manager', txSignature, agentId);
-    if (res.success) {
-      setUnlocked(true);
-      loadFiles();
-    } else {
-      setError(res.error ?? 'Purchase failed');
+    try {
+      const res = await api.stripeCheckoutAddon('addon.file_manager', window.location.href, agentId);
+      if (res.success && res.data.url) {
+        window.location.href = res.data.url;
+      } else {
+        setError(res.error ?? 'Failed to start checkout');
+        setPurchasing(false);
+      }
+    } catch {
+      setError('Failed to start checkout');
+      setPurchasing(false);
+    }
+  };
+
+  const handleUnlockSOL = async () => {
+    setPurchasing(true);
+    setError(null);
+    try {
+      const txSignature = `sol-${Date.now()}`;
+      const res = await api.purchaseAddon('addon.file_manager', txSignature, agentId);
+      if (res.success) {
+        setUnlocked(true);
+        setShowPayModal(false);
+        loadFiles();
+      } else {
+        setError(res.error ?? 'Purchase failed');
+      }
+    } catch {
+      setError('Purchase failed');
+    }
+    setPurchasing(false);
+  };
+
+  const handleUnlockCredits = async () => {
+    setPurchasing(true);
+    setError(null);
+    try {
+      const res = await api.purchaseAddonWithCredits('addon.file_manager', agentId);
+      if (res.success) {
+        setUnlocked(true);
+        setShowPayModal(false);
+        loadFiles();
+      } else {
+        setError(res.error ?? 'Purchase failed');
+      }
+    } catch {
+      setError('Purchase failed');
     }
     setPurchasing(false);
   };
@@ -295,51 +338,123 @@ export function FilesTab() {
   // ── Locked (not Pro and no addon) ──
   if (unlocked === false) {
     return (
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-16">
-        <div
-          className={`w-16 h-16 rounded-2xl ${accent.bg} ${accent.border} border flex items-center justify-center mx-auto mb-6`}
-        >
-          <Lock className={`w-8 h-8 ${accent.text}`} />
-        </div>
-        <h3 className="text-lg font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
-          File Manager
-        </h3>
+      <>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-16">
+          <div
+            className={`w-16 h-16 rounded-2xl ${accent.bg} ${accent.border} border flex items-center justify-center mx-auto mb-6`}
+          >
+            <Lock className={`w-8 h-8 ${accent.text}`} />
+          </div>
+          <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2" style={{ fontFamily: 'var(--font-display)' }}>
+            File Manager
+          </h3>
 
-        {/* Pro badge */}
-        {!isPro && (
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 mb-4">
             <Crown size={12} className="text-amber-400" />
-            <span className="text-[11px] font-medium text-amber-400">Pro Feature</span>
+            <span className="text-[11px] font-medium text-amber-400">Add-on</span>
           </div>
-        )}
 
-        <p className="text-sm text-[#A5A1C2] mb-6 max-w-sm mx-auto">
-          Browse, edit, and download your agent&apos;s configuration and workspace files.
-          {!isPro && (
-            <span className="block mt-1 text-xs text-[#71717a]">
-              Included with Pro plan, or unlock per-agent as an add-on.
+          <p className="text-sm text-[var(--text-secondary)] mb-6 max-w-sm mx-auto">
+            Browse, edit, and download your agent&apos;s configuration and workspace files.
+            <span className="block mt-1 text-xs text-[var(--text-muted)]">
+              One-time purchase per agent — $4.99
             </span>
+          </p>
+          {error && (
+            <p className="text-xs text-red-400 mb-3">{error}</p>
           )}
-        </p>
-        <div className="flex flex-col items-center gap-3">
-          <button
-            onClick={handleUnlock}
-            disabled={purchasing}
-            className="px-6 py-2.5 rounded-xl text-sm font-medium text-white transition-colors flex items-center gap-2 disabled:opacity-50"
-            style={{ backgroundColor: accent.color }}
-          >
-            {purchasing ? (
-              <><Loader2 className="w-4 h-4 animate-spin" /> Unlocking...</>
-            ) : (
-              <><FolderOpen className="w-4 h-4" /> Unlock File Manager — $4.99</>
-            )}
-          </button>
-          <span className="text-xs text-[#71717a]">One-time purchase for this agent</span>
-          <Link href="/pricing" className="text-xs hover:underline transition-colors" style={{ color: accent.color }}>
-            Or upgrade to Pro for all agents
-          </Link>
-        </div>
-      </motion.div>
+          <div className="flex flex-col items-center gap-3">
+            <button
+              onClick={() => setShowPayModal(true)}
+              className="px-6 py-2.5 rounded-xl text-sm font-medium text-white transition-colors flex items-center gap-2"
+              style={{ backgroundColor: accent.color }}
+            >
+              <FolderOpen className="w-4 h-4" /> Unlock File Manager — $4.99
+            </button>
+            <Link href="/pricing" className="text-xs hover:underline transition-colors" style={{ color: accent.color }}>
+              Or upgrade to a tier that includes it
+            </Link>
+          </div>
+        </motion.div>
+
+        {/* Payment modal */}
+        <AnimatePresence>
+          {showPayModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+              onClick={() => !purchasing && setShowPayModal(false)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] w-full max-w-md mx-4 overflow-hidden shadow-xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
+                  <h3 className="font-semibold text-[var(--text-primary)]">Unlock File Manager</h3>
+                  <button onClick={() => !purchasing && setShowPayModal(false)} className="text-[var(--text-muted)] hover:text-[var(--text-primary)]">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="p-6 space-y-3">
+                  <p className="text-sm text-[var(--text-secondary)] mb-4">
+                    File Manager for this agent — <span className="font-bold text-[var(--text-primary)]">$4.99</span> <span className="text-xs text-[var(--text-muted)]">(one-time)</span>
+                  </p>
+
+                  <button
+                    onClick={handleUnlockCredits}
+                    disabled={purchasing}
+                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-green-500/30 hover:border-green-400/50 hover:bg-green-500/[0.05] transition-all disabled:opacity-40"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold text-sm">$</span>
+                    </div>
+                    <div className="text-left flex-1">
+                      <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with Credits</p>
+                      <p className="text-[11px] text-[var(--text-muted)]">Instant activation</p>
+                    </div>
+                    {purchasing && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)]" />}
+                  </button>
+
+                  <button
+                    onClick={handleUnlockSOL}
+                    disabled={purchasing}
+                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/[0.03] transition-all disabled:opacity-40"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#9945FF] to-[#14F195] flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold text-sm">SOL</span>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with SOL</p>
+                      <p className="text-[11px] text-[var(--text-muted)]">Solana wallet payment</p>
+                    </div>
+                    {purchasing && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)]" />}
+                  </button>
+
+                  <button
+                    onClick={handleUnlockStripe}
+                    disabled={purchasing}
+                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/[0.03] transition-all disabled:opacity-40"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#635BFF] to-[#A259FF] flex items-center justify-center flex-shrink-0">
+                      <CreditCard className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with Card</p>
+                      <p className="text-[11px] text-[var(--text-muted)]">Credit/debit card via Stripe</p>
+                    </div>
+                    {purchasing && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)]" />}
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </>
     );
   }
 
@@ -348,7 +463,7 @@ export function FilesTab() {
     return (
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-16">
         <AlertCircle className="w-10 h-10 mx-auto mb-3 text-amber-400 opacity-60" />
-        <p className="text-sm text-[#A5A1C2]">{stoppedMessage}</p>
+        <p className="text-sm text-[var(--text-secondary)]">{stoppedMessage}</p>
       </motion.div>
     );
   }
@@ -362,7 +477,7 @@ export function FilesTab() {
         {/* Editor header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <button onClick={() => setEditingFile(null)} className="p-1.5 rounded-lg text-[#71717a] hover:text-white hover:bg-white/[0.04] transition-colors">
+            <button onClick={() => setEditingFile(null)} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-white hover:bg-[var(--bg-card)] transition-colors">
               <ArrowLeft size={16} />
             </button>
             {getFileIcon(editingFile.name, 'file')}
@@ -385,14 +500,14 @@ export function FilesTab() {
               {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
               Save
             </button>
-            <button onClick={() => setEditingFile(null)} className="p-1.5 rounded-lg text-[#71717a] hover:text-white hover:bg-white/[0.04] transition-colors">
+            <button onClick={() => setEditingFile(null)} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-white hover:bg-[var(--bg-card)] transition-colors">
               <X size={14} />
             </button>
           </div>
         </div>
 
         {/* Breadcrumb path for editor */}
-        <div className="flex items-center gap-1 text-[10px] text-[#71717a] mb-3 font-mono overflow-x-auto">
+        <div className="flex items-center gap-1 text-[10px] text-[var(--text-muted)] mb-3 font-mono overflow-x-auto">
           {editingFile.path.split('/').filter(Boolean).map((seg, i, arr) => (
             <span key={i} className="flex items-center gap-1 flex-shrink-0">
               {i > 0 && <ChevronRight size={8} className="text-[#52525b]" />}
@@ -405,7 +520,7 @@ export function FilesTab() {
         <textarea
           value={editContent}
           onChange={(e) => setEditContent(e.target.value)}
-          className="w-full h-[500px] px-4 py-3 rounded-xl text-xs font-mono text-white bg-[rgba(13,11,26,0.9)] border border-white/[0.08] focus:outline-none resize-none leading-relaxed"
+          className="w-full h-[500px] px-4 py-3 rounded-xl text-xs font-mono text-white bg-[var(--bg-base)]/90 border border-[var(--border-default)] focus:outline-none resize-none leading-relaxed"
           style={{ borderColor: isModified ? accent.color + '40' : undefined }}
           spellCheck={false}
         />
@@ -429,11 +544,11 @@ export function FilesTab() {
                 {ROOT_PATH}
               </span>
             </div>
-            <p className="text-[11px] text-[#A5A1C2] leading-relaxed">{fsInfo.description}</p>
+            <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">{fsInfo.description}</p>
           </div>
           <button
             onClick={() => setShowInfoBanner(false)}
-            className="p-0.5 rounded text-[#71717a] hover:text-white transition-colors flex-shrink-0"
+            className="p-0.5 rounded text-[var(--text-muted)] hover:text-white transition-colors flex-shrink-0"
           >
             <X size={12} />
           </button>
@@ -441,11 +556,11 @@ export function FilesTab() {
       )}
 
       {/* Breadcrumb path navigator */}
-      <div className="mb-4 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2">
+      <div className="mb-4 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] px-3 py-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1 text-xs overflow-x-auto flex-1 min-w-0">
             {currentPath !== ROOT_PATH && (
-              <button onClick={goUp} className="p-1 rounded-md text-[#71717a] hover:text-white hover:bg-white/[0.06] transition-colors flex-shrink-0">
+              <button onClick={goUp} className="p-1 rounded-md text-[var(--text-muted)] hover:text-white hover:bg-[var(--bg-card)] transition-colors flex-shrink-0">
                 <ArrowLeft size={14} />
               </button>
             )}
@@ -457,7 +572,7 @@ export function FilesTab() {
                   className={`px-1.5 py-0.5 rounded-md font-mono transition-colors ${
                     i === breadcrumbs.length - 1
                       ? `${accent.text} ${accent.bg}`
-                      : 'text-[#A5A1C2] hover:text-white hover:bg-white/[0.04]'
+                      : 'text-[var(--text-secondary)] hover:text-white hover:bg-[var(--bg-card)]'
                   }`}
                 >
                   {crumb.label === '~' ? (
@@ -474,7 +589,7 @@ export function FilesTab() {
           <div className="flex items-center gap-2 flex-shrink-0 ml-3">
             {/* Stats summary */}
             {files.length > 0 && (
-              <div className="hidden sm:flex items-center gap-2 text-[10px] text-[#71717a] mr-1">
+              <div className="hidden sm:flex items-center gap-2 text-[10px] text-[var(--text-muted)] mr-1">
                 {dirCount > 0 && <span>{dirCount} folder{dirCount !== 1 ? 's' : ''}</span>}
                 {fileCount > 0 && <span>{fileCount} file{fileCount !== 1 ? 's' : ''}</span>}
                 {totalSize > 0 && (
@@ -485,7 +600,7 @@ export function FilesTab() {
                 )}
               </div>
             )}
-            <button onClick={() => loadFiles()} className="p-1.5 rounded-lg text-[#71717a] hover:text-white hover:bg-white/[0.04] transition-colors" title="Refresh">
+            <button onClick={() => loadFiles()} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-white hover:bg-[var(--bg-card)] transition-colors" title="Refresh">
               {loading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
             </button>
             <button
@@ -500,7 +615,7 @@ export function FilesTab() {
 
       {/* New file form */}
       {creating && (
-        <div className="mb-4 p-4 rounded-xl border border-white/[0.06] bg-[rgba(13,11,26,0.8)]">
+        <div className="mb-4 p-4 rounded-xl border border-[var(--border-default)] bg-[var(--bg-base)]/80">
           <div className="space-y-3">
             <input
               type="text"
@@ -508,7 +623,7 @@ export function FilesTab() {
               onChange={(e) => setNewFileName(e.target.value)}
               placeholder="filename.json"
               autoFocus
-              className="w-full h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:outline-none placeholder:text-[#71717a] font-mono"
+              className="w-full h-9 px-3 rounded-lg text-sm text-white bg-[var(--bg-card)] border border-[var(--border-default)] focus:outline-none placeholder:text-[var(--text-muted)] font-mono"
               style={{ borderColor: newFileName ? accent.color + '50' : undefined }}
             />
             <textarea
@@ -516,11 +631,11 @@ export function FilesTab() {
               onChange={(e) => setNewFileContent(e.target.value)}
               placeholder="File content (optional)..."
               rows={4}
-              className="w-full px-3 py-2 rounded-lg text-xs font-mono text-white bg-white/[0.04] border border-white/[0.08] focus:outline-none placeholder:text-[#71717a]"
+              className="w-full px-3 py-2 rounded-lg text-xs font-mono text-white bg-[var(--bg-card)] border border-[var(--border-default)] focus:outline-none placeholder:text-[var(--text-muted)]"
               style={{ borderColor: newFileContent ? accent.color + '30' : undefined }}
             />
             <div className="flex items-center gap-2 justify-end">
-              <button onClick={() => { setCreating(false); setNewFileName(''); setNewFileContent(''); }} className="px-3 py-1.5 text-xs text-[#71717a] hover:text-white transition-colors">
+              <button onClick={() => { setCreating(false); setNewFileName(''); setNewFileContent(''); }} className="px-3 py-1.5 text-xs text-[var(--text-muted)] hover:text-white transition-colors">
                 Cancel
               </button>
               <button
@@ -540,24 +655,24 @@ export function FilesTab() {
       {/* File list */}
       {files.length === 0 && !loading ? (
         <div className="text-center py-12">
-          <File className="w-10 h-10 mx-auto mb-3 text-[#71717a] opacity-40" />
-          <p className="text-sm text-[#71717a]">This directory is empty.</p>
+          <File className="w-10 h-10 mx-auto mb-3 text-[var(--text-muted)] opacity-40" />
+          <p className="text-sm text-[var(--text-muted)]">This directory is empty.</p>
         </div>
       ) : (
-        <div className="rounded-xl border border-white/[0.06] overflow-hidden" style={{ background: 'rgba(13, 11, 26, 0.6)' }}>
+        <div className="rounded-xl border border-[var(--border-default)] overflow-hidden" style={{ background: 'var(--bg-base)' }}>
           {files.map((entry) => {
             const tag = entry.type === 'file' ? getFileTypeTag(entry.name) : null;
             const isEnvFile = /^\.env/i.test(entry.name);
             return (
               <div
                 key={entry.path}
-                className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.03] last:border-0 hover:bg-white/[0.02] transition-colors group cursor-pointer"
+                className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--border-default)] last:border-0 hover:bg-[var(--bg-card)] transition-colors group cursor-pointer"
                 onClick={() => openFile(entry)}
               >
                 <div className="flex items-center gap-3 min-w-0">
                   {getFileIcon(entry.name, entry.type)}
                   <span className="text-sm text-white truncate font-mono">{entry.name}</span>
-                  {entry.type === 'directory' && <ChevronRight size={12} className="text-[#71717a]" />}
+                  {entry.type === 'directory' && <ChevronRight size={12} className="text-[var(--text-muted)]" />}
                   {tag && (
                     <span className={`text-[9px] px-1.5 py-0.5 rounded border font-medium tracking-wide ${tag.color}`}>
                       {tag.label}
@@ -571,7 +686,7 @@ export function FilesTab() {
                 </div>
                 <div className="flex items-center gap-3">
                   {entry.type === 'file' && (
-                    <span className="text-[10px] text-[#71717a] tabular-nums">{formatBytes(entry.size)}</span>
+                    <span className="text-[10px] text-[var(--text-muted)] tabular-nums">{formatBytes(entry.size)}</span>
                   )}
                   {entry.type === 'directory' && (
                     <span className="text-[10px] text-[#52525b]">DIR</span>
@@ -580,7 +695,7 @@ export function FilesTab() {
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDelete(entry); }}
                       disabled={deleting === entry.path}
-                      className="p-1 rounded text-[#71717a] hover:text-red-400 hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100"
+                      className="p-1 rounded text-[var(--text-muted)] hover:text-red-400 hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100"
                       title="Delete"
                     >
                       {deleting === entry.path ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
@@ -595,7 +710,7 @@ export function FilesTab() {
 
       {/* Pro tier hint for non-pro users */}
       {!isPro && (
-        <div className="mt-4 flex items-center justify-center gap-2 text-[11px] text-[#71717a]">
+        <div className="mt-4 flex items-center justify-center gap-2 text-[11px] text-[var(--text-muted)]">
           <Crown size={12} className="text-amber-400" />
           <span>File Manager add-on active.</span>
           <Link href="/pricing" className="hover:underline transition-colors" style={{ color: accent.color }}>

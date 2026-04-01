@@ -46,15 +46,12 @@ function getTabs(framework?: string): TabDef[] {
     { id: 'integrations', label: 'Integrations', icon: <Puzzle size={18} />, group: 'configure' },
     { id: 'skills', label: framework === 'elizaos' ? 'Plugins' : 'Skills', icon: <Sparkles size={18} />, group: 'configure' },
     { id: 'logs', label: 'Logs', icon: <ScrollText size={18} />, group: 'data' },
-    { id: 'stats', label: 'Stats', icon: <BarChart3 size={18} />, group: 'data' },
     { id: 'analytics', label: 'Analytics', icon: <TrendingUp size={18} />, group: 'data' },
     { id: 'usage', label: 'Usage', icon: <Activity size={18} />, group: 'data' },
     { id: 'health', label: 'Health', icon: <HeartPulse size={18} />, group: 'data' },
     { id: 'memory', label: 'Memory', icon: <Brain size={18} />, group: 'data' },
     { id: 'knowledge', label: 'Knowledge', icon: <BookOpen size={18} />, group: 'data' },
     { id: 'files', label: 'Files', icon: <FolderOpen size={18} />, group: 'data' },
-    { id: 'schedules', label: 'Schedules', icon: <Clock size={18} />, group: 'advanced' },
-    { id: 'workflows', label: 'Workflows', icon: <GitMerge size={18} />, group: 'advanced' },
     { id: 'versions', label: 'Versions', icon: <History size={18} />, group: 'advanced' },
   ];
 }
@@ -99,10 +96,10 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
   const navContent = (
     <nav className="flex flex-col h-full" aria-label="Agent navigation">
       {/* Agent identity */}
-      <div className="p-4 border-b border-[rgba(46,43,74,0.3)]">
+      <div className="p-4 border-b border-[var(--border-default)]">
         <Link
           href="/dashboard/agents"
-          className="inline-flex items-center gap-1.5 text-xs mb-3 text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs mb-3 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
         >
           <ChevronLeft size={14} />
           All Agents
@@ -111,10 +108,10 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
           <img
             src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)}
             alt={agent.name}
-            className="w-10 h-10 rounded-full object-cover border border-[rgba(46,43,74,0.3)] flex-shrink-0"
+            className="w-10 h-10 rounded-full object-cover border border-[var(--border-default)] flex-shrink-0"
           />
           <div className="min-w-0">
-            <h2 className="text-sm font-semibold text-[#FFFFFF] truncate">{agent.name}</h2>
+            <h2 className="text-sm font-semibold text-[var(--text-primary)] truncate">{agent.name}</h2>
             <div className="flex items-center gap-2 mt-0.5">
               <span
                 role="status"
@@ -145,7 +142,7 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
           return (
             <div key={group} className={group !== 'main' ? 'mt-4' : ''}>
               {GROUP_LABELS[group] && (
-                <p className="text-[10px] font-medium uppercase tracking-wider text-[#52506b] px-3 mb-1">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-[var(--text-muted)] px-3 mb-1">
                   {GROUP_LABELS[group]}
                 </p>
               )}
@@ -158,8 +155,8 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
                     aria-current={isActive ? 'page' : undefined}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150 relative cursor-pointer ${
                       isActive
-                        ? 'text-[#FFFFFF] bg-[#06b6d4]/10'
-                        : 'text-[#71717a] hover:text-[#A5A1C2] hover:bg-white/[0.03]'
+                        ? 'text-[var(--text-primary)] bg-[#06b6d4]/10'
+                        : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-card)]'
                     }`}
                   >
                     {isActive && (
@@ -194,12 +191,12 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
   return (
     <>
       {/* Mobile: sticky horizontal tab bar — replaces hamburger on small screens */}
-      <div className="lg:hidden sticky top-14 z-30 border-b border-[rgba(46,43,74,0.3)] bg-[#0a0a12]/95 backdrop-blur-sm">
+      <div className="lg:hidden sticky top-14 z-30 border-b border-[var(--border-default)] bg-[var(--bg-base)]/95 backdrop-blur-sm">
         {/* Agent identity strip */}
-        <div className="flex items-center gap-2 px-3 py-2 border-b border-[rgba(46,43,74,0.15)]">
+        <div className="flex items-center gap-2 px-3 py-2 border-b border-[var(--border-default)]">
           <Link
             href="/dashboard/agents"
-            className="flex-shrink-0 text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+            className="flex-shrink-0 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
             aria-label="Back to all agents"
           >
             <ChevronLeft size={16} />
@@ -207,9 +204,9 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
           <img
             src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)}
             alt={agent.name}
-            className="w-5 h-5 rounded-full object-cover border border-[rgba(46,43,74,0.3)] flex-shrink-0"
+            className="w-5 h-5 rounded-full object-cover border border-[var(--border-default)] flex-shrink-0"
           />
-          <span className="text-xs font-semibold text-white truncate min-w-0">{agent.name}</span>
+          <span className="text-xs font-semibold text-[var(--text-primary)] truncate min-w-0">{agent.name}</span>
           <div className="ml-auto flex items-center gap-1.5 flex-shrink-0">
             <span
               role="status"
@@ -244,7 +241,7 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
             return (
               <div key={group} className="flex flex-shrink-0 items-stretch">
                 {groupIndex > 0 && (
-                  <div className="w-px bg-[rgba(46,43,74,0.5)] my-1.5 flex-shrink-0" aria-hidden="true" />
+                  <div className="w-px bg-[var(--border-default)] my-1.5 flex-shrink-0" aria-hidden="true" />
                 )}
                 {groupTabs.map((t) => {
                   const isActive = activeTab === t.id;
@@ -256,7 +253,7 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
                       data-active={isActive}
                       onClick={() => onTabChange(t.id)}
                       className={`relative flex flex-col items-center gap-0.5 px-3 py-2 min-w-[58px] flex-shrink-0 cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#06b6d4]/50 focus-visible:ring-inset ${
-                        isActive ? 'text-[#06b6d4]' : 'text-[#52506b] hover:text-[#A5A1C2]'
+                        isActive ? 'text-[#06b6d4]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
                       }`}
                     >
                       {isActive && (
@@ -278,7 +275,7 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
       </div>
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-56 xl:w-60 flex-shrink-0 border-r border-[rgba(46,43,74,0.3)] bg-[#0a0a12]/50 min-h-screen sticky top-0 max-h-screen overflow-hidden">
+      <aside className="hidden lg:flex flex-col w-56 xl:w-60 flex-shrink-0 border-r border-[var(--border-default)] bg-[var(--bg-base)]/50 min-h-screen sticky top-0 max-h-screen overflow-hidden">
         {navContent}
       </aside>
     </>

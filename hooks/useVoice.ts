@@ -44,19 +44,34 @@ let voicesReady: Promise<SpeechSynthesisVoice[]> | null = null;
 function getVoicesReady(): Promise<SpeechSynthesisVoice[]> {
   if (voicesReady) return voicesReady;
   voicesReady = new Promise((resolve) => {
-    const voices = window.speechSynthesis.getVoices();
-    if (voices.length > 0) {
-      resolve(voices);
-      return;
-    }
-    // Chrome loads voices async
+    const tryGetVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) return voices;
+      return null;
+    };
+
+    const voices = tryGetVoices();
+    if (voices) { resolve(voices); return; }
+
+    // Chrome/Edge load voices async via voiceschanged event
     const handler = () => {
-      window.speechSynthesis.removeEventListener('voiceschanged', handler);
-      resolve(window.speechSynthesis.getVoices());
+      const v = tryGetVoices();
+      if (v) {
+        window.speechSynthesis.removeEventListener('voiceschanged', handler);
+        resolve(v);
+      }
     };
     window.speechSynthesis.addEventListener('voiceschanged', handler);
-    // Safety fallback — some browsers never fire voiceschanged
-    setTimeout(() => resolve(window.speechSynthesis.getVoices()), 500);
+
+    // Firefox/Safari may never fire voiceschanged — poll with increasing delays
+    let attempts = 0;
+    const poll = () => {
+      attempts++;
+      const v = tryGetVoices();
+      if (v) { resolve(v); return; }
+      if (attempts < 10) setTimeout(poll, 200 * attempts);
+    };
+    setTimeout(poll, 300);
   });
   return voicesReady;
 }

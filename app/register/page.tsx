@@ -63,8 +63,8 @@ export default function RegisterPage() {
   }, [refCode]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      if (didSubmit.current) track.register();
+    // Only auto-redirect if user was already logged in (not fresh registration)
+    if (isAuthenticated && !didSubmit.current) {
       router.push('/dashboard');
     }
   }, [isAuthenticated, router]);
@@ -88,6 +88,9 @@ export default function RegisterPage() {
 
     didSubmit.current = true;
     await register(email, username, password, refCode || undefined);
+    // Redirect to verify-email page after successful registration
+    track.register();
+    router.push('/verify-email');
   };
 
   const displayError = localError || error;
@@ -95,7 +98,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-[calc(100vh-3.5rem)] flex items-stretch">
       {/* Left panel — value propositions (hidden on mobile) */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-16 bg-white/[0.02] border-r border-white/[0.06]">
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-16 bg-[var(--bg-card)] border-r border-[var(--border-default)]">
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Hatcher</h2>
           <p className="text-sm text-[var(--text-muted)]">Managed AI agent hosting platform</p>
@@ -137,18 +140,13 @@ export default function RegisterPage() {
       {/* Right panel — register form */}
       <div className="flex-1 flex items-center justify-center px-4">
         <div
-          className="w-full max-w-sm rounded-2xl p-8"
-          style={{
-            background: 'rgba(13, 11, 26, 0.8)',
-            backdropFilter: 'blur(24px)',
-            border: '1px solid rgba(46, 43, 74, 0.4)',
-          }}
+          className="w-full max-w-sm rounded-2xl p-8 bg-[var(--bg-card)] border border-[var(--border-default)] backdrop-blur-xl shadow-lg"
         >
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="text-2xl font-bold text-[var(--text-primary)]">
               Create account
             </h1>
-            <p className="text-sm text-[#A5A1C2] mt-2">Get started with Hatcher</p>
+            <p className="text-sm text-[var(--text-secondary)] mt-2">Get started with Hatcher</p>
           </div>
 
           {/* Referral badge */}
@@ -163,7 +161,7 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-xs font-medium text-[#A5A1C2] mb-1.5">
+              <label htmlFor="email" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
                 Email
               </label>
               <input
@@ -173,13 +171,13 @@ export default function RegisterPage() {
                 onChange={(e) => { setEmail(e.target.value); clearError(); setLocalError(null); }}
                 required
                 autoFocus
-                className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[#71717a] transition-colors"
+                className="w-full h-10 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[var(--text-muted)] transition-colors"
                 placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label htmlFor="username" className="block text-xs font-medium text-[#A5A1C2] mb-1.5">
+              <label htmlFor="username" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
                 Username
               </label>
               <input
@@ -191,14 +189,14 @@ export default function RegisterPage() {
                 minLength={3}
                 maxLength={30}
                 pattern="^[a-zA-Z0-9_-]+$"
-                className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[#71717a] transition-colors"
+                className="w-full h-10 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[var(--text-muted)] transition-colors"
                 placeholder="cooluser123"
               />
-              <p className="text-[10px] text-[#71717a] mt-1">Letters, numbers, hyphens and underscores only</p>
+              <p className="text-[10px] text-[var(--text-muted)] mt-1">Letters, numbers, hyphens and underscores only</p>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-xs font-medium text-[#A5A1C2] mb-1.5">
+              <label htmlFor="password" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
                 Password
               </label>
               <input
@@ -208,13 +206,13 @@ export default function RegisterPage() {
                 onChange={(e) => { setPassword(e.target.value); clearError(); setLocalError(null); }}
                 required
                 minLength={8}
-                className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[#71717a] transition-colors"
+                className="w-full h-10 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[var(--text-muted)] transition-colors"
                 placeholder="Enter a strong password"
               />
 
               {/* Password requirements — always visible as helper text */}
               <div className="mt-2 space-y-1.5">
-                <p className="text-[10px] text-[#71717a]">Must include: 8+ characters, uppercase, lowercase, and a number</p>
+                <p className="text-[10px] text-[var(--text-muted)]">Must include: 8+ characters, uppercase, lowercase, and a number</p>
 
                 {/* Strength indicator — only when typing */}
                 {password.length > 0 && (
@@ -227,7 +225,7 @@ export default function RegisterPage() {
                             key={i}
                             className="h-1 flex-1 rounded-full transition-all duration-300"
                             style={{
-                              background: i <= strength.score ? strength.color : 'rgba(255,255,255,0.06)',
+                              background: i <= strength.score ? strength.color : 'var(--border-default)',
                             }}
                           />
                         ))}
@@ -247,11 +245,11 @@ export default function RegisterPage() {
                           {check.met ? (
                             <Check className="w-3 h-3 text-green-400 flex-shrink-0" />
                           ) : (
-                            <X className="w-3 h-3 text-[#71717a] flex-shrink-0" />
+                            <X className="w-3 h-3 text-[var(--text-muted)] flex-shrink-0" />
                           )}
                           <span
                             className="text-[10px] transition-colors duration-200"
-                            style={{ color: check.met ? '#86efac' : '#71717a' }}
+                            style={{ color: check.met ? '#86efac' : 'var(--text-muted)' }}
                           >
                             {check.label}
                           </span>
@@ -264,7 +262,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-xs font-medium text-[#A5A1C2] mb-1.5">
+              <label htmlFor="confirmPassword" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
                 Confirm Password
               </label>
               <input
@@ -273,7 +271,7 @@ export default function RegisterPage() {
                 value={confirmPassword}
                 onChange={(e) => { setConfirmPassword(e.target.value); setLocalError(null); }}
                 required
-                className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[#71717a] transition-colors"
+                className="w-full h-10 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[var(--text-muted)] transition-colors"
                 placeholder="Repeat your password"
               />
             </div>
@@ -300,7 +298,7 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <p className="text-center text-xs text-[#A5A1C2] mt-6">
+          <p className="text-center text-xs text-[var(--text-secondary)] mt-6">
             Already have an account?{' '}
             <Link href="/login" className="text-cyan-400 hover:text-cyan-300 transition-colors">
               Sign In

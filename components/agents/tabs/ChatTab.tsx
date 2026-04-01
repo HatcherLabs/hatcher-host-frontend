@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useCallback, memo, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Mic, MicOff, Volume2, VolumeX, Square, ThumbsUp, ThumbsDown, MessageSquare, Bot } from 'lucide-react';
+import { Send, Mic, MicOff, Volume2, VolumeX, Square, ThumbsUp, ThumbsDown, MessageSquare, Bot, Phone, PhoneOff, X } from 'lucide-react';
 import { FRAMEWORKS } from '@hatcher/shared';
 import { useVoice } from '@/hooks/useVoice';
 import { api } from '@/lib/api';
@@ -116,7 +116,7 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
       <div className={`flex flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start'}`} style={{ maxWidth: '75%' }}>
         {/* User bubble: subtle gradient; Assistant bubble: framework accent color */}
         <div
-          className={`chat-bubble text-[#FFFFFF] ${
+          className={`chat-bubble text-[var(--text-primary)] ${
             msg.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-assistant'
           }`}
           style={
@@ -144,15 +144,15 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
         </div>
         <div className="flex items-center gap-1.5">
           {msg.timestamp && !msg.streaming && (
-            <span className="text-[10px] px-1.5 text-[#71717a] select-none">
+            <span className="text-[10px] px-1.5 text-[var(--text-muted)] select-none">
               {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           )}
           {msg.role === 'assistant' && !msg.streaming && msg.content && ttsSupported && (
             <button
               onClick={() => onSpeak(msg.id, msg.content)}
-              className={`opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 p-0.5 rounded hover:bg-white/5 cursor-pointer ${
-                isSpeakingThis ? 'text-[#06b6d4] !opacity-100' : 'text-[#71717a] hover:text-[#A5A1C2]'
+              className={`opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 p-0.5 rounded hover:bg-[var(--bg-card)] cursor-pointer ${
+                isSpeakingThis ? 'text-[#06b6d4] !opacity-100' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
               }`}
               title={isSpeakingThis ? 'Stop reading' : 'Read aloud'}
             >
@@ -163,8 +163,8 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
             <>
               <button
                 onClick={() => handleVote('up')}
-                className={`opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 p-0.5 rounded hover:bg-white/5 cursor-pointer ${
-                  vote === 'up' ? 'text-emerald-400 !opacity-100' : 'text-[#71717a] hover:text-emerald-400'
+                className={`opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 p-0.5 rounded hover:bg-[var(--bg-card)] cursor-pointer ${
+                  vote === 'up' ? 'text-emerald-400 !opacity-100' : 'text-[var(--text-muted)] hover:text-emerald-400'
                 }`}
                 title="Good response"
               >
@@ -172,8 +172,8 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
               </button>
               <button
                 onClick={() => handleVote('down')}
-                className={`opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 p-0.5 rounded hover:bg-white/5 cursor-pointer ${
-                  vote === 'down' ? 'text-red-400 !opacity-100' : 'text-[#71717a] hover:text-red-400'
+                className={`opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 p-0.5 rounded hover:bg-[var(--bg-card)] cursor-pointer ${
+                  vote === 'down' ? 'text-red-400 !opacity-100' : 'text-[var(--text-muted)] hover:text-red-400'
                 }`}
                 title="Bad response"
               >
@@ -287,6 +287,182 @@ export function ChatTab() {
   }, [voice]);
 
   const hasVoiceSupport = voice.sttSupported || voice.ttsSupported;
+  const [voiceCallMode, setVoiceCallMode] = useState(false);
+  const [callDuration, setCallDuration] = useState(0);
+  const callTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Voice call mode: auto-listen after TTS finishes
+  useEffect(() => {
+    if (!voiceCallMode) return;
+    // When TTS stops and we're in call mode, start listening again
+    if (!voice.isSpeaking && !voice.isListening && !sending) {
+      const timer = setTimeout(() => {
+        if (voiceCallMode && !sending) {
+          voice.startListening((finalText: string) => {
+            if (finalText.trim()) sendMessage(finalText.trim());
+          });
+        }
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [voice.isSpeaking, voice.isListening, voiceCallMode, sending]);
+
+  // Call duration timer
+  useEffect(() => {
+    if (voiceCallMode) {
+      setCallDuration(0);
+      callTimerRef.current = setInterval(() => setCallDuration(d => d + 1), 1000);
+    } else {
+      if (callTimerRef.current) clearInterval(callTimerRef.current);
+      callTimerRef.current = null;
+    }
+    return () => { if (callTimerRef.current) clearInterval(callTimerRef.current); };
+  }, [voiceCallMode]);
+
+  const startVoiceCall = useCallback(() => {
+    setVoiceCallMode(true);
+    voice.toggleAutoSpeak(); // Enable auto-speak if not already
+    voice.startListening((finalText: string) => {
+      if (finalText.trim()) sendMessage(finalText.trim());
+    });
+  }, [voice, sendMessage]);
+
+  const endVoiceCall = useCallback(() => {
+    setVoiceCallMode(false);
+    voice.stopListening();
+    voice.stopSpeaking();
+  }, [voice]);
+
+  const formatDuration = (secs: number) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
+  // Voice Call Mode overlay
+  if (voiceCallMode) {
+    return (
+      <motion.div
+        key="voice-call-mode"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--bg-base)]/95 backdrop-blur-2xl"
+      >
+        {/* Close button */}
+        <button
+          onClick={endVoiceCall}
+          className="absolute top-6 right-6 p-2 rounded-full bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+        >
+          <X size={20} />
+        </button>
+
+        {/* Agent avatar + name */}
+        <div className="flex flex-col items-center gap-4 mb-8">
+          <div className="relative">
+            <div className={`w-24 h-24 rounded-full bg-gradient-to-br ${
+              agent.framework === 'openclaw' ? 'from-amber-500/20 to-amber-600/10' :
+              agent.framework === 'hermes' ? 'from-purple-500/20 to-purple-600/10' :
+              agent.framework === 'elizaos' ? 'from-cyan-500/20 to-cyan-600/10' :
+              'from-rose-500/20 to-rose-600/10'
+            } flex items-center justify-center border border-white/10`}>
+              <Bot size={40} className={
+                agent.framework === 'openclaw' ? 'text-amber-400' :
+                agent.framework === 'hermes' ? 'text-purple-400' :
+                agent.framework === 'elizaos' ? 'text-cyan-400' :
+                'text-rose-400'
+              } />
+            </div>
+            {/* Pulsing ring when listening */}
+            {voice.isListening && (
+              <>
+                <span className="absolute inset-0 rounded-full animate-ping bg-[#06b6d4]/20" />
+                <span className="absolute inset-[-4px] rounded-full border-2 border-[#06b6d4]/40 animate-pulse" />
+              </>
+            )}
+            {/* Sound wave ring when speaking */}
+            {voice.isSpeaking && (
+              <span className="absolute inset-[-4px] rounded-full border-2 border-purple-500/40 animate-pulse" />
+            )}
+          </div>
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-white">{agent.name}</h3>
+            <p className="text-xs text-[var(--text-muted)] mt-1">{formatDuration(callDuration)}</p>
+          </div>
+        </div>
+
+        {/* Status indicator */}
+        <div className="mb-12 h-8 flex items-center gap-2">
+          {voice.isListening && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
+              <RecordingDot />
+              <span className="text-sm text-[#06b6d4]">Listening...</span>
+            </motion.div>
+          )}
+          {sending && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
+              <div className="w-3 h-3 border-2 border-[#06b6d4]/30 border-t-[#06b6d4] rounded-full animate-spin" />
+              <span className="text-sm text-[var(--text-muted)]">Thinking...</span>
+            </motion.div>
+          )}
+          {voice.isSpeaking && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
+              <SoundWaveBars />
+              <span className="text-sm text-purple-400">Speaking...</span>
+            </motion.div>
+          )}
+          {!voice.isListening && !sending && !voice.isSpeaking && (
+            <span className="text-sm text-[var(--text-muted)]">Tap mic to speak</span>
+          )}
+        </div>
+
+        {/* Last transcript / response preview */}
+        {messages.length > 0 && (
+          <div className="max-w-sm mx-auto mb-8 px-4">
+            <p className="text-center text-xs text-[var(--text-muted)] line-clamp-2">
+              {messages[messages.length - 1]?.content?.slice(0, 120)}
+              {(messages[messages.length - 1]?.content?.length ?? 0) > 120 ? '...' : ''}
+            </p>
+          </div>
+        )}
+
+        {/* Controls */}
+        <div className="flex items-center gap-6">
+          {/* Mute/unmute mic */}
+          <button
+            onClick={() => voice.isListening ? voice.stopListening() : voice.startListening((t: string) => { if (t.trim()) sendMessage(t.trim()); })}
+            className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200 ${
+              voice.isListening
+                ? 'bg-[#06b6d4] shadow-[0_0_30px_rgba(6,182,212,0.4)]'
+                : 'bg-white/10 hover:bg-white/15'
+            }`}
+          >
+            {voice.isListening ? <Mic size={24} className="text-white" /> : <MicOff size={24} className="text-[var(--text-muted)]" />}
+          </button>
+
+          {/* End call */}
+          <button
+            onClick={endVoiceCall}
+            className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center shadow-[0_0_30px_rgba(239,68,68,0.3)] transition-all duration-200"
+          >
+            <PhoneOff size={28} className="text-white" />
+          </button>
+
+          {/* Stop speaking */}
+          <button
+            onClick={voice.stopSpeaking}
+            className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200 ${
+              voice.isSpeaking
+                ? 'bg-purple-500/20 border border-purple-500/40'
+                : 'bg-white/10 hover:bg-white/15'
+            }`}
+          >
+            {voice.isSpeaking ? <Square size={20} className="text-purple-400" /> : <Volume2 size={22} className="text-[var(--text-muted)]" />}
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div key="tab-chat" className="flex flex-col h-[calc(100vh-300px)] min-h-[300px] sm:min-h-[400px]" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
@@ -305,13 +481,24 @@ export function ChatTab() {
           )}
         </div>
         <div className="flex items-center gap-2">
+          {/* Voice Call button */}
+          {hasVoiceSupport && voice.sttSupported && isAuthenticated && (
+            <button
+              onClick={startVoiceCall}
+              className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-[var(--border-default)] bg-transparent text-[var(--text-muted)] hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all duration-200 cursor-pointer"
+              title="Start voice call"
+            >
+              <Phone size={11} />
+              <span className="hidden sm:inline">Voice</span>
+            </button>
+          )}
           {voice.ttsSupported && (
             <button
               onClick={voice.toggleAutoSpeak}
               className={`group flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border transition-all duration-200 cursor-pointer ${
                 voice.autoSpeak
                   ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[#06b6d4]'
-                  : 'border-[rgba(46,43,74,0.3)] bg-transparent text-[#71717a] hover:border-[#71717a]/40 hover:text-[#A5A1C2]'
+                  : 'border-[var(--border-default)] bg-transparent text-[var(--text-muted)] hover:border-[var(--text-muted)]/40 hover:text-[var(--text-secondary)]'
               }`}
               title="Auto-read responses"
             >
@@ -334,10 +521,10 @@ export function ChatTab() {
             <div className="w-16 h-16 rounded-2xl bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mx-auto mb-4">
               <Bot size={32} className="text-[#06b6d4]" />
             </div>
-            <p className="text-sm mb-1 text-[#A5A1C2]">
+            <p className="text-sm mb-1 text-[var(--text-secondary)]">
               Start a conversation with <span className="font-medium text-[#06b6d4]">{agent.name}</span>
             </p>
-            <p className="text-xs mb-1 text-[#71717a]">
+            <p className="text-xs mb-1 text-[var(--text-muted)]">
               Responses appear in real time
             </p>
 
@@ -347,7 +534,7 @@ export function ChatTab() {
                 <motion.button
                   key={prompt}
                   onClick={() => sendMessage(prompt)}
-                  className="text-xs px-4 py-2 rounded-full border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all cursor-pointer"
+                  className="text-xs px-4 py-2 rounded-full border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all cursor-pointer"
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 + i * 0.1 }}
@@ -363,7 +550,7 @@ export function ChatTab() {
           <div className="flex justify-center py-2">
             <button
               onClick={() => setExtraLoaded((n) => n + MESSAGES_WINDOW)}
-              className="text-xs px-3 py-1.5 rounded-lg border border-[rgba(46,43,74,0.4)] text-[#71717a] hover:text-[#A5A1C2] hover:border-[#71717a]/40 transition-all"
+              className="text-xs px-3 py-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:border-[var(--text-muted)]/40 transition-all"
             >
               Load earlier messages ({windowStart} older)
             </button>
@@ -394,7 +581,7 @@ export function ChatTab() {
             exit={{ opacity: 0, y: 4, height: 0 }}
             className="mb-2"
           >
-            <div className="flex items-center justify-between px-3 py-1.5 rounded-lg border border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl">
+            <div className="flex items-center justify-between px-3 py-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl">
               <div className="flex items-center gap-2 text-xs">
                 {voice.isListening && (
                   <>
@@ -414,7 +601,7 @@ export function ChatTab() {
                   if (voice.isListening) voice.stopListening();
                   if (voice.isSpeaking) voice.stopSpeaking();
                 }}
-                className="p-1 rounded hover:bg-white/5 text-[#71717a] hover:text-white transition-colors"
+                className="p-1 rounded hover:bg-[var(--bg-card)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
                 title="Stop"
               >
                 <Square size={12} fill="currentColor" />
@@ -443,7 +630,7 @@ export function ChatTab() {
           </span>
           {(chatErrorType === 'timeout' || chatErrorType === 'generic' || chatErrorType === 'network') && (
             <button
-              className="text-xs border border-white/20 px-2 py-0.5 rounded hover:bg-white/5 transition-colors text-[#71717a]"
+              className="text-xs border border-[var(--border-default)] px-2 py-0.5 rounded hover:bg-[var(--bg-card)] transition-colors text-[var(--text-muted)]"
               onClick={() => {
                 setChatError(null);
                 setChatErrorType(null);
@@ -471,7 +658,7 @@ export function ChatTab() {
             </div>
           ) : msgLimit > 0 && (
             <div className="flex items-center gap-2 px-1">
-              <div className="flex-1 h-1 rounded-full bg-[rgba(46,43,74,0.5)] overflow-hidden">
+              <div className="flex-1 h-1 rounded-full bg-[var(--bg-hover)] overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
                     remaining === null || remaining / msgLimit > 0.5
@@ -500,7 +687,7 @@ export function ChatTab() {
       {/* Input bar */}
       {!isAuthenticated ? (
         <GlassCard className="text-center">
-          <p className="text-sm text-[#71717a]">
+          <p className="text-sm text-[var(--text-muted)]">
             Sign in to chat with this agent.
           </p>
         </GlassCard>
@@ -519,10 +706,10 @@ export function ChatTab() {
         </div>
       ) : (
         <div>
-          <div className="flex gap-2 items-end rounded-2xl p-3 border border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.6)] backdrop-blur-xl focus-within:border-[#06b6d4]/40 focus-within:shadow-[0_0_20px_rgba(6,182,212,0.06)] transition-all duration-200">
+          <div className="flex gap-2 items-end rounded-2xl p-3 border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl focus-within:border-[#06b6d4]/40 focus-within:shadow-[0_0_20px_rgba(6,182,212,0.06)] transition-all duration-200">
             <textarea
               ref={inputRef}
-              className="flex-1 bg-transparent border-none outline-none resize-none min-h-[36px] max-h-32 text-sm text-[#FFFFFF] placeholder:text-[#71717a] leading-relaxed"
+              className="flex-1 bg-transparent border-none outline-none resize-none min-h-[36px] max-h-32 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] leading-relaxed"
               rows={1}
               placeholder={`Message ${agent.name}...`}
               value={input}
@@ -530,8 +717,16 @@ export function ChatTab() {
               onKeyDown={handleKeyDown}
               onInput={(e) => {
                 const el = e.currentTarget;
+                const scrollParent = el.closest('.overflow-y-auto')?.parentElement;
+                const prevScroll = scrollParent?.scrollTop ?? 0;
                 el.style.height = 'auto';
                 el.style.height = el.scrollHeight + 'px';
+                // Prevent page from jumping when textarea grows
+                if (scrollParent) scrollParent.scrollTop = prevScroll;
+              }}
+              onFocus={(e) => {
+                // Prevent browser from scrolling page to bring textarea into view
+                e.preventDefault();
               }}
               disabled={sending || sendCooldown}
             />
@@ -543,7 +738,7 @@ export function ChatTab() {
                 className={`h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
                   voice.isListening
                     ? 'bg-red-500/20 border border-red-500/40 shadow-[0_0_12px_rgba(239,68,68,0.3)] hover:bg-red-500/30'
-                    : 'bg-[rgba(46,43,74,0.4)] hover:bg-[rgba(46,43,74,0.6)] border border-transparent hover:border-[#71717a]/30'
+                    : 'bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] border border-transparent hover:border-[var(--text-muted)]/30'
                 }`}
                 title={voice.isListening ? 'Stop recording' : 'Start voice input'}
                 disabled={sending || sendCooldown}
@@ -551,7 +746,7 @@ export function ChatTab() {
                 {voice.isListening ? (
                   <MicOff size={15} className="text-red-400" />
                 ) : (
-                  <Mic size={15} className="text-[#A5A1C2]" />
+                  <Mic size={15} className="text-[var(--text-secondary)]" />
                 )}
               </button>
             )}
@@ -575,12 +770,12 @@ export function ChatTab() {
           </div>
 
           <div className="flex items-center justify-between mt-1.5 px-1">
-            <span className="text-[10px] text-[#71717a]">
+            <span className="text-[10px] text-[var(--text-muted)]">
               Powered by {llmProvider}
             </span>
             <div className="flex items-center gap-3">
               {isAuthenticated && !hasUnlimitedChat && msgLimit > 0 && (
-                <span className="inline-flex items-center gap-1 text-[10px] text-[#71717a]">
+                <span className="inline-flex items-center gap-1 text-[10px] text-[var(--text-muted)]">
                   <MessageSquare size={9} />
                   <span className={`font-medium ${
                     remaining === null || remaining / msgLimit > 0.5
@@ -598,7 +793,7 @@ export function ChatTab() {
                   unlimited
                 </span>
               )}
-              <span className="hidden sm:block text-[10px] text-[#71717a]">
+              <span className="hidden sm:block text-[10px] text-[var(--text-muted)]">
                 Enter to send, Shift+Enter for new line
               </span>
             </div>
@@ -631,17 +826,17 @@ export function ChatTab() {
         }
         .markdown-body strong {
           font-weight: 700;
-          color: #FFFFFF;
+          color: var(--text-primary);
         }
         .markdown-body em {
           font-style: italic;
-          color: #d4d0f0;
+          color: var(--text-secondary);
         }
         .markdown-body h1, .markdown-body h2, .markdown-body h3,
         .markdown-body h4, .markdown-body h5, .markdown-body h6 {
           font-weight: 600;
           margin: 0.75em 0 0.25em;
-          color: #FFFFFF;
+          color: var(--text-primary);
         }
         .markdown-body h1 { font-size: 1.25em; }
         .markdown-body h2 { font-size: 1.15em; }
@@ -670,7 +865,7 @@ export function ChatTab() {
         }
         .markdown-body pre {
           background: rgba(0, 0, 0, 0.3);
-          border: 1px solid rgba(46, 43, 74, 0.4);
+          border: 1px solid var(--border-default);
           border-radius: 8px;
           padding: 0.75em 1em;
           margin: 0.5em 0;
@@ -681,13 +876,13 @@ export function ChatTab() {
           border: none;
           padding: 0;
           font-size: 0.85em;
-          color: #e2e8f0;
+          color: var(--text-secondary);
         }
         .markdown-body blockquote {
           border-left: 3px solid #06b6d4;
           margin: 0.5em 0;
           padding: 0.25em 0.75em;
-          color: #A5A1C2;
+          color: var(--text-secondary);
           background: rgba(6, 182, 212, 0.05);
           border-radius: 0 4px 4px 0;
         }
@@ -701,7 +896,7 @@ export function ChatTab() {
         }
         .markdown-body hr {
           border: none;
-          border-top: 1px solid rgba(46, 43, 74, 0.4);
+          border-top: 1px solid var(--border-default);
           margin: 0.75em 0;
         }
         .markdown-body table {
@@ -710,7 +905,7 @@ export function ChatTab() {
           width: 100%;
         }
         .markdown-body th, .markdown-body td {
-          border: 1px solid rgba(46, 43, 74, 0.4);
+          border: 1px solid var(--border-default);
           padding: 0.35em 0.6em;
           text-align: left;
           font-size: 0.9em;
@@ -718,7 +913,7 @@ export function ChatTab() {
         .markdown-body th {
           background: rgba(6, 182, 212, 0.08);
           font-weight: 600;
-          color: #FFFFFF;
+          color: var(--text-primary);
         }
       `}</style>
     </motion.div>

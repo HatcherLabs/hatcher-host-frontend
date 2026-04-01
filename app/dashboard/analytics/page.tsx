@@ -56,7 +56,7 @@ const FRAMEWORK_COLORS: Record<string, string> = {
 
 const STATUS_COLORS: Record<string, string> = {
   active: '#22c55e',
-  sleeping: '#71717a',
+  sleeping: 'var(--text-muted)',
   paused: '#f59e0b',
   error: '#ef4444',
   restarting: '#06b6d4',
@@ -81,16 +81,16 @@ function StatCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       className="rounded-2xl border p-5"
-      style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}
+      style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}
     >
       <div className="flex items-center gap-3 mb-3">
         <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `${color}15` }}>
           <Icon size={18} style={{ color }} />
         </div>
-        <p className="text-xs text-[#71717a] uppercase tracking-wider">{label}</p>
+        <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider">{label}</p>
       </div>
-      <p className="text-2xl font-bold text-[#fafafa]">{value}</p>
-      {sub && <p className="text-xs text-[#71717a] mt-1">{sub}</p>}
+      <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
+      {sub && <p className="text-xs text-[var(--text-muted)] mt-1">{sub}</p>}
     </motion.div>
   );
 }
@@ -110,10 +110,10 @@ function BarChartSection({ data, color = '#06b6d4' }: { data: Array<{ date: stri
         return (
           <div key={d.date} className="flex-1 flex flex-col items-center gap-1 group relative">
             {/* Tooltip */}
-            <div className="absolute bottom-full mb-1 opacity-0 group-hover:opacity-100 transition-opacity bg-[#1a1730] border border-white/10 rounded-lg px-2 py-1 text-xs text-white whitespace-nowrap z-10 pointer-events-none">
+            <div className="absolute bottom-full mb-1 opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--bg-elevated)] border border-white/10 rounded-lg px-2 py-1 text-xs text-white whitespace-nowrap z-10 pointer-events-none">
               {formatChartDate(d.date)}: {d.count}
             </div>
-            <span className="text-[9px] font-medium text-[#71717a] group-hover:text-[#A5A1C2] transition-colors">
+            <span className="text-[9px] font-medium text-[var(--text-muted)] group-hover:text-[var(--text-secondary)] transition-colors">
               {d.count > 0 ? d.count : ''}
             </span>
             <div
@@ -125,10 +125,10 @@ function BarChartSection({ data, color = '#06b6d4' }: { data: Array<{ date: stri
             />
             {showLabel(i) && (
               <div className="flex flex-col items-center">
-                <span className={`text-[8px] ${isToday ? 'font-medium' : ''}`} style={{ color: isToday ? color : '#71717a' }}>
+                <span className={`text-[8px] ${isToday ? 'font-medium' : ''}`} style={{ color: isToday ? color : 'var(--text-muted)' }}>
                   {isToday ? 'Today' : formatWeekday(d.date)}
                 </span>
-                <span className="text-[7px] text-[#71717a]/50">{formatChartDate(d.date)}</span>
+                <span className="text-[7px] text-[var(--text-muted)]/50">{formatChartDate(d.date)}</span>
               </div>
             )}
           </div>
@@ -140,7 +140,7 @@ function BarChartSection({ data, color = '#06b6d4' }: { data: Array<{ date: stri
 
 // ─── Skeleton ────────────────────────────────────────────────
 function Skeleton({ className }: { className?: string }) {
-  return <div className={`animate-pulse rounded-xl bg-white/[0.04] ${className ?? ''}`} />;
+  return <div className={`animate-pulse rounded-xl bg-[var(--bg-card)] ${className ?? ''}`} />;
 }
 
 // ─── Main Page ───────────────────────────────────────────────
@@ -177,7 +177,7 @@ export default function AnalyticsPage() {
   const totalDailyMessages = data ? data.dailyVolume.reduce((s, d) => s + d.count, 0) : 0;
 
   return (
-    <main className="min-h-screen" style={{ background: '#0a0a0f' }}>
+    <main className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Header */}
         <motion.div
@@ -188,21 +188,21 @@ export default function AnalyticsPage() {
           <div className="flex items-center gap-4">
             <Link
               href="/dashboard/agents"
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-[#71717a] hover:text-white hover:bg-white/[0.06] transition-colors"
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors"
             >
               <ArrowLeft size={16} />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-[#fafafa]" style={{ fontFamily: 'Sora, sans-serif' }}>
+              <h1 className="text-xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'Sora, sans-serif' }}>
                 Analytics
               </h1>
-              <p className="text-xs text-[#71717a] mt-0.5">Account-wide usage insights</p>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">Account-wide usage insights</p>
             </div>
           </div>
           <button
             onClick={() => load(true)}
             disabled={refreshing}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-[#71717a] hover:text-white hover:bg-white/[0.06] transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors disabled:opacity-50"
           >
             <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
             Refresh
@@ -219,7 +219,7 @@ export default function AnalyticsPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="rounded-2xl border p-5" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
+              <div key={i} className="rounded-2xl border p-5" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
                 <Skeleton className="h-9 w-9 mb-3" />
                 <Skeleton className="h-7 w-20 mb-1" />
                 <Skeleton className="h-3 w-16" />
@@ -229,14 +229,8 @@ export default function AnalyticsPage() {
             <>
               <StatCard icon={Bot} label="Total Agents" value={data?.totalAgents ?? 0} sub={`${data?.activeAgents ?? 0} active`} color="#8b5cf6" />
               <StatCard icon={MessageSquare} label="Total Messages" value={formatNumber(data?.totalMessages ?? 0)} sub="All time" color="#06b6d4" />
-              <StatCard icon={Activity} label="Last 14 Days" value={formatNumber(totalDailyMessages)} sub="LLM messages" color="#22c55e" />
-              <StatCard
-                icon={Cpu}
-                label="Token Usage"
-                value={formatNumber(data?.tokenSummary.totalTokens ?? 0)}
-                sub={`$${data?.tokenSummary.usdCost.toFixed(4) ?? '0.0000'} USD (30d)`}
-                color="#f59e0b"
-              />
+              <StatCard icon={Activity} label="Last 14 Days" value={formatNumber(totalDailyMessages)} sub="Messages" color="#22c55e" />
+              <StatCard icon={Zap} label="Active Now" value={data?.activeAgents ?? 0} sub="Running agents" color="#f59e0b" />
             </>
           )}
         </div>
@@ -247,20 +241,20 @@ export default function AnalyticsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="rounded-2xl border p-6 mb-6"
-          style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}
+          style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}
         >
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
               <BarChart3 size={18} className="text-[#06b6d4]" />
-              <h3 className="text-sm font-semibold text-[#fafafa]">Message Volume</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Message Volume</h3>
             </div>
-            <span className="text-[10px] text-[#71717a] uppercase tracking-wider">Last 14 days</span>
+            <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Last 14 days</span>
           </div>
           {loading ? (
             <div className="flex items-end gap-1 h-40">
               {Array.from({ length: 14 }).map((_, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                  <div className="w-full rounded-t bg-white/[0.04] animate-pulse" style={{ height: `${15 + Math.random() * 60}%` }} />
+                  <div className="w-full rounded-t bg-[var(--bg-card)] animate-pulse" style={{ height: `${15 + Math.random() * 60}%` }} />
                 </div>
               ))}
             </div>
@@ -268,7 +262,7 @@ export default function AnalyticsPage() {
             <BarChartSection data={data.dailyVolume} />
           ) : (
             <div className="h-40 flex items-center justify-center">
-              <p className="text-sm text-[#6B6890]">No message data yet</p>
+              <p className="text-sm text-[var(--text-muted)]">No message data yet</p>
             </div>
           )}
         </motion.div>
@@ -281,11 +275,11 @@ export default function AnalyticsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
             className="rounded-2xl border p-6"
-            style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}
+            style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}
           >
             <div className="flex items-center gap-2 mb-5">
               <Cpu size={16} className="text-[#06b6d4]" />
-              <h3 className="text-sm font-semibold text-[#fafafa]">Frameworks</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Frameworks</h3>
             </div>
             {loading ? (
               <div className="space-y-3">
@@ -302,9 +296,9 @@ export default function AnalyticsPage() {
                       <div key={fw}>
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-xs capitalize font-medium" style={{ color }}>{fw}</span>
-                          <span className="text-xs text-[#71717a]">{count} agent{count !== 1 ? 's' : ''}</span>
+                          <span className="text-xs text-[var(--text-muted)]">{count} agent{count !== 1 ? 's' : ''}</span>
                         </div>
-                        <div className="h-2 rounded-full bg-white/[0.04] overflow-hidden">
+                        <div className="h-2 rounded-full bg-[var(--bg-card)] overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-500"
                             style={{ width: `${pct}%`, background: color }}
@@ -315,7 +309,7 @@ export default function AnalyticsPage() {
                   })}
               </div>
             ) : (
-              <p className="text-sm text-[#6B6890] text-center py-4">No agents yet</p>
+              <p className="text-sm text-[var(--text-muted)] text-center py-4">No agents yet</p>
             )}
           </motion.div>
 
@@ -325,11 +319,11 @@ export default function AnalyticsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="rounded-2xl border p-6"
-            style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}
+            style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}
           >
             <div className="flex items-center gap-2 mb-5">
               <Activity size={16} className="text-[#06b6d4]" />
-              <h3 className="text-sm font-semibold text-[#fafafa]">Agent Status</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Agent Status</h3>
             </div>
             {loading ? (
               <div className="space-y-3">
@@ -341,14 +335,14 @@ export default function AnalyticsPage() {
                   .sort(([, a], [, b]) => b - a)
                   .map(([status, count]) => {
                     const pct = data.totalAgents > 0 ? (count / data.totalAgents) * 100 : 0;
-                    const color = STATUS_COLORS[status] ?? '#71717a';
+                    const color = STATUS_COLORS[status] ?? 'var(--text-muted)';
                     return (
                       <div key={status}>
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-xs capitalize font-medium" style={{ color }}>{status}</span>
-                          <span className="text-xs text-[#71717a]">{count}</span>
+                          <span className="text-xs text-[var(--text-muted)]">{count}</span>
                         </div>
-                        <div className="h-2 rounded-full bg-white/[0.04] overflow-hidden">
+                        <div className="h-2 rounded-full bg-[var(--bg-card)] overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-500"
                             style={{ width: `${pct}%`, background: color }}
@@ -359,7 +353,7 @@ export default function AnalyticsPage() {
                   })}
               </div>
             ) : (
-              <p className="text-sm text-[#6B6890] text-center py-4">No agents yet</p>
+              <p className="text-sm text-[var(--text-muted)] text-center py-4">No agents yet</p>
             )}
           </motion.div>
         </div>
@@ -370,11 +364,11 @@ export default function AnalyticsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
           className="rounded-2xl border p-6 mb-6"
-          style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}
+          style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}
         >
           <div className="flex items-center gap-2 mb-5">
             <Hash size={16} className="text-[#06b6d4]" />
-            <h3 className="text-sm font-semibold text-[#fafafa]">Messages Per Agent</h3>
+            <h3 className="text-sm font-semibold text-[var(--text-primary)]">Messages Per Agent</h3>
           </div>
           {loading ? (
             <div className="space-y-3">
@@ -390,18 +384,18 @@ export default function AnalyticsPage() {
                   <div key={agent.id}>
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-[10px] text-[#71717a] w-4 text-right shrink-0">#{i + 1}</span>
+                        <span className="text-[10px] text-[var(--text-muted)] w-4 text-right shrink-0">#{i + 1}</span>
                         <Link
-                          href={`/dashboard/agent/${agent.id}?tab=stats`}
-                          className="text-xs font-medium text-[#fafafa] hover:text-[#06b6d4] transition-colors truncate"
+                          href={`/dashboard/agent/${agent.id}?tab=analytics`}
+                          className="text-xs font-medium text-[var(--text-primary)] hover:text-[#06b6d4] transition-colors truncate"
                         >
                           {agent.name}
                         </Link>
                         <span className="text-[9px] capitalize shrink-0" style={{ color }}>{agent.framework}</span>
                       </div>
-                      <span className="text-xs text-[#71717a] shrink-0 ml-3">{agent.count.toLocaleString()}</span>
+                      <span className="text-xs text-[var(--text-muted)] shrink-0 ml-3">{agent.count.toLocaleString()}</span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
+                    <div className="h-1.5 rounded-full bg-[var(--bg-card)] overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{ width: `${pct}%`, background: color }}
@@ -412,45 +406,15 @@ export default function AnalyticsPage() {
               })}
             </div>
           ) : (
-            <p className="text-sm text-[#6B6890] text-center py-4">No message data yet — start chatting with your agents!</p>
+            <p className="text-sm text-[var(--text-muted)] text-center py-4">No message data yet — start chatting with your agents!</p>
           )}
         </motion.div>
-
-        {/* Token Usage Detail */}
-        {!loading && data && data.tokenSummary.totalTokens > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="rounded-2xl border p-6"
-            style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}
-          >
-            <div className="flex items-center gap-2 mb-5">
-              <Zap size={16} className="text-[#f59e0b]" />
-              <h3 className="text-sm font-semibold text-[#fafafa]">LLM Token Usage</h3>
-              <span className="text-[10px] text-[#71717a] uppercase tracking-wider ml-auto">Last 30 days</span>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {[
-                { label: 'Input Tokens', value: formatNumber(data.tokenSummary.inputTokens), color: '#8b5cf6' },
-                { label: 'Output Tokens', value: formatNumber(data.tokenSummary.outputTokens), color: '#06b6d4' },
-                { label: 'Total Tokens', value: formatNumber(data.tokenSummary.totalTokens), color: '#22c55e' },
-                { label: 'USD Cost', value: `$${data.tokenSummary.usdCost.toFixed(4)}`, color: '#f59e0b' },
-              ].map(({ label, value, color }) => (
-                <div key={label} className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
-                  <p className="text-[10px] text-[#71717a] uppercase tracking-wider mb-1">{label}</p>
-                  <p className="text-lg font-bold" style={{ color }}>{value}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
 
         {/* Empty state */}
         {!loading && !error && data?.totalAgents === 0 && (
           <div className="text-center py-16">
-            <TrendingUp size={40} className="mx-auto text-[#71717a] mb-4" />
-            <p className="text-sm text-[#71717a]">No agents yet. Create your first agent to start seeing analytics.</p>
+            <TrendingUp size={40} className="mx-auto text-[var(--text-muted)] mb-4" />
+            <p className="text-sm text-[var(--text-muted)]">No agents yet. Create your first agent to start seeing analytics.</p>
             <Link href="/create" className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-xl text-sm font-medium bg-[#8b5cf6] text-white hover:bg-[#7c3aed] transition-colors">
               Create Agent
             </Link>

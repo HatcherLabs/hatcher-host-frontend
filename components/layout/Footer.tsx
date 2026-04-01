@@ -6,6 +6,7 @@ const PRODUCT_LINKS = [
   { label: 'Explore', href: '/explore' },
   { label: 'Dashboard', href: '/dashboard' },
   { label: 'Pricing', href: '/pricing' },
+  { label: 'Status', href: '/status' },
 ];
 
 const RESOURCE_LINKS = [
@@ -57,7 +58,7 @@ const SOCIAL_ICONS = [
 export function Footer() {
   return (
     <footer className="mt-auto">
-      <div className="h-px bg-white/[0.06]" />
+      <div className="h-px bg-[var(--border-default)]" />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
           {/* Brand */}
@@ -82,7 +83,7 @@ export function Footer() {
               </svg>
               <span className="text-base font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Hatcher</span>
             </div>
-            <p className="text-xs text-[#A5A1C2] leading-relaxed max-w-[200px]">
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed max-w-[200px]">
               Deploy AI agents on 20+ platforms. One click, any framework.
             </p>
             {/* Social icons */}
@@ -94,7 +95,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-[#71717a] ${s.hoverClass} hover:bg-white/[0.04] transition-colors duration-200`}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] ${s.hoverClass} hover:bg-[var(--bg-card)] transition-colors duration-200`}
                 >
                   {s.icon}
                 </a>
@@ -104,11 +105,11 @@ export function Footer() {
 
           {/* Product */}
           <div>
-            <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[#71717a] mb-3">Product</p>
+            <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">Product</p>
             <ul className="space-y-2">
               {PRODUCT_LINKS.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-[#A5A1C2] hover:text-[var(--text-primary)] transition-colors duration-200">
+                  <Link href={link.href} className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200">
                     {link.label}
                   </Link>
                 </li>
@@ -118,7 +119,7 @@ export function Footer() {
 
           {/* Resources */}
           <div>
-            <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[#71717a] mb-3">Resources</p>
+            <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">Resources</p>
             <ul className="space-y-2">
               {RESOURCE_LINKS.map((link) => (
                 <li key={link.href}>
@@ -127,12 +128,12 @@ export function Footer() {
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-[#A5A1C2] hover:text-[var(--text-primary)] transition-colors duration-200"
+                      className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
                     >
                       {link.label}
                     </a>
                   ) : (
-                    <Link href={link.href} className="text-sm text-[#A5A1C2] hover:text-[var(--text-primary)] transition-colors duration-200">
+                    <Link href={link.href} className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200">
                       {link.label}
                     </Link>
                   )}
@@ -143,7 +144,7 @@ export function Footer() {
 
           {/* Community */}
           <div>
-            <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[#71717a] mb-3">Community</p>
+            <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">Community</p>
             <ul className="space-y-2">
               {COMMUNITY_LINKS.map((link) => (
                 <li key={link.href}>
@@ -151,7 +152,7 @@ export function Footer() {
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-[#A5A1C2] hover:text-[var(--text-primary)] transition-colors duration-200"
+                    className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
                   >
                     {link.label}
                   </a>
@@ -162,9 +163,9 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/[0.06] pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <span className="text-xs text-[#71717a]">&copy; {new Date().getFullYear()} HatcherLabs. All rights reserved.</span>
-          <div className="flex items-center gap-4 text-xs text-[#71717a]">
+        <div className="border-t border-[var(--border-default)] pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <span className="text-xs text-[var(--text-muted)]">&copy; {new Date().getFullYear()} HatcherLabs. All rights reserved.</span>
+          <div className="flex items-center gap-4 text-xs text-[var(--text-muted)]">
             <Link href="/pricing" className="hover:text-[var(--text-primary)] transition-colors duration-200">Pricing</Link>
             <Link href="/support" className="hover:text-[var(--text-primary)] transition-colors duration-200">Support</Link>
             <a href={DOCS_URL} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--text-primary)] transition-colors duration-200">Docs</a>
