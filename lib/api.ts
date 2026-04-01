@@ -631,7 +631,7 @@ export const api = {
 
   /** Admin: list all agents across all users */
   adminGetAgents: () =>
-    req<Array<Agent & { ownerWallet: string }>>('/admin/agents?limit=200&offset=0'),
+    req<Array<Agent & { ownerWallet: string }>>('/admin/agents?limit=100&offset=0'),
 
   adminGetStats: () =>
     req<{
@@ -686,7 +686,7 @@ export const api = {
         createdAt: string;
         updatedAt: string;
       }>;
-    }>('/admin/tickets?limit=200&offset=0'),
+    }>('/admin/tickets?limit=100&offset=0'),
 
   /** Admin: reply to a ticket */
   adminReplyTicket: (ticketId: string, message: string) =>
