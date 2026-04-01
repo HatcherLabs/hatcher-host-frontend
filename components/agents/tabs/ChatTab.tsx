@@ -226,6 +226,13 @@ export function ChatTab() {
   // Reset extra-loaded window when switching agents
   useEffect(() => { setExtraLoaded(0); }, [agent.id]);
 
+  // Lock body scroll while chat tab is mounted
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
   // Scroll chat container to bottom when messages change — only if user is near bottom
   const isNearBottomRef = useRef(true);
   useEffect(() => {
