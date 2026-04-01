@@ -238,15 +238,26 @@ export function useVoice() {
     // Wait for voices to be ready
     const voices = await getVoicesReady();
 
+    // If no voices available, try forcing a reload
+    if (!voices || voices.length === 0) {
+      voicesReady = null; // Reset cache
+      const retryVoices = await getVoicesReady();
+      if (!retryVoices || retryVoices.length === 0) {
+        console.warn('[TTS] No voices available');
+        return;
+      }
+    }
+
+    const availableVoices = window.speechSynthesis.getVoices();
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'en-US';
     utterance.rate = 1;
     utterance.pitch = 1;
 
     // Pick a voice explicitly — Chrome sometimes has no default
-    const preferred = voices.find(v => v.lang.startsWith('en') && v.default)
-      || voices.find(v => v.lang.startsWith('en'))
-      || voices[0];
+    const preferred = availableVoices.find(v => v.lang.startsWith('en') && v.default)
+      || availableVoices.find(v => v.lang.startsWith('en'))
+      || availableVoices[0];
     if (preferred) utterance.voice = preferred;
 
     utterance.onstart = () => setIsSpeaking(true);
