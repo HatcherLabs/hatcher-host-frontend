@@ -21,14 +21,14 @@ export default function AgentManagementError({
         <div className="w-20 h-20 rounded-2xl bg-red-500/15 flex items-center justify-center mx-auto mb-6">
           <AlertTriangle className="w-10 h-10 text-red-400" />
         </div>
-        <h1 className="text-2xl font-bold text-[#F0EEFC] mb-3">
+        <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-3">
           Agent Management Error
         </h1>
-        <p className="text-sm text-[#A5A1C2] mb-2">
+        <p className="text-sm text-[var(--text-secondary)] mb-2">
           Something went wrong loading this agent&apos;s management panel.
         </p>
         {error.digest && (
-          <p className="text-xs font-mono text-[#6B6890] mb-6">
+          <p className="text-xs font-mono text-[var(--text-muted)] mb-6">
             Error ID: {error.digest}
           </p>
         )}
@@ -42,7 +42,7 @@ export default function AgentManagementError({
           </button>
           <Link
             href="/dashboard/agents"
-            className="inline-flex items-center gap-2 px-5 py-2.5 border border-white/[0.06] bg-[#1A1730] text-[#A5A1C2] rounded-xl font-semibold text-sm transition-colors hover:text-[#F0EEFC] hover:border-[#06b6d4]/30"
+            className="inline-flex items-center gap-2 px-5 py-2.5 border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-secondary)] rounded-xl font-semibold text-sm transition-colors hover:text-[var(--text-primary)] hover:border-[#06b6d4]/30"
           >
             <ArrowLeft className="w-4 h-4" />
             My Agents

@@ -25,7 +25,7 @@ export default function Error({
         </div>
 
         <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3">Something went wrong</h1>
-        <p className="text-sm text-[#a1a1aa] mb-8 leading-relaxed">
+        <p className="text-sm text-[var(--text-secondary)] mb-8 leading-relaxed">
           An unexpected error occurred. Please try again or contact support if the problem persists.
         </p>
 
@@ -38,7 +38,7 @@ export default function Error({
           </button>
           <a
             href="/support"
-            className="inline-flex items-center gap-2 border border-white/[0.12] text-[#d4d4d8] font-medium px-6 py-2.5 rounded-full text-sm hover:bg-white/[0.04] hover:border-white/20 transition-all duration-200"
+            className="inline-flex items-center gap-2 border border-[var(--border-hover)] text-[#d4d4d8] font-medium px-6 py-2.5 rounded-full text-sm hover:bg-[var(--bg-card)] hover:border-white/20 transition-all duration-200"
           >
             Contact Support
           </a>

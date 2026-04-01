@@ -38,10 +38,10 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="card glass-noise p-12 text-center">
           <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-[#fafafa] mb-2">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
             Something went wrong
           </h3>
-          <p className="text-[#A5A1C2] text-sm mb-6 max-w-md mx-auto">
+          <p className="text-[var(--text-secondary)] text-sm mb-6 max-w-md mx-auto">
             An unexpected error occurred. Try refreshing this section.
           </p>
           <button

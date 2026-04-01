@@ -15,10 +15,10 @@ export default function TermsOfServicePage() {
           <h1 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
             Terms of Service
           </h1>
-          <p className="text-sm text-[#71717a]">Last updated: March 30, 2026</p>
+          <p className="text-sm text-[var(--text-muted)]">Last updated: March 30, 2026</p>
         </div>
 
-        <div className="prose-custom space-y-10 text-[#A5A1C2] text-[15px] leading-relaxed">
+        <div className="prose-custom space-y-10 text-[var(--text-secondary)] text-[15px] leading-relaxed">
           {/* 1 */}
           <section>
             <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-3">1. Acceptance of Terms</h2>

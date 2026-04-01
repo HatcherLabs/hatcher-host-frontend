@@ -127,12 +127,12 @@ export function MemoryTab() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Brain size={16} className="text-purple-400" />
-          <span className="text-sm font-medium text-[#A5A1C2]">Agent Memory</span>
+          <span className="text-sm font-medium text-[var(--text-secondary)]">Agent Memory</span>
         </div>
         <button
           onClick={loadMemory}
           disabled={loading}
-          className="text-xs px-3 py-1.5 rounded-lg border border-[rgba(46,43,74,0.4)] text-[#71717a] hover:border-[rgba(46,43,74,0.6)] hover:text-[#A5A1C2] transition-all flex items-center gap-1.5"
+          className="text-xs px-3 py-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)] transition-all flex items-center gap-1.5"
         >
           <RotateCcw size={12} className={loading ? 'animate-spin' : ''} />
           {loading ? 'Loading...' : 'Refresh'}
@@ -150,11 +150,11 @@ export function MemoryTab() {
       {/* Hermes persistent memory indicator */}
       {agent?.framework === 'hermes' && (
         <div className="flex items-center gap-2 px-1">
-          <CircleDot size={14} className={hermesPersistentMemory ? 'text-emerald-400' : 'text-[#71717a]'} />
-          <span className="text-xs font-medium text-[#A5A1C2]">
+          <CircleDot size={14} className={hermesPersistentMemory ? 'text-emerald-400' : 'text-[var(--text-muted)]'} />
+          <span className="text-xs font-medium text-[var(--text-secondary)]">
             Persistent Memory:
           </span>
-          <span className={`text-xs font-semibold ${hermesPersistentMemory ? 'text-emerald-400' : 'text-[#71717a]'}`}>
+          <span className={`text-xs font-semibold ${hermesPersistentMemory ? 'text-emerald-400' : 'text-[var(--text-muted)]'}`}>
             {hermesPersistentMemory ? 'Active' : 'Disabled'}
           </span>
           {hermesPersistentMemory && (
@@ -169,17 +169,17 @@ export function MemoryTab() {
       {/* Memory stats row */}
       {!loading && !error && !isEmpty && (
         <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 flex items-center gap-2.5">
+          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-3 py-2.5 flex items-center gap-2.5">
             <Hash size={14} className="text-purple-400/60" />
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-[#71717a]">Memories</p>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">Memories</p>
               <p className="text-sm font-semibold text-white">{memoryStats.totalMemories}</p>
             </div>
           </div>
-          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 flex items-center gap-2.5">
+          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-3 py-2.5 flex items-center gap-2.5">
             <Database size={14} className="text-purple-400/60" />
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-[#71717a]">Size</p>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">Size</p>
               <p className="text-sm font-semibold text-white">
                 {memoryStats.totalSize < 1024
                   ? `${memoryStats.totalSize} B`
@@ -187,10 +187,10 @@ export function MemoryTab() {
               </p>
             </div>
           </div>
-          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 flex items-center gap-2.5">
+          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-3 py-2.5 flex items-center gap-2.5">
             <Clock size={14} className="text-purple-400/60" />
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-[#71717a]">Latest</p>
+              <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">Latest</p>
               <p className="text-sm font-semibold text-white">
                 {memoryStats.lastDate || '--'}
               </p>
@@ -221,7 +221,7 @@ export function MemoryTab() {
               <Brain size={28} className="text-purple-400" />
             </div>
             <p className="text-base font-semibold text-white mb-1">No memories yet</p>
-            <p className="text-sm text-[#71717a] max-w-xs">
+            <p className="text-sm text-[var(--text-muted)] max-w-xs">
               Your agent builds memory by chatting with users. Start a conversation and it will remember context across sessions.
             </p>
           </div>
@@ -231,12 +231,12 @@ export function MemoryTab() {
           {/* MEMORY.md — main memory file */}
           {memoryMd && (
             <GlassCard className="!p-0 overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.04] bg-black/20">
+              <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[var(--border-default)] bg-black/20">
                 <Brain size={14} className="text-purple-400" />
-                <span className="text-xs font-mono text-[#71717a]">MEMORY.md</span>
+                <span className="text-xs font-mono text-[var(--text-muted)]">MEMORY.md</span>
               </div>
               <div className="p-4 max-h-[400px] overflow-y-auto">
-                <pre className="text-sm text-[#A5A1C2] whitespace-pre-wrap font-mono leading-relaxed">
+                <pre className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap font-mono leading-relaxed">
                   {memoryMd}
                 </pre>
               </div>
@@ -247,7 +247,7 @@ export function MemoryTab() {
           {dailyLogs.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center gap-2 px-1">
-                <span className="text-xs font-medium text-[#71717a] uppercase tracking-wider">
+                <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
                   Daily Logs ({dailyLogs.length})
                 </span>
               </div>
@@ -257,15 +257,15 @@ export function MemoryTab() {
                   <GlassCard key={log.date} className="!p-0 overflow-hidden">
                     <button
                       onClick={() => toggleDate(log.date)}
-                      className="w-full flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.04] bg-black/20 hover:bg-black/30 transition-colors text-left"
+                      className="w-full flex items-center gap-2 px-4 py-2.5 border-b border-[var(--border-default)] bg-black/20 hover:bg-black/30 transition-colors text-left"
                     >
                       {isExpanded ? (
                         <ChevronDown size={14} className="text-purple-400" />
                       ) : (
-                        <ChevronRight size={14} className="text-[#71717a]" />
+                        <ChevronRight size={14} className="text-[var(--text-muted)]" />
                       )}
-                      <span className="text-xs font-mono text-[#A5A1C2]">{log.date}</span>
-                      <span className="text-[10px] text-[#71717a] ml-auto">
+                      <span className="text-xs font-mono text-[var(--text-secondary)]">{log.date}</span>
+                      <span className="text-[10px] text-[var(--text-muted)] ml-auto">
                         {log.content.split('\n').length} lines
                       </span>
                     </button>
@@ -277,7 +277,7 @@ export function MemoryTab() {
                         transition={{ duration: 0.2 }}
                         className="p-4 max-h-[300px] overflow-y-auto"
                       >
-                        <pre className="text-sm text-[#A5A1C2] whitespace-pre-wrap font-mono leading-relaxed">
+                        <pre className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap font-mono leading-relaxed">
                           {log.content}
                         </pre>
                       </motion.div>

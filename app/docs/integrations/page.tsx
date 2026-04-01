@@ -105,7 +105,7 @@ const PLATFORMS = [
     id: 'twitter',
     name: 'Twitter / X',
     icon: Twitter,
-    color: '#fafafa',
+    color: 'var(--text-primary)',
     difficulty: 'Advanced',
     cost: 'Pay-per-use',
     setupTime: '10 min',
@@ -139,7 +139,7 @@ export default function IntegrationsPage() {
         <motion.div variants={cardVariants} className="mb-8">
           <Link
             href="/docs"
-            className="inline-flex items-center gap-2 text-sm text-[#6B6890] hover:text-[#06b6d4] transition-colors duration-200"
+            className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[#06b6d4] transition-colors duration-200"
           >
             <ArrowLeft size={16} />
             Back to Docs
@@ -153,12 +153,12 @@ export default function IntegrationsPage() {
             Integrations
           </div>
           <h1
-            className="text-4xl font-extrabold tracking-tight text-[#F0EEFC] sm:text-5xl"
+            className="text-4xl font-extrabold tracking-tight text-[var(--text-primary)] sm:text-5xl"
             style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
             Platform Integrations
           </h1>
-          <p className="mt-4 max-w-2xl text-lg text-[#A5A1C2]">
+          <p className="mt-4 max-w-2xl text-lg text-[var(--text-secondary)]">
             Connect your Hatcher agents to messaging platforms. Each guide walks you through
             setup from start to finish.
           </p>
@@ -188,7 +188,7 @@ export default function IntegrationsPage() {
                       <Icon size={22} style={{ color: platform.color }} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-semibold text-[#F0EEFC] group-hover:text-[#06b6d4] transition-colors">
+                      <h3 className="text-base font-semibold text-[var(--text-primary)] group-hover:text-[#06b6d4] transition-colors">
                         {platform.name}
                       </h3>
                       <DifficultyBadge level={platform.difficulty} />
@@ -196,12 +196,12 @@ export default function IntegrationsPage() {
                   </div>
 
                   {/* Description */}
-                  <p className="text-sm text-[#A5A1C2] leading-relaxed flex-1">
+                  <p className="text-sm text-[var(--text-secondary)] leading-relaxed flex-1">
                     {platform.description}
                   </p>
 
                   {/* Meta info */}
-                  <div className="flex items-center gap-4 text-xs text-[#6B6890]">
+                  <div className="flex items-center gap-4 text-xs text-[var(--text-muted)]">
                     <span className="inline-flex items-center gap-1">
                       <Clock size={12} />
                       {platform.setupTime}
@@ -225,11 +225,11 @@ export default function IntegrationsPage() {
 
         {/* ── Info callout ───────────────────────────────────── */}
         <motion.div variants={cardVariants} className="mt-10">
-          <div className="flex items-start gap-3 rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.6)] p-5 backdrop-blur-xl">
+          <div className="flex items-start gap-3 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-5 backdrop-blur-xl">
             <ShieldAlert size={20} className="text-amber-400 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-[#F0EEFC] mb-1">Platform changes in 2025-2026</p>
-              <p className="text-sm text-[#A5A1C2] leading-relaxed">
+              <p className="text-sm font-medium text-[var(--text-primary)] mb-1">Platform changes in 2025-2026</p>
+              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
                 Several platforms have made significant API changes recently. Twitter/X moved to pay-per-use pricing (Jan 2026),
                 Slack deprecated legacy bots (March 2025), and WhatsApp discontinued On-Premises API (Oct 2025).
                 Each guide reflects the latest requirements.
@@ -240,8 +240,8 @@ export default function IntegrationsPage() {
 
         {/* ── Help CTA ───────────────────────────────────────── */}
         <motion.div variants={cardVariants} className="mt-8">
-          <div className="rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.6)] p-8 text-center backdrop-blur-xl">
-            <p className="text-sm text-[#A5A1C2] mb-4">
+          <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-8 text-center backdrop-blur-xl">
+            <p className="text-sm text-[var(--text-secondary)] mb-4">
               Need help with the API? Check out the full endpoint reference.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
@@ -253,7 +253,7 @@ export default function IntegrationsPage() {
               </Link>
               <Link
                 href="/docs"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/[0.06] bg-[#1A1730] px-5 py-2.5 text-sm font-semibold text-[#A5A1C2] transition-all duration-200 hover:border-[#06b6d4]/30 hover:text-[#F0EEFC]"
+                className="inline-flex items-center gap-2 rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] px-5 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-200 hover:border-[#06b6d4]/30 hover:text-[var(--text-primary)]"
               >
                 All Documentation
               </Link>

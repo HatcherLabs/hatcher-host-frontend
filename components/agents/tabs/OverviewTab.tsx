@@ -45,20 +45,20 @@ function TechnicalDetails({ chatEndpoint, port }: { chatEndpoint?: string; port?
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 text-[11px] text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+        className="flex items-center gap-1.5 text-[11px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
       >
         {open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
         Technical Details
       </button>
       {open && (
-        <div className="grid sm:grid-cols-2 gap-4 mt-3 pt-3 border-t border-white/[0.04]">
+        <div className="grid sm:grid-cols-2 gap-4 mt-3 pt-3 border-t border-[var(--border-default)]">
           <div>
-            <span className="text-xs block mb-1 text-[#71717a]">API Endpoint</span>
-            <span className="text-sm font-mono text-[#FFFFFF]">{chatEndpoint ?? 'N/A'}</span>
+            <span className="text-xs block mb-1 text-[var(--text-muted)]">API Endpoint</span>
+            <span className="text-sm font-mono text-[var(--text-primary)]">{chatEndpoint ?? 'N/A'}</span>
           </div>
           <div>
-            <span className="text-xs block mb-1 text-[#71717a]">Port</span>
-            <span className="text-sm font-mono text-[#FFFFFF]">{port ?? 'N/A'}</span>
+            <span className="text-xs block mb-1 text-[var(--text-muted)]">Port</span>
+            <span className="text-sm font-mono text-[var(--text-primary)]">{port ?? 'N/A'}</span>
           </div>
         </div>
       )}
@@ -79,12 +79,12 @@ function ResourceBar({ label, value, max, unit, color }: {
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-xs text-[#71717a]">{label}</span>
-        <span className="text-xs font-mono text-[#A5A1C2]">
+        <span className="text-xs text-[var(--text-muted)]">{label}</span>
+        <span className="text-xs font-mono text-[var(--text-secondary)]">
           {value.toFixed(1)}{unit} / {max.toFixed(0)}{unit}
         </span>
       </div>
-      <div className="h-2 rounded-full bg-white/[0.06] overflow-hidden">
+      <div className="h-2 rounded-full bg-[var(--bg-card)] overflow-hidden">
         <motion.div
           className={`h-full rounded-full ${barColor}`}
           initial={{ width: 0 }}
@@ -172,7 +172,7 @@ function HealthPerformanceSection({ agentId, isActive }: { agentId: string; isAc
   if (error && !data) {
     return (
       <GlassCard>
-        <div className="flex items-center gap-2 text-sm text-[#71717a]">
+        <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
           <AlertTriangle size={14} className="text-amber-400" />
           Monitoring unavailable
         </div>
@@ -201,7 +201,7 @@ function HealthPerformanceSection({ agentId, isActive }: { agentId: string; isAc
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Heart size={14} className="text-[#06b6d4]" />
-          <h3 className="text-sm font-semibold text-[#A5A1C2]">Health & Performance</h3>
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Health & Performance</h3>
           {data && (
             <ResourceAlertBadge
               cpuPercent={data.resources.cpuPercent}
@@ -211,7 +211,7 @@ function HealthPerformanceSection({ agentId, isActive }: { agentId: string; isAc
         </div>
         <button
           onClick={() => { setLoading(true); fetchMonitoring(); }}
-          className="text-[11px] px-2 py-1 rounded-lg border border-white/10 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all text-[#71717a] hover:text-[#A5A1C2] flex items-center gap-1 cursor-pointer"
+          className="text-[11px] px-2 py-1 rounded-lg border border-white/10 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all text-[var(--text-muted)] hover:text-[var(--text-secondary)] flex items-center gap-1 cursor-pointer"
         >
           <RefreshCw size={10} />
           Refresh
@@ -221,42 +221,42 @@ function HealthPerformanceSection({ agentId, isActive }: { agentId: string; isAc
       {/* Top row: health, uptime, restarts, errors */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         {/* Health */}
-        <div className={`rounded-xl px-3 py-2.5 ${healthConfig.bg} border border-white/[0.04]`}>
+        <div className={`rounded-xl px-3 py-2.5 ${healthConfig.bg} border border-[var(--border-default)]`}>
           <div className="flex items-center gap-2 mb-1">
             <span className={`w-2 h-2 rounded-full ${healthConfig.dot} ${data.health === 'healthy' && isActive ? 'animate-pulse' : ''}`} />
             <span className={`text-sm font-semibold ${healthConfig.text}`}>{healthConfig.label}</span>
           </div>
-          <div className="text-[10px] text-[#71717a]">Container Health</div>
+          <div className="text-[10px] text-[var(--text-muted)]">Container Health</div>
         </div>
 
         {/* Uptime */}
-        <div className="rounded-xl px-3 py-2.5 bg-blue-500/10 border border-white/[0.04]">
+        <div className="rounded-xl px-3 py-2.5 bg-blue-500/10 border border-[var(--border-default)]">
           <div className="text-sm font-semibold text-blue-400 mb-1 tabular-nums">
             {data.uptime.seconds > 0 ? formatUptime(data.uptime.seconds) : '--'}
           </div>
-          <div className="text-[10px] text-[#71717a]">Uptime</div>
+          <div className="text-[10px] text-[var(--text-muted)]">Uptime</div>
         </div>
 
         {/* Restarts */}
-        <div className={`rounded-xl px-3 py-2.5 border border-white/[0.04] ${data.restarts > 0 ? 'bg-amber-500/10' : 'bg-white/[0.03]'}`}>
+        <div className={`rounded-xl px-3 py-2.5 border border-[var(--border-default)] ${data.restarts > 0 ? 'bg-amber-500/10' : 'bg-[var(--bg-card)]'}`}>
           <div className="flex items-center gap-1.5">
-            <RefreshCw size={12} className={data.restarts > 0 ? 'text-amber-400' : 'text-[#71717a]'} />
-            <span className={`text-sm font-semibold tabular-nums ${data.restarts > 0 ? 'text-amber-400' : 'text-[#FFFFFF]'}`}>
+            <RefreshCw size={12} className={data.restarts > 0 ? 'text-amber-400' : 'text-[var(--text-muted)]'} />
+            <span className={`text-sm font-semibold tabular-nums ${data.restarts > 0 ? 'text-amber-400' : 'text-[var(--text-primary)]'}`}>
               {data.restarts}
             </span>
           </div>
-          <div className="text-[10px] text-[#71717a] mt-1">Restarts</div>
+          <div className="text-[10px] text-[var(--text-muted)] mt-1">Restarts</div>
         </div>
 
         {/* Errors */}
-        <div className={`rounded-xl px-3 py-2.5 border border-white/[0.04] ${data.errors.last24h > 0 ? 'bg-red-500/10' : 'bg-white/[0.03]'}`}>
+        <div className={`rounded-xl px-3 py-2.5 border border-[var(--border-default)] ${data.errors.last24h > 0 ? 'bg-red-500/10' : 'bg-[var(--bg-card)]'}`}>
           <div className="flex items-center gap-1.5">
-            <AlertTriangle size={12} className={data.errors.last24h > 0 ? 'text-red-400' : 'text-[#71717a]'} />
-            <span className={`text-sm font-semibold tabular-nums ${data.errors.last24h > 0 ? 'text-red-400' : 'text-[#FFFFFF]'}`}>
+            <AlertTriangle size={12} className={data.errors.last24h > 0 ? 'text-red-400' : 'text-[var(--text-muted)]'} />
+            <span className={`text-sm font-semibold tabular-nums ${data.errors.last24h > 0 ? 'text-red-400' : 'text-[var(--text-primary)]'}`}>
               {data.errors.last24h}
             </span>
           </div>
-          <div className="text-[10px] text-[#71717a] mt-1">Errors (24h)</div>
+          <div className="text-[10px] text-[var(--text-muted)] mt-1">Errors (24h)</div>
         </div>
       </div>
 
@@ -288,20 +288,20 @@ function HealthPerformanceSection({ agentId, isActive }: { agentId: string; isAc
 
       {/* Response times — hidden until actual duration tracking is implemented */}
       {(data.responseTimes.avg > 0 || data.responseTimes.last > 0) && (
-        <div className="border-t border-white/[0.04] pt-3">
+        <div className="border-t border-[var(--border-default)] pt-3">
           <div className="flex items-center gap-1.5">
             <Zap size={12} className="text-[#06b6d4]" />
-            <span className="text-xs text-[#71717a]">Response Times</span>
-            <span className="text-[10px] text-[#71717a] ml-auto">Tracking coming soon</span>
+            <span className="text-xs text-[var(--text-muted)]">Response Times</span>
+            <span className="text-[10px] text-[var(--text-muted)] ml-auto">Tracking coming soon</span>
           </div>
         </div>
       )}
 
       {/* Last error preview */}
       {data.errors.lastError && (
-        <div className="border-t border-white/[0.04] pt-3 mt-3">
+        <div className="border-t border-[var(--border-default)] pt-3 mt-3">
           <div className="text-[10px] text-red-400 mb-1">Last Error</div>
-          <div className="text-xs text-[#A5A1C2] font-mono bg-red-500/5 rounded-lg px-3 py-2 border border-red-500/10 truncate">
+          <div className="text-xs text-[var(--text-secondary)] font-mono bg-red-500/5 rounded-lg px-3 py-2 border border-red-500/10 truncate">
             {data.errors.lastError}
           </div>
         </div>
@@ -423,17 +423,17 @@ function ActivityFeedSection({ agentId, agent }: { agentId: string; agent: impor
 
   return (
     <GlassCard className="!p-0 overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.04]">
+      <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border-default)]">
         <div className="flex items-center gap-2">
           <Activity size={14} className="text-[#06b6d4]" />
-          <h3 className="text-sm font-semibold text-[#A5A1C2]">Activity</h3>
-          <span className="flex items-center gap-1 text-[9px] text-[#71717a] bg-white/[0.04] px-1.5 py-0.5 rounded-full">
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Activity</h3>
+          <span className="flex items-center gap-1 text-[9px] text-[var(--text-muted)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded-full">
             Last 24h
           </span>
         </div>
         <button
           onClick={() => { setLoading(true); fetchActivity(); }}
-          className="text-[11px] px-2 py-1 rounded-lg border border-white/10 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all text-[#71717a] hover:text-[#A5A1C2] flex items-center gap-1 cursor-pointer"
+          className="text-[11px] px-2 py-1 rounded-lg border border-white/10 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all text-[var(--text-muted)] hover:text-[var(--text-secondary)] flex items-center gap-1 cursor-pointer"
         >
           <RefreshCw size={10} />
           Refresh
@@ -455,17 +455,17 @@ function ActivityFeedSection({ agentId, agent }: { agentId: string; agent: impor
           </div>
         ) : events.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 px-4">
-            <Activity size={22} className="text-[#71717a] mb-2" />
-            <p className="text-xs text-[#71717a]">No recent activity</p>
+            <Activity size={22} className="text-[var(--text-muted)] mb-2" />
+            <p className="text-xs text-[var(--text-muted)]">No recent activity</p>
           </div>
         ) : (
           <div className="relative px-4 py-3">
             {/* Timeline line */}
-            <div className="absolute left-[28px] top-3 bottom-3 w-px bg-white/[0.05]" />
+            <div className="absolute left-[28px] top-3 bottom-3 w-px bg-[var(--bg-card)]" />
             <div className="space-y-3">
               {events.map((event, i) => {
                 const Icon = ACTIVITY_ICON[event.type] ?? Activity;
-                const colorClass = ACTIVITY_COLOR[event.type] ?? 'text-[#a1a1aa] bg-white/10';
+                const colorClass = ACTIVITY_COLOR[event.type] ?? 'text-[var(--text-secondary)] bg-white/10';
                 const [iconText, iconBg] = colorClass.split(' ');
                 return (
                   <motion.div
@@ -479,8 +479,8 @@ function ActivityFeedSection({ agentId, agent }: { agentId: string; agent: impor
                       <Icon size={13} className={iconText} />
                     </div>
                     <div className="flex-1 min-w-0 pt-0.5">
-                      <p className="text-xs text-[#A5A1C2] leading-relaxed">{event.message}</p>
-                      <p className="text-[10px] text-[#71717a] mt-0.5">{relativeTime(event.timestamp)}</p>
+                      <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{event.message}</p>
+                      <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{relativeTime(event.timestamp)}</p>
                     </div>
                   </motion.div>
                 );
@@ -566,11 +566,11 @@ export function OverviewTab() {
               <MessageSquare size={18} className="text-[#06b6d4]" />
             </div>
             <div className="flex-1">
-              <div className="text-2xl font-bold text-[#FFFFFF] tabular-nums">
+              <div className="text-2xl font-bold text-[var(--text-primary)] tabular-nums">
                 {stats?.messagesProcessed ?? 0}
               </div>
-              <div className="text-xs text-[#71717a]">Messages</div>
-              <div className="text-[10px] text-[#6B6890] mt-0.5">Total</div>
+              <div className="text-xs text-[var(--text-muted)]">Messages</div>
+              <div className="text-[10px] text-[var(--text-muted)] mt-0.5">All channels</div>
             </div>
             {/* Mini bar chart indicator */}
             <div className="flex items-end gap-[2px] h-5 self-end">
@@ -587,13 +587,13 @@ export function OverviewTab() {
               <Clock size={18} className="text-blue-400" />
             </div>
             <div className="flex-1">
-              <div className="text-2xl font-bold text-[#FFFFFF] tabular-nums">
+              <div className="text-2xl font-bold text-[var(--text-primary)] tabular-nums">
                 {displayUptime < 3600
                   ? `${Math.floor(displayUptime / 60)}m`
                   : `${(displayUptime / 3600).toFixed(1)}h`}
               </div>
-              <div className="text-xs text-[#71717a]">Uptime</div>
-              <div className="text-[10px] text-[#6B6890] mt-0.5">{isLiveUptime ? 'Live' : 'Since creation'}</div>
+              <div className="text-xs text-[var(--text-muted)]">Uptime</div>
+              <div className="text-[10px] text-[var(--text-muted)] mt-0.5">{isLiveUptime ? 'Live' : 'Since creation'}</div>
             </div>
             {/* Uptime ring */}
             <svg width="28" height="28" viewBox="0 0 28 28" className="progress-ring self-end">
@@ -615,10 +615,10 @@ export function OverviewTab() {
               <Cpu size={18} className="text-emerald-400" />
             </div>
             <div className="flex-1">
-              <div className="text-lg font-bold truncate text-[#FFFFFF]">
+              <div className="text-lg font-bold truncate text-[var(--text-primary)]">
                 {llmProvider}
               </div>
-              <div className="text-xs text-[#71717a]">LLM Provider</div>
+              <div className="text-xs text-[var(--text-muted)]">LLM Provider</div>
             </div>
             {hasApiKey && (
               <div className="self-end">
@@ -638,7 +638,7 @@ export function OverviewTab() {
             <div className="flex-1">
               <div className="flex items-center gap-1.5">
                 <span className={`inline-flex items-center gap-1.5 text-lg font-bold ${
-                  isActive ? 'text-emerald-400' : 'text-[#FFFFFF]'
+                  isActive ? 'text-emerald-400' : 'text-[var(--text-primary)]'
                 }`}>
                   {isActive && (
                     <span className="relative flex h-2 w-2">
@@ -649,10 +649,10 @@ export function OverviewTab() {
                   {statusInfo.label}
                 </span>
               </div>
-              <div className="text-xs text-[#71717a]">Status</div>
+              <div className="text-xs text-[var(--text-muted)]">Status</div>
             </div>
             {stats?.lastActiveAt && (
-              <div className="self-end text-[9px] text-[#71717a]">
+              <div className="self-end text-[9px] text-[var(--text-muted)]">
                 {timeAgo(stats.lastActiveAt)}
               </div>
             )}
@@ -670,8 +670,8 @@ export function OverviewTab() {
       <GlassCard>
         <div className="flex items-center gap-2 mb-4">
           <Zap size={14} className="text-[#06b6d4]" />
-          <h3 className="text-sm font-semibold text-[#A5A1C2]">Framework Capabilities</h3>
-          <span className={`text-[10px] px-2 py-0.5 rounded-full border ${FRAMEWORK_BADGE[agent.framework] ?? 'bg-white/5 text-white/60 border-white/10'}`}>
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Framework Capabilities</h3>
+          <span className={`text-[10px] px-2 py-0.5 rounded-full border ${FRAMEWORK_BADGE[agent.framework] ?? 'bg-[var(--bg-card)] text-white/60 border-white/10'}`}>
             {frameworkMeta?.name ?? agent.framework}
           </span>
         </div>
@@ -681,7 +681,7 @@ export function OverviewTab() {
           {(FRAMEWORK_CAPABILITIES[agent.framework] ?? []).map((cap) => (
             <span
               key={cap}
-              className={`text-[11px] px-2.5 py-1 rounded-lg border font-medium ${FRAMEWORK_CAP_STYLE[agent.framework] ?? 'bg-white/5 text-white/60 border-white/10'}`}
+              className={`text-[11px] px-2.5 py-1 rounded-lg border font-medium ${FRAMEWORK_CAP_STYLE[agent.framework] ?? 'bg-[var(--bg-card)] text-white/60 border-white/10'}`}
             >
               {cap}
             </span>
@@ -691,11 +691,11 @@ export function OverviewTab() {
         {/* Framework stats */}
         <div className="grid grid-cols-3 gap-3">
           {(FRAMEWORK_STATS[agent.framework] ?? []).map((stat) => (
-            <div key={stat.label} className="rounded-xl px-3 py-2.5 bg-white/[0.03] border border-white/[0.06]">
+            <div key={stat.label} className="rounded-xl px-3 py-2.5 bg-[var(--bg-card)] border border-[var(--border-default)]">
               <div className={`text-sm font-semibold tabular-nums ${FRAMEWORK_STAT_COLOR[agent.framework] ?? 'text-white'}`}>
                 {stat.value}
               </div>
-              <div className="text-[10px] text-[#71717a] mt-0.5">{stat.label}</div>
+              <div className="text-[10px] text-[var(--text-muted)] mt-0.5">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -703,26 +703,26 @@ export function OverviewTab() {
 
       {/* Agent info */}
       <GlassCard>
-        <h3 className="text-sm font-semibold mb-4 text-[#A5A1C2]">
+        <h3 className="text-sm font-semibold mb-4 text-[var(--text-secondary)]">
           Agent Details
         </h3>
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <span className="text-xs block mb-1 text-[#71717a]">Framework</span>
+            <span className="text-xs block mb-1 text-[var(--text-muted)]">Framework</span>
             <span className={`inline-flex items-center gap-2 text-sm font-medium px-3 py-1.5 rounded-lg border ${FRAMEWORK_BADGE[agent.framework] ?? ''}`}>
               {frameworkMeta?.name ?? agent.framework}
             </span>
           </div>
           <div>
-            <span className="text-xs block mb-1 text-[#71717a]">Runtime</span>
-            <span className="text-sm text-[#FFFFFF]">
+            <span className="text-xs block mb-1 text-[var(--text-muted)]">Runtime</span>
+            <span className="text-sm text-[var(--text-primary)]">
               {frameworkMeta?.dockerImage ?? 'N/A'}
             </span>
           </div>
           {frameworkMeta?.bestFor && (
             <div className="sm:col-span-2">
-              <span className="text-xs block mb-1 text-[#71717a]">Best For</span>
-              <span className="text-sm text-[#A5A1C2]">
+              <span className="text-xs block mb-1 text-[var(--text-muted)]">Best For</span>
+              <span className="text-sm text-[var(--text-secondary)]">
                 {frameworkMeta.bestFor}
               </span>
             </div>
@@ -740,10 +740,10 @@ export function OverviewTab() {
 
       {/* Live logs preview */}
       <GlassCard className="!p-0 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.04]">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <ScrollText size={14} className="text-[#06b6d4]" />
-            <h3 className="text-sm font-semibold text-[#A5A1C2]">Live Logs</h3>
+            <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Live Logs</h3>
             {isActive && (
               <span className="flex items-center gap-1 text-[9px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">
                 <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
@@ -753,7 +753,7 @@ export function OverviewTab() {
           </div>
           <button
             onClick={() => setTab('logs')}
-            className="text-[11px] px-3 py-1 rounded-lg border border-white/10 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all text-[#71717a] hover:text-[#A5A1C2] cursor-pointer"
+            className="text-[11px] px-3 py-1 rounded-lg border border-white/10 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all text-[var(--text-muted)] hover:text-[var(--text-secondary)] cursor-pointer"
           >
             View All
           </button>
@@ -765,7 +765,7 @@ export function OverviewTab() {
             </div>
           ) : logs.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-sm text-[#71717a]">No logs available yet.</p>
+              <p className="text-sm text-[var(--text-muted)]">No logs available yet.</p>
             </div>
           ) : (
             logs.slice(-10).map((log, i) => (
@@ -776,7 +776,7 @@ export function OverviewTab() {
                 <span className={`log-badge log-badge-${log.level}`}>
                   {log.level}
                 </span>
-                <span className={`truncate ${LOG_LEVEL_COLORS[log.level] ?? 'text-[#A5A1C2]'}`}>{log.message}</span>
+                <span className={`truncate ${LOG_LEVEL_COLORS[log.level] ?? 'text-[var(--text-secondary)]'}`}>{log.message}</span>
               </div>
             ))
           )}
@@ -787,7 +787,7 @@ export function OverviewTab() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <button
           onClick={() => setTab('chat')}
-          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-white/[0.06] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[#A5A1C2] bg-[rgba(26,23,48,0.6)] cursor-pointer"
+          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[var(--text-secondary)] bg-[var(--bg-elevated)] cursor-pointer"
         >
           <div className="w-9 h-9 rounded-xl bg-[#06b6d4]/10 flex items-center justify-center group-hover/btn:bg-[#06b6d4]/15 transition-colors">
             <MessageSquare size={16} className="text-[#06b6d4]" />
@@ -796,7 +796,7 @@ export function OverviewTab() {
         </button>
         <button
           onClick={() => setTab('logs')}
-          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-white/[0.06] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[#A5A1C2] bg-[rgba(26,23,48,0.6)] cursor-pointer"
+          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[var(--text-secondary)] bg-[var(--bg-elevated)] cursor-pointer"
         >
           <div className="w-9 h-9 rounded-xl bg-[#06b6d4]/10 flex items-center justify-center group-hover/btn:bg-[#06b6d4]/15 transition-colors">
             <ScrollText size={16} className="text-[#06b6d4]" />
@@ -805,7 +805,7 @@ export function OverviewTab() {
         </button>
         <button
           onClick={() => setTab('config')}
-          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-white/[0.06] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[#A5A1C2] bg-[rgba(26,23,48,0.6)] cursor-pointer"
+          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[var(--text-secondary)] bg-[var(--bg-elevated)] cursor-pointer"
         >
           <div className="w-9 h-9 rounded-xl bg-[#06b6d4]/10 flex items-center justify-center group-hover/btn:bg-[#06b6d4]/15 transition-colors">
             <Settings size={16} className="text-[#06b6d4]" />
@@ -848,12 +848,12 @@ function PublishToMarketplaceButton({ agentId }: { agentId: string }) {
     <button
       onClick={handlePublish}
       disabled={publishing || published}
-      className={`group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border transition-all duration-200 text-sm bg-[rgba(26,23,48,0.6)] ${
+      className={`group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border transition-all duration-200 text-sm bg-[var(--bg-elevated)] ${
         published
           ? 'border-emerald-500/30 bg-emerald-500/5 text-emerald-400'
           : error
           ? 'border-red-500/30 bg-red-500/5 text-red-400'
-          : 'border-white/[0.06] hover:border-purple-500/30 hover:bg-purple-500/5 text-[#A5A1C2]'
+          : 'border-[var(--border-default)] hover:border-purple-500/30 hover:bg-purple-500/5 text-[var(--text-secondary)]'
       }`}
     >
       <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${

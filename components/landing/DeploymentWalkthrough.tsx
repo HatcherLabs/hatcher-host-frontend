@@ -89,17 +89,17 @@ function ChoosePanel() {
           className={`flex items-center gap-3 px-4 py-3 rounded-lg border transition-colors ${
             opt.selected
               ? 'border-purple-500/40 bg-purple-500/10'
-              : 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.1]'
+              : 'border-[var(--border-default)] bg-[var(--bg-card)] hover:border-[var(--border-hover)]'
           }`}
         >
           <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-            opt.selected ? 'border-purple-400 bg-purple-500/30' : 'border-white/20'
+            opt.selected ? 'border-purple-400 bg-purple-500/30' : 'border-[var(--border-default)]'
           }`}>
             {opt.selected && <div className="w-1.5 h-1.5 rounded-full bg-purple-400" />}
           </div>
           <div>
-            <p className="text-sm font-medium text-white">{opt.name}</p>
-            <p className="text-xs text-[#71717a]">{opt.desc}</p>
+            <p className="text-sm font-medium text-[var(--text-primary)]">{opt.name}</p>
+            <p className="text-xs text-[var(--text-muted)]">{opt.desc}</p>
           </div>
           {opt.selected && (
             <motion.div
@@ -128,8 +128,8 @@ function ConfigurePanel() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.15, duration: 0.3 }}
         >
-          <label className="text-xs text-[#71717a] mb-1 block">{field.label}</label>
-          <div className="px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-sm text-white">
+          <label className="text-xs text-[var(--text-muted)] mb-1 block">{field.label}</label>
+          <div className="px-3 py-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-sm text-[var(--text-primary)]">
             <TypedValue value={field.value} animate={field.typing} />
           </div>
         </motion.div>
@@ -151,11 +151,11 @@ function ConnectPanel() {
           className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border ${
             p.connected
               ? 'border-emerald-500/30 bg-emerald-500/10'
-              : 'border-white/[0.06] bg-white/[0.02]'
+              : 'border-[var(--border-default)] bg-[var(--bg-card)]'
           }`}
         >
           <div className={`w-2 h-2 rounded-full ${p.connected ? 'bg-emerald-400' : 'bg-white/20'}`} />
-          <span className="text-sm text-white">{p.name}</span>
+          <span className="text-sm text-[var(--text-primary)]">{p.name}</span>
           {p.connected && <Check className="w-3.5 h-3.5 text-emerald-400 ml-auto" />}
         </motion.div>
       ))}
@@ -172,7 +172,7 @@ function LaunchPanel() {
         transition={{ type: 'spring', stiffness: 200, damping: 12, delay: 0.2 }}
         className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center shadow-lg shadow-emerald-500/30"
       >
-        <Check className="w-8 h-8 text-[#0a0a0f]" strokeWidth={3} />
+        <Check className="w-8 h-8 text-[var(--bg-base)]" strokeWidth={3} />
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -180,8 +180,8 @@ function LaunchPanel() {
         transition={{ delay: 0.5 }}
         className="text-center"
       >
-        <p className="text-base font-semibold text-white">CryptoBot is online</p>
-        <p className="text-sm text-[#a1a1aa] mt-1">Running 24/7 on Hatcher Cloud</p>
+        <p className="text-base font-semibold text-[var(--text-primary)]">CryptoBot is online</p>
+        <p className="text-sm text-[var(--text-secondary)] mt-1">Running 24/7 on Hatcher Cloud</p>
         <div className="flex items-center justify-center gap-2 mt-3">
           <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-xs text-emerald-400 font-medium">Live on Telegram & Discord</span>
@@ -228,12 +228,12 @@ function ChatPanel() {
           <div className={`max-w-[85%] px-3 py-2 rounded-xl text-xs leading-relaxed ${
             msg.role === 'user'
               ? 'bg-purple-500/20 border border-purple-500/30 text-purple-100'
-              : 'bg-white/[0.04] border border-white/[0.08] text-[#d4d4d8]'
+              : 'bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-secondary)]'
           }`}>
             {msg.role === 'bot' && (
               <div className="flex items-center gap-1.5 mb-1">
                 <div className="w-4 h-4 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
-                  <Bot className="w-2.5 h-2.5 text-[#0a0a0f]" />
+                  <Bot className="w-2.5 h-2.5 text-[var(--bg-base)]" />
                 </div>
                 <span className="text-[10px] font-medium text-amber-400">CryptoBot</span>
               </div>
@@ -253,7 +253,7 @@ function ChatPanel() {
             <div className="w-1.5 h-1.5 rounded-full bg-white/30 animate-bounce" style={{ animationDelay: '150ms' }} />
             <div className="w-1.5 h-1.5 rounded-full bg-white/30 animate-bounce" style={{ animationDelay: '300ms' }} />
           </div>
-          <span className="text-[10px] text-[#52525b]">CryptoBot is typing...</span>
+          <span className="text-[10px] text-[var(--text-muted)]">CryptoBot is typing...</span>
         </motion.div>
       )}
     </div>
@@ -288,19 +288,19 @@ export function DeploymentWalkthrough() {
       onMouseLeave={() => setPaused(false)}
     >
       {/* Window chrome */}
-      <div className={`rounded-2xl border border-white/[0.08] bg-[#0c0c14] shadow-2xl ${accent(step.color, 'glow')} overflow-hidden transition-shadow duration-500`}>
+      <div className={`rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] shadow-2xl ${accent(step.color, 'glow')} overflow-hidden transition-shadow duration-500`}>
         {/* Title bar */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06] bg-[#0e0e16]">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border-default)] bg-[var(--bg-sidebar)]">
           <div className="flex gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
             <div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
             <div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
           </div>
-          <span className="ml-3 text-xs text-[#52525b] font-mono select-none">hatcher.host/create</span>
+          <span className="ml-3 text-xs text-[var(--text-muted)] font-mono select-none">hatcher.host/create</span>
         </div>
 
         {/* Step tabs */}
-        <div className="flex border-b border-white/[0.06]">
+        <div className="flex border-b border-[var(--border-default)]">
           {STEPS.map((s, i) => {
             const Icon = s.icon;
             const isActive = i === activeStep;
@@ -310,7 +310,7 @@ export function DeploymentWalkthrough() {
                 key={s.id}
                 onClick={() => { setActiveStep(i); setPaused(true); }}
                 className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors relative ${
-                  isActive ? accent(s.color, 'text') : isDone ? 'text-emerald-400/60' : 'text-[#52525b]'
+                  isActive ? accent(s.color, 'text') : isDone ? 'text-emerald-400/60' : 'text-[var(--text-muted)]'
                 }`}
               >
                 {isDone ? <Check className="w-3 h-3" /> : <Icon className="w-3 h-3" />}
@@ -353,7 +353,7 @@ export function DeploymentWalkthrough() {
           {/* Progress bar */}
           <div className="mt-4 flex gap-1.5">
             {STEPS.map((s, i) => (
-              <div key={s.id} className="flex-1 h-1 rounded-full bg-white/[0.06] overflow-hidden">
+              <div key={s.id} className="flex-1 h-1 rounded-full bg-[var(--bg-card)] overflow-hidden">
                 {i === activeStep && !paused ? (
                   <motion.div
                     className={`h-full rounded-full ${accent(s.color, 'bg').replace('/20', '/60')}`}

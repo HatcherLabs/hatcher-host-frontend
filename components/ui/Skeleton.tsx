@@ -7,7 +7,7 @@ interface SkeletonProps {
 export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
-      className={cn('animate-pulse rounded-xl bg-white/[0.04]', className)}
+      className={cn('animate-pulse rounded-xl bg-[var(--bg-card)]', className)}
     />
   );
 }
@@ -32,7 +32,7 @@ export function SkeletonCard({ className }: { className?: string }) {
     <div
       className={cn(
         'rounded-2xl border p-5 space-y-4',
-        'bg-[rgba(26,23,48,0.8)] border-[rgba(46,43,74,0.4)]',
+        'bg-[var(--bg-elevated)] border-[var(--border-default)]',
         className
       )}
     >
@@ -66,7 +66,7 @@ export function AgentCardSkeleton() {
         <div className="h-5 w-16 rounded-full shimmer" />
         <div className="h-5 w-20 rounded-full shimmer" />
       </div>
-      <div className="flex items-center justify-between mt-4 pt-3 border-t border-[rgba(46,43,74,0.3)]">
+      <div className="flex items-center justify-between mt-4 pt-3 border-t border-[var(--border-default)]">
         <div className="h-3 w-20 rounded shimmer" />
         <div className="h-3 w-16 rounded shimmer" />
       </div>
@@ -89,7 +89,7 @@ export function SkeletonStat({ className }: { className?: string }) {
     <div
       className={cn(
         'rounded-2xl border p-5',
-        'bg-[rgba(26,23,48,0.8)] border-[rgba(46,43,74,0.4)]',
+        'bg-[var(--bg-elevated)] border-[var(--border-default)]',
         className
       )}
     >

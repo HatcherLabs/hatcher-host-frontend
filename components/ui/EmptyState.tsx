@@ -77,7 +77,7 @@ export function EmptyState({
       {/* Description */}
       <motion.p
         className="text-sm max-w-sm mb-8"
-        style={{ color: '#A5A1C2' }}
+        style={{ color: 'var(--text-secondary)' }}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.3 }}
@@ -122,7 +122,7 @@ export function EmptyState({
               href={secondaryHref}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all hover:opacity-80 border"
               style={{
-                color: '#A5A1C2',
+                color: 'var(--text-secondary)',
                 borderColor: 'rgba(46,43,74,0.6)',
                 background: 'rgba(255,255,255,0.02)',
               }}

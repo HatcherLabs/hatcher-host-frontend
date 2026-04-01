@@ -98,18 +98,18 @@ export function DemoChat() {
   return (
     <div className="w-full max-w-2xl mx-auto">
       {/* ── Terminal chrome ──────────────────────────────── */}
-      <div className="rounded-2xl border border-white/[0.08] bg-[#0d0d14] overflow-hidden shadow-2xl shadow-black/60">
+      <div className="rounded-2xl border border-[var(--border-default)] bg-[#0d0d14] overflow-hidden shadow-2xl shadow-black/60">
 
         {/* Title bar */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06] bg-white/[0.02]">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border-default)] bg-[var(--bg-card)]">
           <div className="flex gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-white/[0.08]" />
-            <span className="w-3 h-3 rounded-full bg-white/[0.08]" />
-            <span className="w-3 h-3 rounded-full bg-white/[0.08]" />
+            <span className="w-3 h-3 rounded-full bg-[var(--bg-hover)]" />
+            <span className="w-3 h-3 rounded-full bg-[var(--bg-hover)]" />
+            <span className="w-3 h-3 rounded-full bg-[var(--bg-hover)]" />
           </div>
           <div className="flex-1 flex items-center justify-center gap-1.5">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_4px_#10b981]" />
-            <span className="text-xs font-medium text-[#71717a]">Hatcher Demo Agent</span>
+            <span className="text-xs font-medium text-[var(--text-muted)]">Hatcher Demo Agent</span>
           </div>
           <span className="text-[10px] text-[#52525b] font-mono">
             {MAX_MESSAGES - msgCount > 0 ? `${MAX_MESSAGES - msgCount} msg left` : 'limit reached'}
@@ -131,7 +131,7 @@ export function DemoChat() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-[var(--text-primary)] mb-1">Ask me anything</p>
-                <p className="text-xs text-[#71717a]">No sign-up required · {MAX_MESSAGES} free messages</p>
+                <p className="text-xs text-[var(--text-muted)]">No sign-up required · {MAX_MESSAGES} free messages</p>
               </div>
               {/* Suggestion chips */}
               <div className="flex flex-wrap gap-2 justify-center">
@@ -139,7 +139,7 @@ export function DemoChat() {
                   <button
                     key={chip}
                     onClick={() => send(chip)}
-                    className="px-3 py-1.5 rounded-full text-xs font-medium border border-white/[0.08] bg-white/[0.04] text-[#a1a1aa] hover:border-purple-500/30 hover:bg-purple-500/[0.08] hover:text-purple-300 transition-all duration-200 cursor-pointer"
+                    className="px-3 py-1.5 rounded-full text-xs font-medium border border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:border-purple-500/30 hover:bg-purple-500/[0.08] hover:text-purple-300 transition-all duration-200 cursor-pointer"
                   >
                     {chip}
                   </button>
@@ -152,7 +152,7 @@ export function DemoChat() {
           {unavailable && (
             <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
               <Zap size={24} className="text-amber-400 opacity-60" />
-              <p className="text-sm text-[#a1a1aa]">Demo agent warming up — check back in a moment</p>
+              <p className="text-sm text-[var(--text-secondary)]">Demo agent warming up — check back in a moment</p>
               <Link href="/register" className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-2">
                 Or sign up now to deploy your own
               </Link>
@@ -173,11 +173,11 @@ export function DemoChat() {
                 <div className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${
                   msg.role === 'assistant'
                     ? 'bg-gradient-to-br from-purple-600/40 to-cyan-500/20 border border-purple-500/20'
-                    : 'bg-white/[0.06] border border-white/[0.08]'
+                    : 'bg-[var(--bg-card)] border border-[var(--border-default)]'
                 }`}>
                   {msg.role === 'assistant'
                     ? <Bot size={12} className="text-purple-400" />
-                    : <span className="text-[10px] text-[#a1a1aa] font-bold">U</span>
+                    : <span className="text-[10px] text-[var(--text-secondary)] font-bold">U</span>
                   }
                 </div>
 
@@ -185,7 +185,7 @@ export function DemoChat() {
                 <div className={`max-w-[80%] px-3 py-2 rounded-xl text-sm leading-relaxed ${
                   msg.role === 'user'
                     ? 'bg-[var(--primary-500)]/15 border border-[var(--primary-500)]/20 text-[var(--text-primary)]'
-                    : 'bg-white/[0.04] border border-white/[0.06] text-[#d4d4d8]'
+                    : 'bg-[var(--bg-card)] border border-[var(--border-default)] text-[#d4d4d8]'
                 }`}>
                   {msg.content}
                 </div>
@@ -203,7 +203,7 @@ export function DemoChat() {
               <div className="w-6 h-6 rounded-lg flex items-center justify-center bg-gradient-to-br from-purple-600/40 to-cyan-500/20 border border-purple-500/20">
                 <Bot size={12} className="text-purple-400" />
               </div>
-              <div className="px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center gap-1">
+              <div className="px-3 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] flex items-center gap-1">
                 {[0, 1, 2].map((i) => (
                   <motion.span
                     key={i}
@@ -221,10 +221,10 @@ export function DemoChat() {
 
         {/* ── CTA after limit ────────────────────────────── */}
         {limitReached ? (
-          <div className="border-t border-white/[0.06] px-4 py-4 flex flex-col sm:flex-row items-center gap-3 bg-gradient-to-r from-purple-600/[0.07] to-cyan-500/[0.04]">
+          <div className="border-t border-[var(--border-default)] px-4 py-4 flex flex-col sm:flex-row items-center gap-3 bg-gradient-to-r from-purple-600/[0.07] to-cyan-500/[0.04]">
             <div className="flex-1 text-center sm:text-left">
               <p className="text-sm font-semibold text-[var(--text-primary)]">Ready to deploy your own?</p>
-              <p className="text-xs text-[#71717a] mt-0.5">Free tier — deploy in 60 seconds, no credit card required</p>
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">Free tier — deploy in 60 seconds, no credit card required</p>
             </div>
             <Link
               href="/register"
@@ -237,7 +237,7 @@ export function DemoChat() {
           /* ── Input bar ──────────────────────────────────── */
           <form
             onSubmit={handleSubmit}
-            className="border-t border-white/[0.06] px-3 py-3 flex items-center gap-2"
+            className="border-t border-[var(--border-default)] px-3 py-3 flex items-center gap-2"
           >
             <input
               ref={inputRef}
@@ -272,7 +272,7 @@ export function DemoChat() {
             <button
               key={chip}
               onClick={() => send(chip)}
-              className="px-3 py-1 rounded-full text-xs border border-white/[0.06] bg-white/[0.02] text-[#71717a] hover:border-purple-500/20 hover:text-[#a1a1aa] transition-all cursor-pointer"
+              className="px-3 py-1 rounded-full text-xs border border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-muted)] hover:border-purple-500/20 hover:text-[var(--text-secondary)] transition-all cursor-pointer"
             >
               {chip}
             </button>

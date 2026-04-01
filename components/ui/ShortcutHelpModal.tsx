@@ -28,10 +28,10 @@ export function ShortcutHelpModal({ isOpen, onClose }: ShortcutHelpModalProps) {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-sm mx-4 rounded-2xl border border-white/[0.08] bg-[#18181b] shadow-2xl"
+          className="w-full max-w-sm mx-4 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-2xl"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border-default)]">
             <div className="flex items-center gap-2">
               <Keyboard size={18} className="text-purple-400" />
               <h3 className="text-base font-semibold text-white">Keyboard Shortcuts</h3>
@@ -50,7 +50,7 @@ export function ShortcutHelpModal({ isOpen, onClose }: ShortcutHelpModalProps) {
                   {SHORTCUTS.filter((s) => s.category === category).map((shortcut) => (
                     <div key={shortcut.key} className="flex items-center justify-between">
                       <span className="text-sm text-zinc-300">{shortcut.label}</span>
-                      <kbd className="px-2 py-0.5 rounded bg-zinc-800 border border-white/[0.08] text-xs text-zinc-400 font-mono">
+                      <kbd className="px-2 py-0.5 rounded bg-zinc-800 border border-[var(--border-default)] text-xs text-zinc-400 font-mono">
                         {shortcut.key}
                       </kbd>
                     </div>
@@ -61,9 +61,9 @@ export function ShortcutHelpModal({ isOpen, onClose }: ShortcutHelpModalProps) {
           </div>
 
           {/* Footer */}
-          <div className="px-5 py-3 border-t border-white/[0.06]">
+          <div className="px-5 py-3 border-t border-[var(--border-default)]">
             <p className="text-xs text-zinc-500 text-center">
-              Press <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 border border-white/[0.08] text-zinc-400 font-mono">?</kbd> anytime to toggle
+              Press <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 border border-[var(--border-default)] text-zinc-400 font-mono">?</kbd> anytime to toggle
             </p>
           </div>
         </motion.div>

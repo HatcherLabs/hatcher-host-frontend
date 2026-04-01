@@ -149,7 +149,7 @@ export default function NewAgentPage() {
           >
             Choose a Template
           </h1>
-          <p className="text-[#A5A1C2] text-sm sm:text-base">
+          <p className="text-[var(--text-secondary)] text-sm sm:text-base">
             Start from a pre-configured template or build from scratch.
             Each template comes with a personality, system prompt, and suggested integrations.
           </p>
@@ -158,13 +158,13 @@ export default function NewAgentPage() {
         {/* ── Search ──────────────────────────────────────── */}
         <motion.div variants={itemVariants} className="max-w-sm mx-auto">
           <div className="relative">
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#71717a]" />
+            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
             <input
               type="text"
               placeholder="Search templates..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-[#71717a] outline-none focus:border-[#06b6d4]/50 transition-colors"
+              className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-[var(--text-muted)] outline-none focus:border-[#06b6d4]/50 transition-colors"
             />
           </div>
         </motion.div>
@@ -183,7 +183,7 @@ export default function NewAgentPage() {
                     'flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0',
                     isActive
                       ? 'bg-[#06b6d4]/15 border border-[#06b6d4]/40 text-[#06b6d4] shadow-[0_0_12px_rgba(6,182,212,0.1)]'
-                      : 'border border-[rgba(46,43,74,0.4)] bg-[rgba(26,23,48,0.4)] text-[#71717a] hover:text-[#A5A1C2] hover:border-[rgba(46,43,74,0.7)]'
+                      : 'border border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:border-[var(--border-hover)]'
                   )}
                 >
                   <Icon size={12} />
@@ -191,7 +191,7 @@ export default function NewAgentPage() {
                   {count > 0 && (
                     <span className={cn(
                       'ml-0.5 text-[10px] px-1.5 py-0.5 rounded-full',
-                      isActive ? 'bg-[#06b6d4]/20 text-[#06b6d4]' : 'bg-[rgba(46,43,74,0.6)] text-[#71717a]'
+                      isActive ? 'bg-[#06b6d4]/20 text-[#06b6d4]' : 'bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)]'
                     )}>
                       {count}
                     </span>
@@ -212,9 +212,9 @@ export default function NewAgentPage() {
               exit={{ opacity: 0 }}
               className="card glass-noise flex flex-col items-center justify-center py-16 text-center"
             >
-              <Bot size={40} className="text-[#71717a] mb-4" />
+              <Bot size={40} className="text-[var(--text-muted)] mb-4" />
               <h3 className="text-lg font-semibold text-white mb-1">No templates found</h3>
-              <p className="text-sm text-[#A5A1C2]">Try a different search or category.</p>
+              <p className="text-sm text-[var(--text-secondary)]">Try a different search or category.</p>
             </motion.div>
           ) : (
             <motion.div
@@ -231,14 +231,14 @@ export default function NewAgentPage() {
                     whileHover={{ y: -2 }}
                     transition={{ duration: 0.2 }}
                     onClick={() => router.push('/create?template=custom')}
-                    className="w-full h-full card glass-noise flex flex-col items-center justify-center gap-3 py-10 border-dashed border-[rgba(46,43,74,0.5)] hover:border-[#06b6d4]/40 transition-all duration-200 group cursor-pointer"
+                    className="w-full h-full card glass-noise flex flex-col items-center justify-center gap-3 py-10 border-dashed border-[var(--border-default)] hover:border-[#06b6d4]/40 transition-all duration-200 group cursor-pointer"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-[rgba(46,43,74,0.6)] border border-[rgba(46,43,74,0.4)] flex items-center justify-center group-hover:bg-[#06b6d4]/10 group-hover:border-[#06b6d4]/30 transition-all duration-200">
+                    <div className="w-12 h-12 rounded-xl bg-[rgba(46,43,74,0.6)] border border-[var(--border-default)] flex items-center justify-center group-hover:bg-[#06b6d4]/10 group-hover:border-[#06b6d4]/30 transition-all duration-200">
                       <span className="text-2xl">+</span>
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-semibold text-white group-hover:text-[#06b6d4] transition-colors">Start from Scratch</p>
-                      <p className="text-xs text-[#71717a] mt-0.5">Full control over every setting</p>
+                      <p className="text-xs text-[var(--text-muted)] mt-0.5">Full control over every setting</p>
                     </div>
                   </motion.button>
                 </motion.div>
@@ -259,7 +259,7 @@ export default function NewAgentPage() {
         {/* ── Footer hint ─────────────────────────────────── */}
         <motion.p
           variants={itemVariants}
-          className="text-center text-xs text-[#71717a]"
+          className="text-center text-xs text-[var(--text-muted)]"
         >
           All templates are fully customizable after deployment &mdash; change the name, system prompt, model, and integrations at any time.
         </motion.p>

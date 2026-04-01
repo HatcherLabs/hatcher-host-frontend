@@ -250,7 +250,7 @@ export function VersionsTab() {
           </div>
           <div className="flex-1 min-w-0">
             <p className={`text-xs font-medium ${fwColors.text} mb-1`}>Auto-versioning enabled</p>
-            <p className="text-[11px] text-[#A5A1C2]/70 leading-relaxed">
+            <p className="text-[11px] text-[var(--text-secondary)]/70 leading-relaxed">
               A new version is created automatically each time you save configuration changes. You can view any snapshot, compare two versions side-by-side, or restore a previous version instantly. Restoring creates a new version with the old config.
             </p>
           </div>
@@ -267,9 +267,9 @@ export function VersionsTab() {
             <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: fwColors.glow }}>
               <History size={14} className={fwColors.text} />
             </div>
-            <h3 className="text-sm font-semibold text-[#A5A1C2]">Version History</h3>
+            <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Version History</h3>
             {total > 0 && (
-              <span className="text-[10px] text-[#71717a] bg-white/[0.06] px-2 py-0.5 rounded-full">
+              <span className="text-[10px] text-[var(--text-muted)] bg-[var(--bg-card)] px-2 py-0.5 rounded-full">
                 {total} version{total !== 1 ? 's' : ''}
               </span>
             )}
@@ -280,7 +280,7 @@ export function VersionsTab() {
             className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-all ${
               diffMode
                 ? `${fwColors.border} ${fwColors.bg} ${fwColors.text}`
-                : 'border-[rgba(46,43,74,0.4)] text-[#71717a] hover:text-[#A5A1C2] hover:border-white/[0.12]'
+                : 'border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:border-[var(--border-hover)]'
             }`}
           >
             <GitCompare size={13} />
@@ -342,7 +342,7 @@ export function VersionsTab() {
         {loading && (
           <div className="flex items-center gap-2 py-6 justify-center">
             <div className="w-4 h-4 border-2 border-white/20 rounded-full animate-spin" style={{ borderTopColor: fwColors.accent }} />
-            <span className="text-xs text-[#71717a]">Loading versions...</span>
+            <span className="text-xs text-[var(--text-muted)]">Loading versions...</span>
           </div>
         )}
 
@@ -353,7 +353,7 @@ export function VersionsTab() {
               <History size={28} className={fwColors.text} />
             </div>
             <p className="text-base font-semibold text-white mb-1">No versions yet</p>
-            <p className="text-sm text-[#71717a] max-w-xs">
+            <p className="text-sm text-[var(--text-muted)] max-w-xs">
               Versions are created automatically when you save configuration changes. Edit your agent&apos;s config to create the first snapshot.
             </p>
           </div>
@@ -406,7 +406,7 @@ export function VersionsTab() {
                           ? 'border-emerald-500/30 bg-emerald-500/[0.04] shadow-[0_0_15px_rgba(16,185,129,0.06)]'
                           : isSelected
                           ? `${fwColors.border} ${fwColors.bg}`
-                          : 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]'
+                          : 'border-[var(--border-default)] bg-[var(--bg-card)] hover:border-[var(--border-hover)]'
                       }`}
                       onClick={() => diffMode && handleDiffSelect(v.version)}
                       role={diffMode ? 'button' : undefined}
@@ -419,7 +419,7 @@ export function VersionsTab() {
                             className={`inline-flex items-center justify-center text-[11px] font-mono font-bold px-2 py-0.5 rounded-md ${
                               isCurrent
                                 ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25'
-                                : 'bg-white/[0.06] text-[#A5A1C2] border border-white/[0.08]'
+                                : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-default)]'
                             }`}
                           >
                             v{v.version}
@@ -432,7 +432,7 @@ export function VersionsTab() {
                           )}
 
                           {v.commitMessage && (
-                            <span className="text-xs text-[#A5A1C2] truncate">{v.commitMessage}</span>
+                            <span className="text-xs text-[var(--text-secondary)] truncate">{v.commitMessage}</span>
                           )}
                         </div>
 
@@ -442,7 +442,7 @@ export function VersionsTab() {
                             <button
                               type="button"
                               onClick={() => setViewVersion(v)}
-                              className="flex items-center gap-1 text-[10px] font-medium text-[#A5A1C2] hover:text-[#FFFFFF] transition-colors px-2 py-1 rounded-md hover:bg-white/[0.04]"
+                              className="flex items-center gap-1 text-[10px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors px-2 py-1 rounded-md hover:bg-[var(--bg-card)]"
                             >
                               <Eye size={12} />
                               View
@@ -466,7 +466,7 @@ export function VersionsTab() {
                                     <button
                                       type="button"
                                       onClick={() => setRestoreConfirm(null)}
-                                      className="text-[10px] font-medium text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+                                      className="text-[10px] font-medium text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
                                     >
                                       No
                                     </button>
@@ -491,7 +491,7 @@ export function VersionsTab() {
                             <span className={`text-[10px] px-2 py-0.5 rounded-full ${
                               isSelected
                                 ? `${fwColors.bg} ${fwColors.text} border ${fwColors.border}`
-                                : 'text-[#71717a]'
+                                : 'text-[var(--text-muted)]'
                             }`}>
                               {isSelected ? 'Selected' : 'Select'}
                             </span>
@@ -501,7 +501,7 @@ export function VersionsTab() {
 
                       {/* Bottom row: timestamp + diff summary */}
                       <div className="flex items-center gap-3 mt-1.5">
-                        <p className="text-[10px] text-[#71717a] flex items-center gap-1">
+                        <p className="text-[10px] text-[var(--text-muted)] flex items-center gap-1">
                           <Clock size={10} className="opacity-50" />
                           {formatRelativeTime(v.createdAt)}
                           {' \u2022 '}
@@ -509,7 +509,7 @@ export function VersionsTab() {
                         </p>
 
                         {summary && summary.total > 0 && (
-                          <span className="flex items-center gap-1.5 text-[10px] text-[#71717a] bg-white/[0.04] px-2 py-0.5 rounded-full border border-white/[0.06]">
+                          <span className="flex items-center gap-1.5 text-[10px] text-[var(--text-muted)] bg-[var(--bg-card)] px-2 py-0.5 rounded-full border border-[var(--border-default)]">
                             <FileText size={9} className="opacity-50" />
                             {summary.total} field{summary.total !== 1 ? 's' : ''} changed
                             {summary.added > 0 && (
@@ -522,7 +522,7 @@ export function VersionsTab() {
                         )}
 
                         {!summary && idx === versions.length - 1 && (
-                          <span className="flex items-center gap-1 text-[10px] text-[#71717a]/60 italic">
+                          <span className="flex items-center gap-1 text-[10px] text-[var(--text-muted)]/60 italic">
                             <Shield size={9} />
                             Initial version
                           </span>
@@ -538,24 +538,24 @@ export function VersionsTab() {
 
         {/* Pagination */}
         {!loading && total > limit && (
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/[0.06]">
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-[var(--border-default)]">
             <button
               type="button"
               onClick={() => setOffset(Math.max(0, offset - limit))}
               disabled={!hasPrev}
-              className="flex items-center gap-1 text-xs text-[#A5A1C2] hover:text-white transition-colors disabled:opacity-30 disabled:cursor-default"
+              className="flex items-center gap-1 text-xs text-[var(--text-secondary)] hover:text-white transition-colors disabled:opacity-30 disabled:cursor-default"
             >
               <ChevronLeft size={14} />
               Previous
             </button>
-            <span className="text-[10px] text-[#71717a]">
+            <span className="text-[10px] text-[var(--text-muted)]">
               {offset + 1}-{Math.min(offset + limit, total)} of {total}
             </span>
             <button
               type="button"
               onClick={() => setOffset(offset + limit)}
               disabled={!hasMore}
-              className="flex items-center gap-1 text-xs text-[#A5A1C2] hover:text-white transition-colors disabled:opacity-30 disabled:cursor-default"
+              className="flex items-center gap-1 text-xs text-[var(--text-secondary)] hover:text-white transition-colors disabled:opacity-30 disabled:cursor-default"
             >
               Next
               <ChevronRight size={14} />
@@ -578,10 +578,10 @@ export function VersionsTab() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-2xl max-h-[80vh] flex flex-col rounded-2xl border border-white/[0.08] bg-[#1A1730] shadow-2xl"
+              className="w-full max-w-2xl max-h-[80vh] flex flex-col rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between p-4 border-b border-white/[0.06]">
+              <div className="flex items-center justify-between p-4 border-b border-[var(--border-default)]">
                 <div className="flex items-center gap-3">
                   <span
                     className={`inline-flex items-center text-xs font-mono font-bold px-2 py-0.5 rounded-md ${
@@ -593,13 +593,13 @@ export function VersionsTab() {
                     v{viewVersion.version}
                   </span>
                   <div>
-                    <h3 className="text-sm font-semibold text-[#FFFFFF]">
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">
                       Version {viewVersion.version}
                       {viewVersion.version === latestVersion && (
                         <span className="ml-2 text-[10px] text-emerald-400 font-normal">(current)</span>
                       )}
                     </h3>
-                    <p className="text-[10px] text-[#71717a] mt-0.5">
+                    <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
                       {viewVersion.commitMessage ?? 'No message'}
                       {' \u2022 '}
                       {new Date(viewVersion.createdAt).toLocaleString()}
@@ -609,13 +609,13 @@ export function VersionsTab() {
                 <button
                   type="button"
                   onClick={() => setViewVersion(null)}
-                  className="text-[#71717a] hover:text-white transition-colors"
+                  className="text-[var(--text-muted)] hover:text-white transition-colors"
                 >
                   <X size={18} />
                 </button>
               </div>
               <div className="flex-1 overflow-auto p-4">
-                <pre className="text-xs font-mono text-[#A5A1C2] whitespace-pre-wrap break-words leading-relaxed">
+                <pre className="text-xs font-mono text-[var(--text-secondary)] whitespace-pre-wrap break-words leading-relaxed">
                   {formatConfig(viewVersion.configSnapshot)}
                 </pre>
               </div>
@@ -638,17 +638,17 @@ export function VersionsTab() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-4xl max-h-[85vh] flex flex-col rounded-2xl border border-white/[0.08] bg-[#1A1730] shadow-2xl"
+              className="w-full max-w-4xl max-h-[85vh] flex flex-col rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between p-4 border-b border-white/[0.06]">
+              <div className="flex items-center justify-between p-4 border-b border-[var(--border-default)]">
                 <div className="flex items-center gap-3">
                   <GitCompare size={16} className={fwColors.text} />
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono font-bold text-[#A5A1C2] bg-white/[0.06] px-2 py-0.5 rounded-md border border-white/[0.08]">
+                    <span className="text-xs font-mono font-bold text-[var(--text-secondary)] bg-[var(--bg-card)] px-2 py-0.5 rounded-md border border-[var(--border-default)]">
                       v{diffResult.v1.version}
                     </span>
-                    <ArrowRight size={12} className="text-[#71717a]" />
+                    <ArrowRight size={12} className="text-[var(--text-muted)]" />
                     <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded-md border ${fwColors.bg} ${fwColors.text} ${fwColors.border}`}>
                       v{diffResult.v2.version}
                     </span>
@@ -657,7 +657,7 @@ export function VersionsTab() {
                 <button
                   type="button"
                   onClick={() => setDiffResult(null)}
-                  className="text-[#71717a] hover:text-white transition-colors"
+                  className="text-[var(--text-muted)] hover:text-white transition-colors"
                 >
                   <X size={18} />
                 </button>
@@ -675,7 +675,7 @@ export function VersionsTab() {
                           ? 'bg-emerald-500/10 text-emerald-400 border-l-2 border-emerald-500'
                           : line.type === 'removed'
                           ? 'bg-red-500/10 text-red-400 border-l-2 border-red-500'
-                          : 'text-[#71717a] border-l-2 border-transparent'
+                          : 'text-[var(--text-muted)] border-l-2 border-transparent'
                       }`}
                     >
                       <span className="inline-block w-4 mr-2 text-right opacity-50">
@@ -685,7 +685,7 @@ export function VersionsTab() {
                     </div>
                   ))}
                 </div>
-                <div className="flex items-center gap-4 mt-4 pt-3 border-t border-white/[0.06]">
+                <div className="flex items-center gap-4 mt-4 pt-3 border-t border-[var(--border-default)]">
                   <span className="flex items-center gap-1.5 text-[10px] text-emerald-400">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" /> Added (v{diffResult.v2.version})
                   </span>

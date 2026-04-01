@@ -224,7 +224,7 @@ export function StatsTab() {
               {framework}
             </span>
           </div>
-          <p className="text-[11px] text-[#a1a1aa] leading-relaxed">
+          <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
             {theme.description}
           </p>
         </div>
@@ -235,15 +235,15 @@ export function StatsTab() {
         {/* Total Messages */}
         <div
           className="rounded-xl border p-3.5 relative overflow-hidden"
-          style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}
+          style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}
         >
           <div className="absolute top-0 left-0 w-full h-[2px]" style={{ background: theme.accentHex }} />
           <div className="flex items-center gap-1.5 mb-2">
             <MessageSquare size={12} style={{ color: theme.accentHex }} />
-            <span className="text-[10px] text-[#71717a] uppercase tracking-wider">Messages</span>
+            <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Messages</span>
           </div>
           <div className="flex items-end gap-1.5">
-            <span className="text-xl font-bold text-[#fafafa]">
+            <span className="text-xl font-bold text-[var(--text-primary)]">
               {(analytics?.totalMessages ?? stats?.messagesProcessed ?? 0).toLocaleString()}
             </span>
             {trendData && (
@@ -255,15 +255,15 @@ export function StatsTab() {
         {/* Avg/Day */}
         <div
           className="rounded-xl border p-3.5 relative overflow-hidden"
-          style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}
+          style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}
         >
           <div className="absolute top-0 left-0 w-full h-[2px]" style={{ background: theme.accentHex, opacity: 0.6 }} />
           <div className="flex items-center gap-1.5 mb-2">
             <TrendingUp size={12} style={{ color: theme.accentHex }} />
-            <span className="text-[10px] text-[#71717a] uppercase tracking-wider">Avg/Day</span>
+            <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Avg/Day</span>
           </div>
           <div className="flex items-end gap-1.5">
-            <span className="text-xl font-bold text-[#fafafa]">
+            <span className="text-xl font-bold text-[var(--text-primary)]">
               {analytics?.avgPerDay ?? 0}
             </span>
             {trendData && (
@@ -275,15 +275,15 @@ export function StatsTab() {
         {/* Uptime */}
         <div
           className="rounded-xl border p-3.5 relative overflow-hidden"
-          style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}
+          style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}
         >
           <div className="absolute top-0 left-0 w-full h-[2px]" style={{ background: theme.accentHex, opacity: 0.4 }} />
           <div className="flex items-center gap-1.5 mb-2">
             <Clock size={12} style={{ color: theme.accentHex }} />
-            <span className="text-[10px] text-[#71717a] uppercase tracking-wider">Uptime</span>
+            <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Uptime</span>
           </div>
           <div className="flex items-end gap-1.5">
-            <span className="text-xl font-bold text-[#fafafa]">
+            <span className="text-xl font-bold text-[var(--text-primary)]">
               {uptimePct !== null ? `${uptimePct}%` : '--'}
             </span>
             {isLiveUptime && (
@@ -297,41 +297,41 @@ export function StatsTab() {
         {/* Feedback Score */}
         <div
           className="rounded-xl border p-3.5 relative overflow-hidden"
-          style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}
+          style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}
         >
           <div className="absolute top-0 left-0 w-full h-[2px]" style={{ background: theme.accentHex, opacity: 0.25 }} />
           <div className="flex items-center gap-1.5 mb-2">
             <Sparkles size={12} style={{ color: theme.accentHex }} />
-            <span className="text-[10px] text-[#71717a] uppercase tracking-wider">Satisfaction</span>
+            <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Satisfaction</span>
           </div>
-          <span className="text-xl font-bold text-[#fafafa]">
+          <span className="text-xl font-bold text-[var(--text-primary)]">
             {feedback?.score !== null && feedback?.score !== undefined ? `${feedback.score}%` : '--'}
           </span>
         </div>
       </div>
 
       {/* Message Activity Chart */}
-      <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
+      <div className="rounded-2xl border p-6" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
             <BarChart3 size={18} style={{ color: theme.accentHex }} />
-            <h3 className="text-base font-semibold text-[#fafafa]">Message Activity</h3>
+            <h3 className="text-base font-semibold text-[var(--text-primary)]">Message Activity</h3>
           </div>
-          <span className="text-[10px] text-[#71717a] uppercase tracking-wider">Last 7 days</span>
+          <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Last 7 days</span>
         </div>
 
         {analyticsLoading ? (
           <div className="flex items-end gap-1.5 h-36">
             {Array.from({ length: 7 }).map((_, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                <div className="w-full rounded-t bg-white/[0.04] animate-pulse" style={{ height: `${20 + Math.random() * 60}%` }} />
-                <div className="w-8 h-2 rounded bg-white/[0.04] animate-pulse" />
+                <div className="w-full rounded-t bg-[var(--bg-card)] animate-pulse" style={{ height: `${20 + Math.random() * 60}%` }} />
+                <div className="w-8 h-2 rounded bg-[var(--bg-card)] animate-pulse" />
               </div>
             ))}
           </div>
         ) : analyticsError ? (
           <div className="h-36 flex items-center justify-center">
-            <p className="text-sm text-[#6B6890]">{analyticsError}</p>
+            <p className="text-sm text-[var(--text-muted)]">{analyticsError}</p>
           </div>
         ) : analytics ? (
           <>
@@ -347,7 +347,7 @@ export function StatsTab() {
                     <span className={`text-[10px] font-medium transition-colors`} style={{
                       color: isPeak ? theme.accentHex : undefined,
                     }}>
-                      <span className={isPeak ? '' : 'text-[#71717a] group-hover:text-[#A5A1C2]'}>
+                      <span className={isPeak ? '' : 'text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]'}>
                         {d.count > 0 ? d.count : ''}
                       </span>
                     </span>
@@ -366,10 +366,10 @@ export function StatsTab() {
                     />
                     {/* Date label */}
                     <div className="flex flex-col items-center">
-                      <span className={`text-[9px] ${isToday ? 'font-medium' : 'text-[#71717a]'}`} style={isToday ? { color: theme.accentHex } : {}}>
+                      <span className={`text-[9px] ${isToday ? 'font-medium' : 'text-[var(--text-muted)]'}`} style={isToday ? { color: theme.accentHex } : {}}>
                         {isToday ? 'Today' : formatWeekday(d.date)}
                       </span>
-                      <span className="text-[8px] text-[#71717a]/60">
+                      <span className="text-[8px] text-[var(--text-muted)]/60">
                         {formatChartDate(d.date)}
                       </span>
                     </div>
@@ -379,32 +379,32 @@ export function StatsTab() {
             </div>
 
             {/* Summary Stats Row */}
-            <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/[0.04]">
-              <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+            <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-[var(--border-default)]">
+              <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'var(--bg-card)' }}>
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${theme.accentHex}15` }}>
                   <Hash size={13} style={{ color: theme.accentHex }} />
                 </div>
                 <div>
-                  <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Total</p>
-                  <p className="text-sm font-bold text-[#fafafa]">{analytics.totalMessages.toLocaleString()}</p>
+                  <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Total</p>
+                  <p className="text-sm font-bold text-[var(--text-primary)]">{analytics.totalMessages.toLocaleString()}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+              <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'var(--bg-card)' }}>
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${theme.accentHex}15` }}>
                   <TrendingUp size={13} style={{ color: theme.accentHex }} />
                 </div>
                 <div>
-                  <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Avg/Day</p>
-                  <p className="text-sm font-bold text-[#fafafa]">{analytics.avgPerDay}</p>
+                  <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Avg/Day</p>
+                  <p className="text-sm font-bold text-[var(--text-primary)]">{analytics.avgPerDay}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+              <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'var(--bg-card)' }}>
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${theme.accentHex}15` }}>
                   <Calendar size={13} style={{ color: theme.accentHex }} />
                 </div>
                 <div>
-                  <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Peak</p>
-                  <p className="text-sm font-bold text-[#fafafa]">
+                  <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Peak</p>
+                  <p className="text-sm font-bold text-[var(--text-primary)]">
                     {analytics.peakDay ? formatChartDate(analytics.peakDay) : '--'}
                   </p>
                 </div>
@@ -416,37 +416,37 @@ export function StatsTab() {
 
       {/* User Feedback */}
       {feedback && feedback.total > 0 && (
-        <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
+        <div className="rounded-2xl border p-6" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
           <div className="flex items-center gap-2 mb-5">
             <MessageSquare size={18} style={{ color: theme.accentHex }} />
-            <h3 className="text-base font-semibold text-[#fafafa]">User Feedback</h3>
+            <h3 className="text-base font-semibold text-[var(--text-primary)]">User Feedback</h3>
           </div>
           <div className="grid grid-cols-3 gap-3">
-            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'var(--bg-card)' }}>
               <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-emerald-500/10">
                 <ThumbsUp size={13} className="text-emerald-400" />
               </div>
               <div>
-                <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Positive</p>
-                <p className="text-sm font-bold text-[#fafafa]">{feedback.upCount}</p>
+                <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Positive</p>
+                <p className="text-sm font-bold text-[var(--text-primary)]">{feedback.upCount}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'var(--bg-card)' }}>
               <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-red-500/10">
                 <ThumbsDown size={13} className="text-red-400" />
               </div>
               <div>
-                <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Negative</p>
-                <p className="text-sm font-bold text-[#fafafa]">{feedback.downCount}</p>
+                <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Negative</p>
+                <p className="text-sm font-bold text-[var(--text-primary)]">{feedback.downCount}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'var(--bg-card)' }}>
               <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${theme.accentHex}15` }}>
                 <TrendingUp size={13} style={{ color: theme.accentHex }} />
               </div>
               <div>
-                <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Score</p>
-                <p className="text-sm font-bold text-[#fafafa]">{feedback.score !== null ? `${feedback.score}%` : '--'}</p>
+                <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Score</p>
+                <p className="text-sm font-bold text-[var(--text-primary)]">{feedback.score !== null ? `${feedback.score}%` : '--'}</p>
               </div>
             </div>
           </div>
@@ -454,21 +454,21 @@ export function StatsTab() {
       )}
 
       {/* Agent Info */}
-      <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
+      <div className="rounded-2xl border p-6" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
         <div className="flex items-center gap-2 mb-4">
           <Settings size={18} style={{ color: theme.accentHex }} />
-          <h3 className="text-base font-semibold text-[#fafafa]">Agent Info</h3>
+          <h3 className="text-base font-semibold text-[var(--text-primary)]">Agent Info</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
-            <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Created</p>
-            <p className="text-sm font-medium text-[#fafafa]">
+          <div className="rounded-xl p-4" style={{ background: 'var(--bg-card)' }}>
+            <p className="text-xs text-[var(--text-muted)] mb-1 uppercase tracking-wider">Created</p>
+            <p className="text-sm font-medium text-[var(--text-primary)]">
               {agent ? new Date(agent.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '--'}
             </p>
           </div>
-          <div className="rounded-xl p-4 relative overflow-hidden" style={{ background: 'rgba(46,43,74,0.3)' }}>
+          <div className="rounded-xl p-4 relative overflow-hidden" style={{ background: 'var(--bg-card)' }}>
             <div className="absolute bottom-0 left-0 w-full h-[2px]" style={{ background: theme.accentHex, opacity: 0.4 }} />
-            <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Framework</p>
+            <p className="text-xs text-[var(--text-muted)] mb-1 uppercase tracking-wider">Framework</p>
             <div className="flex items-center gap-2">
               <p className="text-sm font-medium capitalize" style={{ color: theme.accentHex }}>{agent?.framework ?? '--'}</p>
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${fwBadge}`}>
@@ -476,14 +476,14 @@ export function StatsTab() {
               </span>
             </div>
           </div>
-          <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
-            <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Instance ID</p>
-            <p className="text-sm font-medium text-[#fafafa] font-mono">
+          <div className="rounded-xl p-4" style={{ background: 'var(--bg-card)' }}>
+            <p className="text-xs text-[var(--text-muted)] mb-1 uppercase tracking-wider">Instance ID</p>
+            <p className="text-sm font-medium text-[var(--text-primary)] font-mono">
               {stats?.containerId ? stats.containerId.substring(0, 12) + '...' : 'Not running'}
             </p>
           </div>
-          <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
-            <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Status</p>
+          <div className="rounded-xl p-4" style={{ background: 'var(--bg-card)' }}>
+            <p className="text-xs text-[var(--text-muted)] mb-1 uppercase tracking-wider">Status</p>
             {(() => {
               const currentStatus = stats?.status ?? agent?.status ?? 'paused';
               const si = STATUS_STYLES[currentStatus] ?? STATUS_STYLES.paused;
@@ -501,30 +501,30 @@ export function StatsTab() {
       </div>
 
       {/* Activity Summary */}
-      <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
+      <div className="rounded-2xl border p-6" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
         <div className="flex items-center gap-2 mb-4">
           <Activity size={18} style={{ color: theme.accentHex }} />
-          <h3 className="text-base font-semibold text-[#fafafa]">Activity Summary</h3>
+          <h3 className="text-base font-semibold text-[var(--text-primary)]">Activity Summary</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="rounded-xl p-4 relative overflow-hidden" style={{ background: 'rgba(46,43,74,0.3)' }}>
+          <div className="rounded-xl p-4 relative overflow-hidden" style={{ background: 'var(--bg-card)' }}>
             <div className="absolute top-0 left-0 h-full w-[2px]" style={{ background: theme.accentHex }} />
-            <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Messages</p>
+            <p className="text-xs text-[var(--text-muted)] mb-1 uppercase tracking-wider">Messages</p>
             {(analytics?.totalMessages ?? stats?.messagesProcessed ?? 0) > 0 ? (
               <div className="flex items-end gap-2">
-                <p className="text-2xl font-bold text-[#fafafa]">{(analytics?.totalMessages ?? stats?.messagesProcessed ?? 0).toLocaleString()}</p>
+                <p className="text-2xl font-bold text-[var(--text-primary)]">{(analytics?.totalMessages ?? stats?.messagesProcessed ?? 0).toLocaleString()}</p>
                 {trendData && (
                   <TrendArrow current={trendData.recentTotal} previous={trendData.prevTotal} />
                 )}
               </div>
             ) : (
-              <p className="text-sm text-[#6B6890] mt-1">No messages yet</p>
+              <p className="text-sm text-[var(--text-muted)] mt-1">No messages yet</p>
             )}
           </div>
-          <div className="rounded-xl p-4 relative overflow-hidden" style={{ background: 'rgba(46,43,74,0.3)' }}>
+          <div className="rounded-xl p-4 relative overflow-hidden" style={{ background: 'var(--bg-card)' }}>
             <div className="absolute top-0 left-0 h-full w-[2px]" style={{ background: theme.accentHex, opacity: 0.6 }} />
-            <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Uptime</p>
-            <p className="text-2xl font-bold text-[#fafafa]">
+            <p className="text-xs text-[var(--text-muted)] mb-1 uppercase tracking-wider">Uptime</p>
+            <p className="text-2xl font-bold text-[var(--text-primary)]">
               {displayUptime < 60
                 ? `${displayUptime}s`
                 : displayUptime < 3600
@@ -533,39 +533,39 @@ export function StatsTab() {
                 ? `${Math.floor(displayUptime / 3600)}h ${Math.floor((displayUptime % 3600) / 60)}m`
                 : `${Math.floor(displayUptime / 86400)}d ${Math.floor((displayUptime % 86400) / 3600)}h`}
             </p>
-            <p className="text-[10px] text-[#6B6890] mt-1">
+            <p className="text-[10px] text-[var(--text-muted)] mt-1">
               {isLiveUptime ? 'Live' : 'Since creation'}
               {uptimePct !== null && ` \u00b7 ${uptimePct}% uptime`}
             </p>
           </div>
-          <div className="rounded-xl p-4 relative overflow-hidden" style={{ background: 'rgba(46,43,74,0.3)' }}>
+          <div className="rounded-xl p-4 relative overflow-hidden" style={{ background: 'var(--bg-card)' }}>
             <div className="absolute top-0 left-0 h-full w-[2px]" style={{ background: theme.accentHex, opacity: 0.35 }} />
-            <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Last Active</p>
+            <p className="text-xs text-[var(--text-muted)] mb-1 uppercase tracking-wider">Last Active</p>
             {stats?.lastActiveAt ? (
-              <p className="text-2xl font-bold text-[#fafafa]">{timeAgo(stats.lastActiveAt)}</p>
+              <p className="text-2xl font-bold text-[var(--text-primary)]">{timeAgo(stats.lastActiveAt)}</p>
             ) : (
-              <p className="text-sm text-[#6B6890] mt-1">Not yet active</p>
+              <p className="text-sm text-[var(--text-muted)] mt-1">Not yet active</p>
             )}
           </div>
         </div>
       </div>
 
       {/* LLM Configuration */}
-      <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
+      <div className="rounded-2xl border p-6" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
         <div className="flex items-center gap-2 mb-4">
           <Cpu size={18} style={{ color: theme.accentHex }} />
-          <h3 className="text-base font-semibold text-[#fafafa]">AI Model</h3>
+          <h3 className="text-base font-semibold text-[var(--text-primary)]">AI Model</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
-            <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Provider</p>
-            <p className="text-sm font-medium text-[#fafafa] capitalize">
+          <div className="rounded-xl p-4" style={{ background: 'var(--bg-card)' }}>
+            <p className="text-xs text-[var(--text-muted)] mb-1 uppercase tracking-wider">Provider</p>
+            <p className="text-sm font-medium text-[var(--text-primary)] capitalize">
               {hasApiKey ? (currentProviderMeta?.name ?? llmProvider) : 'Hatcher Platform'}
             </p>
           </div>
-          <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
-            <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Model</p>
-            <p className="text-sm font-medium text-[#fafafa] font-mono">
+          <div className="rounded-xl p-4" style={{ background: 'var(--bg-card)' }}>
+            <p className="text-xs text-[var(--text-muted)] mb-1 uppercase tracking-wider">Model</p>
+            <p className="text-sm font-medium text-[var(--text-primary)] font-mono">
               {(() => {
                 if (!hasApiKey) return 'Platform Default';
                 const cfg = (agent?.config ?? {}) as Record<string, unknown>;
@@ -574,8 +574,8 @@ export function StatsTab() {
               })()}
             </p>
           </div>
-          <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
-            <p className="text-xs text-[#71717a] mb-1 uppercase tracking-wider">Mode</p>
+          <div className="rounded-xl p-4" style={{ background: 'var(--bg-card)' }}>
+            <p className="text-xs text-[var(--text-muted)] mb-1 uppercase tracking-wider">Mode</p>
             <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${
               hasApiKey
                 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
@@ -592,10 +592,10 @@ export function StatsTab() {
       </div>
 
       {/* Your Plan */}
-      <div className="rounded-2xl border p-6" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
+      <div className="rounded-2xl border p-6" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
         <div className="flex items-center gap-2 mb-4">
           <Zap size={18} style={{ color: theme.accentHex }} />
-          <h3 className="text-base font-semibold text-[#fafafa]">Your Plan</h3>
+          <h3 className="text-base font-semibold text-[var(--text-primary)]">Your Plan</h3>
         </div>
         {(() => {
           const tierNames: Record<string, string> = { free: 'Free', starter: 'Starter', pro: 'Pro', business: 'Business' };
@@ -612,19 +612,19 @@ export function StatsTab() {
 
           return (
             <div className="space-y-3">
-              <div className="flex items-center gap-3 rounded-xl px-4 py-3" style={{ background: 'rgba(46,43,74,0.3)' }}>
+              <div className="flex items-center gap-3 rounded-xl px-4 py-3" style={{ background: 'var(--bg-card)' }}>
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: isPaid ? `${theme.accentHex}20` : 'rgba(255,255,255,0.06)' }}>
-                  <Shield size={16} style={{ color: isPaid ? theme.accentHex : '#71717a' }} />
+                  <Shield size={16} style={{ color: isPaid ? theme.accentHex : 'var(--text-muted)' }} />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-white">{tierName} Tier</p>
-                  <p className="text-[10px] text-[#71717a]">{tierKey === 'free' ? 'No charge' : tierKey === 'starter' ? '$4.99/mo' : tierKey === 'pro' ? '$14.99/mo' : '$39.99/mo'}</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">{tierKey === 'free' ? 'No charge' : tierKey === 'starter' ? '$4.99/mo' : tierKey === 'pro' ? '$14.99/mo' : '$39.99/mo'}</p>
                 </div>
               </div>
               {features.map((f) => (
                 <div key={f.label} className="flex items-center justify-between px-4 py-2">
-                  <span className="text-xs text-[#71717a]">{f.label}</span>
-                  <span className="text-xs font-medium text-[#A5A1C2]">{f.value}</span>
+                  <span className="text-xs text-[var(--text-muted)]">{f.label}</span>
+                  <span className="text-xs font-medium text-[var(--text-secondary)]">{f.value}</span>
                 </div>
               ))}
             </div>

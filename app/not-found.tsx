@@ -23,8 +23,8 @@ export default function NotFound() {
           </div>
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3">Page not found</h1>
-        <p className="text-sm text-[#a1a1aa] mb-8 leading-relaxed">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mb-3">Page not found</h1>
+        <p className="text-sm text-[var(--text-secondary)] mb-8 leading-relaxed">
           The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
 
@@ -37,7 +37,7 @@ export default function NotFound() {
           </Link>
           <Link
             href="/explore"
-            className="inline-flex items-center gap-2 border border-white/[0.12] text-[#d4d4d8] font-medium px-6 py-2.5 rounded-full text-sm hover:bg-white/[0.04] hover:border-white/20 transition-all duration-200"
+            className="inline-flex items-center gap-2 border border-[var(--border-hover)] text-[var(--text-secondary)] font-medium px-6 py-2.5 rounded-full text-sm hover:bg-[var(--bg-card)] hover:border-white/20 transition-all duration-200"
           >
             Explore Agents
           </Link>

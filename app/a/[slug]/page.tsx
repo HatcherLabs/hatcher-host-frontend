@@ -164,7 +164,7 @@ export default function AgentPublicProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg-base)] flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-violet-400 animate-spin" />
       </div>
     );
@@ -172,7 +172,7 @@ export default function AgentPublicProfilePage() {
 
   if (notFound || !agent) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex flex-col items-center justify-center gap-4 px-4">
+      <div className="min-h-screen bg-[var(--bg-base)] flex flex-col items-center justify-center gap-4 px-4">
         <Bot className="w-16 h-16 text-zinc-600" />
         <h1 className="text-2xl font-bold text-zinc-200">Agent not found</h1>
         <p className="text-zinc-500 text-center">This agent doesn't exist or is set to private.</p>
@@ -187,9 +187,9 @@ export default function AgentPublicProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
+    <div className="min-h-screen bg-[var(--bg-base)] flex flex-col">
       {/* Header */}
-      <header className="border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-xl sticky top-0 z-10">
+      <header className="border-b border-white/5 bg-[var(--bg-base)]/80 backdrop-blur-xl sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm">
             <Zap className="w-4 h-4 text-violet-400" />
@@ -219,7 +219,7 @@ export default function AgentPublicProfilePage() {
         <div className="border-b border-white/5 bg-violet-950/20">
           <div className="max-w-5xl mx-auto px-4 py-4">
             <p className="text-xs text-zinc-400 mb-2">Embed this agent on your website:</p>
-            <pre className="bg-[#12121a] border border-white/10 rounded-lg p-3 text-xs text-violet-300 overflow-x-auto whitespace-pre-wrap">
+            <pre className="bg-[var(--bg-elevated)] border border-white/10 rounded-lg p-3 text-xs text-violet-300 overflow-x-auto whitespace-pre-wrap">
               {embedCode}
             </pre>
           </div>
@@ -228,7 +228,7 @@ export default function AgentPublicProfilePage() {
 
       <div className="max-w-5xl mx-auto px-4 py-6 flex-1 flex flex-col gap-6 w-full">
         {/* Agent profile card */}
-        <div className="bg-[#12121a] border border-white/8 rounded-2xl p-6 flex flex-col sm:flex-row items-start gap-5">
+        <div className="bg-[var(--bg-elevated)] border border-white/8 rounded-2xl p-6 flex flex-col sm:flex-row items-start gap-5">
           {/* Avatar */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)} alt={agent.name} className="w-20 h-20 rounded-2xl object-cover shrink-0" />
@@ -274,7 +274,7 @@ export default function AgentPublicProfilePage() {
         </div>
 
         {/* Chat interface */}
-        <div className="flex-1 bg-[#12121a] border border-white/8 rounded-2xl flex flex-col overflow-hidden min-h-[500px]">
+        <div className="flex-1 bg-[var(--bg-elevated)] border border-white/8 rounded-2xl flex flex-col overflow-hidden min-h-[500px]">
           <div className="px-5 py-3 border-b border-white/5 flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-violet-400" />
             <span className="text-sm font-medium text-zinc-300">Chat with {agent.name}</span>

@@ -18,7 +18,7 @@ const TIER_LABELS: Record<string, string> = {
 };
 
 const TIER_COLORS: Record<string, string> = {
-  free:  'text-[#71717a]',
+  free:  'text-[var(--text-muted)]',
   basic: 'text-cyan-400',
   pro:   'text-purple-400',
 };
@@ -58,7 +58,7 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
 
   const msgLimit   = TIER_MSG_LIMIT[tier] ?? 20;
   const tierLabel  = TIER_LABELS[tier]  ?? tier;
-  const tierColor  = TIER_COLORS[tier]  ?? 'text-[#71717a]';
+  const tierColor  = TIER_COLORS[tier]  ?? 'text-[var(--text-muted)]';
   const tierBg     = TIER_BG[tier]      ?? 'bg-[rgba(113,113,122,0.1)]';
   const agentPct   = agentLimit > 0 ? Math.min(100, (agentCount / agentLimit) * 100) : 0;
 
@@ -83,13 +83,13 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
           <div className="w-9 h-9 rounded-lg bg-[#06b6d4]/15 flex items-center justify-center flex-shrink-0">
             <Bot size={16} className="text-[#06b6d4]" />
           </div>
-          <div className="text-xs text-[#71717a] leading-tight">Total Agents</div>
+          <div className="text-xs text-[var(--text-muted)] leading-tight">Total Agents</div>
         </div>
-        <div className="text-2xl font-bold text-white mb-1.5">
+        <div className="text-2xl font-bold text-[var(--text-primary)] mb-1.5">
           {agentCount}
-          <span className="text-sm font-normal text-[#71717a] ml-1">/ {agentLimit}</span>
+          <span className="text-sm font-normal text-[var(--text-muted)] ml-1">/ {agentLimit}</span>
         </div>
-        <div className="h-1 rounded-full bg-[rgba(46,43,74,0.5)] overflow-hidden">
+        <div className="h-1 rounded-full bg-[var(--bg-hover)] overflow-hidden">
           <div
             className="h-full rounded-full bg-[#06b6d4] transition-all duration-500"
             style={{ width: `${agentPct}%` }}
@@ -103,12 +103,12 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
           <div className="w-9 h-9 rounded-lg bg-amber-500/15 flex items-center justify-center flex-shrink-0">
             <Zap size={16} className="text-amber-400" />
           </div>
-          <div className="text-xs text-[#71717a] leading-tight">Msg Limit / Agent</div>
+          <div className="text-xs text-[var(--text-muted)] leading-tight">Msg Limit / Agent</div>
         </div>
-        <div className="text-2xl font-bold text-white">
+        <div className="text-2xl font-bold text-[var(--text-primary)]">
           {msgLimit}
         </div>
-        <div className="text-[10px] text-[#71717a] mt-1">per day · BYOK = unlimited</div>
+        <div className="text-[10px] text-[var(--text-muted)] mt-1">per day · BYOK = unlimited</div>
       </motion.div>
 
       {/* Active Agents */}
@@ -117,9 +117,9 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
           <div className="w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
             <Activity size={16} className="text-emerald-400" />
           </div>
-          <div className="text-xs text-[#71717a] leading-tight">Active Now</div>
+          <div className="text-xs text-[var(--text-muted)] leading-tight">Active Now</div>
         </div>
-        <div className="text-2xl font-bold text-white flex items-center gap-2">
+        <div className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2">
           {activeCount}
           {activeCount > 0 && (
             <span className="relative flex h-2 w-2">
@@ -128,7 +128,7 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
             </span>
           )}
         </div>
-        <div className="text-[10px] text-[#71717a] mt-1">
+        <div className="text-[10px] text-[var(--text-muted)] mt-1">
           {activeCount === 0 ? 'No agents running' : `${activeCount} agent${activeCount !== 1 ? 's' : ''} online`}
         </div>
       </motion.div>
@@ -139,7 +139,7 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
           <div className={`w-9 h-9 rounded-lg ${tierBg} flex items-center justify-center flex-shrink-0`}>
             <CreditCard size={16} className={tierColor} />
           </div>
-          <div className="text-xs text-[#71717a] leading-tight">Account Tier</div>
+          <div className="text-xs text-[var(--text-muted)] leading-tight">Account Tier</div>
         </div>
         <div className={`text-2xl font-bold ${tierColor}`}>{tierLabel}</div>
         {tier !== 'pro' && (

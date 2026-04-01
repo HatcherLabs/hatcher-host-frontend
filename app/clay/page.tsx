@@ -275,7 +275,7 @@ export default function ClayDemoPage() {
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-sm font-semibold uppercase tracking-widest text-text-muted border-b border-white/[0.06] pb-2">
+    <h2 className="text-sm font-semibold uppercase tracking-widest text-text-muted border-b border-[var(--border-default)] pb-2">
       {children}
     </h2>
   );

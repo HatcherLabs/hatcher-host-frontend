@@ -173,7 +173,10 @@ export default function CreatePage() {
     systemPrompt: '',  // custom override only — blank means "use template default"
   });
   const [showCustomPrompt, setShowCustomPrompt] = useState(false);
-  const [openclawSkills, setOpenclawSkills] = useState<string[]>([...OPENCLAW_SKILLS_LIST]);
+  const [openclawSkills, setOpenclawSkills] = useState<string[]>(['web_search', 'calculator']);
+  const [hermesTools, setHermesTools] = useState<string[]>(['web_search', 'memory', 'calculator']);
+  const [elizaPlugins, setElizaPlugins] = useState<string[]>(['@elizaos/plugin-bootstrap', '@elizaos/plugin-node', '@elizaos/plugin-sql']);
+  const [miladyCapabilities, setMiladyCapabilities] = useState<string[]>(['chat', 'defi', 'social']);
 
   // ── ElizaOS-specific form state ──
   const [elizaBio, setElizaBio] = useState('');
@@ -242,6 +245,24 @@ export default function CreatePage() {
   function toggleSkill(skill: string) {
     setOpenclawSkills((prev) =>
       prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill]
+    );
+  }
+
+  function toggleHermesTool(tool: string) {
+    setHermesTools((prev) =>
+      prev.includes(tool) ? prev.filter((t) => t !== tool) : [...prev, tool]
+    );
+  }
+
+  function toggleElizaPlugin(plugin: string) {
+    setElizaPlugins((prev) =>
+      prev.includes(plugin) ? prev.filter((p) => p !== plugin) : [...prev, plugin]
+    );
+  }
+
+  function toggleMiladyCapability(cap: string) {
+    setMiladyCapabilities((prev) =>
+      prev.includes(cap) ? prev.filter((c) => c !== cap) : [...prev, cap]
     );
   }
 
@@ -335,6 +356,9 @@ export default function CreatePage() {
           model: llm.model ?? 'llama-4-scout-17b',
           provider: llm.modelProvider,
           ...(selectedFramework === 'openclaw' ? { skills: openclawSkills } : {}),
+          ...(selectedFramework === 'hermes' ? { tools: hermesTools } : {}),
+          ...(selectedFramework === 'elizaos' ? { plugins: elizaPlugins } : {}),
+          ...(selectedFramework === 'milady' ? { capabilities: miladyCapabilities } : {}),
           ...(selectedFramework === 'elizaos' ? {
             bio: elizaBio.trim() || undefined,
             lore: elizaLore.trim() || undefined,
@@ -441,8 +465,8 @@ export default function CreatePage() {
           <div className="w-16 h-16 rounded-2xl bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mx-auto mb-6">
             <Key className="w-8 h-8 text-[#06b6d4]" />
           </div>
-          <h1 className="text-xl font-bold text-[var(--text-primary)] mb-3">Sign In Required</h1>
-          <p className="text-[var(--text-secondary)] text-sm mb-8">Sign in to your account to create agents.</p>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Create Your Agent</h1>
+          <p className="text-[var(--text-secondary)] text-sm mb-8">Sign in to your account to create and deploy AI agents.</p>
           <a href="/login" className="btn-primary inline-block">
             Sign In
           </a>
@@ -573,7 +597,7 @@ export default function CreatePage() {
                     'p-6 rounded-xl border text-left transition-all duration-200 relative',
                     selectedFramework === 'openclaw'
                       ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
-                      : 'bg-[rgba(26,23,48,0.6)] border-[rgba(46,43,74,0.4)] hover:border-[rgba(6,182,212,0.4)]'
+                      : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.4)]'
                   )}
                 >
                   {selectedFramework === 'openclaw' && (
@@ -591,7 +615,7 @@ export default function CreatePage() {
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {['Thousands of skills', 'Web browsing', 'Scheduled tasks'].map(f => (
-                      <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)]">{f}</span>
+                      <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-hover)] text-[var(--text-secondary)] border border-[var(--border-default)]">{f}</span>
                     ))}
                   </div>
                 </motion.button>
@@ -604,7 +628,7 @@ export default function CreatePage() {
                     'p-6 rounded-xl border text-left transition-all duration-200 relative',
                     selectedFramework === 'hermes'
                       ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
-                      : 'bg-[rgba(26,23,48,0.6)] border-[rgba(46,43,74,0.4)] hover:border-[rgba(6,182,212,0.4)]'
+                      : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.4)]'
                   )}
                 >
                   {selectedFramework === 'hermes' && (
@@ -622,7 +646,7 @@ export default function CreatePage() {
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {['Long-term memory', '40+ built-in tools', 'Self-improving'].map(f => (
-                      <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)]">{f}</span>
+                      <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-hover)] text-[var(--text-secondary)] border border-[var(--border-default)]">{f}</span>
                     ))}
                   </div>
                 </motion.button>
@@ -635,7 +659,7 @@ export default function CreatePage() {
                     'p-6 rounded-xl border text-left transition-all duration-200 relative',
                     selectedFramework === 'elizaos'
                       ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
-                      : 'bg-[rgba(26,23,48,0.6)] border-[rgba(46,43,74,0.4)] hover:border-[rgba(6,182,212,0.4)]'
+                      : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.4)]'
                   )}
                 >
                   {selectedFramework === 'elizaos' && (
@@ -653,7 +677,7 @@ export default function CreatePage() {
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {['90+ plugins', 'Vector memory', 'Web3 native'].map(f => (
-                      <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)]">{f}</span>
+                      <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-hover)] text-[var(--text-secondary)] border border-[var(--border-default)]">{f}</span>
                     ))}
                   </div>
                 </motion.button>
@@ -666,7 +690,7 @@ export default function CreatePage() {
                     'p-6 rounded-xl border text-left transition-all duration-200 relative',
                     selectedFramework === 'milady'
                       ? 'bg-[#f43f5e]/10 border-[#f43f5e] shadow-[0_0_24px_rgba(244,63,94,0.15)]'
-                      : 'bg-[rgba(26,23,48,0.6)] border-[rgba(46,43,74,0.4)] hover:border-[rgba(244,63,94,0.4)]'
+                      : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(244,63,94,0.4)]'
                   )}
                 >
                   {selectedFramework === 'milady' && (
@@ -684,7 +708,7 @@ export default function CreatePage() {
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {['20+ connectors', 'Personality presets', 'Privacy-first'].map(f => (
-                      <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)]">{f}</span>
+                      <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-hover)] text-[var(--text-secondary)] border border-[var(--border-default)]">{f}</span>
                     ))}
                   </div>
                 </motion.button>
@@ -742,8 +766,8 @@ export default function CreatePage() {
                             className={cn(
                               'p-4 rounded-xl border text-left transition-all duration-200 relative group',
                               selectedTemplate === t.id
-                                ? 'bg-[#06b6d4]/10 border-[#06b6d4] text-[#FFFFFF] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
-                                : 'bg-[rgba(26,23,48,0.6)] border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[rgba(6,182,212,0.4)] hover:shadow-[0_0_16px_rgba(6,182,212,0.08)]'
+                                ? 'bg-[#06b6d4]/10 border-[#06b6d4] text-[var(--text-primary)] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
+                                : 'bg-[var(--bg-elevated)] border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[rgba(6,182,212,0.4)] hover:shadow-[0_0_16px_rgba(6,182,212,0.08)]'
                             )}
                           >
                             {selectedTemplate === t.id && (
@@ -759,12 +783,12 @@ export default function CreatePage() {
                               'w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-lg transition-colors duration-200',
                               selectedTemplate === t.id
                                 ? 'bg-[#06b6d4]/20'
-                                : 'bg-[rgba(46,43,74,0.4)] group-hover:bg-[#06b6d4]/10'
+                                : 'bg-[var(--bg-hover)] group-hover:bg-[#06b6d4]/10'
                             )}>
                               {t.icon}
                             </div>
                             <div className="text-sm font-medium">{t.name}</div>
-                            <div className="text-xs text-[#71717a] mt-1">{t.description}</div>
+                            <div className="text-xs text-[var(--text-muted)] mt-1">{t.description}</div>
                           </motion.button>
                         ))}
                       </div>
@@ -880,7 +904,7 @@ export default function CreatePage() {
                             'rounded-xl border transition-all duration-200 overflow-hidden',
                             isEnabled
                               ? 'bg-[#06b6d4]/5 border-[#06b6d4]/40 shadow-[0_0_12px_rgba(6,182,212,0.08)]'
-                              : 'bg-[rgba(26,23,48,0.6)] border-[rgba(46,43,74,0.4)] hover:border-[rgba(46,43,74,0.7)]'
+                              : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[var(--border-hover)]'
                           )}
                         >
                           {/* Platform header with toggle */}
@@ -911,7 +935,7 @@ export default function CreatePage() {
                                 transition={{ duration: 0.2 }}
                                 className="overflow-hidden"
                               >
-                                <div className="px-4 pb-4 pt-1 space-y-3 border-t border-[rgba(46,43,74,0.3)]">
+                                <div className="px-4 pb-4 pt-1 space-y-3 border-t border-[var(--border-default)]">
                                   {platform.fields.length > 0 ? (
                                     platform.fields.map((field) => {
                                       const fieldVisKey = `${platform.id}_${field.key}`;
@@ -939,10 +963,10 @@ export default function CreatePage() {
                                             <button
                                               type="button"
                                               onClick={() => setPlatformSecretVisibility(prev => ({ ...prev, [fieldVisKey]: !prev[fieldVisKey] }))}
-                                              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-[rgba(46,43,74,0.4)] transition-colors"
+                                              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-[var(--bg-hover)] transition-colors"
                                               aria-label={isVisible ? 'Hide value' : 'Show value'}
                                             >
-                                              {isVisible ? <EyeOff size={14} className="text-[#71717a]" /> : <Eye size={14} className="text-[#71717a]" />}
+                                              {isVisible ? <EyeOff size={14} className="text-[var(--text-muted)]" /> : <Eye size={14} className="text-[var(--text-muted)]" />}
                                             </button>
                                           </div>
                                           {'helper' in field && field.helper && (
@@ -975,7 +999,7 @@ export default function CreatePage() {
 
                 {/* LLM Choice */}
                 <fieldset>
-                  <legend className="block text-sm font-medium text-[#FFFFFF] mb-3">
+                  <legend className="block text-sm font-medium text-[var(--text-primary)] mb-3">
                     AI Model
                   </legend>
                   <div className="space-y-3" role="radiogroup" aria-label="AI Model selection">
@@ -988,7 +1012,7 @@ export default function CreatePage() {
                         'w-full p-4 rounded-xl border text-left transition-all duration-200',
                         llmChoice === 'free_groq'
                           ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_16px_rgba(6,182,212,0.1)]'
-                          : 'bg-[rgba(26,23,48,0.6)] border-[rgba(46,43,74,0.4)] hover:border-[rgba(6,182,212,0.3)]'
+                          : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)]'
                       )}
                     >
                       <div className="flex items-center gap-3">
@@ -996,13 +1020,13 @@ export default function CreatePage() {
                           <Zap className="w-5 h-5 text-green-400" />
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-[#FFFFFF] flex items-center gap-2">
+                          <div className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-2">
                             Free AI Model
                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
                               FREE
                             </span>
                           </div>
-                          <div className="text-xs text-[#71717a] mt-0.5">Powered by Groq — no API key needed</div>
+                          <div className="text-xs text-[var(--text-muted)] mt-0.5">Powered by Groq — no API key needed</div>
                         </div>
                       </div>
                     </motion.button>
@@ -1013,7 +1037,7 @@ export default function CreatePage() {
                         'rounded-xl border transition-all duration-200',
                         llmChoice === 'byok'
                           ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_16px_rgba(6,182,212,0.1)]'
-                          : 'bg-[rgba(26,23,48,0.6)] border-[rgba(46,43,74,0.4)]'
+                          : 'bg-[var(--bg-elevated)] border-[var(--border-default)]'
                       )}
                     >
                       <button
@@ -1025,11 +1049,11 @@ export default function CreatePage() {
                             <Key className="w-5 h-5 text-[#06b6d4]" />
                           </div>
                           <div>
-                            <div className="text-sm font-medium text-[#FFFFFF] flex items-center gap-2">
+                            <div className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-2">
                               Use Your Own AI Key
                               <span className="text-[10px] text-green-400">always free</span>
                             </div>
-                            <div className="text-xs text-[#71717a] mt-0.5">Connect your own OpenAI, Anthropic, or other API key</div>
+                            <div className="text-xs text-[var(--text-muted)] mt-0.5">Connect your own OpenAI, Anthropic, or other API key</div>
                           </div>
                         </div>
                       </button>
@@ -1043,10 +1067,10 @@ export default function CreatePage() {
                             transition={{ duration: 0.25 }}
                             className="overflow-hidden"
                           >
-                            <div className="px-4 pb-4 space-y-4 border-t border-[rgba(46,43,74,0.3)] pt-4">
+                            <div className="px-4 pb-4 space-y-4 border-t border-[var(--border-default)] pt-4">
                               {/* Provider */}
                               <div>
-                                <label className="block text-xs text-[#A5A1C2] mb-2 uppercase tracking-wider">Provider</label>
+                                <label className="block text-xs text-[var(--text-secondary)] mb-2 uppercase tracking-wider">Provider</label>
                                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                                   {BYOK_PROVIDERS.map((p) => (
                                     <motion.button
@@ -1064,12 +1088,12 @@ export default function CreatePage() {
                                       className={cn(
                                         'text-xs border rounded-lg px-3 py-2 transition-all text-left',
                                         byokProvider === p.key
-                                          ? 'border-[#06b6d4] bg-[#06b6d4]/10 text-[#FFFFFF] shadow-[0_0_8px_rgba(6,182,212,0.15)]'
-                                          : 'border-[rgba(46,43,74,0.4)] hover:border-[rgba(6,182,212,0.3)] text-[#A5A1C2]'
+                                          ? 'border-[#06b6d4] bg-[#06b6d4]/10 text-[var(--text-primary)] shadow-[0_0_8px_rgba(6,182,212,0.15)]'
+                                          : 'border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)] text-[var(--text-secondary)]'
                                       )}
                                     >
                                       <div className="font-medium">{p.name}</div>
-                                      <div className="text-[10px] text-[#71717a] mt-0.5 leading-tight truncate">{p.description}</div>
+                                      <div className="text-[10px] text-[var(--text-muted)] mt-0.5 leading-tight truncate">{p.description}</div>
                                     </motion.button>
                                   ))}
                                 </div>
@@ -1077,7 +1101,7 @@ export default function CreatePage() {
 
                               {/* Model */}
                               <div>
-                                <label htmlFor="byok-model" className="block text-xs text-[#A5A1C2] mb-2 uppercase tracking-wider">
+                                <label htmlFor="byok-model" className="block text-xs text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
                                   Model
                                 </label>
                                 {byokCustomModel ? (
@@ -1114,15 +1138,15 @@ export default function CreatePage() {
                                         }
                                       }}
                                     >
-                                      <option value="" style={{ background: '#0D0B1A' }}>Select a model...</option>
+                                      <option value="" style={{ background: 'var(--bg-base)' }}>Select a model...</option>
                                       {(getBYOKProvider(byokProvider)?.models ?? []).map((m) => (
-                                        <option key={m.id} value={m.id} style={{ background: '#0D0B1A' }}>
+                                        <option key={m.id} value={m.id} style={{ background: 'var(--bg-base)' }}>
                                           {m.name}{m.context ? ` (${m.context})` : ''}
                                         </option>
                                       ))}
-                                      <option value="__custom__" style={{ background: '#0D0B1A' }}>Custom model...</option>
+                                      <option value="__custom__" style={{ background: 'var(--bg-base)' }}>Custom model...</option>
                                     </select>
-                                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                                   </div>
                                 )}
                               </div>
@@ -1130,8 +1154,8 @@ export default function CreatePage() {
                               {/* API Key (conditional on provider metadata) */}
                               {(getBYOKProvider(byokProvider)?.requiresApiKey ?? true) && (
                                 <div>
-                                  <label htmlFor="byok-api-key" className="block text-xs text-[#A5A1C2] mb-2 uppercase tracking-wider">
-                                    API Key <span className="normal-case text-[#71717a] ml-1">encrypted at rest</span>
+                                  <label htmlFor="byok-api-key" className="block text-xs text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
+                                    API Key <span className="normal-case text-[var(--text-muted)] ml-1">encrypted at rest</span>
                                   </label>
                                   <input
                                     id="byok-api-key"
@@ -1148,7 +1172,7 @@ export default function CreatePage() {
                               {/* Base URL (conditional on provider metadata) */}
                               {(getBYOKProvider(byokProvider)?.requiresBaseUrl ?? false) && (
                                 <div>
-                                  <label htmlFor="byok-base-url" className="block text-xs text-[#A5A1C2] mb-2 uppercase tracking-wider">
+                                  <label htmlFor="byok-base-url" className="block text-xs text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
                                     Base URL
                                   </label>
                                   <input
@@ -1170,6 +1194,208 @@ export default function CreatePage() {
                     {/* Hatcher Credits option removed — use Groq free or BYOK */}
                   </div>
                 </fieldset>
+
+                {/* Agent Skills — OpenClaw only */}
+                {selectedFramework === 'openclaw' && (
+                  <fieldset>
+                    <legend className="block text-sm font-medium text-[var(--text-primary)] mb-1">
+                      Agent Skills
+                    </legend>
+                    <p className="text-xs text-[var(--text-muted)] mb-4">Choose what your agent can do</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {([
+                        { id: 'web_search', emoji: '\uD83D\uDD0D', name: 'Web Search', desc: 'Search the web for real-time info' },
+                        { id: 'calculator', emoji: '\uD83E\uDDEE', name: 'Calculator', desc: 'Math and calculations' },
+                        { id: 'weather', emoji: '\uD83C\uDF24\uFE0F', name: 'Weather', desc: 'Weather forecasts' },
+                        { id: 'code_interpreter', emoji: '\uD83D\uDCBB', name: 'Code Runner', desc: 'Execute code snippets' },
+                        { id: 'file_manager', emoji: '\uD83D\uDCC1', name: 'File Manager', desc: 'Read and write files' },
+                        { id: 'image_gen', emoji: '\uD83C\uDFA8', name: 'Image Gen', desc: 'Generate images from text' },
+                      ] as const).map((skill) => {
+                        const selected = openclawSkills.includes(skill.id);
+                        return (
+                          <motion.button
+                            key={skill.id}
+                            type="button"
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => toggleSkill(skill.id)}
+                            className={cn(
+                              'relative p-4 rounded-xl border text-left transition-all duration-200',
+                              selected
+                                ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_16px_rgba(6,182,212,0.12)]'
+                                : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)]'
+                            )}
+                          >
+                            {selected && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center"
+                              >
+                                <Check className="w-3 h-3 text-white" />
+                              </motion.div>
+                            )}
+                            <span className="text-xl mb-2 block">{skill.emoji}</span>
+                            <div className="text-sm font-medium text-[var(--text-primary)]">{skill.name}</div>
+                            <div className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-snug">{skill.desc}</div>
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+                  </fieldset>
+                )}
+
+                {/* Agent Tools — Hermes only */}
+                {selectedFramework === 'hermes' && (
+                  <fieldset>
+                    <legend className="block text-sm font-medium text-[var(--text-primary)] mb-1">
+                      Agent Tools
+                    </legend>
+                    <p className="text-xs text-[var(--text-muted)] mb-4">Choose what your agent can do</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {([
+                        { id: 'web_search', emoji: '\uD83D\uDD0D', name: 'Web Search', desc: 'Search the internet for information' },
+                        { id: 'calculator', emoji: '\uD83E\uDDEE', name: 'Calculator', desc: 'Math calculations' },
+                        { id: 'code_execution', emoji: '\uD83D\uDCBB', name: 'Code Runner', desc: 'Execute code snippets' },
+                        { id: 'file_operations', emoji: '\uD83D\uDCC1', name: 'File Operations', desc: 'Read and write files' },
+                        { id: 'memory', emoji: '\uD83E\uDDE0', name: 'Memory', desc: 'Remember conversations and facts' },
+                        { id: 'summarize', emoji: '\uD83D\uDCDD', name: 'Summarizer', desc: 'Summarize long texts' },
+                        { id: 'translate', emoji: '\uD83C\uDF10', name: 'Translator', desc: 'Translate between languages' },
+                        { id: 'weather', emoji: '\uD83C\uDF24\uFE0F', name: 'Weather', desc: 'Weather forecasts' },
+                      ] as const).map((tool) => {
+                        const selected = hermesTools.includes(tool.id);
+                        return (
+                          <motion.button
+                            key={tool.id}
+                            type="button"
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => toggleHermesTool(tool.id)}
+                            className={cn(
+                              'relative p-4 rounded-xl border text-left transition-all duration-200',
+                              selected
+                                ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_16px_rgba(6,182,212,0.12)]'
+                                : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)]'
+                            )}
+                          >
+                            {selected && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center"
+                              >
+                                <Check className="w-3 h-3 text-white" />
+                              </motion.div>
+                            )}
+                            <span className="text-xl mb-2 block">{tool.emoji}</span>
+                            <div className="text-sm font-medium text-[var(--text-primary)]">{tool.name}</div>
+                            <div className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-snug">{tool.desc}</div>
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+                  </fieldset>
+                )}
+
+                {/* Plugins — ElizaOS only */}
+                {selectedFramework === 'elizaos' && (
+                  <fieldset>
+                    <legend className="block text-sm font-medium text-[var(--text-primary)] mb-1">
+                      Plugins
+                    </legend>
+                    <p className="text-xs text-[var(--text-muted)] mb-4">Choose what your agent can do</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {([
+                        { id: '@elizaos/plugin-sql', emoji: '\uD83D\uDDC3\uFE0F', name: 'Database', desc: 'SQL database access' },
+                        { id: '@elizaos/plugin-image', emoji: '\uD83C\uDFA8', name: 'Image Gen', desc: 'Generate images' },
+                        { id: '@elizaos/plugin-video', emoji: '\uD83C\uDFAC', name: 'Video', desc: 'Video processing' },
+                        { id: '@elizaos/plugin-tts', emoji: '\uD83D\uDD0A', name: 'Text-to-Speech', desc: 'Voice output' },
+                        { id: '@elizaos/plugin-node', emoji: '\u2699\uFE0F', name: 'Node Runtime', desc: 'Server-side operations' },
+                        { id: '@elizaos/plugin-bootstrap', emoji: '\uD83D\uDE80', name: 'Bootstrap', desc: 'Core utilities' },
+                      ] as const).map((plugin) => {
+                        const selected = elizaPlugins.includes(plugin.id);
+                        return (
+                          <motion.button
+                            key={plugin.id}
+                            type="button"
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => toggleElizaPlugin(plugin.id)}
+                            className={cn(
+                              'relative p-4 rounded-xl border text-left transition-all duration-200',
+                              selected
+                                ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_16px_rgba(6,182,212,0.12)]'
+                                : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)]'
+                            )}
+                          >
+                            {selected && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center"
+                              >
+                                <Check className="w-3 h-3 text-white" />
+                              </motion.div>
+                            )}
+                            <span className="text-xl mb-2 block">{plugin.emoji}</span>
+                            <div className="text-sm font-medium text-[var(--text-primary)]">{plugin.name}</div>
+                            <div className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-snug">{plugin.desc}</div>
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+                  </fieldset>
+                )}
+
+                {/* Capabilities — Milady only */}
+                {selectedFramework === 'milady' && (
+                  <fieldset>
+                    <legend className="block text-sm font-medium text-[var(--text-primary)] mb-1">
+                      Capabilities
+                    </legend>
+                    <p className="text-xs text-[var(--text-muted)] mb-4">Choose what your agent can do</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {([
+                        { id: 'chat', emoji: '\uD83D\uDCAC', name: 'Chat', desc: 'Core conversation' },
+                        { id: 'defi', emoji: '\uD83D\uDCB0', name: 'DeFi', desc: 'DeFi protocol interactions' },
+                        { id: 'social', emoji: '\uD83D\uDCF1', name: 'Social', desc: 'Social media integration' },
+                        { id: 'analysis', emoji: '\uD83D\uDCCA', name: 'Analysis', desc: 'Data analysis' },
+                        { id: 'privacy', emoji: '\uD83D\uDD12', name: 'Privacy', desc: 'Privacy tools' },
+                        { id: 'memes', emoji: '\uD83C\uDFAD', name: 'Memes', desc: 'Meme generation' },
+                      ] as const).map((cap) => {
+                        const selected = miladyCapabilities.includes(cap.id);
+                        return (
+                          <motion.button
+                            key={cap.id}
+                            type="button"
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => toggleMiladyCapability(cap.id)}
+                            className={cn(
+                              'relative p-4 rounded-xl border text-left transition-all duration-200',
+                              selected
+                                ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_16px_rgba(6,182,212,0.12)]'
+                                : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)]'
+                            )}
+                          >
+                            {selected && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center"
+                              >
+                                <Check className="w-3 h-3 text-white" />
+                              </motion.div>
+                            )}
+                            <span className="text-xl mb-2 block">{cap.emoji}</span>
+                            <div className="text-sm font-medium text-[var(--text-primary)]">{cap.name}</div>
+                            <div className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-snug">{cap.desc}</div>
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+                  </fieldset>
+                )}
 
                 {/* Agent personality fields */}
                 <OpenClawFields
@@ -1284,7 +1510,7 @@ export default function CreatePage() {
                 )}
 
                 {/* ── More Options (collapsible, framework-specific) ── */}
-                <div className="border border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.4)] rounded-xl overflow-hidden">
+                <div className="border border-[var(--border-default)] bg-[var(--bg-card)] rounded-xl overflow-hidden">
                   <button
                     type="button"
                     onClick={() => setShowMoreOptions((v) => !v)}
@@ -1315,7 +1541,7 @@ export default function CreatePage() {
                         transition={{ duration: 0.25 }}
                         className="overflow-hidden"
                       >
-                        <div className="px-4 pb-5 pt-2 space-y-5 border-t border-[rgba(46,43,74,0.3)]">
+                        <div className="px-4 pb-5 pt-2 space-y-5 border-t border-[var(--border-default)]">
 
                           {/* ── OpenClaw options ── */}
                           {selectedFramework === 'openclaw' && (
@@ -1563,15 +1789,15 @@ export default function CreatePage() {
                 transition={{ delay: 0.1 }}
               >
                 {/* Agent header */}
-                <div className="flex items-center gap-4 mb-6 pb-6 border-b border-[rgba(46,43,74,0.3)]">
+                <div className="flex items-center gap-4 mb-6 pb-6 border-b border-[var(--border-default)]">
                   <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-[#06b6d4]/10 border border-[#06b6d4]/20" style={{ boxShadow: '0 0 20px rgba(6,182,212,0.15)' }}>
                     <Cpu className="w-7 h-7 text-[#06b6d4]" />
                   </div>
                   <div>
-                    <div className="text-lg font-bold text-[#FFFFFF]">{agentName}</div>
-                    <div className="text-sm text-[#71717a]">
+                    <div className="text-lg font-bold text-[var(--text-primary)]">{agentName}</div>
+                    <div className="text-sm text-[var(--text-muted)]">
                       {selectedFramework === 'openclaw' ? 'OpenClaw' : selectedFramework === 'hermes' ? 'Hermes' : selectedFramework === 'milady' ? 'Milady' : 'ElizaOS'} agent
-                      <span className="ml-1.5 text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)] align-middle">
+                      <span className="ml-1.5 text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-hover)] text-[var(--text-secondary)] border border-[var(--border-default)] align-middle">
                         {selectedFramework === 'openclaw' ? 'Multi-skill assistant' : selectedFramework === 'hermes' ? 'Autonomous agent' : selectedFramework === 'milady' ? 'Privacy-first runtime' : 'Multi-agent framework'}
                       </span>
                     </div>
@@ -1600,7 +1826,7 @@ export default function CreatePage() {
                     systemPrompt={openclawForm.systemPrompt}
                   />
 
-                  <div className="pt-3 border-t border-[rgba(46,43,74,0.3)]">
+                  <div className="pt-3 border-t border-[var(--border-default)]">
                     <SummaryRow
                       label="Cost"
                       value={
@@ -1628,7 +1854,7 @@ export default function CreatePage() {
                     'w-full flex items-center justify-between gap-3 px-5 py-3.5 rounded-xl border transition-all duration-200',
                     showTestChat
                       ? 'bg-[rgba(6,182,212,0.08)] border-[#06b6d4]/40 shadow-[0_0_20px_rgba(6,182,212,0.1)]'
-                      : 'bg-[rgba(26,23,48,0.6)] border-[rgba(46,43,74,0.4)] hover:border-[rgba(6,182,212,0.3)] hover:bg-[rgba(26,23,48,0.8)]'
+                      : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)] hover:bg-[var(--bg-elevated)]'
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -1659,7 +1885,7 @@ export default function CreatePage() {
                     >
                       <div className={cn(cardClass, 'mt-3 p-0 overflow-hidden')}>
                         {/* Header */}
-                        <div className="px-4 py-3 border-b border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.4)]">
+                        <div className="px-4 py-3 border-b border-[var(--border-default)] bg-[var(--bg-card)]">
                           <div className="flex items-center gap-2">
                             <div className="w-6 h-6 rounded-full bg-[#06b6d4]/20 flex items-center justify-center">
                               <Bot className="w-3.5 h-3.5 text-[#06b6d4]" />
@@ -1677,7 +1903,7 @@ export default function CreatePage() {
                         <div className="h-64 overflow-y-auto px-4 py-3 space-y-3 scroll-smooth" id="test-chat-messages">
                           {testMessages.length === 0 && (
                             <div className="h-full flex flex-col items-center justify-center text-center py-6">
-                              <div className="w-12 h-12 rounded-full bg-[rgba(46,43,74,0.4)] flex items-center justify-center mb-3">
+                              <div className="w-12 h-12 rounded-full bg-[var(--bg-hover)] flex items-center justify-center mb-3">
                                 <MessageCircle className="w-6 h-6 text-[var(--text-muted)]" />
                               </div>
                               <p className="text-sm text-[var(--text-muted)]">Send a message to preview your agent</p>
@@ -1698,7 +1924,7 @@ export default function CreatePage() {
                                   'max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
                                   msg.role === 'user'
                                     ? 'bg-gradient-to-br from-[#7c3aed] to-[#6d28d9] text-white rounded-br-md'
-                                    : 'bg-[rgba(46,43,74,0.6)] text-[var(--text-secondary)] border border-[rgba(46,43,74,0.4)] rounded-bl-md'
+                                    : 'bg-[rgba(46,43,74,0.6)] text-[var(--text-secondary)] border border-[var(--border-default)] rounded-bl-md'
                                 )}
                               >
                                 {msg.role === 'assistant' && (
@@ -1717,7 +1943,7 @@ export default function CreatePage() {
                               animate={{ opacity: 1, y: 0 }}
                               className="flex justify-start"
                             >
-                              <div className="bg-[rgba(46,43,74,0.6)] border border-[rgba(46,43,74,0.4)] rounded-2xl rounded-bl-md px-4 py-3">
+                              <div className="bg-[rgba(46,43,74,0.6)] border border-[var(--border-default)] rounded-2xl rounded-bl-md px-4 py-3">
                                 <span className="block text-[10px] font-semibold text-[#06b6d4] mb-1">
                                   {openclawForm.name || 'Agent'}
                                 </span>
@@ -1732,7 +1958,7 @@ export default function CreatePage() {
                         </div>
 
                         {/* Input area */}
-                        <div className="px-4 py-3 border-t border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.3)]">
+                        <div className="px-4 py-3 border-t border-[var(--border-default)] bg-[var(--bg-card)]">
                           <form
                             onSubmit={(e) => {
                               e.preventDefault();
@@ -1751,7 +1977,7 @@ export default function CreatePage() {
                               onChange={(e) => setTestInput(e.target.value)}
                               placeholder="Type a message..."
                               disabled={testLoading}
-                              className="flex-1 bg-[rgba(46,43,74,0.4)] border border-[rgba(46,43,74,0.5)] rounded-xl px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-all disabled:opacity-50"
+                              className="flex-1 bg-[var(--bg-hover)] border border-[rgba(46,43,74,0.5)] rounded-xl px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-all disabled:opacity-50"
                             />
                             <motion.button
                               type="submit"
@@ -1762,7 +1988,7 @@ export default function CreatePage() {
                                 'w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200',
                                 testInput.trim() && !testLoading
                                   ? 'bg-[#06b6d4] text-white shadow-[0_0_12px_rgba(6,182,212,0.3)]'
-                                  : 'bg-[rgba(46,43,74,0.4)] text-[var(--text-muted)]'
+                                  : 'bg-[var(--bg-hover)] text-[var(--text-muted)]'
                               )}
                             >
                               <Send className="w-4 h-4" />
@@ -1782,8 +2008,8 @@ export default function CreatePage() {
                   className={cn(cardClass, 'p-6 mb-5 text-center border-green-500/30')}
                 >
                   <Rocket className="w-10 h-10 text-green-400 mx-auto mb-3" />
-                  <h3 className="text-lg font-bold text-[#FFFFFF] mb-1">Your agent is alive!</h3>
-                  <p className="text-[#71717a] text-sm">Redirecting to your agent&apos;s dashboard...</p>
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">Your agent is alive!</h3>
+                  <p className="text-[var(--text-muted)] text-sm">Redirecting to your agent&apos;s dashboard...</p>
                 </motion.div>
               )}
 
@@ -1862,7 +2088,7 @@ function SystemPromptSection({
   inputClass: string;
 }) {
   return (
-    <div className="border border-[rgba(46,43,74,0.3)] bg-[rgba(26,23,48,0.4)] rounded-xl p-4">
+    <div className="border border-[var(--border-default)] bg-[var(--bg-card)] rounded-xl p-4">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-[var(--text-primary)]">System Prompt</p>
@@ -1952,10 +2178,10 @@ function SummaryRow({
 }) {
   return (
     <div className="flex justify-between gap-4">
-      <span className="text-[#71717a]">{label}</span>
+      <span className="text-[var(--text-muted)]">{label}</span>
       <span className={cn(
         'text-right',
-        valueClass ?? (highlight ? 'text-[#06b6d4]' : 'text-[#A5A1C2]')
+        valueClass ?? (highlight ? 'text-[#06b6d4]' : 'text-[var(--text-secondary)]')
       )}>
         {value}
       </span>
@@ -2047,12 +2273,12 @@ function OptionSelect({
         onChange={(e) => onChange(e.target.value)}
       >
         {options.map((o) => (
-          <option key={o.value} value={o.value} style={{ background: '#0D0B1A' }}>
+          <option key={o.value} value={o.value} style={{ background: 'var(--bg-base)' }}>
             {o.label}
           </option>
         ))}
       </select>
-      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
     </div>
   );
 }

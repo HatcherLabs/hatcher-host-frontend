@@ -155,7 +155,7 @@ export function DomainsSection() {
   if (loading) {
     return (
       <div>
-        <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[#71717a]">
+        <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
           Custom Domains
           <span className="ml-2 text-violet-400 normal-case tracking-normal font-normal">Public Chat Access</span>
         </h3>
@@ -166,7 +166,7 @@ export function DomainsSection() {
 
   return (
     <div>
-      <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[#71717a]">
+      <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
         Custom Domains
         <span className="ml-2 text-violet-400 normal-case tracking-normal font-normal">Public Chat Access</span>
       </h3>
@@ -178,7 +178,7 @@ export function DomainsSection() {
             <div className="p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Globe size={14} className={domain.verified ? 'text-emerald-400' : 'text-[#71717a]'} />
+                  <Globe size={14} className={domain.verified ? 'text-emerald-400' : 'text-[var(--text-muted)]'} />
                   <span className="text-sm font-medium text-white">{domain.domain}</span>
                   <StatusBadge verified={domain.verified} sslStatus={domain.sslStatus} />
                 </div>
@@ -186,7 +186,7 @@ export function DomainsSection() {
                   <button
                     onClick={() => handleVerify(domain.id)}
                     disabled={verifying === domain.id}
-                    className="p-1.5 rounded-lg text-[#71717a] hover:text-white hover:bg-white/5 transition-colors disabled:opacity-40"
+                    className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors disabled:opacity-40"
                     title="Verify DNS"
                   >
                     {verifying === domain.id ? (
@@ -198,7 +198,7 @@ export function DomainsSection() {
                   <button
                     onClick={() => handleDelete(domain.id)}
                     disabled={deleting === domain.id}
-                    className="p-1.5 rounded-lg text-[#71717a] hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-40"
+                    className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-40"
                     title="Remove domain"
                   >
                     {deleting === domain.id ? (
@@ -211,26 +211,26 @@ export function DomainsSection() {
               </div>
 
               {/* CNAME instructions */}
-              <div className="p-3 rounded-lg bg-black/30 border border-white/[0.06]">
-                <p className="text-[10px] font-semibold uppercase tracking-wider mb-2 text-[#71717a]">
+              <div className="p-3 rounded-lg bg-black/30 border border-[var(--border-default)]">
+                <p className="text-[10px] font-semibold uppercase tracking-wider mb-2 text-[var(--text-muted)]">
                   DNS Configuration
                 </p>
                 <div className="flex items-center gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-[#A5A1C2]">
+                    <p className="text-xs text-[var(--text-secondary)]">
                       Point <span className="text-white font-mono">{domain.domain}</span> CNAME to:
                     </p>
                     <p className="text-sm font-mono text-[#06b6d4] mt-1 truncate">{domain.cnameTarget}</p>
                   </div>
                   <button
                     onClick={() => copyToClipboard(domain.cnameTarget, domain.id)}
-                    className="h-8 w-8 flex-shrink-0 flex items-center justify-center rounded-lg border border-white/[0.08] hover:bg-white/5 transition-colors"
+                    className="h-8 w-8 flex-shrink-0 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-[var(--bg-card)] transition-colors"
                     title="Copy CNAME target"
                   >
                     {copiedId === domain.id ? (
                       <Check size={12} className="text-emerald-400" />
                     ) : (
-                      <Copy size={12} className="text-[#71717a]" />
+                      <Copy size={12} className="text-[var(--text-muted)]" />
                     )}
                   </button>
                 </div>
@@ -254,9 +254,9 @@ export function DomainsSection() {
                 <p className="text-sm font-medium text-white">Add Custom Domain</p>
                 <button
                   onClick={() => { setShowForm(false); setError(null); }}
-                  className="p-1 rounded hover:bg-white/5 transition-colors"
+                  className="p-1 rounded hover:bg-[var(--bg-card)] transition-colors"
                 >
-                  <X size={14} className="text-[#71717a]" />
+                  <X size={14} className="text-[var(--text-muted)]" />
                 </button>
               </div>
               <input
@@ -264,7 +264,7 @@ export function DomainsSection() {
                 value={domainInput}
                 onChange={(e) => setDomainInput(e.target.value)}
                 placeholder="chat.yourdomain.com"
-                className="w-full h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-cyan-500/50 focus:outline-none placeholder:text-[#71717a] transition-colors font-mono"
+                className="w-full h-9 px-3 rounded-lg text-sm text-white bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none placeholder:text-[var(--text-muted)] transition-colors font-mono"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleAdd();
                 }}
@@ -280,7 +280,7 @@ export function DomainsSection() {
                 >
                   {adding ? 'Adding...' : 'Add Domain'}
                 </button>
-                <p className="text-[10px] text-[#71717a]">
+                <p className="text-[10px] text-[var(--text-muted)]">
                   You will need to configure a CNAME record after adding.
                 </p>
               </div>
@@ -289,7 +289,7 @@ export function DomainsSection() {
         ) : (
           <button
             onClick={() => setShowForm(true)}
-            className="w-full flex items-center justify-center gap-2 p-3 rounded-xl border border-dashed border-white/[0.08] text-xs text-[#71717a] hover:text-white hover:border-white/[0.15] hover:bg-white/[0.02] transition-all"
+            className="w-full flex items-center justify-center gap-2 p-3 rounded-xl border border-dashed border-[var(--border-default)] text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] hover:bg-[var(--bg-card)] transition-all"
           >
             <Plus size={14} />
             Add Custom Domain
@@ -298,7 +298,7 @@ export function DomainsSection() {
 
         {/* Help text */}
         {domains.length === 0 && !showForm && (
-          <p className="text-center text-xs text-[#71717a] mt-2">
+          <p className="text-center text-xs text-[var(--text-muted)] mt-2">
             Add a custom domain so users can chat with your agent at your own URL.
           </p>
         )}

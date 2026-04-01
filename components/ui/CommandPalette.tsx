@@ -231,7 +231,7 @@ export function CommandPalette() {
           <motion.div
             className="relative w-full max-w-lg mx-4 rounded-2xl border overflow-hidden"
             style={{
-              background: '#1A1730',
+              background: 'var(--bg-elevated)',
               borderColor: 'rgba(46,43,74,0.6)',
               boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(6,182,212,0.08)',
             }}
@@ -244,8 +244,8 @@ export function CommandPalette() {
             aria-modal="true"
           >
             {/* Search input */}
-            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[rgba(46,43,74,0.6)]">
-              <Search size={18} className="text-[#71717a] flex-shrink-0" aria-hidden="true" />
+            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[var(--border-default)]">
+              <Search size={18} className="text-[var(--text-muted)] flex-shrink-0" aria-hidden="true" />
               <input
                 ref={inputRef}
                 type="text"
@@ -253,11 +253,11 @@ export function CommandPalette() {
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Search commands, agents..."
-                className="flex-1 bg-transparent outline-none text-sm text-[#fafafa] placeholder:text-[#71717a]"
+                className="flex-1 bg-transparent outline-none text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
                 aria-label="Command search"
                 autoComplete="off"
               />
-              <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-[#71717a] bg-white/[0.04] border border-white/[0.06] rounded">
+              <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-[var(--text-muted)] bg-[var(--bg-card)] border border-[var(--border-default)] rounded">
                 ESC
               </kbd>
             </div>
@@ -270,13 +270,13 @@ export function CommandPalette() {
               aria-activedescendant={flatItems[selectedIndex] ? `cmd-item-${flatItems[selectedIndex].id}` : undefined}
             >
               {flatItems.length === 0 ? (
-                <div className="px-4 py-8 text-center text-sm text-[#71717a]">
+                <div className="px-4 py-8 text-center text-sm text-[var(--text-muted)]">
                   No commands found
                 </div>
               ) : (
                 Object.entries(sections).map(([section, items]) => (
                   <div key={section}>
-                    <p className="px-4 py-1.5 text-[10px] font-semibold tracking-widest uppercase text-[#71717a]">
+                    <p className="px-4 py-1.5 text-[10px] font-semibold tracking-widest uppercase text-[var(--text-muted)]">
                       {section}
                     </p>
                     {items.map((item) => {
@@ -294,16 +294,16 @@ export function CommandPalette() {
                           className={`w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors cursor-pointer ${
                             isSelected
                               ? 'bg-[rgba(6,182,212,0.08)] text-white'
-                              : 'text-[#A5A1C2] hover:bg-white/[0.02]'
+                              : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card)]'
                           }`}
                         >
-                          <Icon size={16} className={isSelected ? 'text-[#06b6d4]' : 'text-[#71717a]'} aria-hidden="true" />
+                          <Icon size={16} className={isSelected ? 'text-[#06b6d4]' : 'text-[var(--text-muted)]'} aria-hidden="true" />
                           <span className="flex-1 truncate">{item.label}</span>
                           {item.meta && !item.meta.includes('action') && (
-                            <span className="text-[10px] text-[#71717a] font-mono shrink-0">{item.meta}</span>
+                            <span className="text-[10px] text-[var(--text-muted)] font-mono shrink-0">{item.meta}</span>
                           )}
                           {item.shortcut && (
-                            <kbd className="text-[10px] font-mono text-[#71717a] bg-white/[0.04] border border-white/[0.06] rounded px-1.5 py-0.5 shrink-0">
+                            <kbd className="text-[10px] font-mono text-[var(--text-muted)] bg-[var(--bg-card)] border border-[var(--border-default)] rounded px-1.5 py-0.5 shrink-0">
                               {item.shortcut}
                             </kbd>
                           )}
@@ -316,17 +316,17 @@ export function CommandPalette() {
             </div>
 
             {/* Footer hint */}
-            <div className="px-4 py-2.5 border-t border-[rgba(46,43,74,0.6)] flex items-center gap-4 text-[10px] text-[#71717a]">
+            <div className="px-4 py-2.5 border-t border-[var(--border-default)] flex items-center gap-4 text-[10px] text-[var(--text-muted)]">
               <span className="flex items-center gap-1">
-                <kbd className="px-1 py-0.5 bg-white/[0.04] border border-white/[0.06] rounded font-mono">↑↓</kbd>
+                <kbd className="px-1 py-0.5 bg-[var(--bg-card)] border border-[var(--border-default)] rounded font-mono">↑↓</kbd>
                 Navigate
               </span>
               <span className="flex items-center gap-1">
-                <kbd className="px-1 py-0.5 bg-white/[0.04] border border-white/[0.06] rounded font-mono">↵</kbd>
+                <kbd className="px-1 py-0.5 bg-[var(--bg-card)] border border-[var(--border-default)] rounded font-mono">↵</kbd>
                 Select
               </span>
               <span className="flex items-center gap-1">
-                <kbd className="px-1 py-0.5 bg-white/[0.04] border border-white/[0.06] rounded font-mono">esc</kbd>
+                <kbd className="px-1 py-0.5 bg-[var(--bg-card)] border border-[var(--border-default)] rounded font-mono">esc</kbd>
                 Close
               </span>
             </div>

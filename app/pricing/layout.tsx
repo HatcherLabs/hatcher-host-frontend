@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Pricing — Free Tier, Starter, Pro & Business Plans',
   description:
-    'Hatcher pricing plans: Free tier with 10 msgs/day, Starter $4.99/mo (50 msgs/day), Pro $14.99/mo (200 msgs/day), Business $39.99/mo (500 msgs/day). BYOK any LLM for unlimited messages. Pay with SOL or card.',
+    'Hatcher pricing: Free tier included. Starter $4.99/mo, Pro $14.99/mo, Business $39.99/mo. BYOK any LLM for unlimited messages.',
   keywords: [
     'AI agent pricing',
     'agent hosting plans',

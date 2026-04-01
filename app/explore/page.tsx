@@ -31,6 +31,7 @@ import type { AgentFramework } from '@hatcher/shared';
 
 type SortOption = 'newest' | 'most_messages' | 'name_az';
 type StatusFilter = 'all' | 'active' | 'sleeping' | 'paused' | 'error';
+type FrameworkFilter = 'all' | 'openclaw' | 'hermes' | 'elizaos' | 'milady';
 
 const PAGE_SIZE = 12;
 
@@ -54,6 +55,14 @@ const STATUS_ICONS: Record<StatusFilter, string> = {
   sleeping: 'bg-blue-400',
   paused: 'bg-amber-400',
   error: 'bg-red-400',
+};
+
+const FRAMEWORK_FILTER_LABELS: Record<FrameworkFilter, string> = {
+  all: 'All Frameworks',
+  openclaw: 'OpenClaw',
+  hermes: 'Hermes',
+  elizaos: 'ElizaOS',
+  milady: 'Milady',
 };
 
 const cardClass = 'card glass-noise';
@@ -210,6 +219,7 @@ export default function ExplorePage() {
   const [sort, setSort] = useState<SortOption>('newest');
   const [searchInput, setSearchInput] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [frameworkFilter, setFrameworkFilter] = useState<FrameworkFilter>('all');
   const [page, setPage] = useState(1);
   const gridRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated } = useAuth();
@@ -241,7 +251,7 @@ export default function ExplorePage() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setPage(1);
-  }, [search, statusFilter, sort]);
+  }, [search, statusFilter, frameworkFilter, sort]);
 
   const filtered = useMemo(() => {
     let result = [...agents];
@@ -256,6 +266,11 @@ export default function ExplorePage() {
     // Status filter
     if (statusFilter !== 'all') {
       result = result.filter((a) => a.status === statusFilter);
+    }
+
+    // Framework filter
+    if (frameworkFilter !== 'all') {
+      result = result.filter((a) => a.framework === frameworkFilter);
     }
 
     const q = search.trim().toLowerCase();
@@ -275,7 +290,7 @@ export default function ExplorePage() {
     });
 
     return result;
-  }, [agents, sort, search, statusFilter]);
+  }, [agents, sort, search, statusFilter, frameworkFilter]);
 
   // Pagination
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -289,11 +304,12 @@ export default function ExplorePage() {
   }, []);
 
   const activeCount = agents.filter((a) => a.status === 'active').length;
-  const hasActiveFilters = statusFilter !== 'all' || search.trim() !== '';
+  const hasActiveFilters = statusFilter !== 'all' || frameworkFilter !== 'all' || search.trim() !== '';
 
   const clearAllFilters = useCallback(() => {
     setSearchInput('');
     setStatusFilter('all');
+    setFrameworkFilter('all');
     setSort('newest');
   }, []);
 
@@ -326,37 +342,37 @@ export default function ExplorePage() {
       <div className="mx-auto max-w-7xl px-4 pb-12">
         {/* ── Search + Filter Bar ────────────────────────── */}
         {!loading && !error && agents.length > 0 && (
-          <div className="flex flex-col gap-4 mb-8">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              {/* Search */}
-              <div className="relative w-full sm:w-80 group/search">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none group-focus-within/search:text-[#06b6d4] transition-colors duration-200" />
-                <input
-                  type="text"
-                  className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[#06b6d4]/50 focus:shadow-[0_0_16px_rgba(6,182,212,0.12)] transition-all duration-200 backdrop-blur-xl"
-                  placeholder="Search agents by name or description..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                />
-                {searchInput && (
-                  <button
-                    onClick={() => setSearchInput('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[rgba(6,182,212,0.1)] transition-all duration-150"
-                    aria-label="Clear search"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-                {/* Debounce indicator */}
-                {isSearching && (
-                  <div className="absolute right-10 top-1/2 -translate-y-1/2">
-                    <Loader2 className="w-3.5 h-3.5 text-[#06b6d4] animate-spin" />
-                  </div>
-                )}
-              </div>
+          <div className="flex flex-col gap-3 mb-8">
+            {/* Search */}
+            <div className="relative w-full sm:max-w-sm group/search">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none group-focus-within/search:text-[#06b6d4] transition-colors duration-200" />
+              <input
+                type="text"
+                className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[#06b6d4]/50 focus:shadow-[0_0_16px_rgba(6,182,212,0.12)] transition-all duration-200 backdrop-blur-xl"
+                placeholder="Search agents by name or description..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+              {searchInput && (
+                <button
+                  onClick={() => setSearchInput('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[rgba(6,182,212,0.1)] transition-all duration-150"
+                  aria-label="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+              {isSearching && (
+                <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                  <Loader2 className="w-3.5 h-3.5 text-[#06b6d4] animate-spin" />
+                </div>
+              )}
+            </div>
 
+            {/* Filters row — scrollable */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {/* Status filter */}
-              <div className="flex gap-1 w-full sm:w-auto bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto flex-nowrap [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="flex gap-1 flex-shrink-0 bg-[var(--bg-card)] border border-[var(--border-default)] backdrop-blur-xl rounded-xl p-1">
                 {(Object.entries(STATUS_FILTER_LABELS) as [StatusFilter, string][]).map(([val, label]) => (
                   <button
                     key={val}
@@ -379,8 +395,32 @@ export default function ExplorePage() {
                 ))}
               </div>
 
+              {/* Framework filter */}
+              <div className="flex gap-1 flex-shrink-0 bg-[var(--bg-card)] border border-[var(--border-default)] backdrop-blur-xl rounded-xl p-1">
+                {(Object.entries(FRAMEWORK_FILTER_LABELS) as [FrameworkFilter, string][]).map(([val, label]) => (
+                  <button
+                    key={val}
+                    onClick={() => setFrameworkFilter(val)}
+                    className={cn(
+                      'px-3 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium whitespace-nowrap flex items-center gap-1.5',
+                      frameworkFilter === val
+                        ? 'bg-[#06b6d4] text-white shadow-[0_0_12px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
+                        : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[rgba(6,182,212,0.05)]'
+                    )}
+                  >
+                    {val !== 'all' && (
+                      <span
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: frameworkFilter === val ? 'white' : (FRAMEWORK_COLORS[val]?.icon ?? '#06b6d4') }}
+                      />
+                    )}
+                    {label}
+                  </button>
+                ))}
+              </div>
+
               {/* Sort */}
-              <div className="flex gap-1 w-full sm:w-auto bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto flex-nowrap [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="flex gap-1 flex-shrink-0 bg-[var(--bg-card)] border border-[var(--border-default)] backdrop-blur-xl rounded-xl p-1">
                 {(Object.entries(SORT_LABELS) as [SortOption, string][]).map(([val, label]) => (
                   <button
                     key={val}
@@ -643,12 +683,12 @@ const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agen
               <img
                 src={agent.avatarUrl || generateAgentAvatar(agent.name, fw)}
                 alt={agent.name}
-                className="w-12 h-12 rounded-full border border-[rgba(46,43,74,0.3)] object-cover flex-shrink-0 transition-all duration-300"
+                className="w-12 h-12 rounded-full border border-[var(--border-default)] object-cover flex-shrink-0 transition-all duration-300"
                 style={{ ['--tw-ring-color' as string]: fwConfig.border }}
               />
 
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-[#FFFFFF] truncate group-hover:transition-colors duration-200" style={{}}>
+                <h3 className="font-semibold text-[var(--text-primary)] truncate group-hover:transition-colors duration-200" style={{}}>
                   <span className="group-hover:text-[var(--fw-color,#06b6d4)] transition-colors duration-200" style={{ ['--fw-color' as string]: fwConfig.icon }}>
                     {agent.name}
                   </span>
@@ -662,7 +702,7 @@ const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agen
                       status.color,
                       status.pulse && 'animate-pulse shadow-[0_0_6px_rgba(74,222,128,0.5)]'
                     )} />
-                    <span className="text-xs text-[#71717a]">{status.label}</span>
+                    <span className="text-xs text-[var(--text-muted)]">{status.label}</span>
                   </span>
 
                   <span className={cn('fw-tag', fwConfig.badge)}>
@@ -679,13 +719,13 @@ const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agen
             </div>
 
             {/* Description (2 lines) — fall back to framework description */}
-            <p className="text-sm text-[#A5A1C2] leading-relaxed mb-4 flex-1 line-clamp-2">
+            <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4 flex-1 line-clamp-2">
               {description}
             </p>
 
             {/* Footer */}
             <div
-              className="flex items-center justify-between text-xs text-[#71717a] pt-3 border-t border-[rgba(46,43,74,0.3)] transition-colors duration-300"
+              className="flex items-center justify-between text-xs text-[var(--text-muted)] pt-3 border-t border-[var(--border-default)] transition-colors duration-300"
               style={{ ['--hover-border' as string]: fwConfig.border }}
             >
               <div className="flex items-center gap-3">

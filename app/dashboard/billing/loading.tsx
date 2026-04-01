@@ -22,7 +22,7 @@ export default function BillingLoading() {
           <div className="h-5 w-40 rounded shimmer mb-6" />
           <div className="space-y-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex items-center justify-between py-3 border-b border-[rgba(46,43,74,0.3)]">
+              <div key={i} className="flex items-center justify-between py-3 border-b border-[var(--border-default)]">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg shimmer" />
                   <div className="h-4 w-36 rounded shimmer" />

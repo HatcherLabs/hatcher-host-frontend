@@ -273,7 +273,7 @@ export default function MarketplacePage() {
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none group-focus-within/search:text-[#06b6d4] transition-colors duration-200" />
               <input
                 type="text"
-                className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[#06b6d4]/50 focus:shadow-[0_0_16px_rgba(6,182,212,0.12)] transition-all duration-200 backdrop-blur-xl"
+                className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[#06b6d4]/50 focus:shadow-[0_0_16px_rgba(6,182,212,0.12)] transition-all duration-200 backdrop-blur-xl"
                 placeholder="Search templates by name or description..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
@@ -295,7 +295,7 @@ export default function MarketplacePage() {
             </div>
 
             {/* Category filter */}
-            <div className="flex gap-1 bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto">
+            <div className="flex gap-1 bg-[var(--bg-card)] border border-[var(--border-default)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto">
               {(Object.entries(CATEGORY_LABELS) as [CategoryFilter, string][]).map(([val, label]) => (
                 <button
                   key={val}
@@ -313,7 +313,7 @@ export default function MarketplacePage() {
             </div>
 
             {/* Framework filter */}
-            <div className="flex gap-1 bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto">
+            <div className="flex gap-1 bg-[var(--bg-card)] border border-[var(--border-default)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto">
               {(Object.entries(FRAMEWORK_LABELS) as [FrameworkFilter, string][]).map(([val, label]) => (
                 <button
                   key={val}
@@ -331,7 +331,7 @@ export default function MarketplacePage() {
             </div>
 
             {/* Sort */}
-            <div className="flex gap-1 bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto">
+            <div className="flex gap-1 bg-[var(--bg-card)] border border-[var(--border-default)] backdrop-blur-xl rounded-xl p-1 overflow-x-auto">
               {(Object.entries(SORT_LABELS) as [SortOption, string][]).map(([val, label]) => (
                 <button
                   key={val}
@@ -591,7 +591,7 @@ function TemplateCard({
               <Package className="w-6 h-6 text-[#06b6d4]/70" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-[#FFFFFF] truncate group-hover:text-[#06b6d4] transition-colors duration-200">
+              <h3 className="font-semibold text-[var(--text-primary)] truncate group-hover:text-[#06b6d4] transition-colors duration-200">
                 {template.name}
               </h3>
               <div className="flex items-center gap-2 mt-1">
@@ -606,13 +606,13 @@ function TemplateCard({
           </div>
 
           {/* Description */}
-          <p className="text-sm text-[#A5A1C2] leading-relaxed mb-4 flex-1 line-clamp-2">
+          <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4 flex-1 line-clamp-2">
             {template.description}
           </p>
 
           {/* Footer */}
-          <div className="flex items-center justify-between pt-3 border-t border-[rgba(46,43,74,0.3)] group-hover:border-[rgba(6,182,212,0.15)] transition-colors duration-300">
-            <div className="flex items-center gap-3 text-xs text-[#71717a]">
+          <div className="flex items-center justify-between pt-3 border-t border-[var(--border-default)] group-hover:border-[rgba(6,182,212,0.15)] transition-colors duration-300">
+            <div className="flex items-center gap-3 text-xs text-[var(--text-muted)]">
               <span className="flex items-center gap-1">
                 <User className="w-3.5 h-3.5" />
                 {template.author}

@@ -50,12 +50,12 @@ export function ShareModal({ isOpen, onClose, agentName, agentSlug }: ShareModal
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-md mx-4 rounded-2xl border border-white/[0.08] bg-[#18181b] shadow-2xl"
+          className="w-full max-w-md mx-4 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-2xl"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-default)]">
             <h3 className="text-lg font-semibold text-white">Share {agentName}</h3>
-            <button onClick={onClose} className="text-zinc-400 hover:text-white transition-colors">
+            <button onClick={onClose} className="text-zinc-400 hover:text-[var(--text-primary)] transition-colors">
               <X size={20} />
             </button>
           </div>
@@ -69,7 +69,7 @@ export function ShareModal({ isOpen, onClose, agentName, agentSlug }: ShareModal
                 <input
                   readOnly
                   value={agentUrl}
-                  className="flex-1 bg-zinc-900 border border-white/[0.06] rounded-lg px-3 py-2 text-sm text-zinc-300 font-mono"
+                  className="flex-1 bg-zinc-900 border border-[var(--border-default)] rounded-lg px-3 py-2 text-sm text-zinc-300 font-mono"
                 />
                 <button
                   onClick={() => copy(agentUrl, 'link')}
@@ -87,14 +87,14 @@ export function ShareModal({ isOpen, onClose, agentName, agentSlug }: ShareModal
               <div className="flex gap-3">
                 <button
                   onClick={shareTwitter}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-zinc-900 border border-white/[0.06] hover:border-white/[0.12] text-zinc-300 hover:text-white text-sm transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-zinc-900 border border-[var(--border-default)] hover:border-[var(--border-hover)] text-zinc-300 hover:text-[var(--text-primary)] text-sm transition-all"
                 >
                   <Twitter size={16} />
                   Twitter
                 </button>
                 <button
                   onClick={shareDiscord}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-zinc-900 border border-white/[0.06] hover:border-white/[0.12] text-zinc-300 hover:text-white text-sm transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-zinc-900 border border-[var(--border-default)] hover:border-[var(--border-hover)] text-zinc-300 hover:text-[var(--text-primary)] text-sm transition-all"
                 >
                   <MessageCircle size={16} />
                   Discord
@@ -106,12 +106,12 @@ export function ShareModal({ isOpen, onClose, agentName, agentSlug }: ShareModal
             <div>
               <label className="text-xs text-zinc-500 uppercase tracking-wider mb-2 block">Embed Code</label>
               <div className="relative">
-                <pre className="bg-zinc-900 border border-white/[0.06] rounded-lg px-3 py-2 text-xs text-zinc-400 font-mono overflow-x-auto">
+                <pre className="bg-zinc-900 border border-[var(--border-default)] rounded-lg px-3 py-2 text-xs text-zinc-400 font-mono overflow-x-auto">
                   {embedCode}
                 </pre>
                 <button
                   onClick={() => copy(embedCode, 'embed')}
-                  className="absolute top-2 right-2 px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-xs text-zinc-400 hover:text-white transition-colors flex items-center gap-1"
+                  className="absolute top-2 right-2 px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-xs text-zinc-400 hover:text-[var(--text-primary)] transition-colors flex items-center gap-1"
                 >
                   {copied === 'embed' ? <Check size={12} /> : <Code2 size={12} />}
                   {copied === 'embed' ? 'Copied' : 'Copy'}

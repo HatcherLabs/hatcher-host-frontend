@@ -862,7 +862,7 @@ export default function AdminPage() {
                         return (
                           <tr
                             key={agent.id}
-                            className="transition-colors hover:bg-white/[0.02] border-b border-[var(--border-default)]"
+                            className="transition-colors hover:bg-[var(--bg-card)] border-b border-[var(--border-default)]"
                           >
                             {/* Agent name */}
                             <td className="py-3.5 pr-4">
@@ -993,7 +993,7 @@ export default function AdminPage() {
                       {users.map((user) => (
                         <tr
                           key={user.id}
-                          className="transition-colors hover:bg-white/[0.02] border-b border-[var(--border-default)]"
+                          className="transition-colors hover:bg-[var(--bg-card)] border-b border-[var(--border-default)]"
                         >
                           {/* User */}
                           <td className="py-3.5 pr-4">
@@ -1060,7 +1060,7 @@ export default function AdminPage() {
               urgent: 'text-red-400',
               high: 'text-amber-400',
               normal: 'text-[var(--text-secondary)]',
-              low: 'text-[#6B6890]',
+              low: 'text-[var(--text-muted)]',
             };
             return (
               <>
@@ -1105,7 +1105,7 @@ export default function AdminPage() {
                       </thead>
                       <tbody>
                         {filteredTickets.map((ticket) => (
-                          <tr key={ticket.id} className="transition-colors hover:bg-white/[0.02] border-b border-[var(--border-default)]">
+                          <tr key={ticket.id} className="transition-colors hover:bg-[var(--bg-card)] border-b border-[var(--border-default)]">
                             <td className="py-3.5 pr-4">
                               <p className="text-sm font-medium text-[var(--text-primary)] truncate max-w-[250px]">{ticket.subject}</p>
                               <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{ticket.messages.length} message{ticket.messages.length !== 1 ? 's' : ''}</p>

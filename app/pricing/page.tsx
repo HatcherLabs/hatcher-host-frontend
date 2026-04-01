@@ -213,7 +213,7 @@ export default function PricingPage() {
           </motion.p>
 
           {/* Monthly / Annual toggle */}
-          <div className="inline-flex items-center gap-3 mt-8 p-1 rounded-full bg-white/[0.04] border border-white/[0.06]">
+          <div className="inline-flex items-center gap-3 mt-8 p-1 rounded-full bg-[var(--bg-card)] border border-[var(--border-default)]">
             <button
               onClick={() => setIsAnnual(false)}
               className={cn(
@@ -334,7 +334,7 @@ export default function PricingPage() {
                 {tier.key === 'free' ? (
                   <Link
                     href="/register?tier=free"
-                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all border border-green-500/30 text-green-400 hover:bg-green-500/10"
+                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all bg-green-600 text-white hover:bg-green-500"
                   >
                     <Rocket className="w-4 h-4" />
                     Get Started Free
@@ -429,7 +429,7 @@ export default function PricingPage() {
               Telegram, Discord, WhatsApp, Slack, Signal, iMessage, and 14+ more platforms
               are included free on all tiers. No extra charge, ever.
             </p>
-            <p className="text-[var(--text-secondary)] text-sm font-medium p-4 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+            <p className="text-[var(--text-secondary)] text-sm font-medium p-4 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
               All prices in USD, payable in SOL or platform tokens. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier.
             </p>
           </div>
@@ -455,7 +455,7 @@ export default function PricingPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[rgba(46,43,74,0.4)]">
+                  <tr className="border-b border-[var(--border-default)]">
                     <th className="text-left px-2.5 py-3 sm:p-5 text-[var(--text-muted)] font-medium text-[10px] sm:text-xs uppercase tracking-wider">Feature</th>
                     <th className="text-center px-2 py-3 sm:p-5 text-green-400 font-semibold">
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Free</div>
@@ -480,8 +480,8 @@ export default function PricingPage() {
                     <tr
                       key={row.label}
                       className={cn(
-                        'border-b border-[rgba(46,43,74,0.2)] transition-colors hover:bg-white/[0.02]',
-                        i % 2 === 0 && 'bg-white/[0.01]'
+                        'border-b border-[var(--border-default)] transition-colors hover:bg-[var(--bg-card)]',
+                        i % 2 === 0 && 'bg-[var(--bg-card)]'
                       )}
                     >
                       <td className="px-2.5 py-3 sm:p-4 text-[var(--text-secondary)] text-xs sm:text-sm">{row.label}</td>
@@ -613,7 +613,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
         <div
           className={cn(
             'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors',
-            open ? 'bg-[#8b5cf6]/15' : 'bg-white/[0.03]'
+            open ? 'bg-[#8b5cf6]/15' : 'bg-[var(--bg-card)]'
           )}
         >
           <ChevronDown className={cn('w-4 h-4 transition-all duration-200', open ? 'text-[#8b5cf6] rotate-180' : 'text-[var(--text-muted)]')} />

@@ -133,7 +133,7 @@ function ApiKeyCard({
               </button>
               <button
                 onClick={() => { setEditing(false); setEditLabel(apiKey.label); }}
-                className="h-7 px-2.5 text-xs rounded-lg border border-white/[0.08] text-[var(--text-muted)] hover:bg-white/[0.06] transition-colors cursor-pointer"
+                className="h-7 px-2.5 text-xs rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:bg-[var(--bg-card)] transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -143,7 +143,7 @@ function ApiKeyCard({
               <span className="text-sm font-semibold text-[var(--text-primary)] truncate">{apiKey.label}</span>
               <button
                 onClick={() => { setEditing(true); setEditLabel(apiKey.label); }}
-                className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-white/[0.06] cursor-pointer"
+                className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-[var(--bg-card)] cursor-pointer"
                 title="Rename key"
               >
                 <Pencil size={11} className="text-[var(--text-muted)]" />
@@ -153,12 +153,12 @@ function ApiKeyCard({
 
           {/* Prefix + copy */}
           <div className="flex items-center gap-2 mb-3">
-            <code className="text-xs font-mono text-[var(--text-secondary)] bg-white/[0.05] px-2 py-0.5 rounded">
+            <code className="text-xs font-mono text-[var(--text-secondary)] bg-[var(--bg-card)] px-2 py-0.5 rounded">
               {apiKey.prefix}••••••••
             </code>
             <button
               onClick={() => onCopy(apiKey.prefix, apiKey.id)}
-              className="h-6 w-6 rounded-md border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.07] flex items-center justify-center transition-colors cursor-pointer"
+              className="h-6 w-6 rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] hover:bg-[var(--bg-card)] flex items-center justify-center transition-colors cursor-pointer"
               title="Copy prefix"
             >
               {copiedId === apiKey.id ? (
@@ -326,7 +326,7 @@ export default function ApiKeysPage() {
             >
               Hatcher API <ExternalLink size={11} />
             </Link>
-            . Each key starts with <code className="font-mono text-xs bg-white/[0.05] px-1 py-0.5 rounded text-cyan-400">hk_</code>.
+            . Each key starts with <code className="font-mono text-xs bg-[var(--bg-card)] px-1 py-0.5 rounded text-cyan-400">hk_</code>.
           </p>
         </div>
 
@@ -351,19 +351,19 @@ export default function ApiKeysPage() {
               </div>
               <p className="text-xs text-[var(--text-muted)] mb-2 font-medium">{newlyCreated.label}</p>
               <div className="flex items-center gap-2">
-                <div className="flex-1 h-9 px-3 rounded-lg bg-white/[0.06] border border-emerald-500/20 flex items-center font-mono text-xs text-white overflow-x-auto">
+                <div className="flex-1 h-9 px-3 rounded-lg bg-[var(--bg-card)] border border-emerald-500/20 flex items-center font-mono text-xs text-white overflow-x-auto">
                   {newlyCreated.key}
                 </div>
                 <button
                   onClick={() => copy(newlyCreated.key, 'new')}
-                  className="h-9 px-3 rounded-lg border border-emerald-500/25 bg-white/[0.04] hover:bg-white/[0.08] flex items-center gap-1.5 text-xs text-emerald-400 transition-colors cursor-pointer flex-shrink-0"
+                  className="h-9 px-3 rounded-lg border border-emerald-500/25 bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] flex items-center gap-1.5 text-xs text-emerald-400 transition-colors cursor-pointer flex-shrink-0"
                 >
                   {copiedId === 'new' ? <Check size={13} /> : <Copy size={13} />}
                   {copiedId === 'new' ? 'Copied!' : 'Copy'}
                 </button>
                 <button
                   onClick={() => setNewlyCreated(null)}
-                  className="h-9 w-9 rounded-lg border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.07] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
+                  className="h-9 w-9 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] hover:bg-[var(--bg-card)] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
                   title="Dismiss"
                 >
                   <Trash2 size={13} className="text-[var(--text-muted)]" />
@@ -431,7 +431,7 @@ export default function ApiKeysPage() {
         </div>
 
         {/* ── Usage note ─────────────────────────────────── */}
-        <div className="mt-5 p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-start gap-3">
+        <div className="mt-5 p-4 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] flex items-start gap-3">
           <ExternalLink size={14} className="text-cyan-400 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-[var(--text-muted)] leading-relaxed">
             Use your API key in the <code className="font-mono text-cyan-400">Authorization: Bearer hk_...</code> header.

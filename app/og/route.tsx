@@ -99,7 +99,7 @@ export async function GET(req: NextRequest) {
           <div
             style={{
               fontSize: 22,
-              color: '#a1a1aa',
+              color: 'var(--text-secondary)',
               lineHeight: 1.5,
               maxWidth: 760,
             }}
@@ -118,11 +118,11 @@ export async function GET(req: NextRequest) {
               alignItems: 'center',
             }}
           >
-            <span style={{ color: '#71717a' }}>Deploy AI agents in 60 seconds</span>
+            <span style={{ color: 'var(--text-muted)' }}>Deploy AI agents in 60 seconds</span>
             <span style={{ color: '#3f3f46' }}>•</span>
-            <span style={{ color: '#71717a' }}>Free tier included</span>
+            <span style={{ color: 'var(--text-muted)' }}>Free tier included</span>
             <span style={{ color: '#3f3f46' }}>•</span>
-            <span style={{ color: '#71717a' }}>BYOK any LLM</span>
+            <span style={{ color: 'var(--text-muted)' }}>BYOK any LLM</span>
           </div>
         </div>
       </div>

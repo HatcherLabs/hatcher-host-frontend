@@ -103,7 +103,7 @@ export default function PublicChatPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0D0B1A] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg-base)] flex items-center justify-center">
         <Loader2 size={32} className="animate-spin text-[#06b6d4]" />
       </div>
     );
@@ -112,9 +112,9 @@ export default function PublicChatPage() {
   // Not found
   if (notFound || !agent) {
     return (
-      <div className="min-h-screen bg-[#0D0B1A] flex flex-col items-center justify-center gap-4 px-4">
+      <div className="min-h-screen bg-[var(--bg-base)] flex flex-col items-center justify-center gap-4 px-4">
         <div className="text-6xl opacity-30">404</div>
-        <p className="text-[#A5A1C2] text-sm">Agent not found</p>
+        <p className="text-[var(--text-secondary)] text-sm">Agent not found</p>
         <Link
           href="/"
           className="text-xs text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
@@ -129,19 +129,19 @@ export default function PublicChatPage() {
   const FwIcon = fwAvatar.icon;
 
   return (
-    <div className="min-h-screen bg-[#0D0B1A] flex flex-col">
+    <div className="min-h-screen bg-[var(--bg-base)] flex flex-col">
       {/* Header */}
-      <header className="flex-shrink-0 border-b border-white/[0.06] bg-[#0F0D1F]/80 backdrop-blur-xl">
+      <header className="flex-shrink-0 border-b border-[var(--border-default)] bg-[var(--bg-sidebar)]/80 backdrop-blur-xl">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
           <img
             src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)}
             alt={agent.name}
-            className="w-9 h-9 rounded-full object-cover border border-white/[0.08]"
+            className="w-9 h-9 rounded-full object-cover border border-[var(--border-default)]"
           />
           <div className="flex-1 min-w-0">
             <h1 className="text-sm font-semibold text-white truncate">{agent.name}</h1>
             {agent.description && (
-              <p className="text-xs text-[#71717a] truncate">{agent.description}</p>
+              <p className="text-xs text-[var(--text-muted)] truncate">{agent.description}</p>
             )}
           </div>
           <span className={`text-[10px] px-2 py-0.5 rounded-full ${
@@ -162,10 +162,10 @@ export default function PublicChatPage() {
               <div className={`w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br ${fwAvatar.gradient} border border-white/10 flex items-center justify-center`}>
                 <FwIcon className="w-7 h-7 text-white" />
               </div>
-              <p className="text-sm text-[#A5A1C2]">
+              <p className="text-sm text-[var(--text-secondary)]">
                 Start a conversation with <span className="text-white font-medium">{agent.name}</span>
               </p>
-              <p className="text-xs text-[#71717a]">
+              <p className="text-xs text-[var(--text-muted)]">
                 Type a message below to begin
               </p>
             </div>
@@ -189,7 +189,7 @@ export default function PublicChatPage() {
                 className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                   msg.role === 'user'
                     ? 'bg-[#06b6d4]/10 border border-[#06b6d4]/20 text-white rounded-br-md'
-                    : 'bg-white/[0.04] border border-white/[0.06] text-[#e4e4e7] rounded-bl-md'
+                    : 'bg-[var(--bg-card)] border border-[var(--border-default)] text-[#e4e4e7] rounded-bl-md'
                 }`}
               >
                 <div className="whitespace-pre-wrap break-words">{msg.content}</div>
@@ -202,7 +202,7 @@ export default function PublicChatPage() {
               <div className={`flex-shrink-0 w-7 h-7 rounded-full bg-gradient-to-br ${fwAvatar.gradient} flex items-center justify-center`}>
                 <FwIcon className="w-3 h-3 text-white" />
               </div>
-              <div className="px-4 py-2.5 rounded-2xl rounded-bl-md bg-white/[0.04] border border-white/[0.06]">
+              <div className="px-4 py-2.5 rounded-2xl rounded-bl-md bg-[var(--bg-card)] border border-[var(--border-default)]">
                 <div className="flex gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#71717a] animate-bounce" style={{ animationDelay: '0ms' }} />
                   <span className="w-1.5 h-1.5 rounded-full bg-[#71717a] animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -227,7 +227,7 @@ export default function PublicChatPage() {
       )}
 
       {/* Input */}
-      <footer className="flex-shrink-0 border-t border-white/[0.06] bg-[#0F0D1F]/80 backdrop-blur-xl">
+      <footer className="flex-shrink-0 border-t border-[var(--border-default)] bg-[var(--bg-sidebar)]/80 backdrop-blur-xl">
         <div className="max-w-3xl mx-auto px-4 py-3">
           <div className="flex items-center gap-2">
             <input
@@ -243,7 +243,7 @@ export default function PublicChatPage() {
               }}
               placeholder="Type a message..."
               disabled={sending}
-              className="flex-1 h-10 px-4 rounded-xl text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-[#06b6d4]/50 focus:outline-none placeholder:text-[#71717a] transition-colors disabled:opacity-50"
+              className="flex-1 h-10 px-4 rounded-xl text-sm text-white bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-[#06b6d4]/50 focus:outline-none placeholder:text-[var(--text-muted)] transition-colors disabled:opacity-50"
             />
             <button
               onClick={handleSend}
@@ -261,7 +261,7 @@ export default function PublicChatPage() {
             <Link
               href="https://hatcher.host"
               target="_blank"
-              className="text-[10px] text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+              className="text-[10px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
             >
               Powered by Hatcher
             </Link>

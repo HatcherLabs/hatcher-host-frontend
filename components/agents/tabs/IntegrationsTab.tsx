@@ -165,7 +165,7 @@ function IntegrationFieldsForm({
   const currentValues = integrationSecrets[sk] ?? {};
 
   return (
-    <div className="border-t border-white/[0.06] p-5 space-y-4 bg-white/[0.01]">
+    <div className="border-t border-[var(--border-default)] p-5 space-y-4 bg-[var(--bg-card)]">
       {integration.docsUrl && (
         <a
           href={integration.docsUrl}
@@ -186,11 +186,11 @@ function IntegrationFieldsForm({
           <div key={field.key}>
             {/* Section divider before channel settings */}
             {field.key === '_CS_DM_POLICY' && (
-              <p className="text-[10px] font-semibold uppercase tracking-wider mb-3 text-[#71717a] border-t border-white/[0.04] pt-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)] border-t border-[var(--border-default)] pt-3">
                 Channel Behavior
               </p>
             )}
-            <label htmlFor={`field-${fieldId}`} className="flex items-center gap-1.5 text-xs mb-1.5 text-[#71717a]">
+            <label htmlFor={`field-${fieldId}`} className="flex items-center gap-1.5 text-xs mb-1.5 text-[var(--text-muted)]">
               {field.label}
               {field.required && <span className="text-[#06b6d4]">*</span>}
             </label>
@@ -203,14 +203,14 @@ function IntegrationFieldsForm({
                   value={value}
                   onChange={(e) => setIntegrationField(sk, field.key, e.target.value)}
                 >
-                  <option value="" style={{ background: '#0D0B1A' }}>Select...</option>
+                  <option value="" style={{ background: 'var(--bg-base)' }}>Select...</option>
                   {field.options?.map((opt) => (
-                    <option key={opt.value} value={opt.value} style={{ background: '#0D0B1A' }}>
+                    <option key={opt.value} value={opt.value} style={{ background: 'var(--bg-base)' }}>
                       {opt.label}
                     </option>
                   ))}
                 </select>
-                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
               </div>
             ) : (
               <div className="relative">
@@ -229,8 +229,8 @@ function IntegrationFieldsForm({
                     className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-white/5 rounded transition-colors cursor-pointer"
                   >
                     {isVisible
-                      ? <EyeOff size={14} className="text-[#71717a]" />
-                      : <Eye size={14} className="text-[#71717a]" />
+                      ? <EyeOff size={14} className="text-[var(--text-muted)]" />
+                      : <Eye size={14} className="text-[var(--text-muted)]" />
                     }
                   </button>
                 )}
@@ -240,7 +240,7 @@ function IntegrationFieldsForm({
             {/* Show allowlist input when DM or Group policy is set to allowlist */}
             {field.key === '_CS_DM_POLICY' && value === 'allowlist' && (
               <div className="mt-2">
-                <label className="text-[10px] text-[#71717a] mb-1 block">Allowed User IDs (comma-separated)</label>
+                <label className="text-[10px] text-[var(--text-muted)] mb-1 block">Allowed User IDs (comma-separated)</label>
                 <input
                   type="text"
                   className="config-input text-sm"
@@ -252,7 +252,7 @@ function IntegrationFieldsForm({
             )}
             {field.key === '_CS_GROUP_POLICY' && value === 'allowlist' && (
               <div className="mt-2">
-                <label className="text-[10px] text-[#71717a] mb-1 block">Allowed Group IDs (comma-separated)</label>
+                <label className="text-[10px] text-[var(--text-muted)] mb-1 block">Allowed Group IDs (comma-separated)</label>
                 <input
                   type="text"
                   className="config-input text-sm"
@@ -264,7 +264,7 @@ function IntegrationFieldsForm({
             )}
 
             {field.helper && (
-              <p className="text-[10px] mt-1 leading-relaxed text-[#71717a]">
+              <p className="text-[10px] mt-1 leading-relaxed text-[var(--text-muted)]">
                 {field.helper}
               </p>
             )}
@@ -273,7 +273,7 @@ function IntegrationFieldsForm({
       })}
 
       {/* Save button */}
-      <div className="flex items-center gap-3 pt-2 border-t border-white/[0.04]">
+      <div className="flex items-center gap-3 pt-2 border-t border-[var(--border-default)]">
         <button
           onClick={() => saveIntegrationSecrets(integration)}
           disabled={isSaving}
@@ -383,10 +383,10 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
   };
 
   return (
-    <div className="border-t border-white/[0.06] p-5 space-y-4 bg-white/[0.01]">
+    <div className="border-t border-[var(--border-default)] p-5 space-y-4 bg-[var(--bg-card)]">
       {/* AllowFrom — always visible */}
       <div>
-        <label className="block text-xs font-medium text-[#A5A1C2] mb-2">
+        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-2">
           Who can message your agent?
         </label>
         <div className="flex items-center gap-2 mb-2">
@@ -396,7 +396,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
               allowFromValue === '*'
                 ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-white'
-                : 'border-white/[0.08] text-[#71717a] hover:border-white/[0.15]'
+                : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-hover)]'
             }`}
           >
             Everyone
@@ -407,7 +407,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
               allowFromValue !== '*' && allowFromValue !== ''
                 ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-white'
-                : allowFromValue === '' ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-white' : 'border-white/[0.08] text-[#71717a] hover:border-white/[0.15]'
+                : allowFromValue === '' ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-white' : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-hover)]'
             }`}
           >
             Specific numbers
@@ -420,7 +420,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
               value={allowFromValue}
               onChange={(e) => setIntegrationField(sk, allowFromKey, e.target.value)}
               placeholder="+1234567890, +0987654321"
-              className="flex-1 h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-cyan-500/50 focus:outline-none placeholder:text-[#71717a] transition-colors"
+              className="flex-1 h-9 px-3 rounded-lg text-sm text-white bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none placeholder:text-[var(--text-muted)] transition-colors"
             />
           </div>
         )}
@@ -432,11 +432,11 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
           >
             {savingIntegration === sk ? 'Saving...' : 'Save'}
           </button>
-          <p className="text-[10px] text-[#71717a]">
+          <p className="text-[10px] text-[var(--text-muted)]">
             {allowFromValue === '*' ? 'Anyone can message your agent.' : 'Only listed numbers can message your agent.'}
           </p>
         </div>
-        <p className="text-[10px] text-[#71717a] mt-1">
+        <p className="text-[10px] text-[var(--text-muted)] mt-1">
           {existingAllowFrom
             ? 'Restart agent after changing.'
             : 'Set before pairing. Phone numbers in E.164 format (+1234567890).'}
@@ -453,7 +453,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             <p className={`text-sm font-medium ${connected ? 'text-emerald-400' : 'text-amber-400'}`}>
               {connected ? `${integration.name} Connected` : `${integration.name} Disconnected`}
             </p>
-            <p className="text-xs text-[#A5A1C2] mt-0.5">
+            <p className="text-xs text-[var(--text-secondary)] mt-0.5">
               {connected ? 'Messages will be forwarded to your agent' : 'Session expired. Re-pair or disconnect to clean up.'}
             </p>
           </div>
@@ -461,7 +461,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             <button
               onClick={handlePair}
               disabled={loading}
-              className="text-xs px-2 py-1 rounded border border-white/[0.08] text-[#71717a] hover:text-white hover:bg-white/5 transition-colors"
+              className="text-xs px-2 py-1 rounded border border-[var(--border-default)] text-[var(--text-muted)] hover:text-white hover:bg-white/5 transition-colors"
             >
               Re-pair
             </button>
@@ -485,7 +485,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
       {!isRunning && !connected && (
         <div className="flex items-start gap-2.5 p-3 rounded-lg border border-amber-500/20 bg-amber-500/5">
           <AlertTriangle size={14} className="text-amber-400 mt-0.5 flex-shrink-0" />
-          <p className="text-xs leading-relaxed text-[#A5A1C2]">
+          <p className="text-xs leading-relaxed text-[var(--text-secondary)]">
             Your agent must be running to pair {integration.name}. Start the agent first.
           </p>
         </div>
@@ -515,7 +515,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
               href={integration.docsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-center text-xs text-[#71717a] hover:text-[#06b6d4] transition-colors"
+              className="block text-center text-xs text-[var(--text-muted)] hover:text-[#06b6d4] transition-colors"
             >
               How to set up {integration.name} &rarr;
             </a>
@@ -550,7 +550,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
                 >
                   {qrCode}
                 </pre>
-                <p className="text-xs text-center text-[#71717a] mt-4">Tap outside to close</p>
+                <p className="text-xs text-center text-[var(--text-muted)] mt-4">Tap outside to close</p>
               </div>
             </div>,
             document.body
@@ -558,7 +558,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
           <button
             onClick={handlePair}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-white/70 transition-all hover:text-white hover:bg-white/5 border border-white/[0.08]"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-white/70 transition-all hover:text-white hover:bg-white/5 border border-[var(--border-default)]"
           >
             {loading ? <Loader2 size={14} className="animate-spin" /> : null}
             Refresh QR Code
@@ -608,7 +608,7 @@ function WebhookSection() {
 
   return (
     <div>
-      <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[#71717a]">
+      <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
         Webhook
         <span className="ml-2 text-violet-400 normal-case tracking-normal font-normal">Inbound HTTP</span>
       </h3>
@@ -616,87 +616,87 @@ function WebhookSection() {
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
-          className="w-full flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition-colors cursor-pointer"
+          className="w-full flex items-center gap-3 p-4 text-left hover:bg-[var(--bg-card)] transition-colors cursor-pointer"
         >
           <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-violet-500/10 border border-violet-500/20">
             <Webhook size={14} className="text-violet-400" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-[#FFFFFF]">Webhook URL</span>
+              <span className="text-sm font-medium text-[var(--text-primary)]">Webhook URL</span>
               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 Always Active
               </span>
             </div>
-            <p className="text-xs mt-0.5 truncate text-[#71717a]">
+            <p className="text-xs mt-0.5 truncate text-[var(--text-muted)]">
               Trigger your agent from external services (Zapier, GitHub, etc.)
             </p>
           </div>
           {expanded
-            ? <ChevronUp size={16} className="text-[#71717a]" />
-            : <ChevronDown size={16} className="text-[#71717a]" />
+            ? <ChevronUp size={16} className="text-[var(--text-muted)]" />
+            : <ChevronDown size={16} className="text-[var(--text-muted)]" />
           }
         </button>
 
         {expanded && (
-          <div className="border-t border-white/[0.06] p-5 space-y-4 bg-white/[0.01]">
+          <div className="border-t border-[var(--border-default)] p-5 space-y-4 bg-[var(--bg-card)]">
             {/* Webhook URL */}
             <div>
-              <label className="block text-xs font-medium text-[#A5A1C2] mb-1.5">Webhook URL</label>
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Webhook URL</label>
               <div className="flex items-center gap-2">
                 <input
                   type="text"
                   readOnly
                   value={webhookData.url}
-                  className="flex-1 h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:outline-none font-mono"
+                  className="flex-1 h-9 px-3 rounded-lg text-sm text-white bg-[var(--bg-card)] border border-[var(--border-default)] focus:outline-none font-mono"
                 />
                 <button
                   onClick={() => copyToClipboard(webhookData.url, setCopiedUrl)}
-                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-white/[0.08] hover:bg-white/5 transition-colors"
+                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-white/5 transition-colors"
                   title="Copy URL"
                 >
-                  {copiedUrl ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[#71717a]" />}
+                  {copiedUrl ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
                 </button>
               </div>
             </div>
 
             {/* Webhook Token */}
             <div>
-              <label className="block text-xs font-medium text-[#A5A1C2] mb-1.5">Bearer Token</label>
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Bearer Token</label>
               <div className="flex items-center gap-2">
                 <input
                   type={tokenVisible ? 'text' : 'password'}
                   readOnly
                   value={webhookData.token}
-                  className="flex-1 h-9 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:outline-none font-mono"
+                  className="flex-1 h-9 px-3 rounded-lg text-sm text-white bg-[var(--bg-card)] border border-[var(--border-default)] focus:outline-none font-mono"
                 />
                 <button
                   onClick={() => setTokenVisible(!tokenVisible)}
-                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-white/[0.08] hover:bg-white/5 transition-colors"
+                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-white/5 transition-colors"
                   title={tokenVisible ? 'Hide token' : 'Reveal token'}
                 >
-                  {tokenVisible ? <EyeOff size={14} className="text-[#71717a]" /> : <Eye size={14} className="text-[#71717a]" />}
+                  {tokenVisible ? <EyeOff size={14} className="text-[var(--text-muted)]" /> : <Eye size={14} className="text-[var(--text-muted)]" />}
                 </button>
                 <button
                   onClick={() => copyToClipboard(webhookData.token, setCopiedToken)}
-                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-white/[0.08] hover:bg-white/5 transition-colors"
+                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-white/5 transition-colors"
                   title="Copy token"
                 >
-                  {copiedToken ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[#71717a]" />}
+                  {copiedToken ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
                 </button>
               </div>
             </div>
 
             {/* Example */}
             <div>
-              <label className="block text-xs font-medium text-[#A5A1C2] mb-1.5">Example Request</label>
-              <pre className="p-3 rounded-lg text-xs text-[#A5A1C2] bg-black/30 border border-white/[0.06] overflow-x-auto font-mono leading-relaxed whitespace-pre-wrap break-all">
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Example Request</label>
+              <pre className="p-3 rounded-lg text-xs text-[var(--text-secondary)] bg-black/30 border border-[var(--border-default)] overflow-x-auto font-mono leading-relaxed whitespace-pre-wrap break-all">
                 {curlExample}
               </pre>
             </div>
 
             {/* Note */}
-            <p className="text-[10px] leading-relaxed text-[#71717a]">
+            <p className="text-[10px] leading-relaxed text-[var(--text-muted)]">
               Use this URL to trigger your agent from external services (Zapier, GitHub, n8n, etc.).
               Send a POST request with a JSON body containing a <code className="text-violet-400">message</code> field.
               The agent will auto-wake from sleep if needed.
@@ -740,9 +740,9 @@ function IntegrationCard({
   const cardBorder = isConfigured
     ? 'border-emerald-500/30 shadow-[0_0_15px_-3px_rgba(16,185,129,0.15)]'
     : recommended
-      ? 'border-white/[0.10] hover:border-white/[0.15]'
+      ? 'border-[var(--border-hover)] hover:border-[var(--border-hover)]'
       : isPlanned
-        ? 'border-white/[0.04] opacity-60'
+        ? 'border-[var(--border-default)] opacity-60'
         : '';
 
   const cardBg = isConfigured
@@ -754,7 +754,7 @@ function IntegrationCard({
       <button
         type="button"
         onClick={() => !isPlanned && toggleIntegrationExpanded(sk)}
-        className={`w-full flex items-center gap-3 p-4 text-left transition-colors ${isPlanned ? 'cursor-default' : 'hover:bg-white/[0.02] cursor-pointer'}`}
+        className={`w-full flex items-center gap-3 p-4 text-left transition-colors ${isPlanned ? 'cursor-default' : 'hover:bg-[var(--bg-card)] cursor-pointer'}`}
         disabled={isPlanned}
       >
         {/* Icon */}
@@ -762,24 +762,24 @@ function IntegrationCard({
           isConfigured
             ? 'bg-emerald-500/15 border border-emerald-500/25'
             : recommended
-              ? 'bg-white/[0.06] border border-white/[0.10]'
-              : 'bg-white/[0.03] border border-white/[0.06]'
+              ? 'bg-[var(--bg-card)] border border-[var(--border-hover)]'
+              : 'bg-[var(--bg-card)] border border-[var(--border-default)]'
         }`}>
           {isConfigured ? (
             <CheckCircle size={15} className="text-emerald-400" />
           ) : isPairing ? (
-            <Smartphone size={15} className={recommended ? 'text-white/70' : 'text-[#71717a]'} />
+            <Smartphone size={15} className={recommended ? 'text-white/70' : 'text-[var(--text-muted)]'} />
           ) : isPlanned ? (
             <Clock size={15} className="text-zinc-500" />
           ) : (
-            <Settings size={15} className={recommended ? 'text-white/70' : 'text-[#71717a]'} />
+            <Settings size={15} className={recommended ? 'text-white/70' : 'text-[var(--text-muted)]'} />
           )}
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className={`text-sm font-medium ${isPlanned ? 'text-zinc-500' : isConfigured ? 'text-white' : 'text-[#FFFFFF]'}`}>
+            <span className={`text-sm font-medium ${isPlanned ? 'text-zinc-500' : isConfigured ? 'text-white' : 'text-[var(--text-primary)]'}`}>
               {integration.name}
             </span>
 
@@ -824,7 +824,7 @@ function IntegrationCard({
               </span>
             )}
           </div>
-          <p className={`text-xs mt-0.5 truncate ${isPlanned ? 'text-zinc-600' : 'text-[#71717a]'}`}>
+          <p className={`text-xs mt-0.5 truncate ${isPlanned ? 'text-zinc-600' : 'text-[var(--text-muted)]'}`}>
             {integration.description}
           </p>
         </div>
@@ -832,8 +832,8 @@ function IntegrationCard({
         {/* Expand/collapse */}
         {!isPlanned && (
           isExpanded
-            ? <ChevronUp size={16} className="text-[#71717a] flex-shrink-0" />
-            : <ChevronDown size={16} className="text-[#71717a] flex-shrink-0" />
+            ? <ChevronUp size={16} className="text-[var(--text-muted)] flex-shrink-0" />
+            : <ChevronDown size={16} className="text-[var(--text-muted)] flex-shrink-0" />
         )}
       </button>
 
@@ -870,12 +870,12 @@ function EmbedWidgetSection({ slug }: { slug?: string }) {
 
   return (
     <div>
-      <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[#71717a]">
+      <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
         Embed on Your Website
         <span className="ml-2 text-violet-400 normal-case tracking-normal font-normal">Widget &amp; iframe</span>
       </h3>
       <GlassCard className="p-5 space-y-4">
-        <p className="text-xs text-[#A5A1C2] leading-relaxed">
+        <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
           Add a floating chat widget or embed the chat directly into any website. Your agent must be set to <span className="text-white font-medium">public</span> for the embed to work.
         </p>
 
@@ -887,7 +887,7 @@ function EmbedWidgetSection({ slug }: { slug?: string }) {
             <span className="text-[10px] text-zinc-500">Floating button + popup</span>
           </div>
           <div className="relative group">
-            <pre className="bg-black/40 border border-white/[0.06] rounded-lg p-3 text-[11px] text-emerald-400 font-mono overflow-x-auto whitespace-pre-wrap break-all leading-relaxed">
+            <pre className="bg-black/40 border border-[var(--border-default)] rounded-lg p-3 text-[11px] text-emerald-400 font-mono overflow-x-auto whitespace-pre-wrap break-all leading-relaxed">
               {scriptTag}
             </pre>
             <button
@@ -910,7 +910,7 @@ function EmbedWidgetSection({ slug }: { slug?: string }) {
             <span className="text-[10px] text-zinc-500">Fixed-size iframe</span>
           </div>
           <div className="relative group">
-            <pre className="bg-black/40 border border-white/[0.06] rounded-lg p-3 text-[11px] text-cyan-400 font-mono overflow-x-auto whitespace-pre-wrap break-all leading-relaxed">
+            <pre className="bg-black/40 border border-[var(--border-default)] rounded-lg p-3 text-[11px] text-cyan-400 font-mono overflow-x-auto whitespace-pre-wrap break-all leading-relaxed">
               {iframeTag}
             </pre>
             <button
@@ -956,20 +956,20 @@ export function IntegrationsTab() {
       ) : (
         <>
           {/* Framework context bar */}
-          <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)]">
             <div className="flex items-center gap-2.5">
               <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${fwBadge}`}>
                 {fwLabel}
               </span>
-              <span className="text-xs text-[#71717a]">
+              <span className="text-xs text-[var(--text-muted)]">
                 Showing integrations compatible with {fwLabel}
               </span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs text-[#71717a]">
+              <span className="text-xs text-[var(--text-muted)]">
                 {configuredCount}/{totalCount} connected
               </span>
-              <div className="w-16 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+              <div className="w-16 h-1.5 rounded-full bg-[var(--bg-card)] overflow-hidden">
                 <div
                   className="h-full rounded-full bg-emerald-500/60 transition-all duration-500"
                   style={{ width: totalCount > 0 ? `${(configuredCount / totalCount) * 100}%` : '0%' }}
@@ -982,7 +982,7 @@ export function IntegrationsTab() {
           {activeFeatures.length > 0 && (
             <div className="flex items-start gap-2.5 p-3 rounded-lg border border-amber-500/20 bg-amber-500/5">
               <AlertTriangle size={14} className="text-amber-400 mt-0.5 flex-shrink-0" />
-              <p className="text-xs leading-relaxed text-[#A5A1C2]">
+              <p className="text-xs leading-relaxed text-[var(--text-secondary)]">
                 API keys and tokens are encrypted with AES-256-GCM before storage. Once saved, secret values are never shown again — only masked placeholders will appear.
               </p>
             </div>
@@ -993,7 +993,7 @@ export function IntegrationsTab() {
 
           {/* Main integrations — all free on every tier */}
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[#71717a]">
+            <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
               Main Integrations
               <span className="ml-2 text-emerald-400 normal-case tracking-normal font-normal">Free on all tiers</span>
             </h3>
@@ -1011,7 +1011,7 @@ export function IntegrationsTab() {
 
           {/* Other Platforms section — all integrations are free (OpenClaw only) */}
           {extraIntegrations.length > 0 && <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[#71717a]">
+            <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
               Other Platforms
               <span className="ml-2 text-blue-400 normal-case tracking-normal font-normal">Community extensions</span>
             </h3>
@@ -1038,9 +1038,9 @@ export function IntegrationsTab() {
           <EmbedWidgetSection slug={agent?.slug ?? undefined} />
 
           {/* Legend */}
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 pt-2 border-t border-white/[0.04]">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 pt-2 border-t border-[var(--border-default)]">
             {(['native', 'community', 'planned'] as CompatLevel[]).map((level) => (
-              <span key={level} className="flex items-center gap-1.5 text-[10px] text-[#71717a]">
+              <span key={level} className="flex items-center gap-1.5 text-[10px] text-[var(--text-muted)]">
                 <span className={`inline-block w-1.5 h-1.5 rounded-full ${
                   level === 'native' ? 'bg-emerald-400' : level === 'community' ? 'bg-blue-400' : 'bg-zinc-500'
                 }`} />
@@ -1050,7 +1050,7 @@ export function IntegrationsTab() {
           </div>
 
           {/* Note */}
-          <p className="text-center text-xs text-[#71717a]">
+          <p className="text-center text-xs text-[var(--text-muted)]">
             All integrations are free on every tier. Just add your credentials and go.
           </p>
         </>

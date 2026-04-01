@@ -59,7 +59,7 @@ export function RobotMascot({ size = 'md', mood = 'happy', className = '', anima
         <ellipse cx="40" cy="74" rx="20" ry="4" fill="url(#shadowGrad)" />
 
         {/* Antenna */}
-        <line x1="40" y1="12" x2="40" y2="4" stroke="#71717a" strokeWidth="2" strokeLinecap="round" />
+        <line x1="40" y1="12" x2="40" y2="4" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" />
         <circle cx="40" cy="3" r="3" fill="#06b6d4">
           <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" />
         </circle>
@@ -101,7 +101,7 @@ export function RobotMascot({ size = 'md', mood = 'happy', className = '', anima
           <path d="M34 32 Q40 36 46 32" stroke="#06b6d4" strokeWidth="1.5" strokeLinecap="round" fill="none" />
         )}
         {mood === 'thinking' && (
-          <line x1="36" y1="33" x2="44" y2="33" stroke="#71717a" strokeWidth="1.5" strokeLinecap="round" />
+          <line x1="36" y1="33" x2="44" y2="33" stroke="var(--text-muted)" strokeWidth="1.5" strokeLinecap="round" />
         )}
         {mood === 'confused' && (
           <path d="M34 34 Q37 31 40 34 Q43 37 46 34" stroke="#FBBF24" strokeWidth="1.5" strokeLinecap="round" fill="none" />
@@ -123,10 +123,10 @@ export function RobotMascot({ size = 'md', mood = 'happy', className = '', anima
         <circle cx="40" cy="56" r="1.5" fill="#06b6d4" />
 
         {/* Chest panel lines */}
-        <line x1="30" y1="53" x2="34" y2="53" stroke="#71717a" strokeWidth="0.5" opacity="0.4" />
-        <line x1="46" y1="53" x2="50" y2="53" stroke="#71717a" strokeWidth="0.5" opacity="0.4" />
-        <line x1="30" y1="60" x2="34" y2="60" stroke="#71717a" strokeWidth="0.5" opacity="0.4" />
-        <line x1="46" y1="60" x2="50" y2="60" stroke="#71717a" strokeWidth="0.5" opacity="0.4" />
+        <line x1="30" y1="53" x2="34" y2="53" stroke="var(--text-muted)" strokeWidth="0.5" opacity="0.4" />
+        <line x1="46" y1="53" x2="50" y2="53" stroke="var(--text-muted)" strokeWidth="0.5" opacity="0.4" />
+        <line x1="30" y1="60" x2="34" y2="60" stroke="var(--text-muted)" strokeWidth="0.5" opacity="0.4" />
+        <line x1="46" y1="60" x2="50" y2="60" stroke="var(--text-muted)" strokeWidth="0.5" opacity="0.4" />
 
         {/* Arms */}
         {mood === 'waving' ? (

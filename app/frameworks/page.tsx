@@ -247,7 +247,7 @@ function StartupBar({ ms, max }: { ms: number; max: number }) {
   const pct = Math.round((ms / max) * 100);
   return (
     <div className="flex items-center gap-3">
-      <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+      <div className="flex-1 h-1.5 bg-[var(--bg-card)] rounded-full overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
@@ -255,7 +255,7 @@ function StartupBar({ ms, max }: { ms: number; max: number }) {
           className="h-full rounded-full bg-gradient-to-r from-[#06b6d4] to-[#a78bfa]"
         />
       </div>
-      <span className="text-xs font-mono text-[#A5A1C2] w-14 text-right">{(ms / 1000).toFixed(1)}s</span>
+      <span className="text-xs font-mono text-[var(--text-secondary)] w-14 text-right">{(ms / 1000).toFixed(1)}s</span>
     </div>
   );
 }
@@ -264,7 +264,7 @@ function MemoryBar({ mb, max }: { mb: number; max: number }) {
   const pct = Math.round((mb / max) * 100);
   return (
     <div className="flex items-center gap-3">
-      <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+      <div className="flex-1 h-1.5 bg-[var(--bg-card)] rounded-full overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
@@ -272,7 +272,7 @@ function MemoryBar({ mb, max }: { mb: number; max: number }) {
           className="h-full rounded-full bg-gradient-to-r from-[#a78bfa] to-[#f472b6]"
         />
       </div>
-      <span className="text-xs font-mono text-[#A5A1C2] w-14 text-right">{mb} MB</span>
+      <span className="text-xs font-mono text-[var(--text-secondary)] w-14 text-right">{mb} MB</span>
     </div>
   );
 }
@@ -298,10 +298,10 @@ export default function FrameworksPage() {
             <Layers className="h-4 w-4" />
             Framework Comparison
           </div>
-          <h1 className="font-[var(--font-display)] text-4xl font-extrabold tracking-tight text-[#F0EEFC] sm:text-5xl">
+          <h1 className="font-[var(--font-display)] text-4xl font-extrabold tracking-tight text-[var(--text-primary)] sm:text-5xl">
             Pick the right framework
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-[#A5A1C2]">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-[var(--text-secondary)]">
             Hatcher supports 4 battle-tested agent frameworks. Each has unique strengths — here&apos;s how to choose.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -316,7 +316,7 @@ export default function FrameworksPage() {
               href="https://docs.hatcher.host/frameworks"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.03] px-5 py-2.5 text-sm font-semibold text-[#A5A1C2] transition-all duration-200 hover:border-white/[0.12] hover:text-[#F0EEFC]"
+              className="inline-flex items-center gap-2 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] px-5 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-200 hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]"
             >
               <ExternalLink className="h-4 w-4" />
               Full docs
@@ -331,7 +331,7 @@ export default function FrameworksPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.3 }}
-            className="mb-6 text-xl font-bold text-[#F0EEFC]"
+            className="mb-6 text-xl font-bold text-[var(--text-primary)]"
           >
             At a glance
           </motion.h2>
@@ -342,7 +342,7 @@ export default function FrameworksPage() {
                 whileHover={{ y: -3 }}
                 transition={{ duration: 0.2 }}
                 className={cn(
-                  'group relative flex flex-col rounded-2xl border bg-[rgba(14,14,20,0.8)] p-5 backdrop-blur-sm transition-all duration-300 hover:shadow-lg cursor-default',
+                  'group relative flex flex-col rounded-2xl border bg-[var(--bg-card)] p-5 backdrop-blur-sm transition-all duration-300 hover:shadow-lg cursor-default',
                   fw.border
                 )}
                 style={{ '--glow': fw.glow } as React.CSSProperties}
@@ -362,15 +362,15 @@ export default function FrameworksPage() {
                   </div>
 
                   <h3 className={cn('mb-1 text-lg font-bold', fw.text)}>{fw.name}</h3>
-                  <p className="mb-3 text-xs text-[#6B6890]">{fw.tagline}</p>
+                  <p className="mb-3 text-xs text-[var(--text-muted)]">{fw.tagline}</p>
 
-                  <p className="mb-4 text-xs leading-relaxed text-[#A5A1C2]">
+                  <p className="mb-4 text-xs leading-relaxed text-[var(--text-secondary)]">
                     {fw.bestFor}
                   </p>
 
                   <div className="mb-4 space-y-1">
                     {fw.features.filter(f => f.supported).slice(0, 3).map((feat) => (
-                      <div key={feat.name} className="flex items-center gap-1.5 text-xs text-[#A5A1C2]">
+                      <div key={feat.name} className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
                         <Check className={cn('h-3 w-3 flex-shrink-0', fw.text)} />
                         {feat.name}
                       </div>
@@ -399,15 +399,15 @@ export default function FrameworksPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.3 }}
-            className="mb-6 text-xl font-bold text-[#F0EEFC]"
+            className="mb-6 text-xl font-bold text-[var(--text-primary)]"
           >
             Feature matrix
           </motion.h2>
-          <div className="overflow-x-auto rounded-2xl border border-white/[0.06]">
+          <div className="overflow-x-auto rounded-2xl border border-[var(--border-default)]">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-                  <th className="px-5 py-4 text-left font-semibold text-[#A5A1C2]">Feature</th>
+                <tr className="border-b border-[var(--border-default)] bg-[var(--bg-card)]">
+                  <th className="px-5 py-4 text-left font-semibold text-[var(--text-secondary)]">Feature</th>
                   {FRAMEWORKS.map((fw) => (
                     <th key={fw.key} className="px-4 py-4 text-center">
                       <span className={cn('font-bold', fw.text)}>{fw.emoji} {fw.name}</span>
@@ -420,11 +420,11 @@ export default function FrameworksPage() {
                   <tr
                     key={feat}
                     className={cn(
-                      'border-b border-white/[0.04] transition-colors duration-150 hover:bg-white/[0.02]',
+                      'border-b border-[var(--border-default)] transition-colors duration-150 hover:bg-[var(--bg-card)]',
                       i === ALL_FEATURES.length - 1 && 'border-none'
                     )}
                   >
-                    <td className="px-5 py-3.5 font-medium text-[#F0EEFC]">{feat}</td>
+                    <td className="px-5 py-3.5 font-medium text-[var(--text-primary)]">{feat}</td>
                     {FRAMEWORKS.map((fw) => {
                       const supported = fw.features.find((f) => f.name === feat)?.supported ?? false;
                       return (
@@ -432,7 +432,7 @@ export default function FrameworksPage() {
                           {supported ? (
                             <Check className={cn('mx-auto h-4 w-4', fw.text)} />
                           ) : (
-                            <X className="mx-auto h-4 w-4 text-white/[0.15]" />
+                            <X className="mx-auto h-4 w-4 text-[var(--text-muted)]" />
                           )}
                         </td>
                       );
@@ -451,11 +451,11 @@ export default function FrameworksPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.3 }}
-            className="mb-2 text-xl font-bold text-[#F0EEFC]"
+            className="mb-2 text-xl font-bold text-[var(--text-primary)]"
           >
             Best for...
           </motion.h2>
-          <p className="mb-6 text-sm text-[#A5A1C2]">
+          <p className="mb-6 text-sm text-[var(--text-secondary)]">
             Not sure which framework to pick? Match your use case.
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -480,11 +480,11 @@ export default function FrameworksPage() {
                   </div>
                 </div>
 
-                <p className="mb-3 text-sm text-[#A5A1C2]">{fw.bestFor}</p>
+                <p className="mb-3 text-sm text-[var(--text-secondary)]">{fw.bestFor}</p>
 
                 <div className="space-y-1.5">
                   {fw.useCases.map((uc) => (
-                    <div key={uc} className="flex items-center gap-2 text-xs text-[#F0EEFC]/80">
+                    <div key={uc} className="flex items-center gap-2 text-xs text-[var(--text-primary)]/80">
                       <Sparkles className={cn('h-3 w-3 flex-shrink-0', fw.text)} />
                       {uc}
                     </div>
@@ -495,7 +495,7 @@ export default function FrameworksPage() {
                   {fw.integrations.map((p) => (
                     <span
                       key={p}
-                      className="rounded-md border border-white/[0.06] bg-white/[0.04] px-2 py-0.5 text-[10px] text-[#A5A1C2]"
+                      className="rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] px-2 py-0.5 text-[10px] text-[var(--text-secondary)]"
                     >
                       {p}
                     </span>
@@ -513,20 +513,20 @@ export default function FrameworksPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.3 }}
-            className="mb-2 text-xl font-bold text-[#F0EEFC]"
+            className="mb-2 text-xl font-bold text-[var(--text-primary)]"
           >
             Performance benchmarks
           </motion.h2>
-          <p className="mb-6 text-sm text-[#A5A1C2]">
+          <p className="mb-6 text-sm text-[var(--text-secondary)]">
             Cold-start time and baseline memory usage on Hatcher shared infrastructure. Actual values vary by config.
           </p>
-          <div className="rounded-2xl border border-white/[0.06] bg-[rgba(14,14,20,0.7)] p-6">
+          <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-6">
             <div className="grid gap-8 sm:grid-cols-2">
               {/* Startup time */}
               <div>
                 <div className="mb-4 flex items-center gap-2">
                   <Clock className="h-4 w-4 text-[#06b6d4]" />
-                  <h3 className="font-semibold text-[#F0EEFC]">Cold-start time</h3>
+                  <h3 className="font-semibold text-[var(--text-primary)]">Cold-start time</h3>
                 </div>
                 <div className="space-y-4">
                   {FRAMEWORKS.map((fw) => (
@@ -540,14 +540,14 @@ export default function FrameworksPage() {
                     </div>
                   ))}
                 </div>
-                <p className="mt-3 text-xs text-[#6B6890]">Lower is faster</p>
+                <p className="mt-3 text-xs text-[var(--text-muted)]">Lower is faster</p>
               </div>
 
               {/* Memory */}
               <div>
                 <div className="mb-4 flex items-center gap-2">
                   <Cpu className="h-4 w-4 text-[#a78bfa]" />
-                  <h3 className="font-semibold text-[#F0EEFC]">Baseline memory usage</h3>
+                  <h3 className="font-semibold text-[var(--text-primary)]">Baseline memory usage</h3>
                 </div>
                 <div className="space-y-4">
                   {FRAMEWORKS.map((fw) => (
@@ -561,12 +561,12 @@ export default function FrameworksPage() {
                     </div>
                   ))}
                 </div>
-                <p className="mt-3 text-xs text-[#6B6890]">Lower is leaner</p>
+                <p className="mt-3 text-xs text-[var(--text-muted)]">Lower is leaner</p>
               </div>
             </div>
 
             {/* Summary callout */}
-            <div className="mt-6 rounded-xl border border-[#f472b6]/20 bg-[#f472b6]/5 px-4 py-3 text-sm text-[#A5A1C2]">
+            <div className="mt-6 rounded-xl border border-[#f472b6]/20 bg-[#f472b6]/5 px-4 py-3 text-sm text-[var(--text-secondary)]">
               <span className="font-semibold text-[#f472b6]">🌸 Milady</span> is the fastest and lightest — ideal for free-tier deployments.
               {' '}<span className="font-semibold text-[#06b6d4]">🦞 OpenClaw</span> packs the most tools but needs more resources.
             </div>
@@ -580,11 +580,11 @@ export default function FrameworksPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.3 }}
-            className="mb-2 text-xl font-bold text-[#F0EEFC]"
+            className="mb-2 text-xl font-bold text-[var(--text-primary)]"
           >
             Configuration examples
           </motion.h2>
-          <p className="mb-6 text-sm text-[#A5A1C2]">
+          <p className="mb-6 text-sm text-[var(--text-secondary)]">
             Each framework has its own config format. Here&apos;s what a typical setup looks like.
           </p>
 
@@ -597,8 +597,8 @@ export default function FrameworksPage() {
                 className={cn(
                   'rounded-t-xl border border-b-0 px-4 py-2.5 text-sm font-semibold transition-all duration-200',
                   activeCode === fw.key
-                    ? cn('border-white/[0.1] bg-[rgba(14,14,20,0.9)]', fw.text)
-                    : 'border-transparent text-[#6B6890] hover:text-[#A5A1C2]'
+                    ? cn('border-[var(--border-hover)] bg-[var(--bg-card)]', fw.text)
+                    : 'border-transparent text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
                 )}
               >
                 {fw.emoji} {fw.name}
@@ -607,7 +607,7 @@ export default function FrameworksPage() {
           </div>
 
           {/* Code block */}
-          <div className="rounded-b-2xl rounded-tr-2xl border border-white/[0.1] bg-[rgba(8,8,14,0.95)] p-5">
+          <div className="rounded-b-2xl rounded-tr-2xl border border-[var(--border-hover)] bg-[rgba(8,8,14,0.95)] p-5">
             <AnimatePresence mode="wait">
               <motion.pre
                 key={activeCode}
@@ -615,14 +615,14 @@ export default function FrameworksPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.2 }}
-                className="overflow-x-auto font-mono text-xs leading-relaxed text-[#A5A1C2]"
+                className="overflow-x-auto font-mono text-xs leading-relaxed text-[var(--text-secondary)]"
               >
                 <code>{activeFramework.configExample}</code>
               </motion.pre>
             </AnimatePresence>
 
-            <div className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-4">
-              <span className="text-xs text-[#6B6890]">
+            <div className="mt-4 flex items-center justify-between border-t border-[var(--border-default)] pt-4">
+              <span className="text-xs text-[var(--text-muted)]">
                 Full configuration reference →
               </span>
               <a
@@ -645,25 +645,25 @@ export default function FrameworksPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.3 }}
-            className="mb-2 text-xl font-bold text-[#F0EEFC]"
+            className="mb-2 text-xl font-bold text-[var(--text-primary)]"
           >
             LLM support
           </motion.h2>
-          <p className="mb-6 text-sm text-[#A5A1C2]">
+          <p className="mb-6 text-sm text-[var(--text-secondary)]">
             All frameworks support BYOK (Bring Your Own Key) for unlimited messages. Free-tier agents use our hosted Groq key.
           </p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {FRAMEWORKS.map((fw) => (
               <div
                 key={fw.key}
-                className={cn('rounded-2xl border p-4', fw.border, 'bg-[rgba(14,14,20,0.7)]')}
+                className={cn('rounded-2xl border p-4', fw.border, 'bg-[var(--bg-card)]')}
               >
                 <h3 className={cn('mb-3 font-semibold', fw.text)}>
                   {fw.emoji} {fw.name}
                 </h3>
                 <div className="space-y-1.5">
                   {fw.llmSupport.map((llm) => (
-                    <div key={llm} className="flex items-center gap-2 text-xs text-[#A5A1C2]">
+                    <div key={llm} className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
                       <Check className={cn('h-3 w-3 flex-shrink-0', fw.text)} />
                       {llm}
                     </div>
@@ -672,7 +672,7 @@ export default function FrameworksPage() {
               </div>
             ))}
           </div>
-          <p className="mt-3 text-xs text-[#6B6890]">
+          <p className="mt-3 text-xs text-[var(--text-muted)]">
             * BYOK always free — unlimited messages on any framework.{' '}
             <Link href="/docs/api" className="text-[#06b6d4] underline-offset-2 hover:underline">
               View BYOK setup guide →
@@ -683,7 +683,7 @@ export default function FrameworksPage() {
         {/* ── Decision guide ────────────────────────────────── */}
         <section>
           <div className="rounded-2xl border border-[#06b6d4]/20 bg-gradient-to-br from-[#06b6d4]/5 to-[#a78bfa]/5 p-8">
-            <h2 className="mb-6 text-xl font-bold text-[#F0EEFC]">Quick decision guide</h2>
+            <h2 className="mb-6 text-xl font-bold text-[var(--text-primary)]">Quick decision guide</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               {[
                 {
@@ -725,11 +725,11 @@ export default function FrameworksPage() {
               ].map((item) => (
                 <div
                   key={item.condition}
-                  className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
+                  className="flex items-start gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-4"
                 >
                   <ArrowRight className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#06b6d4]" />
                   <div>
-                    <p className="text-sm text-[#A5A1C2]">{item.condition}</p>
+                    <p className="text-sm text-[var(--text-secondary)]">{item.condition}</p>
                     <p className={cn('mt-1 text-sm font-bold', item.color)}>
                       {item.emoji} {item.pick}
                     </p>
@@ -742,10 +742,10 @@ export default function FrameworksPage() {
 
         {/* ── CTA ───────────────────────────────────────────── */}
         <section className="text-center">
-          <div className="rounded-2xl border border-white/[0.06] bg-[rgba(14,14,20,0.7)] p-10">
-            <Bot className="mx-auto mb-4 h-10 w-10 text-[#6B6890]" />
-            <h2 className="mb-2 text-2xl font-bold text-[#F0EEFC]">Ready to deploy?</h2>
-            <p className="mx-auto mb-8 max-w-md text-[#A5A1C2]">
+          <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-10">
+            <Bot className="mx-auto mb-4 h-10 w-10 text-[var(--text-muted)]" />
+            <h2 className="mb-2 text-2xl font-bold text-[var(--text-primary)]">Ready to deploy?</h2>
+            <p className="mx-auto mb-8 max-w-md text-[var(--text-secondary)]">
               Pick a framework, configure your agent, and go live in under 60 seconds. Free tier included.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
@@ -758,7 +758,7 @@ export default function FrameworksPage() {
               </Link>
               <Link
                 href="/pricing"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.03] px-6 py-3 text-sm font-semibold text-[#A5A1C2] transition-all duration-200 hover:border-white/[0.12] hover:text-[#F0EEFC]"
+                className="inline-flex items-center gap-2 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] px-6 py-3 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-200 hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]"
               >
                 View pricing
                 <ArrowRight className="h-4 w-4" />

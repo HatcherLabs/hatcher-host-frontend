@@ -138,7 +138,7 @@ export function Toast({ toast, onDismiss }: ToastProps) {
       transition={{ type: 'spring', stiffness: 500, damping: 35, mass: 0.8 }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      className="relative w-[380px] overflow-hidden rounded-xl border border-white/[0.06] bg-[#1A1730]/90 shadow-lg backdrop-blur-xl"
+      className="relative w-[380px] overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)]/90 shadow-lg backdrop-blur-xl"
       style={{
         borderLeft: `4px solid ${config.borderColor}`,
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.03)',
@@ -152,12 +152,12 @@ export function Toast({ toast, onDismiss }: ToastProps) {
           className={`mt-0.5 flex-shrink-0 ${config.iconColor}`}
           aria-hidden="true"
         />
-        <p className="min-w-0 flex-1 text-sm leading-relaxed text-[#F0EEFC]">
+        <p className="min-w-0 flex-1 text-sm leading-relaxed text-[var(--text-primary)]">
           {toast.message}
         </p>
         <button
           onClick={dismiss}
-          className="flex-shrink-0 rounded-lg p-1 text-[#6B6890] transition-colors hover:bg-white/[0.06] hover:text-[#A5A1C2]"
+          className="flex-shrink-0 rounded-lg p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text-secondary)]"
           aria-label="Dismiss notification"
         >
           <X size={14} />
@@ -165,7 +165,7 @@ export function Toast({ toast, onDismiss }: ToastProps) {
       </div>
 
       {/* Progress bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/[0.04]">
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--bg-card)]">
         <div
           ref={progressRef}
           className="h-full"

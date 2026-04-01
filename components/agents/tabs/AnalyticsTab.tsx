@@ -156,7 +156,7 @@ function calcTrend(data: Array<{ count: number }>): { pct: number; direction: 'u
 function TrendBadge({ pct, direction }: { pct: number; direction: 'up' | 'down' | 'flat' }) {
   if (direction === 'flat') {
     return (
-      <span className="inline-flex items-center gap-0.5 text-[10px] text-[#71717a]">
+      <span className="inline-flex items-center gap-0.5 text-[10px] text-[var(--text-muted)]">
         <Minus size={10} />
         0%
       </span>
@@ -178,10 +178,10 @@ function TrendBadge({ pct, direction }: { pct: number; direction: 'up' | 'down' 
 function ChartTooltipContent({ active, payload, label, theme }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-white/10 px-3 py-2 text-xs shadow-lg" style={{ background: '#1a1730' }}>
+    <div className="rounded-lg border border-white/10 px-3 py-2 text-xs shadow-lg" style={{ background: 'var(--bg-elevated)' }}>
       <p className="font-medium text-white mb-1">{label}</p>
       {payload.map((p: any, i: number) => (
-        <p key={i} style={{ color: p.color || theme?.primary || '#71717a' }}>
+        <p key={i} style={{ color: p.color || theme?.primary || 'var(--text-muted)' }}>
           {p.name}: {typeof p.value === 'number' ? p.value.toLocaleString() : p.value}
         </p>
       ))}
@@ -296,7 +296,7 @@ export function AnalyticsTab() {
     <div className="flex items-end gap-0.5 h-36">
       {Array.from({ length: count }).map((_, i) => (
         <div key={i} className="flex-1 flex flex-col items-center gap-1">
-          <div className="w-full rounded-t bg-white/[0.04] animate-pulse" style={{ height: `${20 + (i * 13) % 60}%` }} />
+          <div className="w-full rounded-t bg-[var(--bg-card)] animate-pulse" style={{ height: `${20 + (i * 13) % 60}%` }} />
         </div>
       ))}
     </div>
@@ -320,7 +320,7 @@ export function AnalyticsTab() {
           <p className="text-xs font-medium" style={{ color: theme.primary }}>
             {(FRAMEWORK_THEME[framework]?.label ?? framework)} Analytics
           </p>
-          <p className="text-[11px] text-[#a1a1aa] leading-relaxed mt-0.5">{tip}</p>
+          <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed mt-0.5">{tip}</p>
         </div>
       </div>
 
@@ -356,15 +356,15 @@ export function AnalyticsTab() {
           <div
             key={label}
             className="rounded-xl border p-3.5 relative overflow-hidden"
-            style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}
+            style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}
           >
             <div className="absolute top-0 left-0 w-full h-[2px]" style={{ background: color || theme.primary }} />
             <div className="flex items-center gap-1.5 mb-2">
               <Icon size={12} style={{ color: color || theme.primary }} />
-              <span className="text-[10px] text-[#71717a] uppercase tracking-wider">{label}</span>
+              <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">{label}</span>
             </div>
             <div className="flex items-end gap-1.5">
-              <span className="text-xl font-bold text-[#fafafa]">{value}</span>
+              <span className="text-xl font-bold text-[var(--text-primary)]">{value}</span>
               {trend && <TrendBadge pct={trend.pct} direction={trend.direction} />}
             </div>
           </div>
@@ -376,12 +376,12 @@ export function AnalyticsTab() {
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
             <BarChart3 size={18} style={{ color: theme.primary }} />
-            <h3 className="text-base font-semibold text-[#fafafa]">Message Volume</h3>
+            <h3 className="text-base font-semibold text-[var(--text-primary)]">Message Volume</h3>
             {analytics && (
               <TrendBadge pct={msgTrend.pct} direction={msgTrend.direction} />
             )}
           </div>
-          <div className="flex items-center gap-1 rounded-lg p-0.5" style={{ background: 'rgba(46,43,74,0.5)' }}>
+          <div className="flex items-center gap-1 rounded-lg p-0.5" style={{ background: 'var(--bg-hover)' }}>
             {RANGES.map(r => (
               <button
                 key={r.value}
@@ -389,7 +389,7 @@ export function AnalyticsTab() {
                 className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
                   range === r.value
                     ? 'text-white'
-                    : 'text-[#71717a] hover:text-white'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 }`}
                 style={range === r.value ? { background: theme.primary } : undefined}
               >
@@ -401,7 +401,7 @@ export function AnalyticsTab() {
 
         {loading ? shimmerBars(range === '7d' ? 7 : 30) : error ? (
           <div className="h-44 flex items-center justify-center">
-            <p className="text-sm text-[#6B6890]">{error}</p>
+            <p className="text-sm text-[var(--text-muted)]">{error}</p>
           </div>
         ) : analytics && chartData.length > 0 ? (
           <>
@@ -411,13 +411,13 @@ export function AnalyticsTab() {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
                   <XAxis
                     dataKey="date"
-                    tick={{ fill: '#71717a', fontSize: 10 }}
+                    tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
                     tickLine={false}
                     axisLine={{ stroke: 'rgba(255,255,255,0.06)' }}
                     interval={range === '30d' ? 4 : 0}
                   />
                   <YAxis
-                    tick={{ fill: '#71717a', fontSize: 10 }}
+                    tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
                     tickLine={false}
                     axisLine={false}
                     allowDecimals={false}
@@ -445,19 +445,19 @@ export function AnalyticsTab() {
             </div>
 
             {/* Summary stats */}
-            <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/[0.04]">
+            <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-[var(--border-default)]">
               {[
                 { icon: Hash, label: 'Total', value: analytics.totalMessages.toLocaleString() },
                 { icon: TrendingUp, label: 'Avg/Day', value: String(analytics.avgPerDay) },
                 { icon: Calendar, label: 'Peak Day', value: analytics.peakDay ? formatChartDate(analytics.peakDay) : '--' },
               ].map(({ icon: Icon, label, value }) => (
-                <div key={label} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+                <div key={label} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'var(--bg-card)' }}>
                   <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: theme.primaryBg }}>
                     <Icon size={13} style={{ color: theme.primary }} />
                   </div>
                   <div>
-                    <p className="text-[10px] text-[#71717a] uppercase tracking-wider">{label}</p>
-                    <p className="text-sm font-bold text-[#fafafa]">{value}</p>
+                    <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">{label}</p>
+                    <p className="text-sm font-bold text-[var(--text-primary)]">{value}</p>
                   </div>
                 </div>
               ))}
@@ -465,7 +465,7 @@ export function AnalyticsTab() {
           </>
         ) : (
           <div className="h-44 flex items-center justify-center">
-            <p className="text-sm text-[#6B6890]">No message data yet</p>
+            <p className="text-sm text-[var(--text-muted)]">No message data yet</p>
           </div>
         )}
       </GlassCard>
@@ -475,10 +475,10 @@ export function AnalyticsTab() {
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
             <Clock size={18} style={{ color: theme.primary }} />
-            <h3 className="text-base font-semibold text-[#fafafa]">Activity by Hour</h3>
+            <h3 className="text-base font-semibold text-[var(--text-primary)]">Activity by Hour</h3>
           </div>
           {peakHour && (
-            <span className="text-[10px] text-[#71717a]">
+            <span className="text-[10px] text-[var(--text-muted)]">
               Peak: <span style={{ color: theme.primary }} className="font-medium">{formatHour(peakHour.hour)}</span>
             </span>
           )}
@@ -491,13 +491,13 @@ export function AnalyticsTab() {
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
                 <XAxis
                   dataKey="hour"
-                  tick={{ fill: '#71717a', fontSize: 9 }}
+                  tick={{ fill: 'var(--text-muted)', fontSize: 9 }}
                   tickLine={false}
                   axisLine={{ stroke: 'rgba(255,255,255,0.06)' }}
                   interval={2}
                 />
                 <YAxis
-                  tick={{ fill: '#71717a', fontSize: 10 }}
+                  tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
                   tickLine={false}
                   axisLine={false}
                   allowDecimals={false}
@@ -519,7 +519,7 @@ export function AnalyticsTab() {
           </div>
         ) : (
           <div className="h-40 flex items-center justify-center">
-            <p className="text-sm text-[#6B6890]">No hourly data available</p>
+            <p className="text-sm text-[var(--text-muted)]">No hourly data available</p>
           </div>
         )}
       </GlassCard>
@@ -528,7 +528,7 @@ export function AnalyticsTab() {
       <GlassCard>
         <div className="flex items-center gap-2 mb-5">
           <Activity size={18} style={{ color: theme.primary }} />
-          <h3 className="text-base font-semibold text-[#fafafa]">Response Time</h3>
+          <h3 className="text-base font-semibold text-[var(--text-primary)]">Response Time</h3>
         </div>
 
         {deepLoading ? (
@@ -544,9 +544,9 @@ export function AnalyticsTab() {
                 { label: 'Median (P50)', value: formatMs(deep.responseTimes.p50Ms) },
                 { label: '95th Percentile', value: formatMs(deep.responseTimes.p95Ms) },
               ].map(({ label, value }) => (
-                <div key={label} className="rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
-                  <p className="text-[10px] text-[#71717a] uppercase tracking-wider">{label}</p>
-                  <p className="text-lg font-bold text-[#fafafa]">{value}</p>
+                <div key={label} className="rounded-xl px-3 py-2.5" style={{ background: 'var(--bg-card)' }}>
+                  <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">{label}</p>
+                  <p className="text-lg font-bold text-[var(--text-primary)]">{value}</p>
                 </div>
               ))}
             </div>
@@ -565,12 +565,12 @@ export function AnalyticsTab() {
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
                     <XAxis
                       dataKey="date"
-                      tick={{ fill: '#71717a', fontSize: 10 }}
+                      tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
                       tickLine={false}
                       axisLine={{ stroke: 'rgba(255,255,255,0.06)' }}
                     />
                     <YAxis
-                      tick={{ fill: '#71717a', fontSize: 10 }}
+                      tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
                       tickLine={false}
                       axisLine={false}
                       tickFormatter={(v: number) => formatMs(v)}
@@ -579,7 +579,7 @@ export function AnalyticsTab() {
                       content={(props: any) => {
                         if (!props.active || !props.payload?.length) return null;
                         return (
-                          <div className="rounded-lg border border-white/10 px-3 py-2 text-xs shadow-lg" style={{ background: '#1a1730' }}>
+                          <div className="rounded-lg border border-white/10 px-3 py-2 text-xs shadow-lg" style={{ background: 'var(--bg-elevated)' }}>
                             <p className="font-medium text-white mb-1">{props.label}</p>
                             <p style={{ color: theme.primary }}>
                               Avg: {formatMs(props.payload[0].value)}
@@ -601,13 +601,13 @@ export function AnalyticsTab() {
               </div>
             )}
 
-            <p className="text-[10px] text-[#71717a] mt-3">
+            <p className="text-[10px] text-[var(--text-muted)] mt-3">
               Based on {deep.responseTimes.totalPairs.toLocaleString()} user-assistant message pairs
             </p>
           </>
         ) : (
           <div className="h-24 flex items-center justify-center">
-            <p className="text-sm text-[#6B6890]">No response time data yet. Chat with your agent to generate data.</p>
+            <p className="text-sm text-[var(--text-muted)]">No response time data yet. Chat with your agent to generate data.</p>
           </div>
         )}
       </GlassCard>
@@ -617,16 +617,16 @@ export function AnalyticsTab() {
         <GlassCard>
           <div className="flex items-center gap-2 mb-5">
             <AlertTriangle size={18} style={{ color: deep.errorRate.rate > 5 ? '#ef4444' : theme.primary }} />
-            <h3 className="text-base font-semibold text-[#fafafa]">Reliability</h3>
+            <h3 className="text-base font-semibold text-[var(--text-primary)]">Reliability</h3>
           </div>
 
           {/* Success/Error bar */}
           <div className="mb-4">
-            <div className="flex justify-between text-[10px] text-[#71717a] mb-1.5">
+            <div className="flex justify-between text-[10px] text-[var(--text-muted)] mb-1.5">
               <span>Successful ({deep.errorRate.successful.toLocaleString()})</span>
               <span>Failed ({deep.errorRate.errors.toLocaleString()})</span>
             </div>
-            <div className="flex h-3 rounded-full overflow-hidden bg-white/[0.04]">
+            <div className="flex h-3 rounded-full overflow-hidden bg-[var(--bg-card)]">
               <div
                 className="transition-all rounded-l-full"
                 style={{
@@ -647,31 +647,31 @@ export function AnalyticsTab() {
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'var(--bg-card)' }}>
               <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-emerald-500/10">
                 <CheckCircle size={13} className="text-emerald-400" />
               </div>
               <div>
-                <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Success</p>
-                <p className="text-sm font-bold text-[#fafafa]">{(100 - deep.errorRate.rate).toFixed(1)}%</p>
+                <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Success</p>
+                <p className="text-sm font-bold text-[var(--text-primary)]">{(100 - deep.errorRate.rate).toFixed(1)}%</p>
               </div>
             </div>
-            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'var(--bg-card)' }}>
               <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-red-500/10">
                 <AlertTriangle size={13} className="text-red-400" />
               </div>
               <div>
-                <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Error Rate</p>
-                <p className="text-sm font-bold text-[#fafafa]">{deep.errorRate.rate.toFixed(1)}%</p>
+                <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Error Rate</p>
+                <p className="text-sm font-bold text-[var(--text-primary)]">{deep.errorRate.rate.toFixed(1)}%</p>
               </div>
             </div>
-            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+            <div className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'var(--bg-card)' }}>
               <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: theme.primaryBg }}>
                 <MessageSquare size={13} style={{ color: theme.primary }} />
               </div>
               <div>
-                <p className="text-[10px] text-[#71717a] uppercase tracking-wider">Total</p>
-                <p className="text-sm font-bold text-[#fafafa]">{deep.errorRate.total.toLocaleString()}</p>
+                <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Total</p>
+                <p className="text-sm font-bold text-[var(--text-primary)]">{deep.errorRate.total.toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -683,18 +683,18 @@ export function AnalyticsTab() {
         <GlassCard>
           <div className="flex items-center gap-2 mb-5">
             <Zap size={16} style={{ color: theme.primary }} />
-            <h3 className="text-sm font-semibold text-[#fafafa]">Token Usage</h3>
+            <h3 className="text-sm font-semibold text-[var(--text-primary)]">Token Usage</h3>
             {tokenTrend.direction !== 'flat' && (
               <TrendBadge pct={tokenTrend.pct} direction={tokenTrend.direction} />
             )}
-            <span className="ml-auto text-[10px] text-[#71717a] uppercase tracking-wider">
+            <span className="ml-auto text-[10px] text-[var(--text-muted)] uppercase tracking-wider">
               {analytics.tokens.hasByok ? 'BYOK' : 'Hatcher Key'}
             </span>
           </div>
 
           {/* Input / Output proportion bar */}
           <div className="mb-4">
-            <div className="flex justify-between text-[10px] text-[#71717a] mb-1.5">
+            <div className="flex justify-between text-[10px] text-[var(--text-muted)] mb-1.5">
               <span>Input ({formatTokens(analytics.tokens.inputTokens)})</span>
               <span>Output ({formatTokens(analytics.tokens.outputTokens)})</span>
             </div>
@@ -725,17 +725,17 @@ export function AnalyticsTab() {
                 icon: DollarSign,
                 label: 'Est. Cost',
                 value: analytics.tokens.hasByok ? 'Your key' : `$${analytics.tokens.totalCost.toFixed(4)}`,
-                color: '#71717a',
+                color: 'var(--text-muted)',
                 dim: false,
               },
             ].map(({ icon: Icon, label, value, color, dim }) => (
-              <div key={label} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'rgba(46,43,74,0.3)' }}>
+              <div key={label} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'var(--bg-card)' }}>
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${color}18`, opacity: dim ? 0.7 : 1 }}>
                   <Icon size={13} style={{ color }} />
                 </div>
                 <div>
-                  <p className="text-[10px] text-[#71717a] uppercase tracking-wider">{label}</p>
-                  <p className="text-sm font-bold text-[#fafafa]">{value}</p>
+                  <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">{label}</p>
+                  <p className="text-sm font-bold text-[var(--text-primary)]">{value}</p>
                 </div>
               </div>
             ))}
@@ -748,8 +748,8 @@ export function AnalyticsTab() {
         <GlassCard>
           <div className="flex items-center gap-2 mb-5">
             <Tag size={18} style={{ color: theme.primary }} />
-            <h3 className="text-base font-semibold text-[#fafafa]">Top Topics</h3>
-            <span className="text-[10px] text-[#71717a] ml-auto">From recent conversations</span>
+            <h3 className="text-base font-semibold text-[var(--text-primary)]">Top Topics</h3>
+            <span className="text-[10px] text-[var(--text-muted)] ml-auto">From recent conversations</span>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -771,7 +771,7 @@ export function AnalyticsTab() {
                   >
                     {topic.word}
                   </span>
-                  <span className="text-[10px] text-[#71717a]">{topic.count}</span>
+                  <span className="text-[10px] text-[var(--text-muted)]">{topic.count}</span>
                 </div>
               );
             })}
@@ -784,13 +784,13 @@ export function AnalyticsTab() {
         <GlassCard>
           <div className="flex items-center gap-2 mb-4">
             <Clock size={16} style={{ color: theme.primary }} />
-            <h3 className="text-sm font-semibold text-[#fafafa]">Today</h3>
+            <h3 className="text-sm font-semibold text-[var(--text-primary)]">Today</h3>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
-              <p className="text-[10px] text-[#71717a] uppercase tracking-wider mb-1">Messages Today</p>
+            <div className="rounded-xl p-4" style={{ background: 'var(--bg-card)' }}>
+              <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Messages Today</p>
               <div className="flex items-baseline gap-2">
-                <p className="text-2xl font-bold text-[#fafafa]">
+                <p className="text-2xl font-bold text-[var(--text-primary)]">
                   {analytics.messagesPerDay.find(d => d.date === today)?.count ?? 0}
                 </p>
                 {analytics.messagesPerDay.length >= 2 && (() => {
@@ -817,10 +817,10 @@ export function AnalyticsTab() {
                 })()}
               </div>
             </div>
-            <div className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
-              <p className="text-[10px] text-[#71717a] uppercase tracking-wider mb-1">{analytics.rangeDays ?? range.replace('d', '')}D Total</p>
+            <div className="rounded-xl p-4" style={{ background: 'var(--bg-card)' }}>
+              <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">{analytics.rangeDays ?? range.replace('d', '')}D Total</p>
               <div className="flex items-baseline gap-2">
-                <p className="text-2xl font-bold text-[#fafafa]">{analytics.totalMessages.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-[var(--text-primary)]">{analytics.totalMessages.toLocaleString()}</p>
                 <TrendBadge pct={msgTrend.pct} direction={msgTrend.direction} />
               </div>
             </div>
@@ -831,8 +831,8 @@ export function AnalyticsTab() {
       {/* Link to account analytics */}
       <Link
         href="/dashboard/analytics"
-        className="flex items-center justify-between rounded-xl border border-white/[0.06] px-5 py-4 text-sm text-[#71717a] hover:text-white hover:border-white/10 transition-colors group"
-        style={{ background: 'rgba(26,23,48,0.4)' }}
+        className="flex items-center justify-between rounded-xl border border-[var(--border-default)] px-5 py-4 text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-white/10 transition-colors group"
+        style={{ background: 'var(--bg-elevated)' }}
       >
         <span>View account-wide analytics</span>
         <ExternalLink size={14} className="transition-colors" style={{ color: undefined }} />

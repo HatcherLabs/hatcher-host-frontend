@@ -97,20 +97,20 @@ function ComponentCard({ component, index }: { component: Component; index: numb
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.06 }}
-      className={`flex items-center justify-between px-5 py-4 rounded-xl border bg-white/[0.02] ${meta.bg}`}
+      className={`flex items-center justify-between px-5 py-4 rounded-xl border bg-[var(--bg-card)] ${meta.bg}`}
     >
       <div className="flex items-center gap-3">
         <Icon className={`w-5 h-5 ${meta.color} flex-shrink-0`} />
         <div>
-          <p className="text-sm font-medium text-white">{component.name}</p>
+          <p className="text-sm font-medium text-[var(--text-primary)]">{component.name}</p>
           {component.message && (
-            <p className="text-xs text-white/40 mt-0.5">{component.message}</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">{component.message}</p>
           )}
         </div>
       </div>
       <div className="flex items-center gap-3">
         {component.latencyMs !== undefined && (
-          <span className="text-xs text-white/40 font-mono">{component.latencyMs}ms</span>
+          <span className="text-xs text-[var(--text-muted)] font-mono">{component.latencyMs}ms</span>
         )}
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${meta.bg} ${meta.color}`}>
           {meta.label}
@@ -155,14 +155,14 @@ export default function StatusPage() {
   const banner = OVERALL_BANNER[overall];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white">
+    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)]">
       {/* Nav */}
-      <nav className="border-b border-white/[0.06] px-6 py-4 flex items-center justify-between max-w-4xl mx-auto">
-        <Link href="/" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+      <nav className="border-b border-[var(--border-default)] px-6 py-4 flex items-center justify-between max-w-4xl mx-auto">
+        <Link href="/" className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
           <Activity className="w-5 h-5 text-cyan-400" />
           <span className="font-semibold text-sm">Hatcher Status</span>
         </Link>
-        <div className="flex items-center gap-2 text-xs text-white/40">
+        <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
           <Wifi className="w-3.5 h-3.5" />
           Auto-refresh 30s
         </div>
@@ -172,7 +172,7 @@ export default function StatusPage() {
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">Platform Status</h1>
-          <p className="text-white/50 text-sm">
+          <p className="text-[var(--text-muted)] text-sm">
             Real-time health of Hatcher infrastructure
           </p>
         </div>
@@ -192,7 +192,7 @@ export default function StatusPage() {
                 <StatusDot status={overall} pulse={overall !== 'operational'} />
                 <div>
                   <p className="font-semibold text-lg">{banner.text}</p>
-                  <p className="text-xs text-white/40 mt-0.5">
+                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
                     Last checked: {lastChecked?.toLocaleTimeString()}
                   </p>
                 </div>
@@ -200,7 +200,7 @@ export default function StatusPage() {
               <button
                 onClick={() => fetch_(true)}
                 disabled={refreshing}
-                className="flex items-center gap-1.5 text-xs text-white/50 hover:text-white transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-white transition-colors disabled:opacity-50"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
                 Refresh
@@ -225,10 +225,10 @@ export default function StatusPage() {
               key="loading"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 flex items-center justify-center gap-3"
+              className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-6 flex items-center justify-center gap-3"
             >
-              <RefreshCw className="w-4 h-4 text-white/40 animate-spin" />
-              <span className="text-sm text-white/40">Checking systems...</span>
+              <RefreshCw className="w-4 h-4 text-[var(--text-muted)] animate-spin" />
+              <span className="text-sm text-[var(--text-muted)]">Checking systems...</span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -260,12 +260,12 @@ export default function StatusPage() {
                 key={label}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 flex items-center gap-4"
+                className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-5 flex items-center gap-4"
               >
                 <Icon className={`w-6 h-6 ${color} flex-shrink-0`} />
                 <div>
                   <p className="text-xl font-bold">{value}</p>
-                  <p className="text-xs text-white/40">{label}</p>
+                  <p className="text-xs text-[var(--text-muted)]">{label}</p>
                 </div>
               </motion.div>
             ))}
@@ -275,7 +275,7 @@ export default function StatusPage() {
         {/* Components list */}
         {data && (
           <div>
-            <h2 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-4">
+            <h2 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-4">
               Components
             </h2>
             <div className="space-y-2">
@@ -287,7 +287,7 @@ export default function StatusPage() {
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-4 border-t border-white/[0.05] text-xs text-white/30">
+        <div className="flex items-center justify-between pt-4 border-t border-[var(--border-default)] text-xs text-[var(--text-muted)]">
           <div className="flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5" />
             {lastChecked ? (
@@ -296,7 +296,7 @@ export default function StatusPage() {
               <span>Loading...</span>
             )}
           </div>
-          <Link href="/" className="hover:text-white/60 transition-colors">
+          <Link href="/" className="hover:text-[var(--text-secondary)] transition-colors">
             ← Back to Hatcher
           </Link>
         </div>

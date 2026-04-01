@@ -103,7 +103,7 @@ function StatCard({ icon, label, value, sub, accentHex }: {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-white/[0.06] bg-[#18181b]/80 p-4 relative overflow-hidden"
+      className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)]/80 p-4 relative overflow-hidden"
     >
       {/* Accent top bar */}
       {accentHex && (
@@ -113,7 +113,7 @@ function StatCard({ icon, label, value, sub, accentHex }: {
         />
       )}
       <div className="flex items-center gap-2 mb-2">
-        <div style={{ color: accentHex || '#a1a1aa' }}>{icon}</div>
+        <div style={{ color: accentHex || 'var(--text-secondary)' }}>{icon}</div>
         <span className="text-xs text-zinc-500 uppercase tracking-wider">{label}</span>
       </div>
       <p className="text-2xl font-bold text-white">{value}</p>
@@ -195,7 +195,7 @@ function RestartIndicator({ restarts, accentHex }: { restarts: number; accentHex
           ? 'border-red-500/20 bg-red-500/5'
           : isWarning
             ? 'border-amber-500/15 bg-amber-500/5'
-            : 'border-white/[0.06] bg-[#18181b]/80'
+            : 'border-[var(--border-default)] bg-[var(--bg-elevated)]/80'
       }`}
     >
       {/* Accent top bar */}
@@ -369,7 +369,7 @@ export function HealthTab() {
         <button
           onClick={refresh}
           disabled={refreshing}
-          className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-[var(--text-primary)] transition-colors disabled:opacity-50"
         >
           <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
           Refresh
@@ -409,7 +409,7 @@ export function HealthTab() {
       {/* Charts + Restarts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* CPU History */}
-        <div className={`rounded-xl border ${fwColors.border} bg-[#18181b]/80 p-4`}>
+        <div className={`rounded-xl border ${fwColors.border} bg-[var(--bg-elevated)]/80 p-4`}>
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-zinc-500 uppercase tracking-wider">CPU History</span>
             <span className={`text-xs ${fwColors.text}`}>{data.resources.cpuPercent.toFixed(1)}%</span>
@@ -418,7 +418,7 @@ export function HealthTab() {
         </div>
 
         {/* Memory History */}
-        <div className={`rounded-xl border ${fwColors.border} bg-[#18181b]/80 p-4`}>
+        <div className={`rounded-xl border ${fwColors.border} bg-[var(--bg-elevated)]/80 p-4`}>
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-zinc-500 uppercase tracking-wider">Memory History</span>
             <span className={`text-xs ${fwColors.text}`}>{memPercent}%</span>
@@ -431,7 +431,7 @@ export function HealthTab() {
       <RestartIndicator restarts={data.restarts} accentHex={fwColors.hex} />
 
       {/* Errors Section */}
-      <div className="rounded-xl border border-white/[0.06] bg-[#18181b]/80 p-4">
+      <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)]/80 p-4">
         <div className="flex items-center gap-2 mb-3">
           <AlertTriangle size={16} className="text-zinc-400" />
           <span className="text-xs text-zinc-500 uppercase tracking-wider">Errors (24h)</span>
@@ -457,7 +457,7 @@ export function HealthTab() {
       </div>
 
       {/* Response Time Details */}
-      <div className={`rounded-xl border ${fwColors.border} bg-[#18181b]/80 p-4`}>
+      <div className={`rounded-xl border ${fwColors.border} bg-[var(--bg-elevated)]/80 p-4`}>
         <div className="flex items-center gap-2 mb-4">
           <Zap size={16} className={fwColors.text} />
           <span className="text-xs text-zinc-500 uppercase tracking-wider">Response Times</span>

@@ -321,7 +321,7 @@ export default function HelpPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search all questions... e.g. &quot;BYOK&quot;, &quot;rate limit&quot;, &quot;Telegram&quot;"
-            className="w-full pl-11 pr-20 py-3.5 rounded-xl bg-[#252240] border border-[rgba(46,43,74,0.6)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 transition-all duration-200"
+            className="w-full pl-11 pr-20 py-3.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-default)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20 transition-all duration-200"
           />
           {searchQuery && (
             <button
@@ -434,7 +434,7 @@ export default function HelpPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
               <a
                 href="mailto:support@hatcher.host"
-                className="flex items-center gap-2.5 p-3 rounded-lg bg-white/[0.02] hover:bg-white/[0.04] transition-colors group"
+                className="flex items-center gap-2.5 p-3 rounded-lg bg-[var(--bg-card)] hover:bg-[var(--bg-card)] transition-colors group"
               >
                 <Mail size={14} className="text-[#06b6d4] flex-shrink-0" />
                 <div>
@@ -444,7 +444,7 @@ export default function HelpPage() {
               </a>
               <a
                 href="mailto:contact@hatcher.host"
-                className="flex items-center gap-2.5 p-3 rounded-lg bg-white/[0.02] hover:bg-white/[0.04] transition-colors group"
+                className="flex items-center gap-2.5 p-3 rounded-lg bg-[var(--bg-card)] hover:bg-[var(--bg-card)] transition-colors group"
               >
                 <Mail size={14} className="text-[#10b981] flex-shrink-0" />
                 <div>
@@ -456,7 +456,7 @@ export default function HelpPage() {
                 href="https://discord.gg/7tY3HjKjMc"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2.5 p-3 rounded-lg bg-white/[0.02] hover:bg-white/[0.04] transition-colors group"
+                className="flex items-center gap-2.5 p-3 rounded-lg bg-[var(--bg-card)] hover:bg-[var(--bg-card)] transition-colors group"
               >
                 <MessageCircle size={14} className="text-[#7289da] flex-shrink-0" />
                 <div>
@@ -552,7 +552,7 @@ function FAQAccordion({
           transition={{ duration: 0.2 }}
           className={cn(
             'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors',
-            isOpen ? 'bg-[#06b6d4]/15' : 'bg-white/[0.03]'
+            isOpen ? 'bg-[#06b6d4]/15' : 'bg-[var(--bg-card)]'
           )}
         >
           <ChevronDown className={cn('w-4 h-4 transition-colors', isOpen ? 'text-[#06b6d4]' : 'text-[var(--text-muted)]')} />

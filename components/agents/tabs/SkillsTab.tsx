@@ -448,9 +448,9 @@ function ToggleSwitch({
         ${w}
         ${enabled
           ? 'bg-[#06b6d4] border border-[#06b6d4]/60 shadow-[0_0_8px_rgba(6,182,212,0.25)]'
-          : 'bg-white/[0.08] border border-white/[0.12]'
+          : 'bg-[var(--bg-hover)] border border-[var(--border-hover)]'
         }
-        ${loading ? 'opacity-50 cursor-wait' : 'cursor-pointer hover:border-white/[0.2]'}
+        ${loading ? 'opacity-50 cursor-wait' : 'cursor-pointer hover:border-[var(--border-hover)]'}
       `}
       aria-label={enabled ? 'Disable' : 'Enable'}
     >
@@ -496,7 +496,7 @@ function SkillCard({
           relative p-4 rounded-xl border transition-all duration-300
           ${skill.enabled
             ? 'bg-[#06b6d4]/[0.06] border-[#06b6d4]/25 shadow-[0_0_20px_rgba(6,182,212,0.06)]'
-            : 'bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.1]'
+            : 'bg-[var(--bg-card)] border-[var(--border-default)] hover:bg-[var(--bg-card)] hover:border-[var(--border-hover)]'
           }
         `}
       >
@@ -508,7 +508,7 @@ function SkillCard({
               transition-all duration-300
               ${skill.enabled
                 ? 'bg-[#06b6d4]/15 shadow-[0_0_12px_rgba(6,182,212,0.1)]'
-                : 'bg-white/[0.05]'
+                : 'bg-[var(--bg-card)]'
               }
             `}
           >
@@ -520,7 +520,7 @@ function SkillCard({
             <h3 className="text-sm font-semibold text-white truncate leading-tight">
               {skill.name}
             </h3>
-            <p className="text-[11px] text-[#71717a] mt-0.5 line-clamp-2 leading-relaxed">
+            <p className="text-[11px] text-[var(--text-muted)] mt-0.5 line-clamp-2 leading-relaxed">
               {skill.description || 'No description available'}
             </p>
           </div>
@@ -578,7 +578,7 @@ function CategorySection({
             {enabledInCategory} active
           </span>
         )}
-        <span className="text-[#71717a] group-hover:text-[#A5A1C2] transition-colors">
+        <span className="text-[var(--text-muted)] group-hover:text-[var(--text-secondary)] transition-colors">
           {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
         </span>
       </button>
@@ -640,7 +640,7 @@ function MarketplaceCard({
     IoT: 'bg-rose-500/15 text-rose-400 border-rose-500/25',
     AI: 'bg-violet-500/15 text-violet-400 border-violet-500/25',
   };
-  const badgeClass = categoryColors[item.category] ?? 'bg-white/10 text-[#A5A1C2] border-white/10';
+  const badgeClass = categoryColors[item.category] ?? 'bg-white/10 text-[var(--text-secondary)] border-white/10';
 
   return (
     <motion.div
@@ -653,14 +653,14 @@ function MarketplaceCard({
           relative p-4 rounded-xl border transition-all duration-300
           ${isInstalled
             ? 'bg-emerald-500/[0.04] border-emerald-500/20'
-            : 'bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.1]'
+            : 'bg-[var(--bg-card)] border-[var(--border-default)] hover:bg-[var(--bg-card)] hover:border-[var(--border-hover)]'
           }
         `}
       >
         <div className="flex items-start gap-3">
           {/* Icon */}
-          <div className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center bg-white/[0.05]">
-            <Package size={16} className="text-[#A5A1C2]" />
+          <div className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center bg-[var(--bg-card)]">
+            <Package size={16} className="text-[var(--text-secondary)]" />
           </div>
 
           {/* Content */}
@@ -673,7 +673,7 @@ function MarketplaceCard({
                 {item.category}
               </span>
             </div>
-            <p className="text-[11px] text-[#71717a] line-clamp-2 leading-relaxed">
+            <p className="text-[11px] text-[var(--text-muted)] line-clamp-2 leading-relaxed">
               {item.description}
             </p>
             <p className="text-[10px] text-[#52525b] mt-1 font-mono truncate">
@@ -684,9 +684,9 @@ function MarketplaceCard({
           {/* Action */}
           <div className="flex-shrink-0 pt-0.5">
             {isInstalling ? (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
                 <Loader2 size={12} className="animate-spin text-[#06b6d4]" />
-                <span className="text-[10px] text-[#A5A1C2]">Installing...</span>
+                <span className="text-[10px] text-[var(--text-secondary)]">Installing...</span>
               </div>
             ) : isInstalled ? (
               <div className="flex items-center gap-1">
@@ -750,7 +750,7 @@ function MarketplaceSection({
         >
           <Store size={16} className="text-[#06b6d4]" />
           <span className="text-sm font-semibold text-white flex-1">Browse Marketplace</span>
-          <span className="text-[#71717a]">
+          <span className="text-[var(--text-muted)]">
             {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
           </span>
         </button>
@@ -763,9 +763,9 @@ function MarketplaceSection({
               transition={{ duration: 0.25 }}
               className="overflow-hidden"
             >
-              <div className="mt-4 flex items-center gap-2 px-4 py-3 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+              <div className="mt-4 flex items-center gap-2 px-4 py-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
                 <Sparkles size={14} className="text-[#06b6d4] flex-shrink-0" />
-                <p className="text-xs text-[#A5A1C2]">
+                <p className="text-xs text-[var(--text-secondary)]">
                   Hermes skills are managed via the Skills Hub. New skills appear automatically when installed through the Hermes CLI.
                 </p>
               </div>
@@ -802,7 +802,7 @@ function MarketplaceSection({
         <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#06b6d4]/15 text-[#06b6d4] border border-[#06b6d4]/25">
           {items.length} packages
         </span>
-        <span className="text-[#71717a]">
+        <span className="text-[var(--text-muted)]">
           {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
         </span>
       </button>
@@ -821,18 +821,18 @@ function MarketplaceSection({
               <div className="space-y-3">
                 {/* Search Bar */}
                 <div className="relative">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]" />
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
                   <input
                     type="text"
                     value={marketSearch}
                     onChange={(e) => setMarketSearch(e.target.value)}
                     placeholder="Search marketplace..."
-                    className="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-white/[0.04] border border-white/[0.06] text-white placeholder-[#71717a] focus:outline-none focus:border-[#06b6d4]/40 transition-colors"
+                    className="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4]/40 transition-colors"
                   />
                   {marketSearch && (
                     <button
                       onClick={() => setMarketSearch('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#71717a] hover:text-white transition-colors"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
                     >
                       <X size={12} />
                     </button>
@@ -849,7 +849,7 @@ function MarketplaceSection({
                         px-2.5 py-1 rounded-full text-[10px] font-medium border transition-all
                         ${categoryFilter === cat
                           ? 'bg-[#06b6d4]/15 text-[#06b6d4] border-[#06b6d4]/30'
-                          : 'bg-white/[0.03] text-[#71717a] border-white/[0.06] hover:bg-white/[0.06] hover:text-[#A5A1C2]'
+                          : 'bg-[var(--bg-card)] text-[var(--text-muted)] border-[var(--border-default)] hover:bg-[var(--bg-card)] hover:text-[var(--text-secondary)]'
                         }
                       `}
                     >
@@ -875,8 +875,8 @@ function MarketplaceSection({
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-6 text-center">
-                  <Search size={20} className="text-[#71717a] mb-2" />
-                  <p className="text-xs text-[#A5A1C2]">No packages match your search</p>
+                  <Search size={20} className="text-[var(--text-muted)] mb-2" />
+                  <p className="text-xs text-[var(--text-secondary)]">No packages match your search</p>
                   <button
                     onClick={() => { setMarketSearch(''); setCategoryFilter('All'); }}
                     className="mt-1.5 text-[10px] text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
@@ -942,7 +942,7 @@ function FrameworkInfoBanner({ framework }: { framework: string }) {
   if (!info) return null;
 
   const Icon = info.icon;
-  const badgeClass = FRAMEWORK_BADGE[framework] ?? 'bg-white/10 text-[#A5A1C2] border-white/10';
+  const badgeClass = FRAMEWORK_BADGE[framework] ?? 'bg-white/10 text-[var(--text-secondary)] border-white/10';
   const frameworkLabel = framework === 'elizaos' ? 'ElizaOS' : framework.charAt(0).toUpperCase() + framework.slice(1);
 
   return (
@@ -956,7 +956,7 @@ function FrameworkInfoBanner({ framework }: { framework: string }) {
             {frameworkLabel}
           </span>
         </div>
-        <p className="text-xs text-[#A5A1C2] leading-relaxed">
+        <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
           {info.description}
         </p>
       </div>
@@ -977,7 +977,7 @@ function SkillsSkeleton() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {Array.from({ length: ci === 0 ? 3 : 2 }).map((_, si) => (
-              <div key={si} className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+              <div key={si} className="p-4 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)]">
                 <div className="flex items-start gap-3">
                   <Skeleton className="h-9 w-9 rounded-lg" />
                   <div className="flex-1 space-y-2">
@@ -1281,7 +1281,7 @@ export function SkillsTab() {
               </span>
             )}
           </h2>
-          <p className="text-xs text-[#71717a] mt-0.5">
+          <p className="text-xs text-[var(--text-muted)] mt-0.5">
             {totalCount > 0
               ? `${totalCount} available \u00B7 ${enabledCount} enabled`
               : `Discover and enable ${labelLower} for your agent`}
@@ -1303,7 +1303,7 @@ export function SkillsTab() {
           <button
             onClick={loadSkills}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-white/[0.04] border border-white/[0.06] text-[#A5A1C2] hover:bg-white/[0.08] transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] transition-colors disabled:opacity-50"
           >
             <RotateCcw size={12} className={loading ? 'animate-spin' : ''} />
             Refresh
@@ -1314,7 +1314,7 @@ export function SkillsTab() {
       {/* Active skills counter */}
       {totalCount > 0 && !loading && (
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
             <div className={`w-2 h-2 rounded-full ${enabledCount > 0 ? 'bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.5)]' : 'bg-[#71717a]'}`} />
             <span className="text-xs font-medium text-white">
               {enabledCount} {labelLower} active
@@ -1323,18 +1323,18 @@ export function SkillsTab() {
 
           {/* Search */}
           <div className="relative flex-1 min-w-[180px]">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a]" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={`Search ${labelLower}...`}
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-white/[0.04] border border-white/[0.06] text-white placeholder-[#71717a] focus:outline-none focus:border-[#06b6d4]/40 transition-colors"
+              className="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4]/40 transition-colors"
             />
             {search && (
               <button
                 onClick={() => setSearch('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#71717a] hover:text-white transition-colors"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
               >
                 <X size={12} />
               </button>
@@ -1372,9 +1372,9 @@ export function SkillsTab() {
       {/* Container not running message */}
       {!loading && message && skills.length === 0 && (
         <GlassCard className="flex flex-col items-center justify-center py-10 text-center">
-          <AlertTriangle size={32} className="text-[#71717a] mb-3" />
-          <p className="text-sm text-[#A5A1C2]">{message}</p>
-          <p className="text-xs text-[#71717a] mt-1">
+          <AlertTriangle size={32} className="text-[var(--text-muted)] mb-3" />
+          <p className="text-sm text-[var(--text-secondary)]">{message}</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1">
             Start the agent to browse available {labelLower}.
           </p>
         </GlassCard>
@@ -1409,8 +1409,8 @@ export function SkillsTab() {
             </div>
           ) : (
             <GlassCard className="flex flex-col items-center justify-center py-8 text-center">
-              <Search size={24} className="text-[#71717a] mb-2" />
-              <p className="text-sm text-[#A5A1C2]">No {labelLower} match your search</p>
+              <Search size={24} className="text-[var(--text-muted)] mb-2" />
+              <p className="text-sm text-[var(--text-secondary)]">No {labelLower} match your search</p>
               <button
                 onClick={() => setSearch('')}
                 className="mt-2 text-xs text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
@@ -1425,9 +1425,9 @@ export function SkillsTab() {
       {/* Empty state -- container running but no skills */}
       {!loading && !message && !error && skills.length === 0 && (
         <GlassCard className="flex flex-col items-center justify-center py-10 text-center">
-          <Sparkles size={32} className="text-[#71717a] mb-3" />
-          <p className="text-sm text-[#A5A1C2]">No {labelLower} found</p>
-          <p className="text-xs text-[#71717a] mt-1">
+          <Sparkles size={32} className="text-[var(--text-muted)] mb-3" />
+          <p className="text-sm text-[var(--text-secondary)]">No {labelLower} found</p>
+          <p className="text-xs text-[var(--text-muted)] mt-1">
             This agent&apos;s container does not have any {labelLower} installed.
           </p>
         </GlassCard>

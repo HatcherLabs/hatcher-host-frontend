@@ -1,6 +1,6 @@
 export default function ExploreLoading() {
   return (
-    <div className="min-h-screen p-4 sm:p-6 lg:p-10" style={{ background: '#0D0B1A' }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-10" style={{ background: 'var(--bg-base)' }}>
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header skeleton */}
         <div className="space-y-2">

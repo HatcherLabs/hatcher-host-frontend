@@ -48,7 +48,7 @@ function TierBadge({ tier }: { tier: string }) {
   const styles: Record<string, string> = {
     pro: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
     basic: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
-    free: 'bg-white/[0.06] text-[var(--text-muted)] border-white/[0.08]',
+    free: 'bg-[var(--bg-card)] text-[var(--text-muted)] border-[var(--border-default)]',
   };
   return (
     <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${styles[tier] ?? styles.free}`}>
@@ -70,7 +70,7 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: 
   return (
     <button
       onClick={() => onChange(!checked)}
-      className={`relative w-11 h-6 rounded-full transition-all duration-300 cursor-pointer ${checked ? 'bg-cyan-500 shadow-[0_0_12px_rgba(6,182,212,0.3)]' : 'bg-white/[0.08]'}`}
+      className={`relative w-11 h-6 rounded-full transition-all duration-300 cursor-pointer ${checked ? 'bg-cyan-500 shadow-[0_0_12px_rgba(6,182,212,0.3)]' : 'bg-[var(--bg-hover)]'}`}
       role="switch"
       aria-checked={checked}
       aria-label={label}
@@ -388,7 +388,7 @@ export default function SettingsPage() {
                       ? id === 'danger'
                         ? 'bg-red-500/10 text-red-400'
                         : 'bg-[var(--primary-500)]/10 text-[var(--primary-400)]'
-                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/[0.04]'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)]'
                   }`}
                 >
                   <Icon size={15} className={activeTab === id && id === 'danger' ? 'text-red-400' : undefined} />
@@ -467,10 +467,10 @@ export default function SettingsPage() {
                             <div key={field}>
                               <label className="text-xs font-medium text-[var(--text-muted)] mb-1.5 block">{label}</label>
                               <div className="flex items-center gap-2">
-                                <div className={`flex-1 h-10 px-3 rounded-lg text-sm bg-white/[0.04] border border-white/[0.08] flex items-center truncate ${mono ? 'font-mono tracking-wider text-white' : 'text-[var(--text-secondary)]'}`}>
+                                <div className={`flex-1 h-10 px-3 rounded-lg text-sm bg-[var(--bg-card)] border border-[var(--border-default)] flex items-center truncate ${mono ? 'font-mono tracking-wider text-white' : 'text-[var(--text-secondary)]'}`}>
                                   {value}
                                 </div>
-                                <button onClick={() => copy(value, field)} className="h-10 w-10 rounded-lg border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0">
+                                <button onClick={() => copy(value, field)} className="h-10 w-10 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0">
                                   {copiedField === field ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
                                 </button>
                               </div>
@@ -485,7 +485,7 @@ export default function SettingsPage() {
                               { label: 'Referred', value: String(referralStats.totalReferred), icon: <Users size={12} />, color: 'text-[var(--text-primary)]' },
                               { label: 'Earned', value: `$${referralStats.totalEarned}`, icon: <Gift size={12} />, color: 'text-emerald-400' },
                             ].map(({ label, value, icon, color }) => (
-                              <div key={label} className="flex-1 rounded-xl bg-white/[0.03] border border-white/[0.06] p-3 text-center">
+                              <div key={label} className="flex-1 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] p-3 text-center">
                                 <div className="flex items-center justify-center gap-1.5 mb-1 text-[var(--text-muted)]">{icon}<span className="text-[10px] font-medium uppercase tracking-wider">{label}</span></div>
                                 <p className={`text-xl font-bold ${color}`}>{value}</p>
                               </div>
@@ -545,7 +545,7 @@ export default function SettingsPage() {
                     <Section title="API Keys" icon={<Key size={16} />}>
                       <div className="flex items-start justify-between gap-4 mb-5">
                         <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-                          Create multiple API keys for programmatic access. Each key uses the <code className="font-mono text-xs bg-white/[0.05] px-1.5 py-0.5 rounded text-cyan-400">hk_</code> prefix.
+                          Create multiple API keys for programmatic access. Each key uses the <code className="font-mono text-xs bg-[var(--bg-card)] px-1.5 py-0.5 rounded text-cyan-400">hk_</code> prefix.
                           The full key is shown <span className="text-amber-400 font-medium">only once</span> at creation.
                         </p>
                         <Link
@@ -562,18 +562,18 @@ export default function SettingsPage() {
                           <p className="text-xs font-semibold text-emerald-400 mb-2 uppercase tracking-wider">New key created — copy it now!</p>
                           <p className="text-xs text-[var(--text-muted)] mb-2">{newlyCreatedKey.label}</p>
                           <div className="flex items-center gap-2">
-                            <div className="flex-1 h-9 px-3 rounded-lg bg-white/[0.06] border border-emerald-500/20 flex items-center font-mono text-xs tracking-wider text-white overflow-hidden">
+                            <div className="flex-1 h-9 px-3 rounded-lg bg-[var(--bg-card)] border border-emerald-500/20 flex items-center font-mono text-xs tracking-wider text-white overflow-hidden">
                               {newlyCreatedKey.key}
                             </div>
                             <button
                               onClick={() => copy(newlyCreatedKey.key, 'newKey')}
-                              className="h-9 w-9 rounded-lg border border-emerald-500/20 bg-white/[0.04] hover:bg-white/[0.08] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
+                              className="h-9 w-9 rounded-lg border border-emerald-500/20 bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
                             >
                               {copiedField === 'newKey' ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} className="text-emerald-400" />}
                             </button>
                             <button
                               onClick={() => setNewlyCreatedKey(null)}
-                              className="h-9 w-9 rounded-lg border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
+                              className="h-9 w-9 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
                               title="Dismiss"
                             >
                               <Trash2 size={13} className="text-[var(--text-muted)]" />
@@ -592,7 +592,7 @@ export default function SettingsPage() {
                       ) : (
                         <div className="space-y-2 mb-5">
                           {apiKeys.map((k) => (
-                            <div key={k.id} className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-3">
+                            <div key={k.id} className="rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] p-3">
                               <div className="flex items-start justify-between gap-3">
                                 <div className="min-w-0 flex-1">
                                   {editingKeyId === k.id ? (
@@ -649,7 +649,7 @@ export default function SettingsPage() {
                                 <div className="flex items-center gap-1 flex-shrink-0">
                                   <button
                                     onClick={() => copy(k.prefix, `key-${k.id}`)}
-                                    className="h-7 w-7 rounded-lg border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.07] flex items-center justify-center transition-colors cursor-pointer"
+                                    className="h-7 w-7 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] hover:bg-[var(--bg-card)] flex items-center justify-center transition-colors cursor-pointer"
                                     title="Copy prefix"
                                   >
                                     {copiedField === `key-${k.id}` ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} className="text-[var(--text-muted)]" />}
@@ -741,14 +741,14 @@ export default function SettingsPage() {
                         { key: 'billing', label: 'Billing Alerts', desc: 'Payment confirmations, subscription renewals, and credits', value: notifBilling, onChange: setNotifBilling },
                       ].map(({ key, label, desc, value, onChange }, i, arr) => (
                         <div key={key}>
-                          <div className="flex items-center justify-between p-3 rounded-xl transition-colors hover:bg-white/[0.02]">
+                          <div className="flex items-center justify-between p-3 rounded-xl transition-colors hover:bg-[var(--bg-card)]">
                             <div>
                               <p className="text-sm font-medium text-[var(--text-primary)]">{label}</p>
                               <p className="text-xs mt-0.5 text-[var(--text-muted)]">{desc}</p>
                             </div>
                             <Toggle checked={value} onChange={onChange} label={`Toggle ${label}`} />
                           </div>
-                          {i < arr.length - 1 && <div className="mx-3 h-px bg-white/[0.04]" />}
+                          {i < arr.length - 1 && <div className="mx-3 h-px bg-[var(--bg-card)]" />}
                         </div>
                       ))}
                     </div>
@@ -763,7 +763,7 @@ export default function SettingsPage() {
                     {profile && (
                       <>
                         {/* Current plan */}
-                        <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4 mb-5">
+                        <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] p-4 mb-5">
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Current Plan</span>
                             <TierBadge tier={profile.tier} />
@@ -778,7 +778,7 @@ export default function SettingsPage() {
                         </div>
 
                         {/* Credits */}
-                        <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4 mb-5">
+                        <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] p-4 mb-5">
                           <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider block mb-1">Hatch Credits</span>
                           <p className="text-2xl font-bold text-emerald-400" style={displayFont}>${profile.hatchCredits.toFixed(2)}</p>
                           <p className="text-xs text-[var(--text-muted)] mt-0.5">Automatically applied at checkout</p>
@@ -810,7 +810,7 @@ export default function SettingsPage() {
 
                     <div className="space-y-4">
                       {/* ── Export Data (GDPR) ──────────────────────────── */}
-                      <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
+                      <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-4">
                         <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Export My Data</h3>
                         <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
                           Download a JSON file containing all your account data: profile, agents, chat history, payments, referrals, support tickets, and more.
@@ -855,7 +855,7 @@ export default function SettingsPage() {
                         <button
                           disabled={deleting}
                           onClick={() => setShowDeleteConfirm(true)}
-                          className="flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500 hover:text-white hover:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          className="flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500 hover:text-[var(--text-primary)] hover:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         >
                           <Trash2 size={14} />
                           {deleting ? 'Deleting...' : 'Delete Account'}
@@ -885,7 +885,7 @@ export default function SettingsPage() {
             />
             <motion.div
               className="relative w-full max-w-md rounded-2xl border p-6"
-              style={{ background: '#1A1730', borderColor: 'rgba(239,68,68,0.25)', boxShadow: '0 16px 64px rgba(0,0,0,0.4)' }}
+              style={{ background: 'var(--bg-elevated)', borderColor: 'rgba(239,68,68,0.25)', boxShadow: '0 16px 64px rgba(0,0,0,0.4)' }}
               initial={{ opacity: 0, scale: 0.95, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 8 }} transition={{ duration: 0.2 }}
               role="alertdialog" aria-modal="true"
@@ -894,11 +894,11 @@ export default function SettingsPage() {
                 <AlertTriangle size={24} className="text-red-400" />
               </div>
               <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">Delete Your Account?</h2>
-              <p className="text-sm text-[#A5A1C2] leading-relaxed mb-5">
+              <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-5">
                 This will permanently remove all your agents, data, and payment history. This action <strong className="text-[var(--text-primary)]">cannot be undone</strong>.
               </p>
               <div className="mb-5">
-                <label className="block text-xs font-medium text-[#71717a] uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-1.5">
                   Confirm your password
                 </label>
                 <div className="relative">
@@ -909,11 +909,11 @@ export default function SettingsPage() {
                     onKeyDown={e => { if (e.key === 'Enter' && !deleting) handleDeleteAccount(); }}
                     placeholder="Your current password"
                     disabled={deleting}
-                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5 pr-10 text-sm text-white placeholder-[#52525b] focus:outline-none focus:border-red-500/50 disabled:opacity-50"
+                    className="w-full bg-[var(--bg-card)] border border-[var(--border-default)] rounded-xl px-3 py-2.5 pr-10 text-sm text-white placeholder-[#52525b] focus:outline-none focus:border-red-500/50 disabled:opacity-50"
                     autoFocus
                   />
                   <button type="button" onClick={() => setShowDeletePassword(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] hover:text-[var(--text-primary)] transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
                     tabIndex={-1}
                   >
                     {showDeletePassword ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -924,7 +924,7 @@ export default function SettingsPage() {
                 <button
                   onClick={() => { setShowDeleteConfirm(false); setDeletePassword(''); }}
                   disabled={deleting}
-                  className="px-4 py-2.5 text-sm font-medium rounded-xl text-[#A5A1C2] hover:text-[var(--text-primary)] hover:bg-white/5 transition-all disabled:opacity-40"
+                  className="px-4 py-2.5 text-sm font-medium rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-all disabled:opacity-40"
                 >
                   Cancel
                 </button>

@@ -98,10 +98,10 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         transition={{ duration: 0.3 }}
-        className="relative w-full max-w-lg bg-[#0e0e14] border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-lg bg-[var(--bg-sidebar)] border border-[var(--border-default)] rounded-2xl shadow-2xl overflow-hidden"
       >
         {/* Close button */}
-        <button onClick={dismiss} className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-white/[0.06] text-[#71717a] hover:text-white transition-colors z-10">
+        <button onClick={dismiss} className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-[var(--bg-card)] text-[var(--text-muted)] hover:text-white transition-colors z-10">
           <X className="w-4 h-4" />
         </button>
 
@@ -111,7 +111,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
             <div
               key={i}
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === step ? 'w-8 bg-purple-500' : i < step ? 'w-4 bg-purple-500/40' : 'w-4 bg-white/[0.08]'
+                i === step ? 'w-8 bg-purple-500' : i < step ? 'w-4 bg-purple-500/40' : 'w-4 bg-[var(--bg-hover)]'
               }`}
             />
           ))}
@@ -127,7 +127,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
                     <Rocket className="w-8 h-8 text-purple-400" />
                   </div>
                   <h2 className="text-2xl font-bold text-white mb-2">Welcome to Hatcher!</h2>
-                  <p className="text-sm text-[#a1a1aa] leading-relaxed">
+                  <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
                     Deploy your first AI agent in under 60 seconds. Pick a framework, name your agent, and you&apos;re live.
                   </p>
                 </div>
@@ -139,7 +139,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
                     { icon: Sparkles, text: 'Free tier — no credit card required' },
                   ].map((item, i) => (
                     <div key={i} className="flex items-center gap-3 text-sm text-[#d4d4d8]">
-                      <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] flex items-center justify-center shrink-0">
                         <item.icon className="w-4 h-4 text-purple-400" />
                       </div>
                       {item.text}
@@ -160,7 +160,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
             {step === 1 && (
               <motion.div key="framework" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}>
                 <h2 className="text-xl font-bold text-white mb-1">Choose your engine</h2>
-                <p className="text-sm text-[#a1a1aa] mb-5">Each framework has different strengths. You can always change later.</p>
+                <p className="text-sm text-[var(--text-secondary)] mb-5">Each framework has different strengths. You can always change later.</p>
 
                 <div className="grid grid-cols-2 gap-2.5 mb-6">
                   {FRAMEWORKS.map((fw) => (
@@ -170,7 +170,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
                       className={`relative text-left p-3.5 rounded-xl border transition-all duration-200 ${
                         selectedFramework === fw.id
                           ? 'border-purple-500/50 bg-purple-500/[0.08] shadow-[0_0_20px_rgba(139,92,246,0.1)]'
-                          : 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]'
+                          : 'border-[var(--border-default)] bg-[var(--bg-card)] hover:border-[var(--border-hover)]'
                       }`}
                     >
                       {selectedFramework === fw.id && (
@@ -182,7 +182,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
                         <Bot className="w-4 h-4 text-white" />
                       </div>
                       <p className="text-sm font-semibold text-white">{fw.name}</p>
-                      <p className="text-[11px] text-[#71717a] mt-0.5 leading-snug">{fw.description}</p>
+                      <p className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-snug">{fw.description}</p>
                     </button>
                   ))}
                 </div>
@@ -190,7 +190,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
                 <div className="flex gap-2.5">
                   <button
                     onClick={() => setStep(0)}
-                    className="flex items-center justify-center gap-1.5 border border-white/[0.1] text-[#a1a1aa] font-medium py-3 px-5 rounded-xl text-sm hover:bg-white/[0.04] transition-all"
+                    className="flex items-center justify-center gap-1.5 border border-[var(--border-hover)] text-[var(--text-secondary)] font-medium py-3 px-5 rounded-xl text-sm hover:bg-[var(--bg-card)] transition-all"
                   >
                     <ArrowLeft className="w-4 h-4" /> Back
                   </button>
@@ -208,7 +208,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
             {step === 2 && (
               <motion.div key="features" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}>
                 <h2 className="text-xl font-bold text-white mb-1">What you can do</h2>
-                <p className="text-sm text-[#a1a1aa] mb-5">Your dashboard gives you full control over every agent.</p>
+                <p className="text-sm text-[var(--text-secondary)] mb-5">Your dashboard gives you full control over every agent.</p>
 
                 <div className="space-y-2.5 mb-6">
                   {DASHBOARD_FEATURES.map((feat, i) => (
@@ -216,12 +216,12 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
                       key={i}
                       className={`flex items-start gap-3.5 p-3.5 rounded-xl border ${feat.bg} transition-all`}
                     >
-                      <div className="w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center shrink-0 mt-0.5">
+                      <div className="w-9 h-9 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] flex items-center justify-center shrink-0 mt-0.5">
                         <feat.icon className={`w-4.5 h-4.5 ${feat.color}`} />
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-white">{feat.title}</p>
-                        <p className="text-xs text-[#71717a] mt-0.5 leading-snug">{feat.description}</p>
+                        <p className="text-xs text-[var(--text-muted)] mt-0.5 leading-snug">{feat.description}</p>
                       </div>
                     </div>
                   ))}
@@ -230,7 +230,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
                 <div className="flex gap-2.5">
                   <button
                     onClick={() => setStep(1)}
-                    className="flex items-center justify-center gap-1.5 border border-white/[0.1] text-[#a1a1aa] font-medium py-3 px-5 rounded-xl text-sm hover:bg-white/[0.04] transition-all"
+                    className="flex items-center justify-center gap-1.5 border border-[var(--border-hover)] text-[var(--text-secondary)] font-medium py-3 px-5 rounded-xl text-sm hover:bg-[var(--bg-card)] transition-all"
                   >
                     <ArrowLeft className="w-4 h-4" /> Back
                   </button>
@@ -252,19 +252,19 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
                     <Sparkles className="w-8 h-8 text-emerald-400" />
                   </div>
                   <h2 className="text-2xl font-bold text-white mb-2">You&apos;re all set!</h2>
-                  <p className="text-sm text-[#a1a1aa] leading-relaxed">
+                  <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
                     We&apos;ll take you to the agent creator where you can name your agent, configure integrations, and deploy in one click.
                   </p>
                 </div>
 
-                <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 mb-6">
+                <div className="bg-[var(--bg-card)] border border-[var(--border-default)] rounded-xl p-4 mb-6">
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${FRAMEWORKS.find(f => f.id === selectedFramework)?.color} flex items-center justify-center`}>
                       <Bot className="w-5 h-5 text-white" />
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-white">{FRAMEWORKS.find(f => f.id === selectedFramework)?.name}</p>
-                      <p className="text-xs text-[#71717a]">Free tier — 10 messages/day</p>
+                      <p className="text-xs text-[var(--text-muted)]">Free tier — 10 messages/day</p>
                     </div>
                   </div>
                 </div>
@@ -272,7 +272,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
                 <div className="flex gap-2.5">
                   <button
                     onClick={() => setStep(2)}
-                    className="flex items-center justify-center gap-1.5 border border-white/[0.1] text-[#a1a1aa] font-medium py-3 px-5 rounded-xl text-sm hover:bg-white/[0.04] transition-all"
+                    className="flex items-center justify-center gap-1.5 border border-[var(--border-hover)] text-[var(--text-secondary)] font-medium py-3 px-5 rounded-xl text-sm hover:bg-[var(--bg-card)] transition-all"
                   >
                     <ArrowLeft className="w-4 h-4" /> Back
                   </button>
@@ -290,7 +290,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
 
         {/* Skip link */}
         <div className="text-center pb-5">
-          <button onClick={dismiss} className="text-xs text-[#52525b] hover:text-[#a1a1aa] transition-colors">
+          <button onClick={dismiss} className="text-xs text-[#52525b] hover:text-[var(--text-secondary)] transition-colors">
             Skip for now
           </button>
         </div>

@@ -148,7 +148,7 @@ function WorkflowNodeComponent({ data, selected }: NodeProps<NodeConfig>) {
       <Handle
         type="target"
         position={Position.Top}
-        className="!w-3 !h-3 !bg-[#A5A1C2] !border-2 !border-[#1a1730] hover:!bg-[#06b6d4] transition-colors"
+        className="!w-3 !h-3 !bg-[var(--text-secondary)] !border-2 !border-[var(--bg-elevated)] hover:!bg-[#06b6d4] transition-colors"
       />
       <div className="flex items-center gap-2.5">
         <div className={`p-1.5 rounded-lg ${colors.bg} ${colors.text}`}>
@@ -157,7 +157,7 @@ function WorkflowNodeComponent({ data, selected }: NodeProps<NodeConfig>) {
         <div className="min-w-0 flex-1">
           <div className={`text-sm font-medium ${colors.text}`}>{data.label}</div>
           {data.subtype && (
-            <div className="text-[10px] text-[#71717a] truncate mt-0.5">
+            <div className="text-[10px] text-[var(--text-muted)] truncate mt-0.5">
               {catalogEntry?.desc || data.subtype}
             </div>
           )}
@@ -166,7 +166,7 @@ function WorkflowNodeComponent({ data, selected }: NodeProps<NodeConfig>) {
       <Handle
         type="source"
         position={Position.Bottom}
-        className="!w-3 !h-3 !bg-[#A5A1C2] !border-2 !border-[#1a1730] hover:!bg-[#06b6d4] transition-colors"
+        className="!w-3 !h-3 !bg-[var(--text-secondary)] !border-2 !border-[var(--bg-elevated)] hover:!bg-[#06b6d4] transition-colors"
       />
     </div>
   );
@@ -196,27 +196,27 @@ function NodeConfigPanel({
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: 300, opacity: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className="absolute right-0 top-0 bottom-0 w-80 bg-[#0D0B1A]/95 backdrop-blur-lg border-l border-[rgba(46,43,74,0.4)] z-20 overflow-y-auto"
+      className="absolute right-0 top-0 bottom-0 w-80 bg-[var(--bg-base)]/95 backdrop-blur-lg border-l border-[var(--border-default)] z-20 overflow-y-auto"
     >
-      <div className="p-4 border-b border-[rgba(46,43,74,0.3)]">
+      <div className="p-4 border-b border-[var(--border-default)]">
         <div className="flex items-center justify-between mb-2">
           <h3 className={`text-sm font-semibold ${colors.text}`}>Configure Node</h3>
-          <button onClick={onClose} className="p-1 text-[#71717a] hover:text-[#A5A1C2] transition-colors">
+          <button onClick={onClose} className="p-1 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors">
             <X size={16} />
           </button>
         </div>
-        <div className="text-xs text-[#71717a]">{d.label} ({d.category})</div>
+        <div className="text-xs text-[var(--text-muted)]">{d.label} ({d.category})</div>
       </div>
 
       <div className="p-4 space-y-4">
         {/* Label */}
         <div>
-          <label className="block text-xs text-[#A5A1C2] mb-1.5">Label</label>
+          <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Label</label>
           <input
             type="text"
             value={d.label}
             onChange={(e) => onUpdate(node.id, { label: e.target.value })}
-            className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 transition-colors"
+            className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 transition-colors"
           />
         </div>
 
@@ -224,11 +224,11 @@ function NodeConfigPanel({
         {d.subtype === 'message_received' && (
           <>
             <div>
-              <label className="block text-xs text-[#A5A1C2] mb-1.5">Channel Filter</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Channel Filter</label>
               <select
                 value={(d.channel as string) || 'any'}
                 onChange={(e) => onUpdate(node.id, { channel: e.target.value })}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50"
               >
                 <option value="any">Any Channel</option>
                 <option value="telegram">Telegram</option>
@@ -240,13 +240,13 @@ function NodeConfigPanel({
               </select>
             </div>
             <div>
-              <label className="block text-xs text-[#A5A1C2] mb-1.5">Keyword Filter (optional)</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Keyword Filter (optional)</label>
               <input
                 type="text"
                 value={(d.keywords as string) || ''}
                 onChange={(e) => onUpdate(node.id, { keywords: e.target.value })}
                 placeholder="e.g. /start, help, price"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a]"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)]"
               />
             </div>
           </>
@@ -255,28 +255,28 @@ function NodeConfigPanel({
         {/* Trigger: Schedule */}
         {d.subtype === 'schedule' && (
           <div>
-            <label className="block text-xs text-[#A5A1C2] mb-1.5">Cron Expression</label>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Cron Expression</label>
             <input
               type="text"
               value={(d.cron as string) || ''}
               onChange={(e) => onUpdate(node.id, { cron: e.target.value })}
               placeholder="e.g. 0 */6 * * *"
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)] font-mono"
             />
-            <p className="text-[10px] text-[#71717a] mt-1">min hour day month weekday</p>
+            <p className="text-[10px] text-[var(--text-muted)] mt-1">min hour day month weekday</p>
           </div>
         )}
 
         {/* Trigger: Webhook */}
         {d.subtype === 'webhook' && (
           <div>
-            <label className="block text-xs text-[#A5A1C2] mb-1.5">Webhook Path</label>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Webhook Path</label>
             <input
               type="text"
               value={(d.path as string) || ''}
               onChange={(e) => onUpdate(node.id, { path: e.target.value })}
               placeholder="/my-hook"
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)] font-mono"
             />
           </div>
         )}
@@ -284,13 +284,13 @@ function NodeConfigPanel({
         {/* Trigger: Keyword Match */}
         {d.subtype === 'keyword_match' && (
           <div>
-            <label className="block text-xs text-[#A5A1C2] mb-1.5">Keywords (comma-separated)</label>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Keywords (comma-separated)</label>
             <input
               type="text"
               value={(d.keywords as string) || ''}
               onChange={(e) => onUpdate(node.id, { keywords: e.target.value })}
               placeholder="hello, help, price"
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a]"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)]"
             />
           </div>
         )}
@@ -298,15 +298,15 @@ function NodeConfigPanel({
         {/* Action: Send Reply */}
         {d.subtype === 'send_reply' && (
           <div>
-            <label className="block text-xs text-[#A5A1C2] mb-1.5">Message Template</label>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Message Template</label>
             <textarea
               value={(d.message as string) || ''}
               onChange={(e) => onUpdate(node.id, { message: e.target.value })}
               placeholder="Hello {{user}}! How can I help?"
               rows={4}
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] resize-none"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)] resize-none"
             />
-            <p className="text-[10px] text-[#71717a] mt-1">Use {'{{variable}}'} for dynamic values</p>
+            <p className="text-[10px] text-[var(--text-muted)] mt-1">Use {'{{variable}}'} for dynamic values</p>
           </div>
         )}
 
@@ -314,21 +314,21 @@ function NodeConfigPanel({
         {d.subtype === 'call_api' && (
           <>
             <div>
-              <label className="block text-xs text-[#A5A1C2] mb-1.5">URL</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">URL</label>
               <input
                 type="text"
                 value={(d.url as string) || ''}
                 onChange={(e) => onUpdate(node.id, { url: e.target.value })}
                 placeholder="https://api.example.com/data"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)] font-mono"
               />
             </div>
             <div>
-              <label className="block text-xs text-[#A5A1C2] mb-1.5">Method</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Method</label>
               <select
                 value={(d.method as string) || 'GET'}
                 onChange={(e) => onUpdate(node.id, { method: e.target.value })}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50"
               >
                 <option value="GET">GET</option>
                 <option value="POST">POST</option>
@@ -338,23 +338,23 @@ function NodeConfigPanel({
               </select>
             </div>
             <div>
-              <label className="block text-xs text-[#A5A1C2] mb-1.5">Headers (JSON)</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Headers (JSON)</label>
               <textarea
                 value={(d.headers as string) || ''}
                 onChange={(e) => onUpdate(node.id, { headers: e.target.value })}
                 placeholder='{"Authorization": "Bearer ..."}'
                 rows={2}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono resize-none"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)] font-mono resize-none"
               />
             </div>
             <div>
-              <label className="block text-xs text-[#A5A1C2] mb-1.5">Body (JSON)</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Body (JSON)</label>
               <textarea
                 value={(d.body as string) || ''}
                 onChange={(e) => onUpdate(node.id, { body: e.target.value })}
                 placeholder='{"key": "value"}'
                 rows={3}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono resize-none"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)] font-mono resize-none"
               />
             </div>
           </>
@@ -363,13 +363,13 @@ function NodeConfigPanel({
         {/* Action: Run Skill */}
         {d.subtype === 'run_skill' && (
           <div>
-            <label className="block text-xs text-[#A5A1C2] mb-1.5">Skill Name</label>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Skill Name</label>
             <input
               type="text"
               value={(d.skillName as string) || ''}
               onChange={(e) => onUpdate(node.id, { skillName: e.target.value })}
               placeholder="research, scan-token, etc."
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a]"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)]"
             />
           </div>
         )}
@@ -377,14 +377,14 @@ function NodeConfigPanel({
         {/* Action: Wait/Delay */}
         {d.subtype === 'wait_delay' && (
           <div>
-            <label className="block text-xs text-[#A5A1C2] mb-1.5">Delay (seconds)</label>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Delay (seconds)</label>
             <input
               type="number"
               value={(d.delaySecs as number) || 5}
               onChange={(e) => onUpdate(node.id, { delaySecs: Number(e.target.value) })}
               min={1}
               max={3600}
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50"
             />
           </div>
         )}
@@ -393,23 +393,23 @@ function NodeConfigPanel({
         {d.subtype === 'set_variable' && (
           <>
             <div>
-              <label className="block text-xs text-[#A5A1C2] mb-1.5">Variable Name</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Variable Name</label>
               <input
                 type="text"
                 value={(d.varName as string) || ''}
                 onChange={(e) => onUpdate(node.id, { varName: e.target.value })}
                 placeholder="my_var"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)] font-mono"
               />
             </div>
             <div>
-              <label className="block text-xs text-[#A5A1C2] mb-1.5">Value</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Value</label>
               <input
                 type="text"
                 value={(d.varValue as string) || ''}
                 onChange={(e) => onUpdate(node.id, { varValue: e.target.value })}
                 placeholder="some value or {{expression}}"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a]"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)]"
               />
             </div>
           </>
@@ -419,21 +419,21 @@ function NodeConfigPanel({
         {d.subtype === 'if_else' && (
           <>
             <div>
-              <label className="block text-xs text-[#A5A1C2] mb-1.5">Variable</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Variable</label>
               <input
                 type="text"
                 value={(d.variable as string) || ''}
                 onChange={(e) => onUpdate(node.id, { variable: e.target.value })}
                 placeholder="{{message}}"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)] font-mono"
               />
             </div>
             <div>
-              <label className="block text-xs text-[#A5A1C2] mb-1.5">Operator</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Operator</label>
               <select
                 value={(d.operator as string) || 'equals'}
                 onChange={(e) => onUpdate(node.id, { operator: e.target.value })}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50"
               >
                 <option value="equals">Equals</option>
                 <option value="not_equals">Not Equals</option>
@@ -447,13 +447,13 @@ function NodeConfigPanel({
               </select>
             </div>
             <div>
-              <label className="block text-xs text-[#A5A1C2] mb-1.5">Value</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Value</label>
               <input
                 type="text"
                 value={(d.condValue as string) || ''}
                 onChange={(e) => onUpdate(node.id, { condValue: e.target.value })}
                 placeholder="expected value"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a]"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)]"
               />
             </div>
           </>
@@ -462,13 +462,13 @@ function NodeConfigPanel({
         {/* Condition: Keyword Contains */}
         {d.subtype === 'keyword_contains' && (
           <div>
-            <label className="block text-xs text-[#A5A1C2] mb-1.5">Keyword</label>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Keyword</label>
             <input
               type="text"
               value={(d.keyword as string) || ''}
               onChange={(e) => onUpdate(node.id, { keyword: e.target.value })}
               placeholder="price, help, etc."
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a]"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)]"
             />
           </div>
         )}
@@ -477,21 +477,21 @@ function NodeConfigPanel({
         {d.subtype === 'time_check' && (
           <>
             <div>
-              <label className="block text-xs text-[#A5A1C2] mb-1.5">After (HH:MM)</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">After (HH:MM)</label>
               <input
                 type="time"
                 value={(d.afterTime as string) || '09:00'}
                 onChange={(e) => onUpdate(node.id, { afterTime: e.target.value })}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50"
               />
             </div>
             <div>
-              <label className="block text-xs text-[#A5A1C2] mb-1.5">Before (HH:MM)</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Before (HH:MM)</label>
               <input
                 type="time"
                 value={(d.beforeTime as string) || '17:00'}
                 onChange={(e) => onUpdate(node.id, { beforeTime: e.target.value })}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50"
               />
             </div>
           </>
@@ -501,23 +501,23 @@ function NodeConfigPanel({
         {d.subtype === 'variable_check' && (
           <>
             <div>
-              <label className="block text-xs text-[#A5A1C2] mb-1.5">Variable Name</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Variable Name</label>
               <input
                 type="text"
                 value={(d.varName as string) || ''}
                 onChange={(e) => onUpdate(node.id, { varName: e.target.value })}
                 placeholder="my_var"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)] font-mono"
               />
             </div>
             <div>
-              <label className="block text-xs text-[#A5A1C2] mb-1.5">Expected Value</label>
+              <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Expected Value</label>
               <input
                 type="text"
                 value={(d.expectedValue as string) || ''}
                 onChange={(e) => onUpdate(node.id, { expectedValue: e.target.value })}
                 placeholder="expected"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a]"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)]"
               />
             </div>
           </>
@@ -526,13 +526,13 @@ function NodeConfigPanel({
         {/* Response: Send Message */}
         {d.subtype === 'send_message' && (
           <div>
-            <label className="block text-xs text-[#A5A1C2] mb-1.5">Message</label>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Message</label>
             <textarea
               value={(d.message as string) || ''}
               onChange={(e) => onUpdate(node.id, { message: e.target.value })}
               placeholder="The response message..."
               rows={4}
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] resize-none"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)] resize-none"
             />
           </div>
         )}
@@ -540,13 +540,13 @@ function NodeConfigPanel({
         {/* Response: Send File */}
         {d.subtype === 'send_file' && (
           <div>
-            <label className="block text-xs text-[#A5A1C2] mb-1.5">File Path / URL</label>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1.5">File Path / URL</label>
             <input
               type="text"
               value={(d.filePath as string) || ''}
               onChange={(e) => onUpdate(node.id, { filePath: e.target.value })}
               placeholder="/workspace/report.pdf or https://..."
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a] font-mono"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)] font-mono"
             />
           </div>
         )}
@@ -554,13 +554,13 @@ function NodeConfigPanel({
         {/* Response: React Emoji */}
         {d.subtype === 'react_emoji' && (
           <div>
-            <label className="block text-xs text-[#A5A1C2] mb-1.5">Emoji</label>
+            <label className="block text-xs text-[var(--text-secondary)] mb-1.5">Emoji</label>
             <input
               type="text"
               value={(d.emoji as string) || ''}
               onChange={(e) => onUpdate(node.id, { emoji: e.target.value })}
               placeholder="e.g. thumbs_up"
-              className="w-full px-3 py-2 text-sm rounded-lg bg-[#1a1730] border border-[rgba(46,43,74,0.4)] text-[#FFFFFF] outline-none focus:border-[#06b6d4]/50 placeholder-[#71717a]"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-primary)] outline-none focus:border-[#06b6d4]/50 placeholder-[var(--text-muted)]"
             />
           </div>
         )}
@@ -666,11 +666,11 @@ function WorkflowEditor({
       </div>
     <div className="relative flex flex-col h-[calc(100vh-280px)] min-h-[500px]">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(46,43,74,0.3)] bg-[#0D0B1A]/80 backdrop-blur-sm">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)] bg-[var(--bg-base)]/80 backdrop-blur-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={onCancel}
-            className="p-1.5 text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+            className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
           >
             <X size={18} />
           </button>
@@ -678,7 +678,7 @@ function WorkflowEditor({
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="bg-transparent text-lg font-semibold text-[#FFFFFF] outline-none border-b border-transparent focus:border-[#06b6d4]/50 transition-colors"
+            className="bg-transparent text-lg font-semibold text-[var(--text-primary)] outline-none border-b border-transparent focus:border-[#06b6d4]/50 transition-colors"
             placeholder="Workflow name..."
           />
         </div>
@@ -694,7 +694,7 @@ function WorkflowEditor({
           )}
           <button
             onClick={onCancel}
-            className="px-4 py-1.5 text-xs rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#06b6d4]/40 transition-all"
+            className="px-4 py-1.5 text-xs rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[#06b6d4]/40 transition-all"
           >
             Cancel
           </button>
@@ -711,16 +711,16 @@ function WorkflowEditor({
 
       <div className="flex flex-1 overflow-hidden relative">
         {/* Toolbar */}
-        <div className="w-56 border-r border-[rgba(46,43,74,0.3)] bg-[#0D0B1A]/60 overflow-y-auto flex-shrink-0">
+        <div className="w-56 border-r border-[var(--border-default)] bg-[var(--bg-base)]/60 overflow-y-auto flex-shrink-0">
           <div className="p-3">
-            <h4 className="text-xs font-semibold text-[#A5A1C2] uppercase tracking-wider mb-3">Node Palette</h4>
+            <h4 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Node Palette</h4>
             {Object.entries(groupedCatalog).map(([cat, items]) => {
               const colors = CATEGORY_COLORS[cat as keyof typeof CATEGORY_COLORS];
               return (
                 <div key={cat} className="mb-2">
                   <button
                     onClick={() => toggleCategory(cat)}
-                    className={`flex items-center gap-2 w-full text-left px-2 py-1.5 text-xs font-medium ${colors.text} hover:bg-white/5 rounded-lg transition-colors`}
+                    className={`flex items-center gap-2 w-full text-left px-2 py-1.5 text-xs font-medium ${colors.text} hover:bg-[var(--bg-card)] rounded-lg transition-colors`}
                   >
                     <ChevronRight
                       size={12}
@@ -750,7 +750,7 @@ function WorkflowEditor({
                               `}
                             >
                               <Icon size={13} className={colors.text} />
-                              <span className="text-[#FFFFFF] truncate">{item.label}</span>
+                              <span className="text-[var(--text-primary)] truncate">{item.label}</span>
                             </button>
                           );
                         })}
@@ -788,15 +788,15 @@ function WorkflowEditor({
               color="#2e2b4a40"
             />
             <Controls
-              className="!bg-[#1a1730] !border-[rgba(46,43,74,0.4)] !rounded-lg [&_button]:!bg-[#1a1730] [&_button]:!border-[rgba(46,43,74,0.4)] [&_button]:!text-[#A5A1C2] [&_button:hover]:!bg-[#2e2b4a]"
+              className="!bg-[var(--bg-elevated)] !border-[var(--border-default)] !rounded-lg [&_button]:!bg-[var(--bg-elevated)] [&_button]:!border-[var(--border-default)] [&_button]:!text-[var(--text-secondary)] [&_button:hover]:!bg-[#2e2b4a]"
             />
             <MiniMap
               nodeColor={(n) => {
                 const cat = (n.data as NodeConfig)?.category;
-                return CATEGORY_COLORS[cat]?.accent || '#71717a';
+                return CATEGORY_COLORS[cat]?.accent || 'var(--text-muted)';
               }}
               maskColor="rgba(13,11,26,0.8)"
-              className="!bg-[#1a1730] !border-[rgba(46,43,74,0.4)] !rounded-lg"
+              className="!bg-[var(--bg-elevated)] !border-[var(--border-default)] !rounded-lg"
             />
           </ReactFlow>
         </div>
@@ -955,8 +955,8 @@ export function WorkflowsTab() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-[#FFFFFF]">Workflows</h2>
-          <p className="text-xs text-[#71717a] mt-0.5">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">Workflows</h2>
+          <p className="text-xs text-[var(--text-muted)] mt-0.5">
             Visual automation flows for your agent
           </p>
         </div>
@@ -970,13 +970,13 @@ export function WorkflowsTab() {
       </div>
 
       {/* Framework Compatibility Banner */}
-      <div className={`flex items-start gap-3 px-4 py-3 rounded-xl border border-white/[0.06] bg-zinc-900/50`}>
+      <div className={`flex items-start gap-3 px-4 py-3 rounded-xl border border-[var(--border-default)] bg-zinc-900/50`}>
         <div className={`p-1.5 rounded-lg border ${fwBadge} flex-shrink-0 mt-0.5`}>
           <Info size={14} />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-medium text-[#FFFFFF]">Workflow Compatibility</span>
+            <span className="text-xs font-medium text-[var(--text-primary)]">Workflow Compatibility</span>
             <span className={`text-[10px] px-2 py-0.5 rounded-full border ${fwBadge} capitalize`}>
               {framework}
             </span>
@@ -988,7 +988,7 @@ export function WorkflowsTab() {
               {fwSupport.level === 'full' ? 'Full Support' : fwSupport.level === 'partial' ? 'Partial' : 'Planned'}
             </span>
           </div>
-          <p className="text-[11px] text-[#71717a] leading-relaxed">{fwSupport.note}</p>
+          <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">{fwSupport.note}</p>
         </div>
       </div>
 
@@ -1016,7 +1016,7 @@ export function WorkflowsTab() {
             {/* Outer ring */}
             <div className="absolute inset-0 rounded-full border border-dashed border-[#06b6d4]/20 animate-[spin_20s_linear_infinite]" />
             {/* Middle ring */}
-            <div className="absolute inset-3 rounded-full border border-white/[0.06]" />
+            <div className="absolute inset-3 rounded-full border border-[var(--border-default)]" />
             {/* Center icon */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="relative">
@@ -1034,8 +1034,8 @@ export function WorkflowsTab() {
             </div>
           </div>
 
-          <h3 className="text-base font-semibold text-[#FFFFFF] mb-2">Create your first workflow</h3>
-          <p className="text-sm text-[#71717a] mb-2 max-w-sm mx-auto leading-relaxed">
+          <h3 className="text-base font-semibold text-[var(--text-primary)] mb-2">Create your first workflow</h3>
+          <p className="text-sm text-[var(--text-muted)] mb-2 max-w-sm mx-auto leading-relaxed">
             Build visual automation pipelines that define how your agent responds to triggers, processes data, and executes actions.
           </p>
           <div className="flex items-center justify-center gap-4 text-[11px] text-[#52525b] mb-6">
@@ -1074,7 +1074,7 @@ export function WorkflowsTab() {
               exit={{ opacity: 0, y: -12 }}
               transition={{ delay: i * 0.05 }}
             >
-              <GlassCard className="group hover:border-white/[0.1] transition-all duration-200">
+              <GlassCard className="group hover:border-[var(--border-hover)] transition-all duration-200">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     {/* Status icon with pulse */}
@@ -1091,13 +1091,13 @@ export function WorkflowsTab() {
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="text-sm font-medium text-[#FFFFFF] truncate">{wf.name}</h3>
+                        <h3 className="text-sm font-medium text-[var(--text-primary)] truncate">{wf.name}</h3>
                         {/* Status badge */}
                         <span className={`text-[10px] px-2 py-0.5 rounded-full border ${statusCfg.badgeClass}`}>
                           {statusCfg.label}
                         </span>
                         {/* Node count badge */}
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/[0.04] text-[#71717a] border border-white/[0.06] flex items-center gap-1">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--bg-card)] text-[var(--text-muted)] border border-[var(--border-default)] flex items-center gap-1">
                           <Hash size={8} />
                           {nodeCount} step{nodeCount !== 1 ? 's' : ''}
                         </span>
@@ -1133,7 +1133,7 @@ export function WorkflowsTab() {
                         {lastRun && (
                           <>
                             <span className="text-[10px] text-[#52525b]">&middot;</span>
-                            <span className="text-[10px] text-[#71717a] flex items-center gap-1">
+                            <span className="text-[10px] text-[var(--text-muted)] flex items-center gap-1">
                               <Play size={8} className="text-[#52525b]" />
                               Last run {lastRun}
                             </span>
@@ -1142,7 +1142,7 @@ export function WorkflowsTab() {
                         {(wf.runCount ?? 0) > 0 && (
                           <>
                             <span className="text-[10px] text-[#52525b]">&middot;</span>
-                            <span className="text-[10px] text-[#71717a]">
+                            <span className="text-[10px] text-[var(--text-muted)]">
                               {wf.runCount} run{wf.runCount !== 1 ? 's' : ''}
                             </span>
                           </>
@@ -1170,7 +1170,7 @@ export function WorkflowsTab() {
                       className={`p-1.5 rounded-lg border transition-all ${
                         wf.enabled
                           ? 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
-                          : 'border-[rgba(46,43,74,0.4)] text-[#71717a] hover:border-[#06b6d4]/40 hover:text-[#A5A1C2]'
+                          : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[#06b6d4]/40 hover:text-[var(--text-secondary)]'
                       } disabled:opacity-40`}
                       title={wf.enabled ? 'Disable' : 'Enable'}
                     >
@@ -1186,7 +1186,7 @@ export function WorkflowsTab() {
                     {/* Edit */}
                     <button
                       onClick={() => setEditingWorkflow(wf)}
-                      className="p-1.5 rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:border-[#06b6d4]/40 hover:text-[#06b6d4] transition-all"
+                      className="p-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[#06b6d4]/40 hover:text-[#06b6d4] transition-all"
                       title="Edit workflow"
                     >
                       <Pencil size={14} />

@@ -205,7 +205,7 @@ export default function AdminTicketDetailPage() {
               onChange={(e) => setReplyText(e.target.value)}
               placeholder="Type your reply to the user..."
               rows={3}
-              className="w-full bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors resize-y mb-3"
+              className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors resize-y mb-3"
             />
             <div className="flex justify-end">
               <button

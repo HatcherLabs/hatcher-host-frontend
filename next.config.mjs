@@ -1,19 +1,24 @@
 import { withSentryConfig } from '@sentry/nextjs';
 
+const isCapacitorBuild = process.env.CAPACITOR_BUILD === 'true';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  ...(isCapacitorBuild ? { output: 'export', trailingSlash: true } : {}),
   compress: true,
   poweredByHeader: false,
   transpilePackages: ['@hatcher/shared'],
-  images: {
-    remotePatterns: [
-      { protocol: 'https', hostname: '*.ipfs.nftstorage.link' },
-      { protocol: 'https', hostname: 'arweave.net' },
-      { protocol: 'https', hostname: 'raw.githubusercontent.com' },
-    ],
-    formats: ['image/avif', 'image/webp'],
-    minimumCacheTTL: 3600,
-  },
+  images: isCapacitorBuild
+    ? { unoptimized: true }
+    : {
+        remotePatterns: [
+          { protocol: 'https', hostname: '*.ipfs.nftstorage.link' },
+          { protocol: 'https', hostname: 'arweave.net' },
+          { protocol: 'https', hostname: 'raw.githubusercontent.com' },
+        ],
+        formats: ['image/avif', 'image/webp'],
+        minimumCacheTTL: 3600,
+      },
   experimental: {
     optimizePackageImports: [
       'lucide-react',

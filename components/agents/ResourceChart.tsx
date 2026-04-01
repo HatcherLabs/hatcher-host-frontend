@@ -17,7 +17,7 @@ interface SparklineProps {
 
 function Sparkline({ data, color, height = 32, alertThreshold }: SparklineProps) {
   if (data.length < 2) {
-    return <div style={{ height }} className="flex items-center justify-center text-[10px] text-[#71717a]">No data</div>;
+    return <div style={{ height }} className="flex items-center justify-center text-[10px] text-[var(--text-muted)]">No data</div>;
   }
 
   const max = Math.max(...data, alertThreshold ?? 0, 1);
@@ -128,17 +128,17 @@ export function ResourceChart({ history, currentCpu, currentMem, memLimitMb }: R
   const memPercent = memLimitMb > 0 ? (currentMem / memLimitMb) * 100 : 0;
 
   return (
-    <div className="space-y-3 mt-3 pt-3 border-t border-white/[0.04]">
+    <div className="space-y-3 mt-3 pt-3 border-t border-[var(--border-default)]">
       <div className="flex items-center justify-between mb-1">
-        <span className="text-[11px] font-medium text-[#71717a]">Resource History (24h)</span>
+        <span className="text-[11px] font-medium text-[var(--text-muted)]">Resource History (24h)</span>
         <ResourceAlertBadge cpuPercent={currentCpu} memPercent={memPercent} />
       </div>
 
       {/* CPU sparkline */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <span className="text-[10px] text-[#71717a]">CPU</span>
-          <span className="text-[10px] tabular-nums text-[#A5A1C2]">{currentCpu.toFixed(1)}%</span>
+          <span className="text-[10px] text-[var(--text-muted)]">CPU</span>
+          <span className="text-[10px] tabular-nums text-[var(--text-secondary)]">{currentCpu.toFixed(1)}%</span>
         </div>
         <Sparkline
           data={cpuData.length > 0 ? cpuData : [currentCpu]}
@@ -151,8 +151,8 @@ export function ResourceChart({ history, currentCpu, currentMem, memLimitMb }: R
       {/* Memory sparkline */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <span className="text-[10px] text-[#71717a]">Memory</span>
-          <span className="text-[10px] tabular-nums text-[#A5A1C2]">
+          <span className="text-[10px] text-[var(--text-muted)]">Memory</span>
+          <span className="text-[10px] tabular-nums text-[var(--text-secondary)]">
             {currentMem.toFixed(0)} / {memLimitMb} MB
           </span>
         </div>

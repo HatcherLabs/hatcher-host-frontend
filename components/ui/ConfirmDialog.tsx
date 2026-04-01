@@ -87,7 +87,7 @@ export function ConfirmDialog({
           <motion.div
             className="relative w-full max-w-md rounded-2xl border p-6"
             style={{
-              background: '#1A1730',
+              background: 'var(--bg-elevated)',
               borderColor: 'rgba(46,43,74,0.6)',
               boxShadow: '0 16px 64px rgba(0,0,0,0.4), 0 0 32px rgba(6,182,212,0.08)',
             }}
@@ -104,7 +104,7 @@ export function ConfirmDialog({
             <button
               onClick={onCancel}
               disabled={loading}
-              className="absolute top-4 right-4 p-1.5 rounded-lg text-[#71717a] hover:text-[#fafafa] hover:bg-white/5 transition-colors disabled:opacity-40"
+              className="absolute top-4 right-4 p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/5 transition-colors disabled:opacity-40"
               aria-label="Close dialog"
             >
               <X size={16} />
@@ -124,13 +124,13 @@ export function ConfirmDialog({
 
             <h2
               id="confirm-dialog-title"
-              className="text-lg font-semibold text-[#fafafa] mb-2"
+              className="text-lg font-semibold text-[var(--text-primary)] mb-2"
             >
               {title}
             </h2>
             <p
               id="confirm-dialog-description"
-              className="text-sm text-[#A5A1C2] leading-relaxed mb-6"
+              className="text-sm text-[var(--text-secondary)] leading-relaxed mb-6"
             >
               {description}
             </p>
@@ -139,7 +139,7 @@ export function ConfirmDialog({
               <button
                 onClick={onCancel}
                 disabled={loading}
-                className="px-4 py-2.5 text-sm font-medium rounded-xl text-[#A5A1C2] hover:text-[#fafafa] hover:bg-white/5 transition-all disabled:opacity-40"
+                className="px-4 py-2.5 text-sm font-medium rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5 transition-all disabled:opacity-40"
               >
                 {cancelLabel}
               </button>

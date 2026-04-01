@@ -330,7 +330,7 @@ export function AgentPageClient() {
                   <Clock className="w-3 h-3" />
                   Days Active
                 </div>
-                <div className="text-3xl font-bold text-white">
+                <div className="text-3xl font-bold text-[var(--text-primary)]">
                   {publicStats?.daysActive ?? Math.max(1, Math.floor((Date.now() - new Date(agent.createdAt).getTime()) / (1000 * 60 * 60 * 24)))}
                 </div>
               </div>

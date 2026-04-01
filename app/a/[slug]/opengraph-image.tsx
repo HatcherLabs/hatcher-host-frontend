@@ -134,7 +134,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             <div
               style={{
                 fontSize: 22,
-                color: '#a1a1aa',
+                color: 'var(--text-secondary)',
                 maxWidth: 700,
                 lineHeight: 1.4,
                 overflow: 'hidden',
@@ -171,7 +171,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             hatcher.host
           </div>
           <div style={{ fontSize: 18, color: '#52525b' }}>|</div>
-          <div style={{ fontSize: 18, color: '#71717a' }}>AI Agent Hosting</div>
+          <div style={{ fontSize: 18, color: 'var(--text-muted)' }}>AI Agent Hosting</div>
         </div>
       </div>
     ),

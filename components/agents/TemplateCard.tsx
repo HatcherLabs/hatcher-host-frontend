@@ -39,8 +39,8 @@ const CATEGORY_COLORS: Record<string, { border: string; bg: string; text: string
   crypto:      { border: 'border-amber-500/40',   bg: 'bg-amber-500/10',   text: 'text-amber-400' },
   research:    { border: 'border-emerald-500/40', bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
   support:     { border: 'border-blue-500/40',    bg: 'bg-blue-500/10',    text: 'text-blue-400' },
-  general:     { border: 'border-[rgba(46,43,74,0.4)]', bg: 'bg-[rgba(26,23,48,0.6)]', text: 'text-[#A5A1C2]' },
-  custom:      { border: 'border-[rgba(46,43,74,0.4)]', bg: 'bg-[rgba(26,23,48,0.6)]', text: 'text-[#A5A1C2]' },
+  general:     { border: 'border-[var(--border-default)]', bg: 'bg-[var(--bg-elevated)]', text: 'text-[var(--text-secondary)]' },
+  custom:      { border: 'border-[var(--border-default)]', bg: 'bg-[var(--bg-elevated)]', text: 'text-[var(--text-secondary)]' },
 };
 
 function getCategoryColors(category: string) {
@@ -87,7 +87,7 @@ function PreviewModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0a0a0f]/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--bg-base)]/80 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <motion.div
@@ -98,14 +98,14 @@ function PreviewModal({
         className="card glass-noise w-full max-w-2xl max-h-[90vh] flex flex-col"
       >
         {/* Header */}
-        <div className="flex items-start justify-between p-6 pb-4 border-b border-[rgba(46,43,74,0.3)]">
+        <div className="flex items-start justify-between p-6 pb-4 border-b border-[var(--border-default)]">
           <div className="flex items-center gap-4">
             <div className={cn('w-14 h-14 rounded-xl flex items-center justify-center text-2xl flex-shrink-0', colors.bg, 'border', colors.border)}>
               {template.icon}
             </div>
             <div>
               <h2 className="text-xl font-bold text-white">{template.name}</h2>
-              <p className="text-sm text-[#A5A1C2] mt-0.5">{template.description}</p>
+              <p className="text-sm text-[var(--text-secondary)] mt-0.5">{template.description}</p>
               <div className="flex items-center gap-2 mt-1.5">
                 <span className={cn('text-[10px] px-2 py-0.5 rounded-full border font-semibold capitalize', colors.bg, colors.border, colors.text)}>
                   {template.category}
@@ -120,7 +120,7 @@ function PreviewModal({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg text-[#71717a] hover:text-white hover:bg-white/5 transition-colors flex-shrink-0"
+            className="p-2 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors flex-shrink-0"
             aria-label="Close preview"
           >
             <X size={18} />
@@ -133,10 +133,10 @@ function PreviewModal({
           <div className="grid grid-cols-2 gap-4">
             {features.length > 0 && (
               <div>
-                <p className="text-[11px] font-semibold text-[#71717a] uppercase tracking-wider mb-2">Capabilities</p>
+                <p className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-2">Capabilities</p>
                 <ul className="space-y-1">
                   {features.slice(0, 4).map(f => (
-                    <li key={f} className="flex items-center gap-2 text-xs text-[#A5A1C2]">
+                    <li key={f} className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#06b6d4] flex-shrink-0" />
                       <span className="capitalize">{f}</span>
                     </li>
@@ -146,10 +146,10 @@ function PreviewModal({
             )}
             {integrations.length > 0 && (
               <div>
-                <p className="text-[11px] font-semibold text-[#71717a] uppercase tracking-wider mb-2">Works With</p>
+                <p className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-2">Works With</p>
                 <div className="flex flex-wrap gap-1.5">
                   {integrations.map(i => (
-                    <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] border border-[rgba(46,43,74,0.4)] text-[#A5A1C2]">
+                    <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-hover)] border border-[var(--border-default)] text-[var(--text-secondary)]">
                       {i}
                     </span>
                   ))}
@@ -160,12 +160,12 @@ function PreviewModal({
 
           {/* Sample conversation */}
           <div>
-            <p className="text-[11px] font-semibold text-[#71717a] uppercase tracking-wider mb-3">
+            <p className="text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-3">
               Live Preview
             </p>
-            <div className="bg-[rgba(10,10,15,0.6)] border border-[rgba(46,43,74,0.3)] rounded-xl p-4 space-y-3 min-h-[160px] max-h-[260px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div className="bg-[rgba(10,10,15,0.6)] border border-[var(--border-default)] rounded-xl p-4 space-y-3 min-h-[160px] max-h-[260px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {messages.length === 0 && !isTyping && (
-                <p className="text-xs text-[#71717a] text-center py-8">
+                <p className="text-xs text-[var(--text-muted)] text-center py-8">
                   Ask anything to preview how this agent responds
                 </p>
               )}
@@ -187,7 +187,7 @@ function PreviewModal({
                       'text-xs rounded-xl px-3 py-2 max-w-[80%] leading-relaxed',
                       msg.role === 'user'
                         ? 'bg-[#06b6d4]/15 text-white border border-[#06b6d4]/20'
-                        : 'bg-[rgba(26,23,48,0.8)] text-[#A5A1C2] border border-[rgba(46,43,74,0.4)]'
+                        : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border-default)]'
                     )}
                   >
                     {msg.content}
@@ -199,7 +199,7 @@ function PreviewModal({
                   <div className={cn('w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-0.5', colors.bg)}>
                     {template.icon}
                   </div>
-                  <div className="bg-[rgba(26,23,48,0.8)] border border-[rgba(46,43,74,0.4)] rounded-xl px-3 py-2">
+                  <div className="bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-3 py-2">
                     <div className="flex gap-1 items-center h-4">
                       {[0, 1, 2].map(i => (
                         <motion.span
@@ -223,7 +223,7 @@ function PreviewModal({
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && sendMessage()}
                 placeholder={`Ask ${template.name} something...`}
-                className="flex-1 bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.4)] rounded-xl px-3 py-2 text-xs text-white placeholder:text-[#71717a] outline-none focus:border-[#06b6d4]/50 transition-colors"
+                className="flex-1 bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-3 py-2 text-xs text-white placeholder:text-[var(--text-muted)] outline-none focus:border-[#06b6d4]/50 transition-colors"
               />
               <button
                 onClick={sendMessage}
@@ -237,8 +237,8 @@ function PreviewModal({
         </div>
 
         {/* Footer */}
-        <div className="p-6 pt-4 border-t border-[rgba(46,43,74,0.3)] flex items-center justify-between gap-3">
-          <p className="text-xs text-[#71717a]">
+        <div className="p-6 pt-4 border-t border-[var(--border-default)] flex items-center justify-between gap-3">
+          <p className="text-xs text-[var(--text-muted)]">
             Deploy in under 2 minutes — free tier available
           </p>
           <button
@@ -342,7 +342,7 @@ export function TemplateCard({ template, onUse, selected = false }: TemplateCard
               <h3 className="font-semibold text-white text-sm leading-tight group-hover:text-[#06b6d4] transition-colors">
                 {template.name}
               </h3>
-              <p className="text-xs text-[#A5A1C2] mt-0.5 line-clamp-2 leading-relaxed">
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5 line-clamp-2 leading-relaxed">
                 {template.description}
               </p>
             </div>
@@ -354,7 +354,7 @@ export function TemplateCard({ template, onUse, selected = false }: TemplateCard
               {features.map(f => (
                 <span
                   key={f}
-                  className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] capitalize"
+                  className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-hover)] border border-[var(--border-default)] text-[var(--text-secondary)] capitalize"
                 >
                   {f}
                 </span>
@@ -372,12 +372,12 @@ export function TemplateCard({ template, onUse, selected = false }: TemplateCard
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <div className="pt-2 border-t border-[rgba(46,43,74,0.3)] space-y-2.5">
+                <div className="pt-2 border-t border-[var(--border-default)] space-y-2.5">
                   <div>
-                    <p className="text-[10px] font-semibold text-[#71717a] uppercase tracking-wider mb-1">Works With</p>
+                    <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1">Works With</p>
                     <div className="flex flex-wrap gap-1">
                       {integrations.map(i => (
-                        <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(46,43,74,0.6)] border border-[rgba(46,43,74,0.4)] text-[#A5A1C2]">
+                        <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-hover)] border border-[var(--border-default)] text-[var(--text-secondary)]">
                           {i}
                         </span>
                       ))}
@@ -385,8 +385,8 @@ export function TemplateCard({ template, onUse, selected = false }: TemplateCard
                   </div>
                   {template.personality && (
                     <div>
-                      <p className="text-[10px] font-semibold text-[#71717a] uppercase tracking-wider mb-1">Personality</p>
-                      <p className="text-xs text-[#A5A1C2]">{template.personality}</p>
+                      <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1">Personality</p>
+                      <p className="text-xs text-[var(--text-secondary)]">{template.personality}</p>
                     </div>
                   )}
                 </div>
@@ -397,7 +397,7 @@ export function TemplateCard({ template, onUse, selected = false }: TemplateCard
           {/* Expand toggle */}
           <button
             onClick={() => setExpanded(v => !v)}
-            className="flex items-center gap-1 text-[10px] text-[#71717a] hover:text-[#A5A1C2] transition-colors mt-2"
+            className="flex items-center gap-1 text-[10px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors mt-2"
           >
             {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
             {expanded ? 'Less' : 'More details'}
@@ -405,10 +405,10 @@ export function TemplateCard({ template, onUse, selected = false }: TemplateCard
         </div>
 
         {/* Actions */}
-        <div className="px-4 pb-4 flex items-center gap-2 border-t border-[rgba(46,43,74,0.3)] pt-3">
+        <div className="px-4 pb-4 flex items-center gap-2 border-t border-[var(--border-default)] pt-3">
           <button
             onClick={() => setShowPreview(true)}
-            className="flex-1 flex items-center justify-center gap-1.5 text-xs py-2 rounded-lg border border-[rgba(46,43,74,0.4)] text-[#A5A1C2] hover:text-white hover:border-[rgba(46,43,74,0.7)] bg-[rgba(26,23,48,0.4)] hover:bg-[rgba(26,23,48,0.7)] transition-all duration-150"
+            className="flex-1 flex items-center justify-center gap-1.5 text-xs py-2 rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[rgba(46,43,74,0.7)] bg-[rgba(26,23,48,0.4)] hover:bg-[rgba(26,23,48,0.7)] transition-all duration-150"
           >
             <MessageSquare size={12} />
             Preview

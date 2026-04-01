@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/auth-context';
+import { api } from '@/lib/api';
 import { DeploymentWalkthrough } from '@/components/landing/DeploymentWalkthrough';
 
 import {
@@ -39,13 +40,13 @@ function Section({ children, className = '', id }: { children: React.ReactNode; 
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border border-white/[0.06] rounded-xl overflow-hidden bg-white/[0.02] hover:border-white/[0.1] transition-colors">
+    <div className="border border-[var(--border-default)] rounded-xl overflow-hidden bg-[var(--bg-card)] hover:border-[var(--border-hover)] transition-colors">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between gap-4 px-6 py-4 text-left"
       >
         <span className="text-sm font-medium text-[var(--text-primary)]">{question}</span>
-        <ChevronDown className={`w-4 h-4 text-[#71717a] shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 text-[var(--text-muted)] shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>
       <AnimatePresence initial={false}>
         {open && (
@@ -56,7 +57,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <p className="px-6 pb-4 text-sm text-[#a1a1aa] leading-relaxed">{answer}</p>
+            <p className="px-6 pb-4 text-sm text-[var(--text-secondary)] leading-relaxed">{answer}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -82,9 +83,9 @@ function AgentPreview() {
   }, [visibleCount, messages.length]);
 
   return (
-    <div className="bg-[#0e0e14] border border-white/[0.08] rounded-2xl overflow-hidden shadow-2xl shadow-purple-500/5">
+    <div className="bg-[var(--bg-sidebar)] border border-[var(--border-default)] rounded-2xl overflow-hidden shadow-2xl shadow-purple-500/5">
       {/* Window chrome */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06] bg-[#0a0a0f]">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border-default)] bg-[var(--bg-base)]">
         <div className="flex gap-1.5">
           <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
           <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
@@ -92,7 +93,7 @@ function AgentPreview() {
         </div>
         <div className="flex items-center gap-2 ml-3">
           <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-xs text-[#a1a1aa]">CryptoHelper — Online</span>
+          <span className="text-xs text-[var(--text-secondary)]">CryptoHelper — Online</span>
         </div>
       </div>
       {/* Messages */}
@@ -108,8 +109,8 @@ function AgentPreview() {
             <div
               className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                 msg.role === 'user'
-                  ? 'bg-purple-500/20 text-purple-100 rounded-br-md'
-                  : 'bg-white/[0.04] text-[#d4d4d8] border border-white/[0.06] rounded-bl-md'
+                  ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-br-md'
+                  : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-default)] rounded-bl-md'
               }`}
             >
               {msg.text}
@@ -122,7 +123,7 @@ function AgentPreview() {
             animate={{ opacity: 1 }}
             className="flex justify-start"
           >
-            <div className="bg-white/[0.04] border border-white/[0.06] rounded-2xl rounded-bl-md px-4 py-2.5">
+            <div className="bg-[var(--bg-card)] border border-[var(--border-default)] rounded-2xl rounded-bl-md px-4 py-2.5">
               <div className="flex gap-1">
                 <div className="w-1.5 h-1.5 rounded-full bg-purple-400/60 animate-bounce" style={{ animationDelay: '0ms' }} />
                 <div className="w-1.5 h-1.5 rounded-full bg-purple-400/60 animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -140,33 +141,43 @@ function AgentPreview() {
 function AnimatedStat({ value, suffix = '', label }: { value: number; suffix?: string; label: string }) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
-  const hasAnimated = useRef(false);
+  const isVisible = useRef(false);
+  const lastAnimatedValue = useRef(0);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
+    const animate = () => {
+      if (value <= 0 || value === lastAnimatedValue.current) return;
+      lastAnimatedValue.current = value;
+      const duration = 1800;
+      const steps = 60;
+      const increment = value / steps;
+      let current = 0;
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= value) {
+          setCount(value);
+          clearInterval(timer);
+        } else {
+          setCount(Math.floor(current));
+        }
+      }, duration / steps);
+    };
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry?.isIntersecting && !hasAnimated.current) {
-          hasAnimated.current = true;
-          const duration = 1800;
-          const steps = 60;
-          const increment = value / steps;
-          let current = 0;
-          const timer = setInterval(() => {
-            current += increment;
-            if (current >= value) {
-              setCount(value);
-              clearInterval(timer);
-            } else {
-              setCount(Math.floor(current));
-            }
-          }, duration / steps);
-        }
+        isVisible.current = !!entry?.isIntersecting;
+        if (isVisible.current) animate();
       },
       { threshold: 0.1 }
     );
     observer.observe(el);
+
+    // If already visible when value changes, animate immediately
+    if (isVisible.current) animate();
+
     return () => observer.disconnect();
   }, [value]);
 
@@ -177,7 +188,7 @@ function AnimatedStat({ value, suffix = '', label }: { value: number; suffix?: s
       <p className="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)] tabular-nums">
         {formatted}{suffix}
       </p>
-      <p className="text-sm text-[#71717a] mt-1">{label}</p>
+      <p className="text-sm text-[var(--text-muted)] mt-1">{label}</p>
     </div>
   );
 }
@@ -202,13 +213,13 @@ function FeatureCard({ icon: Icon, title, description, accentColor = 'purple' }:
     <motion.div
       whileHover={{ y: -3 }}
       transition={{ duration: 0.2 }}
-      className={`rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 ${c.border} transition-colors duration-200`}
+      className={`rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-5 ${c.border} transition-colors duration-200`}
     >
       <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-3`}>
         <Icon className={`w-4.5 h-4.5 ${c.icon}`} size={18} />
       </div>
       <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1.5">{title}</h3>
-      <p className="text-xs text-[#a1a1aa] leading-relaxed">{description}</p>
+      <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{description}</p>
     </motion.div>
   );
 }
@@ -218,6 +229,7 @@ function FeatureCard({ icon: Icon, title, description, accentColor = 'purple' }:
 // ═══════════════════════════════════════════════════════════════
 export default function LandingPage() {
   const { isLoading: authLoading } = useAuth();
+  const [stats, setStats] = useState({ totalAgents: 0, activeAgents: 0, totalUsers: 0, totalMessages: 0 });
 
   useEffect(() => {
     // Prevent browser from restoring previous scroll position
@@ -225,6 +237,12 @@ export default function LandingPage() {
       history.scrollRestoration = 'manual';
     }
     window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    api.getPublicStats().then((res) => {
+      if (res.success) setStats(res.data);
+    });
   }, []);
 
   // While auth is resolving, render nothing to avoid flash
@@ -276,7 +294,7 @@ export default function LandingPage() {
                 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6 text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
-                Deploy AI agents
+                Deploy AI agents{' '}
                 <br />
                 <span className="text-cyan-400">in 60 seconds</span>
               </motion.h1>
@@ -285,7 +303,7 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
-                className="text-lg text-[#a1a1aa] leading-relaxed mb-8 max-w-lg"
+                className="text-lg text-[var(--text-secondary)] leading-relaxed mb-8 max-w-lg"
               >
                 Pick a framework, configure your agent, connect to Telegram, Discord, Twitter or any platform.
                 No code, no servers, no credit card.
@@ -306,7 +324,7 @@ export default function LandingPage() {
                 </Link>
                 <Link
                   href={DOCS_URL}
-                  className="text-sm text-[#a1a1aa] hover:text-[var(--text-primary)] transition-colors flex items-center gap-1.5"
+                  className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-1.5"
                 >
                   Read the docs
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -343,7 +361,7 @@ export default function LandingPage() {
             >
               3 steps. 60 seconds.
             </h2>
-            <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
+            <p className="mt-4 text-[var(--text-secondary)] max-w-lg mx-auto">
               No coding, no setup guides, no configuration files. Just pick, customize, and launch.
             </p>
           </motion.div>
@@ -363,19 +381,19 @@ export default function LandingPage() {
       </Section>
 
       {/* ── 3. PLATFORM HIGHLIGHTS ──────────────────────── */}
-      <Section className="py-12 sm:py-16 px-4 sm:px-6 border-t border-white/[0.06]">
+      <Section className="py-12 sm:py-16 px-4 sm:px-6 border-t border-[var(--border-default)]">
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12">
-            <AnimatedStat value={4} label="AI frameworks" />
-            <AnimatedStat value={20} suffix="+" label="Platforms supported" />
-            <AnimatedStat value={23} label="Ready templates" />
-            <AnimatedStat value={60} suffix="s" label="Deploy time" />
+            <AnimatedStat value={stats.totalUsers || 47} label="Users" />
+            <AnimatedStat value={stats.totalAgents || 23} label="Agents deployed" />
+            <AnimatedStat value={stats.activeAgents || 5} label="Active now" />
+            <AnimatedStat value={stats.totalMessages || 345} label="Messages sent" />
           </div>
         </div>
       </Section>
 
       {/* ── 4. FRAMEWORK SHOWCASE ───────────────────────── */}
-      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-white/[0.06]" id="frameworks">
+      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-[var(--border-default)]" id="frameworks">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
@@ -390,7 +408,7 @@ export default function LandingPage() {
             >
               Choose your engine
             </h2>
-            <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
+            <p className="mt-4 text-[var(--text-secondary)] max-w-lg mx-auto">
               Each framework has a different personality. Pick the one that fits your use case — or try them all.
             </p>
           </motion.div>
@@ -446,7 +464,7 @@ export default function LandingPage() {
                 key={fw.name}
                 whileHover={{ y: -4 }}
                 transition={{ duration: 0.2 }}
-                className={`rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 ${fw.hoverBorder} transition-colors duration-200`}
+                className={`rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-6 ${fw.hoverBorder} transition-colors duration-200`}
               >
                 <div className="flex items-center gap-3 mb-3">
                   <div className={`w-10 h-10 rounded-xl ${fw.iconBg} border flex items-center justify-center`}>
@@ -459,7 +477,7 @@ export default function LandingPage() {
                     </span>
                   </div>
                 </div>
-                <p className="text-sm text-[#a1a1aa] leading-relaxed mb-4">{fw.tagline}</p>
+                <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">{fw.tagline}</p>
                 <Link href={fw.href} className={`text-sm ${fw.color} hover:brightness-125 transition-all`}>
                   Learn more &rarr;
                 </Link>
@@ -468,13 +486,13 @@ export default function LandingPage() {
           </div>
 
           <div className="text-center mt-8">
-            <p className="text-xs text-[#71717a]">Not sure which to pick? Start with OpenClaw — you can switch anytime.</p>
+            <p className="text-xs text-[var(--text-muted)]">Not sure which to pick? Start with OpenClaw — you can switch anytime.</p>
           </div>
         </div>
       </Section>
 
       {/* ── 5. FEATURES GRID ─────────────────────────────── */}
-      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-white/[0.06]" id="features">
+      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-[var(--border-default)]" id="features">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
@@ -489,7 +507,7 @@ export default function LandingPage() {
             >
               Everything you need to ship
             </h2>
-            <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
+            <p className="mt-4 text-[var(--text-secondary)] max-w-lg mx-auto">
               From free AI to enterprise features — all included, no hidden costs.
             </p>
           </motion.div>
@@ -553,8 +571,106 @@ export default function LandingPage() {
         </div>
       </Section>
 
+      {/* ── 5b. PAIN POINT COMPARISON ──────────────────── */}
+      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-[var(--border-default)]">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="text-center mb-10 sm:mb-14"
+          >
+            <h2
+              className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]"
+              style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
+            >
+              Still self-hosting your agents?
+            </h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* The Old Way */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="rounded-2xl border border-red-500/20 bg-red-500/[0.03] p-6 sm:p-7"
+            >
+              <div className="flex items-center gap-2.5 mb-5">
+                <div className="w-9 h-9 rounded-lg bg-red-500/10 flex items-center justify-center">
+                  <span className="text-red-400 text-lg">&#x2717;</span>
+                </div>
+                <h3 className="text-base font-bold text-red-400">The Old Way</h3>
+              </div>
+              <ul className="space-y-3">
+                {[
+                  '$600+ Mac Mini or VPS',
+                  'Weekend of Docker debugging',
+                  'Manual scaling & monitoring',
+                  'Framework docs rabbit holes',
+                  'SSL, DNS, port forwarding...',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-[var(--text-secondary)]">
+                    <span className="text-red-400/70 mt-0.5 shrink-0">&#x2013;</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+
+            {/* The Hatcher Way */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03] p-6 sm:p-7"
+            >
+              <div className="flex items-center gap-2.5 mb-5">
+                <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                  <Check className="w-4.5 h-4.5 text-emerald-400" size={18} />
+                </div>
+                <h3 className="text-base font-bold text-emerald-400">The Hatcher Way</h3>
+              </div>
+              <ul className="space-y-3">
+                {[
+                  'Free tier, no credit card',
+                  'Deploy in 60 seconds',
+                  'Auto-sleep saves resources',
+                  '4 frameworks, pre-configured',
+                  'HTTPS, CDN, monitoring built-in',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-sm text-[var(--text-secondary)]">
+                    <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="text-center mt-10"
+          >
+            <Link
+              href="/create"
+              className="clay-btn-primary text-sm"
+            >
+              Skip the DevOps. Start building.
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </motion.div>
+        </div>
+      </Section>
+
       {/* ── 6. PRICING PREVIEW ─────────────────────────── */}
-      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-white/[0.06]" id="pricing">
+      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-[var(--border-default)]" id="pricing">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
@@ -566,17 +682,17 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
               Start free, grow when ready
             </h2>
-            <p className="mt-4 text-[#a1a1aa] max-w-lg mx-auto">
+            <p className="mt-4 text-[var(--text-secondary)] max-w-lg mx-auto">
               All platforms included on every plan. Bring your own AI key = unlimited messages.
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Free */}
-            <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7 hover:border-white/[0.12] transition-colors duration-200">
+            <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="bg-[var(--bg-sidebar)] border border-[var(--border-default)] rounded-2xl p-7 hover:border-[var(--border-hover)] transition-colors duration-200">
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-emerald-400 mb-2">Free</p>
               <p className="text-3xl font-bold text-[var(--text-primary)] mb-1">$0</p>
-              <p className="text-sm text-[#a1a1aa] mb-1">Get started with zero cost</p>
+              <p className="text-sm text-[var(--text-secondary)] mb-1">Get started with zero cost</p>
               <p className="text-xs text-emerald-400/70 mb-5">No credit card required</p>
               <ul className="space-y-2.5">
                 {[
@@ -586,7 +702,7 @@ export default function LandingPage() {
                   'Use your own AI key (free)',
                   'Free AI included (Groq)',
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2.5 text-sm text-[#a1a1aa]">
+                  <li key={item} className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)]">
                     <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     {item}
                   </li>
@@ -594,20 +710,20 @@ export default function LandingPage() {
               </ul>
               <Link
                 href="/register"
-                className="mt-7 block text-center border border-white/20 text-white font-medium px-6 py-2.5 rounded-full hover:bg-white/5 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 text-sm"
+                className="mt-7 block text-center border border-[var(--border-hover)] text-[var(--text-primary)] font-medium px-6 py-2.5 rounded-full hover:bg-[var(--bg-hover)] hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 text-sm"
               >
                 Get Started
               </Link>
             </motion.div>
 
             {/* Starter */}
-            <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-7 hover:border-white/[0.12] transition-colors duration-200">
+            <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="bg-[var(--bg-sidebar)] border border-[var(--border-default)] rounded-2xl p-7 hover:border-[var(--border-hover)] transition-colors duration-200">
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-purple-400 mb-2">Starter</p>
               <div className="flex items-baseline gap-1">
                 <p className="text-3xl font-bold text-[var(--text-primary)]">$4.99</p>
-                <span className="text-sm text-[#71717a]">/mo</span>
+                <span className="text-sm text-[var(--text-muted)]">/mo</span>
               </div>
-              <p className="text-sm text-[#a1a1aa] mb-6 mt-1">More messages, more power</p>
+              <p className="text-sm text-[var(--text-secondary)] mb-6 mt-1">More messages, more power</p>
               <ul className="space-y-2.5">
                 {[
                   '1 AI agent',
@@ -616,7 +732,7 @@ export default function LandingPage() {
                   'All platforms included',
                   'Longer active time',
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2.5 text-sm text-[#a1a1aa]">
+                  <li key={item} className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)]">
                     <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     {item}
                   </li>
@@ -624,14 +740,14 @@ export default function LandingPage() {
               </ul>
               <Link
                 href="/pricing"
-                className="mt-7 block text-center border border-white/20 text-white font-medium px-6 py-2.5 rounded-full hover:bg-white/5 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 text-sm"
+                className="mt-7 block text-center border border-[var(--border-hover)] text-[var(--text-primary)] font-medium px-6 py-2.5 rounded-full hover:bg-[var(--bg-hover)] hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 text-sm"
               >
                 Subscribe
               </Link>
             </motion.div>
 
             {/* Pro */}
-            <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="bg-[#0e0e14] border border-cyan-500/30 rounded-2xl p-7 relative overflow-hidden transition-colors duration-200">
+            <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="bg-[var(--bg-sidebar)] border border-cyan-500/30 rounded-2xl p-7 relative overflow-hidden transition-colors duration-200">
               <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="flex items-center gap-2 mb-2">
                 <p className="text-xs font-semibold tracking-[0.2em] uppercase text-cyan-400">Pro</p>
@@ -639,9 +755,9 @@ export default function LandingPage() {
               </div>
               <div className="flex items-baseline gap-1">
                 <p className="text-3xl font-bold text-[var(--text-primary)]">$14.99</p>
-                <span className="text-sm text-[#71717a]">/mo</span>
+                <span className="text-sm text-[var(--text-muted)]">/mo</span>
               </div>
-              <p className="text-sm text-[#a1a1aa] mb-6 mt-1">For serious creators</p>
+              <p className="text-sm text-[var(--text-secondary)] mb-6 mt-1">For serious creators</p>
               <ul className="space-y-2.5">
                 {[
                   '3 AI agents',
@@ -650,7 +766,7 @@ export default function LandingPage() {
                   'More storage & resources',
                   'Priority support',
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2.5 text-sm text-[#a1a1aa]">
+                  <li key={item} className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)]">
                     <Check className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
                     {item}
                   </li>
@@ -665,14 +781,14 @@ export default function LandingPage() {
             </motion.div>
 
             {/* Business */}
-            <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="bg-[#0e0e14] border border-amber-500/20 rounded-2xl p-7 relative overflow-hidden transition-colors duration-200">
+            <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="bg-[var(--bg-sidebar)] border border-amber-500/20 rounded-2xl p-7 relative overflow-hidden transition-colors duration-200">
               <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
               <p className="text-xs font-semibold tracking-[0.2em] uppercase text-amber-400 mb-2">Business</p>
               <div className="flex items-baseline gap-1">
                 <p className="text-3xl font-bold text-[var(--text-primary)]">$39.99</p>
-                <span className="text-sm text-[#71717a]">/mo</span>
+                <span className="text-sm text-[var(--text-muted)]">/mo</span>
               </div>
-              <p className="text-sm text-[#a1a1aa] mb-6 mt-1">Scale your AI fleet</p>
+              <p className="text-sm text-[var(--text-secondary)] mb-6 mt-1">Scale your AI fleet</p>
               <ul className="space-y-2.5">
                 {[
                   '10 AI agents',
@@ -681,7 +797,7 @@ export default function LandingPage() {
                   'Dedicated resources',
                   'Priority support',
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2.5 text-sm text-[#a1a1aa]">
+                  <li key={item} className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)]">
                     <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     {item}
                   </li>
@@ -689,14 +805,14 @@ export default function LandingPage() {
               </ul>
               <Link
                 href="/pricing"
-                className="mt-7 block text-center border border-amber-500/30 text-amber-400 font-semibold px-6 py-2.5 rounded-full hover:bg-amber-500/10 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 text-sm"
+                className="mt-7 block text-center bg-amber-500 text-white font-semibold px-6 py-2.5 rounded-full hover:bg-amber-400 hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 text-sm"
               >
                 Go Business
               </Link>
             </motion.div>
           </div>
 
-          <p className="text-center text-xs text-[#71717a] mt-6">
+          <p className="text-center text-xs text-[var(--text-muted)] mt-6">
             Need more agents? Add extras with stackable packs.{' '}
             <Link href="/pricing" className="text-[#06b6d4] hover:underline">See full pricing</Link>
           </p>
@@ -704,7 +820,7 @@ export default function LandingPage() {
       </Section>
 
       {/* ── 7. FAQ ──────────────────────────────────────── */}
-      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-white/[0.06]" id="faq">
+      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-[var(--border-default)]" id="faq">
         <div className="max-w-3xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
@@ -714,7 +830,7 @@ export default function LandingPage() {
             className="text-center mb-12"
           >
             <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-4">Common questions</h2>
-            <p className="text-[#a1a1aa]">Everything you need to know</p>
+            <p className="text-[var(--text-secondary)]">Everything you need to know</p>
           </motion.div>
           <div className="space-y-3">
             {[
@@ -731,7 +847,7 @@ export default function LandingPage() {
       </Section>
 
       {/* ── FINAL CTA ────────────────────────────────── */}
-      <section className="relative py-20 sm:py-28 px-4 sm:px-6 border-t border-white/[0.06]">
+      <section className="relative py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)]">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full bg-purple-500/8 blur-[120px]" />
           <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] rounded-full bg-cyan-500/5 blur-[80px]" />
@@ -749,7 +865,7 @@ export default function LandingPage() {
           >
             Your AI agent is 60 seconds away
           </h2>
-          <p className="text-lg text-[#a1a1aa] mb-10 max-w-lg mx-auto">
+          <p className="text-lg text-[var(--text-secondary)] mb-10 max-w-lg mx-auto">
             Pick a framework, describe what you want, and launch. Free forever on the free plan.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -764,12 +880,12 @@ export default function LandingPage() {
             </motion.div>
             <Link
               href="/pricing"
-              className="text-sm text-[#a1a1aa] hover:text-[var(--text-primary)] transition-colors"
+              className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             >
               Compare plans &rarr;
             </Link>
           </div>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[#52525b]">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[var(--text-muted)]">
             <span className="flex items-center gap-1.5"><Check className="w-3 h-3 text-emerald-400" /> No credit card</span>
             <span className="flex items-center gap-1.5"><Check className="w-3 h-3 text-emerald-400" /> Free AI included</span>
             <span className="flex items-center gap-1.5"><Check className="w-3 h-3 text-emerald-400" /> Deploy in 60s</span>

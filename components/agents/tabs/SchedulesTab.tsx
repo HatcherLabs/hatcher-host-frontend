@@ -188,14 +188,14 @@ function LogViewer({ agentId, jobId, onClose }: { agentId: string; jobId: string
     <GlassCard>
       <div className="flex items-center justify-between mb-3">
         <h4 className="text-sm font-medium text-white">Execution Logs</h4>
-        <button onClick={onClose} className="p-1 text-[#71717a] hover:text-white transition-colors">
+        <button onClick={onClose} className="p-1 text-[var(--text-muted)] hover:text-white transition-colors">
           <X size={14} />
         </button>
       </div>
 
       {loading && (
         <div className="flex items-center justify-center py-6">
-          <Loader2 size={16} className="animate-spin text-[#71717a]" />
+          <Loader2 size={16} className="animate-spin text-[var(--text-muted)]" />
         </div>
       )}
 
@@ -220,12 +220,12 @@ function LogViewer({ agentId, jobId, onClose }: { agentId: string; jobId: string
                 ) : (
                   <XCircle size={12} className="text-red-400" />
                 )}
-                <span className="text-[#71717a]">
+                <span className="text-[var(--text-muted)]">
                   {new Date(log.timestamp).toLocaleString()}
                 </span>
               </div>
               {log.response && (
-                <p className="text-[#a1a1aa] line-clamp-3 mt-1">{log.response}</p>
+                <p className="text-[var(--text-secondary)] line-clamp-3 mt-1">{log.response}</p>
               )}
               {log.error && (
                 <p className="text-red-400 mt-1">{log.error}</p>
@@ -246,7 +246,7 @@ function NextRunsPreview({ cronExpr }: { cronExpr: string }) {
   if (runs.length === 0) return null;
 
   return (
-    <div className="mt-2 pt-2 border-t border-white/[0.04]">
+    <div className="mt-2 pt-2 border-t border-[var(--border-default)]">
       <div className="flex items-center gap-1.5 mb-1.5">
         <CalendarDays size={11} className="text-[#52525b]" />
         <span className="text-[10px] font-medium text-[#52525b] uppercase tracking-wider">Next runs</span>
@@ -255,7 +255,7 @@ function NextRunsPreview({ cronExpr }: { cronExpr: string }) {
         {runs.map((run, i) => (
           <div key={i} className="flex items-center gap-2">
             <div className={`w-1 h-1 rounded-full ${i === 0 ? 'bg-emerald-400' : 'bg-[#3f3f46]'}`} />
-            <span className={`text-[10px] font-mono ${i === 0 ? 'text-[#a1a1aa]' : 'text-[#52525b]'}`}>
+            <span className={`text-[10px] font-mono ${i === 0 ? 'text-[var(--text-secondary)]' : 'text-[#52525b]'}`}>
               {formatNextRun(run)}
             </span>
           </div>
@@ -412,7 +412,7 @@ export function SchedulesTab() {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-white">Scheduled Tasks</h3>
-            <p className="text-xs text-[#71717a] mt-0.5">Set your agent to run tasks automatically on a schedule</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">Set your agent to run tasks automatically on a schedule</p>
           </div>
           {!showForm && (
             <button
@@ -452,7 +452,7 @@ export function SchedulesTab() {
                 {fwSupport.native ? 'Native Support' : 'External Cron'}
               </span>
             </div>
-            <p className="text-[11px] text-[#71717a] leading-relaxed">{fwSupport.note}</p>
+            <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">{fwSupport.note}</p>
             <div className="flex items-center gap-1 mt-1.5">
               <Info size={10} className="text-[#52525b]" />
               <span className="text-[10px] text-[#52525b]">
@@ -472,45 +472,45 @@ export function SchedulesTab() {
           <div className="space-y-3">
             {/* Name */}
             <div>
-              <label className="block text-xs text-[#71717a] mb-1">Name</label>
+              <label className="block text-xs text-[var(--text-muted)] mb-1">Name</label>
               <input
                 type="text"
                 value={formName}
                 onChange={e => setFormName(e.target.value)}
                 placeholder="e.g. Morning briefing"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.04] border border-white/[0.06] text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#06b6d4]/50"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#06b6d4]/50"
               />
             </div>
 
             {/* Schedule Preset */}
             <div>
-              <label className="block text-xs text-[#71717a] mb-1">How often?</label>
+              <label className="block text-xs text-[var(--text-muted)] mb-1">How often?</label>
               <div className="relative">
                 <select
                   value={formPreset}
                   onChange={e => setFormPreset(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.04] border border-white/[0.06] text-white appearance-none focus:outline-none focus:border-[#06b6d4]/50"
+                  className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white appearance-none focus:outline-none focus:border-[#06b6d4]/50"
                 >
                   {CRON_PRESETS.map(p => (
-                    <option key={p.label} value={p.value} className="bg-[#18181b] text-white">
+                    <option key={p.label} value={p.value} className="bg-[var(--bg-elevated)] text-white">
                       {p.label}
                     </option>
                   ))}
                 </select>
-                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
               </div>
             </div>
 
             {/* Custom Interval */}
             {isCustom && (
               <div>
-                <label className="block text-xs text-[#71717a] mb-1">Custom Schedule</label>
+                <label className="block text-xs text-[var(--text-muted)] mb-1">Custom Schedule</label>
                 <input
                   type="text"
                   value={formCustomCron}
                   onChange={e => setFormCustomCron(e.target.value)}
                   placeholder="e.g. */30 * * * *"
-                  className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.04] border border-white/[0.06] text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#06b6d4]/50 font-mono"
+                  className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#06b6d4]/50 font-mono"
                 />
                 <div className="mt-1.5 space-y-0.5">
                   <p className="text-[10px] text-[#52525b]">Common patterns:</p>
@@ -525,7 +525,7 @@ export function SchedulesTab() {
                         key={ex.value}
                         type="button"
                         onClick={() => setFormCustomCron(ex.value)}
-                        className="px-2 py-0.5 text-[10px] rounded bg-white/[0.04] border border-white/[0.06] text-[#a1a1aa] hover:border-[#06b6d4]/40 hover:text-white transition-colors"
+                        className="px-2 py-0.5 text-[10px] rounded bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[#06b6d4]/40 hover:text-white transition-colors"
                       >
                         {ex.label}
                       </button>
@@ -537,10 +537,10 @@ export function SchedulesTab() {
 
             {/* Cron expression explainer in form */}
             {effectiveCron.trim() && (
-              <div className="rounded-lg bg-white/[0.02] border border-white/[0.04] px-3 py-2.5">
+              <div className="rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] px-3 py-2.5">
                 <div className="flex items-center gap-2 mb-2">
                   <CalendarClock size={12} className="text-[#06b6d4]" />
-                  <span className="text-[11px] font-medium text-[#a1a1aa]">
+                  <span className="text-[11px] font-medium text-[var(--text-secondary)]">
                     {cronToHuman(effectiveCron.trim())}
                   </span>
                   <span className="text-[10px] font-mono text-[#52525b] ml-auto">{effectiveCron.trim()}</span>
@@ -551,13 +551,13 @@ export function SchedulesTab() {
 
             {/* Prompt */}
             <div>
-              <label className="block text-xs text-[#71717a] mb-1">What should the agent do?</label>
+              <label className="block text-xs text-[var(--text-muted)] mb-1">What should the agent do?</label>
               <textarea
                 value={formPrompt}
                 onChange={e => setFormPrompt(e.target.value)}
                 placeholder="What should the agent do on this schedule?"
                 rows={3}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.04] border border-white/[0.06] text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#06b6d4]/50 resize-none"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#06b6d4]/50 resize-none"
               />
             </div>
 
@@ -579,7 +579,7 @@ export function SchedulesTab() {
               </button>
               <button
                 onClick={() => { setShowForm(false); setFormError(null); }}
-                className="px-4 py-2 text-xs font-medium rounded-lg text-[#a1a1aa] hover:text-white transition-colors"
+                className="px-4 py-2 text-xs font-medium rounded-lg text-[var(--text-secondary)] hover:text-white transition-colors"
               >
                 Cancel
               </button>
@@ -592,7 +592,7 @@ export function SchedulesTab() {
       {loading && (
         <GlassCard>
           <div className="flex items-center justify-center py-8">
-            <Loader2 size={20} className="animate-spin text-[#71717a]" />
+            <Loader2 size={20} className="animate-spin text-[var(--text-muted)]" />
           </div>
         </GlassCard>
       )}
@@ -602,7 +602,7 @@ export function SchedulesTab() {
         <GlassCard>
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <AlertTriangle size={24} className="text-[#06b6d4] mb-2" />
-            <p className="text-xs text-[#a1a1aa]">{error}</p>
+            <p className="text-xs text-[var(--text-secondary)]">{error}</p>
             <button
               onClick={loadSchedules}
               className="mt-3 text-xs text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
@@ -634,7 +634,7 @@ export function SchedulesTab() {
               </div>
             </div>
             <p className="text-base font-semibold text-white mb-1">No scheduled tasks yet</p>
-            <p className="text-sm text-[#71717a] max-w-sm mb-2">
+            <p className="text-sm text-[var(--text-muted)] max-w-sm mb-2">
               Automate your agent with scheduled tasks — send messages, run commands, or trigger workflows on a cron schedule.
             </p>
 
@@ -658,7 +658,7 @@ export function SchedulesTab() {
                       setFormCustomCron(suggestion.cron);
                     }
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-lg bg-white/[0.03] border border-white/[0.06] text-[#71717a] hover:text-white hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-muted)] hover:text-white hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all"
                 >
                   <suggestion.icon size={12} />
                   {suggestion.label}
@@ -705,14 +705,14 @@ export function SchedulesTab() {
                       </div>
 
                       <div className="flex items-center gap-3 mt-1.5">
-                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.04]">
+                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[var(--bg-card)] border border-[var(--border-default)]">
                           <Clock size={10} className="text-[#52525b]" />
-                          <span className="text-[11px] text-[#a1a1aa] font-mono">{job.schedule}</span>
+                          <span className="text-[11px] text-[var(--text-secondary)] font-mono">{job.schedule}</span>
                         </div>
-                        <span className="text-[11px] text-[#71717a]">{cronToHuman(job.schedule)}</span>
+                        <span className="text-[11px] text-[var(--text-muted)]">{cronToHuman(job.schedule)}</span>
                       </div>
 
-                      <p className="text-xs text-[#a1a1aa] mt-2 line-clamp-2 leading-relaxed">{job.prompt}</p>
+                      <p className="text-xs text-[var(--text-secondary)] mt-2 line-clamp-2 leading-relaxed">{job.prompt}</p>
 
                       <div className="flex items-center gap-4 mt-2">
                         {job.nextRun && (
@@ -743,7 +743,7 @@ export function SchedulesTab() {
 
                     <div className="flex items-center gap-1 flex-shrink-0">
                       {actionLoading === job.id ? (
-                        <Loader2 size={14} className="animate-spin text-[#71717a]" />
+                        <Loader2 size={14} className="animate-spin text-[var(--text-muted)]" />
                       ) : (
                         <>
                           <button
@@ -752,7 +752,7 @@ export function SchedulesTab() {
                             className={`p-1.5 rounded-md transition-colors ${
                               viewingLogs === job.id
                                 ? 'text-[#06b6d4] bg-[#06b6d4]/10'
-                                : 'text-[#71717a] hover:text-[#06b6d4] hover:bg-white/[0.04]'
+                                : 'text-[var(--text-muted)] hover:text-[#06b6d4] hover:bg-[var(--bg-card)]'
                             }`}
                           >
                             <FileText size={14} />
@@ -761,7 +761,7 @@ export function SchedulesTab() {
                             <button
                               onClick={() => handlePause(job.id)}
                               title="Pause"
-                              className="p-1.5 rounded-md text-[#71717a] hover:text-amber-400 hover:bg-white/[0.04] transition-colors"
+                              className="p-1.5 rounded-md text-[var(--text-muted)] hover:text-amber-400 hover:bg-[var(--bg-card)] transition-colors"
                             >
                               <Pause size={14} />
                             </button>
@@ -769,7 +769,7 @@ export function SchedulesTab() {
                             <button
                               onClick={() => handleResume(job.id)}
                               title="Resume"
-                              className="p-1.5 rounded-md text-[#71717a] hover:text-emerald-400 hover:bg-white/[0.04] transition-colors"
+                              className="p-1.5 rounded-md text-[var(--text-muted)] hover:text-emerald-400 hover:bg-[var(--bg-card)] transition-colors"
                             >
                               <Play size={14} />
                             </button>
@@ -777,7 +777,7 @@ export function SchedulesTab() {
                           <button
                             onClick={() => handleDelete(job.id)}
                             title="Delete"
-                            className="p-1.5 rounded-md text-[#71717a] hover:text-red-400 hover:bg-white/[0.04] transition-colors"
+                            className="p-1.5 rounded-md text-[var(--text-muted)] hover:text-red-400 hover:bg-[var(--bg-card)] transition-colors"
                           >
                             <Trash2 size={14} />
                           </button>

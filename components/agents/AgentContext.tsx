@@ -81,12 +81,12 @@ export function integrationStateKey(i: IntegrationDef): string {
 export const DEFAULT_PROMPTS = ['What can you do?', 'Tell me about yourself', 'Help me get started'];
 
 export const COLORS = {
-  bg: '#0D0B1A',
-  card: 'rgba(26,23,48,0.6)',
+  bg: 'var(--bg-base)',
+  card: 'var(--bg-elevated)',
   accent: '#06b6d4',
-  textPrimary: '#FFFFFF',
-  textSecondary: '#A5A1C2',
-  textMuted: '#71717a',
+  textPrimary: 'var(--text-primary)',
+  textSecondary: 'var(--text-secondary)',
+  textMuted: 'var(--text-muted)',
 } as const;
 
 export const tabContentVariants = {

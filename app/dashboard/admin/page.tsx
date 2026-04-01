@@ -181,8 +181,8 @@ function StatCard({
         </div>
         <div className="min-w-0">
           <div className="text-2xl font-bold text-white">{value}</div>
-          <div className="text-xs text-[#71717a] mt-0.5">{label}</div>
-          {sub && <div className="text-[11px] text-[#A5A1C2] mt-0.5">{sub}</div>}
+          <div className="text-xs text-[var(--text-muted)] mt-0.5">{label}</div>
+          {sub && <div className="text-[11px] text-[var(--text-secondary)] mt-0.5">{sub}</div>}
         </div>
       </div>
     </div>
@@ -414,12 +414,12 @@ export default function AdminDashboardPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white">Admin Panel</h1>
-            <p className="text-xs text-[#71717a]">Platform management &amp; oversight</p>
+            <p className="text-xs text-[var(--text-muted)]">Platform management &amp; oversight</p>
           </div>
         </motion.div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] w-fit overflow-x-auto [&::-webkit-scrollbar]:hidden">
+        <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-default)] w-fit overflow-x-auto [&::-webkit-scrollbar]:hidden">
           {TABS.map(tab => {
             const Icon = tab.icon;
             return (
@@ -429,7 +429,7 @@ export default function AdminDashboardPage() {
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap cursor-pointer ${
                   activeTab === tab.key
                     ? 'bg-purple-500/15 text-white'
-                    : 'text-[#71717a] hover:text-white'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 <Icon size={14} />
@@ -468,7 +468,7 @@ export default function AdminDashboardPage() {
                   return (
                     <div key={fw}>
                       <div className="flex items-center justify-between text-xs mb-1">
-                        <span className="text-[#A5A1C2] capitalize">{fw}</span>
+                        <span className="text-[var(--text-secondary)] capitalize">{fw}</span>
                         <span className="text-white font-medium">{count} ({pct}%)</span>
                       </div>
                       <div className="h-1.5 rounded-full bg-[rgba(46,43,74,0.4)]">
@@ -478,7 +478,7 @@ export default function AdminDashboardPage() {
                   );
                 })}
                 {/* By status mini breakdown */}
-                <div className="pt-3 border-t border-[rgba(46,43,74,0.3)] flex flex-wrap gap-2">
+                <div className="pt-3 border-t border-[var(--border-default)] flex flex-wrap gap-2">
                   {Object.entries(agentByStatus).map(([s, c]) => (
                     <span key={s} className={`text-[11px] font-medium px-2 py-0.5 rounded-full border ${STATUS_COLORS[s] ?? STATUS_COLORS.paused}`}>
                       {s}: {c}
@@ -499,7 +499,7 @@ export default function AdminDashboardPage() {
                   return (
                     <div key={tier}>
                       <div className="flex items-center justify-between text-xs mb-1">
-                        <span className="text-[#A5A1C2] capitalize">{tier}</span>
+                        <span className="text-[var(--text-secondary)] capitalize">{tier}</span>
                         <span className="text-white font-medium">{count} ({pct}%)</span>
                       </div>
                       <div className="h-1.5 rounded-full bg-[rgba(46,43,74,0.4)]">
@@ -508,8 +508,8 @@ export default function AdminDashboardPage() {
                     </div>
                   );
                 })}
-                <div className="pt-3 border-t border-[rgba(46,43,74,0.3)]">
-                  <div className="text-xs text-[#71717a]">
+                <div className="pt-3 border-t border-[var(--border-default)]">
+                  <div className="text-xs text-[var(--text-muted)]">
                     {stats.totalFeaturesUnlocked} features unlocked across all accounts
                   </div>
                 </div>
@@ -524,7 +524,7 @@ export default function AdminDashboardPage() {
                   <span className="text-sm font-semibold text-white">
                     {tickets.filter(t => t.status === 'open').length} open support ticket{tickets.filter(t => t.status === 'open').length !== 1 ? 's' : ''}
                   </span>
-                  <button onClick={() => setActiveTab('tickets')} className="ml-auto text-xs text-[#06b6d4] hover:text-white transition-colors">
+                  <button onClick={() => setActiveTab('tickets')} className="ml-auto text-xs text-[#06b6d4] hover:text-[var(--text-primary)] transition-colors">
                     View all
                   </button>
                 </div>
@@ -533,11 +533,11 @@ export default function AdminDashboardPage() {
                     <button
                       key={t.id}
                       onClick={() => { setActiveTab('tickets'); setSelectedTicket(t); }}
-                      className="w-full text-left text-xs text-[#A5A1C2] hover:text-white transition-colors flex items-center gap-2 py-1"
+                      className="w-full text-left text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-2 py-1"
                     >
                       <span className={`font-medium ${TICKET_PRIORITY_COLORS[t.priority]}`}>[{t.priority}]</span>
                       <span className="truncate">{t.subject}</span>
-                      <span className="ml-auto text-[#71717a] flex-shrink-0">{t.userUsername}</span>
+                      <span className="ml-auto text-[var(--text-muted)] flex-shrink-0">{t.userUsername}</span>
                     </button>
                   ))}
                 </div>
@@ -551,23 +551,23 @@ export default function AdminDashboardPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             {/* Filters */}
             <div className="flex flex-col sm:flex-row gap-3">
-              <div className="flex items-center gap-2 bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] rounded-xl px-3 py-2 flex-1 max-w-xs">
-                <Search size={14} className="text-[#71717a]" />
+              <div className="flex items-center gap-2 bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-3 py-2 flex-1 max-w-xs">
+                <Search size={14} className="text-[var(--text-muted)]" />
                 <input
                   type="text"
                   placeholder="Search users..."
                   value={userSearch}
                   onChange={e => { setUserSearch(e.target.value); setUserPage(0); }}
-                  className="bg-transparent outline-none text-sm flex-1 text-white placeholder:text-[#71717a]"
+                  className="bg-transparent outline-none text-sm flex-1 text-white placeholder:text-[var(--text-muted)]"
                 />
               </div>
-              <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)]">
+              <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-default)]">
                 {['all', 'free', 'starter', 'pro', 'business', 'banned'].map(t => (
                   <button
                     key={t}
                     onClick={() => { setUserTierFilter(t); setUserPage(0); }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer capitalize ${
-                      userTierFilter === t ? 'bg-purple-500/15 text-white' : 'text-[#71717a] hover:text-white'
+                      userTierFilter === t ? 'bg-purple-500/15 text-white' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                     }`}
                   >
                     {t}
@@ -582,18 +582,18 @@ export default function AdminDashboardPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-[rgba(46,43,74,0.3)]">
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[#71717a]">User</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[#71717a]">Tier</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[#71717a] hidden sm:table-cell">Agents</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[#71717a] hidden md:table-cell">Payments</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[#71717a] hidden lg:table-cell">Joined</th>
-                      <th className="text-right px-4 py-3 text-xs font-semibold text-[#71717a]">Actions</th>
+                    <tr className="border-b border-[var(--border-default)]">
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--text-muted)]">User</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--text-muted)]">Tier</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--text-muted)] hidden sm:table-cell">Agents</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--text-muted)] hidden md:table-cell">Payments</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--text-muted)] hidden lg:table-cell">Joined</th>
+                      <th className="text-right px-4 py-3 text-xs font-semibold text-[var(--text-muted)]">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {pagedUsers.map(u => (
-                      <tr key={u.id} className="border-b border-[rgba(46,43,74,0.15)] hover:bg-[rgba(255,255,255,0.02)] transition-colors">
+                      <tr key={u.id} className="border-b border-[var(--border-default)] hover:bg-[rgba(255,255,255,0.02)] transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             <div className="w-7 h-7 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
@@ -606,14 +606,14 @@ export default function AdminDashboardPage() {
                                 @{u.username}
                                 {u.isAdmin && <Shield size={11} className="text-amber-400 flex-shrink-0" />}
                               </div>
-                              <div className="text-[#71717a] text-[11px] truncate">{u.email}</div>
+                              <div className="text-[var(--text-muted)] text-[11px] truncate">{u.email}</div>
                             </div>
                           </div>
                         </td>
                         <td className="px-4 py-3"><TierBadge tier={u.tier} /></td>
-                        <td className="px-4 py-3 text-xs text-[#A5A1C2] hidden sm:table-cell">{u.agentCount}</td>
-                        <td className="px-4 py-3 text-xs text-[#A5A1C2] hidden md:table-cell">{u.paymentCount}</td>
-                        <td className="px-4 py-3 text-xs text-[#71717a] hidden lg:table-cell">{timeAgo(u.createdAt)}</td>
+                        <td className="px-4 py-3 text-xs text-[var(--text-secondary)] hidden sm:table-cell">{u.agentCount}</td>
+                        <td className="px-4 py-3 text-xs text-[var(--text-secondary)] hidden md:table-cell">{u.paymentCount}</td>
+                        <td className="px-4 py-3 text-xs text-[var(--text-muted)] hidden lg:table-cell">{timeAgo(u.createdAt)}</td>
                         <td className="px-4 py-3 text-right">
                           {!u.isAdmin && (
                             <button
@@ -622,7 +622,7 @@ export default function AdminDashboardPage() {
                               className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                                 u.tier === 'banned'
                                   ? 'hover:bg-emerald-500/10 text-emerald-400'
-                                  : 'hover:bg-red-500/10 text-[#71717a] hover:text-red-400'
+                                  : 'hover:bg-red-500/10 text-[var(--text-muted)] hover:text-red-400'
                               }`}
                             >
                               {u.tier === 'banned' ? <UserCheck size={14} /> : <Ban size={14} />}
@@ -633,7 +633,7 @@ export default function AdminDashboardPage() {
                     ))}
                     {pagedUsers.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="px-4 py-12 text-center text-sm text-[#71717a]">
+                        <td colSpan={6} className="px-4 py-12 text-center text-sm text-[var(--text-muted)]">
                           No users found
                         </td>
                       </tr>
@@ -643,8 +643,8 @@ export default function AdminDashboardPage() {
               </div>
               {/* Pagination */}
               {filteredUsers.length > USER_PAGE_SIZE && (
-                <div className="flex items-center justify-between px-4 py-3 border-t border-[rgba(46,43,74,0.3)]">
-                  <span className="text-xs text-[#71717a]">
+                <div className="flex items-center justify-between px-4 py-3 border-t border-[var(--border-default)]">
+                  <span className="text-xs text-[var(--text-muted)]">
                     {userPage * USER_PAGE_SIZE + 1}–{Math.min((userPage + 1) * USER_PAGE_SIZE, filteredUsers.length)} of {filteredUsers.length}
                   </span>
                   <div className="flex items-center gap-1">
@@ -653,14 +653,14 @@ export default function AdminDashboardPage() {
                       disabled={userPage === 0}
                       className="p-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.05)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
                     >
-                      <ChevronLeft size={14} className="text-[#A5A1C2]" />
+                      <ChevronLeft size={14} className="text-[var(--text-secondary)]" />
                     </button>
                     <button
                       onClick={() => setUserPage(p => p + 1)}
                       disabled={(userPage + 1) * USER_PAGE_SIZE >= filteredUsers.length}
                       className="p-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.05)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
                     >
-                      <ChevronRight size={14} className="text-[#A5A1C2]" />
+                      <ChevronRight size={14} className="text-[var(--text-secondary)]" />
                     </button>
                   </div>
                 </div>
@@ -674,36 +674,36 @@ export default function AdminDashboardPage() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             {/* Filters */}
             <div className="flex flex-col sm:flex-row gap-3 flex-wrap">
-              <div className="flex items-center gap-2 bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] rounded-xl px-3 py-2 w-full sm:w-auto">
-                <Search size={14} className="text-[#71717a]" />
+              <div className="flex items-center gap-2 bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-3 py-2 w-full sm:w-auto">
+                <Search size={14} className="text-[var(--text-muted)]" />
                 <input
                   type="text"
                   placeholder="Search agents or owners..."
                   value={agentSearch}
                   onChange={e => setAgentSearch(e.target.value)}
-                  className="bg-transparent outline-none text-sm flex-1 text-white placeholder:text-[#71717a] w-40"
+                  className="bg-transparent outline-none text-sm flex-1 text-white placeholder:text-[var(--text-muted)] w-40"
                 />
               </div>
-              <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)]">
+              <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-default)]">
                 {['all', 'active', 'sleeping', 'paused', 'error', 'killed'].map(s => (
                   <button
                     key={s}
                     onClick={() => setAgentStatusFilter(s)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer capitalize ${
-                      agentStatusFilter === s ? 'bg-purple-500/15 text-white' : 'text-[#71717a] hover:text-white'
+                      agentStatusFilter === s ? 'bg-purple-500/15 text-white' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                     }`}
                   >
                     {s}
                   </button>
                 ))}
               </div>
-              <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)]">
+              <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-default)]">
                 {['all', 'openclaw', 'hermes', 'elizaos', 'milady'].map(fw => (
                   <button
                     key={fw}
                     onClick={() => setAgentFrameworkFilter(fw)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer capitalize ${
-                      agentFrameworkFilter === fw ? 'bg-purple-500/15 text-white' : 'text-[#71717a] hover:text-white'
+                      agentFrameworkFilter === fw ? 'bg-purple-500/15 text-white' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                     }`}
                   >
                     {fw}
@@ -716,32 +716,32 @@ export default function AdminDashboardPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-[rgba(46,43,74,0.3)]">
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[#71717a]">Agent</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[#71717a]">Status</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[#71717a] hidden sm:table-cell">Framework</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[#71717a] hidden md:table-cell">Owner</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[#71717a] hidden lg:table-cell">Messages</th>
-                      <th className="text-right px-4 py-3 text-xs font-semibold text-[#71717a]">Actions</th>
+                    <tr className="border-b border-[var(--border-default)]">
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--text-muted)]">Agent</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--text-muted)]">Status</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--text-muted)] hidden sm:table-cell">Framework</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--text-muted)] hidden md:table-cell">Owner</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--text-muted)] hidden lg:table-cell">Messages</th>
+                      <th className="text-right px-4 py-3 text-xs font-semibold text-[var(--text-muted)]">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredAgents.slice(0, 50).map(a => (
-                      <tr key={a.id} className="border-b border-[rgba(46,43,74,0.15)] hover:bg-[rgba(255,255,255,0.02)] transition-colors">
+                      <tr key={a.id} className="border-b border-[var(--border-default)] hover:bg-[rgba(255,255,255,0.02)] transition-colors">
                         <td className="px-4 py-3">
                           <div className="text-white font-medium text-xs">{a.name}</div>
                         </td>
                         <td className="px-4 py-3"><StatusBadge status={a.status} /></td>
-                        <td className="px-4 py-3 text-xs text-[#A5A1C2] hidden sm:table-cell capitalize">{a.framework}</td>
-                        <td className="px-4 py-3 text-xs text-[#71717a] hidden md:table-cell">@{a.ownerUsername}</td>
-                        <td className="px-4 py-3 text-xs text-[#71717a] hidden lg:table-cell">{(a.messageCount ?? 0).toLocaleString()}</td>
+                        <td className="px-4 py-3 text-xs text-[var(--text-secondary)] hidden sm:table-cell capitalize">{a.framework}</td>
+                        <td className="px-4 py-3 text-xs text-[var(--text-muted)] hidden md:table-cell">@{a.ownerUsername}</td>
+                        <td className="px-4 py-3 text-xs text-[var(--text-muted)] hidden lg:table-cell">{(a.messageCount ?? 0).toLocaleString()}</td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex items-center justify-end gap-1">
                             {a.status === 'active' && (
                               <button
                                 onClick={() => handlePauseAgent(a)}
                                 title="Pause agent"
-                                className="p-1.5 rounded-lg hover:bg-amber-500/10 text-[#71717a] hover:text-amber-400 transition-colors cursor-pointer"
+                                className="p-1.5 rounded-lg hover:bg-amber-500/10 text-[var(--text-muted)] hover:text-amber-400 transition-colors cursor-pointer"
                               >
                                 <Square size={13} />
                               </button>
@@ -750,7 +750,7 @@ export default function AdminDashboardPage() {
                               <button
                                 onClick={() => handleKillAgent(a)}
                                 title="Force kill agent"
-                                className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#71717a] hover:text-red-400 transition-colors cursor-pointer"
+                                className="p-1.5 rounded-lg hover:bg-red-500/10 text-[var(--text-muted)] hover:text-red-400 transition-colors cursor-pointer"
                               >
                                 <Zap size={13} />
                               </button>
@@ -761,7 +761,7 @@ export default function AdminDashboardPage() {
                     ))}
                     {filteredAgents.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="px-4 py-12 text-center text-sm text-[#71717a]">No agents found</td>
+                        <td colSpan={6} className="px-4 py-12 text-center text-sm text-[var(--text-muted)]">No agents found</td>
                       </tr>
                     )}
                   </tbody>
@@ -777,13 +777,13 @@ export default function AdminDashboardPage() {
             {/* List */}
             <div className="lg:col-span-2 space-y-3">
               {/* Status filter */}
-              <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] w-fit">
+              <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-default)] w-fit">
                 {['all', 'open', 'in_progress', 'resolved'].map(s => (
                   <button
                     key={s}
                     onClick={() => setTicketStatusFilter(s)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                      ticketStatusFilter === s ? 'bg-purple-500/15 text-white' : 'text-[#71717a] hover:text-white'
+                      ticketStatusFilter === s ? 'bg-purple-500/15 text-white' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                     }`}
                   >
                     {s === 'in_progress' ? 'In Progress' : s.charAt(0).toUpperCase() + s.slice(1)}
@@ -802,7 +802,7 @@ export default function AdminDashboardPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <div className="text-xs font-medium text-white truncate">{t.subject}</div>
-                        <div className="text-[11px] text-[#71717a] mt-0.5">@{t.userUsername}</div>
+                        <div className="text-[11px] text-[var(--text-muted)] mt-0.5">@{t.userUsername}</div>
                       </div>
                       <div className="flex flex-col items-end gap-1 flex-shrink-0">
                         <span className={`text-[10px] font-semibold ${TICKET_PRIORITY_COLORS[t.priority]}`}>
@@ -820,7 +820,7 @@ export default function AdminDashboardPage() {
                   </button>
                 ))}
                 {filteredTickets.length === 0 && (
-                  <div className="py-12 text-center text-sm text-[#71717a]">No tickets</div>
+                  <div className="py-12 text-center text-sm text-[var(--text-muted)]">No tickets</div>
                 )}
               </div>
             </div>
@@ -833,13 +833,13 @@ export default function AdminDashboardPage() {
                     <div>
                       <h3 className="text-sm font-semibold text-white">{selectedTicket.subject}</h3>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[11px] text-[#71717a]">@{selectedTicket.userUsername}</span>
-                        <span className="text-[11px] text-[#71717a]">·</span>
-                        <span className="text-[11px] text-[#71717a]">{selectedTicket.category}</span>
+                        <span className="text-[11px] text-[var(--text-muted)]">@{selectedTicket.userUsername}</span>
+                        <span className="text-[11px] text-[var(--text-muted)]">·</span>
+                        <span className="text-[11px] text-[var(--text-muted)]">{selectedTicket.category}</span>
                         {selectedTicket.agentName && (
                           <>
-                            <span className="text-[11px] text-[#71717a]">·</span>
-                            <span className="text-[11px] text-[#A5A1C2]">{selectedTicket.agentName}</span>
+                            <span className="text-[11px] text-[var(--text-muted)]">·</span>
+                            <span className="text-[11px] text-[var(--text-secondary)]">{selectedTicket.agentName}</span>
                           </>
                         )}
                       </div>
@@ -848,7 +848,7 @@ export default function AdminDashboardPage() {
                       {selectedTicket.status !== 'resolved' && (
                         <button
                           onClick={() => handleTicketStatus(selectedTicket.id, 'resolved')}
-                          className="p-1.5 rounded-lg hover:bg-emerald-500/10 text-[#71717a] hover:text-emerald-400 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg hover:bg-emerald-500/10 text-[var(--text-muted)] hover:text-emerald-400 transition-colors cursor-pointer"
                           title="Mark resolved"
                         >
                           <CheckCircle size={15} />
@@ -857,7 +857,7 @@ export default function AdminDashboardPage() {
                       {selectedTicket.status !== 'open' && (
                         <button
                           onClick={() => handleTicketStatus(selectedTicket.id, 'open')}
-                          className="p-1.5 rounded-lg hover:bg-amber-500/10 text-[#71717a] hover:text-amber-400 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg hover:bg-amber-500/10 text-[var(--text-muted)] hover:text-amber-400 transition-colors cursor-pointer"
                           title="Reopen"
                         >
                           <Clock size={15} />
@@ -877,8 +877,8 @@ export default function AdminDashboardPage() {
                         </div>
                         <div className={`rounded-xl px-3 py-2 text-xs max-w-[80%] ${
                           msg.role === 'admin'
-                            ? 'bg-purple-500/10 text-[#A5A1C2]'
-                            : 'bg-[rgba(255,255,255,0.04)] text-[#A5A1C2]'
+                            ? 'bg-purple-500/10 text-[var(--text-secondary)]'
+                            : 'bg-[rgba(255,255,255,0.04)] text-[var(--text-secondary)]'
                         }`}>
                           {msg.content}
                         </div>
@@ -888,13 +888,13 @@ export default function AdminDashboardPage() {
 
                   {/* Reply */}
                   {selectedTicket.status !== 'resolved' && (
-                    <div className="flex gap-2 pt-2 border-t border-[rgba(46,43,74,0.3)]">
+                    <div className="flex gap-2 pt-2 border-t border-[var(--border-default)]">
                       <textarea
                         value={ticketReply}
                         onChange={e => setTicketReply(e.target.value)}
                         placeholder="Type a reply..."
                         rows={2}
-                        className="flex-1 bg-[rgba(255,255,255,0.03)] border border-[rgba(46,43,74,0.4)] rounded-xl px-3 py-2 text-sm text-white placeholder:text-[#71717a] outline-none focus:border-purple-500/40 resize-none"
+                        className="flex-1 bg-[rgba(255,255,255,0.03)] border border-[var(--border-default)] rounded-xl px-3 py-2 text-sm text-white placeholder:text-[var(--text-muted)] outline-none focus:border-purple-500/40 resize-none"
                       />
                       <button
                         onClick={handleTicketReply}
@@ -908,8 +908,8 @@ export default function AdminDashboardPage() {
                 </div>
               ) : (
                 <div className="card glass-noise p-10 flex flex-col items-center justify-center text-center">
-                  <TicketCheck size={32} className="text-[#71717a] mb-3" />
-                  <p className="text-sm text-[#71717a]">Select a ticket to view details</p>
+                  <TicketCheck size={32} className="text-[var(--text-muted)] mb-3" />
+                  <p className="text-sm text-[var(--text-muted)]">Select a ticket to view details</p>
                 </div>
               )}
             </div>
@@ -930,36 +930,36 @@ export default function AdminDashboardPage() {
                   <div className="card glass-noise p-5">
                     <div className="flex items-center gap-2 mb-2">
                       <HealthDot status={health.database.status} />
-                      <span className="text-xs font-semibold text-[#A5A1C2]">Database</span>
+                      <span className="text-xs font-semibold text-[var(--text-secondary)]">Database</span>
                     </div>
                     <div className="text-white text-sm font-medium capitalize">{health.database.status}</div>
-                    <div className="text-[11px] text-[#71717a] mt-0.5">{health.database.connectionCount} connections</div>
+                    <div className="text-[11px] text-[var(--text-muted)] mt-0.5">{health.database.connectionCount} connections</div>
                   </div>
                   <div className="card glass-noise p-5">
                     <div className="flex items-center gap-2 mb-2">
                       <HealthDot status={health.redis.status} />
-                      <span className="text-xs font-semibold text-[#A5A1C2]">Redis</span>
+                      <span className="text-xs font-semibold text-[var(--text-secondary)]">Redis</span>
                     </div>
                     <div className="text-white text-sm font-medium capitalize">{health.redis.status}</div>
-                    <div className="text-[11px] text-[#71717a] mt-0.5">{health.redis.usedMemory} · {health.redis.connectedClients} clients</div>
+                    <div className="text-[11px] text-[var(--text-muted)] mt-0.5">{health.redis.usedMemory} · {health.redis.connectedClients} clients</div>
                   </div>
                   <div className="card glass-noise p-5">
                     <div className="flex items-center gap-2 mb-2">
                       <HealthDot status={health.docker.status} />
-                      <span className="text-xs font-semibold text-[#A5A1C2]">Docker</span>
+                      <span className="text-xs font-semibold text-[var(--text-secondary)]">Docker</span>
                     </div>
                     <div className="text-white text-sm font-medium capitalize">{health.docker.status}</div>
-                    <div className="text-[11px] text-[#71717a] mt-0.5">{health.docker.containersRunning}/{health.docker.containersTotal} running</div>
+                    <div className="text-[11px] text-[var(--text-muted)] mt-0.5">{health.docker.containersRunning}/{health.docker.containersTotal} running</div>
                   </div>
                   <div className="card glass-noise p-5">
                     <div className="flex items-center gap-2 mb-2">
-                      <Cpu size={12} className="text-[#A5A1C2]" />
-                      <span className="text-xs font-semibold text-[#A5A1C2]">API Process</span>
+                      <Cpu size={12} className="text-[var(--text-secondary)]" />
+                      <span className="text-xs font-semibold text-[var(--text-secondary)]">API Process</span>
                     </div>
                     <div className="text-white text-sm font-medium">
                       {health.api.memory.used}MB / {health.api.memory.total}MB
                     </div>
-                    <div className="text-[11px] text-[#71717a] mt-0.5">
+                    <div className="text-[11px] text-[var(--text-muted)] mt-0.5">
                       Uptime: {Math.floor(health.api.uptime / 3600)}h {Math.floor((health.api.uptime % 3600) / 60)}m
                     </div>
                   </div>
@@ -972,7 +972,7 @@ export default function AdminDashboardPage() {
                       <Cpu size={14} className="text-[#06b6d4]" />
                       API Memory Usage
                     </span>
-                    <span className="text-xs text-[#71717a]">
+                    <span className="text-xs text-[var(--text-muted)]">
                       {health.api.memory.used}MB / {health.api.memory.total}MB
                     </span>
                   </div>
@@ -982,7 +982,7 @@ export default function AdminDashboardPage() {
                       style={{ width: `${Math.min(100, Math.round((health.api.memory.used / health.api.memory.total) * 100))}%` }}
                     />
                   </div>
-                  <div className="text-[11px] text-[#71717a] mt-1">
+                  <div className="text-[11px] text-[var(--text-muted)] mt-1">
                     {Math.round((health.api.memory.used / health.api.memory.total) * 100)}% used
                   </div>
                 </div>
@@ -995,7 +995,7 @@ export default function AdminDashboardPage() {
                         <HardDrive size={14} className="text-amber-400" />
                         Disk Usage
                       </span>
-                      <span className="text-xs text-[#71717a]">{health.disk.used} / {health.disk.total}</span>
+                      <span className="text-xs text-[var(--text-muted)]">{health.disk.used} / {health.disk.total}</span>
                     </div>
                     <div className="h-2 rounded-full bg-[rgba(46,43,74,0.4)]">
                       <div
@@ -1003,7 +1003,7 @@ export default function AdminDashboardPage() {
                         style={{ width: `${health.disk.percent}%` }}
                       />
                     </div>
-                    <div className="text-[11px] text-[#71717a] mt-1">{health.disk.percent}% used</div>
+                    <div className="text-[11px] text-[var(--text-muted)] mt-1">{health.disk.percent}% used</div>
                   </div>
                   <div className="card glass-noise p-5">
                     <span className="text-sm font-semibold text-white flex items-center gap-2 mb-3">
@@ -1013,7 +1013,7 @@ export default function AdminDashboardPage() {
                     {health.backup.lastBackup ? (
                       <div>
                         <div className="text-white text-sm font-medium">{health.backup.lastBackup}</div>
-                        <div className="text-[11px] text-[#71717a] mt-0.5">{health.backup.lastSize}</div>
+                        <div className="text-[11px] text-[var(--text-muted)] mt-0.5">{health.backup.lastSize}</div>
                       </div>
                     ) : (
                       <div className="text-sm text-amber-400 flex items-center gap-1.5">
@@ -1033,12 +1033,12 @@ export default function AdminDashboardPage() {
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                       {health.services.map(svc => (
-                        <div key={svc.name} className="bg-[rgba(255,255,255,0.02)] rounded-xl p-3 border border-[rgba(46,43,74,0.3)]">
+                        <div key={svc.name} className="bg-[rgba(255,255,255,0.02)] rounded-xl p-3 border border-[var(--border-default)]">
                           <div className="flex items-center gap-2 mb-2">
                             <HealthDot status={svc.status === 'online' ? 'healthy' : 'unhealthy'} />
                             <span className="text-xs font-medium text-white truncate">{svc.name}</span>
                           </div>
-                          <div className="text-[11px] text-[#71717a]">Up: {svc.uptime}</div>
+                          <div className="text-[11px] text-[var(--text-muted)]">Up: {svc.uptime}</div>
                           {svc.restarts > 0 && (
                             <div className="text-[11px] text-amber-400 mt-0.5">{svc.restarts} restart{svc.restarts !== 1 ? 's' : ''}</div>
                           )}

@@ -89,7 +89,7 @@ export default function TokenPage() {
             agent add-ons, and platform governance on Solana.
           </motion.p>
 
-          <div className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#1A1730] border border-[rgba(46,43,74,0.6)] text-[var(--text-secondary)] text-sm">
+          <div className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-secondary)] text-sm">
             <Bell className="w-4 h-4 text-[#06b6d4]" />
             Token launch has not happened yet. Stay tuned for announcements.
           </div>
@@ -165,7 +165,7 @@ export default function TokenPage() {
               Key Details
             </motion.h2>
             <div className="grid gap-5">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pb-5 border-b border-[rgba(46,43,74,0.6)]">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pb-5 border-b border-[var(--border-default)]">
                 <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">Network</span>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#9945FF]" />
@@ -173,14 +173,14 @@ export default function TokenPage() {
                   <span className="text-xs px-2 py-0.5 rounded-full bg-[#9945FF]/10 text-[#9945FF] border border-[#9945FF]/20 font-medium">SPL Token</span>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pb-5 border-b border-[rgba(46,43,74,0.6)]">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pb-5 border-b border-[var(--border-default)]">
                 <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">Status</span>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
                   <span className="text-amber-400 font-medium">Not Yet Launched</span>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pb-5 border-b border-[rgba(46,43,74,0.6)]">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pb-5 border-b border-[var(--border-default)]">
                 <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">Supply Model</span>
                 <span className="text-[var(--text-primary)] font-medium">Details at launch</span>
               </div>

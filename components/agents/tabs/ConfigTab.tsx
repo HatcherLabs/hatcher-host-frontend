@@ -330,7 +330,7 @@ export function ConfigTab() {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-1.5 text-xs font-medium text-[#A5A1C2] hover:text-white border border-white/[0.08] hover:border-[#06b6d4]/40 bg-white/[0.02] hover:bg-[#06b6d4]/10 rounded-xl px-3 py-2 transition-all duration-200"
+          className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-default)] hover:border-[#06b6d4]/40 bg-[var(--bg-card)] hover:bg-[#06b6d4]/10 rounded-xl px-3 py-2 transition-all duration-200"
         >
           <Upload size={13} />
           Import Config
@@ -338,7 +338,7 @@ export function ConfigTab() {
         <button
           type="button"
           onClick={handleExport}
-          className="flex items-center gap-1.5 text-xs font-medium text-[#A5A1C2] hover:text-white border border-white/[0.08] hover:border-[#06b6d4]/40 bg-white/[0.02] hover:bg-[#06b6d4]/10 rounded-xl px-3 py-2 transition-all duration-200"
+          className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-default)] hover:border-[#06b6d4]/40 bg-[var(--bg-card)] hover:bg-[#06b6d4]/10 rounded-xl px-3 py-2 transition-all duration-200"
         >
           <Download size={13} />
           Export Config
@@ -360,11 +360,11 @@ export function ConfigTab() {
           <div className="w-7 h-7 rounded-lg bg-[#06b6d4]/10 flex items-center justify-center">
             <Settings size={14} className="text-[#06b6d4]" />
           </div>
-          <h3 className="text-sm font-semibold text-[#A5A1C2]">Agent Info</h3>
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Agent Info</h3>
         </div>
         <div className="space-y-4">
           <div>
-            <label htmlFor="config-name" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Name</label>
+            <label htmlFor="config-name" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Name</label>
             <input
               id="config-name"
               type="text"
@@ -375,7 +375,7 @@ export function ConfigTab() {
             />
           </div>
           <div>
-            <label htmlFor="config-description" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Description</label>
+            <label htmlFor="config-description" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Description</label>
             <textarea
               id="config-description"
               className="config-input resize-none"
@@ -385,7 +385,7 @@ export function ConfigTab() {
               maxLength={500}
             />
             <div className="text-right mt-1">
-              <span className={`text-[10px] ${configDesc.length > 450 ? 'text-amber-400' : 'text-[#71717a]'}`}>
+              <span className={`text-[10px] ${configDesc.length > 450 ? 'text-amber-400' : 'text-[var(--text-muted)]'}`}>
                 {configDesc.length}/500
               </span>
             </div>
@@ -399,26 +399,26 @@ export function ConfigTab() {
           <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${agent?.framework === 'hermes' ? 'bg-purple-500/10' : agent?.framework === 'elizaos' ? 'bg-cyan-500/10' : agent?.framework === 'milady' ? 'bg-rose-500/10' : 'bg-amber-500/10'}`}>
             <Cpu size={14} className={agent?.framework === 'hermes' ? 'text-purple-400' : agent?.framework === 'elizaos' ? 'text-cyan-400' : agent?.framework === 'milady' ? 'text-rose-400' : 'text-amber-400'} />
           </div>
-          <h3 className="text-sm font-semibold text-[#A5A1C2]">{FRAMEWORKS[(agent?.framework ?? 'openclaw') as AgentFramework]?.name ?? 'Agent'} Config</h3>
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">{FRAMEWORKS[(agent?.framework ?? 'openclaw') as AgentFramework]?.name ?? 'Agent'} Config</h3>
         </div>
 
         <div className="space-y-4">
           {/* Personality Builder */}
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 space-y-4">
+          <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-4 space-y-4">
             <div className="flex items-center gap-2">
               <Sparkles size={14} className="text-[#A78BFA]" />
-              <h4 className="text-xs font-semibold text-[#A5A1C2]">Personality Builder</h4>
+              <h4 className="text-xs font-semibold text-[var(--text-secondary)]">Personality Builder</h4>
             </div>
-            <p className="text-[10px] text-[#71717a]">
+            <p className="text-[10px] text-[var(--text-muted)]">
               Adjust sliders to shape your agent&apos;s personality, then click &quot;Apply to Prompt&quot; to generate a system prompt. Or write your own prompt below.
             </p>
 
             {/* Formality */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] text-[#71717a]">Casual</span>
-                <span className="text-[11px] font-medium text-[#A5A1C2]">Formality</span>
-                <span className="text-[10px] text-[#71717a]">Formal</span>
+                <span className="text-[10px] text-[var(--text-muted)]">Casual</span>
+                <span className="text-[11px] font-medium text-[var(--text-secondary)]">Formality</span>
+                <span className="text-[10px] text-[var(--text-muted)]">Formal</span>
               </div>
               <div className="flex items-center gap-3">
                 <input
@@ -427,16 +427,16 @@ export function ConfigTab() {
                   onChange={(e) => setPersonality(p => ({ ...p, formality: parseInt(e.target.value, 10) }))}
                   className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-cyan-500/30 to-purple-500/30 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#A78BFA] [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(167,139,250,0.4)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#A78BFA] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
                 />
-                <span className="text-[10px] font-mono font-medium text-[#A5A1C2] bg-white/[0.04] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.formality}</span>
+                <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.formality}</span>
               </div>
             </div>
 
             {/* Verbosity */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] text-[#71717a]">Concise</span>
-                <span className="text-[11px] font-medium text-[#A5A1C2]">Verbosity</span>
-                <span className="text-[10px] text-[#71717a]">Detailed</span>
+                <span className="text-[10px] text-[var(--text-muted)]">Concise</span>
+                <span className="text-[11px] font-medium text-[var(--text-secondary)]">Verbosity</span>
+                <span className="text-[10px] text-[var(--text-muted)]">Detailed</span>
               </div>
               <div className="flex items-center gap-3">
                 <input
@@ -445,16 +445,16 @@ export function ConfigTab() {
                   onChange={(e) => setPersonality(p => ({ ...p, verbosity: parseInt(e.target.value, 10) }))}
                   className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-emerald-500/30 to-blue-500/30 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#A78BFA] [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(167,139,250,0.4)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#A78BFA] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
                 />
-                <span className="text-[10px] font-mono font-medium text-[#A5A1C2] bg-white/[0.04] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.verbosity}</span>
+                <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.verbosity}</span>
               </div>
             </div>
 
             {/* Creativity */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] text-[#71717a]">Factual</span>
-                <span className="text-[11px] font-medium text-[#A5A1C2]">Creativity</span>
-                <span className="text-[10px] text-[#71717a]">Creative</span>
+                <span className="text-[10px] text-[var(--text-muted)]">Factual</span>
+                <span className="text-[11px] font-medium text-[var(--text-secondary)]">Creativity</span>
+                <span className="text-[10px] text-[var(--text-muted)]">Creative</span>
               </div>
               <div className="flex items-center gap-3">
                 <input
@@ -463,16 +463,16 @@ export function ConfigTab() {
                   onChange={(e) => setPersonality(p => ({ ...p, creativity: parseInt(e.target.value, 10) }))}
                   className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-amber-500/30 to-rose-500/30 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#A78BFA] [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(167,139,250,0.4)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#A78BFA] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
                 />
-                <span className="text-[10px] font-mono font-medium text-[#A5A1C2] bg-white/[0.04] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.creativity}</span>
+                <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.creativity}</span>
               </div>
             </div>
 
             {/* Friendliness */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] text-[#71717a]">Neutral</span>
-                <span className="text-[11px] font-medium text-[#A5A1C2]">Friendliness</span>
-                <span className="text-[10px] text-[#71717a]">Warm</span>
+                <span className="text-[10px] text-[var(--text-muted)]">Neutral</span>
+                <span className="text-[11px] font-medium text-[var(--text-secondary)]">Friendliness</span>
+                <span className="text-[10px] text-[var(--text-muted)]">Warm</span>
               </div>
               <div className="flex items-center gap-3">
                 <input
@@ -481,16 +481,16 @@ export function ConfigTab() {
                   onChange={(e) => setPersonality(p => ({ ...p, friendliness: parseInt(e.target.value, 10) }))}
                   className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-sky-500/30 to-pink-500/30 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#A78BFA] [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(167,139,250,0.4)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#A78BFA] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
                 />
-                <span className="text-[10px] font-mono font-medium text-[#A5A1C2] bg-white/[0.04] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.friendliness}</span>
+                <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.friendliness}</span>
               </div>
             </div>
 
             {/* Expertise */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] text-[#71717a]">Generalist</span>
-                <span className="text-[11px] font-medium text-[#A5A1C2]">Expertise</span>
-                <span className="text-[10px] text-[#71717a]">Specialist</span>
+                <span className="text-[10px] text-[var(--text-muted)]">Generalist</span>
+                <span className="text-[11px] font-medium text-[var(--text-secondary)]">Expertise</span>
+                <span className="text-[10px] text-[var(--text-muted)]">Specialist</span>
               </div>
               <div className="flex items-center gap-3">
                 <input
@@ -499,14 +499,14 @@ export function ConfigTab() {
                   onChange={(e) => setPersonality(p => ({ ...p, expertise: parseInt(e.target.value, 10) }))}
                   className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-teal-500/30 to-indigo-500/30 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#A78BFA] [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(167,139,250,0.4)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#A78BFA] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
                 />
-                <span className="text-[10px] font-mono font-medium text-[#A5A1C2] bg-white/[0.04] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.expertise}</span>
+                <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.expertise}</span>
               </div>
             </div>
 
             <button
               type="button"
               onClick={generatePromptFromPersonality}
-              className="flex items-center gap-1.5 text-xs font-medium text-[#A78BFA] hover:text-white border border-[#A78BFA]/30 hover:border-[#A78BFA]/60 bg-[#A78BFA]/10 hover:bg-[#A78BFA]/20 rounded-xl px-3 py-2 transition-all duration-200"
+              className="flex items-center gap-1.5 text-xs font-medium text-[#A78BFA] hover:text-[var(--text-primary)] border border-[#A78BFA]/30 hover:border-[#A78BFA]/60 bg-[#A78BFA]/10 hover:bg-[#A78BFA]/20 rounded-xl px-3 py-2 transition-all duration-200"
             >
               <Sparkles size={13} />
               Apply to Prompt
@@ -514,7 +514,7 @@ export function ConfigTab() {
           </div>
 
           <div>
-            <label htmlFor="config-system-prompt" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Behavior Instructions</label>
+            <label htmlFor="config-system-prompt" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Behavior Instructions</label>
             <textarea
               id="config-system-prompt"
               className="config-textarea"
@@ -523,7 +523,7 @@ export function ConfigTab() {
               onChange={(e) => setConfigSystemPrompt(e.target.value)}
               placeholder="You are a helpful AI assistant..."
             />
-            <p className="text-[10px] mt-1 text-[#71717a]">
+            <p className="text-[10px] mt-1 text-[var(--text-muted)]">
               Tell your agent how to behave, what tone to use, and what it should know. You can write multiple lines.
             </p>
           </div>
@@ -531,8 +531,8 @@ export function ConfigTab() {
           {agent?.framework === 'elizaos' && (
             <>
               <div>
-                <label htmlFor="config-bio" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Bio</label>
-                <p className="text-[10px] mb-1.5 text-[#71717a]">Define your agent&apos;s personality. One statement per line.</p>
+                <label htmlFor="config-bio" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Bio</label>
+                <p className="text-[10px] mb-1.5 text-[var(--text-muted)]">Define your agent&apos;s personality. One statement per line.</p>
                 <textarea
                   id="config-bio"
                   className="config-textarea"
@@ -543,8 +543,8 @@ export function ConfigTab() {
                 />
               </div>
               <div>
-                <label htmlFor="config-lore" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Lore</label>
-                <p className="text-[10px] mb-1.5 text-[#71717a]">Background knowledge and history for your agent. One fact per line.</p>
+                <label htmlFor="config-lore" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Lore</label>
+                <p className="text-[10px] mb-1.5 text-[var(--text-muted)]">Background knowledge and history for your agent. One fact per line.</p>
                 <textarea
                   id="config-lore"
                   className="config-textarea"
@@ -555,8 +555,8 @@ export function ConfigTab() {
                 />
               </div>
               <div>
-                <label htmlFor="config-topics" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Topics</label>
-                <p className="text-[10px] mb-1.5 text-[#71717a]">Discussion topics your agent engages with</p>
+                <label htmlFor="config-topics" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Topics</label>
+                <p className="text-[10px] mb-1.5 text-[var(--text-muted)]">Discussion topics your agent engages with</p>
                 <TagInput
                   tags={configTopics ? configTopics.split(',').map(s => s.trim()).filter(Boolean) : []}
                   onChange={(tags) => setConfigTopics(tags.join(', '))}
@@ -565,8 +565,8 @@ export function ConfigTab() {
                 />
               </div>
               <div>
-                <label htmlFor="config-adjectives" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Adjectives</label>
-                <p className="text-[10px] mb-1.5 text-[#71717a]">Personality traits that describe your agent</p>
+                <label htmlFor="config-adjectives" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Adjectives</label>
+                <p className="text-[10px] mb-1.5 text-[var(--text-muted)]">Personality traits that describe your agent</p>
                 <TagInput
                   tags={configAdjectives ? configAdjectives.split(',').map(s => s.trim()).filter(Boolean) : []}
                   onChange={(tags) => setConfigAdjectives(tags.join(', '))}
@@ -583,8 +583,8 @@ export function ConfigTab() {
               return (
                 <>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label htmlFor="config-skills" className="block text-[11px] font-medium uppercase tracking-wider text-[#71717a]">Agent Skills</label>
-                    <span className="text-[10px] font-medium text-[#71717a]">
+                    <label htmlFor="config-skills" className="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Agent Skills</label>
+                    <span className="text-[10px] font-medium text-[var(--text-muted)]">
                       {parsedSkills.length} skills
                     </span>
                   </div>
@@ -625,13 +625,13 @@ export function ConfigTab() {
               <Sliders size={14} className="text-[#A78BFA]" />
             </div>
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-[#A5A1C2]">Advanced Settings</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Advanced Settings</h3>
               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#A78BFA]/10 text-[#A78BFA] border border-[#A78BFA]/20">
                 {FRAMEWORKS[(agent?.framework ?? 'openclaw') as AgentFramework]?.name ?? 'Agent'}
               </span>
             </div>
           </div>
-          {showAdvanced ? <ChevronUp size={16} className="text-[#71717a]" /> : <ChevronDown size={16} className="text-[#71717a]" />}
+          {showAdvanced ? <ChevronUp size={16} className="text-[var(--text-muted)]" /> : <ChevronDown size={16} className="text-[var(--text-muted)]" />}
         </button>
 
         <AnimatePresence>
@@ -652,32 +652,32 @@ export function ConfigTab() {
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
                         <Brain size={12} className="text-amber-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Session &amp; Memory</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Session &amp; Memory</span>
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-medium mb-1.5 text-[#71717a]">Session Scope</label>
+                        <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Session Scope</label>
                         <div className="relative">
                           <select
                             className="config-input text-sm appearance-none pr-8 cursor-pointer"
                             value={ocSessionScope}
                             onChange={(e) => setOcSessionScope(e.target.value)}
                           >
-                            <option value="per_user" style={{ background: '#0D0B1A' }}>Per User (recommended)</option>
-                            <option value="global" style={{ background: '#0D0B1A' }}>Global (shared)</option>
+                            <option value="per_user" style={{ background: 'var(--bg-base)' }}>Per User (recommended)</option>
+                            <option value="global" style={{ background: 'var(--bg-base)' }}>Global (shared)</option>
                           </select>
-                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                         </div>
                         <div className="mt-2 space-y-1">
-                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocSessionScope === 'per_user' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-white/[0.02]'}`}>
+                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocSessionScope === 'per_user' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-[var(--bg-card)]'}`}>
                             <Users size={11} className={`mt-0.5 shrink-0 ${ocSessionScope === 'per_user' ? 'text-amber-400' : 'text-[#52525b]'}`} />
-                            <p className={`text-[10px] leading-relaxed ${ocSessionScope === 'per_user' ? 'text-[#A5A1C2]' : 'text-[#52525b]'}`}>
+                            <p className={`text-[10px] leading-relaxed ${ocSessionScope === 'per_user' ? 'text-[var(--text-secondary)]' : 'text-[#52525b]'}`}>
                               <span className="font-medium">Per User</span> — Each user has their own conversation thread
                             </p>
                           </div>
-                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocSessionScope === 'global' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-white/[0.02]'}`}>
+                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocSessionScope === 'global' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-[var(--bg-card)]'}`}>
                             <Globe size={11} className={`mt-0.5 shrink-0 ${ocSessionScope === 'global' ? 'text-amber-400' : 'text-[#52525b]'}`} />
-                            <p className={`text-[10px] leading-relaxed ${ocSessionScope === 'global' ? 'text-[#A5A1C2]' : 'text-[#52525b]'}`}>
+                            <p className={`text-[10px] leading-relaxed ${ocSessionScope === 'global' ? 'text-[var(--text-secondary)]' : 'text-[#52525b]'}`}>
                               <span className="font-medium">Global</span> — All users share a single conversation
                             </p>
                           </div>
@@ -685,35 +685,35 @@ export function ConfigTab() {
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-medium mb-1.5 text-[#71717a]">Compaction Mode</label>
+                        <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Compaction Mode</label>
                         <div className="relative">
                           <select
                             className="config-input text-sm appearance-none pr-8 cursor-pointer"
                             value={ocCompaction}
                             onChange={(e) => setOcCompaction(e.target.value)}
                           >
-                            <option value="safeguard" style={{ background: '#0D0B1A' }}>Safeguard (recommended)</option>
-                            <option value="aggressive" style={{ background: '#0D0B1A' }}>Aggressive</option>
-                            <option value="off" style={{ background: '#0D0B1A' }}>Off</option>
+                            <option value="safeguard" style={{ background: 'var(--bg-base)' }}>Safeguard (recommended)</option>
+                            <option value="aggressive" style={{ background: 'var(--bg-base)' }}>Aggressive</option>
+                            <option value="off" style={{ background: 'var(--bg-base)' }}>Off</option>
                           </select>
-                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                         </div>
                         <div className="mt-2 space-y-1">
-                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocCompaction === 'safeguard' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-white/[0.02]'}`}>
+                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocCompaction === 'safeguard' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-[var(--bg-card)]'}`}>
                             <Shield size={11} className={`mt-0.5 shrink-0 ${ocCompaction === 'safeguard' ? 'text-amber-400' : 'text-[#52525b]'}`} />
-                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'safeguard' ? 'text-[#A5A1C2]' : 'text-[#52525b]'}`}>
+                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'safeguard' ? 'text-[var(--text-secondary)]' : 'text-[#52525b]'}`}>
                               <span className="font-medium">Safeguard</span> — Preserves full conversation history, uses more memory
                             </p>
                           </div>
-                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocCompaction === 'aggressive' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-white/[0.02]'}`}>
+                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocCompaction === 'aggressive' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-[var(--bg-card)]'}`}>
                             <Zap size={11} className={`mt-0.5 shrink-0 ${ocCompaction === 'aggressive' ? 'text-amber-400' : 'text-[#52525b]'}`} />
-                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'aggressive' ? 'text-[#A5A1C2]' : 'text-[#52525b]'}`}>
+                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'aggressive' ? 'text-[var(--text-secondary)]' : 'text-[#52525b]'}`}>
                               <span className="font-medium">Aggressive</span> — Summarizes older messages to save memory
                             </p>
                           </div>
-                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocCompaction === 'off' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-white/[0.02]'}`}>
+                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocCompaction === 'off' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-[var(--bg-card)]'}`}>
                             <History size={11} className={`mt-0.5 shrink-0 ${ocCompaction === 'off' ? 'text-amber-400' : 'text-[#52525b]'}`} />
-                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'off' ? 'text-[#A5A1C2]' : 'text-[#52525b]'}`}>
+                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'off' ? 'text-[var(--text-secondary)]' : 'text-[#52525b]'}`}>
                               <span className="font-medium">Off</span> — No compaction, conversation grows unbounded
                             </p>
                           </div>
@@ -721,13 +721,13 @@ export function ConfigTab() {
                       </div>
                     </div>
 
-                    <div className="border-t border-white/[0.06]" />
+                    <div className="border-t border-[var(--border-default)]" />
 
                     {/* Tools & Search */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
                         <Search size={12} className="text-amber-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Tools &amp; Search</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Tools &amp; Search</span>
                       </div>
 
                       <ToggleSwitch
@@ -739,31 +739,31 @@ export function ConfigTab() {
 
                       {ocWebSearch && (
                         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
-                          <label className="block text-[11px] font-medium mb-1.5 text-[#71717a]">Search Provider</label>
+                          <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Search Provider</label>
                           <div className="relative">
                             <select
                               className="config-input text-sm appearance-none pr-8 cursor-pointer"
                               value={ocSearchProvider}
                               onChange={(e) => setOcSearchProvider(e.target.value)}
                             >
-                              <option value="brave" style={{ background: '#0D0B1A' }}>Brave</option>
-                              <option value="google" style={{ background: '#0D0B1A' }}>Google (Gemini)</option>
-                              <option value="grok" style={{ background: '#0D0B1A' }}>Grok (xAI)</option>
-                              <option value="perplexity" style={{ background: '#0D0B1A' }}>Perplexity</option>
+                              <option value="brave" style={{ background: 'var(--bg-base)' }}>Brave</option>
+                              <option value="google" style={{ background: 'var(--bg-base)' }}>Google (Gemini)</option>
+                              <option value="grok" style={{ background: 'var(--bg-base)' }}>Grok (xAI)</option>
+                              <option value="perplexity" style={{ background: 'var(--bg-base)' }}>Perplexity</option>
                             </select>
-                            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                           </div>
                         </motion.div>
                       )}
                     </div>
 
-                    <div className="border-t border-white/[0.06]" />
+                    <div className="border-t border-[var(--border-default)]" />
 
                     {/* Voice & TTS */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
                         <Mic size={12} className="text-amber-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Voice &amp; TTS</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Voice &amp; TTS</span>
                       </div>
 
                       <ToggleSwitch
@@ -775,29 +775,29 @@ export function ConfigTab() {
 
                       {ocTts && (
                         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
-                          <label className="block text-[11px] font-medium mb-1.5 text-[#71717a]">TTS Provider</label>
+                          <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">TTS Provider</label>
                           <div className="relative">
                             <select
                               className="config-input text-sm appearance-none pr-8 cursor-pointer"
                               value={ocTtsProvider}
                               onChange={(e) => setOcTtsProvider(e.target.value)}
                             >
-                              <option value="elevenlabs" style={{ background: '#0D0B1A' }}>ElevenLabs</option>
-                              <option value="openai" style={{ background: '#0D0B1A' }}>OpenAI</option>
+                              <option value="elevenlabs" style={{ background: 'var(--bg-base)' }}>ElevenLabs</option>
+                              <option value="openai" style={{ background: 'var(--bg-base)' }}>OpenAI</option>
                             </select>
-                            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                           </div>
                         </motion.div>
                       )}
                     </div>
 
-                    <div className="border-t border-white/[0.06]" />
+                    <div className="border-t border-[var(--border-default)]" />
 
                     {/* Limits */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
                         <Layers size={12} className="text-amber-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Limits</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Limits</span>
                       </div>
 
                       <SliderInput
@@ -830,10 +830,10 @@ export function ConfigTab() {
                         <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
                           <Brain size={13} className="text-purple-400" />
                         </div>
-                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Personality & Behavior</span>
+                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Personality & Behavior</span>
                       </div>
 
-                      <label className="block text-[11px] font-medium mb-1 text-[#71717a]">Personality Preset</label>
+                      <label className="block text-[11px] font-medium mb-1 text-[var(--text-muted)]">Personality Preset</label>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {([
                           { key: 'default', name: 'Default', desc: 'Balanced and versatile', icon: Sliders, color: 'purple' as const },
@@ -861,31 +861,31 @@ export function ConfigTab() {
                               className={`group relative flex flex-col items-center gap-1.5 w-full text-center rounded-xl px-3 py-3 border transition-all duration-200 ${
                                 isSelected
                                   ? `${colors.border} ${colors.bg} ring-1 ${colors.ring}`
-                                  : 'border-white/[0.06] bg-[#18181b]/80 hover:border-white/[0.12] hover:bg-[#18181b]'
+                                  : 'border-[var(--border-default)] bg-[var(--bg-elevated)]/80 hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)]'
                               }`}
                             >
                               <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors duration-200 ${
-                                isSelected ? colors.iconBg : 'bg-white/[0.04]'
+                                isSelected ? colors.iconBg : 'bg-[var(--bg-card)]'
                               }`}>
-                                <Icon size={14} className={`transition-colors duration-200 ${isSelected ? colors.icon : 'text-[#71717a]'}`} />
+                                <Icon size={14} className={`transition-colors duration-200 ${isSelected ? colors.icon : 'text-[var(--text-muted)]'}`} />
                               </div>
                               <div>
                                 <div className="flex items-center justify-center gap-1">
-                                  <span className={`text-[12px] font-medium transition-colors duration-200 ${isSelected ? 'text-white' : 'text-[#A5A1C2]'}`}>
+                                  <span className={`text-[12px] font-medium transition-colors duration-200 ${isSelected ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
                                     {preset.name}
                                   </span>
                                   {isSelected && <CheckCircle size={11} className={colors.icon} />}
                                 </div>
-                                <p className="text-[10px] text-[#71717a] mt-0.5 leading-snug">{preset.desc}</p>
+                                <p className="text-[10px] text-[var(--text-muted)] mt-0.5 leading-snug">{preset.desc}</p>
                               </div>
                             </button>
                           );
                         })}
                       </div>
-                      <p className="text-[10px] text-[#71717a]">Quick personality template. Combine with behavior instructions for best results.</p>
+                      <p className="text-[10px] text-[var(--text-muted)]">Quick personality template. Combine with behavior instructions for best results.</p>
                     </div>
 
-                    <div className="border-t border-white/[0.06]" />
+                    <div className="border-t border-[var(--border-default)]" />
 
                     {/* ── Security ── */}
                     <div className="space-y-3">
@@ -893,28 +893,28 @@ export function ConfigTab() {
                         <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
                           <ShieldCheck size={13} className="text-purple-400" />
                         </div>
-                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Security</span>
+                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Security</span>
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-medium mb-1.5 text-[#71717a]">Approval Mode</label>
+                        <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Approval Mode</label>
                         <div className="relative">
                           <select
                             className="config-input text-sm appearance-none pr-8 cursor-pointer"
                             value={hmApprovalMode}
                             onChange={(e) => setHmApprovalMode(e.target.value)}
                           >
-                            <option value="auto" style={{ background: '#0D0B1A' }}>Auto (recommended)</option>
-                            <option value="ask" style={{ background: '#0D0B1A' }}>Ask Before Actions</option>
-                            <option value="manual" style={{ background: '#0D0B1A' }}>Manual Only</option>
+                            <option value="auto" style={{ background: 'var(--bg-base)' }}>Auto (recommended)</option>
+                            <option value="ask" style={{ background: 'var(--bg-base)' }}>Ask Before Actions</option>
+                            <option value="manual" style={{ background: 'var(--bg-base)' }}>Manual Only</option>
                           </select>
-                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                         </div>
-                        <p className="text-[10px] mt-1 text-[#71717a]">Controls whether the agent can take actions automatically or must ask for confirmation.</p>
+                        <p className="text-[10px] mt-1 text-[var(--text-muted)]">Controls whether the agent can take actions automatically or must ask for confirmation.</p>
                       </div>
                     </div>
 
-                    <div className="border-t border-white/[0.06]" />
+                    <div className="border-t border-[var(--border-default)]" />
 
                     {/* ── Memory & Learning ── */}
                     <div className="space-y-3">
@@ -922,7 +922,7 @@ export function ConfigTab() {
                         <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
                           <Database size={13} className="text-purple-400" />
                         </div>
-                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Memory & Learning</span>
+                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Memory & Learning</span>
                       </div>
 
                       <ToggleSwitch
@@ -946,7 +946,7 @@ export function ConfigTab() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-[12px] font-medium text-emerald-300/90">Persistent Memory Active</p>
-                                <p className="text-[10px] text-[#71717a] mt-0.5 leading-relaxed">
+                                <p className="text-[10px] text-[var(--text-muted)] mt-0.5 leading-relaxed">
                                   Your agent learns from conversations and remembers across restarts. Powered by ChromaDB.
                                 </p>
                               </div>
@@ -957,7 +957,7 @@ export function ConfigTab() {
                       </AnimatePresence>
                     </div>
 
-                    <div className="border-t border-white/[0.06]" />
+                    <div className="border-t border-[var(--border-default)]" />
 
                     {/* ── Voice & Speech ── */}
                     <div className="space-y-3">
@@ -965,7 +965,7 @@ export function ConfigTab() {
                         <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
                           <Volume2 size={13} className="text-purple-400" />
                         </div>
-                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Voice & Speech</span>
+                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Voice & Speech</span>
                       </div>
 
                       <ToggleSwitch
@@ -979,32 +979,32 @@ export function ConfigTab() {
                         {hmVoice && (
                           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-3 overflow-hidden">
                             <div>
-                              <label className="block text-[11px] font-medium mb-1.5 text-[#71717a]">STT Provider</label>
+                              <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">STT Provider</label>
                               <div className="relative">
                                 <select
                                   className="config-input text-sm appearance-none pr-8 cursor-pointer"
                                   value={hmSttProvider}
                                   onChange={(e) => setHmSttProvider(e.target.value)}
                                 >
-                                  <option value="whisper" style={{ background: '#0D0B1A' }}>Whisper</option>
-                                  <option value="deepgram" style={{ background: '#0D0B1A' }}>Deepgram</option>
+                                  <option value="whisper" style={{ background: 'var(--bg-base)' }}>Whisper</option>
+                                  <option value="deepgram" style={{ background: 'var(--bg-base)' }}>Deepgram</option>
                                 </select>
-                                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                               </div>
                             </div>
                             <div>
-                              <label className="block text-[11px] font-medium mb-1.5 text-[#71717a]">TTS Provider</label>
+                              <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">TTS Provider</label>
                               <div className="relative">
                                 <select
                                   className="config-input text-sm appearance-none pr-8 cursor-pointer"
                                   value={hmTtsProvider}
                                   onChange={(e) => setHmTtsProvider(e.target.value)}
                                 >
-                                  <option value="elevenlabs" style={{ background: '#0D0B1A' }}>ElevenLabs</option>
-                                  <option value="openai" style={{ background: '#0D0B1A' }}>OpenAI</option>
-                                  <option value="kokoro" style={{ background: '#0D0B1A' }}>Kokoro</option>
+                                  <option value="elevenlabs" style={{ background: 'var(--bg-base)' }}>ElevenLabs</option>
+                                  <option value="openai" style={{ background: 'var(--bg-base)' }}>OpenAI</option>
+                                  <option value="kokoro" style={{ background: 'var(--bg-base)' }}>Kokoro</option>
                                 </select>
-                                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                               </div>
                             </div>
                           </motion.div>
@@ -1021,12 +1021,12 @@ export function ConfigTab() {
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
                         <Users size={12} className="text-cyan-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Communication Style</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Communication Style</span>
                       </div>
-                      <p className="text-[10px] text-[#71717a]">Control how your agent communicates across different contexts. One instruction per line.</p>
+                      <p className="text-[10px] text-[var(--text-muted)]">Control how your agent communicates across different contexts. One instruction per line.</p>
 
                       <div>
-                        <label htmlFor="ez-style-all" className="block text-[11px] font-medium mb-1.5 text-[#71717a]">General Style</label>
+                        <label htmlFor="ez-style-all" className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">General Style</label>
                         <textarea
                           id="ez-style-all"
                           className="config-textarea"
@@ -1035,11 +1035,11 @@ export function ConfigTab() {
                           onChange={(e) => setConfigStyle(e.target.value)}
                           placeholder="Be concise and direct&#10;Use technical terminology when appropriate&#10;Always provide examples"
                         />
-                        <p className="text-[10px] mt-1 text-[#71717a]">Applied to all interactions regardless of platform.</p>
+                        <p className="text-[10px] mt-1 text-[var(--text-muted)]">Applied to all interactions regardless of platform.</p>
                       </div>
 
                       <div>
-                        <label htmlFor="ez-style-chat" className="block text-[11px] font-medium mb-1.5 text-[#71717a]">Chat Style</label>
+                        <label htmlFor="ez-style-chat" className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Chat Style</label>
                         <textarea
                           id="ez-style-chat"
                           className="config-textarea"
@@ -1048,11 +1048,11 @@ export function ConfigTab() {
                           onChange={(e) => setEzStyleChat(e.target.value)}
                           placeholder="Keep responses under 3 sentences&#10;Use casual language&#10;Ask follow-up questions"
                         />
-                        <p className="text-[10px] mt-1 text-[#71717a]">How the agent talks in chat conversations (Telegram, Discord, etc).</p>
+                        <p className="text-[10px] mt-1 text-[var(--text-muted)]">How the agent talks in chat conversations (Telegram, Discord, etc).</p>
                       </div>
 
                       <div>
-                        <label htmlFor="ez-style-post" className="block text-[11px] font-medium mb-1.5 text-[#71717a]">Post Style</label>
+                        <label htmlFor="ez-style-post" className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Post Style</label>
                         <textarea
                           id="ez-style-post"
                           className="config-textarea"
@@ -1061,44 +1061,44 @@ export function ConfigTab() {
                           onChange={(e) => setEzStylePost(e.target.value)}
                           placeholder="Write in a punchy, engaging tone&#10;Use hashtags sparingly&#10;Keep posts under 280 characters"
                         />
-                        <p className="text-[10px] mt-1 text-[#71717a]">How the agent writes posts and tweets on social platforms.</p>
+                        <p className="text-[10px] mt-1 text-[var(--text-muted)]">How the agent writes posts and tweets on social platforms.</p>
                       </div>
                     </div>
 
-                    <div className="border-t border-white/[0.06]" />
+                    <div className="border-t border-[var(--border-default)]" />
 
                     {/* Database */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
                         <Database size={12} className="text-cyan-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Database</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Database</span>
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-medium mb-1.5 text-[#71717a]">Database Backend</label>
+                        <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Database Backend</label>
                         <div className="relative">
                           <select
                             className="config-input text-sm appearance-none pr-8 cursor-pointer"
                             value={ezDatabase}
                             onChange={(e) => setEzDatabase(e.target.value)}
                           >
-                            <option value="pglite" style={{ background: '#0D0B1A' }}>PGLite (default)</option>
-                            <option value="postgresql" style={{ background: '#0D0B1A' }}>PostgreSQL</option>
-                            <option value="sqlite" style={{ background: '#0D0B1A' }}>SQLite</option>
+                            <option value="pglite" style={{ background: 'var(--bg-base)' }}>PGLite (default)</option>
+                            <option value="postgresql" style={{ background: 'var(--bg-base)' }}>PostgreSQL</option>
+                            <option value="sqlite" style={{ background: 'var(--bg-base)' }}>SQLite</option>
                           </select>
-                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                         </div>
-                        <p className="text-[10px] mt-1 text-[#71717a]">PGLite runs in-process with zero setup. PostgreSQL is better for large-scale deployments.</p>
+                        <p className="text-[10px] mt-1 text-[var(--text-muted)]">PGLite runs in-process with zero setup. PostgreSQL is better for large-scale deployments.</p>
                       </div>
                     </div>
 
-                    <div className="border-t border-white/[0.06]" />
+                    <div className="border-t border-[var(--border-default)]" />
 
                     {/* Features */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
                         <Puzzle size={12} className="text-cyan-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Features</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Features</span>
                       </div>
 
                       <ToggleSwitch
@@ -1123,13 +1123,13 @@ export function ConfigTab() {
                       />
                     </div>
 
-                    <div className="border-t border-white/[0.06]" />
+                    <div className="border-t border-[var(--border-default)]" />
 
                     {/* Plugins */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
                         <Puzzle size={12} className="text-cyan-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Plugins</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Plugins</span>
                       </div>
 
                       <ToggleSwitch
@@ -1149,7 +1149,7 @@ export function ConfigTab() {
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
                         <Zap size={12} className="text-rose-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Performance</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Performance</span>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -1169,13 +1169,13 @@ export function ConfigTab() {
                       </div>
                     </div>
 
-                    <div className="border-t border-white/[0.06]" />
+                    <div className="border-t border-[var(--border-default)]" />
 
                     {/* Privacy */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
                         <ShieldCheck size={12} className="text-rose-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Privacy</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Privacy</span>
                       </div>
 
                       <ToggleSwitch
@@ -1186,30 +1186,30 @@ export function ConfigTab() {
                       />
 
                       <div>
-                        <label className="block text-[11px] font-medium mb-1.5 text-[#71717a]">Embedding Model</label>
+                        <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Embedding Model</label>
                         <div className="relative">
                           <select
                             className="config-input text-sm appearance-none pr-8 cursor-pointer"
                             value={mlEmbedding}
                             onChange={(e) => setMlEmbedding(e.target.value)}
                           >
-                            <option value="nomic" style={{ background: '#0D0B1A' }}>nomic-embed-text (local)</option>
-                            <option value="openai" style={{ background: '#0D0B1A' }}>OpenAI</option>
-                            <option value="voyage" style={{ background: '#0D0B1A' }}>Voyage</option>
+                            <option value="nomic" style={{ background: 'var(--bg-base)' }}>nomic-embed-text (local)</option>
+                            <option value="openai" style={{ background: 'var(--bg-base)' }}>OpenAI</option>
+                            <option value="voyage" style={{ background: 'var(--bg-base)' }}>Voyage</option>
                           </select>
-                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                         </div>
-                        <p className="text-[10px] mt-1 text-[#71717a]">nomic-embed-text runs locally. OpenAI and Voyage require API keys.</p>
+                        <p className="text-[10px] mt-1 text-[var(--text-muted)]">nomic-embed-text runs locally. OpenAI and Voyage require API keys.</p>
                       </div>
                     </div>
 
-                    <div className="border-t border-white/[0.06]" />
+                    <div className="border-t border-[var(--border-default)]" />
 
                     {/* Personality Preset Cards */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
                         <Brain size={12} className="text-rose-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Personality</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Personality</span>
                       </div>
 
                       <div className="grid gap-2">
@@ -1244,24 +1244,24 @@ export function ConfigTab() {
                               className={`group relative flex items-start gap-3 w-full text-left rounded-xl px-3.5 py-3 border transition-all duration-200 ${
                                 isSelected
                                   ? `${colors.border} ${colors.bg} ring-1 ${colors.ring}`
-                                  : 'border-white/[0.06] bg-[#18181b]/80 hover:border-white/[0.12] hover:bg-[#18181b]'
+                                  : 'border-[var(--border-default)] bg-[var(--bg-elevated)]/80 hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)]'
                               }`}
                             >
                               <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ${
-                                isSelected ? colors.iconBg : 'bg-white/[0.04]'
+                                isSelected ? colors.iconBg : 'bg-[var(--bg-card)]'
                               }`}>
-                                <Icon size={15} className={`transition-colors duration-200 ${isSelected ? colors.icon : 'text-[#71717a]'}`} />
+                                <Icon size={15} className={`transition-colors duration-200 ${isSelected ? colors.icon : 'text-[var(--text-muted)]'}`} />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
-                                  <span className={`text-[13px] font-medium transition-colors duration-200 ${isSelected ? 'text-white' : 'text-[#A5A1C2]'}`}>
+                                  <span className={`text-[13px] font-medium transition-colors duration-200 ${isSelected ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
                                     {preset.name}
                                   </span>
                                   {isSelected && (
                                     <CheckCircle size={13} className={colors.icon} />
                                   )}
                                 </div>
-                                <p className="text-[11px] text-[#71717a] mt-0.5 leading-relaxed">{preset.desc}</p>
+                                <p className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-relaxed">{preset.desc}</p>
                               </div>
                             </button>
                           );
@@ -1269,36 +1269,36 @@ export function ConfigTab() {
                       </div>
 
                       {mlPersonality === 'custom' && (
-                        <p className="text-[10px] text-[#71717a]">Write your custom personality in the Behavior Instructions field above.</p>
+                        <p className="text-[10px] text-[var(--text-muted)]">Write your custom personality in the Behavior Instructions field above.</p>
                       )}
                       {mlPersonality !== 'custom' && (
-                        <p className="text-[10px] text-[#71717a]">Selecting a preset auto-fills the Behavior Instructions. Switch to Custom for full control.</p>
+                        <p className="text-[10px] text-[var(--text-muted)]">Selecting a preset auto-fills the Behavior Instructions. Switch to Custom for full control.</p>
                       )}
                     </div>
 
-                    <div className="border-t border-white/[0.06]" />
+                    <div className="border-t border-[var(--border-default)]" />
 
                     {/* Database */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5">
                         <Database size={12} className="text-rose-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A5A1C2]">Database</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Database</span>
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-medium mb-1.5 text-[#71717a]">Database Backend</label>
+                        <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Database Backend</label>
                         <div className="relative">
                           <select
                             className="config-input text-sm appearance-none pr-8 cursor-pointer"
                             value={mlDatabase}
                             onChange={(e) => setMlDatabase(e.target.value)}
                           >
-                            <option value="pglite" style={{ background: '#0D0B1A' }}>PGLite (default)</option>
-                            <option value="postgresql" style={{ background: '#0D0B1A' }}>PostgreSQL</option>
+                            <option value="pglite" style={{ background: 'var(--bg-base)' }}>PGLite (default)</option>
+                            <option value="postgresql" style={{ background: 'var(--bg-base)' }}>PostgreSQL</option>
                           </select>
-                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                         </div>
-                        <p className="text-[10px] mt-1 text-[#71717a]">PGLite runs embedded. PostgreSQL is for production-scale deployments.</p>
+                        <p className="text-[10px] mt-1 text-[var(--text-muted)]">PGLite runs embedded. PostgreSQL is for production-scale deployments.</p>
                       </div>
                     </div>
                   </>
@@ -1316,12 +1316,12 @@ export function ConfigTab() {
           <div className="w-7 h-7 rounded-lg bg-cyan-500/10 flex items-center justify-center">
             <Zap size={14} className="text-cyan-400" />
           </div>
-          <h3 className="text-sm font-semibold text-[#A5A1C2]">AI Model</h3>
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">AI Model</h3>
         </div>
         <div className="space-y-4">
           {/* 1. LLM Mode toggle */}
           <div>
-            <label className="block text-[11px] font-medium uppercase tracking-wider mb-2 text-[#71717a]">Mode</label>
+            <label className="block text-[11px] font-medium uppercase tracking-wider mb-2 text-[var(--text-muted)]">Mode</label>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
@@ -1332,8 +1332,8 @@ export function ConfigTab() {
                 }}
                 className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-left transition-all ${
                   configProvider === 'groq'
-                    ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-white'
-                    : 'border-white/[0.06] bg-white/[0.02] text-[#71717a] hover:border-white/[0.12]'
+                    ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[var(--text-primary)]'
+                    : 'border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-muted)] hover:border-[var(--border-hover)]'
                 }`}
               >
                 <Zap size={16} className={configProvider === 'groq' ? 'text-[#06b6d4]' : ''} />
@@ -1354,8 +1354,8 @@ export function ConfigTab() {
                 }}
                 className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-left transition-all ${
                   configProvider !== 'groq'
-                    ? 'border-emerald-500/40 bg-emerald-500/10 text-white'
-                    : 'border-white/[0.06] bg-white/[0.02] text-[#71717a] hover:border-white/[0.12]'
+                    ? 'border-emerald-500/40 bg-emerald-500/10 text-[var(--text-primary)]'
+                    : 'border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-muted)] hover:border-[var(--border-hover)]'
                 }`}
               >
                 <Shield size={16} className={configProvider !== 'groq' ? 'text-emerald-400' : ''} />
@@ -1372,9 +1372,9 @@ export function ConfigTab() {
             <div className="rounded-xl p-4 border border-[#06b6d4]/20 bg-[#06b6d4]/5">
               <div className="flex items-center gap-2 mb-1">
                 <CheckCircle size={14} className="text-[#06b6d4]" />
-                <p className="text-xs font-medium text-white">Platform Model Active</p>
+                <p className="text-xs font-medium text-[var(--text-primary)]">Platform Model Active</p>
               </div>
-              <p className="text-[10px] text-[#A5A1C2] ml-[22px]">
+              <p className="text-[10px] text-[var(--text-secondary)] ml-[22px]">
                 Your agent is using Hatcher&apos;s built-in AI model. No setup needed. Switch to &quot;Use Your Own AI&quot; to connect your own provider.
               </p>
             </div>
@@ -1385,7 +1385,7 @@ export function ConfigTab() {
             <>
               {/* BYOK Provider selector */}
               <div>
-                <label htmlFor="config-provider" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Provider</label>
+                <label htmlFor="config-provider" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Provider</label>
                 <div className="relative">
                   <select
                     id="config-provider"
@@ -1401,16 +1401,16 @@ export function ConfigTab() {
                     }}
                   >
                     {byokProvidersFiltered.map((p) => (
-                      <option key={p.key} value={p.key} style={{ background: '#0D0B1A' }}>{p.name} — {p.description}</option>
+                      <option key={p.key} value={p.key} style={{ background: 'var(--bg-base)' }}>{p.name} — {p.description}</option>
                     ))}
                   </select>
-                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                 </div>
               </div>
 
               {/* BYOK Model selector */}
               <div>
-                <label htmlFor="config-model" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Model</label>
+                <label htmlFor="config-model" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Model</label>
                 {!useCustomModel ? (
                   <>
                     <div className="relative">
@@ -1428,15 +1428,15 @@ export function ConfigTab() {
                         }}
                       >
                         {providerModels.map((m) => (
-                          <option key={m.id} value={m.id} style={{ background: '#0D0B1A' }}>
+                          <option key={m.id} value={m.id} style={{ background: 'var(--bg-base)' }}>
                             {m.name}{m.context ? ` (${m.context})` : ''}
                           </option>
                         ))}
-                        <option value="__custom__" style={{ background: '#0D0B1A' }}>Custom model...</option>
+                        <option value="__custom__" style={{ background: 'var(--bg-base)' }}>Custom model...</option>
                       </select>
-                      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+                      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                     </div>
-                    <p className="text-[10px] mt-1 text-[#71717a]">
+                    <p className="text-[10px] mt-1 text-[var(--text-muted)]">
                       Select a model or choose &quot;Custom model...&quot; to enter an ID manually.
                     </p>
                   </>
@@ -1451,7 +1451,7 @@ export function ConfigTab() {
                       placeholder="e.g. my-fine-tuned-model-v2"
                     />
                     <div className="flex items-center justify-between mt-1">
-                      <p className="text-[10px] text-[#71717a]">
+                      <p className="text-[10px] text-[var(--text-muted)]">
                         Enter a custom model ID for {currentProviderMeta?.name ?? configProvider}.
                       </p>
                       <button
@@ -1478,7 +1478,7 @@ export function ConfigTab() {
           {/* 3. BYOK API Key — only shown in BYOK mode */}
           {configProvider !== 'groq' && (
             <div>
-              <label htmlFor="config-byok-key" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">
+              <label htmlFor="config-byok-key" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">
                 API Key <span className="text-red-400">*</span>
               </label>
               <div className="relative">
@@ -1492,13 +1492,13 @@ export function ConfigTab() {
                 />
                 <button
                   type="button"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
                   onClick={() => setShowByokKey(!showByokKey)}
                 >
                   {showByokKey ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
               </div>
-              <p className="text-[10px] mt-1 text-[#71717a]">
+              <p className="text-[10px] mt-1 text-[var(--text-muted)]">
                 {hasApiKey
                   ? 'Key already saved. Enter a new one to replace it. Your key is securely encrypted and never shared.'
                   : 'Your key is securely encrypted and never shared.'}
@@ -1515,7 +1515,7 @@ export function ConfigTab() {
               {/* Revert to Free Tier button */}
               <button
                 type="button"
-                className="mt-3 flex items-center gap-1.5 text-xs text-[#A5A1C2] hover:text-[#F0EEFC] border border-[rgba(46,43,74,0.6)] hover:border-[rgba(124,58,237,0.5)] bg-transparent hover:bg-[#2E2B4A] rounded-xl px-3 py-1.5 transition-all duration-200 font-medium"
+                className="mt-3 flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[rgba(46,43,74,0.6)] hover:border-[rgba(124,58,237,0.5)] bg-transparent hover:bg-[#2E2B4A] rounded-xl px-3 py-1.5 transition-all duration-200 font-medium"
                 onClick={() => {
                   const groqMeta = getBYOKProvider('groq');
                   setConfigProvider('groq');
@@ -1559,7 +1559,7 @@ export function ConfigTab() {
       {/* Change note + Save button */}
       <div className="space-y-3 pt-2">
         <div>
-          <label htmlFor="commit-message" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[#71717a]">Change Note <span className="normal-case font-normal">(optional)</span></label>
+          <label htmlFor="commit-message" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Change Note <span className="normal-case font-normal">(optional)</span></label>
           <input
             id="commit-message"
             type="text"
@@ -1613,17 +1613,17 @@ function ToggleSwitch({ label, checked, onChange, helper }: {
         className="flex items-center justify-between w-full group"
       >
         <div className="flex-1 text-left">
-          <span className="text-xs font-medium text-[#A5A1C2] group-hover:text-white transition-colors">{label}</span>
+          <span className="text-xs font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">{label}</span>
         </div>
         <div className={`relative w-9 h-5 rounded-full transition-colors duration-200 flex-shrink-0 ${
-          checked ? 'bg-[#06b6d4]' : 'bg-white/[0.08] border border-white/[0.12]'
+          checked ? 'bg-[#06b6d4]' : 'bg-[var(--bg-hover)] border border-[var(--border-hover)]'
         }`}>
           <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
             checked ? 'translate-x-[18px]' : 'translate-x-0.5'
           }`} />
         </div>
       </button>
-      {helper && <p className="text-[10px] mt-1 text-[#71717a]">{helper}</p>}
+      {helper && <p className="text-[10px] mt-1 text-[var(--text-muted)]">{helper}</p>}
     </div>
   );
 }
@@ -1639,8 +1639,8 @@ function SliderInput({ label, value, onChange, min, max, helper }: {
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <label className="text-[11px] font-medium text-[#71717a]">{label}</label>
-        <span className="text-xs font-mono font-medium text-[#A5A1C2] bg-white/[0.04] px-2 py-0.5 rounded">{value}</span>
+        <label className="text-[11px] font-medium text-[var(--text-muted)]">{label}</label>
+        <span className="text-xs font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-2 py-0.5 rounded">{value}</span>
       </div>
       <input
         type="range"
@@ -1649,7 +1649,7 @@ function SliderInput({ label, value, onChange, min, max, helper }: {
         value={value}
         onChange={(e) => onChange(parseInt(e.target.value, 10))}
         className="w-full h-1.5 rounded-full appearance-none cursor-pointer
-          bg-white/[0.08]
+          bg-[var(--bg-hover)]
           [&::-webkit-slider-thumb]:appearance-none
           [&::-webkit-slider-thumb]:w-4
           [&::-webkit-slider-thumb]:h-4
@@ -1667,10 +1667,10 @@ function SliderInput({ label, value, onChange, min, max, helper }: {
           [&::-moz-range-thumb]:cursor-pointer"
       />
       <div className="flex justify-between mt-0.5">
-        <span className="text-[9px] text-[#71717a]">{min}</span>
-        <span className="text-[9px] text-[#71717a]">{max}</span>
+        <span className="text-[9px] text-[var(--text-muted)]">{min}</span>
+        <span className="text-[9px] text-[var(--text-muted)]">{max}</span>
       </div>
-      {helper && <p className="text-[10px] mt-0.5 text-[#71717a]">{helper}</p>}
+      {helper && <p className="text-[10px] mt-0.5 text-[var(--text-muted)]">{helper}</p>}
     </div>
   );
 }
@@ -1716,7 +1716,7 @@ function TagInput({ tags, onChange, placeholder, color = 'cyan' }: {
   }
 
   return (
-    <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-2.5 min-h-[42px]">
+    <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-2.5 min-h-[42px]">
       <div className="flex flex-wrap gap-1.5">
         {tags.map((tag, i) => (
           <span
@@ -1741,7 +1741,7 @@ function TagInput({ tags, onChange, placeholder, color = 'cyan' }: {
           onKeyDown={handleKeyDown}
           onBlur={addTag}
           placeholder={tags.length === 0 ? placeholder : ''}
-          className="flex-1 min-w-[100px] bg-transparent border-0 outline-none text-xs text-white placeholder:text-[#71717a] py-1 px-1"
+          className="flex-1 min-w-[100px] bg-transparent border-0 outline-none text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] py-1 px-1"
         />
       </div>
     </div>
@@ -1878,13 +1878,13 @@ function EnvVarsEditor({ agentId }: { agentId?: string }) {
             <Lock size={14} className="text-emerald-400" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-[#A5A1C2]">Environment Variables</h3>
+            <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Environment Variables</h3>
             {vars.length > 0 && !expanded && (
-              <p className="text-[10px] text-[#71717a] mt-0.5">{vars.length} variable{vars.length !== 1 ? 's' : ''} set</p>
+              <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{vars.length} variable{vars.length !== 1 ? 's' : ''} set</p>
             )}
           </div>
         </div>
-        {expanded ? <ChevronUp size={16} className="text-[#71717a]" /> : <ChevronDown size={16} className="text-[#71717a]" />}
+        {expanded ? <ChevronUp size={16} className="text-[var(--text-muted)]" /> : <ChevronDown size={16} className="text-[var(--text-muted)]" />}
       </button>
 
       <AnimatePresence>
@@ -1897,25 +1897,25 @@ function EnvVarsEditor({ agentId }: { agentId?: string }) {
             className="overflow-hidden"
           >
             <div className="mt-4 space-y-3">
-              <p className="text-[10px] text-[#71717a]">
+              <p className="text-[10px] text-[var(--text-muted)]">
                 Inject secrets and config into your agent container at startup. Values are encrypted at rest with AES-256-GCM and never exposed after saving.
               </p>
 
               {loading && (
                 <div className="flex items-center gap-2 py-2">
                   <div className="w-3 h-3 border-2 border-white/20 border-t-emerald-400 rounded-full animate-spin" />
-                  <span className="text-xs text-[#71717a]">Loading...</span>
+                  <span className="text-xs text-[var(--text-muted)]">Loading...</span>
                 </div>
               )}
 
               {!loading && vars.length === 0 && (
-                <p className="text-xs text-[#71717a] py-1">No environment variables set yet.</p>
+                <p className="text-xs text-[var(--text-muted)] py-1">No environment variables set yet.</p>
               )}
 
               {!loading && vars.map(v => (
-                <div key={v.key} className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3 space-y-2">
+                <div key={v.key} className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-3 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-medium text-[#A5A1C2]">{v.key}</span>
+                    <span className="text-xs font-mono font-medium text-[var(--text-secondary)]">{v.key}</span>
                     <div className="flex items-center gap-2">
                       {!v.editing && (
                         <button
@@ -1940,16 +1940,16 @@ function EnvVarsEditor({ agentId }: { agentId?: string }) {
                   {!v.editing && (
                     <div className="flex items-center gap-2">
                       <div
-                        className="flex-1 text-xs font-mono text-[#71717a] bg-white/[0.03] rounded px-2 py-1 border border-white/[0.04] cursor-pointer select-none"
+                        className="flex-1 text-xs font-mono text-[var(--text-muted)] bg-[var(--bg-card)] rounded px-2 py-1 border border-[var(--border-default)] cursor-pointer select-none"
                         onClick={() => setVars(prev => prev.map(x => x.key === v.key ? { ...x, visible: !x.visible } : x))}
                         title="Click to reveal/hide"
                       >
-                        {v.visible ? <span className="text-[#A5A1C2]">value set</span> : '••••••••••••'}
+                        {v.visible ? <span className="text-[var(--text-secondary)]">value set</span> : '••••••••••••'}
                       </div>
                       <button
                         type="button"
                         onClick={() => setVars(prev => prev.map(x => x.key === v.key ? { ...x, visible: !x.visible } : x))}
-                        className="text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+                        className="text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
                         title={v.visible ? 'Hide' : 'Reveal indicator'}
                       >
                         {v.visible ? <EyeOff size={13} /> : <Eye size={13} />}
@@ -1980,7 +1980,7 @@ function EnvVarsEditor({ agentId }: { agentId?: string }) {
                       <button
                         type="button"
                         onClick={() => setVars(prev => prev.map(x => x.key === v.key ? { ...x, editing: false, newValue: '' } : x))}
-                        className="text-[10px] font-medium text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+                        className="text-[10px] font-medium text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
                       >
                         Cancel
                       </button>
@@ -1991,8 +1991,8 @@ function EnvVarsEditor({ agentId }: { agentId?: string }) {
 
               {/* Add new variable */}
               {vars.length < MAX_ENV_VARS && (
-                <div className="rounded-lg border border-dashed border-white/[0.08] bg-white/[0.01] p-3 space-y-2">
-                  <p className="text-[10px] font-medium uppercase tracking-wider text-[#71717a]">Add Variable</p>
+                <div className="rounded-lg border border-dashed border-[var(--border-default)] bg-[var(--bg-card)] p-3 space-y-2">
+                  <p className="text-[10px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Add Variable</p>
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
@@ -2016,7 +2016,7 @@ function EnvVarsEditor({ agentId }: { agentId?: string }) {
                       <button
                         type="button"
                         onClick={() => setShowNewValue(!showNewValue)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
                       >
                         {showNewValue ? <EyeOff size={12} /> : <Eye size={12} />}
                       </button>
@@ -2130,9 +2130,9 @@ function ConfigHistory({ agentId }: { agentId?: string }) {
           <div className="w-7 h-7 rounded-lg bg-[#A78BFA]/10 flex items-center justify-center">
             <History size={14} className="text-[#A78BFA]" />
           </div>
-          <h3 className="text-sm font-semibold text-[#A5A1C2]">Config History</h3>
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Config History</h3>
         </div>
-        {expanded ? <ChevronUp size={16} className="text-[#71717a]" /> : <ChevronDown size={16} className="text-[#71717a]" />}
+        {expanded ? <ChevronUp size={16} className="text-[var(--text-muted)]" /> : <ChevronDown size={16} className="text-[var(--text-muted)]" />}
       </button>
 
       <AnimatePresence>
@@ -2148,12 +2148,12 @@ function ConfigHistory({ agentId }: { agentId?: string }) {
               {loading && (
                 <div className="flex items-center gap-2 py-3">
                   <div className="w-3 h-3 border-2 border-white/20 border-t-[#A78BFA] rounded-full animate-spin" />
-                  <span className="text-xs text-[#71717a]">Loading snapshots...</span>
+                  <span className="text-xs text-[var(--text-muted)]">Loading snapshots...</span>
                 </div>
               )}
 
               {!loading && snapshots.length === 0 && (
-                <p className="text-xs text-[#71717a] py-3">
+                <p className="text-xs text-[var(--text-muted)] py-3">
                   No config history yet. Changes will be tracked automatically.
                 </p>
               )}
@@ -2161,13 +2161,13 @@ function ConfigHistory({ agentId }: { agentId?: string }) {
               {!loading && snapshots.map((snap) => (
                 <div
                   key={snap.id}
-                  className="flex items-center justify-between p-3 rounded-lg border border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] transition-colors"
+                  className="flex items-center justify-between p-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] hover:border-[var(--border-hover)] transition-colors"
                 >
                   <div className="flex-1 min-w-0 mr-3">
-                    <p className="text-xs font-medium text-[#A5A1C2]">
+                    <p className="text-xs font-medium text-[var(--text-secondary)]">
                       {formatRelativeTime(snap.timestamp)}
                     </p>
-                    <p className="text-[10px] text-[#71717a] truncate mt-0.5 font-mono">
+                    <p className="text-[10px] text-[var(--text-muted)] truncate mt-0.5 font-mono">
                       {snap.preview}
                     </p>
                   </div>
@@ -2185,7 +2185,7 @@ function ConfigHistory({ agentId }: { agentId?: string }) {
                       <button
                         type="button"
                         onClick={() => setConfirmId(null)}
-                        className="text-[10px] font-medium text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+                        className="text-[10px] font-medium text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
                       >
                         Cancel
                       </button>

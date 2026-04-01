@@ -95,8 +95,8 @@ function RobotSVG() {
       {/* Eyes - white circles with dark pupils */}
       <circle cx="22" cy="28" r="6" fill="white" />
       <circle cx="38" cy="28" r="6" fill="white" />
-      <circle cx="23" cy="28" r="3" fill="#0a0a0f" />
-      <circle cx="39" cy="28" r="3" fill="#0a0a0f" />
+      <circle cx="23" cy="28" r="3" fill="var(--bg-base)" />
+      <circle cx="39" cy="28" r="3" fill="var(--bg-base)" />
       {/* Eye glint */}
       <circle cx="24.5" cy="26.5" r="1.2" fill="white" opacity="0.8" />
       <circle cx="40.5" cy="26.5" r="1.2" fill="white" opacity="0.8" />
@@ -188,7 +188,7 @@ export function IntroSplash({ onComplete }: { onComplete: () => void }) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#0a0a0f]"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-[var(--bg-base)]"
       animate={
         phase >= 4
           ? { opacity: 0, y: -60 }

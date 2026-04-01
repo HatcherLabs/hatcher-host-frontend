@@ -101,14 +101,14 @@ function SelectField({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium uppercase tracking-wider text-[#A5A1C2] mb-2">
+      <label className="block text-xs font-medium uppercase tracking-wider text-[var(--text-secondary)] mb-2">
         {label}
       </label>
       <div className="relative">
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full appearance-none bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors cursor-pointer"
+          className="w-full appearance-none bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors cursor-pointer"
         >
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -118,7 +118,7 @@ function SelectField({
         </select>
         <ChevronDown
           size={16}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6890] pointer-events-none"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
         />
       </div>
     </div>
@@ -239,12 +239,12 @@ export default function SupportPage() {
             </div>
             <div>
               <h1
-                className="text-2xl font-bold text-[#F0EEFC]"
+                className="text-2xl font-bold text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
                 Support
               </h1>
-              <p className="text-sm text-[#A5A1C2]">
+              <p className="text-sm text-[var(--text-secondary)]">
                 Get help with your agents, billing, or anything else
               </p>
             </div>
@@ -264,7 +264,7 @@ export default function SupportPage() {
               <Wrapper
                 key={link.label}
                 {...(extraProps as any)}
-                className="group flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl p-4 transition-all duration-200 hover:border-[#06b6d4]/30 hover:bg-white/[0.03] hover:-translate-y-[3px]"
+                className="group flex items-center gap-3 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl p-4 transition-all duration-200 hover:border-[#06b6d4]/30 hover:bg-[var(--bg-card)] hover:-translate-y-[3px]"
               >
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors"
@@ -274,14 +274,14 @@ export default function SupportPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-sm font-semibold text-[#F0EEFC] group-hover:text-[#06b6d4] transition-colors">
+                    <span className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-[#06b6d4] transition-colors">
                       {link.label}
                     </span>
                     {link.external && (
-                      <ExternalLink size={12} className="text-[#6B6890] group-hover:text-[#06b6d4]/60 transition-colors" />
+                      <ExternalLink size={12} className="text-[var(--text-muted)] group-hover:text-[#06b6d4]/60 transition-colors" />
                     )}
                   </div>
-                  <span className="text-xs text-[#6B6890]">{link.description}</span>
+                  <span className="text-xs text-[var(--text-muted)]">{link.description}</span>
                 </div>
               </Wrapper>
             );
@@ -290,8 +290,8 @@ export default function SupportPage() {
 
         {/* ─── Direct Contact ──────────────────────────────────── */}
         <motion.div variants={itemVariants}>
-          <div className="rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl p-5">
-            <p className="text-sm text-[#A5A1C2]">
+          <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl p-5">
+            <p className="text-sm text-[var(--text-secondary)]">
               Or email us directly at{' '}
               <a href="mailto:support@hatcher.host" className="text-[#06b6d4] hover:underline font-medium">
                 support@hatcher.host
@@ -312,12 +312,12 @@ export default function SupportPage() {
 
         {/* ─── Ticket Form / Success State ─────────────────────── */}
         <motion.div variants={itemVariants}>
-          <div className="rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl overflow-hidden">
+          <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl overflow-hidden">
             {/* Card header */}
-            <div className="flex items-center gap-2.5 px-6 pt-6 pb-4 border-b border-white/[0.04]">
+            <div className="flex items-center gap-2.5 px-6 pt-6 pb-4 border-b border-[var(--border-default)]">
               <Send size={16} className="text-[#06b6d4]" />
               <h2
-                className="text-base font-semibold text-[#F0EEFC]"
+                className="text-base font-semibold text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
                 Submit a Ticket
@@ -363,7 +363,7 @@ export default function SupportPage() {
                     </motion.div>
 
                     <motion.h3
-                      className="text-lg font-semibold text-[#F0EEFC] mb-2"
+                      className="text-lg font-semibold text-[var(--text-primary)] mb-2"
                       style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -372,7 +372,7 @@ export default function SupportPage() {
                       Ticket Submitted
                     </motion.h3>
                     <motion.p
-                      className="text-sm text-[#A5A1C2] mb-6 max-w-sm"
+                      className="text-sm text-[var(--text-secondary)] mb-6 max-w-sm"
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
@@ -382,9 +382,9 @@ export default function SupportPage() {
                     </motion.p>
                     <motion.button
                       onClick={resetForm}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all duration-200 hover:bg-white/[0.04]"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all duration-200 hover:bg-[var(--bg-card)]"
                       style={{
-                        color: '#A5A1C2',
+                        color: 'var(--text-secondary)',
                         borderColor: 'rgba(46,43,74,0.6)',
                       }}
                       initial={{ opacity: 0 }}
@@ -427,7 +427,7 @@ export default function SupportPage() {
 
                     {/* Subject */}
                     <div>
-                      <label className="block text-xs font-medium uppercase tracking-wider text-[#A5A1C2] mb-2">
+                      <label className="block text-xs font-medium uppercase tracking-wider text-[var(--text-secondary)] mb-2">
                         Subject <span className="text-[#F87171]">*</span>
                       </label>
                       <input
@@ -439,11 +439,11 @@ export default function SupportPage() {
                           }
                         }}
                         placeholder="Brief description of your issue"
-                        className="w-full bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] placeholder:text-[#6B6890] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors"
+                        className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors"
                         maxLength={SUBJECT_MAX}
                       />
                       <div className="flex justify-end mt-1">
-                        <span className={`text-[11px] ${subject.length > SUBJECT_MAX * 0.9 ? 'text-[#FBBF24]' : 'text-[#6B6890]'}`}>
+                        <span className={`text-[11px] ${subject.length > SUBJECT_MAX * 0.9 ? 'text-[#FBBF24]' : 'text-[var(--text-muted)]'}`}>
                           {subject.length}/{SUBJECT_MAX}
                         </span>
                       </div>
@@ -467,14 +467,14 @@ export default function SupportPage() {
 
                     {/* Agent selector (optional) */}
                     <div>
-                      <label className="block text-xs font-medium uppercase tracking-wider text-[#A5A1C2] mb-2">
-                        Related Agent <span className="text-[#6B6890] normal-case tracking-normal">(optional)</span>
+                      <label className="block text-xs font-medium uppercase tracking-wider text-[var(--text-secondary)] mb-2">
+                        Related Agent <span className="text-[var(--text-muted)] normal-case tracking-normal">(optional)</span>
                       </label>
                       <div className="relative">
                         <select
                           value={agentId}
                           onChange={(e) => setAgentId(e.target.value)}
-                          className="w-full appearance-none bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors cursor-pointer"
+                          className="w-full appearance-none bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors cursor-pointer"
                         >
                           <option value="">Select an agent...</option>
                           {agents.map((a) => (
@@ -484,15 +484,15 @@ export default function SupportPage() {
                           ))}
                         </select>
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
-                          <Bot size={14} className="text-[#6B6890]" />
-                          <ChevronDown size={16} className="text-[#6B6890]" />
+                          <Bot size={14} className="text-[var(--text-muted)]" />
+                          <ChevronDown size={16} className="text-[var(--text-muted)]" />
                         </div>
                       </div>
                     </div>
 
                     {/* Message */}
                     <div>
-                      <label className="block text-xs font-medium uppercase tracking-wider text-[#A5A1C2] mb-2">
+                      <label className="block text-xs font-medium uppercase tracking-wider text-[var(--text-secondary)] mb-2">
                         Message <span className="text-[#F87171]">*</span>
                       </label>
                       <textarea
@@ -504,11 +504,11 @@ export default function SupportPage() {
                         }}
                         placeholder="Describe your issue in detail..."
                         rows={6}
-                        className="w-full bg-[#252240] border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-[#F0EEFC] placeholder:text-[#6B6890] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors resize-y min-h-[120px]"
+                        className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors resize-y min-h-[120px]"
                         maxLength={MESSAGE_MAX}
                       />
                       <div className="flex justify-end mt-1">
-                        <span className={`text-[11px] ${message.length > MESSAGE_MAX * 0.9 ? 'text-[#FBBF24]' : 'text-[#6B6890]'}`}>
+                        <span className={`text-[11px] ${message.length > MESSAGE_MAX * 0.9 ? 'text-[#FBBF24]' : 'text-[var(--text-muted)]'}`}>
                           {message.length}/{MESSAGE_MAX.toLocaleString()}
                         </span>
                       </div>
@@ -547,18 +547,18 @@ export default function SupportPage() {
 
         {/* ─── Recent Tickets ──────────────────────────────────── */}
         <motion.div variants={itemVariants}>
-          <div className="rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.8)] backdrop-blur-xl overflow-hidden">
+          <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl overflow-hidden">
             {/* Section header */}
-            <div className="flex items-center gap-2.5 px-6 pt-6 pb-4 border-b border-white/[0.04]">
+            <div className="flex items-center gap-2.5 px-6 pt-6 pb-4 border-b border-[var(--border-default)]">
               <Ticket size={16} className="text-[#06b6d4]" />
               <h2
-                className="text-base font-semibold text-[#F0EEFC]"
+                className="text-base font-semibold text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
                 Recent Tickets
               </h2>
               {tickets.length > 0 && (
-                <span className="ml-auto text-xs font-medium text-[#6B6890]">
+                <span className="ml-auto text-xs font-medium text-[var(--text-muted)]">
                   {tickets.length} ticket{tickets.length !== 1 ? 's' : ''}
                 </span>
               )}
@@ -593,7 +593,7 @@ export default function SupportPage() {
                       open: { color: 'text-amber-400', bg: 'bg-amber-500/10', icon: Clock },
                       in_progress: { color: 'text-blue-400', bg: 'bg-blue-500/10', icon: MessageSquare },
                       resolved: { color: 'text-green-400', bg: 'bg-green-500/10', icon: CheckCircle2 },
-                      closed: { color: 'text-[#6B6890]', bg: 'bg-[#252240]', icon: XCircle },
+                      closed: { color: 'text-[var(--text-muted)]', bg: 'bg-[var(--bg-elevated)]', icon: XCircle },
                     };
                     const sc = statusConfig[ticket.status] ?? statusConfig.open;
                     const StatusIcon = sc.icon;
@@ -601,27 +601,27 @@ export default function SupportPage() {
                       <Link
                         key={ticket.id}
                         href={`/support/${ticket.id}`}
-                        className="flex items-center gap-3 px-6 py-4 transition-all duration-200 hover:bg-white/[0.02] hover:-translate-y-[2px] group"
+                        className="flex items-center gap-3 px-6 py-4 transition-all duration-200 hover:bg-[var(--bg-card)] hover:-translate-y-[2px] group"
                       >
                         <div className={`w-8 h-8 rounded-lg ${sc.bg} flex items-center justify-center flex-shrink-0`}>
                           <StatusIcon size={14} className={sc.color} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[#F0EEFC] truncate group-hover:text-[#06b6d4] transition-colors">
+                          <p className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-[#06b6d4] transition-colors">
                             {ticket.subject}
                           </p>
                           <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[11px] text-[#6B6890]">
+                            <span className="text-[11px] text-[var(--text-muted)]">
                               {ticket.category.replace('_', ' ')}
                             </span>
                             {ticket.agent && (
                               <>
-                                <span className="text-[#6B6890]">&middot;</span>
-                                <span className="text-[11px] text-[#6B6890]">{ticket.agent.name}</span>
+                                <span className="text-[var(--text-muted)]">&middot;</span>
+                                <span className="text-[11px] text-[var(--text-muted)]">{ticket.agent.name}</span>
                               </>
                             )}
-                            <span className="text-[#6B6890]">&middot;</span>
-                            <span className="text-[11px] text-[#6B6890]">
+                            <span className="text-[var(--text-muted)]">&middot;</span>
+                            <span className="text-[11px] text-[var(--text-muted)]">
                               {new Date(ticket.createdAt).toLocaleDateString()}
                             </span>
                           </div>

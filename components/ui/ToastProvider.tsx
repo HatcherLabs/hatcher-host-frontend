@@ -102,6 +102,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {/* Toast container -- fixed top-center */}
       <div
         className="pointer-events-none fixed top-20 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3 items-center w-full max-w-md px-4"
+        role="status"
         aria-live="polite"
         aria-label="Notifications"
       >

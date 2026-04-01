@@ -119,7 +119,7 @@ export function LogsTab() {
         <Info size={14} className={`${fwInfo.accent} mt-0.5 shrink-0`} />
         <div className="flex-1 min-w-0">
           <span className={`text-xs font-medium ${fwInfo.accent}`}>{fwInfo.label} Logs</span>
-          <p className="text-[11px] text-[#71717a] mt-0.5 leading-relaxed">{fwInfo.description}</p>
+          <p className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-relaxed">{fwInfo.description}</p>
         </div>
       </div>
 
@@ -137,7 +137,7 @@ export function LogsTab() {
               className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-mono transition-all cursor-pointer ${
                 logFilter === level
                   ? `${cfg.bg} ${cfg.border} ${cfg.color}`
-                  : 'border-white/[0.06] text-[#71717a] hover:border-white/[0.12] hover:text-[#A5A1C2]'
+                  : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-hover)] hover:text-[var(--text-secondary)]'
               }`}
             >
               <Icon size={10} />
@@ -146,12 +146,12 @@ export function LogsTab() {
             </button>
           );
         })}
-        <span className="text-[10px] text-[#71717a]/60 ml-1 tabular-nums">{logs.length} total</span>
+        <span className="text-[10px] text-[var(--text-muted)]/60 ml-1 tabular-nums">{logs.length} total</span>
       </div>
 
       {/* ── Filter bar ── */}
       <div className="flex items-center gap-2 flex-wrap">
-        <Filter size={14} className="text-[#71717a]" />
+        <Filter size={14} className="text-[var(--text-muted)]" />
         {(['all', 'info', 'warn', 'error'] as LogFilter[]).map((f) => {
           const filterColors: Record<string, string> = {
             all: '',
@@ -165,8 +165,8 @@ export function LogsTab() {
               onClick={() => setLogFilter(f)}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
                 logFilter === f
-                  ? (filterColors[f] || 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[#FFFFFF]')
-                  : 'border-[rgba(46,43,74,0.4)] text-[#71717a] hover:border-[rgba(46,43,74,0.6)] hover:text-[#A5A1C2]'
+                  ? (filterColors[f] || 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[var(--text-primary)]')
+                  : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)]'
               }`}
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -199,7 +199,7 @@ export function LogsTab() {
           className={`text-xs px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
             autoScroll
               ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
-              : 'border-[rgba(46,43,74,0.4)] text-[#71717a] hover:border-[rgba(46,43,74,0.6)] hover:text-[#A5A1C2]'
+              : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)]'
           }`}
         >
           <ArrowDownToLine size={12} className={autoScroll ? 'animate-bounce' : ''} />
@@ -209,7 +209,7 @@ export function LogsTab() {
         <button
           onClick={loadLogs}
           disabled={logsLoading}
-          className="text-xs px-3 py-1.5 rounded-lg border border-[rgba(46,43,74,0.4)] text-[#71717a] hover:border-[rgba(46,43,74,0.6)] hover:text-[#A5A1C2] transition-all flex items-center gap-1.5 cursor-pointer"
+          className="text-xs px-3 py-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)] transition-all flex items-center gap-1.5 cursor-pointer"
         >
           <RotateCcw size={12} className={logsLoading ? 'animate-spin' : ''} />
           {logsLoading ? 'Loading...' : 'Refresh'}
@@ -218,7 +218,7 @@ export function LogsTab() {
         <button
           onClick={handleDownload}
           disabled={logs.length === 0}
-          className="text-xs px-3 py-1.5 rounded-lg border border-[rgba(46,43,74,0.4)] text-[#71717a] hover:border-[rgba(46,43,74,0.6)] hover:text-[#A5A1C2] transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          className="text-xs px-3 py-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)] transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <Download size={12} />
           Download
@@ -227,18 +227,18 @@ export function LogsTab() {
 
       {/* Search bar */}
       <div className="relative">
-        <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717a] pointer-events-none" />
+        <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
         <input
           type="text"
           value={logSearch}
           onChange={(e) => setLogSearch(e.target.value)}
           placeholder="Search logs..."
-          className="w-full bg-[rgba(26,23,48,0.4)] border border-[rgba(46,43,74,0.4)] rounded-lg pl-8 pr-8 py-2 text-xs font-mono text-[#A5A1C2] placeholder-[#71717a] focus:outline-none focus:border-[#8b5cf6]/50 focus:bg-[rgba(26,23,48,0.6)] transition-all"
+          className="w-full bg-[var(--bg-card)] border border-[var(--border-default)] rounded-lg pl-8 pr-8 py-2 text-xs font-mono text-[var(--text-secondary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[#8b5cf6]/50 focus:bg-[var(--bg-elevated)] transition-all"
         />
         {logSearch && (
           <button
             onClick={() => setLogSearch('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717a] hover:text-[#A5A1C2] transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
           >
             <X size={12} />
           </button>
@@ -248,11 +248,11 @@ export function LogsTab() {
       {/* Log viewer */}
       <GlassCard className="!p-0 overflow-hidden">
         {/* Terminal-style header bar */}
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.04] bg-black/20">
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[var(--border-default)] bg-black/20">
           <span className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
           <span className="w-2.5 h-2.5 rounded-full bg-amber-500/60" />
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/60" />
-          <span className="ml-3 text-[10px] font-mono text-[#71717a]">
+          <span className="ml-3 text-[10px] font-mono text-[var(--text-muted)]">
             {agent.name} -- {filteredLogs.length}{logSearch || logFilter !== 'all' ? ` / ${logs.length}` : ''} entries
           </span>
           {autoScroll && (
@@ -269,8 +269,8 @@ export function LogsTab() {
             </div>
           ) : filteredLogs.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-48 gap-2">
-              <ScrollText size={24} className="text-[#71717a]/50" />
-              <p className="text-sm text-[#71717a]">
+              <ScrollText size={24} className="text-[var(--text-muted)]/50" />
+              <p className="text-sm text-[var(--text-muted)]">
                 {logs.length === 0
                   ? 'No logs available yet.'
                   : logSearch
@@ -300,7 +300,7 @@ export function LogsTab() {
                       {log.level}
                     </span>
                   )}
-                  <span className={`break-all flex-1 ${LOG_LEVEL_COLORS[log.level] ?? 'text-[#A5A1C2]'}`}>
+                  <span className={`break-all flex-1 ${LOG_LEVEL_COLORS[log.level] ?? 'text-[var(--text-secondary)]'}`}>
                     {logSearch
                       ? highlightMatch(log.message, logSearch)
                       : log.message}

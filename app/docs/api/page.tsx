@@ -64,8 +64,8 @@ function CodeTabs({ examples }: { examples: Record<Lang, string> }) {
   }
 
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-[#0D0B1A] overflow-hidden">
-      <div className="flex items-center justify-between border-b border-white/[0.06] px-1">
+    <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-base)] overflow-hidden">
+      <div className="flex items-center justify-between border-b border-[var(--border-default)] px-1">
         <div className="flex">
           {(Object.keys(examples) as Lang[]).map((lang) => (
             <button
@@ -75,7 +75,7 @@ function CodeTabs({ examples }: { examples: Record<Lang, string> }) {
                 'px-4 py-2.5 text-xs font-medium transition-all duration-200',
                 active === lang
                   ? 'text-[#06b6d4] border-b-2 border-[#06b6d4]'
-                  : 'text-[#6B6890] hover:text-[#A5A1C2]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
               )}
             >
               {labels[lang]}
@@ -84,13 +84,13 @@ function CodeTabs({ examples }: { examples: Record<Lang, string> }) {
         </div>
         <button
           onClick={handleCopy}
-          className="mr-2 p-1.5 rounded-lg text-[#6B6890] hover:text-[#06b6d4] hover:bg-[#06b6d4]/10 transition-all duration-200"
+          className="mr-2 p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[#06b6d4] hover:bg-[#06b6d4]/10 transition-all duration-200"
           aria-label="Copy code"
         >
           {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
         </button>
       </div>
-      <pre className="p-4 text-sm leading-relaxed overflow-x-auto font-[family-name:var(--font-mono)] text-[#A5A1C2]">
+      <pre className="p-4 text-sm leading-relaxed overflow-x-auto font-[family-name:var(--font-mono)] text-[var(--text-secondary)]">
         <code>{examples[active]}</code>
       </pre>
     </div>
@@ -140,10 +140,10 @@ function EndpointCard({ method, path, description, body, response, examples }: E
         className="w-full flex items-center gap-3 p-4 text-left group"
       >
         <MethodBadge method={method} />
-        <span className="font-[family-name:var(--font-mono)] text-sm text-[#F0EEFC] flex-1 truncate">
+        <span className="font-[family-name:var(--font-mono)] text-sm text-[var(--text-primary)] flex-1 truncate">
           {path}
         </span>
-        <span className="hidden sm:block text-xs text-[#6B6890] mr-2 flex-shrink-0 max-w-[200px] truncate">
+        <span className="hidden sm:block text-xs text-[var(--text-muted)] mr-2 flex-shrink-0 max-w-[200px] truncate">
           {description}
         </span>
         <motion.div
@@ -151,10 +151,10 @@ function EndpointCard({ method, path, description, body, response, examples }: E
           transition={{ duration: 0.2 }}
           className={cn(
             'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors',
-            open ? 'bg-[#06b6d4]/15' : 'bg-white/[0.03]'
+            open ? 'bg-[#06b6d4]/15' : 'bg-[var(--bg-card)]'
           )}
         >
-          <ChevronDown className={cn('w-4 h-4 transition-colors', open ? 'text-[#06b6d4]' : 'text-[#6B6890]')} />
+          <ChevronDown className={cn('w-4 h-4 transition-colors', open ? 'text-[#06b6d4]' : 'text-[var(--text-muted)]')} />
         </motion.div>
       </button>
       <AnimatePresence initial={false}>
@@ -169,26 +169,26 @@ function EndpointCard({ method, path, description, body, response, examples }: E
             <div className="px-4 pb-4 space-y-4">
               <div className="w-full h-px bg-gradient-to-r from-transparent via-[rgba(6,182,212,0.2)] to-transparent" />
 
-              <p className="text-sm text-[#A5A1C2]">{description}</p>
+              <p className="text-sm text-[var(--text-secondary)]">{description}</p>
 
               {body && (
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-[#6B6890] mb-2">Request Body</p>
-                  <pre className="p-3 rounded-lg bg-[#0D0B1A] border border-white/[0.06] text-xs font-[family-name:var(--font-mono)] text-[#A5A1C2] overflow-x-auto">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-2">Request Body</p>
+                  <pre className="p-3 rounded-lg bg-[var(--bg-base)] border border-[var(--border-default)] text-xs font-[family-name:var(--font-mono)] text-[var(--text-secondary)] overflow-x-auto">
                     <code>{body}</code>
                   </pre>
                 </div>
               )}
 
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#6B6890] mb-2">Response</p>
-                <pre className="p-3 rounded-lg bg-[#0D0B1A] border border-white/[0.06] text-xs font-[family-name:var(--font-mono)] text-[#A5A1C2] overflow-x-auto">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-2">Response</p>
+                <pre className="p-3 rounded-lg bg-[var(--bg-base)] border border-[var(--border-default)] text-xs font-[family-name:var(--font-mono)] text-[var(--text-secondary)] overflow-x-auto">
                   <code>{response}</code>
                 </pre>
               </div>
 
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#6B6890] mb-2">Example</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-2">Example</p>
                 <CodeTabs examples={examples} />
               </div>
             </div>
@@ -545,7 +545,7 @@ export default function ApiReferencePage() {
         <motion.div variants={cardVariants} className="mb-8">
           <Link
             href="/docs"
-            className="inline-flex items-center gap-2 text-sm text-[#6B6890] hover:text-[#06b6d4] transition-colors duration-200"
+            className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[#06b6d4] transition-colors duration-200"
           >
             <ArrowLeft size={16} />
             Back to Docs
@@ -559,12 +559,12 @@ export default function ApiReferencePage() {
             v1
           </div>
           <h1
-            className="text-4xl font-extrabold tracking-tight text-[#F0EEFC] sm:text-5xl"
+            className="text-4xl font-extrabold tracking-tight text-[var(--text-primary)] sm:text-5xl"
             style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
             API Reference
           </h1>
-          <p className="mt-4 max-w-2xl text-lg text-[#A5A1C2]">
+          <p className="mt-4 max-w-2xl text-lg text-[var(--text-secondary)]">
             Integrate your Hatcher agents into any application. Manage agents, send messages, and monitor status programmatically.
           </p>
         </motion.div>
@@ -577,31 +577,31 @@ export default function ApiReferencePage() {
                 <Shield size={16} className="text-[#06b6d4]" />
               </div>
               <h2
-                className="text-lg font-semibold text-[#F0EEFC]"
+                className="text-lg font-semibold text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
                 Authentication
               </h2>
             </div>
 
-            <p className="text-sm text-[#A5A1C2] mb-4 leading-relaxed">
+            <p className="text-sm text-[var(--text-secondary)] mb-4 leading-relaxed">
               All API requests require authentication using your platform API key. Include it in
-              the <code className="px-1.5 py-0.5 rounded bg-[#252240] text-[#06b6d4] font-[family-name:var(--font-mono)] text-xs">Authorization</code> header
+              the <code className="px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] text-[#06b6d4] font-[family-name:var(--font-mono)] text-xs">Authorization</code> header
               as a Bearer token.
             </p>
 
-            <div className="rounded-lg border border-white/[0.06] bg-[#0D0B1A] p-4 mb-4">
-              <code className="text-sm font-[family-name:var(--font-mono)] text-[#A5A1C2]">
+            <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-base)] p-4 mb-4">
+              <code className="text-sm font-[family-name:var(--font-mono)] text-[var(--text-secondary)]">
                 Authorization: Bearer <span className="text-[#06b6d4]">hk_your_api_key</span>
               </code>
             </div>
 
-            <p className="text-sm text-[#A5A1C2] mb-4 leading-relaxed">
+            <p className="text-sm text-[var(--text-secondary)] mb-4 leading-relaxed">
               You can find and regenerate your API key on the{' '}
               <Link href="/settings" className="text-[#06b6d4] hover:underline underline-offset-2 decoration-[#06b6d4]/30">
                 Settings page
               </Link>
-              . Keys are prefixed with <code className="px-1.5 py-0.5 rounded bg-[#252240] text-[#06b6d4] font-[family-name:var(--font-mono)] text-xs">hk_</code> for easy identification.
+              . Keys are prefixed with <code className="px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] text-[#06b6d4] font-[family-name:var(--font-mono)] text-xs">hk_</code> for easy identification.
             </p>
 
             <CodeTabs
@@ -638,40 +638,40 @@ data = res.json()['data']`,
                 <Zap size={16} className="text-[#06b6d4]" />
               </div>
               <h2
-                className="text-lg font-semibold text-[#F0EEFC]"
+                className="text-lg font-semibold text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
                 Rate Limits
               </h2>
             </div>
 
-            <p className="text-sm text-[#A5A1C2] mb-4 leading-relaxed">
+            <p className="text-sm text-[var(--text-secondary)] mb-4 leading-relaxed">
               API usage is rate-limited per day based on your plan. Rate limit information is included
               in every response header.
             </p>
 
-            <div className="rounded-xl border border-white/[0.06] overflow-hidden mb-4">
+            <div className="rounded-xl border border-[var(--border-default)] overflow-hidden mb-4">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/[0.06] bg-[#252240]/50">
-                    <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B6890]">Tier</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B6890]">Requests / Day</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B6890]">Price</th>
+                  <tr className="border-b border-[var(--border-default)] bg-[var(--bg-card)]">
+                    <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">Tier</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">Requests / Day</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">Price</th>
                   </tr>
                 </thead>
                 <tbody>
                   {RATE_LIMIT_TIERS.map((tier, i) => (
-                    <tr key={tier.tier} className={cn('border-b border-white/[0.04] transition-colors hover:bg-white/[0.02]', i === RATE_LIMIT_TIERS.length - 1 && 'border-b-0')}>
-                      <td className="px-4 py-3 font-medium text-[#F0EEFC]">{tier.tier}</td>
-                      <td className="px-4 py-3 font-[family-name:var(--font-mono)] text-[#A5A1C2]">{tier.requests}</td>
-                      <td className="px-4 py-3 text-[#A5A1C2]">{tier.price}</td>
+                    <tr key={tier.tier} className={cn('border-b border-[var(--border-default)] transition-colors hover:bg-[var(--bg-card)]', i === RATE_LIMIT_TIERS.length - 1 && 'border-b-0')}>
+                      <td className="px-4 py-3 font-medium text-[var(--text-primary)]">{tier.tier}</td>
+                      <td className="px-4 py-3 font-[family-name:var(--font-mono)] text-[var(--text-secondary)]">{tier.requests}</td>
+                      <td className="px-4 py-3 text-[var(--text-secondary)]">{tier.price}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
 
-            <p className="text-sm text-[#A5A1C2] mb-3 leading-relaxed">
+            <p className="text-sm text-[var(--text-secondary)] mb-3 leading-relaxed">
               Check the following response headers to monitor your usage:
             </p>
 
@@ -682,10 +682,10 @@ data = res.json()['data']`,
                 { header: 'X-RateLimit-Reset', desc: 'UTC timestamp when the limit resets' },
               ].map((h) => (
                 <div key={h.header} className="flex items-center gap-3 text-sm">
-                  <code className="px-2 py-0.5 rounded bg-[#252240] text-[#06b6d4] font-[family-name:var(--font-mono)] text-xs flex-shrink-0">
+                  <code className="px-2 py-0.5 rounded bg-[var(--bg-elevated)] text-[#06b6d4] font-[family-name:var(--font-mono)] text-xs flex-shrink-0">
                     {h.header}
                   </code>
-                  <span className="text-[#6B6890]">{h.desc}</span>
+                  <span className="text-[var(--text-muted)]">{h.desc}</span>
                 </div>
               ))}
             </div>
@@ -708,7 +708,7 @@ data = res.json()['data']`,
                     <Icon size={16} className="text-[#06b6d4]" />
                   </div>
                   <h2
-                    className="text-lg font-semibold text-[#F0EEFC]"
+                    className="text-lg font-semibold text-[var(--text-primary)]"
                     style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
                   >
                     {group.title}
@@ -732,23 +732,23 @@ data = res.json()['data']`,
                 <BarChart3 size={16} className="text-[#06b6d4]" />
               </div>
               <h2
-                className="text-lg font-semibold text-[#F0EEFC]"
+                className="text-lg font-semibold text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
                 Response Format
               </h2>
             </div>
 
-            <p className="text-sm text-[#A5A1C2] mb-4 leading-relaxed">
+            <p className="text-sm text-[var(--text-secondary)] mb-4 leading-relaxed">
               All API responses follow a consistent JSON structure. Successful responses include
-              a <code className="px-1.5 py-0.5 rounded bg-[#252240] text-green-400 font-[family-name:var(--font-mono)] text-xs">data</code> field.
-              Error responses include <code className="px-1.5 py-0.5 rounded bg-[#252240] text-red-400 font-[family-name:var(--font-mono)] text-xs">error</code> and <code className="px-1.5 py-0.5 rounded bg-[#252240] text-red-400 font-[family-name:var(--font-mono)] text-xs">code</code> fields.
+              a <code className="px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] text-green-400 font-[family-name:var(--font-mono)] text-xs">data</code> field.
+              Error responses include <code className="px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] text-red-400 font-[family-name:var(--font-mono)] text-xs">error</code> and <code className="px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] text-red-400 font-[family-name:var(--font-mono)] text-xs">code</code> fields.
             </p>
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-green-400 mb-2">Success</p>
-                <pre className="p-3 rounded-lg bg-[#0D0B1A] border border-green-500/15 text-xs font-[family-name:var(--font-mono)] text-[#A5A1C2] overflow-x-auto">
+                <pre className="p-3 rounded-lg bg-[var(--bg-base)] border border-green-500/15 text-xs font-[family-name:var(--font-mono)] text-[var(--text-secondary)] overflow-x-auto">
                   <code>{`{
   "success": true,
   "data": { ... }
@@ -757,7 +757,7 @@ data = res.json()['data']`,
               </div>
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-red-400 mb-2">Error</p>
-                <pre className="p-3 rounded-lg bg-[#0D0B1A] border border-red-500/15 text-xs font-[family-name:var(--font-mono)] text-[#A5A1C2] overflow-x-auto">
+                <pre className="p-3 rounded-lg bg-[var(--bg-base)] border border-red-500/15 text-xs font-[family-name:var(--font-mono)] text-[var(--text-secondary)] overflow-x-auto">
                   <code>{`{
   "success": false,
   "error": "Not found",
@@ -777,25 +777,25 @@ data = res.json()['data']`,
                 <Lock size={16} className="text-red-400" />
               </div>
               <h2
-                className="text-lg font-semibold text-[#F0EEFC]"
+                className="text-lg font-semibold text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
                 Error Codes
               </h2>
             </div>
 
-            <div className="rounded-xl border border-white/[0.06] overflow-hidden">
+            <div className="rounded-xl border border-[var(--border-default)] overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/[0.06] bg-[#252240]/50">
-                    <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B6890]">Code</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B6890]">HTTP</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#6B6890]">Description</th>
+                  <tr className="border-b border-[var(--border-default)] bg-[var(--bg-card)]">
+                    <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">Code</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">HTTP</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">Description</th>
                   </tr>
                 </thead>
                 <tbody>
                   {ERROR_CODES.map((err, i) => (
-                    <tr key={err.code} className={cn('border-b border-white/[0.04] transition-colors hover:bg-white/[0.02]', i === ERROR_CODES.length - 1 && 'border-b-0')}>
+                    <tr key={err.code} className={cn('border-b border-[var(--border-default)] transition-colors hover:bg-[var(--bg-card)]', i === ERROR_CODES.length - 1 && 'border-b-0')}>
                       <td className="px-4 py-3 font-[family-name:var(--font-mono)] text-xs text-[#06b6d4]">{err.code}</td>
                       <td className="px-4 py-3">
                         <span className={cn(
@@ -810,7 +810,7 @@ data = res.json()['data']`,
                           {err.http}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-[#A5A1C2]">{err.description}</td>
+                      <td className="px-4 py-3 text-[var(--text-secondary)]">{err.description}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -821,8 +821,8 @@ data = res.json()['data']`,
 
         {/* ── Help CTA ───────────────────────────────────────── */}
         <motion.div variants={cardVariants}>
-          <div className="rounded-2xl border border-white/[0.06] bg-[rgba(26,23,48,0.6)] p-8 text-center backdrop-blur-xl">
-            <p className="text-sm text-[#A5A1C2] mb-4">
+          <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-8 text-center backdrop-blur-xl">
+            <p className="text-sm text-[var(--text-secondary)] mb-4">
               Need help integrating? Check out the platform-specific guides.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
@@ -834,7 +834,7 @@ data = res.json()['data']`,
               </Link>
               <Link
                 href="/docs"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/[0.06] bg-[#1A1730] px-5 py-2.5 text-sm font-semibold text-[#A5A1C2] transition-all duration-200 hover:border-[#06b6d4]/30 hover:text-[#F0EEFC]"
+                className="inline-flex items-center gap-2 rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] px-5 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-200 hover:border-[#06b6d4]/30 hover:text-[var(--text-primary)]"
               >
                 All Documentation
               </Link>

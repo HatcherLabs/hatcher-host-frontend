@@ -519,7 +519,7 @@ export function KnowledgeTab() {
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.2 }}
-                      className="border-t border-white/[0.06]"
+                      className="border-t border-[var(--border-default)]"
                     >
                       <div className="p-3">
                         {viewLoading ? (

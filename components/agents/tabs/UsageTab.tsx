@@ -133,12 +133,12 @@ function ProgressBar({ value, max, color = '#06b6d4', label, colorCoded }: Progr
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-1.5">
-        {label && <span className="text-[11px] text-[#71717a]">{label}</span>}
-        <span className="text-[11px] font-medium text-[#A5A1C2] ml-auto">
+        {label && <span className="text-[11px] text-[var(--text-muted)]">{label}</span>}
+        <span className="text-[11px] font-medium text-[var(--text-secondary)] ml-auto">
           {value.toFixed(1)} / {max} {label?.includes('MB') ? 'MB' : '%'}
         </span>
       </div>
-      <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+      <div className="h-1.5 rounded-full bg-[var(--bg-card)] overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
@@ -168,12 +168,12 @@ function MessageProgressBar({ used, limit }: { used: number; limit: number }) {
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-2">
-        <span className="text-[11px] text-[#71717a]">Daily usage</span>
+        <span className="text-[11px] text-[var(--text-muted)]">Daily usage</span>
         <span className="text-xs font-medium" style={{ color: barColor }}>
           {pct.toFixed(0)}%
         </span>
       </div>
-      <div className={`h-2.5 rounded-full bg-white/[0.06] overflow-hidden ${bgGlow}`}>
+      <div className={`h-2.5 rounded-full bg-[var(--bg-card)] overflow-hidden ${bgGlow}`}>
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
@@ -183,8 +183,8 @@ function MessageProgressBar({ used, limit }: { used: number; limit: number }) {
         />
       </div>
       <div className="flex justify-between items-center mt-1.5">
-        <span className="text-[10px] text-[#71717a]">{used} used</span>
-        <span className="text-[10px] text-[#71717a]">{limit} limit</span>
+        <span className="text-[10px] text-[var(--text-muted)]">{used} used</span>
+        <span className="text-[10px] text-[var(--text-muted)]">{limit} limit</span>
       </div>
     </div>
   );
@@ -238,15 +238,15 @@ export function UsageTab() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border p-5 animate-pulse" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
-              <div className="h-4 w-24 bg-white/[0.06] rounded mb-3" />
-              <div className="h-8 w-16 bg-white/[0.06] rounded" />
+            <div key={i} className="rounded-2xl border p-5 animate-pulse" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
+              <div className="h-4 w-24 bg-[var(--bg-card)] rounded mb-3" />
+              <div className="h-8 w-16 bg-[var(--bg-card)] rounded" />
             </div>
           ))}
         </div>
       ) : error ? (
-        <div className="rounded-2xl border p-8 flex items-center justify-center" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
-          <p className="text-sm text-[#6B6890]">{error}</p>
+        <div className="rounded-2xl border p-8 flex items-center justify-center" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
+          <p className="text-sm text-[var(--text-muted)]">{error}</p>
         </div>
       ) : data ? (
         <>
@@ -264,7 +264,7 @@ export function UsageTab() {
                     {tierBadge.label} Tier
                   </span>
                 </div>
-                <p className={`text-[11px] leading-relaxed text-[#A5A1C2]`}>
+                <p className={`text-[11px] leading-relaxed text-[var(--text-secondary)]`}>
                   {fwCtx.text}
                 </p>
               </div>
@@ -272,11 +272,11 @@ export function UsageTab() {
           </div>
 
           {/* ── Messages Today ── */}
-          <div className="rounded-2xl border p-5" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
+          <div className="rounded-2xl border p-5" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <MessageSquare size={16} className="text-[#06b6d4]" />
-                <h3 className="text-sm font-semibold text-[#fafafa]">Messages Today</h3>
+                <h3 className="text-sm font-semibold text-[var(--text-primary)]">Messages Today</h3>
               </div>
               <div className="flex items-center gap-2">
                 {data.messages.isByok ? (
@@ -297,9 +297,9 @@ export function UsageTab() {
             </div>
 
             <div className="flex items-end gap-3 mb-4">
-              <span className="text-3xl font-bold text-[#fafafa]">{data.messages.today}</span>
+              <span className="text-3xl font-bold text-[var(--text-primary)]">{data.messages.today}</span>
               {!data.messages.isByok && data.messages.limit > 0 && (
-                <span className="text-base text-[#71717a] mb-1">/ {data.messages.limit} daily</span>
+                <span className="text-base text-[var(--text-muted)] mb-1">/ {data.messages.limit} daily</span>
               )}
               {data.messages.isByok && (
                 <span className="text-base text-emerald-400/60 mb-1">messages sent</span>
@@ -309,7 +309,7 @@ export function UsageTab() {
             {data.messages.isByok ? (
               /* BYOK — show unlimited indicator instead of progress bar */
               <div className="rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] p-3 flex items-center gap-3">
-                <div className="h-2.5 flex-1 rounded-full bg-white/[0.04] overflow-hidden">
+                <div className="h-2.5 flex-1 rounded-full bg-[var(--bg-card)] overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: '100%' }}
@@ -327,13 +327,13 @@ export function UsageTab() {
           </div>
 
           {/* ── 7-day Message Chart ── */}
-          <div className="rounded-2xl border p-5" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
+          <div className="rounded-2xl border p-5" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <TrendingUp size={16} className="text-[#06b6d4]" />
-                <h3 className="text-sm font-semibold text-[#fafafa]">Message Activity</h3>
+                <h3 className="text-sm font-semibold text-[var(--text-primary)]">Message Activity</h3>
               </div>
-              <span className="text-[10px] text-[#71717a] uppercase tracking-wider">Last 7 days</span>
+              <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Last 7 days</span>
             </div>
 
             <div className="flex items-end gap-1.5 h-28 mb-1">
@@ -342,7 +342,7 @@ export function UsageTab() {
                 const isToday = i === data.messages.chart.length - 1;
                 return (
                   <div key={d.date} className="flex-1 flex flex-col items-center gap-1 group relative">
-                    <span className={`text-[10px] font-medium transition-colors ${isToday ? 'text-[#06b6d4]' : 'text-[#71717a] group-hover:text-[#A5A1C2]'}`}>
+                    <span className={`text-[10px] font-medium transition-colors ${isToday ? 'text-[#06b6d4]' : 'text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]'}`}>
                       {d.count > 0 ? d.count : ''}
                     </span>
                     <div
@@ -352,10 +352,10 @@ export function UsageTab() {
                       style={{ height: `${Math.max(heightPct, d.count > 0 ? 4 : 1)}%` }}
                     />
                     <div className="flex flex-col items-center">
-                      <span className={`text-[9px] ${isToday ? 'text-[#06b6d4] font-medium' : 'text-[#71717a]'}`}>
+                      <span className={`text-[9px] ${isToday ? 'text-[#06b6d4] font-medium' : 'text-[var(--text-muted)]'}`}>
                         {isToday ? 'Today' : formatWeekday(d.date)}
                       </span>
-                      <span className="text-[8px] text-[#71717a]/60">{formatChartDate(d.date)}</span>
+                      <span className="text-[8px] text-[var(--text-muted)]/60">{formatChartDate(d.date)}</span>
                     </div>
                   </div>
                 );
@@ -366,50 +366,50 @@ export function UsageTab() {
           {/* ── Bottom Row: Uptime + Resources + Storage ── */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Uptime */}
-            <div className="rounded-2xl border p-5" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
+            <div className="rounded-2xl border p-5" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
               <div className="flex items-center gap-2 mb-4">
                 <Clock size={16} className="text-[#06b6d4]" />
-                <h3 className="text-sm font-semibold text-[#fafafa]">Uptime</h3>
+                <h3 className="text-sm font-semibold text-[var(--text-primary)]">Uptime</h3>
               </div>
               <div className="space-y-2">
                 <div>
-                  <p className="text-2xl font-bold text-[#fafafa]">
+                  <p className="text-2xl font-bold text-[var(--text-primary)]">
                     {data.uptime.seconds > 0 ? formatUptime(data.uptime.seconds) : '—'}
                   </p>
-                  <p className="text-[11px] text-[#71717a] mt-0.5">
+                  <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
                     {data.uptime.since
                       ? `Since ${new Date(data.uptime.since).toLocaleString()}`
                       : data.uptime.status === 'sleeping' ? 'Agent sleeping' : 'Agent not running'}
                   </p>
                 </div>
-                <div className="pt-2 border-t border-white/[0.04]">
+                <div className="pt-2 border-t border-[var(--border-default)]">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-[#71717a]">Reliability</span>
+                    <span className="text-[11px] text-[var(--text-muted)]">Reliability</span>
                     <span className="text-[11px] font-medium text-emerald-400">{data.uptime.percent}%</span>
                   </div>
                   <div className="flex items-center justify-between mt-1">
-                    <span className="text-[11px] text-[#71717a]">Days active</span>
-                    <span className="text-[11px] font-medium text-[#A5A1C2]">{data.uptime.daysActive}</span>
+                    <span className="text-[11px] text-[var(--text-muted)]">Days active</span>
+                    <span className="text-[11px] font-medium text-[var(--text-secondary)]">{data.uptime.daysActive}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* CPU & Memory */}
-            <div className="rounded-2xl border p-5" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
+            <div className="rounded-2xl border p-5" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
               <div className="flex items-center gap-2 mb-4">
                 <Cpu size={16} className="text-[#06b6d4]" />
-                <h3 className="text-sm font-semibold text-[#fafafa]">Resources</h3>
+                <h3 className="text-sm font-semibold text-[var(--text-primary)]">Resources</h3>
               </div>
               {data.uptime.status === 'active' ? (
                 <div className="space-y-4">
                   <div>
                     <div className="flex items-center gap-1.5 mb-1.5">
-                      <Activity size={12} className="text-[#71717a]" />
-                      <span className="text-[11px] text-[#71717a]">CPU</span>
-                      <span className="text-[11px] font-medium text-[#A5A1C2] ml-auto">{data.resources.cpuPercent.toFixed(1)}%</span>
+                      <Activity size={12} className="text-[var(--text-muted)]" />
+                      <span className="text-[11px] text-[var(--text-muted)]">CPU</span>
+                      <span className="text-[11px] font-medium text-[var(--text-secondary)] ml-auto">{data.resources.cpuPercent.toFixed(1)}%</span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+                    <div className="h-1.5 rounded-full bg-[var(--bg-card)] overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.min(100, data.resources.cpuPercent)}%` }}
@@ -417,17 +417,17 @@ export function UsageTab() {
                         className="h-full rounded-full bg-[#06b6d4]"
                       />
                     </div>
-                    <p className="text-[10px] text-[#71717a] mt-1">Limit: {data.resources.cpuLimit} vCPU</p>
+                    <p className="text-[10px] text-[var(--text-muted)] mt-1">Limit: {data.resources.cpuLimit} vCPU</p>
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5 mb-1.5">
-                      <Zap size={12} className="text-[#71717a]" />
-                      <span className="text-[11px] text-[#71717a]">Memory</span>
-                      <span className="text-[11px] font-medium text-[#A5A1C2] ml-auto">
+                      <Zap size={12} className="text-[var(--text-muted)]" />
+                      <span className="text-[11px] text-[var(--text-muted)]">Memory</span>
+                      <span className="text-[11px] font-medium text-[var(--text-secondary)] ml-auto">
                         {data.resources.memoryUsageMb.toFixed(0)} / {data.resources.memoryLimitMb} MB
                       </span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+                    <div className="h-1.5 rounded-full bg-[var(--bg-card)] overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${data.resources.memoryLimitMb > 0 ? Math.min(100, (data.resources.memoryUsageMb / data.resources.memoryLimitMb) * 100) : 0}%` }}
@@ -438,20 +438,20 @@ export function UsageTab() {
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-[#6B6890]">Agent not running</p>
+                <p className="text-sm text-[var(--text-muted)]">Agent not running</p>
               )}
             </div>
 
             {/* Storage */}
-            <div className="rounded-2xl border p-5" style={{ background: 'rgba(26,23,48,0.8)', borderColor: 'rgba(46,43,74,0.4)' }}>
+            <div className="rounded-2xl border p-5" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
               <div className="flex items-center gap-2 mb-4">
                 <HardDrive size={16} className="text-[#06b6d4]" />
-                <h3 className="text-sm font-semibold text-[#fafafa]">Storage</h3>
+                <h3 className="text-sm font-semibold text-[var(--text-primary)]">Storage</h3>
               </div>
               <div className="space-y-3">
                 <div className="flex items-end gap-2">
-                  <span className="text-2xl font-bold text-[#fafafa]">{data.storage.usedMb.toFixed(1)}</span>
-                  <span className="text-sm text-[#71717a] mb-0.5">/ {data.storage.limitMb} MB</span>
+                  <span className="text-2xl font-bold text-[var(--text-primary)]">{data.storage.usedMb.toFixed(1)}</span>
+                  <span className="text-sm text-[var(--text-muted)] mb-0.5">/ {data.storage.limitMb} MB</span>
                 </div>
                 <ProgressBar
                   value={data.storage.usedMb}
@@ -459,7 +459,7 @@ export function UsageTab() {
                   label="MB used"
                 />
                 {data.storage.usedMb === 0 && data.uptime.status !== 'active' && (
-                  <p className="text-[11px] text-[#71717a]">Start agent to measure storage</p>
+                  <p className="text-[11px] text-[var(--text-muted)]">Start agent to measure storage</p>
                 )}
               </div>
             </div>

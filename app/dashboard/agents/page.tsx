@@ -320,7 +320,7 @@ export default function MyAgentsPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 rounded-full border-2 border-[#06b6d4] border-t-transparent animate-spin mx-auto mb-4" />
-          <p className="text-[#A5A1C2]">Authenticating...</p>
+          <p className="text-[var(--text-secondary)]">Authenticating...</p>
         </div>
       </div>
     );
@@ -337,8 +337,8 @@ export default function MyAgentsPage() {
           <div className="w-20 h-20 rounded-2xl bg-[#06b6d4]/15 flex items-center justify-center mx-auto mb-6">
             <Zap size={40} className="text-[#06b6d4]" />
           </div>
-          <h1 className="text-2xl font-bold mb-3 text-[#FFFFFF]">Sign In Required</h1>
-          <p className="mb-8 text-sm text-[#A5A1C2]">
+          <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">Sign In Required</h1>
+          <p className="mb-8 text-sm text-[var(--text-secondary)]">
             Sign in to your account to access your agents.
           </p>
           <a href="/login" className="btn-primary px-8 py-3 inline-block">
@@ -394,8 +394,8 @@ export default function MyAgentsPage() {
           variants={cardVariants}
         >
           <div>
-            <h1 className="text-2xl font-bold text-[#FFFFFF]">My Agents</h1>
-            <p className="text-sm mt-0.5 text-[#A5A1C2]">
+            <h1 className="text-2xl font-bold text-[var(--text-primary)]">My Agents</h1>
+            <p className="text-sm mt-0.5 text-[var(--text-secondary)]">
               {agents.length === 0
                 ? 'Create your first agent to get started'
                 : `${agents.length} agent${agents.length !== 1 ? 's' : ''} total, ${activeCount} active`}
@@ -424,7 +424,7 @@ export default function MyAgentsPage() {
           variants={cardVariants}
         >
           {/* Status filters */}
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] overflow-x-auto flex-nowrap w-full sm:w-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-default)] overflow-x-auto flex-nowrap w-full sm:w-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {STATUS_FILTERS.map((f) => (
               <button
                 key={f.key}
@@ -432,7 +432,7 @@ export default function MyAgentsPage() {
                 className={`px-3.5 py-2 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer ${
                   statusFilter === f.key
                     ? 'bg-purple-500/15 text-[var(--text-primary)] shadow-[0_0_8px_rgba(139,92,246,0.15)]'
-                    : 'text-[#71717a] hover:text-[var(--text-primary)]'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 {f.label}
@@ -444,7 +444,7 @@ export default function MyAgentsPage() {
           <select
             value={frameworkFilter}
             onChange={(e) => setFrameworkFilter(e.target.value as FrameworkFilter)}
-            className="px-3 py-2.5 rounded-xl text-xs font-medium bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] text-[#A5A1C2] outline-none cursor-pointer appearance-none pr-7"
+            className="px-3 py-2.5 rounded-xl text-xs font-medium bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-secondary)] outline-none cursor-pointer appearance-none pr-7"
             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center' }}
           >
             {FRAMEWORK_FILTERS.map((f) => (
@@ -453,15 +453,15 @@ export default function MyAgentsPage() {
           </select>
 
           {/* Search */}
-          <div className="flex items-center gap-2 w-full sm:w-auto sm:flex-initial bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] backdrop-blur-xl rounded-xl">
-            <Search size={16} className="text-[#71717a] ml-3" />
+          <div className="flex items-center gap-2 w-full sm:w-auto sm:flex-initial bg-[var(--bg-elevated)] border border-[var(--border-default)] backdrop-blur-xl rounded-xl">
+            <Search size={16} className="text-[var(--text-muted)] ml-3" />
             <input
               ref={searchInputRef}
               type="text"
               placeholder="Search agents... ( / )"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-transparent outline-none text-sm w-full sm:w-48 text-[#FFFFFF] placeholder:text-[#71717a] px-2 py-2.5"
+              className="bg-transparent outline-none text-sm w-full sm:w-48 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] px-2 py-2.5"
             />
           </div>
 
@@ -469,7 +469,7 @@ export default function MyAgentsPage() {
           <select
             value={sortOption}
             onChange={(e) => setSortOption(e.target.value as SortOption)}
-            className="px-3 py-2.5 rounded-xl text-xs font-medium bg-[rgba(26,23,48,0.6)] border border-[rgba(46,43,74,0.3)] text-[#A5A1C2] outline-none cursor-pointer appearance-none pr-7"
+            className="px-3 py-2.5 rounded-xl text-xs font-medium bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-secondary)] outline-none cursor-pointer appearance-none pr-7"
             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center' }}
           >
             {SORT_OPTIONS.map((s) => (
@@ -518,10 +518,10 @@ export default function MyAgentsPage() {
               <div className="w-16 h-16 rounded-2xl bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mx-auto mb-6">
                 <Bot size={32} className="text-[#06b6d4]" />
               </div>
-              <h2 className="text-xl font-semibold text-[#FFFFFF] mb-2">
+              <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
                 No matching agents
               </h2>
-              <p className="text-sm text-[#A5A1C2] max-w-sm mb-6">
+              <p className="text-sm text-[var(--text-secondary)] max-w-sm mb-6">
                 Try adjusting your search or filter criteria.
               </p>
             </motion.div>
@@ -552,17 +552,17 @@ export default function MyAgentsPage() {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <h3 className="text-[#FFFFFF] font-semibold text-sm truncate group-hover:text-[#06b6d4] transition-colors">
+                        <h3 className="text-[var(--text-primary)] font-semibold text-sm truncate group-hover:text-[#06b6d4] transition-colors">
                           {agent.name}
                         </h3>
                         <StatusBadge status={agent.status} />
                       </div>
                       {agent.description ? (
-                        <p className="text-xs text-[#A5A1C2] mt-1 line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-[var(--text-secondary)] mt-1 line-clamp-2 leading-relaxed">
                           {agent.description}
                         </p>
                       ) : (
-                        <p className="text-xs text-[#71717a] mt-1 italic">No description</p>
+                        <p className="text-xs text-[var(--text-muted)] mt-1 italic">No description</p>
                       )}
                     </div>
                   </div>
@@ -579,8 +579,8 @@ export default function MyAgentsPage() {
                   </div>
 
                   {/* Footer: Created date + Quick actions */}
-                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-[rgba(46,43,74,0.3)]">
-                    <span className="flex items-center gap-1.5 text-xs text-[#71717a]">
+                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-[var(--border-default)]">
+                    <span className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
                       <Calendar size={12} />
                       {timeAgo(agent.createdAt)}
                     </span>

@@ -181,12 +181,12 @@ export function NotificationCenter() {
     <div className="relative" ref={containerRef}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="relative h-9 w-9 flex items-center justify-center rounded-lg hover:bg-white/[0.06] transition-colors"
+        className="relative h-9 w-9 flex items-center justify-center rounded-lg hover:bg-[var(--bg-card)] transition-colors"
         aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'}
         aria-expanded={open}
         aria-haspopup="true"
       >
-        <Bell size={18} className="text-[#a1a1aa]" aria-hidden="true" />
+        <Bell size={18} className="text-[var(--text-secondary)]" aria-hidden="true" />
         {unreadCount > 0 && (
           <span aria-hidden="true" className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-purple-600 text-[9px] font-bold text-white px-1">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -210,7 +210,7 @@ export function NotificationCenter() {
             transition={{ duration: 0.15 }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)]">
               <h3 className="text-sm font-semibold text-white">Notifications</h3>
               <div className="flex items-center gap-2">
                 {unreadCount > 0 && (
@@ -227,7 +227,7 @@ export function NotificationCenter() {
                   <button
                     onClick={clearAll}
                     aria-label="Clear all notifications"
-                    className="flex items-center gap-1 text-[10px] text-[#71717a] hover:text-red-400 transition-colors"
+                    className="flex items-center gap-1 text-[10px] text-[var(--text-muted)] hover:text-red-400 transition-colors"
                   >
                     <Trash2 size={10} aria-hidden="true" />
                     Clear
@@ -240,8 +240,8 @@ export function NotificationCenter() {
             <div className="max-h-80 overflow-y-auto">
               {visibleNotifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 px-4">
-                  <Activity size={24} className="text-[#71717a] mb-2" />
-                  <p className="text-xs text-[#71717a]">No notifications</p>
+                  <Activity size={24} className="text-[var(--text-muted)] mb-2" />
+                  <p className="text-xs text-[var(--text-muted)]">No notifications</p>
                 </div>
               ) : (
                 visibleNotifications.map((n) => {
@@ -249,13 +249,13 @@ export function NotificationCenter() {
                     ? new Date(n.timestamp).getTime() > new Date(readAt).getTime()
                     : true;
                   const Icon = ICON_MAP[n.type] || Activity;
-                  const colorClass = ICON_COLOR_MAP[n.type] || 'text-[#a1a1aa] bg-white/10';
+                  const colorClass = ICON_COLOR_MAP[n.type] || 'text-[var(--text-secondary)] bg-white/10';
                   const [iconText, iconBg] = colorClass.split(' ');
 
                   return (
                     <div
                       key={n.id}
-                      className={`group flex items-start gap-3 px-4 py-3 border-b border-white/[0.03] transition-colors ${
+                      className={`group flex items-start gap-3 px-4 py-3 border-b border-[var(--border-default)] transition-colors ${
                         isUnread ? 'bg-purple-500/[0.03]' : ''
                       }`}
                     >
@@ -263,19 +263,19 @@ export function NotificationCenter() {
                         <Icon size={14} className={iconText} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-xs leading-relaxed ${isUnread ? 'text-white' : 'text-[#a1a1aa]'}`}>
+                        <p className={`text-xs leading-relaxed ${isUnread ? 'text-white' : 'text-[var(--text-secondary)]'}`}>
                           {n.message}
                         </p>
-                        <p className="text-[10px] text-[#71717a] mt-0.5">
+                        <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
                           {timeAgo(n.timestamp)}
                         </p>
                       </div>
                       <button
                         onClick={() => dismissOne(n.id)}
-                        className="opacity-0 group-hover:opacity-100 flex-shrink-0 mt-0.5 p-1 rounded hover:bg-white/[0.06] transition-all focus:opacity-100"
+                        className="opacity-0 group-hover:opacity-100 flex-shrink-0 mt-0.5 p-1 rounded hover:bg-[var(--bg-card)] transition-all focus:opacity-100"
                         aria-label={`Dismiss notification: ${n.message}`}
                       >
-                        <X size={12} className="text-[#71717a]" aria-hidden="true" />
+                        <X size={12} className="text-[var(--text-muted)]" aria-hidden="true" />
                       </button>
                     </div>
                   );

@@ -23,10 +23,10 @@ function ResetForm() {
         <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
           <AlertTriangle className="w-6 h-6 text-amber-400" />
         </div>
-        <h1 className="text-xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
+        <h1 className="text-xl font-bold text-[var(--text-primary)] mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           Invalid Reset Link
         </h1>
-        <p className="text-sm text-[#A5A1C2] mb-6">
+        <p className="text-sm text-[var(--text-secondary)] mb-6">
           This reset link is missing or invalid. Please request a new one.
         </p>
         <Link
@@ -45,10 +45,10 @@ function ResetForm() {
         <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
           <CheckCircle className="w-6 h-6 text-emerald-400" />
         </div>
-        <h1 className="text-xl font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
+        <h1 className="text-xl font-bold text-[var(--text-primary)] mb-2" style={{ fontFamily: 'var(--font-display)' }}>
           Password Reset
         </h1>
-        <p className="text-sm text-[#A5A1C2] mb-6">
+        <p className="text-sm text-[var(--text-secondary)] mb-6">
           Your password has been updated. You can now sign in with your new password.
         </p>
         <Link
@@ -84,17 +84,17 @@ function ResetForm() {
         <div className="w-12 h-12 rounded-full bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mx-auto mb-4">
           <Lock className="w-6 h-6 text-[#06b6d4]" />
         </div>
-        <h1 className="text-2xl font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>
+        <h1 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
           Set new password
         </h1>
-        <p className="text-sm text-[#A5A1C2] mt-2">
+        <p className="text-sm text-[var(--text-secondary)] mt-2">
           Enter your new password below
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="password" className="block text-xs font-medium text-[#A5A1C2] mb-1.5">
+          <label htmlFor="password" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
             New Password
           </label>
           <input
@@ -105,13 +105,13 @@ function ResetForm() {
             required
             minLength={8}
             autoFocus
-            className="w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border border-white/[0.08] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[#71717a] transition-colors"
+            className="w-full h-10 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[var(--text-muted)] transition-colors"
             placeholder="At least 8 characters"
           />
         </div>
 
         <div>
-          <label htmlFor="confirm" className="block text-xs font-medium text-[#A5A1C2] mb-1.5">
+          <label htmlFor="confirm" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
             Confirm Password
           </label>
           <input
@@ -120,10 +120,10 @@ function ResetForm() {
             value={confirm}
             onChange={(e) => { setConfirm(e.target.value); setError(null); }}
             required
-            className={`w-full h-10 px-3 rounded-lg text-sm text-white bg-white/[0.04] border focus:outline-none focus:ring-1 placeholder:text-[#71717a] transition-colors ${
+            className={`w-full h-10 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border focus:outline-none focus:ring-1 placeholder:text-[var(--text-muted)] transition-colors ${
               confirm && !passwordsMatch
                 ? 'border-red-500/50 focus:border-red-500/50 focus:ring-red-500/30'
-                : 'border-white/[0.08] focus:border-cyan-500/50 focus:ring-cyan-500/30'
+                : 'border-[var(--border-default)] focus:border-cyan-500/50 focus:ring-cyan-500/30'
             }`}
             placeholder="Repeat your password"
           />
@@ -154,7 +154,7 @@ function ResetForm() {
         </button>
       </form>
 
-      <p className="text-center text-xs text-[#A5A1C2] mt-6">
+      <p className="text-center text-xs text-[var(--text-secondary)] mt-6">
         <Link href="/login" className="text-cyan-400 hover:text-cyan-300 transition-colors inline-flex items-center gap-1">
           <ArrowLeft size={12} />
           Back to sign in
@@ -168,12 +168,7 @@ export default function ResetPasswordPage() {
   return (
     <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4">
       <div
-        className="w-full max-w-sm rounded-2xl p-8"
-        style={{
-          background: 'rgba(13, 11, 26, 0.8)',
-          backdropFilter: 'blur(24px)',
-          border: '1px solid rgba(46, 43, 74, 0.4)',
-        }}
+        className="w-full max-w-sm rounded-2xl p-8 bg-[var(--bg-card)] border border-[var(--border-default)] backdrop-blur-xl shadow-lg"
       >
         <Suspense fallback={
           <div className="flex items-center justify-center py-12">
