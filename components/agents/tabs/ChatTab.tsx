@@ -226,11 +226,18 @@ export function ChatTab() {
   // Reset extra-loaded window when switching agents
   useEffect(() => { setExtraLoaded(0); }, [agent.id]);
 
-  // Lock body scroll while chat tab is mounted
+  // Prevent outer page scroll when interacting with chat
   useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = prev; };
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    const preventPageScroll = (e: WheelEvent) => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const atTop = scrollTop === 0 && e.deltaY < 0;
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 1 && e.deltaY > 0;
+      if (!atTop && !atBottom) e.preventDefault();
+    };
+    container.addEventListener('wheel', preventPageScroll, { passive: false });
+    return () => container.removeEventListener('wheel', preventPageScroll);
   }, []);
 
   // Scroll chat container to bottom when messages change — only if user is near bottom
