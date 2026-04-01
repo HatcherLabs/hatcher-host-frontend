@@ -386,11 +386,7 @@ export default function AnalyticsPage() {
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="text-[10px] text-[var(--text-muted)] w-4 text-right shrink-0">#{i + 1}</span>
                         <Link
-<<<<<<< Updated upstream
                           href={`/dashboard/agent/${agent.id}?tab=analytics`}
-=======
-                          href={`/dashboard/agent/${agent.id}?tab=stats`}
->>>>>>> Stashed changes
                           className="text-xs font-medium text-[var(--text-primary)] hover:text-[#06b6d4] transition-colors truncate"
                         >
                           {agent.name}
@@ -414,39 +410,6 @@ export default function AnalyticsPage() {
           )}
         </motion.div>
 
-<<<<<<< Updated upstream
-=======
-        {/* Token Usage Detail */}
-        {!loading && data && data.tokenSummary.totalTokens > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="rounded-2xl border p-6"
-            style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}
-          >
-            <div className="flex items-center gap-2 mb-5">
-              <Zap size={16} className="text-[#f59e0b]" />
-              <h3 className="text-sm font-semibold text-[var(--text-primary)]">LLM Token Usage</h3>
-              <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider ml-auto">Last 30 days</span>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {[
-                { label: 'Input Tokens', value: formatNumber(data.tokenSummary.inputTokens), color: '#8b5cf6' },
-                { label: 'Output Tokens', value: formatNumber(data.tokenSummary.outputTokens), color: '#06b6d4' },
-                { label: 'Total Tokens', value: formatNumber(data.tokenSummary.totalTokens), color: '#22c55e' },
-                { label: 'USD Cost', value: `$${data.tokenSummary.usdCost.toFixed(4)}`, color: '#f59e0b' },
-              ].map(({ label, value, color }) => (
-                <div key={label} className="rounded-xl p-4" style={{ background: 'rgba(46,43,74,0.3)' }}>
-                  <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">{label}</p>
-                  <p className="text-lg font-bold" style={{ color }}>{value}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
->>>>>>> Stashed changes
         {/* Empty state */}
         {!loading && !error && data?.totalAgents === 0 && (
           <div className="text-center py-16">

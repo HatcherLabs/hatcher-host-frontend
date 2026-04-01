@@ -631,11 +631,7 @@ export const api = {
 
   /** Admin: list all agents across all users */
   adminGetAgents: () =>
-<<<<<<< Updated upstream
     req<Array<Agent & { ownerWallet: string }>>('/admin/agents?limit=200&offset=0'),
-=======
-    req<Array<Agent & { ownerWallet: string }>>('/admin/agents'),
->>>>>>> Stashed changes
 
   adminGetStats: () =>
     req<{

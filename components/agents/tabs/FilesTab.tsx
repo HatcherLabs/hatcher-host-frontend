@@ -354,24 +354,15 @@ export function FilesTab() {
             <span className="text-[11px] font-medium text-amber-400">Add-on</span>
           </div>
 
-<<<<<<< Updated upstream
           <p className="text-sm text-[var(--text-secondary)] mb-6 max-w-sm mx-auto">
             Browse, edit, and download your agent&apos;s configuration and workspace files.
             <span className="block mt-1 text-xs text-[var(--text-muted)]">
               One-time purchase per agent — $4.99
-=======
-        <p className="text-sm text-[var(--text-secondary)] mb-6 max-w-sm mx-auto">
-          Browse, edit, and download your agent&apos;s configuration and workspace files.
-          {!isPro && (
-            <span className="block mt-1 text-xs text-[var(--text-muted)]">
-              Included with Pro plan, or unlock per-agent as an add-on.
->>>>>>> Stashed changes
             </span>
           </p>
           {error && (
             <p className="text-xs text-red-400 mb-3">{error}</p>
           )}
-<<<<<<< Updated upstream
           <div className="flex flex-col items-center gap-3">
             <button
               onClick={() => setShowPayModal(true)}
@@ -464,28 +455,6 @@ export function FilesTab() {
           )}
         </AnimatePresence>
       </>
-=======
-        </p>
-        <div className="flex flex-col items-center gap-3">
-          <button
-            onClick={handleUnlock}
-            disabled={purchasing}
-            className="px-6 py-2.5 rounded-xl text-sm font-medium text-white transition-colors flex items-center gap-2 disabled:opacity-50"
-            style={{ backgroundColor: accent.color }}
-          >
-            {purchasing ? (
-              <><Loader2 className="w-4 h-4 animate-spin" /> Unlocking...</>
-            ) : (
-              <><FolderOpen className="w-4 h-4" /> Unlock File Manager — $4.99</>
-            )}
-          </button>
-          <span className="text-xs text-[var(--text-muted)]">One-time purchase for this agent</span>
-          <Link href="/pricing" className="text-xs hover:underline transition-colors" style={{ color: accent.color }}>
-            Or upgrade to Pro for all agents
-          </Link>
-        </div>
-      </motion.div>
->>>>>>> Stashed changes
     );
   }
 

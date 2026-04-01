@@ -145,11 +145,7 @@ export default function AgentManagePage() {
   // Core state
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
-<<<<<<< Updated upstream
   const validTabs: Tab[] = ['overview','config','integrations','skills','files','logs','memory','knowledge','versions','chat','usage','analytics'];
-=======
-  const validTabs: Tab[] = ['overview','config','integrations','skills','files','logs','memory','knowledge','schedules','workflows','versions','chat','stats','usage','analytics'];
->>>>>>> Stashed changes
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const initialTab = validTabs.includes(searchParams.get('tab') as Tab)
     ? (searchParams.get('tab') as Tab)
