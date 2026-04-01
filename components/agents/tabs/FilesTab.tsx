@@ -477,11 +477,11 @@ export function FilesTab() {
         {/* Editor header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <button onClick={() => setEditingFile(null)} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-white hover:bg-[var(--bg-card)] transition-colors">
+            <button onClick={() => setEditingFile(null)} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors">
               <ArrowLeft size={16} />
             </button>
             {getFileIcon(editingFile.name, 'file')}
-            <span className="text-sm font-medium text-white font-mono">{editingFile.name}</span>
+            <span className="text-sm font-medium text-[var(--text-primary)] font-mono">{editingFile.name}</span>
             {isModified && <span className="text-[10px] text-amber-400 ml-1">Modified</span>}
             {isEnvFile && (
               <span className="text-[10px] text-red-400 bg-red-500/10 border border-red-500/20 rounded px-1.5 py-0.5 ml-1">
@@ -494,13 +494,13 @@ export function FilesTab() {
             <button
               onClick={handleSave}
               disabled={saving || !isModified}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white disabled:opacity-30 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--text-primary)] disabled:opacity-30 transition-colors"
               style={{ backgroundColor: isModified ? accent.color : undefined }}
             >
               {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
               Save
             </button>
-            <button onClick={() => setEditingFile(null)} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-white hover:bg-[var(--bg-card)] transition-colors">
+            <button onClick={() => setEditingFile(null)} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors">
               <X size={14} />
             </button>
           </div>
@@ -511,7 +511,7 @@ export function FilesTab() {
           {editingFile.path.split('/').filter(Boolean).map((seg, i, arr) => (
             <span key={i} className="flex items-center gap-1 flex-shrink-0">
               {i > 0 && <ChevronRight size={8} className="text-[#52525b]" />}
-              <span className={i === arr.length - 1 ? 'text-white' : ''}>{seg}</span>
+              <span className={i === arr.length - 1 ? 'text-[var(--text-primary)]' : ''}>{seg}</span>
             </span>
           ))}
         </div>
@@ -520,7 +520,7 @@ export function FilesTab() {
         <textarea
           value={editContent}
           onChange={(e) => setEditContent(e.target.value)}
-          className="w-full h-[500px] px-4 py-3 rounded-xl text-xs font-mono text-white bg-[var(--bg-base)]/90 border border-[var(--border-default)] focus:outline-none resize-none leading-relaxed"
+          className="w-full h-[500px] px-4 py-3 rounded-xl text-xs font-mono text-[var(--text-primary)] bg-[var(--bg-base)]/90 border border-[var(--border-default)] focus:outline-none resize-none leading-relaxed"
           style={{ borderColor: isModified ? accent.color + '40' : undefined }}
           spellCheck={false}
         />
@@ -548,7 +548,7 @@ export function FilesTab() {
           </div>
           <button
             onClick={() => setShowInfoBanner(false)}
-            className="p-0.5 rounded text-[var(--text-muted)] hover:text-white transition-colors flex-shrink-0"
+            className="p-0.5 rounded text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors flex-shrink-0"
           >
             <X size={12} />
           </button>
@@ -560,7 +560,7 @@ export function FilesTab() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1 text-xs overflow-x-auto flex-1 min-w-0">
             {currentPath !== ROOT_PATH && (
-              <button onClick={goUp} className="p-1 rounded-md text-[var(--text-muted)] hover:text-white hover:bg-[var(--bg-card)] transition-colors flex-shrink-0">
+              <button onClick={goUp} className="p-1 rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors flex-shrink-0">
                 <ArrowLeft size={14} />
               </button>
             )}
@@ -572,7 +572,7 @@ export function FilesTab() {
                   className={`px-1.5 py-0.5 rounded-md font-mono transition-colors ${
                     i === breadcrumbs.length - 1
                       ? `${accent.text} ${accent.bg}`
-                      : 'text-[var(--text-secondary)] hover:text-white hover:bg-[var(--bg-card)]'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)]'
                   }`}
                 >
                   {crumb.label === '~' ? (
@@ -600,7 +600,7 @@ export function FilesTab() {
                 )}
               </div>
             )}
-            <button onClick={() => loadFiles()} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-white hover:bg-[var(--bg-card)] transition-colors" title="Refresh">
+            <button onClick={() => loadFiles()} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors" title="Refresh">
               {loading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
             </button>
             <button
@@ -623,7 +623,7 @@ export function FilesTab() {
               onChange={(e) => setNewFileName(e.target.value)}
               placeholder="filename.json"
               autoFocus
-              className="w-full h-9 px-3 rounded-lg text-sm text-white bg-[var(--bg-card)] border border-[var(--border-default)] focus:outline-none placeholder:text-[var(--text-muted)] font-mono"
+              className="w-full h-9 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:outline-none placeholder:text-[var(--text-muted)] font-mono"
               style={{ borderColor: newFileName ? accent.color + '50' : undefined }}
             />
             <textarea
@@ -631,17 +631,17 @@ export function FilesTab() {
               onChange={(e) => setNewFileContent(e.target.value)}
               placeholder="File content (optional)..."
               rows={4}
-              className="w-full px-3 py-2 rounded-lg text-xs font-mono text-white bg-[var(--bg-card)] border border-[var(--border-default)] focus:outline-none placeholder:text-[var(--text-muted)]"
+              className="w-full px-3 py-2 rounded-lg text-xs font-mono text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:outline-none placeholder:text-[var(--text-muted)]"
               style={{ borderColor: newFileContent ? accent.color + '30' : undefined }}
             />
             <div className="flex items-center gap-2 justify-end">
-              <button onClick={() => { setCreating(false); setNewFileName(''); setNewFileContent(''); }} className="px-3 py-1.5 text-xs text-[var(--text-muted)] hover:text-white transition-colors">
+              <button onClick={() => { setCreating(false); setNewFileName(''); setNewFileContent(''); }} className="px-3 py-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
                 Cancel
               </button>
               <button
                 onClick={handleCreateFile}
                 disabled={creatingFile || !newFileName.trim()}
-                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium text-white disabled:opacity-50 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium text-[var(--text-primary)] disabled:opacity-50 transition-colors"
                 style={{ backgroundColor: accent.color }}
               >
                 {creatingFile ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
@@ -671,7 +671,7 @@ export function FilesTab() {
               >
                 <div className="flex items-center gap-3 min-w-0">
                   {getFileIcon(entry.name, entry.type)}
-                  <span className="text-sm text-white truncate font-mono">{entry.name}</span>
+                  <span className="text-sm text-[var(--text-primary)] truncate font-mono">{entry.name}</span>
                   {entry.type === 'directory' && <ChevronRight size={12} className="text-[var(--text-muted)]" />}
                   {tag && (
                     <span className={`text-[9px] px-1.5 py-0.5 rounded border font-medium tracking-wide ${tag.color}`}>
