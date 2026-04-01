@@ -1035,7 +1035,8 @@ export function IntegrationsTab() {
           <DomainsSection />
 
           {/* Embed Widget */}
-          <EmbedWidgetSection slug={agent?.slug ?? undefined} />
+          {/* Embed widget disabled — re-enable after adding abuse protection */}
+          {/* <EmbedWidgetSection slug={agent?.slug ?? undefined} /> */}
 
           {/* Legend */}
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 pt-2 border-t border-[var(--border-default)]">

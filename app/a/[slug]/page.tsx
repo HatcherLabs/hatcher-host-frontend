@@ -196,35 +196,12 @@ export default function AgentPublicProfilePage() {
             <span className="font-semibold text-white">Hatcher</span>
           </Link>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowEmbed(!showEmbed)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
-            >
-              <Code2 className="w-3.5 h-3.5" />
-              Embed
-            </button>
-            <button
-              onClick={() => setShowShareModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
-            >
-              <Share2 className="w-3.5 h-3.5" />
-              Share
-            </button>
+            {/* Embed + Share disabled until abuse protection is implemented */}
           </div>
         </div>
       </header>
 
-      {/* Embed code panel */}
-      {showEmbed && (
-        <div className="border-b border-white/5 bg-violet-950/20">
-          <div className="max-w-5xl mx-auto px-4 py-4">
-            <p className="text-xs text-zinc-400 mb-2">Embed this agent on your website:</p>
-            <pre className="bg-[var(--bg-elevated)] border border-white/10 rounded-lg p-3 text-xs text-violet-300 overflow-x-auto whitespace-pre-wrap">
-              {embedCode}
-            </pre>
-          </div>
-        </div>
-      )}
+      {/* Embed code panel — disabled until abuse protection */}
 
       <div className="max-w-5xl mx-auto px-4 py-6 flex-1 flex flex-col gap-6 w-full">
         {/* Agent profile card */}
