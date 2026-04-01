@@ -253,7 +253,7 @@ export function FilesTab() {
       const res = await api.stripeCheckoutAddon('addon.file_manager', window.location.href, agentId);
       if (res.success && res.data.url) {
         window.location.href = res.data.url;
-      } else {
+      } else if (!res.success) {
         setError(res.error ?? 'Failed to start checkout');
         setPurchasing(false);
       }
