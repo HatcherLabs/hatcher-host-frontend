@@ -102,7 +102,20 @@ export function useVoice() {
     setTtsSupported(hasTTS);
 
     // Warm up: trigger voice loading early
-    if (hasTTS) getVoicesReady();
+    if (hasTTS) {
+      getVoicesReady();
+      // Unlock speechSynthesis on first user interaction (Chrome blocks without gesture)
+      const unlock = () => {
+        const utt = new SpeechSynthesisUtterance('');
+        utt.volume = 0;
+        window.speechSynthesis.speak(utt);
+        window.speechSynthesis.cancel();
+        document.removeEventListener('click', unlock);
+        document.removeEventListener('keydown', unlock);
+      };
+      document.addEventListener('click', unlock, { once: true });
+      document.addEventListener('keydown', unlock, { once: true });
+    }
 
     // Restore autoSpeak preference
     try {

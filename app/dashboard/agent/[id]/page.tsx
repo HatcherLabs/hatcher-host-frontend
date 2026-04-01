@@ -1151,19 +1151,7 @@ export default function AgentManagePage() {
                   <span className="hidden sm:inline">{actionLoading === 'start' ? 'Starting...' : 'Start'}</span>
                 </button>
               )}
-              <button
-                onClick={handleClone}
-                disabled={cloning}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-violet-500/40 hover:bg-violet-500/10 transition-all disabled:opacity-40"
-                title="Clone agent"
-              >
-                {cloning ? (
-                  <div className="w-3 h-3 border-2 border-[#A5A1C2]/30 border-t-[#A5A1C2] rounded-full animate-spin" />
-                ) : (
-                  <Copy size={13} />
-                )}
-                <span className="hidden sm:inline">{cloning ? 'Cloning...' : 'Clone'}</span>
-              </button>
+              {/* Clone disabled — re-enable with proper agent limit enforcement */}
               <button
                 onClick={handleDelete}
                 disabled={deleting}

@@ -717,16 +717,12 @@ export function ChatTab() {
               onKeyDown={handleKeyDown}
               onInput={(e) => {
                 const el = e.currentTarget;
-                const scrollParent = el.closest('.overflow-y-auto')?.parentElement;
-                const prevScroll = scrollParent?.scrollTop ?? 0;
+                // Save window scroll position before resize
+                const winY = window.scrollY;
                 el.style.height = 'auto';
-                el.style.height = el.scrollHeight + 'px';
-                // Prevent page from jumping when textarea grows
-                if (scrollParent) scrollParent.scrollTop = prevScroll;
-              }}
-              onFocus={(e) => {
-                // Prevent browser from scrolling page to bring textarea into view
-                e.preventDefault();
+                el.style.height = Math.min(el.scrollHeight, 128) + 'px';
+                // Restore window scroll — prevents page jump on textarea resize
+                window.scrollTo({ top: winY });
               }}
               disabled={sending || sendCooldown}
             />

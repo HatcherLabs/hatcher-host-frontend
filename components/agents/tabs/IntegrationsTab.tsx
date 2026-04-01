@@ -123,7 +123,7 @@ const COMPAT_BADGE: Record<CompatLevel, { label: string; className: string }> = 
   },
   planned: {
     label: 'Planned',
-    className: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
+    className: 'bg-zinc-500/10 text-[var(--text-muted)] border-zinc-500/20',
   },
 };
 
@@ -226,7 +226,7 @@ function IntegrationFieldsForm({
                   <button
                     type="button"
                     onClick={() => toggleFieldVisibility(fieldId)}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-white/5 rounded transition-colors cursor-pointer"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 hover:bg-[var(--bg-hover)] rounded transition-colors cursor-pointer"
                   >
                     {isVisible
                       ? <EyeOff size={14} className="text-[var(--text-muted)]" />
@@ -277,7 +277,7 @@ function IntegrationFieldsForm({
         <button
           onClick={() => saveIntegrationSecrets(integration)}
           disabled={isSaving}
-          className="px-4 py-2 rounded-lg text-xs font-medium text-white transition-all disabled:opacity-40 hover:opacity-90 bg-[#06b6d4]"
+          className="px-4 py-2 rounded-lg text-xs font-medium text-[var(--text-primary)] transition-all disabled:opacity-40 hover:opacity-90 bg-[#06b6d4]"
         >
           {isSaving ? 'Saving...' : 'Save Credentials'}
         </button>
@@ -395,7 +395,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             onClick={() => setIntegrationField(sk, allowFromKey, '*')}
             className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
               allowFromValue === '*'
-                ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-white'
+                ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[var(--text-primary)]'
                 : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-hover)]'
             }`}
           >
@@ -406,8 +406,8 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             onClick={() => { if (allowFromValue === '*') setIntegrationField(sk, allowFromKey, ''); }}
             className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
               allowFromValue !== '*' && allowFromValue !== ''
-                ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-white'
-                : allowFromValue === '' ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-white' : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-hover)]'
+                ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[var(--text-primary)]'
+                : allowFromValue === '' ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[var(--text-primary)]' : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-hover)]'
             }`}
           >
             Specific numbers
@@ -420,7 +420,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
               value={allowFromValue}
               onChange={(e) => setIntegrationField(sk, allowFromKey, e.target.value)}
               placeholder="+1234567890, +0987654321"
-              className="flex-1 h-9 px-3 rounded-lg text-sm text-white bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none placeholder:text-[var(--text-muted)] transition-colors"
+              className="flex-1 h-9 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none placeholder:text-[var(--text-muted)] transition-colors"
             />
           </div>
         )}
@@ -428,7 +428,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
           <button
             onClick={handleSaveAllowFrom}
             disabled={savingIntegration === sk || !allowFromValue.trim()}
-            className="px-3 h-8 rounded-lg text-xs font-medium text-white bg-[#06b6d4] hover:bg-[#0891b2] disabled:opacity-50 transition-colors"
+            className="px-3 h-8 rounded-lg text-xs font-medium text-[var(--text-primary)] bg-[#06b6d4] hover:bg-[#0891b2] disabled:opacity-50 transition-colors"
           >
             {savingIntegration === sk ? 'Saving...' : 'Save'}
           </button>
@@ -461,7 +461,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             <button
               onClick={handlePair}
               disabled={loading}
-              className="text-xs px-2 py-1 rounded border border-[var(--border-default)] text-[var(--text-muted)] hover:text-white hover:bg-white/5 transition-colors"
+              className="text-xs px-2 py-1 rounded border border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-colors"
             >
               Re-pair
             </button>
@@ -496,7 +496,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
           <button
             onClick={handlePair}
             disabled={loading}
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-white transition-all disabled:opacity-40 hover:opacity-90 bg-[#06b6d4]"
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-[var(--text-primary)] transition-all disabled:opacity-40 hover:opacity-90 bg-[#06b6d4]"
           >
             {loading ? (
               <>
@@ -536,7 +536,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
                 className="bg-[#111] rounded-2xl p-6 max-w-[95vw] max-h-[95vh] overflow-auto border border-white/10"
                 onClick={(e) => e.stopPropagation()}
               >
-                <p className="text-sm text-center text-white mb-4 font-medium">
+                <p className="text-sm text-center text-[var(--text-primary)] mb-4 font-medium">
                   {message || `Scan with ${integration.name}`}
                 </p>
                 <pre
@@ -558,7 +558,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
           <button
             onClick={handlePair}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-white/70 transition-all hover:text-white hover:bg-white/5 border border-[var(--border-default)]"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--text-primary)]/70 transition-all hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border-default)]"
           >
             {loading ? <Loader2 size={14} className="animate-spin" /> : null}
             Refresh QR Code
@@ -648,11 +648,11 @@ function WebhookSection() {
                   type="text"
                   readOnly
                   value={webhookData.url}
-                  className="flex-1 h-9 px-3 rounded-lg text-sm text-white bg-[var(--bg-card)] border border-[var(--border-default)] focus:outline-none font-mono"
+                  className="flex-1 h-9 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:outline-none font-mono"
                 />
                 <button
                   onClick={() => copyToClipboard(webhookData.url, setCopiedUrl)}
-                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-white/5 transition-colors"
+                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-[var(--bg-hover)] transition-colors"
                   title="Copy URL"
                 >
                   {copiedUrl ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
@@ -668,18 +668,18 @@ function WebhookSection() {
                   type={tokenVisible ? 'text' : 'password'}
                   readOnly
                   value={webhookData.token}
-                  className="flex-1 h-9 px-3 rounded-lg text-sm text-white bg-[var(--bg-card)] border border-[var(--border-default)] focus:outline-none font-mono"
+                  className="flex-1 h-9 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:outline-none font-mono"
                 />
                 <button
                   onClick={() => setTokenVisible(!tokenVisible)}
-                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-white/5 transition-colors"
+                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-[var(--bg-hover)] transition-colors"
                   title={tokenVisible ? 'Hide token' : 'Reveal token'}
                 >
                   {tokenVisible ? <EyeOff size={14} className="text-[var(--text-muted)]" /> : <Eye size={14} className="text-[var(--text-muted)]" />}
                 </button>
                 <button
                   onClick={() => copyToClipboard(webhookData.token, setCopiedToken)}
-                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-white/5 transition-colors"
+                  className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-[var(--bg-hover)] transition-colors"
                   title="Copy token"
                 >
                   {copiedToken ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
@@ -768,18 +768,18 @@ function IntegrationCard({
           {isConfigured ? (
             <CheckCircle size={15} className="text-emerald-400" />
           ) : isPairing ? (
-            <Smartphone size={15} className={recommended ? 'text-white/70' : 'text-[var(--text-muted)]'} />
+            <Smartphone size={15} className={recommended ? 'text-[var(--text-primary)]/70' : 'text-[var(--text-muted)]'} />
           ) : isPlanned ? (
-            <Clock size={15} className="text-zinc-500" />
+            <Clock size={15} className="text-[var(--text-muted)]" />
           ) : (
-            <Settings size={15} className={recommended ? 'text-white/70' : 'text-[var(--text-muted)]'} />
+            <Settings size={15} className={recommended ? 'text-[var(--text-primary)]/70' : 'text-[var(--text-muted)]'} />
           )}
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className={`text-sm font-medium ${isPlanned ? 'text-zinc-500' : isConfigured ? 'text-white' : 'text-[var(--text-primary)]'}`}>
+            <span className={`text-sm font-medium ${isPlanned ? 'text-[var(--text-muted)]' : isConfigured ? 'text-[var(--text-primary)]' : 'text-[var(--text-primary)]'}`}>
               {integration.name}
             </span>
 
@@ -824,7 +824,7 @@ function IntegrationCard({
               </span>
             )}
           </div>
-          <p className={`text-xs mt-0.5 truncate ${isPlanned ? 'text-zinc-600' : 'text-[var(--text-muted)]'}`}>
+          <p className={`text-xs mt-0.5 truncate ${isPlanned ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'}`}>
             {integration.description}
           </p>
         </div>
@@ -876,15 +876,15 @@ function EmbedWidgetSection({ slug }: { slug?: string }) {
       </h3>
       <GlassCard className="p-5 space-y-4">
         <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-          Add a floating chat widget or embed the chat directly into any website. Your agent must be set to <span className="text-white font-medium">public</span> for the embed to work.
+          Add a floating chat widget or embed the chat directly into any website. Your agent must be set to <span className="text-[var(--text-primary)] font-medium">public</span> for the embed to work.
         </p>
 
         {/* Script tag (widget) */}
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Code2 size={14} className="text-violet-400" />
-            <span className="text-xs font-medium text-white">Chat Widget</span>
-            <span className="text-[10px] text-zinc-500">Floating button + popup</span>
+            <span className="text-xs font-medium text-[var(--text-primary)]">Chat Widget</span>
+            <span className="text-[10px] text-[var(--text-muted)]">Floating button + popup</span>
           </div>
           <div className="relative group">
             <pre className="bg-black/40 border border-[var(--border-default)] rounded-lg p-3 text-[11px] text-emerald-400 font-mono overflow-x-auto whitespace-pre-wrap break-all leading-relaxed">
@@ -894,11 +894,11 @@ function EmbedWidgetSection({ slug }: { slug?: string }) {
               onClick={() => copy(scriptTag, 'script')}
               className="absolute top-2 right-2 p-1.5 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 transition-colors opacity-0 group-hover:opacity-100"
             >
-              {copied === 'script' ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} className="text-zinc-400" />}
+              {copied === 'script' ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} className="text-[var(--text-muted)]" />}
             </button>
           </div>
-          <p className="text-[10px] text-zinc-500 mt-1.5 leading-relaxed">
-            Options: <code className="text-zinc-400">data-position=&quot;left&quot;</code> or <code className="text-zinc-400">&quot;right&quot;</code> (default) &middot; <code className="text-zinc-400">data-color=&quot;#7c3aed&quot;</code> for brand color
+          <p className="text-[10px] text-[var(--text-muted)] mt-1.5 leading-relaxed">
+            Options: <code className="text-[var(--text-muted)]">data-position=&quot;left&quot;</code> or <code className="text-[var(--text-muted)]">&quot;right&quot;</code> (default) &middot; <code className="text-[var(--text-muted)]">data-color=&quot;#7c3aed&quot;</code> for brand color
           </p>
         </div>
 
@@ -906,8 +906,8 @@ function EmbedWidgetSection({ slug }: { slug?: string }) {
         <div>
           <div className="flex items-center gap-2 mb-2">
             <ExternalLink size={14} className="text-cyan-400" />
-            <span className="text-xs font-medium text-white">Inline Embed</span>
-            <span className="text-[10px] text-zinc-500">Fixed-size iframe</span>
+            <span className="text-xs font-medium text-[var(--text-primary)]">Inline Embed</span>
+            <span className="text-[10px] text-[var(--text-muted)]">Fixed-size iframe</span>
           </div>
           <div className="relative group">
             <pre className="bg-black/40 border border-[var(--border-default)] rounded-lg p-3 text-[11px] text-cyan-400 font-mono overflow-x-auto whitespace-pre-wrap break-all leading-relaxed">
@@ -917,7 +917,7 @@ function EmbedWidgetSection({ slug }: { slug?: string }) {
               onClick={() => copy(iframeTag, 'iframe')}
               className="absolute top-2 right-2 p-1.5 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 transition-colors opacity-0 group-hover:opacity-100"
             >
-              {copied === 'iframe' ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} className="text-zinc-400" />}
+              {copied === 'iframe' ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} className="text-[var(--text-muted)]" />}
             </button>
           </div>
         </div>
