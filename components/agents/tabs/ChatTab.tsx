@@ -465,7 +465,7 @@ export function ChatTab() {
   }
 
   return (
-    <motion.div key="tab-chat" className="flex flex-col h-[calc(100vh-300px)] min-h-[300px] sm:min-h-[400px]" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
+    <motion.div key="tab-chat" className="flex flex-col h-[calc(100dvh-220px)] min-h-[400px] max-h-[calc(100dvh-180px)] overflow-hidden" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
       {/* Chat header with framework badge + auto-speak toggle */}
       <div className="flex items-center justify-between mb-2 px-1">
         <div className="flex items-center gap-2">
