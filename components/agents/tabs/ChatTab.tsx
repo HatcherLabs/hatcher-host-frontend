@@ -226,29 +226,40 @@ export function ChatTab() {
   // Reset extra-loaded window when switching agents
   useEffect(() => { setExtraLoaded(0); }, [agent.id]);
 
-  // Scroll messages container to bottom — uses rAF + scrollY guard
+  // Disable scroll anchoring on the entire page while chat is active
+  useEffect(() => {
+    document.documentElement.style.overflowAnchor = 'none';
+    document.body.style.overflowAnchor = 'none';
+    // Also add to all ancestors of chat
+    const el = messagesContainerRef.current;
+    const ancestors: HTMLElement[] = [];
+    let parent = el?.parentElement;
+    while (parent && parent !== document.body) {
+      parent.style.overflowAnchor = 'none';
+      ancestors.push(parent);
+      parent = parent.parentElement;
+    }
+    return () => {
+      document.documentElement.style.overflowAnchor = '';
+      document.body.style.overflowAnchor = '';
+      ancestors.forEach(a => { a.style.overflowAnchor = ''; });
+    };
+  }, []);
+
+  // Scroll messages container to bottom on new messages
   const prevMsgCountRef = useRef(0);
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
     const msgCount = messages.length;
-    // Only auto-scroll when new messages arrive (not on every rerender)
     if (msgCount <= prevMsgCountRef.current) {
       prevMsgCountRef.current = msgCount;
       return;
     }
     prevMsgCountRef.current = msgCount;
-    // Check if user is near bottom before scrolling
     const gap = container.scrollHeight - container.scrollTop - container.clientHeight;
-    if (gap > 300) return; // User scrolled up, don't force scroll
-    // Use rAF to scroll after paint, then immediately fix page scroll
-    requestAnimationFrame(() => {
-      const wy = window.scrollY;
-      container.scrollTop = container.scrollHeight;
-      requestAnimationFrame(() => {
-        if (window.scrollY !== wy) window.scrollTo(0, wy);
-      });
-    });
+    if (gap > 300) return;
+    container.scrollTop = container.scrollHeight;
   }, [messages]);
 
   // Auto-speak new assistant messages when autoSpeak is enabled.
@@ -527,7 +538,7 @@ export function ChatTab() {
       </div>
 
       {/* Messages area */}
-      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overscroll-contain space-y-4 mb-4 pr-1">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overscroll-contain space-y-4 mb-4 pr-1" style={{ overflowAnchor: 'none' }}
         {messages.length === 0 && (
           <motion.div
             className="text-center py-16"
