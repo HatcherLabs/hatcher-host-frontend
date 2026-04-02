@@ -1081,8 +1081,8 @@ export default function AgentManagePage() {
   return (
     <AgentContext.Provider value={contextValue!}>
       <motion.div
-        className="flex flex-col lg:flex-row"
-        style={{ minHeight: 'calc(100vh - 64px)' }}
+        className={`flex flex-col lg:flex-row ${tab === 'chat' ? 'h-[calc(100vh-64px)] overflow-hidden' : ''}`}
+        style={tab === 'chat' ? { height: 'calc(100vh - 64px)' } : { minHeight: 'calc(100vh - 64px)' }}
         variants={pageEntranceVariants}
         initial="hidden"
         animate="visible"
@@ -1091,7 +1091,7 @@ export default function AgentManagePage() {
         <AgentSidebar agent={agent} activeTab={tab} onTabChange={setTab} />
 
         {/* ─── Main Content ─────────────────────────────────── */}
-        <div className="flex-1 min-w-0 flex flex-col">
+        <div className={`flex-1 min-w-0 flex flex-col ${tab === 'chat' ? 'overflow-hidden' : ''}`}>
           {/* Top action bar */}
           <div className="px-4 sm:px-6 py-3 border-b border-[var(--border-default)] flex items-center gap-3 flex-wrap">
             {/* Status badge */}
