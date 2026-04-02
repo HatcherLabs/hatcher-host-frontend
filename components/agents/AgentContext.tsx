@@ -111,7 +111,7 @@ export const FRAMEWORK_BADGE: Record<string, string> = {
 export const FRAMEWORK_ROOT_PATH: Record<string, string> = {
   openclaw: '/home/node/.openclaw',
   hermes: '/home/hermes/.hermes',
-  elizaos: '/app',
+  elizaos: '/data',
   milady: '/data',
 };
 
