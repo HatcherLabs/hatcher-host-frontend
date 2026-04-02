@@ -226,33 +226,19 @@ export function ChatTab() {
   // Reset extra-loaded window when switching agents
   useEffect(() => { setExtraLoaded(0); }, [agent.id]);
 
-  // Disable browser scroll anchoring — prevents page from jumping when messages change
-  useEffect(() => {
-    document.documentElement.style.overflowAnchor = 'none';
-    return () => { document.documentElement.style.overflowAnchor = ''; };
-  }, []);
-
-  // Scroll chat container to bottom when messages change — only if user is near bottom
-  const isNearBottomRef = useRef(true);
+  // Scroll messages to bottom — save/restore window.scrollY to prevent page jump
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
-    const onScroll = () => {
-      const threshold = 100;
-      isNearBottomRef.current = container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
-    };
-    container.addEventListener('scroll', onScroll, { passive: true });
-    return () => container.removeEventListener('scroll', onScroll);
-  }, []);
-
-  useEffect(() => {
-    if (!isNearBottomRef.current) return;
-    // Scroll to bottom div inside messages container only — never scroll page
-    const el = bottomRef?.current;
-    if (el) {
-      el.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+    // Only auto-scroll if already near bottom
+    const gap = container.scrollHeight - container.scrollTop - container.clientHeight;
+    if (gap < 150) {
+      const wy = window.scrollY;
+      container.scrollTop = container.scrollHeight;
+      // Restore page scroll position synchronously
+      window.scrollTo(0, wy);
     }
-  }, [messages, bottomRef]);
+  }, [messages]);
 
   // Auto-speak new assistant messages when autoSpeak is enabled.
   // Triggers when a message finishes streaming (streaming → false with content).
@@ -485,7 +471,7 @@ export function ChatTab() {
   }
 
   return (
-    <motion.div key="tab-chat" className="flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 280px)', minHeight: '350px' }} variants={tabContentVariants} initial="enter" animate="center" exit="exit">
+    <motion.div key="tab-chat" className="flex flex-col" style={{ height: 'min(calc(100vh - 240px), 800px)', minHeight: '350px' }} variants={tabContentVariants} initial="enter" animate="center" exit="exit">
       {/* Chat header with framework badge + auto-speak toggle */}
       <div className="flex items-center justify-between mb-2 px-1">
         <div className="flex items-center gap-2">
