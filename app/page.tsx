@@ -257,8 +257,13 @@ export default function LandingPage() {
       transition={{ duration: 0.6 }}
       className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)]"
     >
+      {/* ── Beta Banner ──────────────────────────────────── */}
+      <div className="w-full bg-gradient-to-r from-purple-600/90 to-cyan-500/90 text-white text-center py-2.5 px-4 text-sm font-medium">
+        <span className="mr-1">🚀</span> We&apos;re in <strong>open beta</strong> — all features are free to try. <a href="/support" className="underline underline-offset-2 hover:text-white/80 transition-colors">Share your feedback</a> and help us improve!
+      </div>
+
       {/* ── 1. HERO ─────────────────────────────────────── */}
-      <Section className="relative pt-20 sm:pt-28 md:pt-36 pb-16 sm:pb-24 md:pb-32 px-4 sm:px-6">
+      <Section className="relative pt-16 sm:pt-24 md:pt-32 pb-16 sm:pb-24 md:pb-32 px-4 sm:px-6">
         {/* Ambient background glow */}
         <div className="absolute inset-0 pointer-events-none" style={{
           background: 'radial-gradient(ellipse 60% 50% at 50% 30%, rgba(139,92,246,0.12), transparent 70%), radial-gradient(ellipse 40% 40% at 70% 60%, rgba(6,182,212,0.06), transparent 60%)',
