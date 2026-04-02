@@ -226,19 +226,7 @@ export function ChatTab() {
   // Reset extra-loaded window when switching agents
   useEffect(() => { setExtraLoaded(0); }, [agent.id]);
 
-  // Prevent outer page scroll when interacting with chat
-  useEffect(() => {
-    const container = messagesContainerRef.current;
-    if (!container) return;
-    const preventPageScroll = (e: WheelEvent) => {
-      const { scrollTop, scrollHeight, clientHeight } = container;
-      const atTop = scrollTop === 0 && e.deltaY < 0;
-      const atBottom = scrollTop + clientHeight >= scrollHeight - 1 && e.deltaY > 0;
-      if (!atTop && !atBottom) e.preventDefault();
-    };
-    container.addEventListener('wheel', preventPageScroll, { passive: false });
-    return () => container.removeEventListener('wheel', preventPageScroll);
-  }, []);
+  // No outer scroll prevention needed — chat uses fixed height container
 
   // Scroll chat container to bottom when messages change — only if user is near bottom
   const isNearBottomRef = useRef(true);
@@ -493,7 +481,7 @@ export function ChatTab() {
   }
 
   return (
-    <motion.div key="tab-chat" className="flex flex-col h-[calc(100dvh-220px)] min-h-[400px] max-h-[calc(100dvh-180px)] overflow-hidden" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
+    <motion.div key="tab-chat" className="flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 280px)', minHeight: '350px' }} variants={tabContentVariants} initial="enter" animate="center" exit="exit">
       {/* Chat header with framework badge + auto-speak toggle */}
       <div className="flex items-center justify-between mb-2 px-1">
         <div className="flex items-center gap-2">
