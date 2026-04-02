@@ -111,8 +111,8 @@ export const FRAMEWORK_BADGE: Record<string, string> = {
 export const FRAMEWORK_ROOT_PATH: Record<string, string> = {
   openclaw: '/home/node/.openclaw',
   hermes: '/home/hermes/.hermes',
-  elizaos: '/data',
-  milady: '/data/.milady',
+  elizaos: '/app',
+  milady: '/data',
 };
 
 /** Get integrations filtered by framework */
