@@ -226,40 +226,26 @@ export function ChatTab() {
   // Reset extra-loaded window when switching agents
   useEffect(() => { setExtraLoaded(0); }, [agent.id]);
 
-  // Prevent ANY page scroll while chat tab is active
-  // This is the nuclear option — intercepts scroll events on window
+  // Prevent page scroll ONLY when chat DOM changes (new messages)
+  // User can still scroll the page manually
   useEffect(() => {
-    let locked = false;
-    let lockY = window.scrollY;
-    const onScroll = () => {
-      if (locked && window.scrollY !== lockY) {
-        window.scrollTo(0, lockY);
-      }
-    };
-    // Lock scroll position whenever messages change
-    const lock = () => {
-      lockY = 0; // Always keep at top
-      locked = true;
-      window.scrollTo(0, 0);
-    };
-    lock();
-    window.addEventListener('scroll', onScroll, { passive: false });
-    // Observe message container for DOM changes to re-lock
     const container = messagesContainerRef.current;
+    if (!container) return;
     let observer: MutationObserver | null = null;
-    if (container) {
-      observer = new MutationObserver(() => {
-        lockY = 0;
-        if (window.scrollY !== 0) window.scrollTo(0, 0);
-        // Auto-scroll messages container to bottom
-        const gap = container.scrollHeight - container.scrollTop - container.clientHeight;
-        if (gap < 300) container.scrollTop = container.scrollHeight;
+    observer = new MutationObserver(() => {
+      // When messages change, snap page back and scroll chat internally
+      const wy = window.scrollY;
+      const gap = container.scrollHeight - container.scrollTop - container.clientHeight;
+      if (gap < 300) container.scrollTop = container.scrollHeight;
+      // If page scrolled away from where it was, restore after a frame
+      requestAnimationFrame(() => {
+        if (window.scrollY !== wy && window.scrollY > wy) {
+          window.scrollTo(0, wy);
+        }
       });
-      observer.observe(container, { childList: true, subtree: true, characterData: true });
-    }
+    });
+    observer.observe(container, { childList: true, subtree: true });
     return () => {
-      locked = false;
-      window.removeEventListener('scroll', onScroll);
       observer?.disconnect();
     };
   }, []);
