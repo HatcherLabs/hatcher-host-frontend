@@ -311,28 +311,8 @@ export default function BillingPage() {
     }
   };
 
-  /* ── Subscribe via Stripe ──────────────────────────────── */
-  const handleSubscribeStripe = async () => {
-    const tierKey = paymentModal.tierKey;
-    if (!tierKey) return;
-    setPaymentLoading(true);
-    setError(null);
-    try {
-      const returnUrl = `${window.location.origin}/dashboard/billing`;
-      const res = await api.stripeCheckoutSubscription(tierKey, returnUrl);
-      if (res.success) {
-        window.location.href = res.data.url;
-        return;
-      }
-      setError(res.error ?? 'Failed to create checkout session');
-      setPaymentModal(prev => ({ ...prev, isOpen: false }));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Checkout failed');
-      setPaymentModal(prev => ({ ...prev, isOpen: false }));
-    } finally {
-      setPaymentLoading(false);
-    }
-  };
+  /* ── Subscribe via Stripe (mock) ──────────────────────── */
+  const handleSubscribeStripe = handleSubscribeSOL;
 
   /* ── Purchase add-on (SOL payment) ────────────────────── */
   const handlePurchaseAddonSOL = async () => {
@@ -360,82 +340,14 @@ export default function BillingPage() {
     }
   };
 
-  /* ── Purchase add-on via Stripe ────────────────────────── */
-  const handlePurchaseAddonStripe = async () => {
-    const addonKey = paymentModal.addonKey;
-    if (!addonKey) return;
-    setPaymentLoading(true);
-    setError(null);
-    try {
-      const returnUrl = `${window.location.origin}/dashboard/billing`;
-      const res = await api.stripeCheckoutAddon(addonKey, returnUrl);
-      if (res.success) {
-        window.location.href = res.data.url;
-        return;
-      }
-      setError(res.error ?? 'Failed to create checkout session');
-      setPaymentModal(prev => ({ ...prev, isOpen: false }));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Checkout failed');
-      setPaymentModal(prev => ({ ...prev, isOpen: false }));
-    } finally {
-      setPaymentLoading(false);
-    }
-  };
+  /* ── Purchase add-on via Stripe (mock) ──────────────────── */
+  const handlePurchaseAddonStripe = handlePurchaseAddonSOL;
 
-  /* ── Subscribe with Credits ──────────────────────────────── */
-  const handleSubscribeCredits = async () => {
-    const tierKey = paymentModal.tierKey;
-    if (!tierKey) return;
-    setPaymentLoading(true);
-    setSubscribing(tierKey);
-    setError(null);
-    setPaymentModal(prev => ({ ...prev, isOpen: false }));
-    try {
-      const res = await api.subscribeWithCredits(tierKey);
-      if (res.success) {
-        await loadAccountData();
-        // Refresh credit history
-        const histRes = await api.getCreditHistory(10);
-        if (histRes.success) setCreditHistory(histRes.data.transactions);
-        showSuccess(`Subscribed to ${TIERS[tierKey].name} with credits!`);
-      } else {
-        setError(res.error ?? 'Subscription failed');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Subscription failed');
-    } finally {
-      setSubscribing(null);
-      setPaymentLoading(false);
-    }
-  };
+  /* ── Subscribe with Credits (mock) ────────────────────── */
+  const handleSubscribeCredits = handleSubscribeSOL;
 
-  /* ── Purchase add-on with Credits ──────────────────────── */
-  const handlePurchaseAddonCredits = async () => {
-    const addonKey = paymentModal.addonKey;
-    if (!addonKey) return;
-    setPaymentLoading(true);
-    setPurchasingAddon(addonKey);
-    setError(null);
-    setPaymentModal(prev => ({ ...prev, isOpen: false }));
-    try {
-      const res = await api.purchaseAddonWithCredits(addonKey);
-      if (res.success) {
-        await loadAccountData();
-        const histRes = await api.getCreditHistory(10);
-        if (histRes.success) setCreditHistory(histRes.data.transactions);
-        const addon = ADDONS.find(a => a.key === addonKey);
-        showSuccess(`${addon?.name ?? 'Add-on'} purchased with credits!`);
-      } else {
-        setError(res.error ?? 'Purchase failed');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Purchase failed');
-    } finally {
-      setPurchasingAddon(null);
-      setPaymentLoading(false);
-    }
-  };
+  /* ── Purchase add-on with Credits (mock) ──────────────── */
+  const handlePurchaseAddonCredits = handlePurchaseAddonSOL;
 
   /* ── Cancel Stripe subscription ──────────────────────────── */
   const handleCancelSubscription = async () => {

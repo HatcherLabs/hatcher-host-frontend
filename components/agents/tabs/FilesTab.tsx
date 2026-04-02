@@ -247,46 +247,12 @@ export function FilesTab() {
     setDeleting(null);
   };
 
-  const handleUnlockStripe = async () => {
-    setPurchasing(true);
-    try {
-      const res = await api.stripeCheckoutAddon('addon.file_manager', window.location.href, agentId);
-      if (res.success && res.data.url) {
-        window.location.href = res.data.url;
-      } else if (!res.success) {
-        setError(res.error ?? 'Failed to start checkout');
-        setPurchasing(false);
-      }
-    } catch {
-      setError('Failed to start checkout');
-      setPurchasing(false);
-    }
-  };
-
-  const handleUnlockSOL = async () => {
+  const handleUnlockPurchase = async () => {
     setPurchasing(true);
     setError(null);
     try {
-      const txSignature = `sol-${Date.now()}`;
+      const txSignature = `mock-${Date.now()}`;
       const res = await api.purchaseAddon('addon.file_manager', txSignature, agentId);
-      if (res.success) {
-        setUnlocked(true);
-        setShowPayModal(false);
-        loadFiles();
-      } else {
-        setError(res.error ?? 'Purchase failed');
-      }
-    } catch {
-      setError('Purchase failed');
-    }
-    setPurchasing(false);
-  };
-
-  const handleUnlockCredits = async () => {
-    setPurchasing(true);
-    setError(null);
-    try {
-      const res = await api.purchaseAddonWithCredits('addon.file_manager', agentId);
       if (res.success) {
         setUnlocked(true);
         setShowPayModal(false);
@@ -406,7 +372,7 @@ export function FilesTab() {
                   </p>
 
                   <button
-                    onClick={handleUnlockCredits}
+                    onClick={handleUnlockPurchase}
                     disabled={purchasing}
                     className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-green-500/30 hover:border-green-400/50 hover:bg-green-500/[0.05] transition-all disabled:opacity-40"
                   >
@@ -421,7 +387,7 @@ export function FilesTab() {
                   </button>
 
                   <button
-                    onClick={handleUnlockSOL}
+                    onClick={handleUnlockPurchase}
                     disabled={purchasing}
                     className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/[0.03] transition-all disabled:opacity-40"
                   >
@@ -436,7 +402,7 @@ export function FilesTab() {
                   </button>
 
                   <button
-                    onClick={handleUnlockStripe}
+                    onClick={handleUnlockPurchase}
                     disabled={purchasing}
                     className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/[0.03] transition-all disabled:opacity-40"
                   >
