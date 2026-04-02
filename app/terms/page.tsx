@@ -105,7 +105,7 @@ export default function TermsOfServicePage() {
           <section>
             <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-3">7. Payment Terms</h2>
             <p>
-              Certain features of the Service require payment. Prices are listed in USD and may be paid using SOL (Solana), platform tokens, or USD via Stripe. Cryptocurrency prices are converted at the current market rate via Jupiter at the time of transaction.
+              Certain features of the Service require payment. Prices are listed in USD and may be paid using SOL (Solana), $HATCHER, or USD via Stripe. Cryptocurrency prices are converted at the current market rate via Jupiter at the time of transaction.
             </p>
             <p className="mt-3">
               Subscriptions are billed monthly. Add-on purchases may be one-time or recurring depending on the product. All sales are final unless otherwise required by applicable law.

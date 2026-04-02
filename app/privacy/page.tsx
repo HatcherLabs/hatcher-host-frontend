@@ -54,7 +54,7 @@ export default function PrivacyPolicyPage() {
 
             <h3 className="text-base font-medium text-[var(--text-primary)] mt-4 mb-2">Payment Information</h3>
             <ul className="list-disc pl-6 space-y-1.5">
-              <li>Transaction signatures for on-chain payments (SOL, platform tokens)</li>
+              <li>Transaction signatures for on-chain payments (SOL, $HATCHER)</li>
               <li>Stripe processes card payments &mdash; we do not store card numbers</li>
             </ul>
           </section>

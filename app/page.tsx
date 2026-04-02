@@ -393,10 +393,10 @@ export default function LandingPage() {
       <Section className="py-12 sm:py-16 px-4 sm:px-6 border-t border-[var(--border-default)]">
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12">
-            <AnimatedStat value={stats.totalUsers || 47} label="Users" />
-            <AnimatedStat value={stats.totalAgents || 23} label="Agents deployed" />
-            <AnimatedStat value={stats.activeAgents || 5} label="Active now" />
-            <AnimatedStat value={stats.totalMessages || 345} label="Messages sent" />
+            <AnimatedStat value={stats.totalUsers} label="Users" />
+            <AnimatedStat value={stats.totalAgents} label="Agents deployed" />
+            <AnimatedStat value={stats.activeAgents} label="Active now" />
+            <AnimatedStat value={stats.totalMessages} label="Messages sent" />
           </div>
         </div>
       </Section>
@@ -847,7 +847,7 @@ export default function LandingPage() {
               { q: 'Do I need to know how to code?', a: 'Not at all! Creating an agent is like filling out a form — choose a name, describe what you want it to do, pick which platforms to connect, and hit launch. The whole process takes about 60 seconds.' },
               { q: 'What is "Bring Your Own Key"?', a: 'If you already have an account with OpenAI (ChatGPT), Google, Anthropic, or another AI provider, you can connect it to your agent. This gives you unlimited messages at no extra cost from us — you only pay your AI provider directly.' },
               { q: 'Where does my agent run?', a: 'Your agent runs on our cloud servers 24/7. You don\'t need to keep your computer on or install anything. Once you launch it, it just works.' },
-              { q: 'How do I pay for upgrades?', a: 'Paid plans are in USD. You can pay with SOL (Solana) or platform tokens — just approve a wallet transaction and the upgrade activates instantly.' },
+              { q: 'How do I pay for upgrades?', a: 'Paid plans are in USD. You can pay with SOL (Solana) or $HATCHER tokens — just approve a wallet transaction and the upgrade activates instantly.' },
             ].map((item, i) => (
               <FAQItem key={i} question={item.q} answer={item.a} />
             ))}

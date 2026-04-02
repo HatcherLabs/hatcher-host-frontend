@@ -27,7 +27,7 @@ const PLANNED_USE_CASES = [
   {
     icon: CreditCard,
     title: 'Token Economy',
-    description: 'Prices listed in USD. Pay with SOL or platform tokens at live rates.',
+    description: 'Prices listed in USD. Pay with SOL or $HATCHER at live rates.',
     color: '#22D3EE',
   },
   {
@@ -75,8 +75,7 @@ export default function TokenPage() {
             transition={{ ...fadeUpTransition, delay: 0.06 }}
             className="text-5xl md:text-7xl font-extrabold mb-5 tracking-tight"
           >
-            <span className="text-[var(--text-primary)]">Platform</span>{' '}
-            <span className="text-[var(--text-primary)]">Token</span>
+            <span className="text-[var(--text-primary)]">$HATCHER</span>
           </motion.h1>
 
           <motion.p
@@ -85,8 +84,8 @@ export default function TokenPage() {
             transition={{ ...fadeUpTransition, delay: 0.12 }}
             className="text-lg md:text-xl mb-6 max-w-2xl mx-auto leading-relaxed text-[var(--text-secondary)]"
           >
-            The ecosystem token of the Hatcher platform. Launched on pump.fun.
-            Powers tier subscriptions, agent add-ons, and platform governance on Solana.
+            The ecosystem token of Hatcher. Launched on pump.fun.
+            Powers tier subscriptions, agent add-ons, and governance on Solana.
           </motion.p>
 
           <motion.div
@@ -148,7 +147,7 @@ export default function TokenPage() {
               What the Token Will Power
             </motion.h2>
             <p className="text-[var(--text-secondary)] max-w-lg mx-auto">
-              When launched, the platform token will be the native currency of the Hatcher ecosystem.
+              $HATCHER is the native currency of the Hatcher ecosystem.
             </p>
           </div>
 

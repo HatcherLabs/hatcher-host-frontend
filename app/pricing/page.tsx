@@ -430,7 +430,7 @@ export default function PricingPage() {
               are included free on all tiers. No extra charge, ever.
             </p>
             <p className="text-[var(--text-secondary)] text-sm font-medium p-4 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
-              All prices in USD, payable in SOL or platform tokens. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier.
+              All prices in USD, payable in SOL or $HATCHER. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier.
             </p>
           </div>
         </section>
@@ -559,7 +559,7 @@ export default function PricingPage() {
 
         {/* FOOTER NOTE */}
         <p className="text-center text-xs text-[var(--text-muted)] mt-10 max-w-xl mx-auto leading-relaxed">
-          All prices in USD, payable in SOL or platform tokens. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier.
+          All prices in USD, payable in SOL or $HATCHER. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier.
         </p>
       </div>
     </div>
@@ -654,7 +654,7 @@ const FAQ = [
   },
   {
     q: 'What payment methods are accepted?',
-    a: 'You can pay with SOL or our platform token. Prices are listed in USD and converted at live rates via Jupiter.',
+    a: 'You can pay with SOL or $HATCHER. Prices are listed in USD and converted at live rates via Jupiter.',
   },
   {
     q: 'Can I downgrade my tier?',
