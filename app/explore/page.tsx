@@ -34,6 +34,7 @@ type StatusFilter = 'all' | 'active' | 'sleeping' | 'paused' | 'error';
 type FrameworkFilter = 'all' | 'openclaw' | 'hermes' | 'elizaos' | 'milady';
 
 const PAGE_SIZE = 12;
+const LOAD_BATCH = 24;
 
 const SORT_LABELS: Record<SortOption, string> = {
   newest: 'Newest',
@@ -228,13 +229,19 @@ export default function ExplorePage() {
   const search = useDebounce(searchInput, 300);
   const isSearching = searchInput !== search;
 
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
+
   const fetchAgents = useCallback(() => {
     setLoading(true);
     setError(null);
-    api.exploreAgents().then((res) => {
+    api.exploreAgents(LOAD_BATCH, 0).then((res) => {
       setLoading(false);
       if (res.success && res.data) {
         setAgents(res.data.agents ?? []);
+        setHasMore(res.data.pagination?.hasMore ?? false);
+        setTotalCount(res.data.pagination?.total ?? 0);
       } else {
         setError('error' in res ? res.error : 'Failed to load agents');
       }
@@ -243,6 +250,18 @@ export default function ExplorePage() {
       setError('Network error — is the API running?');
     });
   }, []);
+
+  const loadMore = useCallback(() => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    api.exploreAgents(LOAD_BATCH, agents.length).then((res) => {
+      setLoadingMore(false);
+      if (res.success && res.data) {
+        setAgents(prev => [...prev, ...(res.data.agents ?? [])]);
+        setHasMore(res.data.pagination?.hasMore ?? false);
+      }
+    }).catch(() => setLoadingMore(false));
+  }, [agents.length, hasMore, loadingMore]);
 
   useEffect(() => {
     fetchAgents();
@@ -614,6 +633,26 @@ export default function ExplorePage() {
                   >
                     <ChevronRight className="w-5 h-5" />
                   </button>
+                </div>
+              )}
+
+              {/* ── Load More ─────────────────────────── */}
+              {hasMore && !hasActiveFilters && (
+                <div className="flex flex-col items-center gap-2 mt-8">
+                  <button
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border border-[#06b6d4]/30 text-[#06b6d4] hover:bg-[#06b6d4]/10 transition-all text-sm font-medium disabled:opacity-40"
+                  >
+                    {loadingMore ? (
+                      <><Loader2 className="w-4 h-4 animate-spin" /> Loading...</>
+                    ) : (
+                      <>Load More Agents</>
+                    )}
+                  </button>
+                  <span className="text-[10px] text-[var(--text-muted)]">
+                    Showing {agents.length} of {totalCount} agents
+                  </span>
                 </div>
               )}
             </>
