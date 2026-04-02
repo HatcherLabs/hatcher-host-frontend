@@ -392,11 +392,10 @@ export default function LandingPage() {
       {/* ── 3. PLATFORM HIGHLIGHTS ──────────────────────── */}
       <Section className="py-12 sm:py-16 px-4 sm:px-6 border-t border-[var(--border-default)]">
         <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12">
-            <AnimatedStat value={stats.totalUsers} label="Users" />
+          <div className="grid grid-cols-3 gap-8 sm:gap-12">
             <AnimatedStat value={stats.totalAgents} label="Agents deployed" />
             <AnimatedStat value={stats.activeAgents} label="Active now" />
-            <AnimatedStat value={stats.totalMessages} label="Messages sent" />
+            <AnimatedStat value={4} label="Frameworks supported" />
           </div>
         </div>
       </Section>
