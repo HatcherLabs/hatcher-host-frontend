@@ -310,7 +310,7 @@ export const api = {
   getExploreAgents: () => req<{ agents: Agent[]; pagination: { total: number; limit: number; offset: number; hasMore: boolean } }>('/agents/explore'),
 
   /** Alias for getExploreAgents */
-  exploreAgents: () => req<{ agents: Agent[]; pagination: { total: number; limit: number; offset: number; hasMore: boolean } }>('/agents/explore'),
+  exploreAgents: () => req<{ agents: Agent[]; pagination: { total: number; limit: number; offset: number; hasMore: boolean } }>('/agents/explore?limit=100'),
 
   /** Get a single agent */
   getAgent: (id: string) => req<Agent>(`/agents/${id}`),
