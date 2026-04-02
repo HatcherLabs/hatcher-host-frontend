@@ -56,10 +56,10 @@ export default function TokenPage() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={fadeUpTransition}
-            className="mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#06b6d4]/25 bg-[#06b6d4]/8 text-[#06b6d4] text-sm font-medium"
+            className="mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#14F195]/25 bg-[#14F195]/8 text-[#14F195] text-sm font-medium"
           >
             <Sparkles className="w-3.5 h-3.5" />
-            Coming Soon
+            Live on Solana
           </motion.div>
 
           <div
@@ -85,14 +85,40 @@ export default function TokenPage() {
             transition={{ ...fadeUpTransition, delay: 0.12 }}
             className="text-lg md:text-xl mb-6 max-w-2xl mx-auto leading-relaxed text-[var(--text-secondary)]"
           >
-            The native token of the Hatcher platform. It will power tier subscriptions,
-            agent add-ons, and platform governance on Solana.
+            The ecosystem token of the Hatcher platform. Launched on pump.fun.
+            Powers tier subscriptions, agent add-ons, and platform governance on Solana.
           </motion.p>
 
-          <div className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-secondary)] text-sm">
-            <Bell className="w-4 h-4 text-[#06b6d4]" />
-            Token launch has not happened yet. Stay tuned for announcements.
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...fadeUpTransition, delay: 0.18 }}
+            className="inline-flex flex-col items-center gap-3"
+          >
+            <div className="px-5 py-3 rounded-xl bg-[var(--bg-elevated)] border border-[#14F195]/20 text-sm">
+              <span className="text-[var(--text-muted)] mr-2">CA:</span>
+              <code className="text-[#14F195] font-mono text-xs sm:text-sm select-all">Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump</code>
+            </div>
+            <div className="flex items-center gap-3">
+              <a
+                href="https://pump.fun/coin/Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-[#06b6d4] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
+              >
+                View on pump.fun
+              </a>
+              <span className="text-[var(--border-default)]">|</span>
+              <a
+                href="https://solscan.io/token/Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-[#06b6d4] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
+              >
+                Solscan
+              </a>
+            </div>
+          </motion.div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
             <Link href="/create" className="btn-primary text-base px-8 py-3.5 inline-flex items-center gap-2">
@@ -176,13 +202,14 @@ export default function TokenPage() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pb-5 border-b border-[var(--border-default)]">
                 <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">Status</span>
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                  <span className="text-amber-400 font-medium">Not Yet Launched</span>
+                  <span className="w-2 h-2 rounded-full bg-[#14F195]" />
+                  <span className="text-[#14F195] font-medium">Live</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-[#14F195]/10 text-[#14F195] border border-[#14F195]/20 font-medium">Launched on pump.fun</span>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pb-5 border-b border-[var(--border-default)]">
-                <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">Supply Model</span>
-                <span className="text-[var(--text-primary)] font-medium">Details at launch</span>
+                <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">Contract</span>
+                <code className="text-[var(--text-primary)] font-mono text-xs select-all">Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump</code>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                 <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">Platform</span>
@@ -207,7 +234,7 @@ export default function TokenPage() {
                 Stay in the Loop
               </h2>
               <p className="text-lg mb-10 max-w-xl mx-auto text-[var(--text-secondary)]">
-                Follow us for token launch announcements. In the meantime, create your first agent for free.
+                The token is live. The platform is in open beta. All features are free to try. More details coming soon.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/create" className="btn-primary text-base px-10 py-4 inline-flex items-center gap-2">

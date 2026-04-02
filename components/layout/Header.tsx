@@ -21,12 +21,14 @@ const AUTH_NAV_LINKS = [
   { href: '/dashboard/analytics', label: 'Analytics' },
   { href: '/explore',             label: 'Explore' },
   { href: '/create',              label: 'Create' },
+  { href: '/token',               label: 'Token' },
 ];
 
 // ── Nav links when logged OUT ──
 const GUEST_NAV_LINKS = [
   { href: '/explore',             label: 'Explore' },
   { href: '/templates',           label: 'Templates' },
+  { href: '/token',               label: 'Token' },
 ];
 
 // ── Auxiliary links (visible in both states, after a divider) ──
