@@ -658,7 +658,7 @@ export const api = {
     }>('/admin/server-stats'),
 
   /** Admin: list all users with agent/payment counts */
-  adminGetUsers: (skip = 0, take = 50) =>
+  adminGetUsers: (skip = 0, take = 500) =>
     req<{
       users: Array<{
         id: string;
