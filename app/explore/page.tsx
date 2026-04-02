@@ -34,7 +34,7 @@ type StatusFilter = 'all' | 'active' | 'sleeping' | 'paused' | 'error';
 type FrameworkFilter = 'all' | 'openclaw' | 'hermes' | 'elizaos' | 'milady';
 
 const PAGE_SIZE = 12;
-const LOAD_BATCH = 12;
+const LOAD_BATCH = 48;
 
 const SORT_LABELS: Record<SortOption, string> = {
   newest: 'Newest',
