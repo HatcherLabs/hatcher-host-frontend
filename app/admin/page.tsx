@@ -194,6 +194,8 @@ export default function AdminPage() {
     docker: { status: string; containersRunning: number; containersTotal: number };
     services: Array<{ name: string; status: string; uptime: string; restarts: number }>;
     disk: { used: string; total: string; percent: number };
+    ram: { total: string; used: string; available: string; percent: number };
+    cpu: { cores: number; model: string; load1m: string; load5m: string; load15m: string; percent: number };
     backup: { lastBackup: string | null; lastSize: string | null };
   } | null>(null);
   const [healthLoading, setHealthLoading] = useState(false);
@@ -1313,6 +1315,50 @@ export default function AdminPage() {
                     {health.api.memory.total ? Math.round((health.api.memory.used / health.api.memory.total) * 100) : 0}% used
                   </span>
                 </div>
+
+                {/* CPU Load */}
+                {health.cpu && (
+                <div className="rounded-xl border border-[var(--border-default)] p-4 bg-[var(--bg-elevated)]">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Activity size={16} className="text-[var(--text-muted)]" />
+                      <span className="text-sm font-semibold text-[var(--text-primary)]">CPU Load</span>
+                    </div>
+                    <span className="text-xs text-[var(--text-secondary)]">{health.cpu.load1m} / {health.cpu.cores} cores</span>
+                  </div>
+                  <div className="w-full h-3 rounded-full bg-[rgba(46,43,74,0.4)] overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        health.cpu.percent > 90 ? 'bg-red-500' : health.cpu.percent > 70 ? 'bg-amber-500' : 'bg-[#F59E0B]'
+                      }`}
+                      style={{ width: `${Math.min(health.cpu.percent, 100)}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] text-[var(--text-muted)] mt-1.5 block">{health.cpu.percent}% — load avg: {health.cpu.load1m} / {health.cpu.load5m} / {health.cpu.load15m}</span>
+                </div>
+                )}
+
+                {/* System RAM */}
+                {health.ram && (
+                <div className="rounded-xl border border-[var(--border-default)] p-4 bg-[var(--bg-elevated)]">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Activity size={16} className="text-[var(--text-muted)]" />
+                      <span className="text-sm font-semibold text-[var(--text-primary)]">System RAM</span>
+                    </div>
+                    <span className="text-xs text-[var(--text-secondary)]">{health.ram.used} / {health.ram.total}</span>
+                  </div>
+                  <div className="w-full h-3 rounded-full bg-[rgba(46,43,74,0.4)] overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        health.ram.percent > 90 ? 'bg-red-500' : health.ram.percent > 70 ? 'bg-amber-500' : 'bg-[#A78BFA]'
+                      }`}
+                      style={{ width: `${health.ram.percent}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] text-[var(--text-muted)] mt-1.5 block">{health.ram.percent}% used — {health.ram.available} available</span>
+                </div>
+                )}
 
                 {/* PM2 Process List */}
                 <div className="rounded-xl border border-[var(--border-default)] p-4 bg-[var(--bg-elevated)]">
