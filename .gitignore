@@ -41,3 +41,9 @@ e2e/.auth/
 android/
 ios/
 out/
+
+# Dev artifacts
+.claude/
+content/
+test-*.png
+e2e-*.png
