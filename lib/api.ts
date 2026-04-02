@@ -631,7 +631,7 @@ export const api = {
 
   /** Admin: list all agents across all users */
   adminGetAgents: () =>
-    req<Array<Agent & { ownerWallet: string }>>('/admin/agents?limit=100&offset=0'),
+    req<Array<Agent & { ownerWallet: string }>>('/admin/agents?limit=500&offset=0'),
 
   adminGetStats: () =>
     req<{
