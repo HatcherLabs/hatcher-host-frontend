@@ -493,7 +493,7 @@ export function ChatTab() {
   }
 
   return (
-    <motion.div key="tab-chat" className="flex flex-col flex-1" style={{ height: 'calc(100vh - 160px)' }} variants={tabContentVariants} initial="enter" animate="center" exit="exit">
+    <motion.div key="tab-chat" className="flex flex-col" style={{ height: 'calc(100vh - 280px)', minHeight: '300px' }} variants={tabContentVariants} initial="enter" animate="center" exit="exit">
       {/* Chat header with framework badge + auto-speak toggle */}
       <div className="flex items-center justify-between mb-2 px-1">
         <div className="flex items-center gap-2">
@@ -538,7 +538,7 @@ export function ChatTab() {
       </div>
 
       {/* Messages area */}
-      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overscroll-contain space-y-4 mb-4 pr-1" style={{ overflowAnchor: 'none' }}
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overscroll-contain space-y-4 mb-4 pr-1" style={{ overflowAnchor: 'none' as const }}>
         {messages.length === 0 && (
           <motion.div
             className="text-center py-16"

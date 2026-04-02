@@ -1181,7 +1181,7 @@ export default function AgentManagePage() {
           )}
 
           {/* ─── Tab Content ──────────────────────────────────── */}
-          <div className={`flex-1 px-4 sm:px-6 min-w-0 flex flex-col ${tab === 'chat' ? 'py-2' : 'py-6'}`}>
+          <div className={`flex-1 px-4 sm:px-6 py-6 min-w-0`}>
             <AnimatePresence mode="wait">
               {tab === 'overview' && <OverviewTab />}
               {tab === 'config' && <ConfigTab />}
