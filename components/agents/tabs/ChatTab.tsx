@@ -226,41 +226,43 @@ export function ChatTab() {
   // Reset extra-loaded window when switching agents
   useEffect(() => { setExtraLoaded(0); }, [agent.id]);
 
-  // Disable scroll anchoring on the entire page while chat is active
+  // Prevent ANY page scroll while chat tab is active
+  // This is the nuclear option — intercepts scroll events on window
   useEffect(() => {
-    document.documentElement.style.overflowAnchor = 'none';
-    document.body.style.overflowAnchor = 'none';
-    // Also add to all ancestors of chat
-    const el = messagesContainerRef.current;
-    const ancestors: HTMLElement[] = [];
-    let parent = el?.parentElement;
-    while (parent && parent !== document.body) {
-      parent.style.overflowAnchor = 'none';
-      ancestors.push(parent);
-      parent = parent.parentElement;
+    let locked = false;
+    let lockY = window.scrollY;
+    const onScroll = () => {
+      if (locked && window.scrollY !== lockY) {
+        window.scrollTo(0, lockY);
+      }
+    };
+    // Lock scroll position whenever messages change
+    const lock = () => {
+      lockY = 0; // Always keep at top
+      locked = true;
+      window.scrollTo(0, 0);
+    };
+    lock();
+    window.addEventListener('scroll', onScroll, { passive: false });
+    // Observe message container for DOM changes to re-lock
+    const container = messagesContainerRef.current;
+    let observer: MutationObserver | null = null;
+    if (container) {
+      observer = new MutationObserver(() => {
+        lockY = 0;
+        if (window.scrollY !== 0) window.scrollTo(0, 0);
+        // Auto-scroll messages container to bottom
+        const gap = container.scrollHeight - container.scrollTop - container.clientHeight;
+        if (gap < 300) container.scrollTop = container.scrollHeight;
+      });
+      observer.observe(container, { childList: true, subtree: true, characterData: true });
     }
     return () => {
-      document.documentElement.style.overflowAnchor = '';
-      document.body.style.overflowAnchor = '';
-      ancestors.forEach(a => { a.style.overflowAnchor = ''; });
+      locked = false;
+      window.removeEventListener('scroll', onScroll);
+      observer?.disconnect();
     };
   }, []);
-
-  // Scroll messages container to bottom on new messages
-  const prevMsgCountRef = useRef(0);
-  useEffect(() => {
-    const container = messagesContainerRef.current;
-    if (!container) return;
-    const msgCount = messages.length;
-    if (msgCount <= prevMsgCountRef.current) {
-      prevMsgCountRef.current = msgCount;
-      return;
-    }
-    prevMsgCountRef.current = msgCount;
-    const gap = container.scrollHeight - container.scrollTop - container.clientHeight;
-    if (gap > 300) return;
-    container.scrollTop = container.scrollHeight;
-  }, [messages]);
 
   // Auto-speak new assistant messages when autoSpeak is enabled.
   // Triggers when a message finishes streaming (streaming → false with content).
