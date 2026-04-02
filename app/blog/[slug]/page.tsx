@@ -119,7 +119,7 @@ export default async function BlogArticlePage({ params }: Props) {
             prose-blockquote:border-purple-500/40 prose-blockquote:bg-purple-500/5 prose-blockquote:rounded-lg prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:not-italic prose-blockquote:text-[var(--text-secondary)]
             prose-table:border-collapse prose-th:text-left prose-th:text-xs prose-th:uppercase prose-th:tracking-wider prose-th:text-[var(--text-muted)] prose-th:pb-2 prose-th:border-b prose-th:border-white/10
             prose-td:py-2 prose-td:pr-6 prose-td:text-sm prose-td:text-[#c4c4cc] prose-td:border-b prose-td:border-[var(--border-default)]"
-          dangerouslySetInnerHTML={{ __html: post.content }}
+          dangerouslySetInnerHTML={{ __html: post.content }} // SAFE: content from hardcoded lib/blog.ts, not user input
         />
 
         {/* Divider */}
