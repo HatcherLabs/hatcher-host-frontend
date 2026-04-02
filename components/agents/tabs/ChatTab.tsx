@@ -226,34 +226,29 @@ export function ChatTab() {
   // Reset extra-loaded window when switching agents
   useEffect(() => { setExtraLoaded(0); }, [agent.id]);
 
-  // Lock page scroll while chat is active — prevents page jumping on new messages
-  useEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-    const savedScrollY = window.scrollY;
-    // Scroll to top first, then lock
-    window.scrollTo(0, 0);
-    html.style.overflow = 'hidden';
-    html.style.height = '100vh';
-    body.style.overflow = 'hidden';
-    body.style.height = '100vh';
-    return () => {
-      html.style.overflow = '';
-      html.style.height = '';
-      body.style.overflow = '';
-      body.style.height = '';
-      window.scrollTo(0, savedScrollY);
-    };
-  }, []);
-
-  // Scroll messages container to bottom on new messages
+  // Scroll messages container to bottom — uses rAF + scrollY guard
+  const prevMsgCountRef = useRef(0);
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
-    const gap = container.scrollHeight - container.scrollTop - container.clientHeight;
-    if (gap < 150) {
-      container.scrollTop = container.scrollHeight;
+    const msgCount = messages.length;
+    // Only auto-scroll when new messages arrive (not on every rerender)
+    if (msgCount <= prevMsgCountRef.current) {
+      prevMsgCountRef.current = msgCount;
+      return;
     }
+    prevMsgCountRef.current = msgCount;
+    // Check if user is near bottom before scrolling
+    const gap = container.scrollHeight - container.scrollTop - container.clientHeight;
+    if (gap > 300) return; // User scrolled up, don't force scroll
+    // Use rAF to scroll after paint, then immediately fix page scroll
+    requestAnimationFrame(() => {
+      const wy = window.scrollY;
+      container.scrollTop = container.scrollHeight;
+      requestAnimationFrame(() => {
+        if (window.scrollY !== wy) window.scrollTo(0, wy);
+      });
+    });
   }, [messages]);
 
   // Auto-speak new assistant messages when autoSpeak is enabled.
