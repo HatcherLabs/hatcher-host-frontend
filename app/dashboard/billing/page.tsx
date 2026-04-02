@@ -79,11 +79,16 @@ interface PaymentModalProps {
   onPayWithCredits?: () => void;
   creditBalance: number;
   loading: boolean;
+  requiresAgent?: boolean;
+  agents?: Array<{ id: string; name: string }>;
+  selectedAgentId?: string | null;
+  onSelectAgent?: (agentId: string) => void;
 }
 
-function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithCard, onPayWithCredits, creditBalance, loading }: PaymentModalProps) {
+function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithCard, onPayWithCredits, creditBalance, loading, requiresAgent, agents, selectedAgentId, onSelectAgent }: PaymentModalProps) {
   if (!isOpen) return null;
   const canPayWithCredits = creditBalance >= price && price > 0;
+  const needsAgentSelection = requiresAgent && !selectedAgentId;
   return (
     <AnimatePresence>
       <motion.div
@@ -102,7 +107,7 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
           onClick={(e) => e.stopPropagation()}
         >
           <div className="px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
-            <h3 className="font-semibold text-[var(--text-primary)]">Choose Payment Method</h3>
+            <h3 className="font-semibold text-[var(--text-primary)]">{requiresAgent ? 'Select Agent' : 'Choose Payment Method'}</h3>
             <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
               <X className="w-4 h-4" />
             </button>
@@ -112,11 +117,35 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
               {title} — <span className="font-bold text-[var(--text-primary)]">${price}</span>
             </p>
 
+            {/* Agent selector for per-agent addons */}
+            {requiresAgent && (
+              <div className="mb-4">
+                <label className="block text-xs text-[var(--text-muted)] mb-2">Apply to agent:</label>
+                <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                  {agents && agents.length > 0 ? agents.map(agent => (
+                    <button
+                      key={agent.id}
+                      onClick={() => onSelectAgent?.(agent.id)}
+                      className={`w-full text-left px-3 py-2.5 rounded-lg border text-sm transition-all ${
+                        selectedAgentId === agent.id
+                          ? 'border-[#06b6d4] bg-[#06b6d4]/10 text-[var(--text-primary)]'
+                          : 'border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[#06b6d4]/30'
+                      }`}
+                    >
+                      {agent.name}
+                    </button>
+                  )) : (
+                    <p className="text-xs text-[var(--text-muted)] py-2">No agents found. Create an agent first.</p>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Pay with Credits */}
             {canPayWithCredits && onPayWithCredits && (
               <button
                 onClick={onPayWithCredits}
-                disabled={loading}
+                disabled={loading || needsAgentSelection}
                 className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-green-500/30 hover:border-green-400/50 hover:bg-green-500/[0.05] transition-all disabled:opacity-40"
               >
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0">
@@ -133,7 +162,7 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
             {/* Pay with SOL */}
             <button
               onClick={onPayWithSOL}
-              disabled={loading}
+              disabled={loading || needsAgentSelection}
               className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/[0.03] transition-all disabled:opacity-40"
             >
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#9945FF] to-[#14F195] flex items-center justify-center flex-shrink-0">
@@ -149,7 +178,7 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
             {/* Pay with Card */}
             <button
               onClick={onPayWithCard}
-              disabled={loading}
+              disabled={loading || needsAgentSelection}
               className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/[0.03] transition-all disabled:opacity-40"
             >
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#635BFF] to-[#A259FF] flex items-center justify-center flex-shrink-0">
@@ -197,6 +226,8 @@ export default function BillingPage() {
   const [creditHistory, setCreditHistory] = useState<Array<{
     id: string; amount: number; balance: number; type: string; description: string | null; createdAt: string;
   }>>([]);
+  const [userAgents, setUserAgents] = useState<Array<{ id: string; name: string }>>([]);
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
 
   // Payment method modal state
   const [paymentModal, setPaymentModal] = useState<{
@@ -250,11 +281,16 @@ export default function BillingPage() {
       api.getPayments(),
       api.getCreditBalance(),
       api.getCreditHistory(10),
-    ]).then(([acctRes, payRes, balRes, histRes]) => {
+      api.listAgents(),
+    ]).then(([acctRes, payRes, balRes, histRes, agentsRes]) => {
       if (acctRes.success) setAccountData(acctRes.data as unknown as AccountFeatures);
       if (payRes.success) setPayments(payRes.data.payments);
       if (balRes.success) setCreditBalance(balRes.data.balance);
       if (histRes.success) setCreditHistory(histRes.data.transactions);
+      if (agentsRes.success && agentsRes.data) {
+        const agents = (agentsRes.data as unknown as Array<{ id: string; name: string }>);
+        setUserAgents(agents.map(a => ({ id: a.id, name: a.name })));
+      }
       if (!acctRes.success) setError(acctRes.error ?? 'Failed to load account');
       setLoading(false);
     }).catch(() => {
@@ -277,6 +313,7 @@ export default function BillingPage() {
 
   const openAddonModal = (addonKey: AddonKey) => {
     const addon = ADDONS.find(a => a.key === addonKey);
+    setSelectedAgentId(null);
     setPaymentModal({
       isOpen: true,
       type: 'addon',
@@ -318,13 +355,15 @@ export default function BillingPage() {
   const handlePurchaseAddonSOL = async () => {
     const addonKey = paymentModal.addonKey;
     if (!addonKey) return;
+    const addonConfig = ADDONS.find(a => a.key === addonKey);
+    if (addonConfig?.perAgent && !selectedAgentId) return;
     setPaymentLoading(true);
     setPurchasingAddon(addonKey);
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
       const txSignature = `mock-${Date.now()}`;
-      const res = await api.purchaseAddon(addonKey, txSignature);
+      const res = await api.purchaseAddon(addonKey, txSignature, selectedAgentId ?? undefined);
       if (res.success) {
         await loadAccountData();
         const addon = ADDONS.find(a => a.key === addonKey);
@@ -898,6 +937,10 @@ export default function BillingPage() {
         onPayWithCredits={paymentModal.type === 'subscription' ? handleSubscribeCredits : handlePurchaseAddonCredits}
         creditBalance={creditBalance}
         loading={paymentLoading}
+        requiresAgent={paymentModal.type === 'addon' && ADDONS.find(a => a.key === paymentModal.addonKey)?.perAgent}
+        agents={userAgents}
+        selectedAgentId={selectedAgentId}
+        onSelectAgent={setSelectedAgentId}
       />
 
       {/* Success toast */}
