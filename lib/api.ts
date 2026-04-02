@@ -723,6 +723,8 @@ export const api = {
       docker: { status: string; containersRunning: number; containersTotal: number };
       services: Array<{ name: string; status: string; uptime: string; restarts: number }>;
       disk: { used: string; total: string; percent: number };
+      ram: { total: string; used: string; available: string; percent: number };
+      cpu: { cores: number; model: string; load1m: string; load5m: string; load15m: string; percent: number };
       backup: { lastBackup: string | null; lastSize: string | null };
     }>('/admin/health'),
 
