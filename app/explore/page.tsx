@@ -34,7 +34,7 @@ type StatusFilter = 'all' | 'active' | 'sleeping' | 'paused' | 'error';
 type FrameworkFilter = 'all' | 'openclaw' | 'hermes' | 'elizaos' | 'milady';
 
 const PAGE_SIZE = 12;
-const LOAD_BATCH = 24;
+const LOAD_BATCH = 12;
 
 const SORT_LABELS: Record<SortOption, string> = {
   newest: 'Newest',
@@ -468,7 +468,12 @@ export default function ExplorePage() {
                     </>
                   ) : (
                     <>
-                      <span className="text-[var(--text-secondary)] font-medium">{agents.length}</span> agent{agents.length !== 1 ? 's' : ''}
+                      <span className="text-[var(--text-secondary)] font-medium">{totalCount || agents.length}</span> agent{(totalCount || agents.length) !== 1 ? 's' : ''}
+                      {totalCount > agents.length && (
+                        <span className="ml-1 text-[var(--text-muted)]">
+                          ({agents.length} loaded)
+                        </span>
+                      )}
                       {totalPages > 1 && (
                         <span className="ml-2">
                           — page {safePage} of {totalPages}
