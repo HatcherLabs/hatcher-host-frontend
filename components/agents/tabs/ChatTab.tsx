@@ -242,13 +242,13 @@ export function ChatTab() {
   }, []);
 
   useEffect(() => {
-    const container = messagesContainerRef.current;
-    if (container && isNearBottomRef.current) {
-      requestAnimationFrame(() => {
-        container.scrollTop = container.scrollHeight;
-      });
+    if (!isNearBottomRef.current) return;
+    // Scroll to bottom div inside messages container only — never scroll page
+    const el = bottomRef?.current;
+    if (el) {
+      el.scrollIntoView({ block: 'nearest', behavior: 'instant' });
     }
-  }, [messages]);
+  }, [messages, bottomRef]);
 
   // Auto-speak new assistant messages when autoSpeak is enabled.
   // Triggers when a message finishes streaming (streaming → false with content).
