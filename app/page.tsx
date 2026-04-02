@@ -261,6 +261,10 @@ export default function LandingPage() {
       <div className="w-full bg-gradient-to-r from-purple-600/90 to-cyan-500/90 text-white text-center py-2.5 px-4 text-sm font-medium">
         <span className="mr-1">🚀</span> We&apos;re in <strong>open beta</strong> — all features are free to try. <a href="/support" className="underline underline-offset-2 hover:text-white/80 transition-colors">Share your feedback</a> and help us improve!
       </div>
+      {/* ── Token Banner ──────────────────────────────────── */}
+      <div className="w-full bg-gradient-to-r from-[#9945FF]/90 to-[#14F195]/90 text-white text-center py-2.5 px-4 text-sm font-medium">
+        <span className="mr-1">🪙</span> Our token is <strong>live</strong> &mdash; CA: <code className="font-mono text-xs bg-white/15 px-1.5 py-0.5 rounded select-all">Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump</code> <a href="/token" className="underline underline-offset-2 hover:text-white/80 transition-colors ml-1">Learn more</a>
+      </div>
 
       {/* ── 1. HERO ─────────────────────────────────────── */}
       <Section className="relative pt-16 sm:pt-24 md:pt-32 pb-16 sm:pb-24 md:pb-32 px-4 sm:px-6">
