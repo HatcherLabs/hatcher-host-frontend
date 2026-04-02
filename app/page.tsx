@@ -137,62 +137,6 @@ function AgentPreview() {
   );
 }
 
-// ─── Animated counter ─────────────────────────────────────────
-function AnimatedStat({ value, suffix = '', label }: { value: number; suffix?: string; label: string }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
-  const isVisible = useRef(false);
-  const lastAnimatedValue = useRef(0);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const animate = () => {
-      if (value <= 0 || value === lastAnimatedValue.current) return;
-      lastAnimatedValue.current = value;
-      const duration = 1800;
-      const steps = 60;
-      const increment = value / steps;
-      let current = 0;
-      const timer = setInterval(() => {
-        current += increment;
-        if (current >= value) {
-          setCount(value);
-          clearInterval(timer);
-        } else {
-          setCount(Math.floor(current));
-        }
-      }, duration / steps);
-    };
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        isVisible.current = !!entry?.isIntersecting;
-        if (isVisible.current) animate();
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(el);
-
-    // If already visible when value changes, animate immediately
-    if (isVisible.current) animate();
-
-    return () => observer.disconnect();
-  }, [value]);
-
-  const formatted = count >= 1000 ? `${(count / 1000).toFixed(count >= 10000 ? 0 : 1)}k` : count.toString();
-
-  return (
-    <div ref={ref} className="text-center">
-      <p className="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)] tabular-nums">
-        {formatted}{suffix}
-      </p>
-      <p className="text-sm text-[var(--text-muted)] mt-1">{label}</p>
-    </div>
-  );
-}
-
 // ─── Feature card ─────────────────────────────────────────────
 function FeatureCard({ icon: Icon, title, description, accentColor = 'purple' }: {
   icon: React.ElementType;
@@ -229,7 +173,6 @@ function FeatureCard({ icon: Icon, title, description, accentColor = 'purple' }:
 // ═══════════════════════════════════════════════════════════════
 export default function LandingPage() {
   const { isLoading: authLoading } = useAuth();
-  const [stats, setStats] = useState({ totalAgents: 0, activeAgents: 0, totalUsers: 0, totalMessages: 0 });
 
   useEffect(() => {
     // Prevent browser from restoring previous scroll position
@@ -239,11 +182,6 @@ export default function LandingPage() {
     window.scrollTo(0, 0);
   }, []);
 
-  useEffect(() => {
-    api.getPublicStats().then((res) => {
-      if (res.success) setStats(res.data);
-    });
-  }, []);
 
   // While auth is resolving, render nothing to avoid flash
   if (authLoading) {
@@ -389,16 +327,7 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* ── 3. PLATFORM HIGHLIGHTS ──────────────────────── */}
-      <Section className="py-12 sm:py-16 px-4 sm:px-6 border-t border-[var(--border-default)]">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-3 gap-8 sm:gap-12">
-            <AnimatedStat value={stats.totalAgents} label="Agents deployed" />
-            <AnimatedStat value={stats.activeAgents} label="Active now" />
-            <AnimatedStat value={4} label="Frameworks supported" />
-          </div>
-        </div>
-      </Section>
+      {/* ── 3. FRAMEWORK SHOWCASE ─── (stats section removed) */}
 
       {/* ── 4. FRAMEWORK SHOWCASE ───────────────────────── */}
       <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-[var(--border-default)]" id="frameworks">
