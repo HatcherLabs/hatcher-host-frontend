@@ -89,16 +89,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const res = await api.register(email, username, password, referralCode);
       if (!res.success) throw new Error(res.error);
 
-      setToken(res.data.token);
-      setUser({
-        id: res.data.user.id,
-        email: res.data.user.email,
-        username: res.data.user.username,
-        walletAddress: null,
-        isAdmin: false,
-        tier: 'free',
-      });
-      setAuthed(true);
+      // Don't set token or auth — user must verify email first
+      // Token is only stored after login (which requires verified email)
     } catch (e) {
       setError((e as Error).message);
       setAuthed(false);

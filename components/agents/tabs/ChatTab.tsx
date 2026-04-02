@@ -226,7 +226,11 @@ export function ChatTab() {
   // Reset extra-loaded window when switching agents
   useEffect(() => { setExtraLoaded(0); }, [agent.id]);
 
-  // No outer scroll prevention needed — chat uses fixed height container
+  // Disable browser scroll anchoring — prevents page from jumping when messages change
+  useEffect(() => {
+    document.documentElement.style.overflowAnchor = 'none';
+    return () => { document.documentElement.style.overflowAnchor = ''; };
+  }, []);
 
   // Scroll chat container to bottom when messages change — only if user is near bottom
   const isNearBottomRef = useRef(true);
