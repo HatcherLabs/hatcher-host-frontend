@@ -226,17 +226,33 @@ export function ChatTab() {
   // Reset extra-loaded window when switching agents
   useEffect(() => { setExtraLoaded(0); }, [agent.id]);
 
-  // Scroll messages to bottom — save/restore window.scrollY to prevent page jump
+  // Lock page scroll while chat is active — prevents page jumping on new messages
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const savedScrollY = window.scrollY;
+    // Scroll to top first, then lock
+    window.scrollTo(0, 0);
+    html.style.overflow = 'hidden';
+    html.style.height = '100vh';
+    body.style.overflow = 'hidden';
+    body.style.height = '100vh';
+    return () => {
+      html.style.overflow = '';
+      html.style.height = '';
+      body.style.overflow = '';
+      body.style.height = '';
+      window.scrollTo(0, savedScrollY);
+    };
+  }, []);
+
+  // Scroll messages container to bottom on new messages
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
-    // Only auto-scroll if already near bottom
     const gap = container.scrollHeight - container.scrollTop - container.clientHeight;
     if (gap < 150) {
-      const wy = window.scrollY;
       container.scrollTop = container.scrollHeight;
-      // Restore page scroll position synchronously
-      window.scrollTo(0, wy);
     }
   }, [messages]);
 
@@ -471,7 +487,7 @@ export function ChatTab() {
   }
 
   return (
-    <motion.div key="tab-chat" className="flex flex-col" style={{ height: 'min(calc(100vh - 240px), 800px)', minHeight: '350px' }} variants={tabContentVariants} initial="enter" animate="center" exit="exit">
+    <motion.div key="tab-chat" className="flex flex-col" style={{ height: 'calc(100vh - 200px)', maxHeight: 'calc(100vh - 200px)' }} variants={tabContentVariants} initial="enter" animate="center" exit="exit">
       {/* Chat header with framework badge + auto-speak toggle */}
       <div className="flex items-center justify-between mb-2 px-1">
         <div className="flex items-center gap-2">
