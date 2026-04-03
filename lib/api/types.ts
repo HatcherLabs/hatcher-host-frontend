@@ -1,7 +1,29 @@
 // ============================================================
 // API Types — shared type definitions for the API client
+//
+// Types here represent the *serialized API response* shape
+// (string dates, optional joined relations, subset of fields).
+// Domain/DB types live in @hatcher/shared.
 // ============================================================
 
+import type {
+  AgentFramework,
+  TicketStatus,
+  TicketCategory,
+  TicketPriority,
+  WsChatMessage,
+} from '@hatcher/shared';
+
+// Re-export shared types that are used identically in the frontend
+export type { TicketStatus, TicketCategory, TicketPriority };
+
+/** Re-export WsChatMessage as ChatMessage for frontend use */
+export type ChatMessage = WsChatMessage;
+
+/**
+ * Payment as returned by the API (serialized dates, optional agent join).
+ * Differs from shared Payment which has userId and Date fields.
+ */
 export interface Payment {
   id: string;
   agentId: string | null;
@@ -14,6 +36,10 @@ export interface Payment {
   agent?: { name: string };
 }
 
+/**
+ * AgentFeature as returned by the API (serialized dates, simpler type field).
+ * Differs from shared AgentFeature which uses FeatureKey/FeatureType enums and Date fields.
+ */
 export interface AgentFeature {
   id: string;
   featureKey: string;
@@ -24,6 +50,11 @@ export interface AgentFeature {
   createdAt: string;
 }
 
+/**
+ * Agent as returned by the API (serialized dates, optional joined relations,
+ * public-facing fields like isPublic/ownerUsername/ownerAddress).
+ * Differs from shared Agent which is the full DB model with Date fields and AgentConfig.
+ */
 export interface Agent {
   id: string;
   name: string;
@@ -31,7 +62,7 @@ export interface Agent {
   description: string | null;
   avatarUrl: string | null;
   status: string;
-  framework: 'openclaw' | 'hermes' | 'elizaos' | 'milady';
+  framework: AgentFramework;
   isPublic?: boolean;
   messageCount?: number;
   ownerId?: string;
@@ -44,15 +75,10 @@ export interface Agent {
   updatedAt?: string;
 }
 
-export interface ChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
-}
-
-export type TicketStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
-export type TicketCategory = 'general' | 'billing' | 'technical' | 'feature_request' | 'bug_report';
-export type TicketPriority = 'low' | 'normal' | 'high' | 'urgent';
-
+/**
+ * TicketMessage as returned by the API.
+ * Differs from shared TicketMessage which has no id/ticketId and uses 'system' role.
+ */
 export interface TicketMessage {
   id: string;
   ticketId: string;
@@ -61,6 +87,10 @@ export interface TicketMessage {
   createdAt: string;
 }
 
+/**
+ * Ticket as returned by the API (serialized dates, optional agent join).
+ * Differs from shared SupportTicket which uses Date fields.
+ */
 export interface Ticket {
   id: string;
   userId: string;

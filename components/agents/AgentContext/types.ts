@@ -1,4 +1,5 @@
 import type { Agent, AgentFeature } from '@/lib/api';
+import type { AgentFramework } from '@hatcher/shared';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -49,7 +50,7 @@ export interface IntegrationDef {
   /** Additional config fields shown when paired (e.g. allowFrom for WhatsApp) */
   pairingFields?: IntegrationField[];
   /** Which frameworks support this integration. If omitted, all frameworks. */
-  frameworks?: Array<'openclaw' | 'hermes' | 'elizaos' | 'milady'>;
+  frameworks?: AgentFramework[];
 }
 
 export interface AgentStats {
