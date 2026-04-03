@@ -10,6 +10,7 @@ import {
   Check,
   ChevronDown,
   Crown,
+  Gem,
   Globe,
   HelpCircle,
   MessageSquare,
@@ -126,6 +127,31 @@ const TIERS_DATA: TierDef[] = [
     ],
     missing: [],
   },
+  {
+    key: 'founding_member',
+    name: 'Founding Member',
+    price: 99,
+    icon: <Gem className="w-5 h-5" />,
+    accent: '#e11d48',
+    badge: 'Limited',
+    agents: '25 agents included',
+    messages: 'Unlimited messages/day',
+    cpu: '2 CPU',
+    ram: '4 GB RAM',
+    storage: '2 GB workspace',
+    sleep: 'Always-on (no auto-sleep)',
+    features: [
+      'One-time payment — lifetime access',
+      'BYOK = unlimited messages',
+      'Dedicated resources',
+      'File manager included',
+      'Full logs',
+      'Priority support',
+      'Team collaboration',
+      'All integrations',
+    ],
+    missing: [],
+  },
 ];
 
 /* ── Add-on definitions ──────────────────────────────────── */
@@ -153,25 +179,26 @@ interface FeatureRow {
   starter: string | boolean;
   pro: string | boolean;
   business: string | boolean;
+  founding: string | boolean;
 }
 
 const FEATURE_ROWS: FeatureRow[] = [
-  { label: 'Agents included',       free: '1',       starter: '1',         pro: '3',           business: '10' },
-  { label: 'Messages/day',          free: '10',      starter: '50',        pro: '200/agent',   business: '500/agent' },
-  { label: 'BYOK messages',         free: 'Unlimited', starter: 'Unlimited', pro: 'Unlimited', business: 'Unlimited' },
-  { label: 'CPU',                   free: '0.5',     starter: '1',         pro: '1.5',         business: '2' },
-  { label: 'RAM',                   free: '1 GB',    starter: '1.5 GB',    pro: '2 GB',        business: '3 GB' },
-  { label: 'Storage',               free: '100 MB',  starter: '200 MB',    pro: '500 MB',      business: '1 GB' },
-  { label: 'Resources',             free: 'Shared',  starter: 'Shared',    pro: 'Dedicated',   business: 'Dedicated' },
-  { label: 'Auto-sleep',            free: '10 min',  starter: '2 hours',   pro: 'Always-on',   business: 'Always-on' },
-  { label: 'File Manager',          free: false,      starter: false,       pro: false,         business: true },
-  { label: 'Full Logs',             free: false,      starter: false,       pro: true,          business: true },
-  { label: 'Custom domains + SSL',  free: false,      starter: false,       pro: true,          business: true },
-  { label: 'Team collaboration',    free: false,      starter: false,       pro: false,         business: true },
-  { label: 'Priority support',      free: false,      starter: false,       pro: false,         business: true },
-  { label: 'All integrations',      free: true,       starter: true,        pro: true,          business: true },
-  { label: 'BYOK (own LLM key)',    free: true,       starter: true,        pro: true,          business: true },
-  { label: 'Default LLM (Groq)',    free: true,       starter: true,        pro: true,          business: true },
+  { label: 'Agents included',       free: '1',       starter: '1',         pro: '3',           business: '10',       founding: '25' },
+  { label: 'Messages/day',          free: '10',      starter: '50',        pro: '200/agent',   business: '500/agent', founding: 'Unlimited' },
+  { label: 'BYOK messages',         free: 'Unlimited', starter: 'Unlimited', pro: 'Unlimited', business: 'Unlimited', founding: 'Unlimited' },
+  { label: 'CPU',                   free: '0.5',     starter: '1',         pro: '1.5',         business: '2',        founding: '2' },
+  { label: 'RAM',                   free: '1 GB',    starter: '1.5 GB',    pro: '2 GB',        business: '3 GB',     founding: '4 GB' },
+  { label: 'Storage',               free: '100 MB',  starter: '200 MB',    pro: '500 MB',      business: '1 GB',     founding: '2 GB' },
+  { label: 'Resources',             free: 'Shared',  starter: 'Shared',    pro: 'Dedicated',   business: 'Dedicated', founding: 'Dedicated' },
+  { label: 'Auto-sleep',            free: '10 min',  starter: '2 hours',   pro: 'Always-on',   business: 'Always-on', founding: 'Always-on' },
+  { label: 'File Manager',          free: false,      starter: false,       pro: false,         business: true,       founding: true },
+  { label: 'Full Logs',             free: false,      starter: false,       pro: true,          business: true,       founding: true },
+  { label: 'Custom domains + SSL',  free: false,      starter: false,       pro: true,          business: true,       founding: true },
+  { label: 'Team collaboration',    free: false,      starter: false,       pro: false,         business: true,       founding: true },
+  { label: 'Priority support',      free: false,      starter: false,       pro: false,         business: true,       founding: true },
+  { label: 'All integrations',      free: true,       starter: true,        pro: true,          business: true,       founding: true },
+  { label: 'BYOK (own LLM key)',    free: true,       starter: true,        pro: true,          business: true,       founding: true },
+  { label: 'Default LLM (Groq)',    free: true,       starter: true,        pro: true,          business: true,       founding: true },
 ];
 
 function renderCell(value: string | boolean) {
@@ -243,13 +270,14 @@ export default function PricingPage() {
         </div>
 
         {/* TIER CARDS */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-20">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mb-20">
           {TIERS_DATA.map((tier) => {
+            const isLifetime = tier.key === 'founding_member';
             const monthlyPrice = tier.price;
-            const annualMonthlyPrice = monthlyPrice === 0 ? 0 : parseFloat((monthlyPrice * 0.8).toFixed(2));
-            const displayPrice = isAnnual ? annualMonthlyPrice : monthlyPrice;
-            const annualTotal = isAnnual && monthlyPrice > 0 ? parseFloat((annualMonthlyPrice * 12).toFixed(2)) : null;
-            const billingParam = isAnnual ? 'annual' : 'monthly';
+            const annualMonthlyPrice = monthlyPrice === 0 || isLifetime ? monthlyPrice : parseFloat((monthlyPrice * 0.8).toFixed(2));
+            const displayPrice = isLifetime ? monthlyPrice : (isAnnual ? annualMonthlyPrice : monthlyPrice);
+            const annualTotal = isAnnual && monthlyPrice > 0 && !isLifetime ? parseFloat((annualMonthlyPrice * 12).toFixed(2)) : null;
+            const billingParam = isLifetime ? 'lifetime' : (isAnnual ? 'annual' : 'monthly');
 
             return (
               <motion.div
@@ -264,8 +292,13 @@ export default function PricingPage() {
                 {/* Popular badge */}
                 {tier.badge && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-[#8b5cf6] to-[#7c3aed] text-white text-[11px] font-bold uppercase tracking-wider shadow-[0_0_20px_rgba(139,92,246,0.5)]">
-                      <Crown className="w-3.5 h-3.5" />
+                    <span className={cn(
+                      'inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-white text-[11px] font-bold uppercase tracking-wider',
+                      isLifetime
+                        ? 'bg-gradient-to-r from-[#e11d48] to-[#be123c] shadow-[0_0_20px_rgba(225,29,72,0.5)]'
+                        : 'bg-gradient-to-r from-[#8b5cf6] to-[#7c3aed] shadow-[0_0_20px_rgba(139,92,246,0.5)]'
+                    )}>
+                      {isLifetime ? <Gem className="w-3.5 h-3.5" /> : <Crown className="w-3.5 h-3.5" />}
                       {tier.badge}
                     </span>
                   </div>
@@ -296,7 +329,7 @@ export default function PricingPage() {
                       </motion.span>
                     </AnimatePresence>
                     {displayPrice > 0 && (
-                      <span className="text-sm text-[var(--text-muted)]">/mo</span>
+                      <span className="text-sm text-[var(--text-muted)]">{isLifetime ? ' once' : '/mo'}</span>
                     )}
                   </div>
                   {annualTotal && (
@@ -308,9 +341,14 @@ export default function PricingPage() {
                       </span>
                     </p>
                   )}
-                  {!isAnnual && monthlyPrice > 0 && (
+                  {!isAnnual && monthlyPrice > 0 && !isLifetime && (
                     <p className="text-[10px] text-[var(--text-muted)] mt-1">
                       Switch to annual and save 20%
+                    </p>
+                  )}
+                  {isLifetime && (
+                    <p className="text-[10px] text-[#e11d48] font-semibold mt-1">
+                      Pay once, keep forever
                     </p>
                   )}
                 </div>
@@ -473,6 +511,10 @@ export default function PricingPage() {
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Business</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$39.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
                     </th>
+                    <th className="text-center px-2 py-3 sm:p-5 text-[#e11d48] font-semibold">
+                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Founding</div>
+                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal"> once</span></div>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -489,6 +531,7 @@ export default function PricingPage() {
                       <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.starter)}</td>
                       <td className="px-2 py-3 sm:p-4 text-center bg-[#8b5cf6]/[0.03]">{renderCell(row.pro)}</td>
                       <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.business)}</td>
+                      <td className="px-2 py-3 sm:p-4 text-center bg-[#e11d48]/[0.03]">{renderCell(row.founding)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -671,5 +714,9 @@ const FAQ = [
   {
     q: 'What LLM do I get with the free tier?',
     a: 'All tiers include Groq Llama 4 Scout as the default LLM. Free tier gets 10 messages/day, Starter gets 50, Pro gets 200 per agent, and Business gets 500 per agent. BYOK bypasses all limits.',
+  },
+  {
+    q: 'What is the Founding Member tier?',
+    a: 'Founding Member is a one-time $99 payment that gives you lifetime access to Hatcher with 25 agents, unlimited messages, 4 GB RAM, always-on, and all premium features. No monthly fees, ever. Limited availability — once all spots are taken, this tier is gone.',
   },
 ];

@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Mobile app safe areas ──────────────────────────── */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 /* Hide scrollbar for horizontal scroll containers */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
@@ -799,6 +807,30 @@
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   transform: translateZ(0);
+}
+
+/* ── Accessibility enhancements ──────────────────────── */
+
+/* Ensure minimum touch targets (48x48) for mobile a11y */
+@media (pointer: coarse) {
+  button, a, [role="button"], input[type="checkbox"], input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Visible error state for invalid form fields */
+input[aria-invalid="true"],
+textarea[aria-invalid="true"],
+select[aria-invalid="true"] {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+/* Busy state indicator for async content */
+[aria-busy="true"] {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 /* ── Prefers reduced motion ──────────────────────────── */

@@ -19,6 +19,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 const AUTH_NAV_LINKS = [
   { href: '/dashboard/agents',    label: 'My Agents' },
   { href: '/dashboard/analytics', label: 'Analytics' },
+  { href: '/dashboard/team',      label: 'Team' },
   { href: '/explore',             label: 'Explore' },
   { href: '/create',              label: 'Create' },
   { href: '/token',               label: 'Token' },
@@ -40,6 +41,7 @@ const AUX_LINKS = [
 
 // ── User dropdown links ──
 const USER_EXTRA_LINKS = [
+  { href: '/dashboard/team', label: 'Team', icon: Users },
   { href: '/dashboard/billing', label: 'Billing', icon: CreditCard },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
@@ -48,6 +50,7 @@ const USER_EXTRA_LINKS = [
 const MOBILE_AUTH_LINKS = [
   { href: '/dashboard/agents',    label: 'My Agents' },
   { href: '/dashboard/analytics', label: 'Analytics' },
+  { href: '/dashboard/team',      label: 'Team' },
   { href: '/explore',             label: 'Explore' },
   { href: '/create',              label: 'Create' },
   { href: '/pricing',             label: 'Pricing' },
@@ -121,7 +124,7 @@ export function Header() {
             <Link href="/" className="flex items-center gap-2 group">
               <span className="flex items-center gap-2">
                 <span className="relative flex items-center justify-center w-7 h-7">
-                  <svg viewBox="0 0 28 28" width="28" height="28" fill="none">
+                  <svg viewBox="0 0 28 28" width="28" height="28" fill="none" aria-label="Hatcher logo" role="img">
                     <defs>
                       <linearGradient id="eggShell" x1="14" y1="3" x2="14" y2="27" gradientUnits="userSpaceOnUse">
                         <stop offset="0%" stopColor="#2a2a38" />

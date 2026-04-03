@@ -169,6 +169,13 @@ const softwareApplicationJsonLd = {
       billingIncrement: 'P1M',
       description: '10 agents, 500 messages/day, always-on, priority support.',
     },
+    {
+      '@type': 'Offer',
+      name: 'Founding Member',
+      price: '99',
+      priceCurrency: 'USD',
+      description: '25 agents, unlimited messages, lifetime access, always-on, priority support.',
+    },
   ],
   creator: {
     '@type': 'Organization',
