@@ -203,6 +203,7 @@ export default function PrivacyPolicyPage() {
               <li>Support: <a href="mailto:support@hatcher.host" className="text-cyan-400 hover:underline">support@hatcher.host</a></li>
               <li>General inquiries: <a href="mailto:contact@hatcher.host" className="text-cyan-400 hover:underline">contact@hatcher.host</a></li>
               <li>Discord: <a href="https://discord.gg/7tY3HjKjMc" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">discord.gg/7tY3HjKjMc</a></li>
+              <li>Telegram: <a href="https://t.me/HatcherLabs" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">t.me/HatcherLabs</a></li>
             </ul>
           </section>
         </div>

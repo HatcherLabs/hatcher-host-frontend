@@ -54,6 +54,14 @@ const QUICK_LINKS = [
     external: true,
   },
   {
+    label: 'Telegram Group',
+    href: 'https://t.me/HatcherLabs',
+    icon: MessageCircle,
+    emoji: '\u2708\uFE0F',
+    color: '#29a9eb',
+    external: true,
+  },
+  {
     label: 'Submit Ticket',
     href: '/support',
     icon: Ticket,
@@ -462,6 +470,18 @@ export default function HelpPage() {
                 <div>
                   <p className="text-xs font-medium text-[var(--text-primary)] group-hover:text-[#06b6d4] transition-colors">Discord</p>
                   <p className="text-[10px] text-[var(--text-muted)]">Community support</p>
+                </div>
+              </a>
+              <a
+                href="https://t.me/HatcherLabs"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2.5 p-3 rounded-lg bg-[var(--bg-card)] hover:bg-[var(--bg-card)] transition-colors group"
+              >
+                <MessageCircle size={14} className="text-[#29a9eb] flex-shrink-0" />
+                <div>
+                  <p className="text-xs font-medium text-[var(--text-primary)] group-hover:text-[#06b6d4] transition-colors">Telegram</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">Community chat</p>
                 </div>
               </a>
             </div>

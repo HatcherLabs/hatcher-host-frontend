@@ -10,6 +10,7 @@ export const SOLANA_RPC = process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.dev
 export const SOCIAL_LINKS = {
   twitter: 'https://x.com/HatcherLabs',
   github: 'https://github.com/HatcherLabs',
+  telegram: 'https://t.me/HatcherLabs',
 } as const;
 
 export const EXTERNAL_LINKS = {

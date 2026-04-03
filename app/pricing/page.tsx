@@ -527,7 +527,11 @@ export default function PricingPage() {
             </a>
             {' '}or{' '}
             <a href="https://discord.gg/7tY3HjKjMc" target="_blank" rel="noopener noreferrer" className="text-[#8b5cf6] hover:underline font-medium">
-              ask on Discord
+              Discord
+            </a>
+            {' '}or{' '}
+            <a href="https://t.me/HatcherLabs" target="_blank" rel="noopener noreferrer" className="text-[#8b5cf6] hover:underline font-medium">
+              Telegram
             </a>
           </p>
         </div>

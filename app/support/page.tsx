@@ -304,6 +304,14 @@ export default function SupportPage() {
                 className="text-[#06b6d4] hover:underline font-medium"
               >
                 Join our Discord
+              </a>{' '}&middot;{' '}
+              <a
+                href="https://t.me/HatcherLabs"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#06b6d4] hover:underline font-medium"
+              >
+                Telegram
               </a>{' '}
               for community support
             </p>
