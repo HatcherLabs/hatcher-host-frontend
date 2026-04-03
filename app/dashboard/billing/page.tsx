@@ -573,7 +573,9 @@ export default function BillingPage() {
                     : '0 0 24px rgba(6,182,212,0.1)',
                 }}
               >
-                {currentTier === 'pro' ? (
+                {currentTier === 'founding_member' ? (
+                  <Crown className="w-7 h-7 text-[#e11d48]" />
+                ) : currentTier === 'pro' ? (
                   <Crown className="w-7 h-7 text-[#06b6d4]" />
                 ) : currentTier === 'business' ? (
                   <Crown className="w-7 h-7 text-[#ec4899]" />
@@ -595,8 +597,8 @@ export default function BillingPage() {
                   </span>
                 </div>
                 <p className="text-sm text-[var(--text-muted)]">
-                  {tierConfig.usdPrice === 0 ? 'No charge' : `$${tierConfig.usdPrice} / 30 days`}
-                  {` -- ${tierConfig.messagesPerDay} messages/day`}{tierConfig.usdPrice > 0 && ' (BYOK = unlimited)'}
+                  {tierConfig.usdPrice === 0 ? 'No charge' : currentTier === 'founding_member' ? `$${tierConfig.usdPrice} lifetime` : `$${tierConfig.usdPrice} / 30 days`}
+                  {` -- ${tierConfig.messagesPerDay === 0 ? 'unlimited' : tierConfig.messagesPerDay} messages/day`}{tierConfig.usdPrice > 0 && ' (BYOK = unlimited)'}
                 </p>
                 {accountData?.subscriptionExpiresAt && (() => {
                   const expires = new Date(accountData.subscriptionExpiresAt);
@@ -718,7 +720,7 @@ export default function BillingPage() {
       </motion.div>
 
       {/* ── Upgrade Tier ─────────────────────────────────── */}
-      {currentTier !== 'pro' && (
+      {currentTier !== 'founding_member' && (
         <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
           <div className="px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
             <div className="flex items-center gap-2">

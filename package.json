@@ -31,7 +31,7 @@
     "@capacitor/push-notifications": "^8.0.3",
     "@capacitor/splash-screen": "^8.0.1",
     "@capacitor/status-bar": "^8.0.2",
-    "@hatcher/shared": "github:HatcherLabs/hatcher-shared#a702645",
+    "@hatcher/shared": "github:HatcherLabs/hatcher-shared#6e4c719",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@sentry/nextjs": "^10.46.0",
     "@solana/wallet-adapter-base": "^0.9.25",
