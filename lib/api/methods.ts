@@ -83,11 +83,15 @@ export const api = {
     const token = getToken();
     const res = await fetch(`${API_BASE}/auth/export-data`, {
       method: 'POST',
+      credentials: 'include', // Send httpOnly cookie
       headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}), 'Content-Type': 'application/json' },
     });
     if (!res.ok) throw new Error('Export failed');
     return res.blob();
   },
+
+  /** Logout — clear httpOnly cookie server-side */
+  logout: () => req<{ loggedOut: boolean }>('/auth/logout', { method: 'POST' }),
 
   /** Regenerate API key (legacy single-key) */
   regenerateApiKey: () =>

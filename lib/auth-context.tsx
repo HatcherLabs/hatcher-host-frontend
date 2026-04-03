@@ -100,6 +100,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const logout = useCallback(() => {
+    // Clear the httpOnly cookie via the API (best-effort, don't block on failure)
+    api.logout().catch(() => {});
+    // Clear localStorage fallback
     clearToken();
     setAuthed(false);
     setUser(null);
@@ -108,27 +111,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const clearError = useCallback(() => setError(null), []);
 
   // Sync state with token on mount (e.g. page refresh)
+  // Check both localStorage token AND httpOnly cookie (via profile fetch)
   useEffect(() => {
-    if (isAuthenticated()) {
-      setAuthed(true);
-      api.getProfile().then((res) => {
-        if (res.success) {
-          setUser({
-            id: res.data.id,
-            email: res.data.email,
-            username: res.data.username,
-            walletAddress: res.data.walletAddress ?? null,
-            isAdmin: res.data.isAdmin ?? false,
-            tier: (res.data as any).tier ?? 'free',
-          });
-        } else {
-          clearToken();
-          setAuthed(false);
-        }
-      }).finally(() => setIsLoading(false));
-    } else {
-      setIsLoading(false);
-    }
+    // Always attempt a profile fetch — the httpOnly cookie may authenticate
+    // even if localStorage is empty (cookie-based session after migration)
+    const hasLocalToken = isAuthenticated();
+    
+    api.getProfile().then((res) => {
+      if (res.success) {
+        setAuthed(true);
+        setUser({
+          id: res.data.id,
+          email: res.data.email,
+          username: res.data.username,
+          walletAddress: res.data.walletAddress ?? null,
+          isAdmin: res.data.isAdmin ?? false,
+          tier: (res.data as any).tier ?? 'free',
+        });
+      } else {
+        // Neither cookie nor localStorage token is valid
+        if (hasLocalToken) clearToken();
+        setAuthed(false);
+      }
+    }).finally(() => setIsLoading(false));
   }, []);
 
   // Listen for auth-expired event dispatched by the API client on 401
