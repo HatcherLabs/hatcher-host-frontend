@@ -371,7 +371,7 @@ export default function PricingPage() {
                 {/* CTA */}
                 {tier.key === 'free' ? (
                   <Link
-                    href="/register?tier=free"
+                    href="/register"
                     className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all bg-green-600 text-white hover:bg-green-500"
                   >
                     <Rocket className="w-4 h-4" />
@@ -379,7 +379,7 @@ export default function PricingPage() {
                   </Link>
                 ) : tier.highlighted ? (
                   <Link
-                    href={`/register?tier=${tier.key}&billing=${billingParam}`}
+                    href={`/dashboard/billing?upgrade=${tier.key}`}
                     className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all text-white"
                     style={{
                       background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
@@ -391,7 +391,7 @@ export default function PricingPage() {
                   </Link>
                 ) : (
                   <Link
-                    href={`/register?tier=${tier.key}&billing=${billingParam}`}
+                    href={`/dashboard/billing?upgrade=${tier.key}`}
                     className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all text-white"
                     style={{
                       background: tier.accent,
