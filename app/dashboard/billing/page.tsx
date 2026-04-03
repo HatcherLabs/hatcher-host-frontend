@@ -27,6 +27,7 @@ import {
   Wallet,
   X,
   Zap,
+  Diamond,
 } from 'lucide-react';
 
 /* ── Animation ───────────────────────────────────────────── */
@@ -75,6 +76,7 @@ interface PaymentModalProps {
   title: string;
   price: number;
   onPayWithSOL: () => void;
+  onPayWithHATCHER: () => void;
   onPayWithCard: () => void;
   onPayWithCredits?: () => void;
   creditBalance: number;
@@ -85,7 +87,7 @@ interface PaymentModalProps {
   onSelectAgent?: (agentId: string) => void;
 }
 
-function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithCard, onPayWithCredits, creditBalance, loading, requiresAgent, agents, selectedAgentId, onSelectAgent }: PaymentModalProps) {
+function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithHATCHER, onPayWithCard, onPayWithCredits, creditBalance, loading, requiresAgent, agents, selectedAgentId, onSelectAgent }: PaymentModalProps) {
   if (!isOpen) return null;
   const canPayWithCredits = creditBalance >= price && price > 0;
   const needsAgentSelection = requiresAgent && !selectedAgentId;
@@ -171,6 +173,22 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
               <div className="text-left">
                 <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with SOL</p>
                 <p className="text-[11px] text-[var(--text-muted)]">Solana wallet payment</p>
+              </div>
+              {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
+            </button>
+
+            {/* Pay with $HATCHER */}
+            <button
+              onClick={onPayWithHATCHER}
+              disabled={loading || needsAgentSelection}
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#f59e0b]/30 hover:bg-[#f59e0b]/[0.03] transition-all disabled:opacity-40"
+            >
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#f59e0b] to-[#f97316] flex items-center justify-center flex-shrink-0">
+                <Diamond className="w-5 h-5 text-white" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with $HATCHER</p>
+                <p className="text-[11px] text-[var(--text-muted)]">HATCHER token on Solana</p>
               </div>
               {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
             </button>
@@ -348,6 +366,31 @@ export default function BillingPage() {
     }
   };
 
+  /* ── Subscribe to a tier (HATCHER token payment) ────────── */
+  const handleSubscribeHATCHER = async () => {
+    const tierKey = paymentModal.tierKey;
+    if (!tierKey) return;
+    setPaymentLoading(true);
+    setSubscribing(tierKey);
+    setError(null);
+    setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    try {
+      const txSignature = `mock-${Date.now()}`;
+      const res = await api.subscribe(tierKey, txSignature, 'hatch');
+      if (res.success) {
+        await loadAccountData();
+        showSuccess(`Subscribed to ${TIERS[tierKey].name} with $HATCHER!`);
+      } else {
+        setError(res.error ?? 'Subscription failed');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Subscription failed');
+    } finally {
+      setSubscribing(null);
+      setPaymentLoading(false);
+    }
+  };
+
   /* ── Subscribe via Stripe (mock) ──────────────────────── */
   const handleSubscribeStripe = handleSubscribeSOL;
 
@@ -368,6 +411,34 @@ export default function BillingPage() {
         await loadAccountData();
         const addon = ADDONS.find(a => a.key === addonKey);
         showSuccess(`${addon?.name ?? 'Add-on'} purchased!`);
+      } else {
+        setError(res.error ?? 'Purchase failed');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Purchase failed');
+    } finally {
+      setPurchasingAddon(null);
+      setPaymentLoading(false);
+    }
+  };
+
+  /* ── Purchase add-on (HATCHER token payment) ──────────── */
+  const handlePurchaseAddonHATCHER = async () => {
+    const addonKey = paymentModal.addonKey;
+    if (!addonKey) return;
+    const addonConfig = ADDONS.find(a => a.key === addonKey);
+    if (addonConfig?.perAgent && !selectedAgentId) return;
+    setPaymentLoading(true);
+    setPurchasingAddon(addonKey);
+    setError(null);
+    setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    try {
+      const txSignature = `mock-${Date.now()}`;
+      const res = await api.purchaseAddon(addonKey, txSignature, selectedAgentId ?? undefined, 'hatch');
+      if (res.success) {
+        await loadAccountData();
+        const addon = ADDONS.find(a => a.key === addonKey);
+        showSuccess(`${addon?.name ?? 'Add-on'} purchased with $HATCHER!`);
       } else {
         setError(res.error ?? 'Purchase failed');
       }
@@ -755,7 +826,7 @@ export default function BillingPage() {
                           </span>
                         )}
                       </div>
-                      <span className="text-xl font-extrabold text-[var(--text-primary)]">${tier.usdPrice}<span className="text-xs text-[var(--text-muted)] font-normal"> / 30 days</span></span>
+                      <span className="text-xl font-extrabold text-[var(--text-primary)]">${tier.usdPrice}<span className="text-xs text-[var(--text-muted)] font-normal"> {tierKey === 'founding_member' ? 'lifetime' : '/ 30 days'}</span></span>
                     </div>
                     <div className="space-y-1.5 mb-4">
                       <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
@@ -935,6 +1006,7 @@ export default function BillingPage() {
         title={paymentModal.title}
         price={paymentModal.price}
         onPayWithSOL={paymentModal.type === 'subscription' ? handleSubscribeSOL : handlePurchaseAddonSOL}
+        onPayWithHATCHER={paymentModal.type === 'subscription' ? handleSubscribeHATCHER : handlePurchaseAddonHATCHER}
         onPayWithCard={paymentModal.type === 'subscription' ? handleSubscribeStripe : handlePurchaseAddonStripe}
         onPayWithCredits={paymentModal.type === 'subscription' ? handleSubscribeCredits : handlePurchaseAddonCredits}
         creditBalance={creditBalance}

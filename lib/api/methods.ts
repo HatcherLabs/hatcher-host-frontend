@@ -317,17 +317,17 @@ export const api = {
   getFeatureCatalog: () => req<{ tiers: any; addons: any }>('/features'),
 
   /** Subscribe to a tier */
-  subscribe: (tier: string, txSignature: string) =>
+  subscribe: (tier: string, txSignature: string, paymentToken: 'sol' | 'hatch' = 'sol') =>
     req<{ tier: string }>('/features/subscribe', {
       method: 'POST',
-      body: JSON.stringify({ tier, txSignature }),
+      body: JSON.stringify({ tier, txSignature, paymentToken }),
     }),
 
   /** Purchase an add-on (optionally per-agent) */
-  purchaseAddon: (addonKey: string, txSignature: string, agentId?: string) =>
+  purchaseAddon: (addonKey: string, txSignature: string, agentId?: string, paymentToken: 'sol' | 'hatch' = 'sol') =>
     req<{ addonKey: string }>('/features/addon', {
       method: 'POST',
-      body: JSON.stringify({ addonKey, txSignature, ...(agentId ? { agentId } : {}) }),
+      body: JSON.stringify({ addonKey, txSignature, paymentToken, ...(agentId ? { agentId } : {}) }),
     }),
 
   /** Cancel current subscription (revert to free at end of period) */

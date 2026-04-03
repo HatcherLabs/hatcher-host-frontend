@@ -305,7 +305,7 @@ export default function AdminPage() {
   }, [agents]);
 
   const tierDistribution = useMemo(() => {
-    const counts: Record<string, number> = { free: 0, starter: 0, pro: 0, business: 0 };
+    const counts: Record<string, number> = { free: 0, starter: 0, pro: 0, business: 0, founding_member: 0 };
     users.forEach((u) => {
       const t = (u.tier || 'free').toLowerCase();
       counts[t] = (counts[t] || 0) + 1;
@@ -314,6 +314,7 @@ export default function AdminPage() {
     return [
       { key: 'free', label: 'Free', color: '#6B7280', count: counts.free, percent: Math.round((counts.free / total) * 100) },
       { key: 'starter', label: 'Starter', color: '#60A5FA', count: counts.starter, percent: Math.round((counts.starter / total) * 100) },
+      { key: 'founding_member', label: 'Founding', color: '#A78BFA', count: counts.founding_member, percent: Math.round((counts.founding_member / total) * 100) },
       { key: 'pro', label: 'Pro', color: '#FBBF24', count: counts.pro, percent: Math.round((counts.pro / total) * 100) },
       { key: 'business', label: 'Business', color: '#F472B6', count: counts.business, percent: Math.round((counts.business / total) * 100) },
     ];
@@ -753,9 +754,11 @@ export default function AdminPage() {
                               ? 'text-pink-400 bg-pink-500/10 border-pink-500/20'
                               : u.tier === 'starter'
                               ? 'text-blue-400 bg-blue-500/10 border-blue-500/20'
+                              : u.tier === 'founding_member'
+                              ? 'text-purple-400 bg-purple-500/10 border-purple-500/20'
                               : 'text-[var(--text-muted)] bg-[rgba(46,43,74,0.3)] border-[var(--border-default)]'
                           }`}>
-                            {u.tier || 'free'}
+                            {u.tier === 'founding_member' ? 'Founding' : (u.tier || 'free')}
                           </span>
                           <span className="text-[10px] text-[var(--text-muted)] w-16 text-right">{timeAgo(u.createdAt)}</span>
                         </div>
