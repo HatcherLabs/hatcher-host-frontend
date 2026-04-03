@@ -157,7 +157,7 @@ export function NotificationCenter() {
     try {
       const res = await api.markNotificationsRead();
       if (res.success) setReadAt(res.data.readAt);
-    } catch {}
+    } catch (e) { console.debug('Failed to mark notifications as read', e); }
   };
 
   const dismissOne = (id: string) => {

@@ -2,6 +2,8 @@ import { MetadataRoute } from 'next';
 import { BLOG_POSTS } from '@/lib/blog';
 import { API_URL } from '@/lib/config';
 
+export const dynamic = 'force-static';
+
 interface ExploreAgent {
   id: string;
   updatedAt?: string;

@@ -5,9 +5,8 @@ const config: CapacitorConfig = {
   appName: 'Hatcher',
   webDir: 'out',
   server: {
-    // In production, serve from the bundled web assets
-    // For development, uncomment the url below to use live reload
-    // url: 'http://192.168.1.x:3000',
+    // Load from live server — always up-to-date, no static export needed
+    url: 'https://hatcher.host',
     androidScheme: 'https',
     iosScheme: 'https',
   },
@@ -25,8 +24,11 @@ const config: CapacitorConfig = {
       style: 'LIGHT', // light text on dark background
     },
     Keyboard: {
-      resize: 'body' as unknown as undefined,
-      resizeOnFullScreen: true,
+      resize: 'none' as unknown as undefined,
+      resizeOnFullScreen: false,
+    },
+    PushNotifications: {
+      presentationOptions: ['badge', 'sound', 'alert'],
     },
   },
   android: {
