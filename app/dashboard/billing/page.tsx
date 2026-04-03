@@ -183,11 +183,9 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
               disabled={loading || needsAgentSelection}
               className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#f59e0b]/30 hover:bg-[#f59e0b]/[0.03] transition-all disabled:opacity-40"
             >
-              <img
-                src="https://ipfs.io/ipfs/bafybeih4oxihihor3bxlloibfm3ir4l5acupy2kjsrwpp7zbyqlgflwktu"
-                alt="HATCHER"
-                className="w-10 h-10 rounded-lg flex-shrink-0"
-              />
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#f59e0b] to-[#f97316] flex items-center justify-center flex-shrink-0">
+                <span className="text-white font-extrabold text-[7px] tracking-tight">HATCHER</span>
+              </div>
               <div className="text-left">
                 <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with $HATCHER</p>
                 <p className="text-[11px] text-[var(--text-muted)]">HATCHER token on Solana</p>

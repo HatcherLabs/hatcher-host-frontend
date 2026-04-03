@@ -173,6 +173,7 @@ function FeatureCard({ icon: Icon, title, description, accentColor = 'purple' }:
 // ═══════════════════════════════════════════════════════════════
 export default function LandingPage() {
   const { isLoading: authLoading } = useAuth();
+  const [tokenData, setTokenData] = useState<{ price: string; mcap: string } | null>(null);
 
   useEffect(() => {
     // Prevent browser from restoring previous scroll position
@@ -180,6 +181,22 @@ export default function LandingPage() {
       history.scrollRestoration = 'manual';
     }
     window.scrollTo(0, 0);
+
+    // Fetch HATCHER token price + mcap from DexScreener (one-time on load)
+    fetch('https://api.dexscreener.com/latest/dex/tokens/Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump')
+      .then(r => r.json())
+      .then(d => {
+        const pair = d?.pairs?.[0];
+        if (pair) {
+          const price = parseFloat(pair.priceUsd);
+          const mcap = pair.marketCap || pair.fdv || 0;
+          setTokenData({
+            price: price < 0.01 ? `$${price.toFixed(6)}` : `$${price.toFixed(4)}`,
+            mcap: mcap >= 1_000_000 ? `$${(mcap / 1_000_000).toFixed(2)}M` : `$${(mcap / 1_000).toFixed(1)}K`,
+          });
+        }
+      })
+      .catch(() => {});
   }, []);
 
 
@@ -201,7 +218,7 @@ export default function LandingPage() {
       </div>
       {/* ── Token Banner ──────────────────────────────────── */}
       <div className="w-full bg-gradient-to-r from-[#9945FF]/90 to-[#14F195]/90 text-white text-center py-2.5 px-4 text-sm font-medium">
-        <span className="mr-1">🪙</span> Our token is <strong>live</strong> &mdash; CA: <code className="font-mono text-xs bg-white/15 px-1.5 py-0.5 rounded select-all">Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump</code> <a href="/token" className="underline underline-offset-2 hover:text-white/80 transition-colors ml-1">Learn more</a>
+        <span className="mr-1">🪙</span> <strong>$HATCHER</strong> is live{tokenData && <> — <span className="font-mono">{tokenData.price}</span> · MCap <span className="font-mono">{tokenData.mcap}</span></>} — CA: <code className="font-mono text-xs bg-white/15 px-1.5 py-0.5 rounded select-all">Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump</code> <a href="/token" className="underline underline-offset-2 hover:text-white/80 transition-colors ml-1">Learn more</a>
       </div>
 
       {/* ── 1. HERO ─────────────────────────────────────── */}
