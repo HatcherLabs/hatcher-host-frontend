@@ -43,7 +43,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https://*.ipfs.nftstorage.link https://arweave.net https://raw.githubusercontent.com",
-              "connect-src 'self' https://api.hatcher.host wss://api.hatcher.host https://*.solana.com https://*.helius-rpc.com",
+              "connect-src 'self' https://api.hatcher.host wss://api.hatcher.host https://*.solana.com https://*.helius-rpc.com https://api.dexscreener.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",
