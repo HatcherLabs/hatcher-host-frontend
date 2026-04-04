@@ -43,7 +43,7 @@ export function TerminalTab() {
   const [state, setState] = useState<ConnectionState>('disconnected');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const isActive = agent?.status === 'active' && !!agent.containerId;
+  const isActive = agent?.status === 'active';
 
   // ── Initialize xterm + connect WebSocket ──
   const connect = useCallback(async () => {
