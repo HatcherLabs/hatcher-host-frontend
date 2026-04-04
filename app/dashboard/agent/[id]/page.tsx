@@ -126,6 +126,10 @@ const AnalyticsTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const TerminalTab = dynamic(
+  () => import('@/components/agents/tabs/TerminalTab').then(mod => ({ default: mod.TerminalTab })),
+  { loading: TabSkeleton },
+);
 const HealthTab = dynamic(
   () => import('@/components/agents/tabs/HealthTab').then(mod => ({ default: mod.HealthTab })),
   { loading: () => <TabSkeleton /> }
@@ -1194,6 +1198,7 @@ export default function AgentManagePage() {
               {tab === 'skills' && <SkillsTab />}
               {tab === 'files' && <FilesTab />}
               {tab === 'logs' && <LogsTab />}
+              {tab === 'terminal' && <TerminalTab />}
               {tab === 'memory' && <MemoryTab />}
               {tab === 'knowledge' && <KnowledgeTab />}
               {/* schedules and workflows hidden from public for now */}

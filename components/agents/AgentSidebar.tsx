@@ -22,6 +22,7 @@ import {
   HeartPulse,
   Bot,
   Cpu,
+  TerminalSquare,
 } from 'lucide-react';
 import type { Tab } from './AgentContext';
 import { STATUS_STYLES, FRAMEWORK_BADGE } from './AgentContext';
@@ -46,6 +47,7 @@ function getTabs(framework?: string): TabDef[] {
     { id: 'integrations', label: 'Integrations', icon: <Puzzle size={18} />, group: 'configure' },
     { id: 'skills', label: framework === 'elizaos' ? 'Plugins' : 'Skills', icon: <Sparkles size={18} />, group: 'configure' },
     { id: 'logs', label: 'Logs', icon: <ScrollText size={18} />, group: 'data' },
+    { id: 'terminal', label: 'Terminal', icon: <TerminalSquare size={18} />, group: 'data' },
     { id: 'analytics', label: 'Analytics', icon: <TrendingUp size={18} />, group: 'data' },
     { id: 'usage', label: 'Usage', icon: <Activity size={18} />, group: 'data' },
     { id: 'health', label: 'Health', icon: <HeartPulse size={18} />, group: 'data' },
