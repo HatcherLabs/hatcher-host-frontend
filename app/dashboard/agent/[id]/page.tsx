@@ -362,6 +362,7 @@ export default function AgentManagePage() {
 
   const userTier = (user?.tier ?? 'free') as UserTierKey;
   const [hasUnlimitedChat, setHasUnlimitedChat] = useState(false);
+  const [isByok, setIsByok] = useState(false);
   const [msgLimit, setMsgLimit] = useState(TIERS[userTier]?.messagesPerDay ?? TIERS.free.messagesPerDay);
 
   // Keep msgLimit in sync with userTier when it changes (e.g. after profile loads)
@@ -378,8 +379,12 @@ export default function AgentManagePage() {
       const res = await api.getAgentUsage(id);
       if (res.success) {
         setMsgCount(res.data.messages.today);
-        if (res.data.messages.isByok || res.data.messages.limit === 0) {
+        if (res.data.messages.isByok) {
           setHasUnlimitedChat(true);
+          setIsByok(true);
+        } else if (res.data.messages.limit === 0) {
+          setHasUnlimitedChat(true);
+          setIsByok(false);
         } else if (res.data.messages.limit > 0) {
           setMsgLimit(res.data.messages.limit);
           setHasUnlimitedChat(false);
@@ -403,6 +408,9 @@ export default function AgentManagePage() {
         setMsgCount(agentData.chatUsedToday);
       }
       if (agentData.isByok) {
+        setHasUnlimitedChat(true);
+        setIsByok(true);
+      } else if (typeof agentData.chatLimit === 'number' && agentData.chatLimit === 0) {
         setHasUnlimitedChat(true);
       } else if (typeof agentData.chatLimit === 'number' && agentData.chatLimit > 0) {
         setMsgLimit(agentData.chatLimit);
@@ -1003,7 +1011,7 @@ export default function AgentManagePage() {
       logs, logsLoading, logFilter, setLogFilter, logSearch, setLogSearch, autoScroll, setAutoScroll, filteredLogs, logsEndRef, loadLogs,
       messages, setMessages, input, setInput, sending,
       chatError, setChatError, chatErrorType, setChatErrorType,
-      msgCount, hasUnlimitedChat, msgLimit, remaining, isLimitReached,
+      msgCount, hasUnlimitedChat, isByok, msgLimit, remaining, isLimitReached,
       bottomRef, inputRef, sendMessage, handleKeyDown, sendCooldown,
       wsConnected: wsChat.isConnected,
       configName, setConfigName, configDesc, setConfigDesc,

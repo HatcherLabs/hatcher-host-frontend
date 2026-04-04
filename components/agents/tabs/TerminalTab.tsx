@@ -40,14 +40,31 @@ export function TerminalTab() {
   const termInstance = useRef<InstanceType<typeof import('@xterm/xterm').Terminal> | null>(null);
   const fitAddonRef = useRef<InstanceType<typeof import('@xterm/addon-fit').FitAddon> | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
+  const onDataDisposable = useRef<{ dispose: () => void } | null>(null);
+  const stateRef = useRef<ConnectionState>('disconnected');
   const [state, setState] = useState<ConnectionState>('disconnected');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const isActive = agent?.status === 'active';
 
+  // Keep ref in sync with state for use inside closures
+  useEffect(() => { stateRef.current = state; }, [state]);
+
   // ── Initialize xterm + connect WebSocket ──
   const connect = useCallback(async () => {
     if (!agent?.id || !isActive) return;
+
+    // Close existing connection first to avoid race conditions
+    if (wsRef.current) {
+      wsRef.current.close(1000, 'Reconnecting');
+      wsRef.current = null;
+    }
+
+    // Dispose previous onData listener to prevent duplicate keystrokes
+    if (onDataDisposable.current) {
+      onDataDisposable.current.dispose();
+      onDataDisposable.current = null;
+    }
 
     setState('connecting');
     setErrorMsg(null);
@@ -166,7 +183,7 @@ export function TerminalTab() {
       };
 
       ws.onclose = (e) => {
-        if (state !== 'error') setState('disconnected');
+        if (stateRef.current !== 'error') setState('disconnected');
         if (e.code !== 1000) {
           term.writeln(`\x1b[33m[hatcher]\x1b[0m Connection closed (${e.reason || `code ${e.code}`})`);
         }
@@ -174,7 +191,7 @@ export function TerminalTab() {
       };
 
       // Forward terminal input to WebSocket
-      term.onData((data: string) => {
+      onDataDisposable.current = term.onData((data: string) => {
         if (ws.readyState === WebSocket.OPEN) {
           ws.send(JSON.stringify({ type: 'input', data }));
         }
@@ -188,6 +205,10 @@ export function TerminalTab() {
 
   // ── Disconnect ──
   const disconnect = useCallback(() => {
+    if (onDataDisposable.current) {
+      onDataDisposable.current.dispose();
+      onDataDisposable.current = null;
+    }
     if (wsRef.current) {
       wsRef.current.close(1000, 'User disconnect');
       wsRef.current = null;
@@ -203,7 +224,8 @@ export function TerminalTab() {
     return () => {
       disconnect();
     };
-  }, [isActive]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive, connect, disconnect]);
 
   // ── Handle resize ──
   useEffect(() => {

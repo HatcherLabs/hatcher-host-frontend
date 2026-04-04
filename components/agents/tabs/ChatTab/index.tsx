@@ -29,7 +29,7 @@ export function ChatTab() {
     chatError, setChatError,
     chatErrorType, setChatErrorType,
     msgCount, msgLimit,
-    hasUnlimitedChat,
+    hasUnlimitedChat, isByok,
     remaining, isLimitReached,
     bottomRef, inputRef,
     sendMessage, handleKeyDown,
@@ -239,9 +239,10 @@ export function ChatTab() {
       />
 
       <RateLimitIndicator
-        isAuthenticated={isAuthenticated}
+        isAuthenticated={!!isAuthenticated}
         isLimitReached={isLimitReached}
         hasUnlimitedChat={hasUnlimitedChat}
+        isByok={isByok}
         msgCount={msgCount}
         msgLimit={msgLimit}
         remaining={remaining}

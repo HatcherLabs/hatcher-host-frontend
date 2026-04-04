@@ -100,6 +100,7 @@ export interface AgentContextValue {
   setChatErrorType: (type: 'timeout' | 'ratelimit' | 'network' | 'generic' | null) => void;
   msgCount: number;
   hasUnlimitedChat: boolean;
+  isByok: boolean;
   msgLimit: number;
   remaining: number | null;
   isLimitReached: boolean;

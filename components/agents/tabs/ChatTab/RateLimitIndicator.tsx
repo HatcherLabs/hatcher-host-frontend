@@ -4,6 +4,7 @@ interface RateLimitIndicatorProps {
   isAuthenticated: boolean;
   isLimitReached: boolean;
   hasUnlimitedChat: boolean;
+  isByok?: boolean;
   msgCount: number;
   msgLimit: number;
   remaining: number | null;
@@ -13,6 +14,7 @@ export function RateLimitIndicator({
   isAuthenticated,
   isLimitReached,
   hasUnlimitedChat,
+  isByok,
   msgCount,
   msgLimit,
   remaining,
@@ -24,7 +26,7 @@ export function RateLimitIndicator({
       {hasUnlimitedChat ? (
         <div className="flex items-center gap-1.5 px-1">
           <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium">
-            Unlimited (BYOK)
+            {isByok ? 'Unlimited (BYOK)' : 'Unlimited'}
           </span>
         </div>
       ) : msgLimit > 0 && (
