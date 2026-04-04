@@ -67,11 +67,22 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 
 // ─── Live agent demo preview ───────────────────────────────────
 function AgentPreview() {
+  const [solPrice, setSolPrice] = useState<number | null>(null);
+
+  useEffect(() => {
+    api.getPrice('sol').then((res) => {
+      if (res.success && res.data.price) setSolPrice(res.data.price);
+    }).catch(() => {});
+  }, []);
+
+  const priceStr = solPrice ? `$${solPrice.toFixed(2)}` : '$---.--';
+  const alertPrice = solPrice ? `$${Math.round(solPrice * 0.95)}` : '$---';
+
   const messages = [
     { role: 'user', text: 'What\'s the price of SOL right now?' },
-    { role: 'agent', text: 'SOL is currently trading at $142.37, up 3.2% in the last 24h. Want me to set a price alert?' },
-    { role: 'user', text: 'Yes, alert me if it drops below $135' },
-    { role: 'agent', text: 'Done! I\'ll send you a notification on Telegram if SOL drops below $135.' },
+    { role: 'agent', text: `SOL is currently trading at ${priceStr}. Want me to set a price alert?` },
+    { role: 'user', text: `Yes, alert me if it drops below ${alertPrice}` },
+    { role: 'agent', text: `Done! I'll send you a notification on Telegram if SOL drops below ${alertPrice}.` },
   ];
 
   const [visibleCount, setVisibleCount] = useState(0);

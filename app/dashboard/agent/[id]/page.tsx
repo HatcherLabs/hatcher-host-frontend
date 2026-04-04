@@ -286,10 +286,18 @@ export default function AgentManagePage() {
         const updated = [...prev];
         const last = updated[updated.length - 1];
         if (last?.streaming) {
+          if (!last.content) {
+            // Empty response — remove the bubble instead of showing empty
+            return updated.filter((m) => m.id !== last.id);
+          }
           updated[updated.length - 1] = { ...last, streaming: false };
         }
         return updated;
       });
+      if (!_content) {
+        setChatErrorType('generic');
+        setChatError('Agent returned an empty response. Try again or check if the agent is running.');
+      }
       setSending(false);
     },
     onError: (errMsg) => {
@@ -920,6 +928,9 @@ export default function AgentManagePage() {
             const updated = [...prev];
             const last = updated[updated.length - 1];
             if (last?.streaming) {
+              if (!last.content) {
+                return updated.filter((m) => m.id !== last.id);
+              }
               updated[updated.length - 1] = { ...last, streaming: false };
             }
             return updated;

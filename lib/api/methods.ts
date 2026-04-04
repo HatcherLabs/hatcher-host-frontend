@@ -695,6 +695,7 @@ export const api = {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
+        credentials: 'include',
         body: JSON.stringify({ message, history }),
       });
     } catch {
@@ -706,6 +707,7 @@ export const api = {
             'Content-Type': 'application/json',
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
+          credentials: 'include',
           body: JSON.stringify({ message, history }),
         });
         if (!fallback.ok) { onError(`HTTP ${fallback.status}`); return; }
