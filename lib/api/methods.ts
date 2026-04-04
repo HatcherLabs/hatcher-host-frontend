@@ -472,6 +472,36 @@ export const api = {
   getPrice: (token: 'hatch' | 'sol') =>
     req<{ price: number; currency: string; source: string; error?: string }>(`/prices/${token}`),
 
+  // ─── Agent Communication ──────────────────────────────────────
+
+  /** Toggle agent-to-agent communication */
+  toggleComm: (agentId: string, commEnabled: boolean) =>
+    req<{ id: string; commEnabled: boolean }>(`/agents/${agentId}/comm`, {
+      method: 'PATCH',
+      body: JSON.stringify({ commEnabled }),
+    }),
+
+  /** List communication permissions for an agent */
+  getCommPermissions: (agentId: string) =>
+    req<{ commEnabled: boolean; permissions: Array<{ id: string; allowedAgent: { id: string; name: string; framework: string }; createdAt: string }> }>(`/agents/${agentId}/comm/permissions`),
+
+  /** Add a communication permission */
+  addCommPermission: (agentId: string, allowedAgentId: string) =>
+    req<{ id: string; allowedAgentId: string }>(`/agents/${agentId}/comm/permissions`, {
+      method: 'POST',
+      body: JSON.stringify({ allowedAgentId }),
+    }),
+
+  /** Remove a communication permission */
+  removeCommPermission: (agentId: string, permId: string) =>
+    req<{ deleted: boolean }>(`/agents/${agentId}/comm/permissions/${permId}`, {
+      method: 'DELETE',
+    }),
+
+  /** Get communication logs */
+  getCommLogs: (agentId: string) =>
+    req<{ logs: Array<{ id: string; sourceAgentId: string; targetAgentId: string; message: string; response: string | null; status: string; latencyMs: number; chainDepth: number; createdAt: string }> }>(`/agents/${agentId}/comm/logs`),
+
   /** Admin: force-kill an agent container */
   adminKillAgent: (id: string) =>
     req<{ killed: boolean; agentId: string }>(`/admin/agents/${id}/kill`, { method: 'POST' }),

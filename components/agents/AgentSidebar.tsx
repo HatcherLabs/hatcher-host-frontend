@@ -23,6 +23,7 @@ import {
   Bot,
   Cpu,
   TerminalSquare,
+  Radio,
 } from 'lucide-react';
 import type { Tab } from './AgentContext';
 import { STATUS_STYLES, FRAMEWORK_BADGE } from './AgentContext';
@@ -55,6 +56,7 @@ function getTabs(framework?: string): TabDef[] {
     { id: 'knowledge', label: 'Knowledge', icon: <BookOpen size={18} />, group: 'data' },
     { id: 'files', label: 'Files', icon: <FolderOpen size={18} />, group: 'data' },
     { id: 'versions', label: 'Versions', icon: <History size={18} />, group: 'advanced' },
+    { id: 'comm', label: 'Communication', icon: <Radio size={18} />, group: 'advanced' },
   ];
 }
 

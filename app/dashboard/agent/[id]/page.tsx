@@ -134,6 +134,10 @@ const HealthTab = dynamic(
   () => import('@/components/agents/tabs/HealthTab').then(mod => ({ default: mod.HealthTab })),
   { loading: () => <TabSkeleton /> }
 );
+const CommTab = dynamic(
+  () => import('@/components/agents/tabs/CommTab').then(mod => ({ default: mod.CommTab })),
+  { loading: TabSkeleton },
+);
 
 // ─── Tab definitions ─────────────────────────────────────────
 
@@ -1228,6 +1232,7 @@ export default function AgentManagePage() {
               {tab === 'usage' && <UsageTab />}
               {tab === 'analytics' && <AnalyticsTab />}
               {tab === 'health' && <HealthTab />}
+              {tab === 'comm' && <CommTab />}
             </AnimatePresence>
           </div>
         </div>
