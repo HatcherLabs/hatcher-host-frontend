@@ -50,8 +50,7 @@ async function attemptRefresh(): Promise<boolean> {
       method: 'POST',
       credentials: 'include', // Send cookie
       headers: {
-        'Content-Type': 'application/json',
-        // Send localStorage token as fallback for existing sessions
+        // No Content-Type — Fastify rejects empty body with JSON content-type
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     });
