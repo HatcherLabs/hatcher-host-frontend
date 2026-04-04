@@ -368,6 +368,8 @@ export default function AgentManagePage() {
   useEffect(() => {
     const tierLimit = TIERS[userTier]?.messagesPerDay ?? TIERS.free.messagesPerDay;
     setMsgLimit(tierLimit);
+    // messagesPerDay === 0 means unlimited for this tier
+    if (tierLimit === 0) setHasUnlimitedChat(true);
   }, [userTier]);
 
   // Fetch actual usage data from the usage endpoint (authoritative source for limits + BYOK)
@@ -376,7 +378,7 @@ export default function AgentManagePage() {
       const res = await api.getAgentUsage(id);
       if (res.success) {
         setMsgCount(res.data.messages.today);
-        if (res.data.messages.isByok) {
+        if (res.data.messages.isByok || res.data.messages.limit === 0) {
           setHasUnlimitedChat(true);
         } else if (res.data.messages.limit > 0) {
           setMsgLimit(res.data.messages.limit);

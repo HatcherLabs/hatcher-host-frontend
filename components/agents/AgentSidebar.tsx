@@ -43,11 +43,11 @@ function getTabs(framework?: string): TabDef[] {
   return [
     { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={18} />, group: 'main' },
     { id: 'chat', label: 'Chat', icon: <MessageSquare size={18} />, group: 'main' },
+    { id: 'terminal', label: 'Terminal', icon: <TerminalSquare size={18} />, group: 'main' },
     { id: 'config', label: 'Config', icon: <Settings size={18} />, group: 'configure' },
     { id: 'integrations', label: 'Integrations', icon: <Puzzle size={18} />, group: 'configure' },
     { id: 'skills', label: framework === 'elizaos' ? 'Plugins' : 'Skills', icon: <Sparkles size={18} />, group: 'configure' },
     { id: 'logs', label: 'Logs', icon: <ScrollText size={18} />, group: 'data' },
-    { id: 'terminal', label: 'Terminal', icon: <TerminalSquare size={18} />, group: 'data' },
     { id: 'analytics', label: 'Analytics', icon: <TrendingUp size={18} />, group: 'data' },
     { id: 'usage', label: 'Usage', icon: <Activity size={18} />, group: 'data' },
     { id: 'health', label: 'Health', icon: <HeartPulse size={18} />, group: 'data' },
