@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useAgentContext } from '../AgentContext';
 import { getToken } from '@/lib/api';
-import { RotateCcw, Circle } from 'lucide-react';
+import { RotateCcw, Circle, Send } from 'lucide-react';
 
 // xterm.js CSS — imported once when component loads
 import '@xterm/xterm/css/xterm.css';
@@ -40,10 +40,12 @@ export function TerminalTab() {
   const termInstance = useRef<InstanceType<typeof import('@xterm/xterm').Terminal> | null>(null);
   const fitAddonRef = useRef<InstanceType<typeof import('@xterm/addon-fit').FitAddon> | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
-  const onDataDisposable = useRef<{ dispose: () => void } | null>(null);
   const stateRef = useRef<ConnectionState>('disconnected');
   const [state, setState] = useState<ConnectionState>('disconnected');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [messageInput, setMessageInput] = useState('');
+  const [sending, setSending] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const isActive = agent?.status === 'active';
 
@@ -60,12 +62,6 @@ export function TerminalTab() {
       wsRef.current = null;
     }
 
-    // Dispose previous onData listener to prevent duplicate keystrokes
-    if (onDataDisposable.current) {
-      onDataDisposable.current.dispose();
-      onDataDisposable.current = null;
-    }
-
     setState('connecting');
     setErrorMsg(null);
 
@@ -76,7 +72,7 @@ export function TerminalTab() {
       // Create terminal instance if not exists
       if (!termInstance.current && termRef.current) {
         const term = new Terminal({
-          cursorBlink: true,
+          cursorBlink: false,
           fontSize: 13,
           fontFamily: '"JetBrains Mono", "Fira Code", "Cascadia Code", Menlo, Monaco, monospace',
           theme: {
@@ -105,6 +101,7 @@ export function TerminalTab() {
           allowTransparency: true,
           scrollback: 5000,
           convertEol: true,
+          disableStdin: true, // No raw keyboard input — messages only
         });
 
         const fit = new FitAddon();
@@ -146,7 +143,9 @@ export function TerminalTab() {
               setState('connected');
               term.writeln(`\x1b[32m[hatcher]\x1b[0m Connected to \x1b[1m${msg.agentName || agent.name}\x1b[0m (${msg.framework || agent.framework})`);
               term.writeln('\x1b[90m─────────────────────────────────────────\x1b[0m');
+              term.writeln('\x1b[90mType a message below to talk to the agent.\x1b[0m');
               term.writeln('');
+              inputRef.current?.focus();
               break;
 
             case 'output':
@@ -159,9 +158,6 @@ export function TerminalTab() {
               setState('disconnected');
               term.writeln('');
               term.writeln(`\x1b[33m[hatcher]\x1b[0m ${msg.reason || 'Disconnected'}`);
-              if (msg.reason?.includes('stopped')) {
-                term.writeln('\x1b[90mPress the Restart button to reconnect.\x1b[0m');
-              }
               break;
 
             case 'error':
@@ -190,25 +186,47 @@ export function TerminalTab() {
         wsRef.current = null;
       };
 
-      // Forward terminal input to WebSocket
-      onDataDisposable.current = term.onData((data: string) => {
-        if (ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({ type: 'input', data }));
-        }
-      });
-
     } catch (e) {
       setState('error');
       setErrorMsg((e as Error).message);
     }
   }, [agent?.id, agent?.name, agent?.framework, isActive]);
 
+  // ── Send message to agent ──
+  const sendMessage = useCallback(() => {
+    const text = messageInput.trim();
+    if (!text || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN || sending) return;
+
+    setSending(true);
+    wsRef.current.send(JSON.stringify({ type: 'input', data: text }));
+    setMessageInput('');
+    // Re-enable after response (or timeout)
+    setTimeout(() => setSending(false), 30000);
+  }, [messageInput, sending]);
+
+  // Listen for output messages to detect when response is complete
+  useEffect(() => {
+    if (!wsRef.current) return;
+    const ws = wsRef.current;
+    const handler = (event: MessageEvent) => {
+      try {
+        const msg = JSON.parse(event.data);
+        // When we get output that's a green response (from proxyChat), the request is done
+        if (msg.type === 'output' && typeof msg.data === 'string' && msg.data.includes('\x1b[32m')) {
+          setSending(false);
+        }
+        // Error responses also unblock
+        if (msg.type === 'output' && typeof msg.data === 'string' && msg.data.includes('\x1b[31m')) {
+          setSending(false);
+        }
+      } catch { /* ignore */ }
+    };
+    ws.addEventListener('message', handler);
+    return () => ws.removeEventListener('message', handler);
+  });
+
   // ── Disconnect ──
   const disconnect = useCallback(() => {
-    if (onDataDisposable.current) {
-      onDataDisposable.current.dispose();
-      onDataDisposable.current = null;
-    }
     if (wsRef.current) {
       wsRef.current.close(1000, 'User disconnect');
       wsRef.current = null;
@@ -307,10 +325,33 @@ export function TerminalTab() {
         <div ref={termRef} className="h-full w-full" />
       </div>
 
+      {/* Message input */}
+      {state === 'connected' && (
+        <div className="flex items-center gap-2 px-3 py-2 border-t border-zinc-800 bg-zinc-900/80">
+          <input
+            ref={inputRef}
+            type="text"
+            value={messageInput}
+            onChange={(e) => setMessageInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+            placeholder={sending ? 'Waiting for response...' : 'Send a message to the agent...'}
+            disabled={sending}
+            className="flex-1 bg-zinc-800/50 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm font-mono text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 disabled:opacity-50"
+          />
+          <button
+            onClick={sendMessage}
+            disabled={!messageInput.trim() || sending}
+            className="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <Send size={14} />
+          </button>
+        </div>
+      )}
+
       {/* Info banner */}
       <div className="px-4 py-1.5 border-t border-zinc-800 bg-zinc-900/50">
         <p className="text-[10px] text-zinc-600 font-mono">
-          Streaming agent process output. Input is forwarded to the agent&apos;s stdin.
+          Streaming agent logs. Send messages via the input field above.
           {errorMsg && <span className="text-red-400 ml-2">Error: {errorMsg}</span>}
         </p>
       </div>
