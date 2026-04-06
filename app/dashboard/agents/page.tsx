@@ -423,16 +423,16 @@ export default function MyAgentsPage() {
           className="flex flex-col gap-2"
           variants={cardVariants}
         >
-          {/* Row 1: Status filters (scrollable on mobile) */}
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-default)] overflow-x-auto flex-nowrap self-start max-w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          {/* Row 1: Status filters */}
+          <div className="inline-flex items-center gap-0.5 p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-default)] overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {STATUS_FILTERS.map((f) => (
               <button
                 key={f.key}
                 onClick={() => setStatusFilter(f.key as StatusFilter)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200 cursor-pointer ${
+                className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200 cursor-pointer ${
                   statusFilter === f.key
-                    ? 'bg-purple-500/15 text-[var(--text-primary)] shadow-[0_0_8px_rgba(139,92,246,0.15)]'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                    ? 'bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm ring-1 ring-[var(--border-default)]'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
                 }`}
               >
                 {f.label}
