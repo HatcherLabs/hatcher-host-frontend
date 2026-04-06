@@ -627,7 +627,7 @@ export default function BillingPage() {
 
       {/* ── Current Tier Card ──────────────────────────────── */}
       <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
-        <div className="p-6 sm:p-8">
+        <div className="p-4 sm:p-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <div
