@@ -107,42 +107,46 @@ export function Footer() {
           </div>
 
           {/* Product */}
-          <div className="text-center md:text-left">
-            <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">Product</p>
-            <ul className="space-y-2">
-              {PRODUCT_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div className="text-center md:text-left">
-            <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">Resources</p>
-            <ul className="space-y-2">
-              {RESOURCE_LINKS.map((link) => (
-                <li key={link.href}>
-                  {link.external ? (
-                    <a
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
-                    >
-                      {link.label}
-                    </a>
-                  ) : (
+          <div className="flex justify-center md:justify-start">
+            <div>
+              <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">Product</p>
+              <ul className="space-y-2">
+                {PRODUCT_LINKS.map((link) => (
+                  <li key={link.href}>
                     <Link href={link.href} className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200">
                       {link.label}
                     </Link>
-                  )}
-                </li>
-              ))}
-            </ul>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Resources */}
+          <div className="flex justify-center md:justify-start">
+            <div>
+              <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">Resources</p>
+              <ul className="space-y-2">
+                {RESOURCE_LINKS.map((link) => (
+                  <li key={link.href}>
+                    {link.external ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link href={link.href} className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200">
+                        {link.label}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           {/* Community */}
