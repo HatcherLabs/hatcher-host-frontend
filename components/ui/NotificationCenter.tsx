@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -278,14 +279,15 @@ export function NotificationCenter() {
 
                   if (n.link) {
                     return (
-                      <a
+                      <Link
                         key={n.id}
                         href={n.link}
+                        onClick={() => setOpen(false)}
                         className={`${rowBase} hover:bg-[var(--bg-card)] cursor-pointer no-underline`}
                         style={{ textDecoration: 'none' }}
                       >
                         {inner}
-                      </a>
+                      </Link>
                     );
                   }
                   return (
