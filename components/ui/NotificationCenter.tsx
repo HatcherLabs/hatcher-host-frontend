@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { motion, AnimatePresence } from 'framer-motion';
+// motion/AnimatePresence removed — was interfering with Link click navigation
 import {
   Bell,
   Server,
@@ -137,10 +137,10 @@ export function NotificationCenter() {
     function handleKey(e: KeyboardEvent) {
       if (e.key === 'Escape') setOpen(false);
     }
-    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('mouseup', handleClick);
     document.addEventListener('keydown', handleKey);
     return () => {
-      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('mouseup', handleClick);
       document.removeEventListener('keydown', handleKey);
     };
   }, []);
@@ -196,19 +196,14 @@ export function NotificationCenter() {
         )}
       </button>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
+      {open && (
+          <div
             className="absolute right-0 mt-1 w-80 rounded-xl shadow-xl z-50 overflow-hidden bg-[var(--bg-card-solid)] border border-[var(--border-default)]"
             style={{
               backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',
               boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
             }}
-            initial={{ opacity: 0, y: -8, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)]">
@@ -298,9 +293,8 @@ export function NotificationCenter() {
                 })
               )}
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
     </div>
   );
 }
