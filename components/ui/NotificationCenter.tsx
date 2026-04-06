@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
@@ -254,29 +255,10 @@ export function NotificationCenter() {
                   const colorClass = ICON_COLOR_MAP[n.type] || 'text-[var(--text-secondary)] bg-white/10';
                   const [iconText, iconBg] = colorClass.split(' ');
 
-                  return (
-                    <div
-                      key={n.id}
-                      role={n.link ? 'button' : undefined}
-                      tabIndex={n.link ? 0 : undefined}
-                      onMouseDown={(e) => {
-                        if (!n.link) return;
-                        e.stopPropagation();
-                        setOpen(false);
-                        markAllRead();
-                        router.push(n.link);
-                      }}
-                      onKeyDown={(e) => {
-                        if (n.link && (e.key === 'Enter' || e.key === ' ')) {
-                          setOpen(false);
-                          markAllRead();
-                          router.push(n.link);
-                        }
-                      }}
-                      className={`group flex items-start gap-3 px-4 py-3 border-b border-[var(--border-default)] transition-colors ${
-                        isUnread ? 'bg-purple-500/[0.04]' : ''
-                      } ${n.link ? 'cursor-pointer hover:bg-[var(--bg-card)]' : ''}`}
-                    >
+                  const itemClass = `group flex items-start gap-3 px-4 py-3 border-b border-[var(--border-default)] transition-colors ${isUnread ? 'bg-purple-500/[0.04]' : ''} ${n.link ? 'cursor-pointer hover:bg-[var(--bg-card)]' : ''}`;
+
+                  const inner = (
+                    <>
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${iconBg}`}>
                         <Icon size={14} className={iconText} />
                       </div>
@@ -289,13 +271,26 @@ export function NotificationCenter() {
                         </p>
                       </div>
                       <button
-                        onClick={(e) => { e.stopPropagation(); dismissOne(n.id); }}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); dismissOne(n.id); }}
                         className="opacity-0 group-hover:opacity-100 flex-shrink-0 mt-0.5 p-1 rounded hover:bg-[var(--bg-card)] transition-all focus:opacity-100"
                         aria-label={`Dismiss notification: ${n.message}`}
                       >
                         <X size={12} className="text-[var(--text-muted)]" aria-hidden="true" />
                       </button>
-                    </div>
+                    </>
+                  );
+
+                  return n.link ? (
+                    <Link
+                      key={n.id}
+                      href={n.link}
+                      onClick={() => { setOpen(false); markAllRead(); }}
+                      className={itemClass}
+                    >
+                      {inner}
+                    </Link>
+                  ) : (
+                    <div key={n.id} className={itemClass}>{inner}</div>
                   );
                 })
               )}
