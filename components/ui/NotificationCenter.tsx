@@ -183,7 +183,7 @@ export function NotificationCenter() {
   return (
     <div className="relative" ref={containerRef}>
       <button
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => setOpen((o) => { if (!o && unreadCount > 0) markAllRead(); return !o; })}
         className="relative h-9 w-9 flex items-center justify-center rounded-lg hover:bg-[var(--bg-card)] transition-colors"
         aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'}
         aria-expanded={open}
@@ -200,12 +200,11 @@ export function NotificationCenter() {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="absolute right-0 mt-1 w-80 rounded-xl shadow-xl z-50 overflow-hidden"
+            className="absolute right-0 mt-1 w-80 rounded-xl shadow-xl z-50 overflow-hidden bg-[var(--bg-card-solid)] border border-[var(--border-default)]"
             style={{
-              background: 'rgba(14, 14, 20, 0.97)',
               backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
             }}
             initial={{ opacity: 0, y: -8, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -213,8 +212,8 @@ export function NotificationCenter() {
             transition={{ duration: 0.15 }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
-              <h3 className="text-sm font-semibold text-white">Notifications</h3>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)]">
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Notifications</h3>
               <div className="flex items-center gap-2">
                 {unreadCount > 0 && (
                   <button
@@ -259,17 +258,17 @@ export function NotificationCenter() {
                     <div
                       key={n.id}
                       onClick={() => {
-                        if (n.link) { setOpen(false); router.push(n.link); }
+                        if (n.link) { setOpen(false); markAllRead(); router.push(n.link); }
                       }}
-                      className={`group flex items-start gap-3 px-4 py-3 border-b border-white/[0.06] transition-colors ${
-                        isUnread ? 'bg-purple-500/[0.03]' : ''
-                      } ${n.link ? 'cursor-pointer hover:bg-white/[0.03]' : ''}`}
+                      className={`group flex items-start gap-3 px-4 py-3 border-b border-[var(--border-default)] transition-colors ${
+                        isUnread ? 'bg-purple-500/[0.04]' : ''
+                      } ${n.link ? 'cursor-pointer hover:bg-[var(--bg-card)]' : ''}`}
                     >
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${iconBg}`}>
                         <Icon size={14} className={iconText} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-xs leading-relaxed ${isUnread ? 'text-white' : 'text-zinc-400'}`}>
+                        <p className={`text-xs leading-relaxed ${isUnread ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
                           {n.message}
                         </p>
                         <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
@@ -278,7 +277,7 @@ export function NotificationCenter() {
                       </div>
                       <button
                         onClick={(e) => { e.stopPropagation(); dismissOne(n.id); }}
-                        className="opacity-0 group-hover:opacity-100 flex-shrink-0 mt-0.5 p-1 rounded hover:bg-white/10 transition-all focus:opacity-100"
+                        className="opacity-0 group-hover:opacity-100 flex-shrink-0 mt-0.5 p-1 rounded hover:bg-[var(--bg-card)] transition-all focus:opacity-100"
                         aria-label={`Dismiss notification: ${n.message}`}
                       >
                         <X size={12} className="text-[var(--text-muted)]" aria-hidden="true" />
