@@ -99,41 +99,71 @@ function StatCard({
 function BarChartSection({ data, color = '#06b6d4' }: { data: Array<{ date: string; count: number }>; color?: string }) {
   const maxCount = Math.max(...data.map(d => d.count), 1);
   const today = new Date().toISOString().slice(0, 10);
-  // Show every other label if we have 14 bars
-  const showLabel = (i: number) => data.length <= 7 || i % 2 === 0;
+  const W = 600;
+  const H = 160;
+  const PAD = { top: 20, right: 12, bottom: 32, left: 36 };
+  const cw = W - PAD.left - PAD.right;
+  const ch = H - PAD.top - PAD.bottom;
+
+  // Build points for area/line
+  const points = data.map((d, i) => ({
+    x: PAD.left + (i / Math.max(data.length - 1, 1)) * cw,
+    y: PAD.top + ch - (d.count / maxCount) * ch,
+    ...d,
+  }));
+
+  const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+  const area = `${line} L${points[points.length - 1]?.x ?? W},${PAD.top + ch} L${PAD.left},${PAD.top + ch} Z`;
+
+  // Y-axis ticks (4 ticks)
+  const yTicks = Array.from({ length: 4 }, (_, i) => {
+    const val = Math.round((maxCount / 3) * i);
+    const y = PAD.top + ch - (val / maxCount) * ch;
+    return { val, y };
+  });
+
+  // X-axis labels (show ~5-6 evenly spaced)
+  const labelStep = Math.max(1, Math.floor(data.length / 5));
 
   return (
-    <div className="flex items-end gap-1 h-40">
-      {data.map((d, i) => {
-        const heightPct = (d.count / maxCount) * 100;
-        const isToday = d.date === today;
-        return (
-          <div key={d.date} className="flex-1 flex flex-col items-center gap-1 group relative">
-            {/* Tooltip */}
-            <div className="absolute bottom-full mb-1 opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--bg-elevated)] border border-white/10 rounded-lg px-2 py-1 text-xs text-white whitespace-nowrap z-10 pointer-events-none">
-              {formatChartDate(d.date)}: {d.count}
-            </div>
-            <span className="text-[9px] font-medium text-[var(--text-muted)] group-hover:text-[var(--text-secondary)] transition-colors">
-              {d.count > 0 ? d.count : ''}
-            </span>
-            <div
-              className="w-full rounded-t transition-all duration-300 min-h-[2px]"
-              style={{
-                height: `${Math.max(heightPct, d.count > 0 ? 4 : 1)}%`,
-                background: isToday ? color : `${color}60`,
-              }}
-            />
-            {showLabel(i) && (
-              <div className="flex flex-col items-center">
-                <span className={`text-[8px] ${isToday ? 'font-medium' : ''}`} style={{ color: isToday ? color : 'var(--text-muted)' }}>
-                  {isToday ? 'Today' : formatWeekday(d.date)}
-                </span>
-                <span className="text-[7px] text-[var(--text-muted)]/50">{formatChartDate(d.date)}</span>
-              </div>
-            )}
-          </div>
-        );
-      })}
+    <div className="w-full overflow-hidden">
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" preserveAspectRatio="xMidYMid meet">
+        {/* Grid lines */}
+        {yTicks.map(t => (
+          <g key={t.val}>
+            <line x1={PAD.left} y1={t.y} x2={W - PAD.right} y2={t.y} stroke="var(--border-default)" strokeWidth="0.5" strokeDasharray="4 4" />
+            <text x={PAD.left - 6} y={t.y + 3} textAnchor="end" fill="var(--text-muted)" fontSize="9" fontFamily="var(--font-mono, monospace)">{t.val}</text>
+          </g>
+        ))}
+        {/* Gradient fill */}
+        <defs>
+          <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity="0.25" />
+            <stop offset="100%" stopColor={color} stopOpacity="0.02" />
+          </linearGradient>
+        </defs>
+        <path d={area} fill="url(#areaGrad)" />
+        {/* Line */}
+        <path d={line} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        {/* Dots */}
+        {points.map((p) => (
+          <g key={p.date}>
+            <circle cx={p.x} cy={p.y} r={p.date === today ? 4 : 2.5} fill={p.date === today ? color : `${color}80`} stroke={p.date === today ? 'white' : 'none'} strokeWidth="1.5" />
+            {/* Hover target + tooltip */}
+            <circle cx={p.x} cy={p.y} r="12" fill="transparent" className="cursor-pointer">
+              <title>{formatChartDate(p.date)}: {p.count} messages</title>
+            </circle>
+          </g>
+        ))}
+        {/* X-axis labels */}
+        {points.map((p, i) => (
+          (i % labelStep === 0 || p.date === today) && (
+            <text key={`label-${p.date}`} x={p.x} y={H - 6} textAnchor="middle" fill={p.date === today ? color : 'var(--text-muted)'} fontSize="9" fontWeight={p.date === today ? '600' : '400'} fontFamily="var(--font-mono, monospace)">
+              {p.date === today ? 'Today' : formatChartDate(p.date)}
+            </text>
+          )
+        ))}
+      </svg>
     </div>
   );
 }
