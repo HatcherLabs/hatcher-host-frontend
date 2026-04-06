@@ -114,7 +114,7 @@ export function FilesTab() {
   const accent = FRAMEWORK_ACCENT[framework] ?? FRAMEWORK_ACCENT.openclaw;
   const fsInfo = FRAMEWORK_FS_INFO[framework] ?? FRAMEWORK_FS_INFO.openclaw;
   const userTier = (user as any)?.tier ?? 'free';
-  const isPro = userTier === 'pro';
+  const isPro = userTier === 'pro' || userTier === 'business' || userTier === 'founding_member';
 
   const [files, setFiles] = useState<FileEntry[]>([]);
   const [currentPath, setCurrentPath] = useState(ROOT_PATH);

@@ -86,7 +86,7 @@ export function LogsTab() {
     userTier,
   } = ctx;
 
-  const isPro = userTier === 'pro';
+  const isPro = userTier === 'pro' || userTier === 'business' || userTier === 'founding_member';
   const framework = agent.framework ?? 'openclaw';
   const fwInfo = FRAMEWORK_LOG_INFO[framework] ?? FRAMEWORK_LOG_INFO.openclaw;
 

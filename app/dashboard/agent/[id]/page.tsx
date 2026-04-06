@@ -539,7 +539,7 @@ export default function AgentManagePage() {
       wsLogsRef.current = null;
     }
     const isActiveStatus = agentStatus === 'active';
-    const wantsStream = tab === 'logs' && isActiveStatus && userTier === 'pro';
+    const wantsStream = tab === 'logs' && isActiveStatus && (userTier === 'pro' || userTier === 'business' || userTier === 'founding_member');
     if (wantsStream) {
       const token = getToken();
       const apiBase = process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001';
