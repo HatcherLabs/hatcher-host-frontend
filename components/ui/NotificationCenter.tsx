@@ -257,8 +257,21 @@ export function NotificationCenter() {
                   return (
                     <div
                       key={n.id}
-                      onClick={() => {
-                        if (n.link) { setOpen(false); markAllRead(); router.push(n.link); }
+                      role={n.link ? 'button' : undefined}
+                      tabIndex={n.link ? 0 : undefined}
+                      onMouseDown={(e) => {
+                        if (!n.link) return;
+                        e.stopPropagation();
+                        setOpen(false);
+                        markAllRead();
+                        router.push(n.link);
+                      }}
+                      onKeyDown={(e) => {
+                        if (n.link && (e.key === 'Enter' || e.key === ' ')) {
+                          setOpen(false);
+                          markAllRead();
+                          router.push(n.link);
+                        }
                       }}
                       className={`group flex items-start gap-3 px-4 py-3 border-b border-[var(--border-default)] transition-colors ${
                         isUnread ? 'bg-purple-500/[0.04]' : ''
