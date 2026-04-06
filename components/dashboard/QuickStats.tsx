@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Activity, Bot, CreditCard, Zap } from 'lucide-react';
+import { Activity, Bot, Crown, Zap, Building2, Star, Rocket, User } from 'lucide-react';
 import { api } from '@/lib/api';
 import Link from 'next/link';
 
@@ -12,29 +12,50 @@ interface QuickStatsProps {
 }
 
 const TIER_LABELS: Record<string, string> = {
-  free:  'Free',
-  basic: 'Basic',
-  pro:   'Pro',
+  free:            'Free',
+  starter:         'Starter',
+  pro:             'Pro',
+  business:        'Business',
+  founding_member: 'Founding',
 };
 
+// text color per tier
 const TIER_COLORS: Record<string, string> = {
-  free:  'text-[var(--text-muted)]',
-  basic: 'text-cyan-400',
-  pro:   'text-purple-400',
+  free:            'text-[var(--text-muted)]',
+  starter:         'text-cyan-400',
+  pro:             'text-violet-400',
+  business:        'text-blue-400',
+  founding_member: 'text-rose-400',
 };
 
+// icon bg per tier
 const TIER_BG: Record<string, string> = {
-  free:  'bg-[rgba(113,113,122,0.1)]',
-  basic: 'bg-cyan-500/10',
-  pro:   'bg-purple-500/10',
+  free:            'bg-zinc-500/10',
+  starter:         'bg-cyan-500/10',
+  pro:             'bg-violet-500/10',
+  business:        'bg-blue-500/10',
+  founding_member: 'bg-rose-500/10',
 };
 
-// Daily message limits per tier (mirrors CLAUDE.md pricing)
-const TIER_MSG_LIMIT: Record<string, number> = {
-  free:  20,
-  basic: 100,
-  pro:   300,
+// daily message limits per tier (BYOK is always unlimited — shown separately)
+const TIER_MSG_LIMIT: Record<string, number | 'unlimited'> = {
+  free:            10,
+  starter:         50,
+  pro:             200,
+  business:        500,
+  founding_member: 'unlimited',
 };
+
+function TierIcon({ tier, className }: { tier: string; className?: string }) {
+  const cls = className ?? 'w-4 h-4';
+  switch (tier) {
+    case 'founding_member': return <Crown className={cls} />;
+    case 'business':        return <Building2 className={cls} />;
+    case 'pro':             return <Star className={cls} />;
+    case 'starter':         return <Rocket className={cls} />;
+    default:                return <User className={cls} />;
+  }
+}
 
 const cardVariants = {
   hidden:  { opacity: 0, scale: 0.95 },
@@ -56,11 +77,12 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
     });
   }, []);
 
-  const msgLimit   = TIER_MSG_LIMIT[tier] ?? 20;
-  const tierLabel  = TIER_LABELS[tier]  ?? tier;
-  const tierColor  = TIER_COLORS[tier]  ?? 'text-[var(--text-muted)]';
-  const tierBg     = TIER_BG[tier]      ?? 'bg-[rgba(113,113,122,0.1)]';
-  const agentPct   = agentLimit > 0 ? Math.min(100, (agentCount / agentLimit) * 100) : 0;
+  const rawLimit  = TIER_MSG_LIMIT[tier] ?? 10;
+  const tierLabel = TIER_LABELS[tier]  ?? tier;
+  const tierColor = TIER_COLORS[tier]  ?? 'text-[var(--text-muted)]';
+  const tierBg    = TIER_BG[tier]      ?? 'bg-zinc-500/10';
+  const agentPct  = agentLimit > 0 ? Math.min(100, (agentCount / agentLimit) * 100) : 0;
+  const isTopTier = tier === 'founding_member' || tier === 'business';
 
   if (loading) {
     return (
@@ -105,9 +127,11 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
           </div>
           <div className="text-xs text-[var(--text-muted)] leading-tight">Msg Limit / Agent</div>
         </div>
-        <div className="text-2xl font-bold text-[var(--text-primary)]">
-          {msgLimit}
-        </div>
+        {rawLimit === 'unlimited' ? (
+          <div className="text-2xl font-bold text-emerald-400">∞</div>
+        ) : (
+          <div className="text-2xl font-bold text-[var(--text-primary)]">{rawLimit}</div>
+        )}
         <div className="text-[10px] text-[var(--text-muted)] mt-1">per day · BYOK = unlimited</div>
       </motion.div>
 
@@ -137,12 +161,16 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
       <motion.div className="card glass-noise p-5" variants={cardVariants}>
         <div className="flex items-center gap-3 mb-3">
           <div className={`w-9 h-9 rounded-lg ${tierBg} flex items-center justify-center flex-shrink-0`}>
-            <CreditCard size={16} className={tierColor} />
+            <TierIcon tier={tier} className={`w-4 h-4 ${tierColor}`} />
           </div>
           <div className="text-xs text-[var(--text-muted)] leading-tight">Account Tier</div>
         </div>
         <div className={`text-2xl font-bold ${tierColor}`}>{tierLabel}</div>
-        {tier !== 'pro' && (
+        {isTopTier ? (
+          <div className="text-[10px] text-[var(--text-muted)] mt-1">
+            {tier === 'founding_member' ? 'Lifetime access' : 'Priority support'}
+          </div>
+        ) : (
           <Link
             href="/dashboard/billing"
             className="text-[10px] text-[#06b6d4] hover:opacity-80 transition-opacity mt-1 block"
