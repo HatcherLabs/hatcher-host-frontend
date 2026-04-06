@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useAgentContext } from '../AgentContext';
 import { getToken, req } from '@/lib/api';
+import { API_URL } from '@/lib/config';
 import { RotateCcw, Circle, Send } from 'lucide-react';
 
 // xterm.js CSS — imported once when component loads
@@ -26,8 +27,6 @@ async function loadXterm() {
 }
 
 type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 function getWsUrl(agentId: string, token: string): string {
   const base = API_URL.replace(/^http/, 'ws');

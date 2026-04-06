@@ -238,27 +238,18 @@ describe('api.chat', () => {
   });
 });
 
-// ─── api.listAgents / getMyAgents ────────────────────────────
+// ─── api.getMyAgents ─────────────────────────────────────────
 
-describe('api.listAgents', () => {
+describe('api.getMyAgents', () => {
   it('calls GET /agents', async () => {
     mockFetchOk([]);
     const { api } = await import('../lib/api.js');
-    await api.listAgents();
+    await api.getMyAgents();
 
     const [url, opts] = fetchSpy.mock.calls[0] as [string, RequestInit];
     expect(url).toContain('/agents');
     // No method means GET (default)
     expect(opts.method).toBeUndefined();
-  });
-
-  it('getMyAgents is an alias for listAgents', async () => {
-    mockFetchOk([]);
-    const { api } = await import('../lib/api.js');
-    await api.getMyAgents();
-
-    const [url] = fetchSpy.mock.calls[0] as [string];
-    expect(url).toContain('/agents');
   });
 });
 

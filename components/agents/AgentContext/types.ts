@@ -190,10 +190,8 @@ export interface AgentContextValue {
   loadAgent: () => Promise<void>;
   loadFeatures: () => Promise<void>;
 
-  // Wallet/auth
+  // Auth
   isAuthenticated: boolean;
-  wallet: ReturnType<typeof import('@solana/wallet-adapter-react').useWallet>;
-  connection: ReturnType<typeof import('@solana/wallet-adapter-react').useConnection>['connection'];
 
   // Tier
   userTier: string;

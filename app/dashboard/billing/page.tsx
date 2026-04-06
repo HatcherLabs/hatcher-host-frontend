@@ -299,7 +299,7 @@ export default function BillingPage() {
       api.getPayments(),
       api.getCreditBalance(),
       api.getCreditHistory(10),
-      api.listAgents(),
+      api.getMyAgents(),
     ]).then(([acctRes, payRes, balRes, histRes, agentsRes]) => {
       if (acctRes.success) setAccountData(acctRes.data as unknown as AccountFeatures);
       if (payRes.success) setPayments(payRes.data.payments);

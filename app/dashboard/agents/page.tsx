@@ -341,9 +341,9 @@ export default function MyAgentsPage() {
           <p className="mb-8 text-sm text-[var(--text-secondary)]">
             Sign in to your account to access your agents.
           </p>
-          <a href="/login" className="btn-primary px-8 py-3 inline-block">
+          <Link href="/login" className="btn-primary px-8 py-3 inline-block">
             Sign In
-          </a>
+          </Link>
         </div>
       </motion.div>
     );

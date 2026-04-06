@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
@@ -419,9 +420,9 @@ export default function AdminPage() {
           <p className="mb-8 text-sm text-[var(--text-secondary)]">
             Sign in to your account to access admin controls.
           </p>
-          <a href="/login" className="btn-primary px-8 py-3 inline-block">
+          <Link href="/login" className="btn-primary px-8 py-3 inline-block">
             Sign In
-          </a>
+          </Link>
         </motion.div>
       </div>
     );

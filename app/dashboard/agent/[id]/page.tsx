@@ -3,9 +3,8 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useConnection } from '@solana/wallet-adapter-react';
 import { api, getToken } from '@/lib/api';
+import { API_URL } from '@/lib/config';
 import type { Agent, AgentFeature } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { haptic, hapticNotification } from '@/lib/capacitor';
@@ -147,8 +146,6 @@ export default function AgentManagePage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
-  const wallet = useWallet();
-  const { connection } = useConnection();
   const { toast } = useToast();
 
   // Core state
@@ -547,7 +544,7 @@ export default function AgentManagePage() {
     const wantsStream = tab === 'logs' && isActiveStatus && (userTier === 'pro' || userTier === 'business' || userTier === 'founding_member');
     if (wantsStream) {
       const token = getToken();
-      const apiBase = process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001';
+      const apiBase = API_URL;
       const wsBase = apiBase.replace(/^http/, 'ws');
       const url = `${wsBase}/agents/${id}/logs/ws${token ? `?token=${encodeURIComponent(token)}` : ''}`;
       setLogsLoading(true);
@@ -1098,7 +1095,7 @@ export default function AgentManagePage() {
       handleAction, handleDelete,
       deleteConfirm, setDeleteConfirm, deleting, deleteError, setDeleteError,
       loadAgent, loadFeatures,
-      isAuthenticated, wallet, connection,
+      isAuthenticated,
       userTier,
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1110,7 +1107,7 @@ export default function AgentManagePage() {
     visibleFields, savingIntegration, integrationSaveMsg, activeFeatures, activeFeatureKeys,
     featuresLoading, deleteConfirm, deleting, deleteError, actionLoading, actionError, actionSuccess,
     llmProvider, currentProviderMeta, providerModels, hasApiKey, displayUptime, isLiveUptime,
-    isActive, isNotActive, statusInfo, frameworkMeta, isAuthenticated, wallet, connection, userTier, hasUnlimitedChat]);
+    isActive, isNotActive, statusInfo, frameworkMeta, isAuthenticated, userTier, hasUnlimitedChat]);
 
   // ─── Loading state ───────────────────────────────────────
 

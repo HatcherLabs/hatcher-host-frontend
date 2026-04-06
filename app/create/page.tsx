@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { track } from '@/lib/analytics';
@@ -469,9 +470,9 @@ export default function CreatePage() {
           </div>
           <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Create Your Agent</h1>
           <p className="text-[var(--text-secondary)] text-sm mb-8">Sign in to your account to create and deploy AI agents.</p>
-          <a href="/login" className="btn-primary inline-block">
+          <Link href="/login" className="btn-primary inline-block">
             Sign In
-          </a>
+          </Link>
         </div>
       </motion.div>
     );

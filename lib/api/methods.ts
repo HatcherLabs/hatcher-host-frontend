@@ -151,16 +151,10 @@ export const api = {
   /** List the current user's agents */
   getMyAgents: () => req<Agent[]>('/agents'),
 
-  /** Alias for getMyAgents */
-  listAgents: () => req<Agent[]>('/agents'),
-
   /** Public platform stats (no auth required) */
   getPublicStats: () => req<{ totalAgents: number; activeAgents: number; totalUsers: number; totalMessages: number; frameworks: Record<string, number> }>('/stats'),
 
   /** Browse all public agents */
-  getExploreAgents: () => req<{ agents: Agent[]; pagination: { total: number; limit: number; offset: number; hasMore: boolean } }>('/agents/explore'),
-
-  /** Alias for getExploreAgents */
   exploreAgents: (limit = 24, offset = 0) => req<{ agents: Agent[]; pagination: { total: number; limit: number; offset: number; hasMore: boolean } }>(`/agents/explore?limit=${limit}&offset=${offset}`),
 
   /** Get a single agent */
