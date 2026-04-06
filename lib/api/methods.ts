@@ -511,8 +511,8 @@ export const api = {
     req<{ paused: boolean; agentId: string }>(`/admin/agents/${id}/pause`, { method: 'POST' }),
 
   /** Admin: list all agents across all users */
-  adminGetAgents: () =>
-    req<Array<Agent & { ownerWallet: string }>>('/admin/agents?limit=500&offset=0'),
+  adminGetAgents: (limit = 25, offset = 0) =>
+    req<{ agents: Array<Agent & { ownerWallet: string; ownerUsername: string }>; pagination: { total: number; limit: number; offset: number; hasMore: boolean } }>(`/admin/agents?limit=${limit}&offset=${offset}`),
 
   adminGetStats: () =>
     req<{

@@ -216,6 +216,10 @@ export default function AdminDashboardPage() {
   const [agentSearch, setAgentSearch] = useState('');
   const [agentStatusFilter, setAgentStatusFilter] = useState<string>('all');
   const [agentFrameworkFilter, setAgentFrameworkFilter] = useState<string>('all');
+  const [agentTotal, setAgentTotal] = useState(0);
+  const [agentHasMore, setAgentHasMore] = useState(false);
+  const [agentLoadingMore, setAgentLoadingMore] = useState(false);
+  const AGENT_PAGE_SIZE = 25;
 
   // Tickets tab state
   const [selectedTicket, setSelectedTicket] = useState<AdminTicket | null>(null);
@@ -237,12 +241,17 @@ export default function AdminDashboardPage() {
     Promise.all([
       api.adminGetStats(),
       api.adminGetUsers(0, 100),
-      api.adminGetAgents(),
+      api.adminGetAgents(AGENT_PAGE_SIZE, 0),
       api.adminGetTickets(),
     ]).then(([statsRes, usersRes, agentsRes, ticketsRes]) => {
       if (statsRes.success) setStats(statsRes.data);
       if (usersRes.success) setUsers((usersRes.data as any).users ?? []);
-      if (agentsRes.success) setAgents((agentsRes.data as any).agents ?? agentsRes.data ?? []);
+      if (agentsRes.success) {
+        const d = agentsRes.data as any;
+        setAgents(d.agents ?? []);
+        setAgentTotal(d.pagination?.total ?? 0);
+        setAgentHasMore(d.pagination?.hasMore ?? false);
+      }
       if (ticketsRes.success) setTickets((ticketsRes.data as any).tickets ?? []);
       setLoading(false);
     });
@@ -263,6 +272,19 @@ export default function AdminDashboardPage() {
     setActionMsg({ type, text });
     setTimeout(() => setActionMsg(null), 3500);
   }, []);
+
+  // ── Load more agents ──────────────────────────────────────
+  const loadMoreAgents = useCallback(async () => {
+    setAgentLoadingMore(true);
+    const res = await api.adminGetAgents(AGENT_PAGE_SIZE, agents.length);
+    if (res.success) {
+      const d = res.data as any;
+      setAgents(prev => [...prev, ...(d.agents ?? [])]);
+      setAgentHasMore(d.pagination?.hasMore ?? false);
+      setAgentTotal(d.pagination?.total ?? agentTotal);
+    }
+    setAgentLoadingMore(false);
+  }, [agents.length, agentTotal]);
 
   // ── User actions ──────────────────────────────────────────
   const handleBanUser = async (u: AdminUser) => {
@@ -769,7 +791,7 @@ export default function AdminDashboardPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredAgents.slice(0, 50).map(a => (
+                    {filteredAgents.map(a => (
                       <tr key={a.id} className="border-b border-[var(--border-default)] hover:bg-[rgba(255,255,255,0.02)] transition-colors">
                         <td className="px-4 py-3">
                           <div className="text-white font-medium text-xs">{a.name}</div>
@@ -809,6 +831,24 @@ export default function AdminDashboardPage() {
                     )}
                   </tbody>
                 </table>
+              </div>
+              {/* Footer: count + load more */}
+              <div className="px-4 py-3 border-t border-[var(--border-default)] flex items-center justify-between">
+                <span className="text-xs text-[var(--text-muted)]">
+                  Showing {agents.length} of {agentTotal} agents
+                </span>
+                {agentHasMore && (
+                  <button
+                    onClick={loadMoreAgents}
+                    disabled={agentLoadingMore}
+                    className="text-xs font-medium text-purple-400 hover:text-purple-300 disabled:opacity-50 transition-colors cursor-pointer flex items-center gap-1.5"
+                  >
+                    {agentLoadingMore
+                      ? <><span className="w-3 h-3 border border-purple-400 border-t-transparent rounded-full animate-spin" /> Loading...</>
+                      : `Load more (+${Math.min(AGENT_PAGE_SIZE, agentTotal - agents.length)})`
+                    }
+                  </button>
+                )}
               </div>
             </div>
           </motion.div>
