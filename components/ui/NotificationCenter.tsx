@@ -255,42 +255,40 @@ export function NotificationCenter() {
                   const colorClass = ICON_COLOR_MAP[n.type] || 'text-[var(--text-secondary)] bg-white/10';
                   const [iconText, iconBg] = colorClass.split(' ');
 
-                  const itemClass = `group flex items-start gap-3 px-4 py-3 border-b border-[var(--border-default)] transition-colors ${isUnread ? 'bg-purple-500/[0.04]' : ''} ${n.link ? 'cursor-pointer hover:bg-[var(--bg-card)]' : ''}`;
-
-                  const inner = (
-                    <>
+                  return (
+                    <div
+                      key={n.id}
+                      className={`group flex items-start gap-3 px-4 py-3 border-b border-[var(--border-default)] transition-colors ${isUnread ? 'bg-purple-500/[0.04]' : ''}`}
+                    >
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${iconBg}`}>
                         <Icon size={14} className={iconText} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-xs leading-relaxed ${isUnread ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
-                          {n.message}
-                        </p>
+                        {n.link ? (
+                          <a
+                            href={n.link}
+                            onClick={() => { setOpen(false); markAllRead(); }}
+                            className={`text-xs leading-relaxed hover:underline underline-offset-2 ${isUnread ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}
+                          >
+                            {n.message} →
+                          </a>
+                        ) : (
+                          <p className={`text-xs leading-relaxed ${isUnread ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
+                            {n.message}
+                          </p>
+                        )}
                         <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
                           {timeAgo(n.timestamp)}
                         </p>
                       </div>
                       <button
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); dismissOne(n.id); }}
+                        onClick={(e) => { e.stopPropagation(); dismissOne(n.id); }}
                         className="opacity-0 group-hover:opacity-100 flex-shrink-0 mt-0.5 p-1 rounded hover:bg-[var(--bg-card)] transition-all focus:opacity-100"
                         aria-label={`Dismiss notification: ${n.message}`}
                       >
                         <X size={12} className="text-[var(--text-muted)]" aria-hidden="true" />
                       </button>
-                    </>
-                  );
-
-                  return n.link ? (
-                    <Link
-                      key={n.id}
-                      href={n.link}
-                      onClick={() => { setOpen(false); markAllRead(); }}
-                      className={itemClass}
-                    >
-                      {inner}
-                    </Link>
-                  ) : (
-                    <div key={n.id} className={itemClass}>{inner}</div>
+                    </div>
                   );
                 })
               )}
