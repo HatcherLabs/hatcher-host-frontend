@@ -343,9 +343,13 @@ export default function CreatePage() {
         .filter(([, enabled]) => enabled)
         .map(([id]) => id);
 
-      const filteredPlatformSecrets = Object.fromEntries(
-        Object.entries(platformSecrets).filter(([key]) => platformsEnabled[key])
-      );
+      // Flatten platform secrets to root level — build-spec.ts reads them as agentConfig['TELEGRAM_BOT_TOKEN'] etc.
+      const flatSecrets: Record<string, string> = {};
+      for (const [platformId, secrets] of Object.entries(platformSecrets)) {
+        if (platformsEnabled[platformId]) {
+          Object.assign(flatSecrets, secrets);
+        }
+      }
 
       const payload: Parameters<typeof api.createAgent>[0] = {
         name: openclawForm.name,
@@ -376,11 +380,9 @@ export default function CreatePage() {
             : (AGENT_TEMPLATES.find(t => t.id === selectedTemplate)?.defaultSystemPrompt ?? ''),
           // BYOK config -- backend reads agentConfig['byok']
           ...(llm.byok ? { byok: llm.byok } : {}),
-          // Platform integrations
-          ...(enabledPlatforms.length > 0 ? {
-            platforms: enabledPlatforms,
-            platformSecrets: filteredPlatformSecrets,
-          } : {}),
+          // Platform integrations — secrets flattened to root so build-spec.ts can extract them
+          ...(enabledPlatforms.length > 0 ? { platforms: enabledPlatforms } : {}),
+          ...flatSecrets,
           // Advanced options (framework-specific)
           ...(selectedFramework === 'openclaw' && {
             sessionScope,
