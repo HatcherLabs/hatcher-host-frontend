@@ -282,7 +282,6 @@ export default function AgentManagePage() {
         }
         return updated;
       });
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     },
     onDone: (_content, _model) => {
       wsStreamingMsgRef.current = false;
@@ -638,8 +637,7 @@ export default function AgentManagePage() {
     });
   }, [agent]);
 
-  // Auto-scroll chat
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
+  // Auto-scroll chat — handled by ChatTab's MutationObserver (no page-level scroll)
 
   // Auto-focus chat input
   useEffect(() => {
@@ -967,7 +965,6 @@ export default function AgentManagePage() {
             }
             return updated;
           });
-          bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
         },
         () => {
           setMessages((prev) => {
