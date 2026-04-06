@@ -225,7 +225,7 @@ export default function SecurityPage() {
               contact@hatcher.host
             </a>
             <a
-              href="https://discord.gg/hatcher"
+              href="https://discord.gg/7tY3HjKjMc"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--bg-card-solid)] border border-[var(--border-default)] text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors"

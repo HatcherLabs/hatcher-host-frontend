@@ -9,7 +9,7 @@ import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield, LogOut, Settings, ChevronDown,
-  CreditCard, Users, Wallet,
+  CreditCard, Users, Wallet, Activity,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
@@ -18,8 +18,6 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 // ── Nav links when logged IN ──
 const AUTH_NAV_LINKS = [
   { href: '/dashboard/agents',    label: 'My Agents' },
-  { href: '/dashboard/analytics', label: 'Analytics' },
-  { href: '/dashboard/team',      label: 'Team' },
   { href: '/explore',             label: 'Explore' },
   { href: '/create',              label: 'Create' },
   { href: '/token',               label: 'Token' },
@@ -41,6 +39,7 @@ const AUX_LINKS = [
 
 // ── User dropdown links ──
 const USER_EXTRA_LINKS = [
+  { href: '/dashboard/analytics', label: 'Analytics', icon: Activity },
   { href: '/dashboard/team', label: 'Team', icon: Users },
   { href: '/dashboard/billing', label: 'Billing', icon: CreditCard },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },

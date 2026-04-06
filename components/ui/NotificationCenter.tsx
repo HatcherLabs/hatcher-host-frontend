@@ -280,14 +280,17 @@ export function NotificationCenter() {
                   );
 
                   return n.link ? (
-                    <a
+                    <div
                       key={n.id}
-                      href={n.link}
-                      onClick={() => { setOpen(false); markAllRead(); }}
+                      role="link"
+                      tabIndex={0}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onClick={() => { markAllRead(); setOpen(false); router.push(n.link!); }}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { markAllRead(); setOpen(false); router.push(n.link!); } }}
                       className={`${rowBase} hover:bg-[var(--bg-card)] cursor-pointer`}
                     >
                       {inner}
-                    </a>
+                    </div>
                   ) : (
                     <div key={n.id} className={rowBase}>
                       {inner}
