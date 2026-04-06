@@ -100,24 +100,6 @@ export function Footer() {
               </svg>
               <span className="text-base font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Hatcher</span>
             </div>
-            <p className="text-xs text-[var(--text-secondary)] leading-relaxed max-w-[200px]">
-              Deploy AI agents on 20+ platforms. One click, any framework.
-            </p>
-            {/* Social icons */}
-            <div className="flex items-center gap-1.5 mt-4">
-              {SOCIAL_ICONS.map((s) => (
-                <a
-                  key={s.href}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={s.label}
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] ${s.hoverClass} hover:bg-[var(--bg-card)] transition-colors duration-200`}
-                >
-                  {s.icon}
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Product */}
