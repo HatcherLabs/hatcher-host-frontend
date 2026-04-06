@@ -583,7 +583,7 @@ export default function PricingPage() {
         <div className="card glass-noise p-10 sm:p-14 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.1),transparent_60%)] pointer-events-none" />
           <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 relative text-[var(--text-primary)]">
-            Ready to hatch your agent?
+            Ready to deploy your agent?
           </h2>
           <p className="text-[var(--text-secondary)] text-base max-w-lg mx-auto mb-8 leading-relaxed relative">
             Pick your framework, choose a template, and deploy in seconds.

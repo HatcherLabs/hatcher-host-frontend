@@ -38,7 +38,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <h3>3. Cost Efficiency</h3>
 <p>Running an AI agent costs a fraction of hiring dedicated staff for routine operations. Free tiers and BYOK (Bring Your Own Key) options make it even more accessible for startups and individuals.</p>
 <h3>4. The Agent Economy</h3>
-<p>We are entering an era where AI agents are not just tools but participants in marketplaces. Agents can be rented, shared, and monetized — creating entirely new business models. Platforms like hatcher.markets are pioneering this shift by enabling agent creators to earn revenue from their deployments.</p>
+<p>We are entering an era where AI agents are not just tools but participants in marketplaces. Agents can be rented, shared, and monetized — creating entirely new business models that were impossible with traditional software.</p>
 
 <h2>Real-World Use Cases</h2>
 <p>AI agents are already being deployed across industries:</p>
@@ -490,9 +490,6 @@ export const BLOG_POSTS: BlogPost[] = [
 </ul>
 <p>Templates are fully customizable after deployment. They are starting points, not restrictions.</p>
 
-<h2>hatcher.markets</h2>
-<p>Alongside the hosting platform, we are launching <a href="https://hatcher.markets">hatcher.markets</a> — a marketplace where agent creators can list their agents for rent. If you build something useful, you can earn revenue from it. If you need a specialized agent fast, you can rent one instead of building from scratch.</p>
-
 <h2>What's Next</h2>
 <p>We are a small team and we ship fast. The roadmap includes multi-agent workflows, visual workflow editors, custom domain routing for public-facing agents, and a lot more integrations. We will be posting updates here as we go.</p>
 <p>Sign up at <a href="https://hatcher.host/register">hatcher.host/register</a> — it takes 30 seconds, no credit card required. Your first agent is free.</p>`,
@@ -717,7 +714,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>Non-engineers can deploy and manage agents. A product manager can configure a customer support agent without filing a DevOps ticket. A founder can spin up a community bot for their token launch without hiring a backend engineer.</p>
 <h3>The Agent Marketplace</h3>
 <p>When deploying an agent is as easy as clicking a button, a marketplace for pre-built agents becomes viable. Creators can build specialized agents (crypto trading monitors, content schedulers, support bots tuned to specific industries) and earn revenue by renting them to users who need that functionality without the build time.</p>
-<p>This is what <a href="https://hatcher.markets">hatcher.markets</a> is beginning to explore — an economy where agent expertise is a tradeable asset.</p>
+<p>This is the next frontier — an economy where agent expertise is a tradeable asset.</p>
 
 <h2>The BYOK Inflection Point</h2>
 <p>One of the most important trends in 2026 is the normalization of BYOK (Bring Your Own Key) LLM access. As model providers have proliferated and prices have dropped, most serious users already have direct relationships with one or more LLM providers.</p>
@@ -737,59 +734,6 @@ export const BLOG_POSTS: BlogPost[] = [
     category: 'Industry',
     readTime: '8 min',
     coverImageDescription: 'A skyline of server towers glowing with AI agent icons floating above them, connected by data streams, dark futuristic aesthetic with purple and amber accents',
-  },
-  {
-    slug: 'ai-agent-rental-marketplace',
-    title: 'AI Agent Rental Marketplace: A New Economy',
-    excerpt:
-      'Introducing hatcher.markets — the first marketplace where you can rent, list, and monetize AI agents.',
-    content: `<p>What if you could rent an AI agent the same way you rent a server, a domain, or a SaaS tool? That is the vision behind <strong>hatcher.markets</strong> — the first dedicated marketplace for renting and monetizing AI agents.</p>
-
-<h2>The Problem</h2>
-<p>Building an AI agent from scratch is time-consuming. Even with platforms like Hatcher that simplify deployment, crafting the perfect system prompt, choosing the right integrations, tuning the model, and testing across platforms takes effort and expertise. Meanwhile, many skilled creators have already built incredible agents that sit idle or underutilized.</p>
-
-<h2>The Solution: An Agent Marketplace</h2>
-<p>hatcher.markets connects agent <strong>creators</strong> who build and optimize agents with <strong>renters</strong> who want to use them. Think of it as the Airbnb for AI agents:</p>
-<ul>
-<li><strong>Creators</strong> list their agents with pricing, descriptions, and capability demos</li>
-<li><strong>Renters</strong> browse, test, and rent agents by the hour, day, or month</li>
-<li><strong>Payments</strong> are handled in SOL or platform tokens with automatic revenue splitting</li>
-</ul>
-
-<h2>How It Works</h2>
-<h3>For Creators</h3>
-<ol>
-<li>Build and deploy your agent on hatcher.host</li>
-<li>List it on hatcher.markets with your price and rental terms</li>
-<li>Earn revenue every time someone rents your agent</li>
-<li>Maintain full control — update, pause, or remove your listing anytime</li>
-</ol>
-<h3>For Renters</h3>
-<ol>
-<li>Browse the marketplace by category, rating, or price</li>
-<li>Preview agents with live demos before renting</li>
-<li>Rent with one click — the agent deploys instantly to your account</li>
-<li>Leave reviews to help the community find the best agents</li>
-</ol>
-
-<h2>Use Cases</h2>
-<p>The marketplace enables entirely new workflows:</p>
-<ul>
-<li><strong>Crypto Projects</strong> — Rent a pre-built community manager for your new token launch</li>
-<li><strong>Startups</strong> — Get a customer support agent running in minutes, not weeks</li>
-<li><strong>Content Creators</strong> — Rent a social media agent that posts, replies, and engages on autopilot</li>
-<li><strong>Developers</strong> — Monetize agents you have already built but are not using full-time</li>
-</ul>
-
-<h2>The Agent Economy</h2>
-<p>We believe AI agents will become a fundamental economic unit — like websites in the 2000s or mobile apps in the 2010s. hatcher.markets is building the infrastructure for this agent economy, where value flows directly between creators and users with minimal friction.</p>
-
-<p>The marketplace is live at <a href="https://hatcher.markets">hatcher.markets</a>. Whether you are a builder looking to monetize your work or a team looking for ready-made AI capabilities, the agent economy starts here.</p>`,
-    author: 'Hatcher Labs',
-    date: '2026-03-15',
-    category: 'Product',
-    readTime: '4 min',
-    coverImageDescription: 'A digital marketplace storefront with AI agent icons displayed as products, featuring a purple-tinted cyberpunk aesthetic',
   },
   {
     slug: 'byok-explained-free-ai-agents',

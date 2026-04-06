@@ -15,12 +15,18 @@ const RESOURCE_LINKS = [
   { label: 'Blog', href: '/blog' },
 ];
 
-const COMMUNITY_LINKS = [
-  { label: 'Twitter', href: SOCIAL_LINKS.twitter },
-  { label: 'GitHub', href: SOCIAL_LINKS.github },
-  { label: 'Discord', href: 'https://discord.gg/7tY3HjKjMc' },
-  { label: 'Telegram', href: SOCIAL_LINKS.telegram },
-  { label: 'Contact Us', href: 'mailto:contact@hatcher.host' },
+const COMMUNITY_ICONS = [
+  ...SOCIAL_ICONS,
+  {
+    href: 'mailto:contact@hatcher.host',
+    label: 'Contact Us',
+    hoverClass: 'hover:text-emerald-400',
+    icon: (
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+      </svg>
+    ),
+  },
 ];
 
 const SOCIAL_ICONS = [
@@ -156,20 +162,21 @@ export function Footer() {
           {/* Community */}
           <div>
             <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">Community</p>
-            <ul className="space-y-2">
-              {COMMUNITY_LINKS.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200"
-                  >
-                    {link.label}
-                  </a>
-                </li>
+            <div className="flex flex-wrap gap-1.5">
+              {COMMUNITY_ICONS.map((s) => (
+                <a
+                  key={s.href}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
+                  title={s.label}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] ${s.hoverClass} hover:bg-[var(--bg-card)] transition-colors duration-200`}
+                >
+                  {s.icon}
+                </a>
               ))}
-            </ul>
+            </div>
           </div>
         </div>
 

@@ -39,7 +39,7 @@ const STEP_LABELS: Record<Step, string> = {
   1: 'Pick a style',
   2: 'Choose a template',
   3: 'Set it up',
-  4: 'Ready to hatch?',
+  4: 'Ready to launch?',
 };
 
 type LLMChoice = 'free_groq' | 'byok';
@@ -1779,7 +1779,7 @@ export default function CreatePage() {
               animate="center"
               exit="exit"
             >
-              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">Ready to hatch?</h2>
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">Ready to launch?</h2>
               <p className="text-[var(--text-muted)] text-sm mb-8 text-center">
                 Review your configuration before launching
               </p>
@@ -2061,7 +2061,7 @@ export default function CreatePage() {
                   ) : (
                     <>
                       <Rocket className="w-5 h-5" />
-                      Hatch My Agent!
+                      Launch My Agent!
                     </>
                   )}
                 </motion.button>

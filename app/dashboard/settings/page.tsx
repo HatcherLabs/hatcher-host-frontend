@@ -779,7 +779,7 @@ export default function SettingsPage() {
 
                         {/* Credits */}
                         <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] p-4 mb-5">
-                          <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider block mb-1">Hatch Credits</span>
+                          <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider block mb-1">HATCHER Credits</span>
                           <p className="text-2xl font-bold text-emerald-400" style={displayFont}>${profile.hatchCredits.toFixed(2)}</p>
                           <p className="text-xs text-[var(--text-muted)] mt-0.5">Automatically applied at checkout</p>
                         </div>

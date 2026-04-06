@@ -420,16 +420,16 @@ export default function MyAgentsPage() {
 
         {/* ── Filter / Search / Sort bar ──────────────────── */}
         <motion.div
-          className="flex flex-col sm:flex-row items-start sm:items-center gap-3"
+          className="flex flex-col gap-2"
           variants={cardVariants}
         >
-          {/* Status filters */}
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-default)] overflow-x-auto flex-nowrap w-full sm:w-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          {/* Row 1: Status filters (scrollable on mobile) */}
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-default)] overflow-x-auto flex-nowrap self-start max-w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {STATUS_FILTERS.map((f) => (
               <button
                 key={f.key}
                 onClick={() => setStatusFilter(f.key as StatusFilter)}
-                className={`px-3.5 py-2 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200 cursor-pointer ${
                   statusFilter === f.key
                     ? 'bg-purple-500/15 text-[var(--text-primary)] shadow-[0_0_8px_rgba(139,92,246,0.15)]'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
@@ -440,53 +440,56 @@ export default function MyAgentsPage() {
             ))}
           </div>
 
-          {/* Framework filter */}
-          <select
-            value={frameworkFilter}
-            onChange={(e) => setFrameworkFilter(e.target.value as FrameworkFilter)}
-            className="px-3 py-2.5 rounded-xl text-xs font-medium bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-secondary)] outline-none cursor-pointer appearance-none pr-7"
-            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center' }}
-          >
-            {FRAMEWORK_FILTERS.map((f) => (
-              <option key={f.key} value={f.key}>{f.label}</option>
-            ))}
-          </select>
-
-          {/* Search */}
-          <div className="flex items-center gap-2 w-full sm:w-auto sm:flex-initial bg-[var(--bg-elevated)] border border-[var(--border-default)] backdrop-blur-xl rounded-xl">
-            <Search size={16} className="text-[var(--text-muted)] ml-3" />
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder="Search agents... ( / )"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-transparent outline-none text-sm w-full sm:w-48 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] px-2 py-2.5"
-            />
-          </div>
-
-          {/* Sort */}
-          <select
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value as SortOption)}
-            className="px-3 py-2.5 rounded-xl text-xs font-medium bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-secondary)] outline-none cursor-pointer appearance-none pr-7"
-            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center' }}
-          >
-            {SORT_OPTIONS.map((s) => (
-              <option key={s.key} value={s.key}>{s.label}</option>
-            ))}
-          </select>
-
-          {/* Clear filters */}
-          {(statusFilter !== 'all' || frameworkFilter !== 'all' || searchQuery.trim()) && (
-            <button
-              onClick={() => { setStatusFilter('all'); setFrameworkFilter('all'); setSearchQuery(''); }}
-              className="flex items-center gap-1 px-2.5 py-2 rounded-xl text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+          {/* Row 2: Framework, Search, Sort, Clear */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Framework filter */}
+            <select
+              value={frameworkFilter}
+              onChange={(e) => setFrameworkFilter(e.target.value as FrameworkFilter)}
+              className="h-9 px-3 rounded-xl text-xs font-medium bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-secondary)] outline-none cursor-pointer appearance-none pr-7"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center' }}
             >
-              <X size={12} />
-              Clear
-            </button>
-          )}
+              {FRAMEWORK_FILTERS.map((f) => (
+                <option key={f.key} value={f.key}>{f.label}</option>
+              ))}
+            </select>
+
+            {/* Search */}
+            <div className="flex items-center gap-2 flex-1 min-w-[160px] h-9 bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-3">
+              <Search size={14} className="text-[var(--text-muted)] shrink-0" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search agents... ( / )"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-transparent outline-none text-xs w-full text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
+              />
+            </div>
+
+            {/* Sort */}
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value as SortOption)}
+              className="h-9 px-3 rounded-xl text-xs font-medium bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-secondary)] outline-none cursor-pointer appearance-none pr-7"
+              style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center' }}
+            >
+              {SORT_OPTIONS.map((s) => (
+                <option key={s.key} value={s.key}>{s.label}</option>
+              ))}
+            </select>
+
+            {/* Clear filters */}
+            {(statusFilter !== 'all' || frameworkFilter !== 'all' || searchQuery.trim()) && (
+              <button
+                onClick={() => { setStatusFilter('all'); setFrameworkFilter('all'); setSearchQuery(''); }}
+                className="h-9 flex items-center gap-1 px-2.5 rounded-xl text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+              >
+                <X size={12} />
+                Clear
+              </button>
+            )}
+          </div>
         </motion.div>
 
         {/* ── Agent Grid ──────────────────────────────────── */}
