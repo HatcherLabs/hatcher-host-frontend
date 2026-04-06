@@ -248,8 +248,8 @@ export function NotificationCenter() {
                   const colorClass = ICON_COLOR_MAP[n.type] || 'text-[var(--text-secondary)] bg-white/10';
                   const [iconText, iconBg] = colorClass.split(' ');
 
-                  const rowBase = `group flex items-start gap-3 px-4 py-3 border-b border-[var(--border-default)] transition-colors ${isUnread ? 'bg-purple-500/[0.04]' : ''}`;
-                  const inner = (
+                  const rowBase = `group relative flex items-start gap-3 px-4 py-3 border-b border-[var(--border-default)] transition-colors ${isUnread ? 'bg-purple-500/[0.04]' : ''}`;
+                  const content = (
                     <>
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${iconBg}`}>
                         <Icon size={14} className={iconText} />
@@ -262,32 +262,29 @@ export function NotificationCenter() {
                           {timeAgo(n.timestamp)}
                         </p>
                       </div>
+                    </>
+                  );
+
+                  return (
+                    <div key={n.id} className={rowBase}>
+                      {n.link ? (
+                        <Link
+                          href={n.link}
+                          onClick={() => setOpen(false)}
+                          className="absolute inset-0 z-0"
+                          aria-label={n.message}
+                        />
+                      ) : null}
+                      <div className="flex items-start gap-3 flex-1 min-w-0 relative z-[1] pointer-events-none">
+                        {content}
+                      </div>
                       <button
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); dismissOne(n.id); }}
-                        className="opacity-0 group-hover:opacity-100 flex-shrink-0 mt-0.5 p-1 rounded hover:bg-[var(--bg-card)] transition-all focus:opacity-100"
+                        onClick={() => dismissOne(n.id)}
+                        className="opacity-0 group-hover:opacity-100 flex-shrink-0 mt-0.5 p-1 rounded hover:bg-[var(--bg-card)] transition-all focus:opacity-100 relative z-[2]"
                         aria-label={`Dismiss notification: ${n.message}`}
                       >
                         <X size={12} className="text-[var(--text-muted)]" aria-hidden="true" />
                       </button>
-                    </>
-                  );
-
-                  if (n.link) {
-                    return (
-                      <Link
-                        key={n.id}
-                        href={n.link}
-                        onClick={() => setOpen(false)}
-                        className={`${rowBase} hover:bg-[var(--bg-card)] cursor-pointer no-underline`}
-                        style={{ textDecoration: 'none' }}
-                      >
-                        {inner}
-                      </Link>
-                    );
-                  }
-                  return (
-                    <div key={n.id} className={rowBase}>
-                      {inner}
                     </div>
                   );
                 })
