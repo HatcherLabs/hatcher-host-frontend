@@ -336,31 +336,39 @@ export function UsageTab() {
               <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Last 7 days</span>
             </div>
 
-            <div className="flex items-end gap-1.5 h-28 mb-1">
-              {data.messages.chart.map((d, i) => {
-                const heightPct = maxChartCount > 0 ? (d.count / maxChartCount) * 100 : 0;
-                const isToday = i === data.messages.chart.length - 1;
-                return (
-                  <div key={d.date} className="flex-1 flex flex-col items-center gap-1 group relative">
-                    <span className={`text-[10px] font-medium transition-colors ${isToday ? 'text-[#06b6d4]' : 'text-[var(--text-muted)] group-hover:text-[var(--text-secondary)]'}`}>
-                      {d.count > 0 ? d.count : ''}
-                    </span>
-                    <div
-                      className={`w-full rounded-t transition-all duration-300 min-h-[2px] ${
-                        isToday ? 'bg-[#06b6d4]' : 'bg-[#06b6d4]/40 group-hover:bg-[#06b6d4]/60'
-                      }`}
-                      style={{ height: `${Math.max(heightPct, d.count > 0 ? 4 : 1)}%` }}
-                    />
-                    <div className="flex flex-col items-center">
-                      <span className={`text-[9px] ${isToday ? 'text-[#06b6d4] font-medium' : 'text-[var(--text-muted)]'}`}>
-                        {isToday ? 'Today' : formatWeekday(d.date)}
-                      </span>
-                      <span className="text-[8px] text-[var(--text-muted)]/60">{formatChartDate(d.date)}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            {(() => {
+              const chartData = data.messages.chart;
+              const W = 400, H = 120;
+              const PAD = { top: 14, right: 8, bottom: 24, left: 28 };
+              const cw = W - PAD.left - PAD.right;
+              const ch = H - PAD.top - PAD.bottom;
+              const max = Math.max(...chartData.map(d => d.count), 1);
+              const pts = chartData.map((d, i) => ({
+                x: PAD.left + (i / Math.max(chartData.length - 1, 1)) * cw,
+                y: PAD.top + ch - (d.count / max) * ch,
+                ...d,
+              }));
+              const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+              const area = `${line} L${pts[pts.length - 1]?.x ?? W},${PAD.top + ch} L${PAD.left},${PAD.top + ch} Z`;
+              const yTicks = [0, Math.round(max / 2), max].map(v => ({ v, y: PAD.top + ch - (v / max) * ch }));
+              return (
+                <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto">
+                  {yTicks.map(t => (
+                    <g key={t.v}><line x1={PAD.left} y1={t.y} x2={W - PAD.right} y2={t.y} stroke="var(--border-default)" strokeWidth="0.5" strokeDasharray="3 3" /><text x={PAD.left - 4} y={t.y + 3} textAnchor="end" fill="var(--text-muted)" fontSize="8">{t.v}</text></g>
+                  ))}
+                  <defs><linearGradient id="usageGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#06b6d4" stopOpacity="0.25" /><stop offset="100%" stopColor="#06b6d4" stopOpacity="0.02" /></linearGradient></defs>
+                  <path d={area} fill="url(#usageGrad)" />
+                  <path d={line} fill="none" stroke="#06b6d4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  {pts.map((p, i) => (
+                    <g key={p.date}>
+                      <circle cx={p.x} cy={p.y} r={i === pts.length - 1 ? 3.5 : 2} fill={i === pts.length - 1 ? '#06b6d4' : '#06b6d480'} stroke={i === pts.length - 1 ? 'white' : 'none'} strokeWidth="1.5" />
+                      <circle cx={p.x} cy={p.y} r="10" fill="transparent"><title>{formatChartDate(p.date)}: {p.count}</title></circle>
+                      <text x={p.x} y={H - 4} textAnchor="middle" fill={i === pts.length - 1 ? '#06b6d4' : 'var(--text-muted)'} fontSize="8" fontWeight={i === pts.length - 1 ? '600' : '400'}>{i === pts.length - 1 ? 'Today' : formatWeekday(p.date)}</text>
+                    </g>
+                  ))}
+                </svg>
+              );
+            })()}
           </div>
 
           {/* ── Bottom Row: Uptime + Resources + Storage ── */}
