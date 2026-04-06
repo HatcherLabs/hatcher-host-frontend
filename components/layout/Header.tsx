@@ -48,17 +48,18 @@ const USER_EXTRA_LINKS = [
 // ── Mobile links (when logged in) ──
 const MOBILE_AUTH_LINKS = [
   { href: '/dashboard/agents',    label: 'My Agents' },
-  { href: '/dashboard/analytics', label: 'Analytics' },
-  { href: '/dashboard/team',      label: 'Team' },
   { href: '/explore',             label: 'Explore' },
   { href: '/create',              label: 'Create' },
+  { href: '/token',               label: 'Token' },
   { href: '/pricing',             label: 'Pricing' },
+  { href: '/support',             label: 'Support' },
 ];
 
 // ── Mobile links (when logged out) ──
 const MOBILE_GUEST_LINKS = [
   { href: '/explore',   label: 'Explore' },
   { href: '/templates', label: 'Templates' },
+  { href: '/token',     label: 'Token' },
   { href: '/pricing',   label: 'Pricing' },
 ];
 
