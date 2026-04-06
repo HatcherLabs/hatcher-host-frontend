@@ -582,6 +582,11 @@ export default function AgentManagePage() {
       };
     } else {
       loadLogs();
+      // Poll every 10s for non-Pro users (Pro gets WebSocket streaming)
+      if (tab === 'logs' && isActiveStatus) {
+        const interval = setInterval(loadLogs, 10_000);
+        return () => clearInterval(interval);
+      }
     }
     return () => {
       if (wsLogsRef.current) {
