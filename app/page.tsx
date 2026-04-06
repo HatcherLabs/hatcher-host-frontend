@@ -811,6 +811,99 @@ export default function LandingPage() {
         </div>
       </Section>
 
+      {/* ── ROADMAP TEASER ───────────────────────────── */}
+      <Section className="py-16 sm:py-24 px-4 sm:px-6 border-t border-[var(--border-default)]">
+        <div className="max-w-3xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+              Built in public
+            </h2>
+            <p className="text-[var(--text-secondary)]">We ship every day. Here's where we're headed.</p>
+          </motion.div>
+
+          <div className="relative">
+            {/* Vertical line */}
+            <div className="absolute left-[7px] top-2 bottom-2 w-px bg-gradient-to-b from-emerald-500/40 via-amber-500/30 to-[var(--border-default)]" />
+
+            <div className="space-y-6 pl-8">
+              {[
+                {
+                  label: 'Live now',
+                  badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+                  dot: 'bg-emerald-400',
+                  delay: 0.1,
+                  items: ['4 frameworks, 20+ integrations', '$HATCHER token live on Solana', 'SDK, CLI, Zapier, Make, referral program'],
+                },
+                {
+                  label: 'Next 3–7 days',
+                  badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+                  dot: 'bg-amber-400 animate-pulse',
+                  delay: 0.2,
+                  items: ['Official public launch', 'Stripe card payments', 'Signal integration, mobile app'],
+                },
+                {
+                  label: 'Next 2–4 weeks',
+                  badge: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+                  dot: 'bg-purple-400',
+                  delay: 0.3,
+                  items: ['Agent Marketplace', 'Scheduled agents & cron jobs', 'Conversation analytics'],
+                },
+                {
+                  label: 'Next 1–3 months',
+                  badge: 'bg-[var(--bg-elevated)] text-[var(--text-muted)] border-[var(--border-default)]',
+                  dot: 'bg-[var(--text-muted)]',
+                  delay: 0.4,
+                  items: ['More frameworks', 'Token staking', 'Voice-first agents'],
+                },
+              ].map((phase, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.35, delay: phase.delay }}
+                  className="relative"
+                >
+                  {/* Dot on the line */}
+                  <div className={`absolute -left-8 top-1 w-3.5 h-3.5 rounded-full border-2 border-[var(--bg-base)] ${phase.dot}`} />
+
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
+                    <span className={`inline-flex items-center shrink-0 px-2.5 py-0.5 rounded text-[11px] font-semibold border ${phase.badge}`}>
+                      {phase.label}
+                    </span>
+                    <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                      {phase.items.join(' · ')}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.35, delay: 0.5 }}
+            className="mt-10 flex justify-center"
+          >
+            <Link
+              href="/roadmap"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] text-sm font-medium text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors"
+            >
+              View full roadmap
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
+            </Link>
+          </motion.div>
+        </div>
+      </Section>
+
       {/* ── FINAL CTA ────────────────────────────────── */}
       <section className="relative py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)]">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">

@@ -14,6 +14,7 @@ const RESOURCE_LINKS = [
   { label: 'Support', href: '/support' },
   { label: 'Blog', href: '/blog' },
   { label: 'Changelog', href: '/changelog' },
+  { label: 'Roadmap', href: '/roadmap' },
 ];
 
 const SOCIAL_ICONS = [
