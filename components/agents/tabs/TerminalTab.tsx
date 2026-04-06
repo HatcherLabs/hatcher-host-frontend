@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useAgentContext } from '../AgentContext';
-import { getToken } from '@/lib/api';
+import { getToken, req } from '@/lib/api';
 import { RotateCcw, Circle, Send } from 'lucide-react';
 
 // xterm.js CSS — imported once when component loads
@@ -122,8 +122,14 @@ export function TerminalTab() {
       term.clear();
       term.writeln('\x1b[36m[hatcher]\x1b[0m Connecting to agent terminal...');
 
-      // Get JWT
-      const token = getToken();
+      // Get JWT — try refresh via cookie if localStorage token is missing (cookie-only sessions)
+      let token = getToken();
+      if (!token) {
+        try {
+          await req('/auth/refresh', { method: 'POST' });
+          token = getToken();
+        } catch { /* ignore — will fail below with Not authenticated */ }
+      }
       if (!token) throw new Error('Not authenticated');
 
       // Connect WebSocket
