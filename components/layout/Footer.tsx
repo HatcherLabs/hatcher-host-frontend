@@ -107,7 +107,7 @@ export function Footer() {
           </div>
 
           {/* Product */}
-          <div>
+          <div className="text-center md:text-left">
             <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">Product</p>
             <ul className="space-y-2">
               {PRODUCT_LINKS.map((link) => (
@@ -121,7 +121,7 @@ export function Footer() {
           </div>
 
           {/* Resources */}
-          <div>
+          <div className="text-center md:text-left">
             <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">Resources</p>
             <ul className="space-y-2">
               {RESOURCE_LINKS.map((link) => (
