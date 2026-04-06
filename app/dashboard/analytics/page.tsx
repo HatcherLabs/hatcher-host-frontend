@@ -398,40 +398,38 @@ export default function AnalyticsPage() {
         >
           <div className="flex items-center gap-2 mb-5">
             <Hash size={16} className="text-[#06b6d4]" />
-            <h3 className="text-sm font-semibold text-[var(--text-primary)]">Messages Per Agent</h3>
+            <h3 className="text-sm font-semibold text-[var(--text-primary)]">Total Messages by Agent</h3>
           </div>
           {loading ? (
             <div className="space-y-3">
               {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
             </div>
           ) : data && data.agentMessageBreakdown.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {data.agentMessageBreakdown.map((agent, i) => {
                 const maxCount = data.agentMessageBreakdown[0]?.count ?? 1;
                 const pct = maxCount > 0 ? (agent.count / maxCount) * 100 : 0;
                 const color = FRAMEWORK_COLORS[agent.framework] ?? '#8b5cf6';
                 return (
-                  <div key={agent.id}>
-                    <div className="flex items-center justify-between mb-1">
+                  <Link
+                    key={agent.id}
+                    href={`/dashboard/agent/${agent.id}?tab=analytics`}
+                    className="block p-3 rounded-xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-[10px] text-[var(--text-muted)] w-4 text-right shrink-0">#{i + 1}</span>
-                        <Link
-                          href={`/dashboard/agent/${agent.id}?tab=analytics`}
-                          className="text-xs font-medium text-[var(--text-primary)] hover:text-[#06b6d4] transition-colors truncate"
-                        >
-                          {agent.name}
-                        </Link>
-                        <span className="text-[9px] capitalize shrink-0" style={{ color }}>{agent.framework}</span>
+                        <span className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-bold shrink-0" style={{ background: `${color}20`, color }}>{i + 1}</span>
+                        <span className="text-sm font-medium text-[var(--text-primary)] truncate">{agent.name}</span>
                       </div>
-                      <span className="text-xs text-[var(--text-muted)] shrink-0 ml-3">{agent.count.toLocaleString()}</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[10px] capitalize px-1.5 py-0.5 rounded-md shrink-0" style={{ background: `${color}15`, color }}>{agent.framework}</span>
+                        <span className="text-sm font-semibold text-[var(--text-primary)] tabular-nums">{agent.count.toLocaleString()}</span>
+                      </div>
                     </div>
                     <div className="h-1.5 rounded-full bg-[var(--bg-card)] overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{ width: `${pct}%`, background: color }}
-                      />
+                      <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: color }} />
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>
