@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -23,6 +24,7 @@ interface Notification {
   type: string;
   message: string;
   timestamp: string;
+  link?: string;
 }
 
 const ICON_MAP: Record<string, typeof Server> = {
@@ -96,6 +98,7 @@ function saveDismissed(ids: Set<string>) {
 
 export function NotificationCenter() {
   const { isAuthenticated } = useAuth();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [readAt, setReadAt] = useState<string | null>(null);
@@ -210,7 +213,7 @@ export function NotificationCenter() {
             transition={{ duration: 0.15 }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)]">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
               <h3 className="text-sm font-semibold text-white">Notifications</h3>
               <div className="flex items-center gap-2">
                 {unreadCount > 0 && (
@@ -255,15 +258,18 @@ export function NotificationCenter() {
                   return (
                     <div
                       key={n.id}
-                      className={`group flex items-start gap-3 px-4 py-3 border-b border-[var(--border-default)] transition-colors ${
+                      onClick={() => {
+                        if (n.link) { setOpen(false); router.push(n.link); }
+                      }}
+                      className={`group flex items-start gap-3 px-4 py-3 border-b border-white/[0.06] transition-colors ${
                         isUnread ? 'bg-purple-500/[0.03]' : ''
-                      }`}
+                      } ${n.link ? 'cursor-pointer hover:bg-white/[0.03]' : ''}`}
                     >
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${iconBg}`}>
                         <Icon size={14} className={iconText} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-xs leading-relaxed ${isUnread ? 'text-white' : 'text-[var(--text-secondary)]'}`}>
+                        <p className={`text-xs leading-relaxed ${isUnread ? 'text-white' : 'text-zinc-400'}`}>
                           {n.message}
                         </p>
                         <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
@@ -271,8 +277,8 @@ export function NotificationCenter() {
                         </p>
                       </div>
                       <button
-                        onClick={() => dismissOne(n.id)}
-                        className="opacity-0 group-hover:opacity-100 flex-shrink-0 mt-0.5 p-1 rounded hover:bg-[var(--bg-card)] transition-all focus:opacity-100"
+                        onClick={(e) => { e.stopPropagation(); dismissOne(n.id); }}
+                        className="opacity-0 group-hover:opacity-100 flex-shrink-0 mt-0.5 p-1 rounded hover:bg-white/10 transition-all focus:opacity-100"
                         aria-label={`Dismiss notification: ${n.message}`}
                       >
                         <X size={12} className="text-[var(--text-muted)]" aria-hidden="true" />

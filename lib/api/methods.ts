@@ -122,7 +122,7 @@ export const api = {
     }),
 
   /** Get recent notifications/activity */
-  getNotifications: () => req<{ items: Array<{id: string; type: string; message: string; timestamp: string}>; readAt: string | null }>('/auth/notifications'),
+  getNotifications: () => req<{ items: Array<{id: string; type: string; message: string; timestamp: string; link?: string}>; readAt: string | null }>('/auth/notifications'),
 
   /** Mark all notifications as read (persists server-side) */
   markNotificationsRead: () => req<{ readAt: string }>('/auth/notifications/read', { method: 'PATCH' }),

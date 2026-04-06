@@ -351,7 +351,7 @@ export default function TeamPage() {
           <p className="text-sm text-[var(--text-secondary)] mb-6">
             Start collaborating by creating a team. You can then invite members and share your agents.
           </p>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
               placeholder="Team name..."
@@ -364,7 +364,7 @@ export default function TeamPage() {
             <button
               onClick={handleCreateTeam}
               disabled={creating || !teamName.trim()}
-              className="px-5 py-2.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors flex items-center gap-2"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors flex items-center gap-2"
             >
               {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
               Create

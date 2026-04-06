@@ -76,8 +76,8 @@ export function Footer() {
   return (
     <footer className="mt-auto">
       <div className="h-px bg-[var(--border-default)]" />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-4 md:mb-6">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-3">
