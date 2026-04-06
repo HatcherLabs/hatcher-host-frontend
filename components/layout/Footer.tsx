@@ -82,8 +82,8 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-4 md:mb-6">
           {/* Brand */}
-          <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-3">
+          <div className="col-span-2 md:col-span-1 text-center md:text-left">
+            <div className="flex items-center gap-2 mb-3 justify-center md:justify-start">
               <svg viewBox="0 0 28 28" width="22" height="22" fill="none" aria-label="Hatcher logo" role="img">
                 <defs>
                   <linearGradient id="eggShellF" x1="14" y1="3" x2="14" y2="27" gradientUnits="userSpaceOnUse">
@@ -146,9 +146,9 @@ export function Footer() {
           </div>
 
           {/* Community */}
-          <div>
+          <div className="text-center md:text-left">
             <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">Community</p>
-            <div className="flex flex-nowrap gap-1">
+            <div className="flex flex-nowrap gap-1 justify-center md:justify-start">
               {COMMUNITY_ICONS.map((s) => (
                 <a
                   key={s.href}
