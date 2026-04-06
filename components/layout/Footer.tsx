@@ -13,6 +13,7 @@ const RESOURCE_LINKS = [
   { label: 'Documentation', href: DOCS_URL, external: true },
   { label: 'Support', href: '/support' },
   { label: 'Blog', href: '/blog' },
+  { label: 'Changelog', href: '/changelog' },
 ];
 
 const SOCIAL_ICONS = [
