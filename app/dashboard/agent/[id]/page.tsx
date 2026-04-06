@@ -609,6 +609,7 @@ export default function AgentManagePage() {
     slack: 'openclaw.platform.slack',
     whatsapp: 'openclaw.platform.whatsapp',
     twitter: 'openclaw.platform.twitter',
+    xurl: 'openclaw.platform.twitter',
     signal: 'openclaw.platform.signal',
     irc: 'openclaw.platform.irc',
     matrix: 'openclaw.platform.matrix',
