@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Roadmap — Hatcher',
-  description: 'Where Hatcher is headed. See what we shipped, what's launching this week, and what's coming next.',
+  description: "Where Hatcher is headed. See what we shipped, what's launching this week, and what's coming next.",
 };
 
 type Status = 'done' | 'launching' | 'soon' | 'planned';
