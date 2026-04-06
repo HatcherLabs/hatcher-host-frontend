@@ -79,6 +79,14 @@ export function Header() {
   const isAdmin = user?.isAdmin ?? false;
   const [creditBalance, setCreditBalance] = useState<number | null>(null);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = ''; };
+    }
+  }, [mobileOpen]);
+
   useEffect(() => {
     if (isAuthenticated && dropdownOpen && creditBalance === null) {
       api.getCreditBalance().then(res => {
