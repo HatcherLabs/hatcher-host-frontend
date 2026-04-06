@@ -55,6 +55,19 @@ export function ChatTab() {
   // Reset extra-loaded window when switching agents
   useEffect(() => { setExtraLoaded(0); }, [agent.id]);
 
+  // Scroll to bottom on initial load (show latest messages after refresh)
+  const initialScrollDone = useRef(false);
+  useEffect(() => {
+    if (initialScrollDone.current || messages.length === 0) return;
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    // Use requestAnimationFrame to ensure DOM is painted
+    requestAnimationFrame(() => {
+      container.scrollTop = container.scrollHeight;
+      initialScrollDone.current = true;
+    });
+  }, [messages.length]);
+
   // Prevent page scroll ONLY when chat DOM changes (new messages)
   useEffect(() => {
     const container = messagesContainerRef.current;
