@@ -159,7 +159,13 @@ export default function AgentManagePage() {
   const initialTab = validTabs.includes(searchParams.get('tab') as Tab)
     ? (searchParams.get('tab') as Tab)
     : 'overview';
-  const [tab, setTab] = useState<Tab>(initialTab);
+  const [tab, setTabRaw] = useState<Tab>(initialTab);
+  const setTab = useCallback((t: Tab) => {
+    setTabRaw(t);
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', t);
+    window.history.replaceState({}, '', url.pathname + url.search);
+  }, []);
 
   // Reset tab when agent ID changes (fixes navigation between agents keeping stale tab)
   const prevIdRef = useRef(id);
