@@ -524,14 +524,14 @@ export default function CreatePage() {
               />
             </div>
           </div>
-          <div className="flex items-center justify-center gap-0" role="list" aria-label="Creation steps">
+          <div className="flex items-center justify-center gap-0 overflow-x-auto px-2" role="list" aria-label="Creation steps">
             {([1, 2, 3, 4] as Step[]).map((s, i) => (
               <div key={s} className="flex items-center" role="listitem" aria-current={s === step ? 'step' : undefined}>
                 {/* Step circle */}
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex flex-col items-center gap-1.5 sm:gap-2">
                   <motion.div
                     className={cn(
-                      'w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 border-2',
+                      'w-8 h-8 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-300 border-2',
                       s < step
                         ? 'bg-[var(--accent-600)] border-[var(--accent-600)] text-white shadow-[0_0_16px_rgba(6,182,212,0.3)]'
                         : s === step
@@ -549,7 +549,7 @@ export default function CreatePage() {
                   </motion.div>
                   <span
                     className={cn(
-                      'text-xs max-w-[120px] text-center font-medium',
+                      'text-[10px] sm:text-xs max-w-[70px] sm:max-w-[120px] text-center font-medium',
                       s < step ? 'text-[var(--accent-400)]' : s === step ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'
                     )}
                   >
@@ -558,7 +558,7 @@ export default function CreatePage() {
                 </div>
                 {/* Connecting line */}
                 {i < 3 && (
-                  <div className="relative w-20 sm:w-32 mx-3 mb-6">
+                  <div className="relative w-8 sm:w-32 mx-1 sm:mx-3 mb-5 sm:mb-6">
                     <div className="h-0.5 rounded-full bg-[var(--border-default)]" />
                     <motion.div
                       className="absolute top-0 left-0 h-0.5 rounded-full"

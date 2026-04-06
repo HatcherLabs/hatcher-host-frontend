@@ -133,7 +133,7 @@ export default function TokenPage() {
       </section>
 
       {/* ── PLANNED USE CASES ──────────────────────────────── */}
-      <section className="py-20 px-4">
+      <section className="py-12 sm:py-20 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <div className="section-label mb-3">Planned Utility</div>
@@ -151,7 +151,7 @@ export default function TokenPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
             {PLANNED_USE_CASES.map((item) => {
               const Icon = item.icon;
               return (
@@ -177,7 +177,7 @@ export default function TokenPage() {
       </section>
 
       {/* ── KEY DETAILS ──────────────────────────────────────── */}
-      <section className="py-16 px-4">
+      <section className="py-12 sm:py-20 px-4">
         <div className="mx-auto max-w-4xl">
           <div className="card glass-noise p-8">
             <motion.h2
@@ -220,7 +220,7 @@ export default function TokenPage() {
       </section>
 
       {/* ── STAY UPDATED CTA ─────────────────────────────────── */}
-      <section className="py-20 px-4">
+      <section className="py-12 sm:py-20 px-4">
         <div className="mx-auto max-w-4xl">
           <div className="relative rounded-3xl overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-[#06b6d4]/15 via-[#06b6d4]/10 to-[#0891b2]/10" />

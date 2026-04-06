@@ -146,7 +146,7 @@ export function Footer() {
           </div>
 
           {/* Community */}
-          <div className="text-center md:text-left">
+          <div className="col-span-2 md:col-span-1 text-center md:text-left">
             <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">Community</p>
             <div className="flex flex-nowrap gap-1 justify-center md:justify-start">
               {COMMUNITY_ICONS.map((s) => (
