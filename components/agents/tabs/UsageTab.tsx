@@ -65,27 +65,29 @@ function formatChartDate(dateStr: string): string {
 }
 
 /* ── Framework context banners ── */
+const USAGE_DESCRIPTION = 'Each message you send to the agent counts toward your daily limit, regardless of channel (web chat, Telegram, Discord, etc.). BYOK users have unlimited messages.';
+
 const FRAMEWORK_CONTEXT: Record<string, { text: string; accent: string; accentBg: string; accentBorder: string }> = {
   openclaw: {
-    text: 'OpenClaw agents use Groq for LLM inference. Messages are counted per 24h rolling window. Tools like web search, memory, and file operations do not count toward your message limit.',
+    text: USAGE_DESCRIPTION,
     accent: 'text-amber-400',
     accentBg: 'bg-amber-500/[0.06]',
     accentBorder: 'border-amber-500/20',
   },
   hermes: {
-    text: 'Hermes agents use Groq for LLM inference. Each conversation turn counts as one message. Plugin calls (Twitter, Discord) are bundled with the triggering message.',
+    text: USAGE_DESCRIPTION,
     accent: 'text-purple-400',
     accentBg: 'bg-purple-500/[0.06]',
     accentBorder: 'border-purple-500/20',
   },
   elizaos: {
-    text: 'ElizaOS agents use Groq for LLM inference. Plugins may consume additional resources and memory. Each plugin interaction counts as one message toward your daily limit.',
+    text: USAGE_DESCRIPTION,
     accent: 'text-cyan-400',
     accentBg: 'bg-cyan-500/[0.06]',
     accentBorder: 'border-cyan-500/20',
   },
   milady: {
-    text: 'Milady agents use Groq for LLM inference. Multi-modal interactions (image generation, voice) consume more resources but each still counts as a single message.',
+    text: USAGE_DESCRIPTION,
     accent: 'text-rose-400',
     accentBg: 'bg-rose-500/[0.06]',
     accentBorder: 'border-rose-500/20',
@@ -98,13 +100,21 @@ const TIER_BADGE: Record<string, { label: string; className: string }> = {
     label: 'Free',
     className: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30',
   },
-  basic: {
-    label: 'Basic',
+  starter: {
+    label: 'Starter',
     className: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
   },
   pro: {
     label: 'Pro',
     className: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+  },
+  business: {
+    label: 'Business',
+    className: 'bg-pink-500/15 text-pink-400 border-pink-500/30',
+  },
+  founding_member: {
+    label: 'Founding Member',
+    className: 'bg-red-500/15 text-red-400 border-red-500/30',
   },
 };
 
