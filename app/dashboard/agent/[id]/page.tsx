@@ -601,6 +601,42 @@ export default function AgentManagePage() {
     if ((tab === 'integrations' || tab === 'config') && agentStatus) loadFeatures();
   }, [tab, agentStatus, loadFeatures]);
 
+  // Pre-populate channel settings from agent config (dmPolicy, groupPolicy, streaming)
+  // Maps channelSettings.telegram → openclaw.platform.telegram state key
+  const CHANNEL_TO_FEATURE: Record<string, string> = {
+    telegram: 'openclaw.platform.telegram',
+    discord: 'openclaw.platform.discord',
+    slack: 'openclaw.platform.slack',
+    whatsapp: 'openclaw.platform.whatsapp',
+    twitter: 'openclaw.platform.twitter',
+    signal: 'openclaw.platform.signal',
+    irc: 'openclaw.platform.irc',
+    matrix: 'openclaw.platform.matrix',
+  };
+  useEffect(() => {
+    if (!agent) return;
+    const config = (agent.config ?? {}) as Record<string, unknown>;
+    const cs = config.channelSettings as Record<string, Record<string, unknown>> | undefined;
+    if (!cs || typeof cs !== 'object') return;
+    setIntegrationSecrets((prev) => {
+      const next = { ...prev };
+      for (const [channel, settings] of Object.entries(cs)) {
+        if (!settings || typeof settings !== 'object') continue;
+        const sk = CHANNEL_TO_FEATURE[channel.toLowerCase()] ?? channel.toLowerCase();
+        const mapped: Record<string, string> = {};
+        if (settings.dmPolicy) mapped._CS_DM_POLICY = String(settings.dmPolicy);
+        if (settings.groupPolicy) mapped._CS_GROUP_POLICY = String(settings.groupPolicy);
+        if (settings.streaming) mapped._CS_STREAMING = String(settings.streaming);
+        if (Array.isArray(settings.allowFrom)) mapped._CS_DM_ALLOWLIST = settings.allowFrom.join(', ');
+        if (Array.isArray(settings.groupAllowFrom)) mapped._CS_GROUP_ALLOWLIST = settings.groupAllowFrom.join(', ');
+        if (Object.keys(mapped).length > 0) {
+          next[sk] = { ...(next[sk] ?? {}), ...mapped };
+        }
+      }
+      return next;
+    });
+  }, [agent]);
+
   // Auto-scroll chat
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
