@@ -1461,8 +1461,8 @@ export function SkillsTab() {
         </div>
       )}
 
-      {/* Marketplace Section — not available for ElizaOS/Milady (plugins are pre-built in image) */}
-      {!loading && agent && agent.framework !== 'elizaos' && agent.framework !== 'milady' && (
+      {/* Marketplace Section — disabled for now (skill persistence in progress) */}
+      {false && !loading && agent && (
         <MarketplaceSection
           framework={agent.framework ?? 'openclaw'}
           installedSkillIds={installedSkillIds}
