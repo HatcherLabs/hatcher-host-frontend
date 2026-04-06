@@ -402,10 +402,6 @@ export default function MyAgentsPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/dashboard/templates" className="btn-ghost text-sm">
-              <Layers size={15} />
-              Templates
-            </Link>
             <Link href="/create" className="btn-primary text-sm">
               <PlusCircle size={16} />
               Create Agent
