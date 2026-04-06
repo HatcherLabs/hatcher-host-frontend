@@ -552,7 +552,7 @@ export default function BillingPage() {
       animate="visible"
     >
       {/* Breadcrumb */}
-      <motion.div className="flex items-center gap-2 text-sm mb-8 text-[var(--text-muted)]" variants={itemVariants}>
+      <motion.div className="flex items-baseline gap-2 text-sm mb-8 text-[var(--text-muted)]" variants={itemVariants}>
         <Link href="/dashboard" className="hover:text-[#06b6d4] transition-colors duration-200">Dashboard</Link>
         <span>/</span>
         <span className="text-[var(--text-secondary)]">Billing</span>
