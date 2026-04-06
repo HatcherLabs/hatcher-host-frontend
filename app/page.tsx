@@ -895,7 +895,7 @@ export default function LandingPage() {
           >
             <Link
               href="/roadmap"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] text-sm font-medium text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] text-sm font-medium text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-colors"
             >
               View full roadmap
               <ArrowRight className="w-4 h-4" aria-hidden="true" />

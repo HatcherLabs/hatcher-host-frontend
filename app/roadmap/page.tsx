@@ -210,7 +210,7 @@ export default function RoadmapPage() {
           <div className="flex flex-wrap gap-3">
             <Link
               href="/support"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-sm font-medium text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-sm font-medium text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-colors"
             >
               Submit a request
             </Link>
@@ -218,7 +218,7 @@ export default function RoadmapPage() {
               href="https://x.com/hatcherlabs"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-colors"
             >
               Follow on X
             </Link>
