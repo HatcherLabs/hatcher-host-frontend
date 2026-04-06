@@ -163,9 +163,9 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-[var(--border-default)] pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="border-t border-[var(--border-default)] pt-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span className="text-xs text-[var(--text-muted)]">&copy; {new Date().getFullYear()} HatcherLabs. All rights reserved.</span>
-          <div className="flex items-center gap-4 text-xs text-[var(--text-muted)]">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--text-muted)]">
             <Link href="/pricing" className="hover:text-[var(--text-primary)] transition-colors duration-200">Pricing</Link>
             <Link href="/support" className="hover:text-[var(--text-primary)] transition-colors duration-200">Support</Link>
             <a href={DOCS_URL} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--text-primary)] transition-colors duration-200">Docs</a>
