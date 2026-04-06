@@ -175,6 +175,11 @@ export default function SupportPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    if (!isAuthenticated) {
+      setFormError('Please sign in to submit a ticket.');
+      return;
+    }
+
     // Validate
     if (!subject.trim()) {
       setFormError('Subject is required.');
@@ -333,6 +338,14 @@ export default function SupportPage() {
             </div>
 
             <div className="p-6">
+              {!isAuthenticated ? (
+                <div className="text-center py-8">
+                  <p className="text-sm text-[var(--text-secondary)] mb-4">Sign in to submit a support ticket.</p>
+                  <Link href="/login" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-colors">
+                    Sign In
+                  </Link>
+                </div>
+              ) : (
               <AnimatePresence mode="wait">
                 {submitted ? (
                   /* ─── Success State ─────────────────────────── */
@@ -549,6 +562,7 @@ export default function SupportPage() {
                   </motion.form>
                 )}
               </AnimatePresence>
+              )}
             </div>
           </div>
         </motion.div>

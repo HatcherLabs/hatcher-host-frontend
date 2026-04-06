@@ -32,9 +32,9 @@ const GUEST_NAV_LINKS = [
 
 // ── Auxiliary links (visible in both states, after a divider) ──
 const AUX_LINKS = [
-  { href: '/pricing',   label: 'Pricing',   external: false, badge: null },
-  { href: '/support',   label: 'Support',   external: false, badge: null },
-  { href: DOCS_URL,     label: 'Docs',      external: true,  badge: null },
+  { href: '/pricing',   label: 'Pricing',   external: false, badge: null, authOnly: false },
+  { href: '/support',   label: 'Support',   external: false, badge: null, authOnly: true },
+  { href: DOCS_URL,     label: 'Docs',      external: true,  badge: null, authOnly: false },
 ];
 
 // ── User dropdown links ──
@@ -198,8 +198,8 @@ export function Header() {
               <span className="w-px h-4 bg-[var(--border-default)] mx-1" aria-hidden="true" />
             )}
 
-            {/* Auxiliary links: Pricing + Changelog + Docs (always visible) */}
-            {AUX_LINKS.map((link) => {
+            {/* Auxiliary links */}
+            {AUX_LINKS.filter(l => !l.authOnly || isAuthenticated).map((link) => {
               const active = !link.external && isActive(pathname, link.href);
               const Comp = link.external ? 'a' : Link;
               const extraProps = link.external
