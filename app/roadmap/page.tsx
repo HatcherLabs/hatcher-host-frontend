@@ -42,19 +42,20 @@ const PHASES: Phase[] = [
       { text: 'Teams, custom domains, agent versioning, workflow builder' },
       { text: 'Referral program — earn credits for every signup you bring' },
       { text: 'Embeddable chat widget — add your agent to any website' },
+      { text: 'Agent-to-Agent — agents can call and collaborate with each other' },
       { text: 'Full docs, live changelog, support tickets' },
     ],
   },
   {
-    period: 'This week',
+    period: 'Next 3–7 days',
     status: 'launching',
-    label: 'LAUNCHING',
+    label: 'SOON',
     items: [
       { text: 'Official public launch — Product Hunt, Hacker News, X threads' },
       { text: 'Stripe live payments — pay with card in addition to SOL / HATCHER' },
       { text: 'Platform directory listings — AlternativeTo, There\'s An AI For That, Futurepedia and more' },
       { text: 'Signal integration — QR code pairing, encrypted messaging' },
-      { text: 'Mobile app — iOS & Android (Capacitor-based)' },
+      { text: 'Mobile app — iOS & Android' },
       { text: 'Agent template gallery expansion — 30+ ready-to-deploy templates' },
     ],
   },
@@ -76,7 +77,7 @@ const PHASES: Phase[] = [
     status: 'planned',
     label: 'PLANNED',
     items: [
-      { text: 'Agent-to-Agent — one agent can call another, simple multi-agent pipelines' },
+      { text: 'More frameworks — additional agent runtimes for different use cases and developer preferences' },
       { text: 'Token staking — stake HATCHER for subscription discounts and early access' },
       { text: 'No-code framework — deploy an agent from a prompt, no config required' },
       { text: 'Voice-first agents — native voice (Twilio / ElevenLabs), not just browser Speech API' },
@@ -123,9 +124,9 @@ export default function RoadmapPage() {
         {/* Header */}
         <div className="mb-14">
           <div className="flex items-center gap-2 mb-4">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 tracking-wide">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-              LAUNCHING THIS WEEK
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20 tracking-wide">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+              SOON
             </span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
