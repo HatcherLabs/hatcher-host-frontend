@@ -146,7 +146,7 @@ export function Footer() {
           {/* Community */}
           <div>
             <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">Community</p>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-nowrap gap-1">
               {COMMUNITY_ICONS.map((s) => (
                 <a
                   key={s.href}
@@ -155,7 +155,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   aria-label={s.label}
                   title={s.label}
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] ${s.hoverClass} hover:bg-[var(--bg-card)] transition-colors duration-200`}
+                  className={`w-7 h-7 rounded-lg flex items-center justify-center text-[var(--text-muted)] ${s.hoverClass} hover:bg-[var(--bg-card)] transition-colors duration-200`}
                 >
                   {s.icon}
                 </a>
