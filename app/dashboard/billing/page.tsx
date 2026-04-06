@@ -108,7 +108,7 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
           className="card glass-noise w-full max-w-md mx-4 overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
+          <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
             <h3 className="font-semibold text-[var(--text-primary)]">{requiresAgent ? 'Select Agent' : 'Choose Payment Method'}</h3>
             <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
               <X className="w-4 h-4" />
@@ -546,7 +546,7 @@ export default function BillingPage() {
 
   return (
     <motion.div
-      className="mx-auto max-w-5xl px-4 py-10"
+      className="mx-auto max-w-5xl px-4 sm:px-6 py-8 sm:py-10"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -574,13 +574,13 @@ export default function BillingPage() {
 
       {/* ── Credits Balance Card ──────────────────────────── */}
       <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
-        <div className="px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
+        <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <Wallet className="w-4 h-4 text-green-400" />
             <h2 className="font-semibold text-[var(--text-primary)]">Credits Balance</h2>
           </div>
         </div>
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div>
               <div className="flex items-baseline gap-1">
@@ -729,13 +729,13 @@ export default function BillingPage() {
 
       {/* ── Agent Usage ───────────────────────────────────── */}
       <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
-        <div className="px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
+        <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 text-[#06b6d4]" />
             <h2 className="font-semibold text-[var(--text-primary)]">Agent Usage</h2>
           </div>
         </div>
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-[var(--text-secondary)]">
               {agentCount} of {agentLimit} agents used
@@ -793,7 +793,7 @@ export default function BillingPage() {
       {/* ── Upgrade Tier ─────────────────────────────────── */}
       {currentTier !== 'founding_member' && (
         <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
-          <div className="px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
+          <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
             <div className="flex items-center gap-2">
               <ArrowUpRight className="w-4 h-4 text-[#06b6d4]" />
               <h2 className="font-semibold text-[var(--text-primary)]">Upgrade Your Tier</h2>
@@ -802,7 +802,7 @@ export default function BillingPage() {
               Compare plans &rarr;
             </Link>
           </div>
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <div className="grid sm:grid-cols-2 gap-4">
               {TIER_ORDER.filter(k => k !== 'free' && TIER_ORDER.indexOf(k) > TIER_ORDER.indexOf(currentTier)).map((tierKey) => {
                 const tier = TIERS[tierKey];
@@ -817,7 +817,7 @@ export default function BillingPage() {
                         : 'border-[var(--border-default)] hover:border-[#06b6d4]/30'
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                       <div className="flex items-center gap-2">
                         <h3 className="font-bold text-[var(--text-primary)]">{tier.name}</h3>
                         {tierKey === 'pro' && (
@@ -879,14 +879,14 @@ export default function BillingPage() {
 
       {/* ── Agent Add-ons ────────────────────────────────── */}
       <motion.div id="addons" className={`mb-8 ${cardClass}`} variants={itemVariants}>
-        <div className="px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
+        <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <Plus className="w-4 h-4 text-[#06b6d4]" />
             <h2 className="font-semibold text-[var(--text-primary)]">Agent Add-ons</h2>
           </div>
           <span className="text-[10px] text-[var(--text-muted)]">Stackable on any tier</span>
         </div>
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {ADDONS.filter(a => a.key !== 'addon.file_manager').map((addon) => {
               const isBuying = purchasingAddon === addon.key;
@@ -934,7 +934,7 @@ export default function BillingPage() {
 
       {/* ── Payment History ──────────────────────────────── */}
       <motion.div className={`overflow-hidden ${cardClass}`} variants={itemVariants}>
-        <div className="px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
+        <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <Receipt className="w-4 h-4 text-[var(--text-muted)]" />
             <h2 className="font-semibold text-[var(--text-primary)]">Payment History</h2>

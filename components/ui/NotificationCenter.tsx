@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -99,7 +97,6 @@ function saveDismissed(ids: Set<string>) {
 
 export function NotificationCenter() {
   const { isAuthenticated } = useAuth();
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [readAt, setReadAt] = useState<string | null>(null);
@@ -279,19 +276,19 @@ export function NotificationCenter() {
                     </>
                   );
 
-                  return n.link ? (
-                    <div
-                      key={n.id}
-                      role="link"
-                      tabIndex={0}
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onClick={() => { markAllRead(); setOpen(false); router.push(n.link!); }}
-                      onKeyDown={(e) => { if (e.key === 'Enter') { markAllRead(); setOpen(false); router.push(n.link!); } }}
-                      className={`${rowBase} hover:bg-[var(--bg-card)] cursor-pointer`}
-                    >
-                      {inner}
-                    </div>
-                  ) : (
+                  if (n.link) {
+                    return (
+                      <a
+                        key={n.id}
+                        href={n.link}
+                        className={`${rowBase} hover:bg-[var(--bg-card)] cursor-pointer no-underline`}
+                        style={{ textDecoration: 'none' }}
+                      >
+                        {inner}
+                      </a>
+                    );
+                  }
+                  return (
                     <div key={n.id} className={rowBase}>
                       {inner}
                     </div>
