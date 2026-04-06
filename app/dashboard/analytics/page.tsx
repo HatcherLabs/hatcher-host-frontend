@@ -258,9 +258,9 @@ export default function AnalyticsPage() {
           ) : (
             <>
               <StatCard icon={Bot} label="Total Agents" value={data?.totalAgents ?? 0} sub={`${data?.activeAgents ?? 0} active`} color="#8b5cf6" />
-              <StatCard icon={MessageSquare} label="LLM Requests" value={formatNumber(data?.totalMessages ?? 0)} sub="All time" color="#06b6d4" />
-              <StatCard icon={Activity} label="Last 14 Days" value={formatNumber(totalDailyMessages)} sub="Messages" color="#22c55e" />
-              <StatCard icon={Zap} label="Active Now" value={data?.activeAgents ?? 0} sub="Running agents" color="#f59e0b" />
+              <StatCard icon={MessageSquare} label="Messages" value={formatNumber(data?.totalMessages ?? 0)} sub="All time" color="#06b6d4" />
+              <StatCard icon={Zap} label="LLM Calls" value={formatNumber((data as any)?.totalLlmCalls ?? 0)} sub="All time" color="#f59e0b" />
+              <StatCard icon={Activity} label="Last 14 Days" value={formatNumber(totalDailyMessages)} sub="User messages" color="#22c55e" />
             </>
           )}
         </div>
