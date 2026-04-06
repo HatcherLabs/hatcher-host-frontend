@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 export const revalidate = 300; // refresh every 5 min
 
-type Tag = 'frontend' | 'backend' | 'shared' | 'infrastructure';
+type Tag = 'frontend' | 'backend' | 'shared' | 'infrastructure' | 'docs';
 
 interface Commit {
   sha: string;
@@ -21,6 +21,7 @@ const TAG_CONFIG: Record<Tag, { label: string; className: string }> = {
   backend:        { label: 'Backend',        className: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
   shared:         { label: 'Shared',         className: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
   infrastructure: { label: 'Infrastructure', className: 'bg-slate-500/10 text-slate-400 border-slate-500/20' },
+  docs:           { label: 'Docs',           className: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
 };
 
 async function fetchCommits(): Promise<Commit[]> {
