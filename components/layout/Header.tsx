@@ -426,10 +426,16 @@ export function Header() {
                       <span className="text-sm font-medium text-purple-300">{user.username}</span>
                       <span className="text-[10px] text-[var(--text-secondary)] ml-auto truncate max-w-[150px]">{user.email}</span>
                     </div>
+                    <Link href="/dashboard/analytics" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
+                      <Activity className="w-4 h-4" /> Analytics
+                    </Link>
+                    <Link href="/dashboard/team" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
+                      <Users className="w-4 h-4" /> Team
+                    </Link>
                     <Link href="/dashboard/billing" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
                       <CreditCard className="w-4 h-4" /> Billing
                     </Link>
-                    <Link href="/settings" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
+                    <Link href="/dashboard/settings" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
                       <Settings className="w-4 h-4" /> Settings
                     </Link>
                     <button
