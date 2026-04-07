@@ -37,6 +37,8 @@ import {
   BarChart3,
   TrendingUp,
   PieChart,
+  Calendar,
+  Sunrise,
 } from 'lucide-react';
 
 
@@ -148,7 +150,12 @@ export default function AdminPage() {
     totalRevenueUsd: number;
     totalMessages: number;
     newUsersLast7d: number;
+    newUsersToday?: number;
+    newAgentsToday?: number;
+    revenueToday?: number;
+    revenueWeek?: number;
     frameworkDistribution?: Record<string, number>;
+    tierBreakdown?: Record<string, number>;
   } | null>(null);
   const [agents, setAgents] = useState<AdminAgent[]>([]);
   const [users, setUsers] = useState<Array<{
@@ -310,20 +317,25 @@ export default function AdminPage() {
   }, [agents, stats]);
 
   const tierDistribution = useMemo(() => {
-    const counts: Record<string, number> = { free: 0, starter: 0, pro: 0, business: 0, founding_member: 0 };
-    users.forEach((u) => {
-      const t = (u.tier || 'free').toLowerCase();
-      counts[t] = (counts[t] || 0) + 1;
-    });
-    const total = users.length || 1;
+    // Prefer server-side tierBreakdown (covers ALL users) over client-side (paginated)
+    const counts: Record<string, number> = stats?.tierBreakdown
+      ? { ...stats.tierBreakdown }
+      : { free: 0, starter: 0, pro: 0, business: 0, founding_member: 0 };
+    if (!stats?.tierBreakdown) {
+      users.forEach((u) => {
+        const t = (u.tier || 'free').toLowerCase();
+        counts[t] = (counts[t] || 0) + 1;
+      });
+    }
+    const total = Object.values(counts).reduce((s, c) => s + c, 0) || 1;
     return [
-      { key: 'free', label: 'Free', color: '#6B7280', count: counts.free, percent: Math.round((counts.free / total) * 100) },
-      { key: 'starter', label: 'Starter', color: '#60A5FA', count: counts.starter, percent: Math.round((counts.starter / total) * 100) },
-      { key: 'founding_member', label: 'Founding', color: '#A78BFA', count: counts.founding_member, percent: Math.round((counts.founding_member / total) * 100) },
-      { key: 'pro', label: 'Pro', color: '#FBBF24', count: counts.pro, percent: Math.round((counts.pro / total) * 100) },
-      { key: 'business', label: 'Business', color: '#F472B6', count: counts.business, percent: Math.round((counts.business / total) * 100) },
+      { key: 'free', label: 'Free', color: '#6B7280', count: counts.free ?? 0, percent: Math.round(((counts.free ?? 0) / total) * 100) },
+      { key: 'starter', label: 'Starter', color: '#60A5FA', count: counts.starter ?? 0, percent: Math.round(((counts.starter ?? 0) / total) * 100) },
+      { key: 'founding_member', label: 'Founding', color: '#A78BFA', count: counts.founding_member ?? 0, percent: Math.round(((counts.founding_member ?? 0) / total) * 100) },
+      { key: 'pro', label: 'Pro', color: '#FBBF24', count: counts.pro ?? 0, percent: Math.round(((counts.pro ?? 0) / total) * 100) },
+      { key: 'business', label: 'Business', color: '#F472B6', count: counts.business ?? 0, percent: Math.round(((counts.business ?? 0) / total) * 100) },
     ];
-  }, [users]);
+  }, [users, stats]);
 
   const recentAgents = useMemo(() => agents.slice(0, 10), [agents]);
   const recentUsers = useMemo(() => users.slice(0, 10), [users]);
@@ -577,6 +589,33 @@ export default function AdminPage() {
                 iconColor="var(--color-accent)"
               />
             </div>
+            {/* Daily stats row — resets at 00:00 UTC */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <StatCard
+                label="Users Today"
+                value={stats.newUsersToday ?? 0}
+                icon={Sunrise}
+                iconColor="#34D399"
+              />
+              <StatCard
+                label="Agents Today"
+                value={stats.newAgentsToday ?? 0}
+                icon={Calendar}
+                iconColor="#818CF8"
+              />
+              <StatCard
+                label="Revenue Today"
+                value={`$${(stats.revenueToday ?? 0).toFixed(2)}`}
+                icon={DollarSign}
+                iconColor="#34D399"
+              />
+              <StatCard
+                label="Revenue 7d"
+                value={`$${(stats.revenueWeek ?? 0).toFixed(2)}`}
+                icon={TrendingUp}
+                iconColor="#FBBF24"
+              />
+            </div>
           </div>
         )}
 
@@ -631,7 +670,7 @@ export default function AdminPage() {
                   </div>
                   <div>
                     <h3 className="text-sm font-semibold text-[var(--text-primary)]">Tier Distribution</h3>
-                    <p className="text-[10px] text-[var(--text-muted)]">{users.length} total users</p>
+                    <p className="text-[10px] text-[var(--text-muted)]">{stats?.totalUsers ?? users.length} total users</p>
                   </div>
                 </div>
                 <div className="space-y-3">
