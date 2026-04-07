@@ -115,23 +115,9 @@ const VersionsTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
-const UsageTab = dynamic(
-  () => import('@/components/agents/tabs/UsageTab').then(mod => ({ default: mod.UsageTab })),
-  { loading: () => <TabSkeleton /> }
-);
-
-const AnalyticsTab = dynamic(
-  () => import('@/components/agents/tabs/AnalyticsTab').then(mod => ({ default: mod.AnalyticsTab })),
-  { loading: () => <TabSkeleton /> }
-);
-
 const TerminalTab = dynamic(
   () => import('@/components/agents/tabs/TerminalTab').then(mod => ({ default: mod.TerminalTab })),
   { loading: TabSkeleton },
-);
-const HealthTab = dynamic(
-  () => import('@/components/agents/tabs/HealthTab').then(mod => ({ default: mod.HealthTab })),
-  { loading: () => <TabSkeleton /> }
 );
 const CommTab = dynamic(
   () => import('@/components/agents/tabs/CommTab').then(mod => ({ default: mod.CommTab })),
@@ -151,11 +137,16 @@ export default function AgentManagePage() {
   // Core state
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
-  const validTabs: Tab[] = ['overview','config','integrations','skills','files','logs','memory','knowledge','versions','chat','usage','analytics'];
+  const validTabs: Tab[] = ['overview','config','integrations','skills','files','logs','memory','knowledge','versions','chat','stats'];
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const initialTab = validTabs.includes(searchParams.get('tab') as Tab)
-    ? (searchParams.get('tab') as Tab)
-    : 'overview';
+  const rawTab = searchParams.get('tab') as Tab;
+  // Redirect legacy tab names to stats
+  const normalizeTab = (t: Tab | null): Tab => {
+    if (!t) return 'overview';
+    if (t === 'analytics' || t === 'usage' || t === 'health') return 'stats';
+    return validTabs.includes(t) ? t : 'overview';
+  };
+  const initialTab = normalizeTab(rawTab);
   const [tab, setTabRaw] = useState<Tab>(initialTab);
   const setTab = useCallback((t: Tab) => {
     setTabRaw(t);
@@ -170,8 +161,7 @@ export default function AgentManagePage() {
     if (prevIdRef.current !== id) {
       prevIdRef.current = id;
       const params = new URLSearchParams(window.location.search);
-      const urlTab = params.get('tab') as Tab;
-      setTab(validTabs.includes(urlTab) ? urlTab : 'overview');
+      setTab(normalizeTab(params.get('tab') as Tab));
       // Reset chat and other per-agent state
       setMessages([]);
       setLogs([]);
@@ -1271,9 +1261,7 @@ export default function AgentManagePage() {
               {/* schedules and workflows hidden from public for now */}
               {tab === 'versions' && <VersionsTab />}
               {tab === 'chat' && <ChatTab />}
-              {tab === 'usage' && <UsageTab />}
-              {tab === 'analytics' && <AnalyticsTab />}
-              {tab === 'health' && <HealthTab />}
+              {tab === 'stats' && <StatsTab />}
               {tab === 'comm' && <CommTab />}
             </AnimatePresence>
           </div>
