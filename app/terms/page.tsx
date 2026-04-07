@@ -192,8 +192,16 @@ export default function TermsOfServicePage() {
 
           {/* 14 */}
           <section>
-            <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-3">14. Contact Information</h2>
+            <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-3">14. Company &amp; Contact Information</h2>
             <p>
+              The Service is operated by:
+            </p>
+            <ul className="mt-3 space-y-1.5">
+              <li><strong className="text-[var(--text-primary)]">HHX TECHNOLOGY SRL</strong></li>
+              <li>CUI: 45318471</li>
+              <li>Timișoara, România</li>
+            </ul>
+            <p className="mt-4">
               If you have any questions about these Terms, please contact us at:
             </p>
             <ul className="mt-3 space-y-1.5">

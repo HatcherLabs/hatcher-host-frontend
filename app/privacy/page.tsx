@@ -195,8 +195,16 @@ export default function PrivacyPolicyPage() {
 
           {/* 11 */}
           <section>
-            <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-3">11. Contact</h2>
+            <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-3">11. Contact &amp; Data Controller</h2>
             <p>
+              The data controller for the Hatcher platform is:
+            </p>
+            <ul className="mt-3 space-y-1.5">
+              <li><strong className="text-[var(--text-primary)]">HHX TECHNOLOGY SRL</strong></li>
+              <li>CUI: 45318471</li>
+              <li>Timișoara, România</li>
+            </ul>
+            <p className="mt-4">
               If you have any questions or concerns about this Privacy Policy or our data practices, please contact us:
             </p>
             <ul className="mt-3 space-y-1.5">

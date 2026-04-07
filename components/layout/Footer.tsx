@@ -172,7 +172,11 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-[var(--border-default)] pt-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span className="text-xs text-[var(--text-muted)]">&copy; {new Date().getFullYear()} HatcherLabs. All rights reserved.</span>
+          <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-3 text-xs text-[var(--text-muted)] text-center sm:text-left">
+            <span>&copy; {new Date().getFullYear()} HatcherLabs. All rights reserved.</span>
+            <span className="hidden sm:inline text-[var(--border-default)]">·</span>
+            <span>HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România</span>
+          </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--text-muted)]">
             <Link href="/pricing" className="hover:text-[var(--text-primary)] transition-colors duration-200">Pricing</Link>
             <Link href="/support" className="hover:text-[var(--text-primary)] transition-colors duration-200">Support</Link>
