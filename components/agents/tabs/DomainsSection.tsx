@@ -220,7 +220,7 @@ export function DomainsSection() {
                     <p className="text-xs text-[var(--text-secondary)]">
                       Point <span className="text-white font-mono">{domain.domain}</span> CNAME to:
                     </p>
-                    <p className="text-sm font-mono text-[#06b6d4] mt-1 truncate">{domain.cnameTarget}</p>
+                    <p className="text-sm font-mono text-[var(--color-accent)] mt-1 truncate">{domain.cnameTarget}</p>
                   </div>
                   <button
                     onClick={() => copyToClipboard(domain.cnameTarget, domain.id)}
@@ -276,7 +276,7 @@ export function DomainsSection() {
                 <button
                   onClick={handleAdd}
                   disabled={adding || !domainInput.trim()}
-                  className="px-4 py-2 rounded-lg text-xs font-medium text-white bg-[#06b6d4] hover:bg-[#0891b2] disabled:opacity-40 transition-colors"
+                  className="px-4 py-2 rounded-lg text-xs font-medium text-white bg-[var(--color-accent)] hover:bg-[#0891b2] disabled:opacity-40 transition-colors"
                 >
                   {adding ? 'Adding...' : 'Add Domain'}
                 </button>

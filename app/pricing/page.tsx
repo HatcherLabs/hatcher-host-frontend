@@ -68,7 +68,7 @@ const TIERS_DATA: TierDef[] = [
     name: 'Starter',
     price: 4.99,
     icon: <Zap className="w-5 h-5" />,
-    accent: '#06b6d4',
+    accent: 'var(--color-accent)',
     agents: '1 agent included',
     messages: '50 messages/day',
     cpu: '1 CPU',
@@ -499,7 +499,7 @@ export default function PricingPage() {
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Free</div>
                       <div className="text-sm sm:text-lg font-extrabold">$0</div>
                     </th>
-                    <th className="text-center px-2 py-3 sm:p-5 text-[#06b6d4] font-semibold">
+                    <th className="text-center px-2 py-3 sm:p-5 text-[var(--color-accent)] font-semibold">
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Starter</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$4.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
                     </th>

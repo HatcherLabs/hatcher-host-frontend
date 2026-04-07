@@ -53,7 +53,7 @@ interface LogEntry {
 const FRAMEWORK_COLORS: Record<string, { accent: string; glow: string; label: string }> = {
   openclaw: { accent: '#f59e0b', glow: 'rgba(245,158,11,0.15)', label: 'OpenClaw' },
   hermes:   { accent: '#a855f7', glow: 'rgba(168,85,247,0.15)', label: 'Hermes' },
-  elizaos:  { accent: '#06b6d4', glow: 'rgba(6,182,212,0.15)',  label: 'ElizaOS' },
+  elizaos:  { accent: 'var(--color-accent)', glow: 'rgba(6,182,212,0.15)',  label: 'ElizaOS' },
   milady:   { accent: '#f43f5e', glow: 'rgba(244,63,94,0.15)',  label: 'Milady' },
 };
 
@@ -200,7 +200,7 @@ function LogViewer({ agentId, jobId, onClose }: { agentId: string; jobId: string
       )}
 
       {!loading && logs.length === 0 && (
-        <p className="text-xs text-[#52525b] text-center py-4">No execution logs yet.</p>
+        <p className="text-xs text-[var(--text-muted)] text-center py-4">No execution logs yet.</p>
       )}
 
       {!loading && logs.length > 0 && (
@@ -248,14 +248,14 @@ function NextRunsPreview({ cronExpr }: { cronExpr: string }) {
   return (
     <div className="mt-2 pt-2 border-t border-[var(--border-default)]">
       <div className="flex items-center gap-1.5 mb-1.5">
-        <CalendarDays size={11} className="text-[#52525b]" />
-        <span className="text-[10px] font-medium text-[#52525b] uppercase tracking-wider">Next runs</span>
+        <CalendarDays size={11} className="text-[var(--text-muted)]" />
+        <span className="text-[10px] font-medium text-[var(--text-muted)] uppercase tracking-wider">Next runs</span>
       </div>
       <div className="space-y-0.5">
         {runs.map((run, i) => (
           <div key={i} className="flex items-center gap-2">
             <div className={`w-1 h-1 rounded-full ${i === 0 ? 'bg-emerald-400' : 'bg-[#3f3f46]'}`} />
-            <span className={`text-[10px] font-mono ${i === 0 ? 'text-[var(--text-secondary)]' : 'text-[#52525b]'}`}>
+            <span className={`text-[10px] font-mono ${i === 0 ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'}`}>
               {formatNextRun(run)}
             </span>
           </div>
@@ -417,7 +417,7 @@ export function SchedulesTab() {
           {!showForm && (
             <button
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-[#06b6d4] text-white hover:bg-[#0891b2] transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-[var(--color-accent)] text-white hover:bg-[#0891b2] transition-colors"
             >
               <Plus size={14} />
               New Schedule
@@ -454,8 +454,8 @@ export function SchedulesTab() {
             </div>
             <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">{fwSupport.note}</p>
             <div className="flex items-center gap-1 mt-1.5">
-              <Info size={10} className="text-[#52525b]" />
-              <span className="text-[10px] text-[#52525b]">
+              <Info size={10} className="text-[var(--text-muted)]" />
+              <span className="text-[10px] text-[var(--text-muted)]">
                 {fwSupport.native
                   ? 'Schedules persist across container restarts.'
                   : 'Schedules are managed by the Hatcher platform and trigger the agent externally.'}
@@ -478,7 +478,7 @@ export function SchedulesTab() {
                 value={formName}
                 onChange={e => setFormName(e.target.value)}
                 placeholder="e.g. Morning briefing"
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#06b6d4]/50"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50"
               />
             </div>
 
@@ -489,7 +489,7 @@ export function SchedulesTab() {
                 <select
                   value={formPreset}
                   onChange={e => setFormPreset(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white appearance-none focus:outline-none focus:border-[#06b6d4]/50"
+                  className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white appearance-none focus:outline-none focus:border-[var(--color-accent)]/50"
                 >
                   {CRON_PRESETS.map(p => (
                     <option key={p.label} value={p.value} className="bg-[var(--bg-elevated)] text-white">
@@ -510,10 +510,10 @@ export function SchedulesTab() {
                   value={formCustomCron}
                   onChange={e => setFormCustomCron(e.target.value)}
                   placeholder="e.g. */30 * * * *"
-                  className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#06b6d4]/50 font-mono"
+                  className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50 font-mono"
                 />
                 <div className="mt-1.5 space-y-0.5">
-                  <p className="text-[10px] text-[#52525b]">Common patterns:</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">Common patterns:</p>
                   <div className="flex flex-wrap gap-1.5">
                     {[
                       { label: 'Every 30 min', value: '*/30 * * * *' },
@@ -525,7 +525,7 @@ export function SchedulesTab() {
                         key={ex.value}
                         type="button"
                         onClick={() => setFormCustomCron(ex.value)}
-                        className="px-2 py-0.5 text-[10px] rounded bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[#06b6d4]/40 hover:text-white transition-colors"
+                        className="px-2 py-0.5 text-[10px] rounded bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--color-accent)]/40 hover:text-white transition-colors"
                       >
                         {ex.label}
                       </button>
@@ -539,11 +539,11 @@ export function SchedulesTab() {
             {effectiveCron.trim() && (
               <div className="rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] px-3 py-2.5">
                 <div className="flex items-center gap-2 mb-2">
-                  <CalendarClock size={12} className="text-[#06b6d4]" />
+                  <CalendarClock size={12} className="text-[var(--color-accent)]" />
                   <span className="text-[11px] font-medium text-[var(--text-secondary)]">
                     {cronToHuman(effectiveCron.trim())}
                   </span>
-                  <span className="text-[10px] font-mono text-[#52525b] ml-auto">{effectiveCron.trim()}</span>
+                  <span className="text-[10px] font-mono text-[var(--text-muted)] ml-auto">{effectiveCron.trim()}</span>
                 </div>
                 <NextRunsPreview cronExpr={effectiveCron.trim()} />
               </div>
@@ -557,7 +557,7 @@ export function SchedulesTab() {
                 onChange={e => setFormPrompt(e.target.value)}
                 placeholder="What should the agent do on this schedule?"
                 rows={3}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder:text-[#52525b] focus:outline-none focus:border-[#06b6d4]/50 resize-none"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50 resize-none"
               />
             </div>
 
@@ -572,7 +572,7 @@ export function SchedulesTab() {
               <button
                 onClick={handleCreate}
                 disabled={creating}
-                className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-lg bg-[#06b6d4] text-white hover:bg-[#0891b2] transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-lg bg-[var(--color-accent)] text-white hover:bg-[#0891b2] transition-colors disabled:opacity-50"
               >
                 {creating ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                 Create
@@ -601,11 +601,11 @@ export function SchedulesTab() {
       {error && !loading && (
         <GlassCard>
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <AlertTriangle size={24} className="text-[#06b6d4] mb-2" />
+            <AlertTriangle size={24} className="text-[var(--color-accent)] mb-2" />
             <p className="text-xs text-[var(--text-secondary)]">{error}</p>
             <button
               onClick={loadSchedules}
-              className="mt-3 text-xs text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
+              className="mt-3 text-xs text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors"
             >
               Retry
             </button>
@@ -619,8 +619,8 @@ export function SchedulesTab() {
           <div className="flex flex-col items-center justify-center py-14 text-center">
             {/* Illustration */}
             <div className="relative mb-6">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#06b6d4]/10 to-[#06b6d4]/5 border border-[#06b6d4]/15 flex items-center justify-center">
-                <CalendarClock size={32} className="text-[#06b6d4]/60" />
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--color-accent)]/10 to-[var(--color-accent)]/5 border border-[var(--color-accent)]/15 flex items-center justify-center">
+                <CalendarClock size={32} className="text-[var(--color-accent)]/60" />
               </div>
               {/* Decorative orbiting dots */}
               <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
@@ -658,7 +658,7 @@ export function SchedulesTab() {
                       setFormCustomCron(suggestion.cron);
                     }
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-muted)] hover:text-white hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-muted)] hover:text-white hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5 transition-all"
                 >
                   <suggestion.icon size={12} />
                   {suggestion.label}
@@ -669,7 +669,7 @@ export function SchedulesTab() {
             <button
               onClick={() => setShowForm(true)}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
-              style={{ background: '#06b6d4', boxShadow: '0 4px 16px rgba(6,182,212,0.3)' }}
+              style={{ background: 'var(--color-accent)', boxShadow: '0 4px 16px rgba(6,182,212,0.3)' }}
             >
               <Plus size={16} />
               Create Your First Schedule
@@ -706,7 +706,7 @@ export function SchedulesTab() {
 
                       <div className="flex items-center gap-3 mt-1.5">
                         <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[var(--bg-card)] border border-[var(--border-default)]">
-                          <Clock size={10} className="text-[#52525b]" />
+                          <Clock size={10} className="text-[var(--text-muted)]" />
                           <span className="text-[11px] text-[var(--text-secondary)] font-mono">{job.schedule}</span>
                         </div>
                         <span className="text-[11px] text-[var(--text-muted)]">{cronToHuman(job.schedule)}</span>
@@ -716,19 +716,19 @@ export function SchedulesTab() {
 
                       <div className="flex items-center gap-4 mt-2">
                         {job.nextRun && (
-                          <p className="text-[10px] text-[#52525b] flex items-center gap-1">
+                          <p className="text-[10px] text-[var(--text-muted)] flex items-center gap-1">
                             <CalendarClock size={10} />
                             Next: {new Date(job.nextRun).toLocaleString()}
                           </p>
                         )}
                         {job.lastRun && (
-                          <p className="text-[10px] text-[#52525b] flex items-center gap-1">
+                          <p className="text-[10px] text-[var(--text-muted)] flex items-center gap-1">
                             <CheckCircle size={10} />
                             Last: {new Date(job.lastRun).toLocaleString()}
                           </p>
                         )}
                         {(job.runCount ?? 0) > 0 && (
-                          <p className="text-[10px] text-[#52525b] flex items-center gap-1">
+                          <p className="text-[10px] text-[var(--text-muted)] flex items-center gap-1">
                             <Zap size={10} />
                             {job.runCount} runs
                           </p>
@@ -751,8 +751,8 @@ export function SchedulesTab() {
                             title="View logs"
                             className={`p-1.5 rounded-md transition-colors ${
                               viewingLogs === job.id
-                                ? 'text-[#06b6d4] bg-[#06b6d4]/10'
-                                : 'text-[var(--text-muted)] hover:text-[#06b6d4] hover:bg-[var(--bg-card)]'
+                                ? 'text-[var(--color-accent)] bg-[var(--color-accent)]/10'
+                                : 'text-[var(--text-muted)] hover:text-[var(--color-accent)] hover:bg-[var(--bg-card)]'
                             }`}
                           >
                             <FileText size={14} />

@@ -69,7 +69,7 @@ const FRAMEWORK_THEME: Record<string, {
   },
   elizaos: {
     accent: 'cyan',
-    accentHex: '#06b6d4',
+    accentHex: 'var(--color-accent)',
     accentBg: 'rgba(6,182,212,0.08)',
     accentBorder: 'rgba(6,182,212,0.2)',
     label: 'ElizaOS',

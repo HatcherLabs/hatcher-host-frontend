@@ -108,7 +108,7 @@ function SelectField({
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full appearance-none bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors cursor-pointer"
+          className="w-full appearance-none bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--color-accent)]/50 focus:ring-1 focus:ring-[var(--color-accent)]/20 transition-colors cursor-pointer"
         >
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -240,7 +240,7 @@ export default function SupportPage() {
               className="w-10 h-10 rounded-xl flex items-center justify-center"
               style={{ background: 'rgba(6,182,212,0.12)' }}
             >
-              <LifeBuoy size={20} className="text-[#06b6d4]" />
+              <LifeBuoy size={20} className="text-[var(--color-accent)]" />
             </div>
             <div>
               <h1
@@ -269,21 +269,21 @@ export default function SupportPage() {
               <Wrapper
                 key={link.label}
                 {...(extraProps as any)}
-                className="group flex items-center gap-3 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl p-4 transition-all duration-200 hover:border-[#06b6d4]/30 hover:bg-[var(--bg-card)] hover:-translate-y-[3px]"
+                className="group flex items-center gap-3 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl p-4 transition-all duration-200 hover:border-[var(--color-accent)]/30 hover:bg-[var(--bg-card)] hover:-translate-y-[3px]"
               >
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors"
                   style={{ background: 'rgba(6,182,212,0.1)' }}
                 >
-                  <LinkIcon size={18} className="text-[#06b6d4]" />
+                  <LinkIcon size={18} className="text-[var(--color-accent)]" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-[#06b6d4] transition-colors">
+                    <span className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-[var(--color-accent)] transition-colors">
                       {link.label}
                     </span>
                     {link.external && (
-                      <ExternalLink size={12} className="text-[var(--text-muted)] group-hover:text-[#06b6d4]/60 transition-colors" />
+                      <ExternalLink size={12} className="text-[var(--text-muted)] group-hover:text-[var(--color-accent)]/60 transition-colors" />
                     )}
                   </div>
                   <span className="text-xs text-[var(--text-muted)]">{link.description}</span>
@@ -298,7 +298,7 @@ export default function SupportPage() {
           <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl p-5">
             <p className="text-sm text-[var(--text-secondary)]">
               Or email us directly at{' '}
-              <a href="mailto:support@hatcher.host" className="text-[#06b6d4] hover:underline font-medium">
+              <a href="mailto:support@hatcher.host" className="text-[var(--color-accent)] hover:underline font-medium">
                 support@hatcher.host
               </a>
               {' '}&middot;{' '}
@@ -306,7 +306,7 @@ export default function SupportPage() {
                 href="https://discord.gg/7tY3HjKjMc"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#06b6d4] hover:underline font-medium"
+                className="text-[var(--color-accent)] hover:underline font-medium"
               >
                 Join our Discord
               </a>{' '}&middot;{' '}
@@ -314,7 +314,7 @@ export default function SupportPage() {
                 href="https://t.me/HatcherLabs"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#06b6d4] hover:underline font-medium"
+                className="text-[var(--color-accent)] hover:underline font-medium"
               >
                 Telegram
               </a>{' '}
@@ -328,7 +328,7 @@ export default function SupportPage() {
           <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl overflow-hidden">
             {/* Card header */}
             <div className="flex items-center gap-2.5 px-6 pt-6 pb-4 border-b border-[var(--border-default)]">
-              <Send size={16} className="text-[#06b6d4]" />
+              <Send size={16} className="text-[var(--color-accent)]" />
               <h2
                 className="text-base font-semibold text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
@@ -460,7 +460,7 @@ export default function SupportPage() {
                           }
                         }}
                         placeholder="Brief description of your issue"
-                        className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors"
+                        className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50 focus:ring-1 focus:ring-[var(--color-accent)]/20 transition-colors"
                         maxLength={SUBJECT_MAX}
                       />
                       <div className="flex justify-end mt-1">
@@ -495,7 +495,7 @@ export default function SupportPage() {
                         <select
                           value={agentId}
                           onChange={(e) => setAgentId(e.target.value)}
-                          className="w-full appearance-none bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors cursor-pointer"
+                          className="w-full appearance-none bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--color-accent)]/50 focus:ring-1 focus:ring-[var(--color-accent)]/20 transition-colors cursor-pointer"
                         >
                           <option value="">Select an agent...</option>
                           {agents.map((a) => (
@@ -525,7 +525,7 @@ export default function SupportPage() {
                         }}
                         placeholder="Describe your issue in detail..."
                         rows={6}
-                        className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-colors resize-y min-h-[120px]"
+                        className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50 focus:ring-1 focus:ring-[var(--color-accent)]/20 transition-colors resize-y min-h-[120px]"
                         maxLength={MESSAGE_MAX}
                       />
                       <div className="flex justify-end mt-1">
@@ -542,7 +542,7 @@ export default function SupportPage() {
                         disabled={submitting}
                         className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 active:scale-[0.98]"
                         style={{
-                          background: submitting ? 'rgba(6,182,212,0.7)' : '#06b6d4',
+                          background: submitting ? 'rgba(6,182,212,0.7)' : 'var(--color-accent)',
                           boxShadow: '0 4px 16px rgba(6,182,212,0.3)',
                         }}
                       >
@@ -572,7 +572,7 @@ export default function SupportPage() {
           <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl overflow-hidden">
             {/* Section header */}
             <div className="flex items-center gap-2.5 px-6 pt-6 pb-4 border-b border-[var(--border-default)]">
-              <Ticket size={16} className="text-[#06b6d4]" />
+              <Ticket size={16} className="text-[var(--color-accent)]" />
               <h2
                 className="text-base font-semibold text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
@@ -629,7 +629,7 @@ export default function SupportPage() {
                           <StatusIcon size={14} className={sc.color} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-[#06b6d4] transition-colors">
+                          <p className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-[var(--color-accent)] transition-colors">
                             {ticket.subject}
                           </p>
                           <div className="flex items-center gap-2 mt-0.5">

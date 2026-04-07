@@ -63,8 +63,8 @@ export function VoiceCallOverlay({ agent, messages, sending, voice, callDuration
           {/* Pulsing ring when listening */}
           {voice.isListening && (
             <>
-              <span className="absolute inset-0 rounded-full animate-ping bg-[#06b6d4]/20" />
-              <span className="absolute inset-[-4px] rounded-full border-2 border-[#06b6d4]/40 animate-pulse" />
+              <span className="absolute inset-0 rounded-full animate-ping bg-[var(--color-accent)]/20" />
+              <span className="absolute inset-[-4px] rounded-full border-2 border-[var(--color-accent)]/40 animate-pulse" />
             </>
           )}
           {/* Sound wave ring when speaking */}
@@ -83,12 +83,12 @@ export function VoiceCallOverlay({ agent, messages, sending, voice, callDuration
         {voice.isListening && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
             <RecordingDot />
-            <span className="text-sm text-[#06b6d4]">Listening...</span>
+            <span className="text-sm text-[var(--color-accent)]">Listening...</span>
           </motion.div>
         )}
         {sending && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
-            <div className="w-3 h-3 border-2 border-[#06b6d4]/30 border-t-[#06b6d4] rounded-full animate-spin" />
+            <div className="w-3 h-3 border-2 border-[var(--color-accent)]/30 border-t-[var(--color-accent)] rounded-full animate-spin" />
             <span className="text-sm text-[var(--text-muted)]">Thinking...</span>
           </motion.div>
         )}
@@ -120,7 +120,7 @@ export function VoiceCallOverlay({ agent, messages, sending, voice, callDuration
           onClick={() => voice.isListening ? voice.stopListening() : voice.startListening((t: string) => { if (t.trim()) onSendMessage(t.trim()); })}
           className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-200 ${
             voice.isListening
-              ? 'bg-[#06b6d4] shadow-[0_0_30px_rgba(6,182,212,0.4)]'
+              ? 'bg-[var(--color-accent)] shadow-[0_0_30px_rgba(6,182,212,0.4)]'
               : 'bg-white/10 hover:bg-white/15'
           }`}
         >

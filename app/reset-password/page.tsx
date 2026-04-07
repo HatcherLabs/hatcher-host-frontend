@@ -31,7 +31,7 @@ function ResetForm() {
         </p>
         <Link
           href="/forgot-password"
-          className="inline-flex items-center gap-2 text-sm text-[#06b6d4] hover:underline"
+          className="inline-flex items-center gap-2 text-sm text-[var(--color-accent)] hover:underline"
         >
           Request new reset link
         </Link>
@@ -81,8 +81,8 @@ function ResetForm() {
   return (
     <>
       <div className="text-center mb-8">
-        <div className="w-12 h-12 rounded-full bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mx-auto mb-4">
-          <Lock className="w-6 h-6 text-[#06b6d4]" />
+        <div className="w-12 h-12 rounded-full bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center mx-auto mb-4">
+          <Lock className="w-6 h-6 text-[var(--color-accent)]" />
         </div>
         <h1 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
           Set new password
@@ -172,7 +172,7 @@ export default function ResetPasswordPage() {
       >
         <Suspense fallback={
           <div className="flex items-center justify-center py-12">
-            <div className="w-8 h-8 border-2 border-[#06b6d4]/30 border-t-[#06b6d4] rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-[var(--color-accent)]/30 border-t-[var(--color-accent)] rounded-full animate-spin" />
           </div>
         }>
           <ResetForm />

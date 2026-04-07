@@ -127,7 +127,7 @@ interface ProgressBarProps {
   colorCoded?: boolean;
 }
 
-function ProgressBar({ value, max, color = '#06b6d4', label, colorCoded }: ProgressBarProps) {
+function ProgressBar({ value, max, color = 'var(--color-accent)', label, colorCoded }: ProgressBarProps) {
   const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
 
   let barColor = color;
@@ -285,7 +285,7 @@ export function UsageTab() {
           <div className="rounded-2xl border p-5" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <MessageSquare size={16} className="text-[#06b6d4]" />
+                <MessageSquare size={16} className="text-[var(--color-accent)]" />
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">Messages Today</h3>
               </div>
               <div className="flex items-center gap-2">
@@ -340,7 +340,7 @@ export function UsageTab() {
           <div className="rounded-2xl border p-5" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <TrendingUp size={16} className="text-[#06b6d4]" />
+                <TrendingUp size={16} className="text-[var(--color-accent)]" />
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">Message Activity</h3>
               </div>
               <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Last 7 days</span>
@@ -366,14 +366,14 @@ export function UsageTab() {
                   {yTicks.map(t => (
                     <g key={t.v}><line x1={PAD.left} y1={t.y} x2={W - PAD.right} y2={t.y} stroke="var(--border-default)" strokeWidth="0.5" strokeDasharray="3 3" /><text x={PAD.left - 4} y={t.y + 3} textAnchor="end" fill="var(--text-muted)" fontSize="8">{t.v}</text></g>
                   ))}
-                  <defs><linearGradient id="usageGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#06b6d4" stopOpacity="0.25" /><stop offset="100%" stopColor="#06b6d4" stopOpacity="0.02" /></linearGradient></defs>
+                  <defs><linearGradient id="usageGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="var(--color-accent)" stopOpacity="0.25" /><stop offset="100%" stopColor="var(--color-accent)" stopOpacity="0.02" /></linearGradient></defs>
                   <path d={area} fill="url(#usageGrad)" />
-                  <path d={line} fill="none" stroke="#06b6d4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d={line} fill="none" stroke="var(--color-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   {pts.map((p, i) => (
                     <g key={p.date}>
-                      <circle cx={p.x} cy={p.y} r={i === pts.length - 1 ? 3.5 : 2} fill={i === pts.length - 1 ? '#06b6d4' : '#06b6d480'} stroke={i === pts.length - 1 ? 'white' : 'none'} strokeWidth="1.5" />
+                      <circle cx={p.x} cy={p.y} r={i === pts.length - 1 ? 3.5 : 2} fill={i === pts.length - 1 ? 'var(--color-accent)' : '#06b6d480'} stroke={i === pts.length - 1 ? 'white' : 'none'} strokeWidth="1.5" />
                       <circle cx={p.x} cy={p.y} r="10" fill="transparent"><title>{formatChartDate(p.date)}: {p.count}</title></circle>
-                      <text x={p.x} y={H - 4} textAnchor="middle" fill={i === pts.length - 1 ? '#06b6d4' : 'var(--text-muted)'} fontSize="8" fontWeight={i === pts.length - 1 ? '600' : '400'}>{i === pts.length - 1 ? 'Today' : formatWeekday(p.date)}</text>
+                      <text x={p.x} y={H - 4} textAnchor="middle" fill={i === pts.length - 1 ? 'var(--color-accent)' : 'var(--text-muted)'} fontSize="8" fontWeight={i === pts.length - 1 ? '600' : '400'}>{i === pts.length - 1 ? 'Today' : formatWeekday(p.date)}</text>
                     </g>
                   ))}
                 </svg>
@@ -386,7 +386,7 @@ export function UsageTab() {
             {/* Uptime */}
             <div className="rounded-2xl border p-5" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
               <div className="flex items-center gap-2 mb-4">
-                <Clock size={16} className="text-[#06b6d4]" />
+                <Clock size={16} className="text-[var(--color-accent)]" />
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">Uptime</h3>
               </div>
               <div className="space-y-2">
@@ -416,7 +416,7 @@ export function UsageTab() {
             {/* CPU & Memory */}
             <div className="rounded-2xl border p-5" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
               <div className="flex items-center gap-2 mb-4">
-                <Cpu size={16} className="text-[#06b6d4]" />
+                <Cpu size={16} className="text-[var(--color-accent)]" />
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">Resources</h3>
               </div>
               {data.uptime.status === 'active' ? (
@@ -432,7 +432,7 @@ export function UsageTab() {
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.min(100, data.resources.cpuPercent)}%` }}
                         transition={{ duration: 0.6, ease: 'easeOut' }}
-                        className="h-full rounded-full bg-[#06b6d4]"
+                        className="h-full rounded-full bg-[var(--color-accent)]"
                       />
                     </div>
                     <p className="text-[10px] text-[var(--text-muted)] mt-1">Limit: {data.resources.cpuLimit} vCPU</p>
@@ -450,7 +450,7 @@ export function UsageTab() {
                         initial={{ width: 0 }}
                         animate={{ width: `${data.resources.memoryLimitMb > 0 ? Math.min(100, (data.resources.memoryUsageMb / data.resources.memoryLimitMb) * 100) : 0}%` }}
                         transition={{ duration: 0.6, ease: 'easeOut' }}
-                        className="h-full rounded-full bg-[#06b6d4]"
+                        className="h-full rounded-full bg-[var(--color-accent)]"
                       />
                     </div>
                   </div>
@@ -463,7 +463,7 @@ export function UsageTab() {
             {/* Storage */}
             <div className="rounded-2xl border p-5" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
               <div className="flex items-center gap-2 mb-4">
-                <HardDrive size={16} className="text-[#06b6d4]" />
+                <HardDrive size={16} className="text-[var(--color-accent)]" />
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">Storage</h3>
               </div>
               <div className="space-y-3">

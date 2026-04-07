@@ -330,7 +330,7 @@ export function ConfigTab() {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-default)] hover:border-[#06b6d4]/40 bg-[var(--bg-card)] hover:bg-[#06b6d4]/10 rounded-xl px-3 py-2 transition-all duration-200"
+          className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-default)] hover:border-[var(--color-accent)]/40 bg-[var(--bg-card)] hover:bg-[var(--color-accent)]/10 rounded-xl px-3 py-2 transition-all duration-200"
         >
           <Upload size={13} />
           Import Config
@@ -338,7 +338,7 @@ export function ConfigTab() {
         <button
           type="button"
           onClick={handleExport}
-          className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-default)] hover:border-[#06b6d4]/40 bg-[var(--bg-card)] hover:bg-[#06b6d4]/10 rounded-xl px-3 py-2 transition-all duration-200"
+          className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-default)] hover:border-[var(--color-accent)]/40 bg-[var(--bg-card)] hover:bg-[var(--color-accent)]/10 rounded-xl px-3 py-2 transition-all duration-200"
         >
           <Download size={13} />
           Export Config
@@ -357,8 +357,8 @@ export function ConfigTab() {
       {/* Agent basic info */}
       <GlassCard>
         <div className="flex items-center gap-2 mb-4">
-          <div className="w-7 h-7 rounded-lg bg-[#06b6d4]/10 flex items-center justify-center">
-            <Settings size={14} className="text-[#06b6d4]" />
+          <div className="w-7 h-7 rounded-lg bg-[var(--color-accent)]/10 flex items-center justify-center">
+            <Settings size={14} className="text-[var(--color-accent)]" />
           </div>
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Agent Info</h3>
         </div>
@@ -600,7 +600,7 @@ export function ConfigTab() {
                   {parsedSkills.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {parsedSkills.map((skill, i) => (
-                        <span key={skill} className="text-[10px] px-2 py-0.5 rounded-full border bg-[#06b6d4]/10 text-[#06b6d4] border-[#06b6d4]/20">
+                        <span key={skill} className="text-[10px] px-2 py-0.5 rounded-full border bg-[var(--color-accent)]/10 text-[var(--color-accent)] border-[var(--color-accent)]/20">
                           {skill}
                         </span>
                       ))}
@@ -670,14 +670,14 @@ export function ConfigTab() {
                         </div>
                         <div className="mt-2 space-y-1">
                           <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocSessionScope === 'per_user' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-[var(--bg-card)]'}`}>
-                            <Users size={11} className={`mt-0.5 shrink-0 ${ocSessionScope === 'per_user' ? 'text-amber-400' : 'text-[#52525b]'}`} />
-                            <p className={`text-[10px] leading-relaxed ${ocSessionScope === 'per_user' ? 'text-[var(--text-secondary)]' : 'text-[#52525b]'}`}>
+                            <Users size={11} className={`mt-0.5 shrink-0 ${ocSessionScope === 'per_user' ? 'text-amber-400' : 'text-[var(--text-muted)]'}`} />
+                            <p className={`text-[10px] leading-relaxed ${ocSessionScope === 'per_user' ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'}`}>
                               <span className="font-medium">Per User</span> — Each user has their own conversation thread
                             </p>
                           </div>
                           <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocSessionScope === 'global' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-[var(--bg-card)]'}`}>
-                            <Globe size={11} className={`mt-0.5 shrink-0 ${ocSessionScope === 'global' ? 'text-amber-400' : 'text-[#52525b]'}`} />
-                            <p className={`text-[10px] leading-relaxed ${ocSessionScope === 'global' ? 'text-[var(--text-secondary)]' : 'text-[#52525b]'}`}>
+                            <Globe size={11} className={`mt-0.5 shrink-0 ${ocSessionScope === 'global' ? 'text-amber-400' : 'text-[var(--text-muted)]'}`} />
+                            <p className={`text-[10px] leading-relaxed ${ocSessionScope === 'global' ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'}`}>
                               <span className="font-medium">Global</span> — All users share a single conversation
                             </p>
                           </div>
@@ -700,20 +700,20 @@ export function ConfigTab() {
                         </div>
                         <div className="mt-2 space-y-1">
                           <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocCompaction === 'safeguard' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-[var(--bg-card)]'}`}>
-                            <Shield size={11} className={`mt-0.5 shrink-0 ${ocCompaction === 'safeguard' ? 'text-amber-400' : 'text-[#52525b]'}`} />
-                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'safeguard' ? 'text-[var(--text-secondary)]' : 'text-[#52525b]'}`}>
+                            <Shield size={11} className={`mt-0.5 shrink-0 ${ocCompaction === 'safeguard' ? 'text-amber-400' : 'text-[var(--text-muted)]'}`} />
+                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'safeguard' ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'}`}>
                               <span className="font-medium">Safeguard</span> — Preserves full conversation history, uses more memory
                             </p>
                           </div>
                           <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocCompaction === 'aggressive' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-[var(--bg-card)]'}`}>
-                            <Zap size={11} className={`mt-0.5 shrink-0 ${ocCompaction === 'aggressive' ? 'text-amber-400' : 'text-[#52525b]'}`} />
-                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'aggressive' ? 'text-[var(--text-secondary)]' : 'text-[#52525b]'}`}>
+                            <Zap size={11} className={`mt-0.5 shrink-0 ${ocCompaction === 'aggressive' ? 'text-amber-400' : 'text-[var(--text-muted)]'}`} />
+                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'aggressive' ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'}`}>
                               <span className="font-medium">Aggressive</span> — Summarizes older messages to save memory
                             </p>
                           </div>
                           <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocCompaction === 'off' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-[var(--bg-card)]'}`}>
-                            <History size={11} className={`mt-0.5 shrink-0 ${ocCompaction === 'off' ? 'text-amber-400' : 'text-[#52525b]'}`} />
-                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'off' ? 'text-[var(--text-secondary)]' : 'text-[#52525b]'}`}>
+                            <History size={11} className={`mt-0.5 shrink-0 ${ocCompaction === 'off' ? 'text-amber-400' : 'text-[var(--text-muted)]'}`} />
+                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'off' ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'}`}>
                               <span className="font-medium">Off</span> — No compaction, conversation grows unbounded
                             </p>
                           </div>
@@ -1332,11 +1332,11 @@ export function ConfigTab() {
                 }}
                 className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-left transition-all ${
                   configProvider === 'groq'
-                    ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[var(--text-primary)]'
+                    ? 'border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--text-primary)]'
                     : 'border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-muted)] hover:border-[var(--border-hover)]'
                 }`}
               >
-                <Zap size={16} className={configProvider === 'groq' ? 'text-[#06b6d4]' : ''} />
+                <Zap size={16} className={configProvider === 'groq' ? 'text-[var(--color-accent)]' : ''} />
                 <div>
                   <p className="text-xs font-medium">Hatcher Platform</p>
                   <p className="text-[10px] opacity-60">Free, no setup needed</p>
@@ -1369,9 +1369,9 @@ export function ConfigTab() {
 
           {/* Platform mode — show info only */}
           {configProvider === 'groq' && (
-            <div className="rounded-xl p-4 border border-[#06b6d4]/20 bg-[#06b6d4]/5">
+            <div className="rounded-xl p-4 border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5">
               <div className="flex items-center gap-2 mb-1">
-                <CheckCircle size={14} className="text-[#06b6d4]" />
+                <CheckCircle size={14} className="text-[var(--color-accent)]" />
                 <p className="text-xs font-medium text-[var(--text-primary)]">Platform Model Active</p>
               </div>
               <p className="text-[10px] text-[var(--text-secondary)] ml-[22px]">
@@ -1534,7 +1534,7 @@ export function ConfigTab() {
             <button
               onClick={() => handleSaveAll()}
               disabled={saving}
-              className="mt-3 flex items-center gap-1.5 text-xs font-medium text-white bg-[#06b6d4] hover:bg-[#0891b2] rounded-xl px-4 py-2 transition-all duration-200 disabled:opacity-40"
+              className="mt-3 flex items-center gap-1.5 text-xs font-medium text-white bg-[var(--color-accent)] hover:bg-[#0891b2] rounded-xl px-4 py-2 transition-all duration-200 disabled:opacity-40"
             >
               {saving ? (
                 <><div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
@@ -1616,7 +1616,7 @@ function ToggleSwitch({ label, checked, onChange, helper }: {
           <span className="text-xs font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">{label}</span>
         </div>
         <div className={`relative w-9 h-5 rounded-full transition-colors duration-200 flex-shrink-0 ${
-          checked ? 'bg-[#06b6d4]' : 'bg-[var(--bg-hover)] border border-[var(--border-hover)]'
+          checked ? 'bg-[var(--color-accent)]' : 'bg-[var(--bg-hover)] border border-[var(--border-hover)]'
         }`}>
           <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
             checked ? 'translate-x-[18px]' : 'translate-x-0.5'
@@ -1654,7 +1654,7 @@ function SliderInput({ label, value, onChange, min, max, helper }: {
           [&::-webkit-slider-thumb]:w-4
           [&::-webkit-slider-thumb]:h-4
           [&::-webkit-slider-thumb]:rounded-full
-          [&::-webkit-slider-thumb]:bg-[#06b6d4]
+          [&::-webkit-slider-thumb]:bg-[var(--color-accent)]
           [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(6,182,212,0.4)]
           [&::-webkit-slider-thumb]:cursor-pointer
           [&::-webkit-slider-thumb]:transition-shadow
@@ -1662,7 +1662,7 @@ function SliderInput({ label, value, onChange, min, max, helper }: {
           [&::-moz-range-thumb]:w-4
           [&::-moz-range-thumb]:h-4
           [&::-moz-range-thumb]:rounded-full
-          [&::-moz-range-thumb]:bg-[#06b6d4]
+          [&::-moz-range-thumb]:bg-[var(--color-accent)]
           [&::-moz-range-thumb]:border-0
           [&::-moz-range-thumb]:cursor-pointer"
       />

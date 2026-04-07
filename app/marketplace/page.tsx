@@ -237,7 +237,7 @@ export default function MarketplacePage() {
         >
           <div className="text-center mb-2">
             <motion.div
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#06b6d4]/10 border border-[#06b6d4]/20 text-[#06b6d4] text-xs font-medium mb-4"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 text-[var(--color-accent)] text-xs font-medium mb-4"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
@@ -270,10 +270,10 @@ export default function MarketplacePage() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 flex-wrap">
             {/* Search */}
             <div className="relative w-full sm:w-80 group/search">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none group-focus-within/search:text-[#06b6d4] transition-colors duration-200" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none group-focus-within/search:text-[var(--color-accent)] transition-colors duration-200" />
               <input
                 type="text"
-                className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[#06b6d4]/50 focus:shadow-[0_0_16px_rgba(6,182,212,0.12)] transition-all duration-200 backdrop-blur-xl"
+                className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--color-accent)]/50 focus:shadow-[0_0_16px_rgba(6,182,212,0.12)] transition-all duration-200 backdrop-blur-xl"
                 placeholder="Search templates by name or description..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
@@ -289,7 +289,7 @@ export default function MarketplacePage() {
               )}
               {isSearching && (
                 <div className="absolute right-10 top-1/2 -translate-y-1/2">
-                  <Loader2 className="w-3.5 h-3.5 text-[#06b6d4] animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 text-[var(--color-accent)] animate-spin" />
                 </div>
               )}
             </div>
@@ -303,7 +303,7 @@ export default function MarketplacePage() {
                   className={cn(
                     'px-3 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium whitespace-nowrap',
                     category === val
-                      ? 'bg-[#06b6d4] text-white shadow-[0_0_12px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
+                      ? 'bg-[var(--color-accent)] text-white shadow-[0_0_12px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[rgba(6,182,212,0.05)]'
                   )}
                 >
@@ -321,7 +321,7 @@ export default function MarketplacePage() {
                   className={cn(
                     'px-3 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium whitespace-nowrap',
                     framework === val
-                      ? 'bg-[#06b6d4] text-white shadow-[0_0_12px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
+                      ? 'bg-[var(--color-accent)] text-white shadow-[0_0_12px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[rgba(6,182,212,0.05)]'
                   )}
                 >
@@ -339,7 +339,7 @@ export default function MarketplacePage() {
                   className={cn(
                     'px-4 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium whitespace-nowrap',
                     sort === val
-                      ? 'bg-[#06b6d4] text-white shadow-[0_0_12px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
+                      ? 'bg-[var(--color-accent)] text-white shadow-[0_0_12px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[rgba(6,182,212,0.05)]'
                   )}
                 >
@@ -364,7 +364,7 @@ export default function MarketplacePage() {
                   <>
                     Showing <span className="text-[var(--text-secondary)] font-medium">{templates.length}</span> of{' '}
                     <span className="text-[var(--text-secondary)] font-medium">{total}</span> templates
-                    {isSearching && <span className="text-[#06b6d4] ml-2">searching...</span>}
+                    {isSearching && <span className="text-[var(--color-accent)] ml-2">searching...</span>}
                   </>
                 ) : (
                   <>
@@ -381,7 +381,7 @@ export default function MarketplacePage() {
 
             {hasActiveFilters && (
               <motion.button
-                className="flex items-center gap-1.5 text-xs font-medium text-[#06b6d4] hover:text-[#22d3ee] transition-colors duration-150 px-2.5 py-1 rounded-lg hover:bg-[rgba(6,182,212,0.08)]"
+                className="flex items-center gap-1.5 text-xs font-medium text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors duration-150 px-2.5 py-1 rounded-lg hover:bg-[rgba(6,182,212,0.08)]"
                 onClick={clearAllFilters}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -422,7 +422,7 @@ export default function MarketplacePage() {
               animate={{ opacity: 1, y: 0 }}
             >
               <div className="w-20 h-20 rounded-2xl bg-[rgba(6,182,212,0.08)] border border-[rgba(6,182,212,0.15)] flex items-center justify-center mx-auto mb-6">
-                <Package className="w-10 h-10 text-[#06b6d4]/60" />
+                <Package className="w-10 h-10 text-[var(--color-accent)]/60" />
               </div>
               <h3 className="text-xl font-medium text-[var(--text-primary)] mb-2">No templates yet</h3>
               <p className="text-[var(--text-muted)] mb-6">
@@ -444,7 +444,7 @@ export default function MarketplacePage() {
               transition={{ duration: 0.3 }}
             >
               <div className="w-16 h-16 rounded-2xl bg-[rgba(6,182,212,0.08)] border border-[rgba(6,182,212,0.15)] flex items-center justify-center mx-auto mb-5">
-                <SearchX className="w-8 h-8 text-[#06b6d4]/60" />
+                <SearchX className="w-8 h-8 text-[var(--color-accent)]/60" />
               </div>
               <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">No templates found</h3>
               <p className="text-[var(--text-muted)] text-sm mb-1.5">
@@ -520,7 +520,7 @@ export default function MarketplacePage() {
                           className={cn(
                             'min-w-[36px] h-9 rounded-xl text-sm font-medium transition-all duration-200',
                             safePage === p
-                              ? 'bg-[#06b6d4] text-white shadow-[0_0_16px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
+                              ? 'bg-[var(--color-accent)] text-white shadow-[0_0_16px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
                               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[rgba(6,182,212,0.08)]'
                           )}
                         >
@@ -567,7 +567,7 @@ function TemplateCard({
   const categoryColor = CATEGORY_COLORS[template.category] ?? CATEGORY_COLORS.custom;
   const frameworkBadge = template.framework === 'hermes'
     ? 'bg-purple-500/10 text-purple-400 border-purple-500/25'
-    : 'bg-[#06b6d4]/10 text-[#06b6d4] border-[#06b6d4]/25';
+    : 'bg-[var(--color-accent)]/10 text-[var(--color-accent)] border-[var(--color-accent)]/25';
 
   return (
     <motion.div variants={cardVariants}>
@@ -588,10 +588,10 @@ function TemplateCard({
           {/* Header: icon + name */}
           <div className="flex items-start gap-3 mb-3">
             <div className="w-12 h-12 rounded-xl bg-[rgba(6,182,212,0.08)] border border-[rgba(6,182,212,0.15)] flex items-center justify-center flex-shrink-0 group-hover:border-[rgba(6,182,212,0.3)] group-hover:shadow-[0_0_16px_rgba(6,182,212,0.15)] transition-all duration-300">
-              <Package className="w-6 h-6 text-[#06b6d4]/70" />
+              <Package className="w-6 h-6 text-[var(--color-accent)]/70" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-[var(--text-primary)] truncate group-hover:text-[#06b6d4] transition-colors duration-200">
+              <h3 className="font-semibold text-[var(--text-primary)] truncate group-hover:text-[var(--color-accent)] transition-colors duration-200">
                 {template.name}
               </h3>
               <div className="flex items-center gap-2 mt-1">
@@ -632,8 +632,8 @@ function TemplateCard({
               className={cn(
                 'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200',
                 cloning
-                  ? 'bg-[#06b6d4]/20 text-[#06b6d4]/60 cursor-wait'
-                  : 'bg-[#06b6d4]/10 text-[#06b6d4] border border-[#06b6d4]/25 hover:bg-[#06b6d4]/20 hover:border-[#06b6d4]/40'
+                  ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)]/60 cursor-wait'
+                  : 'bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/25 hover:bg-[var(--color-accent)]/20 hover:border-[var(--color-accent)]/40'
               )}
             >
               {cloning ? (

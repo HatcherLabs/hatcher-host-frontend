@@ -130,8 +130,8 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
                       onClick={() => onSelectAgent?.(agent.id)}
                       className={`w-full text-left px-3 py-2.5 rounded-lg border text-sm transition-all ${
                         selectedAgentId === agent.id
-                          ? 'border-[#06b6d4] bg-[#06b6d4]/10 text-[var(--text-primary)]'
-                          : 'border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[#06b6d4]/30'
+                          ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/10 text-[var(--text-primary)]'
+                          : 'border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--color-accent)]/30'
                       }`}
                     >
                       {agent.name}
@@ -165,7 +165,7 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
             <button
               onClick={onPayWithSOL}
               disabled={loading || needsAgentSelection}
-              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/[0.03] transition-all disabled:opacity-40"
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/[0.03] transition-all disabled:opacity-40"
             >
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#9945FF] to-[#14F195] flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-bold text-sm">SOL</span>
@@ -197,7 +197,7 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
             <button
               onClick={onPayWithCard}
               disabled={loading || needsAgentSelection}
-              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/[0.03] transition-all disabled:opacity-40"
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/[0.03] transition-all disabled:opacity-40"
             >
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#635BFF] to-[#A259FF] flex items-center justify-center flex-shrink-0">
                 <CreditCard className="w-5 h-5 text-white" />
@@ -512,7 +512,7 @@ export default function BillingPage() {
   if (authLoading) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#06b6d4] mx-auto mb-4" />
+        <Loader2 className="w-8 h-8 animate-spin text-[var(--color-accent)] mx-auto mb-4" />
         <p className="text-[var(--text-secondary)]">Loading...</p>
       </div>
     );
@@ -532,7 +532,7 @@ export default function BillingPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#06b6d4] mx-auto mb-4" />
+        <Loader2 className="w-8 h-8 animate-spin text-[var(--color-accent)] mx-auto mb-4" />
         <p className="text-[var(--text-secondary)]">Loading billing...</p>
       </div>
     );
@@ -553,7 +553,7 @@ export default function BillingPage() {
     >
       {/* Breadcrumb */}
       <motion.div className="flex items-baseline gap-2 text-sm mb-8 text-[var(--text-muted)]" variants={itemVariants}>
-        <Link href="/dashboard" className="hover:text-[#06b6d4] transition-colors duration-200">Dashboard</Link>
+        <Link href="/dashboard" className="hover:text-[var(--color-accent)] transition-colors duration-200">Dashboard</Link>
         <span>/</span>
         <span className="text-[var(--text-secondary)]">Billing</span>
       </motion.div>
@@ -647,11 +647,11 @@ export default function BillingPage() {
                 {currentTier === 'founding_member' ? (
                   <Crown className="w-7 h-7 text-[#e11d48]" />
                 ) : currentTier === 'pro' ? (
-                  <Crown className="w-7 h-7 text-[#06b6d4]" />
+                  <Crown className="w-7 h-7 text-[var(--color-accent)]" />
                 ) : currentTier === 'business' ? (
                   <Crown className="w-7 h-7 text-[#ec4899]" />
                 ) : currentTier === 'starter' ? (
-                  <Zap className="w-7 h-7 text-[#06b6d4]" />
+                  <Zap className="w-7 h-7 text-[var(--color-accent)]" />
                 ) : (
                   <Rocket className="w-7 h-7 text-green-400" />
                 )}
@@ -662,7 +662,7 @@ export default function BillingPage() {
                   <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
                     currentTier === 'free'
                       ? 'text-green-400 bg-green-500/10 border border-green-500/20'
-                      : 'text-[#06b6d4] bg-[#06b6d4]/10 border border-[#06b6d4]/20'
+                      : 'text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20'
                   }`}>
                     {currentTier === 'free' ? 'Free Tier' : 'Active'}
                   </span>
@@ -690,7 +690,7 @@ export default function BillingPage() {
                         <button
                           onClick={() => handleSubscribe(currentTier)}
                           disabled={subscribing !== null}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-[#06b6d4] hover:bg-[#0891b2] disabled:opacity-50 transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-[var(--color-accent)] hover:bg-[#0891b2] disabled:opacity-50 transition-colors"
                         >
                           {subscribing === currentTier ? <Loader2 className="w-3 h-3 animate-spin" /> : <ArrowRight className="w-3 h-3" />}
                           Renew for ${tierConfig.usdPrice}
@@ -708,7 +708,7 @@ export default function BillingPage() {
                 <button
                   onClick={handleOpenPortal}
                   disabled={openingPortal}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border border-[#06b6d4]/30 text-[#06b6d4] hover:bg-[#06b6d4]/10 disabled:opacity-50 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border border-[var(--color-accent)]/30 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 disabled:opacity-50 transition-colors"
                 >
                   {openingPortal ? <Loader2 className="w-3 h-3 animate-spin" /> : <CreditCard className="w-3 h-3" />}
                   Manage Billing
@@ -731,7 +731,7 @@ export default function BillingPage() {
       <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
         <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-[#06b6d4]" />
+            <Users className="w-4 h-4 text-[var(--color-accent)]" />
             <h2 className="font-semibold text-[var(--text-primary)]">Agent Usage</h2>
           </div>
         </div>
@@ -752,8 +752,8 @@ export default function BillingPage() {
               style={{
                 width: `${Math.min((agentCount / agentLimit) * 100, 100)}%`,
                 background: agentCount >= agentLimit
-                  ? 'linear-gradient(90deg, #ef4444, #06b6d4)'
-                  : 'linear-gradient(90deg, #06b6d4, #22d3ee)',
+                  ? 'linear-gradient(90deg, #ef4444, var(--color-accent))'
+                  : 'linear-gradient(90deg, var(--color-accent), #22d3ee)',
               }}
             />
           </div>
@@ -782,7 +782,7 @@ export default function BillingPage() {
 
           {/* Need more agents? */}
           <div className="mt-4 pt-4 border-t border-[var(--border-default)]">
-            <a href="#addons" className="text-xs text-[#06b6d4] hover:text-[#fed7aa] transition-colors flex items-center gap-1">
+            <a href="#addons" className="text-xs text-[var(--color-accent)] hover:text-[#fed7aa] transition-colors flex items-center gap-1">
               <Plus className="w-3 h-3" />
               Need more agents? Purchase an add-on
             </a>
@@ -795,10 +795,10 @@ export default function BillingPage() {
         <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
           <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
             <div className="flex items-center gap-2">
-              <ArrowUpRight className="w-4 h-4 text-[#06b6d4]" />
+              <ArrowUpRight className="w-4 h-4 text-[var(--color-accent)]" />
               <h2 className="font-semibold text-[var(--text-primary)]">Upgrade Your Tier</h2>
             </div>
-            <Link href="/pricing" className="text-xs text-[#06b6d4] hover:text-[#fed7aa] transition-colors duration-200">
+            <Link href="/pricing" className="text-xs text-[var(--color-accent)] hover:text-[#fed7aa] transition-colors duration-200">
               Compare plans &rarr;
             </Link>
           </div>
@@ -813,15 +813,15 @@ export default function BillingPage() {
                     key={tierKey}
                     className={`p-5 rounded-xl border transition-all ${
                       tierKey === 'pro'
-                        ? 'border-[#06b6d4]/30 bg-[#06b6d4]/[0.03]'
-                        : 'border-[var(--border-default)] hover:border-[#06b6d4]/30'
+                        ? 'border-[var(--color-accent)]/30 bg-[var(--color-accent)]/[0.03]'
+                        : 'border-[var(--border-default)] hover:border-[var(--color-accent)]/30'
                     }`}
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                       <div className="flex items-center gap-2">
                         <h3 className="font-bold text-[var(--text-primary)]">{tier.name}</h3>
                         {tierKey === 'pro' && (
-                          <span className="text-[9px] px-2 py-0.5 rounded-full bg-gradient-to-r from-[#06b6d4] to-[#0891b2] text-white font-bold uppercase tracking-wider">
+                          <span className="text-[9px] px-2 py-0.5 rounded-full bg-gradient-to-r from-[var(--color-accent)] to-[#0891b2] text-white font-bold uppercase tracking-wider">
                             Popular
                           </span>
                         )}
@@ -830,21 +830,21 @@ export default function BillingPage() {
                     </div>
                     <div className="space-y-1.5 mb-4">
                       <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
-                        <Check className="w-3 h-3 text-[#06b6d4]" />
+                        <Check className="w-3 h-3 text-[var(--color-accent)]" />
                         {tier.includedAgents} agent{tier.includedAgents > 1 ? 's' : ''}, {tier.messagesPerDay} messages/day
                       </p>
                       <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
-                        <Check className="w-3 h-3 text-[#06b6d4]" />
+                        <Check className="w-3 h-3 text-[var(--color-accent)]" />
                         {tier.cpuLimit} CPU, {tier.memoryMb >= 1024 ? `${tier.memoryMb / 1024} GB` : `${tier.memoryMb} MB`} RAM, {tier.storageMb >= 1024 ? `${tier.storageMb / 1024} GB` : `${tier.storageMb} MB`} storage
                       </p>
                       {tier.fileManager && (
                         <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
-                          <Check className="w-3 h-3 text-[#06b6d4]" />
+                          <Check className="w-3 h-3 text-[var(--color-accent)]" />
                           File Manager + Full Logs
                         </p>
                       )}
                       <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
-                        <Check className="w-3 h-3 text-[#06b6d4]" />
+                        <Check className="w-3 h-3 text-[var(--color-accent)]" />
                         No auto-sleep
                       </p>
                     </div>
@@ -853,7 +853,7 @@ export default function BillingPage() {
                       disabled={isSubscribing || subscribing !== null}
                       className="w-full inline-flex items-center justify-center gap-1.5 text-sm px-4 py-2.5 rounded-xl font-bold transition-all disabled:opacity-40 text-white"
                       style={{
-                        background: '#06b6d4',
+                        background: 'var(--color-accent)',
                         boxShadow: '0 4px 16px rgba(6,182,212,0.3)',
                       }}
                     >
@@ -881,7 +881,7 @@ export default function BillingPage() {
       <motion.div id="addons" className={`mb-8 ${cardClass}`} variants={itemVariants}>
         <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
-            <Plus className="w-4 h-4 text-[#06b6d4]" />
+            <Plus className="w-4 h-4 text-[var(--color-accent)]" />
             <h2 className="font-semibold text-[var(--text-primary)]">Agent Add-ons</h2>
           </div>
           <span className="text-[10px] text-[var(--text-muted)]">Stackable on any tier</span>
@@ -893,10 +893,10 @@ export default function BillingPage() {
               return (
                 <div
                   key={addon.key}
-                  className="p-4 rounded-xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 transition-all"
+                  className="p-4 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 transition-all"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <Users className="w-4 h-4 text-[#06b6d4]" />
+                    <Users className="w-4 h-4 text-[var(--color-accent)]" />
                     <span className="text-sm font-semibold text-[var(--text-primary)]">{addon.name}</span>
                   </div>
                   <div className="flex items-baseline gap-1 mb-1">
@@ -911,7 +911,7 @@ export default function BillingPage() {
                   <button
                     onClick={() => handlePurchaseAddon(addon.key as AddonKey)}
                     disabled={isBuying || purchasingAddon !== null}
-                    className="w-full inline-flex items-center justify-center gap-1.5 text-xs px-3 py-2 rounded-lg border border-[#06b6d4]/30 text-[#06b6d4] hover:bg-[#06b6d4]/10 transition-all disabled:opacity-40 font-semibold"
+                    className="w-full inline-flex items-center justify-center gap-1.5 text-xs px-3 py-2 rounded-lg border border-[var(--color-accent)]/30 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 transition-all disabled:opacity-40 font-semibold"
                   >
                     {isBuying ? (
                       <>
@@ -944,7 +944,7 @@ export default function BillingPage() {
               </span>
             )}
           </div>
-          <Link href="/pricing" className="text-xs text-[#06b6d4] hover:text-[#fed7aa] transition-colors duration-200">
+          <Link href="/pricing" className="text-xs text-[var(--color-accent)] hover:text-[#fed7aa] transition-colors duration-200">
             View pricing &rarr;
           </Link>
         </div>
@@ -967,7 +967,7 @@ export default function BillingPage() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.03, duration: 0.25 }}
-                className="p-3 rounded-lg border border-[var(--border-default)] hover:border-[#06b6d4]/20 transition-colors"
+                className="p-3 rounded-lg border border-[var(--border-default)] hover:border-[var(--color-accent)]/20 transition-colors"
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-[var(--text-primary)]">{formatFeatureKey(payment.featureKey)}</span>
@@ -1000,7 +1000,7 @@ export default function BillingPage() {
                     initial={{ opacity: 0, x: -8 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.03, duration: 0.25 }}
-                    className="hover:bg-[#06b6d4]/[0.03] transition-colors duration-150 border-b border-[var(--border-default)] last:border-b-0"
+                    className="hover:bg-[var(--color-accent)]/[0.03] transition-colors duration-150 border-b border-[var(--border-default)] last:border-b-0"
                   >
                     <td className="px-6 py-4 text-sm whitespace-nowrap text-[var(--text-secondary)]">
                       {formatDate(payment.createdAt)}

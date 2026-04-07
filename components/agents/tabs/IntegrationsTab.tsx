@@ -171,7 +171,7 @@ function IntegrationFieldsForm({
           href={integration.docsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-xs text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
+          className="inline-flex items-center gap-1 text-xs text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors"
         >
           How to get your API key &rarr;
         </a>
@@ -192,7 +192,7 @@ function IntegrationFieldsForm({
             )}
             <label htmlFor={`field-${fieldId}`} className="flex items-center gap-1.5 text-xs mb-1.5 text-[var(--text-muted)]">
               {field.label}
-              {field.required && <span className="text-[#06b6d4]">*</span>}
+              {field.required && <span className="text-[var(--color-accent)]">*</span>}
             </label>
 
             {field.type === 'select' ? (
@@ -277,7 +277,7 @@ function IntegrationFieldsForm({
         <button
           onClick={() => saveIntegrationSecrets(integration)}
           disabled={isSaving}
-          className="px-4 py-2 rounded-lg text-xs font-medium text-[var(--text-primary)] transition-all disabled:opacity-40 hover:opacity-90 bg-[#06b6d4]"
+          className="px-4 py-2 rounded-lg text-xs font-medium text-[var(--text-primary)] transition-all disabled:opacity-40 hover:opacity-90 bg-[var(--color-accent)]"
         >
           {isSaving ? 'Saving...' : 'Save Credentials'}
         </button>
@@ -395,7 +395,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             onClick={() => setIntegrationField(sk, allowFromKey, '*')}
             className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
               allowFromValue === '*'
-                ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[var(--text-primary)]'
+                ? 'border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--text-primary)]'
                 : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-hover)]'
             }`}
           >
@@ -406,8 +406,8 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             onClick={() => { if (allowFromValue === '*') setIntegrationField(sk, allowFromKey, ''); }}
             className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
               allowFromValue !== '*' && allowFromValue !== ''
-                ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[var(--text-primary)]'
-                : allowFromValue === '' ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[var(--text-primary)]' : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-hover)]'
+                ? 'border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--text-primary)]'
+                : allowFromValue === '' ? 'border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--text-primary)]' : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-hover)]'
             }`}
           >
             Specific numbers
@@ -428,7 +428,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
           <button
             onClick={handleSaveAllowFrom}
             disabled={savingIntegration === sk || !allowFromValue.trim()}
-            className="px-3 h-8 rounded-lg text-xs font-medium text-[var(--text-primary)] bg-[#06b6d4] hover:bg-[#0891b2] disabled:opacity-50 transition-colors"
+            className="px-3 h-8 rounded-lg text-xs font-medium text-[var(--text-primary)] bg-[var(--color-accent)] hover:bg-[#0891b2] disabled:opacity-50 transition-colors"
           >
             {savingIntegration === sk ? 'Saving...' : 'Save'}
           </button>
@@ -496,7 +496,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
           <button
             onClick={handlePair}
             disabled={loading}
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-[var(--text-primary)] transition-all disabled:opacity-40 hover:opacity-90 bg-[#06b6d4]"
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-[var(--text-primary)] transition-all disabled:opacity-40 hover:opacity-90 bg-[var(--color-accent)]"
           >
             {loading ? (
               <>
@@ -515,7 +515,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
               href={integration.docsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-center text-xs text-[var(--text-muted)] hover:text-[#06b6d4] transition-colors"
+              className="block text-center text-xs text-[var(--text-muted)] hover:text-[var(--color-accent)] transition-colors"
             >
               How to set up {integration.name} &rarr;
             </a>

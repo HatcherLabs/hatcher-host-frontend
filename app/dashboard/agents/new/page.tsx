@@ -164,7 +164,7 @@ export default function NewAgentPage() {
               placeholder="Search templates..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-[var(--text-muted)] outline-none focus:border-[#06b6d4]/50 transition-colors"
+              className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--color-accent)]/50 transition-colors"
             />
           </div>
         </motion.div>
@@ -182,7 +182,7 @@ export default function NewAgentPage() {
                   className={cn(
                     'flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0',
                     isActive
-                      ? 'bg-[#06b6d4]/15 border border-[#06b6d4]/40 text-[#06b6d4] shadow-[0_0_12px_rgba(6,182,212,0.1)]'
+                      ? 'bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/40 text-[var(--color-accent)] shadow-[0_0_12px_rgba(6,182,212,0.1)]'
                       : 'border border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:border-[var(--border-hover)]'
                   )}
                 >
@@ -191,7 +191,7 @@ export default function NewAgentPage() {
                   {count > 0 && (
                     <span className={cn(
                       'ml-0.5 text-[10px] px-1.5 py-0.5 rounded-full',
-                      isActive ? 'bg-[#06b6d4]/20 text-[#06b6d4]' : 'bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)]'
+                      isActive ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)]' : 'bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)]'
                     )}>
                       {count}
                     </span>
@@ -231,13 +231,13 @@ export default function NewAgentPage() {
                     whileHover={{ y: -2 }}
                     transition={{ duration: 0.2 }}
                     onClick={() => router.push('/create?template=custom')}
-                    className="w-full h-full card glass-noise flex flex-col items-center justify-center gap-3 py-10 border-dashed border-[var(--border-default)] hover:border-[#06b6d4]/40 transition-all duration-200 group cursor-pointer"
+                    className="w-full h-full card glass-noise flex flex-col items-center justify-center gap-3 py-10 border-dashed border-[var(--border-default)] hover:border-[var(--color-accent)]/40 transition-all duration-200 group cursor-pointer"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-[rgba(46,43,74,0.6)] border border-[var(--border-default)] flex items-center justify-center group-hover:bg-[#06b6d4]/10 group-hover:border-[#06b6d4]/30 transition-all duration-200">
+                    <div className="w-12 h-12 rounded-xl bg-[rgba(46,43,74,0.6)] border border-[var(--border-default)] flex items-center justify-center group-hover:bg-[var(--color-accent)]/10 group-hover:border-[var(--color-accent)]/30 transition-all duration-200">
                       <span className="text-2xl">+</span>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm font-semibold text-white group-hover:text-[#06b6d4] transition-colors">Start from Scratch</p>
+                      <p className="text-sm font-semibold text-white group-hover:text-[var(--color-accent)] transition-colors">Start from Scratch</p>
                       <p className="text-xs text-[var(--text-muted)] mt-0.5">Full control over every setting</p>
                     </div>
                   </motion.button>

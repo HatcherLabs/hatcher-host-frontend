@@ -297,7 +297,7 @@ export function CommandPalette() {
                               : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card)]'
                           }`}
                         >
-                          <Icon size={16} className={isSelected ? 'text-[#06b6d4]' : 'text-[var(--text-muted)]'} aria-hidden="true" />
+                          <Icon size={16} className={isSelected ? 'text-[var(--color-accent)]' : 'text-[var(--text-muted)]'} aria-hidden="true" />
                           <span className="flex-1 truncate">{item.label}</span>
                           {item.meta && !item.meta.includes('action') && (
                             <span className="text-[10px] text-[var(--text-muted)] font-mono shrink-0">{item.meta}</span>

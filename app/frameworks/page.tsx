@@ -128,11 +128,11 @@ telegram = { token = "\${TELEGRAM_BOT_TOKEN}" }`,
     name: 'ElizaOS',
     tagline: 'Character-driven',
     emoji: '🎭',
-    color: '#06b6d4',
+    color: 'var(--color-accent)',
     glow: 'rgba(6,182,212,0.15)',
-    border: 'border-[#06b6d4]/30',
-    bg: 'bg-[#06b6d4]/10',
-    text: 'text-[#06b6d4]',
+    border: 'border-[var(--color-accent)]/30',
+    bg: 'bg-[var(--color-accent)]/10',
+    text: 'text-[var(--color-accent)]',
     complexity: 'Intermediate',
     complexityColor: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
     bestFor: 'Social media bots and community agents — deep character customization, platform-native behavior, plugin ecosystem.',
@@ -252,7 +252,7 @@ function StartupBar({ ms, max }: { ms: number; max: number }) {
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
           transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
-          className="h-full rounded-full bg-gradient-to-r from-[#06b6d4] to-[#a78bfa]"
+          className="h-full rounded-full bg-gradient-to-r from-[var(--color-accent)] to-[#a78bfa]"
         />
       </div>
       <span className="text-xs font-mono text-[var(--text-secondary)] w-14 text-right">{(ms / 1000).toFixed(1)}s</span>
@@ -294,7 +294,7 @@ export default function FrameworksPage() {
 
         {/* ── Hero ──────────────────────────────────────────────── */}
         <motion.div initial="hidden" animate="visible" variants={fadeUp} className="text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#06b6d4]/20 bg-[#06b6d4]/5 px-4 py-1.5 text-sm font-medium text-[#06b6d4]">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5 px-4 py-1.5 text-sm font-medium text-[var(--color-accent)]">
             <Layers className="h-4 w-4" />
             Framework Comparison
           </div>
@@ -307,7 +307,7 @@ export default function FrameworksPage() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/create"
-              className="inline-flex items-center gap-2 rounded-xl bg-[#06b6d4] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#06b6d4]/20 transition-all duration-200 hover:bg-[#0891b2]"
+              className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[var(--color-accent)]/20 transition-all duration-200 hover:bg-[#0891b2]"
             >
               <Rocket className="h-4 w-4" />
               Deploy an agent
@@ -525,7 +525,7 @@ export default function FrameworksPage() {
               {/* Startup time */}
               <div>
                 <div className="mb-4 flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-[#06b6d4]" />
+                  <Clock className="h-4 w-4 text-[var(--color-accent)]" />
                   <h3 className="font-semibold text-[var(--text-primary)]">Cold-start time</h3>
                 </div>
                 <div className="space-y-4">
@@ -568,7 +568,7 @@ export default function FrameworksPage() {
             {/* Summary callout */}
             <div className="mt-6 rounded-xl border border-[#f472b6]/20 bg-[#f472b6]/5 px-4 py-3 text-sm text-[var(--text-secondary)]">
               <span className="font-semibold text-[#f472b6]">🌸 Milady</span> is the fastest and lightest — ideal for free-tier deployments.
-              {' '}<span className="font-semibold text-[#06b6d4]">🦞 OpenClaw</span> packs the most tools but needs more resources.
+              {' '}<span className="font-semibold text-[var(--color-accent)]">🦞 OpenClaw</span> packs the most tools but needs more resources.
             </div>
           </div>
         </section>
@@ -674,7 +674,7 @@ export default function FrameworksPage() {
           </div>
           <p className="mt-3 text-xs text-[var(--text-muted)]">
             * BYOK always free — unlimited messages on any framework.{' '}
-            <Link href="/docs/api" className="text-[#06b6d4] underline-offset-2 hover:underline">
+            <Link href="/docs/api" className="text-[var(--color-accent)] underline-offset-2 hover:underline">
               View BYOK setup guide →
             </Link>
           </p>
@@ -682,7 +682,7 @@ export default function FrameworksPage() {
 
         {/* ── Decision guide ────────────────────────────────── */}
         <section>
-          <div className="rounded-2xl border border-[#06b6d4]/20 bg-gradient-to-br from-[#06b6d4]/5 to-[#a78bfa]/5 p-8">
+          <div className="rounded-2xl border border-[var(--color-accent)]/20 bg-gradient-to-br from-[var(--color-accent)]/5 to-[#a78bfa]/5 p-8">
             <h2 className="mb-6 text-xl font-bold text-[var(--text-primary)]">Quick decision guide</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               {[
@@ -690,7 +690,7 @@ export default function FrameworksPage() {
                   condition: 'I want maximum tools and automation',
                   pick: 'OpenClaw',
                   emoji: '🦞',
-                  color: 'text-[#06b6d4]',
+                  color: 'text-[var(--color-accent)]',
                 },
                 {
                   condition: 'I want an agent that learns over time',
@@ -714,7 +714,7 @@ export default function FrameworksPage() {
                   condition: 'I need multi-channel messaging (Telegram + Discord + WhatsApp)',
                   pick: 'OpenClaw or Hermes',
                   emoji: '🦞🪽',
-                  color: 'text-[#06b6d4]',
+                  color: 'text-[var(--color-accent)]',
                 },
                 {
                   condition: 'I want a character-driven persona bot',
@@ -727,7 +727,7 @@ export default function FrameworksPage() {
                   key={item.condition}
                   className="flex items-start gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-4"
                 >
-                  <ArrowRight className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#06b6d4]" />
+                  <ArrowRight className="mt-0.5 h-4 w-4 flex-shrink-0 text-[var(--color-accent)]" />
                   <div>
                     <p className="text-sm text-[var(--text-secondary)]">{item.condition}</p>
                     <p className={cn('mt-1 text-sm font-bold', item.color)}>
@@ -751,7 +751,7 @@ export default function FrameworksPage() {
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/create"
-                className="inline-flex items-center gap-2 rounded-xl bg-[#06b6d4] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#06b6d4]/20 transition-all duration-200 hover:bg-[#0891b2]"
+                className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[var(--color-accent)]/20 transition-all duration-200 hover:bg-[#0891b2]"
               >
                 <Rocket className="h-4 w-4" />
                 Deploy your first agent

@@ -59,7 +59,7 @@ function TierBadge({ tier }: { tier: string }) {
 
 // ── Avatar initials ─────────────────────────────────────────
 function getAvatarColor(name: string) {
-  const colors = ['#06b6d4', '#8b5cf6', '#10b981', '#f43f5e', '#6366f1', '#14b8a6', '#eab308'];
+  const colors = [var(--color-accent), '#8b5cf6', '#10b981', '#f43f5e', '#6366f1', '#14b8a6', '#eab308'];
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
   return colors[Math.abs(hash) % colors.length];
@@ -909,7 +909,7 @@ export default function SettingsPage() {
                     onKeyDown={e => { if (e.key === 'Enter' && !deleting) handleDeleteAccount(); }}
                     placeholder="Your current password"
                     disabled={deleting}
-                    className="w-full bg-[var(--bg-card)] border border-[var(--border-default)] rounded-xl px-3 py-2.5 pr-10 text-sm text-white placeholder-[#52525b] focus:outline-none focus:border-red-500/50 disabled:opacity-50"
+                    className="w-full bg-[var(--bg-card)] border border-[var(--border-default)] rounded-xl px-3 py-2.5 pr-10 text-sm text-white placeholder-[var(--text-muted)] focus:outline-none focus:border-red-500/50 disabled:opacity-50"
                     autoFocus
                   />
                   <button type="button" onClick={() => setShowDeletePassword(v => !v)}

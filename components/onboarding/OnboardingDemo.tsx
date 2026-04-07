@@ -216,7 +216,7 @@ export function OnboardingDemo() {
         </div>
         <button
           onClick={dismiss}
-          className="p-1 rounded-md hover:bg-[var(--bg-card)] text-[#52525b] hover:text-[var(--text-secondary)] transition-colors"
+          className="p-1 rounded-md hover:bg-[var(--bg-card)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
         >
           <X className="w-3.5 h-3.5" />
         </button>
@@ -234,7 +234,7 @@ export function OnboardingDemo() {
               i === activeScreen ? 'bg-purple-500' : i < activeScreen ? 'bg-purple-500/30' : 'bg-[var(--bg-card)]'
             }`} />
             <span className={`text-[9px] font-medium transition-colors ${
-              i === activeScreen ? 'text-[#d4d4d8]' : 'text-[#52525b]'
+              i === activeScreen ? 'text-[#d4d4d8]' : 'text-[var(--text-muted)]'
             }`}>
               {label}
             </span>

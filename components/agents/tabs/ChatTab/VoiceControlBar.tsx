@@ -31,7 +31,7 @@ export function VoiceControlBar({ isListening, isSpeaking, onStop }: VoiceContro
               {isSpeaking && (
                 <>
                   <SoundWaveBars />
-                  <span className="text-[#06b6d4]">Speaking...</span>
+                  <span className="text-[var(--color-accent)]">Speaking...</span>
                 </>
               )}
             </div>

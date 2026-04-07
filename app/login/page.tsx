@@ -38,8 +38,8 @@ export default function LoginPage() {
 
         <div className="space-y-8">
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center flex-shrink-0">
-              <Rocket className="w-5 h-5 text-[#06b6d4]" />
+            <div className="w-10 h-10 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center flex-shrink-0">
+              <Rocket className="w-5 h-5 text-[var(--color-accent)]" />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Deploy AI agents in 60 seconds</h3>
@@ -48,8 +48,8 @@ export default function LoginPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center flex-shrink-0">
-              <Layers className="w-5 h-5 text-[#06b6d4]" />
+            <div className="w-10 h-10 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center flex-shrink-0">
+              <Layers className="w-5 h-5 text-[var(--color-accent)]" />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">4 frameworks, 20+ platforms</h3>
@@ -121,7 +121,7 @@ export default function LoginPage() {
             )}
 
             <div className="flex justify-end">
-              <Link href="/forgot-password" className="text-xs text-[#06b6d4] hover:underline">
+              <Link href="/forgot-password" className="text-xs text-[var(--color-accent)] hover:underline">
                 Forgot password?
               </Link>
             </div>

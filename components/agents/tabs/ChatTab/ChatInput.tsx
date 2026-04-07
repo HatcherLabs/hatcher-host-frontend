@@ -61,7 +61,7 @@ export function ChatInput({
         <p className="text-sm text-amber-400">
           Daily message limit reached.{' '}
           <a
-            className="underline hover:opacity-80 transition-opacity text-[#06b6d4]"
+            className="underline hover:opacity-80 transition-opacity text-[var(--color-accent)]"
             href="/dashboard/billing"
           >
             Upgrade to Pro
@@ -74,7 +74,7 @@ export function ChatInput({
 
   return (
     <div>
-      <div className="flex gap-2 items-end rounded-2xl p-3 border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl focus-within:border-[#06b6d4]/40 focus-within:shadow-[0_0_20px_rgba(6,182,212,0.06)] transition-all duration-200">
+      <div className="flex gap-2 items-end rounded-2xl p-3 border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl focus-within:border-[var(--color-accent)]/40 focus-within:shadow-[0_0_20px_rgba(6,182,212,0.06)] transition-all duration-200">
         <textarea
           ref={inputRef}
           className="flex-1 bg-transparent border-none outline-none resize-none min-h-[36px] max-h-32 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] leading-relaxed"
@@ -117,8 +117,8 @@ export function ChatInput({
         <button
           className={`h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
             input.trim() && !sending && !sendCooldown
-              ? 'bg-[#06b6d4] hover:bg-[#0891b2] shadow-[0_0_12px_rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]'
-              : 'bg-[#06b6d4]/30 opacity-50 cursor-not-allowed'
+              ? 'bg-[var(--color-accent)] hover:bg-[#0891b2] shadow-[0_0_12px_rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]'
+              : 'bg-[var(--color-accent)]/30 opacity-50 cursor-not-allowed'
           }`}
           onClick={onSendMessage}
           disabled={!input.trim() || sending || sendCooldown}

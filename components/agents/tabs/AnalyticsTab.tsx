@@ -85,10 +85,10 @@ const FRAMEWORK_THEME: Record<string, { primary: string; primaryDim: string; pri
     label: 'Hermes',
   },
   elizaos: {
-    primary: '#06b6d4',
+    primary: 'var(--color-accent)',
     primaryDim: 'rgba(6,182,212,0.4)',
     primaryBg: 'rgba(6,182,212,0.1)',
-    gradient: 'linear-gradient(90deg, #06b6d4, #0891b2)',
+    gradient: 'linear-gradient(90deg, var(--color-accent), #0891b2)',
     gradientDim: 'linear-gradient(90deg, #0891b2, #0e7490)',
     label: 'ElizaOS',
   },

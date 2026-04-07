@@ -51,7 +51,7 @@ function formatNumber(n: number): string {
 const FRAMEWORK_COLORS: Record<string, string> = {
   openclaw: '#f59e0b',
   hermes: '#a855f7',
-  elizaos: '#06b6d4',
+  elizaos: 'var(--color-accent)',
   milady: '#f43f5e',
 };
 
@@ -60,7 +60,7 @@ const STATUS_COLORS: Record<string, string> = {
   sleeping: 'var(--text-muted)',
   paused: '#f59e0b',
   error: '#ef4444',
-  restarting: '#06b6d4',
+  restarting: 'var(--color-accent)',
 };
 
 // ─── Stat Card ───────────────────────────────────────────────
@@ -69,7 +69,7 @@ function StatCard({
   label,
   value,
   sub,
-  color = '#06b6d4',
+  color = 'var(--color-accent)',
 }: {
   icon: React.ElementType;
   label: string;
@@ -97,7 +97,7 @@ function StatCard({
 }
 
 // ─── Bar Chart ───────────────────────────────────────────────
-function BarChartSection({ data, color = '#06b6d4' }: { data: Array<{ date: string; count: number }>; color?: string }) {
+function BarChartSection({ data, color = 'var(--color-accent)' }: { data: Array<{ date: string; count: number }>; color?: string }) {
   const maxCount = Math.max(...data.map(d => d.count), 1);
   const today = new Date().toISOString().slice(0, 10);
   const W = 600;
@@ -278,7 +278,7 @@ export default function AnalyticsPage() {
           ) : (
             <>
               <StatCard icon={Bot} label="Total Agents" value={data?.totalAgents ?? 0} sub={`${data?.activeAgents ?? 0} active`} color="#8b5cf6" />
-              <StatCard icon={MessageSquare} label="Messages" value={formatNumber(data?.totalMessages ?? 0)} sub="All time" color="#06b6d4" />
+              <StatCard icon={MessageSquare} label="Messages" value={formatNumber(data?.totalMessages ?? 0)} sub="All time" color="var(--color-accent)" />
               <StatCard icon={Zap} label="LLM Calls" value={formatNumber((data as any)?.totalLlmCalls ?? 0)} sub="All time" color="#f59e0b" />
               <StatCard icon={Activity} label="Last 14 Days" value={formatNumber(totalDailyMessages)} sub="User messages" color="#22c55e" />
             </>
@@ -295,7 +295,7 @@ export default function AnalyticsPage() {
         >
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
-              <BarChart3 size={18} className="text-[#06b6d4]" />
+              <BarChart3 size={18} className="text-[var(--color-accent)]" />
               <h3 className="text-sm font-semibold text-[var(--text-primary)]">Message Volume</h3>
             </div>
             <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Last 14 days</span>
@@ -328,7 +328,7 @@ export default function AnalyticsPage() {
             style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}
           >
             <div className="flex items-center gap-2 mb-5">
-              <Cpu size={16} className="text-[#06b6d4]" />
+              <Cpu size={16} className="text-[var(--color-accent)]" />
               <h3 className="text-sm font-semibold text-[var(--text-primary)]">Frameworks</h3>
             </div>
             {loading ? (
@@ -372,7 +372,7 @@ export default function AnalyticsPage() {
             style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}
           >
             <div className="flex items-center gap-2 mb-5">
-              <Activity size={16} className="text-[#06b6d4]" />
+              <Activity size={16} className="text-[var(--color-accent)]" />
               <h3 className="text-sm font-semibold text-[var(--text-primary)]">Agent Status</h3>
             </div>
             {loading ? (
@@ -417,7 +417,7 @@ export default function AnalyticsPage() {
           style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}
         >
           <div className="flex items-center gap-2 mb-5">
-            <Hash size={16} className="text-[#06b6d4]" />
+            <Hash size={16} className="text-[var(--color-accent)]" />
             <h3 className="text-sm font-semibold text-[var(--text-primary)]">Total Messages by Agent</h3>
           </div>
           {loading ? (
@@ -434,7 +434,7 @@ export default function AnalyticsPage() {
                   <Link
                     key={agent.id}
                     href={`/dashboard/agent/${agent.id}?tab=analytics`}
-                    className="block p-3 rounded-xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 transition-colors"
+                    className="block p-3 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 transition-colors"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2 min-w-0">

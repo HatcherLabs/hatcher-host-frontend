@@ -142,7 +142,7 @@ export function ResourceChart({ history, currentCpu, currentMem, memLimitMb }: R
         </div>
         <Sparkline
           data={cpuData.length > 0 ? cpuData : [currentCpu]}
-          color="#06b6d4"
+          color="var(--color-accent)"
           height={36}
           alertThreshold={80}
         />

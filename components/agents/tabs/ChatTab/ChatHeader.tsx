@@ -60,7 +60,7 @@ export function ChatHeader({
             onClick={onToggleAutoSpeak}
             className={`group flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border transition-all duration-200 cursor-pointer ${
               autoSpeak
-                ? 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[#06b6d4]'
+                ? 'border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--color-accent)]'
                 : 'border-[var(--border-default)] bg-transparent text-[var(--text-muted)] hover:border-[var(--text-muted)]/40 hover:text-[var(--text-secondary)]'
             }`}
             title="Auto-read responses"

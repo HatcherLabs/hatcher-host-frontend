@@ -30,8 +30,8 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
     >
       {msg.role === 'assistant' && (
         <div className="flex-shrink-0 mt-1">
-          <div className="w-7 h-7 rounded-lg bg-[#06b6d4]/15 border border-[#06b6d4]/25 flex items-center justify-center">
-            <Bot size={14} className="text-[#06b6d4]" />
+          <div className="w-7 h-7 rounded-lg bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/25 flex items-center justify-center">
+            <Bot size={14} className="text-[var(--color-accent)]" />
           </div>
         </div>
       )}
@@ -54,7 +54,7 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
               <div className="markdown-body">
                 <ReactMarkdown>{msg.content}</ReactMarkdown>
                 {msg.streaming && (
-                  <span className="inline-block w-[2px] h-4 ml-0.5 align-text-bottom bg-[#06b6d4] animate-pulse rounded-full" />
+                  <span className="inline-block w-[2px] h-4 ml-0.5 align-text-bottom bg-[var(--color-accent)] animate-pulse rounded-full" />
                 )}
               </div>
             ) : (
@@ -74,7 +74,7 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
             <button
               onClick={() => onSpeak(msg.id, msg.content)}
               className={`opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 p-0.5 rounded hover:bg-[var(--bg-card)] cursor-pointer ${
-                isSpeakingThis ? 'text-[#06b6d4] !opacity-100' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
+                isSpeakingThis ? 'text-[var(--color-accent)] !opacity-100' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
               }`}
               title={isSpeakingThis ? 'Stop reading' : 'Read aloud'}
             >

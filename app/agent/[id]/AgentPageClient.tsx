@@ -139,8 +139,8 @@ export function AgentPageClient() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4 }}
         >
-          <div className="w-16 h-16 rounded-2xl bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mx-auto mb-6">
-            <Bot size={32} className="text-[#06b6d4]" />
+          <div className="w-16 h-16 rounded-2xl bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center mx-auto mb-6">
+            <Bot size={32} className="text-[var(--color-accent)]" />
           </div>
           <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">{title}</h1>
           <p className="mb-6 text-[var(--text-secondary)]">
@@ -184,7 +184,7 @@ export function AgentPageClient() {
       <motion.div variants={itemVariants} className="mb-6">
         <Link
           href="/explore"
-          className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[#06b6d4] transition-colors duration-200"
+          className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--color-accent)] transition-colors duration-200"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Explore
@@ -219,7 +219,7 @@ export function AgentPageClient() {
                 </span>
               )}
               {featureCount > 0 && (
-                <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#06b6d4]/10 text-[#06b6d4] border border-[#06b6d4]/20">
+                <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20">
                   <Layers className="w-3 h-3" />
                   {featureCount} feature{featureCount !== 1 ? 's' : ''}
                 </span>
@@ -265,7 +265,7 @@ export function AgentPageClient() {
           </div>
           <button
             onClick={handleShare}
-            className="inline-flex items-center gap-1.5 text-[var(--text-muted)] hover:text-[#06b6d4] transition-colors duration-200 border border-[var(--border-default)] rounded-lg px-3 py-1.5 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5"
+            className="inline-flex items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--color-accent)] transition-colors duration-200 border border-[var(--border-default)] rounded-lg px-3 py-1.5 hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5"
           >
             {copied ? (
               <>
@@ -309,7 +309,7 @@ export function AgentPageClient() {
           {/* Analytics Section */}
           <motion.div className={`${cardClass} p-6 mb-6`} variants={itemVariants}>
             <h2 className="text-lg font-semibold mb-4 text-[var(--text-primary)] flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-[#06b6d4]" />
+              <BarChart3 className="w-5 h-5 text-[var(--color-accent)]" />
               Agent Analytics
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -319,7 +319,7 @@ export function AgentPageClient() {
                   <MessageSquare className="w-3 h-3" />
                   Messages
                 </div>
-                <div className="text-3xl font-bold text-[#06b6d4]">
+                <div className="text-3xl font-bold text-[var(--color-accent)]">
                   {publicStats ? publicStats.messagesProcessed.toLocaleString() : ((agent as any).messageCount ?? 0).toLocaleString()}
                 </div>
               </div>

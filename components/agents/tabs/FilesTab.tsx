@@ -53,7 +53,7 @@ function formatBytes(bytes: number): string {
 const FRAMEWORK_ACCENT: Record<string, { color: string; border: string; bg: string; text: string }> = {
   openclaw: { color: '#f59e0b', border: 'border-amber-500/30', bg: 'bg-amber-500/10', text: 'text-amber-400' },
   hermes:   { color: '#a855f7', border: 'border-purple-500/30', bg: 'bg-purple-500/10', text: 'text-purple-400' },
-  elizaos:  { color: '#06b6d4', border: 'border-cyan-500/20', bg: 'bg-cyan-500/10', text: 'text-cyan-400' },
+  elizaos:  { color: 'var(--color-accent)', border: 'border-cyan-500/20', bg: 'bg-cyan-500/10', text: 'text-cyan-400' },
   milady:   { color: '#f43f5e', border: 'border-rose-500/20', bg: 'bg-rose-500/10', text: 'text-rose-400' },
 };
 
@@ -389,7 +389,7 @@ export function FilesTab() {
                   <button
                     onClick={handleUnlockPurchase}
                     disabled={purchasing}
-                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/[0.03] transition-all disabled:opacity-40"
+                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/[0.03] transition-all disabled:opacity-40"
                   >
                     <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#9945FF] to-[#14F195] flex items-center justify-center flex-shrink-0">
                       <span className="text-white font-bold text-sm">SOL</span>
@@ -404,7 +404,7 @@ export function FilesTab() {
                   <button
                     onClick={handleUnlockPurchase}
                     disabled={purchasing}
-                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/[0.03] transition-all disabled:opacity-40"
+                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/[0.03] transition-all disabled:opacity-40"
                   >
                     <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#635BFF] to-[#A259FF] flex items-center justify-center flex-shrink-0">
                       <CreditCard className="w-5 h-5 text-white" />
@@ -476,7 +476,7 @@ export function FilesTab() {
         <div className="flex items-center gap-1 text-[10px] text-[var(--text-muted)] mb-3 font-mono overflow-x-auto">
           {editingFile.path.split('/').filter(Boolean).map((seg, i, arr) => (
             <span key={i} className="flex items-center gap-1 flex-shrink-0">
-              {i > 0 && <ChevronRight size={8} className="text-[#52525b]" />}
+              {i > 0 && <ChevronRight size={8} className="text-[var(--text-muted)]" />}
               <span className={i === arr.length - 1 ? 'text-[var(--text-primary)]' : ''}>{seg}</span>
             </span>
           ))}
@@ -532,7 +532,7 @@ export function FilesTab() {
             )}
             {breadcrumbs.map((crumb, i) => (
               <span key={i} className="flex items-center gap-1 flex-shrink-0">
-                {i > 0 && <ChevronRight size={10} className="text-[#52525b]" />}
+                {i > 0 && <ChevronRight size={10} className="text-[var(--text-muted)]" />}
                 <button
                   onClick={() => navigateTo(crumb.path)}
                   className={`px-1.5 py-0.5 rounded-md font-mono transition-colors ${
@@ -655,7 +655,7 @@ export function FilesTab() {
                     <span className="text-[10px] text-[var(--text-muted)] tabular-nums">{formatBytes(entry.size)}</span>
                   )}
                   {entry.type === 'directory' && (
-                    <span className="text-[10px] text-[#52525b]">DIR</span>
+                    <span className="text-[10px] text-[var(--text-muted)]">DIR</span>
                   )}
                   {entry.type === 'file' && (
                     <button

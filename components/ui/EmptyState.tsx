@@ -56,7 +56,7 @@ export function EmptyState({
             boxShadow: '0 0 24px rgba(6,182,212,0.15), 0 0 48px rgba(6,182,212,0.05)',
           }}
         >
-          <Icon size={36} style={{ color: '#06b6d4' }} />
+          <Icon size={36} style={{ color: 'var(--color-accent)' }} />
         </div>
       </motion.div>
 
@@ -98,7 +98,7 @@ export function EmptyState({
               href={actionHref}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
               style={{
-                background: '#06b6d4',
+                background: 'var(--color-accent)',
                 boxShadow: '0 4px 16px rgba(6,182,212,0.3)',
               }}
             >
@@ -109,7 +109,7 @@ export function EmptyState({
               onClick={onAction}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
               style={{
-                background: '#06b6d4',
+                background: 'var(--color-accent)',
                 boxShadow: '0 4px 16px rgba(6,182,212,0.3)',
               }}
             >

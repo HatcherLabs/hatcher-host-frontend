@@ -35,14 +35,14 @@ export default function SettingsError({
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={reset}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#06b6d4] hover:bg-[#0891b2] text-white rounded-xl font-semibold text-sm transition-colors shadow-lg shadow-[#06b6d4]/20"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--color-accent)] hover:bg-[#0891b2] text-white rounded-xl font-semibold text-sm transition-colors shadow-lg shadow-[var(--color-accent)]/20"
           >
             <RefreshCw className="w-4 h-4" />
             Try Again
           </button>
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 px-5 py-2.5 border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-secondary)] rounded-xl font-semibold text-sm transition-colors hover:text-[var(--text-primary)] hover:border-[#06b6d4]/30"
+            className="inline-flex items-center gap-2 px-5 py-2.5 border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-secondary)] rounded-xl font-semibold text-sm transition-colors hover:text-[var(--text-primary)] hover:border-[var(--color-accent)]/30"
           >
             <ArrowLeft className="w-4 h-4" />
             Dashboard

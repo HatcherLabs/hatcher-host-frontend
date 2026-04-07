@@ -91,7 +91,7 @@ const FRAMEWORK_COLORS: Record<string, { border: string; glow: string; badge: st
     border: 'rgba(6,182,212,0.35)',
     glow: 'rgba(6,182,212,0.12)',
     badge: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/25',
-    icon: '#06b6d4',
+    icon: 'var(--color-accent)',
   },
   milady: {
     border: 'rgba(244,63,94,0.35)',
@@ -103,7 +103,7 @@ const FRAMEWORK_COLORS: Record<string, { border: string; glow: string; badge: st
 
 // ── Framework SVG avatars ────────────────────────────────────
 function FrameworkAvatar({ framework, size = 48 }: { framework: string; size?: number }) {
-  const color = FRAMEWORK_COLORS[framework]?.icon ?? '#06b6d4';
+  const color = FRAMEWORK_COLORS[framework]?.icon ?? 'var(--color-accent)';
   const s = size;
 
   if (framework === 'hermes') {
@@ -365,10 +365,10 @@ export default function ExplorePage() {
           <div className="flex flex-col gap-3 mb-8">
             {/* Search */}
             <div className="relative w-full sm:max-w-sm group/search">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none group-focus-within/search:text-[#06b6d4] transition-colors duration-200" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none group-focus-within/search:text-[var(--color-accent)] transition-colors duration-200" />
               <input
                 type="text"
-                className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[#06b6d4]/50 focus:shadow-[0_0_16px_rgba(6,182,212,0.12)] transition-all duration-200 backdrop-blur-xl"
+                className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--color-accent)]/50 focus:shadow-[0_0_16px_rgba(6,182,212,0.12)] transition-all duration-200 backdrop-blur-xl"
                 placeholder="Search agents by name or description..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
@@ -384,7 +384,7 @@ export default function ExplorePage() {
               )}
               {isSearching && (
                 <div className="absolute right-10 top-1/2 -translate-y-1/2">
-                  <Loader2 className="w-3.5 h-3.5 text-[#06b6d4] animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 text-[var(--color-accent)] animate-spin" />
                 </div>
               )}
             </div>
@@ -400,7 +400,7 @@ export default function ExplorePage() {
                     className={cn(
                       'px-3 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium whitespace-nowrap flex items-center gap-1.5',
                       statusFilter === val
-                        ? 'bg-[#06b6d4] text-white shadow-[0_0_12px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
+                        ? 'bg-[var(--color-accent)] text-white shadow-[0_0_12px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
                         : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[rgba(6,182,212,0.05)]'
                     )}
                   >
@@ -424,14 +424,14 @@ export default function ExplorePage() {
                     className={cn(
                       'px-3 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium whitespace-nowrap flex items-center gap-1.5',
                       frameworkFilter === val
-                        ? 'bg-[#06b6d4] text-white shadow-[0_0_12px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
+                        ? 'bg-[var(--color-accent)] text-white shadow-[0_0_12px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
                         : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[rgba(6,182,212,0.05)]'
                     )}
                   >
                     {val !== 'all' && (
                       <span
                         className="w-2 h-2 rounded-full"
-                        style={{ backgroundColor: frameworkFilter === val ? 'white' : (FRAMEWORK_COLORS[val]?.icon ?? '#06b6d4') }}
+                        style={{ backgroundColor: frameworkFilter === val ? 'white' : (FRAMEWORK_COLORS[val]?.icon ?? var(--color-accent)) }}
                       />
                     )}
                     {label}
@@ -448,7 +448,7 @@ export default function ExplorePage() {
                     className={cn(
                       'px-4 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium whitespace-nowrap',
                       sort === val
-                        ? 'bg-[#06b6d4] text-white shadow-[0_0_12px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
+                        ? 'bg-[var(--color-accent)] text-white shadow-[0_0_12px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
                         : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[rgba(6,182,212,0.05)]'
                     )}
                   >
@@ -465,7 +465,7 @@ export default function ExplorePage() {
                     <>
                       Showing <span className="text-[var(--text-secondary)] font-medium">{filtered.length}</span> of{' '}
                       <span className="text-[var(--text-secondary)] font-medium">{agents.length}</span> agents
-                      {isSearching && <span className="text-[#06b6d4] ml-2">searching...</span>}
+                      {isSearching && <span className="text-[var(--color-accent)] ml-2">searching...</span>}
                     </>
                   ) : (
                     <>
@@ -486,7 +486,7 @@ export default function ExplorePage() {
 
               {hasActiveFilters && (
                 <button
-                  className="flex items-center gap-1.5 text-xs font-medium text-[#06b6d4] hover:text-[#22d3ee] transition-colors duration-150 px-2.5 py-1 rounded-lg hover:bg-[rgba(6,182,212,0.08)]"
+                  className="flex items-center gap-1.5 text-xs font-medium text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors duration-150 px-2.5 py-1 rounded-lg hover:bg-[rgba(6,182,212,0.08)]"
                   onClick={clearAllFilters}
                 >
                   <X className="w-3 h-3" />
@@ -521,7 +521,7 @@ export default function ExplorePage() {
           ) : agents.length === 0 ? (
             <div className={cn(cardClass, 'p-16 text-center')}>
               <div className="w-14 h-14 rounded-2xl bg-[rgba(6,182,212,0.08)] border border-[rgba(6,182,212,0.15)] flex items-center justify-center mx-auto mb-5">
-                <Bot className="w-7 h-7 text-[#06b6d4]/60" />
+                <Bot className="w-7 h-7 text-[var(--color-accent)]/60" />
               </div>
               <h3 className="text-xl font-medium text-[var(--text-primary)] mb-2">No agents yet</h3>
               <p className="text-[var(--text-muted)] mb-6">Be the first to deploy an agent on Hatcher.</p>
@@ -536,7 +536,7 @@ export default function ExplorePage() {
           ) : filtered.length === 0 ? (
             <div className={cn(cardClass, 'p-16 text-center max-w-lg mx-auto')}>
               <div className="w-16 h-16 rounded-2xl bg-[rgba(6,182,212,0.08)] border border-[rgba(6,182,212,0.15)] flex items-center justify-center mx-auto mb-5">
-                <SearchX className="w-8 h-8 text-[#06b6d4]/60" />
+                <SearchX className="w-8 h-8 text-[var(--color-accent)]/60" />
               </div>
               <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">No agents found</h3>
               <p className="text-[var(--text-muted)] text-sm mb-1.5">
@@ -567,13 +567,13 @@ export default function ExplorePage() {
                           className={cn(cardClass, 'p-5 flex flex-col items-center justify-center text-center gap-3 border-dashed border-[rgba(6,182,212,0.25)] hover:border-[rgba(6,182,212,0.5)] transition-colors duration-200')}
                         >
                           <div className="w-10 h-10 rounded-xl bg-[rgba(6,182,212,0.08)] flex items-center justify-center">
-                            <Plus className="w-5 h-5 text-[#06b6d4]" />
+                            <Plus className="w-5 h-5 text-[var(--color-accent)]" />
                           </div>
                           <div>
                             <p className="text-sm font-semibold text-[var(--text-primary)] mb-1">Like what you see?</p>
                             <p className="text-xs text-[var(--text-muted)]">Create your own agent in minutes</p>
                           </div>
-                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#06b6d4]">
+                          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-accent)]">
                             Get started <ArrowRight className="w-3.5 h-3.5" />
                           </span>
                         </Link>
@@ -615,7 +615,7 @@ export default function ExplorePage() {
                           className={cn(
                             'min-w-[36px] h-9 rounded-xl text-sm font-medium transition-all duration-200',
                             safePage === p
-                              ? 'bg-[#06b6d4] text-white shadow-[0_0_16px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
+                              ? 'bg-[var(--color-accent)] text-white shadow-[0_0_16px_rgba(6,182,212,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]'
                               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[rgba(6,182,212,0.08)]'
                           )}
                         >
@@ -648,7 +648,7 @@ export default function ExplorePage() {
                   <button
                     onClick={loadMore}
                     disabled={loadingMore}
-                    className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border border-[#06b6d4]/30 text-[#06b6d4] hover:bg-[#06b6d4]/10 transition-all text-sm font-medium disabled:opacity-40"
+                    className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border border-[var(--color-accent)]/30 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 transition-all text-sm font-medium disabled:opacity-40"
                   >
                     {loadingMore ? (
                       <><Loader2 className="w-4 h-4 animate-spin" /> Loading...</>

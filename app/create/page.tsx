@@ -430,7 +430,7 @@ export default function CreatePage() {
         particleCount: 150,
         spread: 80,
         origin: { y: 0.6 },
-        colors: ['#06b6d4', '#06b6d4', '#fed7aa', '#FFFFFF'],
+        colors: [var(--color-accent), var(--color-accent), '#fed7aa', '#FFFFFF'],
       });
 
       setTimeout(() => {
@@ -449,7 +449,7 @@ export default function CreatePage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className={cn(cardClass, 'p-10 max-w-md w-full text-center')}>
-          <Loader2 className="w-10 h-10 text-[#06b6d4] animate-spin mx-auto mb-4" />
+          <Loader2 className="w-10 h-10 text-[var(--color-accent)] animate-spin mx-auto mb-4" />
           <p className="text-[var(--text-secondary)] text-sm">Authenticating...</p>
         </div>
       </div>
@@ -465,8 +465,8 @@ export default function CreatePage() {
         className="min-h-screen flex items-center justify-center px-4"
       >
         <div className={cn(cardClass, 'p-10 max-w-md w-full text-center')}>
-          <div className="w-16 h-16 rounded-2xl bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mx-auto mb-6">
-            <Key className="w-8 h-8 text-[#06b6d4]" />
+          <div className="w-16 h-16 rounded-2xl bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center mx-auto mb-6">
+            <Key className="w-8 h-8 text-[var(--color-accent)]" />
           </div>
           <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Create Your Agent</h1>
           <p className="text-[var(--text-secondary)] text-sm mb-8">Sign in to your account to create and deploy AI agents.</p>
@@ -501,8 +501,8 @@ export default function CreatePage() {
           transition={{ duration: 0.4, delay: 0.1 }}
         >
           <div className="flex items-center justify-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center">
-              <Bot size={20} className="text-[#06b6d4]" />
+            <div className="w-10 h-10 rounded-xl bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center">
+              <Bot size={20} className="text-[var(--color-accent)]" />
             </div>
             <div className="text-left">
               <h1 className="text-3xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Create Your Agent</h1>
@@ -518,7 +518,7 @@ export default function CreatePage() {
             <div className="h-1 rounded-full bg-[var(--border-default)] overflow-hidden">
               <motion.div
                 className="h-full rounded-full"
-                style={{ background: 'linear-gradient(90deg, #22d3ee, #06b6d4, #0891b2)' }}
+                style={{ background: 'linear-gradient(90deg, #22d3ee, var(--color-accent), #0891b2)' }}
                 initial={{ width: '0%' }}
                 animate={{ width: step === 1 ? '10%' : step === 2 ? '33%' : step === 3 ? '66%' : '100%' }}
                 transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -563,7 +563,7 @@ export default function CreatePage() {
                     <div className="h-0.5 rounded-full bg-[var(--border-default)]" />
                     <motion.div
                       className="absolute top-0 left-0 h-0.5 rounded-full"
-                      style={{ background: 'linear-gradient(90deg, #06b6d4, #0891b2)' }}
+                      style={{ background: 'linear-gradient(90deg, var(--color-accent), #0891b2)' }}
                       initial={{ width: '0%' }}
                       animate={{ width: s < step ? '100%' : '0%' }}
                       transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -599,7 +599,7 @@ export default function CreatePage() {
                   className={cn(
                     'p-6 rounded-xl border text-left transition-all duration-200 relative',
                     selectedFramework === 'openclaw'
-                      ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
+                      ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
                       : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.4)]'
                   )}
                 >
@@ -609,8 +609,8 @@ export default function CreatePage() {
                       <Check className="w-4 h-4 text-white" />
                     </motion.div>
                   )}
-                  <div className="w-12 h-12 rounded-xl bg-[#06b6d4]/10 flex items-center justify-center mb-4">
-                    <Cpu className="w-6 h-6 text-[#06b6d4]" />
+                  <div className="w-12 h-12 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center mb-4">
+                    <Cpu className="w-6 h-6 text-[var(--color-accent)]" />
                   </div>
                   <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">OpenClaw</h3>
                   <p className="text-sm text-[var(--text-muted)] mb-3">
@@ -630,7 +630,7 @@ export default function CreatePage() {
                   className={cn(
                     'p-6 rounded-xl border text-left transition-all duration-200 relative',
                     selectedFramework === 'hermes'
-                      ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
+                      ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
                       : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.4)]'
                   )}
                 >
@@ -661,7 +661,7 @@ export default function CreatePage() {
                   className={cn(
                     'p-6 rounded-xl border text-left transition-all duration-200 relative',
                     selectedFramework === 'elizaos'
-                      ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
+                      ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
                       : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.4)]'
                   )}
                 >
@@ -769,7 +769,7 @@ export default function CreatePage() {
                             className={cn(
                               'p-4 rounded-xl border text-left transition-all duration-200 relative group',
                               selectedTemplate === t.id
-                                ? 'bg-[#06b6d4]/10 border-[#06b6d4] text-[var(--text-primary)] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
+                                ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] text-[var(--text-primary)] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
                                 : 'bg-[var(--bg-elevated)] border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[rgba(6,182,212,0.4)] hover:shadow-[0_0_16px_rgba(6,182,212,0.08)]'
                             )}
                           >
@@ -785,8 +785,8 @@ export default function CreatePage() {
                             <div className={cn(
                               'w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-lg transition-colors duration-200',
                               selectedTemplate === t.id
-                                ? 'bg-[#06b6d4]/20'
-                                : 'bg-[var(--bg-hover)] group-hover:bg-[#06b6d4]/10'
+                                ? 'bg-[var(--color-accent)]/20'
+                                : 'bg-[var(--bg-hover)] group-hover:bg-[var(--color-accent)]/10'
                             )}>
                               {t.icon}
                             </div>
@@ -906,7 +906,7 @@ export default function CreatePage() {
                           className={cn(
                             'rounded-xl border transition-all duration-200 overflow-hidden',
                             isEnabled
-                              ? 'bg-[#06b6d4]/5 border-[#06b6d4]/40 shadow-[0_0_12px_rgba(6,182,212,0.08)]'
+                              ? 'bg-[var(--color-accent)]/5 border-[var(--color-accent)]/40 shadow-[0_0_12px_rgba(6,182,212,0.08)]'
                               : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[var(--border-hover)]'
                           )}
                         >
@@ -981,7 +981,7 @@ export default function CreatePage() {
                                   ) : (
                                     'note' in platform && platform.note && (
                                       <p className="text-xs text-[var(--text-muted)] py-1 flex items-center gap-1.5">
-                                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#06b6d4]/60 shrink-0" />
+                                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]/60 shrink-0" />
                                         {platform.note}
                                       </p>
                                     )
@@ -1014,7 +1014,7 @@ export default function CreatePage() {
                       className={cn(
                         'w-full p-4 rounded-xl border text-left transition-all duration-200',
                         llmChoice === 'free_groq'
-                          ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_16px_rgba(6,182,212,0.1)]'
+                          ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-[0_0_16px_rgba(6,182,212,0.1)]'
                           : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)]'
                       )}
                     >
@@ -1039,7 +1039,7 @@ export default function CreatePage() {
                       className={cn(
                         'rounded-xl border transition-all duration-200',
                         llmChoice === 'byok'
-                          ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_16px_rgba(6,182,212,0.1)]'
+                          ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-[0_0_16px_rgba(6,182,212,0.1)]'
                           : 'bg-[var(--bg-elevated)] border-[var(--border-default)]'
                       )}
                     >
@@ -1048,8 +1048,8 @@ export default function CreatePage() {
                         className="w-full p-4 text-left"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-[#06b6d4]/10 flex items-center justify-center">
-                            <Key className="w-5 h-5 text-[#06b6d4]" />
+                          <div className="w-10 h-10 rounded-lg bg-[var(--color-accent)]/10 flex items-center justify-center">
+                            <Key className="w-5 h-5 text-[var(--color-accent)]" />
                           </div>
                           <div>
                             <div className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-2">
@@ -1091,7 +1091,7 @@ export default function CreatePage() {
                                       className={cn(
                                         'text-xs border rounded-lg px-3 py-2 transition-all text-left',
                                         byokProvider === p.key
-                                          ? 'border-[#06b6d4] bg-[#06b6d4]/10 text-[var(--text-primary)] shadow-[0_0_8px_rgba(6,182,212,0.15)]'
+                                          ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/10 text-[var(--text-primary)] shadow-[0_0_8px_rgba(6,182,212,0.15)]'
                                           : 'border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)] text-[var(--text-secondary)]'
                                       )}
                                     >
@@ -1121,7 +1121,7 @@ export default function CreatePage() {
                                     <button
                                       type="button"
                                       onClick={() => { setByokCustomModel(false); setByokModel(''); }}
-                                      className="text-[11px] text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
+                                      className="text-[11px] text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors"
                                     >
                                       Back to model list
                                     </button>
@@ -1225,7 +1225,7 @@ export default function CreatePage() {
                             className={cn(
                               'relative p-4 rounded-xl border text-left transition-all duration-200',
                               selected
-                                ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_16px_rgba(6,182,212,0.12)]'
+                                ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-[0_0_16px_rgba(6,182,212,0.12)]'
                                 : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)]'
                             )}
                           >
@@ -1277,7 +1277,7 @@ export default function CreatePage() {
                             className={cn(
                               'relative p-4 rounded-xl border text-left transition-all duration-200',
                               selected
-                                ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_16px_rgba(6,182,212,0.12)]'
+                                ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-[0_0_16px_rgba(6,182,212,0.12)]'
                                 : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)]'
                             )}
                           >
@@ -1327,7 +1327,7 @@ export default function CreatePage() {
                             className={cn(
                               'relative p-4 rounded-xl border text-left transition-all duration-200',
                               selected
-                                ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_16px_rgba(6,182,212,0.12)]'
+                                ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-[0_0_16px_rgba(6,182,212,0.12)]'
                                 : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)]'
                             )}
                           >
@@ -1377,7 +1377,7 @@ export default function CreatePage() {
                             className={cn(
                               'relative p-4 rounded-xl border text-left transition-all duration-200',
                               selected
-                                ? 'bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_16px_rgba(6,182,212,0.12)]'
+                                ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-[0_0_16px_rgba(6,182,212,0.12)]'
                                 : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)]'
                             )}
                           >
@@ -1793,8 +1793,8 @@ export default function CreatePage() {
               >
                 {/* Agent header */}
                 <div className="flex items-center gap-4 mb-6 pb-6 border-b border-[var(--border-default)]">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-[#06b6d4]/10 border border-[#06b6d4]/20" style={{ boxShadow: '0 0 20px rgba(6,182,212,0.15)' }}>
-                    <Cpu className="w-7 h-7 text-[#06b6d4]" />
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20" style={{ boxShadow: '0 0 20px rgba(6,182,212,0.15)' }}>
+                    <Cpu className="w-7 h-7 text-[var(--color-accent)]" />
                   </div>
                   <div>
                     <div className="text-lg font-bold text-[var(--text-primary)]">{agentName}</div>
@@ -1856,13 +1856,13 @@ export default function CreatePage() {
                   className={cn(
                     'w-full flex items-center justify-between gap-3 px-5 py-3.5 rounded-xl border transition-all duration-200',
                     showTestChat
-                      ? 'bg-[rgba(6,182,212,0.08)] border-[#06b6d4]/40 shadow-[0_0_20px_rgba(6,182,212,0.1)]'
+                      ? 'bg-[rgba(6,182,212,0.08)] border-[var(--color-accent)]/40 shadow-[0_0_20px_rgba(6,182,212,0.1)]'
                       : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)] hover:bg-[var(--bg-elevated)]'
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-[#06b6d4]/10 flex items-center justify-center">
-                      <MessageCircle className="w-5 h-5 text-[#06b6d4]" />
+                    <div className="w-9 h-9 rounded-lg bg-[var(--color-accent)]/10 flex items-center justify-center">
+                      <MessageCircle className="w-5 h-5 text-[var(--color-accent)]" />
                     </div>
                     <div className="text-left">
                       <span className="text-sm font-semibold text-[var(--text-primary)]">Test Your Agent</span>
@@ -1890,8 +1890,8 @@ export default function CreatePage() {
                         {/* Header */}
                         <div className="px-4 py-3 border-b border-[var(--border-default)] bg-[var(--bg-card)]">
                           <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full bg-[#06b6d4]/20 flex items-center justify-center">
-                              <Bot className="w-3.5 h-3.5 text-[#06b6d4]" />
+                            <div className="w-6 h-6 rounded-full bg-[var(--color-accent)]/20 flex items-center justify-center">
+                              <Bot className="w-3.5 h-3.5 text-[var(--color-accent)]" />
                             </div>
                             <span className="text-xs font-medium text-[var(--text-secondary)]">
                               Chat Preview &mdash; {openclawForm.name || 'Your Agent'}
@@ -1931,7 +1931,7 @@ export default function CreatePage() {
                                 )}
                               >
                                 {msg.role === 'assistant' && (
-                                  <span className="block text-[10px] font-semibold text-[#06b6d4] mb-1">
+                                  <span className="block text-[10px] font-semibold text-[var(--color-accent)] mb-1">
                                     {openclawForm.name || 'Agent'}
                                   </span>
                                 )}
@@ -1947,7 +1947,7 @@ export default function CreatePage() {
                               className="flex justify-start"
                             >
                               <div className="bg-[rgba(46,43,74,0.6)] border border-[var(--border-default)] rounded-2xl rounded-bl-md px-4 py-3">
-                                <span className="block text-[10px] font-semibold text-[#06b6d4] mb-1">
+                                <span className="block text-[10px] font-semibold text-[var(--color-accent)] mb-1">
                                   {openclawForm.name || 'Agent'}
                                 </span>
                                 <div className="flex items-center gap-1.5">
@@ -1980,7 +1980,7 @@ export default function CreatePage() {
                               onChange={(e) => setTestInput(e.target.value)}
                               placeholder="Type a message..."
                               disabled={testLoading}
-                              className="flex-1 bg-[var(--bg-hover)] border border-[rgba(46,43,74,0.5)] rounded-xl px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4]/50 focus:ring-1 focus:ring-[#06b6d4]/20 transition-all disabled:opacity-50"
+                              className="flex-1 bg-[var(--bg-hover)] border border-[rgba(46,43,74,0.5)] rounded-xl px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50 focus:ring-1 focus:ring-[var(--color-accent)]/20 transition-all disabled:opacity-50"
                             />
                             <motion.button
                               type="submit"
@@ -1990,7 +1990,7 @@ export default function CreatePage() {
                               className={cn(
                                 'w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200',
                                 testInput.trim() && !testLoading
-                                  ? 'bg-[#06b6d4] text-white shadow-[0_0_12px_rgba(6,182,212,0.3)]'
+                                  ? 'bg-[var(--color-accent)] text-white shadow-[0_0_12px_rgba(6,182,212,0.3)]'
                                   : 'bg-[var(--bg-hover)] text-[var(--text-muted)]'
                               )}
                             >
@@ -2114,7 +2114,7 @@ function SystemPromptSection({
               setShowCustom(true);
             }
           }}
-          className="text-xs font-medium text-[#06b6d4] hover:text-[#22d3ee] transition-colors px-3 py-1.5 rounded-lg hover:bg-[#06b6d4]/10"
+          className="text-xs font-medium text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors px-3 py-1.5 rounded-lg hover:bg-[var(--color-accent)]/10"
         >
           {showCustom ? 'Use template default' : 'Customize'}
         </button>
@@ -2184,7 +2184,7 @@ function SummaryRow({
       <span className="text-[var(--text-muted)]">{label}</span>
       <span className={cn(
         'text-right',
-        valueClass ?? (highlight ? 'text-[#06b6d4]' : 'text-[var(--text-secondary)]')
+        valueClass ?? (highlight ? 'text-[var(--color-accent)]' : 'text-[var(--text-secondary)]')
       )}>
         {value}
       </span>
@@ -2243,8 +2243,8 @@ function ToggleSwitch({
       aria-checked={checked}
       onClick={(e) => { e.stopPropagation(); onChange(!checked); }}
       className={cn(
-        'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#06b6d4] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0D0B1A]',
-        checked ? 'bg-[#06b6d4]' : 'bg-[rgba(46,43,74,0.8)]'
+        'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0D0B1A]',
+        checked ? 'bg-[var(--color-accent)]' : 'bg-[rgba(46,43,74,0.8)]'
       )}
     >
       <span

@@ -27,7 +27,7 @@ function getPasswordStrength(pw: string): PasswordStrength {
   const labels: Record<number, { label: string; color: string }> = {
     0: { label: '', color: 'transparent' },
     1: { label: 'Very weak', color: '#ef4444' },
-    2: { label: 'Weak', color: '#06b6d4' },
+    2: { label: 'Weak', color: 'var(--color-accent)' },
     3: { label: 'Fair', color: '#eab308' },
     4: { label: 'Strong', color: '#22c55e' },
     5: { label: 'Very strong', color: '#10b981' },
@@ -106,8 +106,8 @@ export default function RegisterPage() {
 
         <div className="space-y-8">
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center flex-shrink-0">
-              <Rocket className="w-5 h-5 text-[#06b6d4]" />
+            <div className="w-10 h-10 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center flex-shrink-0">
+              <Rocket className="w-5 h-5 text-[var(--color-accent)]" />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Deploy AI agents in 60 seconds</h3>
@@ -116,8 +116,8 @@ export default function RegisterPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center flex-shrink-0">
-              <Layers className="w-5 h-5 text-[#06b6d4]" />
+            <div className="w-10 h-10 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center flex-shrink-0">
+              <Layers className="w-5 h-5 text-[var(--color-accent)]" />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">4 frameworks, 20+ platforms</h3>

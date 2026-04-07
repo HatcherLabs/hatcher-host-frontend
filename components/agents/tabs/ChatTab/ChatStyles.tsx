@@ -61,7 +61,7 @@ export function ChatStyles() {
         padding: 0.1em 0.35em;
         font-size: 0.88em;
         font-family: 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
-        color: #06b6d4;
+        color: var(--color-accent);
       }
       .markdown-body pre {
         background: rgba(0, 0, 0, 0.3);
@@ -79,7 +79,7 @@ export function ChatStyles() {
         color: var(--text-secondary);
       }
       .markdown-body blockquote {
-        border-left: 3px solid #06b6d4;
+        border-left: 3px solid var(--color-accent);
         margin: 0.5em 0;
         padding: 0.25em 0.75em;
         color: var(--text-secondary);
@@ -87,7 +87,7 @@ export function ChatStyles() {
         border-radius: 0 4px 4px 0;
       }
       .markdown-body a {
-        color: #06b6d4;
+        color: var(--color-accent);
         text-decoration: underline;
         text-underline-offset: 2px;
       }

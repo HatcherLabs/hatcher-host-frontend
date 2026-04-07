@@ -7,7 +7,7 @@ export function SoundWaveBars({ className = '' }: { className?: string }) {
       {[0, 1, 2, 3].map((i) => (
         <span
           key={i}
-          className="w-[2px] bg-[#06b6d4] rounded-full"
+          className="w-[2px] bg-[var(--color-accent)] rounded-full"
           style={{
             animation: `voiceBar 0.8s ease-in-out ${i * 0.15}s infinite alternate`,
           }}

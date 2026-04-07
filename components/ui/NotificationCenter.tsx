@@ -47,7 +47,7 @@ const ICON_MAP: Record<string, typeof Server> = {
 const ICON_COLOR_MAP: Record<string, string> = {
   agent_started: 'text-emerald-400 bg-emerald-500/15',
   agent_stopped: 'text-amber-400 bg-amber-500/15',
-  agent_created: 'text-[#06b6d4] bg-[#06b6d4]/15',
+  agent_created: 'text-[var(--color-accent)] bg-[var(--color-accent)]/15',
   agent: 'text-emerald-400 bg-emerald-500/15',
   subscription: 'text-purple-400 bg-purple-500/15',
   subscription_confirmed: 'text-purple-400 bg-purple-500/15',
@@ -56,8 +56,8 @@ const ICON_COLOR_MAP: Record<string, string> = {
   team_joined: 'text-blue-400 bg-blue-500/15',
   rental: 'text-emerald-400 bg-emerald-500/15',
   rental_received: 'text-emerald-400 bg-emerald-500/15',
-  support: 'text-[#06b6d4] bg-[#06b6d4]/15',
-  support_reply: 'text-[#06b6d4] bg-[#06b6d4]/15',
+  support: 'text-[var(--color-accent)] bg-[var(--color-accent)]/15',
+  support_reply: 'text-[var(--color-accent)] bg-[var(--color-accent)]/15',
   feature: 'text-amber-400 bg-amber-500/15',
 };
 

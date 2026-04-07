@@ -135,11 +135,11 @@ export default function RoadmapPage() {
           <p className="text-[var(--text-secondary)] text-base leading-relaxed">
             What we've built, what's shipping now, and where we're headed.
             We build in public — follow along on{' '}
-            <Link href="https://x.com/hatcherlabs" target="_blank" rel="noopener noreferrer" className="text-[var(--text-primary)] underline underline-offset-2 hover:text-[#06b6d4] transition-colors">
+            <Link href="https://x.com/hatcherlabs" target="_blank" rel="noopener noreferrer" className="text-[var(--text-primary)] underline underline-offset-2 hover:text-[var(--color-accent)] transition-colors">
               X&nbsp;/@hatcherlabs
             </Link>
             {' '}or check the{' '}
-            <Link href="/changelog" className="text-[var(--text-primary)] underline underline-offset-2 hover:text-[#06b6d4] transition-colors">
+            <Link href="/changelog" className="text-[var(--text-primary)] underline underline-offset-2 hover:text-[var(--color-accent)] transition-colors">
               live changelog
             </Link>
             .

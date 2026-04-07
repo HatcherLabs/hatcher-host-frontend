@@ -39,7 +39,7 @@ interface VersionEntry {
 const FRAMEWORK_COLORS: Record<string, { text: string; bg: string; border: string; accent: string; glow: string }> = {
   openclaw: { text: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20', accent: '#f59e0b', glow: 'rgba(245,158,11,0.08)' },
   hermes:   { text: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20', accent: '#a855f7', glow: 'rgba(168,85,247,0.08)' },
-  elizaos:  { text: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', accent: '#06b6d4', glow: 'rgba(6,182,212,0.08)' },
+  elizaos:  { text: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', accent: 'var(--color-accent)', glow: 'rgba(6,182,212,0.08)' },
   milady:   { text: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20', accent: '#f43f5e', glow: 'rgba(244,63,94,0.08)' },
 };
 

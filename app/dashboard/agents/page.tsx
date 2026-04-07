@@ -38,13 +38,13 @@ import type { AgentFramework } from '@hatcher/shared';
 const FRAMEWORK_ICON_COLORS: Record<string, string> = {
   openclaw: '#f59e0b',
   hermes: '#a855f7',
-  elizaos: '#06b6d4',
+  elizaos: 'var(--color-accent)',
   milady: '#f43f5e',
 };
 
 // ── Framework SVG avatars (matches Explore page) ─────────────
 function FrameworkAvatar({ framework, size = 48 }: { framework: string; size?: number }) {
-  const color = FRAMEWORK_ICON_COLORS[framework] ?? '#06b6d4';
+  const color = FRAMEWORK_ICON_COLORS[framework] ?? 'var(--color-accent)';
   const s = size;
 
   if (framework === 'hermes') {
@@ -320,7 +320,7 @@ export default function MyAgentsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-full border-2 border-[#06b6d4] border-t-transparent animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 rounded-full border-2 border-[var(--color-accent)] border-t-transparent animate-spin mx-auto mb-4" />
           <p className="text-[var(--text-secondary)]">Authenticating...</p>
         </div>
       </div>
@@ -335,8 +335,8 @@ export default function MyAgentsPage() {
         className="min-h-screen flex items-center justify-center"
       >
         <div className="text-center max-w-md px-4">
-          <div className="w-20 h-20 rounded-2xl bg-[#06b6d4]/15 flex items-center justify-center mx-auto mb-6">
-            <Zap size={40} className="text-[#06b6d4]" />
+          <div className="w-20 h-20 rounded-2xl bg-[var(--color-accent)]/15 flex items-center justify-center mx-auto mb-6">
+            <Zap size={40} className="text-[var(--color-accent)]" />
           </div>
           <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">Sign In Required</h1>
           <p className="mb-8 text-sm text-[var(--text-secondary)]">
@@ -515,8 +515,8 @@ export default function MyAgentsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="w-16 h-16 rounded-2xl bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mx-auto mb-6">
-                <Bot size={32} className="text-[#06b6d4]" />
+              <div className="w-16 h-16 rounded-2xl bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center mx-auto mb-6">
+                <Bot size={32} className="text-[var(--color-accent)]" />
               </div>
               <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
                 No matching agents
@@ -555,7 +555,7 @@ export default function MyAgentsPage() {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <h3 className="text-[var(--text-primary)] font-semibold text-sm truncate group-hover:text-[#06b6d4] transition-colors">
+                        <h3 className="text-[var(--text-primary)] font-semibold text-sm truncate group-hover:text-[var(--color-accent)] transition-colors">
                           {agent.name}
                         </h3>
                         <StatusBadge status={agent.status} />
@@ -594,11 +594,11 @@ export default function MyAgentsPage() {
                         <>
                           <button
                             onClick={(e) => { e.stopPropagation(); api.restartAgent(agent.id).then((res) => { if (res.success) { setAgents((prev) => prev.map((a) => a.id === agent.id ? { ...a, status: 'active' } : a)); setSuccessMsg(`${agent.name} restarted`); setTimeout(() => setSuccessMsg(null), 3000); } else setError(res.error ?? 'Restart failed'); }).catch(() => setError('Failed to restart agent')); }}
-                            className="p-1.5 rounded-lg hover:bg-[#06b6d4]/10 transition-colors"
+                            className="p-1.5 rounded-lg hover:bg-[var(--color-accent)]/10 transition-colors"
                             title="Restart"
                             aria-label={`Restart ${agent.name}`}
                           >
-                            <RotateCcw size={13} className="text-[#06b6d4]" />
+                            <RotateCcw size={13} className="text-[var(--color-accent)]" />
                           </button>
                           <button
                             onClick={(e) => { e.stopPropagation(); api.stopAgent(agent.id).then((res) => { if (res.success) { setAgents((prev) => prev.map((a) => a.id === agent.id ? { ...a, status: 'paused' } : a)); setSuccessMsg(`${agent.name} stopped`); setTimeout(() => setSuccessMsg(null), 3000); } else setError(res.error ?? 'Stop failed'); }).catch(() => setError('Failed to stop agent')); }}
@@ -619,7 +619,7 @@ export default function MyAgentsPage() {
                           <Play size={13} className="text-emerald-400" />
                         </button>
                       ) : null}
-                      <span className="text-xs text-[#06b6d4] ml-0.5">
+                      <span className="text-xs text-[var(--color-accent)] ml-0.5">
                         Details
                       </span>
                     </div>

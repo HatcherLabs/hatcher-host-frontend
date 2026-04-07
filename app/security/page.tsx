@@ -34,7 +34,7 @@ export default function SecurityPage() {
             href="https://github.com/HatcherLabs/hatcher-host-frontend"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-[#06b6d4] hover:underline underline-offset-2 font-mono"
+            className="text-xs text-[var(--color-accent)] hover:underline underline-offset-2 font-mono"
           >
             github.com/HatcherLabs/hatcher-host-frontend
           </a>

@@ -290,7 +290,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
 
         {/* Skip link */}
         <div className="text-center pb-5">
-          <button onClick={dismiss} className="text-xs text-[#52525b] hover:text-[var(--text-secondary)] transition-colors">
+          <button onClick={dismiss} className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors">
             Skip for now
           </button>
         </div>

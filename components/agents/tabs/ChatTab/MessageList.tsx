@@ -54,11 +54,11 @@ export function MessageList({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <div className="w-16 h-16 rounded-2xl bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mx-auto mb-4">
-            <Bot size={32} className="text-[#06b6d4]" />
+          <div className="w-16 h-16 rounded-2xl bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center mx-auto mb-4">
+            <Bot size={32} className="text-[var(--color-accent)]" />
           </div>
           <p className="text-sm mb-1 text-[var(--text-secondary)]">
-            Start a conversation with <span className="font-medium text-[#06b6d4]">{agentName}</span>
+            Start a conversation with <span className="font-medium text-[var(--color-accent)]">{agentName}</span>
           </p>
           <p className="text-xs mb-1 text-[var(--text-muted)]">
             Responses appear in real time
@@ -70,7 +70,7 @@ export function MessageList({
               <motion.button
                 key={prompt}
                 onClick={() => onSendMessage(prompt)}
-                className="text-xs px-4 py-2 rounded-full border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all cursor-pointer"
+                className="text-xs px-4 py-2 rounded-full border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5 transition-all cursor-pointer"
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 + i * 0.1 }}

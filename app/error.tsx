@@ -45,7 +45,7 @@ export default function Error({
         </div>
 
         {error.digest && (
-          <p className="mt-6 text-xs text-[#52525b]">
+          <p className="mt-6 text-xs text-[var(--text-muted)]">
             Error ID: {error.digest}
           </p>
         )}

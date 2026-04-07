@@ -139,7 +139,7 @@ export default function IntegrationsPage() {
         <motion.div variants={cardVariants} className="mb-8">
           <Link
             href="/docs"
-            className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[#06b6d4] transition-colors duration-200"
+            className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--color-accent)] transition-colors duration-200"
           >
             <ArrowLeft size={16} />
             Back to Docs
@@ -148,7 +148,7 @@ export default function IntegrationsPage() {
 
         {/* ── Hero ───────────────────────────────────────────── */}
         <motion.div variants={cardVariants} className="mb-12">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#06b6d4]/20 bg-[#06b6d4]/5 px-4 py-1.5 text-sm font-medium text-[#06b6d4]">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5 px-4 py-1.5 text-sm font-medium text-[var(--color-accent)]">
             <Plug className="h-4 w-4" />
             Integrations
           </div>
@@ -188,7 +188,7 @@ export default function IntegrationsPage() {
                       <Icon size={22} style={{ color: platform.color }} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-semibold text-[var(--text-primary)] group-hover:text-[#06b6d4] transition-colors">
+                      <h3 className="text-base font-semibold text-[var(--text-primary)] group-hover:text-[var(--color-accent)] transition-colors">
                         {platform.name}
                       </h3>
                       <DifficultyBadge level={platform.difficulty} />
@@ -213,7 +213,7 @@ export default function IntegrationsPage() {
                   </div>
 
                   {/* Arrow */}
-                  <div className="flex items-center gap-1 text-xs font-medium text-[#06b6d4]/70 group-hover:text-[#06b6d4] transition-colors">
+                  <div className="flex items-center gap-1 text-xs font-medium text-[var(--color-accent)]/70 group-hover:text-[var(--color-accent)] transition-colors">
                     View guide
                     <ArrowRight size={12} className="transition-transform duration-200 group-hover:translate-x-0.5" />
                   </div>
@@ -247,13 +247,13 @@ export default function IntegrationsPage() {
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/docs/api"
-                className="inline-flex items-center gap-2 rounded-xl bg-[#06b6d4] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#06b6d4]/20 transition-all duration-200 hover:bg-[#0891b2] hover:shadow-[#06b6d4]/30"
+                className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[var(--color-accent)]/20 transition-all duration-200 hover:bg-[#0891b2] hover:shadow-[var(--color-accent)]/30"
               >
                 API Reference
               </Link>
               <Link
                 href="/docs"
-                className="inline-flex items-center gap-2 rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] px-5 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-200 hover:border-[#06b6d4]/30 hover:text-[var(--text-primary)]"
+                className="inline-flex items-center gap-2 rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] px-5 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-200 hover:border-[var(--color-accent)]/30 hover:text-[var(--text-primary)]"
               >
                 All Documentation
               </Link>

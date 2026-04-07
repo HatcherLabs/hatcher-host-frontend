@@ -42,7 +42,7 @@ export default function ForgotPasswordPage() {
             </p>
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 text-sm text-[#06b6d4] hover:underline"
+              className="inline-flex items-center gap-2 text-sm text-[var(--color-accent)] hover:underline"
             >
               <ArrowLeft size={14} />
               Back to sign in
@@ -51,8 +51,8 @@ export default function ForgotPasswordPage() {
         ) : (
           <>
             <div className="text-center mb-8">
-              <div className="w-12 h-12 rounded-full bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-6 h-6 text-[#06b6d4]" />
+              <div className="w-12 h-12 rounded-full bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center mx-auto mb-4">
+                <Mail className="w-6 h-6 text-[var(--color-accent)]" />
               </div>
               <h1 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
                 Forgot password?

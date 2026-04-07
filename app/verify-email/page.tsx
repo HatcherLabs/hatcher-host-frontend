@@ -36,7 +36,7 @@ export default function VerifyEmailPage() {
       <div className="max-w-md w-full text-center">
         {status === 'loading' && (
           <div className="space-y-4">
-            <Loader2 className="w-12 h-12 animate-spin text-[#06b6d4] mx-auto" />
+            <Loader2 className="w-12 h-12 animate-spin text-[var(--color-accent)] mx-auto" />
             <h1 className="text-xl font-bold text-[var(--text-primary)]">Verifying your email...</h1>
           </div>
         )}

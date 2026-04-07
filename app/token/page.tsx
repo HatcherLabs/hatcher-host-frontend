@@ -22,7 +22,7 @@ const PLANNED_USE_CASES = [
     icon: Zap,
     title: 'Subscriptions & Add-ons',
     description: 'Subscribe to Starter ($4.99/mo), Pro ($14.99/mo), or Business ($39.99/mo) tiers. Purchase agent add-ons to scale your fleet.',
-    color: '#06b6d4',
+    color: 'var(--color-accent)',
   },
   {
     icon: CreditCard,
@@ -46,9 +46,9 @@ export default function TokenPage() {
       <section className="relative py-28 md:py-36 px-4 text-center">
         {/* Background glows */}
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[550px] rounded-full bg-gradient-to-br from-[#06b6d4]/12 via-[#06b6d4]/6 to-transparent blur-3xl" />
+          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[550px] rounded-full bg-gradient-to-br from-[var(--color-accent)]/12 via-[var(--color-accent)]/6 to-transparent blur-3xl" />
           <div className="absolute top-20 right-1/4 w-[400px] h-[400px] rounded-full bg-[#0891b2]/5 blur-3xl" />
-          <div className="absolute -bottom-20 left-1/4 w-[300px] h-[300px] rounded-full bg-[#06b6d4]/4 blur-3xl" />
+          <div className="absolute -bottom-20 left-1/4 w-[300px] h-[300px] rounded-full bg-[var(--color-accent)]/4 blur-3xl" />
         </div>
 
         <div className="mx-auto max-w-4xl">
@@ -63,7 +63,7 @@ export default function TokenPage() {
           </motion.div>
 
           <div
-            className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#06b6d4] to-[#0891b2] flex items-center justify-center text-5xl mx-auto mb-8 shadow-[0_0_60px_rgba(6,182,212,0.35)]"
+            className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[var(--color-accent)] to-[#0891b2] flex items-center justify-center text-5xl mx-auto mb-8 shadow-[0_0_60px_rgba(6,182,212,0.35)]"
             style={{ animation: 'float 3s ease-in-out infinite' }}
           >
             &#x1F95A;
@@ -103,7 +103,7 @@ export default function TokenPage() {
                 href="https://pump.fun/coin/Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-[#06b6d4] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
+                className="text-xs text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
               >
                 View on pump.fun
               </a>
@@ -112,7 +112,7 @@ export default function TokenPage() {
                 href="https://solscan.io/token/Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-[#06b6d4] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
+                className="text-xs text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
               >
                 Solscan
               </a>
@@ -223,10 +223,10 @@ export default function TokenPage() {
       <section className="py-12 sm:py-20 px-4">
         <div className="mx-auto max-w-4xl">
           <div className="relative rounded-3xl overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#06b6d4]/15 via-[#06b6d4]/10 to-[#0891b2]/10" />
-            <div className="absolute inset-0 border border-[#06b6d4]/20 rounded-3xl" />
-            <div className="absolute -top-12 -right-12 w-64 h-64 rounded-full bg-[#06b6d4]/10 blur-3xl" />
-            <div className="absolute -bottom-12 -left-12 w-64 h-64 rounded-full bg-[#06b6d4]/8 blur-3xl" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/15 via-[var(--color-accent)]/10 to-[#0891b2]/10" />
+            <div className="absolute inset-0 border border-[var(--color-accent)]/20 rounded-3xl" />
+            <div className="absolute -top-12 -right-12 w-64 h-64 rounded-full bg-[var(--color-accent)]/10 blur-3xl" />
+            <div className="absolute -bottom-12 -left-12 w-64 h-64 rounded-full bg-[var(--color-accent)]/8 blur-3xl" />
 
             <div className="relative text-center px-8 py-16">
               <h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-[var(--text-primary)]">

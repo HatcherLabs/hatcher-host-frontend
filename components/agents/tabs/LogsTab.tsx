@@ -165,7 +165,7 @@ export function LogsTab() {
               onClick={() => setLogFilter(f)}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
                 logFilter === f
-                  ? (filterColors[f] || 'border-[#06b6d4]/40 bg-[#06b6d4]/10 text-[var(--text-primary)]')
+                  ? (filterColors[f] || 'border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--text-primary)]')
                   : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)]'
               }`}
             >

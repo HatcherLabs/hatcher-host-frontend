@@ -779,7 +779,7 @@ export default function LandingPage() {
 
           <p className="text-center text-xs text-[var(--text-muted)] mt-6">
             Need more agents? Add extras with stackable packs.{' '}
-            <Link href="/pricing" className="text-[#06b6d4] hover:underline">See full pricing</Link>
+            <Link href="/pricing" className="text-[var(--color-accent)] hover:underline">See full pricing</Link>
           </p>
         </div>
       </Section>

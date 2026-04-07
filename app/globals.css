@@ -43,6 +43,7 @@
   /* Accents */
   --cyan-400: #22d3ee;
   --cyan-500: #06b6d4;
+  --color-accent: #06b6d4;
   --amber-400: #FBBF24;
 
   /* Text */
@@ -99,6 +100,7 @@
   /* Accents — darker for contrast */
   --cyan-400: #0891b2;
   --cyan-500: #0e7490;
+  --color-accent: #0e7490;
   --amber-400: #b45309;
 
   /* Text — strong contrast hierarchy (WCAG AA+) */
@@ -371,18 +373,18 @@
            font-semibold px-5 py-2.5 rounded-xl
            transition-all duration-200 active:scale-95
            disabled:opacity-40 disabled:cursor-not-allowed;
-    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    background: linear-gradient(135deg, var(--color-accent), #0891b2);
     color: #ffffff;
     box-shadow: 0 0 20px rgba(6, 182, 212, 0.25), 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
   .btn-cta:hover:not(:disabled) {
-    background: linear-gradient(135deg, #22d3ee, #06b6d4);
+    background: linear-gradient(135deg, #22d3ee, var(--color-accent));
     box-shadow: 0 0 32px rgba(6, 182, 212, 0.45), 0 8px 24px rgba(0, 0, 0, 0.3);
   }
 
   .btn-cta:focus-visible {
-    box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px #06b6d4, 0 0 20px rgba(6, 182, 212, 0.25);
+    box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--color-accent), 0 0 20px rgba(6, 182, 212, 0.25);
   }
 
   .btn-secondary {
@@ -503,7 +505,7 @@
 
   .text-gradient-cyan {
     @apply text-transparent bg-clip-text;
-    background-image: linear-gradient(135deg, #22d3ee, #06b6d4, #0891b2);
+    background-image: linear-gradient(135deg, #22d3ee, var(--color-accent), #0891b2);
   }
 
   /* ── Text glow utility ──────────────────────────── */
@@ -592,7 +594,7 @@
   padding: 1px 6px;
   border-radius: 3px;
   font-size: 9px;
-  color: #06b6d4;
+  color: var(--color-accent);
   transition: all 0.2s ease;
 }
 

@@ -66,7 +66,7 @@ const FRAMEWORK_COLORS: Record<string, { primary: string; hex: string; hexLight:
   },
   elizaos: {
     primary: 'cyan',
-    hex: '#06b6d4',
+    hex: 'var(--color-accent)',
     hexLight: '#22d3ee',
     bg: 'bg-cyan-500/8',
     border: 'border-cyan-500/20',

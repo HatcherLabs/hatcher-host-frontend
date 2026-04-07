@@ -447,7 +447,7 @@ function ToggleSwitch({
         relative flex-shrink-0 rounded-full transition-all duration-200
         ${w}
         ${enabled
-          ? 'bg-[#06b6d4] border border-[#06b6d4]/60 shadow-[0_0_8px_rgba(6,182,212,0.25)]'
+          ? 'bg-[var(--color-accent)] border border-[var(--color-accent)]/60 shadow-[0_0_8px_rgba(6,182,212,0.25)]'
           : 'bg-[var(--bg-hover)] border border-[var(--border-hover)]'
         }
         ${loading ? 'opacity-50 cursor-wait' : 'cursor-pointer hover:border-[var(--border-hover)]'}
@@ -495,7 +495,7 @@ function SkillCard({
         className={`
           relative p-4 rounded-xl border transition-all duration-300
           ${skill.enabled
-            ? 'bg-[#06b6d4]/[0.06] border-[#06b6d4]/25 shadow-[0_0_20px_rgba(6,182,212,0.06)]'
+            ? 'bg-[var(--color-accent)]/[0.06] border-[var(--color-accent)]/25 shadow-[0_0_20px_rgba(6,182,212,0.06)]'
             : 'bg-[var(--bg-card)] border-[var(--border-default)] hover:bg-[var(--bg-card)] hover:border-[var(--border-hover)]'
           }
         `}
@@ -507,7 +507,7 @@ function SkillCard({
               flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center text-base
               transition-all duration-300
               ${skill.enabled
-                ? 'bg-[#06b6d4]/15 shadow-[0_0_12px_rgba(6,182,212,0.1)]'
+                ? 'bg-[var(--color-accent)]/15 shadow-[0_0_12px_rgba(6,182,212,0.1)]'
                 : 'bg-[var(--bg-card)]'
               }
             `}
@@ -537,7 +537,7 @@ function SkillCard({
 
         {/* Enabled indicator dot */}
         {skill.enabled && (
-          <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#06b6d4] shadow-[0_0_4px_rgba(6,182,212,0.6)]" />
+          <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] shadow-[0_0_4px_rgba(6,182,212,0.6)]" />
         )}
       </div>
     </motion.div>
@@ -574,7 +574,7 @@ function CategorySection({
           {category.name}
         </h3>
         {enabledInCategory > 0 && (
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#06b6d4]/15 text-[#06b6d4] border border-[#06b6d4]/25">
+          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--color-accent)]/15 text-[var(--color-accent)] border border-[var(--color-accent)]/25">
             {enabledInCategory} active
           </span>
         )}
@@ -676,7 +676,7 @@ function MarketplaceCard({
             <p className="text-[11px] text-[var(--text-muted)] line-clamp-2 leading-relaxed">
               {item.description}
             </p>
-            <p className="text-[10px] text-[#52525b] mt-1 font-mono truncate">
+            <p className="text-[10px] text-[var(--text-muted)] mt-1 font-mono truncate">
               {item.id}
             </p>
           </div>
@@ -685,7 +685,7 @@ function MarketplaceCard({
           <div className="flex-shrink-0 pt-0.5">
             {isInstalling ? (
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
-                <Loader2 size={12} className="animate-spin text-[#06b6d4]" />
+                <Loader2 size={12} className="animate-spin text-[var(--color-accent)]" />
                 <span className="text-[10px] text-[var(--text-secondary)]">Installing...</span>
               </div>
             ) : isInstalled ? (
@@ -696,7 +696,7 @@ function MarketplaceCard({
                 </span>
                 <button
                   onClick={() => onUninstall(item.id)}
-                  className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#52525b] hover:text-red-400 transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-red-500/10 text-[var(--text-muted)] hover:text-red-400 transition-colors"
                   title="Uninstall"
                 >
                   <Trash2 size={12} />
@@ -705,7 +705,7 @@ function MarketplaceCard({
             ) : (
               <button
                 onClick={() => onInstall(item.id)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#06b6d4]/10 border border-[#06b6d4]/20 text-[#06b6d4] hover:bg-[#06b6d4]/20 transition-colors text-xs font-medium"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-colors text-xs font-medium"
               >
                 <Download size={12} />
                 Install
@@ -748,7 +748,7 @@ function MarketplaceSection({
           onClick={() => setExpanded(!expanded)}
           className="flex items-center gap-2.5 w-full text-left"
         >
-          <Store size={16} className="text-[#06b6d4]" />
+          <Store size={16} className="text-[var(--color-accent)]" />
           <span className="text-sm font-semibold text-white flex-1">Browse Marketplace</span>
           <span className="text-[var(--text-muted)]">
             {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -764,7 +764,7 @@ function MarketplaceSection({
               className="overflow-hidden"
             >
               <div className="mt-4 flex items-center gap-2 px-4 py-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
-                <Sparkles size={14} className="text-[#06b6d4] flex-shrink-0" />
+                <Sparkles size={14} className="text-[var(--color-accent)] flex-shrink-0" />
                 <p className="text-xs text-[var(--text-secondary)]">
                   Hermes skills are managed via the Skills Hub. New skills appear automatically when installed through the Hermes CLI.
                 </p>
@@ -795,11 +795,11 @@ function MarketplaceSection({
         onClick={() => setExpanded(!expanded)}
         className="flex items-center gap-2.5 w-full text-left"
       >
-        <Store size={16} className="text-[#06b6d4]" />
+        <Store size={16} className="text-[var(--color-accent)]" />
         <span className="text-sm font-semibold text-white flex-1">
           Browse Marketplace
         </span>
-        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#06b6d4]/15 text-[#06b6d4] border border-[#06b6d4]/25">
+        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--color-accent)]/15 text-[var(--color-accent)] border border-[var(--color-accent)]/25">
           {items.length} packages
         </span>
         <span className="text-[var(--text-muted)]">
@@ -827,7 +827,7 @@ function MarketplaceSection({
                     value={marketSearch}
                     onChange={(e) => setMarketSearch(e.target.value)}
                     placeholder="Search marketplace..."
-                    className="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4]/40 transition-colors"
+                    className="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-colors"
                   />
                   {marketSearch && (
                     <button
@@ -848,7 +848,7 @@ function MarketplaceSection({
                       className={`
                         px-2.5 py-1 rounded-full text-[10px] font-medium border transition-all
                         ${categoryFilter === cat
-                          ? 'bg-[#06b6d4]/15 text-[#06b6d4] border-[#06b6d4]/30'
+                          ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] border-[var(--color-accent)]/30'
                           : 'bg-[var(--bg-card)] text-[var(--text-muted)] border-[var(--border-default)] hover:bg-[var(--bg-card)] hover:text-[var(--text-secondary)]'
                         }
                       `}
@@ -879,7 +879,7 @@ function MarketplaceSection({
                   <p className="text-xs text-[var(--text-secondary)]">No packages match your search</p>
                   <button
                     onClick={() => { setMarketSearch(''); setCategoryFilter('All'); }}
-                    className="mt-1.5 text-[10px] text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
+                    className="mt-1.5 text-[10px] text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors"
                   >
                     Clear filters
                   </button>
@@ -887,7 +887,7 @@ function MarketplaceSection({
               )}
 
               {/* Source info */}
-              <div className="flex items-center gap-1.5 text-[10px] text-[#52525b]">
+              <div className="flex items-center gap-1.5 text-[10px] text-[var(--text-muted)]">
                 <ShoppingBag size={10} />
                 <span>
                   {framework === 'elizaos' || framework === 'milady'
@@ -1273,7 +1273,7 @@ export function SkillsTab() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-            <Sparkles size={18} className="text-[#06b6d4]" />
+            <Sparkles size={18} className="text-[var(--color-accent)]" />
             {isEliza ? 'Plugins' : 'Skills Browser'}
             {enabledCount > 0 && (
               <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
@@ -1293,7 +1293,7 @@ export function SkillsTab() {
             <button
               onClick={handleSelectPopular}
               disabled={restarting || !!toggling}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-[#06b6d4]/10 border border-[#06b6d4]/20 text-[#06b6d4] hover:bg-[#06b6d4]/20 transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-colors disabled:opacity-50"
             >
               <Zap size={12} />
               Select Popular
@@ -1329,7 +1329,7 @@ export function SkillsTab() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={`Search ${labelLower}...`}
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder-[var(--text-muted)] focus:outline-none focus:border-[#06b6d4]/40 transition-colors"
+              className="w-full pl-9 pr-3 py-2 text-xs rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-white placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/40 transition-colors"
             />
             {search && (
               <button
@@ -1345,9 +1345,9 @@ export function SkillsTab() {
 
       {/* Restarting indicator */}
       {restarting && (
-        <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#06b6d4]/10 border border-[#06b6d4]/20">
-          <Loader2 size={14} className="text-[#06b6d4] flex-shrink-0 animate-spin" />
-          <p className="text-xs text-[#06b6d4]">
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20">
+          <Loader2 size={14} className="text-[var(--color-accent)] flex-shrink-0 animate-spin" />
+          <p className="text-xs text-[var(--color-accent)]">
             Restarting agent to apply {labelLower.slice(0, -1)} changes...
           </p>
         </div>
@@ -1355,14 +1355,14 @@ export function SkillsTab() {
 
       {/* Restart hint */}
       {restartHint && !restarting && (
-        <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#06b6d4]/10 border border-[#06b6d4]/20">
-          <AlertTriangle size={14} className="text-[#06b6d4] flex-shrink-0" />
-          <p className="text-xs text-[#06b6d4]">
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20">
+          <AlertTriangle size={14} className="text-[var(--color-accent)] flex-shrink-0" />
+          <p className="text-xs text-[var(--color-accent)]">
             Start the agent for {labelLower.slice(0, -1)} changes to take effect.
           </p>
           <button
             onClick={() => setRestartHint(false)}
-            className="ml-auto text-[#06b6d4]/60 hover:text-[#06b6d4] transition-colors"
+            className="ml-auto text-[var(--color-accent)]/60 hover:text-[var(--color-accent)] transition-colors"
           >
             <X size={12} />
           </button>
@@ -1413,7 +1413,7 @@ export function SkillsTab() {
               <p className="text-sm text-[var(--text-secondary)]">No {labelLower} match your search</p>
               <button
                 onClick={() => setSearch('')}
-                className="mt-2 text-xs text-[#06b6d4] hover:text-[#22d3ee] transition-colors"
+                className="mt-2 text-xs text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors"
               >
                 Clear search
               </button>

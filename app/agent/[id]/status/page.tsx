@@ -271,7 +271,7 @@ export default async function AgentStatusPage({
                 <MessageSquare className="w-3 h-3" aria-hidden="true" />
                 Messages
               </div>
-              <div className="text-xl font-bold text-[#06b6d4] tabular-nums">
+              <div className="text-xl font-bold text-[var(--color-accent)] tabular-nums">
                 {stats.messagesProcessed >= 1000
                   ? `${(stats.messagesProcessed / 1000).toFixed(1)}k`
                   : stats.messagesProcessed.toLocaleString()}

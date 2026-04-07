@@ -102,8 +102,8 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
       {/* Total Agents */}
       <motion.div className="card glass-noise p-5" variants={cardVariants}>
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 rounded-lg bg-[#06b6d4]/15 flex items-center justify-center flex-shrink-0">
-            <Bot size={16} className="text-[#06b6d4]" />
+          <div className="w-9 h-9 rounded-lg bg-[var(--color-accent)]/15 flex items-center justify-center flex-shrink-0">
+            <Bot size={16} className="text-[var(--color-accent)]" />
           </div>
           <div className="text-xs text-[var(--text-muted)] leading-tight">Total Agents</div>
         </div>
@@ -113,7 +113,7 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
         </div>
         <div className="h-1 rounded-full bg-[var(--bg-hover)] overflow-hidden">
           <div
-            className="h-full rounded-full bg-[#06b6d4] transition-all duration-500"
+            className="h-full rounded-full bg-[var(--color-accent)] transition-all duration-500"
             style={{ width: `${agentPct}%` }}
           />
         </div>
@@ -173,7 +173,7 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
         ) : (
           <Link
             href="/dashboard/billing"
-            className="text-[10px] text-[#06b6d4] hover:opacity-80 transition-opacity mt-1 block"
+            className="text-[10px] text-[var(--color-accent)] hover:opacity-80 transition-opacity mt-1 block"
           >
             Upgrade plan
           </Link>

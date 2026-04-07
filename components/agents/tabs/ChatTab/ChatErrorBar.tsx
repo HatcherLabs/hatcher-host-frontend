@@ -31,7 +31,7 @@ export function ChatErrorBar({
           <>
             Daily message limit reached.{' '}
             <a
-              className="underline hover:opacity-80 transition-opacity text-[#06b6d4]"
+              className="underline hover:opacity-80 transition-opacity text-[var(--color-accent)]"
               href="/dashboard/billing"
             >
               Upgrade to Pro

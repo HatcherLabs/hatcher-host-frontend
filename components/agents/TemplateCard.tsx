@@ -137,7 +137,7 @@ function PreviewModal({
                 <ul className="space-y-1">
                   {features.slice(0, 4).map(f => (
                     <li key={f} className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#06b6d4] flex-shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] flex-shrink-0" />
                       <span className="capitalize">{f}</span>
                     </li>
                   ))}
@@ -186,7 +186,7 @@ function PreviewModal({
                     className={cn(
                       'text-xs rounded-xl px-3 py-2 max-w-[80%] leading-relaxed',
                       msg.role === 'user'
-                        ? 'bg-[#06b6d4]/15 text-white border border-[#06b6d4]/20'
+                        ? 'bg-[var(--color-accent)]/15 text-white border border-[var(--color-accent)]/20'
                         : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border-default)]'
                     )}
                   >
@@ -223,12 +223,12 @@ function PreviewModal({
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && sendMessage()}
                 placeholder={`Ask ${template.name} something...`}
-                className="flex-1 bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-3 py-2 text-xs text-white placeholder:text-[var(--text-muted)] outline-none focus:border-[#06b6d4]/50 transition-colors"
+                className="flex-1 bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-3 py-2 text-xs text-white placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--color-accent)]/50 transition-colors"
               />
               <button
                 onClick={sendMessage}
                 disabled={!input.trim() || isTyping}
-                className="w-8 h-8 rounded-xl bg-[#06b6d4]/15 border border-[#06b6d4]/30 flex items-center justify-center text-[#06b6d4] hover:bg-[#06b6d4]/25 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-8 h-8 rounded-xl bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/30 flex items-center justify-center text-[var(--color-accent)] hover:bg-[var(--color-accent)]/25 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Send size={13} />
               </button>
@@ -317,7 +317,7 @@ export function TemplateCard({ template, onUse, selected = false }: TemplateCard
         layout
         className={cn(
           'card glass-noise flex flex-col gap-0 overflow-hidden transition-all duration-200 group',
-          selected && 'ring-1 ring-[#06b6d4]/50 shadow-[0_0_24px_rgba(6,182,212,0.12)]'
+          selected && 'ring-1 ring-[var(--color-accent)]/50 shadow-[0_0_24px_rgba(6,182,212,0.12)]'
         )}
         whileHover={{ y: -2 }}
         transition={{ duration: 0.2 }}
@@ -325,7 +325,7 @@ export function TemplateCard({ template, onUse, selected = false }: TemplateCard
         {/* Badge */}
         {template.badge && (
           <div className="px-4 pt-3 pb-0">
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#06b6d4]/15 border border-[#06b6d4]/30 text-[#06b6d4] font-semibold">
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/30 text-[var(--color-accent)] font-semibold">
               {template.badge}
             </span>
           </div>
@@ -339,7 +339,7 @@ export function TemplateCard({ template, onUse, selected = false }: TemplateCard
               {template.icon}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-white text-sm leading-tight group-hover:text-[#06b6d4] transition-colors">
+              <h3 className="font-semibold text-white text-sm leading-tight group-hover:text-[var(--color-accent)] transition-colors">
                 {template.name}
               </h3>
               <p className="text-xs text-[var(--text-secondary)] mt-0.5 line-clamp-2 leading-relaxed">
@@ -415,7 +415,7 @@ export function TemplateCard({ template, onUse, selected = false }: TemplateCard
           </button>
           <button
             onClick={() => onUse(template.id)}
-            className="flex-1 flex items-center justify-center gap-1.5 text-xs py-2 rounded-lg bg-[#06b6d4]/10 border border-[#06b6d4]/30 text-[#06b6d4] hover:bg-[#06b6d4]/20 hover:border-[#06b6d4]/50 transition-all duration-150 font-medium"
+            className="flex-1 flex items-center justify-center gap-1.5 text-xs py-2 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 hover:border-[var(--color-accent)]/50 transition-all duration-150 font-medium"
           >
             Use
             <ArrowRight size={12} />

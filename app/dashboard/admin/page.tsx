@@ -167,7 +167,7 @@ function StatCard({
   color?: 'cyan' | 'purple' | 'emerald' | 'amber' | 'red';
 }) {
   const colors = {
-    cyan: 'bg-[#06b6d4]/15 text-[#06b6d4]',
+    cyan: 'bg-[var(--color-accent)]/15 text-[var(--color-accent)]',
     purple: 'bg-purple-500/15 text-purple-400',
     emerald: 'bg-emerald-500/15 text-emerald-400',
     amber: 'bg-amber-500/15 text-amber-400',
@@ -555,7 +555,7 @@ export default function AdminDashboardPage() {
               {/* Users by tier */}
               <div className="card glass-noise p-5 space-y-4">
                 <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                  <Users size={14} className="text-[#06b6d4]" />
+                  <Users size={14} className="text-[var(--color-accent)]" />
                   Users by Tier
                 </h3>
                 {Object.entries(usersByTier).map(([tier, count]) => {
@@ -589,7 +589,7 @@ export default function AdminDashboardPage() {
                   <span className="text-sm font-semibold text-white">
                     {tickets.filter(t => t.status === 'open').length} open support ticket{tickets.filter(t => t.status === 'open').length !== 1 ? 's' : ''}
                   </span>
-                  <button onClick={() => setActiveTab('tickets')} className="ml-auto text-xs text-[#06b6d4] hover:text-[var(--text-primary)] transition-colors">
+                  <button onClick={() => setActiveTab('tickets')} className="ml-auto text-xs text-[var(--color-accent)] hover:text-[var(--text-primary)] transition-colors">
                     View all
                   </button>
                 </div>
@@ -954,7 +954,7 @@ export default function AdminDashboardPage() {
                     {selectedTicket.messages.map((msg, i) => (
                       <div key={i} className={`flex gap-2 ${msg.role === 'admin' ? 'flex-row-reverse' : ''}`}>
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold ${
-                          msg.role === 'admin' ? 'bg-purple-500/20 text-purple-300' : 'bg-[#06b6d4]/20 text-[#06b6d4]'
+                          msg.role === 'admin' ? 'bg-purple-500/20 text-purple-300' : 'bg-[var(--color-accent)]/20 text-[var(--color-accent)]'
                         }`}>
                           {msg.role === 'admin' ? 'A' : 'U'}
                         </div>
@@ -1052,7 +1052,7 @@ export default function AdminDashboardPage() {
                 <div className="card glass-noise p-5">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-sm font-semibold text-white flex items-center gap-2">
-                      <Cpu size={14} className="text-[#06b6d4]" />
+                      <Cpu size={14} className="text-[var(--color-accent)]" />
                       API Memory Usage
                     </span>
                     <span className="text-xs text-[var(--text-muted)]">
@@ -1061,7 +1061,7 @@ export default function AdminDashboardPage() {
                   </div>
                   <div className="h-2 rounded-full bg-[rgba(46,43,74,0.4)]">
                     <div
-                      className="h-full rounded-full bg-gradient-to-r from-[#06b6d4] to-purple-500"
+                      className="h-full rounded-full bg-gradient-to-r from-[var(--color-accent)] to-purple-500"
                       style={{ width: `${Math.min(100, Math.round((health.api.memory.used / health.api.memory.total) * 100))}%` }}
                     />
                   </div>

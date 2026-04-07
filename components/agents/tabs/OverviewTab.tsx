@@ -200,7 +200,7 @@ function HealthPerformanceSection({ agentId, isActive }: { agentId: string; isAc
     <GlassCard>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Heart size={14} className="text-[#06b6d4]" />
+          <Heart size={14} className="text-[var(--color-accent)]" />
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Health & Performance</h3>
           {data && (
             <ResourceAlertBadge
@@ -211,7 +211,7 @@ function HealthPerformanceSection({ agentId, isActive }: { agentId: string; isAc
         </div>
         <button
           onClick={() => { setLoading(true); fetchMonitoring(); }}
-          className="text-[11px] px-2 py-1 rounded-lg border border-white/10 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all text-[var(--text-muted)] hover:text-[var(--text-secondary)] flex items-center gap-1 cursor-pointer"
+          className="text-[11px] px-2 py-1 rounded-lg border border-white/10 hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5 transition-all text-[var(--text-muted)] hover:text-[var(--text-secondary)] flex items-center gap-1 cursor-pointer"
         >
           <RefreshCw size={10} />
           Refresh
@@ -267,7 +267,7 @@ function HealthPerformanceSection({ agentId, isActive }: { agentId: string; isAc
           value={data.resources.cpuPercent}
           max={100}
           unit="%"
-          color="bg-[#06b6d4]"
+          color="bg-[var(--color-accent)]"
         />
         <ResourceBar
           label="Memory"
@@ -290,7 +290,7 @@ function HealthPerformanceSection({ agentId, isActive }: { agentId: string; isAc
       {(data.responseTimes.avg > 0 || data.responseTimes.last > 0) && (
         <div className="border-t border-[var(--border-default)] pt-3">
           <div className="flex items-center gap-1.5">
-            <Zap size={12} className="text-[#06b6d4]" />
+            <Zap size={12} className="text-[var(--color-accent)]" />
             <span className="text-xs text-[var(--text-muted)]">Response Times</span>
             <span className="text-[10px] text-[var(--text-muted)] ml-auto">Tracking coming soon</span>
           </div>
@@ -335,10 +335,10 @@ const ACTIVITY_COLOR: Record<ActivityEventType, string> = {
   started: 'text-emerald-400 bg-emerald-500/15',
   stopped: 'text-amber-400 bg-amber-500/15',
   restarted: 'text-blue-400 bg-blue-500/15',
-  config_updated: 'text-[#06b6d4] bg-[#06b6d4]/15',
+  config_updated: 'text-[var(--color-accent)] bg-[var(--color-accent)]/15',
   error: 'text-red-400 bg-red-500/15',
   message_burst: 'text-purple-400 bg-purple-500/15',
-  version_deployed: 'text-[#06b6d4] bg-[#06b6d4]/15',
+  version_deployed: 'text-[var(--color-accent)] bg-[var(--color-accent)]/15',
   created: 'text-emerald-400 bg-emerald-500/15',
 };
 
@@ -425,7 +425,7 @@ function ActivityFeedSection({ agentId, agent }: { agentId: string; agent: impor
     <GlassCard className="!p-0 overflow-hidden">
       <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border-default)]">
         <div className="flex items-center gap-2">
-          <Activity size={14} className="text-[#06b6d4]" />
+          <Activity size={14} className="text-[var(--color-accent)]" />
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Activity</h3>
           <span className="flex items-center gap-1 text-[9px] text-[var(--text-muted)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded-full">
             Last 24h
@@ -433,7 +433,7 @@ function ActivityFeedSection({ agentId, agent }: { agentId: string; agent: impor
         </div>
         <button
           onClick={() => { setLoading(true); fetchActivity(); }}
-          className="text-[11px] px-2 py-1 rounded-lg border border-white/10 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all text-[var(--text-muted)] hover:text-[var(--text-secondary)] flex items-center gap-1 cursor-pointer"
+          className="text-[11px] px-2 py-1 rounded-lg border border-white/10 hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5 transition-all text-[var(--text-muted)] hover:text-[var(--text-secondary)] flex items-center gap-1 cursor-pointer"
         >
           <RefreshCw size={10} />
           Refresh
@@ -562,8 +562,8 @@ export function OverviewTab() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <GlassCard>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#06b6d4]/15 flex items-center justify-center">
-              <MessageSquare size={18} className="text-[#06b6d4]" />
+            <div className="w-10 h-10 rounded-lg bg-[var(--color-accent)]/15 flex items-center justify-center">
+              <MessageSquare size={18} className="text-[var(--color-accent)]" />
             </div>
             <div className="flex-1">
               <div className="text-2xl font-bold text-[var(--text-primary)] tabular-nums">
@@ -575,7 +575,7 @@ export function OverviewTab() {
             {/* Mini bar chart indicator */}
             <div className="flex items-end gap-[2px] h-5 self-end">
               {[0.4, 0.6, 0.3, 0.8, 0.5, 0.9, 0.7].map((h, i) => (
-                <div key={i} className="w-[2px] rounded-full bg-[#06b6d4]/30" style={{ height: `${h * 20}px` }} />
+                <div key={i} className="w-[2px] rounded-full bg-[var(--color-accent)]/30" style={{ height: `${h * 20}px` }} />
               ))}
             </div>
           </div>
@@ -669,7 +669,7 @@ export function OverviewTab() {
       {/* Framework Capabilities */}
       <GlassCard>
         <div className="flex items-center gap-2 mb-4">
-          <Zap size={14} className="text-[#06b6d4]" />
+          <Zap size={14} className="text-[var(--color-accent)]" />
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Framework Capabilities</h3>
           <span className={`text-[10px] px-2 py-0.5 rounded-full border ${FRAMEWORK_BADGE[agent.framework] ?? 'bg-[var(--bg-card)] text-white/60 border-white/10'}`}>
             {frameworkMeta?.name ?? agent.framework}
@@ -742,7 +742,7 @@ export function OverviewTab() {
       <GlassCard className="!p-0 overflow-hidden">
         <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
-            <ScrollText size={14} className="text-[#06b6d4]" />
+            <ScrollText size={14} className="text-[var(--color-accent)]" />
             <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Live Logs</h3>
             {isActive && (
               <span className="flex items-center gap-1 text-[9px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">
@@ -753,7 +753,7 @@ export function OverviewTab() {
           </div>
           <button
             onClick={() => setTab('logs')}
-            className="text-[11px] px-3 py-1 rounded-lg border border-white/10 hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all text-[var(--text-muted)] hover:text-[var(--text-secondary)] cursor-pointer"
+            className="text-[11px] px-3 py-1 rounded-lg border border-white/10 hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5 transition-all text-[var(--text-muted)] hover:text-[var(--text-secondary)] cursor-pointer"
           >
             View All
           </button>
@@ -787,28 +787,28 @@ export function OverviewTab() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <button
           onClick={() => setTab('chat')}
-          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[var(--text-secondary)] bg-[var(--bg-elevated)] cursor-pointer"
+          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5 transition-all duration-200 text-sm text-[var(--text-secondary)] bg-[var(--bg-elevated)] cursor-pointer"
         >
-          <div className="w-9 h-9 rounded-xl bg-[#06b6d4]/10 flex items-center justify-center group-hover/btn:bg-[#06b6d4]/15 transition-colors">
-            <MessageSquare size={16} className="text-[#06b6d4]" />
+          <div className="w-9 h-9 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center group-hover/btn:bg-[var(--color-accent)]/15 transition-colors">
+            <MessageSquare size={16} className="text-[var(--color-accent)]" />
           </div>
           Chat
         </button>
         <button
           onClick={() => setTab('logs')}
-          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[var(--text-secondary)] bg-[var(--bg-elevated)] cursor-pointer"
+          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5 transition-all duration-200 text-sm text-[var(--text-secondary)] bg-[var(--bg-elevated)] cursor-pointer"
         >
-          <div className="w-9 h-9 rounded-xl bg-[#06b6d4]/10 flex items-center justify-center group-hover/btn:bg-[#06b6d4]/15 transition-colors">
-            <ScrollText size={16} className="text-[#06b6d4]" />
+          <div className="w-9 h-9 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center group-hover/btn:bg-[var(--color-accent)]/15 transition-colors">
+            <ScrollText size={16} className="text-[var(--color-accent)]" />
           </div>
           Full Logs
         </button>
         <button
           onClick={() => setTab('config')}
-          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-[var(--border-default)] hover:border-[#06b6d4]/30 hover:bg-[#06b6d4]/5 transition-all duration-200 text-sm text-[var(--text-secondary)] bg-[var(--bg-elevated)] cursor-pointer"
+          className="group/btn flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5 transition-all duration-200 text-sm text-[var(--text-secondary)] bg-[var(--bg-elevated)] cursor-pointer"
         >
-          <div className="w-9 h-9 rounded-xl bg-[#06b6d4]/10 flex items-center justify-center group-hover/btn:bg-[#06b6d4]/15 transition-colors">
-            <Settings size={16} className="text-[#06b6d4]" />
+          <div className="w-9 h-9 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center group-hover/btn:bg-[var(--color-accent)]/15 transition-colors">
+            <Settings size={16} className="text-[var(--color-accent)]" />
           </div>
           Configure
         </button>

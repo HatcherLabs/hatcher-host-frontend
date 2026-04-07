@@ -74,7 +74,7 @@ function CodeTabs({ examples }: { examples: Record<Lang, string> }) {
               className={cn(
                 'px-4 py-2.5 text-xs font-medium transition-all duration-200',
                 active === lang
-                  ? 'text-[#06b6d4] border-b-2 border-[#06b6d4]'
+                  ? 'text-[var(--color-accent)] border-b-2 border-[var(--color-accent)]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
               )}
             >
@@ -84,7 +84,7 @@ function CodeTabs({ examples }: { examples: Record<Lang, string> }) {
         </div>
         <button
           onClick={handleCopy}
-          className="mr-2 p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[#06b6d4] hover:bg-[#06b6d4]/10 transition-all duration-200"
+          className="mr-2 p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 transition-all duration-200"
           aria-label="Copy code"
         >
           {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
@@ -102,7 +102,7 @@ function CodeTabs({ examples }: { examples: Record<Lang, string> }) {
 function MethodBadge({ method }: { method: string }) {
   const colors: Record<string, string> = {
     GET: 'bg-green-500/15 text-green-400 border-green-500/25',
-    POST: 'bg-[#06b6d4]/15 text-[#06b6d4] border-[#06b6d4]/25',
+    POST: 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] border-[var(--color-accent)]/25',
     PUT: 'bg-blue-500/15 text-blue-400 border-blue-500/25',
     PATCH: 'bg-amber-500/15 text-amber-400 border-amber-500/25',
     DELETE: 'bg-red-500/15 text-red-400 border-red-500/25',
@@ -151,10 +151,10 @@ function EndpointCard({ method, path, description, body, response, examples }: E
           transition={{ duration: 0.2 }}
           className={cn(
             'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors',
-            open ? 'bg-[#06b6d4]/15' : 'bg-[var(--bg-card)]'
+            open ? 'bg-[var(--color-accent)]/15' : 'bg-[var(--bg-card)]'
           )}
         >
-          <ChevronDown className={cn('w-4 h-4 transition-colors', open ? 'text-[#06b6d4]' : 'text-[var(--text-muted)]')} />
+          <ChevronDown className={cn('w-4 h-4 transition-colors', open ? 'text-[var(--color-accent)]' : 'text-[var(--text-muted)]')} />
         </motion.div>
       </button>
       <AnimatePresence initial={false}>
@@ -545,7 +545,7 @@ export default function ApiReferencePage() {
         <motion.div variants={cardVariants} className="mb-8">
           <Link
             href="/docs"
-            className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[#06b6d4] transition-colors duration-200"
+            className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--color-accent)] transition-colors duration-200"
           >
             <ArrowLeft size={16} />
             Back to Docs
@@ -554,7 +554,7 @@ export default function ApiReferencePage() {
 
         {/* ── Hero ───────────────────────────────────────────── */}
         <motion.div variants={cardVariants} className="mb-12">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#06b6d4]/20 bg-[#06b6d4]/5 px-4 py-1.5 text-sm font-medium text-[#06b6d4]">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5 px-4 py-1.5 text-sm font-medium text-[var(--color-accent)]">
             <BookOpen className="h-4 w-4" />
             v1
           </div>
@@ -573,8 +573,8 @@ export default function ApiReferencePage() {
         <motion.div variants={cardVariants} className="mb-10">
           <div className="card glass-noise p-6">
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-[#06b6d4]/15 flex items-center justify-center">
-                <Shield size={16} className="text-[#06b6d4]" />
+              <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)]/15 flex items-center justify-center">
+                <Shield size={16} className="text-[var(--color-accent)]" />
               </div>
               <h2
                 className="text-lg font-semibold text-[var(--text-primary)]"
@@ -586,22 +586,22 @@ export default function ApiReferencePage() {
 
             <p className="text-sm text-[var(--text-secondary)] mb-4 leading-relaxed">
               All API requests require authentication using your platform API key. Include it in
-              the <code className="px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] text-[#06b6d4] font-[family-name:var(--font-mono)] text-xs">Authorization</code> header
+              the <code className="px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] text-[var(--color-accent)] font-[family-name:var(--font-mono)] text-xs">Authorization</code> header
               as a Bearer token.
             </p>
 
             <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-base)] p-4 mb-4">
               <code className="text-sm font-[family-name:var(--font-mono)] text-[var(--text-secondary)]">
-                Authorization: Bearer <span className="text-[#06b6d4]">hk_your_api_key</span>
+                Authorization: Bearer <span className="text-[var(--color-accent)]">hk_your_api_key</span>
               </code>
             </div>
 
             <p className="text-sm text-[var(--text-secondary)] mb-4 leading-relaxed">
               You can find and regenerate your API key on the{' '}
-              <Link href="/settings" className="text-[#06b6d4] hover:underline underline-offset-2 decoration-[#06b6d4]/30">
+              <Link href="/settings" className="text-[var(--color-accent)] hover:underline underline-offset-2 decoration-[var(--color-accent)]/30">
                 Settings page
               </Link>
-              . Keys are prefixed with <code className="px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] text-[#06b6d4] font-[family-name:var(--font-mono)] text-xs">hk_</code> for easy identification.
+              . Keys are prefixed with <code className="px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] text-[var(--color-accent)] font-[family-name:var(--font-mono)] text-xs">hk_</code> for easy identification.
             </p>
 
             <CodeTabs
@@ -634,8 +634,8 @@ data = res.json()['data']`,
         <motion.div variants={cardVariants} className="mb-10">
           <div className="card glass-noise p-6">
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-[#06b6d4]/15 flex items-center justify-center">
-                <Zap size={16} className="text-[#06b6d4]" />
+              <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)]/15 flex items-center justify-center">
+                <Zap size={16} className="text-[var(--color-accent)]" />
               </div>
               <h2
                 className="text-lg font-semibold text-[var(--text-primary)]"
@@ -682,7 +682,7 @@ data = res.json()['data']`,
                 { header: 'X-RateLimit-Reset', desc: 'UTC timestamp when the limit resets' },
               ].map((h) => (
                 <div key={h.header} className="flex items-center gap-3 text-sm">
-                  <code className="px-2 py-0.5 rounded bg-[var(--bg-elevated)] text-[#06b6d4] font-[family-name:var(--font-mono)] text-xs flex-shrink-0">
+                  <code className="px-2 py-0.5 rounded bg-[var(--bg-elevated)] text-[var(--color-accent)] font-[family-name:var(--font-mono)] text-xs flex-shrink-0">
                     {h.header}
                   </code>
                   <span className="text-[var(--text-muted)]">{h.desc}</span>
@@ -704,8 +704,8 @@ data = res.json()['data']`,
             return (
               <motion.div key={group.title} variants={staggerItem}>
                 <div className="flex items-center gap-2.5 mb-4">
-                  <div className="w-8 h-8 rounded-lg bg-[#06b6d4]/15 flex items-center justify-center">
-                    <Icon size={16} className="text-[#06b6d4]" />
+                  <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)]/15 flex items-center justify-center">
+                    <Icon size={16} className="text-[var(--color-accent)]" />
                   </div>
                   <h2
                     className="text-lg font-semibold text-[var(--text-primary)]"
@@ -728,8 +728,8 @@ data = res.json()['data']`,
         <motion.div variants={cardVariants} className="mb-10">
           <div className="card glass-noise p-6">
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-[#06b6d4]/15 flex items-center justify-center">
-                <BarChart3 size={16} className="text-[#06b6d4]" />
+              <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)]/15 flex items-center justify-center">
+                <BarChart3 size={16} className="text-[var(--color-accent)]" />
               </div>
               <h2
                 className="text-lg font-semibold text-[var(--text-primary)]"
@@ -796,14 +796,14 @@ data = res.json()['data']`,
                 <tbody>
                   {ERROR_CODES.map((err, i) => (
                     <tr key={err.code} className={cn('border-b border-[var(--border-default)] transition-colors hover:bg-[var(--bg-card)]', i === ERROR_CODES.length - 1 && 'border-b-0')}>
-                      <td className="px-4 py-3 font-[family-name:var(--font-mono)] text-xs text-[#06b6d4]">{err.code}</td>
+                      <td className="px-4 py-3 font-[family-name:var(--font-mono)] text-xs text-[var(--color-accent)]">{err.code}</td>
                       <td className="px-4 py-3">
                         <span className={cn(
                           'inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border',
                           err.http === '401' || err.http === '403' ? 'bg-amber-500/15 text-amber-400 border-amber-500/25' :
                           err.http === '404' ? 'bg-blue-500/15 text-blue-400 border-blue-500/25' :
                           err.http === '429' ? 'bg-purple-500/15 text-purple-400 border-purple-500/25' :
-                          err.http === '400' ? 'bg-[#06b6d4]/15 text-[#06b6d4] border-[#06b6d4]/25' :
+                          err.http === '400' ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] border-[var(--color-accent)]/25' :
                           err.http === '409' ? 'bg-amber-500/15 text-amber-400 border-amber-500/25' :
                           'bg-red-500/15 text-red-400 border-red-500/25'
                         )}>
@@ -828,13 +828,13 @@ data = res.json()['data']`,
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/docs/integrations"
-                className="inline-flex items-center gap-2 rounded-xl bg-[#06b6d4] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#06b6d4]/20 transition-all duration-200 hover:bg-[#0891b2] hover:shadow-[#06b6d4]/30"
+                className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[var(--color-accent)]/20 transition-all duration-200 hover:bg-[#0891b2] hover:shadow-[var(--color-accent)]/30"
               >
                 Integration Guides
               </Link>
               <Link
                 href="/docs"
-                className="inline-flex items-center gap-2 rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] px-5 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-200 hover:border-[#06b6d4]/30 hover:text-[var(--text-primary)]"
+                className="inline-flex items-center gap-2 rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] px-5 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-200 hover:border-[var(--color-accent)]/30 hover:text-[var(--text-primary)]"
               >
                 All Documentation
               </Link>

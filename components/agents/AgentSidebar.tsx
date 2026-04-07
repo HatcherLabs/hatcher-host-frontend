@@ -163,18 +163,18 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
                     aria-current={isActive ? 'page' : undefined}
                     className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150 relative cursor-pointer ${
                       isActive
-                        ? 'text-[var(--text-primary)] bg-[#06b6d4]/10'
+                        ? 'text-[var(--text-primary)] bg-[var(--color-accent)]/10'
                         : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-card)]'
                     }`}
                   >
                     {isActive && (
                       <motion.div
                         layoutId="sidebarActive"
-                        className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full bg-[#06b6d4]"
+                        className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full bg-[var(--color-accent)]"
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                       />
                     )}
-                    <span className={isActive ? 'text-[#06b6d4]' : ''}>{t.icon}</span>
+                    <span className={isActive ? 'text-[var(--color-accent)]' : ''}>{t.icon}</span>
                     {t.label}
                   </button>
                 );
@@ -263,14 +263,14 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
                       aria-selected={isActive}
                       data-active={isActive}
                       onClick={() => onTabChange(t.id)}
-                      className={`relative flex flex-col items-center gap-0.5 px-3 py-2 min-w-[58px] flex-shrink-0 cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#06b6d4]/50 focus-visible:ring-inset ${
-                        isActive ? 'text-[#06b6d4]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
+                      className={`relative flex flex-col items-center gap-0.5 px-3 py-2 min-w-[58px] flex-shrink-0 cursor-pointer transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]/50 focus-visible:ring-inset ${
+                        isActive ? 'text-[var(--color-accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
                       }`}
                     >
                       {isActive && (
                         <motion.div
                           layoutId="mobileTabUnderline"
-                          className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-[#06b6d4]"
+                          className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-[var(--color-accent)]"
                           transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                         />
                       )}

@@ -113,7 +113,7 @@ export async function GET(req: NextRequest) {
               display: 'flex',
               marginTop: 40,
               gap: 32,
-              color: '#52525b',
+              color: var(--text-muted),
               fontSize: 16,
               alignItems: 'center',
             }}

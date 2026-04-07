@@ -121,7 +121,7 @@ function StatusBadge({ status }: { status: string }) {
 const FRAMEWORK_META: Record<string, { label: string; color: string; style: string }> = {
   openclaw: { label: 'OpenClaw', color: '#f59e0b', style: 'bg-amber-500/10 text-amber-400 border-amber-500/25' },
   hermes: { label: 'Hermes', color: '#a855f7', style: 'bg-purple-500/10 text-purple-400 border-purple-500/25' },
-  elizaos: { label: 'ElizaOS', color: '#06b6d4', style: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/25' },
+  elizaos: { label: 'ElizaOS', color: 'var(--color-accent)', style: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/25' },
   milady: { label: 'Milady', color: '#f43f5e', style: 'bg-rose-500/10 text-rose-400 border-rose-500/25' },
 };
 
@@ -395,7 +395,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-full border-2 border-[#06b6d4] border-t-transparent animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 rounded-full border-2 border-[var(--color-accent)] border-t-transparent animate-spin mx-auto mb-4" />
           <p className="text-[var(--text-secondary)]">Authenticating...</p>
         </div>
       </div>
@@ -411,8 +411,8 @@ export default function AdminPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <div className="w-20 h-20 rounded-2xl bg-[#06b6d4]/15 flex items-center justify-center mx-auto mb-6">
-            <Zap size={40} className="text-[#06b6d4]" />
+          <div className="w-20 h-20 rounded-2xl bg-[var(--color-accent)]/15 flex items-center justify-center mx-auto mb-6">
+            <Zap size={40} className="text-[var(--color-accent)]" />
           </div>
           <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">
             Sign In Required
@@ -499,8 +499,8 @@ export default function AdminPage() {
           variants={cardVariants}
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#06b6d4]/15 flex items-center justify-center flex-shrink-0">
-              <Shield size={20} className="text-[#06b6d4]" />
+            <div className="w-10 h-10 rounded-xl bg-[var(--color-accent)]/15 flex items-center justify-center flex-shrink-0">
+              <Shield size={20} className="text-[var(--color-accent)]" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-[var(--text-primary)]">
@@ -531,7 +531,7 @@ export default function AdminPage() {
                 label="Total Users"
                 value={stats.totalUsers}
                 icon={Users}
-                iconColor="#06b6d4"
+                iconColor="var(--color-accent)"
               />
               <StatCard
                 label="Total Agents"
@@ -570,7 +570,7 @@ export default function AdminPage() {
                 label="New Users 7d"
                 value={stats.newUsersLast7d}
                 icon={UserPlus}
-                iconColor="#06b6d4"
+                iconColor="var(--color-accent)"
               />
             </div>
           </div>
@@ -584,8 +584,8 @@ export default function AdminPage() {
               {/* Framework Distribution */}
               <motion.div className="card glass-noise p-5" variants={cardVariants}>
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-lg bg-[#06b6d4]/12 flex items-center justify-center flex-shrink-0">
-                    <BarChart3 size={16} className="text-[#06b6d4]" />
+                  <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)]/12 flex items-center justify-center flex-shrink-0">
+                    <BarChart3 size={16} className="text-[var(--color-accent)]" />
                   </div>
                   <div>
                     <h3 className="text-sm font-semibold text-[var(--text-primary)]">Framework Distribution</h3>
@@ -698,8 +698,8 @@ export default function AdminPage() {
                         className={`flex items-center justify-between py-2.5 ${i < recentAgents.length - 1 ? 'border-b border-[var(--border-default)]' : ''}`}
                       >
                         <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <div className="w-7 h-7 rounded-lg bg-[#06b6d4]/10 flex items-center justify-center flex-shrink-0">
-                            <Bot size={12} className="text-[#06b6d4]" />
+                          <div className="w-7 h-7 rounded-lg bg-[var(--color-accent)]/10 flex items-center justify-center flex-shrink-0">
+                            <Bot size={12} className="text-[var(--color-accent)]" />
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-xs font-medium text-[var(--text-primary)] truncate">{agent.name}</p>
@@ -783,7 +783,7 @@ export default function AdminPage() {
                   onClick={() => setActiveTab(tab)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-2 ${
                     activeTab === tab
-                      ? 'text-[var(--text-primary)] bg-[#06b6d4]/20'
+                      ? 'text-[var(--text-primary)] bg-[var(--color-accent)]/20'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                   }`}
                 >
@@ -814,7 +814,7 @@ export default function AdminPage() {
                         onClick={() => setStatusFilter(f.key)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 ${
                           statusFilter === f.key
-                            ? 'text-[var(--text-primary)] bg-[#06b6d4]/20'
+                            ? 'text-[var(--text-primary)] bg-[var(--color-accent)]/20'
                             : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                         }`}
                       >
@@ -873,8 +873,8 @@ export default function AdminPage() {
                             {/* Agent name */}
                             <td className="py-3.5 pr-4">
                               <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-[#06b6d4]/12 flex items-center justify-center flex-shrink-0">
-                                  <Bot size={14} className="text-[#06b6d4]" />
+                                <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)]/12 flex items-center justify-center flex-shrink-0">
+                                  <Bot size={14} className="text-[var(--color-accent)]" />
                                 </div>
                                 <div className="min-w-0">
                                   <p className="text-sm font-medium truncate max-w-[180px] text-[var(--text-primary)]">
@@ -1004,8 +1004,8 @@ export default function AdminPage() {
                           {/* User */}
                           <td className="py-3.5 pr-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-[#06b6d4]/12 flex items-center justify-center flex-shrink-0">
-                                <Users size={14} className="text-[#06b6d4]" />
+                              <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)]/12 flex items-center justify-center flex-shrink-0">
+                                <Users size={14} className="text-[var(--color-accent)]" />
                               </div>
                               <div>
                                 <span className="text-xs font-medium text-[var(--text-primary)] block">{user.username}</span>
@@ -1082,7 +1082,7 @@ export default function AdminPage() {
                         onClick={() => setTicketFilter(f)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 capitalize ${
                           ticketFilter === f
-                            ? 'text-[var(--text-primary)] bg-[#06b6d4]/20'
+                            ? 'text-[var(--text-primary)] bg-[var(--color-accent)]/20'
                             : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                         }`}
                       >
@@ -1146,7 +1146,7 @@ export default function AdminPage() {
                                 href={`/admin/tickets/${ticket.id}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#06b6d4]/10 text-[#06b6d4] border border-[#06b6d4]/20 hover:bg-[#06b6d4]/20 transition-colors"
+                                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20 hover:bg-[var(--color-accent)]/20 transition-colors"
                               >
                                 Open
                                 <ExternalLink size={10} />
@@ -1203,7 +1203,7 @@ export default function AdminPage() {
                   <div className="rounded-xl border border-[var(--border-default)] p-4 bg-[var(--bg-elevated)]">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <Server size={16} className="text-[#06b6d4]" />
+                        <Server size={16} className="text-[var(--color-accent)]" />
                         <span className="text-sm font-semibold text-[var(--text-primary)]">API</span>
                       </div>
                       {statusDot(health.api.status)}
@@ -1292,7 +1292,7 @@ export default function AdminPage() {
                   <div className="w-full h-3 rounded-full bg-[rgba(46,43,74,0.4)] overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
-                        health.disk.percent > 90 ? 'bg-red-500' : health.disk.percent > 70 ? 'bg-amber-500' : 'bg-[#06b6d4]'
+                        health.disk.percent > 90 ? 'bg-red-500' : health.disk.percent > 70 ? 'bg-amber-500' : 'bg-[var(--color-accent)]'
                       }`}
                       style={{ width: `${health.disk.percent}%` }}
                     />
@@ -1418,7 +1418,7 @@ export default function AdminPage() {
                     <button
                       onClick={handleRunBackup}
                       disabled={backupRunning}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#06b6d4]/10 text-[#06b6d4] border border-[#06b6d4]/20 hover:bg-[#06b6d4]/20 transition-colors disabled:opacity-40"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20 hover:bg-[var(--color-accent)]/20 transition-colors disabled:opacity-40"
                     >
                       {backupRunning ? <RefreshCw size={12} className="animate-spin" /> : <Play size={12} />}
                       {backupRunning ? 'Running...' : 'Run Backup Now'}
