@@ -849,7 +849,7 @@ export function StatsTab() {
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-[var(--border-default)]">
+                <div className="grid grid-cols-3 sm:grid-cols-3 gap-2 sm:gap-3 mt-4 pt-4 border-t border-[var(--border-default)]">
                   {[
                     { icon: Hash, label: 'Total', value: analytics.totalMessages.toLocaleString() },
                     { icon: TrendingUp, label: 'Avg/Day', value: String(analytics.avgPerDay) },
@@ -922,7 +922,7 @@ export function StatsTab() {
               </div>
             ) : deep && deep.responseTimes.totalPairs > 0 ? (
               <>
-                <div className="grid grid-cols-3 gap-3 mb-5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
                   {[
                     { label: 'Average', value: formatMs(deep.responseTimes.avgMs) },
                     { label: 'Median (P50)', value: formatMs(deep.responseTimes.p50Ms) },
@@ -993,7 +993,7 @@ export function StatsTab() {
                   )}
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 {[
                   { icon: CheckCircle, label: 'Success', value: `${(100 - deep.errorRate.rate).toFixed(1)}%`, bg: 'bg-emerald-500/10', hex: '#22c55e' },
                   { icon: AlertTriangle, label: 'Error Rate', value: `${deep.errorRate.rate.toFixed(1)}%`, bg: 'bg-red-500/10', hex: '#ef4444' },
@@ -1034,7 +1034,7 @@ export function StatsTab() {
                   <div className="transition-all" style={{ width: `${(analytics.tokens.outputTokens / analytics.tokens.totalTokens) * 100}%`, background: theme.gradientDim, opacity: 0.6 }} />
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 {[
                   { icon: Activity, label: 'Input', value: formatTokens(analytics.tokens.inputTokens), color: theme.primary, dim: false },
                   { icon: Activity, label: 'Output', value: formatTokens(analytics.tokens.outputTokens), color: theme.primary, dim: true },
@@ -1197,7 +1197,7 @@ export function StatsTab() {
                     <span className="text-sm font-medium">{monData.errors.last24h} error{monData.errors.last24h > 1 ? 's' : ''}</span>
                   </div>
                   {monData.errors.lastError && (
-                    <p className="text-xs text-zinc-500 font-mono bg-zinc-900 rounded-lg px-3 py-2 overflow-x-auto">{monData.errors.lastError}</p>
+                    <p className="text-xs text-[var(--text-muted)] font-mono bg-[var(--bg-card)] rounded-lg px-3 py-2 overflow-x-auto">{monData.errors.lastError}</p>
                   )}
                 </div>
               )}
@@ -1207,9 +1207,9 @@ export function StatsTab() {
             <div className={`rounded-xl border ${fwColors.border} bg-[var(--bg-elevated)]/80 p-4`}>
               <div className="flex items-center gap-2 mb-4">
                 <Zap size={16} className={fwColors.text} />
-                <span className="text-xs text-zinc-500 uppercase tracking-wider">Response Times</span>
+                <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider">Response Times</span>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-2 sm:gap-4">
                 {[
                   { label: 'Average', value: monData.responseTimes.avg },
                   { label: 'P95', value: monData.responseTimes.p95 },
