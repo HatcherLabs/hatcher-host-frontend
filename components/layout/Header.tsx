@@ -123,6 +123,7 @@ export function Header() {
   const mobileLinks = isAuthenticated ? MOBILE_AUTH_LINKS : MOBILE_GUEST_LINKS;
 
   return (
+    <>
     <header className="sticky top-0 z-50 border-b border-[var(--border-default)] backdrop-blur-xl" style={{ backgroundColor: 'color-mix(in srgb, var(--bg-base) 80%, transparent)' }}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between">
@@ -368,12 +369,14 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile dropdown */}
+    </header>
+
+      {/* Mobile dropdown — MUST be outside <header> because backdrop-blur creates a stacking context that breaks position:fixed children */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             id="mobile-nav-menu"
-            className="lg:hidden fixed inset-0 z-40 overflow-y-auto"
+            className="lg:hidden fixed inset-0 z-[60] overflow-y-auto"
             style={{ backgroundColor: 'var(--bg-base)', top: '57px' }}
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -465,6 +468,6 @@ export function Header() {
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }
