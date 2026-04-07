@@ -240,6 +240,7 @@ export default function BillingPage() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [creditBalance, setCreditBalance] = useState(0);
   const [cancellingSubscription, setCancellingSubscription] = useState(false);
+  const [subscriptionCancelled, setSubscriptionCancelled] = useState(false);
   const [openingPortal, setOpeningPortal] = useState(false);
   const [creditHistory, setCreditHistory] = useState<Array<{
     id: string; amount: number; balance: number; type: string; description: string | null; createdAt: string;
@@ -467,6 +468,7 @@ export default function BillingPage() {
     try {
       const res = await api.stripeCancelSubscription();
       if (res.success) {
+        setSubscriptionCancelled(true);
         await loadAccountData();
         showSuccess('Subscription cancelled. You will keep access until the end of your billing period.');
       } else {
@@ -490,9 +492,11 @@ export default function BillingPage() {
         window.location.href = res.data.url;
         return;
       }
-      setError(res.error ?? 'Failed to open billing portal');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to open billing portal');
+      // Portal not configured — redirect to support
+      window.location.href = '/support?topic=billing';
+    } catch {
+      // Portal endpoint unavailable — redirect to support
+      window.location.href = '/support?topic=billing';
     } finally {
       setOpeningPortal(false);
     }
@@ -708,19 +712,27 @@ export default function BillingPage() {
                 <button
                   onClick={handleOpenPortal}
                   disabled={openingPortal}
+                  title="Manage payment method, invoices, and billing details"
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border border-[var(--color-accent)]/30 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 disabled:opacity-50 transition-colors"
                 >
                   {openingPortal ? <Loader2 className="w-3 h-3 animate-spin" /> : <CreditCard className="w-3 h-3" />}
                   Manage Billing
                 </button>
-                <button
-                  onClick={handleCancelSubscription}
-                  disabled={cancellingSubscription}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border border-red-500/20 text-red-400 hover:bg-red-500/10 disabled:opacity-50 transition-colors"
-                >
-                  {cancellingSubscription ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
-                  Cancel Plan
-                </button>
+                {subscriptionCancelled ? (
+                  <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border border-amber-500/20 text-amber-400 bg-amber-500/5">
+                    <Clock className="w-3 h-3" />
+                    Cancellation scheduled
+                  </span>
+                ) : (
+                  <button
+                    onClick={handleCancelSubscription}
+                    disabled={cancellingSubscription}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold border border-red-500/20 text-red-400 hover:bg-red-500/10 disabled:opacity-50 transition-colors"
+                  >
+                    {cancellingSubscription ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
+                    Cancel Plan
+                  </button>
+                )}
               </div>
             )}
           </div>

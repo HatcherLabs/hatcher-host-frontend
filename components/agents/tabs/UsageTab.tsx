@@ -201,7 +201,7 @@ function MessageProgressBar({ used, limit }: { used: number; limit: number }) {
 }
 
 export function UsageTab() {
-  const { agent } = useAgentContext();
+  const { agent, isActive } = useAgentContext();
   const { user } = useAuth();
   const [data, setData] = useState<UsageData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -419,7 +419,7 @@ export function UsageTab() {
                 <Cpu size={16} className="text-[var(--color-accent)]" />
                 <h3 className="text-sm font-semibold text-[var(--text-primary)]">Resources</h3>
               </div>
-              {data.uptime.status === 'active' ? (
+              {isActive ? (
                 <div className="space-y-4">
                   <div>
                     <div className="flex items-center gap-1.5 mb-1.5">
@@ -476,7 +476,7 @@ export function UsageTab() {
                   max={data.storage.limitMb}
                   label="MB used"
                 />
-                {data.storage.usedMb === 0 && data.uptime.status !== 'active' && (
+                {data.storage.usedMb === 0 && !isActive && (
                   <p className="text-[11px] text-[var(--text-muted)]">Start agent to measure storage</p>
                 )}
               </div>
