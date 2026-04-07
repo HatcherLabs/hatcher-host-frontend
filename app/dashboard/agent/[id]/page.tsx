@@ -192,7 +192,7 @@ export default function AgentManagePage() {
   const [sendCooldown, setSendCooldown] = useState(false);
   const sendCooldownRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [chatError, setChatError] = useState<string | null>(null);
-  const [chatErrorType, setChatErrorType] = useState<'timeout' | 'ratelimit' | 'network' | 'generic' | null>(null);
+  const [chatErrorType, setChatErrorType] = useState<'timeout' | 'ratelimit' | 'network' | 'llm_down' | 'generic' | null>(null);
   const [msgCount, setMsgCount] = useState(0);
 
   // Track whether history has been loaded from server (to avoid saving during load)
@@ -305,6 +305,9 @@ export default function AgentManagePage() {
       } else if (lower.includes('content policy') || lower.includes('filtered')) {
         setChatErrorType('generic');
         setChatError('Agent response was blocked by content policy.');
+      } else if (lower.includes('503') || lower.includes('no_groq_key') || lower.includes('service unavailable') || lower.includes('groq') || lower.includes('llm') || lower.includes('proxy_error')) {
+        setChatErrorType('llm_down');
+        setChatError('AI service is temporarily unavailable.');
       } else {
         setChatErrorType('generic');
         setChatError(errMsg);
@@ -977,6 +980,9 @@ export default function AgentManagePage() {
             setChatErrorType('ratelimit');
             setChatError('Daily message limit reached. Upgrade to Pro for more, or bring your own key for unlimited.');
             toast.warning('Daily limit reached. Upgrade to Pro or bring your own API key for unlimited.');
+          } else if (lower.includes('503') || lower.includes('no_groq_key') || lower.includes('service unavailable') || lower.includes('groq') || lower.includes('llm') || lower.includes('proxy_error')) {
+            setChatErrorType('llm_down');
+            setChatError('AI service is temporarily unavailable.');
           } else if (lower.includes('timeout') || lower.includes('504') || lower.includes('502')) {
             setChatErrorType('timeout');
             setChatError('Agent had trouble thinking. Try again.');
