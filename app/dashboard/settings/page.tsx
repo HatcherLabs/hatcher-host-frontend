@@ -59,7 +59,7 @@ function TierBadge({ tier }: { tier: string }) {
 
 // ── Avatar initials ─────────────────────────────────────────
 function getAvatarColor(name: string) {
-  const colors = [var(--color-accent), '#8b5cf6', '#10b981', '#f43f5e', '#6366f1', '#14b8a6', '#eab308'];
+  const colors = ['var(--color-accent)', '#8b5cf6', '#10b981', '#f43f5e', '#6366f1', '#14b8a6', '#eab308'];
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
   return colors[Math.abs(hash) % colors.length];

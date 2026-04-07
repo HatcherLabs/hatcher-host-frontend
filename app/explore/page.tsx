@@ -431,7 +431,7 @@ export default function ExplorePage() {
                     {val !== 'all' && (
                       <span
                         className="w-2 h-2 rounded-full"
-                        style={{ backgroundColor: frameworkFilter === val ? 'white' : (FRAMEWORK_COLORS[val]?.icon ?? var(--color-accent)) }}
+                        style={{ backgroundColor: frameworkFilter === val ? 'white' : (FRAMEWORK_COLORS[val]?.icon ?? 'var(--color-accent)') }}
                       />
                     )}
                     {label}

@@ -430,7 +430,7 @@ export default function CreatePage() {
         particleCount: 150,
         spread: 80,
         origin: { y: 0.6 },
-        colors: [var(--color-accent), var(--color-accent), '#fed7aa', '#FFFFFF'],
+        colors: ['var(--color-accent)', 'var(--color-accent)', '#fed7aa', '#FFFFFF'],
       });
 
       setTimeout(() => {
