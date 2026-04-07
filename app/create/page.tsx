@@ -525,11 +525,11 @@ export default function CreatePage() {
               />
             </div>
           </div>
-          <div className="flex items-center justify-center gap-0 overflow-x-auto px-2" role="list" aria-label="Creation steps">
+          <div className="grid grid-cols-4 w-full px-2" role="list" aria-label="Creation steps">
             {([1, 2, 3, 4] as Step[]).map((s, i) => (
               <div key={s} className="flex items-center" role="listitem" aria-current={s === step ? 'step' : undefined}>
-                {/* Step circle */}
-                <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+                {/* Step circle + label */}
+                <div className="flex flex-col items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
                   <motion.div
                     className={cn(
                       'w-8 h-8 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-300 border-2',
@@ -550,7 +550,7 @@ export default function CreatePage() {
                   </motion.div>
                   <span
                     className={cn(
-                      'text-[10px] sm:text-xs max-w-[70px] sm:max-w-[120px] text-center font-medium',
+                      'text-[9px] sm:text-xs w-full text-center font-medium leading-tight px-0.5',
                       s < step ? 'text-[var(--accent-400)]' : s === step ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'
                     )}
                   >
@@ -559,7 +559,7 @@ export default function CreatePage() {
                 </div>
                 {/* Connecting line */}
                 {i < 3 && (
-                  <div className="relative w-8 sm:w-32 mx-1 sm:mx-3 mb-5 sm:mb-6">
+                  <div className="relative w-4 sm:w-8 flex-shrink-0 mb-5 sm:mb-6">
                     <div className="h-0.5 rounded-full bg-[var(--border-default)]" />
                     <motion.div
                       className="absolute top-0 left-0 h-0.5 rounded-full"

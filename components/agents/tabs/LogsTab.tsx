@@ -6,7 +6,6 @@ import {
   ArrowDownToLine,
   Bug,
   Download,
-  Filter,
   Info,
   Lock,
   RotateCcw,
@@ -123,93 +122,97 @@ export function LogsTab() {
         </div>
       </div>
 
-      {/* ── Log count summary ── */}
+      {/* ── Toolbar: search + level filters + actions ── */}
       <div className="flex items-center gap-2 flex-wrap">
-        {(['info', 'warn', 'error', 'debug'] as const).map((level) => {
-          const cfg = LEVEL_BADGE_CONFIG[level];
-          const Icon = cfg.icon;
-          const count = counts[level];
-          if (count === 0 && level === 'debug') return null;
-          return (
+        {/* Search input */}
+        <div className="relative flex-1 min-w-[180px]">
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
+          <input
+            type="text"
+            value={logSearch}
+            onChange={(e) => setLogSearch(e.target.value)}
+            placeholder="Search logs..."
+            className="w-full bg-[var(--bg-card)] border border-[var(--border-default)] rounded-lg pl-8 pr-8 py-1.5 text-xs font-mono text-[var(--text-secondary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[#8b5cf6]/50 focus:bg-[var(--bg-elevated)] transition-all"
+          />
+          {logSearch && (
             <button
-              key={level}
-              onClick={() => setLogFilter(level === logFilter ? 'all' : level as LogFilter)}
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-mono transition-all cursor-pointer ${
-                logFilter === level
-                  ? `${cfg.bg} ${cfg.border} ${cfg.color}`
-                  : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-hover)] hover:text-[var(--text-secondary)]'
-              }`}
+              onClick={() => setLogSearch('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
             >
-              <Icon size={10} />
-              <span className="uppercase font-medium">{level}</span>
-              <span className={`ml-0.5 tabular-nums ${logFilter === level ? 'opacity-80' : 'opacity-50'}`}>{count}</span>
+              <X size={12} />
             </button>
-          );
-        })}
-        <span className="text-[10px] text-[var(--text-muted)]/60 ml-1 tabular-nums">{logs.length} total</span>
-      </div>
+          )}
+        </div>
 
-      {/* ── Filter bar ── */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <Filter size={14} className="text-[var(--text-muted)]" />
-        {(['all', 'info', 'warn', 'error'] as LogFilter[]).map((f) => {
-          const filterColors: Record<string, string> = {
-            all: '',
-            info: logFilter === f ? 'border-blue-500/40 bg-blue-500/10 text-blue-400' : '',
-            warn: logFilter === f ? 'border-amber-500/40 bg-amber-500/10 text-amber-400' : '',
-            error: logFilter === f ? 'border-red-500/40 bg-red-500/10 text-red-400' : '',
-          };
-          return (
-            <button
-              key={f}
-              onClick={() => setLogFilter(f)}
-              className={`text-xs px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
-                logFilter === f
-                  ? (filterColors[f] || 'border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--text-primary)]')
-                  : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)]'
-              }`}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-              <span className="text-[10px] opacity-60">{counts[f as keyof typeof counts] ?? 0}</span>
-            </button>
-          );
-        })}
+        {/* Level filter badges */}
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setLogFilter('all')}
+            className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer ${
+              logFilter === 'all'
+                ? 'border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--text-primary)]'
+                : 'border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
+            }`}
+          >
+            All <span className="opacity-60 text-[10px]">{logs.length}</span>
+          </button>
+          {(['info', 'warn', 'error', 'debug'] as const).map((level) => {
+            const cfg = LEVEL_BADGE_CONFIG[level];
+            const Icon = cfg.icon;
+            const count = counts[level];
+            if (count === 0 && level === 'debug') return null;
+            return (
+              <button
+                key={level}
+                onClick={() => setLogFilter(level === logFilter ? 'all' : level as LogFilter)}
+                className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-[10px] font-mono transition-all cursor-pointer ${
+                  logFilter === level
+                    ? `${cfg.bg} ${cfg.border} ${cfg.color}`
+                    : 'border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
+                }`}
+              >
+                <Icon size={10} />
+                <span className="uppercase font-medium">{level}</span>
+                <span className={`ml-0.5 tabular-nums ${logFilter === level ? 'opacity-80' : 'opacity-50'}`}>{count}</span>
+              </button>
+            );
+          })}
+        </div>
 
-        {/* SSE live indicator -- Pro only */}
-        {isActive && tab === 'logs' && isPro && (
-          <span className="flex items-center gap-1.5 ml-2 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20">
+        {/* Status / Pro badge */}
+        {isActive && tab === 'logs' && isPro ? (
+          <span className="flex items-center gap-1.5 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20">
             <span className="relative flex h-1.5 w-1.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
             </span>
             Live
           </span>
-        )}
-        {!isPro && (
-          <span className="flex items-center gap-1.5 ml-2 text-[10px] text-[#8b5cf6] bg-[#8b5cf6]/10 px-2 py-1 rounded-full border border-[#8b5cf6]/20">
+        ) : !isPro ? (
+          <span className="flex items-center gap-1.5 text-[10px] text-[#8b5cf6] bg-[#8b5cf6]/10 px-2 py-1 rounded-full border border-[#8b5cf6]/20">
             <Lock size={10} />
             Pro
           </span>
-        )}
+        ) : null}
 
-        {/* Auto-scroll toggle */}
+        {/* Action buttons */}
         <button
           onClick={() => setAutoScroll(!autoScroll)}
           title={autoScroll ? 'Auto-scroll enabled — pinned to bottom' : 'Auto-scroll disabled'}
-          className={`text-xs px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
+          className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
             autoScroll
               ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
-              : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)]'
+              : 'border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
           }`}
         >
-          <ArrowDownToLine size={12} className={autoScroll ? 'animate-bounce' : ''} />
-          {autoScroll ? 'Pinned' : 'Auto-scroll'}
+          <ArrowDownToLine size={12} />
+          {autoScroll ? 'Pinned' : 'Scroll'}
         </button>
 
         <button
           onClick={loadLogs}
           disabled={logsLoading}
-          className="text-xs px-3 py-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)] transition-all flex items-center gap-1.5 cursor-pointer"
+          className="text-xs px-2.5 py-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-all flex items-center gap-1.5 cursor-pointer"
         >
           <RotateCcw size={12} className={logsLoading ? 'animate-spin' : ''} />
           {logsLoading ? 'Loading...' : 'Refresh'}
@@ -218,31 +221,11 @@ export function LogsTab() {
         <button
           onClick={handleDownload}
           disabled={logs.length === 0}
-          className="text-xs px-3 py-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)] transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          className="text-xs px-2.5 py-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <Download size={12} />
           Download
         </button>
-      </div>
-
-      {/* Search bar */}
-      <div className="relative">
-        <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-        <input
-          type="text"
-          value={logSearch}
-          onChange={(e) => setLogSearch(e.target.value)}
-          placeholder="Search logs..."
-          className="w-full bg-[var(--bg-card)] border border-[var(--border-default)] rounded-lg pl-8 pr-8 py-2 text-xs font-mono text-[var(--text-secondary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[#8b5cf6]/50 focus:bg-[var(--bg-elevated)] transition-all"
-        />
-        {logSearch && (
-          <button
-            onClick={() => setLogSearch('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
-          >
-            <X size={12} />
-          </button>
-        )}
       </div>
 
       {/* Log viewer */}

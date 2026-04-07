@@ -124,7 +124,7 @@ export default function TokenPage() {
               Create Free Agent
               <Rocket className="w-4 h-4" />
             </Link>
-            <Link href="/pricing" className="btn-secondary text-base px-8 py-3.5 inline-flex items-center gap-2">
+            <Link href="/pricing" className="btn-secondary text-base px-8 py-3.5 inline-flex items-center gap-2 border-[var(--border-hover)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
               View Pricing
               <ArrowRight className="w-4 h-4" />
             </Link>

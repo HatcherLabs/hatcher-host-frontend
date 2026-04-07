@@ -426,7 +426,7 @@ export function AnalyticsTab() {
                     content={(props: any) => <ChartTooltipContent {...props} theme={theme} />}
                     cursor={{ fill: 'rgba(255,255,255,0.03)' }}
                   />
-                  <Bar dataKey="messages" radius={[4, 4, 0, 0]} maxBarSize={40}>
+                  <Bar dataKey="messages" radius={[4, 4, 0, 0]} maxBarSize={40} isAnimationActive={false}>
                     {chartData.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
@@ -506,7 +506,7 @@ export function AnalyticsTab() {
                   content={(props: any) => <ChartTooltipContent {...props} theme={theme} />}
                   cursor={{ fill: 'rgba(255,255,255,0.03)' }}
                 />
-                <Bar dataKey="count" name="Messages" radius={[3, 3, 0, 0]} maxBarSize={20}>
+                <Bar dataKey="count" name="Messages" radius={[3, 3, 0, 0]} maxBarSize={20} isAnimationActive={false}>
                   {hourlyData.map((entry, index) => (
                     <Cell
                       key={`hcell-${index}`}
@@ -595,6 +595,7 @@ export function AnalyticsTab() {
                       strokeWidth={2}
                       fill="url(#rtGradient)"
                       name="Avg Response"
+                      isAnimationActive={false}
                     />
                   </AreaChart>
                 </ResponsiveContainer>

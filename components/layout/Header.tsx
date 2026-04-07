@@ -373,13 +373,14 @@ export function Header() {
         {mobileOpen && (
           <motion.div
             id="mobile-nav-menu"
-            className="lg:hidden border-t border-[var(--border-default)] backdrop-blur-xl" style={{ backgroundColor: 'color-mix(in srgb, var(--bg-base) 90%, transparent)' }}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
+            className="lg:hidden fixed inset-0 z-40 overflow-y-auto"
+            style={{ backgroundColor: 'var(--bg-base)', top: '57px' }}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2, ease: 'easeInOut' }}
           >
-            <nav className="mx-auto max-w-7xl px-4 py-3 flex flex-col gap-0.5" aria-label="Mobile navigation">
+            <nav className="mx-auto max-w-7xl px-4 py-3 flex flex-col gap-0.5 min-h-full border-t border-[var(--border-default)]" aria-label="Mobile navigation">
               {mobileLinks.map((link, i) => (
                 <motion.div key={link.href} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}>
                   <Link

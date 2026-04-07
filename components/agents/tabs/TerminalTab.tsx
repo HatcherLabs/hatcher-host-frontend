@@ -286,7 +286,7 @@ export function TerminalTab() {
   return (
     <div className="flex flex-col h-full">
       {/* Terminal header */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-800 bg-zinc-900/50">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--border-default)] bg-[var(--bg-elevated)]">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             <Circle
@@ -294,12 +294,12 @@ export function TerminalTab() {
               fill={state === 'connected' ? '#00ff41' : state === 'connecting' ? '#ffb86c' : '#ff5555'}
               className={state === 'connected' ? 'text-green-400' : state === 'connecting' ? 'text-yellow-400' : 'text-red-400'}
             />
-            <span className="text-xs font-mono text-zinc-500">
+            <span className="text-xs font-mono text-[var(--text-muted)]">
               {state === 'connected' ? 'connected' : state === 'connecting' ? 'connecting...' : 'disconnected'}
             </span>
           </div>
-          <span className="text-xs text-zinc-600">|</span>
-          <span className="text-xs font-mono text-zinc-500">
+          <span className="text-xs text-[var(--border-default)]">|</span>
+          <span className="text-xs font-mono text-[var(--text-muted)]">
             {agent.name} ({agent.framework})
           </span>
         </div>
@@ -308,7 +308,7 @@ export function TerminalTab() {
           {state === 'disconnected' && (
             <button
               onClick={connect}
-              className="flex items-center gap-1.5 px-3 py-1 text-xs rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1 text-xs rounded-md bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] border border-[var(--border-default)] transition-colors"
             >
               <RotateCcw size={12} />
               Reconnect
@@ -317,7 +317,7 @@ export function TerminalTab() {
           {state === 'connected' && (
             <button
               onClick={disconnect}
-              className="flex items-center gap-1.5 px-3 py-1 text-xs rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1 text-xs rounded-md bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] border border-[var(--border-default)] transition-colors"
             >
               Disconnect
             </button>
@@ -332,7 +332,7 @@ export function TerminalTab() {
 
       {/* Message input */}
       {state === 'connected' && (
-        <div className="flex items-center gap-2 px-3 py-2 border-t border-zinc-800 bg-zinc-900/80">
+        <div className="flex items-center gap-2 px-3 py-2 border-t border-[var(--border-default)] bg-[var(--bg-elevated)]">
           <input
             ref={inputRef}
             type="text"
@@ -341,12 +341,12 @@ export function TerminalTab() {
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
             placeholder={sending ? 'Waiting for response...' : 'Send a message to the agent...'}
             disabled={sending}
-            className="flex-1 bg-zinc-800/50 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm font-mono text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 disabled:opacity-50"
+            className="flex-1 bg-[var(--bg-card)] border border-[var(--border-default)] rounded-lg px-3 py-1.5 text-sm font-mono text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--border-hover)] disabled:opacity-50"
           />
           <button
             onClick={sendMessage}
             disabled={!messageInput.trim() || sending}
-            className="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="p-1.5 rounded-lg bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border-default)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
             <Send size={14} />
           </button>
@@ -354,8 +354,8 @@ export function TerminalTab() {
       )}
 
       {/* Info banner */}
-      <div className="px-4 py-1.5 border-t border-zinc-800 bg-zinc-900/50">
-        <p className="text-[10px] text-zinc-600 font-mono">
+      <div className="px-4 py-1.5 border-t border-[var(--border-default)] bg-[var(--bg-elevated)]">
+        <p className="text-[10px] text-[var(--text-muted)] font-mono">
           Streaming agent logs. Send messages via the input field above.
           {errorMsg && <span className="text-red-400 ml-2">Error: {errorMsg}</span>}
         </p>
