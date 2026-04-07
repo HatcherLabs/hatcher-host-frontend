@@ -148,6 +148,7 @@ export default function AdminPage() {
     totalRevenueUsd: number;
     totalMessages: number;
     newUsersLast7d: number;
+    frameworkDistribution?: Record<string, number>;
   } | null>(null);
   const [agents, setAgents] = useState<AdminAgent[]>([]);
   const [users, setUsers] = useState<Array<{
@@ -290,12 +291,15 @@ export default function AdminPage() {
 
   // ── Analytics computations ──────────────────────────────────
   const frameworkDistribution = useMemo(() => {
-    const counts: Record<string, number> = {};
-    agents.forEach((a) => {
-      const fw = a.framework || 'openclaw';
-      counts[fw] = (counts[fw] || 0) + 1;
-    });
-    const total = agents.length || 1;
+    // Prefer server-side stats (covers ALL agents) over client-side (paginated)
+    const counts: Record<string, number> = stats?.frameworkDistribution ?? {};
+    if (!stats?.frameworkDistribution) {
+      agents.forEach((a) => {
+        const fw = a.framework || 'openclaw';
+        counts[fw] = (counts[fw] || 0) + 1;
+      });
+    }
+    const total = Object.values(counts).reduce((s, c) => s + c, 0) || 1;
     return Object.entries(FRAMEWORK_META).map(([key, meta]) => ({
       key,
       label: meta.label,
@@ -303,7 +307,7 @@ export default function AdminPage() {
       count: counts[key] || 0,
       percent: Math.round(((counts[key] || 0) / total) * 100),
     }));
-  }, [agents]);
+  }, [agents, stats]);
 
   const tierDistribution = useMemo(() => {
     const counts: Record<string, number> = { free: 0, starter: 0, pro: 0, business: 0, founding_member: 0 };
@@ -589,7 +593,7 @@ export default function AdminPage() {
                   </div>
                   <div>
                     <h3 className="text-sm font-semibold text-[var(--text-primary)]">Framework Distribution</h3>
-                    <p className="text-[10px] text-[var(--text-muted)]">{agents.length} total agents</p>
+                    <p className="text-[10px] text-[var(--text-muted)]">{stats?.totalAgents ?? agents.length} total agents</p>
                   </div>
                 </div>
                 <div className="space-y-3">
