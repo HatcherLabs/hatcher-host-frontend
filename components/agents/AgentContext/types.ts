@@ -96,8 +96,8 @@ export interface AgentContextValue {
   sending: boolean;
   chatError: string | null;
   setChatError: (error: string | null) => void;
-  chatErrorType: 'timeout' | 'ratelimit' | 'network' | 'generic' | null;
-  setChatErrorType: (type: 'timeout' | 'ratelimit' | 'network' | 'generic' | null) => void;
+  chatErrorType: 'timeout' | 'ratelimit' | 'network' | 'llm_down' | 'generic' | null;
+  setChatErrorType: (type: 'timeout' | 'ratelimit' | 'network' | 'llm_down' | 'generic' | null) => void;
   msgCount: number;
   hasUnlimitedChat: boolean;
   isByok: boolean;
