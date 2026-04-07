@@ -248,18 +248,14 @@ export function NotificationCenter() {
                   const colorClass = ICON_COLOR_MAP[n.type] || 'text-[var(--text-secondary)] bg-white/10';
                   const [iconText, iconBg] = colorClass.split(' ');
 
-                  const rowBase = `group relative flex items-start gap-3 px-4 py-3 border-b border-[var(--border-default)] transition-colors ${isUnread ? 'bg-purple-500/[0.04]' : ''} ${href ? 'cursor-pointer hover:bg-[var(--bg-card)]/50' : ''}`;
-
                   // Derive a navigation target from explicit link or notification type
-                  const getHref = (): string | null => {
-                    if (n.link) return n.link;
-                    if (n.type.startsWith('agent') || n.type === 'feature') return '/dashboard';
-                    if (n.type === 'subscription' || n.type === 'subscription_confirmed' || n.type === 'payment') return '/dashboard/billing';
-                    if (n.type.startsWith('team')) return '/dashboard/team';
-                    if (n.type.startsWith('support')) return '/dashboard/support';
-                    return null;
-                  };
-                  const href = getHref();
+                  const href: string | null = n.link
+                    || (n.type.startsWith('agent') || n.type === 'feature' ? '/dashboard' : null)
+                    || (n.type === 'subscription' || n.type === 'subscription_confirmed' || n.type === 'payment' ? '/dashboard/billing' : null)
+                    || (n.type.startsWith('team') ? '/dashboard/team' : null)
+                    || (n.type.startsWith('support') ? '/dashboard/support' : null);
+
+                  const rowBase = `group relative flex items-start gap-3 px-4 py-3 border-b border-[var(--border-default)] transition-colors ${isUnread ? 'bg-purple-500/[0.04]' : ''} ${href ? 'cursor-pointer hover:bg-[var(--bg-card)]/50' : ''}`;
 
                   const handleNotificationClick = () => {
                     if (!href) return;
