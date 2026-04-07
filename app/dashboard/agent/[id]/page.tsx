@@ -7,7 +7,6 @@ import { api, getToken } from '@/lib/api';
 import { API_URL } from '@/lib/config';
 import type { Agent, AgentFeature } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { haptic, hapticNotification } from '@/lib/capacitor';
 import { useWebSocketChat } from '@/hooks/useWebSocketChat';
 import { FRAMEWORKS, TIERS, getBYOKProvider } from '@hatcher/shared';
 import type { UserTierKey } from '@hatcher/shared';
@@ -659,10 +658,10 @@ export default function AgentManagePage() {
       else if (action === 'stop') res = await api.stopAgent(id);
       else if (action === 'restart') res = await api.restartAgent(id);
       if (res && !res.success) {
-        hapticNotification('error');
+
         toast.error(`Failed to ${action} agent: ${res.error ?? 'Unknown error'}`);
       } else if (res?.success) {
-        hapticNotification('success');
+
         const labels = { start: 'started', stop: 'stopped', restart: 'restarted' };
         toast.success(`Agent ${labels[action]} successfully`);
       }
@@ -915,7 +914,7 @@ export default function AgentManagePage() {
     setInput('');
     setChatError(null);
     setChatErrorType(null);
-    haptic('light');
+
 
     // 2-second send cooldown to prevent rapid-fire
     setSendCooldown(true);

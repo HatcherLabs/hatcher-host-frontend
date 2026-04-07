@@ -37,9 +37,7 @@ playwright-report/
 test-results/
 e2e/.auth/
 
-# Capacitor
-android/
-ios/
+# Native app (moved to separate repo)
 out/
 
 # Dev artifacts

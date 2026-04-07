@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-// motion/AnimatePresence removed — was interfering with Link click navigation
 import {
   Bell,
   Server,
@@ -98,6 +97,7 @@ function saveDismissed(ids: Set<string>) {
 
 export function NotificationCenter() {
   const { isAuthenticated } = useAuth();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [readAt, setReadAt] = useState<string | null>(null);
@@ -137,10 +137,10 @@ export function NotificationCenter() {
     function handleKey(e: KeyboardEvent) {
       if (e.key === 'Escape') setOpen(false);
     }
-    document.addEventListener('mouseup', handleClick);
+    document.addEventListener('mousedown', handleClick);
     document.addEventListener('keydown', handleKey);
     return () => {
-      document.removeEventListener('mouseup', handleClick);
+      document.removeEventListener('mousedown', handleClick);
       document.removeEventListener('keydown', handleKey);
     };
   }, []);
@@ -248,39 +248,51 @@ export function NotificationCenter() {
                   const colorClass = ICON_COLOR_MAP[n.type] || 'text-[var(--text-secondary)] bg-white/10';
                   const [iconText, iconBg] = colorClass.split(' ');
 
-                  const rowBase = `group relative flex items-start gap-3 px-4 py-3 border-b border-[var(--border-default)] transition-colors ${isUnread ? 'bg-purple-500/[0.04]' : ''}`;
-                  const content = (
-                    <>
+                  const rowBase = `group relative flex items-start gap-3 px-4 py-3 border-b border-[var(--border-default)] transition-colors ${isUnread ? 'bg-purple-500/[0.04]' : ''} ${href ? 'cursor-pointer hover:bg-[var(--bg-card)]/50' : ''}`;
+
+                  // Derive a navigation target from explicit link or notification type
+                  const getHref = (): string | null => {
+                    if (n.link) return n.link;
+                    if (n.type.startsWith('agent') || n.type === 'feature') return '/dashboard';
+                    if (n.type === 'subscription' || n.type === 'subscription_confirmed' || n.type === 'payment') return '/dashboard/billing';
+                    if (n.type.startsWith('team')) return '/dashboard/team';
+                    if (n.type.startsWith('support')) return '/dashboard/support';
+                    return null;
+                  };
+                  const href = getHref();
+
+                  const handleNotificationClick = () => {
+                    if (!href) return;
+                    // Close popover first, then navigate after DOM settles
+                    // — mousedown-based outside-click can race with click,
+                    //   so we delay navigation to avoid the unmount cancelling it
+                    setOpen(false);
+                    setTimeout(() => router.push(href), 50);
+                  };
+
+                  return (
+                    <div
+                      key={n.id}
+                      className={rowBase}
+                      onClick={handleNotificationClick}
+                      role={href ? 'link' : undefined}
+                      tabIndex={href ? 0 : undefined}
+                      onKeyDown={href ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleNotificationClick(); } } : undefined}
+                    >
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${iconBg}`}>
                         <Icon size={14} className={iconText} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className={`text-xs leading-relaxed ${isUnread ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
-                          {n.message}{n.link ? ' →' : ''}
+                          {n.message}{href ? ' \u2192' : ''}
                         </p>
                         <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
                           {timeAgo(n.timestamp)}
                         </p>
                       </div>
-                    </>
-                  );
-
-                  return (
-                    <div key={n.id} className={rowBase}>
-                      {n.link ? (
-                        <Link
-                          href={n.link}
-                          onClick={() => setOpen(false)}
-                          className="absolute inset-0 z-0"
-                          aria-label={n.message}
-                        />
-                      ) : null}
-                      <div className="flex items-start gap-3 flex-1 min-w-0 relative z-[1] pointer-events-none">
-                        {content}
-                      </div>
                       <button
-                        onClick={() => dismissOne(n.id)}
-                        className="opacity-0 group-hover:opacity-100 flex-shrink-0 mt-0.5 p-1 rounded hover:bg-[var(--bg-card)] transition-all focus:opacity-100 relative z-[2]"
+                        onClick={(e) => { e.stopPropagation(); dismissOne(n.id); }}
+                        className="opacity-0 group-hover:opacity-100 flex-shrink-0 mt-0.5 p-1 rounded hover:bg-[var(--bg-card)] transition-all focus:opacity-100"
                         aria-label={`Dismiss notification: ${n.message}`}
                       >
                         <X size={12} className="text-[var(--text-muted)]" aria-hidden="true" />
