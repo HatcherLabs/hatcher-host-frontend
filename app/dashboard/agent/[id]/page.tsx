@@ -666,7 +666,6 @@ export default function AgentManagePage() {
         toast.success(`Agent ${labels[action]} successfully`);
       }
     } catch {
-      hapticNotification('error');
       toast.error(`Failed to ${action} agent. Check your connection.`);
     }
     await loadAgent();
