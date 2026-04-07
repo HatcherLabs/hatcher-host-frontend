@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { api } from '@/lib/api';
 import { generateAgentAvatar } from '@/lib/avatar-generator';
 import { Send, Loader2, Bot, Brain, Cpu, Sparkles, User, Zap } from 'lucide-react';
@@ -121,8 +122,7 @@ export default function EmbedPage() {
     <div className="h-screen bg-[var(--bg-base)] flex flex-col overflow-hidden">
       {/* Mini header */}
       <div className="px-3 py-2.5 border-b border-white/5 flex items-center gap-2.5 shrink-0">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)} alt="" className="w-7 h-7 rounded-lg object-cover shrink-0" />
+        <Image src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)} alt={agent.name} width={28} height={28} unoptimized className="w-7 h-7 rounded-lg object-cover shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold text-white truncate">{agent.name}</p>
         </div>
@@ -149,8 +149,7 @@ export default function EmbedPage() {
         {messages.map((msg) => (
           <div key={msg.id} className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)} alt="" className="w-6 h-6 rounded-md object-cover shrink-0 mt-0.5" />
+              <Image src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)} alt={agent.name} width={24} height={24} unoptimized className="w-6 h-6 rounded-md object-cover shrink-0 mt-0.5" />
             )}
             <div
               className={`max-w-[85%] rounded-xl px-3 py-2 text-xs leading-relaxed ${

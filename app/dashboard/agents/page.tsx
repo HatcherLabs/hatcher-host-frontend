@@ -28,6 +28,7 @@ import { QuickStats } from '@/components/dashboard/QuickStats';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { ShortcutHelpModal } from '@/components/ui/ShortcutHelpModal';
 import { AgentCardSkeleton, SkeletonStat } from '@/components/ui/Skeleton';
+import Image from 'next/image';
 import { generateAgentAvatar } from '@/lib/avatar-generator';
 
 import { AGENT_STATUSES, AGENT_STATUS_CONFIG } from '@hatcher/shared';
@@ -543,9 +544,12 @@ export default function MyAgentsPage() {
                   {/* Top: Avatar + Name + Status */}
                   <div className="flex items-start gap-3.5">
                     {/* Avatar */}
-                    <img
+                    <Image
                       src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)}
                       alt={agent.name}
+                      width={48}
+                      height={48}
+                      unoptimized
                       className="w-12 h-12 rounded-xl object-cover flex-shrink-0 ring-1 ring-white/10"
                     />
 

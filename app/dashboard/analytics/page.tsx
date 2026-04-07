@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   RefreshCw,
   MessageSquare,
+  Shield,
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -175,7 +176,7 @@ function Skeleton({ className }: { className?: string }) {
 
 // ─── Main Page ───────────────────────────────────────────────
 export default function AnalyticsPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [data, setData] = useState<AccountAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -205,6 +206,25 @@ export default function AnalyticsPage() {
   }, [isAuthenticated, load]);
 
   const totalDailyMessages = data ? data.dailyVolume.reduce((s, d) => s + d.count, 0) : 0;
+
+  if (authLoading) {
+    return (
+      <div className="min-h-[40vh] flex items-center justify-center">
+        <div className="w-6 h-6 rounded-full border-2 border-[var(--border-default)] border-t-[var(--text-muted)] animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-24 text-center">
+        <Shield className="w-12 h-12 text-[var(--text-muted)] mx-auto mb-4" />
+        <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">Sign In Required</h1>
+        <p className="mb-6 text-[var(--text-secondary)]">Sign in to view analytics.</p>
+        <Link href="/login" className="btn-primary">Sign In</Link>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen" style={{ background: 'var(--bg-base)' }}>

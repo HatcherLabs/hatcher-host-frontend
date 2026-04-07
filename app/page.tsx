@@ -225,11 +225,11 @@ export default function LandingPage() {
     >
       {/* ── Beta Banner ──────────────────────────────────── */}
       <div className="w-full bg-gradient-to-r from-purple-600/90 to-cyan-500/90 text-white text-center py-2.5 px-4 text-sm font-medium">
-        <span className="mr-1">🚀</span> We&apos;re in <strong>open beta</strong> — all features are free to try. <a href="/support" className="underline underline-offset-2 hover:text-white/80 transition-colors">Share your feedback</a> and help us improve!
+        <span className="mr-1">🚀</span> We&apos;re in <strong>open beta</strong> — all features are free to try. <Link href="/support" className="underline underline-offset-2 hover:text-white/80 transition-colors">Share your feedback</Link> and help us improve!
       </div>
       {/* ── Token Banner ──────────────────────────────────── */}
       <div className="w-full bg-gradient-to-r from-[#9945FF]/90 to-[#14F195]/90 text-white text-center py-2.5 px-4 text-sm font-medium">
-        <span className="mr-1">🪙</span> <strong>$HATCHER</strong> is live{tokenData && <> — <span className="font-mono">{tokenData.price}</span> · MCap <span className="font-mono">{tokenData.mcap}</span></>} — CA: <code className="font-mono text-xs bg-white/15 px-1.5 py-0.5 rounded select-all">Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump</code> <a href="/token" className="underline underline-offset-2 hover:text-white/80 transition-colors ml-1">Learn more</a>
+        <span className="mr-1">🪙</span> <strong>$HATCHER</strong> is live{tokenData && <> — <span className="font-mono">{tokenData.price}</span> · MCap <span className="font-mono">{tokenData.mcap}</span></>} — CA: <code className="font-mono text-xs bg-white/15 px-1.5 py-0.5 rounded select-all">Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump</code> <Link href="/token" className="underline underline-offset-2 hover:text-white/80 transition-colors ml-1">Learn more</Link>
       </div>
 
       {/* ── 1. HERO ─────────────────────────────────────── */}

@@ -2,6 +2,7 @@
 
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
@@ -723,10 +724,12 @@ const ExploreAgentCard = memo(function ExploreAgentCard({ agent }: { agent: Agen
             {/* Header: avatar + name + status */}
             <div className="flex items-start gap-3 mb-3">
               {/* Avatar — real image or framework SVG icon */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={agent.avatarUrl || generateAgentAvatar(agent.name, fw)}
                 alt={agent.name}
+                width={48}
+                height={48}
+                unoptimized
                 className="w-12 h-12 rounded-full border border-[var(--border-default)] object-cover flex-shrink-0 transition-all duration-300"
                 style={{ ['--tw-ring-color' as string]: fwConfig.border }}
               />

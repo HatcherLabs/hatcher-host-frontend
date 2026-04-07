@@ -42,8 +42,10 @@ export const viewport: Viewport = {
   themeColor: '#8b5cf6',
 };
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hatcher.host';
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://hatcher.host'),
+  metadataBase: new URL(SITE_URL),
   title: { default: 'Hatcher — AI Agent Hosting Platform', template: '%s | Hatcher' },
   description:
     'Deploy autonomous AI agents across 20+ platforms in 60 seconds. Free tier included. OpenClaw, Hermes, ElizaOS, Milady frameworks. BYOK any LLM.',
@@ -67,12 +69,12 @@ export const metadata: Metadata = {
   publisher: 'Hatcher Labs',
   openGraph: {
     type: 'website',
-    url: 'https://hatcher.host',
+    url: SITE_URL,
     siteName: 'Hatcher',
     title: 'Hatcher — AI Agent Hosting Platform',
     description:
       'Deploy autonomous AI agents across 20+ platforms in 60 seconds. Free tier included. OpenClaw, Hermes, ElizaOS, Milady frameworks. BYOK any LLM.',
-    images: [{ url: 'https://hatcher.host/og?title=Hatcher&subtitle=Deploy+autonomous+AI+agents+across+20%2B+platforms+in+60+seconds.+Free+tier+included.+BYOK+any+LLM.&tag=AI+Agent+Hosting', width: 1200, height: 630, alt: 'Hatcher — AI Agent Hosting Platform' }],
+    images: [{ url: `${SITE_URL}/og?title=Hatcher&subtitle=Deploy+autonomous+AI+agents+across+20%2B+platforms+in+60+seconds.+Free+tier+included.+BYOK+any+LLM.&tag=AI+Agent+Hosting`, width: 1200, height: 630, alt: 'Hatcher — AI Agent Hosting Platform' }],
     locale: 'en_US',
   },
   twitter: {
@@ -82,10 +84,10 @@ export const metadata: Metadata = {
     title: 'Hatcher — AI Agent Hosting Platform',
     description:
       'Deploy autonomous AI agents across 20+ platforms in 60 seconds. Free tier included. BYOK any LLM.',
-    images: ['https://hatcher.host/og?title=Hatcher&subtitle=Deploy+autonomous+AI+agents+across+20%2B+platforms+in+60+seconds.+Free+tier+included.+BYOK+any+LLM.&tag=AI+Agent+Hosting'],
+    images: [`${SITE_URL}/og?title=Hatcher&subtitle=Deploy+autonomous+AI+agents+across+20%2B+platforms+in+60+seconds.+Free+tier+included.+BYOK+any+LLM.&tag=AI+Agent+Hosting`],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
-  alternates: { canonical: 'https://hatcher.host' },
+  alternates: { canonical: SITE_URL },
   icons: {
     icon: [
       { url: '/icon.svg', type: 'image/svg+xml' },
@@ -110,7 +112,7 @@ const organizationJsonLd = {
   '@type': 'Organization',
   name: 'Hatcher',
   url: 'https://hatcher.host',
-  logo: 'https://hatcher.host/icon.svg',
+  logo: `${SITE_URL}/icon.svg`,
   description: 'Deploy autonomous AI agents across 20+ platforms in 60 seconds. Free tier included.',
   sameAs: ['https://twitter.com/HatcherLabs'],
 };
@@ -123,7 +125,7 @@ const websiteJsonLd = {
   description: 'AI Agent Hosting Platform',
   potentialAction: {
     '@type': 'SearchAction',
-    target: 'https://hatcher.host/explore?q={search_term_string}',
+    target: `${SITE_URL}/explore?q={search_term_string}`,
     'query-input': 'required name=search_term_string',
   },
 };
@@ -180,7 +182,7 @@ const softwareApplicationJsonLd = {
   creator: {
     '@type': 'Organization',
     name: 'Hatcher Labs',
-    url: 'https://hatcher.host',
+    url: SITE_URL,
   },
 };
 

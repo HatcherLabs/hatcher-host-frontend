@@ -13,9 +13,3 @@ export const SOCIAL_LINKS = {
   telegram: 'https://t.me/HatcherLabs',
 } as const;
 
-export const EXTERNAL_LINKS = {
-  openclaw: 'https://openclaw.org',
-  clawhub: 'https://clawhub.org',
-  jupiterSwap: 'https://jup.ag/swap/SOL',
-  supportEmail: 'support@hatcher.host',
-} as const;

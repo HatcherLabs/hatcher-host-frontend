@@ -31,6 +31,7 @@ import { FRAMEWORKS } from '@hatcher/shared';
 import type { LucideIcon } from 'lucide-react';
 import type { Agent } from '@/lib/api';
 import Link from 'next/link';
+import Image from 'next/image';
 import { generateAgentAvatar } from '@/lib/avatar-generator';
 
 interface TabDef {
@@ -109,9 +110,12 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
           All Agents
         </Link>
         <div className="flex items-center gap-3">
-          <img
+          <Image
             src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)}
             alt={agent.name}
+            width={40}
+            height={40}
+            unoptimized
             className="w-10 h-10 rounded-full object-cover border border-[var(--border-default)] flex-shrink-0"
           />
           <div className="min-w-0">
@@ -205,9 +209,12 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
           >
             <ChevronLeft size={16} />
           </Link>
-          <img
+          <Image
             src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)}
             alt={agent.name}
+            width={20}
+            height={20}
+            unoptimized
             className="w-5 h-5 rounded-full object-cover border border-[var(--border-default)] flex-shrink-0"
           />
           <span className="text-xs font-semibold text-[var(--text-primary)] truncate min-w-0">{agent.name}</span>
