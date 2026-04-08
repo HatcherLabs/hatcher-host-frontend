@@ -160,7 +160,9 @@ export default function SettingsPage() {
   // ── Profile state ─────────────────────────────────────────
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [savingProfile, setSavingProfile] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   // ── Password state ────────────────────────────────────────
   const [currentPassword, setCurrentPassword] = useState('');
@@ -214,6 +216,7 @@ export default function SettingsPage() {
     if (user) {
       setUsername(user.username ?? '');
       setEmail(user.email ?? '');
+      setAvatarUrl(user.avatarUrl ?? null);
     }
   }, [user]);
 
@@ -280,15 +283,25 @@ export default function SettingsPage() {
     if (!username.trim() || !email.trim()) { toast('error', 'Username and email are required'); return; }
     setSavingProfile(true);
     try {
-      const updates: { username?: string; email?: string } = {};
+      const updates: { username?: string; email?: string; avatarUrl?: string | null } = {};
       if (username !== user.username) updates.username = username;
       if (email !== user.email) updates.email = email;
+      if (avatarUrl !== user.avatarUrl) updates.avatarUrl = avatarUrl;
       if (!Object.keys(updates).length) { toast('info', 'No changes to save'); return; }
       const res = await api.updateProfile(updates);
       if (res.success) toast('success', 'Profile updated');
       else toast('error', (res as any).error || 'Failed to update profile');
     } catch { toast('error', 'Failed to update profile'); }
     finally { setSavingProfile(false); }
+  }
+
+  function handleAvatarFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { toast('error', 'Image must be under 2 MB'); return; }
+    const reader = new FileReader();
+    reader.onload = () => setAvatarUrl(reader.result as string);
+    reader.readAsDataURL(file);
   }
 
   // ── Save password ─────────────────────────────────────────
@@ -367,12 +380,16 @@ export default function SettingsPage() {
             <div className="card glass-noise p-2 space-y-0.5 lg:sticky lg:top-6">
               {/* User info */}
               <div className="flex items-center gap-3 px-3 py-3 mb-1 border-b border-[var(--border-default)]">
-                <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-base"
-                  style={{ backgroundColor: avatarColor + '20', color: avatarColor, border: `1px solid ${avatarColor}30` }}
-                >
-                  {(user?.username ?? 'U').charAt(0).toUpperCase()}
-                </div>
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt={user?.username ?? ''} className="w-9 h-9 rounded-xl object-cover flex-shrink-0" />
+                ) : (
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-base"
+                    style={{ backgroundColor: avatarColor + '20', color: avatarColor, border: `1px solid ${avatarColor}30` }}
+                  >
+                    {(user?.username ?? 'U').charAt(0).toUpperCase()}
+                  </div>
+                )}
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{user?.username}</p>
                   <TierBadge tier={tier} />
@@ -418,11 +435,36 @@ export default function SettingsPage() {
                     <Section title="Profile" icon={<User size={16} />}>
                       {/* Avatar */}
                       <div className="flex items-center gap-4 mb-6 pb-6 border-b border-[var(--border-default)]">
-                        <div
-                          className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 text-2xl font-bold shadow-lg"
-                          style={{ backgroundColor: avatarColor + '20', color: avatarColor, border: `1px solid ${avatarColor}30` }}
-                        >
-                          {(user?.username ?? 'U').charAt(0).toUpperCase()}
+                        <div className="relative flex-shrink-0 group">
+                          {avatarUrl ? (
+                            <img
+                              src={avatarUrl}
+                              alt={user?.username ?? 'Avatar'}
+                              className="w-16 h-16 rounded-2xl object-cover shadow-lg"
+                            />
+                          ) : (
+                            <div
+                              className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold shadow-lg"
+                              style={{ backgroundColor: avatarColor + '20', color: avatarColor, border: `1px solid ${avatarColor}30` }}
+                            >
+                              {(user?.username ?? 'U').charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          {/* Upload overlay */}
+                          <button
+                            onClick={() => avatarInputRef.current?.click()}
+                            className="absolute inset-0 rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+                            title="Upload avatar"
+                          >
+                            <RefreshCw size={16} className="text-white" />
+                          </button>
+                          <input
+                            ref={avatarInputRef}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleAvatarFile}
+                          />
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-[var(--text-primary)]">{user?.username}</p>
@@ -433,6 +475,22 @@ export default function SettingsPage() {
                               <span className="text-[10px] text-[var(--text-muted)]">
                                 Joined {new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                               </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 mt-2">
+                            <button
+                              onClick={() => avatarInputRef.current?.click()}
+                              className="text-[11px] text-[var(--color-accent)] hover:underline cursor-pointer"
+                            >
+                              {avatarUrl ? 'Change photo' : 'Upload photo'}
+                            </button>
+                            {avatarUrl && (
+                              <button
+                                onClick={() => setAvatarUrl(null)}
+                                className="text-[11px] text-red-400 hover:underline cursor-pointer"
+                              >
+                                Remove
+                              </button>
                             )}
                           </div>
                         </div>

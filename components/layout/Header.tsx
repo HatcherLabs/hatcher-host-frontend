@@ -259,7 +259,11 @@ export function Header() {
                       aria-haspopup="menu"
                       className="h-9 px-3 flex items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 transition-all duration-200"
                     >
-                      <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
+                      {user.avatarUrl ? (
+                        <img src={user.avatarUrl} alt={user.username} className="w-5 h-5 rounded-full object-cover flex-shrink-0" />
+                      ) : (
+                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
+                      )}
                       <span className="text-xs font-medium text-purple-300">{user.username}</span>
                       <ChevronDown className={clsx('w-3 h-3 text-purple-400/60 transition-transform duration-200', dropdownOpen && 'rotate-180')} />
                     </button>
@@ -279,7 +283,15 @@ export function Header() {
                           }}
                         >
                           {/* User info */}
-                          <div className="px-4 py-2.5 border-b border-[var(--border-default)]">
+                          <div className="px-4 py-2.5 border-b border-[var(--border-default)] flex items-center gap-2.5">
+                            {user.avatarUrl ? (
+                              <img src={user.avatarUrl} alt={user.username} className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
+                            ) : (
+                              <div className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-bold text-purple-300 bg-purple-500/20">
+                                {user.username.charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                            <div className="min-w-0 flex-1">
                             <p className="text-xs text-[var(--text-primary)] font-medium truncate">{user.username}</p>
                             <p className="text-[10px] text-[var(--text-secondary)] truncate">{user.email}</p>
                             {creditBalance !== null && creditBalance > 0 && (
@@ -293,6 +305,7 @@ export function Header() {
                                 <span className="text-[var(--text-secondary)]">credits</span>
                               </Link>
                             )}
+                            </div>
                           </div>
 
                           {/* Extra nav links */}

@@ -10,6 +10,7 @@ interface UserProfile {
   walletAddress: string | null;
   isAdmin: boolean;
   tier: string;
+  avatarUrl: string | null;
 }
 
 interface AuthContextValue {
@@ -61,6 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           walletAddress: profile.data.walletAddress ?? null,
           isAdmin: profile.data.isAdmin ?? false,
           tier: (profile.data as any).tier ?? 'free',
+          avatarUrl: (profile.data as any).avatarUrl ?? null,
         });
       } else {
         // Fallback: use login response data (tier may default to 'free')
@@ -71,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           walletAddress: res.data.user.walletAddress ?? null,
           isAdmin: res.data.user.isAdmin ?? false,
           tier: (res.data.user as any).tier ?? 'free',
+          avatarUrl: null,
         });
       }
     } catch (e) {
@@ -127,6 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           walletAddress: res.data.walletAddress ?? null,
           isAdmin: res.data.isAdmin ?? false,
           tier: (res.data as any).tier ?? 'free',
+          avatarUrl: (res.data as any).avatarUrl ?? null,
         });
       } else {
         // Neither cookie nor localStorage token is valid

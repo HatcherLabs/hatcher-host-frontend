@@ -68,8 +68,8 @@ export const api = {
   /** Get current user profile */
   getProfile: () => req<{id: string; email: string; username: string; walletAddress: string | null; apiKey: string; hatchCredits: number; isAdmin: boolean; tier: string; createdAt: string}>('/auth/me'),
 
-  /** Update profile (username, email, or password) */
-  updateProfile: (data: { username?: string; email?: string; currentPassword?: string; newPassword?: string }) =>
+  /** Update profile (username, email, password, or avatarUrl) */
+  updateProfile: (data: { username?: string; email?: string; avatarUrl?: string | null; currentPassword?: string; newPassword?: string }) =>
     req<{ id: string; email: string; username: string }>('/auth/me', {
       method: 'PATCH',
       body: JSON.stringify(data),
