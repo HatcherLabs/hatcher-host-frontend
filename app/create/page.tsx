@@ -261,7 +261,10 @@ export default function CreatePage() {
 
     // Find previous template to detect if user manually edited the fields
     const prevTpl = templates.find((t) => t.id === lastAppliedTemplateRef.current);
-    const prevDesc = (prevTpl?.description ?? '').slice(0, 140);
+    const prevDescVal = (prevTpl?.description || prevTpl?.personality || '').slice(0, 140);
+
+    // Best description: prefer description field, fall back to personality if empty
+    const bestDesc = (tpl.description?.trim() ? tpl.description : (tpl.personality || '')).slice(0, 140);
 
     const updates: Partial<typeof openclawForm> = {};
     // Override name only if empty OR still matches the previous template's name (not manually edited)
@@ -269,8 +272,8 @@ export default function CreatePage() {
       updates.name = tpl.name;
     }
     // Override description only if empty OR still matches the previous template's description
-    if (!openclawForm.description.trim() || openclawForm.description.trim() === prevDesc) {
-      updates.description = (tpl.description ?? '').slice(0, 140);
+    if (!openclawForm.description.trim() || openclawForm.description.trim() === prevDescVal) {
+      updates.description = bestDesc;
     }
     // Auto-select skills from suggestedSkills
     if (tpl.suggestedSkills.length > 0) {

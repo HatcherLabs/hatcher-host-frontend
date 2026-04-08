@@ -272,13 +272,24 @@ export function TerminalTab() {
     };
   }, []);
 
-  // ── Not running state ──
+  // ── Not running / starting state ──
   if (!isActive) {
+    const isStarting = agent?.status === 'starting';
     return (
       <div className="flex flex-col items-center justify-center h-full min-h-[400px] gap-4 text-zinc-400">
-        <div className="text-5xl opacity-50">⬛</div>
-        <p className="text-lg font-medium">Agent is not running</p>
-        <p className="text-sm text-zinc-500">Start the agent to access the terminal</p>
+        {isStarting ? (
+          <>
+            <div className="w-10 h-10 rounded-full border-2 border-[var(--color-accent)]/40 border-t-[var(--color-accent)] animate-spin" />
+            <p className="text-lg font-medium text-[var(--text-primary)]">Agent is starting up...</p>
+            <p className="text-sm text-zinc-500">The terminal will connect automatically when ready</p>
+          </>
+        ) : (
+          <>
+            <div className="text-5xl opacity-50">⬛</div>
+            <p className="text-lg font-medium">Agent is not running</p>
+            <p className="text-sm text-zinc-500">Start the agent to access the terminal</p>
+          </>
+        )}
       </div>
     );
   }

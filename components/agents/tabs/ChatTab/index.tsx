@@ -265,7 +265,7 @@ export function ChatTab() {
         agent={agent}
         isAuthenticated={isAuthenticated}
         isLimitReached={isLimitReached}
-        agentStarting={agent.status !== 'active' && agent.status !== 'error'}
+        agentStarting={agent.status === 'starting'}
         input={input}
         setInput={setInput}
         sending={sending}

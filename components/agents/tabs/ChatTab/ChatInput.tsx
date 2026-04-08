@@ -5,7 +5,7 @@ import { Send, Mic, MicOff, MessageSquare } from 'lucide-react';
 import { GlassCard } from '../../AgentContext';
 
 interface ChatInputProps {
-  agent: { name: string };
+  agent: { name: string; status?: string };
   isAuthenticated: boolean;
   isLimitReached: boolean;
   agentStarting?: boolean;
@@ -69,6 +69,19 @@ export function ChatInput({
             Upgrade to Pro
           </a>
           {' '}for more, or bring your own key for unlimited.
+        </p>
+      </div>
+    );
+  }
+
+  const agentStatus = agent.status;
+  const isNotRunning = agentStatus && agentStatus !== 'active' && agentStatus !== 'starting' && agentStatus !== 'sleeping';
+  if (isNotRunning) {
+    return (
+      <div className="bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-lg px-4 py-3 text-center">
+        <p className="text-sm text-[var(--text-muted)]">
+          Agent is not running.{' '}
+          <span className="text-[var(--text-secondary)]">Start it from the Overview tab to chat.</span>
         </p>
       </div>
     );
