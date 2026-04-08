@@ -173,6 +173,7 @@ export default function CreatePage() {
   const [templates, setTemplates] = useState<ApiTemplate[]>([]);
   const [apiCategories, setApiCategories] = useState<string[]>([]);
   const [templatesLoading, setTemplatesLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
@@ -181,7 +182,9 @@ export default function CreatePage() {
       .then(r => r.json() as Promise<{ templates: ApiTemplate[]; categories: string[] }>)
       .then(data => {
         setTemplates(data.templates);
-        setApiCategories(data.categories);
+        const sorted = [...data.categories].sort();
+        setApiCategories(sorted);
+        setSelectedCategory(prev => prev || sorted[0] || '');
       })
       .catch(() => {})
       .finally(() => setTemplatesLoading(false));
@@ -785,7 +788,23 @@ export default function CreatePage() {
                 </div>
               </div>
 
-              {/* Templates grouped by category */}
+              {/* Category selector + filtered templates */}
+              <div className="mb-4">
+                <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-3">Browse by category</p>
+                <select
+                  value={selectedCategory}
+                  onChange={e => setSelectedCategory(e.target.value)}
+                  disabled={templatesLoading}
+                  className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--color-accent)]/50 transition-colors disabled:opacity-50"
+                >
+                  {apiCategories.map(cat => (
+                    <option key={cat} value={cat}>
+                      {cat.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} ({templates.filter(t => t.category === cat).length})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               {templatesLoading ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {Array.from({ length: 6 }).map((_, i) => (
@@ -793,44 +812,38 @@ export default function CreatePage() {
                   ))}
                 </div>
               ) : (
-                <motion.div className="space-y-6" variants={staggerContainer} initial="hidden" animate="visible">
-                  {[...apiCategories].sort().map((cat) => {
-                    const catTemplates = templates.filter(t => t.category === cat);
-                    if (catTemplates.length === 0) return null;
-                    const catLabel = cat.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                    return (
-                      <div key={cat}>
-                        <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-3">{catLabel}</p>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                          {catTemplates.map((t) => (
-                            <motion.button
-                              key={t.id}
-                              variants={staggerItem}
-                              whileHover={cardHover}
-                              onClick={() => setSelectedTemplate(t.id)}
-                              className={cn(
-                                'p-4 rounded-xl border text-left transition-all duration-200 relative group',
-                                selectedTemplate === t.id
-                                  ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] text-[var(--text-primary)] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
-                                  : 'bg-[var(--bg-elevated)] border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[rgba(6,182,212,0.4)] hover:shadow-[0_0_16px_rgba(6,182,212,0.08)]'
-                              )}
-                            >
-                              {selectedTemplate === t.id && (
-                                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
-                                  <Check className="w-3 h-3 text-white" />
-                                </motion.div>
-                              )}
-                              <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-lg', selectedTemplate === t.id ? 'bg-[var(--color-accent)]/20' : 'bg-[var(--bg-hover)] group-hover:bg-[var(--color-accent)]/10')}>
-                                {t.icon}
-                              </div>
-                              <div className="text-sm font-medium">{t.name}</div>
-                              <div className="text-xs text-[var(--text-muted)] mt-1">{t.description}</div>
-                            </motion.button>
-                          ))}
-                        </div>
+                <motion.div
+                  key={selectedCategory}
+                  className="grid grid-cols-2 sm:grid-cols-3 gap-3"
+                  variants={staggerContainer}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  {templates.filter(t => t.category === selectedCategory).map((t) => (
+                    <motion.button
+                      key={t.id}
+                      variants={staggerItem}
+                      whileHover={cardHover}
+                      onClick={() => setSelectedTemplate(t.id)}
+                      className={cn(
+                        'p-4 rounded-xl border text-left transition-all duration-200 relative group',
+                        selectedTemplate === t.id
+                          ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] text-[var(--text-primary)] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
+                          : 'bg-[var(--bg-elevated)] border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[rgba(6,182,212,0.4)] hover:shadow-[0_0_16px_rgba(6,182,212,0.08)]'
+                      )}
+                    >
+                      {selectedTemplate === t.id && (
+                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
+                          <Check className="w-3 h-3 text-white" />
+                        </motion.div>
+                      )}
+                      <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-lg', selectedTemplate === t.id ? 'bg-[var(--color-accent)]/20' : 'bg-[var(--bg-hover)] group-hover:bg-[var(--color-accent)]/10')}>
+                        {t.icon}
                       </div>
-                    );
-                  })}
+                      <div className="text-sm font-medium">{t.name}</div>
+                      <div className="text-xs text-[var(--text-muted)] mt-1 line-clamp-2">{t.description}</div>
+                    </motion.button>
+                  ))}
                 </motion.div>
               )}
 
