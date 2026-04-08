@@ -185,6 +185,8 @@ export default function AdminPage() {
     updatedAt: string;
   }>>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMoreAgents, setLoadingMoreAgents] = useState(false);
+  const [agentsPagination, setAgentsPagination] = useState<{ total: number; hasMore: boolean }>({ total: 0, hasMore: false });
   const [error, setError] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState<'agents' | 'users' | 'tickets' | 'health'>('agents');
@@ -220,14 +222,19 @@ export default function AdminPage() {
     setLoading(true);
     setError(null);
 
-    Promise.all([api.adminGetStats(), api.adminGetAgents(), api.adminGetUsers(), api.adminGetTickets()])
+    Promise.all([api.adminGetStats(), api.adminGetAgents(50), api.adminGetUsers(), api.adminGetTickets()])
       .then(([statsRes, agentsRes, usersRes, ticketsRes]) => {
         setLoading(false);
         if (statsRes.success) setStats(statsRes.data);
         else setError(statsRes.error);
 
-        if (agentsRes.success) setAgents(Array.isArray(agentsRes.data) ? agentsRes.data : (agentsRes.data as any).agents ?? []);
-        else setError((prev) => prev ?? agentsRes.error);
+        if (agentsRes.success) {
+          const agentsData = (agentsRes.data as any);
+          setAgents(Array.isArray(agentsData) ? agentsData : agentsData.agents ?? []);
+          if (agentsData.pagination) {
+            setAgentsPagination({ total: agentsData.pagination.total, hasMore: agentsData.pagination.hasMore });
+          }
+        } else setError((prev) => prev ?? agentsRes.error);
 
         if (usersRes.success) setUsers(Array.isArray(usersRes.data) ? usersRes.data : (usersRes.data as any).users ?? []);
         else setError((prev) => prev ?? usersRes.error);
@@ -271,6 +278,20 @@ export default function AdminPage() {
       if (backupsRes.success) setBackups(backupsRes.data.backups);
     } else {
       alert(`Backup failed: ${(res as any).error ?? 'Unknown error'}`);
+    }
+  }
+
+  // ── Load more agents ───────────────────────────────────────
+  async function handleLoadMoreAgents() {
+    setLoadingMoreAgents(true);
+    const res = await api.adminGetAgents(50, agents.length);
+    setLoadingMoreAgents(false);
+    if (res.success) {
+      const data = res.data as any;
+      setAgents((prev) => [...prev, ...(data.agents ?? [])]);
+      if (data.pagination) {
+        setAgentsPagination({ total: data.pagination.total, hasMore: data.pagination.hasMore });
+      }
     }
   }
 
@@ -844,7 +865,7 @@ export default function AdminPage() {
                 <h2 className="text-lg font-semibold text-[var(--text-primary)]">
                   All Agents
                   <span className="text-sm font-normal ml-2 text-[var(--text-muted)]">
-                    ({filteredAgents.length})
+                    ({filteredAgents.length}{agentsPagination.total > agents.length ? ` of ${agentsPagination.total}` : ''})
                   </span>
                 </h2>
 
@@ -890,7 +911,7 @@ export default function AdminPage() {
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left">
+                  <table className="w-full text-left" style={{ tableLayout: 'auto' }}>
                     <thead>
                       <tr className="border-b border-[var(--border-default)]">
                         {['Agent', 'Owner', 'Framework', 'Status', 'Created', 'Actions'].map(
@@ -999,6 +1020,24 @@ export default function AdminPage() {
                       })}
                     </tbody>
                   </table>
+                </div>
+              )}
+
+              {/* Load More */}
+              {agentsPagination.hasMore && (
+                <div className="flex justify-center mt-4">
+                  <button
+                    onClick={handleLoadMoreAgents}
+                    disabled={loadingMoreAgents}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[rgba(6,182,212,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loadingMoreAgents ? (
+                      <RefreshCw size={14} className="animate-spin" />
+                    ) : (
+                      <Download size={14} />
+                    )}
+                    {loadingMoreAgents ? 'Loading…' : `Load more (${agentsPagination.total - agents.length} remaining)`}
+                  </button>
                 </div>
               )}
             </>
