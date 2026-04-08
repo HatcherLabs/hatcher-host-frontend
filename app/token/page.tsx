@@ -84,7 +84,7 @@ export default function TokenPage() {
             transition={{ ...fadeUpTransition, delay: 0.12 }}
             className="text-lg md:text-xl mb-6 max-w-2xl mx-auto leading-relaxed text-[var(--text-secondary)]"
           >
-            The ecosystem token of Hatcher. Launched on pump.fun.
+            The ecosystem token of Hatcher.
             Powers tier subscriptions, agent add-ons, and governance on Solana.
           </motion.p>
 
@@ -98,7 +98,7 @@ export default function TokenPage() {
               <span className="text-[var(--text-muted)] mr-2">CA:</span>
               <code className="text-[#14F195] font-mono text-xs sm:text-sm select-all">Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump</code>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center gap-3 w-full">
               <a
                 href="https://pump.fun/coin/Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump"
                 target="_blank"
@@ -203,7 +203,7 @@ export default function TokenPage() {
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#14F195]" />
                   <span className="text-[#14F195] font-medium">Live</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-[#14F195]/10 text-[#14F195] border border-[#14F195]/20 font-medium">Launched on pump.fun</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-[#14F195]/10 text-[#14F195] border border-[#14F195]/20 font-medium">Trading</span>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pb-5 border-b border-[var(--border-default)]">

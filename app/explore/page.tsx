@@ -223,6 +223,7 @@ export default function ExplorePage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [frameworkFilter, setFrameworkFilter] = useState<FrameworkFilter>('all');
   const [page, setPage] = useState(1);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated } = useAuth();
 
@@ -389,8 +390,9 @@ export default function ExplorePage() {
               )}
             </div>
 
-            {/* Filters row — scrollable */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {/* Filters row — inline on desktop, dropdown on mobile */}
+            {/* Desktop filters */}
+            <div className="hidden sm:flex items-center gap-2 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {/* Status filter */}
               <div className="flex gap-1 flex-shrink-0 bg-[var(--bg-card)] border border-[var(--border-default)] backdrop-blur-xl rounded-xl p-1">
                 {(Object.entries(STATUS_FILTER_LABELS) as [StatusFilter, string][]).map(([val, label]) => (
@@ -456,6 +458,105 @@ export default function ExplorePage() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Mobile filter button + dropdown */}
+            <div className="sm:hidden relative">
+              <button
+                onClick={() => setMobileFiltersOpen((prev) => !prev)}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 w-full justify-between',
+                  'bg-[var(--bg-card)] border border-[var(--border-default)] backdrop-blur-xl',
+                  hasActiveFilters ? 'text-[var(--color-accent)] border-[var(--color-accent)]/30' : 'text-[var(--text-secondary)]'
+                )}
+              >
+                <span className="flex items-center gap-2">
+                  <Filter className="w-4 h-4" />
+                  Filters & Sort
+                  {hasActiveFilters && (
+                    <span className="w-5 h-5 rounded-full bg-[var(--color-accent)] text-white text-[10px] flex items-center justify-center font-bold">
+                      {(statusFilter !== 'all' ? 1 : 0) + (frameworkFilter !== 'all' ? 1 : 0) + (sort !== 'newest' ? 1 : 0)}
+                    </span>
+                  )}
+                </span>
+                <Layers className={cn('w-4 h-4 transition-transform duration-200', mobileFiltersOpen && 'rotate-180')} />
+              </button>
+
+              {mobileFiltersOpen && (
+                <div className="absolute top-full left-0 right-0 mt-2 z-30 bg-[var(--bg-card)] border border-[var(--border-default)] backdrop-blur-xl rounded-xl p-4 shadow-xl space-y-4">
+                  {/* Status */}
+                  <div>
+                    <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium mb-2">Status</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {(Object.entries(STATUS_FILTER_LABELS) as [StatusFilter, string][]).map(([val, label]) => (
+                        <button
+                          key={val}
+                          onClick={() => setStatusFilter(val)}
+                          className={cn(
+                            'px-3 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium whitespace-nowrap flex items-center gap-1.5',
+                            statusFilter === val
+                              ? 'bg-[var(--color-accent)] text-white shadow-[0_0_12px_rgba(6,182,212,0.3)]'
+                              : 'text-[var(--text-muted)] bg-[var(--bg-elevated)] hover:text-[var(--text-secondary)]'
+                          )}
+                        >
+                          {val !== 'all' && (
+                            <span className={cn('w-1.5 h-1.5 rounded-full', statusFilter === val ? 'bg-white' : STATUS_ICONS[val])} />
+                          )}
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Framework */}
+                  <div>
+                    <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium mb-2">Framework</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {(Object.entries(FRAMEWORK_FILTER_LABELS) as [FrameworkFilter, string][]).map(([val, label]) => (
+                        <button
+                          key={val}
+                          onClick={() => setFrameworkFilter(val)}
+                          className={cn(
+                            'px-3 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium whitespace-nowrap flex items-center gap-1.5',
+                            frameworkFilter === val
+                              ? 'bg-[var(--color-accent)] text-white shadow-[0_0_12px_rgba(6,182,212,0.3)]'
+                              : 'text-[var(--text-muted)] bg-[var(--bg-elevated)] hover:text-[var(--text-secondary)]'
+                          )}
+                        >
+                          {val !== 'all' && (
+                            <span
+                              className="w-2 h-2 rounded-full"
+                              style={{ backgroundColor: frameworkFilter === val ? 'white' : (FRAMEWORK_COLORS[val]?.icon ?? 'var(--color-accent)') }}
+                            />
+                          )}
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Sort */}
+                  <div>
+                    <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium mb-2">Sort by</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {(Object.entries(SORT_LABELS) as [SortOption, string][]).map(([val, label]) => (
+                        <button
+                          key={val}
+                          onClick={() => setSort(val)}
+                          className={cn(
+                            'px-3 py-1.5 text-sm rounded-lg transition-all duration-200 font-medium whitespace-nowrap',
+                            sort === val
+                              ? 'bg-[var(--color-accent)] text-white shadow-[0_0_12px_rgba(6,182,212,0.3)]'
+                              : 'text-[var(--text-muted)] bg-[var(--bg-elevated)] hover:text-[var(--text-secondary)]'
+                          )}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Results summary bar */}

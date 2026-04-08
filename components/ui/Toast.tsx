@@ -138,7 +138,7 @@ export function Toast({ toast, onDismiss }: ToastProps) {
       transition={{ type: 'spring', stiffness: 500, damping: 35, mass: 0.8 }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      className="relative w-[380px] overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)]/90 shadow-lg backdrop-blur-xl"
+      className="relative w-full max-w-[380px] overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)]/90 shadow-lg backdrop-blur-xl"
       style={{
         borderLeft: `4px solid ${config.borderColor}`,
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.03)',
