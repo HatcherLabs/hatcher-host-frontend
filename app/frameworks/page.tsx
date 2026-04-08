@@ -52,7 +52,7 @@ const FRAMEWORKS = [
     memoryMb: 400,
     docsUrl: 'https://docs.openclaw.ai',
     configExample: `# openclaw/config.yaml
-model: meta-llama/llama-4-scout-17b-16e-instruct
+model: openai/gpt-oss-20b
 provider: groq
 
 skills:
@@ -104,7 +104,7 @@ memory:
     configExample: `# hermes/config.toml
 [model]
 provider = "groq"
-model = "meta-llama/llama-4-scout-17b-16e-instruct"
+model = "openai/gpt-oss-20b"
 
 [memory]
 backend = "chromadb"
@@ -170,7 +170,7 @@ telegram = { token = "\${TELEGRAM_BOT_TOKEN}" }`,
     "@elizaos/plugin-web3"
   ],
   "modelProvider": "groq",
-  "model": "llama-4-scout"
+  "model": "gpt-oss-20b"
 }`,
   },
   {
@@ -212,7 +212,7 @@ personality: |
 
 model:
   provider: groq
-  id: meta-llama/llama-4-scout-17b-16e-instruct
+  id: openai/gpt-oss-20b
 
 platforms:
   telegram:
@@ -650,7 +650,7 @@ export default function FrameworksPage() {
             LLM support
           </motion.h2>
           <p className="mb-6 text-sm text-[var(--text-secondary)]">
-            All frameworks support BYOK (Bring Your Own Key) for unlimited messages. Free-tier agents use our hosted Groq key.
+            All frameworks support BYOK (Bring Your Own Key) for unlimited messages. Free and Starter tiers use GPT-OSS 20B on Groq. Pro, Business, and Founding Member tiers use Llama 3.3 70B on Groq.
           </p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {FRAMEWORKS.map((fw) => (

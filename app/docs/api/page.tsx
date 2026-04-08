@@ -318,7 +318,7 @@ status = res.json()['data']['status']`,
   "success": true,
   "data": {
     "content": "SOL is currently trading at $142.50...",
-    "model": "llama-4-scout-17b",
+    "model": "gpt-oss-20b",
     "tokensUsed": { "input": 85, "output": 234 }
   }
 }`,

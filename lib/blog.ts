@@ -367,7 +367,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <tr><td><strong>OpenAI</strong></td><td>GPT-4o, GPT-4 Turbo, GPT-4o-mini</td><td>General purpose, coding, creative writing</td></tr>
 <tr><td><strong>Anthropic</strong></td><td>Claude 3.5 Sonnet, Claude 3 Opus</td><td>Analysis, research, long-form writing, safety</td></tr>
 <tr><td><strong>Google</strong></td><td>Gemini 2.0 Flash, Gemini Pro</td><td>Multimodal tasks, fast inference, large context</td></tr>
-<tr><td><strong>Groq</strong></td><td>Llama 4 Scout, Llama 3.3 70B, Mixtral 8x7B</td><td>Speed-critical applications, low-latency responses</td></tr>
+<tr><td><strong>Groq</strong></td><td>GPT-OSS 20B, Llama 3.3 70B, Mixtral 8x7B</td><td>Speed-critical applications, low-latency responses</td></tr>
 <tr><td><strong>xAI</strong></td><td>Grok-2, Grok-3</td><td>Real-time information, X/Twitter integration</td></tr>
 <tr><td><strong>OpenRouter</strong></td><td>Any model (routes to best provider)</td><td>Model switching, fallback routing, cost optimization</td></tr>
 </tbody>
@@ -385,7 +385,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <h3>BYOK on the Free Tier</h3>
 <ul>
 <li>Hatcher cost: <strong>$0/mo</strong> (free tier)</li>
-<li>Groq API cost for 200 messages/day (Llama 4 Scout, avg 500 tokens in + 300 tokens out): approximately <strong>$1.80/mo</strong></li>
+<li>Groq API cost for 200 messages/day (GPT-OSS 20B, avg 500 tokens in + 300 tokens out): approximately <strong>$1.80/mo</strong></li>
 <li><strong>Total: ~$1.80/mo</strong></li>
 </ul>
 <h3>BYOK with OpenAI on the Free Tier</h3>
@@ -536,7 +536,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>Hatcher builds the container, starts the agent, and connects it to Telegram. The whole process takes under 30 seconds.</p>
 
 <h2>Step 3: Test It</h2>
-<p>Open Telegram and search for your bot by username. Send it a message — any message. It should reply almost instantly using the default AI model (Llama 4 Scout via Groq).</p>
+<p>Open Telegram and search for your bot by username. Send it a message — any message. It should reply almost instantly using the default AI model (GPT-OSS 20B via Groq on the free tier).</p>
 <p>The default system prompt makes the agent a general-purpose assistant. You can customize it from the <strong>Config</strong> tab in your Hatcher dashboard.</p>
 
 <h2>Customizing Your Bot</h2>
@@ -544,7 +544,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <ul>
 <li><strong>System Prompt</strong> — define the bot's personality, role, and knowledge</li>
 <li><strong>Model</strong> — switch to GPT-4, Claude, Gemini, or any BYOK provider</li>
-<li><strong>Tools</strong> — enable web search (via Tavily), file access, memory, and more</li>
+<li><strong>Tools</strong> — enable web search (via Brave, Pro+ only), file access, memory, and more</li>
 <li><strong>Welcome Message</strong> — the first message users see when they start the bot</li>
 </ul>
 
@@ -761,7 +761,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <ul>
 <li>Platform fee: $0 (free tier) or $4.99/month (Starter)</li>
 <li>LLM cost: depends on your provider</li>
-<li>Groq (Llama 4 Scout): <strong>free tier available</strong></li>
+<li>Groq (GPT-OSS 20B): <strong>free tier available</strong></li>
 <li>OpenRouter: from $0.10 per million tokens</li>
 <li>Together AI: competitive rates with free credits</li>
 <li><strong>Monthly cost for an active bot: $0-5</strong></li>
@@ -785,7 +785,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>Here is our recommendation based on cost and quality:</p>
 
 <h3>Groq (Best Free Option)</h3>
-<p>Groq offers free access to Llama 4 Scout with generous rate limits. For most personal and small-scale agents, you will never hit the ceiling. This is the genuine $0 setup.</p>
+<p>Groq offers free access to GPT-OSS 20B with generous rate limits. For most personal and small-scale agents, you will never hit the ceiling. This is the genuine $0 setup.</p>
 
 <h3>OpenRouter (Best Variety)</h3>
 <p>OpenRouter aggregates 100+ models from multiple providers. You can switch between GPT-4, Claude, Llama, Mistral, and others without changing your API key. Great for experimentation.</p>
@@ -813,7 +813,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>Here is the math that matters:</p>
 <ul>
 <li>Hatcher free tier: $0/month — includes 1 agent, all integrations, all frameworks</li>
-<li>Groq free API key: $0/month — includes Llama 4 Scout with generous limits</li>
+<li>Groq free API key: $0/month — includes GPT-OSS 20B with generous limits</li>
 <li>Telegram/Discord bot tokens: free to create</li>
 <li><strong>Total: $0/month for a fully functional AI agent</strong></li>
 </ul>

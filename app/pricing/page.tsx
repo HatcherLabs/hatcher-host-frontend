@@ -57,11 +57,11 @@ const TIERS_DATA: TierDef[] = [
     storage: '100 MB workspace',
     sleep: 'Auto-sleep after 10 min idle',
     features: [
-      'Groq Llama 4 Scout',
+      'Groq GPT-OSS 20B',
       'BYOK = unlimited messages',
       'All integrations (Telegram, Discord, Twitter, etc)',
     ],
-    missing: ['No full logs', 'No file manager', 'No custom domains'],
+    missing: ['No web search', 'No full logs', 'No file manager', 'No custom domains'],
   },
   {
     key: 'starter',
@@ -79,7 +79,7 @@ const TIERS_DATA: TierDef[] = [
       'BYOK = unlimited messages',
       'All integrations',
     ],
-    missing: ['No full logs', 'No file manager', 'No custom domains'],
+    missing: ['No web search', 'No full logs', 'No file manager', 'No custom domains'],
   },
   {
     key: 'pro',
@@ -96,7 +96,9 @@ const TIERS_DATA: TierDef[] = [
     storage: '500 MB workspace',
     sleep: 'Always-on (no auto-sleep)',
     features: [
+      'Llama 3.3 70B on Groq',
       'BYOK = unlimited messages',
+      'Web Search (Brave)',
       'Dedicated resources',
       'Full logs',
       'Custom domains + SSL',
@@ -117,7 +119,9 @@ const TIERS_DATA: TierDef[] = [
     storage: '1 GB workspace',
     sleep: 'Always-on',
     features: [
+      'Llama 3.3 70B on Groq',
       'BYOK = unlimited messages',
+      'Web Search (Brave)',
       'Dedicated resources',
       'File manager included',
       'Full logs',
@@ -142,7 +146,9 @@ const TIERS_DATA: TierDef[] = [
     sleep: 'Always-on (no auto-sleep)',
     features: [
       'One-time payment — lifetime access',
+      'Llama 3.3 70B on Groq',
       'BYOK = unlimited messages',
+      'Web Search (Brave)',
       'Dedicated resources',
       'File manager included',
       'Full logs',
@@ -196,9 +202,10 @@ const FEATURE_ROWS: FeatureRow[] = [
   { label: 'Custom domains + SSL',  free: false,      starter: false,       pro: true,          business: true,       founding: true },
   { label: 'Team collaboration',    free: false,      starter: false,       pro: false,         business: true,       founding: true },
   { label: 'Priority support',      free: false,      starter: false,       pro: false,         business: true,       founding: true },
+  { label: 'Web Search (Brave)',     free: false,      starter: false,       pro: true,          business: true,       founding: true },
   { label: 'All integrations',      free: true,       starter: true,        pro: true,          business: true,       founding: true },
   { label: 'BYOK (own LLM key)',    free: true,       starter: true,        pro: true,          business: true,       founding: true },
-  { label: 'Default LLM (Groq)',    free: true,       starter: true,        pro: true,          business: true,       founding: true },
+  { label: 'Default LLM (Groq)',    free: 'GPT-OSS 20B', starter: 'GPT-OSS 20B', pro: 'Llama 3.3 70B', business: 'Llama 3.3 70B', founding: 'Llama 3.3 70B' },
 ];
 
 function renderCell(value: string | boolean) {
@@ -713,7 +720,7 @@ const FAQ = [
   },
   {
     q: 'What LLM do I get with the free tier?',
-    a: 'All tiers include Groq Llama 4 Scout as the default LLM. Free tier gets 10 messages/day, Starter gets 50, Pro gets 200 per agent, and Business gets 500 per agent. BYOK bypasses all limits.',
+    a: 'Free and Starter tiers use GPT-OSS 20B on Groq. Pro, Business, and Founding Member tiers get Llama 3.3 70B on Groq — a more capable model. Free tier gets 10 messages/day, Starter gets 50, Pro gets 200 per agent, and Business gets 500 per agent. BYOK bypasses all limits and lets you use any model you want.',
   },
   {
     q: 'What is the Founding Member tier?',

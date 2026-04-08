@@ -493,7 +493,7 @@ export default function LandingPage() {
             <FeatureCard
               icon={Zap}
               title="Free AI Included"
-              description="Every agent gets free AI via Groq (Llama 4 Scout). Start building immediately, upgrade when you want."
+              description="Every agent gets free AI via Groq. Start building immediately, upgrade when you want."
               accentColor="emerald"
             />
             <FeatureCard
@@ -799,7 +799,7 @@ export default function LandingPage() {
           </motion.div>
           <div className="space-y-3">
             {[
-              { q: 'Is it really free?', a: 'Yes. The free plan gives you 1 agent, 10 messages per day, and access to all platforms. We even include a free AI provider (Groq) so you don\'t need to pay anything to get started. No credit card required.' },
+              { q: 'Is it really free?', a: 'Yes. The free plan gives you 1 agent, 10 messages per day using GPT-OSS 20B on Groq, and access to all platforms. No credit card required. Paid tiers get Llama 3.3 70B for more capable responses.' },
               { q: 'Do I need to know how to code?', a: 'Not at all! Creating an agent is like filling out a form — choose a name, describe what you want it to do, pick which platforms to connect, and hit launch. The whole process takes about 60 seconds.' },
               { q: 'What is "Bring Your Own Key"?', a: 'If you already have an account with OpenAI (ChatGPT), Google, Anthropic, or another AI provider, you can connect it to your agent. This gives you unlimited messages at no extra cost from us — you only pay your AI provider directly.' },
               { q: 'Where does my agent run?', a: 'Your agent runs on our cloud servers 24/7. You don\'t need to keep your computer on or install anything. Once you launch it, it just works.' },

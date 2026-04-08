@@ -107,7 +107,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'How does the free tier work?',
-        a: 'Every account starts with a free tier that includes 1 agent. Free agents get 10 messages per day using our hosted Groq LLM key, with a 24-hour rolling reset. You get access to all integrations (Telegram, Discord, Twitter, WhatsApp, Slack). Free agents run on shared resources (0.5 CPU, 1GB RAM) and auto-sleep after 10 minutes of inactivity. If you bring your own API key (BYOK), messages are always unlimited and free.',
+        a: 'Every account starts with a free tier that includes 1 agent. Free agents get 10 messages per day using GPT-OSS 20B on Groq, with a 24-hour rolling reset. You get access to all integrations (Telegram, Discord, Twitter, WhatsApp, Slack). Free agents run on shared resources (0.5 CPU, 1GB RAM) and auto-sleep after 10 minutes of inactivity. Paid tiers (Pro, Business, Founding Member) use the more capable Llama 3.3 70B model and include web search via Brave. If you bring your own API key (BYOK), messages are always unlimited and free.',
       },
       {
         q: 'What is BYOK (Bring Your Own Key)?',
@@ -141,7 +141,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'How do I change the AI model?',
-        a: 'Open your agent\'s Config tab and look for the model settings section. If you\'re using Hatcher\'s hosted key, you\'ll use the default Groq model. If you have BYOK configured, you can select from any model supported by your provider (e.g., GPT-4o, Claude 3.5, Gemini Pro). Change the model identifier, save, and restart.',
+        a: 'Open your agent\'s Config tab and look for the model settings section. If you\'re using Hatcher\'s hosted key, Free and Starter tiers use GPT-OSS 20B on Groq, while Pro, Business, and Founding Member tiers use Llama 3.3 70B on Groq. If you have BYOK configured, you can select from any model supported by your provider (e.g., GPT-4o, Claude 3.5, Gemini Pro). Change the model identifier, save, and restart.',
       },
       {
         q: 'How do I start, stop, or restart my agent?',
@@ -155,7 +155,7 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'What plans are available?',
-        a: 'Hatcher offers four tiers. Free: 1 agent, 10 messages/day, shared resources, auto-sleep after 10 min. Starter ($4.99/mo): 1 agent, 50 messages/day, better resources (1 CPU, 1.5GB RAM), auto-sleep after 2 hours. Pro ($14.99/mo): 3 agents, 200 messages/day per agent, dedicated resources (2 CPU, 2GB RAM), file manager, full log viewer. Business ($39.99/mo): 10 agents, 500 messages/day per agent, always-on, priority support. All tiers include all integrations and BYOK is always unlimited.',
+        a: 'Hatcher offers four tiers. Free: 1 agent, 10 messages/day (GPT-OSS 20B), shared resources, auto-sleep after 10 min. Starter ($4.99/mo): 1 agent, 50 messages/day (GPT-OSS 20B), better resources (1 CPU, 1.5GB RAM), auto-sleep after 2 hours. Pro ($14.99/mo): 3 agents, 200 messages/day per agent (Llama 3.3 70B), web search via Brave, dedicated resources (2 CPU, 2GB RAM), full log viewer. Business ($39.99/mo): 10 agents, 500 messages/day per agent (Llama 3.3 70B), web search via Brave, always-on, priority support. All tiers include all integrations and BYOK is always unlimited.',
       },
       {
         q: 'How do add-ons work?',
@@ -197,7 +197,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'I am getting rate limited',
-        a: 'Rate limiting means you\'ve hit your daily message quota. Free tier: 10 messages/day, Starter: 50/day, Pro: 200/day, Business: 500/day. The limit resets on a 24-hour rolling window. Solutions: upgrade your plan for a higher limit, switch to BYOK (your own API key) for unlimited messages, or wait for the limit to reset. The 429 error in logs confirms rate limiting. BYOK always bypasses Hatcher\'s message limits.',
+        a: 'Rate limiting means you\'ve hit your daily message quota. Free tier: 10 messages/day, Starter: 50/day, Pro: 200/day, Business: 500/day. The limit resets on a 24-hour rolling window. Solutions: upgrade your plan for a higher limit (Pro and above also get a more capable model and web search), switch to BYOK (your own API key) for unlimited messages, or wait for the limit to reset. The 429 error in logs confirms rate limiting. BYOK always bypasses Hatcher\'s message limits.',
       },
     ],
   },

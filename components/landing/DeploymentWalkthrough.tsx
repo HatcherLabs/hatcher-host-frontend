@@ -14,7 +14,7 @@ const FRAMEWORK_OPTIONS = [
 const CONFIG_FIELDS = [
   { label: 'Name', value: 'CryptoBot', typing: true },
   { label: 'Personality', value: 'Friendly crypto expert who explains clearly', typing: true },
-  { label: 'Model', value: 'Llama 4 Scout (Free)', typing: false },
+  { label: 'Model', value: 'GPT-OSS 20B (Free)', typing: false },
 ];
 
 const PLATFORM_OPTIONS = [
