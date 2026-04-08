@@ -34,13 +34,14 @@ import {
 
 // ── Types ────────────────────────────────────────────────────
 
-type Step = 1 | 2 | 3 | 4;
+type Step = 1 | 2 | 3 | 4 | 5;
 
 const STEP_LABELS: Record<Step, string> = {
-  1: 'Pick a style',
-  2: 'Choose a template',
-  3: 'Set it up',
-  4: 'Ready to launch?',
+  1: 'Style',
+  2: 'Category',
+  3: 'Template',
+  4: 'Set Up',
+  5: 'Launch',
 };
 
 type LLMChoice = 'free_groq' | 'byok';
@@ -544,19 +545,19 @@ export default function CreatePage() {
                 className="h-full rounded-full"
                 style={{ background: 'linear-gradient(90deg, #22d3ee, var(--color-accent), #0891b2)' }}
                 initial={{ width: '0%' }}
-                animate={{ width: step === 1 ? '10%' : step === 2 ? '33%' : step === 3 ? '66%' : '100%' }}
+                animate={{ width: step === 1 ? '8%' : step === 2 ? '25%' : step === 3 ? '50%' : step === 4 ? '75%' : '100%' }}
                 transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
               />
             </div>
           </div>
-          <div className="grid grid-cols-4 w-full px-2" role="list" aria-label="Creation steps">
-            {([1, 2, 3, 4] as Step[]).map((s, i) => (
+          <div className="grid grid-cols-5 w-full px-1" role="list" aria-label="Creation steps">
+            {([1, 2, 3, 4, 5] as Step[]).map((s, i) => (
               <div key={s} className="flex items-center" role="listitem" aria-current={s === step ? 'step' : undefined}>
                 {/* Step circle + label */}
                 <div className="flex flex-col items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
                   <motion.div
                     className={cn(
-                      'w-8 h-8 sm:w-11 sm:h-11 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all duration-300 border-2',
+                      'w-7 h-7 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-[10px] sm:text-sm font-bold transition-all duration-300 border-2',
                       s < step
                         ? 'bg-[var(--accent-600)] border-[var(--accent-600)] text-white shadow-[0_0_16px_rgba(6,182,212,0.3)]'
                         : s === step
@@ -574,7 +575,7 @@ export default function CreatePage() {
                   </motion.div>
                   <span
                     className={cn(
-                      'text-[9px] sm:text-xs w-full text-center font-medium leading-tight px-0.5',
+                      'text-[8px] sm:text-[11px] w-full text-center font-medium leading-tight px-0.5',
                       s < step ? 'text-[var(--accent-400)]' : s === step ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'
                     )}
                   >
@@ -582,8 +583,8 @@ export default function CreatePage() {
                   </span>
                 </div>
                 {/* Connecting line */}
-                {i < 3 && (
-                  <div className="relative w-4 sm:w-8 flex-shrink-0 mb-5 sm:mb-6">
+                {i < 4 && (
+                  <div className="relative w-2 sm:w-5 flex-shrink-0 mb-5 sm:mb-6">
                     <div className="h-0.5 rounded-full bg-[var(--border-default)]" />
                     <motion.div
                       className="absolute top-0 left-0 h-0.5 rounded-full"
@@ -750,78 +751,56 @@ export default function CreatePage() {
             </motion.div>
           )}
 
-          {/* ── STEP 2: TEMPLATE ───────────────────────────────────── */}
+          {/* ── STEP 2: CATEGORY ───────────────────────────────────── */}
           {step === 2 && (
             <motion.div key="step2" variants={stepVariants} initial="enter" animate="center" exit="exit">
-              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">Choose a template</h2>
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">What type of agent?</h2>
               <p className="text-[var(--text-muted)] text-sm mb-6 text-center">
-                Pick a starting point — you can customize everything in the next step
+                Choose a category — we&apos;ll show you the best templates
               </p>
 
-              {/* Category pills */}
-              <div className="flex gap-1.5 overflow-x-auto pb-2 mb-5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                {templatesLoading
-                  ? Array.from({ length: 8 }).map((_, i) => (
-                      <div key={i} className="h-7 w-20 flex-shrink-0 rounded-full bg-[var(--bg-card)] animate-pulse" />
-                    ))
-                  : apiCategories.map(cat => (
-                      <button
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat)}
-                        className={cn(
-                          'flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium border transition-all duration-150',
-                          selectedCategory === cat
-                            ? 'bg-[var(--color-accent)]/15 border-[var(--color-accent)]/40 text-[var(--color-accent)]'
-                            : 'bg-transparent border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)]'
-                        )}
-                      >
-                        {cat.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                        <span className="ml-1 opacity-40">{templates.filter(t => t.category === cat).length}</span>
-                      </button>
-                    ))
-                }
-              </div>
-
-              {/* Template grid */}
               {templatesLoading ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="h-28 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] animate-pulse" />
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <div key={i} className="h-24 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] animate-pulse" />
                   ))}
                 </div>
               ) : (
                 <motion.div
-                  key={selectedCategory}
                   className="grid grid-cols-2 sm:grid-cols-3 gap-3"
                   variants={staggerContainer}
                   initial="hidden"
                   animate="visible"
                 >
-                  {templates.filter(t => t.category === selectedCategory).map((t) => (
-                    <motion.button
-                      key={t.id}
-                      variants={staggerItem}
-                      whileHover={cardHover}
-                      onClick={() => setSelectedTemplate(t.id)}
-                      className={cn(
-                        'p-4 rounded-xl border text-left transition-all duration-200 relative group',
-                        selectedTemplate === t.id
-                          ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] text-[var(--text-primary)] shadow-[0_0_20px_rgba(6,182,212,0.12)]'
-                          : 'bg-[var(--bg-elevated)] border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[rgba(6,182,212,0.3)] hover:bg-[var(--bg-card)]'
-                      )}
-                    >
-                      {selectedTemplate === t.id && (
-                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
-                          <Check className="w-3 h-3 text-white" />
-                        </motion.div>
-                      )}
-                      <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center mb-2.5 text-base transition-colors', selectedTemplate === t.id ? 'bg-[var(--color-accent)]/20' : 'bg-[var(--bg-hover)] group-hover:bg-[var(--color-accent)]/10')}>
-                        {t.icon}
-                      </div>
-                      <div className="text-sm font-semibold leading-tight mb-1">{t.name}</div>
-                      <div className="text-xs text-[var(--text-muted)] line-clamp-2 leading-relaxed">{t.description}</div>
-                    </motion.button>
-                  ))}
+                  {apiCategories.map(cat => {
+                    const icon = templates.find(t => t.category === cat)?.icon ?? '🤖';
+                    const count = templates.filter(t => t.category === cat).length;
+                    const label = cat.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+                    const isSelected = selectedCategory === cat && selectedTemplate !== 'custom';
+                    return (
+                      <motion.button
+                        key={cat}
+                        variants={staggerItem}
+                        whileHover={cardHover}
+                        onClick={() => { setSelectedCategory(cat); setSelectedTemplate(''); }}
+                        className={cn(
+                          'p-4 rounded-xl border text-left transition-all duration-200 relative',
+                          isSelected
+                            ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-[0_0_20px_rgba(6,182,212,0.12)]'
+                            : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)] hover:bg-[var(--bg-card)]'
+                        )}
+                      >
+                        {isSelected && (
+                          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
+                            <Check className="w-3 h-3 text-white" />
+                          </motion.div>
+                        )}
+                        <div className="text-2xl mb-2.5 leading-none">{icon}</div>
+                        <div className="text-sm font-semibold leading-tight text-[var(--text-primary)] mb-0.5">{label}</div>
+                        <div className="text-[11px] text-[var(--text-muted)]">{count} templates</div>
+                      </motion.button>
+                    );
+                  })}
                 </motion.div>
               )}
 
@@ -829,7 +808,7 @@ export default function CreatePage() {
               <div className="mt-6 pt-5 border-t border-[var(--border-default)]">
                 <motion.button
                   whileHover={cardHover}
-                  onClick={() => setSelectedTemplate('custom')}
+                  onClick={() => { setSelectedTemplate('custom'); setSelectedCategory(''); }}
                   className={cn(
                     'w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border text-left transition-all duration-200',
                     selectedTemplate === 'custom'
@@ -852,8 +831,23 @@ export default function CreatePage() {
                 </motion.button>
               </div>
 
-              <div className="mt-6 flex justify-end">
-                <button className="btn-primary" onClick={() => { applyTemplate(); setStep(3); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+              <div className="mt-6 flex justify-between">
+                <button className="btn-secondary" onClick={() => { setStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                  <ChevronLeft className="w-4 h-4" />
+                  Back
+                </button>
+                <button
+                  className="btn-primary"
+                  disabled={!selectedCategory && selectedTemplate !== 'custom'}
+                  onClick={() => {
+                    if (selectedTemplate === 'custom') {
+                      setStep(4);
+                    } else {
+                      setStep(3);
+                    }
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                >
                   Continue
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -861,10 +855,69 @@ export default function CreatePage() {
             </motion.div>
           )}
 
-          {/* ── STEP 3: CONFIGURE ───────────────────────────────────── */}
+          {/* ── STEP 3: TEMPLATE ───────────────────────────────────── */}
           {step === 3 && (
+            <motion.div key="step3" variants={stepVariants} initial="enter" animate="center" exit="exit">
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-1 text-center">
+                {selectedCategory.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+              </h2>
+              <p className="text-[var(--text-muted)] text-sm mb-6 text-center">
+                Pick a template — you can customize everything in the next step
+              </p>
+
+              <motion.div
+                className="grid grid-cols-2 sm:grid-cols-3 gap-3"
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+              >
+                {templates.filter(t => t.category === selectedCategory).map((t) => (
+                  <motion.button
+                    key={t.id}
+                    variants={staggerItem}
+                    whileHover={cardHover}
+                    onClick={() => setSelectedTemplate(t.id)}
+                    className={cn(
+                      'p-4 rounded-xl border text-left transition-all duration-200 relative group',
+                      selectedTemplate === t.id
+                        ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] text-[var(--text-primary)] shadow-[0_0_20px_rgba(6,182,212,0.12)]'
+                        : 'bg-[var(--bg-elevated)] border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[rgba(6,182,212,0.3)] hover:bg-[var(--bg-card)]'
+                    )}
+                  >
+                    {selectedTemplate === t.id && (
+                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
+                        <Check className="w-3 h-3 text-white" />
+                      </motion.div>
+                    )}
+                    <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center mb-2.5 text-base transition-colors', selectedTemplate === t.id ? 'bg-[var(--color-accent)]/20' : 'bg-[var(--bg-hover)] group-hover:bg-[var(--color-accent)]/10')}>
+                      {t.icon}
+                    </div>
+                    <div className="text-sm font-semibold leading-tight mb-1">{t.name}</div>
+                    <div className="text-xs text-[var(--text-muted)] line-clamp-2 leading-relaxed">{t.description}</div>
+                  </motion.button>
+                ))}
+              </motion.div>
+
+              <div className="mt-6 flex justify-between">
+                <button className="btn-secondary" onClick={() => { setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                  <ChevronLeft className="w-4 h-4" />
+                  Back
+                </button>
+                <button
+                  className="btn-primary"
+                  onClick={() => { applyTemplate(); setStep(4); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                >
+                  Continue
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── STEP 4: CONFIGURE ───────────────────────────────────── */}
+          {step === 4 && (
             <motion.div
-              key="step3"
+              key="step4"
               variants={stepVariants}
               initial="enter"
               animate="center"
@@ -1807,14 +1860,21 @@ export default function CreatePage() {
               </div>
 
               <div className="mt-8 flex justify-between">
-                <button className="btn-secondary" onClick={() => { setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                <button className="btn-secondary" onClick={() => {
+                  if (selectedTemplate === 'custom') {
+                    setStep(2);
+                  } else {
+                    setStep(3);
+                  }
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}>
                   <ChevronLeft className="w-4 h-4" />
                   Back
                 </button>
                 <button
                   className="btn-primary"
                   disabled={!isConfigValid}
-                  onClick={() => { setStep(4); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  onClick={() => { setStep(5); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 >
                   Continue
                   <ChevronRight className="w-4 h-4" />
@@ -1823,10 +1883,10 @@ export default function CreatePage() {
             </motion.div>
           )}
 
-          {/* ── STEP 4: CONFIRM & LAUNCH ────────────────────────────── */}
-          {step === 4 && (
+          {/* ── STEP 5: CONFIRM & LAUNCH ────────────────────────────── */}
+          {step === 5 && (
             <motion.div
-              key="step4"
+              key="step5"
               variants={stepVariants}
               initial="enter"
               animate="center"
@@ -2071,7 +2131,7 @@ export default function CreatePage() {
               <div className="flex justify-between items-center">
                 <button
                   className="btn-secondary"
-                  onClick={() => { setStep(3); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  onClick={() => { setStep(4); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   disabled={launching || launched}
                 >
                   <ChevronLeft className="w-4 h-4" />
