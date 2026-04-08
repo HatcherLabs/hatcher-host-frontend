@@ -754,57 +754,35 @@ export default function CreatePage() {
           {step === 2 && (
             <motion.div key="step2" variants={stepVariants} initial="enter" animate="center" exit="exit">
               <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">Choose a template</h2>
-              <p className="text-[var(--text-muted)] text-sm mb-2 text-center">
-                Pick a starting point for your agent
-              </p>
-              <p className="text-xs text-[var(--text-muted)] mb-8 text-center opacity-60">
-                Templates give your agent a head start -- you can customize everything later
+              <p className="text-[var(--text-muted)] text-sm mb-6 text-center">
+                Pick a starting point — you can customize everything in the next step
               </p>
 
-              {/* Custom option always at top */}
-              <div className="mb-6">
-                <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-3">Start fresh</p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  <motion.button
-                    variants={staggerItem}
-                    whileHover={cardHover}
-                    onClick={() => setSelectedTemplate('custom')}
-                    className={cn(
-                      'p-4 rounded-xl border text-left transition-all duration-200 relative group',
-                      selectedTemplate === 'custom'
-                        ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] text-[var(--text-primary)] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
-                        : 'bg-[var(--bg-elevated)] border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[rgba(6,182,212,0.4)] hover:shadow-[0_0_16px_rgba(6,182,212,0.08)]'
-                    )}
-                  >
-                    {selectedTemplate === 'custom' && (
-                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
-                        <Check className="w-3 h-3 text-white" />
-                      </motion.div>
-                    )}
-                    <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-lg', selectedTemplate === 'custom' ? 'bg-[var(--color-accent)]/20' : 'bg-[var(--bg-hover)] group-hover:bg-[var(--color-accent)]/10')}>⚙️</div>
-                    <div className="text-sm font-medium">Custom Agent</div>
-                    <div className="text-xs text-[var(--text-muted)] mt-1">Start from scratch with your own system prompt</div>
-                  </motion.button>
-                </div>
+              {/* Category pills */}
+              <div className="flex gap-1.5 overflow-x-auto pb-2 mb-5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                {templatesLoading
+                  ? Array.from({ length: 8 }).map((_, i) => (
+                      <div key={i} className="h-7 w-20 flex-shrink-0 rounded-full bg-[var(--bg-card)] animate-pulse" />
+                    ))
+                  : apiCategories.map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={cn(
+                          'flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium border transition-all duration-150',
+                          selectedCategory === cat
+                            ? 'bg-[var(--color-accent)]/15 border-[var(--color-accent)]/40 text-[var(--color-accent)]'
+                            : 'bg-transparent border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)]'
+                        )}
+                      >
+                        {cat.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        <span className="ml-1 opacity-40">{templates.filter(t => t.category === cat).length}</span>
+                      </button>
+                    ))
+                }
               </div>
 
-              {/* Category selector + filtered templates */}
-              <div className="mb-4">
-                <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-3">Browse by category</p>
-                <select
-                  value={selectedCategory}
-                  onChange={e => setSelectedCategory(e.target.value)}
-                  disabled={templatesLoading}
-                  className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-3 py-2.5 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--color-accent)]/50 transition-colors disabled:opacity-50"
-                >
-                  {apiCategories.map(cat => (
-                    <option key={cat} value={cat}>
-                      {cat.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} ({templates.filter(t => t.category === cat).length})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+              {/* Template grid */}
               {templatesLoading ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {Array.from({ length: 6 }).map((_, i) => (
@@ -828,26 +806,53 @@ export default function CreatePage() {
                       className={cn(
                         'p-4 rounded-xl border text-left transition-all duration-200 relative group',
                         selectedTemplate === t.id
-                          ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] text-[var(--text-primary)] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
-                          : 'bg-[var(--bg-elevated)] border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[rgba(6,182,212,0.4)] hover:shadow-[0_0_16px_rgba(6,182,212,0.08)]'
+                          ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] text-[var(--text-primary)] shadow-[0_0_20px_rgba(6,182,212,0.12)]'
+                          : 'bg-[var(--bg-elevated)] border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[rgba(6,182,212,0.3)] hover:bg-[var(--bg-card)]'
                       )}
                     >
                       {selectedTemplate === t.id && (
-                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
+                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
                           <Check className="w-3 h-3 text-white" />
                         </motion.div>
                       )}
-                      <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-lg', selectedTemplate === t.id ? 'bg-[var(--color-accent)]/20' : 'bg-[var(--bg-hover)] group-hover:bg-[var(--color-accent)]/10')}>
+                      <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center mb-2.5 text-base transition-colors', selectedTemplate === t.id ? 'bg-[var(--color-accent)]/20' : 'bg-[var(--bg-hover)] group-hover:bg-[var(--color-accent)]/10')}>
                         {t.icon}
                       </div>
-                      <div className="text-sm font-medium">{t.name}</div>
-                      <div className="text-xs text-[var(--text-muted)] mt-1 line-clamp-2">{t.description}</div>
+                      <div className="text-sm font-semibold leading-tight mb-1">{t.name}</div>
+                      <div className="text-xs text-[var(--text-muted)] line-clamp-2 leading-relaxed">{t.description}</div>
                     </motion.button>
                   ))}
                 </motion.div>
               )}
 
-              <div className="mt-8 flex justify-end">
+              {/* Custom option at bottom */}
+              <div className="mt-6 pt-5 border-t border-[var(--border-default)]">
+                <motion.button
+                  whileHover={cardHover}
+                  onClick={() => setSelectedTemplate('custom')}
+                  className={cn(
+                    'w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border text-left transition-all duration-200',
+                    selectedTemplate === 'custom'
+                      ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] text-[var(--text-primary)]'
+                      : 'bg-[var(--bg-elevated)] border-dashed border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]'
+                  )}
+                >
+                  <div className={cn('w-9 h-9 flex-shrink-0 rounded-lg flex items-center justify-center text-lg', selectedTemplate === 'custom' ? 'bg-[var(--color-accent)]/20' : 'bg-[var(--bg-hover)]')}>
+                    ⚙️
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-semibold">Custom Agent</div>
+                    <div className="text-xs text-[var(--text-muted)] mt-0.5">Start from scratch with your own system prompt</div>
+                  </div>
+                  {selectedTemplate === 'custom' && (
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-white" />
+                    </motion.div>
+                  )}
+                </motion.button>
+              </div>
+
+              <div className="mt-6 flex justify-end">
                 <button className="btn-primary" onClick={() => { applyTemplate(); setStep(3); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                   Continue
                   <ChevronRight className="w-4 h-4" />
