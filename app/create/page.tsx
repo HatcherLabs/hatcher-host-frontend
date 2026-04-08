@@ -312,7 +312,7 @@ export default function CreatePage() {
   // Build LLM config for payload
   function getLLMConfig() {
     if (llmChoice === 'free_groq') {
-      return { modelProvider: 'groq', model: 'meta-llama/llama-4-scout-17b-16e-instruct' };
+      return { modelProvider: 'groq', model: 'openai/gpt-oss-20b' };
     }
     if (llmChoice === 'byok') {
       return {
@@ -327,7 +327,7 @@ export default function CreatePage() {
       };
     }
     // Fallback: use free groq
-    return { modelProvider: 'groq', model: 'meta-llama/llama-4-scout-17b-16e-instruct' };
+    return { modelProvider: 'groq', model: 'openai/gpt-oss-20b' };
   }
 
   function getLLMSummary(): string {
@@ -400,7 +400,7 @@ export default function CreatePage() {
         framework: selectedFramework,
         template: selectedTemplate,
         config: {
-          model: llm.model ?? 'llama-4-scout-17b',
+          model: llm.model ?? 'openai/gpt-oss-20b',
           provider: llm.modelProvider,
           ...(selectedFramework === 'openclaw' ? { skills: openclawSkills } : {}),
           ...(selectedFramework === 'hermes' ? { tools: hermesTools } : {}),
