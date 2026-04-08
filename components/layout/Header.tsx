@@ -447,7 +447,11 @@ export function Header() {
                 {isAuthenticated && user ? (
                   <div className="space-y-1">
                     <div className="px-3 py-2 flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
+                      {user.avatarUrl ? (
+                        <img src={user.avatarUrl} alt="" className="w-6 h-6 rounded-full object-cover flex-shrink-0" />
+                      ) : (
+                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
+                      )}
                       <span className="text-sm font-medium text-purple-300">{user.username}</span>
                       <span className="text-[10px] text-[var(--text-secondary)] ml-auto truncate max-w-[150px]">{user.email}</span>
                     </div>

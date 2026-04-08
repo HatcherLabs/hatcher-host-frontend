@@ -153,7 +153,7 @@ type TabId = (typeof TABS)[number]['id'];
 // ═══════════════════════════════════════════════════════════
 export default function SettingsPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading, user, logout } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user, logout, refreshUser } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<TabId>('profile');
 
@@ -289,8 +289,10 @@ export default function SettingsPage() {
       if (avatarUrl !== user.avatarUrl) updates.avatarUrl = avatarUrl;
       if (!Object.keys(updates).length) { toast('info', 'No changes to save'); return; }
       const res = await api.updateProfile(updates);
-      if (res.success) toast('success', 'Profile updated');
-      else toast('error', (res as any).error || 'Failed to update profile');
+      if (res.success) {
+        toast('success', 'Profile updated');
+        await refreshUser();
+      } else toast('error', (res as any).error || 'Failed to update profile');
     } catch { toast('error', 'Failed to update profile'); }
     finally { setSavingProfile(false); }
   }

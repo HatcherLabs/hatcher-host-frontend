@@ -22,6 +22,7 @@ interface AuthContextValue {
   register: (email: string, username: string, password: string, referralCode?: string) => Promise<void>;
   logout: () => void;
   clearError: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -33,6 +34,7 @@ const AuthContext = createContext<AuthContextValue>({
   register: async () => {},
   logout: () => {},
   clearError: () => {},
+  refreshUser: async () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -113,6 +115,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const clearError = useCallback(() => setError(null), []);
 
+  const refreshUser = useCallback(async () => {
+    const res = await api.getProfile();
+    if (res.success) {
+      setUser({
+        id: res.data.id,
+        email: res.data.email,
+        username: res.data.username,
+        walletAddress: res.data.walletAddress ?? null,
+        isAdmin: res.data.isAdmin ?? false,
+        tier: (res.data as any).tier ?? 'free',
+        avatarUrl: (res.data as any).avatarUrl ?? null,
+      });
+    }
+  }, []);
+
   // Sync state with token on mount (e.g. page refresh)
   // Check both localStorage token AND httpOnly cookie (via profile fetch)
   useEffect(() => {
@@ -153,7 +170,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated: authed, isLoading, error, user, login, register, logout, clearError }}>
+    <AuthContext.Provider value={{ isAuthenticated: authed, isLoading, error, user, login, register, logout, clearError, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
