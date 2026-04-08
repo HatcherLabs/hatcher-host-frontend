@@ -116,19 +116,6 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
           <div className="min-w-0">
             <h2 className="text-sm font-semibold text-[var(--text-primary)] truncate">{agent.name}</h2>
             <div className="flex items-center gap-2 mt-0.5">
-              <span
-                role="status"
-                aria-label={`Agent status: ${statusInfo.label}`}
-                className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full border ${statusInfo.classes}`}
-              >
-                {statusInfo.pulse && (
-                  <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
-                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${statusInfo.dotColor} opacity-75`} />
-                    <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${statusInfo.dotColor}`} />
-                  </span>
-                )}
-                {statusInfo.label}
-              </span>
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${FRAMEWORK_BADGE[agent.framework] ?? 'bg-slate-500/15 text-slate-400 border-slate-500/30'}`}>
                 {frameworkMeta?.name ?? agent.framework}
               </span>
