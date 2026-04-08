@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: 'Live updates from the Hatcher team. We ship improvements every day.',
 };
 
-export const revalidate = 300; // refresh every 5 min
+export const dynamic = 'force-dynamic'; // always fetch fresh — changelog should be live
 
 type Tag = 'frontend' | 'backend' | 'shared' | 'infrastructure' | 'docs';
 
@@ -27,7 +27,7 @@ const TAG_CONFIG: Record<Tag, { label: string; className: string }> = {
 async function fetchCommits(): Promise<Commit[]> {
   try {
     const API = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.hatcher.host';
-    const res = await fetch(`${API}/changelog`, { next: { revalidate: 300 } });
+    const res = await fetch(`${API}/changelog`, { cache: 'no-store' });
     if (!res.ok) return [];
     const data = await res.json();
     return data.commits ?? [];
