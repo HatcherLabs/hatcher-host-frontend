@@ -136,6 +136,7 @@ export default function AgentManagePage() {
   // Core state
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
+  const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const validTabs: Tab[] = ['overview','config','integrations','skills','files','logs','memory','knowledge','versions','chat','stats'];
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const rawTab = searchParams.get('tab') as Tab;
@@ -484,6 +485,32 @@ export default function AgentManagePage() {
 
   // Initial load
   useEffect(() => { loadAgent(); loadUsage(); }, [loadAgent, loadUsage]);
+
+  // Poll agent status every 5s while agent is starting up (not yet active/error)
+  useEffect(() => {
+    const status = agent?.status;
+    if (statusPollRef.current) {
+      clearInterval(statusPollRef.current);
+      statusPollRef.current = null;
+    }
+    if (!agent || status === 'active' || status === 'error') return;
+
+    statusPollRef.current = setInterval(async () => {
+      const res = await api.getAgent(id);
+      if (!res.success) return;
+      setAgent(res.data);
+      if (res.data.status === 'active') {
+        if (statusPollRef.current) { clearInterval(statusPollRef.current); statusPollRef.current = null; }
+        toast('success', 'Agent is ready to chat!');
+      } else if (res.data.status === 'error') {
+        if (statusPollRef.current) { clearInterval(statusPollRef.current); statusPollRef.current = null; }
+      }
+    }, 5000);
+
+    return () => {
+      if (statusPollRef.current) { clearInterval(statusPollRef.current); statusPollRef.current = null; }
+    };
+  }, [agent?.status, id]);
 
   // Guided onboarding for newly created agents (?new=1 query param)
   useEffect(() => {
@@ -907,6 +934,7 @@ export default function AgentManagePage() {
   const sendMessage = async (overrideText?: string) => {
     const text = (overrideText ?? input).trim();
     if (!text || sending || sendCooldown) return;
+    if (agent?.status !== 'active') return; // block until agent is running
     if (!hasUnlimitedChat && msgCount >= msgLimit) {
       setChatErrorType('ratelimit');
       setChatError('Daily message limit reached. Upgrade to Pro for more, or bring your own key for unlimited.');
@@ -1008,6 +1036,8 @@ export default function AgentManagePage() {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
+      // On mobile (small screen), Enter inserts a newline — send via button only
+      if (typeof window !== 'undefined' && window.innerWidth < 768) return;
       e.preventDefault();
       sendMessage();
     }

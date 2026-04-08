@@ -47,7 +47,7 @@ export default function EmbedPage() {
   const [sending, setSending] = useState(false);
   const [rateLimited, setRateLimited] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (!slug) return;
@@ -91,8 +91,9 @@ export default function EmbedPage() {
     }
   }, [input, sending, agent, messages, slug]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
+      if (typeof window !== 'undefined' && window.innerWidth < 768) return;
       e.preventDefault();
       handleSend();
     }
@@ -193,15 +194,20 @@ export default function EmbedPage() {
       {/* Input */}
       <div className="px-3 py-2.5 border-t border-white/5 shrink-0">
         <div className="flex gap-1.5 items-center">
-          <input
+          <textarea
             ref={inputRef}
-            type="text"
+            rows={1}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
+            onInput={(e) => {
+              const el = e.currentTarget;
+              el.style.height = 'auto';
+              el.style.height = Math.min(el.scrollHeight, 80) + 'px';
+            }}
             placeholder="Type a message..."
             disabled={sending || rateLimited}
-            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500/50 disabled:opacity-50 transition-colors"
+            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500/50 disabled:opacity-50 transition-colors resize-none leading-relaxed"
           />
           <button
             onClick={handleSend}

@@ -8,6 +8,7 @@ interface ChatInputProps {
   agent: { name: string };
   isAuthenticated: boolean;
   isLimitReached: boolean;
+  agentStarting?: boolean;
   input: string;
   setInput: (val: string) => void;
   sending: boolean;
@@ -29,6 +30,7 @@ export function ChatInput({
   agent,
   isAuthenticated,
   isLimitReached,
+  agentStarting,
   input,
   setInput,
   sending,
@@ -72,14 +74,22 @@ export function ChatInput({
     );
   }
 
+  const inputDisabled = sending || sendCooldown || !!agentStarting;
+
   return (
     <div>
+      {agentStarting && (
+        <div className="flex items-center justify-center gap-2 px-3 py-2 mb-2 rounded-xl bg-[var(--color-accent)]/5 border border-[var(--color-accent)]/15">
+          <div className="w-3 h-3 rounded-full border-2 border-[var(--color-accent)]/40 border-t-[var(--color-accent)] animate-spin flex-shrink-0" />
+          <span className="text-xs text-[var(--text-muted)]">Agent is starting up, please wait...</span>
+        </div>
+      )}
       <div className="flex gap-2 items-end rounded-2xl p-3 border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl focus-within:border-[var(--color-accent)]/40 focus-within:shadow-[0_0_20px_rgba(6,182,212,0.06)] transition-all duration-200">
         <textarea
           ref={inputRef}
           className="flex-1 bg-transparent border-none outline-none resize-none min-h-[36px] max-h-32 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] leading-relaxed"
           rows={1}
-          placeholder={`Message ${agent.name}...`}
+          placeholder={agentStarting ? 'Waiting for agent to start...' : `Message ${agent.name}...`}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
@@ -90,7 +100,7 @@ export function ChatInput({
             el.style.height = Math.min(el.scrollHeight, 128) + 'px';
             window.scrollTo({ top: winY });
           }}
-          disabled={sending || sendCooldown}
+          disabled={inputDisabled}
         />
 
         {/* Mic button */}
@@ -103,7 +113,7 @@ export function ChatInput({
                 : 'bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] border border-transparent hover:border-[var(--text-muted)]/30'
             }`}
             title={isListening ? 'Stop recording' : 'Start voice input'}
-            disabled={sending || sendCooldown}
+            disabled={inputDisabled}
           >
             {isListening ? (
               <MicOff size={15} className="text-red-400" />
@@ -116,12 +126,12 @@ export function ChatInput({
         {/* Send button */}
         <button
           className={`h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
-            input.trim() && !sending && !sendCooldown
+            input.trim() && !inputDisabled
               ? 'bg-[var(--color-accent)] hover:bg-[#0891b2] shadow-[0_0_12px_rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]'
               : 'bg-[var(--color-accent)]/30 opacity-50 cursor-not-allowed'
           }`}
           onClick={onSendMessage}
-          disabled={!input.trim() || sending || sendCooldown}
+          disabled={!input.trim() || inputDisabled}
         >
           {sending ? (
             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

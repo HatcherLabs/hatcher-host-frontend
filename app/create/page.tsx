@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
@@ -175,6 +175,8 @@ export default function CreatePage() {
   const [apiCategories, setApiCategories] = useState<string[]>([]);
   const [templatesLoading, setTemplatesLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  // Track which template was last auto-applied so we can override it when template changes
+  const lastAppliedTemplateRef = useRef<string>('');
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
@@ -251,15 +253,25 @@ export default function CreatePage() {
 
   // ── Helpers ──
 
-  /** Pre-populate form fields from the selected template when moving to step 3 */
+  /** Pre-populate form fields from the selected template when moving to step 4 */
   function applyTemplate() {
     if (selectedTemplate === 'custom') return;
     const tpl = templates.find((t) => t.id === selectedTemplate);
     if (!tpl) return;
 
+    // Find previous template to detect if user manually edited the fields
+    const prevTpl = templates.find((t) => t.id === lastAppliedTemplateRef.current);
+    const prevDesc = (prevTpl?.description ?? '').slice(0, 140);
+
     const updates: Partial<typeof openclawForm> = {};
-    if (!openclawForm.name.trim()) updates.name = tpl.name;
-    if (!openclawForm.description.trim()) updates.description = tpl.description;
+    // Override name only if empty OR still matches the previous template's name (not manually edited)
+    if (!openclawForm.name.trim() || openclawForm.name.trim() === (prevTpl?.name ?? '')) {
+      updates.name = tpl.name;
+    }
+    // Override description only if empty OR still matches the previous template's description
+    if (!openclawForm.description.trim() || openclawForm.description.trim() === prevDesc) {
+      updates.description = (tpl.description ?? '').slice(0, 140);
+    }
     // Auto-select skills from suggestedSkills
     if (tpl.suggestedSkills.length > 0) {
       setOpenclawSkills(tpl.suggestedSkills.filter(s => OPENCLAW_SKILLS_LIST.includes(s)));
@@ -267,6 +279,7 @@ export default function CreatePage() {
     if (Object.keys(updates).length > 0) {
       setOpenclawForm((prev) => ({ ...prev, ...updates }));
     }
+    lastAppliedTemplateRef.current = selectedTemplate;
   }
 
   function toggleSkill(skill: string) {
