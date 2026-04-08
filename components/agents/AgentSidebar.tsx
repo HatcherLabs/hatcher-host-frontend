@@ -49,10 +49,7 @@ function getTabs(framework?: string): TabDef[] {
     { id: 'logs', label: 'Logs', icon: <ScrollText size={18} />, group: 'data' },
     { id: 'stats', label: 'Stats', icon: <BarChart3 size={18} />, group: 'data' },
     { id: 'memory', label: 'Memory', icon: <Brain size={18} />, group: 'data' },
-    { id: 'knowledge', label: 'Knowledge', icon: <BookOpen size={18} />, group: 'data' },
     { id: 'files', label: 'Files', icon: <FolderOpen size={18} />, group: 'data' },
-    { id: 'versions', label: 'Versions', icon: <History size={18} />, group: 'advanced' },
-    { id: 'comm', label: 'Communication', icon: <Radio size={18} />, group: 'advanced' },
   ];
 }
 

@@ -984,25 +984,7 @@ export function StatsTab() {
               )}
             </div>
 
-            {/* Response Times detail */}
-            <div className={`rounded-xl border ${fwColors.border} bg-[var(--bg-elevated)]/80 p-4`}>
-              <div className="flex items-center gap-2 mb-4">
-                <Zap size={16} className={fwColors.text} />
-                <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider">Response Times</span>
-              </div>
-              <div className="grid grid-cols-3 gap-2 sm:gap-4">
-                {[
-                  { label: 'Average', value: monData.responseTimes.avg },
-                  { label: 'P95', value: monData.responseTimes.p95 },
-                  { label: 'Last', value: monData.responseTimes.last },
-                ].map(rt => (
-                  <div key={rt.label} className="text-center">
-                    <p className="text-lg font-bold" style={{ color: fwColors.hex }}>{formatMs(rt.value)}</p>
-                    <p className="text-xs text-zinc-500">{rt.label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Response Times — shown in stat cards above */}
           </div>
         ) : null}
       </div>
