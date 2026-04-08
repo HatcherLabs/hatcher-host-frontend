@@ -94,11 +94,6 @@ const SchedulesTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
-const KnowledgeTab = dynamic(
-  () => import('@/components/agents/tabs/KnowledgeTab').then(mod => ({ default: mod.KnowledgeTab })),
-  { loading: () => <TabSkeleton /> }
-);
-
 const SkillsTab = dynamic(
   () => import('@/components/agents/tabs/SkillsTab').then(mod => ({ default: mod.SkillsTab })),
   { loading: () => <TabSkeleton /> }
@@ -109,20 +104,10 @@ const WorkflowsTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
-const VersionsTab = dynamic(
-  () => import('@/components/agents/tabs/VersionsTab').then(mod => ({ default: mod.VersionsTab })),
-  { loading: () => <TabSkeleton /> }
-);
-
 const TerminalTab = dynamic(
   () => import('@/components/agents/tabs/TerminalTab').then(mod => ({ default: mod.TerminalTab })),
   { loading: TabSkeleton },
 );
-const CommTab = dynamic(
-  () => import('@/components/agents/tabs/CommTab').then(mod => ({ default: mod.CommTab })),
-  { loading: TabSkeleton },
-);
-
 // ─── Tab definitions ─────────────────────────────────────────
 
 // ─── Main Component ─────────────────────────────────────────
@@ -1291,12 +1276,8 @@ export default function AgentManagePage() {
               {tab === 'logs' && <LogsTab />}
               {tab === 'terminal' && <TerminalTab />}
               {tab === 'memory' && <MemoryTab />}
-              {tab === 'knowledge' && <KnowledgeTab />}
-              {/* schedules and workflows hidden from public for now */}
-              {tab === 'versions' && <VersionsTab />}
               {tab === 'chat' && <ChatTab />}
               {tab === 'stats' && <StatsTab />}
-              {tab === 'comm' && <CommTab />}
             </AnimatePresence>
           </div>
         </div>
