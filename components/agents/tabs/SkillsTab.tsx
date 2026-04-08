@@ -998,7 +998,7 @@ function SkillsSkeleton() {
 // ─── Main Component ─────────────────────────────────────────
 
 export function SkillsTab() {
-  const { agent } = useAgentContext();
+  const { agent, loadAgent } = useAgentContext();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -1049,8 +1049,13 @@ export function SkillsTab() {
         setRestartHint(false);
         try {
           await api.restartAgent(agent.id);
+          // Immediately refresh agent so status transitions to 'starting',
+          // which triggers the page-level status poll and shows the startup
+          // indicator in Chat / Terminal tabs.
+          await loadAgent();
           await new Promise(r => setTimeout(r, 10_000));
           await loadSkills();
+          await loadAgent(); // Final refresh to confirm active
         } catch {
           setRestartHint(true);
         } finally {
@@ -1060,7 +1065,7 @@ export function SkillsTab() {
         setRestartHint(true);
       }
     }
-  }, [agent, loadSkills]);
+  }, [agent, loadSkills, loadAgent]);
 
   // Merge API skills with catalog for richer display
   // Map each API skill to its catalog category, using fuzzy matching
@@ -1185,8 +1190,10 @@ export function SkillsTab() {
       setRestarting(true);
       try {
         await api.restartAgent(agent.id);
+        await loadAgent();
         await new Promise(r => setTimeout(r, 10_000));
         await loadSkills();
+        await loadAgent();
       } catch {
         setRestartHint(true);
       } finally {
@@ -1195,7 +1202,7 @@ export function SkillsTab() {
     } else if (toEnable.length > 0) {
       setRestartHint(true);
     }
-  }, [agent, skills, loadSkills]);
+  }, [agent, skills, loadSkills, loadAgent]);
 
   // Build a set of installed skill IDs for the marketplace
   const installedSkillIds = useMemo(() => {
