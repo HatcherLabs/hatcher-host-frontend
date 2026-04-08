@@ -83,8 +83,9 @@ export const api = {
     const token = getToken();
     const res = await fetch(`${API_BASE}/auth/export-data`, {
       method: 'POST',
-      credentials: 'include', // Send httpOnly cookie
+      credentials: 'include',
       headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}), 'Content-Type': 'application/json' },
+      body: '{}',
     });
     if (!res.ok) throw new Error('Export failed');
     return res.blob();
