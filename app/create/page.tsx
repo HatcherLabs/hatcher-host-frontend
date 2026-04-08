@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { track } from '@/lib/analytics';
-import { BYOK_PROVIDERS, getBYOKProvider, AGENT_TEMPLATES } from '@hatcher/shared';
-import type { BYOKProvider, AgentTemplateId } from '@hatcher/shared';
+import { BYOK_PROVIDERS, getBYOKProvider } from '@hatcher/shared';
+import type { BYOKProvider } from '@hatcher/shared';
 import { cn } from '@/lib/utils';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -47,9 +47,18 @@ type LLMChoice = 'free_groq' | 'byok';
 
 // BYOK_PROVIDERS imported from @hatcher/shared
 
-// ── Templates (derived from shared AGENT_TEMPLATES) ─────────
+// ── Templates (fetched from API) ─────────────────────────────
 
-const CATEGORY_ORDER = ['business', 'development', 'crypto', 'research', 'support', 'custom'] as const;
+interface ApiTemplate {
+  id: string;
+  name: string;
+  icon: string;
+  category: string;
+  description: string;
+  personality: string;
+  topics: string[];
+  suggestedSkills: string[];
+}
 
 const OPENCLAW_SKILLS_LIST = ['web_search', 'calculator', 'weather', 'code_interpreter', 'file_manager', 'image_gen'];
 
@@ -160,10 +169,28 @@ export default function CreatePage() {
   const [byokBaseUrl, setByokBaseUrl] = useState('');
   // Credits model removed — using Groq free or BYOK only
 
+  // ── Templates (fetched from API) ──
+  const [templates, setTemplates] = useState<ApiTemplate[]>([]);
+  const [apiCategories, setApiCategories] = useState<string[]>([]);
+  const [templatesLoading, setTemplatesLoading] = useState(true);
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+
+  useEffect(() => {
+    void fetch(`${apiUrl}/api/templates?limit=200`)
+      .then(r => r.json() as Promise<{ templates: ApiTemplate[]; categories: string[] }>)
+      .then(data => {
+        setTemplates(data.templates);
+        setApiCategories(data.categories);
+      })
+      .catch(() => {})
+      .finally(() => setTemplatesLoading(false));
+  }, [apiUrl]);
+
   // ── Template state (pre-select via ?template= URL param) ──
   const searchParams = useSearchParams();
   const preselectedTemplate = searchParams.get('template') ?? 'custom';
-  const validPreselect = AGENT_TEMPLATES.some(t => t.id === preselectedTemplate) ? preselectedTemplate : 'custom';
+  const validPreselect = preselectedTemplate; // will be validated dynamically
   const [selectedTemplate, setSelectedTemplate] = useState(validPreselect);
   const [selectedFramework, setSelectedFramework] = useState<'openclaw' | 'hermes' | 'elizaos' | 'milady'>('openclaw');
 
@@ -220,24 +247,19 @@ export default function CreatePage() {
 
   // ── Helpers ──
 
-  /** Pre-populate form fields from the selected template when moving to step 2 */
+  /** Pre-populate form fields from the selected template when moving to step 3 */
   function applyTemplate() {
     if (selectedTemplate === 'custom') return;
-    const tpl = AGENT_TEMPLATES.find((t) => t.id === selectedTemplate);
+    const tpl = templates.find((t) => t.id === selectedTemplate);
     if (!tpl) return;
 
     const updates: Partial<typeof openclawForm> = {};
-
-    // Only pre-fill empty fields (don't overwrite user edits)
-    if (!openclawForm.name.trim()) {
-      updates.name = tpl.name;
+    if (!openclawForm.name.trim()) updates.name = tpl.name;
+    if (!openclawForm.description.trim()) updates.description = tpl.description;
+    // Auto-select skills from suggestedSkills
+    if (tpl.suggestedSkills.length > 0) {
+      setOpenclawSkills(tpl.suggestedSkills.filter(s => OPENCLAW_SKILLS_LIST.includes(s)));
     }
-    if (!openclawForm.description.trim()) {
-      updates.description = tpl.description;
-    }
-    // System prompt is NOT pre-filled — it uses the template default server-side
-    // User only fills systemPrompt if they want to override
-
     if (Object.keys(updates).length > 0) {
       setOpenclawForm((prev) => ({ ...prev, ...updates }));
     }
@@ -356,7 +378,7 @@ export default function CreatePage() {
         name: openclawForm.name,
         ...(openclawForm.description.trim() ? { description: openclawForm.description.trim() } : {}),
         framework: selectedFramework,
-        template: selectedTemplate as AgentTemplateId,
+        template: selectedTemplate,
         config: {
           model: llm.model ?? 'llama-4-scout-17b',
           provider: llm.modelProvider,
@@ -376,9 +398,8 @@ export default function CreatePage() {
           ...(selectedFramework === 'milady' ? {
             miladyPersonality,
           } : {}),
-          systemPrompt: openclawForm.systemPrompt.trim()
-            ? openclawForm.systemPrompt
-            : (AGENT_TEMPLATES.find(t => t.id === selectedTemplate)?.defaultSystemPrompt ?? ''),
+          systemPrompt: openclawForm.systemPrompt.trim() || '',
+          // Note: template system prompt is fetched server-side from AgentTemplate.soulMd
           // BYOK config -- backend reads agentConfig['byok']
           ...(llm.byok ? { byok: llm.byok } : {}),
           // Platform integrations — secrets flattened to root so build-spec.ts can extract them
@@ -728,77 +749,90 @@ export default function CreatePage() {
 
           {/* ── STEP 2: TEMPLATE ───────────────────────────────────── */}
           {step === 2 && (
-            <motion.div
-              key="step2"
-              variants={stepVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-            >
+            <motion.div key="step2" variants={stepVariants} initial="enter" animate="center" exit="exit">
               <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">Choose a template</h2>
               <p className="text-[var(--text-muted)] text-sm mb-2 text-center">
                 Pick a starting point for your agent
               </p>
-              <p className="text-xs text-[var(--text-muted)] mb-8 text-center opacity-60">Templates give your agent a head start -- you can customize everything later</p>
+              <p className="text-xs text-[var(--text-muted)] mb-8 text-center opacity-60">
+                Templates give your agent a head start -- you can customize everything later
+              </p>
 
-              <motion.div
-                className="space-y-6"
-                variants={staggerContainer}
-                initial="hidden"
-                animate="visible"
-              >
-                {CATEGORY_ORDER.map((cat) => {
-                  const templates = AGENT_TEMPLATES.filter((t) => t.category === cat);
-                  if (templates.length === 0) return null;
-                  const catLabel = cat === 'business' ? 'Business & Marketing'
-                    : cat === 'development' ? 'Development & Technical'
-                    : cat === 'crypto' ? 'Crypto & Finance'
-                    : cat === 'research' ? 'Research & Knowledge'
-                    : cat === 'support' ? 'Support & Operations'
-                    : 'Custom';
-                  return (
-                    <div key={cat}>
-                      <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-3">{catLabel}</p>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {templates.map((t) => (
-                          <motion.button
-                            key={t.id}
-                            variants={staggerItem}
-                            whileHover={cardHover}
-                            onClick={() => setSelectedTemplate(t.id)}
-                            className={cn(
-                              'p-4 rounded-xl border text-left transition-all duration-200 relative group',
-                              selectedTemplate === t.id
-                                ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] text-[var(--text-primary)] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
-                                : 'bg-[var(--bg-elevated)] border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[rgba(6,182,212,0.4)] hover:shadow-[0_0_16px_rgba(6,182,212,0.08)]'
-                            )}
-                          >
-                            {selectedTemplate === t.id && (
-                              <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center"
-                              >
-                                <Check className="w-3 h-3 text-white" />
-                              </motion.div>
-                            )}
-                            <div className={cn(
-                              'w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-lg transition-colors duration-200',
-                              selectedTemplate === t.id
-                                ? 'bg-[var(--color-accent)]/20'
-                                : 'bg-[var(--bg-hover)] group-hover:bg-[var(--color-accent)]/10'
-                            )}>
-                              {t.icon}
-                            </div>
-                            <div className="text-sm font-medium">{t.name}</div>
-                            <div className="text-xs text-[var(--text-muted)] mt-1">{t.description}</div>
-                          </motion.button>
-                        ))}
+              {/* Custom option always at top */}
+              <div className="mb-6">
+                <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-3">Start fresh</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <motion.button
+                    variants={staggerItem}
+                    whileHover={cardHover}
+                    onClick={() => setSelectedTemplate('custom')}
+                    className={cn(
+                      'p-4 rounded-xl border text-left transition-all duration-200 relative group',
+                      selectedTemplate === 'custom'
+                        ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] text-[var(--text-primary)] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
+                        : 'bg-[var(--bg-elevated)] border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[rgba(6,182,212,0.4)] hover:shadow-[0_0_16px_rgba(6,182,212,0.08)]'
+                    )}
+                  >
+                    {selectedTemplate === 'custom' && (
+                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
+                        <Check className="w-3 h-3 text-white" />
+                      </motion.div>
+                    )}
+                    <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-lg', selectedTemplate === 'custom' ? 'bg-[var(--color-accent)]/20' : 'bg-[var(--bg-hover)] group-hover:bg-[var(--color-accent)]/10')}>⚙️</div>
+                    <div className="text-sm font-medium">Custom Agent</div>
+                    <div className="text-xs text-[var(--text-muted)] mt-1">Start from scratch with your own system prompt</div>
+                  </motion.button>
+                </div>
+              </div>
+
+              {/* Templates grouped by category */}
+              {templatesLoading ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="h-28 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] animate-pulse" />
+                  ))}
+                </div>
+              ) : (
+                <motion.div className="space-y-6" variants={staggerContainer} initial="hidden" animate="visible">
+                  {[...apiCategories].sort().map((cat) => {
+                    const catTemplates = templates.filter(t => t.category === cat);
+                    if (catTemplates.length === 0) return null;
+                    const catLabel = cat.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    return (
+                      <div key={cat}>
+                        <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-3">{catLabel}</p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {catTemplates.map((t) => (
+                            <motion.button
+                              key={t.id}
+                              variants={staggerItem}
+                              whileHover={cardHover}
+                              onClick={() => setSelectedTemplate(t.id)}
+                              className={cn(
+                                'p-4 rounded-xl border text-left transition-all duration-200 relative group',
+                                selectedTemplate === t.id
+                                  ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] text-[var(--text-primary)] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
+                                  : 'bg-[var(--bg-elevated)] border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[rgba(6,182,212,0.4)] hover:shadow-[0_0_16px_rgba(6,182,212,0.08)]'
+                              )}
+                            >
+                              {selectedTemplate === t.id && (
+                                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
+                                  <Check className="w-3 h-3 text-white" />
+                                </motion.div>
+                              )}
+                              <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-lg', selectedTemplate === t.id ? 'bg-[var(--color-accent)]/20' : 'bg-[var(--bg-hover)] group-hover:bg-[var(--color-accent)]/10')}>
+                                {t.icon}
+                              </div>
+                              <div className="text-sm font-medium">{t.name}</div>
+                              <div className="text-xs text-[var(--text-muted)] mt-1">{t.description}</div>
+                            </motion.button>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </motion.div>
+                    );
+                  })}
+                </motion.div>
+              )}
 
               <div className="mt-8 flex justify-end">
                 <button className="btn-primary" onClick={() => { applyTemplate(); setStep(3); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
@@ -1810,7 +1844,7 @@ export default function CreatePage() {
                 {/* Summary details */}
                 <div className="space-y-3 text-sm">
                   <SummaryRow label="Agent Type" value={selectedFramework === 'openclaw' ? 'OpenClaw' : selectedFramework === 'hermes' ? 'Hermes' : selectedFramework === 'milady' ? 'Milady' : 'ElizaOS'} />
-                  <SummaryRow label="Template" value={AGENT_TEMPLATES.find(t => t.id === selectedTemplate)?.name ?? 'Custom'} />
+                  <SummaryRow label="Template" value={templates.find(t => t.id === selectedTemplate)?.name ?? 'Custom'} />
                   <SummaryRow label="AI Model" value={getLLMSummary()} />
 
                   {agentDesc && <SummaryRow label="Description" value={agentDesc} />}
