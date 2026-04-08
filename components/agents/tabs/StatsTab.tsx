@@ -911,10 +911,9 @@ export function StatsTab() {
               </button>
             </div>
 
-            {/* Stat cards: Uptime, Avg Response, CPU, Memory */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Stat cards: Uptime, CPU, Memory */}
+            <div className="grid grid-cols-3 gap-4">
               <StatCard icon={<Clock size={16} />} label="Uptime" value={formatUptime(monData.uptime.seconds)} accentHex={fwColors.hex} />
-              <StatCard icon={<Zap size={16} />} label="Avg Response" value={formatMs(monData.responseTimes.avg)} sub={`P95: ${formatMs(monData.responseTimes.p95)}`} accentHex={fwColors.hex} />
               <StatCard icon={<Cpu size={16} />} label="CPU" value={`${monData.resources.cpuPercent.toFixed(1)}%`} accentHex={fwColors.hex} />
               <StatCard icon={<MemoryStick size={16} />} label="Memory" value={`${monData.resources.memoryUsageMb.toFixed(0)} MB`} sub={`${memPercent}% of ${monData.resources.memoryLimitMb} MB`} accentHex={fwColors.hex} />
             </div>
