@@ -48,7 +48,7 @@ function getTabs(framework?: string): TabDef[] {
     { id: 'skills', label: framework === 'elizaos' ? 'Plugins' : 'Skills', icon: <Sparkles size={18} />, group: 'configure' },
     { id: 'logs', label: 'Logs', icon: <ScrollText size={18} />, group: 'data' },
     { id: 'stats', label: 'Stats', icon: <BarChart3 size={18} />, group: 'data' },
-    { id: 'memory', label: 'Memory', icon: <Brain size={18} />, group: 'data' },
+    ...((framework !== 'elizaos' && framework !== 'milady') ? [{ id: 'memory' as const, label: 'Memory', icon: <Brain size={18} />, group: 'data' as const }] : []),
     { id: 'files', label: 'Files', icon: <FolderOpen size={18} />, group: 'data' },
   ];
 }
