@@ -1,9 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AGENT_TEMPLATES } from '@hatcher/shared';
 import { TemplateCard } from '@/components/agents/TemplateCard';
 import type { TemplateCardData } from '@/components/agents/TemplateCard';
 import {
@@ -15,32 +14,95 @@ import {
   Search,
   Sparkles,
   TrendingUp,
+  Zap,
+  Database,
+  Shield,
+  Megaphone,
+  ShoppingCart,
+  GraduationCap,
+  DollarSign,
+  Heart,
+  Users,
+  Scale,
+  Cpu,
+  Package,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// ── Category config ────────────────────────────────────────
+// ── ApiTemplate (from /api/templates) ─────────────────────
 
-const CATEGORIES = [
-  { key: 'all',         label: 'All Templates', icon: Sparkles },
-  { key: 'support',     label: 'Customer Support', icon: Headphones },
-  { key: 'business',    label: 'Business', icon: Briefcase },
-  { key: 'research',    label: 'Research', icon: FlaskConical },
-  { key: 'crypto',      label: 'Trading & DeFi', icon: TrendingUp },
-  { key: 'development', label: 'Development', icon: Code2 },
-  { key: 'general',     label: 'General', icon: Bot },
-] as const;
+interface ApiTemplate {
+  id: string;
+  name: string;
+  icon: string;
+  category: string;
+  description: string;
+  personality: string;
+  topics: string[];
+  suggestedSkills: string[];
+}
 
-type CategoryKey = typeof CATEGORIES[number]['key'];
+// ── Category icon map ──────────────────────────────────────
+
+const CATEGORY_ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+  'all':              Sparkles,
+  'automation':       Zap,
+  'business':         Briefcase,
+  'compliance':       Scale,
+  'creative':         Sparkles,
+  'customer-success': Headphones,
+  'data':             Database,
+  'development':      Code2,
+  'devops':           Cpu,
+  'ecommerce':        ShoppingCart,
+  'education':        GraduationCap,
+  'finance':          DollarSign,
+  'freelance':        Briefcase,
+  'healthcare':       Heart,
+  'hr':               Users,
+  'legal':            Scale,
+  'marketing':        Megaphone,
+  'moltbook':         Bot,
+  'personal':         Bot,
+  'productivity':     Zap,
+  'real-estate':      Bot,
+  'saas':             Bot,
+  'security':         Shield,
+  'supply-chain':     Package,
+  'voice':            Bot,
+  'ollama':           Bot,
+  'research':         FlaskConical,
+  'support':          Headphones,
+  'crypto':           TrendingUp,
+  'general':          Bot,
+};
+
+function getCategoryIcon(key: string): React.ComponentType<{ size?: number; className?: string }> {
+  return CATEGORY_ICON_MAP[key] ?? Bot;
+}
+
+function getCategoryLabel(key: string): string {
+  if (key === 'all') return 'All Templates';
+  return key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
 
 // ── Integration suggestions by category ───────────────────
 
 const CATEGORY_INTEGRATIONS: Record<string, string[]> = {
-  business:    ['Telegram', 'Slack', 'Discord', 'Web Chat'],
-  development: ['Slack', 'Discord', 'Web Chat', 'Telegram'],
-  crypto:      ['Telegram', 'Discord', 'Twitter/X', 'Web Chat'],
-  research:    ['Telegram', 'Slack', 'Web Chat', 'Discord'],
-  support:     ['Telegram', 'Slack', 'Discord', 'WhatsApp', 'Web Chat'],
-  general:     ['Telegram', 'Discord', 'Web Chat'],
+  business:          ['Telegram', 'Slack', 'Discord', 'Web Chat'],
+  development:       ['Slack', 'Discord', 'Web Chat', 'Telegram'],
+  crypto:            ['Telegram', 'Discord', 'Twitter/X', 'Web Chat'],
+  research:          ['Telegram', 'Slack', 'Web Chat', 'Discord'],
+  support:           ['Telegram', 'Slack', 'Discord', 'WhatsApp', 'Web Chat'],
+  'customer-success':['Telegram', 'Slack', 'Discord', 'WhatsApp', 'Web Chat'],
+  general:           ['Telegram', 'Discord', 'Web Chat'],
+  marketing:         ['Telegram', 'Discord', 'Twitter/X', 'Web Chat'],
+  finance:           ['Telegram', 'Slack', 'Discord', 'Web Chat'],
+  education:         ['Telegram', 'Discord', 'Web Chat'],
+  healthcare:        ['Telegram', 'Web Chat'],
+  hr:                ['Slack', 'Web Chat', 'Telegram'],
+  legal:             ['Slack', 'Web Chat', 'Telegram'],
+  ecommerce:         ['Telegram', 'WhatsApp', 'Web Chat'],
 };
 
 // ── Badge suggestions ─────────────────────────────────────
@@ -53,31 +115,6 @@ function getBadge(id: string): string | undefined {
   if (NEW_IDS.includes(id))     return 'New';
   return undefined;
 }
-
-// ── Framework suggestion by template ─────────────────────
-
-function getSuggestedFramework(id: string): TemplateCardData['framework'] {
-  if (id.startsWith('hermes-')) return 'hermes';
-  if (['elizaos-', 'milady-'].some(p => id.startsWith(p))) return 'elizaos';
-  return 'openclaw';
-}
-
-// ── Enrich AGENT_TEMPLATES into TemplateCardData ──────────
-
-const ENRICHED_TEMPLATES: TemplateCardData[] = AGENT_TEMPLATES.map(t => ({
-  id: t.id,
-  name: t.name,
-  icon: t.icon,
-  category: t.category,
-  description: t.description,
-  personality: t.personality,
-  defaultBio: t.defaultBio,
-  defaultTopics: t.defaultTopics,
-  defaultSystemPrompt: t.defaultSystemPrompt,
-  integrations: CATEGORY_INTEGRATIONS[t.category] ?? ['Telegram', 'Discord', 'Web Chat'],
-  badge: getBadge(t.id),
-  framework: getSuggestedFramework(t.id),
-}));
 
 // ── Animation variants ────────────────────────────────────
 
@@ -95,11 +132,43 @@ const itemVariants = {
 
 export default function NewAgentPage() {
   const router = useRouter();
-  const [activeCategory, setActiveCategory] = useState<CategoryKey>('all');
+  const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [rawTemplates, setRawTemplates] = useState<ApiTemplate[]>([]);
+  const [apiCategories, setApiCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+
+  useEffect(() => {
+    void fetch(`${apiUrl}/api/templates?limit=200`)
+      .then(r => r.json() as Promise<{ templates: ApiTemplate[]; categories: string[] }>)
+      .then(data => {
+        setRawTemplates(data.templates);
+        setApiCategories(data.categories);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [apiUrl]);
+
+  const enrichedTemplates = useMemo<TemplateCardData[]>(() => (
+    rawTemplates.map(t => ({
+      id: t.id,
+      name: t.name,
+      icon: t.icon,
+      category: t.category,
+      description: t.description,
+      personality: t.personality,
+      defaultTopics: t.topics,
+      integrations: CATEGORY_INTEGRATIONS[t.category] ?? ['Telegram', 'Discord', 'Web Chat'],
+      badge: getBadge(t.id),
+      framework: 'openclaw' as const,
+    }))
+  ), [rawTemplates]);
+
   const filteredTemplates = useMemo(() => {
-    let result = ENRICHED_TEMPLATES;
+    let result = enrichedTemplates;
 
     if (activeCategory !== 'all') {
       result = result.filter(t => t.category === activeCategory);
@@ -117,20 +186,19 @@ export default function NewAgentPage() {
     }
 
     return result;
-  }, [activeCategory, searchQuery]);
+  }, [activeCategory, searchQuery, enrichedTemplates]);
 
   function handleUseTemplate(templateId: string) {
-    const framework = getSuggestedFramework(templateId);
-    router.push(`/create?template=${templateId}&framework=${framework}`);
+    router.push(`/create?template=${templateId}&framework=openclaw`);
   }
 
-  const counts: Record<string, number> = useMemo(() => {
-    const map: Record<string, number> = { all: ENRICHED_TEMPLATES.length };
-    for (const t of ENRICHED_TEMPLATES) {
+  const counts = useMemo(() => {
+    const map: Record<string, number> = { all: enrichedTemplates.length };
+    for (const t of enrichedTemplates) {
       map[t.category] = (map[t.category] ?? 0) + 1;
     }
     return map;
-  }, []);
+  }, [enrichedTemplates]);
 
   return (
     <motion.div
@@ -172,31 +240,28 @@ export default function NewAgentPage() {
         {/* ── Category tabs ──────────────────────────────── */}
         <motion.div variants={itemVariants}>
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            {CATEGORIES.map(({ key, label, icon: Icon }) => {
+            {['all', ...apiCategories.sort()].map((key) => {
+              const Icon = getCategoryIcon(key);
+              const label = getCategoryLabel(key);
               const count = counts[key] ?? 0;
+              if (count === 0 && key !== 'all') return null;
               const isActive = activeCategory === key;
               return (
-                <button
+                <motion.button
                   key={key}
+                  variants={itemVariants}
                   onClick={() => setActiveCategory(key)}
                   className={cn(
-                    'flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium transition-all duration-200 whitespace-nowrap flex-shrink-0',
+                    'flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium border whitespace-nowrap transition-all duration-200',
                     isActive
-                      ? 'bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/40 text-[var(--color-accent)] shadow-[0_0_12px_rgba(6,182,212,0.1)]'
-                      : 'border border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:border-[var(--border-hover)]'
+                      ? 'bg-[var(--color-accent)]/15 border-[var(--color-accent)]/40 text-[var(--color-accent)]'
+                      : 'bg-[var(--bg-elevated)] border-[var(--border-default)] text-[var(--text-muted)] hover:text-white hover:border-[var(--border-hover)]'
                   )}
                 >
                   <Icon size={12} />
                   {label}
-                  {count > 0 && (
-                    <span className={cn(
-                      'ml-0.5 text-[10px] px-1.5 py-0.5 rounded-full',
-                      isActive ? 'bg-[var(--color-accent)]/20 text-[var(--color-accent)]' : 'bg-[rgba(46,43,74,0.6)] text-[var(--text-muted)]'
-                    )}>
-                      {count}
-                    </span>
-                  )}
-                </button>
+                  <span className="opacity-50">{count}</span>
+                </motion.button>
               );
             })}
           </div>
@@ -204,7 +269,13 @@ export default function NewAgentPage() {
 
         {/* ── Template grid ───────────────────────────────── */}
         <AnimatePresence mode="wait">
-          {filteredTemplates.length === 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="h-48 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] animate-pulse" />
+              ))}
+            </div>
+          ) : filteredTemplates.length === 0 ? (
             <motion.div
               key="empty"
               initial={{ opacity: 0, y: 12 }}
