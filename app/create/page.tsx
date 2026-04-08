@@ -506,7 +506,7 @@ export default function CreatePage() {
   // ── Validation ──
 
   const selectedByokProvider = getBYOKProvider(byokProvider);
-  const nameValid = openclawForm.name.trim().length >= 3 && /^[a-zA-Z0-9 \-]+$/.test(openclawForm.name.trim());
+  const nameValid = openclawForm.name.trim().length >= 3 && /^[a-zA-Z0-9 \-:'.()&]+$/.test(openclawForm.name.trim());
   const isConfigValid = nameValid
     && (llmChoice !== 'byok' || !selectedByokProvider?.requiresApiKey || byokApiKey.trim().length > 0);
 
@@ -962,8 +962,8 @@ export default function CreatePage() {
                   )}>
                     {openclawForm.name.length > 0 && openclawForm.name.trim().length < 3
                       ? 'Name must be at least 3 characters'
-                      : openclawForm.name.trim().length > 0 && !/^[a-zA-Z0-9 \-]+$/.test(openclawForm.name.trim())
-                        ? 'Only letters, numbers, spaces, and hyphens allowed'
+                      : openclawForm.name.trim().length > 0 && !/^[a-zA-Z0-9 \-:'.()&]+$/.test(openclawForm.name.trim())
+                        ? 'Only letters, numbers, spaces, hyphens, colons, apostrophes allowed'
                         : `${openclawForm.name.trim().length}/50 characters`}
                   </p>
                 </div>
