@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AGENT_TEMPLATES } from '@hatcher/shared';
 import { cn } from '@/lib/utils';
 import {
   ArrowRight,
@@ -19,22 +18,54 @@ import {
 } from 'lucide-react';
 
 // ── Types ───────────────────────────────────────────────────
-type Category = 'all' | 'business' | 'development' | 'crypto' | 'research' | 'support' | 'general';
 type FrameworkFilter = 'all' | 'openclaw' | 'hermes' | 'elizaos' | 'milady';
-type TemplateItem = (typeof AGENT_TEMPLATES)[number];
+
+interface ApiTemplate {
+  id: string;
+  name: string;
+  icon: string;
+  category: string;
+  description: string;
+  personality: string;
+  topics: string[];
+  suggestedSkills: string[];
+}
+
+interface TemplatesApiResponse {
+  templates: ApiTemplate[];
+  total: number;
+  categories: string[];
+}
 
 // ── Category config ─────────────────────────────────────────
-const CATEGORY_CONFIG: Record<Category, { label: string; color: string; glow: string }> = {
-  all:         { label: 'All',         color: 'bg-[var(--bg-card)] text-white border-[var(--border-default)]',             glow: '' },
-  business:    { label: 'Business',    color: 'bg-blue-500/10 text-blue-400 border-blue-500/25',             glow: 'rgba(59,130,246,0.08)' },
-  development: { label: 'Development', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',    glow: 'rgba(16,185,129,0.08)' },
-  crypto:      { label: 'Crypto',      color: 'bg-amber-500/10 text-amber-400 border-amber-500/25',          glow: 'rgba(245,158,11,0.08)' },
-  research:    { label: 'Research',    color: 'bg-purple-500/10 text-purple-400 border-purple-500/25',       glow: 'rgba(139,92,246,0.08)' },
-  support:     { label: 'Support',     color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/25',             glow: 'rgba(6,182,212,0.08)' },
-  general:     { label: 'General',     color: 'bg-rose-500/10 text-rose-400 border-rose-500/25',             glow: 'rgba(244,63,94,0.08)' },
+const CATEGORY_CONFIG: Record<string, { label: string; color: string; glow: string }> = {
+  all:              { label: 'All',              color: 'bg-[var(--bg-card)] text-white border-[var(--border-default)]',          glow: '' },
+  automation:       { label: 'Automation',       color: 'bg-slate-500/10 text-slate-400 border-slate-500/25',                    glow: 'rgba(100,116,139,0.08)' },
+  business:         { label: 'Business',         color: 'bg-blue-500/10 text-blue-400 border-blue-500/25',                       glow: 'rgba(59,130,246,0.08)' },
+  compliance:       { label: 'Compliance',       color: 'bg-amber-500/10 text-amber-400 border-amber-500/25',                    glow: 'rgba(245,158,11,0.08)' },
+  creative:         { label: 'Creative',         color: 'bg-pink-500/10 text-pink-400 border-pink-500/25',                       glow: 'rgba(236,72,153,0.08)' },
+  'customer-success': { label: 'Customer Success', color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/25',                     glow: 'rgba(6,182,212,0.08)' },
+  data:             { label: 'Data',             color: 'bg-teal-500/10 text-teal-400 border-teal-500/25',                       glow: 'rgba(20,184,166,0.08)' },
+  development:      { label: 'Development',      color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',              glow: 'rgba(16,185,129,0.08)' },
+  devops:           { label: 'DevOps',           color: 'bg-orange-500/10 text-orange-400 border-orange-500/25',                 glow: 'rgba(249,115,22,0.08)' },
+  ecommerce:        { label: 'E-Commerce',       color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/25',                 glow: 'rgba(234,179,8,0.08)' },
+  education:        { label: 'Education',        color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/25',                 glow: 'rgba(99,102,241,0.08)' },
+  finance:          { label: 'Finance',          color: 'bg-green-500/10 text-green-400 border-green-500/25',                    glow: 'rgba(34,197,94,0.08)' },
+  freelance:        { label: 'Freelance',        color: 'bg-violet-500/10 text-violet-400 border-violet-500/25',                 glow: 'rgba(139,92,246,0.08)' },
+  healthcare:       { label: 'Healthcare',       color: 'bg-red-500/10 text-red-400 border-red-500/25',                          glow: 'rgba(239,68,68,0.08)' },
+  hr:               { label: 'HR',               color: 'bg-sky-500/10 text-sky-400 border-sky-500/25',                          glow: 'rgba(14,165,233,0.08)' },
+  legal:            { label: 'Legal',            color: 'bg-amber-600/10 text-amber-500 border-amber-600/25',                    glow: 'rgba(217,119,6,0.08)' },
+  marketing:        { label: 'Marketing',        color: 'bg-orange-500/10 text-orange-400 border-orange-500/25',                 glow: 'rgba(249,115,22,0.08)' },
+  moltbook:         { label: 'Moltbook',         color: 'bg-slate-500/10 text-slate-400 border-slate-500/25',                    glow: 'rgba(100,116,139,0.08)' },
+  personal:         { label: 'Personal',         color: 'bg-purple-500/10 text-purple-400 border-purple-500/25',                 glow: 'rgba(168,85,247,0.08)' },
+  productivity:     { label: 'Productivity',     color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/25',                 glow: 'rgba(234,179,8,0.08)' },
+  'real-estate':    { label: 'Real Estate',      color: 'bg-green-600/10 text-green-500 border-green-600/25',                    glow: 'rgba(22,163,74,0.08)' },
+  saas:             { label: 'SaaS',             color: 'bg-sky-500/10 text-sky-400 border-sky-500/25',                          glow: 'rgba(14,165,233,0.08)' },
+  security:         { label: 'Security',         color: 'bg-red-600/10 text-red-500 border-red-600/25',                          glow: 'rgba(220,38,38,0.08)' },
+  'supply-chain':   { label: 'Supply Chain',     color: 'bg-orange-600/10 text-orange-500 border-orange-600/25',                 glow: 'rgba(234,88,12,0.08)' },
+  voice:            { label: 'Voice',            color: 'bg-pink-600/10 text-pink-500 border-pink-600/25',                       glow: 'rgba(219,39,119,0.08)' },
+  ollama:           { label: 'Ollama (Local)',    color: 'bg-amber-500/10 text-amber-400 border-amber-500/25',                    glow: 'rgba(245,158,11,0.08)' },
 };
-
-const CATEGORIES = Object.keys(CATEGORY_CONFIG) as Category[];
 
 // ── Framework config ────────────────────────────────────────
 const FRAMEWORK_CONFIG: Record<FrameworkFilter, { label: string; color: string; badgeColor: string }> = {
@@ -48,10 +79,7 @@ const FRAMEWORK_CONFIG: Record<FrameworkFilter, { label: string; color: string; 
 const FRAMEWORK_FILTERS = Object.keys(FRAMEWORK_CONFIG) as FrameworkFilter[];
 
 // ── Helpers ─────────────────────────────────────────────────
-function getSuggestedFramework(id: string): FrameworkFilter {
-  if (id.startsWith('hermes-')) return 'hermes';
-  if (id.startsWith('elizaos-')) return 'elizaos';
-  if (id.startsWith('milady-')) return 'milady';
+function getSuggestedFramework(_id: string): FrameworkFilter {
   return 'openclaw';
 }
 
@@ -105,12 +133,12 @@ function DemoModal({
   template,
   onClose,
 }: {
-  template: TemplateItem;
+  template: ApiTemplate;
   onClose: () => void;
 }) {
   const framework = getSuggestedFramework(template.id);
   const fwConfig = FRAMEWORK_CONFIG[framework];
-  const demo = DEMO_MESSAGES[template.id] || DEFAULT_DEMO;
+  const demo = DEMO_MESSAGES[template.id] ?? DEFAULT_DEMO;
 
   return (
     <motion.div
@@ -197,12 +225,12 @@ function TemplateCard({
   template,
   onPreview,
 }: {
-  template: TemplateItem;
+  template: ApiTemplate;
   index: number;
-  onPreview: (t: TemplateItem) => void;
+  onPreview: (t: ApiTemplate) => void;
 }) {
-  const catKey = (template.category || 'general') as Category;
-  const cat = CATEGORY_CONFIG[catKey] ?? CATEGORY_CONFIG.general;
+  const catKey = template.category || 'general';
+  const cat = CATEGORY_CONFIG[catKey] ?? CATEGORY_CONFIG['business'];
   const framework = getSuggestedFramework(template.id);
   const fwConfig = FRAMEWORK_CONFIG[framework];
 
@@ -243,9 +271,9 @@ function TemplateCard({
         </p>
 
         {/* Topics */}
-        {template.defaultTopics && template.defaultTopics.length > 0 && (
+        {template.topics && template.topics.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-4">
-            {template.defaultTopics.slice(0, 3).map((topic) => (
+            {template.topics.slice(0, 3).map((topic) => (
               <span
                 key={topic}
                 className="text-[10px] px-2 py-0.5 rounded-md bg-[var(--bg-card)] text-[var(--text-muted)] border border-[var(--border-default)]"
@@ -253,9 +281,9 @@ function TemplateCard({
                 {topic}
               </span>
             ))}
-            {template.defaultTopics.length > 3 && (
+            {template.topics.length > 3 && (
               <span className="text-[10px] px-2 py-0.5 rounded-md bg-[var(--bg-card)] text-[var(--text-muted)] border border-[var(--border-default)]">
-                +{template.defaultTopics.length - 3}
+                +{template.topics.length - 3}
               </span>
             )}
           </div>
@@ -291,13 +319,13 @@ function CategorySection({
   onPreview,
   defaultOpen = true,
 }: {
-  category: Category;
-  templates: TemplateItem[];
-  onPreview: (t: TemplateItem) => void;
+  category: string;
+  templates: ApiTemplate[];
+  onPreview: (t: ApiTemplate) => void;
   defaultOpen?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
-  const cat = CATEGORY_CONFIG[category];
+  const cat = CATEGORY_CONFIG[category] ?? CATEGORY_CONFIG['business'];
 
   if (templates.length === 0) return null;
 
@@ -342,23 +370,39 @@ function CategorySection({
   );
 }
 
-// All non-custom templates
-const ALL_TEMPLATES: TemplateItem[] = [...AGENT_TEMPLATES].filter(t => t.id !== 'custom');
-
 // ── Main page ────────────────────────────────────────────────
 export default function TemplatesPage() {
-  const [activeCategory, setActiveCategory] = useState<Category>('all');
+  const [templates, setTemplates] = useState<ApiTemplate[]>([]);
+  const [apiCategories, setApiCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState<string>('all');
   const [activeFramework, setActiveFramework] = useState<FrameworkFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [previewTemplate, setPreviewTemplate] = useState<TemplateItem | null>(null);
+  const [previewTemplate, setPreviewTemplate] = useState<ApiTemplate | null>(null);
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+
+  useEffect(() => {
+    void fetch(`${apiUrl}/api/templates?limit=200`)
+      .then(r => r.json() as Promise<TemplatesApiResponse>)
+      .then(data => {
+        setTemplates(data.templates);
+        setApiCategories(data.categories);
+      })
+      .catch(() => {}) // silently fail — empty state is handled in UI
+      .finally(() => setLoading(false));
+  }, [apiUrl]);
+
+  const CATEGORIES = useMemo(
+    () => ['all', ...apiCategories.sort()],
+    [apiCategories],
+  );
 
   const filtered = useMemo(() => {
-    let result = ALL_TEMPLATES;
+    let result = templates;
 
-    // Framework filter
-    if (activeFramework !== 'all') {
-      result = result.filter(t => getSuggestedFramework(t.id) === activeFramework);
-    }
+    // Framework filter — all templates support all frameworks
+    // (activeFramework filter kept for UX but doesn't reduce results)
 
     // Category filter
     if (activeCategory !== 'all') {
@@ -373,48 +417,37 @@ export default function TemplatesPage() {
           t.name.toLowerCase().includes(q) ||
           t.description.toLowerCase().includes(q) ||
           t.category.toLowerCase().includes(q) ||
-          (t.defaultTopics ?? []).some((topic: string) => topic.toLowerCase().includes(q))
+          (t.topics ?? []).some((topic: string) => topic.toLowerCase().includes(q))
       );
     }
 
     return result;
-  }, [activeCategory, activeFramework, searchQuery]);
+  }, [templates, activeCategory, searchQuery]);
 
   // Group templates by category for collapsible view
   const groupedByCategory = useMemo(() => {
-    const groups: Record<Category, TemplateItem[]> = {
-      all: [],
-      business: [],
-      development: [],
-      crypto: [],
-      research: [],
-      support: [],
-      general: [],
-    };
+    const groups: Record<string, ApiTemplate[]> = {};
     for (const t of filtered) {
-      const cat = (t.category || 'general') as Category;
-      if (groups[cat]) groups[cat].push(t);
+      const cat = t.category || 'general';
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(t);
     }
     return groups;
   }, [filtered]);
 
   const showGrouped = activeCategory === 'all' && !searchQuery.trim();
 
-  const handlePreview = useCallback((t: TemplateItem) => {
+  const handlePreview = useCallback((t: ApiTemplate) => {
     setPreviewTemplate(t);
   }, []);
 
-  const totalCount = ALL_TEMPLATES.length;
+  const totalCount = templates.length;
 
-  // Framework counts
+  // Framework counts — all templates support all frameworks
   const frameworkCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: ALL_TEMPLATES.length };
-    for (const t of ALL_TEMPLATES) {
-      const fw = getSuggestedFramework(t.id);
-      counts[fw] = (counts[fw] ?? 0) + 1;
-    }
-    return counts;
-  }, []);
+    const total = templates.length;
+    return { all: total, openclaw: total, hermes: total, elizaos: total, milady: total };
+  }, [templates]);
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)]">
@@ -485,7 +518,6 @@ export default function TemplatesPage() {
           {FRAMEWORK_FILTERS.map((fw) => {
             const cfg = FRAMEWORK_CONFIG[fw];
             const count = frameworkCounts[fw] ?? 0;
-            if (count === 0 && fw !== 'all') return null;
             return (
               <button
                 key={fw}
@@ -514,7 +546,7 @@ export default function TemplatesPage() {
           className="flex items-center justify-center gap-1.5 mb-8 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {CATEGORIES.map((cat) => {
-            const cfg = CATEGORY_CONFIG[cat];
+            const cfg = CATEGORY_CONFIG[cat] ?? CATEGORY_CONFIG['business'];
             const count = cat === 'all'
               ? filtered.length
               : filtered.filter(t => t.category === cat).length;
@@ -540,7 +572,13 @@ export default function TemplatesPage() {
         </motion.div>
 
         {/* ── Template content ── */}
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="h-48 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] animate-pulse" />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -558,8 +596,9 @@ export default function TemplatesPage() {
         ) : showGrouped ? (
           /* Grouped by category with collapsible sections */
           <div>
-            {(Object.keys(groupedByCategory) as Category[])
-              .filter(cat => cat !== 'all' && groupedByCategory[cat].length > 0)
+            {Object.keys(groupedByCategory)
+              .sort()
+              .filter(cat => groupedByCategory[cat].length > 0)
               .map((cat) => (
                 <CategorySection
                   key={cat}
