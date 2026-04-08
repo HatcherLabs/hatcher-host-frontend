@@ -1078,7 +1078,7 @@ export default function AgentManagePage() {
 
   const displayUptime = stats?.uptimeSecs && stats.uptimeSecs > 0
     ? stats.uptimeSecs
-    : (agent?.createdAt ? Math.floor((Date.now() - new Date(agent.createdAt).getTime()) / 1000) : 0);
+    : 0;
   const isLiveUptime = !!(stats?.uptimeSecs && stats.uptimeSecs > 0);
 
   // ─── Build context value ───────────────────────────────────
