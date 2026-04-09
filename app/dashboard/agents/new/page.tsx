@@ -70,7 +70,6 @@ const CATEGORY_ICON_MAP: Record<string, React.ComponentType<{ size?: number; cla
   'security':         Shield,
   'supply-chain':     Package,
   'voice':            Bot,
-  'ollama':           Bot,
   'research':         FlaskConical,
   'support':          Headphones,
   'crypto':           TrendingUp,

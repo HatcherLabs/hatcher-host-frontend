@@ -50,6 +50,7 @@ function StatusBadge({ status }: { status: Payment['status'] }) {
     confirmed: 'bg-green-500/10 text-green-400 border border-green-500/20',
     pending: 'bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse',
     failed: 'bg-red-500/10 text-red-400 border border-red-500/20',
+    refunded: 'bg-slate-500/10 text-slate-400 border border-slate-500/20',
   };
   return (
     <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full ${styles[status]}`}>

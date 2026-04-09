@@ -91,22 +91,43 @@ export async function req<T>(
       headers,
       credentials: 'include', // Always send httpOnly cookie
     });
-    const json = await res.json();
-    if (!res.ok && res.status === 401) {
-      if (!_isRetry) {
-        // Try to refresh the token once, then retry the original request
-        const refreshed = await attemptRefresh();
-        if (refreshed) {
-          return req<T>(path, options, true);
+
+    // Parse JSON safely — non-JSON responses (HTML error pages, etc.) return null
+    let json: unknown = null;
+    try {
+      json = await res.json();
+    } catch {
+      json = null;
+    }
+
+    if (!res.ok) {
+      // 429 Too Many Requests — return a meaningful error immediately
+      if (res.status === 429) {
+        return { success: false, error: 'Rate limit exceeded. Please wait before trying again.' };
+      }
+
+      if (res.status === 401) {
+        if (!_isRetry) {
+          // Try to refresh the token once, then retry the original request
+          const refreshed = await attemptRefresh();
+          if (refreshed) {
+            return req<T>(path, options, true);
+          }
+        }
+        // Refresh failed or already retried — clear session
+        clearToken();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('hatcher:auth-expired'));
         }
       }
-      // Refresh failed or already retried — clear session
-      clearToken();
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('hatcher:auth-expired'));
-      }
     }
-    return json;
+
+    // If JSON parsing failed and response was not ok, return a generic error
+    if (json === null && !res.ok) {
+      return { success: false, error: `Request failed with status ${res.status}` };
+    }
+
+    return (json ?? { success: false, error: 'Empty response' }) as { success: true; data: T } | { success: false; error: string };
   } catch {
     return { success: false, error: 'Network error — is the API running?' };
   }

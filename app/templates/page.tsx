@@ -64,7 +64,6 @@ const CATEGORY_CONFIG: Record<string, { label: string; color: string; glow: stri
   security:         { label: 'Security',         color: 'bg-red-600/10 text-red-500 border-red-600/25',                          glow: 'rgba(220,38,38,0.08)' },
   'supply-chain':   { label: 'Supply Chain',     color: 'bg-orange-600/10 text-orange-500 border-orange-600/25',                 glow: 'rgba(234,88,12,0.08)' },
   voice:            { label: 'Voice',            color: 'bg-pink-600/10 text-pink-500 border-pink-600/25',                       glow: 'rgba(219,39,119,0.08)' },
-  ollama:           { label: 'Ollama (Local)',    color: 'bg-amber-500/10 text-amber-400 border-amber-500/25',                    glow: 'rgba(245,158,11,0.08)' },
 };
 
 // ── Framework config ────────────────────────────────────────

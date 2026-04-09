@@ -31,7 +31,7 @@ export interface Payment {
   usdAmount: number;
   hatchAmount: number;
   txSignature: string;
-  status: 'pending' | 'confirmed' | 'failed';
+  status: 'pending' | 'confirmed' | 'failed' | 'refunded';
   createdAt: string;
   agent?: { name: string };
 }
