@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ChangelogAutoRefresh } from './ChangelogAutoRefresh';
 
 export const metadata: Metadata = {
   title: 'Changelog — Hatcher',
@@ -66,6 +67,7 @@ export default async function ChangelogPage() {
 
   return (
     <main className="min-h-screen">
+      <ChangelogAutoRefresh />
       <div className="mx-auto max-w-2xl px-4 sm:px-6 py-16 sm:py-20">
 
         {/* Header */}
