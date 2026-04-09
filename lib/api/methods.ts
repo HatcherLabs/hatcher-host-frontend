@@ -23,9 +23,9 @@ export const api = {
       body: JSON.stringify({ email, password }),
     }),
 
-  /** Verify email with token */
+  /** Verify email with token — returns fresh accessToken with emailVerified=true */
   verifyEmail: (token: string) =>
-    req<{ verified: boolean }>('/auth/verify-email', {
+    req<{ verified: boolean; accessToken?: string }>('/auth/verify-email', {
       method: 'POST',
       body: JSON.stringify({ token }),
     }),

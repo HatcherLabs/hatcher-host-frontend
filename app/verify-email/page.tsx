@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { setToken } from '@/lib/api/core';
 import { CheckCircle2, XCircle, Loader2, Mail } from 'lucide-react';
 
 export default function VerifyEmailPage() {
@@ -20,6 +21,8 @@ export default function VerifyEmailPage() {
 
     api.verifyEmail(token).then((res) => {
       if (res.success) {
+        // Store the fresh token (emailVerified=true) so subsequent API calls work immediately
+        if (res.data?.accessToken) setToken(res.data.accessToken);
         setStatus('success');
       } else {
         setStatus('error');
