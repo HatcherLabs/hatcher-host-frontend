@@ -66,7 +66,7 @@ export const api = {
     }),
 
   /** Get current user profile */
-  getProfile: () => req<{id: string; email: string; username: string; walletAddress: string | null; apiKey: string; hatchCredits: number; isAdmin: boolean; tier: string; createdAt: string}>('/auth/me'),
+  getProfile: () => req<{id: string; email: string; username: string; walletAddress: string | null; apiKey: string | null; hatchCredits: number; isAdmin: boolean; tier: string; createdAt: string}>('/auth/me'),
 
   /** Update profile (username, email, password, or avatarUrl) */
   updateProfile: (data: { username?: string; email?: string; avatarUrl?: string | null; currentPassword?: string; newPassword?: string }) =>
