@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, memo } from 'react';
 import { motion } from 'framer-motion';
 import {
   MessageSquare,
@@ -81,7 +81,7 @@ interface AgentSidebarProps {
   onTabChange: (tab: Tab) => void;
 }
 
-export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProps) {
+export const AgentSidebar = memo(function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProps) {
   const tabs = getTabs(agent.framework);
   const statusInfo = STATUS_STYLES[agent.status] ?? STATUS_STYLES.paused;
   const frameworkMeta = FRAMEWORKS[agent.framework];
@@ -270,4 +270,4 @@ export function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProp
       </aside>
     </>
   );
-}
+});
