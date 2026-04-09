@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
@@ -26,9 +26,11 @@ import {
   Loader2,
   MessageCircle,
   Rocket,
+  Search,
   Send,
   Settings2,
   Gem,
+  X,
   Zap,
 } from 'lucide-react';
 
@@ -175,6 +177,7 @@ export default function CreatePage() {
   const [apiCategories, setApiCategories] = useState<string[]>([]);
   const [templatesLoading, setTemplatesLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [templateSearch, setTemplateSearch] = useState('');
   // Track which template was last auto-applied so we can override it when template changes
   const lastAppliedTemplateRef = useRef<string>('');
 
@@ -253,10 +256,12 @@ export default function CreatePage() {
 
   // ── Helpers ──
 
-  /** Pre-populate form fields from the selected template when moving to step 4 */
-  function applyTemplate() {
-    if (selectedTemplate === 'custom') return;
-    const tpl = templates.find((t) => t.id === selectedTemplate);
+  /** Pre-populate form fields from the selected template when moving to step 4.
+   *  Accepts an optional templateId override for when state hasn't flushed yet (e.g. search result click). */
+  function applyTemplate(templateId?: string) {
+    const tid = templateId ?? selectedTemplate;
+    if (tid === 'custom') return;
+    const tpl = templates.find((t) => t.id === tid);
     if (!tpl) return;
 
     // Find previous template to detect if user manually edited the fields
@@ -282,8 +287,18 @@ export default function CreatePage() {
     if (Object.keys(updates).length > 0) {
       setOpenclawForm((prev) => ({ ...prev, ...updates }));
     }
-    lastAppliedTemplateRef.current = selectedTemplate;
+    lastAppliedTemplateRef.current = tid;
   }
+
+  const searchResults = useMemo(() => {
+    if (!templateSearch.trim()) return [];
+    const q = templateSearch.toLowerCase();
+    return templates.filter(t =>
+      t.name.toLowerCase().includes(q) ||
+      t.description?.toLowerCase().includes(q) ||
+      t.category?.toLowerCase().includes(q)
+    ).slice(0, 12);
+  }, [templates, templateSearch]);
 
   function toggleSkill(skill: string) {
     setOpenclawSkills((prev) =>
@@ -775,7 +790,78 @@ export default function CreatePage() {
                 Choose a category — we&apos;ll show you the best templates
               </p>
 
-              {templatesLoading ? (
+              {/* Search bar */}
+              <div className="relative mb-6">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
+                <input
+                  type="text"
+                  className="input pl-9 pr-9 w-full"
+                  placeholder="Search 200+ templates..."
+                  value={templateSearch}
+                  onChange={e => setTemplateSearch(e.target.value)}
+                />
+                {templateSearch && (
+                  <button
+                    type="button"
+                    aria-label="Clear search"
+                    onClick={() => setTemplateSearch('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Search results */}
+              {templateSearch.trim() ? (
+                searchResults.length > 0 ? (
+                  <motion.div
+                    className="grid grid-cols-2 sm:grid-cols-3 gap-3"
+                    variants={staggerContainer}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    {searchResults.map(t => (
+                      <motion.button
+                        key={t.id}
+                        variants={staggerItem}
+                        whileHover={cardHover}
+                        onClick={() => {
+                          setSelectedTemplate(t.id);
+                          setSelectedCategory(t.category);
+                          applyTemplate(t.id);
+                          setStep(4);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className={cn(
+                          'p-4 rounded-xl border text-left transition-all duration-200 relative group',
+                          selectedTemplate === t.id
+                            ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] text-[var(--text-primary)] shadow-[0_0_20px_rgba(6,182,212,0.12)]'
+                            : 'bg-[var(--bg-elevated)] border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[rgba(6,182,212,0.3)] hover:bg-[var(--bg-card)]'
+                        )}
+                      >
+                        <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center mb-2.5 text-base transition-colors', selectedTemplate === t.id ? 'bg-[var(--color-accent)]/20' : 'bg-[var(--bg-hover)] group-hover:bg-[var(--color-accent)]/10')}>
+                          {t.icon}
+                        </div>
+                        <div className="text-sm font-semibold leading-tight mb-1">{t.name}</div>
+                        <div className="text-xs text-[var(--text-muted)] line-clamp-2 leading-relaxed">{t.description}</div>
+                      </motion.button>
+                    ))}
+                  </motion.div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <Search className="w-8 h-8 text-[var(--text-muted)] mb-3 opacity-40" />
+                    <p className="text-sm text-[var(--text-muted)]">No templates found for &ldquo;{templateSearch}&rdquo;</p>
+                    <button
+                      type="button"
+                      className="mt-3 text-xs text-[var(--accent-400)] hover:underline"
+                      onClick={() => setTemplateSearch('')}
+                    >
+                      Clear search
+                    </button>
+                  </div>
+                )
+              ) : templatesLoading ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {Array.from({ length: 12 }).map((_, i) => (
                     <div key={i} className="h-24 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] animate-pulse" />
@@ -798,7 +884,7 @@ export default function CreatePage() {
                         key={cat}
                         variants={staggerItem}
                         whileHover={cardHover}
-                        onClick={() => { setSelectedCategory(cat); setSelectedTemplate(''); }}
+                        onClick={() => { setSelectedCategory(cat); setSelectedTemplate(''); setStep(3); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                         className={cn(
                           'p-4 rounded-xl border text-left transition-all duration-200 relative',
                           isSelected
@@ -824,7 +910,7 @@ export default function CreatePage() {
               <div className="mt-6 pt-5 border-t border-[var(--border-default)]">
                 <motion.button
                   whileHover={cardHover}
-                  onClick={() => { setSelectedTemplate('custom'); setSelectedCategory(''); }}
+                  onClick={() => { setSelectedTemplate('custom'); setSelectedCategory(''); setStep(4); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className={cn(
                     'w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border text-left transition-all duration-200',
                     selectedTemplate === 'custom'

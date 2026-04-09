@@ -169,6 +169,7 @@ export default function AdminPage() {
     paymentCount: number;
     hatchCredits: number;
     createdAt: string;
+    emailVerified: boolean;
   }>>([]);
   const [tickets, setTickets] = useState<Array<{
     id: string;
@@ -212,6 +213,20 @@ export default function AdminPage() {
   const [healthLoading, setHealthLoading] = useState(false);
   const [backupRunning, setBackupRunning] = useState(false);
   const [backups, setBackups] = useState<Array<{ filename: string; size: string; date: string }>>([]);
+
+  // ── User detail slide-over ─────────────────────────────────
+  type UserDetail = {
+    id: string; email: string; username: string; walletAddress: string | null;
+    tier: string; isAdmin: boolean; hatchCredits: number; emailVerified: boolean;
+    createdAt: string;
+    features: Array<{ id: string; featureKey: string; type: string; expiresAt: string | null; createdAt: string; txSignature: string; usdPrice: number }>;
+    payments: Array<{ id: string; featureKey: string; usdAmount: number; txSignature: string; status: string; createdAt: string; agentId: string | null }>;
+    agents: Array<{ id: string; name: string; framework: string; status: string; createdAt: string }>;
+  };
+
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [userDetail, setUserDetail] = useState<UserDetail | null>(null);
+  const [userDetailLoading, setUserDetailLoading] = useState(false);
 
   const isAdmin = user?.isAdmin ?? false;
 
@@ -425,6 +440,23 @@ export default function AdminPage() {
       }
     } catch (e) {
       alert(`Error: ${(e as Error).message}`);
+    }
+  }
+
+  async function loadUserDetail(userId: string) {
+    setSelectedUserId(userId);
+    setUserDetailLoading(true);
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+    const token = typeof window !== 'undefined' ? localStorage.getItem('hatcher_token') : null;
+    try {
+      const res = await fetch(`${API_BASE}/admin/users/${userId}`, {
+        credentials: 'include',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const json = await res.json();
+      if (json.success) setUserDetail(json.data);
+    } finally {
+      setUserDetailLoading(false);
     }
   }
 
@@ -1081,7 +1113,8 @@ export default function AdminPage() {
                       {users.map((user) => (
                         <tr
                           key={user.id}
-                          className="transition-colors hover:bg-[var(--bg-card)] border-b border-[var(--border-default)]"
+                          onClick={() => loadUserDetail(user.id)}
+                          className="transition-colors hover:bg-[var(--bg-hover)] border-b border-[var(--border-default)] cursor-pointer"
                         >
                           {/* User */}
                           <td className="py-3.5 pr-4">
@@ -1095,6 +1128,9 @@ export default function AdminPage() {
                               </div>
                               {user.isAdmin && (
                                 <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-400 uppercase">Admin</span>
+                              )}
+                              {user.emailVerified === false && (
+                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 uppercase">Unverified</span>
                               )}
                             </div>
                           </td>
@@ -1574,6 +1610,125 @@ export default function AdminPage() {
           </motion.div>
         )}
       </div>
+
+      {/* User Detail Slide-over */}
+      {selectedUserId && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/50" onClick={() => { setSelectedUserId(null); setUserDetail(null); }} />
+          {/* Panel */}
+          <div className="relative w-full max-w-lg bg-[var(--bg-elevated)] border-l border-[var(--border-default)] h-full overflow-y-auto shadow-2xl">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold text-[var(--text-primary)]">User Details</h2>
+                <button onClick={() => { setSelectedUserId(null); setUserDetail(null); }} className="p-1.5 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-muted)]">
+                  ✕
+                </button>
+              </div>
+
+              {userDetailLoading && <div className="text-center py-12 text-[var(--text-muted)] text-sm">Loading...</div>}
+
+              {!userDetailLoading && userDetail && (
+                <div className="space-y-6">
+                  {/* Identity */}
+                  <div>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-full bg-[var(--color-accent)]/20 flex items-center justify-center text-sm font-bold text-[var(--color-accent)]">
+                        {userDetail.username[0]?.toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-[var(--text-primary)]">{userDetail.username}</div>
+                        <div className="text-xs text-[var(--text-muted)]">{userDetail.email}</div>
+                      </div>
+                      <div className="ml-auto flex items-center gap-1.5">
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold border ${userDetail.emailVerified ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'}`}>
+                          {userDetail.emailVerified ? '✓ Verified' : '⚠ Unverified'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
+                        <div className="text-[var(--text-muted)] mb-0.5">Tier</div>
+                        <div className="font-semibold text-[var(--text-primary)] capitalize">{userDetail.tier}</div>
+                      </div>
+                      <div className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
+                        <div className="text-[var(--text-muted)] mb-0.5">Credits</div>
+                        <div className="font-semibold text-[var(--text-primary)]">{userDetail.hatchCredits}</div>
+                      </div>
+                      <div className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
+                        <div className="text-[var(--text-muted)] mb-0.5">Joined</div>
+                        <div className="font-semibold text-[var(--text-primary)]">{new Date(userDetail.createdAt).toLocaleDateString()}</div>
+                      </div>
+                      <div className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
+                        <div className="text-[var(--text-muted)] mb-0.5">Wallet</div>
+                        <div className="font-semibold text-[var(--text-primary)] truncate">{userDetail.walletAddress ? `${userDetail.walletAddress.slice(0,6)}…${userDetail.walletAddress.slice(-4)}` : '—'}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Agents */}
+                  <div>
+                    <h3 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-2">Agents ({userDetail.agents.length})</h3>
+                    {userDetail.agents.length === 0 ? (
+                      <p className="text-xs text-[var(--text-muted)]">No agents yet.</p>
+                    ) : (
+                      <div className="space-y-1.5">
+                        {userDetail.agents.map(a => (
+                          <div key={a.id} className="flex items-center justify-between p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-xs">
+                            <div>
+                              <span className="font-medium text-[var(--text-primary)]">{a.name}</span>
+                              <span className="ml-2 text-[var(--text-muted)] capitalize">{a.framework}</span>
+                            </div>
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${a.status === 'running' ? 'bg-emerald-500/10 text-emerald-400' : a.status === 'stopped' ? 'bg-slate-500/10 text-slate-400' : 'bg-amber-500/10 text-amber-400'}`}>{a.status}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Purchases / Features */}
+                  <div>
+                    <h3 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-2">Purchases ({userDetail.payments.length})</h3>
+                    {userDetail.payments.length === 0 ? (
+                      <p className="text-xs text-[var(--text-muted)]">No purchases yet.</p>
+                    ) : (
+                      <div className="space-y-1.5">
+                        {userDetail.payments.map(p => (
+                          <div key={p.id} className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-xs">
+                            <div className="flex items-center justify-between mb-0.5">
+                              <span className="font-medium text-[var(--text-primary)]">{p.featureKey}</span>
+                              <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${p.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-400' : p.status === 'pending' ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'}`}>{p.status}</span>
+                            </div>
+                            <div className="text-[var(--text-muted)]">${p.usdAmount.toFixed(2)} · {new Date(p.createdAt).toLocaleDateString()}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Active Features */}
+                  <div>
+                    <h3 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-2">Active Features ({userDetail.features.filter(f => !f.expiresAt || new Date(f.expiresAt) > new Date()).length})</h3>
+                    {userDetail.features.length === 0 ? (
+                      <p className="text-xs text-[var(--text-muted)]">No active features.</p>
+                    ) : (
+                      <div className="space-y-1.5">
+                        {userDetail.features.map(f => (
+                          <div key={f.id} className="flex items-center justify-between p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-xs">
+                            <span className="font-medium text-[var(--text-primary)]">{f.featureKey}</span>
+                            <span className="text-[var(--text-muted)]">{f.expiresAt ? `until ${new Date(f.expiresAt).toLocaleDateString()}` : 'lifetime'}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }

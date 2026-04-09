@@ -47,7 +47,7 @@ const PHASES: Phase[] = [
     ],
   },
   {
-    period: 'Next 3–7 days',
+    period: '10–15 April',
     status: 'launching',
     label: 'SOON',
     items: [
