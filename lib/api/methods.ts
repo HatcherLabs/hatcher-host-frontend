@@ -30,13 +30,6 @@ export const api = {
       body: JSON.stringify({ token }),
     }),
 
-  /** Resend verification email */
-  resendVerification: (email: string) =>
-    req<{ sent: boolean }>('/auth/resend-verification', {
-      method: 'POST',
-      body: JSON.stringify({ email }),
-    }),
-
   /** Request password reset email */
   forgotPassword: (email: string) =>
     req<{ message: string }>('/auth/forgot-password', {
@@ -49,20 +42,6 @@ export const api = {
     req<{ message: string }>('/auth/reset-password', {
       method: 'POST',
       body: JSON.stringify({ token, password }),
-    }),
-
-  /** Get a sign challenge for wallet linking */
-  challenge: (walletAddress: string) =>
-    req<{ message: string; nonce: string }>('/auth/challenge', {
-      method: 'POST',
-      body: JSON.stringify({ walletAddress }),
-    }),
-
-  /** Link a wallet to the current account */
-  linkWallet: (walletAddress: string, signature: string) =>
-    req<{ walletAddress: string }>('/auth/link-wallet', {
-      method: 'POST',
-      body: JSON.stringify({ walletAddress, signature }),
     }),
 
   /** Get current user profile */
@@ -93,10 +72,6 @@ export const api = {
 
   /** Logout — clear httpOnly cookie server-side */
   logout: () => req<{ loggedOut: boolean }>('/auth/logout', { method: 'POST' }),
-
-  /** Regenerate API key (legacy single-key) */
-  regenerateApiKey: () =>
-    req<{ apiKey: string }>('/auth/api-key/regenerate', { method: 'POST' }),
 
   /** List all named API keys */
   listApiKeys: () =>
@@ -151,9 +126,6 @@ export const api = {
 
   /** List the current user's agents */
   getMyAgents: () => req<Agent[]>('/agents'),
-
-  /** Public platform stats (no auth required) */
-  getPublicStats: () => req<{ totalAgents: number; activeAgents: number; totalUsers: number; totalMessages: number; frameworks: Record<string, number> }>('/stats'),
 
   /** Browse all public agents */
   exploreAgents: (limit = 24, offset = 0) => req<{ agents: Agent[]; pagination: { total: number; limit: number; offset: number; hasMore: boolean } }>(`/agents/explore?limit=${limit}&offset=${offset}`),
@@ -280,13 +252,6 @@ export const api = {
       body: JSON.stringify({ message, systemPrompt, ...(model ? { model } : {}), ...(provider ? { provider } : {}) }),
     }),
 
-  /** Chat with an agent (non-streaming) */
-  chat: (agentId: string, message: string, history?: Array<{ role: 'user' | 'assistant'; content: string }>) =>
-    req<{ content: string; model: string }>(`/agents/${agentId}/chat`, {
-      method: 'POST',
-      body: JSON.stringify({ message, history }),
-    }),
-
   /** Get payment history for the current user */
   getPayments: (skip = 0, take = 50) =>
     req<{ payments: Payment[]; total: number; skip: number; take: number }>(`/payments?skip=${skip}&take=${take}`),
@@ -308,9 +273,6 @@ export const api = {
       hatchCredits?: number;
     }>('/features/account'),
 
-  /** Get feature catalog (tiers + addons) */
-  getFeatureCatalog: () => req<{ tiers: any; addons: any }>('/features'),
-
   /** Subscribe to a tier */
   subscribe: (tier: string, txSignature: string, paymentToken: 'sol' | 'hatch' = 'sol') =>
     req<{ tier: string }>('/features/subscribe', {
@@ -325,24 +287,6 @@ export const api = {
       body: JSON.stringify({ addonKey, txSignature, paymentToken, ...(agentId ? { agentId } : {}) }),
     }),
 
-  /** Cancel current subscription (revert to free at end of period) */
-  cancelSubscription: () =>
-    req<{ tier: string }>('/features/cancel', { method: 'POST' }),
-
-  /** Create Stripe checkout session for tier subscription */
-  stripeCheckoutSubscription: (tier: string, returnUrl: string) =>
-    req<{ sessionId: string; url: string }>('/stripe/checkout/subscription', {
-      method: 'POST',
-      body: JSON.stringify({ tier, returnUrl }),
-    }),
-
-  /** Create Stripe checkout session for addon */
-  stripeCheckoutAddon: (addonKey: string, returnUrl: string, agentId?: string) =>
-    req<{ sessionId: string; url: string }>('/stripe/checkout/addon', {
-      method: 'POST',
-      body: JSON.stringify({ addonKey, returnUrl, ...(agentId ? { agentId } : {}) }),
-    }),
-
   /** Cancel Stripe subscription (cancels at end of billing period) */
   stripeCancelSubscription: () =>
     req<{ message: string }>('/stripe/cancel-subscription', { method: 'POST' }),
@@ -353,10 +297,6 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ returnUrl }),
     }),
-
-  /** Refresh JWT token */
-  refreshToken: () =>
-    req<{ token: string }>('/auth/refresh', { method: 'POST' }),
 
   /** Get agent memory (MEMORY.md + daily logs) */
   getAgentMemory: (id: string) =>
@@ -452,50 +392,9 @@ export const api = {
       note: string;
     }>(`/agents/${id}/logs`),
 
-  /** Get watched wallets for an agent */
-  getWalletWatch: (id: string) =>
-    req<{ watchedWallets: string[] }>(`/agents/${id}/wallet-watch`),
-
-  /** Set watched wallets for an agent (max 3) */
-  setWalletWatch: (id: string, wallets: string[]) =>
-    req<{ watchedWallets: string[] }>(`/agents/${id}/wallet-watch`, {
-      method: 'POST',
-      body: JSON.stringify({ wallets }),
-    }),
-
   /** Get token price from Jupiter */
   getPrice: (token: 'hatch' | 'sol') =>
     req<{ price: number; currency: string; source: string; error?: string }>(`/prices/${token}`),
-
-  // ─── Agent Communication ──────────────────────────────────────
-
-  /** Toggle agent-to-agent communication */
-  toggleComm: (agentId: string, commEnabled: boolean) =>
-    req<{ id: string; commEnabled: boolean }>(`/agents/${agentId}/comm`, {
-      method: 'PATCH',
-      body: JSON.stringify({ commEnabled }),
-    }),
-
-  /** List communication permissions for an agent */
-  getCommPermissions: (agentId: string) =>
-    req<{ commEnabled: boolean; permissions: Array<{ id: string; allowedAgent: { id: string; name: string; framework: string }; createdAt: string }> }>(`/agents/${agentId}/comm/permissions`),
-
-  /** Add a communication permission */
-  addCommPermission: (agentId: string, allowedAgentId: string) =>
-    req<{ id: string; allowedAgentId: string }>(`/agents/${agentId}/comm/permissions`, {
-      method: 'POST',
-      body: JSON.stringify({ allowedAgentId }),
-    }),
-
-  /** Remove a communication permission */
-  removeCommPermission: (agentId: string, permId: string) =>
-    req<{ deleted: boolean }>(`/agents/${agentId}/comm/permissions/${permId}`, {
-      method: 'DELETE',
-    }),
-
-  /** Get communication logs */
-  getCommLogs: (agentId: string) =>
-    req<{ logs: Array<{ id: string; sourceAgentId: string; targetAgentId: string; message: string; response: string | null; status: string; latencyMs: number; chainDepth: number; createdAt: string }> }>(`/agents/${agentId}/comm/logs`),
 
   /** Admin: force-kill an agent container */
   adminKillAgent: (id: string) =>
@@ -611,71 +510,6 @@ export const api = {
   /** Admin: list backup files */
   adminGetBackups: () =>
     req<{ backups: Array<{ filename: string; size: string; date: string }> }>('/admin/backups'),
-
-  /** Run a research task for an agent */
-  research: (agentId: string, query: string) =>
-    req<{ query: string; result: string; model: string; completedAt: string }>(`/agents/${agentId}/research`, {
-      method: 'POST',
-      body: JSON.stringify({ query }),
-    }),
-
-  /** Scan a Solana token mint address with AI analysis */
-  scanToken: (agentId: string, mintAddress: string) =>
-    req<{
-      mintAddress: string;
-      name: string;
-      symbol: string;
-      price: number | null;
-      marketCap: number | null;
-      holders: number | null;
-      aiSummary: string;
-      model: string;
-      scannedAt: string;
-      note: string;
-    }>(`/agents/${agentId}/scan-token`, {
-      method: 'POST',
-      body: JSON.stringify({ mintAddress }),
-    }),
-
-  /** List files in an agent's file manager (requires file_manager feature) */
-  getFiles: (agentId: string) =>
-    req<Array<{
-      id: string;
-      agentId: string;
-      name: string;
-      mimeType: string;
-      sizeBytes: number;
-      content: string | null;
-      createdAt: string;
-      updatedAt: string;
-    }>>(`/agents/${agentId}/files`),
-
-  /** Upload (store) a file for an agent (requires file_manager feature) */
-  uploadFile: (agentId: string, data: {
-    name: string;
-    mimeType?: string;
-    sizeBytes?: number;
-    content?: string;
-  }) =>
-    req<{
-      id: string;
-      agentId: string;
-      name: string;
-      mimeType: string;
-      sizeBytes: number;
-      content: string | null;
-      createdAt: string;
-      updatedAt: string;
-    }>(`/agents/${agentId}/files`, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
-
-  /** Delete a file from an agent's file manager */
-  deleteFile: (agentId: string, fileId: string) =>
-    req<{ deleted: boolean; fileId: string }>(`/agents/${agentId}/files/${fileId}`, {
-      method: 'DELETE',
-    }),
 
   /** List files in agent's running container */
   listContainerFiles: (agentId: string, path?: string) =>
@@ -817,32 +651,6 @@ export const api = {
       method: 'PATCH',
     }),
 
-  /** Get active subscriptions for the user */
-  getSubscriptions: () =>
-    req<{
-      subscriptions: Array<{
-        id: string;
-        featureKey: string;
-        agent: { id: string; name: string; framework: string } | null;
-        expiresAt: string;
-        pricing: { key: string; name: string; usdPrice: number; type: string } | null;
-      }>;
-    }>('/features/subscriptions'),
-
-  /** Get the public feed for an agent */
-  getFeed: (agentId: string) =>
-    req<Array<{
-      id: string;
-      type: string;
-      content: string;
-      platform: string;
-      createdAt: string;
-    }>>(`/agents/${agentId}/feed`),
-
-  /** Get API usage stats for the current user */
-  getApiUsage: () =>
-    req<{ requestsToday: number; limit: number; remaining: number; resetAt: string }>('/usage'),
-
   /** Start channel pairing (WhatsApp QR, Signal, etc.) */
   pairChannel: (agentId: string, channel: string) =>
     req<{ status: string; qrCode?: string; message: string; raw?: string }>(`/agents/${agentId}/pair-channel`, {
@@ -860,10 +668,6 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ messages }),
     }),
-
-  /** Clear chat history */
-  clearChatHistory: (agentId: string) =>
-    req<{ cleared: boolean }>(`/agents/${agentId}/chat/history`, { method: 'DELETE' }),
 
   /** Get channel connection status */
   getChannelStatus: (agentId: string) =>
@@ -945,29 +749,6 @@ export const api = {
   getAgentScheduleLogs: (agentId: string, jobId: string) =>
     req<{ logs: Array<{ timestamp: string; success: boolean; response?: string; error?: string }> }>(`/agents/${agentId}/schedules/${jobId}/logs`),
 
-  // ─── Knowledge Base ──────────────────────────────────────────
-
-  /** List knowledge files for an agent */
-  getAgentKnowledge: (agentId: string) =>
-    req<{ files: Array<{ name: string; size: number; createdAt: string }>; totalFiles: number }>(`/agents/${agentId}/knowledge`),
-
-  /** Upload a knowledge file (text content) */
-  uploadAgentKnowledge: (agentId: string, data: { filename: string; content: string }) =>
-    req<{ written: boolean; filename: string; size: number }>(`/agents/${agentId}/knowledge`, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
-
-  /** Read a knowledge file */
-  readAgentKnowledge: (agentId: string, filename: string) =>
-    req<{ filename: string; content: string }>(`/agents/${agentId}/knowledge/${encodeURIComponent(filename)}`),
-
-  /** Delete a knowledge file */
-  deleteAgentKnowledge: (agentId: string, filename: string) =>
-    req<{ deleted: boolean; filename: string }>(`/agents/${agentId}/knowledge/${encodeURIComponent(filename)}`, {
-      method: 'DELETE',
-    }),
-
   // ─── Marketplace ──────────────────────────────────────────
 
   /** List marketplace templates */
@@ -1005,21 +786,6 @@ export const api = {
     }>(`/marketplace/templates${qs ? `?${qs}` : ''}`);
   },
 
-  /** Get a single marketplace template */
-  getMarketplaceTemplate: (id: string) =>
-    req<{
-      id: string;
-      name: string;
-      description: string;
-      framework: string;
-      category: string;
-      author: string;
-      authorId: string;
-      config: Record<string, unknown>;
-      usageCount: number;
-      createdAt: string;
-    }>(`/marketplace/templates/${id}`),
-
   /** Publish an agent as a marketplace template */
   publishToMarketplace: (agentId: string, category?: string) =>
     req<{
@@ -1050,12 +816,6 @@ export const api = {
   exportAgent: (agentId: string) =>
     req<{ exportVersion: number; exportedAt: string; name: string; description?: string; framework: string; template: string; config: Record<string, unknown> }>(`/agents/${agentId}/export`),
 
-  /** Delete a marketplace template (owner only) */
-  deleteMarketplaceTemplate: (id: string) =>
-    req<{ deleted: boolean; id: string }>(`/marketplace/templates/${id}`, {
-      method: 'DELETE',
-    }),
-
   // ─── Skills Browser ─────────────────────────────────────────
   // ─── Teams (Collaboration) ──────────────────────────────────
 
@@ -1069,13 +829,6 @@ export const api = {
   createTeam: (name: string) =>
     req<{ id: string; name: string; ownerId: string; members: Array<{ id: string; role: string; user: { id: string; username: string } }>; createdAt: string }>('/teams', {
       method: 'POST',
-      body: JSON.stringify({ name }),
-    }),
-
-  /** Update team name */
-  updateTeam: (id: string, name: string) =>
-    req<{ id: string; name: string }>(`/teams/${id}`, {
-      method: 'PATCH',
       body: JSON.stringify({ name }),
     }),
 
@@ -1195,19 +948,6 @@ export const api = {
       updatedAt: string;
     }>>('/domains'),
 
-  /** Get a single domain's details */
-  getDomain: (id: string) =>
-    req<{
-      id: string;
-      agentId: string;
-      domain: string;
-      verified: boolean;
-      sslStatus: string;
-      cnameTarget: string;
-      createdAt: string;
-      updatedAt: string;
-    }>(`/domains/${id}`),
-
   /** Delete a custom domain */
   deleteDomain: (id: string) =>
     req<{ deleted: boolean; id: string }>(`/domains/${id}`, { method: 'DELETE' }),
@@ -1274,19 +1014,6 @@ export const api = {
       body: JSON.stringify(data),
     }),
 
-  /** Get a single workflow */
-  getAgentWorkflow: (agentId: string, workflowId: string) =>
-    req<{
-      id: string;
-      agentId: string;
-      name: string;
-      enabled: boolean;
-      nodes: unknown[];
-      edges: unknown[];
-      createdAt: string;
-      updatedAt: string;
-    }>(`/agents/${agentId}/workflows/${workflowId}`),
-
   /** Update a workflow */
   updateAgentWorkflow: (agentId: string, workflowId: string, data: {
     name?: string;
@@ -1320,70 +1047,6 @@ export const api = {
       method: 'POST',
     }),
 
-  // ─── Agent Versioning ──────────────────────────────────────
-
-  /** List versions for an agent (paginated) */
-  getAgentVersions: (agentId: string, limit = 20, offset = 0) =>
-    req<{
-      versions: Array<{
-        id: string;
-        agentId: string;
-        version: number;
-        configSnapshot: string;
-        commitMessage: string | null;
-        createdBy: string | null;
-        createdAt: string;
-      }>;
-      total: number;
-      limit: number;
-      offset: number;
-    }>(`/agents/${agentId}/versions?limit=${limit}&offset=${offset}`),
-
-  /** Get a specific version */
-  getAgentVersion: (agentId: string, version: number) =>
-    req<{
-      id: string;
-      agentId: string;
-      version: number;
-      configSnapshot: string;
-      commitMessage: string | null;
-      createdBy: string | null;
-      createdAt: string;
-    }>(`/agents/${agentId}/versions/${version}`),
-
-  /** Restore agent to a specific version */
-  restoreAgentVersion: (agentId: string, version: number) =>
-    req<{
-      id: string;
-      agentId: string;
-      version: number;
-      configSnapshot: string;
-      commitMessage: string | null;
-      createdBy: string | null;
-      createdAt: string;
-    }>(`/agents/${agentId}/versions/${version}/restore`, {
-      method: 'POST',
-    }),
-
-  /** Get two versions for diffing */
-  diffAgentVersions: (agentId: string, v1: number, v2: number) =>
-    req<{
-      v1: {
-        id: string;
-        version: number;
-        configSnapshot: string;
-        commitMessage: string | null;
-        createdAt: string;
-      };
-      v2: {
-        id: string;
-        version: number;
-        configSnapshot: string;
-        commitMessage: string | null;
-        createdAt: string;
-      };
-    }>(`/agents/${agentId}/versions/diff?v1=${v1}&v2=${v2}`),
-
   // ─── Credits ──────────────────────────────────────────────────
 
   /** Get credit balance */
@@ -1403,20 +1066,6 @@ export const api = {
       }>;
     }>(`/credits/history?limit=${limit}`),
 
-  /** Subscribe to a tier using credits */
-  subscribeWithCredits: (tier: string) =>
-    req<{ tier: string; expiresAt: string; paidWith: string; amountDeducted: number; remainingBalance: number }>('/features/subscribe-with-credits', {
-      method: 'POST',
-      body: JSON.stringify({ tier }),
-    }),
-
-  /** Purchase an addon using credits */
-  purchaseAddonWithCredits: (addonKey: string, agentId?: string) =>
-    req<{ addonKey: string; paidWith: string; amountDeducted: number; remainingBalance: number }>('/features/addon-with-credits', {
-      method: 'POST',
-      body: JSON.stringify({ addonKey, ...(agentId ? { agentId } : {}) }),
-    }),
-
   /** Submit thumbs up/down feedback for a message */
   submitFeedback: (agentId: string, messageId: string, rating: 'up' | 'down') =>
     req<{ success: true }>(`/agents/${agentId}/feedback`, {
@@ -1424,7 +1073,4 @@ export const api = {
       body: JSON.stringify({ messageId, rating }),
     }),
 
-  /** Get feedback summary for an agent (owner only) */
-  getAgentFeedbackSummary: (agentId: string) =>
-    req<{ upCount: number; downCount: number; total: number; score: number | null }>(`/agents/${agentId}/feedback/summary`),
 };
