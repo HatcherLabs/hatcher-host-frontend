@@ -122,14 +122,12 @@ export default function AgentManagePage() {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','skills','files','logs','memory','knowledge','versions','chat','stats'];
+  const validTabs: Tab[] = ['overview','config','integrations','skills','files','logs','memory','schedules','workflows','chat','stats'];
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const rawTab = searchParams.get('tab') as Tab;
-  // Redirect legacy tab names to stats
-  const normalizeTab = (t: Tab | null): Tab => {
+  const normalizeTab = (t: string | null): Tab => {
     if (!t) return 'overview';
-    if (t === 'analytics' || t === 'usage' || t === 'health') return 'stats';
-    return validTabs.includes(t) ? t : 'overview';
+    return validTabs.includes(t as Tab) ? (t as Tab) : 'overview';
   };
   const initialTab = normalizeTab(rawTab);
   const [tab, setTabRaw] = useState<Tab>(initialTab);
