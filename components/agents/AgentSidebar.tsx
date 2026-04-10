@@ -49,11 +49,17 @@ function getTabs(framework?: string): TabDef[] {
     { id: 'skills', label: framework === 'elizaos' ? 'Plugins' : 'Skills', icon: <Sparkles size={18} />, group: 'configure' },
     { id: 'logs', label: 'Logs', icon: <ScrollText size={18} />, group: 'data' },
     { id: 'stats', label: 'Stats', icon: <BarChart3 size={18} />, group: 'data' },
-    ...((framework !== 'elizaos' && framework !== 'milady') ? [{ id: 'memory' as const, label: 'Memory', icon: <Brain size={18} />, group: 'data' as const }] : []),
+    // Memory tab: for openclaw/hermes reads files from the workspace,
+    // for elizaos hits the elizaos REST API (PGLite-backed). Milady
+    // doesn't expose a memory viewer yet.
+    ...(framework !== 'milady' ? [{ id: 'memory' as const, label: 'Memory', icon: <Brain size={18} />, group: 'data' as const }] : []),
+    // Sessions tab: elizaos-specific. Lists rooms (conversation sessions)
+    // from the agent's PGLite database via /api/agents/:uuid/rooms.
+    ...(framework === 'elizaos' ? [{ id: 'sessions' as const, label: 'Sessions', icon: <MessageSquare size={18} />, group: 'data' as const }] : []),
     { id: 'files', label: 'Files', icon: <FolderOpen size={18} />, group: 'data' },
-    // Workspace viewer — managed OpenClaw only (Etapa 3). Read-only tree
-    // of the agent's ~/.openclaw/workspace dir. Free for all users.
-    ...(framework === 'openclaw' ? [{ id: 'workspace' as const, label: 'Workspace', icon: <FolderTree size={18} />, group: 'data' as const }] : []),
+    // Workspace viewer — openclaw (managed) and managed hermes. Read-only
+    // tree of the agent's workspace. Free for all users.
+    ...(framework === 'openclaw' || framework === 'hermes' ? [{ id: 'workspace' as const, label: 'Workspace', icon: <FolderTree size={18} />, group: 'data' as const }] : []),
   ];
 }
 
