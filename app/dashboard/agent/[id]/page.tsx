@@ -98,6 +98,21 @@ const ElizaosPluginsTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const MiladySkillsTab = dynamic(
+  () => import('@/components/agents/tabs/MiladySkillsTab').then(mod => ({ default: mod.MiladySkillsTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
+const MiladyPluginsTab = dynamic(
+  () => import('@/components/agents/tabs/MiladyPluginsTab').then(mod => ({ default: mod.MiladyPluginsTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
+const MiladyRestartBanner = dynamic(
+  () => import('@/components/agents/MiladyRestartBanner').then(mod => ({ default: mod.MiladyRestartBanner })),
+  { ssr: false }
+);
+
 const StatsTab = dynamic(
   () => import('@/components/agents/tabs/StatsTab').then(mod => ({ default: mod.StatsTab })),
   { loading: () => <TabSkeleton /> }
@@ -140,7 +155,7 @@ export default function AgentManagePage() {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','skills','files','workspace','logs','memory','sessions','schedules','workflows','chat','stats'];
+  const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','workspace','logs','memory','sessions','schedules','workflows','chat','stats'];
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const rawTab = searchParams.get('tab') as Tab;
   const normalizeTab = (t: string | null): Tab => {
@@ -917,13 +932,21 @@ export default function AgentManagePage() {
             <p className="text-xs text-red-400 px-6 py-2 border-b border-[rgba(46,43,74,0.2)]">{actions.deleteError}</p>
           )}
 
+          {/* M4: "Restart required" banner for Milady agents with pendingRestart=true */}
+          {agent?.framework === 'milady' && agent?.status === 'active' && <MiladyRestartBanner />}
+
           {/* ─── Tab Content ──────────────────────────────────── */}
           <div className={`flex-1 px-4 sm:px-6 py-6 min-w-0`}>
             <AnimatePresence mode="wait">
               {tab === 'overview' && <OverviewTab />}
               {tab === 'config' && <ConfigTab />}
               {tab === 'integrations' && <IntegrationsTab />}
-              {tab === 'skills' && (agent?.framework === 'elizaos' ? <ElizaosPluginsTab /> : <SkillsTab />)}
+              {tab === 'skills' && (
+                agent?.framework === 'elizaos' ? <ElizaosPluginsTab /> :
+                agent?.framework === 'milady' ? <MiladySkillsTab /> :
+                <SkillsTab />
+              )}
+              {tab === 'plugins' && agent?.framework === 'milady' && <MiladyPluginsTab />}
               {tab === 'files' && <FilesTab />}
               {tab === 'workspace' && <WorkspaceTab />}
               {tab === 'logs' && <LogsTab />}

@@ -409,6 +409,70 @@ export const api = {
       { method: 'PATCH', body: JSON.stringify({ enabled }) },
     ),
 
+  /** Milady skills catalog (78 bundled skills). Read-only. */
+  getMiladySkills: (id: string) =>
+    req<{
+      total: number;
+      enabled: number;
+      skills: Array<{
+        id: string;
+        name: string;
+        description: string;
+        enabled: boolean;
+      }>;
+    }>(`/agents/${id}/milady/skills`),
+
+  /** Milady plugins catalog (109 plugins across 6 categories). */
+  getMiladyPlugins: (id: string) =>
+    req<{
+      total: number;
+      enabled: number;
+      configured: number;
+      categories: Record<string, number>;
+      plugins: Array<{
+        id: string;
+        name: string;
+        description: string;
+        tags: string[];
+        enabled: boolean;
+        configured: boolean;
+        envKey: string | null;
+        category: string;
+      }>;
+    }>(`/agents/${id}/milady/plugins`),
+
+  /** Milady runtime status with pendingRestart flag. */
+  getMiladyStatus: (id: string) =>
+    req<{
+      state: string;
+      agentName: string;
+      model: string;
+      uptime: number;
+      startup: { phase: string; attempt: number };
+      pendingRestart: boolean;
+      pendingRestartReasons: string[];
+    }>(`/agents/${id}/milady/status`),
+
+  /**
+   * Hot-reload milady config from agent.configJson. Pushes the
+   * rebuilt config via PUT /api/config on the live container.
+   * Returns `pendingRestart: true` if the agent needs a restart
+   * to apply changes.
+   */
+  hotReloadMilady: (id: string) =>
+    req<{
+      applied: boolean;
+      pendingRestart: boolean;
+      pendingRestartReasons: string[];
+    }>(`/agents/${id}/milady/hot-reload`, { method: 'POST' }),
+
+  /** Graceful restart via Milady's native POST /api/restart. */
+  restartMilady: (id: string) =>
+    req<{ restarting: boolean; message?: string }>(
+      `/agents/${id}/milady/restart`,
+      { method: 'POST' },
+    ),
+
   /**
    * Managed OpenClaw live config (Etapa 2).
    *
