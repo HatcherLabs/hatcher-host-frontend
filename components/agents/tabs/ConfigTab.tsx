@@ -314,6 +314,17 @@ export function ConfigTab() {
     } as Parameters<typeof api.updateAgent>[1]).catch(() => {
       // Silent fail — main config was already saved
     });
+    // E4 (elizaos only): hot-reload the running container so the changes
+    // take effect immediately instead of requiring a stop/start. Backend
+    // reads the freshly-saved agent.configJson, regenerates the character,
+    // and PATCHes /api/agents/:uuid on the live container. Swallow errors
+    // — if the container isn't running or the reload fails, the next
+    // container start will still pick up the new config from DB.
+    if (agent.framework === 'elizaos' && agent.status === 'active') {
+      await api.hotReloadElizaosAgent(agent.id).catch(() => {
+        // Silent — user can still see the change on next restart
+      });
+    }
   }, [agent, buildAdvancedConfig, saveConfig]);
 
   return (

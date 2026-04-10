@@ -336,6 +336,80 @@ export const api = {
     }>(`/agents/${id}/workspace/file?path=${encodeURIComponent(filePath)}`),
 
   /**
+   * ElizaOS memory viewer (E3). Reads the live memories table from
+   * the running container via /api/agents/:uuid/memories. Returns
+   * 503 if the container is stopped.
+   */
+  getElizaosMemories: (id: string) =>
+    req<{
+      total: number;
+      returned: number;
+      memories: Array<{
+        id: string;
+        type: string;
+        createdAt: number;
+        text: string;
+        source?: string;
+        roomId?: string;
+      }>;
+    }>(`/agents/${id}/elizaos/memories`),
+
+  /**
+   * ElizaOS sessions/rooms viewer (E3).
+   */
+  getElizaosRooms: (id: string) =>
+    req<{
+      total: number;
+      rooms: Array<{
+        id: string;
+        name: string;
+        channelId?: string;
+        worldId?: string;
+      }>;
+    }>(`/agents/${id}/elizaos/rooms`),
+
+  /**
+   * ElizaOS live agent detail (plugins, settings, style, system prompt).
+   * Secrets in settings.secrets are redacted server-side.
+   */
+  getElizaosAgent: (id: string) =>
+    req<{
+      id: string;
+      name: string;
+      system: string;
+      bio: string[];
+      topics: string[];
+      adjectives: string[];
+      plugins: string[];
+      style: Record<string, unknown>;
+      settings: Record<string, unknown>;
+      enabled: boolean;
+      status: string;
+    }>(`/agents/${id}/elizaos/agent`),
+
+  /**
+   * Hot-reload: PATCH the running elizaos container with the current
+   * agent.configJson. Call this after saving config to apply without
+   * a stop/start cycle.
+   */
+  hotReloadElizaosAgent: (id: string) =>
+    req<{ applied: boolean; name: string; pluginsCount: number }>(
+      `/agents/${id}/elizaos/hot-reload`,
+      { method: 'POST' },
+    ),
+
+  /**
+   * Update the list of enabled plugins for an elizaos agent.
+   * Core plugins (plugin-sql, plugin-bootstrap) are always included
+   * server-side regardless of what's sent.
+   */
+  setElizaosPlugins: (id: string, enabled: string[]) =>
+    req<{ plugins: string[]; core: string[]; liveApplied: boolean }>(
+      `/agents/${id}/elizaos/plugins`,
+      { method: 'PATCH', body: JSON.stringify({ enabled }) },
+    ),
+
+  /**
    * Managed OpenClaw live config (Etapa 2).
    *
    * Returns the current openclaw.json (live from the container, or the

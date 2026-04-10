@@ -83,6 +83,21 @@ const MemoryTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const ElizaosMemoryTab = dynamic(
+  () => import('@/components/agents/tabs/ElizaosMemoryTab').then(mod => ({ default: mod.ElizaosMemoryTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
+const ElizaosSessionsTab = dynamic(
+  () => import('@/components/agents/tabs/ElizaosSessionsTab').then(mod => ({ default: mod.ElizaosSessionsTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
+const ElizaosPluginsTab = dynamic(
+  () => import('@/components/agents/tabs/ElizaosPluginsTab').then(mod => ({ default: mod.ElizaosPluginsTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 const StatsTab = dynamic(
   () => import('@/components/agents/tabs/StatsTab').then(mod => ({ default: mod.StatsTab })),
   { loading: () => <TabSkeleton /> }
@@ -125,7 +140,7 @@ export default function AgentManagePage() {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','skills','files','workspace','logs','memory','schedules','workflows','chat','stats'];
+  const validTabs: Tab[] = ['overview','config','integrations','skills','files','workspace','logs','memory','sessions','schedules','workflows','chat','stats'];
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const rawTab = searchParams.get('tab') as Tab;
   const normalizeTab = (t: string | null): Tab => {
@@ -908,12 +923,13 @@ export default function AgentManagePage() {
               {tab === 'overview' && <OverviewTab />}
               {tab === 'config' && <ConfigTab />}
               {tab === 'integrations' && <IntegrationsTab />}
-              {tab === 'skills' && <SkillsTab />}
+              {tab === 'skills' && (agent?.framework === 'elizaos' ? <ElizaosPluginsTab /> : <SkillsTab />)}
               {tab === 'files' && <FilesTab />}
               {tab === 'workspace' && <WorkspaceTab />}
               {tab === 'logs' && <LogsTab />}
               {tab === 'terminal' && <TerminalTab />}
-              {tab === 'memory' && <MemoryTab />}
+              {tab === 'memory' && (agent?.framework === 'elizaos' ? <ElizaosMemoryTab /> : <MemoryTab />)}
+              {tab === 'sessions' && <ElizaosSessionsTab />}
               {tab === 'chat' && <ChatTab />}
               {tab === 'stats' && <StatsTab />}
             </AnimatePresence>
