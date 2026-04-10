@@ -187,6 +187,10 @@ export function WorkspaceTab() {
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set());
   const [agentNotRunning, setAgentNotRunning] = useState(false);
 
+  // loadTree intentionally does NOT auto-select SOUL.md — that's handled by
+  // a separate effect below after the tree has loaded. Keeping loadTree's
+  // deps to `agent?.id` means it doesn't re-create when selectedPath changes,
+  // which avoids a reload loop.
   const loadTree = useCallback(async () => {
     if (!agent?.id) return;
     setTreeLoading(true);
@@ -197,14 +201,8 @@ export function WorkspaceTab() {
       if (res.success) {
         setEntries(res.data.entries);
         setTruncated(res.data.truncated);
-        // Auto-select SOUL.md on first load — it's the most interesting file
-        if (!selectedPath) {
-          const soul = res.data.entries.find((e) => e.path === 'SOUL.md');
-          if (soul) setSelectedPath('SOUL.md');
-        }
       } else {
-        const errCode = (res as { code?: string }).code;
-        if (errCode === 'AGENT_NOT_RUNNING') {
+        if (res.code === 'AGENT_NOT_RUNNING') {
           setAgentNotRunning(true);
         } else {
           setTreeError(res.error || 'Failed to load workspace');
@@ -215,7 +213,7 @@ export function WorkspaceTab() {
     } finally {
       setTreeLoading(false);
     }
-  }, [agent?.id, selectedPath]);
+  }, [agent?.id]);
 
   const loadFile = useCallback(
     async (filePath: string) => {
@@ -242,12 +240,28 @@ export function WorkspaceTab() {
     [agent?.id],
   );
 
+  // On agent switch, clear ALL tab state before loading the new agent's
+  // tree. Without this reset, `selectedPath` from the previous agent lingers
+  // in state, which would trigger `loadFile` against the new agent.id with
+  // a path that doesn't exist in its workspace → confusing 404.
   useEffect(() => {
+    setSelectedPath(null);
+    setFileContent(null);
+    setFileReason(null);
+    setFileSize(null);
+    setFileError(null);
+    setExpandedDirs(new Set());
     loadTree();
-    // loadTree depends on selectedPath (for auto-select) — exclude to avoid a
-    // reload loop when we set selectedPath inside it
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [agent?.id]);
+  }, [agent?.id, loadTree]);
+
+  // After the tree loads and if nothing is selected yet, auto-pick SOUL.md
+  // so the right pane lands on a meaningful file. Split from loadTree so we
+  // don't need selectedPath in loadTree's closure.
+  useEffect(() => {
+    if (selectedPath || treeLoading || entries.length === 0) return;
+    const soul = entries.find((e) => e.path === 'SOUL.md');
+    if (soul) setSelectedPath('SOUL.md');
+  }, [entries, treeLoading, selectedPath]);
 
   useEffect(() => {
     if (selectedPath) loadFile(selectedPath);

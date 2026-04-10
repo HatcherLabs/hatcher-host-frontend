@@ -72,7 +72,7 @@ export async function req<T>(
   path: string,
   options: RequestInit = {},
   _isRetry = false
-): Promise<{ success: true; data: T } | { success: false; error: string }> {
+): Promise<{ success: true; data: T } | { success: false; error: string; code?: string }> {
   const token = getToken();
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string>),
@@ -127,7 +127,7 @@ export async function req<T>(
       return { success: false, error: `Request failed with status ${res.status}` };
     }
 
-    return (json ?? { success: false, error: 'Empty response' }) as { success: true; data: T } | { success: false; error: string };
+    return (json ?? { success: false, error: 'Empty response' }) as { success: true; data: T } | { success: false; error: string; code?: string };
   } catch {
     return { success: false, error: 'Network error — is the API running?' };
   }
