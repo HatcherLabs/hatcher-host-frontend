@@ -17,12 +17,23 @@ import { SOCIAL_LINKS } from '@/lib/config';
 const fadeUpTransition = { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const };
 
 /* ── What the token will power ──────────────────────────── */
-const PLANNED_USE_CASES = [
+type UseCase = {
+  icon: typeof Zap;
+  title: string;
+  description: string;
+  color: string;
+  linkHref?: string;
+  linkLabel?: string;
+};
+
+const PLANNED_USE_CASES: UseCase[] = [
   {
     icon: Zap,
     title: 'Subscriptions & Add-ons',
-    description: 'Subscribe to Starter ($4.99/mo), Pro ($14.99/mo), or Business ($39.99/mo) tiers. Purchase agent add-ons to scale your fleet.',
+    description: 'Pay for any subscription tier or agent add-on directly with $HATCHER. Prices settled at live rates on-chain.',
     color: 'var(--color-accent)',
+    linkHref: '/pricing',
+    linkLabel: 'See plans & add-ons',
   },
   {
     icon: CreditCard,
@@ -63,10 +74,16 @@ export default function TokenPage() {
           </motion.div>
 
           <div
-            className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[var(--color-accent)] to-[#0891b2] flex items-center justify-center text-5xl mx-auto mb-8 shadow-[0_0_60px_rgba(6,182,212,0.35)]"
+            className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[var(--color-accent)] to-[#0891b2] flex items-center justify-center mx-auto mb-8 shadow-[0_0_60px_rgba(6,182,212,0.35)]"
             style={{ animation: 'float 3s ease-in-out infinite' }}
           >
-            &#x1F95A;
+            <img
+              src="/icon.svg"
+              alt="Hatcher logo"
+              width={72}
+              height={72}
+              className="w-[72px] h-[72px]"
+            />
           </div>
 
           <motion.h1
@@ -92,20 +109,20 @@ export default function TokenPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...fadeUpTransition, delay: 0.18 }}
-            className="inline-flex flex-col items-center gap-3"
+            className="flex flex-col items-center gap-3"
           >
             <div className="px-5 py-3 rounded-xl bg-[var(--bg-elevated)] border border-[#14F195]/20 text-sm">
               <span className="text-[var(--text-muted)] mr-2">CA:</span>
               <code className="text-[#14F195] font-mono text-xs sm:text-sm select-all">Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump</code>
             </div>
-            <div className="flex items-center justify-center gap-3 w-full">
+            <div className="flex items-center justify-center gap-3">
               <a
-                href="https://pump.fun/coin/Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump"
+                href="https://dexscreener.com/solana/Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
               >
-                View on pump.fun
+                View on Dexscreener
               </a>
               <span className="text-[var(--border-default)]">|</span>
               <a
@@ -154,10 +171,11 @@ export default function TokenPage() {
           <div className="grid md:grid-cols-3 gap-4 sm:gap-6">
             {PLANNED_USE_CASES.map((item) => {
               const Icon = item.icon;
+              const { linkHref, linkLabel } = item;
               return (
                 <motion.div
                   key={item.title}
-                  className="card glass-noise p-8 group"
+                  className="card glass-noise p-8 group flex flex-col"
                   whileHover={{ y: -3 }}
                   transition={{ duration: 0.2 }}
                 >
@@ -169,6 +187,15 @@ export default function TokenPage() {
                   </div>
                   <h3 className="font-bold text-xl mb-3 text-[var(--text-primary)]">{item.title}</h3>
                   <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{item.description}</p>
+                  {linkHref && linkLabel && (
+                    <Link
+                      href={linkHref}
+                      className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors self-start"
+                    >
+                      {linkLabel}
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  )}
                 </motion.div>
               );
             })}

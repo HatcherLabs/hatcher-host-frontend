@@ -645,10 +645,10 @@ export default function MyAgentsPage() {
         <AnimatePresence>
           {successMsg && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="fixed bottom-6 right-6 z-50 card glass-noise px-5 py-3 border-l-4 border-green-500 shadow-lg"
+              className="fixed top-20 left-1/2 -translate-x-1/2 z-50 card glass-noise px-5 py-3 border-l-4 border-green-500 shadow-lg max-w-[calc(100vw-2rem)]"
             >
               <p className="text-sm text-green-400">{successMsg}</p>
             </motion.div>
