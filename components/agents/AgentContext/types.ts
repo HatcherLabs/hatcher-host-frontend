@@ -3,7 +3,7 @@ import type { AgentFramework } from '@hatcher/shared';
 
 // ─── Types ───────────────────────────────────────────────────
 
-export type Tab = 'overview' | 'config' | 'integrations' | 'skills' | 'files' | 'workspace' | 'logs' | 'terminal' | 'memory' | 'sessions' | 'schedules' | 'workflows' | 'chat' | 'stats';
+export type Tab = 'overview' | 'config' | 'integrations' | 'skills' | 'plugins' | 'files' | 'workspace' | 'logs' | 'terminal' | 'memory' | 'sessions' | 'schedules' | 'workflows' | 'chat' | 'stats';
 
 export interface Message {
   id: string;

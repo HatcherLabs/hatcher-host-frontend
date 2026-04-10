@@ -314,17 +314,13 @@ export function ConfigTab() {
     } as Parameters<typeof api.updateAgent>[1]).catch(() => {
       // Silent fail — main config was already saved
     });
-    // E4 (elizaos only): hot-reload the running container so the changes
-    // take effect immediately instead of requiring a stop/start. Backend
-    // reads the freshly-saved agent.configJson, regenerates the character,
-    // and PATCHes /api/agents/:uuid on the live container. Swallow errors
-    // — if the container isn't running or the reload fails, the next
-    // container start will still pick up the new config from DB.
-    if (agent.framework === 'elizaos' && agent.status === 'active') {
-      await api.hotReloadElizaosAgent(agent.id).catch(() => {
-        // Silent — user can still see the change on next restart
-      });
-    }
+    // Note: for elizaos and milady we DO NOT call the hot-reload endpoints
+    // from here. crud.ts PATCH /agents/:id already triggers an async full
+    // container restart whenever `config` changes (see crud.ts:626). The
+    // hot-reload endpoints exist as building blocks for future "Apply live"
+    // buttons but auto-calling them from save races with crud.ts's restart
+    // and writes to a container that's about to go down. The crud.ts
+    // restart picks up all config changes from the DB on the next start.
   }, [agent, buildAdvancedConfig, saveConfig]);
 
   return (

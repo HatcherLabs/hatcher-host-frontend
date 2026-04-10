@@ -47,6 +47,8 @@ function getTabs(framework?: string): TabDef[] {
     { id: 'config', label: 'Config', icon: <Settings size={18} />, group: 'configure' },
     { id: 'integrations', label: 'Integrations', icon: <Puzzle size={18} />, group: 'configure' },
     { id: 'skills', label: framework === 'elizaos' ? 'Plugins' : 'Skills', icon: <Sparkles size={18} />, group: 'configure' },
+    // Milady has BOTH skills (78) and plugins (109) as separate concepts
+    ...(framework === 'milady' ? [{ id: 'plugins' as const, label: 'Plugins', icon: <Puzzle size={18} />, group: 'configure' as const }] : []),
     { id: 'logs', label: 'Logs', icon: <ScrollText size={18} />, group: 'data' },
     { id: 'stats', label: 'Stats', icon: <BarChart3 size={18} />, group: 'data' },
     // Memory tab: for openclaw/hermes reads files from the workspace,
