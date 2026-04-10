@@ -327,8 +327,8 @@ export function DeploymentWalkthrough() {
           })}
         </div>
 
-        {/* Content area */}
-        <div className="p-5 min-h-[304px] flex flex-col">
+        {/* Content area — min-h sized to max panel during ChatPanel cascade (316px measured live on mobile 390x844); previous 304px clamped steps 0-3 but was exceeded at step 4, oscillating ±12px each 15s cycle */}
+        <div className="p-5 min-h-[320px] flex flex-col">
           <AnimatePresence mode="wait">
             <motion.div
               key={step.id}
