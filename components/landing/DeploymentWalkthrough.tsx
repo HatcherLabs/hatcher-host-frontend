@@ -328,7 +328,7 @@ export function DeploymentWalkthrough() {
         </div>
 
         {/* Content area */}
-        <div className="p-5 min-h-[240px] flex flex-col">
+        <div className="p-5 min-h-[304px] flex flex-col">
           <AnimatePresence mode="wait">
             <motion.div
               key={step.id}
