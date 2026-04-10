@@ -108,6 +108,11 @@ const TerminalTab = dynamic(
   { loading: TabSkeleton },
 );
 
+const WorkspaceTab = dynamic(
+  () => import('@/components/agents/tabs/WorkspaceTab').then(mod => ({ default: mod.WorkspaceTab })),
+  { loading: () => <TabSkeleton /> },
+);
+
 // ─── Main Component ─────────────────────────────────────────
 
 export default function AgentManagePage() {
@@ -120,7 +125,7 @@ export default function AgentManagePage() {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','skills','files','logs','memory','schedules','workflows','chat','stats'];
+  const validTabs: Tab[] = ['overview','config','integrations','skills','files','workspace','logs','memory','schedules','workflows','chat','stats'];
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const rawTab = searchParams.get('tab') as Tab;
   const normalizeTab = (t: string | null): Tab => {
@@ -905,6 +910,7 @@ export default function AgentManagePage() {
               {tab === 'integrations' && <IntegrationsTab />}
               {tab === 'skills' && <SkillsTab />}
               {tab === 'files' && <FilesTab />}
+              {tab === 'workspace' && <WorkspaceTab />}
               {tab === 'logs' && <LogsTab />}
               {tab === 'terminal' && <TerminalTab />}
               {tab === 'memory' && <MemoryTab />}
