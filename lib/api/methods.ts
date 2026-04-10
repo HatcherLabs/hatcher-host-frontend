@@ -307,6 +307,50 @@ export const api = {
       message?: string;
     }>(`/agents/${id}/memory`),
 
+  /**
+   * Managed OpenClaw workspace viewer (Etapa 3).
+   *
+   * Returns a recursive listing of files under the agent's `workspace/`
+   * directory. Requires the container to be running — when stopped, the
+   * API returns 409 and the UI should prompt the user to start the agent.
+   */
+  getAgentWorkspaceTree: (id: string, depth = 4) =>
+    req<{
+      base: string;
+      entries: Array<{ path: string; type: 'file' | 'dir'; size: number }>;
+      truncated: boolean;
+    }>(`/agents/${id}/workspace/tree?depth=${depth}`),
+
+  /**
+   * Read a single file under the agent's `workspace/`. `path` is relative
+   * to workspace/ (no leading slash). Binary or oversized files return
+   * `{content: null, reason: "..."}` — the UI should render the reason
+   * instead of trying to display raw bytes.
+   */
+  getAgentWorkspaceFile: (id: string, filePath: string) =>
+    req<{
+      path: string;
+      size: number;
+      content: string | null;
+      reason?: string;
+    }>(`/agents/${id}/workspace/file?path=${encodeURIComponent(filePath)}`),
+
+  /**
+   * Managed OpenClaw live config (Etapa 2).
+   *
+   * Returns the current openclaw.json (live from the container, or the
+   * last DB snapshot if stopped). Secrets are redacted to "***" —
+   * the user should edit those directly via the appropriate flow.
+   */
+  getAgentOpenClawConfig: (id: string) =>
+    req<{
+      source: 'live' | 'snapshot' | 'none';
+      config: Record<string, unknown> | null;
+      snapshotAt: string | null;
+      managed: boolean;
+      liveReadError?: string;
+    }>(`/agents/${id}/openclaw-config`),
+
   /** Get agent monitoring data (health, resources, response times, errors) */
   getAgentMonitoring: (id: string) =>
     req<{

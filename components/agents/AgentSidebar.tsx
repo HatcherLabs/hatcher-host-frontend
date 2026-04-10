@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   BarChart3,
   FolderOpen,
+  FolderTree,
   Brain,
   Clock,
   BookOpen,
@@ -50,6 +51,9 @@ function getTabs(framework?: string): TabDef[] {
     { id: 'stats', label: 'Stats', icon: <BarChart3 size={18} />, group: 'data' },
     ...((framework !== 'elizaos' && framework !== 'milady') ? [{ id: 'memory' as const, label: 'Memory', icon: <Brain size={18} />, group: 'data' as const }] : []),
     { id: 'files', label: 'Files', icon: <FolderOpen size={18} />, group: 'data' },
+    // Workspace viewer — managed OpenClaw only (Etapa 3). Read-only tree
+    // of the agent's ~/.openclaw/workspace dir. Free for all users.
+    ...(framework === 'openclaw' ? [{ id: 'workspace' as const, label: 'Workspace', icon: <FolderTree size={18} />, group: 'data' as const }] : []),
   ];
 }
 
