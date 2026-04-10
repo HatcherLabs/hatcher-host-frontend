@@ -115,12 +115,12 @@ export default function TokenPage() {
               <span className="text-[var(--text-muted)] mr-2">CA:</span>
               <code className="text-[#14F195] font-mono text-xs sm:text-sm select-all">Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump</code>
             </div>
-            <div className="flex items-center justify-center gap-3">
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
               <a
                 href="https://dexscreener.com/solana/Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
+                className="justify-self-end text-xs text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
               >
                 View on Dexscreener
               </a>
@@ -129,9 +129,9 @@ export default function TokenPage() {
                 href="https://solscan.io/token/Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
+                className="justify-self-start text-xs text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
               >
-                Solscan
+                View on Solscan
               </a>
             </div>
           </motion.div>
