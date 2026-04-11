@@ -209,9 +209,18 @@ export function TerminalTab() {
     setTimeout(() => setSending(false), 30000);
   }, [messageInput, sending]);
 
-  // Listen for output messages to detect when response is complete
+  // Listen for output messages to detect when response is complete.
+  //
+  // Deps are `[state]` not empty: a ref change is not reactive, so we
+  // key the effect on the connection state transition. `state` flips to
+  // 'connected' after connect() finishes setting wsRef.current, at which
+  // point we attach the message handler once; when state leaves
+  // 'connected' the cleanup removes it and the next 'connected' run
+  // re-attaches against the new socket. Previously the effect had no
+  // dep array at all and re-ran on every component render, attaching
+  // and removing the listener on every keystroke in the command input.
   useEffect(() => {
-    if (!wsRef.current) return;
+    if (state !== 'connected' || !wsRef.current) return;
     const ws = wsRef.current;
     const handler = (event: MessageEvent) => {
       try {
@@ -228,7 +237,7 @@ export function TerminalTab() {
     };
     ws.addEventListener('message', handler);
     return () => ws.removeEventListener('message', handler);
-  });
+  }, [state]);
 
   // ── Disconnect ──
   const disconnect = useCallback(() => {
