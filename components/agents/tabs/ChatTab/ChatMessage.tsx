@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useState, useCallback } from 'react';
+import { memo, useState, useCallback, useMemo, Fragment } from 'react';
 import { motion } from 'framer-motion';
 import { Bot, Volume2, ThumbsUp, ThumbsDown } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
@@ -8,6 +8,7 @@ import { api } from '@/lib/api';
 import { SoundWaveBars, TypingIndicator } from './SoundWaveBars';
 import { FRAMEWORK_BUBBLE } from './constants';
 import type { ChatMessageProps } from './types';
+import { parseMessageSegments, ThinkingBlock, ToolCallChip } from './ThinkingBlock';
 
 const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupported, onSpeak, agentId, isAuthenticated, framework }: ChatMessageProps) {
   const [vote, setVote] = useState<'up' | 'down' | null>(null);
@@ -51,12 +52,7 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
         >
           {msg.content ? (
             msg.role === 'assistant' ? (
-              <div className="markdown-body">
-                <ReactMarkdown>{msg.content}</ReactMarkdown>
-                {msg.streaming && (
-                  <span className="inline-block w-[2px] h-4 ml-0.5 align-text-bottom bg-[var(--color-accent)] animate-pulse rounded-full" />
-                )}
-              </div>
+              <AssistantBody content={msg.content} streaming={Boolean(msg.streaming)} />
             ) : (
               <p className="whitespace-pre-wrap">{msg.content}</p>
             )
@@ -110,3 +106,58 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
 });
 
 export default ChatMessage;
+
+/**
+ * Assistant message body. Parses the raw streaming content into
+ * thinking / text / tool-call segments and renders each with the
+ * appropriate component. Falls through to a plain markdown render
+ * when no structured markers are detected (the common case).
+ */
+const AssistantBody = memo(function AssistantBody({
+  content,
+  streaming,
+}: {
+  content: string;
+  streaming: boolean;
+}) {
+  const segments = useMemo(() => parseMessageSegments(content), [content]);
+
+  // Fast path: no structured markers, just render markdown as before.
+  // Covers the vast majority of messages (nothing changes visually).
+  if (segments.length === 1 && segments[0]?.kind === 'text') {
+    return (
+      <div className="markdown-body">
+        <ReactMarkdown>{segments[0].content}</ReactMarkdown>
+        {streaming && (
+          <span className="inline-block w-[2px] h-4 ml-0.5 align-text-bottom bg-[var(--color-accent)] animate-pulse rounded-full" />
+        )}
+      </div>
+    );
+  }
+
+  // Mixed content: reasoning trace + text + tool calls. Render each
+  // segment with its own component and let ThinkingBlock collapse
+  // itself once streaming finishes.
+  return (
+    <div className="markdown-body">
+      {segments.map((seg, i) => {
+        if (seg.kind === 'think') {
+          return <ThinkingBlock key={i} content={seg.content} streaming={streaming && seg.open} />;
+        }
+        if (seg.kind === 'tool_call') {
+          const toolProps = seg.args !== undefined ? { name: seg.name, args: seg.args } : { name: seg.name };
+          return <ToolCallChip key={i} {...toolProps} />;
+        }
+        // text segment
+        return (
+          <Fragment key={i}>
+            <ReactMarkdown>{seg.content}</ReactMarkdown>
+          </Fragment>
+        );
+      })}
+      {streaming && (
+        <span className="inline-block w-[2px] h-4 ml-0.5 align-text-bottom bg-[var(--color-accent)] animate-pulse rounded-full" />
+      )}
+    </div>
+  );
+});
