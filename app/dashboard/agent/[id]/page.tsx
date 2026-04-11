@@ -113,6 +113,11 @@ const OpenClawSessionsTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const HermesMemoryTab = dynamic(
+  () => import('@/components/agents/tabs/HermesMemoryTab').then(mod => ({ default: mod.HermesMemoryTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 const MiladyPluginsTab = dynamic(
   () => import('@/components/agents/tabs/MiladyPluginsTab').then(mod => ({ default: mod.MiladyPluginsTab })),
   { loading: () => <TabSkeleton /> }
@@ -962,7 +967,11 @@ export default function AgentManagePage() {
               {tab === 'workspace' && <WorkspaceTab />}
               {tab === 'logs' && <LogsTab />}
               {tab === 'terminal' && <TerminalTab />}
-              {tab === 'memory' && (agent?.framework === 'elizaos' ? <ElizaosMemoryTab /> : <MemoryTab />)}
+              {tab === 'memory' && (
+                agent?.framework === 'elizaos' ? <ElizaosMemoryTab /> :
+                agent?.framework === 'hermes' ? <HermesMemoryTab /> :
+                <MemoryTab />
+              )}
               {tab === 'sessions' && (
                 agent?.framework === 'elizaos' ? <ElizaosSessionsTab /> :
                 agent?.framework === 'openclaw' ? <OpenClawSessionsTab /> :
