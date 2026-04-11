@@ -459,6 +459,28 @@ export const api = {
     }>(`/agents/${id}/hermes-config`),
 
   /**
+   * Apply one or more live-config patches to a managed hermes agent.
+   * Each patch is `{path, value}` where `path` is dot-separated into
+   * the config.yaml tree and `value` is the new value. Server enforces
+   * a strict allowlist (see isHermesPatchAllowed in hermes-config-snapshot.ts).
+   *
+   * On partial failure the server returns 422 with `applied` + `failedAt` +
+   * `remaining` so the UI can highlight the offending field without
+   * losing context on what already succeeded.
+   */
+  patchHermesConfig: (
+    id: string,
+    patches: Array<{ path: string; value: unknown }>,
+  ) =>
+    req<{
+      applied: string[];
+      validation: { valid: boolean; error?: string };
+    }>(`/agents/${id}/hermes-config`, {
+      method: 'PATCH',
+      body: JSON.stringify({ patches }),
+    }),
+
+  /**
    * Hermes bundled skills catalog — walks the `skills/` directory in
    * the container and returns categories + individual skill metadata
    * parsed from SKILL.md frontmatter. Managed-mode only.

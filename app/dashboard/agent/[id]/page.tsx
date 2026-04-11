@@ -118,6 +118,11 @@ const HermesMemoryTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const HermesConfigTab = dynamic(
+  () => import('@/components/agents/tabs/HermesConfigTab').then(mod => ({ default: mod.HermesConfigTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 const MiladyPluginsTab = dynamic(
   () => import('@/components/agents/tabs/MiladyPluginsTab').then(mod => ({ default: mod.MiladyPluginsTab })),
   { loading: () => <TabSkeleton /> }
@@ -954,7 +959,9 @@ export default function AgentManagePage() {
           <div className={`flex-1 px-4 sm:px-6 py-6 min-w-0`}>
             <AnimatePresence mode="wait">
               {tab === 'overview' && <OverviewTab />}
-              {tab === 'config' && <ConfigTab />}
+              {tab === 'config' && (
+                agent?.framework === 'hermes' ? <HermesConfigTab /> : <ConfigTab />
+              )}
               {tab === 'integrations' && <IntegrationsTab />}
               {tab === 'skills' && (
                 agent?.framework === 'elizaos' ? <ElizaosPluginsTab /> :
