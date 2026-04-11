@@ -176,6 +176,12 @@
 }
 
 @layer base {
+  html {
+    /* Prevent the default blue tap flash on iOS Safari / Android WebView.
+       Per-element :active / :focus-visible styles provide feedback. */
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     @apply antialiased;
     background-color: var(--bg-base);

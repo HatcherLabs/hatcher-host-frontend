@@ -664,7 +664,7 @@ function WorkflowEditor({
           The workflow editor is best used on a desktop browser. Viewing is supported, but editing requires drag-and-drop.
         </p>
       </div>
-    <div className="relative flex flex-col h-[calc(100vh-280px)] min-h-[500px]">
+    <div className="relative flex flex-col h-[calc(100dvh-280px)] min-h-[500px]">
       {/* Top bar */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)] bg-[var(--bg-base)]/80 backdrop-blur-sm">
         <div className="flex items-center gap-3">
