@@ -433,7 +433,7 @@ export default function AnalyticsPage() {
                 return (
                   <Link
                     key={agent.id}
-                    href={`/dashboard/agent/${agent.id}?tab=analytics`}
+                    href={`/dashboard/agent/${agent.id}?tab=stats`}
                     className="block p-3 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 transition-colors"
                   >
                     <div className="flex items-center justify-between mb-2">
