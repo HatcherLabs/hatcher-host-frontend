@@ -10,6 +10,7 @@ import {
   Users,
   Bot,
   Activity,
+  BarChart3,
   DollarSign,
   MessageSquare,
   Shield,
@@ -189,6 +190,73 @@ function StatCard({
   );
 }
 
+/**
+ * 30-day sparkline using div bars. Pads to 30 entries if the backend
+ * returned fewer days (e.g. platform is <30 days old). Tooltips on
+ * hover show the exact day + count.
+ */
+function SparklineBars({
+  data,
+  color = 'var(--color-accent)',
+}: {
+  data: Array<{ day: string; count: number }>;
+  color?: string;
+}) {
+  // Pad to 30 days backward from today so an otherwise-empty chart still
+  // renders something visible. Backend returns ASC by day.
+  const max = Math.max(1, ...data.map(d => d.count));
+  return (
+    <div className="flex items-end gap-[2px] h-12">
+      {data.length === 0 ? (
+        <div className="w-full text-center text-[10px] text-[var(--text-muted)] leading-[3rem]">
+          No activity yet
+        </div>
+      ) : (
+        data.map(d => (
+          <div
+            key={d.day}
+            title={`${d.day}: ${d.count}`}
+            className="flex-1 min-w-[2px] rounded-sm transition-opacity hover:opacity-80"
+            style={{
+              height: `${Math.max(4, (d.count / max) * 100)}%`,
+              background: color,
+              opacity: d.count === 0 ? 0.2 : 1,
+            }}
+          />
+        ))
+      )}
+    </div>
+  );
+}
+
+/**
+ * One row of a distribution bar chart. Bar width is proportional to
+ * count / total; label + count on the right.
+ */
+function DistributionBar({
+  label,
+  count,
+  total,
+}: {
+  label: string;
+  count: number;
+  total: number;
+}) {
+  const pct = total > 0 ? (count / total) * 100 : 0;
+  return (
+    <div className="flex items-center gap-2 text-xs">
+      <span className="w-20 text-[var(--text-secondary)] truncate capitalize">{label}</span>
+      <div className="flex-1 h-2 rounded-full bg-[var(--bg-card)] overflow-hidden">
+        <div
+          className="h-full rounded-full bg-[var(--color-accent)]/60 transition-all"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <span className="w-10 text-right tabular-nums text-[var(--text-muted)]">{count}</span>
+    </div>
+  );
+}
+
 // ─── Page ────────────────────────────────────────────────────
 export default function AdminDashboardPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -197,6 +265,13 @@ export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [serverStats, setServerStats] = useState<{ cpu: { cores: number; usagePercent: number; model: string; loadAvg: { '1m': number; '5m': number; '15m': number } }; memory: { totalBytes: number; usedBytes: number; usagePercent: number }; disk: { total: number; used: number; usePercent: number }; uptime: number; containers: { running: number; total: number } } | null>(null);
+  const [metrics, setMetrics] = useState<{
+    signupsByDay: Array<{ day: string; count: number }>;
+    agentsByDay: Array<{ day: string; count: number }>;
+    tierDistribution: Record<string, number>;
+    frameworkDistribution: Record<string, number>;
+    recentSignups: Array<{ id: string; email: string; username: string; tier: string; createdAt: string }>;
+  } | null>(null);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [agents, setAgents] = useState<AdminAgent[]>([]);
   const [tickets, setTickets] = useState<AdminTicket[]>([]);
@@ -256,6 +331,10 @@ export default function AdminDashboardPage() {
       setLoading(false);
     });
     api.adminGetServerStats().then(res => { if (res.success) setServerStats(res.data); });
+    // 30-day time-series metrics (signups, agents created, tier/framework
+    // distribution, recent signups). Loaded alongside the primary stats so
+    // the overview tab renders as a single unit. Server caches for 60s.
+    api.adminGetMetrics().then(res => { if (res.success) setMetrics(res.data); });
   }, [user]);
 
   // ── Load health when System tab is shown ─────────────────
@@ -580,6 +659,103 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
             </div>
+
+            {/* 30-day activity metrics */}
+            {metrics && (
+              <div className="card glass-noise p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <BarChart3 size={16} className="text-[var(--color-accent)]" />
+                  <span className="text-sm font-semibold text-white">30-day activity</span>
+                  <span className="ml-auto text-[11px] text-[var(--text-muted)]">server-cached 60s</span>
+                </div>
+
+                {/* Signup sparkline + total */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                  <div>
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <span className="text-2xl font-bold text-white">
+                        {metrics.signupsByDay.reduce((s, d) => s + d.count, 0)}
+                      </span>
+                      <span className="text-xs text-[var(--text-muted)]">new signups</span>
+                    </div>
+                    <SparklineBars data={metrics.signupsByDay} color="var(--color-accent)" />
+                  </div>
+                  <div>
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <span className="text-2xl font-bold text-white">
+                        {metrics.agentsByDay.reduce((s, d) => s + d.count, 0)}
+                      </span>
+                      <span className="text-xs text-[var(--text-muted)]">agents created</span>
+                    </div>
+                    <SparklineBars data={metrics.agentsByDay} color="#f59e0b" />
+                  </div>
+                </div>
+
+                {/* Tier + framework distributions */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                  <div>
+                    <div className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-2">
+                      Tier distribution
+                    </div>
+                    <div className="space-y-1.5">
+                      {Object.entries(metrics.tierDistribution)
+                        .sort((a, b) => b[1] - a[1])
+                        .map(([tier, count]) => (
+                          <DistributionBar
+                            key={tier}
+                            label={tier}
+                            count={count}
+                            total={Object.values(metrics.tierDistribution).reduce((s, c) => s + c, 0)}
+                          />
+                        ))}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-2">
+                      Framework distribution
+                    </div>
+                    <div className="space-y-1.5">
+                      {Object.entries(metrics.frameworkDistribution)
+                        .sort((a, b) => b[1] - a[1])
+                        .map(([fw, count]) => (
+                          <DistributionBar
+                            key={fw}
+                            label={fw}
+                            count={count}
+                            total={Object.values(metrics.frameworkDistribution).reduce((s, c) => s + c, 0)}
+                          />
+                        ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent signups */}
+                <div>
+                  <div className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-2">
+                    Last {metrics.recentSignups.length} signups
+                  </div>
+                  <div className="space-y-1">
+                    {metrics.recentSignups.map(u => (
+                      <div
+                        key={u.id}
+                        className="flex items-center gap-2 text-xs py-1 border-b border-[var(--border-default)]/50 last:border-0"
+                      >
+                        <span className="font-mono text-[var(--text-primary)] truncate max-w-[140px]">
+                          {u.username}
+                        </span>
+                        <span className="text-[var(--text-muted)] truncate flex-1">{u.email}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full border border-[var(--border-default)] text-[var(--text-muted)]">
+                          {u.tier}
+                        </span>
+                        <span className="text-[10px] text-[var(--text-muted)] whitespace-nowrap">
+                          {new Date(u.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Recent tickets summary */}
             {tickets.filter(t => t.status === 'open').length > 0 && (

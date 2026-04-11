@@ -760,6 +760,26 @@ export const api = {
       newUsersLast7d: number;
     }>('/admin/stats'),
 
+  /**
+   * Admin: 30-day time-series metrics for dashboard charts.
+   * Signups/agents per day, tier + framework breakdowns, recent signups.
+   * Cached server-side for 60s.
+   */
+  adminGetMetrics: () =>
+    req<{
+      signupsByDay: Array<{ day: string; count: number }>;
+      agentsByDay: Array<{ day: string; count: number }>;
+      tierDistribution: Record<string, number>;
+      frameworkDistribution: Record<string, number>;
+      recentSignups: Array<{
+        id: string;
+        email: string;
+        username: string;
+        tier: string;
+        createdAt: string;
+      }>;
+    }>('/admin/metrics'),
+
   /** Admin: server resource stats */
   adminGetServerStats: () =>
     req<{
