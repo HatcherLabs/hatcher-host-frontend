@@ -1,6 +1,7 @@
 'use client';
 
 import { type RefObject } from 'react';
+import Link from 'next/link';
 import { Send, Mic, MicOff, MessageSquare } from 'lucide-react';
 import { GlassCard } from '../../AgentContext';
 
@@ -62,12 +63,12 @@ export function ChatInput({
       <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-4 py-3 text-center">
         <p className="text-sm text-amber-400">
           Daily message limit reached.{' '}
-          <a
+          <Link
             className="underline hover:opacity-80 transition-opacity text-[var(--color-accent)]"
             href="/dashboard/billing"
           >
             Upgrade to Pro
-          </a>
+          </Link>
           {' '}for more, or bring your own key for unlimited.
         </p>
       </div>
@@ -119,6 +120,7 @@ export function ChatInput({
         {/* Mic button */}
         {sttSupported && (
           <button
+            type="button"
             onClick={onMicToggle}
             className={`h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
               isListening
@@ -126,6 +128,7 @@ export function ChatInput({
                 : 'bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] border border-transparent hover:border-[var(--text-muted)]/30'
             }`}
             title={isListening ? 'Stop recording' : 'Start voice input'}
+            aria-label={isListening ? 'Stop recording' : 'Start voice input'}
             disabled={inputDisabled}
           >
             {isListening ? (
@@ -138,12 +141,14 @@ export function ChatInput({
 
         {/* Send button */}
         <button
+          type="button"
           className={`h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
             input.trim() && !inputDisabled
               ? 'bg-[var(--color-accent)] hover:bg-[#0891b2] shadow-[0_0_12px_rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]'
               : 'bg-[var(--color-accent)]/30 opacity-50 cursor-not-allowed'
           }`}
           onClick={onSendMessage}
+          aria-label="Send message"
           disabled={!input.trim() || inputDisabled}
         >
           {sending ? (

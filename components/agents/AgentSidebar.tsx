@@ -69,6 +69,15 @@ function getTabs(framework?: string): TabDef[] {
     // Workspace viewer — openclaw (managed) and managed hermes. Read-only
     // tree of the agent's workspace. Free for all users.
     ...(framework === 'openclaw' || framework === 'hermes' ? [{ id: 'workspace' as const, label: 'Workspace', icon: <FolderTree size={18} />, group: 'data' as const }] : []),
+    // Schedules + Workflows: both tabs render for all frameworks (the
+    // components themselves gate on framework-specific support — e.g.
+    // SchedulesTab has FRAMEWORK_SCHEDULE_SUPPORT that distinguishes
+    // native cron vs. external trigger). Before Phase 3 they were
+    // reachable only via the "Manage" button in OpenClawSchedulesCard
+    // (deep-link). Exposing them here in the Advanced group surfaces
+    // the feature to every operator without cluttering the main tabs.
+    { id: 'schedules', label: 'Schedules', icon: <Clock size={18} />, group: 'advanced' },
+    { id: 'workflows', label: 'Workflows', icon: <GitMerge size={18} />, group: 'advanced' },
   ];
 }
 
