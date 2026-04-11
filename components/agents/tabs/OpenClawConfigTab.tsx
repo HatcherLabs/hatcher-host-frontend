@@ -39,53 +39,55 @@ interface EditableField {
   placeholder?: string;
 }
 
+// Every path + every enum option in this list was verified against a
+// real managed-mode OpenClaw instance on 2026-04-11 by round-tripping
+// PATCH calls through openclaw's Zod validator. Do NOT add speculative
+// keys here: the backend allowlist gates which paths CAN be sent, but
+// the OpenClaw runtime has its own Zod schema that will reject unknown
+// roots with `<root>: Unrecognized key: ...`. `identity.*` for example
+// is allowlisted by hatcher but the openclaw runtime has no `identity`
+// namespace at all, so any save would fail with a red banner. Before
+// adding a field, run:
+//   curl -s -H "auth" ".../openclaw-config" | jq '.data.config'
+// and confirm the path exists OR that a probe PATCH succeeds.
 const OPENCLAW_EDITABLE_FIELDS: EditableField[] = [
-  {
-    path: 'identity.displayName',
-    label: 'Display Name',
-    description:
-      'Human-readable agent name used by the CLI and some channels when announcing itself.',
-    kind: 'string',
-    placeholder: 'e.g. Hermes',
-  },
   {
     path: 'agents.defaults.workspace',
     label: 'Default Workspace',
     description:
-      'Absolute path inside the container where the agent keeps its working files. Normally /home/node/.openclaw/workspace — only change if you know what you\'re doing.',
+      'Absolute path inside the container where the agent keeps its working files. Leave as /home/node/.openclaw/workspace unless you know why you\'re changing it — this is also the path the Workspace tab mounts.',
     kind: 'string',
     placeholder: '/home/node/.openclaw/workspace',
   },
   {
-    path: 'agents.defaults.maxConversations',
-    label: 'Max Conversations',
+    path: 'agents.defaults.compaction.mode',
+    label: 'Compaction Mode',
     description:
-      'Upper bound on simultaneous conversations the agent will keep in memory. Higher = more context retained across sessions, more RAM.',
-    kind: 'number',
-    min: 1,
-    max: 500,
-  },
-  {
-    path: 'session.scope',
-    label: 'Session Scope',
-    description:
-      'How sessions are isolated between users. "per-user" keeps each caller in their own scope, "global" shares one session across all callers.',
+      'How OpenClaw compacts the conversation when it approaches the context window. "safeguard" only compacts when truly necessary; "default" lets the model decide. These are the only two values the runtime accepts.',
     kind: 'enum',
-    options: ['per-user', 'global', 'per-channel'],
+    options: ['safeguard', 'default'],
   },
   {
     path: 'tools.profile',
     label: 'Tools Profile',
     description:
-      'Which bundled tools the agent can use. "full" enables everything the install supports, "minimal" keeps only filesystem + web fetch, "readonly" removes all mutation tools.',
+      'Preset that controls which bundled tools the agent can reach. "coding" is the onboard default, "messaging" trims to chat-focused tools, "minimal" keeps only filesystem + fetch, "full" enables everything the install supports.',
     kind: 'enum',
-    options: ['full', 'minimal', 'readonly'],
+    options: ['minimal', 'coding', 'messaging', 'full'],
+  },
+  {
+    path: 'session.dmScope',
+    label: 'Session DM Scope',
+    description:
+      'Controls how direct-message sessions are isolated across platforms. "per-channel-peer" (default) gives each user-in-each-channel their own session; "per-peer" collapses all channels per user; "per-account-channel-peer" splits even further by account; "main" shares one global session.',
+    kind: 'enum',
+    options: ['main', 'per-peer', 'per-channel-peer', 'per-account-channel-peer'],
   },
   {
     path: 'logging.level',
     label: 'Log Level',
     description:
-      'Verbosity of agent logs (the Logs tab). debug = everything, info = normal, warn = warnings + errors only, error = errors only.',
+      'Verbosity of agent logs (the Logs tab). debug = everything, info = normal (default), warn = warnings + errors only, error = errors only.',
     kind: 'enum',
     options: ['debug', 'info', 'warn', 'error'],
   },
