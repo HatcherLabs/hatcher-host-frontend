@@ -30,8 +30,8 @@ function formatRelativeTime(isoTs: string): string {
 
 /**
  * Drill down into the openclaw.json config for a gateway summary.
- * Pulls the top-level model provider, gateway bind, and endpoint
- * toggles without rendering the whole (huge) config.
+ * Pulls the top-level model provider, gateway bind, endpoint toggles,
+ * and active channels without rendering the whole (huge) config.
  */
 function pickGatewayInfo(config: Record<string, unknown> | null) {
   if (!config) return null;
@@ -52,6 +52,19 @@ function pickGatewayInfo(config: Record<string, unknown> | null) {
     }
   }
 
+  // Active channels — each entry under `config.channels.<platform>` with
+  // `enabled !== false` is considered on. Auth tokens have already been
+  // redacted server-side, so we only read the enabled flag here.
+  const channelsNode =
+    (config.channels as Record<string, unknown> | undefined) ?? {};
+  const activeChannels = Object.entries(channelsNode)
+    .filter(([, value]) => {
+      if (!value || typeof value !== 'object') return false;
+      const enabled = (value as Record<string, unknown>)['enabled'];
+      return enabled !== false;
+    })
+    .map(([name]) => name);
+
   return {
     port: gateway.port as number | undefined,
     bind: gateway.bind as string | undefined,
@@ -65,6 +78,7 @@ function pickGatewayInfo(config: Record<string, unknown> | null) {
     providerCount: providerList.length,
     firstProvider: providerList[0] ?? null,
     primaryModel,
+    activeChannels,
   };
 }
 
@@ -214,6 +228,29 @@ export function OpenClawGatewayCard() {
           <div className="text-[10px] text-[var(--text-muted)] mt-1">HTTP Endpoints</div>
         </div>
       </div>
+
+      {/* Active channels pill row — surfaces `config.channels.*` entries
+          with `enabled !== false` so operators can see at a glance
+          which platforms the agent is listening on (telegram, discord,
+          xurl, etc.) without drilling into the config tab. */}
+      {info.activeChannels.length > 0 && (
+        <div className="mt-4 pt-3 border-t border-[var(--border-default)]/50">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">
+              Channels
+            </span>
+            {info.activeChannels.map((ch) => (
+              <span
+                key={ch}
+                className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 capitalize"
+                title={`channels.${ch}.enabled = true`}
+              >
+                {ch}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </GlassCard>
   );
 }

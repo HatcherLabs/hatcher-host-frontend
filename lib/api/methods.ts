@@ -552,6 +552,33 @@ export const api = {
     req<{ models: string[] }>(`/agents/${id}/hermes-config/allowed-models`),
 
   /**
+   * Hermes native cron jobs — reads `/home/hermes/.hermes/cron/jobs.json`
+   * inside the running container and returns a parsed + sorted summary.
+   *
+   * Separate from Hatcher's own workflow scheduler: this is the native
+   * cron system that runs inside the agent's gateway process.
+   */
+  getHermesCron: (id: string) =>
+    req<{
+      jobs: Array<{
+        id: string;
+        name: string | null;
+        schedule_display: string | null;
+        state: string | null;
+        enabled: boolean;
+        next_run_at: number | null;
+        last_run_at: number | null;
+        last_status: string | null;
+        prompt: string | null;
+        skills: string[];
+        created_at: number | null;
+      }>;
+      total: number;
+      enabled: number;
+      schedulerActive: boolean;
+    }>(`/agents/${id}/hermes-cron`),
+
+  /**
    * Hermes bundled skills catalog — walks the `skills/` directory in
    * the container and returns categories + individual skill metadata
    * parsed from SKILL.md frontmatter. Managed-mode only.
