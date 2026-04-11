@@ -271,9 +271,113 @@ export function ElizaosPluginsTab() {
         })()
       )}
 
+      {/* ─── Raw character JSON viewer (power users) ─── */}
+      <ElizaosRawCharacterViewer agentId={agent?.id ?? ''} />
+
       {/* ─── Community plugin browser ─── */}
       <ElizaosRegistryBrowser agentId={agent?.id ?? ''} />
     </motion.div>
+  );
+}
+
+/**
+ * Read-only raw character JSON viewer. Fetches the live character
+ * via /elizaos/agent and shows it as formatted JSON inside a
+ * collapsible card. `settings.secrets.*` is already redacted
+ * server-side. Useful for debugging config drift: what did Hatcher
+ * persist vs what did elizaos actually load?
+ *
+ * Why not a full editor: free-form JSON editing would need a JSON
+ * validator + schema check against ElizaOS's Character type + a
+ * safe hot-reload path. The existing Config + Plugins tabs cover
+ * the editable fields; this view is for inspection only.
+ */
+function ElizaosRawCharacterViewer({ agentId }: { agentId: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [character, setCharacter] = useState<Record<string, unknown> | null>(null);
+
+  const load = useCallback(async () => {
+    if (!agentId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.getElizaosAgent(agentId);
+      if (res.success) {
+        setCharacter(res.data as unknown as Record<string, unknown>);
+      } else {
+        setError('error' in res ? res.error : 'Failed to load character');
+      }
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }, [agentId]);
+
+  // Lazy-load on first expansion so we don't pay the API cost for
+  // users who never open the viewer.
+  useEffect(() => {
+    if (expanded && !character && !loading) {
+      void load();
+    }
+  }, [expanded, character, loading, load]);
+
+  return (
+    <div className="mt-8 pt-6 border-t border-[var(--border-default)]">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Library size={16} className="text-cyan-400" />
+          <span className="text-sm font-medium text-[var(--text-secondary)]">
+            Raw character JSON
+          </span>
+        </div>
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="text-xs px-3 py-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-all"
+        >
+          {expanded ? 'Hide' : 'Show'}
+        </button>
+      </div>
+
+      {expanded && (
+        <div className="rounded-lg border border-cyan-500/20 bg-cyan-500/[0.04] px-4 py-3 flex items-start gap-3 mb-3">
+          <Info size={14} className="text-cyan-400/70 mt-0.5 shrink-0" />
+          <p className="text-xs leading-relaxed text-cyan-400/90">
+            Live character from the running container. Secrets
+            (settings.secrets.*) are already redacted server-side. For
+            debugging — edit config via the tabs above, not this view.
+          </p>
+        </div>
+      )}
+
+      {expanded && loading && (
+        <GlassCard>
+          <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] py-2">
+            <RotateCcw size={12} className="animate-spin text-cyan-400" />
+            Loading character…
+          </div>
+        </GlassCard>
+      )}
+
+      {expanded && error && (
+        <GlassCard>
+          <div className="flex items-center gap-2 text-sm text-red-400">
+            <AlertCircle size={14} />
+            {error}
+          </div>
+        </GlassCard>
+      )}
+
+      {expanded && character && !loading && !error && (
+        <GlassCard className="!p-0 overflow-hidden">
+          <pre className="text-[11px] font-mono text-[var(--text-secondary)] p-4 overflow-auto max-h-[500px] whitespace-pre-wrap break-all leading-relaxed">
+            {JSON.stringify(character, null, 2)}
+          </pre>
+        </GlassCard>
+      )}
+    </div>
   );
 }
 

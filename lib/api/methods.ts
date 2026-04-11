@@ -366,11 +366,15 @@ export const api = {
    * ElizaOS memory viewer (E3). Reads the live memories table from
    * the running container via /api/agents/:uuid/memories. Returns
    * 503 if the container is stopped.
+   *
+   * Optional `roomId` filters to just that room's memories — used by
+   * the sessions tab to drill from a room row into its history.
    */
-  getElizaosMemories: (id: string) =>
+  getElizaosMemories: (id: string, roomId?: string) =>
     req<{
       total: number;
       returned: number;
+      roomId: string | null;
       memories: Array<{
         id: string;
         type: string;
@@ -379,7 +383,11 @@ export const api = {
         source?: string;
         roomId?: string;
       }>;
-    }>(`/agents/${id}/elizaos/memories`),
+    }>(
+      roomId
+        ? `/agents/${id}/elizaos/memories?roomId=${encodeURIComponent(roomId)}`
+        : `/agents/${id}/elizaos/memories`,
+    ),
 
   /**
    * ElizaOS sessions/rooms viewer (E3).
@@ -470,6 +478,43 @@ export const api = {
       bundled: string[];
       core: string[];
     }>(`/agents/${id}/elizaos-registry`),
+
+  /**
+   * Milady live config — returns the full character JSON parsed from
+   * the running container's `GET /api/config`, with secrets redacted.
+   * 503 MILADY_API_UNAVAILABLE when the container is stopped.
+   */
+  getMiladyConfig: (id: string) =>
+    req<{ config: Record<string, unknown> | null }>(`/agents/${id}/milady/config`),
+
+  /**
+   * Milady character patch — edit name/system/bio/topics/adjectives/
+   * style/model. Saves to configJson + hot-reloads via Milady's native
+   * PUT /api/config (no container restart). Returns applied-fields
+   * list + a pendingRestart flag for fields that DO require a full
+   * restart to fully take effect (model change in particular).
+   */
+  patchMiladyConfig: (
+    id: string,
+    patch: {
+      systemPrompt?: string;
+      personality?: string;
+      bio?: string[];
+      topics?: string[];
+      adjectives?: string[];
+      styleAll?: string[];
+      styleChat?: string[];
+      model?: string;
+    },
+  ) =>
+    req<{
+      applied: string[];
+      pendingRestart: boolean;
+      pendingRestartReasons: string[];
+    }>(`/agents/${id}/milady/config`, {
+      method: 'PATCH',
+      body: JSON.stringify(patch),
+    }),
 
   /** Milady skills catalog (78 bundled skills). Read-only. */
   getMiladySkills: (id: string) =>

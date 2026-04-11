@@ -128,6 +128,11 @@ const OpenClawConfigTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const MiladyConfigTab = dynamic(
+  () => import('@/components/agents/tabs/MiladyConfigTab').then(mod => ({ default: mod.MiladyConfigTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 const MiladyPluginsTab = dynamic(
   () => import('@/components/agents/tabs/MiladyPluginsTab').then(mod => ({ default: mod.MiladyPluginsTab })),
   { loading: () => <TabSkeleton /> }
@@ -966,6 +971,7 @@ export default function AgentManagePage() {
               {tab === 'overview' && <OverviewTab />}
               {tab === 'config' && (
                 agent?.framework === 'hermes' ? <HermesConfigTab /> :
+                agent?.framework === 'milady' ? <MiladyConfigTab /> :
                 (agent?.framework === 'openclaw' && agent?.managementMode === 'managed') ? (
                   // Managed OpenClaw: stack the live PATCH editor on top of
                   // the legacy DB-backed form. Live editor handles runtime

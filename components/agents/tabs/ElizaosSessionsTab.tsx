@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { MessagesSquare, RotateCcw, Hash, Info } from 'lucide-react';
+import { MessagesSquare, RotateCcw, Hash, Info, ChevronDown, ChevronRight, Loader2 } from 'lucide-react';
 import { api } from '@/lib/api';
 import {
   useAgentContext,
@@ -18,11 +18,30 @@ interface ElizaRoom {
   worldId?: string;
 }
 
+interface RoomMemory {
+  id: string;
+  type: string;
+  createdAt: number;
+  text: string;
+  source?: string;
+  roomId?: string;
+}
+
+/** Cached per-room memory state so repeated expand/collapse doesn't refetch. */
+interface RoomMemoryState {
+  loading: boolean;
+  error: string | null;
+  memories: RoomMemory[];
+  total: number;
+}
+
 export function ElizaosSessionsTab() {
   const { agent } = useAgentContext();
   const [rooms, setRooms] = useState<ElizaRoom[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expandedRoom, setExpandedRoom] = useState<string | null>(null);
+  const [roomMemories, setRoomMemories] = useState<Record<string, RoomMemoryState>>({});
 
   const load = useCallback(async () => {
     if (!agent?.id) return;
@@ -45,6 +64,58 @@ export function ElizaosSessionsTab() {
   useEffect(() => {
     load();
   }, [load]);
+
+  const toggleRoom = useCallback(
+    async (roomId: string) => {
+      if (!agent?.id) return;
+      if (expandedRoom === roomId) {
+        setExpandedRoom(null);
+        return;
+      }
+      setExpandedRoom(roomId);
+      // Skip refetch if we've already loaded this room's memories
+      if (roomMemories[roomId]?.memories.length || roomMemories[roomId]?.loading) return;
+      setRoomMemories((prev) => ({
+        ...prev,
+        [roomId]: { loading: true, error: null, memories: [], total: 0 },
+      }));
+      try {
+        const res = await api.getElizaosMemories(agent.id, roomId);
+        if (res.success) {
+          setRoomMemories((prev) => ({
+            ...prev,
+            [roomId]: {
+              loading: false,
+              error: null,
+              memories: res.data.memories,
+              total: res.data.total,
+            },
+          }));
+        } else {
+          setRoomMemories((prev) => ({
+            ...prev,
+            [roomId]: {
+              loading: false,
+              error: 'error' in res ? res.error : 'Failed to load',
+              memories: [],
+              total: 0,
+            },
+          }));
+        }
+      } catch (e) {
+        setRoomMemories((prev) => ({
+          ...prev,
+          [roomId]: {
+            loading: false,
+            error: (e as Error).message,
+            memories: [],
+            total: 0,
+          },
+        }));
+      }
+    },
+    [agent?.id, expandedRoom, roomMemories],
+  );
 
   const isEmpty = rooms.length === 0;
 
@@ -119,19 +190,94 @@ export function ElizaosSessionsTab() {
         </GlassCard>
       ) : (
         <div className="space-y-2">
-          {rooms.map((r) => (
-            <GlassCard key={r.id} className="!p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center shrink-0">
-                  <MessagesSquare size={16} className="text-cyan-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-white truncate">{r.name || '(unnamed)'}</p>
-                  <p className="text-[11px] font-mono text-[var(--text-muted)] truncate">{r.id}</p>
-                </div>
-              </div>
-            </GlassCard>
-          ))}
+          {rooms.map((r) => {
+            const isExpanded = expandedRoom === r.id;
+            const memoryState = roomMemories[r.id];
+            return (
+              <GlassCard key={r.id} className="!p-0 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => void toggleRoom(r.id)}
+                  className="w-full p-4 flex items-center gap-3 text-left hover:bg-cyan-500/[0.04] transition-colors cursor-pointer"
+                >
+                  {isExpanded ? (
+                    <ChevronDown size={14} className="text-cyan-400/70 shrink-0" />
+                  ) : (
+                    <ChevronRight size={14} className="text-[var(--text-muted)] shrink-0" />
+                  )}
+                  <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center shrink-0">
+                    <MessagesSquare size={16} className="text-cyan-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-white truncate">{r.name || '(unnamed)'}</p>
+                    <p className="text-[11px] font-mono text-[var(--text-muted)] truncate">{r.id}</p>
+                  </div>
+                </button>
+
+                {isExpanded && (
+                  <div className="border-t border-[var(--border-default)] px-4 py-3 bg-[var(--bg-card)]/30">
+                    {memoryState?.loading && (
+                      <div className="flex items-center gap-2 text-xs text-[var(--text-muted)] py-2">
+                        <Loader2 size={12} className="animate-spin text-cyan-400" />
+                        Loading memories…
+                      </div>
+                    )}
+                    {memoryState?.error && (
+                      <p className="text-xs text-red-400">Error: {memoryState.error}</p>
+                    )}
+                    {memoryState && !memoryState.loading && !memoryState.error && (
+                      <>
+                        {memoryState.memories.length === 0 ? (
+                          <p className="text-xs text-[var(--text-muted)] py-2">
+                            No memories in this room.
+                          </p>
+                        ) : (
+                          <>
+                            <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-2">
+                              {memoryState.memories.length} of {memoryState.total} memories
+                              (newest first)
+                            </p>
+                            <div className="space-y-1.5 max-h-96 overflow-y-auto pr-1">
+                              {memoryState.memories.map((m) => (
+                                <div
+                                  key={m.id}
+                                  className="px-3 py-2 rounded-md bg-[var(--bg-card)] border border-[var(--border-default)]/50"
+                                >
+                                  <div className="flex items-center justify-between gap-2 mb-1">
+                                    <span className="text-[10px] font-mono text-cyan-400/80 uppercase">
+                                      {m.type}
+                                    </span>
+                                    <span className="text-[10px] text-[var(--text-muted)] tabular-nums">
+                                      {m.createdAt
+                                        ? new Date(m.createdAt).toLocaleString([], {
+                                            month: 'short',
+                                            day: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                          })
+                                        : '—'}
+                                    </span>
+                                  </div>
+                                  <p className="text-xs text-[var(--text-secondary)] whitespace-pre-wrap break-words line-clamp-4">
+                                    {m.text || <span className="italic text-[var(--text-muted)]">(empty)</span>}
+                                  </p>
+                                  {m.source && (
+                                    <p className="text-[10px] text-[var(--text-muted)] mt-1">
+                                      source: {m.source}
+                                    </p>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+              </GlassCard>
+            );
+          })}
         </div>
       )}
     </motion.div>
