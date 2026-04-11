@@ -1,43 +1,31 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
 import { AlertTriangle, Puzzle } from 'lucide-react';
-import { api } from '@/lib/api';
+import type { ElizaOSAgentData } from './useElizaOSAgent';
 import { useAgentContext, GlassCard, Skeleton } from '../../../AgentContext';
 
 /**
- * ElizaOS enabled-plugins card. Reads the live character's `plugins`
- * array (server filters out the redacted core plugins) and renders
- * them as chips. Clicking "Manage" jumps to the Skills tab where
- * ElizaOS plugins actually live in the Hatcher UI.
+ * ElizaOS enabled-plugins card. Reads the live character's
+ * `plugins` array (server filters out the redacted core plugins)
+ * and renders them as chips. Clicking "Manage" jumps to the Skills
+ * tab where ElizaOS plugins actually live in the Hatcher UI.
+ *
+ * Data comes from ElizaOSDashboard's single `useElizaOSAgent`
+ * fetch rather than an independent call — see the hook in
+ * `./useElizaOSAgent.ts` for the rationale.
  */
-export function ElizaOSPluginsCard() {
-  const { agent, setTab } = useAgentContext();
-  const [plugins, setPlugins] = useState<string[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+export function ElizaOSPluginsCard({
+  data,
+  error,
+  loading,
+}: {
+  data: ElizaOSAgentData | null;
+  error: string | null;
+  loading: boolean;
+}) {
+  const { setTab } = useAgentContext();
 
-  const fetchPlugins = useCallback(async () => {
-    try {
-      const res = await api.getElizaosAgent(agent.id);
-      if (res.success) {
-        setPlugins(res.data.plugins);
-        setError(null);
-      } else {
-        setError('error' in res ? res.error : 'Failed to load plugins');
-      }
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  }, [agent.id]);
-
-  useEffect(() => {
-    fetchPlugins();
-  }, [fetchPlugins]);
-
-  if (loading && !plugins) {
+  if (loading && !data) {
     return (
       <GlassCard>
         <div className="space-y-3">
@@ -48,7 +36,7 @@ export function ElizaOSPluginsCard() {
     );
   }
 
-  if (error || !plugins) {
+  if (error || !data) {
     return (
       <GlassCard>
         <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
@@ -59,8 +47,11 @@ export function ElizaOSPluginsCard() {
     );
   }
 
+  const plugins = data.plugins ?? [];
+
   // Shorten the `@elizaos/plugin-xyz` namespace for display.
-  const displayName = (pkg: string) => pkg.replace(/^@elizaos\/plugin-/, '').replace(/^@/, '');
+  const displayName = (pkg: string) =>
+    pkg.replace(/^@elizaos\/plugin-/, '').replace(/^@/, '');
 
   return (
     <GlassCard>

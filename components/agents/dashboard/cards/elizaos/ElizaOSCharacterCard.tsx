@@ -1,55 +1,28 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
 import { AlertTriangle, User } from 'lucide-react';
-import { api } from '@/lib/api';
-import { useAgentContext, GlassCard, Skeleton } from '../../../AgentContext';
-
-interface CharacterData {
-  id: string;
-  name: string;
-  system: string;
-  bio: string[];
-  topics: string[];
-  adjectives: string[];
-  plugins: string[];
-  enabled: boolean;
-  status: string;
-}
+import type { ElizaOSAgentData } from './useElizaOSAgent';
+import { GlassCard, Skeleton } from '../../../AgentContext';
 
 /**
- * ElizaOS character / persona card. Pulls the live character from
- * the running container (secrets already redacted server-side) and
- * surfaces bio, topics, and adjectives — the three fields that
- * actually shape how the character talks. System prompt is exposed
- * as a truncated preview (first ~200 chars).
+ * ElizaOS character / persona card. Renders the bio, topics,
+ * adjectives, and a truncated system prompt preview from the
+ * shared ElizaOS agent data passed down by ElizaOSDashboard.
+ *
+ * Data comes from ElizaOSDashboard's single fetch of
+ * `getElizaosAgent` instead of each card fetching independently —
+ * halves the API calls and keeps the two cards (Character and
+ * Plugins) in sync with each other.
  */
-export function ElizaOSCharacterCard() {
-  const { agent } = useAgentContext();
-  const [data, setData] = useState<CharacterData | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const fetchCharacter = useCallback(async () => {
-    try {
-      const res = await api.getElizaosAgent(agent.id);
-      if (res.success) {
-        setData(res.data);
-        setError(null);
-      } else {
-        setError('error' in res ? res.error : 'Failed to load character');
-      }
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  }, [agent.id]);
-
-  useEffect(() => {
-    fetchCharacter();
-  }, [fetchCharacter]);
-
+export function ElizaOSCharacterCard({
+  data,
+  error,
+  loading,
+}: {
+  data: ElizaOSAgentData | null;
+  error: string | null;
+  loading: boolean;
+}) {
   if (loading && !data) {
     return (
       <GlassCard>
@@ -72,8 +45,12 @@ export function ElizaOSCharacterCard() {
     );
   }
 
+  const bio = data.bio ?? [];
+  const topics = data.topics ?? [];
+  const adjectives = data.adjectives ?? [];
+  const system = data.system ?? '';
   const systemPreview =
-    data.system.length > 240 ? data.system.slice(0, 240).trim() + '…' : data.system;
+    system.length > 240 ? system.slice(0, 240).trim() + '…' : system;
 
   return (
     <GlassCard>
@@ -91,13 +68,13 @@ export function ElizaOSCharacterCard() {
         </span>
       </div>
 
-      {data.bio.length > 0 && (
+      {bio.length > 0 && (
         <div className="mb-4">
           <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
             Bio
           </div>
           <ul className="space-y-1">
-            {data.bio.slice(0, 4).map((line, i) => (
+            {bio.slice(0, 4).map((line, i) => (
               <li key={i} className="text-xs text-[var(--text-secondary)] leading-relaxed">
                 • {line}
               </li>
@@ -106,13 +83,13 @@ export function ElizaOSCharacterCard() {
         </div>
       )}
 
-      {data.topics.length > 0 && (
+      {topics.length > 0 && (
         <div className="mb-3">
           <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
             Topics
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {data.topics.slice(0, 10).map((topic) => (
+            {topics.slice(0, 10).map((topic) => (
               <span
                 key={topic}
                 className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
@@ -124,13 +101,13 @@ export function ElizaOSCharacterCard() {
         </div>
       )}
 
-      {data.adjectives.length > 0 && (
+      {adjectives.length > 0 && (
         <div className="mb-3">
           <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
             Adjectives
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {data.adjectives.slice(0, 10).map((adj) => (
+            {adjectives.slice(0, 10).map((adj) => (
               <span
                 key={adj}
                 className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-default)]"
