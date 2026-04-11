@@ -574,6 +574,25 @@ export const api = {
       liveReadError?: string;
     }>(`/agents/${id}/openclaw-config`),
 
+  /**
+   * Apply one or more live-config patches to a managed openclaw agent.
+   * Same contract as patchHermesConfig but hits the openclaw endpoint.
+   * Paths are checked server-side against ALLOWED_PATCH_PREFIXES in
+   * config-snapshot.ts (default-deny). On partial failure the server
+   * returns 422 with `applied` + `failedAt` + `remaining`.
+   */
+  patchOpenClawConfig: (
+    id: string,
+    patches: Array<{ path: string; value: unknown }>,
+  ) =>
+    req<{
+      applied: string[];
+      validation: { valid: boolean; error?: string };
+    }>(`/agents/${id}/openclaw-config`, {
+      method: 'PATCH',
+      body: JSON.stringify({ patches }),
+    }),
+
   /** Get agent monitoring data (health, resources, response times, errors) */
   getAgentMonitoring: (id: string) =>
     req<{
