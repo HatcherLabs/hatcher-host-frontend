@@ -49,6 +49,7 @@ export function HermesSkillsTab() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [stopped, setStopped] = useState(false);
 
   const load = useCallback(async () => {
     if (!agent?.id) return;
@@ -59,8 +60,13 @@ export function HermesSkillsTab() {
       if (res.success) {
         setSkills(res.data.skills);
         setCategories(res.data.categories);
+        setStopped(false);
       } else {
-        setError('error' in res ? res.error : 'Failed to load skills');
+        if ('code' in res && res.code === 'AGENT_NOT_RUNNING') {
+          setStopped(true);
+        } else {
+          setError('error' in res ? res.error : 'Failed to load skills');
+        }
       }
     } catch (e) {
       setError((e as Error).message || 'Failed to load skills');
@@ -114,6 +120,25 @@ export function HermesSkillsTab() {
             Hermes skills browser is only available for managed-mode agents.
             Legacy hermes agents can still chat and use tools but don&apos;t
             expose the bundled skills catalog.
+          </div>
+        </GlassCard>
+      </motion.div>
+    );
+  }
+
+  if (stopped) {
+    return (
+      <motion.div
+        key="tab-hermes-skills"
+        variants={tabContentVariants}
+        initial="enter"
+        animate="center"
+        exit="exit"
+      >
+        <GlassCard>
+          <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
+            <Info size={14} className="text-amber-400" />
+            Agent is stopped — start it to browse the skills catalog.
           </div>
         </GlassCard>
       </motion.div>

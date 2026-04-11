@@ -201,7 +201,25 @@ export function OpenClawConfigTab() {
         );
         await load();
       } else {
-        setError('error' in res ? res.error : 'Patch failed');
+        // Partial-apply: the backend's 422 response carries `applied`,
+        // `failedAt`, and `remaining`. Prune the draft down to only the
+        // still-pending fields so the "modified" badges and the save-bar
+        // count reflect reality.
+        const applied = res.applied ?? [];
+        const failedAt = res.failedAt;
+        if (applied.length > 0) {
+          setDraft((prev) => {
+            const next: Record<string, unknown> = {};
+            for (const [p, v] of Object.entries(prev)) {
+              if (!applied.includes(p)) next[p] = v;
+            }
+            return next;
+          });
+          setSaveMessage(
+            `Saved ${applied.length} of ${patches.length} fields${failedAt ? `. ${failedAt} failed — the remaining fields are still pending.` : '.'}`,
+          );
+        }
+        setError(res.error);
       }
     } catch (e) {
       setError((e as Error).message);
@@ -294,10 +312,7 @@ export function OpenClawConfigTab() {
             </p>
           </div>
           <button
-            onClick={() => {
-              setLoading(true);
-              void load();
-            }}
+            onClick={() => void load()}
             disabled={loading || saving}
             className="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all text-[var(--text-muted)] hover:text-amber-400 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >

@@ -61,6 +61,7 @@ export function OpenClawSessionsTab() {
   const [data, setData] = useState<{ sessions: OpenClawSessionSummary[]; totalBytes: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [stopped, setStopped] = useState(false);
 
   const load = useCallback(async () => {
     if (!agent?.id) return;
@@ -70,8 +71,16 @@ export function OpenClawSessionsTab() {
       const res = await api.getOpenClawSessions(agent.id);
       if (res.success) {
         setData(res.data);
+        setStopped(false);
       } else {
-        setError('error' in res ? res.error : 'Failed to load sessions');
+        // Distinguish "agent isn't running" from real errors so the user
+        // gets a friendly "start your agent" empty state instead of a
+        // red banner. See apps/api/src/lib/errors.ts for the code.
+        if ('code' in res && res.code === 'AGENT_NOT_RUNNING') {
+          setStopped(true);
+        } else {
+          setError('error' in res ? res.error : 'Failed to load sessions');
+        }
       }
     } catch (e) {
       setError((e as Error).message);
@@ -100,6 +109,25 @@ export function OpenClawSessionsTab() {
             aren&apos;t indexed yet. Browse the Files tab to see raw session
             files, or recreate this agent as managed mode to get the full
             sessions browser.
+          </div>
+        </GlassCard>
+      </motion.div>
+    );
+  }
+
+  if (stopped) {
+    return (
+      <motion.div
+        key="tab-openclaw-sessions"
+        variants={tabContentVariants}
+        initial="enter"
+        animate="center"
+        exit="exit"
+      >
+        <GlassCard>
+          <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
+            <Info size={14} className="text-amber-400" />
+            Agent is stopped — start it to browse sessions.
           </div>
         </GlassCard>
       </motion.div>

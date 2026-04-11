@@ -33,6 +33,18 @@ export type MessageSegment =
  *   - `[tool_call: NAME]` — openclaw tool invocation notice (inline)
  *   - `[WEB_SEARCH]` / `[MEMORY]` / etc — action names from the
  *     elizaos/milady bootstrap plugin
+ *
+ * INVARIANT (append-only during streaming): as `raw` grows
+ * character-by-character, earlier segments MUST stay stable. A
+ * segment at index i in parse(raw) must still appear at index i in
+ * parse(raw + delta) with the same kind. The open→closed transition
+ * (kind 'think' with open=true → open=false) is the only allowed
+ * mutation at a given index, and it only happens when the closing
+ * tag arrives. This guarantees that React positional keys in
+ * ChatMessage.tsx don't mis-identify ThinkingBlock instances across
+ * streaming ticks, which would otherwise flap their expanded state.
+ * If you ever add a marker whose body can cause earlier text to be
+ * re-split retroactively, switch ChatMessage to content-derived keys.
  */
 export function parseMessageSegments(raw: string): MessageSegment[] {
   if (!raw) return [];
@@ -129,8 +141,10 @@ export const ThinkingBlock = memo(function ThinkingBlock({
     <div className="rounded-xl border border-white/10 bg-[var(--bg-card)]/60 mb-2 overflow-hidden">
       <button
         type="button"
+        aria-expanded={expanded}
+        aria-label={streaming ? 'Thinking trace (live)' : 'Thoughts'}
         onClick={() => setExpanded((e) => !e)}
-        className="w-full flex items-center gap-2 px-3 py-2 text-left cursor-pointer hover:bg-white/[0.03] transition-colors"
+        className="w-full flex items-center gap-2 px-3 py-2 text-left cursor-pointer hover:bg-white/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]/40 transition-colors"
       >
         <Brain
           size={12}

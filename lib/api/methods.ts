@@ -8,6 +8,33 @@ import type { Agent, Payment, AgentFeature, ChatMessage, Ticket, TicketMessage, 
 
 const API_BASE = API_URL;
 
+/**
+ * Return shape for the managed-mode live-config PATCH endpoints
+ * (/hermes-config, /openclaw-config).
+ *
+ * The backend applies patches sequentially and returns:
+ *   - 200 with `{applied, validation}` if every patch landed
+ *   - 422 with `{success:false, error, code, applied, failedAt, remaining}`
+ *     if any patch failed mid-batch. The failure branch still carries
+ *     `applied` so the UI can show which fields were persisted and which
+ *     one (`failedAt`) needs attention.
+ *
+ * `req<T>` in core.ts passes the whole JSON body through unchanged, so
+ * the extra fields are present at runtime but hidden from the generic
+ * type. This type explicitly surfaces them so callers can narrow on
+ * `!success` and still read `applied` + `failedAt` + `remaining`.
+ */
+export type ConfigPatchResult =
+  | { success: true; data: { applied: string[]; validation: { valid: boolean; error?: string } } }
+  | {
+      success: false;
+      error: string;
+      code?: string;
+      applied?: string[];
+      failedAt?: string;
+      remaining?: string[];
+    };
+
 export const api = {
   /** Register a new account */
   register: (email: string, username: string, password: string, referralCode?: string) =>
@@ -478,7 +505,7 @@ export const api = {
     }>(`/agents/${id}/hermes-config`, {
       method: 'PATCH',
       body: JSON.stringify({ patches }),
-    }),
+    }) as Promise<ConfigPatchResult>,
 
   /**
    * Hermes bundled skills catalog — walks the `skills/` directory in
@@ -591,7 +618,7 @@ export const api = {
     }>(`/agents/${id}/openclaw-config`, {
       method: 'PATCH',
       body: JSON.stringify({ patches }),
-    }),
+    }) as Promise<ConfigPatchResult>,
 
   /** Get agent monitoring data (health, resources, response times, errors) */
   getAgentMonitoring: (id: string) =>

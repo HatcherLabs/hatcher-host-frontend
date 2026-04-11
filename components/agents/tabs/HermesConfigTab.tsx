@@ -88,16 +88,33 @@ const HERMES_EDITABLE_FIELDS: EditableField[] = [
 ];
 
 /**
- * Walk a dot-path through an unknown object. Returns undefined if
- * any segment is missing or not an object. Handles the nested
- * shape the hermes-config endpoint returns.
+ * Walk a dot-path through an unknown object. Supports `[N]` array index
+ * notation (e.g. `custom_providers[0].name`) so the reader stays
+ * future-proof if the Hermes allowlist ever grows into array subtrees —
+ * at the moment all 7 keys are plain dotted paths but this helper is
+ * intentionally kept in sync with OpenClawConfigTab.getPath to prevent
+ * latent bugs from the two tabs drifting apart.
  */
 function getPath(obj: unknown, path: string): unknown {
-  const parts = path.split('.');
+  const tokens: Array<string | number> = [];
+  for (const segment of path.split('.')) {
+    const match = segment.match(/^([^[]+)((?:\[\d+\])*)$/);
+    if (!match) return undefined;
+    tokens.push(match[1]!);
+    for (const idx of match[2]!.matchAll(/\[(\d+)\]/g)) {
+      tokens.push(Number(idx[1]));
+    }
+  }
   let cur: unknown = obj;
-  for (const p of parts) {
-    if (cur === null || typeof cur !== 'object') return undefined;
-    cur = (cur as Record<string, unknown>)[p];
+  for (const t of tokens) {
+    if (cur === null || cur === undefined) return undefined;
+    if (typeof t === 'number') {
+      if (!Array.isArray(cur)) return undefined;
+      cur = cur[t];
+    } else {
+      if (typeof cur !== 'object') return undefined;
+      cur = (cur as Record<string, unknown>)[t];
+    }
   }
   return cur;
 }
@@ -141,11 +158,14 @@ export function HermesConfigTab() {
         setDraft({});
         setStopped(false);
       } else {
-        const errMsg = 'error' in res ? res.error : 'Failed to load config';
-        if (errMsg?.toLowerCase().includes('not running')) {
+        // Use the stable AGENT_NOT_RUNNING code from the backend rather
+        // than matching the human-readable error string — that message
+        // is free-form and a future backend wording tweak would silently
+        // demote the "start your agent" empty state to a red banner.
+        if ('code' in res && res.code === 'AGENT_NOT_RUNNING') {
           setStopped(true);
         } else {
-          setError(errMsg);
+          setError('error' in res ? res.error : 'Failed to load config');
         }
       }
     } catch (e) {
@@ -186,7 +206,25 @@ export function HermesConfigTab() {
         // Re-fetch to get the canonical server state and clear draft
         await load();
       } else {
-        setError('error' in res ? res.error : 'Patch failed');
+        // Partial-apply: backend returns 422 with {applied, failedAt, remaining}
+        // so some draft fields may have already been persisted. Remove only
+        // the applied paths from the draft so the operator sees exactly which
+        // rows still need attention, and surface a specific message.
+        const applied = res.applied ?? [];
+        const failedAt = res.failedAt;
+        if (applied.length > 0) {
+          setDraft((prev) => {
+            const next: Record<string, unknown> = {};
+            for (const [p, v] of Object.entries(prev)) {
+              if (!applied.includes(p)) next[p] = v;
+            }
+            return next;
+          });
+          setSaveMessage(
+            `Saved ${applied.length} of ${patches.length} fields${failedAt ? `. ${failedAt} failed — the remaining fields are still pending.` : '.'}`,
+          );
+        }
+        setError(res.error);
       }
     } catch (e) {
       setError((e as Error).message);
@@ -224,6 +262,11 @@ export function HermesConfigTab() {
   }
 
   if (stopped) {
+    // Unlike OpenClaw, Hermes has no DB-side config snapshot yet, so when
+    // the container is stopped we have nothing to show — not even a
+    // read-only view. Call this out in the banner so operators
+    // comparing both frameworks side-by-side don't assume they're
+    // hitting a bug.
     return (
       <motion.div
         key="tab-hermes-config"
@@ -233,9 +276,14 @@ export function HermesConfigTab() {
         exit="exit"
       >
         <GlassCard>
-          <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
-            <AlertTriangle size={14} className="text-amber-400" />
-            Agent is stopped. Start it to edit live config.
+          <div className="flex items-start gap-2 text-sm text-[var(--text-muted)]">
+            <AlertTriangle size={14} className="text-amber-400 flex-shrink-0 mt-0.5" />
+            <div>
+              Agent is stopped. Hermes reads its live config directly from
+              the running container — start the agent to view and edit
+              it. (Hermes has no DB snapshot fallback, so there is no
+              read-only view available while the container is paused.)
+            </div>
           </div>
         </GlassCard>
       </motion.div>
@@ -265,10 +313,7 @@ export function HermesConfigTab() {
             </p>
           </div>
           <button
-            onClick={() => {
-              setLoading(true);
-              void load();
-            }}
+            onClick={() => void load()}
             disabled={loading || saving}
             className="text-[11px] px-3 py-1.5 rounded-lg border border-white/10 hover:border-purple-500/30 hover:bg-purple-500/5 transition-all text-[var(--text-muted)] hover:text-purple-400 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
@@ -454,7 +499,10 @@ function FieldInput({
   }
 
   if (field.kind === 'number') {
-    const numValue = typeof value === 'number' ? value : Number(value ?? 0);
+    const raw = typeof value === 'number' ? value : Number(value ?? 0);
+    // React errors on NaN in number inputs; default to 0 when we can't
+    // coerce. Matches OpenClawConfigTab.FieldInput.
+    const numValue = Number.isFinite(raw) ? raw : 0;
     return (
       <input
         type="number"

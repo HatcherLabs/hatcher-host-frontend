@@ -310,8 +310,10 @@ function TaggedMemoryRow({ memory }: { memory: MemorySection }) {
     <div>
       <button
         type="button"
+        aria-expanded={expanded}
+        aria-label={`Memory ${memory.name}.md`}
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-5 py-3 text-left flex items-center gap-2 hover:bg-[var(--bg-card)] transition-colors cursor-pointer"
+        className="w-full px-5 py-3 text-left flex items-center gap-2 hover:bg-[var(--bg-card)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/40 focus-visible:ring-inset transition-colors cursor-pointer"
       >
         {expanded ? (
           <ChevronDown size={12} className="text-[var(--text-muted)] flex-shrink-0" />
