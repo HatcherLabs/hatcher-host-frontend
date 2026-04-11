@@ -32,11 +32,16 @@ interface EditableField {
 
 const HERMES_EDITABLE_FIELDS: EditableField[] = [
   {
+    // Rendered as an enum once the allowed-models list has loaded. The
+    // `options` array is filled in at render time from the server — we
+    // start with kind='enum' + empty options so the FieldInput picks
+    // the select branch (see FieldInput below for the fallback handling).
     path: 'model.default',
     label: 'Default Model',
     description:
-      'The LLM the agent uses for generation. Must be a model the LLM proxy is configured to route (e.g. meta-llama/llama-4-scout-17b-16e-instruct).',
-    kind: 'string',
+      'The LLM the agent uses for generation. Must be a model the LLM proxy is configured to route. For exotic BYOK models, edit config.yaml directly via the terminal.',
+    kind: 'enum',
+    options: [],
   },
   {
     path: 'agent.max_turns',
@@ -146,6 +151,27 @@ export function HermesConfigTab() {
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [stopped, setStopped] = useState(false);
+  const [allowedModels, setAllowedModels] = useState<string[]>([]);
+  const [source, setSource] = useState<'live' | 'snapshot' | 'none'>('none');
+  const [snapshotAt, setSnapshotAt] = useState<string | null>(null);
+
+  // Fetch the known-good model list once per agent. Independent of
+  // container state so it works even when the agent is paused.
+  useEffect(() => {
+    if (!agent?.id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await api.getHermesAllowedModels(agent.id);
+        if (!cancelled && res.success) setAllowedModels(res.data.models);
+      } catch {
+        // Non-fatal — the dropdown just falls back to the current value
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [agent?.id]);
 
   const load = useCallback(async () => {
     if (!agent?.id) return;
@@ -156,17 +182,15 @@ export function HermesConfigTab() {
       if (res.success) {
         setConfig(res.data.config);
         setDraft({});
-        setStopped(false);
+        setSource(res.data.source);
+        setSnapshotAt(res.data.snapshotAt ?? null);
+        // Post-snapshot rollout: the API no longer returns 409 for stopped
+        // agents — instead it hands back the DB snapshot with source =
+        // 'snapshot'. Only show the "stopped, nothing to show" empty
+        // state when the source is 'none' (never ran under managed mode).
+        setStopped(res.data.source === 'none');
       } else {
-        // Use the stable AGENT_NOT_RUNNING code from the backend rather
-        // than matching the human-readable error string — that message
-        // is free-form and a future backend wording tweak would silently
-        // demote the "start your agent" empty state to a red banner.
-        if ('code' in res && res.code === 'AGENT_NOT_RUNNING') {
-          setStopped(true);
-        } else {
-          setError('error' in res ? res.error : 'Failed to load config');
-        }
+        setError('error' in res ? res.error : 'Failed to load config');
       }
     } catch (e) {
       setError((e as Error).message);
@@ -262,11 +286,10 @@ export function HermesConfigTab() {
   }
 
   if (stopped) {
-    // Unlike OpenClaw, Hermes has no DB-side config snapshot yet, so when
-    // the container is stopped we have nothing to show — not even a
-    // read-only view. Call this out in the banner so operators
-    // comparing both frameworks side-by-side don't assume they're
-    // hitting a bug.
+    // `source === 'none'` — agent has never run under managed mode, so
+    // there's no live container AND no DB snapshot to show. Once the
+    // agent runs once after the managed rollout, a snapshot is written
+    // on stop and this branch is replaced by the read-only view below.
     return (
       <motion.div
         key="tab-hermes-config"
@@ -279,16 +302,18 @@ export function HermesConfigTab() {
           <div className="flex items-start gap-2 text-sm text-[var(--text-muted)]">
             <AlertTriangle size={14} className="text-amber-400 flex-shrink-0 mt-0.5" />
             <div>
-              Agent is stopped. Hermes reads its live config directly from
-              the running container — start the agent to view and edit
-              it. (Hermes has no DB snapshot fallback, so there is no
-              read-only view available while the container is paused.)
+              No config snapshot available yet — start the agent once so
+              we can capture its live config.yaml. After the first run,
+              you&apos;ll see the last-known config here even when the
+              container is paused.
             </div>
           </div>
         </GlassCard>
       </motion.div>
     );
   }
+
+  const isReadOnly = source === 'snapshot';
 
   return (
     <motion.div
@@ -323,6 +348,22 @@ export function HermesConfigTab() {
         </div>
       </GlassCard>
 
+      {isReadOnly && (
+        <GlassCard>
+          <div className="flex items-start gap-2 text-sm text-amber-400">
+            <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
+            <div>
+              Read-only snapshot — the agent is paused, so you&apos;re
+              viewing the last config.yaml we captured
+              {snapshotAt
+                ? ` on ${new Date(snapshotAt).toLocaleString()}`
+                : ''}
+              . Start the agent to resume live editing.
+            </div>
+          </div>
+        </GlassCard>
+      )}
+
       {error && (
         <GlassCard>
           <div className="flex items-center gap-2 text-sm text-red-400">
@@ -353,15 +394,29 @@ export function HermesConfigTab() {
         <>
           <GlassCard className="!p-0 overflow-hidden">
             <div className="divide-y divide-[var(--border-default)]">
-              {HERMES_EDITABLE_FIELDS.map((field) => (
-                <FieldRow
-                  key={field.path}
-                  field={field}
-                  value={getCurrentValue(field)}
-                  hasDraft={field.path in draft}
-                  onChange={(val) => setDraftValue(field.path, val)}
-                />
-              ))}
+              {HERMES_EDITABLE_FIELDS.map((field) => {
+                // For model.default, splice in the server-provided
+                // known-good list as the dropdown options. If the list
+                // hasn't loaded yet (empty), fall back to rendering the
+                // current value as a free-form string so the operator
+                // isn't stuck staring at an empty select.
+                const resolved: EditableField =
+                  field.path === 'model.default'
+                    ? allowedModels.length > 0
+                      ? { ...field, options: allowedModels }
+                      : { ...field, kind: 'string', options: undefined }
+                    : field;
+                return (
+                  <FieldRow
+                    key={field.path}
+                    field={resolved}
+                    value={getCurrentValue(resolved)}
+                    hasDraft={resolved.path in draft}
+                    readOnly={isReadOnly}
+                    onChange={(val) => setDraftValue(resolved.path, val)}
+                  />
+                );
+              })}
             </div>
           </GlassCard>
 
@@ -412,11 +467,13 @@ function FieldRow({
   field,
   value,
   hasDraft,
+  readOnly,
   onChange,
 }: {
   field: EditableField;
   value: unknown;
   hasDraft: boolean;
+  readOnly?: boolean;
   onChange: (value: unknown) => void;
 }) {
   return (
@@ -438,7 +495,7 @@ function FieldRow({
             {field.description}
           </p>
         </div>
-        <FieldInput field={field} value={value} onChange={onChange} />
+        <FieldInput field={field} value={value} readOnly={readOnly} onChange={onChange} />
       </div>
     </div>
   );
@@ -447,22 +504,25 @@ function FieldRow({
 function FieldInput({
   field,
   value,
+  readOnly,
   onChange,
 }: {
   field: EditableField;
   value: unknown;
+  readOnly?: boolean;
   onChange: (value: unknown) => void;
 }) {
   const common =
-    'w-full bg-[var(--bg-card)] border border-[var(--border-default)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-purple-500/40 transition-colors';
+    'w-full bg-[var(--bg-card)] border border-[var(--border-default)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-purple-500/40 transition-colors disabled:opacity-60 disabled:cursor-not-allowed';
 
   if (field.kind === 'boolean') {
     const checked = Boolean(value);
     return (
       <button
         type="button"
-        onClick={() => onChange(!checked)}
-        className={`flex items-center gap-2 text-sm ${common} justify-between cursor-pointer hover:border-purple-500/30`}
+        disabled={readOnly}
+        onClick={() => !readOnly && onChange(!checked)}
+        className={`flex items-center gap-2 text-sm ${common} justify-between ${readOnly ? '' : 'cursor-pointer hover:border-purple-500/30'}`}
       >
         <span className={checked ? 'text-emerald-400' : 'text-[var(--text-muted)]'}>
           {checked ? 'Enabled' : 'Disabled'}
@@ -486,8 +546,9 @@ function FieldInput({
     return (
       <select
         value={typeof value === 'string' ? value : ''}
+        disabled={readOnly}
         onChange={(e) => onChange(e.target.value)}
-        className={`${common} cursor-pointer`}
+        className={`${common} ${readOnly ? '' : 'cursor-pointer'}`}
       >
         {field.options.map((opt) => (
           <option key={opt || '(default)'} value={opt}>
@@ -510,6 +571,7 @@ function FieldInput({
         min={field.min}
         max={field.max}
         step={field.max !== undefined && field.max <= 1 ? '0.1' : '1'}
+        disabled={readOnly}
         onChange={(e) => onChange(Number(e.target.value))}
         className={common}
       />
@@ -521,6 +583,7 @@ function FieldInput({
     <input
       type="text"
       value={typeof value === 'string' ? value : value == null ? '' : String(value)}
+      disabled={readOnly}
       onChange={(e) => onChange(e.target.value)}
       className={common}
     />

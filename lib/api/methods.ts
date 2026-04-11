@@ -438,9 +438,14 @@ export const api = {
 
   /**
    * Fetch the community plugin registry (elizaos-plugins/registry),
-   * filtered to v1-compatible plugins and annotated with whether each
-   * plugin is installed on THIS agent. Read-only browser for discovery;
-   * installation is a separate flow that's not yet built.
+   * filtered to v1-compatible plugins and annotated with:
+   *   - `installed`   — already enabled on THIS agent
+   *   - `installable` — baked into the image and safe to enable
+   *
+   * Non-installable entries show up in the browser for discovery but
+   * require an image rebuild before they can actually run. The
+   * response also includes the flat `bundled` + `core` sets so the UI
+   * can render them as chips without re-filtering.
    *
    * Works for both running and stopped agents (reads plugin list from
    * the persisted configJson, not from the live container).
@@ -460,7 +465,10 @@ export const api = {
         language: string | null;
         hasNpm: boolean;
         installed: boolean;
+        installable: boolean;
       }>;
+      bundled: string[];
+      core: string[];
     }>(`/agents/${id}/elizaos-registry`),
 
   /** Milady skills catalog (78 bundled skills). Read-only. */
@@ -496,20 +504,21 @@ export const api = {
     }>(`/agents/${id}/milady/plugins`),
 
   /**
-   * Live Hermes config snapshot — returns parsed `config.yaml` from
-   * the running container with secrets redacted (`***`). Only
+   * Hermes config — returns parsed `config.yaml` from whichever source
+   * is currently authoritative, with secrets redacted (`***`). Only
    * available for managed-mode Hermes agents; legacy agents regenerate
    * config from DB on every start and don't expose it live.
    *
-   * Returns `source: 'none'` if the container is up but the file
-   * couldn't be read. Returns AgentNotRunningError (409) when stopped.
+   *   source: 'live'     — container running, freshly read
+   *   source: 'snapshot' — container stopped, DB snapshot from last run
+   *   source: 'none'     — never ran under managed mode, nothing cached
    */
   getHermesConfig: (id: string) =>
     req<{
-      source: 'live' | 'none';
+      source: 'live' | 'snapshot' | 'none';
       config: Record<string, unknown> | null;
-      rawBytes?: number;
-      error?: string;
+      snapshotAt?: string;
+      liveReadError?: string;
     }>(`/agents/${id}/hermes-config`),
 
   /**
@@ -533,6 +542,14 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify({ patches }),
     }) as Promise<ConfigPatchResult>,
+
+  /**
+   * Known-good `model.default` values the UI dropdown should offer.
+   * Gated on auth + framework but independent of container state, so
+   * the UI can load it regardless of whether the agent is running.
+   */
+  getHermesAllowedModels: (id: string) =>
+    req<{ models: string[] }>(`/agents/${id}/hermes-config/allowed-models`),
 
   /**
    * Hermes bundled skills catalog — walks the `skills/` directory in

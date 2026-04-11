@@ -21,6 +21,7 @@ interface RegistryEntry {
   language: string | null;
   hasNpm: boolean;
   installed: boolean;
+  installable: boolean;
 }
 
 const CORE_PLUGINS = new Set(['@elizaos/plugin-sql', '@elizaos/plugin-bootstrap']);
@@ -467,6 +468,21 @@ function ElizaosRegistryBrowser({ agentId }: { agentId: string }) {
                     {entry.installed && (
                       <span className="text-[10px] px-1.5 py-0.5 rounded-full border border-emerald-500/40 bg-emerald-500/15 text-emerald-300">
                         installed
+                      </span>
+                    )}
+                    {entry.installable ? (
+                      <span
+                        className="text-[10px] px-1.5 py-0.5 rounded-full border border-cyan-500/40 bg-cyan-500/10 text-cyan-300"
+                        title="Baked into the ElizaOS image — safe to enable from the plugins tab above"
+                      >
+                        bundled
+                      </span>
+                    ) : (
+                      <span
+                        className="text-[10px] px-1.5 py-0.5 rounded-full border border-amber-500/30 bg-amber-500/[0.07] text-amber-300/80"
+                        title="Not baked into the image. Enabling from the tab above is rejected until we rebuild the image with this package."
+                      >
+                        image rebuild required
                       </span>
                     )}
                     {entry.hasNpm && (
