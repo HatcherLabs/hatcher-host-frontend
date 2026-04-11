@@ -1,17 +1,25 @@
 'use client';
 
 // ============================================================
-// WorkspaceTab — managed OpenClaw workspace viewer (Etapa 3)
+// WorkspaceTab — managed workspace viewer (OpenClaw + Hermes)
 //
-// Read-only file browser for the agent's `workspace/` directory.
+// Read-only file browser for the agent's workspace. Backed by the
+// framework-aware `/agents/:id/workspace/*` routes in api-repo:
+//
+//   - OpenClaw: /home/node/.openclaw/workspace (everything)
+//   - Hermes:   /home/hermes/.hermes restricted to SOUL.md,
+//               memories/, sessions/, skills/ via a backend allowlist
+//               (enforced in getWorkspaceConfig + isUnderAllowedRoot)
+//
 // Shows a tree on the left (dirs collapsed by default) and the selected
 // file's content on the right. Binary or oversized files render a
 // metadata-only placeholder with the upstream reason.
 //
 // Editing is NOT exposed here — the philosophy is that the agent owns
 // its workspace and users drive changes by chatting with it. Power users
-// can still edit openclaw.json via the ConfigTab (Etapa 2) and talk to
-// the agent about SOUL.md / memory updates.
+// can still edit openclaw.json via ConfigTab (Etapa 2), edit config.yaml
+// via HermesConfigTab, and talk to the agent about SOUL.md / memory
+// updates.
 // ============================================================
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
@@ -278,8 +286,16 @@ export function WorkspaceTab() {
     });
   };
 
-  // OpenClaw-only gate — other frameworks don't have a "workspace" in this sense
-  if (agent?.framework !== 'openclaw') {
+  // Framework gate — backend only exposes the workspace viewer for
+  // OpenClaw (any mode) and managed Hermes. Legacy Hermes regenerates
+  // its config dir on every start so there's nothing useful to browse,
+  // and ElizaOS/Milady don't have a "workspace" in this sense at all.
+  // Keep this in sync with getWorkspaceConfig() in
+  // apps/api/src/routes/agents/workspace.ts.
+  const isOpenClaw = agent?.framework === 'openclaw';
+  const isManagedHermes = agent?.framework === 'hermes' && agent?.managementMode === 'managed';
+  if (!isOpenClaw && !isManagedHermes) {
+    const isLegacyHermes = agent?.framework === 'hermes';
     return (
       <motion.div variants={tabContentVariants} initial="hidden" animate="visible">
         <GlassCard className="p-8 text-center">
@@ -288,7 +304,9 @@ export function WorkspaceTab() {
             Workspace viewer not available
           </h3>
           <p className="text-sm text-[var(--text-secondary)]">
-            The workspace viewer is only available for OpenClaw agents.
+            {isLegacyHermes
+              ? 'Legacy Hermes agents regenerate their config directory on every start, so there\'s no persistent workspace to browse. Recreate this agent to switch to managed mode and get the workspace viewer.'
+              : 'The workspace viewer is only available for OpenClaw agents and managed-mode Hermes.'}
           </p>
         </GlassCard>
       </motion.div>
