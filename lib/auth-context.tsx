@@ -63,8 +63,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           username: profile.data.username,
           walletAddress: profile.data.walletAddress ?? null,
           isAdmin: profile.data.isAdmin ?? false,
-          tier: (profile.data as any).tier ?? 'free',
-          avatarUrl: (profile.data as any).avatarUrl ?? null,
+          tier: profile.data.tier ?? 'free',
+          avatarUrl: profile.data.avatarUrl ?? null,
         });
       } else {
         // Fallback: use login response data (tier may default to 'free')
@@ -74,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           username: res.data.user.username,
           walletAddress: res.data.user.walletAddress ?? null,
           isAdmin: res.data.user.isAdmin ?? false,
-          tier: (res.data.user as any).tier ?? 'free',
+          tier: res.data.user.tier ?? 'free',
           avatarUrl: null,
         });
       }
@@ -124,8 +124,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         username: res.data.username,
         walletAddress: res.data.walletAddress ?? null,
         isAdmin: res.data.isAdmin ?? false,
-        tier: (res.data as any).tier ?? 'free',
-        avatarUrl: (res.data as any).avatarUrl ?? null,
+        tier: res.data.tier ?? 'free',
+        avatarUrl: res.data.avatarUrl ?? null,
       });
     }
   }, []);
@@ -146,8 +146,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           username: res.data.username,
           walletAddress: res.data.walletAddress ?? null,
           isAdmin: res.data.isAdmin ?? false,
-          tier: (res.data as any).tier ?? 'free',
-          avatarUrl: (res.data as any).avatarUrl ?? null,
+          tier: res.data.tier ?? 'free',
+          avatarUrl: res.data.avatarUrl ?? null,
         });
       } else {
         // Neither cookie nor localStorage token is valid

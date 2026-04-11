@@ -57,11 +57,11 @@ export default function AdminTicketDetailPage() {
     api.adminGetTickets().then((res) => {
       setLoading(false);
       if (res.success) {
-        const t = ((res.data as any).tickets ?? []).find((t: AdminTicket) => t.id === ticketId);
+        const t = (res.data.tickets ?? []).find((t: AdminTicket) => t.id === ticketId);
         if (t) setTicket(t);
         else setError('Ticket not found');
       } else {
-        setError((res as any).error);
+        setError(res.error);
       }
     });
   }, [isAuthenticated, isAdmin, ticketId]);
@@ -76,11 +76,11 @@ export default function AdminTicketDetailPage() {
       // Refresh
       const refresh = await api.adminGetTickets();
       if (refresh.success) {
-        const t = ((refresh.data as any).tickets ?? []).find((t: AdminTicket) => t.id === ticketId);
+        const t = (refresh.data.tickets ?? []).find((t: AdminTicket) => t.id === ticketId);
         if (t) setTicket(t);
       }
     } else {
-      alert(`Reply failed: ${(res as any).error}`);
+      alert(`Reply failed: ${res.error}`);
     }
   }
 

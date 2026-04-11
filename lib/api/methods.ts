@@ -45,7 +45,18 @@ export const api = {
 
   /** Login with email + password */
   login: (email: string, password: string) =>
-    req<{ token: string; expiresIn: string; user: { id: string; email: string; username: string; walletAddress: string | null; isAdmin: boolean } }>('/auth/login', {
+    req<{
+      token: string;
+      expiresIn: string;
+      user: {
+        id: string;
+        email: string;
+        username: string;
+        walletAddress: string | null;
+        isAdmin: boolean;
+        tier?: string;
+      };
+    }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
@@ -71,12 +82,40 @@ export const api = {
       body: JSON.stringify({ token, password }),
     }),
 
-  /** Get current user profile */
-  getProfile: () => req<{id: string; email: string; username: string; walletAddress: string | null; apiKey: string | null; hatchCredits: number; isAdmin: boolean; tier: string; createdAt: string}>('/auth/me'),
+  /** Get current user profile.
+   *
+   *  Backend response (apps/api/src/routes/auth.ts:494-520) includes
+   *  avatarUrl + agentCount + activeAgents + featureCount on top of
+   *  the base user fields. The local types here have to mirror that
+   *  shape so the settings page can read them without `as any`.
+   */
+  getProfile: () =>
+    req<{
+      id: string;
+      email: string;
+      username: string;
+      walletAddress: string | null;
+      apiKey: string | null;
+      hatchCredits: number;
+      isAdmin: boolean;
+      tier: string;
+      avatarUrl: string | null;
+      agentCount: number;
+      activeAgents: number;
+      featureCount: number;
+      createdAt: string;
+    }>('/auth/me'),
 
   /** Update profile (username, email, password, or avatarUrl) */
   updateProfile: (data: { username?: string; email?: string; avatarUrl?: string | null; currentPassword?: string; newPassword?: string }) =>
-    req<{ id: string; email: string; username: string }>('/auth/me', {
+    req<{
+      id: string;
+      email: string;
+      username: string;
+      avatarUrl: string | null;
+      tier: string;
+      isAdmin: boolean;
+    }>('/auth/me', {
       method: 'PATCH',
       body: JSON.stringify(data),
     }),
@@ -597,6 +636,23 @@ export const api = {
     req<{ models: string[] }>(`/agents/${id}/hermes-config/allowed-models`),
 
   /**
+   * Recent WARN/ERROR/FATAL lines from the most recent OpenClaw
+   * structured log file, parsed and normalized for the dashboard
+   * errors card. Managed-mode only.
+   */
+  getOpenClawErrors: (id: string) =>
+    req<{
+      entries: Array<{
+        ts: string;
+        level: 'WARN' | 'ERROR' | 'FATAL' | 'UNKNOWN';
+        message: string;
+        source: string | null;
+      }>;
+      totalScanned: number;
+      sourceFile: string | null;
+    }>(`/agents/${id}/openclaw/errors`),
+
+  /**
    * Hermes native cron jobs — reads `/home/hermes/.hermes/cron/jobs.json`
    * inside the running container and returns a parsed + sorted summary.
    *
@@ -891,6 +947,7 @@ export const api = {
         walletAddress: string | null;
         tier: string;
         isAdmin: boolean;
+        emailVerified: boolean;
         agentCount: number;
         paymentCount: number;
         hatchCredits: number;
@@ -916,7 +973,9 @@ export const api = {
         category: string;
         priority: string;
         status: string;
-        userWallet: string;
+        userUsername: string;
+        userEmail: string;
+        userWallet: string | null;
         agentName: string | null;
         messages: Array<{ role: string; content: string; timestamp: string }>;
         createdAt: string;

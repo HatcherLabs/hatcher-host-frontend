@@ -244,17 +244,17 @@ export default function AdminPage() {
         else setError(statsRes.error);
 
         if (agentsRes.success) {
-          const agentsData = (agentsRes.data as any);
+          const agentsData = (agentsRes.data);
           setAgents(Array.isArray(agentsData) ? agentsData : agentsData.agents ?? []);
           if (agentsData.pagination) {
             setAgentsPagination({ total: agentsData.pagination.total, hasMore: agentsData.pagination.hasMore });
           }
         } else setError((prev) => prev ?? agentsRes.error);
 
-        if (usersRes.success) setUsers(Array.isArray(usersRes.data) ? usersRes.data : (usersRes.data as any).users ?? []);
+        if (usersRes.success) setUsers(Array.isArray(usersRes.data) ? usersRes.data : usersRes.data.users ?? []);
         else setError((prev) => prev ?? usersRes.error);
 
-        if (ticketsRes.success) setTickets((ticketsRes.data as any).tickets ?? []);
+        if (ticketsRes.success) setTickets(ticketsRes.data.tickets ?? []);
       })
       .catch(() => {
         setLoading(false);
@@ -292,7 +292,7 @@ export default function AdminPage() {
       if (healthRes.success) setHealth(healthRes.data);
       if (backupsRes.success) setBackups(backupsRes.data.backups);
     } else {
-      alert(`Backup failed: ${(res as any).error ?? 'Unknown error'}`);
+      alert(`Backup failed: ${res.error ?? 'Unknown error'}`);
     }
   }
 
@@ -302,7 +302,7 @@ export default function AdminPage() {
     const res = await api.adminGetAgents(50, agents.length);
     setLoadingMoreAgents(false);
     if (res.success) {
-      const data = res.data as any;
+      const data = res.data;
       setAgents((prev) => [...prev, ...(data.agents ?? [])]);
       if (data.pagination) {
         setAgentsPagination({ total: data.pagination.total, hasMore: data.pagination.hasMore });
@@ -425,9 +425,9 @@ export default function AdminPage() {
     const [statsRes, agentsRes, usersRes, ticketsRes] = await Promise.all([api.adminGetStats(), api.adminGetAgents(), api.adminGetUsers(), api.adminGetTickets()]);
     setLoading(false);
     if (statsRes.success) setStats(statsRes.data);
-    if (agentsRes.success) setAgents(Array.isArray(agentsRes.data) ? agentsRes.data : (agentsRes.data as any).agents ?? []);
-    if (usersRes.success) setUsers(Array.isArray(usersRes.data) ? usersRes.data : (usersRes.data as any).users ?? []);
-    if (ticketsRes.success) setTickets((ticketsRes.data as any).tickets ?? []);
+    if (agentsRes.success) setAgents(Array.isArray(agentsRes.data) ? agentsRes.data : agentsRes.data.agents ?? []);
+    if (usersRes.success) setUsers(Array.isArray(usersRes.data) ? usersRes.data : usersRes.data.users ?? []);
+    if (ticketsRes.success) setTickets(ticketsRes.data.tickets ?? []);
   }
 
   async function handleUpdateTicketStatus(ticketId: string, status: string) {
@@ -436,7 +436,7 @@ export default function AdminPage() {
       if (res.success) {
         setTickets(prev => prev.map(t => t.id === ticketId ? { ...t, status } : t));
       } else {
-        alert(`Failed to update status: ${(res as any).error ?? 'Unknown error'}`);
+        alert(`Failed to update status: ${res.error ?? 'Unknown error'}`);
       }
     } catch (e) {
       alert(`Error: ${(e as Error).message}`);

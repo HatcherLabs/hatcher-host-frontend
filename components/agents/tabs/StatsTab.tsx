@@ -422,7 +422,7 @@ export function StatsTab() {
   const { user } = useAuth();
 
   const framework = (agent?.framework ?? 'openclaw').toLowerCase();
-  const tier = (user as any)?.tier ?? 'free';
+  const tier = user?.tier ?? 'free';
   const theme = FRAMEWORK_THEME[framework] ?? DEFAULT_THEME;
   const fwCtx = FRAMEWORK_CONTEXT[framework] ?? FRAMEWORK_CONTEXT.openclaw;
   const fwBadge = FRAMEWORK_BADGE[framework] ?? 'bg-slate-500/15 text-slate-400 border-slate-500/30';

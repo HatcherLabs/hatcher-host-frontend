@@ -238,7 +238,7 @@ export default function SettingsPage() {
           tier: res.data.tier,
           hatchCredits: res.data.hatchCredits,
           createdAt: res.data.createdAt,
-          agentCount: (res.data as any).agentCount,
+          agentCount: res.data.agentCount,
         });
       }
     });
@@ -292,7 +292,7 @@ export default function SettingsPage() {
       if (res.success) {
         toast('success', 'Profile updated');
         await refreshUser();
-      } else toast('error', (res as any).error || 'Failed to update profile');
+      } else toast('error', res.error || 'Failed to update profile');
     } catch { toast('error', 'Failed to update profile'); }
     finally { setSavingProfile(false); }
   }
@@ -318,7 +318,7 @@ export default function SettingsPage() {
         toast('success', 'Password changed');
         setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
       } else {
-        toast('error', (res as any).error || 'Failed to change password');
+        toast('error', res.error || 'Failed to change password');
       }
     } catch { toast('error', 'Failed to change password'); }
     finally { setSavingPassword(false); }
@@ -331,7 +331,7 @@ export default function SettingsPage() {
     try {
       const res = await api.deleteAccount(deletePassword);
       if (res.success) { clearToken(); logout(); router.push('/'); }
-      else { toast('error', (res as any).error || 'Failed to delete account'); setDeleting(false); }
+      else { toast('error', res.error || 'Failed to delete account'); setDeleting(false); }
     } catch { toast('error', 'Failed to delete account. Please try again.'); setDeleting(false); }
   }
 
@@ -561,7 +561,7 @@ export default function SettingsPage() {
                                     toast('success', res.data.message);
                                     const s = await api.getReferralStats();
                                     if (s.success) setReferralStats(s.data);
-                                  } else toast('error', (res as any).error || 'Failed to claim rewards');
+                                  } else toast('error', res.error || 'Failed to claim rewards');
                                 } catch { toast('error', 'Failed to claim rewards'); }
                                 finally { setClaimingRewards(false); }
                               }}
@@ -756,7 +756,7 @@ export default function SettingsPage() {
                                 setApiKeys((prev) => [{ id: res.data.id, label: res.data.label, prefix: res.data.prefix, lastUsedAt: null, revokedAt: null, createdAt: res.data.createdAt, requestsToday: 0, requestsThisWeek: 0 }, ...prev]);
                                 setNewKeyLabel('');
                                 toast('success', 'API key created');
-                              } else toast('error', (res as any).error || 'Failed to create key');
+                              } else toast('error', res.error || 'Failed to create key');
                             } catch { toast('error', 'Failed to create key'); }
                             finally { setCreatingKey(false); }
                           }}
@@ -774,7 +774,7 @@ export default function SettingsPage() {
                                 setApiKeys((prev) => [{ id: res.data.id, label: res.data.label, prefix: res.data.prefix, lastUsedAt: null, revokedAt: null, createdAt: res.data.createdAt, requestsToday: 0, requestsThisWeek: 0 }, ...prev]);
                                 setNewKeyLabel('');
                                 toast('success', 'API key created');
-                              } else toast('error', (res as any).error || 'Failed to create key');
+                              } else toast('error', res.error || 'Failed to create key');
                             } catch { toast('error', 'Failed to create key'); }
                             finally { setCreatingKey(false); }
                           }}

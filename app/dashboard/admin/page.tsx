@@ -67,7 +67,7 @@ interface AdminAgent {
   name: string;
   framework: string;
   status: string;
-  messageCount: number;
+  messageCount?: number;
   ownerUsername: string;
   ownerWallet: string | null;
   createdAt: string;
@@ -320,14 +320,14 @@ export default function AdminDashboardPage() {
       api.adminGetTickets(),
     ]).then(([statsRes, usersRes, agentsRes, ticketsRes]) => {
       if (statsRes.success) setStats(statsRes.data);
-      if (usersRes.success) setUsers((usersRes.data as any).users ?? []);
+      if (usersRes.success) setUsers(usersRes.data.users ?? []);
       if (agentsRes.success) {
-        const d = agentsRes.data as any;
+        const d = agentsRes.data;
         setAgents(d.agents ?? []);
         setAgentTotal(d.pagination?.total ?? 0);
         setAgentHasMore(d.pagination?.hasMore ?? false);
       }
-      if (ticketsRes.success) setTickets((ticketsRes.data as any).tickets ?? []);
+      if (ticketsRes.success) setTickets(ticketsRes.data.tickets ?? []);
       setLoading(false);
     });
     api.adminGetServerStats().then(res => { if (res.success) setServerStats(res.data); });
@@ -357,7 +357,7 @@ export default function AdminDashboardPage() {
     setAgentLoadingMore(true);
     const res = await api.adminGetAgents(AGENT_PAGE_SIZE, agents.length);
     if (res.success) {
-      const d = res.data as any;
+      const d = res.data;
       setAgents(prev => [...prev, ...(d.agents ?? [])]);
       setAgentHasMore(d.pagination?.hasMore ?? false);
       setAgentTotal(d.pagination?.total ?? agentTotal);
@@ -373,7 +373,7 @@ export default function AdminDashboardPage() {
       setUsers(prev => prev.map(x => x.id === u.id ? { ...x, tier: isBanned ? 'free' : 'banned' } : x));
       showAction('success', isBanned ? `@${u.username} unbanned` : `@${u.username} banned`);
     } else {
-      showAction('error', (res as any).error ?? 'Action failed');
+      showAction('error', res.error ?? 'Action failed');
     }
   };
 
@@ -384,7 +384,7 @@ export default function AdminDashboardPage() {
       setAgents(prev => prev.map(x => x.id === a.id ? { ...x, status: 'killed' } : x));
       showAction('success', `Agent "${a.name}" killed`);
     } else {
-      showAction('error', (res as any).error ?? 'Kill failed');
+      showAction('error', res.error ?? 'Kill failed');
     }
   };
 
@@ -394,7 +394,7 @@ export default function AdminDashboardPage() {
       setAgents(prev => prev.map(x => x.id === a.id ? { ...x, status: 'paused' } : x));
       showAction('success', `Agent "${a.name}" paused`);
     } else {
-      showAction('error', (res as any).error ?? 'Pause failed');
+      showAction('error', res.error ?? 'Pause failed');
     }
   };
 

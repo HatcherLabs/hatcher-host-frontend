@@ -113,7 +113,7 @@ export function FilesTab() {
   const ROOT_PATH = FRAMEWORK_ROOT_PATH[framework] ?? '/home/node/.openclaw';
   const accent = FRAMEWORK_ACCENT[framework] ?? FRAMEWORK_ACCENT.openclaw;
   const fsInfo = FRAMEWORK_FS_INFO[framework] ?? FRAMEWORK_FS_INFO.openclaw;
-  const userTier = (user as any)?.tier ?? 'free';
+  const userTier = user?.tier ?? 'free';
   const isPro = userTier === 'pro' || userTier === 'business' || userTier === 'founding_member';
 
   const [files, setFiles] = useState<FileEntry[]>([]);

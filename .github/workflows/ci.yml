@@ -31,6 +31,12 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Lint
+        # ESLint runs against .eslintrc.json (next/core-web-vitals).
+        # Next's own build runs lint internally too but we surface it
+        # as a separate step so failures are obvious in the CI UI.
+        run: npm run lint
+
       - name: Build frontend
         run: npm run build
         env:
