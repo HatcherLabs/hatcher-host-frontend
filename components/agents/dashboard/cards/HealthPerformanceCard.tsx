@@ -156,18 +156,16 @@ export function HealthPerformanceCard({
         <div className="flex items-center gap-2">
           <Heart size={14} className="text-[var(--color-accent)]" />
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">
-            Health &amp; Performance
+            Health & Performance
           </h3>
-          {data && (
-            <ResourceAlertBadge
-              cpuPercent={data.resources.cpuPercent}
-              memPercent={
-                data.resources.memoryLimitMb > 0
-                  ? (data.resources.memoryUsageMb / data.resources.memoryLimitMb) * 100
-                  : 0
-              }
-            />
-          )}
+          <ResourceAlertBadge
+            cpuPercent={data.resources.cpuPercent}
+            memPercent={
+              data.resources.memoryLimitMb > 0
+                ? (data.resources.memoryUsageMb / data.resources.memoryLimitMb) * 100
+                : 0
+            }
+          />
         </div>
         <button
           onClick={() => {
