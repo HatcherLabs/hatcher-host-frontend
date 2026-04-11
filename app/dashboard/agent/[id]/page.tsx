@@ -1001,6 +1001,8 @@ export default function AgentManagePage() {
               )}
               {tab === 'chat' && <ChatTab />}
               {tab === 'stats' && <StatsTab />}
+              {tab === 'schedules' && <SchedulesTab />}
+              {tab === 'workflows' && <WorkflowsTab />}
             </AnimatePresence>
           </div>
         </div>
