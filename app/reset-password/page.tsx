@@ -100,6 +100,7 @@ function ResetForm() {
           <input
             id="password"
             type="password"
+            autoComplete="new-password"
             value={password}
             onChange={(e) => { setPassword(e.target.value); setError(null); }}
             required
@@ -117,6 +118,7 @@ function ResetForm() {
           <input
             id="confirm"
             type="password"
+            autoComplete="new-password"
             value={confirm}
             onChange={(e) => { setConfirm(e.target.value); setError(null); }}
             required

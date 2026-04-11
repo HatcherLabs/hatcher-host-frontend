@@ -167,6 +167,10 @@ export default function RegisterPage() {
               <input
                 id="email"
                 type="email"
+                autoComplete="email"
+                inputMode="email"
+                autoCapitalize="off"
+                spellCheck={false}
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); clearError(); setLocalError(null); }}
                 required
@@ -183,6 +187,10 @@ export default function RegisterPage() {
               <input
                 id="username"
                 type="text"
+                autoComplete="username"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
                 value={username}
                 onChange={(e) => { setUsername(e.target.value); clearError(); setLocalError(null); }}
                 required
@@ -202,6 +210,7 @@ export default function RegisterPage() {
               <input
                 id="password"
                 type="password"
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => { setPassword(e.target.value); clearError(); setLocalError(null); }}
                 required
@@ -268,6 +277,7 @@ export default function RegisterPage() {
               <input
                 id="confirmPassword"
                 type="password"
+                autoComplete="new-password"
                 value={confirmPassword}
                 onChange={(e) => { setConfirmPassword(e.target.value); setLocalError(null); }}
                 required
