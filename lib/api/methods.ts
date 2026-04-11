@@ -441,6 +441,49 @@ export const api = {
       }>;
     }>(`/agents/${id}/milady/plugins`),
 
+  /**
+   * Live Hermes config snapshot — returns parsed `config.yaml` from
+   * the running container with secrets redacted (`***`). Only
+   * available for managed-mode Hermes agents; legacy agents regenerate
+   * config from DB on every start and don't expose it live.
+   *
+   * Returns `source: 'none'` if the container is up but the file
+   * couldn't be read. Returns AgentNotRunningError (409) when stopped.
+   */
+  getHermesConfig: (id: string) =>
+    req<{
+      source: 'live' | 'none';
+      config: Record<string, unknown> | null;
+      rawBytes?: number;
+      error?: string;
+    }>(`/agents/${id}/hermes-config`),
+
+  /**
+   * Hermes bundled skills catalog — walks the `skills/` directory in
+   * the container and returns categories + individual skill metadata
+   * parsed from SKILL.md frontmatter. Managed-mode only.
+   */
+  getHermesSkills: (id: string) =>
+    req<{
+      categories: Array<{ id: string; description: string; skillCount: number }>;
+      skills: Array<{
+        id: string;
+        category: string;
+        path: string;
+        skillMdPath: string;
+        metadata: {
+          name?: string;
+          description?: string;
+          version?: string;
+          author?: string;
+          platforms?: string[];
+          tags?: string[];
+        };
+      }>;
+      totalSkills: number;
+      totalCategories: number;
+    }>(`/agents/${id}/hermes-skills`),
+
   /** Milady runtime status with pendingRestart flag. */
   getMiladyStatus: (id: string) =>
     req<{

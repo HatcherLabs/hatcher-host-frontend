@@ -71,6 +71,13 @@ export interface Agent {
   owner?: { username?: string; walletAddress?: string | null };
   config?: Record<string, unknown>;
   features?: Array<{ featureKey: string }>;
+  /**
+   * `'managed'` for new hermes agents and new openclaw agents created after
+   * the HATCHER_FEATURE_MANAGED_OPENCLAW rollout, `'legacy'` for everything
+   * older. Used by the dashboard to gate features that only work on the
+   * managed flow (live config snapshot, workspace viewer, skills catalog).
+   */
+  managementMode?: 'managed' | 'legacy' | null;
   createdAt: string;
   updatedAt?: string;
 }
