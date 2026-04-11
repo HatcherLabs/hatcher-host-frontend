@@ -41,7 +41,11 @@ interface TabDef {
 
 function getTabs(framework?: string): TabDef[] {
   return [
-    { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={18} />, group: 'main' },
+    // Internal id stays 'overview' to preserve persisted tab state on clients
+    // that saved the previous label — the display-only rename to "Dashboard"
+    // landed with the Etapa 1 dashboard refactor. See
+    // components/agents/dashboard/DashboardTab.tsx for the new entry point.
+    { id: 'overview', label: 'Dashboard', icon: <LayoutDashboard size={18} />, group: 'main' },
     { id: 'chat', label: 'Chat', icon: <MessageSquare size={18} />, group: 'main' },
     { id: 'terminal', label: 'Terminal', icon: <TerminalSquare size={18} />, group: 'main' },
     { id: 'config', label: 'Config', icon: <Settings size={18} />, group: 'configure' },
