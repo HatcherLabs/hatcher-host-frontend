@@ -860,7 +860,7 @@ export default function AgentManagePage() {
     <AgentContext.Provider value={contextValue!}>
       <motion.div
         className="flex flex-col lg:flex-row"
-        style={{ minHeight: 'calc(100vh - 64px)' }}
+        style={{ minHeight: 'calc(100dvh - 64px)' }}
         variants={pageEntranceVariants}
         initial="hidden"
         animate="visible"
