@@ -103,6 +103,11 @@ const MiladySkillsTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const HermesSkillsTab = dynamic(
+  () => import('@/components/agents/tabs/HermesSkillsTab').then(mod => ({ default: mod.HermesSkillsTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 const MiladyPluginsTab = dynamic(
   () => import('@/components/agents/tabs/MiladyPluginsTab').then(mod => ({ default: mod.MiladyPluginsTab })),
   { loading: () => <TabSkeleton /> }
@@ -944,6 +949,7 @@ export default function AgentManagePage() {
               {tab === 'skills' && (
                 agent?.framework === 'elizaos' ? <ElizaosPluginsTab /> :
                 agent?.framework === 'milady' ? <MiladySkillsTab /> :
+                agent?.framework === 'hermes' ? <HermesSkillsTab /> :
                 <SkillsTab />
               )}
               {tab === 'plugins' && agent?.framework === 'milady' && <MiladyPluginsTab />}
