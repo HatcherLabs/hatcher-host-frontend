@@ -104,7 +104,7 @@ export default function EmbedPage() {
 
   if (loading) {
     return (
-      <div className="h-screen bg-[var(--bg-base)] flex items-center justify-center">
+      <div className="h-[100dvh] bg-[var(--bg-base)] flex items-center justify-center">
         <Loader2 className="w-6 h-6 text-violet-400 animate-spin" />
       </div>
     );
@@ -112,7 +112,7 @@ export default function EmbedPage() {
 
   if (notFound || !agent) {
     return (
-      <div className="h-screen bg-[var(--bg-base)] flex flex-col items-center justify-center gap-2 px-4 text-center">
+      <div className="h-[100dvh] bg-[var(--bg-base)] flex flex-col items-center justify-center gap-2 px-4 text-center">
         <Bot className="w-10 h-10 text-zinc-600" />
         <p className="text-zinc-400 text-sm">Agent not found or set to private.</p>
       </div>
@@ -120,7 +120,7 @@ export default function EmbedPage() {
   }
 
   return (
-    <div className="h-screen bg-[var(--bg-base)] flex flex-col overflow-hidden">
+    <div className="h-[100dvh] bg-[var(--bg-base)] flex flex-col overflow-hidden">
       {/* Mini header */}
       <div className="px-3 py-2.5 border-b border-white/5 flex items-center gap-2.5 shrink-0">
         <Image src={agent.avatarUrl || generateAgentAvatar(agent.name, agent.framework)} alt={agent.name} width={28} height={28} unoptimized className="w-7 h-7 rounded-lg object-cover shrink-0" />
@@ -212,7 +212,8 @@ export default function EmbedPage() {
           <button
             onClick={handleSend}
             disabled={!input.trim() || sending || rateLimited}
-            className="w-8 h-8 rounded-lg bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition-colors shrink-0"
+            aria-label="Send message"
+            className="w-10 h-10 rounded-lg bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition-colors shrink-0"
           >
             {sending ? (
               <Loader2 className="w-3.5 h-3.5 text-white animate-spin" />

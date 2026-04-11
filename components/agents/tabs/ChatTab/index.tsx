@@ -200,7 +200,7 @@ export function ChatTab() {
   }
 
   return (
-    <motion.div key="tab-chat" className="flex flex-col" style={{ height: 'calc(100vh - 280px)', minHeight: '300px' }} variants={tabContentVariants} initial="enter" animate="center" exit="exit">
+    <motion.div key="tab-chat" className="flex flex-col" style={{ height: 'calc(100dvh - 280px)', minHeight: '300px' }} variants={tabContentVariants} initial="enter" animate="center" exit="exit">
       <ChatHeader
         agent={agent}
         wsConnected={wsConnected}

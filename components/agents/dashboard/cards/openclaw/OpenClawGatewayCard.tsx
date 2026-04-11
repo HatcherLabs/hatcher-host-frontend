@@ -13,6 +13,22 @@ interface OpenClawConfigSnapshot {
 }
 
 /**
+ * Format an ISO timestamp as a short relative string for the snapshot
+ * age indicator. Returns "just now", "5m ago", "2h ago", "3d ago", or
+ * a locale date for anything older than a week.
+ */
+function formatRelativeTime(isoTs: string): string {
+  const d = new Date(isoTs);
+  if (Number.isNaN(d.getTime())) return 'unknown';
+  const diff = Date.now() - d.getTime();
+  if (diff < 60_000) return 'just now';
+  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
+  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
+  if (diff < 7 * 86_400_000) return `${Math.floor(diff / 86_400_000)}d ago`;
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
+
+/**
  * Drill down into the openclaw.json config for a gateway summary.
  * Pulls the top-level model provider, gateway bind, and endpoint
  * toggles without rendering the whole (huge) config.
@@ -116,6 +132,12 @@ export function OpenClawGatewayCard() {
   const info = pickGatewayInfo(data.config);
   if (!info) return null;
 
+  // Snapshot-mode data is a cached copy from when the container was last
+  // running. Rendering a relative "as of …" hint next to the badge gives
+  // the operator a quick sense of how stale the view is.
+  const snapshotRelative =
+    data.source === 'snapshot' && data.snapshotAt ? formatRelativeTime(data.snapshotAt) : null;
+
   return (
     <GlassCard>
       <div className="flex items-center justify-between mb-4">
@@ -125,6 +147,11 @@ export function OpenClawGatewayCard() {
           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--bg-card)] text-[var(--text-muted)] border border-[var(--border-default)]">
             {data.source === 'live' ? 'live' : data.source === 'snapshot' ? 'snapshot' : 'n/a'}
           </span>
+          {snapshotRelative && (
+            <span className="text-[10px] text-[var(--text-muted)]" title={data.snapshotAt ?? undefined}>
+              · {snapshotRelative}
+            </span>
+          )}
         </div>
       </div>
 

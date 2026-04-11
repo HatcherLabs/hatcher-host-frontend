@@ -39,17 +39,25 @@ interface EditableField {
   placeholder?: string;
 }
 
-// Every path + every enum option in this list was verified against a
-// real managed-mode OpenClaw instance on 2026-04-11 by round-tripping
+// Every path + every enum option in this list was verified against the
+// upstream config reference
+// (docs.openclaw.ai/gateway/configuration-reference) AND a real
+// managed-mode OpenClaw instance on 2026-04-11 by round-tripping
 // PATCH calls through openclaw's Zod validator. Do NOT add speculative
 // keys here: the backend allowlist gates which paths CAN be sent, but
 // the OpenClaw runtime has its own Zod schema that will reject unknown
-// roots with `<root>: Unrecognized key: ...`. `identity.*` for example
-// is allowlisted by hatcher but the openclaw runtime has no `identity`
-// namespace at all, so any save would fail with a red banner. Before
-// adding a field, run:
+// roots with `<root>: Unrecognized key: ...`. Before adding a field,
+// run:
 //   curl -s -H "auth" ".../openclaw-config" | jq '.data.config'
 // and confirm the path exists OR that a probe PATCH succeeds.
+//
+// 2026-04-11 audit (Phase 5): the prior version of this comment claimed
+// `identity.*` was a fake namespace that OpenClaw rejects. That was
+// WRONG — `identity.name`, `identity.theme`, `identity.emoji`, and
+// `identity.avatar` are documented in upstream's IDENTITY template
+// reference and accepted by the runtime schema. The related audit
+// research doc lives at
+// apps/api/docs/research/openclaw-reference.md.
 const OPENCLAW_EDITABLE_FIELDS: EditableField[] = [
   {
     path: 'agents.defaults.workspace',
@@ -90,6 +98,62 @@ const OPENCLAW_EDITABLE_FIELDS: EditableField[] = [
       'Verbosity of agent logs (the Logs tab). debug = everything, info = normal (default), warn = warnings + errors only, error = errors only.',
     kind: 'enum',
     options: ['debug', 'info', 'warn', 'error'],
+  },
+  {
+    path: 'session.scope',
+    label: 'Session Scope',
+    description:
+      'How conversation sessions are partitioned across senders. "per-sender" gives each user their own session history; "global" collapses everyone into one shared session (useful for group scenarios where you want the agent to remember the whole channel).',
+    kind: 'enum',
+    options: ['per-sender', 'global'],
+  },
+  {
+    path: 'identity.name',
+    label: 'Display Name',
+    description:
+      'How the agent presents itself when sending messages (overrides the bot profile name on platforms that expose this). Leave blank to use the agent name from Hatcher.',
+    kind: 'string',
+    placeholder: 'Samantha',
+  },
+  {
+    path: 'identity.theme',
+    label: 'Identity Theme',
+    description:
+      'Short phrase the agent uses as its "personality theme" when reasoning about how to respond (e.g. "helpful sloth", "curious archivist"). Embedded in prompts alongside SOUL.md. Free-form.',
+    kind: 'string',
+    placeholder: 'helpful sloth',
+  },
+  {
+    path: 'identity.emoji',
+    label: 'Identity Emoji',
+    description:
+      'A single emoji the agent uses when reacting to messages or signing off. Some channels (Discord, Slack) surface this as the bot status emoji.',
+    kind: 'string',
+    placeholder: '🦥',
+  },
+  {
+    path: 'messages.responsePrefix',
+    label: 'Response Prefix',
+    description:
+      'Text prepended to every agent reply (e.g. "[bot] "). Use "auto" to let OpenClaw decide per channel, or leave blank for no prefix. Note: OpenClaw has a known issue where `{model}` template variables render a stale session model, so avoid template variables in this field.',
+    kind: 'string',
+    placeholder: '"auto" or > ',
+  },
+  {
+    path: 'messages.ackReaction',
+    label: 'Ack Reaction Emoji',
+    description:
+      'Emoji the agent adds as a reaction on inbound messages to acknowledge receipt before it finishes thinking. Leave blank to disable. Only works on platforms that support reactions (Discord, Slack, Telegram).',
+    kind: 'string',
+    placeholder: '👀',
+  },
+  {
+    path: 'messages.ackReactionScope',
+    label: 'Ack Reaction Scope',
+    description:
+      'Which messages get the ack reaction. "group-mentions" only reacts when you\'re mentioned in a group (default-friendly); "group-all" reacts to every group message; "direct" only reacts in DMs; "all" reacts to everything.',
+    kind: 'enum',
+    options: ['group-mentions', 'group-all', 'direct', 'all'],
   },
 ];
 

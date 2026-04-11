@@ -85,7 +85,7 @@ const PLATFORMS = [
     description: 'Deploy as a Discord bot',
     frameworks: ['openclaw', 'hermes', 'elizaos', 'milady'],
     fields: [
-      { key: 'DISCORD_BOT_TOKEN', label: 'Bot Token', placeholder: 'Discord bot token', helper: 'Discord Developer Portal \u2192 New Application \u2192 Bot \u2192 Copy Token', required: true },
+      { key: 'DISCORD_API_TOKEN', label: 'Bot Token', placeholder: 'Discord bot token', helper: 'Discord Developer Portal \u2192 New Application \u2192 Bot \u2192 Copy Token', required: true },
     ],
   },
   {

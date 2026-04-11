@@ -180,7 +180,7 @@ export default function AgentManagePage() {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','workspace','logs','memory','sessions','schedules','workflows','chat','stats'];
+  const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','workspace','logs','terminal','memory','sessions','schedules','workflows','chat','stats'];
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const rawTab = searchParams.get('tab') as Tab;
   const normalizeTab = (t: string | null): Tab => {
@@ -860,7 +860,7 @@ export default function AgentManagePage() {
     <AgentContext.Provider value={contextValue!}>
       <motion.div
         className="flex flex-col lg:flex-row"
-        style={{ minHeight: 'calc(100vh - 64px)' }}
+        style={{ minHeight: 'calc(100dvh - 64px)' }}
         variants={pageEntranceVariants}
         initial="hidden"
         animate="visible"
@@ -1001,6 +1001,8 @@ export default function AgentManagePage() {
               )}
               {tab === 'chat' && <ChatTab />}
               {tab === 'stats' && <StatsTab />}
+              {tab === 'schedules' && <SchedulesTab />}
+              {tab === 'workflows' && <WorkflowsTab />}
             </AnimatePresence>
           </div>
         </div>
