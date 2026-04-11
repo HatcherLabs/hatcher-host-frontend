@@ -436,6 +436,33 @@ export const api = {
       { method: 'PATCH', body: JSON.stringify({ enabled }) },
     ),
 
+  /**
+   * Fetch the community plugin registry (elizaos-plugins/registry),
+   * filtered to v1-compatible plugins and annotated with whether each
+   * plugin is installed on THIS agent. Read-only browser for discovery;
+   * installation is a separate flow that's not yet built.
+   *
+   * Works for both running and stopped agents (reads plugin list from
+   * the persisted configJson, not from the live container).
+   */
+  getElizaosRegistry: (id: string) =>
+    req<{
+      total: number;
+      fetchedAt: number;
+      source: 'memory' | 'redis' | 'upstream' | 'stale';
+      entries: Array<{
+        name: string;
+        gitRepo: string | null;
+        description: string | null;
+        homepage: string | null;
+        topics: string[];
+        stars: number;
+        language: string | null;
+        hasNpm: boolean;
+        installed: boolean;
+      }>;
+    }>(`/agents/${id}/elizaos-registry`),
+
   /** Milady skills catalog (78 bundled skills). Read-only. */
   getMiladySkills: (id: string) =>
     req<{

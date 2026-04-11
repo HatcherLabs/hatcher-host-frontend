@@ -87,8 +87,11 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     hasChannelSettings: true,
     frameworks: ['openclaw', 'hermes', 'elizaos', 'milady'],
     fields: [
-      { key: 'DISCORD_BOT_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'Discord bot token', helper: 'From Discord Developer Portal > Bot > Token', required: true },
-      { key: 'DISCORD_APPLICATION_ID', label: 'Application ID', type: 'text', placeholder: 'e.g. 123456789012345678', helper: 'From Discord Developer Portal > General Information' },
+      // Canonical env var key after Phase 6 rename. ElizaOS plugin-discord
+      // reads `DISCORD_API_TOKEN` natively; OpenClaw + Milady adapters
+      // accept both names with legacy `DISCORD_BOT_TOKEN` as fallback.
+      { key: 'DISCORD_API_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'Discord bot token', helper: 'From Discord Developer Portal > Bot > Token', required: true },
+      { key: 'DISCORD_APPLICATION_ID', label: 'Application ID', type: 'text', placeholder: 'e.g. 123456789012345678', helper: 'From Discord Developer Portal > General Information', required: true },
     ],
   },
   {
