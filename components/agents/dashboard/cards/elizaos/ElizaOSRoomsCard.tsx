@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { AlertTriangle, MessageSquare } from 'lucide-react';
+import { AlertTriangle, MessageSquare, Power } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAgentContext, GlassCard, Skeleton } from '../../../AgentContext';
 
@@ -19,12 +19,17 @@ interface Room {
  */
 export function ElizaOSRoomsCard() {
   const { agent, setTab } = useAgentContext();
+  const isActive = agent.status === 'active';
   const [rooms, setRooms] = useState<Room[] | null>(null);
   const [total, setTotal] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchRooms = useCallback(async () => {
+    if (!isActive) {
+      setLoading(false);
+      return;
+    }
     try {
       const res = await api.getElizaosRooms(agent.id);
       if (res.success) {
@@ -39,11 +44,26 @@ export function ElizaOSRoomsCard() {
     } finally {
       setLoading(false);
     }
-  }, [agent.id]);
+  }, [agent.id, isActive]);
 
   useEffect(() => {
     fetchRooms();
   }, [fetchRooms]);
+
+  if (!isActive) {
+    return (
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-3">
+          <MessageSquare size={14} className="text-cyan-400" />
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Recent Sessions</h3>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+          <Power size={12} />
+          Start the agent to see recent sessions.
+        </div>
+      </GlassCard>
+    );
+  }
 
   if (loading && !rooms) {
     return (

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { AlertTriangle, Puzzle } from 'lucide-react';
+import { AlertTriangle, Power, Puzzle } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAgentContext, GlassCard, Skeleton } from '../../../AgentContext';
 
@@ -78,11 +78,16 @@ function DonutSlice({
  */
 export function MiladyPluginsOverviewCard() {
   const { agent, setTab } = useAgentContext();
+  const isActive = agent.status === 'active';
   const [data, setData] = useState<PluginsData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchPlugins = useCallback(async () => {
+    if (!isActive) {
+      setLoading(false);
+      return;
+    }
     try {
       const res = await api.getMiladyPlugins(agent.id);
       if (res.success) {
@@ -96,11 +101,26 @@ export function MiladyPluginsOverviewCard() {
     } finally {
       setLoading(false);
     }
-  }, [agent.id]);
+  }, [agent.id, isActive]);
 
   useEffect(() => {
     fetchPlugins();
   }, [fetchPlugins]);
+
+  if (!isActive) {
+    return (
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-3">
+          <Puzzle size={14} className="text-[var(--color-accent)]" />
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Plugins</h3>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+          <Power size={12} />
+          Start the agent to see plugin status.
+        </div>
+      </GlassCard>
+    );
+  }
 
   if (loading && !data) {
     return (

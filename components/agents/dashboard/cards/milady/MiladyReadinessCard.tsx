@@ -1,9 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AlertTriangle, Cpu, Clock, RefreshCw, Sparkles } from 'lucide-react';
+import { AlertTriangle, Cpu, Clock, Power, RefreshCw, Sparkles } from 'lucide-react';
 import { api } from '@/lib/api';
-import { GlassCard, Skeleton } from '../../../AgentContext';
+import { useAgentContext, GlassCard, Skeleton } from '../../../AgentContext';
 
 interface MiladyStatusData {
   state: string;
@@ -38,12 +38,18 @@ function formatUptime(seconds: number): string {
  * that exposes pendingRestart + reasons. OpenClaw / Hermes don't.
  */
 export function MiladyReadinessCard({ agentId }: { agentId: string }) {
+  const { agent } = useAgentContext();
+  const isActive = agent.status === 'active';
   const [data, setData] = useState<MiladyStatusData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchStatus = useCallback(async () => {
+    if (!isActive) {
+      setLoading(false);
+      return;
+    }
     try {
       const res = await api.getMiladyStatus(agentId);
       if (res.success) {
@@ -57,17 +63,19 @@ export function MiladyReadinessCard({ agentId }: { agentId: string }) {
     } finally {
       setLoading(false);
     }
-  }, [agentId]);
+  }, [agentId, isActive]);
 
   useEffect(() => {
     fetchStatus();
+    if (!isActive) return;
     intervalRef.current = setInterval(fetchStatus, 30_000);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [fetchStatus]);
+  }, [fetchStatus, isActive]);
 
   useEffect(() => {
+    if (!isActive) return;
     const handleVisibility = () => {
       if (document.hidden) {
         if (intervalRef.current) {
@@ -81,7 +89,22 @@ export function MiladyReadinessCard({ agentId }: { agentId: string }) {
     };
     document.addEventListener('visibilitychange', handleVisibility);
     return () => document.removeEventListener('visibilitychange', handleVisibility);
-  }, [fetchStatus]);
+  }, [fetchStatus, isActive]);
+
+  if (!isActive) {
+    return (
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-3">
+          <Sparkles size={14} className="text-rose-400" />
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Milady Runtime</h3>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+          <Power size={12} />
+          Agent is {agent.status}. Start it to see live runtime status.
+        </div>
+      </GlassCard>
+    );
+  }
 
   if (loading && !data) {
     return (

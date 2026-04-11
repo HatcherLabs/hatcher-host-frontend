@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { AlertTriangle, Sparkles } from 'lucide-react';
+import { AlertTriangle, Power, Sparkles } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAgentContext, GlassCard, Skeleton } from '../../../AgentContext';
 
@@ -25,11 +25,16 @@ interface SkillsData {
  */
 export function MiladySkillsCard() {
   const { agent, setTab } = useAgentContext();
+  const isActive = agent.status === 'active';
   const [data, setData] = useState<SkillsData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchSkills = useCallback(async () => {
+    if (!isActive) {
+      setLoading(false);
+      return;
+    }
     try {
       const res = await api.getMiladySkills(agent.id);
       if (res.success) {
@@ -43,11 +48,26 @@ export function MiladySkillsCard() {
     } finally {
       setLoading(false);
     }
-  }, [agent.id]);
+  }, [agent.id, isActive]);
 
   useEffect(() => {
     fetchSkills();
   }, [fetchSkills]);
+
+  if (!isActive) {
+    return (
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-3">
+          <Sparkles size={14} className="text-rose-400" />
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Skills</h3>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+          <Power size={12} />
+          Start the agent to browse skills.
+        </div>
+      </GlassCard>
+    );
+  }
 
   if (loading && !data) {
     return (

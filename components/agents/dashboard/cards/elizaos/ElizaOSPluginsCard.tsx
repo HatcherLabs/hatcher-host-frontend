@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertTriangle, Puzzle } from 'lucide-react';
+import { AlertTriangle, Power, Puzzle } from 'lucide-react';
 import type { ElizaOSAgentData } from './useElizaOSAgent';
 import { useAgentContext, GlassCard, Skeleton } from '../../../AgentContext';
 
@@ -18,12 +18,29 @@ export function ElizaOSPluginsCard({
   data,
   error,
   loading,
+  isActive,
 }: {
   data: ElizaOSAgentData | null;
   error: string | null;
   loading: boolean;
+  isActive: boolean;
 }) {
   const { setTab } = useAgentContext();
+
+  if (!isActive) {
+    return (
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-3">
+          <Puzzle size={14} className="text-cyan-400" />
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Plugins</h3>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+          <Power size={12} />
+          Start the agent to see enabled plugins.
+        </div>
+      </GlassCard>
+    );
+  }
 
   if (loading && !data) {
     return (

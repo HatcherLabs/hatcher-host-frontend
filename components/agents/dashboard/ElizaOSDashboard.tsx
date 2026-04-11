@@ -53,6 +53,7 @@ export function ElizaOSDashboard() {
         data={elizaAgent.data}
         error={elizaAgent.error}
         loading={elizaAgent.loading}
+        isActive={elizaAgent.isActive}
       />
       <HealthPerformanceCard agentId={agent.id} isActive={isActive} />
       <CostCard agentId={agent.id} />
@@ -60,6 +61,7 @@ export function ElizaOSDashboard() {
         data={elizaAgent.data}
         error={elizaAgent.error}
         loading={elizaAgent.loading}
+        isActive={elizaAgent.isActive}
       />
       <ElizaOSMemoryStatsCard />
       <ElizaOSRoomsCard />

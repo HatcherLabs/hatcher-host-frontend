@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertTriangle, User } from 'lucide-react';
+import { AlertTriangle, Power, User } from 'lucide-react';
 import type { ElizaOSAgentData } from './useElizaOSAgent';
 import { GlassCard, Skeleton } from '../../../AgentContext';
 
@@ -18,11 +18,28 @@ export function ElizaOSCharacterCard({
   data,
   error,
   loading,
+  isActive,
 }: {
   data: ElizaOSAgentData | null;
   error: string | null;
   loading: boolean;
+  isActive: boolean;
 }) {
+  if (!isActive) {
+    return (
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-3">
+          <User size={14} className="text-cyan-400" />
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Character</h3>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+          <Power size={12} />
+          Start the agent to view its character.
+        </div>
+      </GlassCard>
+    );
+  }
+
   if (loading && !data) {
     return (
       <GlassCard>

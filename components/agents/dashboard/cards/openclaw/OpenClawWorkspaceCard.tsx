@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { AlertTriangle, FolderTree } from 'lucide-react';
+import { AlertTriangle, FolderTree, Power } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAgentContext, GlassCard, Skeleton } from '../../../AgentContext';
 
@@ -28,6 +28,14 @@ function formatBytes(b: number): string {
  *
  * Only useful for managed OpenClaw — legacy agents have no
  * workspace viewer so this card surfaces a "not available" state.
+ *
+ * Gated on `agent.status === 'active'` because /workspace/tree
+ * execs into the container via `find`; if the DB says active but
+ * the container is actually dead, the backend throws a raw
+ * "Container X is not running" error that bubbles as 500. Easier
+ * to not fetch at all and show a friendly "container stopped"
+ * empty state than to rely on backend error handling we don't
+ * control.
  */
 export function OpenClawWorkspaceCard() {
   const { agent, setTab } = useAgentContext();
@@ -35,7 +43,13 @@ export function OpenClawWorkspaceCard() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const isActive = agent.status === 'active';
+
   const fetchTree = useCallback(async () => {
+    if (!isActive) {
+      setLoading(false);
+      return;
+    }
     try {
       const res = await api.getAgentWorkspaceTree(agent.id, 2);
       if (res.success) {
@@ -74,11 +88,26 @@ export function OpenClawWorkspaceCard() {
     } finally {
       setLoading(false);
     }
-  }, [agent.id]);
+  }, [agent.id, isActive]);
 
   useEffect(() => {
     fetchTree();
   }, [fetchTree]);
+
+  if (!isActive) {
+    return (
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-3">
+          <FolderTree size={14} className="text-amber-400" />
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Workspace</h3>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+          <Power size={12} className="text-[var(--text-muted)]" />
+          Start the agent to view its workspace.
+        </div>
+      </GlassCard>
+    );
+  }
 
   if (loading && !data) {
     return (

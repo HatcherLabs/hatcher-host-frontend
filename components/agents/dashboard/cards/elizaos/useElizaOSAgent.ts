@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import { useAgentContext } from '../../../AgentContext';
 
 /**
  * Shared response shape from `api.getElizaosAgent`. Declared here so
@@ -42,12 +43,19 @@ export function useElizaOSAgent(agentId: string): {
   data: ElizaOSAgentData | null;
   error: string | null;
   loading: boolean;
+  isActive: boolean;
 } {
+  const { agent } = useAgentContext();
+  const isActive = agent.status === 'active';
   const [data, setData] = useState<ElizaOSAgentData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchAgent = useCallback(async () => {
+    if (!isActive) {
+      setLoading(false);
+      return;
+    }
     try {
       const res = await api.getElizaosAgent(agentId);
       if (res.success) {
@@ -61,11 +69,11 @@ export function useElizaOSAgent(agentId: string): {
     } finally {
       setLoading(false);
     }
-  }, [agentId]);
+  }, [agentId, isActive]);
 
   useEffect(() => {
     fetchAgent();
   }, [fetchAgent]);
 
-  return { data, error, loading };
+  return { data, error, loading, isActive };
 }

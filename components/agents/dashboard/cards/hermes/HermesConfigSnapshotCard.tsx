@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { AlertTriangle, Sliders } from 'lucide-react';
+import { AlertTriangle, Power, Sliders } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAgentContext, GlassCard, Skeleton } from '../../../AgentContext';
 
@@ -53,11 +53,16 @@ const CONFIG_KEYS: Array<{ path: string; label: string; color: string }> = [
  */
 export function HermesConfigSnapshotCard() {
   const { agent, setTab } = useAgentContext();
+  const isActive = agent.status === 'active';
   const [config, setConfig] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchConfig = useCallback(async () => {
+    if (!isActive) {
+      setLoading(false);
+      return;
+    }
     try {
       const res = await api.getHermesConfig(agent.id);
       if (res.success) {
@@ -71,11 +76,26 @@ export function HermesConfigSnapshotCard() {
     } finally {
       setLoading(false);
     }
-  }, [agent.id]);
+  }, [agent.id, isActive]);
 
   useEffect(() => {
     fetchConfig();
   }, [fetchConfig]);
+
+  if (!isActive) {
+    return (
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-3">
+          <Sliders size={14} className="text-purple-400" />
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Live Config</h3>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
+          <Power size={12} />
+          Start the agent to read its live config.
+        </div>
+      </GlassCard>
+    );
+  }
 
   if (loading && !config) {
     return (
