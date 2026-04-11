@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import type { ChatMsg } from './types';
 import type { Dispatch, SetStateAction } from 'react';
 
@@ -62,12 +63,12 @@ export function ChatErrorBar({
         {chatErrorType === 'ratelimit' ? (
           <>
             {info.icon} Daily message limit reached.{' '}
-            <a
+            <Link
               className="underline hover:opacity-80 transition-opacity text-[var(--color-accent)]"
               href="/dashboard/billing"
             >
               Upgrade to Pro
-            </a>
+            </Link>
             {' '}for more, or bring your own key for unlimited.
           </>
         ) : (

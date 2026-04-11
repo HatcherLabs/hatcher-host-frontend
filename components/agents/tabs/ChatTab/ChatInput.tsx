@@ -1,6 +1,7 @@
 'use client';
 
 import { type RefObject } from 'react';
+import Link from 'next/link';
 import { Send, Mic, MicOff, MessageSquare } from 'lucide-react';
 import { GlassCard } from '../../AgentContext';
 
@@ -62,12 +63,12 @@ export function ChatInput({
       <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-4 py-3 text-center">
         <p className="text-sm text-amber-400">
           Daily message limit reached.{' '}
-          <a
+          <Link
             className="underline hover:opacity-80 transition-opacity text-[var(--color-accent)]"
             href="/dashboard/billing"
           >
             Upgrade to Pro
-          </a>
+          </Link>
           {' '}for more, or bring your own key for unlimited.
         </p>
       </div>
