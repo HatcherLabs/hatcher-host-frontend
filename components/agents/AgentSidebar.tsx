@@ -41,7 +41,11 @@ interface TabDef {
 
 function getTabs(framework?: string): TabDef[] {
   return [
-    { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={18} />, group: 'main' },
+    // Internal id stays 'overview' to preserve persisted tab state on clients
+    // that saved the previous label — the display-only rename to "Dashboard"
+    // landed with the Etapa 1 dashboard refactor. See
+    // components/agents/dashboard/DashboardTab.tsx for the new entry point.
+    { id: 'overview', label: 'Dashboard', icon: <LayoutDashboard size={18} />, group: 'main' },
     { id: 'chat', label: 'Chat', icon: <MessageSquare size={18} />, group: 'main' },
     { id: 'terminal', label: 'Terminal', icon: <TerminalSquare size={18} />, group: 'main' },
     { id: 'config', label: 'Config', icon: <Settings size={18} />, group: 'configure' },
@@ -55,9 +59,12 @@ function getTabs(framework?: string): TabDef[] {
     // for elizaos hits the elizaos REST API (PGLite-backed). Milady
     // doesn't expose a memory viewer yet.
     ...(framework !== 'milady' ? [{ id: 'memory' as const, label: 'Memory', icon: <Brain size={18} />, group: 'data' as const }] : []),
-    // Sessions tab: elizaos-specific. Lists rooms (conversation sessions)
-    // from the agent's PGLite database via /api/agents/:uuid/rooms.
-    ...(framework === 'elizaos' ? [{ id: 'sessions' as const, label: 'Sessions', icon: <MessageSquare size={18} />, group: 'data' as const }] : []),
+    // Sessions tab: framework-specific.
+    //   elizaos → /api/agents/:uuid/rooms (PGLite-backed rooms)
+    //   openclaw (managed) → /openclaw/sessions (reads agents/main/sessions/sessions.json)
+    ...(framework === 'elizaos' || framework === 'openclaw'
+      ? [{ id: 'sessions' as const, label: 'Sessions', icon: <MessageSquare size={18} />, group: 'data' as const }]
+      : []),
     { id: 'files', label: 'Files', icon: <FolderOpen size={18} />, group: 'data' },
     // Workspace viewer — openclaw (managed) and managed hermes. Read-only
     // tree of the agent's workspace. Free for all users.

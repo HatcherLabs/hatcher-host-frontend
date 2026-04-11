@@ -8,6 +8,33 @@ import type { Agent, Payment, AgentFeature, ChatMessage, Ticket, TicketMessage, 
 
 const API_BASE = API_URL;
 
+/**
+ * Return shape for the managed-mode live-config PATCH endpoints
+ * (/hermes-config, /openclaw-config).
+ *
+ * The backend applies patches sequentially and returns:
+ *   - 200 with `{applied, validation}` if every patch landed
+ *   - 422 with `{success:false, error, code, applied, failedAt, remaining}`
+ *     if any patch failed mid-batch. The failure branch still carries
+ *     `applied` so the UI can show which fields were persisted and which
+ *     one (`failedAt`) needs attention.
+ *
+ * `req<T>` in core.ts passes the whole JSON body through unchanged, so
+ * the extra fields are present at runtime but hidden from the generic
+ * type. This type explicitly surfaces them so callers can narrow on
+ * `!success` and still read `applied` + `failedAt` + `remaining`.
+ */
+export type ConfigPatchResult =
+  | { success: true; data: { applied: string[]; validation: { valid: boolean; error?: string } } }
+  | {
+      success: false;
+      error: string;
+      code?: string;
+      applied?: string[];
+      failedAt?: string;
+      remaining?: string[];
+    };
+
 export const api = {
   /** Register a new account */
   register: (email: string, username: string, password: string, referralCode?: string) =>
@@ -441,6 +468,71 @@ export const api = {
       }>;
     }>(`/agents/${id}/milady/plugins`),
 
+  /**
+   * Live Hermes config snapshot — returns parsed `config.yaml` from
+   * the running container with secrets redacted (`***`). Only
+   * available for managed-mode Hermes agents; legacy agents regenerate
+   * config from DB on every start and don't expose it live.
+   *
+   * Returns `source: 'none'` if the container is up but the file
+   * couldn't be read. Returns AgentNotRunningError (409) when stopped.
+   */
+  getHermesConfig: (id: string) =>
+    req<{
+      source: 'live' | 'none';
+      config: Record<string, unknown> | null;
+      rawBytes?: number;
+      error?: string;
+    }>(`/agents/${id}/hermes-config`),
+
+  /**
+   * Apply one or more live-config patches to a managed hermes agent.
+   * Each patch is `{path, value}` where `path` is dot-separated into
+   * the config.yaml tree and `value` is the new value. Server enforces
+   * a strict allowlist (see isHermesPatchAllowed in hermes-config-snapshot.ts).
+   *
+   * On partial failure the server returns 422 with `applied` + `failedAt` +
+   * `remaining` so the UI can highlight the offending field without
+   * losing context on what already succeeded.
+   */
+  patchHermesConfig: (
+    id: string,
+    patches: Array<{ path: string; value: unknown }>,
+  ) =>
+    req<{
+      applied: string[];
+      validation: { valid: boolean; error?: string };
+    }>(`/agents/${id}/hermes-config`, {
+      method: 'PATCH',
+      body: JSON.stringify({ patches }),
+    }) as Promise<ConfigPatchResult>,
+
+  /**
+   * Hermes bundled skills catalog — walks the `skills/` directory in
+   * the container and returns categories + individual skill metadata
+   * parsed from SKILL.md frontmatter. Managed-mode only.
+   */
+  getHermesSkills: (id: string) =>
+    req<{
+      categories: Array<{ id: string; description: string; skillCount: number }>;
+      skills: Array<{
+        id: string;
+        category: string;
+        path: string;
+        skillMdPath: string;
+        metadata: {
+          name?: string;
+          description?: string;
+          version?: string;
+          author?: string;
+          platforms?: string[];
+          tags?: string[];
+        };
+      }>;
+      totalSkills: number;
+      totalCategories: number;
+    }>(`/agents/${id}/hermes-skills`),
+
   /** Milady runtime status with pendingRestart flag. */
   getMiladyStatus: (id: string) =>
     req<{
@@ -480,6 +572,26 @@ export const api = {
    * last DB snapshot if stopped). Secrets are redacted to "***" —
    * the user should edit those directly via the appropriate flow.
    */
+  /**
+   * OpenClaw sessions browser. Lists all sessions from
+   * `agents/main/sessions/sessions.json` in the running container,
+   * with metadata + a short first-user-message preview. Managed-mode
+   * agents only — pre-Etapa-4 volumes have a different layout.
+   */
+  getOpenClawSessions: (id: string) =>
+    req<{
+      sessions: Array<{
+        sessionId: string;
+        user: string;
+        updatedAt: number;
+        modelId: string | null;
+        messageCount: number;
+        firstUserMessage: string | null;
+        sizeBytes: number;
+      }>;
+      totalBytes: number;
+    }>(`/agents/${id}/openclaw/sessions`),
+
   getAgentOpenClawConfig: (id: string) =>
     req<{
       source: 'live' | 'snapshot' | 'none';
@@ -488,6 +600,25 @@ export const api = {
       managed: boolean;
       liveReadError?: string;
     }>(`/agents/${id}/openclaw-config`),
+
+  /**
+   * Apply one or more live-config patches to a managed openclaw agent.
+   * Same contract as patchHermesConfig but hits the openclaw endpoint.
+   * Paths are checked server-side against ALLOWED_PATCH_PREFIXES in
+   * config-snapshot.ts (default-deny). On partial failure the server
+   * returns 422 with `applied` + `failedAt` + `remaining`.
+   */
+  patchOpenClawConfig: (
+    id: string,
+    patches: Array<{ path: string; value: unknown }>,
+  ) =>
+    req<{
+      applied: string[];
+      validation: { valid: boolean; error?: string };
+    }>(`/agents/${id}/openclaw-config`, {
+      method: 'PATCH',
+      body: JSON.stringify({ patches }),
+    }) as Promise<ConfigPatchResult>,
 
   /** Get agent monitoring data (health, resources, response times, errors) */
   getAgentMonitoring: (id: string) =>
