@@ -523,6 +523,26 @@ export const api = {
    * last DB snapshot if stopped). Secrets are redacted to "***" —
    * the user should edit those directly via the appropriate flow.
    */
+  /**
+   * OpenClaw sessions browser. Lists all sessions from
+   * `agents/main/sessions/sessions.json` in the running container,
+   * with metadata + a short first-user-message preview. Managed-mode
+   * agents only — pre-Etapa-4 volumes have a different layout.
+   */
+  getOpenClawSessions: (id: string) =>
+    req<{
+      sessions: Array<{
+        sessionId: string;
+        user: string;
+        updatedAt: number;
+        modelId: string | null;
+        messageCount: number;
+        firstUserMessage: string | null;
+        sizeBytes: number;
+      }>;
+      totalBytes: number;
+    }>(`/agents/${id}/openclaw/sessions`),
+
   getAgentOpenClawConfig: (id: string) =>
     req<{
       source: 'live' | 'snapshot' | 'none';

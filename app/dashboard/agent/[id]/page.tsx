@@ -108,6 +108,11 @@ const HermesSkillsTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const OpenClawSessionsTab = dynamic(
+  () => import('@/components/agents/tabs/OpenClawSessionsTab').then(mod => ({ default: mod.OpenClawSessionsTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 const MiladyPluginsTab = dynamic(
   () => import('@/components/agents/tabs/MiladyPluginsTab').then(mod => ({ default: mod.MiladyPluginsTab })),
   { loading: () => <TabSkeleton /> }
@@ -958,7 +963,11 @@ export default function AgentManagePage() {
               {tab === 'logs' && <LogsTab />}
               {tab === 'terminal' && <TerminalTab />}
               {tab === 'memory' && (agent?.framework === 'elizaos' ? <ElizaosMemoryTab /> : <MemoryTab />)}
-              {tab === 'sessions' && <ElizaosSessionsTab />}
+              {tab === 'sessions' && (
+                agent?.framework === 'elizaos' ? <ElizaosSessionsTab /> :
+                agent?.framework === 'openclaw' ? <OpenClawSessionsTab /> :
+                null
+              )}
               {tab === 'chat' && <ChatTab />}
               {tab === 'stats' && <StatsTab />}
             </AnimatePresence>
