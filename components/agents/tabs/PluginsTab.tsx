@@ -32,6 +32,7 @@ import { useToast } from '@/components/ui/ToastProvider';
 
 interface InstalledItem {
   name: string;
+  displayName?: string;
   type: 'skill' | 'plugin';
   source: string;
   description: string | null;
