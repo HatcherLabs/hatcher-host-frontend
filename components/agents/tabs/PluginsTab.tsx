@@ -36,7 +36,7 @@ interface InstalledItem {
   type: 'skill' | 'plugin';
   source: string;
   description: string | null;
-  status: 'installed' | 'pending_restart' | 'failed';
+  status: 'installed' | 'pending' | 'pending_restart' | 'failed';
   error?: string;
   requiresRestart?: boolean;
 }
@@ -133,11 +133,11 @@ function StatusIndicator({ status, error }: { status: InstalledItem['status']; e
       </span>
     );
   }
-  if (status === 'pending_restart') {
+  if (status === 'pending' || status === 'pending_restart') {
     return (
       <span className="inline-flex items-center gap-1 text-[11px] text-amber-400">
         <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-        Restart Required
+        {status === 'pending' ? 'Pending — Restart to Install' : 'Restart Required'}
       </span>
     );
   }
