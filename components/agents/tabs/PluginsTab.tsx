@@ -41,7 +41,8 @@ interface InstalledItem {
 }
 
 interface AvailableItem {
-  name: string;
+  name: string;            // install identifier (slug)
+  displayName?: string;    // human-readable label
   description: string | null;
   source: string;
   requiresRestart?: boolean;
@@ -624,7 +625,7 @@ export function PluginsTab() {
               <GlassCard key={item.name} className="!p-4 flex flex-col gap-2">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-[var(--text-primary)] truncate">{item.name}</p>
+                    <p className="text-sm font-medium text-[var(--text-primary)] truncate">{item.displayName || item.name}</p>
                     {item.description && (
                       <p className="text-xs text-[var(--text-muted)] mt-0.5 line-clamp-2">{item.description}</p>
                     )}
@@ -690,7 +691,7 @@ export function PluginsTab() {
               <GlassCard key={item.name} className="!p-4 flex flex-col gap-2">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-[var(--text-primary)] truncate">{item.name}</p>
+                    <p className="text-sm font-medium text-[var(--text-primary)] truncate">{item.displayName || item.name}</p>
                     {item.description && (
                       <p className="text-xs text-[var(--text-muted)] mt-0.5 line-clamp-2">{item.description}</p>
                     )}
@@ -733,7 +734,7 @@ export function PluginsTab() {
                 <GlassCard key={item.name} className="!p-4 flex flex-col gap-2 border-amber-500/10">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-[var(--text-primary)] truncate">{item.name}</p>
+                      <p className="text-sm font-medium text-[var(--text-primary)] truncate">{item.displayName || item.name}</p>
                       <p className="text-xs text-[var(--text-muted)] mt-0.5 line-clamp-2">{item.description}</p>
                     </div>
                     <button
