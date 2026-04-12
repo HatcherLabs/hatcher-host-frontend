@@ -198,6 +198,7 @@ export default function AgentManagePage() {
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','workspace','logs','terminal','memory','sessions','schedules','workflows','chat','stats'];
+  // 'skills' kept in validTabs for backwards compat (deep links), but redirects to plugins tab
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const rawTab = searchParams.get('tab') as Tab;
   const normalizeTab = (t: string | null): Tab => {
@@ -996,13 +997,7 @@ export default function AgentManagePage() {
                 ) : <ConfigTab />
               )}
               {tab === 'integrations' && <IntegrationsTab />}
-              {tab === 'skills' && (
-                agent?.framework === 'elizaos' ? <ElizaosPluginsTab /> :
-                agent?.framework === 'milady' ? <MiladySkillsTab /> :
-                agent?.framework === 'hermes' ? <HermesSkillsTab /> :
-                <SkillsTab />
-              )}
-              {tab === 'plugins' && <PluginsTab />}
+              {(tab === 'skills' || tab === 'plugins') && <PluginsTab />}
               {tab === 'files' && <FilesTab />}
               {tab === 'workspace' && <WorkspaceTab />}
               {tab === 'logs' && <LogsTab />}

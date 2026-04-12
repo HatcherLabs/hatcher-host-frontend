@@ -125,6 +125,7 @@ export function PluginsTab() {
   const [installing, setInstalling] = useState<string | null>(null);
   const [uninstalling, setUninstalling] = useState<string | null>(null);
   const [confirmUninstall, setConfirmUninstall] = useState<string | null>(null);
+  const [manualName, setManualName] = useState('');
 
   // ElizaOS has no skills concept in v1.7.x
   const hasSkills = agent?.framework !== 'elizaos';
@@ -205,6 +206,26 @@ export function PluginsTab() {
       setUninstalling(null);
     }
   }, [agent?.id, load, toast]);
+
+  // ─── Manual install handler ─────────────────────────────────
+
+  const handleManualInstall = useCallback(async () => {
+    if (!manualName.trim() || !agent?.id) return;
+    const name = manualName.trim();
+    const fw = agent.framework ?? 'openclaw';
+    // Determine type and source from framework + sub-tab
+    let type: 'skill' | 'plugin' = subTab === 'skills' ? 'skill' : 'plugin';
+    let source = 'clawhub';
+    if (type === 'plugin') {
+      if (fw === 'openclaw') source = 'clawhub-plugin';
+      else if (fw === 'hermes') source = 'github';
+      else source = 'elizaos-registry';
+    } else if (fw === 'milady') {
+      source = 'milady-skills';
+    }
+    setManualName('');
+    await handleInstall(name, type, source);
+  }, [manualName, agent?.id, agent?.framework, subTab, handleInstall]);
 
   // ─── Filtered available lists ───────────────────────────────
 
@@ -402,12 +423,47 @@ export function PluginsTab() {
           </div>
         </div>
 
+        {/* Manual install form */}
+        <GlassCard className="!p-4">
+          <p className="text-xs text-[var(--text-muted)] mb-2">
+            Install by name — paste a {subTab === 'skills' ? 'skill' : 'plugin'} name
+            {agent?.framework === 'openclaw' && subTab === 'plugins' ? ' from ClawHub' : ''}
+            {agent?.framework === 'hermes' && subTab === 'plugins' ? ' (user/repo from GitHub)' : ''}
+          </p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={manualName}
+              onChange={(e) => setManualName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleManualInstall()}
+              placeholder={
+                subTab === 'skills'
+                  ? 'e.g. hello-world'
+                  : agent?.framework === 'hermes'
+                    ? 'e.g. 42-evey/hermes-plugins'
+                    : agent?.framework === 'openclaw'
+                      ? 'e.g. oh-my-browser'
+                      : 'e.g. @elizaos/plugin-image'
+              }
+              className="flex-1 px-3 py-1.5 text-sm rounded-lg bg-white/[0.04] border border-white/10 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/40"
+            />
+            <button
+              onClick={handleManualInstall}
+              disabled={!manualName.trim() || !!installing || atLimit}
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium rounded-lg bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {installing ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+              Install
+            </button>
+          </div>
+        </GlassCard>
+
         {filteredAvailable.length === 0 ? (
-          <GlassCard className="text-center py-8">
+          <GlassCard className="text-center py-6">
             <p className="text-sm text-[var(--text-muted)]">
               {search.trim()
                 ? `No ${subTab} matching "${search}"`
-                : `No additional ${subTab} available`}
+                : `Browse available ${subTab} above or install by name`}
             </p>
           </GlassCard>
         ) : (
