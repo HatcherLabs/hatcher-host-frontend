@@ -165,6 +165,11 @@ const SkillsTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const PluginsTab = dynamic(
+  () => import('@/components/agents/tabs/PluginsTab').then(mod => ({ default: mod.PluginsTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 const WorkflowsTab = dynamic(
   () => import('@/components/agents/tabs/WorkflowsTab').then(mod => ({ default: mod.WorkflowsTab })),
   { loading: () => <TabSkeleton /> }
@@ -997,7 +1002,7 @@ export default function AgentManagePage() {
                 agent?.framework === 'hermes' ? <HermesSkillsTab /> :
                 <SkillsTab />
               )}
-              {tab === 'plugins' && agent?.framework === 'milady' && <MiladyPluginsTab />}
+              {tab === 'plugins' && <PluginsTab />}
               {tab === 'files' && <FilesTab />}
               {tab === 'workspace' && <WorkspaceTab />}
               {tab === 'logs' && <LogsTab />}

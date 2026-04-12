@@ -1474,6 +1474,63 @@ export const api = {
       body: JSON.stringify({ packageName }),
     }),
 
+  // ─── Generic Plugins (all frameworks) ────────────────────
+
+  /** Fetch installed + available plugins/skills with tier limits */
+  getAgentPlugins: (agentId: string) =>
+    req<{
+      installed: Array<{
+        name: string;
+        type: 'skill' | 'plugin';
+        source: string;
+        description: string | null;
+        status: 'installed' | 'pending_restart' | 'failed';
+        error?: string;
+        requiresRestart?: boolean;
+      }>;
+      available: {
+        skills: Array<{
+          name: string;
+          description: string | null;
+          source: string;
+          requiresRestart?: boolean;
+        }>;
+        plugins: Array<{
+          name: string;
+          description: string | null;
+          source: string;
+          requiresRestart?: boolean;
+        }>;
+      };
+      limits: {
+        installed: number;
+        max: number;
+        tierName: string;
+      };
+    }>(`/agents/${agentId}/plugins`),
+
+  /** Install a plugin or skill */
+  installAgentPlugin: (agentId: string, pluginName: string, type: 'skill' | 'plugin', source: string) =>
+    req<{
+      name: string;
+      installed: boolean;
+      requiresRestart: boolean;
+      note: string;
+    }>(`/agents/${agentId}/plugins/install`, {
+      method: 'POST',
+      body: JSON.stringify({ pluginName, type, source }),
+    }),
+
+  /** Uninstall a plugin or skill */
+  uninstallAgentPlugin: (agentId: string, pluginName: string) =>
+    req<{
+      name: string;
+      uninstalled: boolean;
+      note: string;
+    }>(`/agents/${agentId}/plugins/${encodeURIComponent(pluginName)}`, {
+      method: 'DELETE',
+    }),
+
   // ─── Custom Domains ──────────────────────────────────────
   /** Add a custom domain to an agent */
   addCustomDomain: (agentId: string, domain: string) =>
