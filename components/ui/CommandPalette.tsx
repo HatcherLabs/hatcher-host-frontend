@@ -17,6 +17,10 @@ import {
   Clock,
   Play,
   Square,
+  BarChart3,
+  Users,
+  BookOpen,
+  Keyboard,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
@@ -42,7 +46,11 @@ const STATIC_COMMANDS: CommandItem[] = [
   { id: 'settings', label: 'Settings', icon: Settings, href: '/settings', shortcut: 'S', section: 'Navigation' },
   { id: 'pricing', label: 'Pricing', icon: Zap, href: '/pricing', section: 'Navigation' },
   { id: 'token', label: '$HATCHER Token', icon: Coins, href: '/token', section: 'Navigation' },
+  { id: 'analytics', label: 'Analytics', icon: BarChart3, href: '/dashboard/analytics', section: 'Navigation' },
+  { id: 'team', label: 'Team', icon: Users, href: '/dashboard/team', section: 'Navigation' },
   { id: 'help', label: 'Help & Support', icon: HelpCircle, href: '/support', section: 'Navigation' },
+  { id: 'docs', label: 'Documentation', icon: BookOpen, href: 'https://docs.hatcher.host', section: 'Navigation' },
+  { id: 'shortcuts', label: 'Keyboard Shortcuts', icon: Keyboard, href: '/shortcuts', shortcut: '?', section: 'Navigation' },
 ];
 
 const RECENT_KEY = 'cmd_palette_recent';
@@ -192,8 +200,12 @@ export function CommandPalette() {
       pushRecent(item.id);
       if (item.action) {
         item.action();
-      } else if (item.href && item.href !== pathname) {
-        router.push(item.href);
+      } else if (item.href) {
+        if (item.href.startsWith('http')) {
+          window.open(item.href, '_blank', 'noopener,noreferrer');
+        } else if (item.href !== pathname) {
+          router.push(item.href);
+        }
       }
     },
     [router, pathname],
