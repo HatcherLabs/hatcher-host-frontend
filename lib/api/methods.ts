@@ -753,6 +753,31 @@ export const api = {
       totalCategories: number;
     }>(`/agents/${id}/hermes-skills`),
 
+  /**
+   * Hermes usage stats dashboard card.
+   *
+   * DB data (tokens, message counts) is always returned. Session and
+   * tool-call data requires the container to be running — when it is
+   * offline the response carries `containerOffline: true` and the
+   * session/toolCall fields are zeroed.
+   *
+   * Managed Hermes only. 'view' access.
+   */
+  getHermesStats: (id: string) =>
+    req<{
+      sessions: { total: number };
+      messages: { total: number; today: number };
+      toolCalls: { total: number; byType: Record<string, number> };
+      tokens: {
+        input: number;
+        output: number;
+        total: number;
+        today: { input: number; output: number };
+      };
+      lastActiveAt: string;
+      containerOffline: boolean;
+    }>(`/agents/${id}/hermes/stats`),
+
   /** Milady runtime status with pendingRestart flag. */
   getMiladyStatus: (id: string) =>
     req<{

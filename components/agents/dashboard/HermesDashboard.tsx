@@ -11,6 +11,7 @@ import { HermesConfigSnapshotCard } from './cards/hermes/HermesConfigSnapshotCar
 import { HermesSkillsCard } from './cards/hermes/HermesSkillsCard';
 import { HermesCronCard } from './cards/hermes/HermesCronCard';
 import { HermesRecentErrorsCard } from './cards/hermes/HermesRecentErrorsCard';
+import { HermesStatsCard } from './cards/hermes/HermesStatsCard';
 
 /**
  * Framework-native dashboard for Hermes agents.
@@ -26,10 +27,12 @@ import { HermesRecentErrorsCard } from './cards/hermes/HermesRecentErrorsCard';
  *   1. HermesConfigSnapshotCard  — 7 allowlisted live config keys
  *   2. HealthPerformanceCard     — shared
  *   3. CostCard                  — shared
- *   4. HermesCronCard            — native cron jobs (jobs.json)
- *   5. HermesSkillsCard          — bundled catalog summary
- *   6. LiveLogsPreviewCard       — shared
- *   7. QuickActionsCard          — shared
+ *   4. HermesRecentErrorsCard    — WARN/ERROR/FATAL from errors.log
+ *   5. HermesStatsCard           — sessions, messages, tool calls, tokens
+ *   6. HermesCronCard            — native cron jobs (jobs.json)
+ *   7. HermesSkillsCard          — bundled catalog summary
+ *   8. LiveLogsPreviewCard       — shared
+ *   9. QuickActionsCard          — shared
  */
 export function HermesDashboard() {
   const { agent, isActive } = useAgentContext();
@@ -54,6 +57,7 @@ export function HermesDashboard() {
       <HealthPerformanceCard agentId={agent.id} isActive={isActive} />
       <CostCard agentId={agent.id} />
       <HermesRecentErrorsCard />
+      <HermesStatsCard />
       <HermesCronCard />
       <HermesSkillsCard />
       <LiveLogsPreviewCard />
