@@ -24,6 +24,7 @@ interface AccountAnalytics {
   totalAgents: number;
   activeAgents: number;
   totalMessages: number;
+  totalLlmCalls?: number;
   statusBreakdown: Record<string, number>;
   frameworkBreakdown: Record<string, number>;
   agentMessageBreakdown: Array<{ id: string; name: string; framework: string; count: number }>;
@@ -279,7 +280,7 @@ export default function AnalyticsPage() {
             <>
               <StatCard icon={Bot} label="Total Agents" value={data?.totalAgents ?? 0} sub={`${data?.activeAgents ?? 0} active`} color="#8b5cf6" />
               <StatCard icon={MessageSquare} label="Messages" value={formatNumber(data?.totalMessages ?? 0)} sub="All time" color="var(--color-accent)" />
-              <StatCard icon={Zap} label="LLM Calls" value={formatNumber((data as any)?.totalLlmCalls ?? 0)} sub="All time" color="#f59e0b" />
+              <StatCard icon={Zap} label="LLM Calls" value={formatNumber(data?.totalLlmCalls ?? 0)} sub="All time" color="#f59e0b" />
               <StatCard icon={Activity} label="Last 14 Days" value={formatNumber(totalDailyMessages)} sub="User messages" color="#22c55e" />
             </>
           )}

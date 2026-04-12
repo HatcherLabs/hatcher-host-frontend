@@ -653,6 +653,54 @@ export const api = {
     }>(`/agents/${id}/openclaw/errors`),
 
   /**
+   * Recent WARN/ERROR/FATAL lines from the Hermes errors.log file,
+   * parsed and normalized for the dashboard errors card. Managed-mode only.
+   */
+  getHermesErrors: (id: string) =>
+    req<{
+      entries: Array<{
+        ts: string;
+        level: 'WARN' | 'ERROR' | 'FATAL' | 'UNKNOWN';
+        message: string;
+        source: string | null;
+      }>;
+      totalScanned: number;
+      sourceFile: string | null;
+    }>(`/agents/${id}/hermes/errors`),
+
+  /**
+   * Recent ERROR/WARN lines from ElizaOS container stdout logs,
+   * filtered and normalized for the dashboard errors card.
+   */
+  getElizaOSErrors: (id: string) =>
+    req<{
+      entries: Array<{
+        ts: string;
+        level: 'WARN' | 'ERROR' | 'FATAL' | 'UNKNOWN';
+        message: string;
+        source: string | null;
+      }>;
+      totalScanned: number;
+      sourceFile: string | null;
+    }>(`/agents/${id}/elizaos/errors`),
+
+  /**
+   * Recent ERROR/WARN lines from Milady container stdout logs,
+   * filtered and normalized for the dashboard errors card.
+   */
+  getMiladyErrors: (id: string) =>
+    req<{
+      entries: Array<{
+        ts: string;
+        level: 'WARN' | 'ERROR' | 'FATAL' | 'UNKNOWN';
+        message: string;
+        source: string | null;
+      }>;
+      totalScanned: number;
+      sourceFile: string | null;
+    }>(`/agents/${id}/milady/errors`),
+
+  /**
    * Hermes native cron jobs — reads `/home/hermes/.hermes/cron/jobs.json`
    * inside the running container and returns a parsed + sorted summary.
    *

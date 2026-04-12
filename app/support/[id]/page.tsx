@@ -165,7 +165,7 @@ export default function TicketDetailPage() {
                 <span className={`text-xs font-semibold ${(msg.role as string) === 'admin' ? 'text-[var(--color-accent)]' : 'text-[var(--text-muted)]'}`}>
                   {(msg.role as string) === 'admin' ? 'Hatcher Team' : 'You'}
                 </span>
-                <span className="text-[10px] text-[var(--text-muted)]">{timeAgo((msg as any).timestamp ?? msg.createdAt)}</span>
+                <span className="text-[10px] text-[var(--text-muted)]">{timeAgo(msg.createdAt)}</span>
               </div>
               <p className="text-sm text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
             </motion.div>

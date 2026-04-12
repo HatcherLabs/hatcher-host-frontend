@@ -320,7 +320,7 @@ export function AgentPageClient() {
                   Messages
                 </div>
                 <div className="text-3xl font-bold text-[var(--color-accent)]">
-                  {publicStats ? publicStats.messagesProcessed.toLocaleString() : ((agent as any).messageCount ?? 0).toLocaleString()}
+                  {publicStats ? publicStats.messagesProcessed.toLocaleString() : (agent.messageCount ?? 0).toLocaleString()}
                 </div>
               </div>
 

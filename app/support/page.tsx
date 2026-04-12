@@ -260,17 +260,9 @@ export default function SupportPage() {
         <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {QUICK_LINKS.map((link) => {
             const LinkIcon = link.icon;
-            const Wrapper = link.external ? 'a' : Link;
-            const extraProps = link.external
-              ? { href: link.href, target: '_blank', rel: 'noopener noreferrer' }
-              : { href: link.href };
-
-            return (
-              <Wrapper
-                key={link.label}
-                {...(extraProps as any)}
-                className="group flex items-center gap-3 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl p-4 transition-all duration-200 hover:border-[var(--color-accent)]/30 hover:bg-[var(--bg-card)] hover:-translate-y-[3px]"
-              >
+            const sharedClassName = "group flex items-center gap-3 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl p-4 transition-all duration-200 hover:border-[var(--color-accent)]/30 hover:bg-[var(--bg-card)] hover:-translate-y-[3px]";
+            const inner = (
+              <>
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors"
                   style={{ background: 'rgba(6,182,212,0.1)' }}
@@ -288,7 +280,17 @@ export default function SupportPage() {
                   </div>
                   <span className="text-xs text-[var(--text-muted)]">{link.description}</span>
                 </div>
-              </Wrapper>
+              </>
+            );
+
+            return link.external ? (
+              <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className={sharedClassName}>
+                {inner}
+              </a>
+            ) : (
+              <Link key={link.label} href={link.href} className={sharedClassName}>
+                {inner}
+              </Link>
             );
           })}
         </motion.div>

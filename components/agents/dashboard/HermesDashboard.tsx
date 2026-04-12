@@ -10,6 +10,7 @@ import { GenericDashboard } from './GenericDashboard';
 import { HermesConfigSnapshotCard } from './cards/hermes/HermesConfigSnapshotCard';
 import { HermesSkillsCard } from './cards/hermes/HermesSkillsCard';
 import { HermesCronCard } from './cards/hermes/HermesCronCard';
+import { HermesRecentErrorsCard } from './cards/hermes/HermesRecentErrorsCard';
 
 /**
  * Framework-native dashboard for Hermes agents.
@@ -52,6 +53,7 @@ export function HermesDashboard() {
       <HermesConfigSnapshotCard />
       <HealthPerformanceCard agentId={agent.id} isActive={isActive} />
       <CostCard agentId={agent.id} />
+      <HermesRecentErrorsCard />
       <HermesCronCard />
       <HermesSkillsCard />
       <LiveLogsPreviewCard />

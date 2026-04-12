@@ -6,6 +6,13 @@ import Link from 'next/link';
 import { api, getToken } from '@/lib/api';
 import { API_URL } from '@/lib/config';
 import type { Agent, AgentFeature } from '@/lib/api';
+
+/** Extra fields the GET /agents/:id response includes beyond the base Agent type */
+interface AgentDetail extends Agent {
+  chatUsedToday?: number;
+  chatLimit?: number | null;
+  isByok?: boolean;
+}
 import { useAuth } from '@/lib/auth-context';
 import { useWebSocketChat } from '@/hooks/useWebSocketChat';
 import { FRAMEWORKS, TIERS, getBYOKProvider } from '@hatcher/shared';
@@ -245,7 +252,7 @@ export default function AgentManagePage() {
     setLoading(false);
     if (res.success) {
       setAgent(res.data);
-      const agentData = res.data as any;
+      const agentData = res.data as AgentDetail;
       if (typeof agentData.chatUsedToday === 'number') {
         setMsgCount(agentData.chatUsedToday);
       }

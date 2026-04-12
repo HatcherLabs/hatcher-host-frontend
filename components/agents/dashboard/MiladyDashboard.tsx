@@ -9,6 +9,7 @@ import { CostCard } from './cards/CostCard';
 import { MiladyReadinessCard } from './cards/milady/MiladyReadinessCard';
 import { MiladyPluginsOverviewCard } from './cards/milady/MiladyPluginsOverviewCard';
 import { MiladySkillsCard } from './cards/milady/MiladySkillsCard';
+import { MiladyRecentErrorsCard } from './cards/milady/MiladyRecentErrorsCard';
 
 /**
  * Framework-native dashboard for Milady agents.
@@ -41,6 +42,7 @@ export function MiladyDashboard() {
       <MiladyReadinessCard agentId={agent.id} />
       <HealthPerformanceCard agentId={agent.id} isActive={isActive} />
       <CostCard agentId={agent.id} />
+      <MiladyRecentErrorsCard />
       <MiladyPluginsOverviewCard />
       <MiladySkillsCard />
       <LiveLogsPreviewCard />

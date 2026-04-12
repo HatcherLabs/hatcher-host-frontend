@@ -11,6 +11,7 @@ import { ElizaOSPluginsCard } from './cards/elizaos/ElizaOSPluginsCard';
 import { ElizaOSMemoryStatsCard } from './cards/elizaos/ElizaOSMemoryStatsCard';
 import { ElizaOSRoomsCard } from './cards/elizaos/ElizaOSRoomsCard';
 import { useElizaOSAgent } from './cards/elizaos/useElizaOSAgent';
+import { ElizaOSRecentErrorsCard } from './cards/elizaos/ElizaOSRecentErrorsCard';
 
 /**
  * Framework-native dashboard for ElizaOS agents.
@@ -57,6 +58,7 @@ export function ElizaOSDashboard() {
       />
       <HealthPerformanceCard agentId={agent.id} isActive={isActive} />
       <CostCard agentId={agent.id} />
+      <ElizaOSRecentErrorsCard />
       <ElizaOSPluginsCard
         data={elizaAgent.data}
         error={elizaAgent.error}
