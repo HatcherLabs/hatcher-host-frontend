@@ -68,7 +68,7 @@ type SubTab = 'skills' | 'plugins';
 
 // ─── Recommended Items ──────────────────────────────────────
 
-const RECOMMENDED: Record<string, Array<{ name: string; type: 'skill' | 'plugin'; source: string; description: string }>> = {
+const RECOMMENDED: Record<string, Array<{ name: string; displayName?: string; type: 'skill' | 'plugin'; source: string; description: string }>> = {
   openclaw: [
     { name: 'oh-my-browser', type: 'plugin', source: 'clawhub-plugin', description: 'Let AI agents use your real browser session' },
     { name: 'mem0-plugin', type: 'plugin', source: 'clawhub-plugin', description: 'Mem0 memory backend for OpenClaw' },
