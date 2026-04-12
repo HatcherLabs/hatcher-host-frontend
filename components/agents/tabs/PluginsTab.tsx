@@ -516,8 +516,8 @@ export function PluginsTab() {
         </div>
       )}
 
-      {/* ─── 1. Bundled Skills Section ──────────────────────── */}
-      {bundledSkills.length > 0 && (
+      {/* ─── 1. Bundled Skills Section (only on Skills sub-tab) ──── */}
+      {bundledSkills.length > 0 && subTab === 'skills' && (
         <div className="space-y-3">
           <button
             onClick={() => setBundledExpanded(!bundledExpanded)}
