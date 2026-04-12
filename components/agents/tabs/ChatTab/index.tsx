@@ -104,6 +104,7 @@ export function ChatTab() {
       lastAutoSpokenIdRef.current = lastMsg.id;
       voice.speak(lastMsg.content);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages, voice.autoSpeak, voice.ttsSupported, voice.speak]);
 
   // When transcript changes from STT, update input field
@@ -156,6 +157,7 @@ export function ChatTab() {
       }, 800);
       return () => clearTimeout(timer);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [voice.isSpeaking, voice.isListening, voiceCallMode, sending]);
 
   // Call duration timer

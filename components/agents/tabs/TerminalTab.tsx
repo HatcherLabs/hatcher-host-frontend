@@ -279,7 +279,7 @@ export function TerminalTab() {
         termInstance.current = null;
       }
     };
-  }, []);
+  }, [disconnect]);
 
   // ── Not running / starting state ──
   if (!isActive) {

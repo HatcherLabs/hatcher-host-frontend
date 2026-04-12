@@ -83,7 +83,6 @@ export function ConfigTab() {
   // Memoize BYOK provider list (static array — only recomputed if BYOK_PROVIDERS changes)
   const byokProvidersFiltered = useMemo(
     () => BYOK_PROVIDERS.filter((p) => p.key !== 'groq'),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   Globe,
@@ -67,7 +67,7 @@ export function DomainsSection() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const loadDomains = async () => {
+  const loadDomains = useCallback(async () => {
     setLoading(true);
     try {
       const res = await api.getMyDomains();
@@ -79,11 +79,11 @@ export function DomainsSection() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [agent.id]);
 
   useEffect(() => {
     loadDomains();
-  }, [agent.id]);
+  }, [loadDomains]);
 
   const handleAdd = async () => {
     if (!domainInput.trim()) return;

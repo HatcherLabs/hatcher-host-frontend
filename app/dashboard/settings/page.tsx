@@ -8,6 +8,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ui/ToastProvider';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   User,
   Shield,
@@ -383,7 +384,7 @@ export default function SettingsPage() {
               {/* User info */}
               <div className="flex items-center gap-3 px-3 py-3 mb-1 border-b border-[var(--border-default)]">
                 {avatarUrl ? (
-                  <img src={avatarUrl} alt={user?.username ?? ''} className="w-9 h-9 rounded-xl object-cover flex-shrink-0" />
+                  <Image src={avatarUrl} alt={user?.username ?? ''} width={36} height={36} className="w-9 h-9 rounded-xl object-cover flex-shrink-0" unoptimized />
                 ) : (
                   <div
                     className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-base"
@@ -439,10 +440,13 @@ export default function SettingsPage() {
                       <div className="flex items-center gap-4 mb-6 pb-6 border-b border-[var(--border-default)]">
                         <div className="relative flex-shrink-0 group">
                           {avatarUrl ? (
-                            <img
+                            <Image
                               src={avatarUrl}
                               alt={user?.username ?? 'Avatar'}
+                              width={64}
+                              height={64}
                               className="w-16 h-16 rounded-2xl object-cover shadow-lg"
+                              unoptimized
                             />
                           ) : (
                             <div

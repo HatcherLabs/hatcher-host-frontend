@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
@@ -260,7 +261,7 @@ export function Header() {
                       className="h-9 px-3 flex items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 transition-all duration-200"
                     >
                       {user.avatarUrl ? (
-                        <img src={user.avatarUrl} alt={user.username} className="w-5 h-5 rounded-full object-cover flex-shrink-0" />
+                        <Image src={user.avatarUrl} alt={user.username} width={20} height={20} className="w-5 h-5 rounded-full object-cover flex-shrink-0" unoptimized />
                       ) : (
                         <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
                       )}
@@ -285,7 +286,7 @@ export function Header() {
                           {/* User info */}
                           <div className="px-4 py-2.5 border-b border-[var(--border-default)] flex items-center gap-2.5">
                             {user.avatarUrl ? (
-                              <img src={user.avatarUrl} alt={user.username} className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
+                              <Image src={user.avatarUrl} alt={user.username} width={32} height={32} className="w-8 h-8 rounded-lg object-cover flex-shrink-0" unoptimized />
                             ) : (
                               <div className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-bold text-purple-300 bg-purple-500/20">
                                 {user.username.charAt(0).toUpperCase()}
@@ -448,7 +449,7 @@ export function Header() {
                   <div className="space-y-1">
                     <div className="px-3 py-2 flex items-center gap-2">
                       {user.avatarUrl ? (
-                        <img src={user.avatarUrl} alt="" className="w-6 h-6 rounded-full object-cover flex-shrink-0" />
+                        <Image src={user.avatarUrl} alt="" width={24} height={24} className="w-6 h-6 rounded-full object-cover flex-shrink-0" unoptimized />
                       ) : (
                         <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />
                       )}

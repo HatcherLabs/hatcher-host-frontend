@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -77,7 +78,7 @@ export default function TokenPage() {
             className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[var(--color-accent)] to-[#0891b2] flex items-center justify-center mx-auto mb-8 shadow-[0_0_60px_rgba(6,182,212,0.35)]"
             style={{ animation: 'float 3s ease-in-out infinite' }}
           >
-            <img
+            <Image
               src="/icon.svg"
               alt="Hatcher logo"
               width={72}

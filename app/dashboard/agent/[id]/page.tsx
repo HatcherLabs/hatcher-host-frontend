@@ -325,6 +325,7 @@ export default function AgentManagePage() {
       historyLoadedRef.current = false;
       lastSavedCountRef.current = 0;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   // ─── Keep msgLimit in sync with userTier ──────────────────
@@ -364,6 +365,7 @@ export default function AgentManagePage() {
     return () => {
       if (statusPollRef.current) { clearInterval(statusPollRef.current); statusPollRef.current = null; }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [agent?.status, id]);
 
   // ─── Guided onboarding ────────────────────────────────────
@@ -393,7 +395,7 @@ export default function AgentManagePage() {
     const url = new URL(window.location.href);
     url.searchParams.delete('new');
     window.history.replaceState({}, '', url.pathname + (url.search || ''));
-  }, [id]);
+  }, [id, setTab]);
 
   // ─── Load stats ───────────────────────────────────────────
 
@@ -582,7 +584,7 @@ export default function AgentManagePage() {
     if (!logs.autoScroll || tab !== 'logs') return;
     const el = logs.logsEndRef.current;
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, [logs.logs.length, logs.autoScroll, tab]);
+  }, [logs.logs.length, logs.autoScroll, logs.logsEndRef, tab]);
 
   // ─── WebSocket streaming chat ──────────────────────────────
 
@@ -799,7 +801,6 @@ export default function AgentManagePage() {
 
   // ─── Build context value ───────────────────────────────────
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const contextValue: AgentContextValue | null = useMemo(() => {
     if (!agent) return null;
     return {
