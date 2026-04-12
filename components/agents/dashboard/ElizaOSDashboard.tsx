@@ -12,6 +12,7 @@ import { ElizaOSMemoryStatsCard } from './cards/elizaos/ElizaOSMemoryStatsCard';
 import { ElizaOSRoomsCard } from './cards/elizaos/ElizaOSRoomsCard';
 import { useElizaOSAgent } from './cards/elizaos/useElizaOSAgent';
 import { ElizaOSRecentErrorsCard } from './cards/elizaos/ElizaOSRecentErrorsCard';
+import { ElizaOSMemoryGraphCard } from './cards/elizaos/ElizaOSMemoryGraphCard';
 
 /**
  * Framework-native dashboard for ElizaOS agents.
@@ -21,8 +22,9 @@ import { ElizaOSRecentErrorsCard } from './cards/elizaos/ElizaOSRecentErrorsCard
  *   2. HealthPerformanceCard       — shared CPU/mem/restarts/errors
  *   3. CostCard                    — shared daily messages / limit
  *   4. ElizaOSPluginsCard          — enabled plugins chips
- *   5. ElizaOSMemoryStatsCard      — total memories + last-24h counter
- *   6. ElizaOSRoomsCard            — recent conversation sessions
+ *   5. ElizaOSMemoryGraphCard       — SVG radial graph of rooms + memory types
+ *   6. ElizaOSMemoryStatsCard      — total memories + last-24h counter
+ *   7. ElizaOSRoomsCard            — recent conversation sessions
  *   7. LiveLogsPreviewCard         — shared log tail
  *   8. QuickActionsCard            — shared 4-button grid
  *
@@ -65,6 +67,7 @@ export function ElizaOSDashboard() {
         loading={elizaAgent.loading}
         isActive={elizaAgent.isActive}
       />
+      <ElizaOSMemoryGraphCard />
       <ElizaOSMemoryStatsCard />
       <ElizaOSRoomsCard />
       <LiveLogsPreviewCard />
