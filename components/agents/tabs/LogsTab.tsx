@@ -7,7 +7,6 @@ import {
   Bug,
   Download,
   Info,
-  Lock,
   RotateCcw,
   ScrollText,
   Search,
@@ -82,10 +81,8 @@ export function LogsTab() {
     filteredLogs,
     logsEndRef,
     loadLogs,
-    userTier,
+    wsLogsConnected,
   } = ctx;
-
-  const isPro = userTier === 'pro' || userTier === 'business' || userTier === 'founding_member';
   const framework = agent.framework ?? 'openclaw';
   const fwInfo = FRAMEWORK_LOG_INFO[framework] ?? FRAMEWORK_LOG_INFO.openclaw;
 
@@ -179,19 +176,22 @@ export function LogsTab() {
           })}
         </div>
 
-        {/* Status / Pro badge */}
-        {isActive && tab === 'logs' && isPro ? (
+        {/* Connection status badge */}
+        {isActive && wsLogsConnected ? (
           <span className="flex items-center gap-1.5 text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20">
             <span className="relative flex h-1.5 w-1.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
             </span>
-            Live
+            Connected
           </span>
-        ) : !isPro ? (
-          <span className="flex items-center gap-1.5 text-[10px] text-[#8b5cf6] bg-[#8b5cf6]/10 px-2 py-1 rounded-full border border-[#8b5cf6]/20">
-            <Lock size={10} />
-            Pro
+        ) : isActive ? (
+          <span className="flex items-center gap-1.5 text-[10px] text-amber-400 bg-amber-500/10 px-2 py-1 rounded-full border border-amber-500/20">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400" />
+            </span>
+            Reconnecting
           </span>
         ) : null}
 

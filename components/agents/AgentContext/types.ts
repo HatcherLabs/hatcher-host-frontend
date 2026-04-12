@@ -87,6 +87,7 @@ export interface AgentContextValue {
   filteredLogs: LogEntry[];
   logsEndRef: React.RefObject<HTMLDivElement | null>;
   loadLogs: () => Promise<void>;
+  wsLogsConnected: boolean;
 
   // Chat
   messages: Message[];

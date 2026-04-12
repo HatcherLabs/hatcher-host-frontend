@@ -8,10 +8,10 @@ import { useAgentContext, GlassCard, Skeleton, LOG_LEVEL_COLORS } from '../../Ag
  * (tail) with a "View All" button that navigates to the full Logs tab.
  *
  * Data comes from AgentContext's `logs` + `logsLoading` — the parent
- * dashboard tab subscribes to the log stream for us.
+ * dashboard tab subscribes to the log stream for us via WebSocket.
  */
 export function LiveLogsPreviewCard() {
-  const { logs, logsLoading, isActive, setTab } = useAgentContext();
+  const { logs, logsLoading, isActive, setTab, wsLogsConnected } = useAgentContext();
 
   return (
     <GlassCard className="!p-0 overflow-hidden">
@@ -19,12 +19,17 @@ export function LiveLogsPreviewCard() {
         <div className="flex items-center gap-2">
           <ScrollText size={14} className="text-[var(--color-accent)]" />
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Live Logs</h3>
-          {isActive && (
+          {isActive && wsLogsConnected ? (
             <span className="flex items-center gap-1 text-[9px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">
               <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
-              Live
+              Connected
             </span>
-          )}
+          ) : isActive ? (
+            <span className="flex items-center gap-1 text-[9px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded-full">
+              <span className="w-1 h-1 rounded-full bg-amber-400 animate-pulse" />
+              Reconnecting
+            </span>
+          ) : null}
         </div>
         <button
           onClick={() => setTab('logs')}

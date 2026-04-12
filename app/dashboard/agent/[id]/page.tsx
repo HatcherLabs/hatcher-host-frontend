@@ -243,6 +243,9 @@ export default function AgentManagePage() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const wsLogsRef = useRef<WebSocket | null>(null);
+  const [wsLogsConnected, setWsLogsConnected] = useState(false);
+  const wsLogsReconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wsLogsRetryCountRef = useRef(0);
   const wsStreamingMsgRef = useRef(false);
 
   // ─── Custom hooks ─────────────────────────────────────────
@@ -401,72 +404,111 @@ export default function AgentManagePage() {
     });
   }, [agent, id]);
 
-  // ─── Load logs: WebSocket streaming or static fetch ───────
+  // ─── Load logs: WebSocket streaming with auto-reconnect ───
 
   const agentStatus = agent?.status;
 
   useEffect(() => {
     if (!(tab === 'logs' || tab === 'overview') || !agentStatus) return;
+
+    // Clean up any existing connection + pending reconnect
     if (wsLogsRef.current) {
       wsLogsRef.current.close();
       wsLogsRef.current = null;
     }
+    if (wsLogsReconnectRef.current) {
+      clearTimeout(wsLogsReconnectRef.current);
+      wsLogsReconnectRef.current = null;
+    }
+    setWsLogsConnected(false);
+    wsLogsRetryCountRef.current = 0;
+
     const isActiveStatus = agentStatus === 'active';
-    const wantsStream = tab === 'logs' && isActiveStatus && (userTier === 'pro' || userTier === 'business' || userTier === 'founding_member');
-    if (wantsStream) {
-      const token = getToken();
-      const apiBase = API_URL;
-      const wsBase = apiBase.replace(/^http/, 'ws');
-      const url = `${wsBase}/agents/${id}/logs/ws${token ? `?token=${encodeURIComponent(token)}` : ''}`;
-      logs.setLogsLoading(true);
-      const ws = new WebSocket(url);
-      wsLogsRef.current = ws;
-      ws.onopen = () => { /* auth sent via query param */ };
-      ws.onmessage = (event) => {
-        try {
-          const msg = JSON.parse(event.data as string) as { type: string; timestamp?: string; level?: string; message?: string };
-          if (msg.type === 'connected') {
-            logs.setLogsLoading(false);
-          } else if (msg.type === 'log' && msg.timestamp && msg.message) {
-            const entry = {
-              timestamp: msg.timestamp,
-              level: (msg.level as 'info' | 'warn' | 'error') ?? 'info',
-              message: msg.message,
-            };
-            logs.setLogs((prev) => {
-              const next = [...prev, entry];
-              return next.length > 200 ? next.slice(next.length - 200) : next;
-            });
-          } else if (msg.type === 'disconnected') {
-            logs.setLogsLoading(false);
-          } else if (msg.type === 'error') {
-            logs.setLogsLoading(false);
+
+    // Use WebSocket streaming for all tiers when agent is active
+    if (isActiveStatus) {
+      let cancelled = false;
+
+      function connectWsLogs() {
+        if (cancelled) return;
+        const token = getToken();
+        const apiBase = API_URL;
+        const wsBase = apiBase.replace(/^http/, 'ws');
+        const url = `${wsBase}/agents/${id}/logs/ws${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+        logs.setLogsLoading(true);
+        const ws = new WebSocket(url);
+        wsLogsRef.current = ws;
+
+        ws.onopen = () => {
+          wsLogsRetryCountRef.current = 0;
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const msg = JSON.parse(event.data as string) as { type: string; timestamp?: string; level?: string; message?: string };
+            if (msg.type === 'connected') {
+              logs.setLogsLoading(false);
+              setWsLogsConnected(true);
+            } else if (msg.type === 'log' && msg.timestamp && msg.message) {
+              const entry = {
+                timestamp: msg.timestamp,
+                level: (msg.level as 'info' | 'warn' | 'error') ?? 'info',
+                message: msg.message,
+              };
+              logs.setLogs((prev) => {
+                const next = [...prev, entry];
+                return next.length > 200 ? next.slice(next.length - 200) : next;
+              });
+            } else if (msg.type === 'disconnected') {
+              logs.setLogsLoading(false);
+              setWsLogsConnected(false);
+            } else if (msg.type === 'error') {
+              logs.setLogsLoading(false);
+              setWsLogsConnected(false);
+            }
+          } catch { /* Ignore unparseable messages */ }
+        };
+
+        ws.onerror = () => {
+          logs.setLogsLoading(false);
+          setWsLogsConnected(false);
+          wsLogsRef.current = null;
+        };
+
+        ws.onclose = () => {
+          logs.setLogsLoading(false);
+          setWsLogsConnected(false);
+          wsLogsRef.current = null;
+          // Auto-reconnect with exponential backoff (max 30s)
+          if (!cancelled) {
+            const retries = wsLogsRetryCountRef.current;
+            const delay = Math.min(1000 * Math.pow(2, retries), 30_000);
+            wsLogsRetryCountRef.current = retries + 1;
+            wsLogsReconnectRef.current = setTimeout(connectWsLogs, delay);
           }
-        } catch { /* Ignore unparseable messages */ }
-      };
-      ws.onerror = () => {
-        logs.setLogsLoading(false);
-        wsLogsRef.current = null;
-        logs.loadLogs();
-      };
-      ws.onclose = () => {
-        logs.setLogsLoading(false);
-        wsLogsRef.current = null;
+        };
+      }
+
+      connectWsLogs();
+
+      return () => {
+        cancelled = true;
+        if (wsLogsRef.current) {
+          wsLogsRef.current.close();
+          wsLogsRef.current = null;
+        }
+        if (wsLogsReconnectRef.current) {
+          clearTimeout(wsLogsReconnectRef.current);
+          wsLogsReconnectRef.current = null;
+        }
+        setWsLogsConnected(false);
       };
     } else {
+      // Agent not active — do a single static fetch
       logs.loadLogs();
-      if (tab === 'logs' && isActiveStatus) {
-        const interval = setInterval(logs.loadLogs, 10_000);
-        return () => clearInterval(interval);
-      }
     }
-    return () => {
-      if (wsLogsRef.current) {
-        wsLogsRef.current.close();
-        wsLogsRef.current = null;
-      }
-    };
-  }, [tab, agentStatus, id, logs.loadLogs, userTier]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab, agentStatus, id]);
 
   // ─── Load features when integrations or config tab ────────
 
@@ -766,7 +808,7 @@ export default function AgentManagePage() {
       logs: logs.logs, logsLoading: logs.logsLoading, logFilter: logs.logFilter,
       setLogFilter: logs.setLogFilter, logSearch: logs.logSearch, setLogSearch: logs.setLogSearch,
       autoScroll: logs.autoScroll, setAutoScroll: logs.setAutoScroll,
-      filteredLogs: logs.filteredLogs, logsEndRef: logs.logsEndRef, loadLogs: logs.loadLogs,
+      filteredLogs: logs.filteredLogs, logsEndRef: logs.logsEndRef, loadLogs: logs.loadLogs, wsLogsConnected,
       messages, setMessages, input, setInput, sending,
       chatError, setChatError, chatErrorType, setChatErrorType,
       msgCount, hasUnlimitedChat, isByok, msgLimit, remaining, isLimitReached,
@@ -814,7 +856,7 @@ export default function AgentManagePage() {
       userTier,
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, agent, stats, tab, logs.logs, logs.logsLoading, logs.logFilter, logs.logSearch, logs.autoScroll, logs.filteredLogs,
+  }, [id, agent, stats, tab, logs.logs, logs.logsLoading, logs.logFilter, logs.logSearch, logs.autoScroll, logs.filteredLogs, wsLogsConnected,
     messages, input, sending, sendCooldown, chatError, chatErrorType, msgCount, msgLimit, remaining, isLimitReached,
     config.configName, config.configDesc, config.configBio, config.configLore, config.configTopics,
     config.configStyle, config.configAdjectives, config.configSystemPrompt, config.configSkills,
