@@ -451,6 +451,9 @@ export default function AgentManagePage() {
             if (msg.type === 'connected') {
               logs.setLogsLoading(false);
               setWsLogsConnected(true);
+              // Also fetch initial batch via HTTP as fallback — WS stream
+              // may not emit historical lines if Docker log file is empty/rotated
+              logs.loadLogs();
             } else if (msg.type === 'log' && msg.timestamp && msg.message) {
               const entry = {
                 timestamp: msg.timestamp,
