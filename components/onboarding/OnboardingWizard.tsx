@@ -101,7 +101,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
         className="relative w-full max-w-lg bg-[var(--bg-sidebar)] border border-[var(--border-default)] rounded-2xl shadow-2xl overflow-hidden"
       >
         {/* Close button */}
-        <button onClick={dismiss} className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-[var(--bg-card)] text-[var(--text-muted)] hover:text-white transition-colors z-10">
+        <button onClick={dismiss} aria-label="Close" className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-[var(--bg-card)] text-[var(--text-muted)] hover:text-white transition-colors z-10">
           <X className="w-4 h-4" />
         </button>
 
