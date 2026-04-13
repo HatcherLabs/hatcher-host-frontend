@@ -266,18 +266,21 @@ export default function LandingPage() {
               What will you hatch?
             </h2>
             <p className="mt-4 text-[var(--text-secondary)] text-lg max-w-2xl mx-auto">
-              Real people use Hatcher agents every day for work, trading, research, and fun.
+              From personal productivity to business automation — your AI agent, your rules.
             </p>
           </motion.div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { emoji: '📈', title: 'Crypto Tracker', desc: 'Monitor token prices, get alerts on Telegram when SOL dips' },
-              { emoji: '🔬', title: 'Research Assistant', desc: 'Summarize papers, search the web, compile reports automatically' },
-              { emoji: '💬', title: 'Customer Support', desc: 'Answer FAQs on Discord or WhatsApp 24/7 with your knowledge base' },
-              { emoji: '📝', title: 'Content Writer', desc: 'Draft blog posts, tweets, and newsletters in your brand voice' },
-              { emoji: '🤖', title: 'Code Reviewer', desc: 'Review PRs, monitor CI/CD, and triage GitHub issues' },
-              { emoji: '📊', title: 'Data Analyst', desc: 'Query databases, generate charts, and send daily reports' },
+              { emoji: '🧑‍💼', title: 'Personal Assistant', desc: 'Manage your calendar, emails, and reminders — all from Telegram' },
+              { emoji: '💪', title: 'Fitness Coach', desc: 'Track workouts, suggest routines, and keep you accountable daily' },
+              { emoji: '🍽️', title: 'Food & Nutrition', desc: 'Log meals, count calories, suggest recipes based on your goals' },
+              { emoji: '📈', title: 'Crypto Tracker', desc: 'Monitor token prices, get alerts when your portfolio moves' },
+              { emoji: '📚', title: 'Study Buddy', desc: 'Quiz you on any topic, summarize textbooks, help with homework' },
+              { emoji: '✈️', title: 'Travel Planner', desc: 'Find flights, plan itineraries, and get local recommendations' },
+              { emoji: '💰', title: 'Budget Manager', desc: 'Track expenses, set savings goals, get weekly spending reports' },
+              { emoji: '🔬', title: 'Research Assistant', desc: 'Search the web, summarize articles, compile reports for you' },
+              { emoji: '💬', title: 'Customer Support', desc: 'Answer FAQs on Discord or WhatsApp 24/7 for your business' },
             ].map((uc, i) => (
               <motion.div
                 key={uc.title}
