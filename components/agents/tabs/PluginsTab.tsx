@@ -69,17 +69,17 @@ type SubTab = 'skills' | 'plugins';
 
 const RECOMMENDED: Record<string, Array<{ name: string; displayName?: string; type: 'skill' | 'plugin'; source: string; description: string }>> = {
   openclaw: [
-    // Top 10 skills
-    { name: 'capability-evolver', displayName: 'Capability Evolver', type: 'skill', source: 'clawhub', description: 'Autonomous capability improvement and optimization' },
-    { name: 'content-summarizer', displayName: 'Content Summarizer', type: 'skill', source: 'clawhub', description: 'Summarize URLs, YouTube videos, podcasts, and local files' },
-    { name: 'gog', displayName: 'Google Workspace', type: 'skill', source: 'clawhub', description: 'Unified Gmail, Calendar, Drive, Contacts, Sheets, Docs' },
-    { name: 'github', displayName: 'GitHub', type: 'skill', source: 'clawhub', description: 'Monitor repos, PRs, issues, CI/CD failures, release notes' },
-    { name: 'calendar', displayName: 'Calendar', type: 'skill', source: 'clawhub', description: 'Proactively remind of meetings, schedule events' },
-    { name: 'ga4', displayName: 'GA4 Analytics', type: 'skill', source: 'clawhub', description: 'Automated natural language summaries of website traffic' },
-    { name: 'bird', displayName: 'Twitter/X', type: 'skill', source: 'clawhub', description: 'Search keywords, check feeds, pull social data from X' },
-    { name: 'todoist', displayName: 'Todoist', type: 'skill', source: 'clawhub', description: 'Sync tasks and notes with Todoist' },
-    { name: 'email-send', displayName: 'Email Sender', type: 'skill', source: 'clawhub', description: 'Draft and send emails hands-free' },
-    { name: 'home-assistant', displayName: 'Home Assistant', type: 'skill', source: 'clawhub', description: 'Natural language smart home control' },
+    // Top 10 skills — verified slugs, no external binary deps
+    { name: 'github', displayName: 'GitHub', type: 'skill', source: 'clawhub', description: 'Manage repos, PRs, issues, CI runs via gh CLI' },
+    { name: 'in-depth-research', displayName: 'Deep Research', type: 'skill', source: 'clawhub', description: 'Multi-source investigation with methodology tracking' },
+    { name: 'crypto-market-data', displayName: 'Crypto Market Data', type: 'skill', source: 'clawhub', description: 'Real-time prices, company profiles — no API key needed' },
+    { name: 'code-quality', displayName: 'Code Quality', type: 'skill', source: 'clawhub', description: 'Coding style standards, security guidelines, accessibility' },
+    { name: 'human-writing', displayName: 'Human Writing', type: 'skill', source: 'clawhub', description: 'Write naturally human content — no AI tells, no fluff' },
+    { name: 'notion-skill', displayName: 'Notion', type: 'skill', source: 'clawhub', description: 'Work with Notion pages and databases via official API' },
+    { name: 'todoist-task-manager', displayName: 'Todoist', type: 'skill', source: 'clawhub', description: 'Manage tasks via todoist CLI — list, add, complete, delete' },
+    { name: 'desearch-web-search', displayName: 'Web Search', type: 'skill', source: 'clawhub', description: 'Real-time SERP-style search results with URLs and snippets' },
+    { name: 'neural-memory', displayName: 'Neural Memory', type: 'skill', source: 'clawhub', description: 'Associative memory with spreading activation for recall' },
+    { name: 'market-research-agent', displayName: 'Market Research', type: 'skill', source: 'clawhub', description: 'Structured market research — size, trends, competitors' },
     // Top 10 plugins
     { name: 'oh-my-browser', displayName: 'Oh My Browser', type: 'plugin', source: 'clawhub-plugin', description: 'Let AI agents use your real browser session' },
     { name: 'mem0-plugin', displayName: 'Mem0 Memory', type: 'plugin', source: 'clawhub-plugin', description: 'Mem0 memory backend for OpenClaw' },
@@ -87,10 +87,10 @@ const RECOMMENDED: Record<string, Array<{ name: string; displayName?: string; ty
     { name: 'stellar-agent-wallet', displayName: 'Stellar Wallet', type: 'plugin', source: 'clawhub-plugin', description: 'Stellar USDC wallet for AI agents' },
     { name: 'wasm-sandbox', displayName: 'WASM Sandbox', type: 'plugin', source: 'clawhub-plugin', description: 'Safe sandboxed code execution via WebAssembly' },
     { name: 'stayfinder', displayName: 'StayFinder', type: 'plugin', source: 'clawhub-plugin', description: 'Live hotel and vacation rental search' },
-    { name: 'whatsapp-cli', displayName: 'WhatsApp CLI', type: 'plugin', source: 'clawhub-plugin', description: 'Draft and send WhatsApp messages hands-free' },
-    { name: 'notion', displayName: 'Notion', type: 'plugin', source: 'clawhub-plugin', description: 'Sync pages, databases, and tasks with Notion' },
-    { name: 'csv-json', displayName: 'CSV/JSON Tools', type: 'plugin', source: 'clawhub-plugin', description: 'Parse CSV files and transform JSON data' },
-    { name: 'pdf-reader', displayName: 'PDF Reader', type: 'plugin', source: 'clawhub-plugin', description: 'Read and extract content from PDF documents' },
+    { name: 'chrome-for-openclaw', displayName: 'Chrome CDP', type: 'plugin', source: 'clawhub-plugin', description: 'Chrome DevTools Protocol for browser automation' },
+    { name: 'datagate', displayName: 'Datagate', type: 'plugin', source: 'clawhub-plugin', description: 'Structured data extraction and transformation' },
+    { name: 'formatgate', displayName: 'Formatgate', type: 'plugin', source: 'clawhub-plugin', description: 'Output formatting and document generation' },
+    { name: 'diffgate', displayName: 'Diffgate', type: 'plugin', source: 'clawhub-plugin', description: 'Code diff analysis and review' },
   ],
   hermes: [
     { name: '42-evey/hermes-plugins', type: 'plugin', source: 'github', description: '23 plugins: autonomy, telemetry, safety, memory' },
