@@ -120,16 +120,18 @@ const RECOMMENDED: Record<string, Array<{ name: string; displayName?: string; ty
     { name: '@elizaos/plugin-web-search', displayName: 'Web Search', type: 'plugin', source: 'elizaos-registry', description: 'Search the web for real-time information' },
   ],
   milady: [
-    { name: 'milady-development', type: 'skill', source: 'milady-skills', description: 'Agent self-modification skill' },
+    // Skills (from milady-ai/skills GitHub repo)
+    { name: 'milady-development', displayName: 'Development', type: 'skill', source: 'milady-skills', description: 'Agent self-modification and development skill' },
+    { name: 'binance-algo', displayName: 'Binance Algo', type: 'skill', source: 'milady-skills', description: 'Algorithmic trading strategies for Binance' },
+    { name: 'bags', displayName: 'Bags', type: 'skill', source: 'milady-skills', description: 'Portfolio and token bag management' },
+    // Plugins (from ElizaOS registry)
     { name: '@elizaos/plugin-image', displayName: 'Image Generation', type: 'plugin', source: 'elizaos-registry', description: 'Generate images with AI models' },
     { name: '@elizaos/plugin-solana', displayName: 'Solana', type: 'plugin', source: 'elizaos-registry', description: 'Solana blockchain interactions, token transfers' },
     { name: '@elizaos/plugin-evm', displayName: 'EVM Chains', type: 'plugin', source: 'elizaos-registry', description: 'Ethereum, Polygon, Arbitrum, Base interactions' },
     { name: '@elizaos/plugin-tts', displayName: 'Text to Speech', type: 'plugin', source: 'elizaos-registry', description: 'Convert text to natural speech' },
-    { name: '@elizaos/plugin-video', displayName: 'Video', type: 'plugin', source: 'elizaos-registry', description: 'Video generation and processing' },
     { name: '@elizaos/plugin-farcaster', displayName: 'Farcaster', type: 'plugin', source: 'elizaos-registry', description: 'Farcaster social protocol integration' },
     { name: '@elizaos/plugin-github', displayName: 'GitHub', type: 'plugin', source: 'elizaos-registry', description: 'GitHub repo management and automation' },
     { name: '@elizaos/plugin-coinbase', displayName: 'Coinbase', type: 'plugin', source: 'elizaos-registry', description: 'Coinbase trading and wallet integration' },
-    { name: '@elizaos/plugin-web-search', displayName: 'Web Search', type: 'plugin', source: 'elizaos-registry', description: 'Search the web for real-time information' },
   ],
 };
 
@@ -725,7 +727,11 @@ export function PluginsTab() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={`Search ${agent?.framework === 'elizaos' || agent?.framework === 'milady' ? 'ElizaOS' : 'ClawHub'} ${subTab}...`}
+              placeholder={`Search ${
+                agent?.framework === 'elizaos' ? 'ElizaOS'
+                : agent?.framework === 'milady' ? (subTab === 'skills' ? 'Milady' : 'ElizaOS')
+                : 'ClawHub'
+              } ${subTab}...`}
               className="w-full pl-9 pr-3 py-1.5 text-sm rounded-lg bg-white/[0.04] border border-white/10 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/40"
             />
           </div>
