@@ -762,6 +762,41 @@ export default function ExplorePage() {
                   </span>
                 </div>
               )}
+
+              {/* ── Create Your Own CTA ─────────────────── */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="mt-16 mb-4"
+              >
+                <div className={cn(cardClass, 'p-8 sm:p-10 text-center relative overflow-hidden')}>
+                  <div className="absolute inset-0 bg-gradient-to-br from-[rgba(6,182,212,0.04)] to-[rgba(168,85,247,0.04)]" />
+                  <div className="relative">
+                    <div className="flex items-center justify-center gap-3 mb-4">
+                      {(['openclaw', 'hermes', 'elizaos', 'milady'] as const).map((fw) => (
+                        <div key={fw} className="w-10 h-10 rounded-full opacity-60">
+                          <FrameworkAvatar framework={fw} size={40} />
+                        </div>
+                      ))}
+                    </div>
+                    <h3 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mb-2">
+                      Build your own agent
+                    </h3>
+                    <p className="text-[var(--text-muted)] text-sm max-w-md mx-auto mb-6">
+                      Choose from 4 frameworks, 200+ templates, and deploy in under 2 minutes. Free tier included.
+                    </p>
+                    <Link
+                      href={isAuthenticated ? '/create' : '/register'}
+                      className="btn-primary inline-flex items-center gap-2"
+                    >
+                      <Plus className="w-4 h-4" />
+                      {isAuthenticated ? 'Create Agent' : 'Get Started Free'}
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
             </>
           )}
         </div>

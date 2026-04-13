@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import {
+  AlertTriangle,
   Bell,
   Server,
   CreditCard,
@@ -30,6 +31,9 @@ const ICON_MAP: Record<string, typeof Server> = {
   agent_started: Server,
   agent_stopped: Server,
   agent_created: Plus,
+  agent_error: AlertTriangle,
+  agent_restarted: Server,
+  workspace_quota: AlertTriangle,
   subscription: CreditCard,
   subscription_confirmed: CreditCard,
   payment: CreditCard,
@@ -47,6 +51,9 @@ const ICON_COLOR_MAP: Record<string, string> = {
   agent_started: 'text-emerald-400 bg-emerald-500/15',
   agent_stopped: 'text-amber-400 bg-amber-500/15',
   agent_created: 'text-[var(--color-accent)] bg-[var(--color-accent)]/15',
+  agent_error: 'text-red-400 bg-red-500/15',
+  agent_restarted: 'text-blue-400 bg-blue-500/15',
+  workspace_quota: 'text-orange-400 bg-orange-500/15',
   agent: 'text-emerald-400 bg-emerald-500/15',
   subscription: 'text-purple-400 bg-purple-500/15',
   subscription_confirmed: 'text-purple-400 bg-purple-500/15',
@@ -250,6 +257,7 @@ export function NotificationCenter() {
 
                   // Derive a navigation target from explicit link or notification type
                   const href: string | null = n.link
+                    || (n.type === 'workspace_quota' ? '/dashboard' : null)
                     || (n.type.startsWith('agent') || n.type === 'feature' ? '/dashboard' : null)
                     || (n.type === 'subscription' || n.type === 'subscription_confirmed' || n.type === 'payment' ? '/dashboard/billing' : null)
                     || (n.type.startsWith('team') ? '/dashboard/team' : null)
