@@ -50,9 +50,8 @@ interface AvailableItem {
 }
 
 interface PluginLimits {
-  installed: number;
+  used: number;
   max: number;
-  tierName: string;
 }
 
 interface BundledSkill {
@@ -70,12 +69,28 @@ type SubTab = 'skills' | 'plugins';
 
 const RECOMMENDED: Record<string, Array<{ name: string; displayName?: string; type: 'skill' | 'plugin'; source: string; description: string }>> = {
   openclaw: [
-    { name: 'oh-my-browser', type: 'plugin', source: 'clawhub-plugin', description: 'Let AI agents use your real browser session' },
-    { name: 'mem0-plugin', type: 'plugin', source: 'clawhub-plugin', description: 'Mem0 memory backend for OpenClaw' },
-    { name: 'hivemind', type: 'plugin', source: 'clawhub-plugin', description: 'Cloud-backed persistent shared memory' },
-    { name: 'stellar-agent-wallet', type: 'plugin', source: 'clawhub-plugin', description: 'Stellar USDC wallet for AI agents' },
-    { name: 'stayfinder', type: 'plugin', source: 'clawhub-plugin', description: 'Live hotel and vacation rental search' },
-    { name: 'wasm-sandbox', type: 'plugin', source: 'clawhub-plugin', description: 'Wasm sandbox for safe code execution' },
+    // Top 10 skills
+    { name: 'capability-evolver', displayName: 'Capability Evolver', type: 'skill', source: 'clawhub', description: 'Autonomous capability improvement and optimization' },
+    { name: 'content-summarizer', displayName: 'Content Summarizer', type: 'skill', source: 'clawhub', description: 'Summarize URLs, YouTube videos, podcasts, and local files' },
+    { name: 'gog', displayName: 'Google Workspace', type: 'skill', source: 'clawhub', description: 'Unified Gmail, Calendar, Drive, Contacts, Sheets, Docs' },
+    { name: 'github', displayName: 'GitHub', type: 'skill', source: 'clawhub', description: 'Monitor repos, PRs, issues, CI/CD failures, release notes' },
+    { name: 'calendar', displayName: 'Calendar', type: 'skill', source: 'clawhub', description: 'Proactively remind of meetings, schedule events' },
+    { name: 'ga4', displayName: 'GA4 Analytics', type: 'skill', source: 'clawhub', description: 'Automated natural language summaries of website traffic' },
+    { name: 'bird', displayName: 'Twitter/X', type: 'skill', source: 'clawhub', description: 'Search keywords, check feeds, pull social data from X' },
+    { name: 'todoist', displayName: 'Todoist', type: 'skill', source: 'clawhub', description: 'Sync tasks and notes with Todoist' },
+    { name: 'email-send', displayName: 'Email Sender', type: 'skill', source: 'clawhub', description: 'Draft and send emails hands-free' },
+    { name: 'home-assistant', displayName: 'Home Assistant', type: 'skill', source: 'clawhub', description: 'Natural language smart home control' },
+    // Top 10 plugins
+    { name: 'oh-my-browser', displayName: 'Oh My Browser', type: 'plugin', source: 'clawhub-plugin', description: 'Let AI agents use your real browser session' },
+    { name: 'mem0-plugin', displayName: 'Mem0 Memory', type: 'plugin', source: 'clawhub-plugin', description: 'Mem0 memory backend for OpenClaw' },
+    { name: 'hivemind', displayName: 'Hivemind', type: 'plugin', source: 'clawhub-plugin', description: 'Cloud-backed persistent shared memory' },
+    { name: 'stellar-agent-wallet', displayName: 'Stellar Wallet', type: 'plugin', source: 'clawhub-plugin', description: 'Stellar USDC wallet for AI agents' },
+    { name: 'wasm-sandbox', displayName: 'WASM Sandbox', type: 'plugin', source: 'clawhub-plugin', description: 'Safe sandboxed code execution via WebAssembly' },
+    { name: 'stayfinder', displayName: 'StayFinder', type: 'plugin', source: 'clawhub-plugin', description: 'Live hotel and vacation rental search' },
+    { name: 'whatsapp-cli', displayName: 'WhatsApp CLI', type: 'plugin', source: 'clawhub-plugin', description: 'Draft and send WhatsApp messages hands-free' },
+    { name: 'notion', displayName: 'Notion', type: 'plugin', source: 'clawhub-plugin', description: 'Sync pages, databases, and tasks with Notion' },
+    { name: 'csv-json', displayName: 'CSV/JSON Tools', type: 'plugin', source: 'clawhub-plugin', description: 'Parse CSV files and transform JSON data' },
+    { name: 'pdf-reader', displayName: 'PDF Reader', type: 'plugin', source: 'clawhub-plugin', description: 'Read and extract content from PDF documents' },
   ],
   hermes: [
     { name: '42-evey/hermes-plugins', type: 'plugin', source: 'github', description: '23 plugins: autonomy, telemetry, safety, memory' },
@@ -370,13 +385,16 @@ export function PluginsTab() {
 
   const installedNames = useMemo(() => new Set(installed.map(i => i.name)), [installed]);
 
-  const filteredAvailable = useMemo(() => {
+  // Search results: only populated when user is actively searching
+  const searchResults = useMemo(() => {
+    if (!search.trim()) return [];
     const items = subTab === 'skills' ? availableSkills : availablePlugins;
-    if (!search.trim()) return items.filter(i => !installedNames.has(i.name));
     const q = search.toLowerCase();
     return items.filter(i =>
       !installedNames.has(i.name) &&
-      (i.name.toLowerCase().includes(q) || (i.description?.toLowerCase().includes(q) ?? false))
+      (i.name.toLowerCase().includes(q) ||
+       (i.displayName?.toLowerCase().includes(q) ?? false) ||
+       (i.description?.toLowerCase().includes(q) ?? false))
     );
   }, [subTab, availableSkills, availablePlugins, search, installedNames]);
 
@@ -445,7 +463,7 @@ export function PluginsTab() {
 
   // ─── Render ─────────────────────────────────────────────────
 
-  const atLimit = limits ? limits.installed >= limits.max : false;
+  const atLimit = limits ? limits.used >= limits.max : false;
 
   return (
     <motion.div key="plugins" variants={tabContentVariants} initial="enter" animate="center" exit="exit" className="space-y-5">
@@ -460,7 +478,7 @@ export function PluginsTab() {
                 ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
                 : 'bg-[var(--color-accent)]/10 text-[var(--color-accent)] border-[var(--color-accent)]/30'
             }`}>
-              {limits.installed}/{limits.max} installed
+              {limits.used}/{limits.max} installed
             </span>
           )}
         </div>
@@ -478,7 +496,7 @@ export function PluginsTab() {
         <GlassCard className="!p-3 flex items-center gap-3 border-amber-500/20">
           <AlertTriangle size={16} className="text-amber-400 shrink-0" />
           <p className="text-sm text-[var(--text-secondary)]">
-            You've reached the {limits.tierName} limit of {limits.max} plugins.{' '}
+            You've reached the limit of {limits.max} plugins.{' '}
             <a href="/dashboard/settings/billing" className="text-[var(--color-accent)] hover:underline inline-flex items-center gap-0.5">
               Upgrade <ArrowUpRight size={12} />
             </a>
@@ -680,51 +698,60 @@ export function PluginsTab() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={`Search ${subTab}...`}
+              placeholder={`Search ClawHub ${subTab}...`}
               className="w-full pl-9 pr-3 py-1.5 text-sm rounded-lg bg-white/[0.04] border border-white/10 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/40"
             />
           </div>
         </div>
 
-        {filteredAvailable.length > 0 ? (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {filteredAvailable.map((item) => (
-              <GlassCard key={item.name} className="!p-4 flex flex-col gap-2">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-[var(--text-primary)] truncate">{item.displayName || item.name}</p>
-                    {item.description && (
-                      <p className="text-xs text-[var(--text-muted)] mt-0.5 line-clamp-2">{item.description}</p>
+        {search.trim() ? (
+          /* Search results from full ClawHub catalog */
+          searchResults.length > 0 ? (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {searchResults.map((item) => (
+                <GlassCard key={item.name} className="!p-4 flex flex-col gap-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-[var(--text-primary)] truncate">{item.displayName || item.name}</p>
+                      {item.description && (
+                        <p className="text-xs text-[var(--text-muted)] mt-0.5 line-clamp-2">{item.description}</p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => handleInstall(item.name, subTab === 'skills' ? 'skill' : 'plugin', item.source)}
+                      disabled={!!installing || atLimit}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                      title={atLimit ? 'Plugin limit reached' : `Install ${item.name}`}
+                    >
+                      {installing === item.name ? (
+                        <Loader2 size={12} className="animate-spin" />
+                      ) : (
+                        <Download size={12} />
+                      )}
+                      Install
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <TypeBadge type={subTab === 'skills' ? 'skill' : 'plugin'} />
+                    <SourceBadge source={item.source} />
+                    {item.requiresRestart && (
+                      <span className="inline-flex items-center gap-1 text-[11px] text-amber-400">
+                        <RotateCcw size={10} /> Needs restart
+                      </span>
                     )}
                   </div>
-                  <button
-                    onClick={() => handleInstall(item.name, subTab === 'skills' ? 'skill' : 'plugin', item.source)}
-                    disabled={!!installing || atLimit}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
-                    title={atLimit ? 'Plugin limit reached' : `Install ${item.name}`}
-                  >
-                    {installing === item.name ? (
-                      <Loader2 size={12} className="animate-spin" />
-                    ) : (
-                      <Download size={12} />
-                    )}
-                    Install
-                  </button>
-                </div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <TypeBadge type={subTab === 'skills' ? 'skill' : 'plugin'} />
-                  <SourceBadge source={item.source} />
-                  {item.requiresRestart && (
-                    <span className="inline-flex items-center gap-1 text-[11px] text-amber-400">
-                      <RotateCcw size={10} /> Needs restart
-                    </span>
-                  )}
-                </div>
-              </GlassCard>
-            ))}
-          </div>
-        ) : !search.trim() && recommendedItems.length > 0 ? (
-          /* Recommended section — shown when available list is empty and no search */
+                </GlassCard>
+              ))}
+            </div>
+          ) : (
+            <GlassCard className="text-center py-6">
+              <p className="text-sm text-[var(--text-muted)]">
+                No {subTab} matching &ldquo;{search}&rdquo; &mdash; try installing by name below
+              </p>
+            </GlassCard>
+          )
+        ) : recommendedItems.length > 0 ? (
+          /* Recommended section — default view when not searching */
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Star size={14} className="text-amber-400" />
@@ -763,9 +790,7 @@ export function PluginsTab() {
         ) : (
           <GlassCard className="text-center py-6">
             <p className="text-sm text-[var(--text-muted)]">
-              {search.trim()
-                ? `No ${subTab} matching "${search}"`
-                : `Browse available ${subTab} above or install by name`}
+              Search ClawHub or install by name below
             </p>
           </GlassCard>
         )}
@@ -773,9 +798,11 @@ export function PluginsTab() {
         {/* ─── 4. Manual Install Form ───────────────────────── */}
         <GlassCard className="!p-4">
           <p className="text-xs text-[var(--text-muted)] mb-2">
-            Install by name — paste a {subTab === 'skills' ? 'skill' : 'plugin'} name
-            {agent?.framework === 'openclaw' && subTab === 'plugins' ? ' from ClawHub' : ''}
-            {agent?.framework === 'hermes' && subTab === 'plugins' ? ' (user/repo from GitHub)' : ''}
+            {agent?.framework === 'openclaw'
+              ? `Install by name — paste a ${subTab === 'skills' ? 'skill' : 'plugin'} slug from ClawHub`
+              : agent?.framework === 'hermes' && subTab === 'plugins'
+                ? 'Install by name — paste a GitHub user/repo'
+                : `Install by name — paste a ${subTab === 'skills' ? 'skill' : 'plugin'} name`}
           </p>
           <div className="flex gap-2">
             <input

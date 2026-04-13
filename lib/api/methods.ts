@@ -1528,9 +1528,8 @@ export const api = {
         }>;
       };
       limits: {
-        installed: number;
+        used: number;
         max: number;
-        tierName: string;
       };
     }>(`/agents/${agentId}/plugins`),
 
