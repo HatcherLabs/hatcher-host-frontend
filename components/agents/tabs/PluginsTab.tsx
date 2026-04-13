@@ -80,17 +80,17 @@ const RECOMMENDED: Record<string, Array<{ name: string; displayName?: string; ty
     { name: 'desearch-web-search', displayName: 'Web Search', type: 'skill', source: 'clawhub', description: 'Real-time SERP-style search results with URLs and snippets' },
     { name: 'neural-memory', displayName: 'Neural Memory', type: 'skill', source: 'clawhub', description: 'Associative memory with spreading activation for recall' },
     { name: 'market-research-agent', displayName: 'Market Research', type: 'skill', source: 'clawhub', description: 'Structured market research — size, trends, competitors' },
-    // Top 10 plugins
-    { name: 'oh-my-browser', displayName: 'Oh My Browser', type: 'plugin', source: 'clawhub-plugin', description: 'Let AI agents use your real browser session' },
-    { name: 'mem0-plugin', displayName: 'Mem0 Memory', type: 'plugin', source: 'clawhub-plugin', description: 'Mem0 memory backend for OpenClaw' },
-    { name: 'hivemind', displayName: 'Hivemind', type: 'plugin', source: 'clawhub-plugin', description: 'Cloud-backed persistent shared memory' },
-    { name: 'stellar-agent-wallet', displayName: 'Stellar Wallet', type: 'plugin', source: 'clawhub-plugin', description: 'Stellar USDC wallet for AI agents' },
-    { name: 'wasm-sandbox', displayName: 'WASM Sandbox', type: 'plugin', source: 'clawhub-plugin', description: 'Safe sandboxed code execution via WebAssembly' },
-    { name: 'stayfinder', displayName: 'StayFinder', type: 'plugin', source: 'clawhub-plugin', description: 'Live hotel and vacation rental search' },
-    { name: 'chrome-for-openclaw', displayName: 'Chrome CDP', type: 'plugin', source: 'clawhub-plugin', description: 'Chrome DevTools Protocol for browser automation' },
-    { name: 'datagate', displayName: 'Datagate', type: 'plugin', source: 'clawhub-plugin', description: 'Structured data extraction and transformation' },
-    { name: 'formatgate', displayName: 'Formatgate', type: 'plugin', source: 'clawhub-plugin', description: 'Output formatting and document generation' },
-    { name: 'diffgate', displayName: 'Diffgate', type: 'plugin', source: 'clawhub-plugin', description: 'Code diff analysis and review' },
+    // Top 10 plugins — npm packages
+    { name: '@openclaw/openviking', displayName: 'OpenViking Memory', type: 'plugin', source: 'npm', description: 'Long-term memory with auto-recall and context engine' },
+    { name: '@sonicbotman/lobster-press', displayName: 'Lobster Press', type: 'plugin', source: 'npm', description: 'Cognitive memory system for AI agents' },
+    { name: '@memwyre/openclaw-plugin', displayName: 'MemWyre', type: 'plugin', source: 'npm', description: 'Persistent memory integration for OpenClaw' },
+    { name: 'openclaw-engram', displayName: 'Engram Memory', type: 'plugin', source: 'npm', description: 'Persistent memory service connection' },
+    { name: '@echomem/echo-memory-cloud-openclaw-plugin', displayName: 'Echo Memory', type: 'plugin', source: 'npm', description: 'Sync local markdown memory to Echo Memory Cloud' },
+    { name: '@waiaas/openclaw-plugin', displayName: 'WAIaaS Wallet', type: 'plugin', source: 'npm', description: 'AI agent wallet tools for OpenClaw' },
+    { name: '@agentrux/agentrux-openclaw-plugin', displayName: 'AgenTrux', type: 'plugin', source: 'npm', description: 'Agent-to-Agent authenticated communication' },
+    { name: '@artflo-ai/artflo-openclaw-plugin', displayName: 'Artflo Canvas', type: 'plugin', source: 'npm', description: 'Connect to Artflo canvas for visual AI' },
+    { name: 'clawsocial-plugin', displayName: 'ClawSocial', type: 'plugin', source: 'npm', description: 'Social discovery for AI agents' },
+    { name: '@clawchatsai/connector', displayName: 'ClawChats', type: 'plugin', source: 'npm', description: 'P2P tunnel and local API bridge' },
   ],
   hermes: [
     { name: '42-evey/hermes-plugins', type: 'plugin', source: 'github', description: '23 plugins: autonomy, telemetry, safety, memory' },
@@ -371,7 +371,7 @@ export function PluginsTab() {
     let type: 'skill' | 'plugin' = subTab === 'skills' ? 'skill' : 'plugin';
     let source = 'clawhub';
     if (type === 'plugin') {
-      if (fw === 'openclaw') source = 'clawhub-plugin';
+      if (fw === 'openclaw') source = 'npm';
       else if (fw === 'hermes') source = 'github';
       else source = 'elizaos-registry';
     } else if (fw === 'milady') {
@@ -816,7 +816,7 @@ export function PluginsTab() {
                   : agent?.framework === 'hermes'
                     ? 'e.g. 42-evey/hermes-plugins'
                     : agent?.framework === 'openclaw'
-                      ? 'e.g. oh-my-browser'
+                      ? 'e.g. @openclaw/openviking'
                       : 'e.g. @elizaos/plugin-image'
               }
               className="flex-1 px-3 py-1.5 text-sm rounded-lg bg-white/[0.04] border border-white/10 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/40"
