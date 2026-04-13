@@ -63,6 +63,10 @@ function getTabs(framework?: string): TabDef[] {
     ...(framework === 'elizaos' || framework === 'openclaw'
       ? [{ id: 'sessions' as const, label: 'Sessions', icon: <MessageSquare size={18} />, group: 'data' as const }]
       : []),
+    // Knowledge tab: RAG document uploads for elizaos and milady agents.
+    ...(framework === 'elizaos' || framework === 'milady'
+      ? [{ id: 'knowledge' as const, label: 'Knowledge', icon: <BookOpen size={18} />, group: 'data' as const }]
+      : []),
     { id: 'files', label: 'Files', icon: <FolderOpen size={18} />, group: 'data' },
     // Workspace viewer — openclaw (managed) and managed hermes. Read-only
     // tree of the agent's workspace. Free for all users.

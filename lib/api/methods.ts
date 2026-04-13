@@ -1710,4 +1710,22 @@ export const api = {
       body: JSON.stringify({ messageId, rating }),
     }),
 
+  // Knowledge base (ElizaOS / Milady RAG documents)
+  getKnowledge: (agentId: string) =>
+    req<{ files: Array<{ name: string; size: number; createdAt: string }>; totalFiles: number }>(`/agents/${agentId}/knowledge`),
+
+  uploadKnowledge: (agentId: string, filename: string, content: string) =>
+    req<{ written: boolean; filename: string; size: number }>(`/agents/${agentId}/knowledge`, {
+      method: 'POST',
+      body: JSON.stringify({ filename, content }),
+    }),
+
+  readKnowledge: (agentId: string, filename: string) =>
+    req<{ filename: string; content: string }>(`/agents/${agentId}/knowledge/${encodeURIComponent(filename)}`),
+
+  deleteKnowledge: (agentId: string, filename: string) =>
+    req<{ deleted: boolean; filename: string }>(`/agents/${agentId}/knowledge/${encodeURIComponent(filename)}`, {
+      method: 'DELETE',
+    }),
+
 };
