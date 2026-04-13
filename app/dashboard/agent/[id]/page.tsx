@@ -25,6 +25,7 @@ import {
   Square,
   RotateCcw,
   Trash2,
+  Share2,
 } from 'lucide-react';
 import {
   AgentContext,
@@ -998,6 +999,25 @@ export default function AgentManagePage() {
                   <span className="hidden sm:inline">{actions.actionLoading === 'start' ? 'Starting...' : 'Start'}</span>
                 </button>
               )}
+              <button
+                onClick={() => {
+                  const fw = agent?.framework || 'openclaw';
+                  const name = agent?.name || 'My Agent';
+                  const desc = agent?.description || 'an AI agent';
+                  const text = `Check out "${name}" — ${desc}. Built on Hatcher with ${fw}.\n\nhatcher.host`;
+                  if (navigator.share) {
+                    navigator.share({ title: name, text, url: 'https://hatcher.host' }).catch(() => {});
+                  } else {
+                    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+                    window.open(tweetUrl, '_blank', 'width=550,height=420');
+                  }
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-accent)]/10 transition-all"
+                title="Share agent"
+              >
+                <Share2 size={13} />
+                <span className="hidden sm:inline">Share</span>
+              </button>
               <button
                 onClick={actions.handleDelete}
                 disabled={actions.deleting}
