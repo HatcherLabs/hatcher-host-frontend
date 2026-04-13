@@ -31,7 +31,6 @@ import {
   Database,
   HardDrive,
   Server,
-  Container,
   Download,
   Play,
   BarChart3,
@@ -132,6 +131,25 @@ function FrameworkTag({ framework = 'openclaw' }: { framework?: string }) {
   return <span className={`fw-tag ${meta.style}`}>{meta.label}</span>;
 }
 
+// ── Tier badge ──────────────────────────────────────────────
+const TIER_STYLES: Record<string, string> = {
+  free: 'text-[var(--text-muted)] bg-[rgba(46,43,74,0.3)] border-[var(--border-default)]',
+  starter: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+  pro: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+  business: 'text-pink-400 bg-pink-500/10 border-pink-500/20',
+  founding_member: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
+  banned: 'text-red-400 bg-red-500/10 border-red-500/20',
+};
+function TierBadge({ tier }: { tier: string }) {
+  const style = TIER_STYLES[tier] ?? TIER_STYLES.free;
+  const label = tier === 'founding_member' ? 'Founding' : (tier || 'free');
+  return (
+    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border uppercase ${style}`}>
+      {label}
+    </span>
+  );
+}
+
 // ── Admin agent type ─────────────────────────────────────────
 type AdminAgent = Agent & { ownerUsername?: string; ownerWallet: string | null };
 
@@ -190,10 +208,15 @@ export default function AdminPage() {
   const [agentsPagination, setAgentsPagination] = useState<{ total: number; hasMore: boolean }>({ total: 0, hasMore: false });
   const [error, setError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'agents' | 'users' | 'tickets' | 'health'>('agents');
+  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'health'>('overview');
   const [ticketFilter, setTicketFilter] = useState<'all' | 'open' | 'in_progress' | 'resolved'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [userTierFilter, setUserTierFilter] = useState<string>('all');
+  const [userSortBy, setUserSortBy] = useState<'createdAt' | 'agentCount' | 'paymentCount' | 'hatchCredits'>('createdAt');
+  const [userSortDir, setUserSortDir] = useState<'asc' | 'desc'>('desc');
+  const [frameworkFilter, setFrameworkFilter] = useState<string>('all');
 
   // Action in-progress tracking
   const [actionInProgress, setActionInProgress] = useState<Record<string, string>>({});
@@ -376,6 +399,42 @@ export default function AdminPage() {
   const recentAgents = useMemo(() => agents.slice(0, 10), [agents]);
   const recentUsers = useMemo(() => users.slice(0, 10), [users]);
 
+  // ── Filtered + sorted users ────────────────────────────────
+  const filteredUsers = useMemo(() => {
+    let result = users;
+
+    if (userTierFilter !== 'all') {
+      result = result.filter((u) => u.tier === userTierFilter);
+    }
+
+    if (userSearchQuery.trim()) {
+      const q = userSearchQuery.toLowerCase();
+      result = result.filter(
+        (u) =>
+          u.username.toLowerCase().includes(q) ||
+          u.email.toLowerCase().includes(q) ||
+          (u.walletAddress ?? '').toLowerCase().includes(q)
+      );
+    }
+
+    result = [...result].sort((a, b) => {
+      const dir = userSortDir === 'asc' ? 1 : -1;
+      if (userSortBy === 'createdAt') return dir * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      if (userSortBy === 'agentCount') return dir * (a.agentCount - b.agentCount);
+      if (userSortBy === 'paymentCount') return dir * (a.paymentCount - b.paymentCount);
+      if (userSortBy === 'hatchCredits') return dir * (a.hatchCredits - b.hatchCredits);
+      return 0;
+    });
+
+    return result;
+  }, [users, userTierFilter, userSearchQuery, userSortBy, userSortDir]);
+
+  // ── Filtered agents with framework filter ──────────────────
+  const frameworkFilteredAgents = useMemo(() => {
+    if (frameworkFilter === 'all') return filteredAgents;
+    return filteredAgents.filter((a) => a.framework === frameworkFilter);
+  }, [filteredAgents, frameworkFilter]);
+
   // ── Action handlers ────────────────────────────────────────
   async function handleKill(agentId: string) {
     if (!confirm('Force-kill this agent? This will remove its container and set status to killed.')) return;
@@ -428,6 +487,25 @@ export default function AdminPage() {
     if (agentsRes.success) setAgents(Array.isArray(agentsRes.data) ? agentsRes.data : agentsRes.data.agents ?? []);
     if (usersRes.success) setUsers(Array.isArray(usersRes.data) ? usersRes.data : usersRes.data.users ?? []);
     if (ticketsRes.success) setTickets(ticketsRes.data.tickets ?? []);
+  }
+
+  async function handleBanUser(userId: string) {
+    const u = users.find((x) => x.id === userId);
+    if (!u) return;
+    const isBanned = u.tier === 'banned';
+    if (!confirm(isBanned ? `Unban user "${u.username}"?` : `Ban user "${u.username}"? This will set their tier to banned.`)) return;
+
+    const res = isBanned ? await api.adminUnbanUser(userId) : await api.adminBanUser(userId);
+    if (res.success) {
+      setUsers((prev) =>
+        prev.map((x) => (x.id === userId ? { ...x, tier: isBanned ? 'free' : 'banned' } : x))
+      );
+      if (userDetail?.id === userId) {
+        setUserDetail((prev) => prev ? { ...prev, tier: isBanned ? 'free' : 'banned' } : prev);
+      }
+    } else {
+      alert(`Failed: ${res.error ?? 'Unknown error'}`);
+    }
   }
 
   async function handleUpdateTicketStatus(ticketId: string, status: string) {
@@ -591,280 +669,16 @@ export default function AdminPage() {
           </button>
         </motion.div>
 
-        {/* ── Stat Cards ────────────────────────────────────── */}
+        {/* ── Quick Stats Row (always visible) ────────────────── */}
         {stats && (
-          <div className="space-y-4">
-            {/* Top row — 3 cols */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <StatCard
-                label="Total Users"
-                value={stats.totalUsers}
-                icon={Users}
-                iconColor="var(--color-accent)"
-              />
-              <StatCard
-                label="Total Agents"
-                value={stats.totalAgents}
-                icon={Bot}
-                iconColor="#60A5FA"
-              />
-              <StatCard
-                label="Active Agents"
-                value={stats.activeAgents}
-                icon={Activity}
-                iconColor="#4ADE80"
-              />
-            </div>
-            {/* Bottom row — 4 cols */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard
-                label="Total Payments"
-                value={stats.totalPayments}
-                icon={DollarSign}
-                iconColor="#FBBF24"
-              />
-              <StatCard
-                label="Revenue"
-                value={`$${stats.totalRevenueUsd.toFixed(2)}`}
-                icon={Wallet}
-                iconColor="#4ADE80"
-              />
-              <StatCard
-                label="Messages"
-                value={stats.totalMessages}
-                icon={MessageSquare}
-                iconColor="#60A5FA"
-              />
-              <StatCard
-                label="New Users 7d"
-                value={stats.newUsersLast7d}
-                icon={UserPlus}
-                iconColor="var(--color-accent)"
-              />
-            </div>
-            {/* Daily stats row — resets at 00:00 UTC */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard
-                label="Users Today"
-                value={stats.newUsersToday ?? 0}
-                icon={Sunrise}
-                iconColor="#34D399"
-              />
-              <StatCard
-                label="Agents Today"
-                value={stats.newAgentsToday ?? 0}
-                icon={Calendar}
-                iconColor="#818CF8"
-              />
-              <StatCard
-                label="Revenue Today"
-                value={`$${(stats.revenueToday ?? 0).toFixed(2)}`}
-                icon={DollarSign}
-                iconColor="#34D399"
-              />
-              <StatCard
-                label="Revenue 7d"
-                value={`$${(stats.revenueWeek ?? 0).toFixed(2)}`}
-                icon={TrendingUp}
-                iconColor="#FBBF24"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* ── Analytics Dashboard ─────────────────────────────── */}
-        {stats && agents.length + users.length > 0 && (
-          <div className="space-y-4">
-            {/* ROW 2 — Framework + Tier Distribution */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Framework Distribution */}
-              <motion.div className="card glass-noise p-5" variants={cardVariants}>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)]/12 flex items-center justify-center flex-shrink-0">
-                    <BarChart3 size={16} className="text-[var(--color-accent)]" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Framework Distribution</h3>
-                    <p className="text-[10px] text-[var(--text-muted)]">{stats?.totalAgents ?? agents.length} total agents</p>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  {frameworkDistribution.map((fw) => (
-                    <div key={fw.key}>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                            style={{ backgroundColor: fw.color }}
-                          />
-                          <span className="text-xs font-medium text-[var(--text-primary)]">{fw.label}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-mono text-[var(--text-secondary)]">{fw.count}</span>
-                          <span className="text-[10px] text-[var(--text-muted)] w-8 text-right">{fw.percent}%</span>
-                        </div>
-                      </div>
-                      <div className="w-full h-2 rounded-full bg-[rgba(46,43,74,0.4)] overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-700 ease-out"
-                          style={{ width: `${fw.percent}%`, backgroundColor: fw.color, minWidth: fw.count > 0 ? '4px' : '0' }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Tier Distribution */}
-              <motion.div className="card glass-noise p-5" variants={cardVariants}>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-lg bg-[#FBBF24]/12 flex items-center justify-center flex-shrink-0">
-                    <PieChart size={16} className="text-[#FBBF24]" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Tier Distribution</h3>
-                    <p className="text-[10px] text-[var(--text-muted)]">{stats?.totalUsers ?? users.length} total users</p>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  {tierDistribution.map((tier) => (
-                    <div key={tier.key}>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                            style={{ backgroundColor: tier.color }}
-                          />
-                          <span className="text-xs font-medium text-[var(--text-primary)]">{tier.label}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-mono text-[var(--text-secondary)]">{tier.count}</span>
-                          <span className="text-[10px] text-[var(--text-muted)] w-8 text-right">{tier.percent}%</span>
-                        </div>
-                      </div>
-                      <div className="w-full h-2 rounded-full bg-[rgba(46,43,74,0.4)] overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-700 ease-out"
-                          style={{ width: `${tier.percent}%`, backgroundColor: tier.color, minWidth: tier.count > 0 ? '4px' : '0' }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Stacked overview bar */}
-                <div className="mt-4 pt-3 border-t border-[var(--border-default)]">
-                  <p className="text-[10px] text-[var(--text-muted)] mb-2 uppercase tracking-wider font-semibold">Overview</p>
-                  <div className="w-full h-4 rounded-full bg-[rgba(46,43,74,0.4)] overflow-hidden flex">
-                    {tierDistribution.map((tier) => (
-                      tier.count > 0 && (
-                        <div
-                          key={tier.key}
-                          className="h-full transition-all duration-700 ease-out first:rounded-l-full last:rounded-r-full"
-                          style={{ width: `${tier.percent}%`, backgroundColor: tier.color, minWidth: '4px' }}
-                          title={`${tier.label}: ${tier.count} (${tier.percent}%)`}
-                        />
-                      )
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-
-            {/* ROW 3 — Recent Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Recent Agent Creates */}
-              <motion.div className="card glass-noise p-5" variants={cardVariants}>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-lg bg-[#4ADE80]/12 flex items-center justify-center flex-shrink-0">
-                    <TrendingUp size={16} className="text-[#4ADE80]" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Recent Agents</h3>
-                    <p className="text-[10px] text-[var(--text-muted)]">Last 10 created</p>
-                  </div>
-                </div>
-                {recentAgents.length === 0 ? (
-                  <p className="text-xs text-[var(--text-muted)] py-4 text-center">No agents yet.</p>
-                ) : (
-                  <div className="space-y-0">
-                    {recentAgents.map((agent, i) => (
-                      <div
-                        key={agent.id}
-                        className={`flex items-center justify-between py-2.5 ${i < recentAgents.length - 1 ? 'border-b border-[var(--border-default)]' : ''}`}
-                      >
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <div className="w-7 h-7 rounded-lg bg-[var(--color-accent)]/10 flex items-center justify-center flex-shrink-0">
-                            <Bot size={12} className="text-[var(--color-accent)]" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-medium text-[var(--text-primary)] truncate">{agent.name}</p>
-                            <p className="text-[10px] text-[var(--text-muted)]">
-                              by {agent.ownerUsername || 'unknown'}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                          <FrameworkTag framework={agent.framework} />
-                          <span className="text-[10px] text-[var(--text-muted)] w-16 text-right">{timeAgo(agent.createdAt)}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-
-              {/* Recent User Signups */}
-              <motion.div className="card glass-noise p-5" variants={cardVariants}>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 rounded-lg bg-[#A855F7]/12 flex items-center justify-center flex-shrink-0">
-                    <UserPlus size={16} className="text-[#A855F7]" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Recent Signups</h3>
-                    <p className="text-[10px] text-[var(--text-muted)]">Last 10 users</p>
-                  </div>
-                </div>
-                {recentUsers.length === 0 ? (
-                  <p className="text-xs text-[var(--text-muted)] py-4 text-center">No users yet.</p>
-                ) : (
-                  <div className="space-y-0">
-                    {recentUsers.map((u, i) => (
-                      <div
-                        key={u.id}
-                        className={`flex items-center justify-between py-2.5 ${i < recentUsers.length - 1 ? 'border-b border-[var(--border-default)]' : ''}`}
-                      >
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <div className="w-7 h-7 rounded-lg bg-[#A855F7]/10 flex items-center justify-center flex-shrink-0">
-                            <Users size={12} className="text-[#A855F7]" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-medium text-[var(--text-primary)] truncate">{u.username}</p>
-                            <p className="text-[10px] text-[var(--text-muted)] truncate">{u.email}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border uppercase ${
-                            u.tier === 'pro'
-                              ? 'text-amber-400 bg-amber-500/10 border-amber-500/20'
-                              : u.tier === 'business'
-                              ? 'text-pink-400 bg-pink-500/10 border-pink-500/20'
-                              : u.tier === 'starter'
-                              ? 'text-blue-400 bg-blue-500/10 border-blue-500/20'
-                              : u.tier === 'founding_member'
-                              ? 'text-purple-400 bg-purple-500/10 border-purple-500/20'
-                              : 'text-[var(--text-muted)] bg-[rgba(46,43,74,0.3)] border-[var(--border-default)]'
-                          }`}>
-                            {u.tier === 'founding_member' ? 'Founding' : (u.tier || 'free')}
-                          </span>
-                          <span className="text-[10px] text-[var(--text-muted)] w-16 text-right">{timeAgo(u.createdAt)}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+            <StatCard label="Users" value={stats.totalUsers} icon={Users} iconColor="var(--color-accent)" />
+            <StatCard label="Agents" value={stats.totalAgents} icon={Bot} iconColor="#60A5FA" />
+            <StatCard label="Active" value={stats.activeAgents} icon={Activity} iconColor="#4ADE80" />
+            <StatCard label="Revenue" value={`$${stats.totalRevenueUsd.toFixed(2)}`} icon={DollarSign} iconColor="#FBBF24" />
+            <StatCard label="Messages" value={stats.totalMessages} icon={MessageSquare} iconColor="#60A5FA" />
+            <StatCard label="Today" value={`+${stats.newUsersToday ?? 0}u / +${stats.newAgentsToday ?? 0}a`} icon={Sunrise} iconColor="#34D399" />
+            <StatCard label="Rev 7d" value={`$${(stats.revenueWeek ?? 0).toFixed(2)}`} icon={TrendingUp} iconColor="#FBBF24" />
           </div>
         )}
 
@@ -872,23 +686,203 @@ export default function AdminPage() {
         <motion.div className="card glass-noise p-5" variants={cardVariants}>
           {/* Tab switcher */}
           <div className="flex items-center gap-4 mb-5">
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)]">
-              {(['agents', 'users', 'tickets', 'health'] as const).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-2 ${
-                    activeTab === tab
-                      ? 'text-[var(--text-primary)] bg-[var(--color-accent)]/20'
-                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                  }`}
-                >
-                  {tab === 'agents' ? <Bot size={14} /> : tab === 'users' ? <Users size={14} /> : tab === 'tickets' ? <Ticket size={14} /> : <HeartPulse size={14} />}
-                  {tab === 'agents' ? 'Agents' : tab === 'users' ? 'Users' : tab === 'tickets' ? `Tickets${tickets.length ? ` (${tickets.length})` : ''}` : 'Health'}
-                </button>
-              ))}
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)] overflow-x-auto">
+              {(['overview', 'agents', 'users', 'tickets', 'health'] as const).map((tab) => {
+                const tabIcons: Record<string, React.ElementType> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, health: HeartPulse };
+                const TabIcon = tabIcons[tab] ?? BarChart3;
+                const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, health: 'Health' };
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-2 whitespace-nowrap ${
+                      activeTab === tab
+                        ? 'text-[var(--text-primary)] bg-[var(--color-accent)]/20'
+                        : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    <TabIcon size={14} />
+                    {tabLabels[tab]}
+                  </button>
+                );
+              })}
             </div>
           </div>
+
+          {/* ── Overview Tab ─────────────────────────────────── */}
+          {activeTab === 'overview' && stats && (
+            <div className="space-y-5">
+              {/* Daily stats row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatCard label="Users Today" value={stats.newUsersToday ?? 0} icon={Sunrise} iconColor="#34D399" />
+                <StatCard label="Agents Today" value={stats.newAgentsToday ?? 0} icon={Calendar} iconColor="#818CF8" />
+                <StatCard label="Revenue Today" value={`$${(stats.revenueToday ?? 0).toFixed(2)}`} icon={DollarSign} iconColor="#34D399" />
+                <StatCard label="New Users 7d" value={stats.newUsersLast7d} icon={UserPlus} iconColor="var(--color-accent)" />
+              </div>
+
+              {/* Framework + Tier Distribution */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Framework Distribution */}
+                <div className="rounded-xl border border-[var(--border-default)] p-5 bg-[var(--bg-elevated)]">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)]/12 flex items-center justify-center flex-shrink-0">
+                      <BarChart3 size={16} className="text-[var(--color-accent)]" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-[var(--text-primary)]">Framework Distribution</h3>
+                      <p className="text-[10px] text-[var(--text-muted)]">{stats.totalAgents} total agents</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    {frameworkDistribution.map((fw) => (
+                      <div key={fw.key}>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: fw.color }} />
+                            <span className="text-xs font-medium text-[var(--text-primary)]">{fw.label}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-mono text-[var(--text-secondary)]">{fw.count}</span>
+                            <span className="text-[10px] text-[var(--text-muted)] w-8 text-right">{fw.percent}%</span>
+                          </div>
+                        </div>
+                        <div className="w-full h-2 rounded-full bg-[rgba(46,43,74,0.4)] overflow-hidden">
+                          <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${fw.percent}%`, backgroundColor: fw.color, minWidth: fw.count > 0 ? '4px' : '0' }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tier Distribution */}
+                <div className="rounded-xl border border-[var(--border-default)] p-5 bg-[var(--bg-elevated)]">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 rounded-lg bg-[#FBBF24]/12 flex items-center justify-center flex-shrink-0">
+                      <PieChart size={16} className="text-[#FBBF24]" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-[var(--text-primary)]">Tier Distribution</h3>
+                      <p className="text-[10px] text-[var(--text-muted)]">{stats.totalUsers} total users</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    {tierDistribution.map((tier) => (
+                      <div key={tier.key}>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: tier.color }} />
+                            <span className="text-xs font-medium text-[var(--text-primary)]">{tier.label}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-mono text-[var(--text-secondary)]">{tier.count}</span>
+                            <span className="text-[10px] text-[var(--text-muted)] w-8 text-right">{tier.percent}%</span>
+                          </div>
+                        </div>
+                        <div className="w-full h-2 rounded-full bg-[rgba(46,43,74,0.4)] overflow-hidden">
+                          <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${tier.percent}%`, backgroundColor: tier.color, minWidth: tier.count > 0 ? '4px' : '0' }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Stacked overview bar */}
+                  <div className="mt-4 pt-3 border-t border-[var(--border-default)]">
+                    <p className="text-[10px] text-[var(--text-muted)] mb-2 uppercase tracking-wider font-semibold">Overview</p>
+                    <div className="w-full h-4 rounded-full bg-[rgba(46,43,74,0.4)] overflow-hidden flex">
+                      {tierDistribution.map((tier) => (
+                        tier.count > 0 && (
+                          <div key={tier.key} className="h-full transition-all duration-700 ease-out first:rounded-l-full last:rounded-r-full" style={{ width: `${tier.percent}%`, backgroundColor: tier.color, minWidth: '4px' }} title={`${tier.label}: ${tier.count} (${tier.percent}%)`} />
+                        )
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Activity */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Recent Agent Creates */}
+                <div className="rounded-xl border border-[var(--border-default)] p-5 bg-[var(--bg-elevated)]">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 rounded-lg bg-[#4ADE80]/12 flex items-center justify-center flex-shrink-0">
+                      <TrendingUp size={16} className="text-[#4ADE80]" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-[var(--text-primary)]">Recent Agents</h3>
+                      <p className="text-[10px] text-[var(--text-muted)]">Last 10 created</p>
+                    </div>
+                  </div>
+                  {recentAgents.length === 0 ? (
+                    <p className="text-xs text-[var(--text-muted)] py-4 text-center">No agents yet.</p>
+                  ) : (
+                    <div className="space-y-0">
+                      {recentAgents.map((agent, i) => (
+                        <Link
+                          key={agent.id}
+                          href={`/dashboard/agent/${agent.id}`}
+                          className={`flex items-center justify-between py-2.5 hover:bg-[var(--bg-hover)] -mx-2 px-2 rounded-lg transition-colors ${i < recentAgents.length - 1 ? 'border-b border-[var(--border-default)]' : ''}`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                            <div className="w-7 h-7 rounded-lg bg-[var(--color-accent)]/10 flex items-center justify-center flex-shrink-0">
+                              <Bot size={12} className="text-[var(--color-accent)]" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-medium text-[var(--text-primary)] truncate">{agent.name}</p>
+                              <p className="text-[10px] text-[var(--text-muted)]">by {agent.ownerUsername || 'unknown'}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                            <StatusBadge status={agent.status} />
+                            <FrameworkTag framework={agent.framework} />
+                            <span className="text-[10px] text-[var(--text-muted)] w-16 text-right">{timeAgo(agent.createdAt)}</span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Recent User Signups */}
+                <div className="rounded-xl border border-[var(--border-default)] p-5 bg-[var(--bg-elevated)]">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 rounded-lg bg-[#A855F7]/12 flex items-center justify-center flex-shrink-0">
+                      <UserPlus size={16} className="text-[#A855F7]" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-[var(--text-primary)]">Recent Signups</h3>
+                      <p className="text-[10px] text-[var(--text-muted)]">Last 10 users</p>
+                    </div>
+                  </div>
+                  {recentUsers.length === 0 ? (
+                    <p className="text-xs text-[var(--text-muted)] py-4 text-center">No users yet.</p>
+                  ) : (
+                    <div className="space-y-0">
+                      {recentUsers.map((u, i) => (
+                        <button
+                          key={u.id}
+                          onClick={() => loadUserDetail(u.id)}
+                          className={`flex items-center justify-between py-2.5 w-full text-left hover:bg-[var(--bg-hover)] -mx-2 px-2 rounded-lg transition-colors ${i < recentUsers.length - 1 ? 'border-b border-[var(--border-default)]' : ''}`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                            <div className="w-7 h-7 rounded-lg bg-[#A855F7]/10 flex items-center justify-center flex-shrink-0">
+                              <Users size={12} className="text-[#A855F7]" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-medium text-[var(--text-primary)] truncate">{u.username}</p>
+                              <p className="text-[10px] text-[var(--text-muted)] truncate">{u.email}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                            <TierBadge tier={u.tier} />
+                            <span className="text-[10px] text-[var(--text-muted)] w-16 text-right">{timeAgo(u.createdAt)}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* ── Agents Tab ──────────────────────────────────── */}
           {activeTab === 'agents' && (
@@ -897,44 +891,68 @@ export default function AdminPage() {
                 <h2 className="text-lg font-semibold text-[var(--text-primary)]">
                   All Agents
                   <span className="text-sm font-normal ml-2 text-[var(--text-muted)]">
-                    ({filteredAgents.length}{agentsPagination.total > agents.length ? ` of ${agentsPagination.total}` : ''})
+                    ({frameworkFilteredAgents.length}{agentsPagination.total > agents.length ? ` of ${agentsPagination.total}` : ''})
                   </span>
                 </h2>
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
-                  {/* Status filters */}
-                  <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)]">
-                    {STATUS_FILTERS.map((f) => (
-                      <button
-                        key={f.key}
-                        onClick={() => setStatusFilter(f.key)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 ${
-                          statusFilter === f.key
-                            ? 'text-[var(--text-primary)] bg-[var(--color-accent)]/20'
-                            : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                        }`}
-                      >
-                        {f.label}
-                      </button>
-                    ))}
+                <div className="flex flex-col gap-3 w-full">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    {/* Status filters */}
+                    <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)] overflow-x-auto">
+                      {STATUS_FILTERS.map((f) => (
+                        <button
+                          key={f.key}
+                          onClick={() => setStatusFilter(f.key)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 whitespace-nowrap ${
+                            statusFilter === f.key
+                              ? 'text-[var(--text-primary)] bg-[var(--color-accent)]/20'
+                              : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                          }`}
+                        >
+                          {f.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Framework filter */}
+                    <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)]">
+                      {[{ key: 'all', label: 'All FW' }, ...Object.entries(FRAMEWORK_META).map(([k, v]) => ({ key: k, label: v.label }))].map((f) => (
+                        <button
+                          key={f.key}
+                          onClick={() => setFrameworkFilter(f.key)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 whitespace-nowrap ${
+                            frameworkFilter === f.key
+                              ? 'text-[var(--text-primary)] bg-[var(--color-accent)]/20'
+                              : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                          }`}
+                        >
+                          {f.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Search */}
-                  <div className="flex items-center gap-2 flex-1 sm:flex-initial rounded-xl px-4 py-2.5 bg-[var(--bg-elevated)] border border-[var(--border-default)] transition-all duration-200 focus-within:border-[rgba(6,182,212,0.4)]">
+                  <div className="flex items-center gap-2 rounded-xl px-4 py-2.5 bg-[var(--bg-elevated)] border border-[var(--border-default)] transition-all duration-200 focus-within:border-[rgba(6,182,212,0.4)] max-w-md">
                     <Search size={16} className="text-[var(--text-muted)]" />
                     <input
                       type="text"
-                      placeholder="Search agents, wallets..."
+                      placeholder="Search agents, owners, IDs..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="bg-transparent outline-none text-sm w-full sm:w-56 text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
+                      className="bg-transparent outline-none text-sm w-full text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
                     />
+                    {searchQuery && (
+                      <button onClick={() => setSearchQuery('')} className="text-[var(--text-muted)] hover:text-[var(--text-primary)]">
+                        <XCircle size={14} />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
 
               {/* Agents Table */}
-              {filteredAgents.length === 0 ? (
+              {frameworkFilteredAgents.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16">
                   <Bot size={40} className="text-[var(--text-muted)] mb-3 opacity-40" />
                   <p className="text-sm text-[var(--text-muted)]">
@@ -946,7 +964,7 @@ export default function AdminPage() {
                   <table className="w-full text-left" style={{ tableLayout: 'auto' }}>
                     <thead>
                       <tr className="border-b border-[var(--border-default)]">
-                        {['Agent', 'Owner', 'Framework', 'Status', 'Created', 'Actions'].map(
+                        {['Agent', 'Owner', 'Framework', 'Status', 'Messages', 'Created', 'Actions'].map(
                           (header) => (
                             <th
                               key={header}
@@ -959,35 +977,42 @@ export default function AdminPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredAgents.map((agent) => {
+                      {frameworkFilteredAgents.map((agent) => {
                         const inProgress = actionInProgress[agent.id];
                         return (
                           <tr
                             key={agent.id}
                             className="transition-colors hover:bg-[var(--bg-card)] border-b border-[var(--border-default)]"
                           >
-                            {/* Agent name */}
+                            {/* Agent name — clickable */}
                             <td className="py-3.5 pr-4">
-                              <div className="flex items-center gap-3">
+                              <Link href={`/dashboard/agent/${agent.id}`} className="flex items-center gap-3 group">
                                 <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)]/12 flex items-center justify-center flex-shrink-0">
                                   <Bot size={14} className="text-[var(--color-accent)]" />
                                 </div>
                                 <div className="min-w-0">
-                                  <p className="text-sm font-medium truncate max-w-[180px] text-[var(--text-primary)]">
+                                  <p className="text-sm font-medium truncate max-w-[180px] text-[var(--text-primary)] group-hover:text-[var(--color-accent)] transition-colors">
                                     {agent.name}
+                                    <ExternalLink size={10} className="inline ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity" />
                                   </p>
                                   <p className="text-xs font-mono truncate max-w-[180px] text-[var(--text-muted)]">
                                     {agent.id.slice(0, 8)}...
                                   </p>
                                 </div>
-                              </div>
+                              </Link>
                             </td>
 
-                            {/* Owner wallet */}
+                            {/* Owner — clickable to open user detail */}
                             <td className="py-3.5 pr-4">
-                              <span className="text-xs font-mono px-2 py-1 rounded-md bg-[var(--bg-elevated)] text-[var(--text-secondary)]">
+                              <button
+                                onClick={() => {
+                                  const ownerUser = users.find((u) => u.username === agent.ownerUsername);
+                                  if (ownerUser) loadUserDetail(ownerUser.id);
+                                }}
+                                className="text-xs font-mono px-2 py-1 rounded-md bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 transition-colors cursor-pointer"
+                              >
                                 {agent.ownerUsername ?? shortenAddress(agent.ownerWallet ?? '', 4)}
-                              </span>
+                              </button>
                             </td>
 
                             {/* Framework */}
@@ -1000,6 +1025,13 @@ export default function AdminPage() {
                               <StatusBadge status={agent.status} />
                             </td>
 
+                            {/* Messages */}
+                            <td className="py-3.5 pr-4">
+                              <span className="text-xs font-mono text-[var(--text-secondary)]">
+                                {agent.messageCount?.toLocaleString() ?? 0}
+                              </span>
+                            </td>
+
                             {/* Created */}
                             <td className="py-3.5 pr-4">
                               <span className="text-xs text-[var(--text-muted)]">
@@ -1009,7 +1041,16 @@ export default function AdminPage() {
 
                             {/* Actions */}
                             <td className="py-3.5">
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1.5">
+                                {/* View button */}
+                                <Link
+                                  href={`/dashboard/agent/${agent.id}`}
+                                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20 hover:bg-[var(--color-accent)]/20"
+                                  title="View agent dashboard"
+                                >
+                                  <ExternalLink size={11} />
+                                </Link>
+
                                 {/* Pause button */}
                                 <button
                                   onClick={() => handlePause(agent.id)}
@@ -1020,30 +1061,28 @@ export default function AdminPage() {
                                     agent.status === 'restarting' ||
                                     !!inProgress
                                   }
-                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed bg-amber-400/10 text-amber-400 border border-amber-400/20 hover:bg-amber-400/20"
+                                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed bg-amber-400/10 text-amber-400 border border-amber-400/20 hover:bg-amber-400/20"
                                   title="Pause agent"
                                 >
                                   {inProgress === 'pause' ? (
-                                    <RefreshCw size={12} className="animate-spin" />
+                                    <RefreshCw size={11} className="animate-spin" />
                                   ) : (
-                                    <Pause size={12} />
+                                    <Pause size={11} />
                                   )}
-                                  Pause
                                 </button>
 
                                 {/* Kill button */}
                                 <button
                                   onClick={() => handleKill(agent.id)}
                                   disabled={agent.status === 'killed' || !!inProgress}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed bg-red-400/10 text-red-400 border border-red-400/20 hover:bg-red-400/20"
+                                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed bg-red-400/10 text-red-400 border border-red-400/20 hover:bg-red-400/20"
                                   title="Kill agent"
                                 >
                                   {inProgress === 'kill' ? (
-                                    <RefreshCw size={12} className="animate-spin" />
+                                    <RefreshCw size={11} className="animate-spin" />
                                   ) : (
-                                    <XCircle size={12} />
+                                    <XCircle size={11} />
                                   )}
-                                  Kill
                                 </button>
                               </div>
                             </td>
@@ -1078,89 +1117,167 @@ export default function AdminPage() {
           {/* ── Users Tab ───────────────────────────────────── */}
           {activeTab === 'users' && (
             <>
-              <div className="flex items-center justify-between mb-5">
-                <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-                  All Users
-                  <span className="text-sm font-normal ml-2 text-[var(--text-muted)]">
-                    ({users.length})
-                  </span>
-                </h2>
+              <div className="flex flex-col gap-3 mb-5">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+                    All Users
+                    <span className="text-sm font-normal ml-2 text-[var(--text-muted)]">
+                      ({filteredUsers.length}{filteredUsers.length !== users.length ? ` of ${users.length}` : ''})
+                    </span>
+                  </h2>
+
+                  {/* Tier filter */}
+                  <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)]">
+                    {[{ key: 'all', label: 'All' }, { key: 'free', label: 'Free' }, { key: 'starter', label: 'Starter' }, { key: 'founding_member', label: 'Founding' }, { key: 'pro', label: 'Pro' }, { key: 'business', label: 'Business' }, { key: 'banned', label: 'Banned' }].map((f) => (
+                      <button
+                        key={f.key}
+                        onClick={() => setUserTierFilter(f.key)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 whitespace-nowrap ${
+                          userTierFilter === f.key
+                            ? 'text-[var(--text-primary)] bg-[var(--color-accent)]/20'
+                            : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                        }`}
+                      >
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Search */}
+                <div className="flex items-center gap-2 rounded-xl px-4 py-2.5 bg-[var(--bg-elevated)] border border-[var(--border-default)] transition-all duration-200 focus-within:border-[rgba(6,182,212,0.4)] max-w-md">
+                  <Search size={16} className="text-[var(--text-muted)]" />
+                  <input
+                    type="text"
+                    placeholder="Search users by name, email, wallet..."
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                    className="bg-transparent outline-none text-sm w-full text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
+                  />
+                  {userSearchQuery && (
+                    <button onClick={() => setUserSearchQuery('')} className="text-[var(--text-muted)] hover:text-[var(--text-primary)]">
+                      <XCircle size={14} />
+                    </button>
+                  )}
+                </div>
               </div>
 
-              {users.length === 0 ? (
+              {filteredUsers.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16">
                   <Users size={40} className="text-[var(--text-muted)] mb-3 opacity-40" />
-                  <p className="text-sm text-[var(--text-muted)]">No users on the platform yet.</p>
+                  <p className="text-sm text-[var(--text-muted)]">
+                    {users.length === 0 ? 'No users on the platform yet.' : 'No users match your filters.'}
+                  </p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
                       <tr className="border-b border-[var(--border-default)]">
-                        {['Wallet', 'Agents', 'Payments', 'Credits', 'Joined'].map(
-                          (header) => (
-                            <th
-                              key={header}
-                              className="pb-3 pr-4 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]"
-                            >
-                              {header}
-                            </th>
-                          )
-                        )}
+                        {[
+                          { key: 'user', label: 'User', sortable: false },
+                          { key: 'tier', label: 'Tier', sortable: false },
+                          { key: 'agentCount', label: 'Agents', sortable: true },
+                          { key: 'paymentCount', label: 'Payments', sortable: true },
+                          { key: 'hatchCredits', label: 'Credits', sortable: true },
+                          { key: 'createdAt', label: 'Joined', sortable: true },
+                          { key: 'actions', label: '', sortable: false },
+                        ].map((col) => (
+                          <th
+                            key={col.key}
+                            className={`pb-3 pr-4 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] ${col.sortable ? 'cursor-pointer select-none hover:text-[var(--text-primary)]' : ''}`}
+                            onClick={() => {
+                              if (!col.sortable) return;
+                              const sortKey = col.key as typeof userSortBy;
+                              if (userSortBy === sortKey) setUserSortDir((d) => d === 'asc' ? 'desc' : 'asc');
+                              else { setUserSortBy(sortKey); setUserSortDir('desc'); }
+                            }}
+                          >
+                            <span className="flex items-center gap-1">
+                              {col.label}
+                              {col.sortable && userSortBy === col.key && (
+                                <span className="text-[var(--color-accent)]">{userSortDir === 'asc' ? ' ↑' : ' ↓'}</span>
+                              )}
+                            </span>
+                          </th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody>
-                      {users.map((user) => (
+                      {filteredUsers.map((u) => (
                         <tr
-                          key={user.id}
-                          onClick={() => loadUserDetail(user.id)}
+                          key={u.id}
+                          onClick={() => loadUserDetail(u.id)}
                           className="transition-colors hover:bg-[var(--bg-hover)] border-b border-[var(--border-default)] cursor-pointer"
                         >
                           {/* User */}
                           <td className="py-3.5 pr-4">
                             <div className="flex items-center gap-3">
                               <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)]/12 flex items-center justify-center flex-shrink-0">
-                                <Users size={14} className="text-[var(--color-accent)]" />
+                                <span className="text-xs font-bold text-[var(--color-accent)]">{u.username[0]?.toUpperCase()}</span>
                               </div>
                               <div>
-                                <span className="text-xs font-medium text-[var(--text-primary)] block">{user.username}</span>
-                                <span className="text-[10px] text-[var(--text-muted)]">{user.email}</span>
+                                <span className="text-xs font-medium text-[var(--text-primary)] block">{u.username}</span>
+                                <span className="text-[10px] text-[var(--text-muted)]">{u.email}</span>
                               </div>
-                              {user.isAdmin && (
+                              {u.isAdmin && (
                                 <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-400 uppercase">Admin</span>
                               )}
-                              {user.emailVerified === false && (
+                              {u.emailVerified === false && (
                                 <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 uppercase">Unverified</span>
                               )}
                             </div>
                           </td>
 
+                          {/* Tier */}
+                          <td className="py-3.5 pr-4">
+                            <TierBadge tier={u.tier} />
+                          </td>
+
                           {/* Agent count */}
                           <td className="py-3.5 pr-4">
-                            <span className="text-sm text-[var(--text-primary)]">
-                              {user.agentCount}
+                            <span className="text-sm font-mono text-[var(--text-primary)]">
+                              {u.agentCount}
                             </span>
                           </td>
 
                           {/* Payment count */}
                           <td className="py-3.5 pr-4">
-                            <span className="text-sm text-[var(--text-primary)]">
-                              {user.paymentCount}
+                            <span className="text-sm font-mono text-[var(--text-primary)]">
+                              {u.paymentCount}
                             </span>
                           </td>
 
                           {/* Credits */}
                           <td className="py-3.5 pr-4">
                             <span className="text-sm font-mono text-[var(--text-primary)]">
-                              {user.hatchCredits.toFixed(2)}
+                              {u.hatchCredits.toFixed(2)}
                             </span>
                           </td>
 
                           {/* Joined */}
                           <td className="py-3.5 pr-4">
                             <span className="text-xs text-[var(--text-muted)]">
-                              {timeAgo(user.createdAt)}
+                              {timeAgo(u.createdAt)}
                             </span>
+                          </td>
+
+                          {/* Actions */}
+                          <td className="py-3.5" onClick={(e) => e.stopPropagation()}>
+                            {!u.isAdmin && (
+                              <button
+                                onClick={() => handleBanUser(u.id)}
+                                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                                  u.tier === 'banned'
+                                    ? 'bg-green-400/10 text-green-400 border border-green-400/20 hover:bg-green-400/20'
+                                    : 'bg-red-400/10 text-red-400 border border-red-400/20 hover:bg-red-400/20'
+                                }`}
+                                title={u.tier === 'banned' ? 'Unban user' : 'Ban user'}
+                              >
+                                {u.tier === 'banned' ? <CheckCircle2 size={11} /> : <XCircle size={11} />}
+                                <span className="hidden sm:inline">{u.tier === 'banned' ? 'Unban' : 'Ban'}</span>
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -1647,10 +1764,27 @@ export default function AdminPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
+                    {/* Ban/Unban action */}
+                    {!userDetail.isAdmin && (
+                      <div className="mt-3">
+                        <button
+                          onClick={() => handleBanUser(userDetail.id)}
+                          className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${
+                            userDetail.tier === 'banned'
+                              ? 'bg-green-400/10 text-green-400 border border-green-400/20 hover:bg-green-400/20'
+                              : 'bg-red-400/10 text-red-400 border border-red-400/20 hover:bg-red-400/20'
+                          }`}
+                        >
+                          {userDetail.tier === 'banned' ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
+                          {userDetail.tier === 'banned' ? 'Unban User' : 'Ban User'}
+                        </button>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-2 text-xs mt-3">
                       <div className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
                         <div className="text-[var(--text-muted)] mb-0.5">Tier</div>
-                        <div className="font-semibold text-[var(--text-primary)] capitalize">{userDetail.tier}</div>
+                        <div className="font-semibold text-[var(--text-primary)]"><TierBadge tier={userDetail.tier} /></div>
                       </div>
                       <div className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
                         <div className="text-[var(--text-muted)] mb-0.5">Credits</div>
@@ -1675,13 +1809,18 @@ export default function AdminPage() {
                     ) : (
                       <div className="space-y-1.5">
                         {userDetail.agents.map(a => (
-                          <div key={a.id} className="flex items-center justify-between p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-xs">
-                            <div>
-                              <span className="font-medium text-[var(--text-primary)]">{a.name}</span>
-                              <span className="ml-2 text-[var(--text-muted)] capitalize">{a.framework}</span>
+                          <Link
+                            key={a.id}
+                            href={`/dashboard/agent/${a.id}`}
+                            className="flex items-center justify-between p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-xs hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-accent)]/5 transition-colors group"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-[var(--text-primary)] group-hover:text-[var(--color-accent)] transition-colors">{a.name}</span>
+                              <FrameworkTag framework={a.framework} />
+                              <ExternalLink size={10} className="text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity" />
                             </div>
-                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${a.status === 'running' ? 'bg-emerald-500/10 text-emerald-400' : a.status === 'stopped' ? 'bg-slate-500/10 text-slate-400' : 'bg-amber-500/10 text-amber-400'}`}>{a.status}</span>
-                          </div>
+                            <StatusBadge status={a.status} />
+                          </Link>
                         ))}
                       </div>
                     )}
