@@ -22,6 +22,8 @@ import {
   X,
 } from 'lucide-react';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { GuidedTour } from '@/components/ui/GuidedTour';
+import type { TourStep } from '@/components/ui/GuidedTour';
 import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
 import { OnboardingDemo } from '@/components/onboarding/OnboardingDemo';
 import { QuickStats } from '@/components/dashboard/QuickStats';
@@ -139,6 +141,33 @@ const SORT_OPTIONS = [
   { key: 'az', label: 'A-Z' },
   { key: 'messages', label: 'Most Messages' },
   { key: 'active', label: 'Last Active' },
+];
+
+const TOUR_STEPS: TourStep[] = [
+  {
+    target: '[data-tour="create-agent"]',
+    title: 'Create Your First Agent',
+    description: 'Click here to hatch your first AI agent. Choose from 4 frameworks.',
+    position: 'bottom',
+  },
+  {
+    target: '[data-tour="framework-filter"]',
+    title: 'Filter by Framework',
+    description: 'OpenClaw, Hermes, ElizaOS, or Milady \u2014 each has unique strengths.',
+    position: 'bottom',
+  },
+  {
+    target: '[data-tour="search-input"]',
+    title: 'Search & Explore',
+    description: 'Search agents or browse 200+ templates to get started quickly.',
+    position: 'bottom',
+  },
+  {
+    target: '[data-tour="empty-state"]',
+    title: 'Your Plan',
+    description: 'Start free with 1 agent and 10 messages/day. Upgrade anytime.',
+    position: 'top',
+  },
 ];
 
 // ── Animation variants ───────────────────────────────────────
@@ -403,7 +432,7 @@ export default function MyAgentsPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/create" className="btn-primary text-sm">
+            <Link href="/create" className="btn-primary text-sm" data-tour="create-agent">
               <PlusCircle size={16} />
               Create Agent
             </Link>
@@ -445,6 +474,7 @@ export default function MyAgentsPage() {
               onChange={(e) => setFrameworkFilter(e.target.value as FrameworkFilter)}
               className="h-9 px-3 rounded-xl text-xs font-medium bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-secondary)] outline-none cursor-pointer appearance-none pr-7"
               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center' }}
+              data-tour="framework-filter"
             >
               {FRAMEWORK_FILTERS.map((f) => (
                 <option key={f.key} value={f.key}>{f.label}</option>
@@ -452,7 +482,7 @@ export default function MyAgentsPage() {
             </select>
 
             {/* Search */}
-            <div className="flex items-center gap-2 flex-1 min-w-[160px] h-9 bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-3">
+            <div className="flex items-center gap-2 flex-1 min-w-[160px] h-9 bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-3" data-tour="search-input">
               <Search size={14} className="text-[var(--text-muted)] shrink-0" />
               <input
                 ref={searchInputRef}
@@ -495,7 +525,7 @@ export default function MyAgentsPage() {
             /* True empty state — no agents created yet */
             <>
             <OnboardingDemo />
-            <div className="card glass-noise">
+            <div className="card glass-noise" data-tour="empty-state">
               <EmptyState
                 icon={Cpu}
                 title="No agents yet"
@@ -664,6 +694,9 @@ export default function MyAgentsPage() {
       </AnimatePresence>
 
       <ShortcutHelpModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
+
+      {/* Guided tour for first-time users with 0 agents */}
+      {!loading && agents.length === 0 && <GuidedTour steps={TOUR_STEPS} />}
     </motion.div>
   );
 }
