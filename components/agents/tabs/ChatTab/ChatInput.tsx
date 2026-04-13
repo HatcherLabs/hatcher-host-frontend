@@ -1,12 +1,49 @@
 'use client';
 
-import { type RefObject } from 'react';
+import { type RefObject, useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Send, Mic, MicOff, MessageSquare } from 'lucide-react';
+import { Send, Mic, MicOff, MessageSquare, Terminal } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { GlassCard } from '../../AgentContext';
 
+/* ── Slash command definitions per framework ── */
+const FRAMEWORK_COMMANDS: Record<string, Array<{ cmd: string; desc: string }>> = {
+  openclaw: [
+    { cmd: '/help', desc: 'Show available commands' },
+    { cmd: '/plugins', desc: 'List installed plugins' },
+    { cmd: '/skills', desc: 'List available skills' },
+    { cmd: '/config', desc: 'Show current configuration' },
+    { cmd: '/status', desc: 'Agent status and health' },
+    { cmd: '/reset', desc: 'Start a fresh conversation' },
+    { cmd: '/new', desc: 'Start a new session' },
+    { cmd: '/reasoning', desc: 'Toggle reasoning mode' },
+    { cmd: '/model', desc: 'Show or change the active model' },
+    { cmd: '/memory', desc: 'Search agent memory' },
+  ],
+  hermes: [
+    { cmd: '/help', desc: 'Show available commands' },
+    { cmd: '/skills', desc: 'List installed skills' },
+    { cmd: '/plugins', desc: 'List installed plugins' },
+    { cmd: '/memory', desc: 'Search memory files' },
+    { cmd: '/config', desc: 'Show configuration' },
+    { cmd: '/reset', desc: 'Reset conversation' },
+    { cmd: '/status', desc: 'Agent status' },
+  ],
+  elizaos: [
+    { cmd: '/help', desc: 'Show available commands' },
+    { cmd: '/reset', desc: 'Reset conversation' },
+    { cmd: '/status', desc: 'Agent status' },
+  ],
+  milady: [
+    { cmd: '/help', desc: 'Show available commands' },
+    { cmd: '/reset', desc: 'Reset conversation' },
+    { cmd: '/status', desc: 'Agent status' },
+    { cmd: '/plugins', desc: 'List installed plugins' },
+  ],
+};
+
 interface ChatInputProps {
-  agent: { name: string; status?: string };
+  agent: { name: string; status?: string; framework?: string };
   isAuthenticated: boolean;
   isLimitReached: boolean;
   agentStarting?: boolean;
@@ -48,6 +85,74 @@ export function ChatInput({
   msgLimit,
   remaining,
 }: ChatInputProps) {
+  /* ── Slash command autocomplete state ── */
+  const [slashIndex, setSlashIndex] = useState(0);
+  const slashListRef = useRef<HTMLDivElement>(null);
+
+  const slashOpen = input.startsWith('/');
+  const slashFilter = slashOpen ? input.slice(1).toLowerCase() : '';
+
+  const commands = useMemo(() => {
+    const fw = agent.framework?.toLowerCase() ?? 'openclaw';
+    return FRAMEWORK_COMMANDS[fw] ?? FRAMEWORK_COMMANDS.openclaw;
+  }, [agent.framework]);
+
+  const filteredCommands = useMemo(() => {
+    if (!slashOpen) return [];
+    if (slashFilter === '') return commands;
+    return commands.filter((c) => c.cmd.slice(1).toLowerCase().includes(slashFilter));
+  }, [slashOpen, slashFilter, commands]);
+
+  // Reset selection index when filter changes
+  useEffect(() => {
+    setSlashIndex(0);
+  }, [slashFilter]);
+
+  // Scroll selected item into view
+  useEffect(() => {
+    if (!slashListRef.current) return;
+    const items = slashListRef.current.children;
+    if (items[slashIndex]) {
+      (items[slashIndex] as HTMLElement).scrollIntoView({ block: 'nearest' });
+    }
+  }, [slashIndex]);
+
+  const selectSlashCommand = useCallback((cmd: string) => {
+    setInput(cmd + ' ');
+    setSlashIndex(0);
+    inputRef.current?.focus();
+  }, [setInput, inputRef]);
+
+  const handleSlashKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (slashOpen && filteredCommands.length > 0) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          setSlashIndex((i) => (i + 1) % filteredCommands.length);
+          return;
+        }
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          setSlashIndex((i) => (i - 1 + filteredCommands.length) % filteredCommands.length);
+          return;
+        }
+        if (e.key === 'Tab' || (e.key === 'Enter' && !e.shiftKey)) {
+          e.preventDefault();
+          selectSlashCommand(filteredCommands[slashIndex].cmd);
+          return;
+        }
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          setInput('');
+          return;
+        }
+      }
+      // Fall through to the original onKeyDown handler
+      onKeyDown(e);
+    },
+    [slashOpen, filteredCommands, slashIndex, selectSlashCommand, setInput, onKeyDown],
+  );
+
   if (!isAuthenticated) {
     return (
       <GlassCard className="text-center">
@@ -98,7 +203,55 @@ export function ChatInput({
           <span className="text-xs text-[var(--text-muted)]">Agent is starting up, please wait...</span>
         </div>
       )}
-      <div className="flex gap-2 items-end rounded-2xl p-3 border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl focus-within:border-[var(--color-accent)]/40 focus-within:shadow-[0_0_20px_rgba(6,182,212,0.06)] transition-all duration-200">
+      <div className="relative flex gap-2 items-end rounded-2xl p-3 border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl focus-within:border-[var(--color-accent)]/40 focus-within:shadow-[0_0_20px_rgba(6,182,212,0.06)] transition-all duration-200">
+        {/* Slash command autocomplete popup */}
+        <AnimatePresence>
+          {slashOpen && filteredCommands.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 6 }}
+              transition={{ duration: 0.15 }}
+              className="absolute left-0 right-0 bottom-full mb-2 z-50 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)]/90 backdrop-blur-xl shadow-lg overflow-hidden"
+            >
+              <div
+                ref={slashListRef}
+                className="max-h-[260px] overflow-y-auto py-1.5"
+                role="listbox"
+                aria-label="Slash commands"
+              >
+                {filteredCommands.map((c, i) => (
+                  <button
+                    key={c.cmd}
+                    type="button"
+                    role="option"
+                    aria-selected={i === slashIndex}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2 text-left transition-colors duration-100 ${
+                      i === slashIndex
+                        ? 'bg-[var(--color-accent)]/10 text-[var(--text-primary)]'
+                        : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'
+                    }`}
+                    onMouseEnter={() => setSlashIndex(i)}
+                    onMouseDown={(e) => {
+                      e.preventDefault(); // prevent blur
+                      selectSlashCommand(c.cmd);
+                    }}
+                  >
+                    <Terminal size={14} className="flex-shrink-0 text-[var(--color-accent)]" />
+                    <span className="font-medium text-sm">{c.cmd}</span>
+                    <span className="text-xs text-[var(--text-muted)] ml-auto">{c.desc}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-3 px-3.5 py-1.5 border-t border-[var(--border-default)] text-[10px] text-[var(--text-muted)]">
+                <span><kbd className="px-1 py-0.5 rounded bg-[var(--bg-elevated)] text-[var(--text-secondary)]">Tab</kbd> select</span>
+                <span><kbd className="px-1 py-0.5 rounded bg-[var(--bg-elevated)] text-[var(--text-secondary)]">&uarr;&darr;</kbd> navigate</span>
+                <span><kbd className="px-1 py-0.5 rounded bg-[var(--bg-elevated)] text-[var(--text-secondary)]">Esc</kbd> close</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <textarea
           ref={inputRef}
           className="flex-1 bg-transparent border-none outline-none resize-none min-h-[36px] max-h-32 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] leading-relaxed"
@@ -106,7 +259,7 @@ export function ChatInput({
           placeholder={agentStarting ? 'Waiting for agent to start...' : `Message ${agent.name}...`}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={onKeyDown}
+          onKeyDown={handleSlashKeyDown}
           onInput={(e) => {
             const el = e.currentTarget;
             const winY = window.scrollY;
@@ -115,6 +268,8 @@ export function ChatInput({
             window.scrollTo({ top: winY });
           }}
           disabled={inputDisabled}
+          aria-autocomplete={slashOpen ? 'list' : undefined}
+          aria-expanded={slashOpen && filteredCommands.length > 0 ? true : undefined}
         />
 
         {/* Mic button */}
