@@ -27,6 +27,45 @@ import { DOCS_URL } from '@/lib/config';
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
 const fadeUp = { initial: { opacity: 0, y: 30 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true } };
 
+// ─── Typewriter effect ───────────────────────────────────────
+const TYPEWRITER_WORDS = ['AI Agent', 'Fitness Coach', 'Crypto Tracker', 'Study Buddy', 'Travel Planner', 'Personal Assistant'];
+
+function Typewriter() {
+  const [wordIndex, setWordIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const word = TYPEWRITER_WORDS[wordIndex]!;
+    const speed = deleting ? 40 : 80;
+
+    if (!deleting && charIndex === word.length) {
+      const pause = setTimeout(() => setDeleting(true), 2000);
+      return () => clearTimeout(pause);
+    }
+    if (deleting && charIndex === 0) {
+      setDeleting(false);
+      setWordIndex((i) => (i + 1) % TYPEWRITER_WORDS.length);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCharIndex((c) => c + (deleting ? -1 : 1));
+    }, speed);
+    return () => clearTimeout(timer);
+  }, [charIndex, deleting, wordIndex]);
+
+  const word = TYPEWRITER_WORDS[wordIndex]!;
+  const displayed = word.slice(0, charIndex);
+
+  return (
+    <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+      {displayed}
+      <span className="animate-pulse text-purple-400">|</span>
+    </span>
+  );
+}
+
 // ─── Live agent demo preview ──────────────────────────────────
 function AgentPreview() {
   const [solPrice, setSolPrice] = useState<number | null>(null);
@@ -156,6 +195,12 @@ export default function LandingPage() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }} className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)]">
 
+      {/* ── Open Beta Banner ────────────────────────────────── */}
+      <div className="w-full bg-[var(--color-accent)]/90 text-white text-center py-2 px-4 text-sm font-medium">
+        We&apos;re in open beta! All features are free to try.{' '}
+        <Link href="/register" className="underline underline-offset-2 hover:text-white/80 transition-colors">Sign up and start building</Link>
+      </div>
+
       {/* ── Token Banner ──────────────────────────────────── */}
       <div className="w-full bg-gradient-to-r from-[#9945FF]/90 to-[#14F195]/90 text-white text-center py-2.5 px-4 text-sm font-medium">
         <span className="mr-1">&#x1FA99;</span> <strong>$HATCHER</strong> is live{tokenData && <> — <span className="font-mono">{tokenData.price}</span> · MCap <span className="font-mono">{tokenData.mcap}</span></>} — CA: <code className="font-mono text-xs bg-white/15 px-1.5 py-0.5 rounded select-all">Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump</code> <Link href="/token" className="underline underline-offset-2 hover:text-white/80 transition-colors ml-1">Learn more</Link>
@@ -175,6 +220,27 @@ export default function LandingPage() {
           WebkitMaskImage: 'radial-gradient(ellipse 70% 50% at 50% 30%, black, transparent)',
         }} />
 
+        {/* Floating platform icons */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {[
+            { icon: '💬', x: '10%', y: '20%', delay: 0, size: 'text-2xl' },
+            { icon: '🤖', x: '85%', y: '15%', delay: 1.5, size: 'text-3xl' },
+            { icon: '📱', x: '75%', y: '70%', delay: 3, size: 'text-2xl' },
+            { icon: '🔗', x: '15%', y: '75%', delay: 2, size: 'text-xl' },
+            { icon: '⚡', x: '50%', y: '10%', delay: 0.8, size: 'text-xl' },
+          ].map((item, i) => (
+            <motion.span
+              key={i}
+              className={`absolute ${item.size} opacity-[0.08]`}
+              style={{ left: item.x, top: item.y }}
+              animate={{ y: [0, -15, 0], rotate: [0, 5, -5, 0] }}
+              transition={{ duration: 6, repeat: Infinity, delay: item.delay, ease: 'easeInOut' }}
+            >
+              {item.icon}
+            </motion.span>
+          ))}
+        </div>
+
         <div className="relative z-10 max-w-5xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div>
@@ -193,7 +259,7 @@ export default function LandingPage() {
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
                 Hatch Your{' '}<br />
-                <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">AI Agent</span>
+                <Typewriter />
               </motion.h1>
 
               <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1, ease }} className="text-lg text-[var(--text-secondary)] leading-relaxed mb-8 max-w-lg">
@@ -310,10 +376,10 @@ export default function LandingPage() {
 
           <div className="space-y-3">
             {[
-              { icon: Cpu, name: 'OpenClaw', desc: 'The all-rounder — powerful tools, plugins, and browser control', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'hover:border-amber-500/30', href: `${DOCS_URL}/frameworks/openclaw` },
-              { icon: Brain, name: 'Hermes', desc: 'Smart-first design for rich memory and reasoning', color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'hover:border-purple-500/30', href: `${DOCS_URL}/frameworks/hermes` },
-              { icon: Bot, name: 'ElizaOS', desc: 'Multi-agent coordination with 90+ plugins', color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'hover:border-cyan-500/30', href: `${DOCS_URL}/frameworks/elizaos` },
-              { icon: Sparkles, name: 'Milady', desc: 'Crypto-native with on-chain awareness', color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'hover:border-rose-500/30', href: `${DOCS_URL}/frameworks/milady` },
+              { icon: Cpu, name: 'OpenClaw', desc: 'The all-rounder — powerful tools, plugins, and browser control', features: ['2500+ skills', 'Browser automation', 'File management'], color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'hover:border-amber-500/30', href: `${DOCS_URL}/frameworks/openclaw` },
+              { icon: Brain, name: 'Hermes', desc: 'Smart-first design for rich memory and reasoning', features: ['77 bundled skills', 'Deep memory', 'Multi-model'], color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'hover:border-purple-500/30', href: `${DOCS_URL}/frameworks/hermes` },
+              { icon: Bot, name: 'ElizaOS', desc: 'Multi-agent coordination with 90+ plugins', features: ['90+ plugins', 'Multi-agent', 'Knowledge base'], color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'hover:border-cyan-500/30', href: `${DOCS_URL}/frameworks/elizaos` },
+              { icon: Sparkles, name: 'Milady', desc: 'Crypto-native with on-chain awareness', features: ['DeFi tools', 'On-chain data', 'Token tracking'], color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'hover:border-rose-500/30', href: `${DOCS_URL}/frameworks/milady` },
             ].map((fw, i) => (
               <motion.div
                 key={fw.name}
@@ -324,7 +390,7 @@ export default function LandingPage() {
               >
                 <Link
                   href={fw.href}
-                  className={`flex items-center gap-4 p-4 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] ${fw.border} transition-all hover:translate-x-1 duration-200`}
+                  className={`group flex items-center gap-4 p-4 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] ${fw.border} transition-all hover:translate-x-1 duration-200`}
                 >
                   <div className={`w-10 h-10 rounded-lg ${fw.bg} flex items-center justify-center shrink-0`}>
                     <fw.icon size={20} className={fw.color} />
@@ -332,8 +398,13 @@ export default function LandingPage() {
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm font-bold text-[var(--text-primary)]">{fw.name}</h3>
                     <p className="text-sm text-[var(--text-secondary)] truncate">{fw.desc}</p>
+                    <div className="flex gap-2 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      {fw.features.map((f: string) => (
+                        <span key={f} className={`text-[10px] px-1.5 py-0.5 rounded ${fw.bg} ${fw.color} font-medium`}>{f}</span>
+                      ))}
+                    </div>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
+                  <ArrowRight className="w-4 h-4 text-[var(--text-muted)] shrink-0 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </motion.div>
             ))}
