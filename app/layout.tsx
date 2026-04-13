@@ -46,9 +46,9 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hatcher.host';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: 'Hatcher — AI Agent Hosting Platform', template: '%s | Hatcher' },
+  title: { default: 'Hatcher — Hatch Your AI Agent in 60 Seconds', template: '%s | Hatcher' },
   description:
-    'Deploy autonomous AI agents across 20+ platforms in 60 seconds. Free tier included. OpenClaw, Hermes, ElizaOS, Milady frameworks. BYOK any LLM.',
+    'Deploy AI agents instantly. Pick from 4 frameworks, configure with no code, launch on Telegram, Discord, WhatsApp. Free tier available.',
   keywords: [
     'AI agents',
     'agent hosting',
@@ -71,20 +71,20 @@ export const metadata: Metadata = {
     type: 'website',
     url: SITE_URL,
     siteName: 'Hatcher',
-    title: 'Hatcher — AI Agent Hosting Platform',
+    title: 'Hatcher — Hatch Your AI Agent in 60 Seconds',
     description:
-      'Deploy autonomous AI agents across 20+ platforms in 60 seconds. Free tier included. OpenClaw, Hermes, ElizaOS, Milady frameworks. BYOK any LLM.',
-    images: [{ url: `${SITE_URL}/og?title=Hatcher&subtitle=Deploy+autonomous+AI+agents+across+20%2B+platforms+in+60+seconds.+Free+tier+included.+BYOK+any+LLM.&tag=AI+Agent+Hosting`, width: 1200, height: 630, alt: 'Hatcher — AI Agent Hosting Platform' }],
+      'Deploy AI agents instantly. Pick from 4 frameworks, configure with no code, launch on Telegram, Discord, WhatsApp. Free tier available.',
+    images: [{ url: `${SITE_URL}/og?title=Hatcher&subtitle=Deploy+AI+agents+instantly.+Pick+from+4+frameworks%2C+configure+with+no+code%2C+launch+on+Telegram%2C+Discord%2C+WhatsApp.&tag=AI+Agent+Hosting`, width: 1200, height: 630, alt: 'Hatcher — Hatch Your AI Agent in 60 Seconds' }],
     locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
     site: '@HatcherLabs',
     creator: '@HatcherLabs',
-    title: 'Hatcher — AI Agent Hosting Platform',
+    title: 'Hatcher — Hatch Your AI Agent in 60 Seconds',
     description:
-      'Deploy autonomous AI agents across 20+ platforms in 60 seconds. Free tier included. BYOK any LLM.',
-    images: [`${SITE_URL}/og?title=Hatcher&subtitle=Deploy+autonomous+AI+agents+across+20%2B+platforms+in+60+seconds.+Free+tier+included.+BYOK+any+LLM.&tag=AI+Agent+Hosting`],
+      'Deploy AI agents instantly. Pick from 4 frameworks, configure with no code, launch on Telegram, Discord, WhatsApp. Free tier available.',
+    images: [`${SITE_URL}/og?title=Hatcher&subtitle=Deploy+AI+agents+instantly.+Pick+from+4+frameworks%2C+configure+with+no+code%2C+launch+on+Telegram%2C+Discord%2C+WhatsApp.&tag=AI+Agent+Hosting`],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   alternates: { canonical: SITE_URL },
@@ -113,7 +113,7 @@ const organizationJsonLd = {
   name: 'Hatcher',
   url: 'https://hatcher.host',
   logo: `${SITE_URL}/icon.svg`,
-  description: 'Deploy autonomous AI agents across 20+ platforms in 60 seconds. Free tier included.',
+  description: 'Deploy AI agents instantly. Pick from 4 frameworks, configure with no code, launch on Telegram, Discord, WhatsApp. Free tier available.',
   sameAs: ['https://twitter.com/HatcherLabs'],
 };
 
@@ -186,6 +186,45 @@ const softwareApplicationJsonLd = {
   },
 };
 
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'Is it really free?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. The free plan gives you 1 agent, 10 messages per day, and access to all platforms. No credit card required.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Do I need to know how to code?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Not at all! Creating an agent is like filling out a form — choose a name, describe what you want it to do, pick platforms, and launch.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What is "Bring Your Own Key"?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Connect your own OpenAI, Anthropic, Google, or Groq key for unlimited messages. You only pay your AI provider directly.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Where does my agent run?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'On our cloud servers 24/7. No need to keep your computer on or install anything.',
+      },
+    },
+  ],
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`scroll-smooth ${inter.variable} ${jetbrainsMono.variable} ${sora.variable}`} suppressHydrationWarning>
@@ -201,6 +240,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       </head>
       <body>
