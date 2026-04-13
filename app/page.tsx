@@ -192,12 +192,12 @@ export default function LandingPage() {
                 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
-                Deploy AI Agents{' '}<br />
-                <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">in 60 Seconds</span>
+                Hatch Your{' '}<br />
+                <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">AI Agent</span>
               </motion.h1>
 
               <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1, ease }} className="text-lg text-[var(--text-secondary)] leading-relaxed mb-8 max-w-lg">
-                Pick a framework. Configure your agent. Click deploy. No DevOps. No Docker. No headaches.
+                Your personal AI assistant — for crypto, research, customer support, or anything else. Pick a framework, configure, and launch in 60 seconds. No code required.
               </motion.p>
 
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2, ease }} className="flex flex-wrap items-center gap-4">
@@ -255,6 +255,44 @@ export default function LandingPage() {
               Try it now <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </motion.div>
+        </div>
+      </section>
+
+      {/* ── USE CASES ─────────────────────────────────── */}
+      <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden">
+        <div className="max-w-4xl mx-auto">
+          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+              What will you hatch?
+            </h2>
+            <p className="mt-4 text-[var(--text-secondary)] text-lg max-w-2xl mx-auto">
+              Real people use Hatcher agents every day for work, trading, research, and fun.
+            </p>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { emoji: '📈', title: 'Crypto Tracker', desc: 'Monitor token prices, get alerts on Telegram when SOL dips' },
+              { emoji: '🔬', title: 'Research Assistant', desc: 'Summarize papers, search the web, compile reports automatically' },
+              { emoji: '💬', title: 'Customer Support', desc: 'Answer FAQs on Discord or WhatsApp 24/7 with your knowledge base' },
+              { emoji: '📝', title: 'Content Writer', desc: 'Draft blog posts, tweets, and newsletters in your brand voice' },
+              { emoji: '🤖', title: 'Code Reviewer', desc: 'Review PRs, monitor CI/CD, and triage GitHub issues' },
+              { emoji: '📊', title: 'Data Analyst', desc: 'Query databases, generate charts, and send daily reports' },
+            ].map((uc, i) => (
+              <motion.div
+                key={uc.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.08, ease }}
+                className="p-5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] hover:border-[var(--border-hover)] transition-colors"
+              >
+                <span className="text-2xl mb-3 block">{uc.emoji}</span>
+                <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">{uc.title}</h3>
+                <p className="text-xs text-[var(--text-muted)] leading-relaxed">{uc.desc}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
