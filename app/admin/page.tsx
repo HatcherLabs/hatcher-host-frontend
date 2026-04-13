@@ -77,21 +77,21 @@ function StatCard({
   iconColor: string;
 }) {
   return (
-    <motion.div className="card glass-noise p-5" variants={cardVariants}>
+    <motion.div className="card glass-noise p-3 sm:p-5" variants={cardVariants}>
       <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <span className="text-[11px] uppercase tracking-[0.08em] font-semibold block mb-2 text-[var(--text-muted)]">
+        <div className="flex-1 min-w-0">
+          <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.08em] font-semibold block mb-1 sm:mb-2 text-[var(--text-muted)] truncate">
             {label}
           </span>
-          <span className="text-[28px] leading-[1.1] font-bold block text-[var(--text-primary)]">
+          <span className="text-lg sm:text-[28px] leading-[1.1] font-bold block text-[var(--text-primary)] truncate">
             {value}
           </span>
         </div>
         <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+          className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0"
           style={{ background: iconColor + '18' }}
         >
-          <Icon size={20} style={{ color: iconColor }} />
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: iconColor }} />
         </div>
       </div>
     </motion.div>
@@ -671,7 +671,7 @@ export default function AdminPage() {
 
         {/* ── Quick Stats Row (always visible) ────────────────── */}
         {stats && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7 overflow-x-auto">
             <StatCard label="Users" value={stats.totalUsers} icon={Users} iconColor="var(--color-accent)" />
             <StatCard label="Agents" value={stats.totalAgents} icon={Bot} iconColor="#60A5FA" />
             <StatCard label="Active" value={stats.activeAgents} icon={Activity} iconColor="#4ADE80" />
@@ -683,10 +683,10 @@ export default function AdminPage() {
         )}
 
         {/* ── Tab Switcher + Table Area ─────────────────────── */}
-        <motion.div className="card glass-noise p-5" variants={cardVariants}>
+        <motion.div className="card glass-noise p-3 sm:p-5" variants={cardVariants}>
           {/* Tab switcher */}
-          <div className="flex items-center gap-4 mb-5">
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)] overflow-x-auto">
+          <div className="flex items-center gap-4 mb-5 overflow-x-auto -mx-1 px-1">
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)] overflow-x-auto min-w-0">
               {(['overview', 'agents', 'users', 'tickets', 'health'] as const).map((tab) => {
                 const tabIcons: Record<string, React.ElementType> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, health: HeartPulse };
                 const TabIcon = tabIcons[tab] ?? BarChart3;
@@ -695,7 +695,7 @@ export default function AdminPage() {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-2 whitespace-nowrap ${
+                    className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-150 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${
                       activeTab === tab
                         ? 'text-[var(--text-primary)] bg-[var(--color-accent)]/20'
                         : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
@@ -915,7 +915,7 @@ export default function AdminPage() {
                     </div>
 
                     {/* Framework filter */}
-                    <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)]">
+                    <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)] overflow-x-auto">
                       {[{ key: 'all', label: 'All FW' }, ...Object.entries(FRAMEWORK_META).map(([k, v]) => ({ key: k, label: v.label }))].map((f) => (
                         <button
                           key={f.key}
@@ -960,15 +960,15 @@ export default function AdminPage() {
                   </p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left" style={{ tableLayout: 'auto' }}>
+                <div className="overflow-x-auto -mx-3 sm:-mx-0 px-3 sm:px-0">
+                  <table className="w-full text-left text-xs sm:text-sm" style={{ tableLayout: 'auto', minWidth: '700px' }}>
                     <thead>
                       <tr className="border-b border-[var(--border-default)]">
                         {['Agent', 'Owner', 'Framework', 'Status', 'Messages', 'Created', 'Actions'].map(
                           (header) => (
                             <th
                               key={header}
-                              className="pb-3 pr-4 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]"
+                              className="pb-3 pr-4 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]"
                             >
                               {header}
                             </th>
@@ -1127,7 +1127,7 @@ export default function AdminPage() {
                   </h2>
 
                   {/* Tier filter */}
-                  <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)]">
+                  <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)] overflow-x-auto">
                     {[{ key: 'all', label: 'All' }, { key: 'free', label: 'Free' }, { key: 'starter', label: 'Starter' }, { key: 'founding_member', label: 'Founding' }, { key: 'pro', label: 'Pro' }, { key: 'business', label: 'Business' }, { key: 'banned', label: 'Banned' }].map((f) => (
                       <button
                         key={f.key}
@@ -1170,8 +1170,8 @@ export default function AdminPage() {
                   </p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left">
+                <div className="overflow-x-auto -mx-3 sm:-mx-0 px-3 sm:px-0">
+                  <table className="w-full text-left text-xs sm:text-sm" style={{ minWidth: '650px' }}>
                     <thead>
                       <tr className="border-b border-[var(--border-default)]">
                         {[
@@ -1185,7 +1185,7 @@ export default function AdminPage() {
                         ].map((col) => (
                           <th
                             key={col.key}
-                            className={`pb-3 pr-4 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] ${col.sortable ? 'cursor-pointer select-none hover:text-[var(--text-primary)]' : ''}`}
+                            className={`pb-3 pr-4 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] ${col.sortable ? 'cursor-pointer select-none hover:text-[var(--text-primary)]' : ''}`}
                             onClick={() => {
                               if (!col.sortable) return;
                               const sortKey = col.key as typeof userSortBy;
@@ -1310,7 +1310,7 @@ export default function AdminPage() {
                     Support Tickets
                     <span className="text-sm font-normal ml-2 text-[var(--text-muted)]">({filteredTickets.length})</span>
                   </h2>
-                  <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)]">
+                  <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)] overflow-x-auto">
                     {TICKET_FILTERS.map((f) => (
                       <button
                         key={f}
@@ -1335,12 +1335,12 @@ export default function AdminPage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left">
+                  <div className="overflow-x-auto -mx-3 sm:-mx-0 px-3 sm:px-0">
+                    <table className="w-full text-left text-xs sm:text-sm" style={{ minWidth: '650px' }}>
                       <thead>
                         <tr className="border-b border-[var(--border-default)]">
                           {['Subject', 'User', 'Category', 'Priority', 'Status', 'Updated', ''].map((h) => (
-                            <th key={h} className="pb-3 pr-4 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">{h}</th>
+                            <th key={h} className="pb-3 pr-4 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">{h}</th>
                           ))}
                         </tr>
                       </thead>
@@ -1734,8 +1734,8 @@ export default function AdminPage() {
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/50" onClick={() => { setSelectedUserId(null); setUserDetail(null); }} />
           {/* Panel */}
-          <div className="relative w-full max-w-lg bg-[var(--bg-elevated)] border-l border-[var(--border-default)] h-full overflow-y-auto shadow-2xl">
-            <div className="p-6">
+          <div className="relative w-full max-w-full sm:max-w-lg bg-[var(--bg-elevated)] border-l border-[var(--border-default)] h-full overflow-y-auto shadow-2xl">
+            <div className="p-4 sm:p-6">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold text-[var(--text-primary)]">User Details</h2>
