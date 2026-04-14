@@ -24,7 +24,7 @@ import {
   Radio,
 } from 'lucide-react';
 import type { Tab } from './AgentContext';
-import { STATUS_STYLES, FRAMEWORK_BADGE } from './AgentContext';
+import { STATUS_STYLES, FRAMEWORK_BADGE, useAgentContext } from './AgentContext';
 import { FRAMEWORKS } from '@hatcher/shared';
 import type { LucideIcon } from 'lucide-react';
 import type { Agent } from '@/lib/api';
@@ -111,8 +111,12 @@ interface AgentSidebarProps {
   onTabChange: (tab: Tab) => void;
 }
 
+const EASY_TABS: Tab[] = ['overview', 'chat', 'integrations', 'logs', 'stats'];
+
 export const AgentSidebar = memo(function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProps) {
-  const tabs = getTabs(agent.framework);
+  const { viewMode } = useAgentContext();
+  const allTabs = getTabs(agent.framework);
+  const tabs = viewMode === 'easy' ? allTabs.filter(t => EASY_TABS.includes(t.id)) : allTabs;
   const statusInfo = STATUS_STYLES[agent.status] ?? STATUS_STYLES.paused;
   const frameworkMeta = FRAMEWORKS[agent.framework];
   const avatarColors = FRAMEWORK_AVATAR_COLORS[agent.framework] ?? DEFAULT_AVATAR;

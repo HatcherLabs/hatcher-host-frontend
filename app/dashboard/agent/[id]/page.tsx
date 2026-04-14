@@ -199,6 +199,23 @@ export default function AgentManagePage() {
   const { isAuthenticated, user } = useAuth();
   const { toast } = useToast();
 
+  // View mode (easy = Chat/Integrations/Logs/Stats only, advanced = everything)
+  const EASY_TABS: Tab[] = ['overview', 'chat', 'integrations', 'logs', 'stats'];
+  const [viewMode, setViewModeRaw] = useState<'easy' | 'advanced'>('easy');
+  useEffect(() => {
+    const saved = localStorage.getItem('hatcher-view-mode') as 'easy' | 'advanced' | null;
+    if (saved) setViewModeRaw(saved);
+  }, []);
+  const setViewMode = useCallback((mode: 'easy' | 'advanced') => {
+    setViewModeRaw(mode);
+    localStorage.setItem('hatcher-view-mode', mode);
+    // If switching to Easy and the current tab isn't visible in Easy, go to Chat
+    if (mode === 'easy') {
+      setTabRaw(prev => EASY_TABS.includes(prev) ? prev : 'chat');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Core state
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -864,6 +881,7 @@ export default function AgentManagePage() {
       loadAgent, loadFeatures,
       isAuthenticated,
       userTier,
+      viewMode, setViewMode,
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, agent, stats, tab, logs.logs, logs.logsLoading, logs.logFilter, logs.logSearch, logs.autoScroll, logs.filteredLogs, wsLogsConnected,
@@ -879,7 +897,7 @@ export default function AgentManagePage() {
     actions.actionLoading, actions.actionError, actions.actionSuccess,
     llmProvider, currentProviderMeta, providerModels, config.hasApiKey,
     displayUptime, isLiveUptime, isActive, isNotActive, statusInfo, frameworkMeta,
-    isAuthenticated, userTier, hasUnlimitedChat]);
+    isAuthenticated, userTier, hasUnlimitedChat, viewMode]);
 
   // ─── Loading state ───────────────────────────────────────
 
@@ -955,6 +973,23 @@ export default function AgentManagePage() {
 
             {/* Spacer */}
             <div className="flex-1" />
+
+            {/* Easy / Advanced mode toggle */}
+            <div className="flex items-center rounded-lg border border-[var(--border-default)] overflow-hidden text-xs flex-shrink-0">
+              <button
+                onClick={() => setViewMode('easy')}
+                className={`px-2.5 py-1.5 transition-colors ${viewMode === 'easy' ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'}`}
+              >
+                Easy
+              </button>
+              <div className="w-px h-4 bg-[var(--border-default)]" aria-hidden="true" />
+              <button
+                onClick={() => setViewMode('advanced')}
+                className={`px-2.5 py-1.5 transition-colors ${viewMode === 'advanced' ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'}`}
+              >
+                Advanced
+              </button>
+            </div>
 
             {/* Action buttons */}
             <div className="flex items-center gap-2 flex-shrink-0">

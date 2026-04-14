@@ -196,4 +196,8 @@ export interface AgentContextValue {
 
   // Tier
   userTier: string;
+
+  // View mode
+  viewMode: 'easy' | 'advanced';
+  setViewMode: (mode: 'easy' | 'advanced') => void;
 }
