@@ -29,6 +29,7 @@ import {
   Search,
   Send,
   Settings2,
+  Sparkles,
   Gem,
   X,
   Zap,
@@ -61,6 +62,36 @@ interface ApiTemplate {
   personality: string;
   topics: string[];
   suggestedSkills: string[];
+  recommendedSkills?: {
+    openclaw: string[];
+    hermes: string[];
+    elizaos: string[];
+    milady: string[];
+  };
+}
+
+/** Format a ClawHub slug or plugin name for display: "github" → "GitHub", "in-depth-research" → "In-Depth Research" */
+function formatSkillName(name: string): string {
+  const overrides: Record<string, string> = {
+    github: 'GitHub', jira: 'Jira', slack: 'Slack', todoist: 'Todoist',
+    'desearch-web-search': 'DeSearch', 'in-depth-research': 'Research',
+    'market-research-agent': 'Market Research', 'neural-memory': 'Neural Memory',
+    'human-writing': 'Human Writing', 'code-quality': 'Code Quality',
+    'portfolio-tracker': 'Portfolio Tracker', 'blockchain-data': 'Blockchain Data',
+    'trading-signals': 'Trading Signals', 'solana-tools': 'Solana Tools',
+    'social-media-manager': 'Social Media', 'seo-assistant': 'SEO Assistant',
+    'email-assistant': 'Email Assistant', 'pdf-reader': 'PDF Reader',
+    'notion-tools': 'Notion', 'google-sheets': 'Google Sheets',
+    'todoist-task-manager': 'Todoist', 'calendar-assistant': 'Calendar',
+    '@elizaos/plugin-github': 'GitHub', '@elizaos/plugin-bootstrap': 'Bootstrap',
+    '@elizaos/plugin-node': 'Node Runtime', '@elizaos/plugin-sql': 'Database',
+  };
+  if (overrides[name]) return overrides[name];
+  return name
+    .replace(/^@[^/]+\/plugin-/, '')
+    .split(/[-_]/)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
 }
 
 const OPENCLAW_SKILLS_LIST = ['web_search', 'calculator', 'weather', 'code_interpreter', 'file_manager', 'image_gen'];
@@ -1606,6 +1637,35 @@ export default function CreatePage() {
                     </div>
                   </fieldset>
                 )}
+
+                {/* Recommended ClawHub skills from template */}
+                {selectedTemplate !== 'custom' && (() => {
+                  const tpl = templates.find(t => t.id === selectedTemplate);
+                  const recSkills = tpl?.recommendedSkills?.[selectedFramework] ?? [];
+                  if (recSkills.length === 0) return null;
+                  return (
+                    <div className="rounded-xl border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5 p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Sparkles size={14} className="text-[var(--color-accent)] flex-shrink-0" />
+                        <span className="text-sm font-medium text-[var(--text-primary)]">Included with this template</span>
+                      </div>
+                      <p className="text-xs text-[var(--text-muted)] mb-3">
+                        These ClawHub skills install automatically when your agent first starts.
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {recSkills.map(slug => (
+                          <span
+                            key={slug}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 text-xs text-[var(--color-accent)] font-medium"
+                          >
+                            <Check size={10} />
+                            {formatSkillName(slug)}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* Agent personality fields */}
                 <OpenClawFields
