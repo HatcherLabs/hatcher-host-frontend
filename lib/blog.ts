@@ -823,7 +823,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>The free tier is genuinely sufficient for most individual use cases. Consider upgrading when:</p>
 <ul>
 <li>You need <strong>more than one agent</strong> — Starter includes 1, Pro includes 3, plus add-on packs</li>
-<li>You want <strong>dedicated resources</strong> — Pro gives 2 CPU, 2GB RAM per agent instead of shared</li>
+<li>You want <strong>dedicated resources</strong> — Pro gives 1.5 CPU, 2GB RAM per agent instead of shared</li>
 <li>You need <strong>file manager access</strong> — browse and edit your agent's workspace files</li>
 <li>You want <strong>longer idle time</strong> — free agents auto-sleep after 10 minutes, Starter after 2 hours, Pro stays on</li>
 </ul>

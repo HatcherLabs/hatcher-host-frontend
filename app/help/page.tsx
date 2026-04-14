@@ -155,7 +155,7 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'What plans are available?',
-        a: 'Hatcher offers four tiers. Free: 1 agent, 10 messages/day (GPT-OSS 20B), shared resources, auto-sleep after 10 min. Starter ($4.99/mo): 1 agent, 50 messages/day (GPT-OSS 20B), better resources (1 CPU, 1.5GB RAM), auto-sleep after 2 hours. Pro ($14.99/mo): 3 agents, 200 messages/day per agent (Llama 3.3 70B), web search via Brave, dedicated resources (2 CPU, 2GB RAM), full log viewer. Business ($39.99/mo): 10 agents, 500 messages/day per agent (Llama 3.3 70B), web search via Brave, always-on, priority support. All tiers include all integrations and BYOK is always unlimited.',
+        a: 'Hatcher offers four tiers. Free: 1 agent, 10 messages/day (GPT-OSS 20B), shared resources, auto-sleep after 10 min. Starter ($4.99/mo): 1 agent, 50 messages/day (GPT-OSS 20B), better resources (1 CPU, 1.5GB RAM), auto-sleep after 2 hours. Pro ($14.99/mo): 3 agents, 200 messages/day per agent (Llama 3.3 70B), web search via Brave, dedicated resources (1.5 CPU, 2GB RAM), full log viewer. Business ($39.99/mo): 10 agents, 500 messages/day per agent (Llama 3.3 70B), web search via Brave, always-on, priority support. All tiers include all integrations and BYOK is always unlimited.',
       },
       {
         q: 'How do add-ons work?',
