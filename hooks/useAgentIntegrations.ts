@@ -29,27 +29,45 @@ export function useAgentIntegrations(
   const [savingIntegration, setSavingIntegration] = useState<string | null>(null);
   const [integrationSaveMsg, setIntegrationSaveMsg] = useState<Record<string, string>>({});
 
-  // Pre-populate channel settings from agent config
+  // Pre-populate channel settings + non-secret pairing fields from agent config.
+  // The pairing-field block (WHATSAPP_ALLOW_FROM) is plain in configJson — not
+  // encrypted — so we can hydrate it back into local state for display.
   useEffect(() => {
     if (!agent) return;
     const config = (agent.config ?? {}) as Record<string, unknown>;
-    const cs = config.channelSettings as Record<string, Record<string, unknown>> | undefined;
-    if (!cs || typeof cs !== 'object') return;
     setIntegrationSecrets((prev) => {
       const next = { ...prev };
-      for (const [channel, settings] of Object.entries(cs)) {
-        if (!settings || typeof settings !== 'object') continue;
-        const sk = CHANNEL_TO_FEATURE[channel.toLowerCase()] ?? channel.toLowerCase();
-        const mapped: Record<string, string> = {};
-        if (settings.dmPolicy) mapped._CS_DM_POLICY = String(settings.dmPolicy);
-        if (settings.groupPolicy) mapped._CS_GROUP_POLICY = String(settings.groupPolicy);
-        if (settings.streaming) mapped._CS_STREAMING = String(settings.streaming);
-        if (Array.isArray(settings.allowFrom)) mapped._CS_DM_ALLOWLIST = settings.allowFrom.join(', ');
-        if (Array.isArray(settings.groupAllowFrom)) mapped._CS_GROUP_ALLOWLIST = settings.groupAllowFrom.join(', ');
-        if (Object.keys(mapped).length > 0) {
-          next[sk] = { ...(next[sk] ?? {}), ...mapped };
+
+      // channelSettings → _CS_* keys
+      const cs = config.channelSettings as Record<string, Record<string, unknown>> | undefined;
+      if (cs && typeof cs === 'object') {
+        for (const [channel, settings] of Object.entries(cs)) {
+          if (!settings || typeof settings !== 'object') continue;
+          const sk = CHANNEL_TO_FEATURE[channel.toLowerCase()] ?? channel.toLowerCase();
+          const mapped: Record<string, string> = {};
+          if (settings.dmPolicy) mapped._CS_DM_POLICY = String(settings.dmPolicy);
+          if (settings.groupPolicy) mapped._CS_GROUP_POLICY = String(settings.groupPolicy);
+          if (settings.streaming) mapped._CS_STREAMING = String(settings.streaming);
+          if (Array.isArray(settings.allowFrom)) mapped._CS_DM_ALLOWLIST = settings.allowFrom.join(', ');
+          if (Array.isArray(settings.groupAllowFrom)) mapped._CS_GROUP_ALLOWLIST = settings.groupAllowFrom.join(', ');
+          if (Object.keys(mapped).length > 0) {
+            next[sk] = { ...(next[sk] ?? {}), ...mapped };
+          }
         }
       }
+
+      // WhatsApp pairing AllowFrom — hydrate plain root-level config value
+      // into the WhatsApp integration's local state so the saved phone-number
+      // list shows in the input on reload.
+      const waAllowFrom = config['WHATSAPP_ALLOW_FROM'];
+      if (typeof waAllowFrom === 'string' && waAllowFrom.length > 0) {
+        const sk = 'openclaw.platform.whatsapp';
+        const existing = next[sk]?.['WHATSAPP_ALLOW_FROM'];
+        if (!existing) {
+          next[sk] = { ...(next[sk] ?? {}), WHATSAPP_ALLOW_FROM: waAllowFrom };
+        }
+      }
+
       return next;
     });
   }, [agent]);
