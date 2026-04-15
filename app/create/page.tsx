@@ -124,7 +124,9 @@ const PLATFORMS = [
     name: 'WhatsApp',
     icon: '\uD83D\uDCAC',
     description: 'Connect via QR code',
-    frameworks: ['openclaw', 'hermes', 'milady'],
+    // Only OpenClaw supports non-interactive QR pairing from the dashboard.
+    // Hermes needs a TTY; Milady uses Meta Cloud API tokens instead.
+    frameworks: ['openclaw'],
     fields: [],
     note: 'QR pairing will be available after deployment',
   },
