@@ -602,10 +602,10 @@ export default function PricingPage() {
               Create Agent
             </Link>
             <Link
-              href="/templates"
+              href="/frameworks"
               className="inline-flex items-center gap-2 px-6 py-4 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             >
-              Browse Templates
+              See Frameworks
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

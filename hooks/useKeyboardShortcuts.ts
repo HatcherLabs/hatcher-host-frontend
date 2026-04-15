@@ -48,7 +48,7 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers = {}) {
         case 't':
           e.preventDefault();
           if (handlers.onTemplates) handlers.onTemplates();
-          else router.push('/dashboard/templates');
+          else router.push('/create');
           break;
         case '/':
           e.preventDefault();
