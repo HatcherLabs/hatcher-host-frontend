@@ -20,7 +20,6 @@ const nextConfig = {
       'framer-motion',
       'recharts',
       'reactflow',
-      'sonner',
       'cmdk',
       '@solana/web3.js',
     ],
