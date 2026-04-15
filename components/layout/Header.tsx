@@ -20,12 +20,14 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 const AUTH_NAV_LINKS = [
   { href: '/dashboard/agents',    label: 'My Agents' },
   { href: '/create',              label: 'Create' },
+  { href: '/frameworks',          label: 'Frameworks' },
   { href: '/token',               label: 'Token' },
 ];
 
 // ── Nav links when logged OUT ──
 const GUEST_NAV_LINKS = [
   { href: '/templates',           label: 'Templates' },
+  { href: '/frameworks',          label: 'Frameworks' },
   { href: '/token',               label: 'Token' },
 ];
 
@@ -48,6 +50,7 @@ const USER_EXTRA_LINKS = [
 const MOBILE_AUTH_LINKS = [
   { href: '/dashboard/agents',    label: 'My Agents' },
   { href: '/create',              label: 'Create' },
+  { href: '/frameworks',          label: 'Frameworks' },
   { href: '/token',               label: 'Token' },
   { href: '/pricing',             label: 'Pricing' },
   { href: '/dashboard/billing',   label: 'Billing' },
@@ -56,9 +59,10 @@ const MOBILE_AUTH_LINKS = [
 
 // ── Mobile links (when logged out) ──
 const MOBILE_GUEST_LINKS = [
-  { href: '/templates', label: 'Templates' },
-  { href: '/token',     label: 'Token' },
-  { href: '/pricing',   label: 'Pricing' },
+  { href: '/templates',  label: 'Templates' },
+  { href: '/frameworks', label: 'Frameworks' },
+  { href: '/token',      label: 'Token' },
+  { href: '/pricing',    label: 'Pricing' },
 ];
 
 function isActive(pathname: string, href: string) {
