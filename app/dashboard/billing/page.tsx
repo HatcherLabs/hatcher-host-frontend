@@ -81,6 +81,7 @@ interface PaymentModalProps {
   price: number;
   onPayWithSOL: () => void;
   onPayWithHATCHER: () => void;
+  onPayWithUSDC: () => void;
   onPayWithCard: () => void;
   onPayWithCredits?: () => void;
   creditBalance: number;
@@ -91,7 +92,7 @@ interface PaymentModalProps {
   onSelectAgent?: (agentId: string) => void;
 }
 
-function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithHATCHER, onPayWithCard, onPayWithCredits, creditBalance, loading, requiresAgent, agents, selectedAgentId, onSelectAgent }: PaymentModalProps) {
+function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithHATCHER, onPayWithUSDC, onPayWithCard, onPayWithCredits, creditBalance, loading, requiresAgent, agents, selectedAgentId, onSelectAgent }: PaymentModalProps) {
   if (!isOpen) return null;
   const canPayWithCredits = creditBalance >= price && price > 0;
   const needsAgentSelection = requiresAgent && !selectedAgentId;
@@ -193,6 +194,22 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
               <div className="text-left">
                 <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with $HATCHER</p>
                 <p className="text-[11px] text-[var(--text-muted)]">HATCHER token on Solana</p>
+              </div>
+              {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
+            </button>
+
+            {/* Pay with USDC */}
+            <button
+              onClick={onPayWithUSDC}
+              disabled={loading || needsAgentSelection}
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#2775CA]/40 hover:bg-[#2775CA]/[0.05] transition-all disabled:opacity-40"
+            >
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#2775CA] to-[#1E5AA0] flex items-center justify-center flex-shrink-0">
+                <span className="text-white font-bold text-[10px]">USDC</span>
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with USDC</p>
+                <p className="text-[11px] text-[var(--text-muted)]">Stablecoin — 1 USDC = $1</p>
               </div>
               {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
             </button>
@@ -379,6 +396,32 @@ export default function BillingPage() {
     return signature;
   }, [wallet, connection, setWalletModalVisible]);
 
+  /* ── Common USDC payment driver ──────────────────────────
+   * USDC is pegged 1:1 to USD so the quote is trivial. We send the
+   * exact tier/addon price as USDC to the treasury's USDC ATA
+   * (created on-the-fly by payWithSplToken if it doesn't exist).
+   */
+  const driveUsdcPayment = useCallback(async (usdAmount: number, label: string): Promise<string> => {
+    if (!wallet.connected || !wallet.publicKey) {
+      setWalletModalVisible(true);
+      throw new Error('Connect a Solana wallet first');
+    }
+    const confirmed = window.confirm(
+      `Pay with USDC\n\n` +
+      `${label}\n` +
+      `$${usdAmount.toFixed(2)} = ${usdAmount.toFixed(2)} USDC\n\n` +
+      `Approve in your wallet on the next step.`
+    );
+    if (!confirmed) throw new Error('Cancelled');
+    const { signature } = await payWithSplToken({
+      wallet,
+      connection,
+      mint: 'usdc',
+      amountHuman: usdAmount,
+    });
+    return signature;
+  }, [wallet, connection, setWalletModalVisible]);
+
   /* ── Common $HATCHER payment driver ───────────────────────
    * Same UX shape as driveSolPayment but transfers SPL $HATCHER to the
    * treasury's HATCH ATA. usdAmount still comes from the tier/addon; we
@@ -463,6 +506,32 @@ export default function BillingPage() {
     }
   };
 
+  /* ── Subscribe to a tier (USDC payment) ─────────────────── */
+  const handleSubscribeUSDC = async () => {
+    const tierKey = paymentModal.tierKey;
+    if (!tierKey) return;
+    const tierConfig = TIERS[tierKey];
+    setPaymentLoading(true);
+    setSubscribing(tierKey);
+    setError(null);
+    setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    try {
+      const txSignature = await driveUsdcPayment(tierConfig.usdPrice, `Subscribe to ${tierConfig.name}`);
+      const res = await api.subscribe(tierKey, txSignature, 'usdc');
+      if (res.success) {
+        await loadAccountData();
+        showSuccess(`Subscribed to ${tierConfig.name} with USDC!`);
+      } else {
+        setError(res.error ?? 'Subscription failed');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Subscription failed');
+    } finally {
+      setSubscribing(null);
+      setPaymentLoading(false);
+    }
+  };
+
   /* ── Subscribe via Stripe (mock) ──────────────────────── */
   const handleSubscribeStripe = handleSubscribeSOL;
 
@@ -511,6 +580,34 @@ export default function BillingPage() {
       if (res.success) {
         await loadAccountData();
         showSuccess(`${addonConfig.name} purchased with $HATCHER!`);
+      } else {
+        setError(res.error ?? 'Purchase failed');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Purchase failed');
+    } finally {
+      setPurchasingAddon(null);
+      setPaymentLoading(false);
+    }
+  };
+
+  /* ── Purchase add-on (USDC payment) ─────────────────────── */
+  const handlePurchaseAddonUSDC = async () => {
+    const addonKey = paymentModal.addonKey;
+    if (!addonKey) return;
+    const addonConfig = ADDONS.find(a => a.key === addonKey);
+    if (!addonConfig) return;
+    if (addonConfig.perAgent && !selectedAgentId) return;
+    setPaymentLoading(true);
+    setPurchasingAddon(addonKey);
+    setError(null);
+    setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    try {
+      const txSignature = await driveUsdcPayment(addonConfig.usdPrice, addonConfig.name);
+      const res = await api.purchaseAddon(addonKey, txSignature, selectedAgentId ?? undefined, 'usdc');
+      if (res.success) {
+        await loadAccountData();
+        showSuccess(`${addonConfig.name} purchased with USDC!`);
       } else {
         setError(res.error ?? 'Purchase failed');
       }
@@ -1116,6 +1213,7 @@ export default function BillingPage() {
         price={paymentModal.price}
         onPayWithSOL={paymentModal.type === 'subscription' ? handleSubscribeSOL : handlePurchaseAddonSOL}
         onPayWithHATCHER={paymentModal.type === 'subscription' ? handleSubscribeHATCHER : handlePurchaseAddonHATCHER}
+        onPayWithUSDC={paymentModal.type === 'subscription' ? handleSubscribeUSDC : handlePurchaseAddonUSDC}
         onPayWithCard={paymentModal.type === 'subscription' ? handleSubscribeStripe : handlePurchaseAddonStripe}
         onPayWithCredits={paymentModal.type === 'subscription' ? handleSubscribeCredits : handlePurchaseAddonCredits}
         creditBalance={creditBalance}

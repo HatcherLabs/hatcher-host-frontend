@@ -354,14 +354,14 @@ export const api = {
     }>('/features/account'),
 
   /** Subscribe to a tier */
-  subscribe: (tier: string, txSignature: string, paymentToken: 'sol' | 'hatch' = 'sol') =>
+  subscribe: (tier: string, txSignature: string, paymentToken: 'sol' | 'hatch' | 'usdc' = 'sol') =>
     req<{ tier: string }>('/features/subscribe', {
       method: 'POST',
       body: JSON.stringify({ tier, txSignature, paymentToken }),
     }),
 
   /** Purchase an add-on (optionally per-agent) */
-  purchaseAddon: (addonKey: string, txSignature: string, agentId?: string, paymentToken: 'sol' | 'hatch' = 'sol') =>
+  purchaseAddon: (addonKey: string, txSignature: string, agentId?: string, paymentToken: 'sol' | 'hatch' | 'usdc' = 'sol') =>
     req<{ addonKey: string }>('/features/addon', {
       method: 'POST',
       body: JSON.stringify({ addonKey, txSignature, paymentToken, ...(agentId ? { agentId } : {}) }),
