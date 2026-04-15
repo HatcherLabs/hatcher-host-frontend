@@ -208,7 +208,23 @@ export default function AdminPage() {
   const [agentsPagination, setAgentsPagination] = useState<{ total: number; hasMore: boolean }>({ total: 0, hasMore: false });
   const [error, setError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'health'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health'>('overview');
+  const [payments, setPayments] = useState<Array<{
+    id: string;
+    userId: string;
+    userEmail: string | null;
+    userUsername: string | null;
+    agentId: string | null;
+    agentName: string | null;
+    agentFramework: string | null;
+    featureKey: string;
+    usdAmount: number;
+    hatchAmount: number;
+    txSignature: string;
+    status: string;
+    createdAt: string;
+  }>>([]);
+  const [paymentsLoading, setPaymentsLoading] = useState(false);
   const [ticketFilter, setTicketFilter] = useState<'all' | 'open' | 'in_progress' | 'resolved'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
@@ -301,6 +317,17 @@ export default function AdminPage() {
     const interval = setInterval(fetchHealth, 30000);
     return () => clearInterval(interval);
   }, [isAuthenticated, isAdmin, activeTab]);
+
+  // ── Lazy-load payments when the Purchases tab is opened ──────
+  useEffect(() => {
+    if (!isAuthenticated || !isAdmin || activeTab !== 'purchases') return;
+    if (payments.length > 0) return;
+    setPaymentsLoading(true);
+    api.adminGetPayments().then((res) => {
+      if (res.success) setPayments(res.data.payments ?? []);
+      setPaymentsLoading(false);
+    });
+  }, [isAuthenticated, isAdmin, activeTab, payments.length]);
 
   // ── Backup handler ──────────────────────────────────────────
   async function handleRunBackup() {
@@ -687,10 +714,10 @@ export default function AdminPage() {
           {/* Tab switcher */}
           <div className="flex items-center gap-4 mb-5 overflow-x-auto -mx-1 px-1">
             <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)] overflow-x-auto min-w-0">
-              {(['overview', 'agents', 'users', 'tickets', 'health'] as const).map((tab) => {
-                const tabIcons: Record<string, React.ElementType> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, health: HeartPulse };
+              {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health'] as const).map((tab) => {
+                const tabIcons: Record<string, React.ElementType> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse };
                 const TabIcon = tabIcons[tab] ?? BarChart3;
-                const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, health: 'Health' };
+                const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health' };
                 return (
                   <button
                     key={tab}
@@ -1396,6 +1423,81 @@ export default function AdminPage() {
               </>
             );
           })()}
+
+          {/* ── Purchases Tab ────────────────────────────────── */}
+          {activeTab === 'purchases' && (
+            <div className="space-y-4">
+              {paymentsLoading && payments.length === 0 ? (
+                <div className="space-y-2">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="h-14 rounded-xl shimmer" />
+                  ))}
+                </div>
+              ) : payments.length === 0 ? (
+                <div className="text-center py-14">
+                  <DollarSign size={28} className="mx-auto text-[var(--text-muted)] mb-3" />
+                  <p className="text-sm text-[var(--text-muted)]">No payments yet.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="text-left text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-default)]">
+                        <th className="py-2 pr-3">When</th>
+                        <th className="py-2 pr-3">User · Agent</th>
+                        <th className="py-2 pr-3">Feature</th>
+                        <th className="py-2 pr-3 text-right">USD</th>
+                        <th className="py-2 pr-3 text-right">HATCH</th>
+                        <th className="py-2 pr-3">Status · Tx</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {payments.map((p) => (
+                        <tr key={p.id} className="border-b border-[var(--border-default)]/40 hover:bg-white/[0.02] transition-colors">
+                          <td className="py-3 pr-3 text-[var(--text-secondary)] tabular-nums whitespace-nowrap">
+                            {new Date(p.createdAt).toLocaleString([], { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                          </td>
+                          <td className="py-3 pr-3 min-w-0">
+                            <div className="text-white truncate">{p.userUsername ? `@${p.userUsername}` : p.userEmail ?? 'unknown'}</div>
+                            {p.agentName && (
+                              <div className="text-[10px] text-[var(--text-muted)] truncate">
+                                {p.agentName}{p.agentFramework ? ` · ${p.agentFramework}` : ''}
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-3 pr-3 text-[var(--text-secondary)] truncate">{p.featureKey}</td>
+                          <td className="py-3 pr-3 text-right tabular-nums text-white">${p.usdAmount.toFixed(2)}</td>
+                          <td className="py-3 pr-3 text-right tabular-nums text-[var(--text-muted)]">
+                            {p.hatchAmount ? p.hatchAmount.toFixed(0) : '—'}
+                          </td>
+                          <td className="py-3 pr-3">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className={`inline-flex text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                                p.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-400' :
+                                p.status === 'pending' ? 'bg-amber-500/10 text-amber-400' :
+                                'bg-red-500/10 text-red-400'
+                              }`}>{p.status}</span>
+                              {p.txSignature && !p.txSignature.startsWith('stripe_') && (
+                                <a
+                                  href={`https://solscan.io/tx/${p.txSignature}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[10px] text-[var(--color-accent)] hover:text-[var(--text-primary)] transition-colors truncate"
+                                  title={p.txSignature}
+                                >
+                                  {p.txSignature.slice(0, 8)}…
+                                </a>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* ── Health Tab ──────────────────────────────────── */}
           {activeTab === 'health' && (() => {
