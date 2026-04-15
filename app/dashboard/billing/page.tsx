@@ -10,6 +10,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { TIERS, TIER_ORDER, ADDONS } from '@hatcher/shared';
 import type { UserTierKey, AddonKey } from '@hatcher/shared';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { useWalletModal } from '@solana/wallet-adapter-react-ui';
+import { payWithSol, payWithSplToken, quoteSolForUsd } from '@/lib/solana-payments';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -231,6 +234,9 @@ interface AccountFeatures {
 export default function BillingPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const searchParams = useSearchParams();
+  const wallet = useWallet();
+  const { connection } = useConnection();
+  const { setVisible: setWalletModalVisible } = useWalletModal();
 
   const [accountData, setAccountData] = useState<AccountFeatures | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -343,20 +349,83 @@ export default function BillingPage() {
     });
   };
 
+  /* ── Common SOL payment driver ────────────────────────────
+   * Fetches a live SOL/USD quote, asks the user to confirm the exact
+   * SOL amount, then triggers Phantom to sign+send a System transfer
+   * to the treasury wallet. Returns the confirmed tx signature so the
+   * caller can forward it to /features/{subscribe,addon}. Throws on
+   * cancel, wallet disconnect, insufficient funds, or timeout.
+   */
+  const driveSolPayment = useCallback(async (usdAmount: number, label: string): Promise<string> => {
+    if (!wallet.connected || !wallet.publicKey) {
+      // Open wallet-adapter modal, reject so the caller can show a retry msg
+      setWalletModalVisible(true);
+      throw new Error('Connect a Solana wallet first');
+    }
+    const priceRes = await api.getPrice('sol');
+    if (!priceRes.success || !priceRes.data?.price) {
+      throw new Error('Could not fetch live SOL price — try again in a moment');
+    }
+    const quote = quoteSolForUsd(usdAmount, priceRes.data.price);
+    const confirmed = window.confirm(
+      `Pay with SOL\n\n` +
+      `${label}\n` +
+      `$${usdAmount.toFixed(2)} ≈ ${quote.solAmount.toFixed(6)} SOL\n` +
+      `(@ $${quote.solUsdPrice.toFixed(2)}/SOL)\n\n` +
+      `Approve in your wallet on the next step.`
+    );
+    if (!confirmed) throw new Error('Cancelled');
+    const { signature } = await payWithSol({ wallet, connection, quote });
+    return signature;
+  }, [wallet, connection, setWalletModalVisible]);
+
+  /* ── Common $HATCHER payment driver ───────────────────────
+   * Same UX shape as driveSolPayment but transfers SPL $HATCHER to the
+   * treasury's HATCH ATA. usdAmount still comes from the tier/addon; we
+   * convert USD → $HATCHER via the backend's Jupiter price feed.
+   */
+  const driveHatchPayment = useCallback(async (usdAmount: number, label: string): Promise<string> => {
+    if (!wallet.connected || !wallet.publicKey) {
+      setWalletModalVisible(true);
+      throw new Error('Connect a Solana wallet first');
+    }
+    const priceRes = await api.getPrice('hatch');
+    if (!priceRes.success || !priceRes.data?.price) {
+      throw new Error('Could not fetch live $HATCHER price — try again in a moment');
+    }
+    const hatchAmount = (usdAmount / priceRes.data.price) * 1.01;
+    const confirmed = window.confirm(
+      `Pay with $HATCHER\n\n` +
+      `${label}\n` +
+      `$${usdAmount.toFixed(2)} ≈ ${hatchAmount.toFixed(2)} $HATCHER\n` +
+      `(@ $${priceRes.data.price.toFixed(6)}/$HATCHER)\n\n` +
+      `Approve in your wallet on the next step.`
+    );
+    if (!confirmed) throw new Error('Cancelled');
+    const { signature } = await payWithSplToken({
+      wallet,
+      connection,
+      mint: 'hatch',
+      amountHuman: hatchAmount,
+    });
+    return signature;
+  }, [wallet, connection, setWalletModalVisible]);
+
   /* ── Subscribe to a tier (SOL payment) ────────────────── */
   const handleSubscribeSOL = async () => {
     const tierKey = paymentModal.tierKey;
     if (!tierKey) return;
+    const tierConfig = TIERS[tierKey];
     setPaymentLoading(true);
     setSubscribing(tierKey);
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
-      const txSignature = `mock-${Date.now()}`;
+      const txSignature = await driveSolPayment(tierConfig.usdPrice, `Subscribe to ${tierConfig.name}`);
       const res = await api.subscribe(tierKey, txSignature);
       if (res.success) {
         await loadAccountData();
-        showSuccess(`Subscribed to ${TIERS[tierKey].name}!`);
+        showSuccess(`Subscribed to ${tierConfig.name}!`);
       } else {
         setError(res.error ?? 'Subscription failed');
       }
@@ -372,16 +441,17 @@ export default function BillingPage() {
   const handleSubscribeHATCHER = async () => {
     const tierKey = paymentModal.tierKey;
     if (!tierKey) return;
+    const tierConfig = TIERS[tierKey];
     setPaymentLoading(true);
     setSubscribing(tierKey);
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
-      const txSignature = `mock-${Date.now()}`;
+      const txSignature = await driveHatchPayment(tierConfig.usdPrice, `Subscribe to ${tierConfig.name}`);
       const res = await api.subscribe(tierKey, txSignature, 'hatch');
       if (res.success) {
         await loadAccountData();
-        showSuccess(`Subscribed to ${TIERS[tierKey].name} with $HATCHER!`);
+        showSuccess(`Subscribed to ${tierConfig.name} with $HATCHER!`);
       } else {
         setError(res.error ?? 'Subscription failed');
       }
@@ -401,18 +471,18 @@ export default function BillingPage() {
     const addonKey = paymentModal.addonKey;
     if (!addonKey) return;
     const addonConfig = ADDONS.find(a => a.key === addonKey);
-    if (addonConfig?.perAgent && !selectedAgentId) return;
+    if (!addonConfig) return;
+    if (addonConfig.perAgent && !selectedAgentId) return;
     setPaymentLoading(true);
     setPurchasingAddon(addonKey);
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
-      const txSignature = `mock-${Date.now()}`;
+      const txSignature = await driveSolPayment(addonConfig.usdPrice, addonConfig.name);
       const res = await api.purchaseAddon(addonKey, txSignature, selectedAgentId ?? undefined);
       if (res.success) {
         await loadAccountData();
-        const addon = ADDONS.find(a => a.key === addonKey);
-        showSuccess(`${addon?.name ?? 'Add-on'} purchased!`);
+        showSuccess(`${addonConfig.name} purchased!`);
       } else {
         setError(res.error ?? 'Purchase failed');
       }
@@ -429,18 +499,18 @@ export default function BillingPage() {
     const addonKey = paymentModal.addonKey;
     if (!addonKey) return;
     const addonConfig = ADDONS.find(a => a.key === addonKey);
-    if (addonConfig?.perAgent && !selectedAgentId) return;
+    if (!addonConfig) return;
+    if (addonConfig.perAgent && !selectedAgentId) return;
     setPaymentLoading(true);
     setPurchasingAddon(addonKey);
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
-      const txSignature = `mock-${Date.now()}`;
+      const txSignature = await driveHatchPayment(addonConfig.usdPrice, addonConfig.name);
       const res = await api.purchaseAddon(addonKey, txSignature, selectedAgentId ?? undefined, 'hatch');
       if (res.success) {
         await loadAccountData();
-        const addon = ADDONS.find(a => a.key === addonKey);
-        showSuccess(`${addon?.name ?? 'Add-on'} purchased with $HATCHER!`);
+        showSuccess(`${addonConfig.name} purchased with $HATCHER!`);
       } else {
         setError(res.error ?? 'Purchase failed');
       }

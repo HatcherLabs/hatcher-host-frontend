@@ -17,6 +17,7 @@
   "dependencies": {
     "@hatcher/shared": "npm:@hatcherlabs/shared@^1.1.0",
     "@sentry/nextjs": "^10.46.0",
+    "@solana/spl-token": "^0.4.14",
     "@solana/wallet-adapter-base": "^0.9.25",
     "@solana/wallet-adapter-phantom": "^0.9.25",
     "@solana/wallet-adapter-react": "^0.15.38",
