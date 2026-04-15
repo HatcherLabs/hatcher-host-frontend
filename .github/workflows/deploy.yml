@@ -31,8 +31,11 @@ jobs:
 
             cd /home/deploy/hatcher/apps/frontend
 
-            echo "==> Pulling latest code..."
-            git pull origin main
+            echo "==> Fetching latest code..."
+            git fetch origin main
+            # Hard-reset to remote so stray local edits can't silently block
+            # deploys (anything important must be committed and pushed first).
+            git reset --hard origin/main
 
             echo "==> Checking if dependencies changed..."
             if git diff HEAD~1 --name-only | grep -q 'package-lock.json'; then
