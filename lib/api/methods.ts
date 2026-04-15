@@ -5,6 +5,7 @@
 import { API_URL } from '@/lib/config';
 import { getToken, setToken, clearToken, req } from './core';
 import type { Agent, Payment, AgentFeature, ChatMessage, Ticket, TicketMessage, TicketCategory, TicketPriority } from './types';
+import type { TierConfig } from '@hatcher/shared';
 
 const API_BASE = API_URL;
 
@@ -342,7 +343,7 @@ export const api = {
   getAccountFeatures: () =>
     req<{
       tier: string;
-      tierConfig: any;
+      tierConfig: TierConfig;
       addons: Array<{ key: string; name: string; expiresAt: string | null }>;
       agentLimit: number;
       agentCount: number;

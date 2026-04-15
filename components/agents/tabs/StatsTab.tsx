@@ -237,12 +237,23 @@ function TrendBadge({ pct, direction }: { pct: number; direction: 'up' | 'down' 
   );
 }
 
-function ChartTooltipContent({ active, payload, label, theme }: any) {
+interface RechartsTooltipPayload {
+  name?: string | number;
+  value?: string | number;
+  color?: string;
+}
+interface RechartsTooltipProps {
+  active?: boolean;
+  payload?: RechartsTooltipPayload[];
+  label?: string | number;
+  theme?: { primary?: string };
+}
+function ChartTooltipContent({ active, payload, label, theme }: RechartsTooltipProps) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-lg border border-white/10 px-3 py-2 text-xs shadow-lg" style={{ background: 'var(--bg-elevated)' }}>
       <p className="font-medium text-white mb-1">{label}</p>
-      {payload.map((p: any, i: number) => (
+      {payload.map((p, i) => (
         <p key={i} style={{ color: p.color || theme?.primary || 'var(--text-muted)' }}>
           {p.name}: {typeof p.value === 'number' ? p.value.toLocaleString() : p.value}
         </p>
@@ -510,8 +521,8 @@ export function StatsTab() {
         setMonData(d as MonitoringData);
         setMonError(null);
       }
-    } catch (e: any) {
-      setMonError(e.message || 'Failed to load health data');
+    } catch (e) {
+      setMonError(e instanceof Error ? e.message : 'Failed to load health data');
     } finally {
       setMonLoading(false);
       setRefreshing(false);
