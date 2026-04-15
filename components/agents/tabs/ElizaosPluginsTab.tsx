@@ -53,10 +53,8 @@ export function ElizaosPluginsTab() {
     if (!agent?.id) return;
     setLoading(true);
     setError(null);
-    // M-3 fix: for stopped agents the live /elizaos/agent call returns 503.
-    // Fall back to the plugin list in agent.configJson so the user can still
-    // edit (changes will apply on next start). The DB is the source of truth
-    // for "what the next start will use" anyway.
+    // For stopped agents, the live /elizaos/agent call returns 503. Fall back
+    // to agent.configJson — the DB is the source of truth for the next start.
     if (agent.status !== 'active') {
       const config = (agent.config ?? {}) as Record<string, unknown>;
       const dbPlugins = Array.isArray(config['plugins'])
@@ -107,9 +105,8 @@ export function ElizaosPluginsTab() {
       const res = await api.setElizaosPlugins(agent.id, toSend);
       if (res.success) {
         setEnabled(new Set(res.data.plugins));
-        // H-3 fix: only claim "applied live" when the backend confirms
-        // the PATCH reached the running container. Otherwise say "saved"
-        // and hint at a restart.
+        // Only claim "applied live" when the backend confirms the PATCH
+        // reached the running container — otherwise say "saved" + restart hint.
         if (res.data.liveApplied) {
           setSaveMsg('Plugins updated — changes applied live to the running agent');
         } else {

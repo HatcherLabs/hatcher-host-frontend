@@ -74,9 +74,8 @@ export function MiladyPluginsTab() {
     load();
   }, [load]);
 
-  // M-2 fix: close the modal and clear state when the user navigates to
-  // a different agent. Otherwise the modal persists with stale plugin
-  // data and saveEnvKey would write to the wrong agent.
+  // Close the modal and clear state when the agent changes — otherwise the
+  // modal persists with stale data and saveEnvKey would target the wrong agent.
   useEffect(() => {
     setModalPlugin(null);
     setModalValue('');
