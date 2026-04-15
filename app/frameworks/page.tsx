@@ -52,7 +52,7 @@ const FRAMEWORKS = [
     memoryMb: 400,
     docsUrl: 'https://docs.openclaw.ai',
     configExample: `# openclaw/config.yaml
-model: openai/gpt-oss-20b
+model: meta-llama/llama-4-scout-17b-16e-instruct
 provider: groq
 
 skills:
@@ -86,7 +86,7 @@ memory:
     bestFor: 'Agents that learn and adapt — 78 bundled skills, long-running memory, live config editing, multi-provider routing.',
     useCases: ['Research assistants', 'Knowledge base bots', 'DevOps copilots', 'Security/red-team helpers', 'Long-running memory workflows'],
     features: [
-      { name: '2,500+ ClawHub skills', supported: false },
+      { name: '2,500+ ClawHub skills', supported: true },
       { name: 'Browser automation', supported: true },
       { name: 'Cron jobs & triggers', supported: true },
       { name: 'Multi-channel gateway', supported: true },
@@ -104,7 +104,7 @@ memory:
     configExample: `# hermes/config.toml
 [model]
 provider = "groq"
-model = "openai/gpt-oss-20b"
+model = "meta-llama/llama-4-scout-17b-16e-instruct"
 
 [memory]
 backend = "chromadb"
@@ -170,7 +170,7 @@ telegram = { token = "\${TELEGRAM_BOT_TOKEN}" }`,
     "@elizaos/plugin-web3"
   ],
   "modelProvider": "groq",
-  "model": "gpt-oss-20b"
+  "model": "meta-llama/llama-4-scout-17b-16e-instruct"
 }`,
   },
   {
@@ -212,7 +212,7 @@ personality: |
 
 model:
   provider: groq
-  id: openai/gpt-oss-20b
+  id: meta-llama/llama-4-scout-17b-16e-instruct
 
 platforms:
   telegram:
