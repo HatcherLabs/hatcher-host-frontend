@@ -650,7 +650,7 @@ export default function FrameworksPage() {
             LLM support
           </motion.h2>
           <p className="mb-6 text-sm text-[var(--text-secondary)]">
-            All frameworks support BYOK (Bring Your Own Key) for unlimited messages. Free and Starter tiers use GPT-OSS 20B on Groq. Pro, Business, and Founding Member tiers use Llama 3.3 70B on Groq.
+            All frameworks support BYOK (Bring Your Own Key) for unlimited messages. On the hosted LLM, every tier runs Llama 4 Scout (17B) on Groq — tool-call reliability and latency are the same across Free, Starter, Pro, Business, and Founding Member. Only the daily message quota changes per tier.
           </p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {FRAMEWORKS.map((fw) => (
