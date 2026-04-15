@@ -251,8 +251,8 @@ interface RechartsTooltipProps {
 function ChartTooltipContent({ active, payload, label, theme }: RechartsTooltipProps) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-white/10 px-3 py-2 text-xs shadow-lg" style={{ background: 'var(--bg-elevated)' }}>
-      <p className="font-medium text-white mb-1">{label}</p>
+    <div className="rounded-lg border border-[var(--border-default)] px-3 py-2 text-xs shadow-lg" style={{ background: 'var(--bg-elevated)' }}>
+      <p className="font-medium text-[var(--text-primary)] mb-1">{label}</p>
       {payload.map((p, i) => (
         <p key={i} style={{ color: p.color || theme?.primary || 'var(--text-muted)' }}>
           {p.name}: {typeof p.value === 'number' ? p.value.toLocaleString() : p.value}
@@ -334,10 +334,10 @@ function StatCard({ icon, label, value, sub, accentHex }: {
       )}
       <div className="flex items-center gap-2 mb-2">
         <div style={{ color: accentHex || 'var(--text-secondary)' }}>{icon}</div>
-        <span className="text-xs text-zinc-500 uppercase tracking-wider">{label}</span>
+        <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider">{label}</span>
       </div>
-      <p className="text-2xl font-bold text-white">{value}</p>
-      {sub && <p className="text-xs text-zinc-500 mt-1">{sub}</p>}
+      <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
+      {sub && <p className="text-xs text-[var(--text-muted)] mt-1">{sub}</p>}
     </motion.div>
   );
 }
@@ -348,7 +348,7 @@ function MiniChart({ data, dataKey, accentHex, height = 80 }: {
   accentHex: string;
   height?: number;
 }) {
-  if (!data.length) return <div className="text-zinc-600 text-xs">No data yet</div>;
+  if (!data.length) return <div className="text-[var(--text-muted)] text-xs">No data yet</div>;
   const values = data.map(d => d[dataKey]);
   const max = Math.max(...values, 1);
   const points = values.map((v, i) => ({
@@ -390,11 +390,11 @@ function RestartIndicator({ restarts, accentHex }: { restarts: number; accentHex
       <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: isHigh ? 'linear-gradient(90deg, #ef444480, #ef444420)' : `linear-gradient(90deg, ${accentHex}80, ${accentHex}20)` }} />
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <RotateCcw size={16} className={isHigh ? 'text-red-400' : isWarning ? 'text-amber-400' : 'text-zinc-400'} />
-          <span className="text-xs text-zinc-500 uppercase tracking-wider">Restarts</span>
+          <RotateCcw size={16} className={isHigh ? 'text-red-400' : isWarning ? 'text-amber-400' : 'text-[var(--text-muted)]'} />
+          <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider">Restarts</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className={`text-2xl font-bold ${isHigh ? 'text-red-400' : isWarning ? 'text-amber-400' : 'text-white'}`}>{restarts}</span>
+          <span className={`text-2xl font-bold ${isHigh ? 'text-red-400' : isWarning ? 'text-amber-400' : 'text-[var(--text-primary)]'}`}>{restarts}</span>
           {isHigh && (
             <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/15 border border-red-500/25">
               <AlertTriangle size={10} className="text-red-400" />
@@ -880,7 +880,7 @@ export function StatsTab() {
             </div>
           </div>
         ) : monError ? (
-          <div className="flex flex-col items-center justify-center py-16 text-zinc-500">
+          <div className="flex flex-col items-center justify-center py-16 text-[var(--text-muted)]">
             <AlertTriangle size={32} className="mb-3 text-amber-400" />
             <p className="text-sm">{monError}</p>
             <button onClick={refreshMonitoring} className="mt-3 text-xs text-purple-400 hover:underline">Try again</button>
@@ -906,7 +906,7 @@ export function StatsTab() {
                 <div>
                   <span className={`text-sm font-semibold ${healthStyle.text}`}>{healthStyle.label}</span>
                   {monData.uptime.since && (
-                    <p className="text-[10px] text-zinc-500">
+                    <p className="text-[10px] text-[var(--text-muted)]">
                       Since {new Date(monData.uptime.since).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </p>
                   )}
@@ -915,7 +915,7 @@ export function StatsTab() {
               <button
                 onClick={refreshMonitoring}
                 disabled={refreshing}
-                className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-[var(--text-primary)] transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors disabled:opacity-50"
               >
                 <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
                 Refresh
@@ -933,14 +933,14 @@ export function StatsTab() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className={`rounded-xl border ${fwColors.border} bg-[var(--bg-elevated)]/80 p-4`}>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs text-zinc-500 uppercase tracking-wider">CPU History</span>
+                  <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider">CPU History</span>
                   <span className={`text-xs ${fwColors.text}`}>{monData.resources.cpuPercent.toFixed(1)}%</span>
                 </div>
                 <MiniChart data={monData.history} dataKey="cpu" accentHex={fwColors.hex} height={80} />
               </div>
               <div className={`rounded-xl border ${fwColors.border} bg-[var(--bg-elevated)]/80 p-4`}>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs text-zinc-500 uppercase tracking-wider">Memory History</span>
+                  <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider">Memory History</span>
                   <span className={`text-xs ${fwColors.text}`}>{memPercent}%</span>
                 </div>
                 <MiniChart data={monData.history} dataKey="mem" accentHex={fwColors.hexLight} height={80} />
@@ -973,8 +973,8 @@ export function StatsTab() {
             {/* Errors (24h) */}
             <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)]/80 p-4">
               <div className="flex items-center gap-2 mb-3">
-                <AlertTriangle size={16} className="text-zinc-400" />
-                <span className="text-xs text-zinc-500 uppercase tracking-wider">Errors (24h)</span>
+                <AlertTriangle size={16} className="text-[var(--text-muted)]" />
+                <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider">Errors (24h)</span>
               </div>
               {monData.errors.last24h === 0 ? (
                 <div className="flex items-center gap-2 text-emerald-400">
