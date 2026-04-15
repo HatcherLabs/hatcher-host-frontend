@@ -107,14 +107,6 @@ test.describe('Public Page Navigation', () => {
     expect(hasFramework).toBe(true);
   });
 
-  test('explore page loads', async ({ page }) => {
-    await page.goto('/explore');
-    await page.waitForLoadState('networkidle', { timeout: 10_000 });
-
-    // Should have some heading visible
-    await expect(page.locator('h1, h2').first()).toBeVisible();
-  });
-
   test('status page loads', async ({ page }) => {
     await page.goto('/status');
     await page.waitForLoadState('networkidle', { timeout: 10_000 });

@@ -193,9 +193,6 @@ export const api = {
   /** List the current user's agents */
   getMyAgents: () => req<Agent[]>('/agents'),
 
-  /** Browse all public agents */
-  exploreAgents: (limit = 24, offset = 0) => req<{ agents: Agent[]; pagination: { total: number; limit: number; offset: number; hasMore: boolean } }>(`/agents/explore?limit=${limit}&offset=${offset}`),
-
   /** Get a single agent */
   getAgent: (id: string) => req<Agent>(`/agents/${id}`),
 
@@ -286,7 +283,6 @@ export const api = {
   updateAgent: (id: string, data: {
     name?: string;
     description?: string;
-    isPublic?: boolean;
     commitMessage?: string;
     config?: { personality?: string; systemPrompt?: string; [key: string]: unknown };
   }) =>
@@ -1598,28 +1594,6 @@ export const api = {
       expected?: string;
       found?: string[];
     }>(`/domains/${id}/verify`, { method: 'POST' }),
-
-  // ─── Public Chat ──────────────────────────────────────────
-  /** Get public agent info by slug (no auth) */
-  getPublicAgent: (slug: string) =>
-    req<{
-      id: string;
-      name: string;
-      description: string | null;
-      avatarUrl: string | null;
-      framework: string;
-      slug: string;
-      status: string;
-      isPublic: boolean;
-      messageCount: number;
-    }>(`/chat/${slug}`),
-
-  /** Send a message to a public agent (no auth) */
-  sendPublicMessage: (slug: string, message: string, history?: Array<{ role: 'user' | 'assistant'; content: string }>) =>
-    req<{ content: string }>(`/chat/${slug}/message`, {
-      method: 'POST',
-      body: JSON.stringify({ message, history }),
-    }),
 
   // ─── Workflows (Visual Builder) ────────────────────────────
   /** List all workflows for an agent */

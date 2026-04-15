@@ -19,14 +19,12 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 // ── Nav links when logged IN ──
 const AUTH_NAV_LINKS = [
   { href: '/dashboard/agents',    label: 'My Agents' },
-  { href: '/explore',             label: 'Explore' },
   { href: '/create',              label: 'Create' },
   { href: '/token',               label: 'Token' },
 ];
 
 // ── Nav links when logged OUT ──
 const GUEST_NAV_LINKS = [
-  { href: '/explore',             label: 'Explore' },
   { href: '/templates',           label: 'Templates' },
   { href: '/token',               label: 'Token' },
 ];
@@ -49,7 +47,6 @@ const USER_EXTRA_LINKS = [
 // ── Mobile links (when logged in) ──
 const MOBILE_AUTH_LINKS = [
   { href: '/dashboard/agents',    label: 'My Agents' },
-  { href: '/explore',             label: 'Explore' },
   { href: '/create',              label: 'Create' },
   { href: '/token',               label: 'Token' },
   { href: '/pricing',             label: 'Pricing' },
@@ -58,7 +55,6 @@ const MOBILE_AUTH_LINKS = [
 
 // ── Mobile links (when logged out) ──
 const MOBILE_GUEST_LINKS = [
-  { href: '/explore',   label: 'Explore' },
   { href: '/templates', label: 'Templates' },
   { href: '/token',     label: 'Token' },
   { href: '/pricing',   label: 'Pricing' },

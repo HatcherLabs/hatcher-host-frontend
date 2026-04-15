@@ -51,8 +51,7 @@ export interface AgentFeature {
 }
 
 /**
- * Agent as returned by the API (serialized dates, optional joined relations,
- * public-facing fields like isPublic/ownerUsername/ownerAddress).
+ * Agent as returned by the API (serialized dates, optional joined relations).
  * Differs from shared Agent which is the full DB model with Date fields and AgentConfig.
  */
 export interface Agent {
@@ -63,7 +62,6 @@ export interface Agent {
   avatarUrl: string | null;
   status: string;
   framework: AgentFramework;
-  isPublic?: boolean;
   messageCount?: number;
   ownerId?: string;
   ownerUsername?: string;

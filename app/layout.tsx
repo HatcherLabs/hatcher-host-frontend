@@ -125,7 +125,7 @@ const websiteJsonLd = {
   description: 'AI Agent Hosting Platform',
   potentialAction: {
     '@type': 'SearchAction',
-    target: `${SITE_URL}/explore?q={search_term_string}`,
+    target: `${SITE_URL}/templates?q={search_term_string}`,
     'query-input': 'required name=search_term_string',
   },
 };

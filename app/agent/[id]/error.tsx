@@ -41,7 +41,7 @@ export default function AgentError({
             Try Again
           </button>
           <Link
-            href="/explore"
+            href="/dashboard/agents"
             className="inline-flex items-center gap-2 px-5 py-2.5 border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-secondary)] rounded-xl font-semibold text-sm transition-colors hover:text-[var(--text-primary)] hover:border-[var(--color-accent)]/30"
           >
             <ArrowLeft className="w-4 h-4" />

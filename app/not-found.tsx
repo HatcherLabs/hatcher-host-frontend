@@ -36,10 +36,10 @@ export default function NotFound() {
             Go Home
           </Link>
           <Link
-            href="/explore"
+            href="/dashboard/agents"
             className="inline-flex items-center gap-2 border border-[var(--border-hover)] text-[var(--text-secondary)] font-medium px-6 py-2.5 rounded-full text-sm hover:bg-[var(--bg-card)] hover:border-white/20 transition-all duration-200"
           >
-            Explore Agents
+            My Agents
           </Link>
         </div>
       </div>

@@ -154,8 +154,8 @@ export function AgentPageClient() {
               <ArrowLeft className="w-4 h-4" />
               Go Back
             </button>
-            <Link href="/explore" className="btn-secondary inline-flex items-center gap-2 justify-center">
-              Browse Agents
+            <Link href="/dashboard/agents" className="btn-secondary inline-flex items-center gap-2 justify-center">
+              My Agents
             </Link>
           </div>
         </motion.div>
@@ -183,11 +183,11 @@ export function AgentPageClient() {
       {/* Back navigation */}
       <motion.div variants={itemVariants} className="mb-6">
         <Link
-          href="/explore"
+          href="/dashboard/agents"
           className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--color-accent)] transition-colors duration-200"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Explore
+          Back to My Agents
         </Link>
       </motion.div>
 
@@ -387,8 +387,8 @@ export function AgentPageClient() {
                   <Rocket className="w-4 h-4" />
                   Deploy Similar Agent
                 </Link>
-                <Link href="/explore" className="btn-secondary inline-flex items-center gap-2 justify-center">
-                  Browse More Agents
+                <Link href="/dashboard/agents" className="btn-secondary inline-flex items-center gap-2 justify-center">
+                  My Agents
                 </Link>
               </div>
             </div>

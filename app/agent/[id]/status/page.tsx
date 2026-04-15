@@ -186,7 +186,7 @@ export default async function AgentStatusPage({
           <p className="text-sm text-[var(--text-muted)] mb-6">
             This agent does not exist or is not publicly visible.
           </p>
-          <Link href="/explore" className="btn-secondary text-sm inline-flex items-center gap-2 justify-center">
+          <Link href="/dashboard/agents" className="btn-secondary text-sm inline-flex items-center gap-2 justify-center">
             Browse Agents
           </Link>
         </div>
@@ -328,10 +328,6 @@ export default async function AgentStatusPage({
           <Link href={`/agent/${id}`} className="hover:text-[var(--text-secondary)] transition-colors flex items-center gap-1">
             <Activity className="w-3 h-3" aria-hidden="true" />
             View Profile
-          </Link>
-          <span aria-hidden="true">·</span>
-          <Link href="/explore" className="hover:text-[var(--text-secondary)] transition-colors">
-            Explore
           </Link>
           <span aria-hidden="true">·</span>
           <Link href="/" className="hover:text-[var(--text-secondary)] transition-colors">
