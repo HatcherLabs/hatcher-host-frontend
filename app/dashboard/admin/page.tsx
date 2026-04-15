@@ -98,12 +98,13 @@ interface HealthData {
 }
 
 // ─── Tab definition ──────────────────────────────────────────
-type Tab = 'overview' | 'users' | 'agents' | 'tickets' | 'system';
+type Tab = 'overview' | 'users' | 'agents' | 'tickets' | 'purchases' | 'system';
 const TABS: Array<{ key: Tab; label: string; icon: React.ElementType }> = [
   { key: 'overview', label: 'Overview', icon: TrendingUp },
   { key: 'users', label: 'Users', icon: Users },
   { key: 'agents', label: 'Agents', icon: Bot },
   { key: 'tickets', label: 'Support', icon: TicketCheck },
+  { key: 'purchases', label: 'Purchases', icon: DollarSign },
   { key: 'system', label: 'System', icon: Server },
 ];
 
@@ -275,6 +276,21 @@ export default function AdminDashboardPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [agents, setAgents] = useState<AdminAgent[]>([]);
   const [tickets, setTickets] = useState<AdminTicket[]>([]);
+  const [payments, setPayments] = useState<Array<{
+    id: string;
+    userId: string;
+    userEmail: string | null;
+    userUsername: string | null;
+    agentId: string | null;
+    agentName: string | null;
+    agentFramework: string | null;
+    featureKey: string;
+    usdAmount: number;
+    hatchAmount: number;
+    txSignature: string;
+    status: string;
+    createdAt: string;
+  }>>([]);
   const [health, setHealth] = useState<HealthData | null>(null);
 
   const [loading, setLoading] = useState(true);
@@ -346,6 +362,16 @@ export default function AdminDashboardPage() {
       setTabLoading(false);
     });
   }, [activeTab, health]);
+
+  // ── Load payments when Purchases tab is shown ───────────────
+  useEffect(() => {
+    if (activeTab !== 'purchases' || payments.length > 0) return;
+    setTabLoading(true);
+    api.adminGetPayments().then((res) => {
+      if (res.success) setPayments(res.data.payments ?? []);
+      setTabLoading(false);
+    });
+  }, [activeTab, payments.length]);
 
   const showAction = useCallback((type: 'success' | 'error', text: string) => {
     setActionMsg({ type, text });
@@ -1172,6 +1198,80 @@ export default function AdminDashboardPage() {
                 </div>
               )}
             </div>
+          </motion.div>
+        )}
+
+        {/* ── Purchases tab ────────────────────────────────────── */}
+        {activeTab === 'purchases' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+            {tabLoading && payments.length === 0 ? (
+              <div className="space-y-2">
+                {[1,2,3,4,5].map(i => <div key={i} className="card glass-noise h-14 shimmer" />)}
+              </div>
+            ) : payments.length === 0 ? (
+              <div className="card glass-noise p-8 text-center">
+                <DollarSign size={28} className="mx-auto text-[var(--text-muted)] mb-3" />
+                <p className="text-sm text-[var(--text-muted)]">No payments yet.</p>
+              </div>
+            ) : (
+              <div className="card glass-noise overflow-hidden">
+                <div className="hidden sm:grid grid-cols-[minmax(0,1.3fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,0.7fr)_minmax(0,0.8fr)_minmax(0,1fr)] gap-3 px-4 py-2.5 border-b border-[var(--border-default)] text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                  <span>When</span>
+                  <span>User · Agent</span>
+                  <span>Feature</span>
+                  <span className="text-right">USD</span>
+                  <span className="text-right">HATCH</span>
+                  <span>Status · Tx</span>
+                </div>
+                <div className="divide-y divide-[rgba(46,43,74,0.2)]">
+                  {payments.map((p) => (
+                    <div
+                      key={p.id}
+                      className="grid sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,0.7fr)_minmax(0,0.8fr)_minmax(0,1fr)] gap-3 px-4 py-3 hover:bg-[rgba(255,255,255,0.02)] transition-colors text-xs"
+                    >
+                      <div className="text-[var(--text-secondary)] tabular-nums">
+                        {new Date(p.createdAt).toLocaleString([], { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-white truncate">
+                          {p.userUsername ? `@${p.userUsername}` : p.userEmail ?? 'unknown'}
+                        </div>
+                        {p.agentName && (
+                          <div className="text-[10px] text-[var(--text-muted)] truncate">
+                            {p.agentName}{p.agentFramework ? ` · ${p.agentFramework}` : ''}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-[var(--text-secondary)] truncate">{p.featureKey}</div>
+                      <div className="text-right tabular-nums text-white">${p.usdAmount.toFixed(2)}</div>
+                      <div className="text-right tabular-nums text-[var(--text-muted)]">
+                        {p.hatchAmount ? p.hatchAmount.toFixed(0) : '—'}
+                      </div>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className={`inline-flex text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                          p.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-400' :
+                          p.status === 'pending' ? 'bg-amber-500/10 text-amber-400' :
+                          'bg-red-500/10 text-red-400'
+                        }`}>
+                          {p.status}
+                        </span>
+                        {p.txSignature && !p.txSignature.startsWith('stripe_') && (
+                          <a
+                            href={`https://solscan.io/tx/${p.txSignature}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] text-[var(--color-accent)] hover:text-[var(--text-primary)] transition-colors truncate"
+                            title={p.txSignature}
+                          >
+                            {p.txSignature.slice(0, 8)}…
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
 

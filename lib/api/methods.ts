@@ -1088,6 +1088,26 @@ export const api = {
       }>;
     }>('/admin/tickets?limit=100&offset=0'),
 
+  /** Admin: last 25 payments for the Recent Purchases tab */
+  adminGetPayments: () =>
+    req<{
+      payments: Array<{
+        id: string;
+        userId: string;
+        userEmail: string | null;
+        userUsername: string | null;
+        agentId: string | null;
+        agentName: string | null;
+        agentFramework: string | null;
+        featureKey: string;
+        usdAmount: number;
+        hatchAmount: number;
+        txSignature: string;
+        status: string;
+        createdAt: string;
+      }>;
+    }>('/admin/payments'),
+
   /** Admin: reply to a ticket */
   adminReplyTicket: (ticketId: string, message: string) =>
     req<{ id: string }>(`/admin/tickets/${ticketId}/reply`, {
