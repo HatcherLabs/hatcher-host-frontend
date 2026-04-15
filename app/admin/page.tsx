@@ -818,7 +818,7 @@ export default function AdminPage() {
                       {recentAgents.map((agent, i) => (
                         <Link
                           key={agent.id}
-                          href={`/dashboard/agent/${agent.id}`}
+                          href={`/admin/agent/${agent.id}`}
                           className={`flex items-center justify-between py-2.5 hover:bg-[var(--bg-hover)] -mx-2 px-2 rounded-lg transition-colors ${i < recentAgents.length - 1 ? 'border-b border-[var(--border-default)]' : ''}`}
                         >
                           <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -986,7 +986,7 @@ export default function AdminPage() {
                           >
                             {/* Agent name — clickable */}
                             <td className="py-3.5 pr-4">
-                              <Link href={`/dashboard/agent/${agent.id}`} className="flex items-center gap-3 group">
+                              <Link href={`/admin/agent/${agent.id}`} className="flex items-center gap-3 group">
                                 <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)]/12 flex items-center justify-center flex-shrink-0">
                                   <Bot size={14} className="text-[var(--color-accent)]" />
                                 </div>
@@ -1044,7 +1044,7 @@ export default function AdminPage() {
                               <div className="flex items-center gap-1.5">
                                 {/* View button */}
                                 <Link
-                                  href={`/dashboard/agent/${agent.id}`}
+                                  href={`/admin/agent/${agent.id}`}
                                   className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20 hover:bg-[var(--color-accent)]/20"
                                   title="View agent dashboard"
                                 >
@@ -1811,7 +1811,7 @@ export default function AdminPage() {
                         {userDetail.agents.map(a => (
                           <Link
                             key={a.id}
-                            href={`/dashboard/agent/${a.id}`}
+                            href={`/admin/agent/${a.id}`}
                             className="flex items-center justify-between p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-xs hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-accent)]/5 transition-colors group"
                           >
                             <div className="flex items-center gap-2">

@@ -979,6 +979,24 @@ export const api = {
   adminGetAgents: (limit = 25, offset = 0) =>
     req<{ agents: Array<Agent & { ownerWallet: string; ownerUsername: string }>; pagination: { total: number; limit: number; offset: number; hasMore: boolean } }>(`/admin/agents?limit=${limit}&offset=${offset}`),
 
+  /** Admin: read-only agent detail (secrets redacted) */
+  adminGetAgent: (id: string) =>
+    req<Agent & {
+      ownerWallet: string;
+      ownerUsername: string;
+      configJson: Record<string, unknown> | null;
+      containerId: string | null;
+      features: Array<{ featureKey: string; type: string; expiresAt: string | null }>;
+      createdAt: string;
+      updatedAt: string;
+    }>(`/admin/agents/${id}`),
+
+  /** Admin: tail container logs for a given agent */
+  adminGetAgentLogs: (id: string, tail = 200) =>
+    req<{ lines: string[]; containerId: string | null; status: string; error?: string }>(
+      `/admin/agents/${id}/logs?tail=${tail}`,
+    ),
+
   adminGetStats: () =>
     req<{
       totalUsers: number;
