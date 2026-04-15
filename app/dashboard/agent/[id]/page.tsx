@@ -471,13 +471,20 @@ export default function AgentManagePage() {
         const apiBase = API_URL;
         const wsBase = apiBase.replace(/^http/, 'ws');
         const url = `${wsBase}/agents/${id}/logs/ws${token ? `?token=${encodeURIComponent(token)}` : ''}`;
-        logs.setLogsLoading(true);
+        // Don't flash the loading skeleton on every reconnect. Only the
+        // very first attempt sets loading; subsequent retries keep the
+        // existing log buffer on screen so the user doesn't see the
+        // whole pane blink every second while we back off and retry.
+        if (wsLogsRetryCountRef.current === 0) logs.setLogsLoading(true);
         const ws = new WebSocket(url);
         wsLogsRef.current = ws;
 
-        ws.onopen = () => {
-          wsLogsRetryCountRef.current = 0;
-        };
+        // Don't reset the retry counter here — the TCP upgrade can
+        // succeed and the server can then reject us (auth fail, stream
+        // cap hit, etc.) which flips onclose without ever sending the
+        // `connected` app-level message. If we reset on onopen we end
+        // up in a tight 1s reconnect loop; reset only when we've seen
+        // the server's `connected` message.
 
         ws.onmessage = (event) => {
           try {
@@ -485,6 +492,7 @@ export default function AgentManagePage() {
             if (msg.type === 'connected') {
               logs.setLogsLoading(false);
               setWsLogsConnected(true);
+              wsLogsRetryCountRef.current = 0;
               // Historical batch is already loaded in parallel above —
               // no need to refetch here.
             } else if (msg.type === 'log' && msg.timestamp && msg.message) {
