@@ -671,7 +671,7 @@ export default function AdminPage() {
 
         {/* ── Quick Stats Row (always visible) ────────────────── */}
         {stats && (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7 overflow-x-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3">
             <StatCard label="Users" value={stats.totalUsers} icon={Users} iconColor="var(--color-accent)" />
             <StatCard label="Agents" value={stats.totalAgents} icon={Bot} iconColor="#60A5FA" />
             <StatCard label="Active" value={stats.activeAgents} icon={Activity} iconColor="#4ADE80" />

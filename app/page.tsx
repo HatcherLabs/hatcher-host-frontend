@@ -20,12 +20,115 @@ import {
   Zap,
   MessageSquare,
   BarChart3,
+  Users,
+  Activity,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 
 // ─── Shared animation config ──────────────────────────────────
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
 const fadeUp = { initial: { opacity: 0, y: 30 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true } };
+
+// ─── Public stats (users / agents / active) ──────────────────
+interface PlatformStats {
+  totalUsers: number;
+  totalAgents: number;
+  activeAgents: number;
+}
+
+function StatProofCard({
+  label,
+  value,
+  icon: Icon,
+  iconColor,
+  loading,
+}: {
+  label: string;
+  value: string | number;
+  icon: React.ElementType;
+  iconColor: string;
+  loading: boolean;
+}) {
+  return (
+    <div className="card glass-noise p-4 sm:p-5">
+      <div className="flex items-start justify-between">
+        <div className="flex-1 min-w-0">
+          <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.08em] font-semibold block mb-1.5 text-[var(--text-muted)] truncate">
+            {label}
+          </span>
+          {loading ? (
+            <span className="inline-block h-7 w-16 rounded shimmer" />
+          ) : (
+            <span className="text-xl sm:text-[28px] leading-[1.1] font-bold block text-[var(--text-primary)] truncate">
+              {value}
+            </span>
+          )}
+        </div>
+        <div
+          className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{ background: iconColor + '18' }}
+        >
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: iconColor }} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HeroStats() {
+  const [stats, setStats] = useState<PlatformStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await api.getPlatformStats();
+        if (cancelled) return;
+        if (res.success) setStats(res.data);
+      } catch {
+        // silent — stats are decorative; landing still renders
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const fmt = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : n.toLocaleString());
+
+  return (
+    <motion.div
+      {...fadeUp}
+      transition={{ duration: 0.6, ease, delay: 0.2 }}
+      className="max-w-4xl mx-auto grid grid-cols-3 gap-3 sm:gap-4"
+    >
+      <StatProofCard
+        label="Users"
+        value={stats ? fmt(stats.totalUsers) : '—'}
+        icon={Users}
+        iconColor="var(--color-accent)"
+        loading={loading}
+      />
+      <StatProofCard
+        label="Agents"
+        value={stats ? fmt(stats.totalAgents) : '—'}
+        icon={Bot}
+        iconColor="#60A5FA"
+        loading={loading}
+      />
+      <StatProofCard
+        label="Active now"
+        value={stats ? fmt(stats.activeAgents) : '—'}
+        icon={Activity}
+        iconColor="#4ADE80"
+        loading={loading}
+      />
+    </motion.div>
+  );
+}
 
 // ─── Typewriter effect ───────────────────────────────────────
 const TYPEWRITER_WORDS = ['AI Agent', 'Fitness Coach', 'Crypto Tracker', 'Study Buddy', 'Travel Planner', 'Personal Assistant'];
@@ -281,6 +384,11 @@ export default function LandingPage() {
             </motion.div>
           </div>
         </div>
+      </section>
+
+      {/* ── 1b. SOCIAL PROOF (platform stats) ─────────── */}
+      <section className="px-4 sm:px-6 -mt-8 sm:-mt-12 mb-4 sm:mb-6">
+        <HeroStats />
       </section>
 
       {/* ── 2. HOW IT WORKS ─────────────────────────────── */}

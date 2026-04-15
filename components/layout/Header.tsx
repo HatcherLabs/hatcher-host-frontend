@@ -10,7 +10,7 @@ import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield, LogOut, Settings, ChevronDown,
-  CreditCard, Users, Wallet, Activity,
+  Users, Wallet, Activity,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
@@ -31,16 +31,16 @@ const GUEST_NAV_LINKS = [
 
 // ── Auxiliary links (visible in both states, after a divider) ──
 const AUX_LINKS = [
-  { href: '/pricing',   label: 'Pricing',   external: false, badge: null, authOnly: false },
-  { href: '/support',   label: 'Support',   external: false, badge: null, authOnly: true },
-  { href: DOCS_URL,     label: 'Docs',      external: true,  badge: null, authOnly: false },
+  { href: '/pricing',           label: 'Pricing',   external: false, badge: null, authOnly: false },
+  { href: '/support',           label: 'Support',   external: false, badge: null, authOnly: true },
+  { href: DOCS_URL,             label: 'Docs',      external: true,  badge: null, authOnly: false },
+  { href: '/dashboard/billing', label: 'Billing',   external: false, badge: null, authOnly: true },
 ];
 
 // ── User dropdown links ──
 const USER_EXTRA_LINKS = [
   { href: '/dashboard/analytics', label: 'Analytics', icon: Activity },
   { href: '/dashboard/team', label: 'Team', icon: Users },
-  { href: '/dashboard/billing', label: 'Billing', icon: CreditCard },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -50,6 +50,7 @@ const MOBILE_AUTH_LINKS = [
   { href: '/create',              label: 'Create' },
   { href: '/token',               label: 'Token' },
   { href: '/pricing',             label: 'Pricing' },
+  { href: '/dashboard/billing',   label: 'Billing' },
   { href: '/support',             label: 'Support' },
 ];
 
@@ -457,9 +458,6 @@ export function Header() {
                     </Link>
                     <Link href="/dashboard/team" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
                       <Users className="w-4 h-4" /> Team
-                    </Link>
-                    <Link href="/dashboard/billing" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
-                      <CreditCard className="w-4 h-4" /> Billing
                     </Link>
                     <Link href="/dashboard/settings" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
                       <Settings className="w-4 h-4" /> Settings

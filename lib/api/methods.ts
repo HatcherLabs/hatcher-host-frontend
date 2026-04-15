@@ -190,6 +190,16 @@ export const api = {
   validateReferralCode: (code: string) =>
     req<{ valid: boolean; referrerUsername?: string }>(`/referrals/validate/${code}`),
 
+  /** Public platform stats (used by landing social-proof card) */
+  getPlatformStats: () =>
+    req<{
+      totalAgents: number;
+      activeAgents: number;
+      totalUsers: number;
+      totalMessages: number;
+      frameworks: Record<string, number>;
+    }>('/stats'),
+
   /** List the current user's agents */
   getMyAgents: () => req<Agent[]>('/agents'),
 
