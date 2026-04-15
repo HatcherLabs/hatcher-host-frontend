@@ -457,6 +457,14 @@ export default function AgentManagePage() {
     if (isActiveStatus) {
       let cancelled = false;
 
+      // Fire the HTTP batch load immediately, independent of the WS
+      // handshake. Mobile networks / corporate proxies sometimes allow
+      // HTTPS but block WebSocket upgrades, in which case the WS
+      // `connected` event that used to trigger this fetch never fires
+      // and the logs tab stays empty. Running both in parallel makes
+      // sure the tab always has content.
+      logs.loadLogs();
+
       function connectWsLogs() {
         if (cancelled) return;
         const token = getToken();
@@ -477,9 +485,8 @@ export default function AgentManagePage() {
             if (msg.type === 'connected') {
               logs.setLogsLoading(false);
               setWsLogsConnected(true);
-              // Also fetch initial batch via HTTP as fallback — WS stream
-              // may not emit historical lines if Docker log file is empty/rotated
-              logs.loadLogs();
+              // Historical batch is already loaded in parallel above —
+              // no need to refetch here.
             } else if (msg.type === 'log' && msg.timestamp && msg.message) {
               const entry = {
                 timestamp: msg.timestamp,
