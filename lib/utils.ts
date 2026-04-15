@@ -20,9 +20,10 @@ export function shortenAddress(address: string, chars = 4): string {
  * 'short-month'`.
  */
 export function timeAgo(
-  date: string | Date,
+  date: string | Date | null | undefined,
   opts: { switchToDateAfterDays?: number; dateFormat?: 'locale' | 'short-month' } = {},
 ): string {
+  if (!date) return '';
   const d = typeof date === 'string' ? new Date(date) : date;
   if (Number.isNaN(d.getTime())) return String(date);
   const diff = Date.now() - d.getTime();

@@ -85,11 +85,13 @@ export interface Agent {
  * Differs from shared TicketMessage which has no id/ticketId and uses 'system' role.
  */
 export interface TicketMessage {
-  id: string;
-  ticketId: string;
-  role: 'user' | 'support';
+  id?: string;
+  ticketId?: string;
+  role: 'user' | 'support' | 'admin';
   content: string;
-  createdAt: string;
+  /** API emits `timestamp`; older code paths may use `createdAt`. */
+  timestamp?: string;
+  createdAt?: string;
 }
 
 /**
