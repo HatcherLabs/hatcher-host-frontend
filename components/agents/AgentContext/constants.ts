@@ -101,22 +101,15 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     secretPrefix: 'WHATSAPP',
     docsUrl: 'https://docs.hatcher.host/integrations/whatsapp',
     hasChannelSettings: false,
-    frameworks: ['openclaw', 'hermes', 'milady'],
+    // Hermes WhatsApp pairing requires a TTY-capable flow we don't have in
+    // the dashboard yet — Hermes users can still pair via the agent terminal
+    // (`hermes whatsapp`). Milady uses Meta Cloud API tokens, not pairing.
+    frameworks: ['openclaw'],
     pairingRequired: true,
     pairingFields: [
       { key: 'WHATSAPP_ALLOW_FROM', label: 'Allowed Phone Numbers', type: 'text', placeholder: '+123****7890, +0987654321', helper: 'Comma-separated phone numbers (E.164 format). Only these numbers can chat with your agent. Leave empty for everyone.' },
     ],
     pairingChannel: 'whatsapp',
-    fields: [],
-  },
-  {
-    featureKey: 'openclaw.platform.signal',
-    name: 'Signal',
-    description: 'Signal integration — coming soon.',
-    secretPrefix: 'SIGNAL',
-    docsUrl: 'https://docs.hatcher.host/integrations/signal',
-    hasChannelSettings: false,
-    frameworks: ['openclaw', 'hermes', 'milady'],
     fields: [],
   },
   {

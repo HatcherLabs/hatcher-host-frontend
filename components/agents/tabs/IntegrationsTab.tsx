@@ -46,7 +46,6 @@ const FRAMEWORK_COMPAT: Record<string, Record<string, CompatLevel>> = {
     'openclaw.platform.telegram': 'native',
     'openclaw.platform.discord': 'native',
     'openclaw.platform.whatsapp': 'native',
-    'openclaw.platform.signal': 'planned',
     'openclaw.platform.twitter': 'native',
     'openclaw.platform.slack': 'native',
     'openclaw.feature.webhooks': 'native',
@@ -67,7 +66,6 @@ const FRAMEWORK_COMPAT: Record<string, Record<string, CompatLevel>> = {
     'openclaw.platform.telegram': 'native',
     'openclaw.platform.discord': 'native',
     'openclaw.platform.whatsapp': 'native',
-    'openclaw.platform.signal': 'planned',
     'openclaw.platform.slack': 'native',
     'openclaw.feature.webhooks': 'native',
   },
@@ -366,14 +364,16 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
   const isRunning = agent.status === 'active';
   const ctx = useAgentContext();
   const { integrationSecrets, setIntegrationField, saveIntegrationSecrets, savingIntegration, integrationSaveMsg, hasExistingSecret } = ctx;
-  const pairingMarker = integration.pairingChannel === 'whatsapp' ? 'WHATSAPP_PAIRING' : 'SIGNAL_PAIRING';
-  const isPaired = hasExistingSecret(pairingMarker);
+  const isPaired = hasExistingSecret('WHATSAPP_PAIRING');
 
-  // AllowFrom field — always visible
-  const allowFromKey = integration.pairingChannel === 'whatsapp' ? 'WHATSAPP_ALLOW_FROM' : 'SIGNAL_ALLOW_FROM';
+  // AllowFrom — pre-populate from agent.config so a saved value (e.g. a phone
+  // number list) is visible after page reload, not just when the user is mid-edit.
+  // WHATSAPP_ALLOW_FROM is intentionally not in the encrypted secret list.
+  const allowFromKey = 'WHATSAPP_ALLOW_FROM';
   const sk = integrationStateKey(integration);
   const secrets = integrationSecrets[sk] ?? {};
-  const allowFromValue = secrets[allowFromKey] ?? '';
+  const savedAllowFrom = (agent.config as Record<string, unknown> | undefined)?.[allowFromKey];
+  const allowFromValue = secrets[allowFromKey] ?? (typeof savedAllowFrom === 'string' ? savedAllowFrom : '');
   const existingAllowFrom = hasExistingSecret(allowFromKey);
 
   const handleSaveAllowFrom = async () => {

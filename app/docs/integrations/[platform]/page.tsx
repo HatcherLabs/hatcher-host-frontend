@@ -12,7 +12,6 @@ import {
   Phone,
   Slack,
   Twitter,
-  Signal,
   ChevronDown,
   AlertTriangle,
   CheckCircle2,
@@ -438,61 +437,6 @@ const GUIDES: Record<string, PlatformGuide> = {
       { q: 'How much does the Pay-Per-Use API cost?', a: 'Pricing varies by endpoint. Check the X Developer Portal billing page for current rates. Tweets posted are free (up to 1,500/month on free tier).' },
       { q: 'Can I use this for automated trading signals?', a: 'Yes, but be aware of X\'s automation rules. Automated tweets must comply with the X Developer Agreement and Policy.' },
       { q: 'I\'m getting 403 Forbidden errors.', a: 'Check that your app permissions are set to "Read and Write" and that you regenerated tokens AFTER changing permissions. Token permissions are locked at generation time.' },
-    ],
-  },
-  signal: {
-    name: 'Signal',
-    icon: Signal,
-    color: '#3A76F0',
-    difficulty: 'Advanced',
-    cost: 'Free',
-    setupTime: '30 min',
-    warnings: [
-      'Signal does not have an official API. This integration uses signal-cli, an unofficial command-line client.',
-      'You need a spare phone number that is NOT your main Signal number.',
-      'This is the most complex integration. If you\'re new, we recommend starting with Telegram or Discord instead.',
-    ],
-    prerequisites: [
-      'A spare phone number (not registered with Signal)',
-      'Ability to receive SMS or voice calls on that number',
-      'Familiarity with command-line tools',
-    ],
-    steps: [
-      {
-        title: 'Understand the limitations',
-        content: 'Signal has no official bot API. The integration uses signal-cli, which registers as a regular Signal user. This means your agent "is" a Signal user with a phone number, not a bot account.',
-      },
-      {
-        title: 'Solve the CAPTCHA',
-        content: 'Signal requires a CAPTCHA for registration. You\'ll need to complete it in a browser and extract the captcha token. Hatcher provides instructions in the Integrations tab.',
-      },
-      {
-        title: 'Register the phone number',
-        content: 'Use the captcha token to register your spare phone number with Signal. You\'ll receive an SMS verification code.',
-      },
-      {
-        title: 'Verify the number',
-        content: 'Enter the SMS verification code to complete registration. Your phone number is now a Signal account controlled by your agent.',
-      },
-      {
-        title: 'Configure in Hatcher',
-        content: 'Go to your agent\'s Integrations tab. Select Signal and enter your phone number and the verification details.',
-      },
-    ],
-    hatcherConfig: [
-      { field: 'Phone Number', value: '+1234567890', description: 'The spare phone number registered with Signal' },
-    ],
-    testSteps: [
-      'Add the phone number as a Signal contact on another device',
-      'Send a Signal message to that number',
-      'Your agent should respond within a few seconds',
-      'Check the Logs tab in Hatcher for message delivery',
-    ],
-    faq: [
-      { q: 'Can I use my personal Signal number?', a: 'No, registering with signal-cli will disconnect your phone\'s Signal app. Always use a dedicated spare number.' },
-      { q: 'Is this secure?', a: 'Signal messages are end-to-end encrypted. However, signal-cli stores keys locally in the container. The container is isolated and encrypted at rest.' },
-      { q: 'Why is this so complicated?', a: 'Signal prioritizes privacy and doesn\'t offer a bot API. The signal-cli workaround is the only way to integrate. For an easier alternative, consider Telegram.' },
-      { q: 'My registration keeps failing.', a: 'Signal has anti-spam measures. Try using a different phone number, wait a few hours between attempts, and make sure the CAPTCHA token is fresh.' },
     ],
   },
 };

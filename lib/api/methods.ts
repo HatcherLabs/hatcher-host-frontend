@@ -1264,7 +1264,7 @@ export const api = {
       method: 'PATCH',
     }),
 
-  /** Start channel pairing (WhatsApp QR, Signal, etc.) */
+  /** Start WhatsApp QR pairing — backend rejects other channels. */
   pairChannel: (agentId: string, channel: string) =>
     req<{ status: string; qrCode?: string; message: string; raw?: string }>(`/agents/${agentId}/pair-channel`, {
       method: 'POST',
