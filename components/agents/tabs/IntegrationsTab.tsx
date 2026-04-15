@@ -149,11 +149,20 @@ function IntegrationFieldsForm({
 }) {
   const ctx = useAgentContext();
   const {
+    agent,
     integrationSecrets, visibleFields,
     setIntegrationField, toggleFieldVisibility,
     hasExistingSecret, savingIntegration,
     integrationSaveMsg, saveIntegrationSecrets,
   } = ctx;
+
+  // Channel settings (DM policy, group policy, streaming) are only read
+  // by the OpenClaw adapter via build-spec.ts. Hermes/ElizaOS/Milady
+  // have no code path that honors these fields, so rendering them for
+  // those frameworks just gives users controls that silently do nothing.
+  const showChannelSettings =
+    integration.hasChannelSettings === true
+    && (agent?.framework ?? 'openclaw') === 'openclaw';
 
   const sk = integrationStateKey(integration);
   const isSaving = savingIntegration === sk;
@@ -172,7 +181,7 @@ function IntegrationFieldsForm({
           How to get your API key &rarr;
         </a>
       )}
-      {[...integration.fields, ...(integration.hasChannelSettings ? CHANNEL_SETTINGS_FIELDS : [])].map((field) => {
+      {[...integration.fields, ...(showChannelSettings ? CHANNEL_SETTINGS_FIELDS : [])].map((field) => {
         const fieldId = `${fieldIdPrefix}.${sk}.${field.key}`;
         const isVisible = visibleFields.has(fieldId);
         const existsAlready = !field.key.startsWith('_CS_') && hasExistingSecret(field.key);
