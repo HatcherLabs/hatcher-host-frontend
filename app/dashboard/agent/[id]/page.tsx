@@ -26,6 +26,7 @@ import {
   RotateCcw,
   Trash2,
   Share2,
+  Copy,
 } from 'lucide-react';
 import {
   AgentContext,
@@ -39,6 +40,7 @@ import {
   pageEntranceVariants,
 } from '@/components/agents/AgentContext';
 import { AgentSidebar } from '@/components/agents/AgentSidebar';
+import { PortAgentModal } from '@/components/agents/PortAgentModal';
 import { useAgentConfig } from '@/hooks/useAgentConfig';
 import { useAgentIntegrations } from '@/hooks/useAgentIntegrations';
 import { useAgentActions } from '@/hooks/useAgentActions';
@@ -250,6 +252,7 @@ export default function AgentManagePage() {
   const [chatError, setChatError] = useState<string | null>(null);
   const [chatErrorType, setChatErrorType] = useState<'timeout' | 'ratelimit' | 'network' | 'llm_down' | 'generic' | null>(null);
   const [msgCount, setMsgCount] = useState(0);
+  const [portModalOpen, setPortModalOpen] = useState(false);
 
   const historyLoadedRef = useRef(false);
   const lastSavedCountRef = useRef(0);
@@ -1054,6 +1057,14 @@ export default function AgentManagePage() {
                 <span className="hidden sm:inline">Share</span>
               </button>
               <button
+                onClick={() => setPortModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-300 transition-all"
+                title="Clone to another framework"
+              >
+                <Copy size={13} />
+                <span className="hidden sm:inline">Clone</span>
+              </button>
+              <button
                 onClick={actions.handleDelete}
                 disabled={actions.deleting}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border transition-all disabled:opacity-40 ${
@@ -1127,6 +1138,14 @@ export default function AgentManagePage() {
           </div>
         </div>
       </motion.div>
+
+      {agent && (
+        <PortAgentModal
+          agent={{ id: agent.id, name: agent.name, framework: agent.framework }}
+          isOpen={portModalOpen}
+          onClose={() => setPortModalOpen(false)}
+        />
+      )}
     </AgentContext.Provider>
   );
 }

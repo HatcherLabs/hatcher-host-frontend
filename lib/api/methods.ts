@@ -291,6 +291,13 @@ export const api = {
       body: JSON.stringify(data),
     }),
 
+  /** Clone an agent to a different framework (lite port). */
+  portAgent: (id: string, targetFramework: 'openclaw' | 'hermes' | 'elizaos' | 'milady') =>
+    req<Agent & { portedFrom?: { id: string; framework: string } }>(`/agents/${id}/port`, {
+      method: 'POST',
+      body: JSON.stringify({ targetFramework }),
+    }),
+
   /** Delete an agent */
   deleteAgent: (id: string) =>
     req<{ deleted: boolean }>(`/agents/${id}`, { method: 'DELETE' }),
