@@ -14,22 +14,28 @@ export function shortenAddress(address: string, chars = 4): string {
 }
 
 /**
- * Format a date as relative time (e.g. "2 days ago").
+ * Format a date as relative time (e.g. "2 days ago"). After
+ * `switchToDateAfterDays` (default 30) days, falls back to a
+ * formatted date — locale by default, "Mon N" with `dateFormat:
+ * 'short-month'`.
  */
-export function timeAgo(date: string | Date): string {
+export function timeAgo(
+  date: string | Date,
+  opts: { switchToDateAfterDays?: number; dateFormat?: 'locale' | 'short-month' } = {},
+): string {
   const d = typeof date === 'string' ? new Date(date) : date;
-  const now = new Date();
-  const diff = now.getTime() - d.getTime();
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-
-  if (days > 30) return d.toLocaleDateString();
-  if (days > 0) return `${days}d ago`;
-  if (hours > 0) return `${hours}h ago`;
-  if (minutes > 0) return `${minutes}m ago`;
-  return 'just now';
+  if (Number.isNaN(d.getTime())) return String(date);
+  const diff = Date.now() - d.getTime();
+  if (diff < 0) return 'just now';
+  if (diff < 60_000) return 'just now';
+  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
+  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
+  const days = Math.floor(diff / 86_400_000);
+  const threshold = opts.switchToDateAfterDays ?? 30;
+  if (days <= threshold) return `${days}d ago`;
+  return opts.dateFormat === 'short-month'
+    ? d.toLocaleDateString([], { month: 'short', day: 'numeric' })
+    : d.toLocaleDateString();
 }
 
 /**

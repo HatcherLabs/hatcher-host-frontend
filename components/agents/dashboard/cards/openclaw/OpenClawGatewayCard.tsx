@@ -4,28 +4,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { AlertTriangle, Cpu, Link as LinkIcon, Server } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAgentContext, GlassCard, Skeleton } from '../../../AgentContext';
+import { timeAgo } from '@/lib/utils';
 
 interface OpenClawConfigSnapshot {
   source: 'live' | 'snapshot' | 'none';
   config: Record<string, unknown> | null;
   snapshotAt: string | null;
   managed: boolean;
-}
-
-/**
- * Format an ISO timestamp as a short relative string for the snapshot
- * age indicator. Returns "just now", "5m ago", "2h ago", "3d ago", or
- * a locale date for anything older than a week.
- */
-function formatRelativeTime(isoTs: string): string {
-  const d = new Date(isoTs);
-  if (Number.isNaN(d.getTime())) return 'unknown';
-  const diff = Date.now() - d.getTime();
-  if (diff < 60_000) return 'just now';
-  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
-  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
-  if (diff < 7 * 86_400_000) return `${Math.floor(diff / 86_400_000)}d ago`;
-  return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
 
 /**
@@ -150,7 +135,9 @@ export function OpenClawGatewayCard() {
   // running. Rendering a relative "as of …" hint next to the badge gives
   // the operator a quick sense of how stale the view is.
   const snapshotRelative =
-    data.source === 'snapshot' && data.snapshotAt ? formatRelativeTime(data.snapshotAt) : null;
+    data.source === 'snapshot' && data.snapshotAt
+      ? timeAgo(data.snapshotAt, { switchToDateAfterDays: 7, dateFormat: 'short-month' })
+      : null;
 
   return (
     <GlassCard>

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Activity, AlertTriangle, Clock, MessageSquare, Wrench, Zap } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAgentContext, GlassCard, Skeleton } from '../../../AgentContext';
+import { timeAgo } from '@/lib/utils';
 
 // ─── Types ──────────────────────────────────────────────────────
 
@@ -28,22 +29,6 @@ function formatTokenCount(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return String(n);
-}
-
-/**
- * Returns a relative time string like "2 hours ago", "just now",
- * "3 days ago" etc. from an ISO date string.
- */
-function formatRelativeTime(isoDate: string): string {
-  const d = new Date(isoDate);
-  if (Number.isNaN(d.getTime())) return '—';
-  const diff = Date.now() - d.getTime();
-  if (diff < 0) return 'just now';
-  if (diff < 60_000) return 'just now';
-  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
-  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
-  if (diff < 7 * 86_400_000) return `${Math.floor(diff / 86_400_000)}d ago`;
-  return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
 
 /**
@@ -248,7 +233,7 @@ export function HermesStatsCard() {
         <StatItem
           icon={<Clock size={12} />}
           label="Last Active"
-          value={formatRelativeTime(stats.lastActiveAt)}
+          value={timeAgo(stats.lastActiveAt, { switchToDateAfterDays: 7, dateFormat: 'short-month' })}
         />
       </div>
     </GlassCard>
