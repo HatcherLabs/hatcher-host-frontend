@@ -42,6 +42,10 @@ export function ElizaosSessionsTab() {
   const [error, setError] = useState<string | null>(null);
   const [expandedRoom, setExpandedRoom] = useState<string | null>(null);
   const [roomMemories, setRoomMemories] = useState<Record<string, RoomMemoryState>>({});
+  const [showAllRooms, setShowAllRooms] = useState(false);
+  // Cap the render to keep the page responsive even on agents with
+  // hundreds of rooms. Users can expand to see the full list.
+  const ROOM_CAP = 25;
 
   const load = useCallback(async () => {
     if (!agent?.id) return;
@@ -190,7 +194,7 @@ export function ElizaosSessionsTab() {
         </GlassCard>
       ) : (
         <div className="space-y-2">
-          {rooms.map((r) => {
+          {(showAllRooms ? rooms : rooms.slice(0, ROOM_CAP)).map((r) => {
             const isExpanded = expandedRoom === r.id;
             const memoryState = roomMemories[r.id];
             return (
@@ -278,6 +282,14 @@ export function ElizaosSessionsTab() {
               </GlassCard>
             );
           })}
+          {!showAllRooms && rooms.length > ROOM_CAP && (
+            <button
+              onClick={() => setShowAllRooms(true)}
+              className="w-full text-xs text-[var(--color-accent)] hover:text-[var(--text-primary)] py-2 transition-colors"
+            >
+              Show all {rooms.length} rooms &rarr;
+            </button>
+          )}
         </div>
       )}
     </motion.div>

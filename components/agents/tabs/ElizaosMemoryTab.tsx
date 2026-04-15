@@ -43,6 +43,7 @@ export function ElizaosMemoryTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
 
   const load = useCallback(async () => {
     if (!agent?.id) return;
@@ -67,9 +68,16 @@ export function ElizaosMemoryTab() {
     load();
   }, [load]);
 
-  const filtered = typeFilter
+  // Render cap — long conversations can produce thousands of memory
+  // entries and rendering all of them blows up DOM size + scroll cost.
+  // Show the most recent 50 by default and let the user click through
+  // to load the rest.
+  const PAGE_CAP = 50;
+  const filteredAll = typeFilter
     ? memories.filter((m) => m.type === typeFilter)
     : memories;
+  const filtered = showAll ? filteredAll : filteredAll.slice(0, PAGE_CAP);
+  const hiddenCount = Math.max(0, filteredAll.length - filtered.length);
 
   const typeCounts = memories.reduce<Record<string, number>>((acc, m) => {
     acc[m.type] = (acc[m.type] ?? 0) + 1;
@@ -193,6 +201,19 @@ export function ElizaosMemoryTab() {
         </GlassCard>
       ) : (
         <div className="space-y-2">
+          {hiddenCount > 0 && (
+            <div className="flex items-center justify-between px-1">
+              <span className="text-xs text-[var(--text-muted)]">
+                Showing {filtered.length} of {filteredAll.length} — {hiddenCount} older entries hidden
+              </span>
+              <button
+                onClick={() => setShowAll(true)}
+                className="text-xs text-[var(--color-accent)] hover:text-[var(--text-primary)] transition-colors"
+              >
+                Show all &rarr;
+              </button>
+            </div>
+          )}
           {filtered.map((m) => (
             <GlassCard key={m.id} className="!p-0 overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-2 border-b border-[var(--border-default)] bg-black/20">
