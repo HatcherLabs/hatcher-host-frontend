@@ -212,7 +212,7 @@ export function ChatInput({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 6 }}
               transition={{ duration: 0.15 }}
-              className="absolute left-0 right-0 bottom-full mb-2 z-50 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)]/90 backdrop-blur-xl shadow-lg overflow-hidden"
+              className="absolute left-0 right-0 bottom-full mb-2 z-50 rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-2xl overflow-hidden"
             >
               <div
                 ref={slashListRef}
