@@ -532,8 +532,8 @@ export default function MyAgentsPage() {
                 description="Create your first AI agent and deploy it in 60 seconds."
                 actionLabel="Create Agent"
                 actionHref="/create"
-                secondaryLabel="Browse Templates"
-                secondaryHref="/templates"
+                secondaryLabel="See Frameworks"
+                secondaryHref="/frameworks"
               />
             </div>
             </>

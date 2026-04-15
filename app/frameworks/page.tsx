@@ -33,10 +33,10 @@ const FRAMEWORKS = [
     text: 'text-[#f59e0b]',
     complexity: 'Advanced',
     complexityColor: 'text-red-400 bg-red-400/10 border-red-400/20',
-    bestFor: 'Power users who need maximum capability — autonomous task execution, complex tool chains, and enterprise integrations.',
-    useCases: ['Enterprise automation', 'Multi-step research', 'Code generation pipelines', 'Data processing agents'],
+    bestFor: 'Power users who need maximum capability — autonomous task execution, persistent workspace, and full multi-channel gateway.',
+    useCases: ['Enterprise automation', 'Multi-step research', 'Code generation pipelines', 'Cron-driven back-office agents', 'Full multi-platform bots'],
     features: [
-      { name: '3,200+ community skills', supported: true },
+      { name: '2,500+ ClawHub skills', supported: true },
       { name: 'Browser automation', supported: true },
       { name: 'Cron jobs & triggers', supported: true },
       { name: 'Multi-channel gateway', supported: true },
@@ -46,13 +46,13 @@ const FRAMEWORKS = [
       { name: 'Social media native', supported: false },
       { name: 'Lightweight deploy', supported: false },
     ],
-    integrations: ['Telegram', 'Discord', 'Slack', 'WhatsApp', 'X (Twitter)', 'Signal'],
+    integrations: ['Telegram', 'Discord', 'Slack', 'WhatsApp', 'X (Twitter)'],
     llmSupport: ['Groq', 'OpenAI', 'Anthropic', 'Google', 'xAI', 'OpenRouter'],
     startupMs: 3200,
     memoryMb: 400,
     docsUrl: 'https://docs.openclaw.ai',
     configExample: `# openclaw/config.yaml
-model: openai/gpt-oss-20b
+model: meta-llama/llama-4-scout-17b-16e-instruct
 provider: groq
 
 skills:
@@ -83,10 +83,10 @@ memory:
     text: 'text-[#a855f7]',
     complexity: 'Intermediate',
     complexityColor: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-    bestFor: 'Agents that learn and adapt over time — persistent memory, research tasks, and multi-provider LLM flexibility.',
-    useCases: ['Research assistants', 'Knowledge base bots', 'Learning companions', 'Multi-provider routing'],
+    bestFor: 'Agents that learn and adapt — 78 bundled skills, long-running memory, live config editing, multi-provider routing.',
+    useCases: ['Research assistants', 'Knowledge base bots', 'DevOps copilots', 'Security/red-team helpers', 'Long-running memory workflows'],
     features: [
-      { name: '3,200+ community skills', supported: false },
+      { name: '2,500+ ClawHub skills', supported: true },
       { name: 'Browser automation', supported: true },
       { name: 'Cron jobs & triggers', supported: true },
       { name: 'Multi-channel gateway', supported: true },
@@ -96,7 +96,7 @@ memory:
       { name: 'Social media native', supported: false },
       { name: 'Lightweight deploy', supported: false },
     ],
-    integrations: ['Telegram', 'Discord', 'Slack', 'WhatsApp', 'X (Twitter)', 'Signal'],
+    integrations: ['Telegram', 'Discord', 'Slack', 'WhatsApp'],
     llmSupport: ['Groq', 'OpenAI', 'Anthropic', 'Google', 'xAI', 'OpenRouter'],
     startupMs: 2800,
     memoryMb: 350,
@@ -104,7 +104,7 @@ memory:
     configExample: `# hermes/config.toml
 [model]
 provider = "groq"
-model = "openai/gpt-oss-20b"
+model = "meta-llama/llama-4-scout-17b-16e-instruct"
 
 [memory]
 backend = "chromadb"
@@ -135,12 +135,12 @@ telegram = { token = "\${TELEGRAM_BOT_TOKEN}" }`,
     text: 'text-[var(--color-accent)]',
     complexity: 'Intermediate',
     complexityColor: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-    bestFor: 'Social media bots and community agents — deep character customization, platform-native behavior, plugin ecosystem.',
-    useCases: ['Social media bots', 'Community moderators', 'Brand personas', 'NFT project agents'],
+    bestFor: 'Social media bots and community agents — deep character customization, PGLite-backed memory, 650+ plugin registry.',
+    useCases: ['Social media bots', 'Community moderators', 'Brand personas', 'NFT project agents', 'Session-based chat apps'],
     features: [
-      { name: '3,200+ community skills', supported: false },
+      { name: '2,500+ ClawHub skills', supported: false },
       { name: 'Browser automation', supported: false },
-      { name: 'Cron jobs & triggers', supported: true },
+      { name: 'Cron jobs & triggers', supported: false },
       { name: 'Multi-channel gateway', supported: true },
       { name: 'Persistent memory', supported: true },
       { name: 'Character personas', supported: true },
@@ -148,8 +148,8 @@ telegram = { token = "\${TELEGRAM_BOT_TOKEN}" }`,
       { name: 'Social media native', supported: true },
       { name: 'Lightweight deploy', supported: false },
     ],
-    integrations: ['Telegram', 'Discord', 'Slack', 'X (Twitter)', 'Farcaster'],
-    llmSupport: ['Groq', 'OpenAI', 'Anthropic', 'Google', 'xAI', 'OpenRouter'],
+    integrations: ['Telegram', 'Discord', 'Slack', 'X (Twitter)'],
+    llmSupport: ['Groq', 'OpenAI', 'Anthropic', 'Ollama'],
     startupMs: 2400,
     memoryMb: 300,
     docsUrl: 'https://elizaos.github.io/eliza/',
@@ -170,7 +170,7 @@ telegram = { token = "\${TELEGRAM_BOT_TOKEN}" }`,
     "@elizaos/plugin-web3"
   ],
   "modelProvider": "groq",
-  "model": "gpt-oss-20b"
+  "model": "meta-llama/llama-4-scout-17b-16e-instruct"
 }`,
   },
   {
@@ -183,23 +183,23 @@ telegram = { token = "\${TELEGRAM_BOT_TOKEN}" }`,
     border: 'border-[#f43f5e]/30',
     bg: 'bg-[#f43f5e]/10',
     text: 'text-[#f43f5e]',
-    complexity: 'Beginner',
+    complexity: 'Easy',
     complexityColor: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
-    bestFor: 'Quick deploys with strong personality — minimum setup, maximum character. Great for first-time deployers.',
-    useCases: ['Personality chatbots', 'Community bots', 'Fan engagement', 'Cultural agents'],
+    bestFor: 'Opinionated ElizaOS fork with 78 bundled skills and 109 plugins on tap — personality-first with batteries included.',
+    useCases: ['Personality chatbots', 'Community bots', 'Personal productivity agents', 'Home automation hubs', 'Fan engagement'],
     features: [
-      { name: '3,200+ community skills', supported: false },
+      { name: '2,500+ ClawHub skills', supported: false },
       { name: 'Browser automation', supported: false },
-      { name: 'Cron jobs & triggers', supported: false },
+      { name: 'Cron jobs & triggers', supported: true },
       { name: 'Multi-channel gateway', supported: true },
-      { name: 'Persistent memory', supported: false },
+      { name: 'Persistent memory', supported: true },
       { name: 'Character personas', supported: true },
-      { name: 'Plugin ecosystem', supported: false },
+      { name: 'Plugin ecosystem', supported: true },
       { name: 'Social media native', supported: true },
-      { name: 'Lightweight deploy', supported: true },
+      { name: 'Lightweight deploy', supported: false },
     ],
-    integrations: ['Telegram', 'Discord', 'WhatsApp', 'X (Twitter)'],
-    llmSupport: ['Groq', 'OpenAI', 'Anthropic'],
+    integrations: ['Telegram', 'Discord', 'Slack', 'WhatsApp', 'X (Twitter)'],
+    llmSupport: ['Groq', 'OpenAI', 'Anthropic', 'Google', 'OpenRouter', 'Ollama'],
     startupMs: 800,
     memoryMb: 120,
     docsUrl: 'https://docs.milady.gg',
@@ -212,7 +212,7 @@ personality: |
 
 model:
   provider: groq
-  id: openai/gpt-oss-20b
+  id: meta-llama/llama-4-scout-17b-16e-instruct
 
 platforms:
   telegram:
@@ -223,7 +223,7 @@ platforms:
 ];
 
 const ALL_FEATURES = [
-  '3,200+ community skills',
+  '2,500+ ClawHub skills',
   'Browser automation',
   'Cron jobs & triggers',
   'Multi-channel gateway',
