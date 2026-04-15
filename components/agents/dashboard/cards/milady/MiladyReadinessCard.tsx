@@ -15,8 +15,12 @@ interface MiladyStatusData {
   pendingRestartReasons: string[];
 }
 
-function formatUptime(seconds: number): string {
-  if (seconds <= 0) return '—';
+// Milady's /api/status returns uptime in MILLISECONDS. Convert here —
+// a 3-minute agent was being rendered as "50h 32m" because we were
+// treating ms as seconds.
+function formatUptime(ms: number): string {
+  if (!ms || ms <= 0) return '—';
+  const seconds = Math.floor(ms / 1000);
   if (seconds < 60) return `${seconds}s`;
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
   const h = Math.floor(seconds / 3600);
