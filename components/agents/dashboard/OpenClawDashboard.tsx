@@ -34,10 +34,6 @@ import { OpenClawRecentErrorsCard } from './cards/openclaw/OpenClawRecentErrorsC
 export function OpenClawDashboard() {
   const { agent, isActive } = useAgentContext();
 
-  if (agent.managementMode !== 'managed') {
-    return <GenericDashboard />;
-  }
-
   return (
     <motion.div
       key="tab-overview"

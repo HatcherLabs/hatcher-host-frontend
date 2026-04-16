@@ -165,7 +165,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     target: '[data-tour="empty-state"]',
     title: 'Your Plan',
-    description: 'Start free with 1 agent and 10 messages/day. Upgrade anytime.',
+    description: 'Start free with 1 agent and 20 messages/day. Upgrade anytime.',
     position: 'top',
   },
 ];

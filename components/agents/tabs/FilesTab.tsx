@@ -4,6 +4,9 @@ import { useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { AgentContext, FRAMEWORK_ROOT_PATH, FRAMEWORK_BADGE, GlassCard } from '../AgentContext';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
+import { usePaymentDrivers } from '@/lib/payment-drivers';
+import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
+import { PaymentRailButtons } from '@/components/payments/PaymentRailButtons';
 import { motion } from 'framer-motion';
 import {
   File,
@@ -29,7 +32,6 @@ import {
   FileJson,
   Settings,
   HardDrive,
-  CreditCard,
 } from 'lucide-react';
 import Link from 'next/link';
 import { AnimatePresence } from 'framer-motion';
@@ -108,6 +110,7 @@ function getFileTypeTag(name: string): { label: string; color: string } | null {
 export function FilesTab() {
   const ctx = useContext(AgentContext);
   const { user } = useAuth();
+  const { confirmState, closeConfirm, driveSol, driveUsdc, driveHatch } = usePaymentDrivers();
   const agentId = ctx?.agent?.id ?? '';
   const framework = ctx?.agent?.framework ?? 'openclaw';
   const ROOT_PATH = FRAMEWORK_ROOT_PATH[framework] ?? '/home/node/.openclaw';
@@ -247,23 +250,42 @@ export function FilesTab() {
     setDeleting(null);
   };
 
-  const handleUnlockPurchase = async () => {
+  // ── File Manager unlock — $4.99 one-time addon, per agent ──────────
+  //
+  // Uses the shared payment-drivers hook so the unlock flow matches the
+  // billing page exactly: 4 rail buttons, live rate in the confirm
+  // modal, $HATCHER breakdown with burn, Stripe placeholder disabled
+  // until live keys land. Single driver per rail feeds /features/addon
+  // with the on-chain signature for server-side verification.
+  const FILE_MANAGER_PRICE = 4.99;
+  const FILE_MANAGER_LABEL = 'File Manager unlock';
+
+  const finalizeAddon = async (
+    paymentToken: 'sol' | 'usdc' | 'hatch',
+    txSignature: string,
+  ): Promise<void> => {
+    const res = await api.purchaseAddon('addon.file_manager', txSignature, agentId, paymentToken);
+    if (!res.success) throw new Error(res.error ?? 'Purchase failed');
+    setUnlocked(true);
+    setShowPayModal(false);
+    loadFiles();
+  };
+
+  const runUnlock = async (rail: 'sol' | 'usdc' | 'hatch') => {
     setPurchasing(true);
     setError(null);
     try {
-      const txSignature = `mock-${Date.now()}`;
-      const res = await api.purchaseAddon('addon.file_manager', txSignature, agentId);
-      if (res.success) {
-        setUnlocked(true);
-        setShowPayModal(false);
-        loadFiles();
-      } else {
-        setError(res.error ?? 'Purchase failed');
-      }
-    } catch {
-      setError('Purchase failed');
+      const driver = rail === 'sol' ? driveSol : rail === 'usdc' ? driveUsdc : driveHatch;
+      const signature = await driver(FILE_MANAGER_PRICE, FILE_MANAGER_LABEL);
+      await finalizeAddon(rail, signature);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Purchase failed';
+      // Cancelled via modal or wallet popup — silent, not an error the user
+      // needs to see as a red banner.
+      if (msg !== 'Cancelled') setError(msg);
+    } finally {
+      setPurchasing(false);
     }
-    setPurchasing(false);
   };
 
   // Breadcrumb segments
@@ -371,55 +393,29 @@ export function FilesTab() {
                     File Manager for this agent — <span className="font-bold text-[var(--text-primary)]">$4.99</span> <span className="text-xs text-[var(--text-muted)]">(one-time)</span>
                   </p>
 
-                  <button
-                    onClick={handleUnlockPurchase}
-                    disabled={purchasing}
-                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-green-500/30 hover:border-green-400/50 hover:bg-green-500/[0.05] transition-all disabled:opacity-40"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0">
-                      <span className="text-white font-bold text-sm">$</span>
-                    </div>
-                    <div className="text-left flex-1">
-                      <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with Credits</p>
-                      <p className="text-[11px] text-[var(--text-muted)]">Instant activation</p>
-                    </div>
-                    {purchasing && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)]" />}
-                  </button>
+                  {error && (
+                    <p className="text-[11px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                      {error}
+                    </p>
+                  )}
 
-                  <button
-                    onClick={handleUnlockPurchase}
-                    disabled={purchasing}
-                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/[0.03] transition-all disabled:opacity-40"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#9945FF] to-[#14F195] flex items-center justify-center flex-shrink-0">
-                      <span className="text-white font-bold text-sm">SOL</span>
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with SOL</p>
-                      <p className="text-[11px] text-[var(--text-muted)]">Solana wallet payment</p>
-                    </div>
-                    {purchasing && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)]" />}
-                  </button>
-
-                  <button
-                    onClick={handleUnlockPurchase}
-                    disabled={purchasing}
-                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/[0.03] transition-all disabled:opacity-40"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#635BFF] to-[#A259FF] flex items-center justify-center flex-shrink-0">
-                      <CreditCard className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with Card</p>
-                      <p className="text-[11px] text-[var(--text-muted)]">Credit/debit card via Stripe</p>
-                    </div>
-                    {purchasing && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)]" />}
-                  </button>
+                  <PaymentRailButtons
+                    onPayWithSOL={() => runUnlock('sol')}
+                    onPayWithUSDC={() => runUnlock('usdc')}
+                    onPayWithHATCHER={() => runUnlock('hatch')}
+                    loading={purchasing}
+                    /* onPayWithCard omitted — Stripe stays disabled with
+                       "Coming soon" label until live keys are wired. */
+                  />
                 </div>
               </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Pre-sign review modal — rendered alongside the paywall so the
+            live rate + burn split shows after the user picks a rail. */}
+        <ConfirmPaymentModal state={confirmState} onClose={closeConfirm} />
       </>
     );
   }

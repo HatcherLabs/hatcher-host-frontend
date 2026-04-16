@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useVoice } from '@/hooks/useVoice';
+import { api } from '@/lib/api';
 import {
   useAgentContext,
   tabContentVariants,
@@ -40,6 +41,125 @@ export function ChatTab() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const speakingMsgIdRef = useRef<string | null>(null);
   const lastAutoSpokenIdRef = useRef<string | null>(null);
+
+  // ── Chat attachments ──────────────────────────────────────────
+  //
+  // Two paths depending on file shape:
+  //
+  //   1. Text-ish file ≤ 40 KB → content is INLINED in the user message as
+  //      a fenced block. The agent sees it as ordinary conversation input,
+  //      no tool call required — works across every framework regardless
+  //      of what file-reading tools it ships with.
+  //
+  //   2. Larger text files OR binary files → we still upload to the agent's
+  //      knowledge/ volume (POST /agents/:id/knowledge) and drop a marker
+  //      in the message with the filename + path. Framework-specific tools
+  //      handle the read on demand. Binary payloads can't be read directly
+  //      anyway — the file lives on disk for whatever reader the agent has.
+  //
+  // Either way, the file is uploaded so it persists across sessions and
+  // shows up in the Knowledge tab for later reuse.
+  const INLINE_MAX_BYTES = 40_000;
+  type Attachment = {
+    name: string;
+    sizeBytes: number;
+    /** Inline text (null for binary / oversize files handled via knowledge dir only). */
+    content: string | null;
+    /** True when the binary/large-file path was used (content is on disk only). */
+    diskOnly: boolean;
+  };
+
+  const [attachments, setAttachments] = useState<Array<Attachment>>([]);
+  const [uploadingAttachments, setUploadingAttachments] = useState(false);
+  const [attachmentError, setAttachmentError] = useState<string | null>(null);
+
+  const handleAttachFiles = useCallback(async (files: FileList | File[]) => {
+    const list = Array.from(files);
+    if (list.length === 0) return;
+    setAttachmentError(null);
+    setUploadingAttachments(true);
+    try {
+      for (const file of list) {
+        // Knowledge endpoint caps at 700KB of content (routes/agents/files.ts
+        // UploadFileBody). Over that, skip — users should split the file.
+        if (file.size > 700_000) {
+          setAttachmentError(`${file.name} is larger than 700 KB. Upload a smaller file or split it.`);
+          continue;
+        }
+        const looksText = /^(text\/|application\/(json|xml|yaml|x-yaml|csv)(;|$))/i.test(file.type)
+          || /\.(md|markdown|txt|json|csv|ya?ml|toml|ini|cfg|log|html|xml|tsv|env|sh|bash|zsh|py|js|ts|jsx|tsx|mjs|cjs|rs|go|java|kt|rb|php|c|cc|cpp|h|hpp|css|scss|sass|sql)$/i.test(file.name)
+          || file.type === '';
+        const inlineCapable = looksText && file.size <= INLINE_MAX_BYTES;
+
+        let content: string | null = null;
+        if (looksText) {
+          try { content = await file.text(); } catch { /* fall back to disk-only */ }
+        }
+        // Always persist to the volume so the Knowledge tab reflects it.
+        // For binaries we send a placeholder — the agent's read_file /
+        // attachment tools read the real file from the volume, not via this
+        // endpoint.
+        const payload = content ?? `[binary file: ${file.name}, ${file.size} bytes]`;
+        const res = await api.uploadKnowledge(agent.id, file.name, payload);
+        if (!res.success) {
+          setAttachmentError(res.error ?? `Upload failed for ${file.name}`);
+          continue;
+        }
+
+        setAttachments((prev) =>
+          prev.some((a) => a.name === file.name)
+            ? prev
+            : [
+                ...prev,
+                {
+                  name: file.name,
+                  sizeBytes: file.size,
+                  content: inlineCapable ? content : null,
+                  diskOnly: !inlineCapable,
+                },
+              ],
+        );
+      }
+    } finally {
+      setUploadingAttachments(false);
+    }
+  }, [agent.id]);
+
+  const handleRemoveAttachment = useCallback(async (name: string) => {
+    setAttachments((prev) => prev.filter((a) => a.name !== name));
+    api.deleteKnowledge(agent.id, name).catch(() => {});
+  }, [agent.id]);
+
+  // Build the final outbound message. Inline attachments get fenced into
+  // the message body so the agent sees them as conversation context, not
+  // a tool-call requirement. Disk-only attachments get a short marker so
+  // the agent knows to look under knowledge/ if it has a file reader.
+  const sendWithAttachments = useCallback((overrideText?: string) => {
+    const base = (overrideText ?? input).trim();
+    if (attachments.length === 0) {
+      sendMessage(overrideText);
+      return;
+    }
+    const inlineBlocks: string[] = [];
+    const diskOnly: string[] = [];
+    for (const a of attachments) {
+      if (a.content && !a.diskOnly) {
+        inlineBlocks.push(`--- attached file: ${a.name} ---\n${a.content}\n--- end ${a.name} ---`);
+      } else {
+        diskOnly.push(a.name);
+      }
+    }
+    const diskMarker = diskOnly.length > 0
+      ? `[Files saved to knowledge/: ${diskOnly.join(', ')}. Open them from the Knowledge folder if you need to inspect their contents.]`
+      : null;
+    const finalText = [
+      inlineBlocks.join('\n\n'),
+      diskMarker,
+      base,
+    ].filter(Boolean).join('\n\n');
+    sendMessage(finalText);
+    setAttachments([]);
+  }, [attachments, input, sendMessage]);
 
   // Virtual windowing: only render the last N messages for performance
   const [extraLoaded, setExtraLoaded] = useState(0);
@@ -275,14 +395,28 @@ export function ChatTab() {
         sttSupported={voice.sttSupported}
         isListening={voice.isListening}
         onMicToggle={handleMicToggle}
-        onSendMessage={() => sendMessage()}
-        onKeyDown={handleKeyDown}
+        onSendMessage={() => sendWithAttachments()}
+        onKeyDown={(e) => {
+          // Ctrl/Cmd+Enter (or plain Enter per existing handler) sends —
+          // intercept here so attachments merge into the sent text.
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendWithAttachments();
+            return;
+          }
+          handleKeyDown(e);
+        }}
         inputRef={inputRef}
         llmProvider={llmProvider}
         hasUnlimitedChat={hasUnlimitedChat}
         msgCount={msgCount}
         msgLimit={msgLimit}
         remaining={remaining}
+        attachments={attachments}
+        attachmentError={attachmentError}
+        uploadingAttachments={uploadingAttachments}
+        onAttachFiles={handleAttachFiles}
+        onRemoveAttachment={handleRemoveAttachment}
       />
 
       <ChatStyles />

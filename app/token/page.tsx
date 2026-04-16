@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import NextImage from 'next/image';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
@@ -74,17 +74,40 @@ export default function TokenPage() {
             Live on Solana
           </motion.div>
 
+          {/* Token hero logo — Hatcher mascot cropped into a round coin
+              shape so it reads as "token" rather than a rectangular
+              artwork. Gradient border + soft cyan halo frame it. */}
           <div
-            className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[var(--color-accent)] to-[#0891b2] flex items-center justify-center mx-auto mb-8 shadow-[0_0_60px_rgba(6,182,212,0.35)]"
+            className="relative w-32 h-32 sm:w-40 sm:h-40 mx-auto mb-8"
             style={{ animation: 'float 3s ease-in-out infinite' }}
           >
-            <Image
-              src="/icon.svg"
-              alt="Hatcher logo"
-              width={72}
-              height={72}
-              className="w-[72px] h-[72px]"
+            <div
+              aria-hidden="true"
+              className="absolute -inset-2 rounded-full blur-2xl opacity-70"
+              style={{
+                background: 'radial-gradient(circle at center, rgba(6,182,212,0.55), rgba(139,92,246,0.35) 55%, transparent 75%)',
+              }}
             />
+            <div
+              className="relative z-10 w-full h-full rounded-full p-[3px] shadow-[0_0_30px_rgba(6,182,212,0.45)]"
+              style={{
+                background: 'conic-gradient(from 140deg at 50% 50%, #8b5cf6 0deg, #06b6d4 140deg, #14f195 260deg, #8b5cf6 360deg)',
+              }}
+            >
+              <div
+                className="w-full h-full rounded-full overflow-hidden"
+                style={{ background: '#0a0a14' }}
+              >
+                <NextImage
+                  src="/hatcher-logo.png"
+                  alt="$HATCHER token logo"
+                  width={160}
+                  height={160}
+                  priority
+                  className="w-full h-full object-cover scale-110"
+                />
+              </div>
+            </div>
           </div>
 
           <motion.h1
@@ -112,29 +135,47 @@ export default function TokenPage() {
             transition={{ ...fadeUpTransition, delay: 0.18 }}
             className="flex flex-col items-center gap-3"
           >
-            <div className="px-5 py-3 rounded-xl bg-[var(--bg-elevated)] border border-[#14F195]/20 text-sm">
+            <div className="px-5 py-3 rounded-xl bg-[var(--bg-elevated)] border border-[var(--solana-green)]/30 text-sm">
               <span className="text-[var(--text-muted)] mr-2">CA:</span>
-              <code className="text-[#14F195] font-mono text-xs sm:text-sm select-all">Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump</code>
+              <code className="text-[var(--solana-green)] font-mono text-xs sm:text-sm select-all font-semibold">Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump</code>
             </div>
-            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+            <div className="flex items-center justify-center gap-3 text-xs">
               <a
                 href="https://dexscreener.com/solana/Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="justify-self-end text-xs text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
+                className="text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
               >
                 View on Dexscreener
               </a>
-              <span className="text-[var(--border-default)]">|</span>
+              {/* Thin vertical rule — previously a raw `|` glyph which
+                  rendered lower than the surrounding text baseline on
+                  small screens. A 1px element centers cleanly via flex. */}
+              <span aria-hidden="true" className="block w-px h-3 bg-[var(--border-default)]" />
               <a
                 href="https://solscan.io/token/Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="justify-self-start text-xs text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
+                className="text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
               >
                 View on Solscan
               </a>
             </div>
+          </motion.div>
+
+          {/* Burn mechanic badge — visible on the hero so new visitors
+              immediately see that the token isn't purely utility: 10% of
+              every $HATCHER payment on the platform gets burned on-chain
+              in the same signed transaction. Each subscription / addon
+              purchase shrinks total supply by that percentage atomically. */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...fadeUpTransition, delay: 0.22 }}
+            className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#f59e0b]/30 bg-[#f59e0b]/[0.08] text-[11px] font-medium text-[#f59e0b]"
+          >
+            <span className="text-sm">🔥</span>
+            <span>10% of every $HATCHER payment is burned on-chain, in the same transaction.</span>
           </motion.div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
@@ -261,7 +302,7 @@ export default function TokenPage() {
                 Stay in the Loop
               </h2>
               <p className="text-lg mb-10 max-w-xl mx-auto text-[var(--text-secondary)]">
-                The token is live. The platform is in open beta. All features are free to try. More details coming soon.
+                The token is live and the platform is ready. Deploy your first agent in minutes.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/create" className="btn-primary text-base px-10 py-4 inline-flex items-center gap-2">

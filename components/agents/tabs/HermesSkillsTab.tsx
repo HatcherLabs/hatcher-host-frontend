@@ -105,27 +105,6 @@ export function HermesSkillsTab() {
     return [...categories].sort((a, b) => b.skillCount - a.skillCount);
   }, [categories]);
 
-  if (agent && agent.managementMode !== 'managed') {
-    return (
-      <motion.div
-        key="tab-hermes-skills"
-        variants={tabContentVariants}
-        initial="enter"
-        animate="center"
-        exit="exit"
-      >
-        <GlassCard>
-          <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
-            <Info size={14} className="text-amber-400" />
-            Hermes skills browser is only available for managed-mode agents.
-            Legacy hermes agents can still chat and use tools but don&apos;t
-            expose the bundled skills catalog.
-          </div>
-        </GlassCard>
-      </motion.div>
-    );
-  }
-
   if (stopped) {
     return (
       <motion.div

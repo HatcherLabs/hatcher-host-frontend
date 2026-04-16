@@ -2,7 +2,7 @@
 
 import { type RefObject, useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Send, Mic, MicOff, MessageSquare, Terminal } from 'lucide-react';
+import { Send, Mic, MicOff, MessageSquare, Terminal, Paperclip, X, Loader2, FileText } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { GlassCard } from '../../AgentContext';
 
@@ -62,6 +62,17 @@ interface ChatInputProps {
   msgCount: number;
   msgLimit: number;
   remaining: number | null;
+  /** Files the user picked/dropped since the last send. Owned by the
+   *  ChatTab parent so sendMessage can prepend the "[Attachments: ...]"
+   *  marker before clearing the list. */
+  attachments: Array<{ name: string; sizeBytes: number }>;
+  /** Transient upload error, e.g. file over the knowledge endpoint
+   *  size cap. Shown under the chip row; clears on next successful
+   *  attach. */
+  attachmentError: string | null;
+  uploadingAttachments: boolean;
+  onAttachFiles: (files: FileList | File[]) => Promise<void>;
+  onRemoveAttachment: (name: string) => void;
 }
 
 export function ChatInput({
@@ -84,7 +95,22 @@ export function ChatInput({
   msgCount,
   msgLimit,
   remaining,
+  attachments,
+  attachmentError,
+  uploadingAttachments,
+  onAttachFiles,
+  onRemoveAttachment,
 }: ChatInputProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [dragActive, setDragActive] = useState(false);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragActive(false);
+    if (e.dataTransfer.files?.length) {
+      void onAttachFiles(e.dataTransfer.files);
+    }
+  }, [onAttachFiles]);
   /* ── Slash command autocomplete state ── */
   const [slashIndex, setSlashIndex] = useState(0);
   const slashListRef = useRef<HTMLDivElement>(null);
@@ -203,7 +229,59 @@ export function ChatInput({
           <span className="text-xs text-[var(--text-muted)]">Agent is starting up, please wait...</span>
         </div>
       )}
-      <div className="relative flex gap-2 items-end rounded-2xl p-3 border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl focus-within:border-[var(--color-accent)]/40 focus-within:shadow-[0_0_20px_rgba(6,182,212,0.06)] transition-all duration-200">
+      {/* Attachment chip row — renders above the input bar when files
+          are pending. Empty on first render so the chat UI stays clean
+          until the user actually drops/selects a file. */}
+      {(attachments.length > 0 || uploadingAttachments || attachmentError) && (
+        <div className="mb-2 flex flex-wrap items-center gap-1.5">
+          {attachments.map((a) => (
+            <span
+              key={a.name}
+              className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/25 text-xs text-[var(--text-primary)]"
+            >
+              <FileText size={12} className="text-[var(--color-accent)]" />
+              <span className="font-medium truncate max-w-[180px]">{a.name}</span>
+              <span className="text-[10px] text-[var(--text-muted)]">{Math.max(1, Math.round(a.sizeBytes / 1024))} KB</span>
+              <button
+                type="button"
+                onClick={() => onRemoveAttachment(a.name)}
+                className="ml-0.5 p-0.5 rounded hover:bg-[var(--color-accent)]/15 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                aria-label={`Remove ${a.name}`}
+              >
+                <X size={11} />
+              </button>
+            </span>
+          ))}
+          {uploadingAttachments && (
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[11px] text-[var(--text-muted)]">
+              <Loader2 size={12} className="animate-spin" />
+              Uploading…
+            </span>
+          )}
+          {attachmentError && (
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-red-500/10 border border-red-500/25 text-[11px] text-red-400 max-w-full">
+              {attachmentError}
+            </span>
+          )}
+        </div>
+      )}
+
+      <div
+        className={`relative flex gap-2 items-end rounded-2xl p-3 border bg-[var(--bg-elevated)] backdrop-blur-xl focus-within:border-[var(--color-accent)]/40 focus-within:shadow-[0_0_20px_rgba(6,182,212,0.06)] transition-all duration-200 ${
+          dragActive
+            ? 'border-[var(--color-accent)] shadow-[0_0_24px_rgba(6,182,212,0.25)]'
+            : 'border-[var(--border-default)]'
+        }`}
+        onDragEnter={(e) => { e.preventDefault(); setDragActive(true); }}
+        onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+        onDragLeave={(e) => {
+          // Only clear when leaving the wrapper itself, not when hovering
+          // over children (dragleave fires on every descendant).
+          if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+          setDragActive(false);
+        }}
+        onDrop={handleDrop}
+      >
         {/* Slash command autocomplete popup */}
         <AnimatePresence>
           {slashOpen && filteredCommands.length > 0 && (
@@ -271,6 +349,39 @@ export function ChatInput({
           aria-autocomplete={slashOpen ? 'list' : undefined}
           aria-expanded={slashOpen && filteredCommands.length > 0 ? true : undefined}
         />
+
+        {/* Hidden native picker, triggered by the paperclip button. */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          className="hidden"
+          onChange={(e) => {
+            if (e.target.files?.length) {
+              void onAttachFiles(e.target.files);
+              // Reset so re-picking the same file re-fires onChange.
+              e.target.value = '';
+            }
+          }}
+        />
+
+        {/* Attach button — uploads to the agent's knowledge/ dir via
+            POST /agents/:id/knowledge. Accepts any file type; the
+            backend caps payload size and the chip row surfaces errors. */}
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] border border-transparent hover:border-[var(--text-muted)]/30"
+          title="Attach files — saved to agent's knowledge"
+          aria-label="Attach files"
+          disabled={inputDisabled || uploadingAttachments}
+        >
+          {uploadingAttachments ? (
+            <Loader2 size={15} className="animate-spin text-[var(--text-secondary)]" />
+          ) : (
+            <Paperclip size={15} className="text-[var(--text-secondary)]" />
+          )}
+        </button>
 
         {/* Mic button */}
         {sttSupported && (

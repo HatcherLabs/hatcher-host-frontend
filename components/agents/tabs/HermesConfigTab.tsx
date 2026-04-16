@@ -263,28 +263,6 @@ export function HermesConfigTab() {
     setError(null);
   };
 
-  if (agent && agent.managementMode !== 'managed') {
-    return (
-      <motion.div
-        key="tab-hermes-config"
-        variants={tabContentVariants}
-        initial="enter"
-        animate="center"
-        exit="exit"
-      >
-        <GlassCard>
-          <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
-            <Info size={14} className="text-amber-400" />
-            Live config editing requires managed-mode hermes. Legacy agents
-            regenerate config.yaml on every start from their stored
-            configJson — edit it via the agent Config in the DB or recreate
-            the agent to switch to managed mode.
-          </div>
-        </GlassCard>
-      </motion.div>
-    );
-  }
-
   if (stopped) {
     // `source === 'none'` — agent has never run under managed mode, so
     // there's no live container AND no DB snapshot to show. Once the

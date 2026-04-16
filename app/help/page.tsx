@@ -107,7 +107,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'How does the free tier work?',
-        a: 'Every account starts with a free tier that includes 1 agent. Free agents get 10 messages per day using GPT-OSS 20B on Groq, with a 24-hour rolling reset. You get access to all integrations (Telegram, Discord, Twitter, WhatsApp, Slack). Free agents run on shared resources (0.5 CPU, 1GB RAM) and auto-sleep after 10 minutes of inactivity. Paid tiers (Pro, Business, Founding Member) use the more capable Llama 3.3 70B model and include web search via Brave. If you bring your own API key (BYOK), messages are always unlimited and free.',
+        a: 'Every account starts with a free tier that includes 1 agent. Free agents get 20 messages per day using Llama 4 Scout on Groq, with a 24-hour rolling reset. You get access to all integrations (Telegram, Discord, Twitter, WhatsApp, Slack). Free agents run on shared resources (0.5 CPU, 1GB RAM) and auto-sleep after 1 hour of inactivity. All tiers use Llama 4 Scout on Groq. If you bring your own API key (BYOK), messages are always unlimited and free.',
       },
       {
         q: 'What is BYOK (Bring Your Own Key)?',
@@ -141,7 +141,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'How do I change the AI model?',
-        a: 'Open your agent\'s Config tab and look for the model settings section. If you\'re using Hatcher\'s hosted key, Free and Starter tiers use GPT-OSS 20B on Groq, while Pro, Business, and Founding Member tiers use Llama 3.3 70B on Groq. If you have BYOK configured, you can select from any model supported by your provider (e.g., GPT-4o, Claude 3.5, Gemini Pro). Change the model identifier, save, and restart.',
+        a: 'Open your agent\'s Config tab and look for the model settings section. If you\'re using Hatcher\'s hosted key, all tiers use Llama 4 Scout on Groq. If you have BYOK configured, you can select from any model supported by your provider (e.g., GPT-4o, Claude 3.5, Gemini Pro). Change the model identifier, save, and restart.',
       },
       {
         q: 'How do I start, stop, or restart my agent?',
@@ -155,11 +155,11 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'What plans are available?',
-        a: 'Hatcher offers four tiers. Free: 1 agent, 10 messages/day (GPT-OSS 20B), shared resources, auto-sleep after 10 min. Starter ($4.99/mo): 1 agent, 50 messages/day (GPT-OSS 20B), better resources (1 CPU, 1.5GB RAM), auto-sleep after 2 hours. Pro ($14.99/mo): 3 agents, 200 messages/day per agent (Llama 3.3 70B), web search via Brave, dedicated resources (1.5 CPU, 2GB RAM), full log viewer. Business ($39.99/mo): 10 agents, 500 messages/day per agent (Llama 3.3 70B), web search via Brave, always-on, priority support. All tiers include all integrations and BYOK is always unlimited.',
+        a: 'Hatcher offers four tiers plus a lifetime option. Free: 1 agent, 20 messages/day, 3 searches/day, shared resources, auto-sleep after 1 hour. Starter ($6.99/mo): 1 agent, 50 messages/day, 10 searches/day, 1 CPU/1.5GB RAM, auto-sleep after 4 hours. Pro ($19.99/mo): 3 agents, 100 messages/day per agent, 50 searches/day, dedicated resources (1.5 CPU, 2GB RAM), auto-sleep after 12 hours. Business ($49.99/mo): 10 agents, 300 messages/day per agent, 200 searches/day, always-on, priority support. Founding Member ($99 one-time, 10 spots): everything in Business with 4GB RAM and 2GB workspace, forever. All tiers use Llama 4 Scout on Groq. BYOK is always unlimited.',
       },
       {
         q: 'How do add-ons work?',
-        a: 'Add-ons let you expand beyond your plan\'s included agent slots. You can stack multiple add-ons: +3 agents ($3.99/mo) or +10 agents ($9.99/mo). Add-ons are stackable and apply to your account. There\'s also a one-time File Manager add-on ($4.99/agent) that gives non-Pro users access to the file manager for a specific agent permanently.',
+        a: 'Add-ons expand your plan. Account-level (stack by count + expiry): Extra agents (+1 $2.99, +3 $6.99, +5 $11.99, +10 $19.99 /mo), Extra messages (+20 $1.99, +50 $3.99, +100 $5.99, +200 $9.99 /mo), Extra searches (+25 $3.99, +50 $6.99 /mo). Per-agent (extend expiry): Always On ($7.99/mo), File Manager ($4.99 one-time), Full Logs ($2.99/mo), +10 Plugins ($5.99/mo). Every subscription add-on has an annual variant at 15% off. All stackable.',
       },
       {
         q: 'How do I upgrade or downgrade?',
@@ -181,7 +181,7 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'My agent is not responding',
-        a: 'First, check if your agent is running (status should show "running" on the dashboard). If it\'s stopped or sleeping, start it. If it\'s running but not responding: check that your integrations are properly configured with valid tokens, verify your daily message limit hasn\'t been reached (Free: 10/day, Starter: 50/day, Pro: 200/day, Business: 500/day), and check the Logs tab for errors. If using BYOK, confirm your API key is valid and has credits with the provider.',
+        a: 'First, check if your agent is running (status should show "running" on the dashboard). If it\'s stopped or sleeping, start it. If it\'s running but not responding: check that your integrations are properly configured with valid tokens, verify your daily message limit hasn\'t been reached (account-wide: Free 20/day, Starter 50/day, Pro 100/day, Business 300/day, Founding 300/day), and check the Logs tab for errors. If using BYOK, confirm your API key is valid and has credits with the provider.',
       },
       {
         q: 'My agent keeps restarting',
@@ -197,7 +197,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'I am getting rate limited',
-        a: 'Rate limiting means you\'ve hit your daily message quota. Free tier: 10 messages/day, Starter: 50/day, Pro: 200/day, Business: 500/day. The limit resets on a 24-hour rolling window. Solutions: upgrade your plan for a higher limit (Pro and above also get a more capable model and web search), switch to BYOK (your own API key) for unlimited messages, or wait for the limit to reset. The 429 error in logs confirms rate limiting. BYOK always bypasses Hatcher\'s message limits.',
+        a: 'Rate limiting means you\'ve hit your daily message quota. Limits are account-wide: Free 20/day, Starter 50/day, Pro 100/day, Business 300/day, Founding 300/day. The 24h window resets per-user on a rolling basis. Solutions: upgrade your plan, stack a "+N messages/day" addon (e.g. +200 for $9.99/mo), switch to BYOK (unlimited on any tier), or wait for the reset. The 429 error in logs confirms rate limiting.',
       },
     ],
   },

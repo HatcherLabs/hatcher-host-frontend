@@ -22,6 +22,7 @@ import {
   Cpu,
   TerminalSquare,
   Radio,
+  ShoppingCart,
 } from 'lucide-react';
 import type { Tab } from './AgentContext';
 import { STATUS_STYLES, FRAMEWORK_BADGE, useAgentContext } from './AgentContext';
@@ -63,10 +64,13 @@ function getTabs(framework?: string): TabDef[] {
     ...(framework === 'elizaos' || framework === 'openclaw'
       ? [{ id: 'sessions' as const, label: 'Sessions', icon: <MessageSquare size={18} />, group: 'data' as const }]
       : []),
-    // Knowledge tab: RAG document uploads for elizaos and milady agents.
-    ...(framework === 'elizaos' || framework === 'milady'
-      ? [{ id: 'knowledge' as const, label: 'Knowledge', icon: <BookOpen size={18} />, group: 'data' as const }]
-      : []),
+    // Knowledge tab: uploaded documents / reference files the agent can
+    // read on demand. Backend (routes/agents/knowledge.ts) targets each
+    // framework's canonical workspace path — openclaw + hermes get a
+    // `knowledge/` subfolder under their managed volume, elizaos/milady
+    // store under `/data/` in-container.
+    { id: 'knowledge' as const, label: 'Knowledge', icon: <BookOpen size={18} />, group: 'data' as const },
+    { id: 'addons' as const, label: 'Add-ons', icon: <ShoppingCart size={18} />, group: 'data' as const },
     { id: 'files', label: 'Files', icon: <FolderOpen size={18} />, group: 'data' },
     // Workspace viewer — openclaw (managed) and managed hermes. Read-only
     // tree of the agent's workspace. Free for all users.

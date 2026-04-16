@@ -93,28 +93,6 @@ export function OpenClawSessionsTab() {
     load();
   }, [load]);
 
-  if (agent && agent.managementMode !== 'managed') {
-    return (
-      <motion.div
-        key="tab-openclaw-sessions"
-        variants={tabContentVariants}
-        initial="enter"
-        animate="center"
-        exit="exit"
-      >
-        <GlassCard>
-          <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
-            <Info size={14} className="text-amber-400" />
-            Legacy OpenClaw sessions are stored in a different layout and
-            aren&apos;t indexed yet. Browse the Files tab to see raw session
-            files, or recreate this agent as managed mode to get the full
-            sessions browser.
-          </div>
-        </GlassCard>
-      </motion.div>
-    );
-  }
-
   if (stopped) {
     return (
       <motion.div

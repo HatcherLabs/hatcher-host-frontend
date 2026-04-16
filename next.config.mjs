@@ -40,7 +40,7 @@ const nextConfig = {
               // connect-src: in development we also allow localhost origins so
               // the local API (:3001) and LLM proxy (:8080) are reachable from
               // the browser; prod-only values stay as-is.
-              `connect-src 'self' https://api.hatcher.host wss://api.hatcher.host https://*.solana.com https://*.helius-rpc.com https://api.dexscreener.com${process.env.NODE_ENV !== 'production' ? ' http://localhost:3001 ws://localhost:3001 http://localhost:8080 http://127.0.0.1:3001 ws://127.0.0.1:3001 http://127.0.0.1:8080' : ''}`,
+              `connect-src 'self' https://api.hatcher.host wss://api.hatcher.host https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com${process.env.NODE_ENV !== 'production' ? ' http://localhost:3001 ws://localhost:3001 http://localhost:8080 http://127.0.0.1:3001 ws://127.0.0.1:3001 http://127.0.0.1:8080' : ''}`,
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",

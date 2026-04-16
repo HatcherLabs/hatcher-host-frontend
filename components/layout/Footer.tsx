@@ -182,6 +182,8 @@ export function Footer() {
             <a href={DOCS_URL} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--text-primary)] transition-colors duration-200">Docs</a>
             <Link href="/terms" className="hover:text-[var(--text-primary)] transition-colors duration-200">Terms</Link>
             <Link href="/privacy" className="hover:text-[var(--text-primary)] transition-colors duration-200">Privacy</Link>
+            <Link href="/cookies" className="hover:text-[var(--text-primary)] transition-colors duration-200">Cookies</Link>
+            <Link href="/impressum" className="hover:text-[var(--text-primary)] transition-colors duration-200">Impressum</Link>
           </div>
         </div>
       </div>

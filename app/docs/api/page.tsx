@@ -318,7 +318,7 @@ status = res.json()['data']['status']`,
   "success": true,
   "data": {
     "content": "SOL is currently trading at $142.50...",
-    "model": "gpt-oss-20b",
+    "model": "meta-llama/llama-4-scout-17b-16e-instruct",
     "tokensUsed": { "input": 85, "output": 234 }
   }
 }`,
@@ -514,9 +514,9 @@ print(f"{usage['requestsUsed']}/{usage['requestsLimit']} requests used")`,
 
 const RATE_LIMIT_TIERS = [
   { tier: 'Free', requests: '100', price: '$0' },
-  { tier: 'Starter', requests: '10,000', price: '$4.99/mo' },
-  { tier: 'Pro', requests: '100,000', price: '$14.99/mo' },
-  { tier: 'Business', requests: '500,000', price: '$39.99/mo' },
+  { tier: 'Starter', requests: '10,000', price: '$6.99/mo' },
+  { tier: 'Pro', requests: '100,000', price: '$19.99/mo' },
+  { tier: 'Business', requests: '500,000', price: '$49.99/mo' },
 ];
 
 const ERROR_CODES = [

@@ -360,7 +360,7 @@ export default function CreatePage() {
   // Build LLM config for payload
   function getLLMConfig() {
     if (llmChoice === 'free_groq') {
-      return { modelProvider: 'groq', model: 'openai/gpt-oss-20b' };
+      return { modelProvider: 'groq', model: 'meta-llama/llama-4-scout-17b-16e-instruct' };
     }
     if (llmChoice === 'byok') {
       return {
@@ -375,7 +375,7 @@ export default function CreatePage() {
       };
     }
     // Fallback: use free groq
-    return { modelProvider: 'groq', model: 'openai/gpt-oss-20b' };
+    return { modelProvider: 'groq', model: 'meta-llama/llama-4-scout-17b-16e-instruct' };
   }
 
   function getLLMSummary(): string {
@@ -448,7 +448,7 @@ export default function CreatePage() {
         framework: selectedFramework,
         template: selectedTemplate,
         config: {
-          model: llm.model ?? 'openai/gpt-oss-20b',
+          model: llm.model ?? 'meta-llama/llama-4-scout-17b-16e-instruct',
           provider: llm.modelProvider,
           ...(selectedFramework === 'openclaw' ? { skills: openclawSkills } : {}),
           ...(selectedFramework === 'hermes' ? { tools: hermesTools } : {}),
@@ -688,18 +688,18 @@ export default function CreatePage() {
                   className={cn(
                     'p-6 rounded-xl border text-left transition-all duration-200 relative',
                     selectedFramework === 'openclaw'
-                      ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
-                      : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.4)]'
+                      ? 'bg-[#f59e0b]/10 border-[#f59e0b] shadow-[0_0_24px_rgba(245,158,11,0.15)]'
+                      : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(245,158,11,0.4)]'
                   )}
                 >
                   {selectedFramework === 'openclaw' && (
                     <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
-                      className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
+                      className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[#f59e0b] flex items-center justify-center">
                       <Check className="w-4 h-4 text-white" />
                     </motion.div>
                   )}
-                  <div className="w-12 h-12 rounded-xl bg-[var(--color-accent)]/10 flex items-center justify-center mb-4">
-                    <Cpu className="w-6 h-6 text-[var(--color-accent)]" />
+                  <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mb-4">
+                    <Cpu className="w-6 h-6 text-amber-400" />
                   </div>
                   <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">OpenClaw</h3>
                   <p className="text-sm text-[var(--text-muted)] mb-3">
@@ -719,13 +719,13 @@ export default function CreatePage() {
                   className={cn(
                     'p-6 rounded-xl border text-left transition-all duration-200 relative',
                     selectedFramework === 'hermes'
-                      ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
-                      : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.4)]'
+                      ? 'bg-[#a855f7]/10 border-[#a855f7] shadow-[0_0_24px_rgba(168,85,247,0.15)]'
+                      : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(168,85,247,0.4)]'
                   )}
                 >
                   {selectedFramework === 'hermes' && (
                     <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
-                      className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
+                      className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[#a855f7] flex items-center justify-center">
                       <Check className="w-4 h-4 text-white" />
                     </motion.div>
                   )}
@@ -787,7 +787,7 @@ export default function CreatePage() {
                 >
                   {selectedFramework === 'milady' && (
                     <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
-                      className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
+                      className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[#f43f5e] flex items-center justify-center">
                       <Check className="w-4 h-4 text-white" />
                     </motion.div>
                   )}
@@ -1150,11 +1150,23 @@ export default function CreatePage() {
                               : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[var(--border-hover)]'
                           )}
                         >
-                          {/* Platform header with toggle */}
-                          <button
-                            type="button"
+                          {/* Platform header with toggle.
+                              Nested <button> (ToggleSwitch) inside <button>
+                              breaks hydration per HTML spec, so the outer
+                              element is a div with keyboard-friendly click
+                              handling; the inner ToggleSwitch keeps its
+                              native button semantics for screen readers. */}
+                          <div
+                            role="button"
+                            tabIndex={0}
                             onClick={() => setPlatformsEnabled(prev => ({ ...prev, [platform.id]: !prev[platform.id] }))}
-                            className="w-full flex items-center justify-between px-4 py-3 text-left"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                setPlatformsEnabled(prev => ({ ...prev, [platform.id]: !prev[platform.id] }));
+                              }
+                            }}
+                            className="w-full flex items-center justify-between px-4 py-3 text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40 rounded-xl"
                           >
                             <div className="flex items-center gap-3 min-w-0">
                               <span className="text-xl leading-none shrink-0" aria-hidden="true">{platform.icon}</span>
@@ -1163,10 +1175,10 @@ export default function CreatePage() {
                                 <div className="text-[11px] text-[var(--text-muted)] truncate">{platform.description}</div>
                               </div>
                             </div>
-                            <div className="shrink-0 ml-3">
+                            <div className="shrink-0 ml-3" onClick={(e) => e.stopPropagation()}>
                               <ToggleSwitch checked={isEnabled} onChange={(v) => setPlatformsEnabled(prev => ({ ...prev, [platform.id]: v }))} />
                             </div>
-                          </button>
+                          </div>
 
                           {/* Expanded credential fields */}
                           <AnimatePresence>

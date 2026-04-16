@@ -24,6 +24,7 @@ import {
   Activity,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
+import { FOUNDING_MEMBER_MAX_SLOTS } from '@hatcher/shared';
 
 // ─── Shared animation config ──────────────────────────────────
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
@@ -272,6 +273,10 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 export default function LandingPage() {
   const { isLoading: authLoading } = useAuth();
   const [tokenData, setTokenData] = useState<{ price: string; mcap: string } | null>(null);
+  // Founding Member availability. Hidden by default; rendered as a
+  // scarcity banner only while spots remain (no banner when sold out —
+  // don't tease users with something they can't buy).
+  const [foundingRemaining, setFoundingRemaining] = useState<number | null>(null);
 
   useEffect(() => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -291,6 +296,14 @@ export default function LandingPage() {
         }
       })
       .catch(() => {});
+
+    // Founding Member availability — the /features endpoint is public
+    // and already returns a `founding: { remaining }` summary.
+    api.getTiersCatalog()
+      .then((res) => {
+        if (res.success) setFoundingRemaining(res.data.founding.remaining);
+      })
+      .catch(() => {});
   }, []);
 
   if (authLoading) return <div className="min-h-screen bg-[var(--bg-base)]" />;
@@ -298,11 +311,10 @@ export default function LandingPage() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }} className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)]">
 
-      {/* ── Open Beta Banner ────────────────────────────────── */}
-      <div className="w-full bg-[var(--color-accent)] text-white text-center py-2 px-4 text-sm font-medium">
-        We&apos;re in open beta! All features are free to try.{' '}
-        <Link href="/register" className="underline underline-offset-2 hover:text-white/80 transition-colors">Sign up and start building</Link>
-      </div>
+
+      {/* Founding Member now lives as a full section further down the
+          page (between pricing and FAQ), not as a top banner. This
+          gives it room to breathe and show what's included. */}
 
       {/* ── Token Banner ──────────────────────────────────── */}
       <div className="w-full bg-gradient-to-r from-[#9945FF]/90 to-[#14F195]/90 text-white text-center py-2.5 px-4 text-sm font-medium">
@@ -334,7 +346,7 @@ export default function LandingPage() {
           ].map((item, i) => (
             <motion.span
               key={i}
-              className={`absolute ${item.size} opacity-[0.08]`}
+              className={`absolute ${item.size} landing-float-emoji`}
               style={{ left: item.x, top: item.y }}
               animate={{ y: [0, -15, 0], rotate: [0, 5, -5, 0] }}
               transition={{ duration: 6, repeat: Infinity, delay: item.delay, ease: 'easeInOut' }}
@@ -581,22 +593,22 @@ export default function LandingPage() {
             {[
               {
                 name: 'Free', price: '$0', sub: 'No credit card', color: 'emerald', highlight: false,
-                features: ['1 AI agent', '10 messages/day', 'All platforms', 'Free AI included'],
+                features: ['1 AI agent', '20 messages/day', 'All platforms', 'Free AI included'],
                 cta: 'Get Started', href: '/register',
               },
               {
-                name: 'Starter', price: '$4.99', sub: '/month', color: 'purple', highlight: false,
+                name: 'Starter', price: '$6.99', sub: '/month', color: 'purple', highlight: false,
                 features: ['1 AI agent', '50 messages/day', 'BYOK = unlimited', 'Longer active time'],
                 cta: 'Subscribe', href: '/pricing',
               },
               {
-                name: 'Pro', price: '$14.99', sub: '/month', color: 'cyan', highlight: true,
-                features: ['3 AI agents', '200 messages/day', 'BYOK = unlimited', 'Priority support'],
+                name: 'Pro', price: '$19.99', sub: '/month', color: 'cyan', highlight: true,
+                features: ['3 AI agents', '100 messages/day', 'BYOK = unlimited', 'Dedicated resources'],
                 cta: 'Go Pro', href: '/pricing',
               },
               {
-                name: 'Business', price: '$39.99', sub: '/month', color: 'amber', highlight: false,
-                features: ['10 AI agents', '500 messages/day', 'Always-on containers', 'Dedicated resources'],
+                name: 'Business', price: '$49.99', sub: '/month', color: 'amber', highlight: false,
+                features: ['10 AI agents', '300 messages/day', 'Always-on containers', 'Dedicated resources'],
                 cta: 'Go Business', href: '/pricing',
               },
             ].map((tier, i) => {
@@ -648,6 +660,117 @@ export default function LandingPage() {
             Need more agents? Add extras with stackable packs.{' '}
             <Link href="/pricing" className="text-[var(--color-accent)] hover:underline">See full pricing</Link>
           </p>
+        </div>
+      </section>
+
+      {/* ── 5b. FOUNDING MEMBER ─────────────────────────── */}
+      <section className="py-20 sm:py-24 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden relative">
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse 50% 50% at 50% 50%, rgba(139,92,246,0.12), transparent 70%)',
+        }} />
+        <div className="max-w-4xl mx-auto relative">
+          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-[#8b5cf6]/15 to-[#06b6d4]/15 border border-[#8b5cf6]/30 mb-5">
+              <span className="text-lg">👑</span>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-primary)]">Limited offer</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-3">
+              Founding Member
+            </h2>
+            <div className="flex items-baseline justify-center gap-2 mb-3">
+              <span className="text-5xl font-extrabold text-[var(--text-primary)]">$99</span>
+              <span className="text-lg text-[var(--text-muted)]">one-time</span>
+            </div>
+            <p className="text-[var(--text-secondary)] max-w-xl mx-auto">
+              Pay once, keep forever. No monthly fees. Locked-in price that never changes.
+            </p>
+          </motion.div>
+
+          {/* Availability bar */}
+          <motion.div
+            {...fadeUp}
+            transition={{ duration: 0.6, delay: 0.08, ease }}
+            className="card glass-noise p-5 sm:p-6 mb-8"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs uppercase tracking-wider font-bold text-[var(--text-muted)]">
+                Available spots
+              </span>
+              {foundingRemaining === null ? (
+                <span className="text-xs text-[var(--text-muted)] inline-flex items-center gap-1.5">
+                  <span className="w-3 h-3 border-2 border-[var(--text-muted)]/30 border-t-[var(--text-muted)] rounded-full animate-spin" />
+                  Checking…
+                </span>
+              ) : (
+                <span className={`text-xs font-bold ${foundingRemaining === 0 ? 'text-red-400' : foundingRemaining <= 3 ? 'text-orange-400' : 'text-[var(--text-primary)]'}`}>
+                  {foundingRemaining === 0 ? 'Sold out' : `${foundingRemaining} of ${FOUNDING_MEMBER_MAX_SLOTS} left`}
+                </span>
+              )}
+            </div>
+            <div className="relative h-3 rounded-full bg-[var(--bg-elevated)] overflow-hidden">
+              {foundingRemaining === null ? (
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#8b5cf6]/30 to-transparent animate-[shimmer_1.4s_ease-in-out_infinite]" style={{ backgroundSize: '200% 100%' }} />
+              ) : (
+                <motion.div
+                  initial={{ width: 0 }}
+                  whileInView={{ width: `${((FOUNDING_MEMBER_MAX_SLOTS - foundingRemaining) / FOUNDING_MEMBER_MAX_SLOTS) * 100}%` }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, ease }}
+                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#8b5cf6] via-[#a855f7] to-[#06b6d4]"
+                />
+              )}
+            </div>
+            <p className="text-[10px] text-[var(--text-muted)] mt-2 text-center">
+              {foundingRemaining === null
+                ? 'Loading availability…'
+                : foundingRemaining === 0
+                  ? `All ${FOUNDING_MEMBER_MAX_SLOTS} founding spots are taken. Standard tiers still available.`
+                  : `${FOUNDING_MEMBER_MAX_SLOTS - foundingRemaining} of ${FOUNDING_MEMBER_MAX_SLOTS} claimed · once they're gone, this offer is gone.`}
+            </p>
+          </motion.div>
+
+          {/* What's included */}
+          <motion.div
+            {...fadeUp}
+            transition={{ duration: 0.6, delay: 0.14, ease }}
+            className="card glass-noise p-6 sm:p-8 mb-6"
+          >
+            <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--text-muted)] mb-4">
+              Everything included, forever
+            </h3>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {[
+                '10 agents included',
+                'Always-on (no sleep)',
+                '300 messages/day per account',
+                '200 web searches/day',
+                '2 CPU · 4 GB RAM per agent',
+                '2 GB workspace per agent',
+                'File Manager + Full Logs',
+                'Team collaboration + priority support',
+                'Founding badge',
+                'Locked-in price forever',
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
+                  <Check className="w-4 h-4 text-green-400 shrink-0 mt-0.5" />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div {...fadeUp} transition={{ duration: 0.6, delay: 0.2, ease }} className="text-center">
+            <Link
+              href="/pricing"
+              className={`inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-white transition-all ${
+                foundingRemaining === 0
+                  ? 'bg-[var(--text-muted)]/50 pointer-events-none'
+                  : 'bg-gradient-to-r from-[#8b5cf6] to-[#06b6d4] hover:shadow-[0_0_40px_rgba(139,92,246,0.4)] hover:scale-[1.02]'
+              }`}
+            >
+              {foundingRemaining === 0 ? 'Sold out' : 'Claim your spot →'}
+            </Link>
+          </motion.div>
         </div>
       </section>
 

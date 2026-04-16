@@ -293,7 +293,7 @@ export function WorkspaceTab() {
   // Keep this in sync with getWorkspaceConfig() in
   // apps/api/src/routes/agents/workspace.ts.
   const isOpenClaw = agent?.framework === 'openclaw';
-  const isManagedHermes = agent?.framework === 'hermes' && agent?.managementMode === 'managed';
+  const isManagedHermes = agent?.framework === 'hermes' && true;
   if (!isOpenClaw && !isManagedHermes) {
     const isLegacyHermes = agent?.framework === 'hermes';
     return (

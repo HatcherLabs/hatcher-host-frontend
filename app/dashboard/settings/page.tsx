@@ -29,6 +29,7 @@ import {
   Save,
   ArrowRight,
   Download,
+  Wallet,
 } from 'lucide-react';
 
 // ── Animation variants ──────────────────────────────────────
@@ -47,13 +48,17 @@ const displayFont = { fontFamily: 'var(--font-display), system-ui, sans-serif' }
 // ── Tier badge ──────────────────────────────────────────────
 function TierBadge({ tier }: { tier: string }) {
   const styles: Record<string, string> = {
-    pro: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
-    basic: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
     free: 'bg-[var(--bg-card)] text-[var(--text-muted)] border-[var(--border-default)]',
+    starter: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
+    basic: 'bg-purple-500/15 text-purple-400 border-purple-500/30', // legacy alias
+    pro: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
+    business: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+    founding_member: 'bg-gradient-to-r from-[#e11d48]/15 to-[#be123c]/15 text-[#e11d48] border-[#e11d48]/30',
   };
+  const labels: Record<string, string> = { founding_member: 'Founding' };
   return (
     <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${styles[tier] ?? styles.free}`}>
-      {tier}
+      {labels[tier] ?? tier}
     </span>
   );
 }
@@ -517,6 +522,60 @@ export default function SettingsPage() {
                       </div>
                     </Section>
 
+                    {/* Connected Wallet — the wallet_address column is
+                        populated automatically by the first successful
+                        on-chain payment (features.ts subscribe/addon).
+                        Disconnect just clears it; the next payment re-links
+                        whichever wallet signs it. */}
+                    <Section title="Connected Wallet" icon={<Wallet size={16} />} iconColor="text-purple-400" iconBg="bg-purple-500/15">
+                      {user?.walletAddress ? (
+                        <div className="space-y-3">
+                          <p className="text-xs text-[var(--text-muted)]">
+                            Linked automatically from your first on-chain payment. Used when paying with SOL, USDC, or $HATCHER.
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-10 px-3 rounded-lg text-sm bg-[var(--bg-card)] border border-[var(--border-default)] flex items-center truncate font-mono tracking-wider text-[var(--text-primary)]">
+                              {user.walletAddress}
+                            </div>
+                            <button
+                              onClick={() => copy(user.walletAddress ?? '', 'wallet')}
+                              className="h-10 w-10 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
+                              title="Copy address"
+                            >
+                              {copiedField === 'wallet' ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
+                            </button>
+                            <a
+                              href={`https://solscan.io/account/${user.walletAddress}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="h-10 px-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex-shrink-0"
+                              title="View on Solscan"
+                            >
+                              Solscan
+                            </a>
+                          </div>
+                          <button
+                            onClick={async () => {
+                              const res = await api.disconnectWallet();
+                              if (res.success) {
+                                await refreshUser();
+                                toast('success', 'Wallet disconnected');
+                              } else {
+                                toast('error', res.error ?? 'Failed to disconnect wallet');
+                              }
+                            }}
+                            className="text-xs text-red-400 hover:text-red-300 transition-colors"
+                          >
+                            Disconnect wallet
+                          </button>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-[var(--text-secondary)]">
+                          No wallet linked yet. Your Solana wallet connects automatically the first time you make an on-chain payment from the billing page.
+                        </p>
+                      )}
+                    </Section>
+
                     {/* Referral */}
                     <Section title="Referral Program" icon={<Gift size={16} />} iconColor="text-emerald-400" iconBg="bg-emerald-500/15">
                       <p className="text-sm text-[var(--text-secondary)] mb-5 leading-relaxed">
@@ -531,7 +590,7 @@ export default function SettingsPage() {
                             <div key={field}>
                               <label className="text-xs font-medium text-[var(--text-muted)] mb-1.5 block">{label}</label>
                               <div className="flex items-center gap-2">
-                                <div className={`flex-1 h-10 px-3 rounded-lg text-sm bg-[var(--bg-card)] border border-[var(--border-default)] flex items-center truncate ${mono ? 'font-mono tracking-wider text-white' : 'text-[var(--text-secondary)]'}`}>
+                                <div className={`flex-1 h-10 px-3 rounded-lg text-sm bg-[var(--bg-card)] border border-[var(--border-default)] flex items-center truncate ${mono ? 'font-mono tracking-wider text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
                                   {value}
                                 </div>
                                 <button onClick={() => copy(value, field)} className="h-10 w-10 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] flex items-center justify-center transition-colors cursor-pointer flex-shrink-0">
@@ -626,7 +685,7 @@ export default function SettingsPage() {
                           <p className="text-xs font-semibold text-emerald-400 mb-2 uppercase tracking-wider">New key created — copy it now!</p>
                           <p className="text-xs text-[var(--text-muted)] mb-2">{newlyCreatedKey.label}</p>
                           <div className="flex items-center gap-2">
-                            <div className="flex-1 h-9 px-3 rounded-lg bg-[var(--bg-card)] border border-emerald-500/20 flex items-center font-mono text-xs tracking-wider text-white overflow-hidden">
+                            <div className="flex-1 h-9 px-3 rounded-lg bg-[var(--bg-card)] border border-emerald-500/20 flex items-center font-mono text-xs tracking-wider text-[var(--text-primary)] overflow-hidden">
                               {newlyCreatedKey.key}
                             </div>
                             <button
@@ -832,12 +891,16 @@ export default function SettingsPage() {
                             <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Current Plan</span>
                             <TierBadge tier={profile.tier} />
                           </div>
-                          <p className="text-2xl font-bold text-[var(--text-primary)] capitalize" style={displayFont}>{profile.tier}</p>
+                          <p className="text-2xl font-bold text-[var(--text-primary)] capitalize" style={displayFont}>
+                            {profile.tier === 'founding_member' ? 'Founding Member' : profile.tier}
+                          </p>
                           <p className="text-sm text-[var(--text-muted)] mt-0.5">
-                            {profile.tier === 'free' ? 'Free — 1 agent, 10 messages/day' :
-                             profile.tier === 'starter' ? '$4.99/mo — 50 messages/day per agent' :
-                             profile.tier === 'pro' ? '$14.99/mo — 200 messages/day, dedicated resources' :
-                             '$39.99/mo — 500 messages/day, always-on, priority support'}
+                            {profile.tier === 'free' ? 'Free — 1 agent, 20 messages/day' :
+                             profile.tier === 'starter' ? '$6.99/mo — 50 messages/day' :
+                             profile.tier === 'pro' ? '$19.99/mo — 100 messages/day, dedicated resources' :
+                             profile.tier === 'business' ? '$49.99/mo — 300 messages/day, always-on, priority support' :
+                             profile.tier === 'founding_member' ? '$99 lifetime — 10 agents, 300 messages/day, 4 GB RAM, 2 GB workspace, always-on' :
+                             profile.tier}
                           </p>
                         </div>
 
@@ -973,7 +1036,7 @@ export default function SettingsPage() {
                     onKeyDown={e => { if (e.key === 'Enter' && !deleting) handleDeleteAccount(); }}
                     placeholder="Your current password"
                     disabled={deleting}
-                    className="w-full bg-[var(--bg-card)] border border-[var(--border-default)] rounded-xl px-3 py-2.5 pr-10 text-sm text-white placeholder-[var(--text-muted)] focus:outline-none focus:border-red-500/50 disabled:opacity-50"
+                    className="w-full bg-[var(--bg-card)] border border-[var(--border-default)] rounded-xl px-3 py-2.5 pr-10 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-red-500/50 disabled:opacity-50"
                     autoFocus
                   />
                   <button type="button" onClick={() => setShowDeletePassword(v => !v)}
