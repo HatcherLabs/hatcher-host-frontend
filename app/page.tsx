@@ -24,9 +24,7 @@ import {
   Activity,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
-// Inline until @hatcherlabs/shared is published with this export.
-// Keep in sync with packages/shared/src/constants/index.ts.
-const FOUNDING_MEMBER_MAX_SLOTS = 20;
+import { FOUNDING_MEMBER_MAX_SLOTS } from '@hatcher/shared';
 
 // ─── Shared animation config ──────────────────────────────────
 const ease = [0.25, 0.46, 0.45, 0.94] as const;

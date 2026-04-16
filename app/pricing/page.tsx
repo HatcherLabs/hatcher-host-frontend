@@ -2,10 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
-// FOUNDING_MEMBER_MAX_SLOTS lives in @hatcher/shared but the npm-published
-// version doesn't have it yet (pending npm publish). Inline until then.
-// Keep in sync with packages/shared/src/constants/index.ts.
-const FOUNDING_MEMBER_MAX_SLOTS = 20;
+import { FOUNDING_MEMBER_MAX_SLOTS } from '@hatcher/shared';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
