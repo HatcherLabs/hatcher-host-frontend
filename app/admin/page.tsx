@@ -390,7 +390,7 @@ export default function AdminPage() {
 
   async function handleLoadAllAgents() {
     setLoadingMoreAgents(true);
-    const res = await api.adminGetAgents(9999, 0);
+    const res = await api.adminGetAgents(2000, 0);
     setLoadingMoreAgents(false);
     if (res.success) {
       const data = res.data;
