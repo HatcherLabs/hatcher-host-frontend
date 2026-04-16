@@ -29,60 +29,71 @@ const STATUS_CONFIG: Record<Status, { dot: string; badge: string; line: string }
 
 const PHASES: Phase[] = [
   {
-    period: 'Live now',
+    period: 'Shipped (pre-launch)',
     status: 'done',
-    label: 'BETA',
+    label: 'DONE',
     items: [
       { text: '4 agent frameworks — OpenClaw, Hermes, ElizaOS, Milady' },
-      { text: '20+ platform integrations — Telegram, Discord, Twitter/X, WhatsApp, Slack and more' },
-      { text: 'BYOK — bring your own LLM key, 7 providers supported, always free' },
-      { text: '$HATCHER token launched on Solana', note: 'CA: Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump' },
-      { text: 'Free tier + Starter / Pro / Business + Founding Member ($99 lifetime)' },
-      { text: 'SDK, CLI, Zapier, Make, GitHub Action' },
-      { text: 'Teams, custom domains, agent versioning, workflow builder' },
+      { text: '5 integrations — Telegram, Discord, Twitter/X, WhatsApp, Slack' },
+      { text: 'BYOK — bring your own LLM key (OpenAI, Anthropic, Google, Groq), unlimited on any tier' },
+      { text: '$HATCHER token on Solana (Token-2022)', note: 'CA: Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump' },
+      { text: 'Free tier + Starter / Pro / Business + Founding Member ($99 lifetime, 20 spots)' },
+      { text: 'SDK, CLI, Zapier app, Make module, GitHub Action' },
+      { text: 'Teams collaboration, agent versioning with diff + restore, visual workflow builder' },
       { text: 'Referral program — earn credits for every signup you bring' },
-      { text: 'Embeddable chat widget — add your agent to any website' },
-      { text: 'Agent-to-Agent — agents can call and collaborate with each other' },
-      { text: 'Full docs, live changelog, support tickets' },
+      { text: 'Skills + plugins ecosystem — ClawHub, Hermes 77 bundled, ElizaOS registry, npm support' },
+      { text: 'Knowledge base, voice mode, secure terminal, managed mode (OpenClaw + Hermes)' },
+      { text: 'Full docs (35+ pages), live changelog, support tickets, admin panel' },
     ],
   },
   {
-    period: '10–15 April',
-    status: 'launching',
-    label: 'SOON',
+    period: '10–16 April (SHIPPED ✅)',
+    status: 'done',
+    label: 'LAUNCHED',
     items: [
-      { text: 'Official public launch — Product Hunt, Hacker News, X threads' },
-      { text: 'Stripe live payments — pay with card in addition to SOL / HATCHER' },
-      { text: 'Platform directory listings — AlternativeTo, There\'s An AI For That, Futurepedia and more' },
-      { text: 'Signal integration — QR code pairing, encrypted messaging' },
-      { text: 'Mobile app — iOS & Android' },
-      { text: 'Agent template gallery expansion — 30+ ready-to-deploy templates' },
+      { text: 'Official public launch — platform live at hatcher.host' },
+      { text: '5 payment methods — SOL, USDC, $HATCHER (10% burn), Stripe Card, Credits' },
+      { text: 'Annual billing — 15% off on all tiers and addons' },
+      { text: 'Credits system with prorated refunds on upgrades' },
+      { text: 'Addon stacking by count (agents, messages, searches) + per-agent addons' },
+      { text: 'Full Stripe integration — one-time checkout, webhook handling, live products' },
+      { text: 'GDPR-grade legal pages — Privacy, Terms, Cookies, Impressum' },
+      { text: 'Cookie consent v2 — granular (Necessary + Analytics), honors Do-Not-Track' },
+      { text: 'Email normalization (case-insensitive login/register)' },
+      { text: 'Agent limit enforcement — auto-pause on downgrade, block restart over limit' },
+      { text: 'Full Logs gate (20-line cap without addon), "Included in tier" badges' },
+      { text: 'Real-time admin dashboard — online users, page views, unique visitors' },
+      { text: 'Docs billing section — payments, credits, annual billing, addons mechanics' },
+      { text: 'Legacy-to-managed migration, Docker cleanup, DB reset for clean launch' },
     ],
   },
   {
     period: 'Next 2–4 weeks',
-    status: 'soon',
-    label: 'SOON',
+    status: 'launching',
+    label: 'NEXT',
     items: [
+      { text: 'Product Hunt + Hacker News + directory listings (AlternativeTo, TAAFT, Futurepedia)' },
       { text: 'Agent Marketplace — browse, rent, and sell pre-configured agents' },
-      { text: 'Scheduled agents — run agents on a cron schedule (daily reports, auto-posts, etc.)' },
+      { text: 'Agent template gallery expansion — 50+ ready-to-deploy templates' },
       { text: 'Conversation analytics — sentiment, topics, drop-off, message volume over time' },
-      { text: 'WhatsApp Business API — for higher volume use cases, no QR code required' },
-      { text: 'More BYOK providers — Mistral, Cohere, Perplexity' },
-      { text: 'Improved embeds — custom colors, position, avatar, trigger button' },
+      { text: 'Mobile app — Android (Kotlin, feature-complete) + iOS wrapper' },
+      { text: 'More BYOK providers — Mistral, Cohere, Perplexity, DeepSeek' },
+      { text: 'Improved embed widget — custom colors, position, avatar, trigger button' },
     ],
   },
   {
     period: 'Next 1–3 months',
-    status: 'planned',
-    label: 'PLANNED',
+    status: 'soon',
+    label: 'SOON',
     items: [
-      { text: 'More frameworks — additional agent runtimes for different use cases and developer preferences' },
+      { text: 'More frameworks — additional agent runtimes for different use cases' },
       { text: 'Token staking — stake HATCHER for subscription discounts and early access' },
-      { text: 'No-code framework — deploy an agent from a prompt, no config required' },
-      { text: 'Voice-first agents — native voice (Twilio / ElevenLabs), not just browser Speech API' },
-      { text: 'Affiliate dashboard — dedicated panel for tracking referral revenue in HATCHER tokens' },
-      { text: 'Public agent profiles — shareable pages for your agent with live chat embed' },
+      { text: 'No-code agent builder — deploy from a prompt, no config required' },
+      { text: 'Voice-first agents — native voice via Twilio / ElevenLabs' },
+      { text: 'Signal integration — QR code pairing, encrypted messaging' },
+      { text: 'WhatsApp Business API — higher volume, no QR code required' },
+      { text: 'Public agent profiles — shareable pages with live chat embed' },
+      { text: 'Affiliate dashboard — track referral revenue in HATCHER tokens' },
     ],
   },
   {
@@ -90,10 +101,10 @@ const PHASES: Phase[] = [
     status: 'planned',
     label: 'FUTURE',
     items: [
-      { text: 'Multi-agent orchestration — define pipelines where N agents collaborate with defined roles' },
-      { text: 'Token governance — HATCHER holders vote on platform features and treasury allocation' },
+      { text: 'Multi-agent orchestration — pipelines where N agents collaborate with defined roles' },
+      { text: 'Token governance — HATCHER holders vote on features and treasury allocation' },
       { text: 'Enterprise / White-label — run Hatcher on your own infra, under your own brand' },
-      { text: 'Hatcher for Teams (B2B) — SSO, audit logs, granular role access, centralized billing' },
+      { text: 'Hatcher for Teams (B2B) — SSO, audit logs, granular roles, centralized billing' },
       { text: 'Agent App Store — community-certified skills and plugins with revenue sharing' },
       { text: 'API v2 — improved REST API with native webhooks, streaming, and batch operations' },
     ],
@@ -124,9 +135,9 @@ export default function RoadmapPage() {
         {/* Header */}
         <div className="mb-14">
           <div className="flex items-center gap-2 mb-4">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20 tracking-wide">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-              SOON
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 tracking-wide">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              LIVE
             </span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
