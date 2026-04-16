@@ -1078,6 +1078,16 @@ export const api = {
    * Signups/agents per day, tier + framework breakdowns, recent signups.
    * Cached server-side for 60s.
    */
+  /** Admin: live platform activity (online users, page views, unique visitors).
+   *  Redis-backed, refreshed every 30s in the admin panel. */
+  adminGetLiveStats: () =>
+    req<{
+      onlineUsers: number;
+      pageViewsToday: number;
+      uniqueVisitors: number;
+      timestamp: string;
+    }>('/admin/live-stats'),
+
   adminGetMetrics: () =>
     req<{
       signupsByDay: Array<{ day: string; count: number }>;

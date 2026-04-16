@@ -39,6 +39,9 @@ import {
   PieChart,
   Calendar,
   Sunrise,
+  Eye,
+  Globe,
+  Radio,
 } from 'lucide-react';
 
 
@@ -204,6 +207,12 @@ export default function AdminPage() {
     createdAt: string;
     updatedAt: string;
   }>>([]);
+  const [liveStats, setLiveStats] = useState<{
+    onlineUsers: number;
+    pageViewsToday: number;
+    uniqueVisitors: number;
+    timestamp: string;
+  } | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingMoreAgents, setLoadingMoreAgents] = useState(false);
   const [agentsPagination, setAgentsPagination] = useState<{ total: number; hasMore: boolean }>({ total: 0, hasMore: false });
@@ -302,6 +311,21 @@ export default function AdminPage() {
         setLoading(false);
         setError('Failed to load admin data');
       });
+  }, [isAuthenticated, isAdmin]);
+
+  // ── Live stats (online users, page views) — auto-refresh 30s ──
+  useEffect(() => {
+    if (!isAuthenticated || !isAdmin) return;
+    let cancelled = false;
+    async function fetchLive() {
+      try {
+        const res = await api.adminGetLiveStats();
+        if (!cancelled && res.success) setLiveStats(res.data);
+      } catch { /* swallow */ }
+    }
+    fetchLive();
+    const interval = setInterval(fetchLive, 30_000);
+    return () => { cancelled = true; clearInterval(interval); };
   }, [isAuthenticated, isAdmin]);
 
   // ── Fetch health data when Health tab is active ────────────
@@ -698,6 +722,51 @@ export default function AdminPage() {
             Refresh
           </button>
         </motion.div>
+
+        {/* ── Live Activity (real-time, refreshes every 30s) ──── */}
+        {liveStats && (
+          <div className="grid grid-cols-3 gap-3">
+            <motion.div className="card glass-noise p-4 sm:p-5 border-emerald-500/20" variants={cardVariants}>
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)] flex items-center gap-1.5">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                    </span>
+                    Online Now
+                  </span>
+                  <span className="text-2xl sm:text-3xl font-bold text-emerald-400 block mt-1">{liveStats.onlineUsers}</span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+                  <Radio className="w-5 h-5 text-emerald-400" />
+                </div>
+              </div>
+            </motion.div>
+            <motion.div className="card glass-noise p-4 sm:p-5" variants={cardVariants}>
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Page Views Today</span>
+                  <span className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] block mt-1">{liveStats.pageViewsToday.toLocaleString()}</span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-cyan-500/15 flex items-center justify-center">
+                  <Eye className="w-5 h-5 text-cyan-400" />
+                </div>
+              </div>
+            </motion.div>
+            <motion.div className="card glass-noise p-4 sm:p-5" variants={cardVariants}>
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Unique Visitors</span>
+                  <span className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] block mt-1">{liveStats.uniqueVisitors.toLocaleString()}</span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-violet-500/15 flex items-center justify-center">
+                  <Globe className="w-5 h-5 text-violet-400" />
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
 
         {/* ── Quick Stats Row (always visible) ────────────────── */}
         {stats && (
