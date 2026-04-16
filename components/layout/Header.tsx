@@ -10,7 +10,7 @@ import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield, LogOut, Settings, ChevronDown,
-  Users, Wallet, Activity,
+  Users, Wallet, Activity, MessageSquare,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
@@ -33,7 +33,7 @@ const GUEST_NAV_LINKS = [
 // ── Auxiliary links (visible in both states, after a divider) ──
 const AUX_LINKS = [
   { href: '/pricing',           label: 'Pricing',   external: false, badge: null, authOnly: false },
-  { href: '/support',           label: 'Support',   external: false, badge: null, authOnly: true },
+  { href: '/roadmap',           label: 'Roadmap',   external: false, badge: null, authOnly: false },
   { href: DOCS_URL,             label: 'Docs',      external: true,  badge: null, authOnly: false },
   { href: '/dashboard/billing', label: 'Billing',   external: false, badge: null, authOnly: true },
 ];
@@ -42,6 +42,7 @@ const AUX_LINKS = [
 const USER_EXTRA_LINKS = [
   { href: '/dashboard/analytics', label: 'Analytics', icon: Activity },
   { href: '/dashboard/team', label: 'Team', icon: Users },
+  { href: '/support', label: 'Support', icon: MessageSquare },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -52,6 +53,7 @@ const MOBILE_AUTH_LINKS = [
   { href: '/frameworks',          label: 'Frameworks' },
   { href: '/token',               label: 'Token' },
   { href: '/pricing',             label: 'Pricing' },
+  { href: '/roadmap',             label: 'Roadmap' },
   { href: '/dashboard/billing',   label: 'Billing' },
   { href: '/support',             label: 'Support' },
 ];
