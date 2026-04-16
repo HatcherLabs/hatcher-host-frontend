@@ -70,10 +70,6 @@ function formatDate(dateStr: string) {
   });
 }
 
-// formatFeatureKey moved to lib/feature-labels.ts so every surface
-// (billing, admin, notifications) shares the same display logic.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-
 /* ── Payment method modal ─────────────────────────────────── */
 interface PaymentModalProps {
   isOpen: boolean;
