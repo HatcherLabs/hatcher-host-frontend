@@ -135,15 +135,23 @@ export function LogsTab() {
 
   const capped = !hasFullLogs && logs.length > FREE_LOG_LINE_CAP;
 
-  // Cap the filtered set too so search + level-filter still respect the
-  // Full-Logs gate. Slicing the tail keeps recent matches and follows
-  // the same "most-recent-wins" rule as visibleLogs.
+  // Apply the same level-filter + search-text logic the context uses,
+  // but over `visibleLogs` (already capped) instead of `filteredLogs`
+  // (which operates on the uncapped `logs` array). This prevents a
+  // double-cap artifact where filtering the full set then slicing gave
+  // inconsistent counts and could show "no results" for terms that
+  // existed within the visible 20-line window.
   const visibleFilteredLogs = useMemo(() => {
-    if (hasFullLogs) return filteredLogs;
-    return filteredLogs.length > FREE_LOG_LINE_CAP
-      ? filteredLogs.slice(filteredLogs.length - FREE_LOG_LINE_CAP)
-      : filteredLogs;
-  }, [filteredLogs, hasFullLogs]);
+    let result = visibleLogs;
+    if (logFilter !== 'all') {
+      result = result.filter((l) => l.level === logFilter);
+    }
+    if (logSearch) {
+      const q = logSearch.toLowerCase();
+      result = result.filter((l) => l.message.toLowerCase().includes(q));
+    }
+    return result;
+  }, [visibleLogs, logFilter, logSearch]);
 
   /* ── Log counts by level (over visible slice) ── */
   const counts = useMemo(() => {

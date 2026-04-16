@@ -362,16 +362,27 @@ export default function BillingPage() {
     }
   }, [searchParams]);
 
+  // Full reload after any payment — mirrors the initial-load fetches so
+  // the page never shows stale data (credit balance, payment history,
+  // founding slots, agent list). The only difference vs. the initial
+  // load is that we don't flip the top-level `loading` spinner.
   const loadAccountData = useCallback(async () => {
-    const [acctRes, balRes] = await Promise.all([
+    const [acctRes, balRes, payRes, histRes, catalogRes, agentsRes] = await Promise.all([
       api.getAccountFeatures(),
       api.getCreditBalance(),
+      api.getPayments(),
+      api.getCreditHistory(10),
+      api.getTiersCatalog(),
+      api.getMyAgents(),
     ]);
-    if (acctRes.success) {
-      setAccountData(acctRes.data as unknown as AccountFeatures);
-    }
-    if (balRes.success) {
-      setCreditBalance(balRes.data.balance);
+    if (acctRes.success) setAccountData(acctRes.data as unknown as AccountFeatures);
+    if (balRes.success) setCreditBalance(balRes.data.balance);
+    if (payRes.success) setPayments(payRes.data.payments);
+    if (histRes.success) setCreditHistory(histRes.data.transactions);
+    if (catalogRes.success) setFoundingInfo(catalogRes.data.founding);
+    if (agentsRes.success && agentsRes.data) {
+      const agents = (agentsRes.data as unknown as Array<{ id: string; name: string }>);
+      setUserAgents(agents.map(a => ({ id: a.id, name: a.name })));
     }
   }, []);
 

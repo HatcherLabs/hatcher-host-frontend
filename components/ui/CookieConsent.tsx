@@ -114,16 +114,22 @@ export function CookieConsent() {
       if (current.analytics) initPostHogIfConsented(current);
       return;
     }
-    // Honor DNT: if the browser explicitly asks not to be tracked, don't
-    // even show the banner. Default to essential-only so we don't load
-    // PostHog, but also don't write consent so the user can still opt
-    // in later from Settings.
+    // Honor DNT: if the browser sends Do-Not-Track, don't show the
+    // banner and don't load analytics. Crucially, we do NOT write a
+    // consent record here — if the user previously opted IN explicitly
+    // (e.g., via Settings) and we later bump the schema version, their
+    // old record becomes stale and readConsent returns null, landing us
+    // here. Writing ESSENTIAL_ONLY would silently override their
+    // explicit opt-in. By NOT writing, we leave the stale record on
+    // disk (harmless — version mismatch means it's ignored) and let
+    // the user re-opt-in via Settings if they want. Analytics stays
+    // off either way because readConsent returned null → PostHog
+    // default is opt-out.
     const dnt = typeof navigator !== 'undefined'
       && ('doNotTrack' in navigator)
       && (navigator.doNotTrack === '1' || navigator.doNotTrack === 'yes');
     if (dnt) {
-      writeConsent({ ...ESSENTIAL_ONLY, decidedAt: new Date().toISOString() });
-      return;
+      return; // skip banner, skip analytics, don't overwrite old consent
     }
     // Slight delay so we don't flash the banner before first paint.
     const t = setTimeout(() => setVisible(true), 800);
