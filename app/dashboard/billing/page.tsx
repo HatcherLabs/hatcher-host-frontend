@@ -336,6 +336,19 @@ export default function BillingPage() {
     setTimeout(() => setSuccessMsg(null), 6000);
   };
 
+  /**
+   * Wrap a caught error into a user-facing message, but swallow the
+   * "Cancelled" sentinel that the payment drivers throw when the user
+   * dismisses the Phantom popup or the confirm modal. Without this
+   * guard, a normal cancel surfaced as a red "Cancelled" banner which
+   * users reported as confusing.
+   */
+  const reportCatch = (err: unknown, fallback: string): void => {
+    const msg = err instanceof Error ? err.message : fallback;
+    if (msg === 'Cancelled') return;
+    setError(msg);
+  };
+
   // Handle Stripe redirect success/cancel
   useEffect(() => {
     if (searchParams?.get('success') === 'true') {
@@ -465,7 +478,7 @@ export default function BillingPage() {
         setError(res.error ?? 'Subscription failed');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Subscription failed');
+      reportCatch(err, 'Subscription failed');
     } finally {
       setSubscribing(null);
       setPaymentLoading(false);
@@ -497,7 +510,7 @@ export default function BillingPage() {
         setError(res.error ?? 'Subscription failed');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Subscription failed');
+      reportCatch(err, 'Subscription failed');
     } finally {
       setSubscribing(null);
       setPaymentLoading(false);
@@ -529,7 +542,7 @@ export default function BillingPage() {
         setError(res.error ?? 'Subscription failed');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Subscription failed');
+      reportCatch(err, 'Subscription failed');
     } finally {
       setSubscribing(null);
       setPaymentLoading(false);
@@ -549,6 +562,7 @@ export default function BillingPage() {
     setPaymentLoading(true);
     setSubscribing(tierKey);
     setError(null);
+    setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
       const res = await api.stripeCheckoutTier(tierKey, period, `${window.location.origin}/dashboard/billing`);
       if (!res.success) {
@@ -560,7 +574,7 @@ export default function BillingPage() {
       // Redirect the whole tab — Stripe-hosted checkout takes over.
       window.location.href = res.data.url;
     } catch (err) {
-      setError(err instanceof Error ? err.message : `Stripe checkout for ${tierConfig.name} failed`);
+      reportCatch(err, `Stripe checkout for ${tierConfig.name} failed`);
       setSubscribing(null);
       setPaymentLoading(false);
     }
@@ -596,7 +610,7 @@ export default function BillingPage() {
         setError(res.error ?? 'Purchase failed');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Purchase failed');
+      reportCatch(err, 'Purchase failed');
     } finally {
       setPurchasingAddon(null);
       setPaymentLoading(false);
@@ -626,7 +640,7 @@ export default function BillingPage() {
         setError(res.error ?? 'Purchase failed');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Purchase failed');
+      reportCatch(err, 'Purchase failed');
     } finally {
       setPurchasingAddon(null);
       setPaymentLoading(false);
@@ -656,7 +670,7 @@ export default function BillingPage() {
         setError(res.error ?? 'Purchase failed');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Purchase failed');
+      reportCatch(err, 'Purchase failed');
     } finally {
       setPurchasingAddon(null);
       setPaymentLoading(false);
@@ -674,6 +688,7 @@ export default function BillingPage() {
     setPaymentLoading(true);
     setPurchasingAddon(addonKey);
     setError(null);
+    setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
       const res = await api.stripeCheckoutAddon(addonKey, selectedAgentId ?? undefined, period, `${window.location.origin}/dashboard/billing`);
       if (!res.success) {
@@ -684,7 +699,7 @@ export default function BillingPage() {
       }
       window.location.href = res.data.url;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Stripe checkout failed');
+      reportCatch(err, 'Stripe checkout failed');
       setPurchasingAddon(null);
       setPaymentLoading(false);
     }
@@ -723,7 +738,7 @@ export default function BillingPage() {
         setError(res.error ?? 'Credit payment failed');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Credit payment failed');
+      reportCatch(err, 'Credit payment failed');
     } finally {
       setSubscribing(null);
       setPaymentLoading(false);
@@ -756,7 +771,7 @@ export default function BillingPage() {
         setError(res.error ?? 'Credit payment failed');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Credit payment failed');
+      reportCatch(err, 'Credit payment failed');
     } finally {
       setPurchasingAddon(null);
       setPaymentLoading(false);

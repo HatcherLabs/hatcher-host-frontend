@@ -179,7 +179,8 @@ export function AddonsTab() {
       }
       window.location.href = res.data.url;
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Stripe checkout failed');
+      const msg = e instanceof Error ? e.message : 'Stripe checkout failed';
+      if (msg !== 'Cancelled') setError(msg);
       setPurchasing(null);
     }
   };
@@ -210,7 +211,8 @@ export function AddonsTab() {
         setError(res.error ?? 'Credit payment failed');
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Credit payment failed');
+      const msg = e instanceof Error ? e.message : 'Credit payment failed';
+      if (msg !== 'Cancelled') setError(msg);
     } finally {
       setPurchasing(null);
     }

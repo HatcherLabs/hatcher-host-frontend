@@ -105,6 +105,12 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     const start = Date.now();
     while (!walletRef.current.connected || !walletRef.current.publicKey) {
       if (Date.now() - start > 60_000) throw new Error('Wallet connection timed out');
+      // If the user dismissed the modal without selecting a wallet,
+      // bail out immediately instead of spinning for 60 s.
+      const cur = walletRef.current;
+      if (!cur.wallet && !cur.connecting && Date.now() - start > 1_000) {
+        throw new Error('Cancelled');
+      }
       await new Promise((r) => setTimeout(r, 200));
     }
   }, [setWalletModalVisible]);
