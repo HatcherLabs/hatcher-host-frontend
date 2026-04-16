@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { api } from '@/lib/api';
+import { FOUNDING_MEMBER_MAX_SLOTS } from '@hatcher/shared';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -51,80 +53,77 @@ const TIERS_DATA: TierDef[] = [
     icon: <Rocket className="w-5 h-5" />,
     accent: '#22c55e',
     agents: '1 agent included',
-    messages: '10 messages/day',
+    messages: '20 messages/day',
     cpu: '0.5 CPU',
     ram: '1 GB RAM',
-    storage: '100 MB workspace',
-    sleep: 'Auto-sleep after 10 min idle',
+    storage: '50 MB workspace',
+    sleep: 'Auto-sleep after 1h idle',
     features: [
-      'Groq GPT-OSS 20B',
+      'Llama 4 Scout on Groq',
       'BYOK = unlimited messages',
+      '3 web searches/day',
       'All integrations (Telegram, Discord, Twitter, etc)',
     ],
-    missing: ['No web search', 'No full logs', 'No file manager', 'No custom domains'],
+    missing: ['Logs, File Manager available as add-ons'],
   },
   {
     key: 'starter',
     name: 'Starter',
-    price: 4.99,
+    price: 6.99,
     icon: <Zap className="w-5 h-5" />,
     accent: 'var(--color-accent)',
     agents: '1 agent included',
     messages: '50 messages/day',
     cpu: '1 CPU',
     ram: '1.5 GB RAM',
-    storage: '200 MB workspace',
-    sleep: 'Auto-sleep after 2h idle',
+    storage: '150 MB workspace',
+    sleep: 'Auto-sleep after 4h idle',
     features: [
       'BYOK = unlimited messages',
+      '10 web searches/day',
       'All integrations',
     ],
-    missing: ['No web search', 'No full logs', 'No file manager', 'No custom domains'],
+    missing: ['Logs, File Manager available as add-ons'],
   },
   {
     key: 'pro',
     name: 'Pro',
-    price: 14.99,
+    price: 19.99,
     icon: <Crown className="w-5 h-5" />,
     accent: '#8b5cf6',
     badge: 'Most Popular',
     highlighted: true,
     agents: '3 agents included',
-    messages: '200 messages/day per agent',
+    messages: '100 messages/day',
     cpu: '1.5 CPU',
     ram: '2 GB RAM',
     storage: '500 MB workspace',
-    sleep: 'Always-on (no auto-sleep)',
+    sleep: 'Auto-sleep after 12h idle',
     features: [
-      'Llama 3.3 70B on Groq',
       'BYOK = unlimited messages',
-      'Web Search (Brave)',
-      'Dedicated resources',
-      'Full logs',
-      'Custom domains + SSL',
+      '50 web searches/day',
       'All integrations',
+      'Buy Always On per agent for 24/7',
     ],
-    missing: [],
+    missing: ['Logs, File Manager available as add-ons'],
   },
   {
     key: 'business',
     name: 'Business',
-    price: 39.99,
+    price: 49.99,
     icon: <Building2 className="w-5 h-5" />,
     accent: '#f59e0b',
     agents: '10 agents included',
-    messages: '500 messages/day per agent',
+    messages: '300 messages/day',
     cpu: '2 CPU',
     ram: '3 GB RAM',
     storage: '1 GB workspace',
-    sleep: 'Always-on',
+    sleep: 'Always-on (no auto-sleep)',
     features: [
-      'Llama 3.3 70B on Groq',
       'BYOK = unlimited messages',
-      'Web Search (Brave)',
-      'Dedicated resources',
-      'File manager included',
-      'Full logs',
+      '200 web searches/day',
+      'File Manager included',
+      'Full logs included',
       'Priority support',
       'Team collaboration',
       'All integrations',
@@ -137,24 +136,21 @@ const TIERS_DATA: TierDef[] = [
     price: 99,
     icon: <Gem className="w-5 h-5" />,
     accent: '#e11d48',
-    badge: 'Limited',
-    agents: '25 agents included',
-    messages: 'Unlimited messages/day',
+    badge: '20 spots only',
+    agents: '10 agents included',
+    messages: '300 messages/day',
     cpu: '2 CPU',
     ram: '4 GB RAM',
     storage: '2 GB workspace',
     sleep: 'Always-on (no auto-sleep)',
     features: [
-      'One-time payment — lifetime access',
-      'Llama 3.3 70B on Groq',
-      'BYOK = unlimited messages',
-      'Web Search (Brave)',
-      'Dedicated resources',
-      'File manager included',
-      'Full logs',
+      '$99 one-time — lifetime access',
+      '200 web searches/day',
+      'File Manager + Full Logs included',
       'Priority support',
       'Team collaboration',
       'All integrations',
+      'Founding badge',
     ],
     missing: [],
   },
@@ -169,12 +165,46 @@ interface AddonDef {
   description: string;
 }
 
-const ADDONS_DATA: AddonDef[] = [
-  { name: '+3 Agents', price: '$3.99', period: '/mo', description: 'Add 3 extra agent slots' },
-  { name: '+10 Agents', price: '$9.99', period: '/mo', description: 'Add 10 extra agent slots' },
-  { name: 'Always-on', price: '$4.99', period: '/mo per agent', description: 'Keep any agent running 24/7' },
-  { name: '+200 msg/day', price: '$2.99', period: '/mo per agent', description: 'Extra daily messages per agent' },
-  { name: 'File Manager', price: '$4.99', period: 'one-time per agent', description: 'Browse, edit, download files' },
+interface AddonGroup {
+  label: string;
+  items: AddonDef[];
+}
+
+const ADDON_GROUPS: AddonGroup[] = [
+  {
+    label: 'Extra Agents',
+    items: [
+      { name: '+1 Agent',  price: '$2.99',  period: '/mo', description: '1 extra slot' },
+      { name: '+3 Agents', price: '$6.99',  period: '/mo', description: '3 extra slots' },
+      { name: '+5 Agents', price: '$11.99', period: '/mo', description: '5 extra slots' },
+      { name: '+10 Agents', price: '$19.99', period: '/mo', description: '10 extra slots' },
+    ],
+  },
+  {
+    label: 'Extra Messages (account)',
+    items: [
+      { name: '+20 msg/day',  price: '$1.99', period: '/mo', description: 'Stackable' },
+      { name: '+50 msg/day',  price: '$3.99', period: '/mo', description: 'Stackable' },
+      { name: '+100 msg/day', price: '$5.99', period: '/mo', description: 'Stackable' },
+      { name: '+200 msg/day', price: '$9.99', period: '/mo', description: 'Stackable' },
+    ],
+  },
+  {
+    label: 'Extra Searches (account)',
+    items: [
+      { name: '+25 searches/day', price: '$3.99', period: '/mo', description: 'Stackable' },
+      { name: '+50 searches/day', price: '$6.99', period: '/mo', description: 'Stackable' },
+    ],
+  },
+  {
+    label: 'Per-Agent',
+    items: [
+      { name: 'Always On',    price: '$7.99', period: '/mo per agent',      description: 'Keep running 24/7' },
+      { name: 'File Manager', price: '$4.99', period: 'one-time per agent', description: 'Browse & edit files' },
+      { name: 'Full Logs',    price: '$2.99', period: '/mo per agent',      description: 'Unlock log viewer' },
+      { name: '+10 Plugins',  price: '$5.99', period: '/mo per agent',      description: 'Stack extra plugin slots' },
+    ],
+  },
 ];
 
 /* ── Feature comparison data ─────────────────────────────── */
@@ -189,23 +219,21 @@ interface FeatureRow {
 }
 
 const FEATURE_ROWS: FeatureRow[] = [
-  { label: 'Agents included',       free: '1',       starter: '1',         pro: '3',           business: '10',       founding: '25' },
-  { label: 'Messages/day',          free: '10',      starter: '50',        pro: '200/agent',   business: '500/agent', founding: 'Unlimited' },
-  { label: 'BYOK messages',         free: 'Unlimited', starter: 'Unlimited', pro: 'Unlimited', business: 'Unlimited', founding: 'Unlimited' },
-  { label: 'CPU',                   free: '0.5',     starter: '1',         pro: '1.5',         business: '2',        founding: '2' },
-  { label: 'RAM',                   free: '1 GB',    starter: '1.5 GB',    pro: '2 GB',        business: '3 GB',     founding: '4 GB' },
-  { label: 'Storage',               free: '100 MB',  starter: '200 MB',    pro: '500 MB',      business: '1 GB',     founding: '2 GB' },
-  { label: 'Resources',             free: 'Shared',  starter: 'Shared',    pro: 'Dedicated',   business: 'Dedicated', founding: 'Dedicated' },
-  { label: 'Auto-sleep',            free: '10 min',  starter: '2 hours',   pro: 'Always-on',   business: 'Always-on', founding: 'Always-on' },
-  { label: 'File Manager',          free: false,      starter: false,       pro: false,         business: true,       founding: true },
-  { label: 'Full Logs',             free: false,      starter: false,       pro: true,          business: true,       founding: true },
-  { label: 'Custom domains + SSL',  free: false,      starter: false,       pro: true,          business: true,       founding: true },
-  { label: 'Team collaboration',    free: false,      starter: false,       pro: false,         business: true,       founding: true },
-  { label: 'Priority support',      free: false,      starter: false,       pro: false,         business: true,       founding: true },
-  { label: 'Web Search (Brave)',     free: false,      starter: false,       pro: true,          business: true,       founding: true },
-  { label: 'All integrations',      free: true,       starter: true,        pro: true,          business: true,       founding: true },
-  { label: 'BYOK (own LLM key)',    free: true,       starter: true,        pro: true,          business: true,       founding: true },
-  { label: 'Default LLM (Groq)',    free: 'GPT-OSS 20B', starter: 'GPT-OSS 20B', pro: 'Llama 3.3 70B', business: 'Llama 3.3 70B', founding: 'Llama 3.3 70B' },
+  { label: 'Agents included',       free: '1',         starter: '1',         pro: '3',           business: '10',         founding: '10' },
+  { label: 'Messages/day (account)', free: '20',       starter: '50',        pro: '100',         business: '300',        founding: '300' },
+  { label: 'Web searches/day',      free: '3',         starter: '10',        pro: '50',          business: '200',        founding: '200' },
+  { label: 'BYOK messages',         free: 'Unlimited', starter: 'Unlimited', pro: 'Unlimited',   business: 'Unlimited',  founding: 'Unlimited' },
+  { label: 'CPU / RAM',             free: '0.5 / 1GB', starter: '1 / 1.5GB', pro: '1.5 / 2GB',  business: '2 / 3GB',    founding: '2 / 4GB' },
+  { label: 'Storage',               free: '50 MB',     starter: '150 MB',    pro: '500 MB',      business: '1 GB',       founding: '2 GB' },
+  { label: 'Auto-sleep',            free: '1 hour',    starter: '4 hours',   pro: '12 hours',    business: 'Always-on',  founding: 'Always-on' },
+  { label: 'File Manager',          free: 'Add-on',    starter: 'Add-on',    pro: 'Add-on',      business: true,         founding: true },
+  { label: 'Full Logs',             free: 'Add-on',    starter: 'Add-on',    pro: 'Add-on',      business: true,         founding: true },
+  { label: 'Team collaboration',    free: false,        starter: false,       pro: false,         business: true,         founding: true },
+  { label: 'Priority support',      free: false,        starter: false,       pro: false,         business: true,         founding: true },
+  { label: 'Plugins + Skills',      free: '3',         starter: '10',        pro: '25',          business: '50',         founding: '50' },
+  { label: 'All integrations',      free: true,         starter: true,        pro: true,          business: true,         founding: true },
+  { label: 'BYOK (own LLM key)',    free: true,         starter: true,        pro: true,          business: true,         founding: true },
+  { label: 'Default LLM (Groq)',    free: 'Llama 4 Scout', starter: 'Llama 4 Scout', pro: 'Llama 4 Scout', business: 'Llama 4 Scout', founding: 'Llama 4 Scout' },
 ];
 
 function renderCell(value: string | boolean) {
@@ -217,10 +245,35 @@ function renderCell(value: string | boolean) {
 /* ── Page ─────────────────────────────────────────────────── */
 export default function PricingPage() {
   const [isAnnual, setIsAnnual] = useState(false);
+  // Founding Member availability — fetched from /features (public).
+  // null = still loading; a number = actual remaining slots.
+  const [foundingRemaining, setFoundingRemaining] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await api.getTiersCatalog();
+        if (!cancelled && res.success) {
+          setFoundingRemaining(res.data.founding.remaining);
+        }
+      } catch {
+        // Silent — we just won't render the slots bar.
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   return (
-    <div className="min-h-screen">
-      <div className="mx-auto max-w-7xl px-4 py-16">
+    <div className="relative">
+      {/* Subtle radial glow BEHIND the hero — no hard edge, fades into
+          `--bg-base` smoothly. Previously we had a fixed 420px-tall
+          ambient layer under the header that produced a visible colored
+          strip when the browser anti-aliased the transparent edge. The
+          glow is now scoped to the hero section itself so content below
+          sits on the normal page background, same as every other
+          dashboard page. */}
+      <div className="mx-auto max-w-7xl px-4 pt-6 sm:pt-10 pb-16 relative">
         {/* HERO */}
         <div className="text-center mb-16 relative">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.12),transparent_60%)] pointer-events-none" />
@@ -246,7 +299,7 @@ export default function PricingPage() {
             All integrations included on every tier. BYOK always unlimited.
           </motion.p>
 
-          {/* Monthly / Annual toggle */}
+          {/* Monthly / Annual toggle — annual = 15% off (pay for ~10.2 months, get 12) */}
           <div className="inline-flex items-center gap-3 mt-8 p-1 rounded-full bg-[var(--bg-card)] border border-[var(--border-default)]">
             <button
               onClick={() => setIsAnnual(false)}
@@ -270,7 +323,7 @@ export default function PricingPage() {
             >
               Annual
               <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-green-500/15 text-green-400 text-[10px] font-bold leading-none">
-                -20%
+                -15%
               </span>
             </button>
           </div>
@@ -281,7 +334,7 @@ export default function PricingPage() {
           {TIERS_DATA.map((tier) => {
             const isLifetime = tier.key === 'founding_member';
             const monthlyPrice = tier.price;
-            const annualMonthlyPrice = monthlyPrice === 0 || isLifetime ? monthlyPrice : parseFloat((monthlyPrice * 0.8).toFixed(2));
+            const annualMonthlyPrice = monthlyPrice === 0 || isLifetime ? monthlyPrice : parseFloat((monthlyPrice * 0.85).toFixed(2));
             const displayPrice = isLifetime ? monthlyPrice : (isAnnual ? annualMonthlyPrice : monthlyPrice);
             const annualTotal = isAnnual && monthlyPrice > 0 && !isLifetime ? parseFloat((annualMonthlyPrice * 12).toFixed(2)) : null;
             const billingParam = isLifetime ? 'lifetime' : (isAnnual ? 'annual' : 'monthly');
@@ -296,17 +349,20 @@ export default function PricingPage() {
                   tier.highlighted && 'border-[#8b5cf6]/40 shadow-[0_0_40px_rgba(139,92,246,0.15)]'
                 )}
               >
-                {/* Popular badge */}
+                {/* Popular / Founding badge — short pill sits above the
+                    card. The live slot count gets its own row inside the
+                    card body (see below) because it's too wide for the
+                    badge. */}
                 {tier.badge && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
                     <span className={cn(
-                      'inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-white text-[11px] font-bold uppercase tracking-wider',
+                      'inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-white text-[11px] font-bold uppercase tracking-wider whitespace-nowrap',
                       isLifetime
                         ? 'bg-gradient-to-r from-[#e11d48] to-[#be123c] shadow-[0_0_20px_rgba(225,29,72,0.5)]'
                         : 'bg-gradient-to-r from-[#8b5cf6] to-[#7c3aed] shadow-[0_0_20px_rgba(139,92,246,0.5)]'
                     )}>
                       {isLifetime ? <Gem className="w-3.5 h-3.5" /> : <Crown className="w-3.5 h-3.5" />}
-                      {tier.badge}
+                      {isLifetime ? 'Limited' : tier.badge}
                     </span>
                   </div>
                 )}
@@ -350,7 +406,7 @@ export default function PricingPage() {
                   )}
                   {!isAnnual && monthlyPrice > 0 && !isLifetime && (
                     <p className="text-[10px] text-[var(--text-muted)] mt-1">
-                      Switch to annual and save 20%
+                      Switch to annual and save 15%
                     </p>
                   )}
                   {isLifetime && (
@@ -359,6 +415,47 @@ export default function PricingPage() {
                     </p>
                   )}
                 </div>
+
+                {/* Founding: live slot availability — dedicated row so
+                    the text has room to breathe and the progress bar is
+                    fully visible (not clipped behind the badge). */}
+                {isLifetime && (
+                  <div className="mb-5 p-3 rounded-lg bg-[#e11d48]/5 border border-[#e11d48]/20">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] uppercase tracking-wider font-bold text-[var(--text-muted)]">
+                        Availability
+                      </span>
+                      {foundingRemaining === null ? (
+                        <span className="text-[10px] text-[var(--text-muted)] inline-flex items-center gap-1.5">
+                          <span className="w-2.5 h-2.5 border-2 border-[var(--text-muted)]/30 border-t-[var(--text-muted)] rounded-full animate-spin" />
+                          Loading…
+                        </span>
+                      ) : (
+                        <span className={cn(
+                          'text-[11px] font-bold tabular-nums',
+                          foundingRemaining === 0 ? 'text-red-400'
+                            : foundingRemaining <= 3 ? 'text-orange-400'
+                            : 'text-[var(--text-primary)]'
+                        )}>
+                          {foundingRemaining === 0 ? 'Sold out' : `${foundingRemaining} of ${FOUNDING_MEMBER_MAX_SLOTS} left`}
+                        </span>
+                      )}
+                    </div>
+                    <div className="relative h-2 rounded-full bg-[var(--bg-elevated)] overflow-hidden">
+                      {foundingRemaining === null ? (
+                        <div
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-[#e11d48]/40 to-transparent animate-[shimmer_1.4s_ease-in-out_infinite]"
+                          style={{ backgroundSize: '200% 100%' }}
+                        />
+                      ) : (
+                        <div
+                          className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#e11d48] to-[#be123c] transition-all duration-700"
+                          style={{ width: `${((FOUNDING_MEMBER_MAX_SLOTS - foundingRemaining) / FOUNDING_MEMBER_MAX_SLOTS) * 100}%` }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Highlights */}
                 <div className="space-y-2.5 flex-1 mb-7">
@@ -432,25 +529,46 @@ export default function PricingPage() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
-            {ADDONS_DATA.map((addon) => (
-              <motion.div
-                key={addon.name}
-                whileHover={{ y: -3 }}
-                transition={{ duration: 0.2 }}
-                className="card glass-noise p-5 text-center"
-              >
-                <h3 className="font-bold text-[var(--text-primary)] text-base mb-2">{addon.name}</h3>
-                <div className="text-2xl font-extrabold mb-0.5 text-[var(--text-primary)]">
-                  {addon.price}
+          <div className="max-w-6xl mx-auto space-y-6">
+            {ADDON_GROUPS.map((group) => (
+              <div key={group.label}>
+                <h3 className="text-xs uppercase tracking-wider font-bold text-[var(--text-muted)] mb-3 text-center">
+                  {group.label}
+                </h3>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {group.items.map((addon) => {
+                    // Only subscription-type addons get annual pricing.
+                    const isSubscription = addon.period.startsWith('/mo');
+                    const monthlyNum = parseFloat(addon.price.replace('$', ''));
+                    const annualMonthly = isSubscription && isAnnual ? parseFloat((monthlyNum * 0.85).toFixed(2)) : monthlyNum;
+                    const displayPrice = isAnnual && isSubscription ? `$${annualMonthly}` : addon.price;
+                    return (
+                      <motion.div
+                        key={addon.name}
+                        whileHover={{ y: -3 }}
+                        transition={{ duration: 0.2 }}
+                        className="card glass-noise p-4 text-center"
+                      >
+                        <h4 className="font-bold text-[var(--text-primary)] text-sm mb-2">{addon.name}</h4>
+                        <div className="text-xl font-extrabold mb-0.5 text-[var(--text-primary)]">
+                          {displayPrice}
+                        </div>
+                        <p className="text-[var(--text-muted)] text-[10px] mb-2 font-medium">
+                          {addon.period}
+                        </p>
+                        <p className="text-[11px] text-[var(--text-secondary)]">
+                          {addon.description}
+                        </p>
+                        {isAnnual && isSubscription && (
+                          <p className="text-[10px] text-green-400 font-semibold mt-2">
+                            15% off annual
+                          </p>
+                        )}
+                      </motion.div>
+                    );
+                  })}
                 </div>
-                <p className="text-[var(--text-muted)] text-[10px] mb-3 font-medium">
-                  {addon.period}
-                </p>
-                <p className="text-xs text-[var(--text-secondary)]">
-                  {addon.description}
-                </p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </section>

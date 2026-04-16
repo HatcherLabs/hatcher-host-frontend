@@ -255,11 +255,14 @@ export function NotificationCenter() {
                   const colorClass = ICON_COLOR_MAP[n.type] || 'text-[var(--text-secondary)] bg-white/10';
                   const [iconText, iconBg] = colorClass.split(' ');
 
-                  // Derive a navigation target from explicit link or notification type
+                  // Derive a navigation target from explicit link or notification type.
+                  // `feature` / `billing` / `subscription*` / `payment` all land on
+                  // the billing page so users can act on an expiry warning or a
+                  // feature-unlock receipt without hunting through menus.
                   const href: string | null = n.link
                     || (n.type === 'workspace_quota' ? '/dashboard' : null)
-                    || (n.type.startsWith('agent') || n.type === 'feature' ? '/dashboard' : null)
-                    || (n.type === 'subscription' || n.type === 'subscription_confirmed' || n.type === 'payment' ? '/dashboard/billing' : null)
+                    || (n.type.startsWith('agent') ? '/dashboard' : null)
+                    || (n.type === 'feature' || n.type === 'billing' || n.type === 'subscription' || n.type === 'subscription_confirmed' || n.type === 'payment' ? '/dashboard/billing' : null)
                     || (n.type.startsWith('team') ? '/dashboard/team' : null)
                     || (n.type.startsWith('support') ? '/support' : null);
 

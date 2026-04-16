@@ -107,7 +107,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'How does the free tier work?',
-        a: 'Every account starts with a free tier that includes 1 agent. Free agents get 10 messages per day using GPT-OSS 20B on Groq, with a 24-hour rolling reset. You get access to all integrations (Telegram, Discord, Twitter, WhatsApp, Slack). Free agents run on shared resources (0.5 CPU, 1GB RAM) and auto-sleep after 10 minutes of inactivity. Paid tiers (Pro, Business, Founding Member) use the more capable Llama 3.3 70B model and include web search via Brave. If you bring your own API key (BYOK), messages are always unlimited and free.',
+        a: 'Every account starts with a free tier that includes 1 agent. Free agents get 20 messages per day using Llama 4 Scout on Groq, with a 24-hour rolling reset. You get access to all integrations (Telegram, Discord, Twitter, WhatsApp, Slack). Free agents run on shared resources (0.5 CPU, 1GB RAM) and auto-sleep after 1 hour of inactivity. All tiers use Llama 4 Scout on Groq. If you bring your own API key (BYOK), messages are always unlimited and free.',
       },
       {
         q: 'What is BYOK (Bring Your Own Key)?',
@@ -141,7 +141,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'How do I change the AI model?',
-        a: 'Open your agent\'s Config tab and look for the model settings section. If you\'re using Hatcher\'s hosted key, Free and Starter tiers use GPT-OSS 20B on Groq, while Pro, Business, and Founding Member tiers use Llama 3.3 70B on Groq. If you have BYOK configured, you can select from any model supported by your provider (e.g., GPT-4o, Claude 3.5, Gemini Pro). Change the model identifier, save, and restart.',
+        a: 'Open your agent\'s Config tab and look for the model settings section. If you\'re using Hatcher\'s hosted key, all tiers use Llama 4 Scout on Groq. If you have BYOK configured, you can select from any model supported by your provider (e.g., GPT-4o, Claude 3.5, Gemini Pro). Change the model identifier, save, and restart.',
       },
       {
         q: 'How do I start, stop, or restart my agent?',
@@ -155,11 +155,11 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'What plans are available?',
-        a: 'Hatcher offers four tiers. Free: 1 agent, 10 messages/day (GPT-OSS 20B), shared resources, auto-sleep after 10 min. Starter ($4.99/mo): 1 agent, 50 messages/day (GPT-OSS 20B), better resources (1 CPU, 1.5GB RAM), auto-sleep after 2 hours. Pro ($14.99/mo): 3 agents, 200 messages/day per agent (Llama 3.3 70B), web search via Brave, dedicated resources (1.5 CPU, 2GB RAM), full log viewer. Business ($39.99/mo): 10 agents, 500 messages/day per agent (Llama 3.3 70B), web search via Brave, always-on, priority support. All tiers include all integrations and BYOK is always unlimited.',
+        a: 'Hatcher offers four tiers plus a lifetime option. Free: 1 agent, 20 messages/day, 3 searches/day, shared resources, auto-sleep after 1 hour. Starter ($6.99/mo): 1 agent, 50 messages/day, 10 searches/day, 1 CPU/1.5GB RAM, auto-sleep after 4 hours. Pro ($19.99/mo): 3 agents, 100 messages/day per agent, 50 searches/day, dedicated resources (1.5 CPU, 2GB RAM), auto-sleep after 12 hours. Business ($49.99/mo): 10 agents, 300 messages/day per agent, 200 searches/day, always-on, priority support. Founding Member ($99 one-time, 10 spots): everything in Business with 4GB RAM and 2GB workspace, forever. All tiers use Llama 4 Scout on Groq. BYOK is always unlimited.',
       },
       {
         q: 'How do add-ons work?',
-        a: 'Add-ons let you expand beyond your plan\'s included agent slots. You can stack multiple add-ons: +3 agents ($3.99/mo) or +10 agents ($9.99/mo). Add-ons are stackable and apply to your account. There\'s also a one-time File Manager add-on ($4.99/agent) that gives non-Pro users access to the file manager for a specific agent permanently.',
+        a: 'Add-ons let you expand beyond your plan\'s limits. Extra agents: +1 ($2.99/mo), +3 ($6.99/mo), +5 ($11.99/mo), +10 ($19.99/mo). Extra messages: +20/day ($1.99/mo), +50 ($3.99/mo), +100 ($5.99/mo), +200 ($9.99/mo). Extra searches: +25/day ($3.99/mo), +50 ($6.99/mo). Always-On: $7.99/mo per agent. File Manager: $4.99 one-time per agent. Full Logs: $1.99/mo. +10 Plugins: $2.99/mo. All add-ons are stackable.',
       },
       {
         q: 'How do I upgrade or downgrade?',

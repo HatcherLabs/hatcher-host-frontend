@@ -37,15 +37,6 @@ const TIER_BG: Record<string, string> = {
   founding_member: 'bg-rose-500/10',
 };
 
-// daily message limits per tier (BYOK is always unlimited — shown separately)
-const TIER_MSG_LIMIT: Record<string, number | 'unlimited'> = {
-  free:            10,
-  starter:         50,
-  pro:             200,
-  business:        500,
-  founding_member: 'unlimited',
-};
-
 function TierIcon({ tier, className }: { tier: string; className?: string }) {
   const cls = className ?? 'w-4 h-4';
   switch (tier) {
@@ -65,6 +56,9 @@ const cardVariants = {
 export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
   const [tier, setTier]             = useState<string>('free');
   const [agentLimit, setAgentLimit] = useState<number>(1);
+  // Live tier limit from the server (includes active `+N msg/day` addons).
+  // 0 = unlimited / BYOK legacy.
+  const [chatLimit, setChatLimit]   = useState<number>(0);
   const [loading, setLoading]       = useState(true);
 
   useEffect(() => {
@@ -73,11 +67,12 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
       if (res.success) {
         setTier(res.data.tier);
         setAgentLimit(res.data.agentLimit);
+        setChatLimit(res.data.chatLimit ?? 0);
       }
     });
   }, []);
 
-  const rawLimit  = TIER_MSG_LIMIT[tier] ?? 10;
+  const rawLimit: number | 'unlimited' = chatLimit === 0 ? 'unlimited' : chatLimit;
   const tierLabel = TIER_LABELS[tier]  ?? tier;
   const tierColor = TIER_COLORS[tier]  ?? 'text-[var(--text-muted)]';
   const tierBg    = TIER_BG[tier]      ?? 'bg-zinc-500/10';
@@ -125,14 +120,14 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
           <div className="w-9 h-9 rounded-lg bg-amber-500/15 flex items-center justify-center flex-shrink-0">
             <Zap size={16} className="text-amber-400" />
           </div>
-          <div className="text-xs text-[var(--text-muted)] leading-tight">Msg Limit / Agent</div>
+          <div className="text-xs text-[var(--text-muted)] leading-tight">Daily Messages</div>
         </div>
         {rawLimit === 'unlimited' ? (
           <div className="text-2xl font-bold text-emerald-400">∞</div>
         ) : (
           <div className="text-2xl font-bold text-[var(--text-primary)]">{rawLimit}</div>
         )}
-        <div className="text-[10px] text-[var(--text-muted)] mt-1">per day · BYOK = unlimited</div>
+        <div className="text-[10px] text-[var(--text-muted)] mt-1">account-wide · BYOK = unlimited</div>
       </motion.div>
 
       {/* Active Agents */}

@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { formatFeatureKey } from '@/lib/feature-labels';
 import { ArrowLeft, Bot, RefreshCw, AlertTriangle, Clock, Activity, User, Layers, Cpu, Shield } from 'lucide-react';
 import { FRAMEWORKS } from '@hatcher/shared';
 import type { AgentFramework } from '@hatcher/shared';
@@ -23,7 +24,6 @@ interface AdminAgent {
   ownerUsername: string;
   ownerWallet: string;
   ownerId?: string;
-  managementMode?: string;
   createdAt: string;
   updatedAt: string;
   features: Array<{ featureKey: string; type: string; expiresAt: string | null }>;
@@ -155,7 +155,6 @@ export default function AdminAgentDetailPage() {
                 <InfoItem icon={Activity} label="Messages" value={String(agent.messageCount ?? 0)} />
                 <InfoItem icon={Clock} label="Created" value={new Date(agent.createdAt).toLocaleDateString()} />
                 <InfoItem icon={User} label="Owner" value={agent.ownerUsername} />
-                <InfoItem icon={Shield} label="Mode" value={agent.managementMode ?? 'legacy'} />
                 <InfoItem label="Container" value={agent.containerId ? agent.containerId.slice(0, 12) : 'none'} mono />
                 <InfoItem label="Features" value={String(agent.features?.length ?? 0)} />
               </div>
@@ -219,7 +218,7 @@ export default function AdminAgentDetailPage() {
                 <div className="space-y-1.5">
                   {agent.features.map((f, i) => (
                     <div key={i} className="flex items-center justify-between text-xs py-1.5 border-b border-[var(--border-default)] last:border-0">
-                      <span className="font-mono text-[var(--text-primary)]">{f.featureKey}</span>
+                      <span className="text-[var(--text-primary)]">{formatFeatureKey(f.featureKey)}</span>
                       <div className="flex items-center gap-2 text-[var(--text-muted)]">
                         <span className="uppercase tracking-wider text-[10px]">{f.type}</span>
                         {f.expiresAt && <span>· expires {new Date(f.expiresAt).toLocaleDateString()}</span>}

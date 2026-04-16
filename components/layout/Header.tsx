@@ -282,8 +282,13 @@ export function Header() {
                             border: '1px solid var(--border-default)',
                           }}
                         >
-                          {/* User info */}
-                          <div className="px-4 py-2.5 border-b border-[var(--border-default)] flex items-center gap-2.5">
+                          {/* User info — clickable → profile/settings */}
+                          <Link
+                            href="/dashboard/settings"
+                            onClick={() => setDropdownOpen(false)}
+                            className="group px-4 py-2.5 border-b border-[var(--border-default)] flex items-center gap-2.5 hover:bg-[var(--bg-card)] transition-colors"
+                            title="View profile"
+                          >
                             {user.avatarUrl ? (
                               <Image src={user.avatarUrl} alt={user.username} width={32} height={32} className="w-8 h-8 rounded-lg object-cover flex-shrink-0" unoptimized />
                             ) : (
@@ -292,21 +297,20 @@ export function Header() {
                               </div>
                             )}
                             <div className="min-w-0 flex-1">
-                            <p className="text-xs text-[var(--text-primary)] font-medium truncate">{user.username}</p>
-                            <p className="text-[10px] text-[var(--text-secondary)] truncate">{user.email}</p>
-                            {creditBalance !== null && creditBalance > 0 && (
-                              <Link
-                                href="/dashboard/billing"
-                                onClick={() => setDropdownOpen(false)}
-                                className="mt-1.5 flex items-center gap-1.5 text-[10px] text-green-400 hover:text-green-300 transition-colors"
-                              >
-                                <Wallet className="w-3 h-3" />
-                                <span className="font-semibold">${creditBalance.toFixed(2)}</span>
-                                <span className="text-[var(--text-secondary)]">credits</span>
-                              </Link>
-                            )}
+                              <p className="text-xs text-[var(--text-primary)] font-medium truncate group-hover:text-purple-300 transition-colors">{user.username}</p>
+                              <p className="text-[10px] text-[var(--text-secondary)] truncate">{user.email}</p>
+                              {creditBalance !== null && creditBalance > 0 && (
+                                <span
+                                  onClick={(e) => { e.stopPropagation(); e.preventDefault(); setDropdownOpen(false); window.location.href = '/dashboard/billing'; }}
+                                  className="mt-1.5 inline-flex items-center gap-1.5 text-[10px] text-green-400 hover:text-green-300 transition-colors cursor-pointer"
+                                >
+                                  <Wallet className="w-3 h-3" />
+                                  <span className="font-semibold">${creditBalance.toFixed(2)}</span>
+                                  <span className="text-[var(--text-secondary)]">credits</span>
+                                </span>
+                              )}
                             </div>
-                          </div>
+                          </Link>
 
                           {/* Extra nav links */}
                           {USER_EXTRA_LINKS.map((link) => {

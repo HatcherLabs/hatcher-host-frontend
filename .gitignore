@@ -45,3 +45,4 @@ out/
 content/
 test-*.png
 e2e-*.png
+.gstack/

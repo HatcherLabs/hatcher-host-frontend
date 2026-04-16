@@ -32,7 +32,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const } },
 };
 
-const cardClass = 'card glass-noise';
+const cardClass = 'card-solid';
 const displayFont = { fontFamily: 'var(--font-display), system-ui, sans-serif' };
 
 /* ── Types ───────────────────────────────────────────────── */
@@ -358,7 +358,7 @@ export default function TeamPage() {
               value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleCreateTeam()}
-              className="flex-1 px-4 py-2.5 rounded-lg bg-[var(--bg-card)] border border-white/10 text-white placeholder-[var(--text-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="flex-1 px-4 py-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-primary)] placeholder-[var(--text-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
               maxLength={50}
             />
             <button
@@ -435,7 +435,7 @@ export default function TeamPage() {
                       className="flex items-center justify-between py-2.5 px-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] hover:border-[var(--border-default)] transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[var(--bg-card)] flex items-center justify-center text-xs font-bold text-white">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-xs font-bold text-white">
                           {member.user.username.charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -452,11 +452,13 @@ export default function TeamPage() {
                               value={member.role}
                               onChange={(e) => handleUpdateRole(member.id, e.target.value)}
                               disabled={actionLoading === `role-${member.id}`}
-                              className="appearance-none bg-[var(--bg-card)] border border-white/10 rounded-md px-2 py-1 pr-6 text-xs text-[var(--text-secondary)] focus:outline-none focus:ring-1 focus:ring-cyan-500/50 cursor-pointer"
+                              className="appearance-none bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-md px-2 py-1 pr-6 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-cyan-500/50 cursor-pointer"
                             >
-                              {isOwner && <option value="admin">Admin</option>}
-                              <option value="member">Member</option>
-                              <option value="viewer">Viewer</option>
+                              {isOwner && (
+                                <option value="admin" style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)' }}>Admin</option>
+                              )}
+                              <option value="member" style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)' }}>Member</option>
+                              <option value="viewer" style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)' }}>Viewer</option>
                             </select>
                             <ChevronDown className="w-3 h-3 text-[var(--text-muted)] absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                           </div>
@@ -502,17 +504,23 @@ export default function TeamPage() {
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
-                    className="flex-1 px-3 py-2 rounded-lg bg-[var(--bg-card)] border border-white/10 text-white placeholder-[var(--text-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+                    className="flex-1 px-3 py-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-[var(--text-primary)] placeholder-[var(--text-muted)] text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
                   />
                   <div className="relative">
                     <select
                       value={inviteRole}
                       onChange={(e) => setInviteRole(e.target.value as 'admin' | 'member' | 'viewer')}
-                      className="appearance-none h-full bg-[var(--bg-card)] border border-white/10 rounded-lg px-3 pr-7 text-sm text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-cyan-500/50 cursor-pointer"
+                      className="appearance-none h-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-lg px-3 pr-7 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-cyan-500/50 cursor-pointer"
                     >
-                      {isOwner && <option value="admin">Admin</option>}
-                      <option value="member">Member</option>
-                      <option value="viewer">Viewer</option>
+                      {/* Native <option> elements inherit the OS/browser chrome
+                          (white-on-white on dark Chromium) unless we set explicit
+                          background-color + color. Inline style wins over the
+                          dropdown popup stylesheet on every engine. */}
+                      {isOwner && (
+                        <option value="admin" style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)' }}>Admin</option>
+                      )}
+                      <option value="member" style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)' }}>Member</option>
+                      <option value="viewer" style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)' }}>Viewer</option>
                     </select>
                     <ChevronDown className="w-3.5 h-3.5 text-[var(--text-muted)] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
                   </div>
@@ -587,7 +595,7 @@ export default function TeamPage() {
                       >
                         <div className="flex items-center gap-3">
                           <StatusDot status={agent.status} />
-                          <span className="text-sm text-white">{agent.name}</span>
+                          <span className="text-sm text-[var(--text-primary)]">{agent.name}</span>
                           <span className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] font-medium">{agent.framework}</span>
                         </div>
                         <button

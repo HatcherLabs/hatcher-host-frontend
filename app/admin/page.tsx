@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
 import { shortenAddress, timeAgo } from '@/lib/utils';
+import { formatFeatureKey } from '@/lib/feature-labels';
 import { motion } from 'framer-motion';
 import {
   Shield,
@@ -220,6 +221,8 @@ export default function AdminPage() {
     featureKey: string;
     usdAmount: number;
     hatchAmount: number;
+    paymentToken?: 'sol' | 'usdc' | 'hatch' | 'stripe' | null;
+    tokenAmount?: number | null;
     txSignature: string;
     status: string;
     createdAt: string;
@@ -1447,7 +1450,7 @@ export default function AdminPage() {
                         <th className="py-2 pr-3">User · Agent</th>
                         <th className="py-2 pr-3">Feature</th>
                         <th className="py-2 pr-3 text-right">USD</th>
-                        <th className="py-2 pr-3 text-right">HATCH</th>
+                        <th className="py-2 pr-3 text-right">Paid</th>
                         <th className="py-2 pr-3">Status · Tx</th>
                       </tr>
                     </thead>
@@ -1465,10 +1468,20 @@ export default function AdminPage() {
                               </div>
                             )}
                           </td>
-                          <td className="py-3 pr-3 text-[var(--text-secondary)] truncate">{p.featureKey}</td>
-                          <td className="py-3 pr-3 text-right tabular-nums text-white">${p.usdAmount.toFixed(2)}</td>
-                          <td className="py-3 pr-3 text-right tabular-nums text-[var(--text-muted)]">
-                            {p.hatchAmount ? p.hatchAmount.toFixed(0) : '—'}
+                          <td className="py-3 pr-3 text-[var(--text-secondary)] truncate">{formatFeatureKey(p.featureKey)}</td>
+                          <td className="py-3 pr-3 text-right tabular-nums text-[var(--text-primary)]">${p.usdAmount.toFixed(2)}</td>
+                          <td className="py-3 pr-3 text-right tabular-nums text-[var(--text-muted)] whitespace-nowrap">
+                            {p.paymentToken === 'sol' && p.tokenAmount != null
+                              ? `${p.tokenAmount.toFixed(4)} SOL`
+                              : p.paymentToken === 'usdc' && p.tokenAmount != null
+                                ? `${p.tokenAmount.toFixed(2)} USDC`
+                                : p.paymentToken === 'hatch' && p.tokenAmount != null
+                                  ? `${p.tokenAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })} $HATCHER`
+                                  : p.paymentToken === 'stripe'
+                                    ? 'Stripe'
+                                    : p.hatchAmount
+                                      ? `${p.hatchAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })} $HATCHER`
+                                      : '—'}
                           </td>
                           <td className="py-3 pr-3">
                             <div className="flex items-center gap-2 min-w-0">
@@ -1938,7 +1951,7 @@ export default function AdminPage() {
                         {userDetail.payments.map(p => (
                           <div key={p.id} className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-xs">
                             <div className="flex items-center justify-between mb-0.5">
-                              <span className="font-medium text-[var(--text-primary)]">{p.featureKey}</span>
+                              <span className="font-medium text-[var(--text-primary)]">{formatFeatureKey(p.featureKey)}</span>
                               <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${p.status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-400' : p.status === 'pending' ? 'bg-amber-500/10 text-amber-400' : 'bg-red-500/10 text-red-400'}`}>{p.status}</span>
                             </div>
                             <div className="text-[var(--text-muted)]">${p.usdAmount.toFixed(2)} · {new Date(p.createdAt).toLocaleDateString()}</div>
@@ -1957,7 +1970,7 @@ export default function AdminPage() {
                       <div className="space-y-1.5">
                         {userDetail.features.map(f => (
                           <div key={f.id} className="flex items-center justify-between p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-xs">
-                            <span className="font-medium text-[var(--text-primary)]">{f.featureKey}</span>
+                            <span className="font-medium text-[var(--text-primary)]">{formatFeatureKey(f.featureKey)}</span>
                             <span className="text-[var(--text-muted)]">{f.expiresAt ? `until ${new Date(f.expiresAt).toLocaleDateString()}` : 'lifetime'}</span>
                           </div>
                         ))}

@@ -69,6 +69,12 @@ export async function payWithSol(params: {
 }): Promise<{ signature: string }> {
   const { wallet, connection, quote } = params;
   const { publicKey, sendTransaction } = wallet;
+  console.log('[pay-sol] start', {
+    publicKey: publicKey?.toBase58(),
+    hasSendTx: !!sendTransaction,
+    endpoint: connection.rpcEndpoint,
+    lamports: quote.lamports,
+  });
   if (!publicKey || !sendTransaction) throw new Error('Connect a Solana wallet first');
 
   const treasury = new PublicKey(TREASURY_WALLET);
@@ -80,14 +86,31 @@ export async function payWithSol(params: {
     }),
   );
 
-  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
+  let blockhash: string, lastValidBlockHeight: number;
+  try {
+    const bh = await connection.getLatestBlockhash('confirmed');
+    blockhash = bh.blockhash;
+    lastValidBlockHeight = bh.lastValidBlockHeight;
+    console.log('[pay-sol] got blockhash', blockhash.slice(0, 8));
+  } catch (e) {
+    console.error('[pay-sol] getLatestBlockhash FAILED', e);
+    throw new Error(`RPC error: ${(e as Error).message}. Check NEXT_PUBLIC_SOLANA_RPC.`);
+  }
   tx.recentBlockhash = blockhash;
   tx.feePayer = publicKey;
 
-  const signature = await sendTransaction(tx, connection, {
-    skipPreflight: false,
-    preflightCommitment: 'confirmed',
-  });
+  console.log('[pay-sol] calling wallet.sendTransaction — Phantom should pop up NOW');
+  let signature: string;
+  try {
+    signature = await sendTransaction(tx, connection, {
+      skipPreflight: false,
+      preflightCommitment: 'confirmed',
+    });
+    console.log('[pay-sol] tx sent, sig:', signature);
+  } catch (e) {
+    console.error('[pay-sol] sendTransaction FAILED', e);
+    throw e;
+  }
 
   // Wait for cluster confirmation. 'confirmed' ≈ 2-3 block confirmations,
   // usually ~5-10s on mainnet. We use the block-height strategy so the
@@ -122,17 +145,31 @@ export async function payWithSplToken(params: {
   if (!publicKey || !sendTransaction) throw new Error('Connect a Solana wallet first');
 
   // Lazy-load SPL-token so we don't ship the whole SDK in the initial bundle.
-  const { TOKEN_PROGRAM_ID, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferInstruction } =
+  const { TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferInstruction, createBurnInstruction } =
     await import('@solana/spl-token');
+
+  // $HATCHER is a Token-2022 token (pump.fun launched it on the 2022 program
+  // for metadata pointer support). USDC is a classic SPL Token. The ATA
+  // derivation and transfer instruction must be issued to the right program
+  // or simulation reverts with "IncorrectProgramId" / "AccountNotOwnedByProgram".
+  const tokenProgramId = mint === 'hatch' ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID;
 
   const mintPubkey = new PublicKey(mint === 'usdc' ? USDC_TOKEN_MINT : HATCH_TOKEN_MINT);
   const treasury = new PublicKey(TREASURY_WALLET);
 
-  const fromAta = await getAssociatedTokenAddress(mintPubkey, publicKey);
-  const toAta = await getAssociatedTokenAddress(mintPubkey, treasury);
+  const fromAta = await getAssociatedTokenAddress(mintPubkey, publicKey, false, tokenProgramId);
+  const toAta = await getAssociatedTokenAddress(mintPubkey, treasury, false, tokenProgramId);
 
   const decimals = mint === 'usdc' ? 6 : 6; // both USDC + $HATCHER use 6 decimals
-  const amount = BigInt(Math.floor(amountHuman * 10 ** decimals));
+  const totalBaseUnits = BigInt(Math.floor(amountHuman * 10 ** decimals));
+
+  // For $HATCHER payments, split the amount 90/10: treasury receives 90%, the
+  // remaining 10% is burned in the same tx. This ties revenue directly to
+  // token supply reduction and is atomically verifiable — the backend sees
+  // BOTH a transfer to treasury AND a burn instruction signed by the user.
+  // USDC is paid in full; buy-and-burn for stablecoins is handled separately.
+  const burnBaseUnits = mint === 'hatch' ? totalBaseUnits / 10n : 0n;
+  const transferBaseUnits = totalBaseUnits - burnBaseUnits;
 
   const tx = new Transaction();
 
@@ -141,10 +178,11 @@ export async function payWithSplToken(params: {
   if (!toAtaInfo) {
     tx.add(
       createAssociatedTokenAccountInstruction(
-        publicKey,   // payer
-        toAta,       // ata
-        treasury,    // owner
-        mintPubkey,  // mint
+        publicKey,       // payer
+        toAta,           // ata
+        treasury,        // owner
+        mintPubkey,      // mint
+        tokenProgramId,  // token program (Token-2022 for HATCH)
       ),
     );
   }
@@ -154,11 +192,24 @@ export async function payWithSplToken(params: {
       fromAta,
       toAta,
       publicKey,
-      amount,
+      transferBaseUnits,
       [],
-      TOKEN_PROGRAM_ID,
+      tokenProgramId,
     ),
   );
+
+  if (burnBaseUnits > 0n) {
+    tx.add(
+      createBurnInstruction(
+        fromAta,         // burn straight from the payer's ATA
+        mintPubkey,
+        publicKey,       // authority
+        burnBaseUnits,
+        [],
+        tokenProgramId,
+      ),
+    );
+  }
 
   const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('confirmed');
   tx.recentBlockhash = blockhash;

@@ -193,6 +193,11 @@ const KnowledgeTab = dynamic(
   { loading: () => <TabSkeleton /> },
 );
 
+const AddonsTab = dynamic(
+  () => import('@/components/agents/tabs/AddonsTab').then(mod => ({ default: mod.AddonsTab })),
+  { loading: () => <TabSkeleton /> },
+);
+
 // ─── Main Component ─────────────────────────────────────────
 
 export default function AgentManagePage() {
@@ -222,7 +227,7 @@ export default function AgentManagePage() {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','workspace','logs','terminal','memory','sessions','knowledge','schedules','workflows','chat','stats'];
+  const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','workspace','logs','terminal','memory','sessions','knowledge','addons','schedules','workflows','chat','stats'];
   // 'skills' kept in validTabs for backwards compat (deep links), but redirects to plugins tab
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const rawTab = searchParams.get('tab') as Tab;
@@ -354,11 +359,14 @@ export default function AgentManagePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  // ─── Keep msgLimit in sync with userTier ──────────────────
-
+  // ─── Flip `hasUnlimitedChat` when the user holds an unlimited tier ──
+  // We don't overwrite msgLimit here — that's populated from
+  // loadUsage() which returns the authoritative server value (tier +
+  // active addons like +200 msg/day). An earlier effect used to clobber
+  // addon-inclusive limits back down to the raw tier base, so users
+  // who bought `addon.messages.200` saw no change on the agent page.
   useEffect(() => {
     const tierLimit = TIERS[userTier]?.messagesPerDay ?? TIERS.free.messagesPerDay;
-    setMsgLimit(tierLimit);
     if (tierLimit === 0) setHasUnlimitedChat(true);
   }, [userTier]);
 
@@ -1121,7 +1129,7 @@ export default function AgentManagePage() {
               {tab === 'config' && (
                 agent?.framework === 'hermes' ? <HermesConfigTab /> :
                 agent?.framework === 'milady' ? <MiladyConfigTab /> :
-                (agent?.framework === 'openclaw' && agent?.managementMode === 'managed') ? (
+                (agent?.framework === 'openclaw' && true) ? (
                   // Managed OpenClaw: stack the live PATCH editor on top of
                   // the legacy DB-backed form. Live editor handles runtime
                   // tweaks (tools profile, logging, session scope), the old
@@ -1150,6 +1158,7 @@ export default function AgentManagePage() {
               )}
               {tab === 'chat' && <ChatTab />}
               {tab === 'knowledge' && <KnowledgeTab />}
+              {tab === 'addons' && <AddonsTab />}
               {tab === 'stats' && <StatsTab />}
               {tab === 'schedules' && <SchedulesTab />}
               {tab === 'workflows' && <WorkflowsTab />}

@@ -24,7 +24,11 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     didSubmit.current = true;
-    await login(email, password);
+    // Normalize client-side too — the server already lowercases, but
+    // doing it here keeps the address shown in the input consistent
+    // after a failed submit and prevents the "Invalid email" server
+    // error from firing on obvious whitespace.
+    await login(email.trim().toLowerCase(), password);
   };
 
   return (

@@ -124,6 +124,9 @@ export const api = {
   /** Delete current user account (requires password confirmation) */
   deleteAccount: (password: string) => req<{deleted: boolean}>('/auth/me', { method: 'DELETE', body: JSON.stringify({ password }) }),
 
+  /** Unlink the Solana wallet currently attached to the account. */
+  disconnectWallet: () => req<{ walletAddress: null }>('/auth/wallet', { method: 'DELETE' }),
+
   /** GDPR data export — downloads all user data as JSON */
   exportData: async (): Promise<Blob> => {
     const token = getToken();
@@ -348,23 +351,68 @@ export const api = {
       agentLimit: number;
       agentCount: number;
       subscriptionExpiresAt?: string | null;
+      /** Account-wide chat-message daily cap (tier base + active
+       *  `addon.messages.*` bonuses). 0 = unlimited (legacy tiers). */
+      chatLimit: number;
+      /** Account-wide web-search daily cap (tier base + active
+       *  `addon.searches.*` bonuses). 0 = unlimited. */
+      searchLimit: number;
       // Legacy compat fields
       activeFeatures?: Array<{ featureKey: string; type: string; expiresAt: string | null }>;
       hatchCredits?: number;
     }>('/features/account'),
 
-  /** Subscribe to a tier */
-  subscribe: (tier: string, txSignature: string, paymentToken: 'sol' | 'hatch' | 'usdc' = 'sol') =>
-    req<{ tier: string }>('/features/subscribe', {
+  /** Public tier catalog + Founding Member availability. Used by both
+   *  the billing page (to render a "X of 10 spots" badge next to the
+   *  tier) and the landing page banner. */
+  getTiersCatalog: () =>
+    req<{
+      tiers: Record<string, TierConfig>;
+      tierOrder: string[];
+      addons: Array<{ key: string; name: string; usdPrice: number; description?: string }>;
+      founding: { maxSlots: number; taken: number; remaining: number };
+    }>('/features'),
+
+  /** Subscribe to a tier. Returns prorated credit refunded for the
+   *  unused portion of the previous tier on an upgrade (zero otherwise).
+   *  `billingPeriod='annual'` → 12 months at 20% off (server enforces). */
+  subscribe: (tier: string, txSignature: string, paymentToken: 'sol' | 'hatch' | 'usdc' = 'sol', billingPeriod: 'monthly' | 'annual' = 'monthly') =>
+    req<{ tier: string; expiresAt: string | null; paymentId: string; proratedCredit: number }>('/features/subscribe', {
       method: 'POST',
-      body: JSON.stringify({ tier, txSignature, paymentToken }),
+      body: JSON.stringify({ tier, txSignature, paymentToken, billingPeriod }),
     }),
 
-  /** Purchase an add-on (optionally per-agent) */
-  purchaseAddon: (addonKey: string, txSignature: string, agentId?: string, paymentToken: 'sol' | 'hatch' | 'usdc' = 'sol') =>
+  /** Purchase an add-on (optionally per-agent). Subscription-type addons
+   *  honor `billingPeriod='annual'` (20% off, 12 months); one-time addons
+   *  always charge the flat price regardless. */
+  purchaseAddon: (addonKey: string, txSignature: string, agentId?: string, paymentToken: 'sol' | 'hatch' | 'usdc' = 'sol', billingPeriod: 'monthly' | 'annual' = 'monthly') =>
     req<{ addonKey: string }>('/features/addon', {
       method: 'POST',
-      body: JSON.stringify({ addonKey, txSignature, paymentToken, ...(agentId ? { agentId } : {}) }),
+      body: JSON.stringify({ addonKey, txSignature, paymentToken, billingPeriod, ...(agentId ? { agentId } : {}) }),
+    }),
+
+  /** Subscribe to a tier paying entirely with HATCHER credits. Requires
+   *  sufficient balance — returns 400 with `remainingBalance` otherwise.
+   *  On upgrade (lower → higher tier) the unused portion of the current
+   *  tier is refunded as credits (`proratedCredit`). */
+  subscribeWithCredits: (tier: string, billingPeriod: 'monthly' | 'annual' = 'monthly') =>
+    req<{
+      tier: string;
+      expiresAt: string | null;
+      paidWith: 'credits';
+      amountDeducted: number;
+      proratedCredit: number;
+      remainingBalance: number;
+    }>('/features/subscribe-with-credits', {
+      method: 'POST',
+      body: JSON.stringify({ tier, billingPeriod }),
+    }),
+
+  /** Purchase an add-on (optionally per-agent) paying with credits. */
+  purchaseAddonWithCredits: (addonKey: string, agentId?: string, billingPeriod: 'monthly' | 'annual' = 'monthly') =>
+    req<{ addonKey: string; paidWith: 'credits'; amountDeducted: number; remainingBalance: number }>('/features/addon-with-credits', {
+      method: 'POST',
+      body: JSON.stringify({ addonKey, billingPeriod, ...(agentId ? { agentId } : {}) }),
     }),
 
   /** Cancel Stripe subscription (cancels at end of billing period) */

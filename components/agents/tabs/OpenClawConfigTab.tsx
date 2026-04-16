@@ -301,30 +301,6 @@ export function OpenClawConfigTab() {
   };
 
   // Legacy-mode openclaw agent — no live file to edit
-  if (agent && agent.managementMode !== 'managed') {
-    return (
-      <motion.div
-        key="tab-openclaw-config"
-        variants={tabContentVariants}
-        initial="enter"
-        animate="center"
-        exit="exit"
-      >
-        <GlassCard>
-          <div className="flex items-start gap-2 text-sm text-[var(--text-muted)]">
-            <Info size={14} className="text-amber-400 flex-shrink-0 mt-0.5" />
-            <div>
-              Live config editing requires managed-mode OpenClaw. Legacy
-              agents regenerate <code className="text-amber-400">openclaw.json</code> on every
-              start from their stored configJson — edit it via the
-              legacy Config form instead, or recreate the agent to
-              switch to managed mode.
-            </div>
-          </div>
-        </GlassCard>
-      </motion.div>
-    );
-  }
 
   // Server says it's not managed (feature flag off for this agent) —
   // can happen if the agent was created before managed-openclaw was

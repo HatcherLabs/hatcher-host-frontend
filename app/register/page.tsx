@@ -87,7 +87,11 @@ export default function RegisterPage() {
     }
 
     didSubmit.current = true;
-    await register(email, username, password, refCode || undefined);
+    // Lowercase the email client-side so the same canonical form is sent
+    // no matter how the user typed it (Foo@Bar.COM → foo@bar.com). The
+    // server normalizes too, but doing it here avoids showing "already
+    // registered" errors that look like a bug because the case differs.
+    await register(email.trim().toLowerCase(), username, password, refCode || undefined);
     // Redirect to verify-email page after successful registration
     track.register();
     router.push('/verify-email');

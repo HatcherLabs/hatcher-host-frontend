@@ -13,7 +13,9 @@ import {
   X,
   XCircle,
 } from 'lucide-react';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { Lock, Sparkles } from 'lucide-react';
 import {
   useAgentContext,
   tabContentVariants,
@@ -23,6 +25,13 @@ import {
   FRAMEWORK_BADGE,
   type LogFilter,
 } from '../AgentContext';
+import { api } from '@/lib/api';
+
+/** Lines visible to users WITHOUT the Full Logs addon and on tiers
+ *  that don't include it. The tail is live-updated but scrollback is
+ *  capped so free/starter/pro only see recent activity unless they
+ *  unlock the full history. */
+const FREE_LOG_LINE_CAP = 20;
 
 /* ── Framework log format descriptions ── */
 const FRAMEWORK_LOG_INFO: Record<string, { label: string; description: string; accent: string; border: string; bg: string }> = {
@@ -86,17 +95,68 @@ export function LogsTab() {
   const framework = agent.framework ?? 'openclaw';
   const fwInfo = FRAMEWORK_LOG_INFO[framework] ?? FRAMEWORK_LOG_INFO.openclaw;
 
-  /* ── Log counts by level ── */
+  // Full Logs entitlement: unlocked by either
+  //   a) Business / Founding tier (tierConfig.fullLogs === true), OR
+  //   b) `addon.full_logs` purchased for this specific agent (per-agent sub).
+  // We fetch both flags on mount; while loading we default to LOCKED so
+  // a racing render doesn't flash the full log buffer to a non-paying
+  // user.
+  const [hasFullLogs, setHasFullLogs] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [accountRes, featuresRes] = await Promise.all([
+        api.getAccountFeatures(),
+        api.getAgentFeatures(agent.id),
+      ]);
+      if (cancelled) return;
+      const tierIncludes = accountRes.success
+        && accountRes.data.tierConfig?.fullLogs === true;
+      const addonActive = featuresRes.success
+        && featuresRes.data.some((f) =>
+          f.featureKey === 'addon.full_logs'
+          && (!f.expiresAt || new Date(f.expiresAt) > new Date()),
+        );
+      setHasFullLogs(tierIncludes || addonActive);
+    })();
+    return () => { cancelled = true; };
+  }, [agent.id]);
+
+  // Visible logs — capped when not unlocked. We slice from the END
+  // (keep the most recent entries) so the tail-follow behavior is
+  // preserved even under the cap.
+  const visibleLogs = useMemo(() => {
+    if (hasFullLogs) return logs;
+    return logs.length > FREE_LOG_LINE_CAP
+      ? logs.slice(logs.length - FREE_LOG_LINE_CAP)
+      : logs;
+  }, [logs, hasFullLogs]);
+
+  const capped = !hasFullLogs && logs.length > FREE_LOG_LINE_CAP;
+
+  // Cap the filtered set too so search + level-filter still respect the
+  // Full-Logs gate. Slicing the tail keeps recent matches and follows
+  // the same "most-recent-wins" rule as visibleLogs.
+  const visibleFilteredLogs = useMemo(() => {
+    if (hasFullLogs) return filteredLogs;
+    return filteredLogs.length > FREE_LOG_LINE_CAP
+      ? filteredLogs.slice(filteredLogs.length - FREE_LOG_LINE_CAP)
+      : filteredLogs;
+  }, [filteredLogs, hasFullLogs]);
+
+  /* ── Log counts by level (over visible slice) ── */
   const counts = useMemo(() => {
-    const c = { all: logs.length, info: 0, warn: 0, error: 0, debug: 0 };
-    for (const l of logs) {
+    const c = { all: visibleLogs.length, info: 0, warn: 0, error: 0, debug: 0 };
+    for (const l of visibleLogs) {
       if (l.level in c) c[l.level as keyof typeof c]++;
     }
     return c;
-  }, [logs]);
+  }, [visibleLogs]);
 
   const handleDownload = () => {
-    const text = logs
+    const source = hasFullLogs ? logs : visibleLogs;
+    const text = source
       .map((l) => `[${l.timestamp}] [${l.level.toUpperCase()}] ${l.message}`)
       .join('\n');
     const blob = new Blob([text], { type: 'text/plain' });
@@ -118,6 +178,32 @@ export function LogsTab() {
           <p className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-relaxed">{fwInfo.description}</p>
         </div>
       </div>
+
+      {/* Full Logs gate banner — shown only when the user is on a tier
+          that doesn't include full logs AND hasn't bought the per-agent
+          addon. Links straight to this agent's Add-ons tab (see /dashboard/agent/[id]). */}
+      {hasFullLogs === false && (
+        <div className="flex items-start gap-3 px-4 py-3 rounded-xl border border-[#8b5cf6]/30 bg-[#8b5cf6]/[0.06]">
+          <Lock size={14} className="text-[#8b5cf6] mt-0.5 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-[var(--text-primary)]">
+              Showing the last {FREE_LOG_LINE_CAP} log lines
+            </p>
+            <p className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-relaxed">
+              {capped
+                ? `This agent has ${logs.length.toLocaleString()} total entries. Unlock Full Logs to scroll back through the complete history and export every line.`
+                : `Unlock Full Logs on this agent to keep every entry available for scrollback and export, beyond the last ${FREE_LOG_LINE_CAP} lines.`}
+            </p>
+          </div>
+          <Link
+            href={`/dashboard/agent/${agent.id}?tab=addons`}
+            className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-gradient-to-r from-[#8b5cf6] to-[#06b6d4] text-white hover:shadow-[0_0_12px_rgba(139,92,246,0.3)] transition-all"
+          >
+            <Sparkles size={11} />
+            Unlock
+          </Link>
+        </div>
+      )}
 
       {/* ── Toolbar: search + level filters + actions ── */}
       <div className="flex items-center gap-2 flex-wrap">
@@ -236,7 +322,7 @@ export function LogsTab() {
           <span className="w-2.5 h-2.5 rounded-full bg-amber-500/60" />
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/60" />
           <span className="ml-3 text-[10px] font-mono text-[var(--text-muted)]">
-            {agent.name} -- {filteredLogs.length}{logSearch || logFilter !== 'all' ? ` / ${logs.length}` : ''} entries
+            {agent.name} -- {visibleFilteredLogs.length}{logSearch || logFilter !== 'all' ? ` / ${visibleLogs.length}` : ''} entries
           </span>
           {autoScroll && (
             <span className="ml-auto text-[10px] text-emerald-400/60 flex items-center gap-1">
@@ -250,7 +336,7 @@ export function LogsTab() {
             <div className="space-y-2 p-4">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => <Skeleton key={i} className="h-4 w-full" />)}
             </div>
-          ) : filteredLogs.length === 0 ? (
+          ) : visibleFilteredLogs.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-48 gap-2">
               <ScrollText size={24} className="text-[var(--text-muted)]/50" />
               <p className="text-sm text-[var(--text-muted)]">
@@ -262,7 +348,7 @@ export function LogsTab() {
               </p>
             </div>
           ) : (
-            filteredLogs.map((log, i) => {
+            visibleFilteredLogs.map((log, i) => {
               const badgeCfg = LEVEL_BADGE_CONFIG[log.level];
               const BadgeIcon = badgeCfg?.icon;
               return (

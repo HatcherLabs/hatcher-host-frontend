@@ -44,7 +44,12 @@
   --cyan-400: #22d3ee;
   --cyan-500: #06b6d4;
   --color-accent: #06b6d4;
+  --color-accent-hover: #0891b2;
   --amber-400: #FBBF24;
+  /* Solana green — theme-aware. The official #14F195 is ~4.5:1 on dark
+     but only ~1.8:1 on white (fails WCAG). Light theme swaps to a
+     darker green that hits AA contrast while staying "Solana-green". */
+  --solana-green: #14F195;
 
   /* Text */
   --text-primary: #fafafa;
@@ -101,7 +106,10 @@
   --cyan-400: #0891b2;
   --cyan-500: #0e7490;
   --color-accent: #0e7490;
+  --color-accent-hover: #155e75;
   --amber-400: #b45309;
+  /* Solana green darkened for AA contrast on white */
+  --solana-green: #047857;
 
   /* Text — strong contrast hierarchy (WCAG AA+) */
   --text-primary: #0f172a;     /* Slate-900 — 15.4:1 ratio on white */
@@ -572,6 +580,22 @@
   /* ── Glass noise (class kept, texture overlay removed) */
   .glass-noise {
     position: relative;
+  }
+
+  /* ── Solid card — opaque background, no glassmorphism.
+     For surfaces where the translucent `.card` hurts readability
+     (dense financial data, long prose, tables). Uses the themed
+     solid-card background so contrast stays strong on both themes. */
+  .card-solid {
+    background: var(--bg-card-solid);
+    border: 1px solid var(--border-default);
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+
+  .card-solid:hover {
+    border-color: var(--border-hover, rgba(139, 92, 246, 0.3));
   }
 
   /* ── Shimmer loading effect ──────────────────────── */
@@ -1083,5 +1107,18 @@ button, a, [role="tab"] {
     padding: 0.875rem 2rem;
     border-radius: 20px;
     font-size: 1rem;
+  }
+
+  /* Floating hero emoji — decorative, theme-aware opacity.
+     Dark theme: OS-rendered color emoji need more opacity on a dark canvas.
+     Light theme: same emoji over white wash out fast; crank higher and
+     soften with a slight saturation drop so they don't fight the copy. */
+  .landing-float-emoji {
+    opacity: 0.28;
+    filter: saturate(0.85);
+  }
+  .light .landing-float-emoji {
+    opacity: 0.38;
+    filter: saturate(0.75) contrast(0.95);
   }
 }
