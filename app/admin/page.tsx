@@ -50,6 +50,7 @@ const STATUS_FILTERS = [
   { key: 'all', label: 'All' },
   { key: 'active', label: 'Active' },
   { key: 'sleeping', label: 'Sleeping' },
+  { key: 'stopped', label: 'Stopped' },
   { key: 'paused', label: 'Paused' },
   { key: 'error', label: 'Error' },
   { key: 'killed', label: 'Killed' },
@@ -384,6 +385,17 @@ export default function AdminPage() {
       if (data.pagination) {
         setAgentsPagination({ total: data.pagination.total, hasMore: data.pagination.hasMore });
       }
+    }
+  }
+
+  async function handleLoadAllAgents() {
+    setLoadingMoreAgents(true);
+    const res = await api.adminGetAgents(9999, 0);
+    setLoadingMoreAgents(false);
+    if (res.success) {
+      const data = res.data;
+      setAgents(data.agents ?? []);
+      setAgentsPagination({ total: data.pagination?.total ?? 0, hasMore: false });
     }
   }
 
@@ -1193,9 +1205,9 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {/* Load More */}
+              {/* Load More / Load All */}
               {agentsPagination.hasMore && (
-                <div className="flex justify-center mt-4">
+                <div className="flex justify-center gap-3 mt-4">
                   <button
                     onClick={handleLoadMoreAgents}
                     disabled={loadingMoreAgents}
@@ -1206,7 +1218,15 @@ export default function AdminPage() {
                     ) : (
                       <Download size={14} />
                     )}
-                    {loadingMoreAgents ? 'Loading…' : `Load more (${agentsPagination.total - agents.length} remaining)`}
+                    {loadingMoreAgents ? 'Loading…' : `Load more (+50)`}
+                  </button>
+                  <button
+                    onClick={handleLoadAllAgents}
+                    disabled={loadingMoreAgents}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/30 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Download size={14} />
+                    Load all ({agentsPagination.total - agents.length} remaining)
                   </button>
                 </div>
               )}
