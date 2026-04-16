@@ -77,6 +77,9 @@ export function AddonsTab() {
   const [tierIncludes, setTierIncludes] = useState<{ fileManager: boolean; fullLogs: boolean }>(
     { fileManager: false, fullLogs: false },
   );
+  // HATCHER credit balance — powers the "Pay with Credits" rail.
+  // Loaded alongside the tier entitlements.
+  const [creditBalance, setCreditBalance] = useState<number>(0);
   // Annual toggle only shows up if at least one subscription-type per-agent
   // addon exists. File Manager is one-time so it ignores this completely.
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
@@ -114,6 +117,11 @@ export function AddonsTab() {
           fullLogs: accountRes.data.tierConfig?.fullLogs === true,
         });
       }
+      // Credit balance — the account endpoint exposes hatchCredits on
+      // the root response for convenience. Fallback to 0 so the rail
+      // cleanly disables itself when it's missing.
+      const hatchCredits = accountRes.success ? (accountRes.data.hatchCredits ?? 0) : 0;
+      setCreditBalance(Number(hatchCredits));
     } finally {
       setLoading(false);
     }
@@ -146,6 +154,63 @@ export function AddonsTab() {
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Purchase failed';
       if (msg !== 'Cancelled') setError(msg);
+    } finally {
+      setPurchasing(null);
+    }
+  };
+
+  // Stripe hosted checkout — redirects the browser. Return URL lands
+  // back on the agent page so the user sees their new entitlement
+  // after Stripe's success screen.
+  const handlePurchaseCard = async (addonKey: string) => {
+    const addon = PER_AGENT_ADDONS.find((a) => a.key === addonKey);
+    if (!addon) return;
+    const isSub = addon.type === 'subscription';
+    const period: 'monthly' | 'annual' = isSub ? billingPeriod : 'monthly';
+    setPurchasing(addonKey);
+    setError(null);
+    try {
+      const returnUrl = `${window.location.origin}/dashboard/agent/${agent.id}?tab=addons`;
+      const res = await api.stripeCheckoutAddon(addonKey, agent.id, period, returnUrl);
+      if (!res.success) {
+        setError(res.error ?? 'Stripe checkout failed');
+        setPurchasing(null);
+        return;
+      }
+      window.location.href = res.data.url;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Stripe checkout failed');
+      setPurchasing(null);
+    }
+  };
+
+  // Credits checkout — settled entirely server-side, no wallet popup.
+  // Uses the same stacking / billingPeriod logic as the on-chain path.
+  const handlePurchaseCredits = async (addonKey: string) => {
+    const addon = PER_AGENT_ADDONS.find((a) => a.key === addonKey);
+    if (!addon) return;
+    const isSub = addon.type === 'subscription';
+    const period: 'monthly' | 'annual' = isSub ? billingPeriod : 'monthly';
+    const chargedUsd = computePrice(addon.usdPrice, isSub);
+    if (creditBalance < chargedUsd) {
+      setError(`Not enough credits. Need $${chargedUsd.toFixed(2)}, have $${creditBalance.toFixed(2)}.`);
+      return;
+    }
+    setPurchasing(addonKey);
+    setError(null);
+    setSuccess(null);
+    try {
+      const res = await api.purchaseAddonWithCredits(addonKey, agent.id, period);
+      if (res.success) {
+        await loadStatuses();
+        setExpandedKey(null);
+        setSuccess(`${formatFeatureKey(addonKey)} activated with credits! $${res.data.amountDeducted.toFixed(2)} deducted, $${res.data.remainingBalance.toFixed(2)} remaining.`);
+        setTimeout(() => setSuccess(null), 6000);
+      } else {
+        setError(res.error ?? 'Credit payment failed');
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Credit payment failed');
     } finally {
       setPurchasing(null);
     }
@@ -326,6 +391,10 @@ export function AddonsTab() {
                     onPayWithSOL={() => handlePurchase(addon.key, 'sol')}
                     onPayWithUSDC={() => handlePurchase(addon.key, 'usdc')}
                     onPayWithHATCHER={() => handlePurchase(addon.key, 'hatch')}
+                    onPayWithCard={() => handlePurchaseCard(addon.key)}
+                    onPayWithCredits={() => handlePurchaseCredits(addon.key)}
+                    creditBalance={creditBalance}
+                    price={computePrice(addon.usdPrice, addon.type === 'subscription')}
                     loading={isPurchasing}
                   />
                 </motion.div>

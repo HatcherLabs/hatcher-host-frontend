@@ -626,15 +626,15 @@ export default function PricingPage() {
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[var(--color-accent)] font-semibold">
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Starter</div>
-                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$4.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$6.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[#8b5cf6] font-semibold">
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Pro</div>
-                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$14.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$19.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[#f59e0b] font-semibold">
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Business</div>
-                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$39.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$49.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[#e11d48] font-semibold">
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Founding</div>
@@ -834,14 +834,14 @@ const FAQ = [
   },
   {
     q: 'What is auto-sleep?',
-    a: 'Free agents automatically sleep after 10 minutes of inactivity, Starter agents after 2 hours. They wake instantly on the next message. Pro and Business agents are always-on with no auto-sleep. You can also add always-on to any agent for $4.99/mo.',
+    a: 'Free agents sleep after 1 hour of inactivity, Starter after 4 hours, Pro after 12 hours. Business and Founding Member agents are always-on with no auto-sleep. They wake instantly on the next message. You can add Always On to any agent for $7.99/mo.',
   },
   {
     q: 'What LLM do I get with the free tier?',
-    a: 'Free and Starter tiers use GPT-OSS 20B on Groq. Pro, Business, and Founding Member tiers get Llama 3.3 70B on Groq — a more capable model. Free tier gets 10 messages/day, Starter gets 50, Pro gets 200 per agent, and Business gets 500 per agent. BYOK bypasses all limits and lets you use any model you want.',
+    a: 'Free and Starter tiers use GPT-OSS 20B on Groq. Pro, Business, and Founding Member tiers get Llama 3.3 70B on Groq — a more capable model. Message limits are account-wide: Free 20/day, Starter 50/day, Pro 100/day, Business 300/day, Founding 300/day. BYOK (bring your own LLM key) bypasses all limits on any tier.',
   },
   {
     q: 'What is the Founding Member tier?',
-    a: 'Founding Member is a one-time $99 payment that gives you lifetime access to Hatcher with 25 agents, unlimited messages, 4 GB RAM, always-on, and all premium features. No monthly fees, ever. Limited availability — once all spots are taken, this tier is gone.',
+    a: 'Founding Member is a one-time $99 payment that gives you lifetime access to Hatcher: 10 agents, 300 messages/day, 4 GB RAM, 2 GB workspace, always-on, and all premium features (File Manager, Full Logs, priority support) included. No monthly fees, ever. Limited to 20 spots — once they are gone, this tier is gone.',
   },
 ];

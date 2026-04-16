@@ -415,9 +415,24 @@ export const api = {
       body: JSON.stringify({ addonKey, billingPeriod, ...(agentId ? { agentId } : {}) }),
     }),
 
-  /** Cancel Stripe subscription (cancels at end of billing period) */
-  stripeCancelSubscription: () =>
-    req<{ message: string }>('/stripe/cancel-subscription', { method: 'POST' }),
+  /** Start a Stripe checkout session for a tier (Card payment).
+   *  Returns the hosted-checkout URL to redirect to. All tiers are
+   *  billed as one-time charges; the server expands expiry by
+   *  30 days (monthly) or 365 days (annual) when the webhook fires.
+   *  Lifetime tiers (founding_member) ignore billingPeriod. */
+  stripeCheckoutTier: (tier: string, billingPeriod: 'monthly' | 'annual', returnUrl: string) =>
+    req<{ sessionId: string; url: string }>('/stripe/checkout/subscription', {
+      method: 'POST',
+      body: JSON.stringify({ tier, returnUrl, billingPeriod }),
+    }),
+
+  /** Start a Stripe checkout session for an add-on. One-time addons
+   *  (File Manager) ignore billingPeriod. */
+  stripeCheckoutAddon: (addonKey: string, agentId: string | undefined, billingPeriod: 'monthly' | 'annual', returnUrl: string) =>
+    req<{ sessionId: string; url: string }>('/stripe/checkout/addon', {
+      method: 'POST',
+      body: JSON.stringify({ addonKey, returnUrl, billingPeriod, ...(agentId ? { agentId } : {}) }),
+    }),
 
   /** Open Stripe customer portal for billing management */
   stripePortal: (returnUrl: string) =>

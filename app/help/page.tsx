@@ -159,7 +159,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'How do add-ons work?',
-        a: 'Add-ons let you expand beyond your plan\'s limits. Extra agents: +1 ($2.99/mo), +3 ($6.99/mo), +5 ($11.99/mo), +10 ($19.99/mo). Extra messages: +20/day ($1.99/mo), +50 ($3.99/mo), +100 ($5.99/mo), +200 ($9.99/mo). Extra searches: +25/day ($3.99/mo), +50 ($6.99/mo). Always-On: $7.99/mo per agent. File Manager: $4.99 one-time per agent. Full Logs: $1.99/mo. +10 Plugins: $2.99/mo. All add-ons are stackable.',
+        a: 'Add-ons expand your plan. Account-level (stack by count + expiry): Extra agents (+1 $2.99, +3 $6.99, +5 $11.99, +10 $19.99 /mo), Extra messages (+20 $1.99, +50 $3.99, +100 $5.99, +200 $9.99 /mo), Extra searches (+25 $3.99, +50 $6.99 /mo). Per-agent (extend expiry): Always On ($7.99/mo), File Manager ($4.99 one-time), Full Logs ($2.99/mo), +10 Plugins ($5.99/mo). Every subscription add-on has an annual variant at 15% off. All stackable.',
       },
       {
         q: 'How do I upgrade or downgrade?',
@@ -181,7 +181,7 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'My agent is not responding',
-        a: 'First, check if your agent is running (status should show "running" on the dashboard). If it\'s stopped or sleeping, start it. If it\'s running but not responding: check that your integrations are properly configured with valid tokens, verify your daily message limit hasn\'t been reached (Free: 10/day, Starter: 50/day, Pro: 200/day, Business: 500/day), and check the Logs tab for errors. If using BYOK, confirm your API key is valid and has credits with the provider.',
+        a: 'First, check if your agent is running (status should show "running" on the dashboard). If it\'s stopped or sleeping, start it. If it\'s running but not responding: check that your integrations are properly configured with valid tokens, verify your daily message limit hasn\'t been reached (account-wide: Free 20/day, Starter 50/day, Pro 100/day, Business 300/day, Founding 300/day), and check the Logs tab for errors. If using BYOK, confirm your API key is valid and has credits with the provider.',
       },
       {
         q: 'My agent keeps restarting',
@@ -197,7 +197,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'I am getting rate limited',
-        a: 'Rate limiting means you\'ve hit your daily message quota. Free tier: 10 messages/day, Starter: 50/day, Pro: 200/day, Business: 500/day. The limit resets on a 24-hour rolling window. Solutions: upgrade your plan for a higher limit (Pro and above also get a more capable model and web search), switch to BYOK (your own API key) for unlimited messages, or wait for the limit to reset. The 429 error in logs confirms rate limiting. BYOK always bypasses Hatcher\'s message limits.',
+        a: 'Rate limiting means you\'ve hit your daily message quota. Limits are account-wide: Free 20/day, Starter 50/day, Pro 100/day, Business 300/day, Founding 300/day. The 24h window resets per-user on a rolling basis. Solutions: upgrade your plan, stack a "+N messages/day" addon (e.g. +200 for $9.99/mo), switch to BYOK (unlimited on any tier), or wait for the reset. The 429 error in logs confirms rate limiting.',
       },
     ],
   },

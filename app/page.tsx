@@ -311,11 +311,6 @@ export default function LandingPage() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }} className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)]">
 
-      {/* ── Open Beta Banner ────────────────────────────────── */}
-      <div className="w-full bg-[var(--color-accent)] text-white text-center py-2 px-4 text-sm font-medium">
-        We&apos;re in open beta! All features are free to try.{' '}
-        <Link href="/register" className="underline underline-offset-2 hover:text-white/80 transition-colors">Sign up and start building</Link>
-      </div>
 
       {/* Founding Member now lives as a full section further down the
           page (between pricing and FAQ), not as a top banner. This

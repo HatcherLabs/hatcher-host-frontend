@@ -282,8 +282,10 @@ export default function BillingPage() {
   const [purchasingAddon, setPurchasingAddon] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [creditBalance, setCreditBalance] = useState(0);
-  const [cancellingSubscription, setCancellingSubscription] = useState(false);
-  const [subscriptionCancelled, setSubscriptionCancelled] = useState(false);
+  // Cancel flow removed — all tiers are one-time purchases now, no
+  // recurring subscription to cancel. Access simply expires at
+  // `agentFeature.expiresAt`. Users who want early downgrade can wait
+  // out the expiry or delete the account via Settings.
   const [openingPortal, setOpeningPortal] = useState(false);
   const [creditHistory, setCreditHistory] = useState<Array<{
     id: string; amount: number; balance: number; type: string; description: string | null; createdAt: string;
@@ -534,8 +536,35 @@ export default function BillingPage() {
     }
   };
 
-  /* ── Subscribe via Stripe (mock) ──────────────────────── */
-  const handleSubscribeStripe = handleSubscribeSOL;
+  /* ── Subscribe via Stripe Card checkout ─────────────────
+     Opens a Stripe-hosted checkout session. User pays by card and the
+     /stripe/webhook handler grants the tier on payment_intent.succeeded.
+     All tiers are billed as one-time charges (monthly = 30d, annual = 365d,
+     lifetime for founding). We never see the card number. */
+  const handleSubscribeStripe = async () => {
+    const tierKey = paymentModal.tierKey;
+    if (!tierKey) return;
+    const tierConfig = TIERS[tierKey];
+    const period = subscribePeriod(tierKey);
+    setPaymentLoading(true);
+    setSubscribing(tierKey);
+    setError(null);
+    try {
+      const res = await api.stripeCheckoutTier(tierKey, period, `${window.location.origin}/dashboard/billing`);
+      if (!res.success) {
+        setError(res.error ?? 'Stripe checkout failed');
+        setSubscribing(null);
+        setPaymentLoading(false);
+        return;
+      }
+      // Redirect the whole tab — Stripe-hosted checkout takes over.
+      window.location.href = res.data.url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : `Stripe checkout for ${tierConfig.name} failed`);
+      setSubscribing(null);
+      setPaymentLoading(false);
+    }
+  };
 
   // Shared helper — subscription addons honor the annual toggle; one-time
   // addons (File Manager) always charge flat price.
@@ -634,8 +663,32 @@ export default function BillingPage() {
     }
   };
 
-  /* ── Purchase add-on via Stripe (mock) ──────────────────── */
-  const handlePurchaseAddonStripe = handlePurchaseAddonSOL;
+  /* ── Purchase add-on via Stripe Card checkout ──────────── */
+  const handlePurchaseAddonStripe = async () => {
+    const addonKey = paymentModal.addonKey;
+    if (!addonKey) return;
+    const addonConfig = ADDONS.find(a => a.key === addonKey);
+    if (!addonConfig) return;
+    if (addonConfig.perAgent && !selectedAgentId) return;
+    const period = addonPeriod(addonConfig);
+    setPaymentLoading(true);
+    setPurchasingAddon(addonKey);
+    setError(null);
+    try {
+      const res = await api.stripeCheckoutAddon(addonKey, selectedAgentId ?? undefined, period, `${window.location.origin}/dashboard/billing`);
+      if (!res.success) {
+        setError(res.error ?? 'Stripe checkout failed');
+        setPurchasingAddon(null);
+        setPaymentLoading(false);
+        return;
+      }
+      window.location.href = res.data.url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Stripe checkout failed');
+      setPurchasingAddon(null);
+      setPaymentLoading(false);
+    }
+  };
 
   /* ── Subscribe with Credits ─────────────────────────────
      Uses the HATCHER credit balance on the user account. Does NOT open
@@ -707,27 +760,6 @@ export default function BillingPage() {
     } finally {
       setPurchasingAddon(null);
       setPaymentLoading(false);
-    }
-  };
-
-  /* ── Cancel Stripe subscription ──────────────────────────── */
-  const handleCancelSubscription = async () => {
-    if (!confirm('Are you sure you want to cancel your subscription? You will keep access until the end of your billing period.')) return;
-    setCancellingSubscription(true);
-    setError(null);
-    try {
-      const res = await api.stripeCancelSubscription();
-      if (res.success) {
-        setSubscriptionCancelled(true);
-        await loadAccountData();
-        showSuccess('Subscription cancelled. You will keep access until the end of your billing period.');
-      } else {
-        setError(res.error ?? 'Failed to cancel subscription');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to cancel subscription');
-    } finally {
-      setCancellingSubscription(false);
     }
   };
 

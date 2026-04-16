@@ -302,7 +302,7 @@ export default function TokenPage() {
                 Stay in the Loop
               </h2>
               <p className="text-lg mb-10 max-w-xl mx-auto text-[var(--text-secondary)]">
-                The token is live. The platform is in open beta. All features are free to try. More details coming soon.
+                The token is live and the platform is ready. Deploy your first agent in minutes.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/create" className="btn-primary text-base px-10 py-4 inline-flex items-center gap-2">

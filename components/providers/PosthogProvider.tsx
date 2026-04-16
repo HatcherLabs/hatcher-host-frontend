@@ -3,32 +3,36 @@
 import posthog from 'posthog-js';
 import { PostHogProvider as PHProvider } from 'posthog-js/react';
 import { useEffect } from 'react';
-import { getConsentStatus } from '@/components/ui/CookieConsent';
+import { hasAnalyticsConsent, type ConsentState } from '@/components/ui/CookieConsent';
 
+// Initialize PostHog opt-in by default. The CookieConsent banner owns
+// the decision and fires a `hatcher:consent-changed` event that we
+// listen to here so analytics starts immediately after Accept without a
+// page reload.
 export function PosthogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
     if (!key) return;
 
-    const consent = getConsentStatus();
+    const initialConsent = hasAnalyticsConsent();
 
-    // Don't initialize if user has declined
-    if (consent === 'declined') return;
-
-    // Initialize PostHog but only enable capturing if accepted
     posthog.init(key, {
       api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
       person_profiles: 'identified_only',
       capture_pageview: true,
       capture_pageleave: true,
-      // If no consent yet, start opted out (GDPR-safe default)
-      opt_out_capturing_by_default: consent !== 'accepted',
+      // GDPR-safe default: if no consent yet or it's declined, start
+      // opted out. The banner flips this once the user accepts.
+      opt_out_capturing_by_default: !initialConsent,
     });
 
-    // If already accepted, make sure capturing is enabled
-    if (consent === 'accepted') {
-      posthog.opt_in_capturing();
-    }
+    const onConsentChanged = (ev: Event) => {
+      const detail = (ev as CustomEvent<ConsentState>).detail;
+      if (detail?.analytics) posthog.opt_in_capturing();
+      else posthog.opt_out_capturing();
+    };
+    window.addEventListener('hatcher:consent-changed', onConsentChanged);
+    return () => window.removeEventListener('hatcher:consent-changed', onConsentChanged);
   }, []);
 
   return <PHProvider client={posthog}>{children}</PHProvider>;
