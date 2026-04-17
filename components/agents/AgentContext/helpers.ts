@@ -36,9 +36,16 @@ export function getExtraIntegrationsForFramework(framework: string): Integration
     return EXTRA_PLATFORM_INTEGRATIONS.filter(i => i.stateKey && openclawSupported.includes(i.stateKey));
   }
   if (framework === 'milady') {
-    // Milady supports most extra channels too (built on elizaOS with 29 connectors)
-    const miladySupported = ['extra.twitch', 'extra.mattermost', 'extra.line', 'extra.matrix', 'extra.nostr', 'extra.feishu', 'extra.bluebubbles'];
-    return EXTRA_PLATFORM_INTEGRATIONS.filter(i => i.stateKey && miladySupported.includes(i.stateKey));
+    // Milady v2 is built on @elizaos/core@2.0.0-alpha.109 and only has
+    // wired connector logic in the adapter for telegram/discord/slack/
+    // whatsapp (bundled at Milady build time). The "extras" UI
+    // previously advertised here all required their own v2-alpha plugin
+    // to be installed inside the container AND a connector case in the
+    // adapter — neither existed, so users' credentials would silently
+    // land in milady.json and get ignored. Keeping an empty list until
+    // each platform is wired end-to-end (plugin bundled + connector
+    // case + smoke tested).
+    return [];
   }
   if (framework === 'hermes') {
     // Full list of platforms supported by upstream hermes-agent gateway
