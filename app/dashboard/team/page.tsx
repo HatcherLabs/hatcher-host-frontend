@@ -321,11 +321,11 @@ export default function TeamPage() {
     >
       {/* Header */}
       <motion.div variants={itemVariants} className="mb-8">
-        <h1 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-3" style={displayFont}>
-          <Users className="w-6 h-6 text-cyan-400" />
-          Team Collaboration
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Collaboration</p>
+        <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={displayFont}>
+          Team
         </h1>
-        <p className="text-sm text-[var(--text-secondary)] mt-1">
+        <p className="text-sm text-[var(--text-secondary)] mt-2">
           Create a team to share agents and collaborate with others.
         </p>
       </motion.div>

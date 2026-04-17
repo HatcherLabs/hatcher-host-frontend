@@ -582,32 +582,25 @@ export default function CreatePage() {
       animate="visible"
     >
       <div className="mx-auto max-w-3xl px-4 py-12">
-        {/* Page title with robot guide */}
+        {/* Page title — editorial, left-aligned, consistent with landing */}
         <motion.div
-          className="mb-10 text-center"
+          className="mb-12"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center">
-              <Bot size={20} className="text-[var(--color-accent)]" />
-            </div>
-            <div className="text-left">
-              <h1 className="text-3xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Create Your Agent</h1>
-              <p className="text-[var(--text-muted)] text-sm">Launch a free AI agent in under 2 minutes</p>
-            </div>
-          </div>
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Create agent</p>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] mb-2" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Create your agent</h1>
+          <p className="text-[var(--text-secondary)]">Launch a free AI agent in under 2 minutes.</p>
         </motion.div>
 
         {/* ── STEP INDICATOR ─────────────────────────────────────── */}
         <div className="mb-12">
-          {/* Progress bar */}
+          {/* Progress bar — solid accent, no gradient */}
           <div className="max-w-md mx-auto mb-8 px-4">
             <div className="h-1 rounded-full bg-[var(--border-default)] overflow-hidden">
               <motion.div
-                className="h-full rounded-full"
-                style={{ background: 'linear-gradient(90deg, #22d3ee, var(--color-accent), #0891b2)' }}
+                className="h-full rounded-full bg-[var(--color-accent)]"
                 initial={{ width: '0%' }}
                 animate={{ width: step === 1 ? '8%' : step === 2 ? '25%' : step === 3 ? '50%' : step === 4 ? '75%' : '100%' }}
                 transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -652,7 +645,7 @@ export default function CreatePage() {
                     <div className="h-0.5 rounded-full bg-[var(--border-default)]" />
                     <motion.div
                       className="absolute top-0 left-0 h-0.5 rounded-full"
-                      style={{ background: 'linear-gradient(90deg, var(--color-accent), #0891b2)' }}
+                      style={{ background: 'var(--color-accent)' }}
                       initial={{ width: '0%' }}
                       animate={{ width: s < step ? '100%' : '0%' }}
                       transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -675,135 +668,48 @@ export default function CreatePage() {
               animate="center"
               exit="exit"
             >
-              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">What kind of agent do you want?</h2>
-              <p className="text-[var(--text-muted)] text-sm mb-8 text-center">
-                Each style has different strengths -- pick the one that fits your needs
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2">What kind of agent do you want?</h2>
+              <p className="text-[var(--text-secondary)] text-sm mb-8">
+                Each framework has different strengths — pick the one that fits.
               </p>
 
+              {/* Framework cards — unified editorial style, single cyan
+                  accent for the selected state. Was a 4-way color grid
+                  (amber/purple/cyan/rose) which shouted "generic SaaS
+                  grid"; now the choice itself is the visual signal. */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                {/* OpenClaw */}
-                <motion.button
-                  whileHover={cardHover}
-                  onClick={() => setSelectedFramework('openclaw')}
-                  className={cn(
-                    'p-6 rounded-xl border text-left transition-all duration-200 relative',
-                    selectedFramework === 'openclaw'
-                      ? 'bg-[#f59e0b]/10 border-[#f59e0b] shadow-[0_0_24px_rgba(245,158,11,0.15)]'
-                      : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(245,158,11,0.4)]'
-                  )}
-                >
-                  {selectedFramework === 'openclaw' && (
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
-                      className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[#f59e0b] flex items-center justify-center">
-                      <Check className="w-4 h-4 text-white" />
-                    </motion.div>
-                  )}
-                  <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mb-4">
-                    <Cpu className="w-6 h-6 text-amber-400" />
-                  </div>
-                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">OpenClaw</h3>
-                  <p className="text-sm text-[var(--text-muted)] mb-3">
-                    Versatile AI assistant with thousands of community skills and multi-channel messaging.
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {['Thousands of skills', 'Web browsing', 'Scheduled tasks'].map(f => (
-                      <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-hover)] text-[var(--text-secondary)] border border-[var(--border-default)]">{f}</span>
-                    ))}
-                  </div>
-                </motion.button>
-
-                {/* Hermes */}
-                <motion.button
-                  whileHover={cardHover}
-                  onClick={() => setSelectedFramework('hermes')}
-                  className={cn(
-                    'p-6 rounded-xl border text-left transition-all duration-200 relative',
-                    selectedFramework === 'hermes'
-                      ? 'bg-[#a855f7]/10 border-[#a855f7] shadow-[0_0_24px_rgba(168,85,247,0.15)]'
-                      : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(168,85,247,0.4)]'
-                  )}
-                >
-                  {selectedFramework === 'hermes' && (
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
-                      className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[#a855f7] flex items-center justify-center">
-                      <Check className="w-4 h-4 text-white" />
-                    </motion.div>
-                  )}
-                  <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center mb-4">
-                    <Zap className="w-6 h-6 text-purple-400" />
-                  </div>
-                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">Hermes</h3>
-                  <p className="text-sm text-[var(--text-muted)] mb-3">
-                    Smart AI agent that remembers context across conversations and learns over time.
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {['Long-term memory', '40+ built-in tools', 'Self-improving'].map(f => (
-                      <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-hover)] text-[var(--text-secondary)] border border-[var(--border-default)]">{f}</span>
-                    ))}
-                  </div>
-                </motion.button>
-
-                {/* ElizaOS */}
-                <motion.button
-                  whileHover={cardHover}
-                  onClick={() => setSelectedFramework('elizaos')}
-                  className={cn(
-                    'p-6 rounded-xl border text-left transition-all duration-200 relative',
-                    selectedFramework === 'elizaos'
-                      ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-[0_0_24px_rgba(6,182,212,0.15)]'
-                      : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.4)]'
-                  )}
-                >
-                  {selectedFramework === 'elizaos' && (
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
-                      className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[var(--accent-600)] flex items-center justify-center">
-                      <Check className="w-4 h-4 text-white" />
-                    </motion.div>
-                  )}
-                  <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center mb-4">
-                    <Bot className="w-6 h-6 text-cyan-400" />
-                  </div>
-                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">ElizaOS</h3>
-                  <p className="text-sm text-[var(--text-muted)] mb-3">
-                    Open-source multi-agent framework by ai16z. 90+ plugins, persistent memory, Web3 native.
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {['90+ plugins', 'Vector memory', 'Web3 native'].map(f => (
-                      <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-hover)] text-[var(--text-secondary)] border border-[var(--border-default)]">{f}</span>
-                    ))}
-                  </div>
-                </motion.button>
-
-                {/* Milady */}
-                <motion.button
-                  whileHover={cardHover}
-                  onClick={() => setSelectedFramework('milady')}
-                  className={cn(
-                    'p-6 rounded-xl border text-left transition-all duration-200 relative',
-                    selectedFramework === 'milady'
-                      ? 'bg-[#f43f5e]/10 border-[#f43f5e] shadow-[0_0_24px_rgba(244,63,94,0.15)]'
-                      : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(244,63,94,0.4)]'
-                  )}
-                >
-                  {selectedFramework === 'milady' && (
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
-                      className="absolute top-4 right-4 w-6 h-6 rounded-full bg-[#f43f5e] flex items-center justify-center">
-                      <Check className="w-4 h-4 text-white" />
-                    </motion.div>
-                  )}
-                  <div className="w-12 h-12 rounded-xl bg-rose-500/10 flex items-center justify-center mb-4">
-                    <Gem className="w-6 h-6 text-rose-400" />
-                  </div>
-                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">Milady</h3>
-                  <p className="text-sm text-[var(--text-muted)] mb-3">
-                    Privacy-first AI runtime with 20+ connectors, VRM avatars, and DeFi integration.
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {['20+ connectors', 'Personality presets', 'Privacy-first'].map(f => (
-                      <span key={f} className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-hover)] text-[var(--text-secondary)] border border-[var(--border-default)]">{f}</span>
-                    ))}
-                  </div>
-                </motion.button>
+                {([
+                  { key: 'openclaw', name: 'OpenClaw', icon: Cpu, desc: 'Versatile AI assistant with thousands of community skills and multi-channel messaging.', features: ['Thousands of skills', 'Web browsing', 'Scheduled tasks'] },
+                  { key: 'hermes', name: 'Hermes', icon: Zap, desc: 'Smart AI agent that remembers context across conversations and learns over time.', features: ['Long-term memory', '40+ built-in tools', 'Self-improving'] },
+                  { key: 'elizaos', name: 'ElizaOS', icon: Bot, desc: 'Open-source multi-agent framework by ai16z. 90+ plugins, persistent memory, Web3 native.', features: ['90+ plugins', 'Vector memory', 'Web3 native'] },
+                  { key: 'milady', name: 'Milady', icon: Gem, desc: 'Privacy-first AI runtime with 20+ connectors, VRM avatars, and DeFi integration.', features: ['20+ connectors', 'Personality presets', 'Privacy-first'] },
+                ] as const).map((fw) => {
+                  const selected = selectedFramework === fw.key;
+                  return (
+                    <motion.button
+                      key={fw.key}
+                      whileHover={cardHover}
+                      onClick={() => setSelectedFramework(fw.key)}
+                      className={cn(
+                        'p-6 rounded-xl border text-left transition-colors relative',
+                        selected
+                          ? 'bg-[var(--color-accent)]/5 border-[var(--color-accent)]'
+                          : 'bg-[var(--bg-card)]/40 border-[var(--border-default)] hover:border-[var(--border-hover)]'
+                      )}
+                    >
+                      {selected && (
+                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
+                          className="absolute top-4 right-4 w-5 h-5 rounded-full bg-[var(--color-accent)] flex items-center justify-center">
+                          <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                        </motion.div>
+                      )}
+                      <fw.icon className={cn('w-5 h-5 mb-4 transition-colors', selected ? 'text-[var(--color-accent)]' : 'text-[var(--text-muted)]')} strokeWidth={1.75} />
+                      <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-1.5">{fw.name}</h3>
+                      <p className="text-sm text-[var(--text-secondary)] mb-4 leading-relaxed">{fw.desc}</p>
+                      <p className="text-xs text-[var(--text-muted)]">{fw.features.join(' · ')}</p>
+                    </motion.button>
+                  );
+                })}
               </div>
 
               <div className="mt-8 flex justify-end">

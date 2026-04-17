@@ -424,17 +424,18 @@ export default function MyAgentsPage() {
           variants={cardVariants}
         >
           <div>
-            <h1 className="text-2xl font-bold text-[var(--text-primary)]">My Agents</h1>
-            <p className="text-sm mt-0.5 text-[var(--text-secondary)]">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Dashboard</p>
+            <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>My agents</h1>
+            <p className="text-sm mt-2 text-[var(--text-secondary)]">
               {agents.length === 0
-                ? 'Create your first agent to get started'
-                : `${agents.length} agent${agents.length !== 1 ? 's' : ''} total, ${activeCount} active`}
+                ? 'Create your first agent to get started.'
+                : `${agents.length} agent${agents.length !== 1 ? 's' : ''} total · ${activeCount} active`}
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/create" className="btn-primary text-sm" data-tour="create-agent">
+            <Link href="/create" className="inline-flex items-center gap-2 h-10 px-4 rounded-md bg-[var(--text-primary)] text-[var(--bg-base)] text-sm font-semibold hover:opacity-90 transition-opacity" data-tour="create-agent">
               <PlusCircle size={16} />
-              Create Agent
+              Create agent
             </Link>
           </div>
         </motion.div>

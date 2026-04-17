@@ -378,8 +378,9 @@ export default function SettingsPage() {
       <div className="max-w-4xl mx-auto relative">
         {/* ── Page header ─────────────────────────────────── */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-[var(--text-primary)]" style={displayFont}>Settings</h1>
-          <p className="text-sm mt-1 text-[var(--text-secondary)]">Manage your account, security, and preferences</p>
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Account</p>
+          <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={displayFont}>Settings</h1>
+          <p className="text-sm mt-2 text-[var(--text-secondary)]">Manage your account, security, and preferences.</p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">

@@ -867,13 +867,15 @@ export default function BillingPage() {
       </motion.div>
 
       <div className="flex items-center justify-between gap-4 flex-wrap mb-8">
-        <motion.h1
-          className="text-3xl font-bold text-[var(--text-primary)]"
-          style={displayFont}
-          variants={itemVariants}
-        >
-          Billing &amp; Plans
-        </motion.h1>
+        <motion.div variants={itemVariants}>
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Account</p>
+          <h1
+            className="text-3xl font-bold tracking-tight text-[var(--text-primary)]"
+            style={displayFont}
+          >
+            Billing &amp; plans
+          </h1>
+        </motion.div>
 
         {/* Wallet pill dropdown — connected state shows the address pill;
             clicking it toggles a menu with Switch + Disconnect. Disconnected
