@@ -1019,11 +1019,11 @@ export default function BillingPage() {
                 }}
               >
                 {currentTier === 'founding_member' ? (
-                  <Crown className="w-7 h-7 text-[#e11d48]" />
+                  <Crown className="w-7 h-7 text-[var(--color-accent)]" />
                 ) : currentTier === 'pro' ? (
                   <Crown className="w-7 h-7 text-[var(--color-accent)]" />
                 ) : currentTier === 'business' ? (
-                  <Crown className="w-7 h-7 text-[#ec4899]" />
+                  <Crown className="w-7 h-7 text-[var(--color-accent)]" />
                 ) : currentTier === 'starter' ? (
                   <Zap className="w-7 h-7 text-[var(--color-accent)]" />
                 ) : (

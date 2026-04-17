@@ -53,7 +53,7 @@ function TierBadge({ tier }: { tier: string }) {
     basic: 'bg-purple-500/15 text-purple-400 border-purple-500/30', // legacy alias
     pro: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
     business: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-    founding_member: 'bg-gradient-to-r from-[#e11d48]/15 to-[#be123c]/15 text-[#e11d48] border-[#e11d48]/30',
+    founding_member: 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] border-[var(--color-accent)]/30',
   };
   const labels: Record<string, string> = { founding_member: 'Founding' };
   return (
