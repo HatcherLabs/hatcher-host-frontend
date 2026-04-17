@@ -388,12 +388,12 @@ export default function PricingPage() {
                         exit={{ opacity: 0, y: 8 }}
                         transition={{ duration: 0.2 }}
                       >
-                        {displayPrice === 0 ? 'Free' : `$${displayPrice}`}
+                        {displayPrice === 0 ? '$0' : `$${displayPrice}`}
                       </motion.span>
                     </AnimatePresence>
-                    {displayPrice > 0 && (
-                      <span className="text-sm text-[var(--text-muted)]">{isLifetime ? ' once' : '/mo'}</span>
-                    )}
+                    <span className="text-sm text-[var(--text-muted)]">
+                      {displayPrice === 0 ? '/mo' : isLifetime ? ' once' : '/mo'}
+                    </span>
                   </div>
                   {annualTotal && (
                     <p className="text-[10px] text-[var(--text-muted)] mt-1">
