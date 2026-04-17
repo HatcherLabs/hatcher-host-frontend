@@ -292,101 +292,86 @@ export default function FrameworksPage() {
     <div className="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl space-y-20">
 
-        {/* ── Hero ──────────────────────────────────────────────── */}
-        <motion.div initial="hidden" animate="visible" variants={fadeUp} className="text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5 px-4 py-1.5 text-sm font-medium text-[var(--color-accent)]">
-            <Layers className="h-4 w-4" />
-            Framework Comparison
-          </div>
-          <h1 className="font-[var(--font-display)] text-4xl font-extrabold tracking-tight text-[var(--text-primary)] sm:text-5xl">
+        {/* ── Hero — editorial, left-aligned ───────────────────── */}
+        <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Frameworks</p>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] text-[var(--text-primary)] max-w-3xl" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
             Pick the right framework
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-[var(--text-secondary)]">
+          <p className="mt-5 max-w-2xl text-lg text-[var(--text-secondary)] leading-relaxed">
             Hatcher supports 4 battle-tested agent frameworks. Each has unique strengths — here&apos;s how to choose.
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center gap-5">
             <Link
-              href="/create"
-              className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[var(--color-accent)]/20 transition-all duration-200 hover:bg-[#0891b2]"
+              href="/register"
+              className="inline-flex items-center gap-2 h-11 px-5 rounded-md bg-[var(--text-primary)] text-[var(--bg-base)] text-sm font-semibold hover:opacity-90 transition-opacity"
             >
-              <Rocket className="h-4 w-4" />
               Deploy an agent
+              <ArrowRight className="h-4 w-4" />
             </Link>
             <a
               href="https://docs.hatcher.host/frameworks"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] px-5 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-200 hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]"
+              className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors inline-flex items-center gap-1.5 group"
             >
-              <ExternalLink className="h-4 w-4" />
               Full docs
+              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
             </a>
           </div>
         </motion.div>
 
-        {/* ── Framework cards overview ───────────────────────── */}
+        {/* ── Framework cards overview — unified editorial cards ─── */}
         <section>
-          <motion.h2
+          <motion.p
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.3 }}
-            className="mb-6 text-xl font-bold text-[var(--text-primary)]"
+            className="mb-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]"
           >
             At a glance
-          </motion.h2>
+          </motion.p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {FRAMEWORKS.map((fw) => (
               <motion.div
                 key={fw.key}
-                whileHover={{ y: -3 }}
-                transition={{ duration: 0.2 }}
-                className={cn(
-                  'group relative flex flex-col rounded-2xl border bg-[var(--bg-card)] p-5 backdrop-blur-sm transition-all duration-300 hover:shadow-lg cursor-default',
-                  fw.border
-                )}
-                style={{ '--glow': fw.glow } as React.CSSProperties}
+                initial={{ y: 20 }}
+                whileInView={{ y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ duration: 0.4 }}
+                className="relative flex flex-col rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)]/40 p-5 hover:border-[var(--border-hover)] transition-colors"
               >
-                {/* Glow on hover */}
-                <div
-                  className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                  style={{ boxShadow: `0 0 40px ${fw.glow}` }}
-                />
-
-                <div className="relative">
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="text-3xl">{fw.emoji}</span>
-                    <span className={cn('rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide', fw.complexityColor)}>
-                      {fw.complexity}
-                    </span>
-                  </div>
-
-                  <h3 className={cn('mb-1 text-lg font-bold', fw.text)}>{fw.name}</h3>
-                  <p className="mb-3 text-xs text-[var(--text-muted)]">{fw.tagline}</p>
-
-                  <p className="mb-4 text-xs leading-relaxed text-[var(--text-secondary)]">
-                    {fw.bestFor}
-                  </p>
-
-                  <div className="mb-4 space-y-1">
-                    {fw.features.filter(f => f.supported).slice(0, 3).map((feat) => (
-                      <div key={feat.name} className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
-                        <Check className={cn('h-3 w-3 flex-shrink-0', fw.text)} />
-                        {feat.name}
-                      </div>
-                    ))}
-                  </div>
-
-                  <a
-                    href={fw.docsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={cn('inline-flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-80', fw.text)}
-                  >
-                    Docs
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
+                <div className="mb-4 flex items-center justify-between">
+                  <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-[var(--text-muted)]">{fw.name}</p>
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)]">
+                    {fw.complexity}
+                  </span>
                 </div>
+
+                <p className="text-sm font-medium text-[var(--text-primary)] mb-2">{fw.tagline}</p>
+                <p className="mb-4 text-[13px] leading-relaxed text-[var(--text-secondary)] flex-1">
+                  {fw.bestFor}
+                </p>
+
+                <div className="mb-4 space-y-1.5">
+                  {fw.features.filter(f => f.supported).slice(0, 3).map((feat) => (
+                    <div key={feat.name} className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)]">
+                      <Check className="h-3.5 w-3.5 flex-shrink-0 text-[var(--color-accent)]" strokeWidth={2.5} />
+                      {feat.name}
+                    </div>
+                  ))}
+                </div>
+
+                <a
+                  href={fw.docsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-accent)] hover:underline underline-offset-2 mt-auto"
+                >
+                  Docs
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </a>
               </motion.div>
             ))}
           </div>

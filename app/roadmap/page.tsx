@@ -132,15 +132,13 @@ export default function RoadmapPage() {
     <main className="min-h-screen">
       <div className="mx-auto max-w-2xl px-4 sm:px-6 py-16 sm:py-20">
 
-        {/* Header */}
+        {/* Header — editorial eyebrow matches the rest of the site */}
         <div className="mb-14">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 tracking-wide">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              LIVE
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-400 inline-flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Live
+          </p>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[var(--text-primary)] mb-4 tracking-tight leading-[1.05]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
             Roadmap
           </h1>
           <p className="text-[var(--text-secondary)] text-base leading-relaxed">

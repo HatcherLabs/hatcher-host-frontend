@@ -4,14 +4,15 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { api } from '@/lib/api';
 import { track } from '@/lib/analytics';
-import { Zap, Layers, Rocket } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
   const { login, isAuthenticated, isLoading, error, clearError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [stats, setStats] = useState<{ totalUsers: number; totalAgents: number; activeAgents: number } | null>(null);
   const didSubmit = useRef(false);
 
   useEffect(() => {
@@ -20,6 +21,12 @@ export default function LoginPage() {
       router.push('/dashboard');
     }
   }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    api.getPlatformStats().then((res) => {
+      if (res.success) setStats({ totalUsers: res.data.totalUsers, totalAgents: res.data.totalAgents, activeAgents: res.data.activeAgents });
+    }).catch(() => { /* silent — stats are decorative */ });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,42 +40,39 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] flex items-stretch">
-      {/* Left panel — value propositions (hidden on mobile) */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-16 bg-[var(--bg-card)] border-r border-[var(--border-default)]">
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Hatcher</h2>
-          <p className="text-sm text-[var(--text-muted)]">Managed AI agent hosting platform</p>
+      {/* Left panel — editorial proof (hidden on mobile). Replaces the
+          3-icon-card pattern with a punchline + live platform stats pulled
+          from /stats — real numbers beat generic value props. */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between px-16 py-16 bg-[var(--bg-card)] border-r border-[var(--border-default)]">
+        <div>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Hatcher</p>
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.05] text-[var(--text-primary)] max-w-md" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+            Hatch your{' '}<span className="text-[var(--color-accent)]">AI agent.</span>
+          </h2>
+          <p className="mt-5 text-[15px] text-[var(--text-secondary)] leading-relaxed max-w-md">
+            Pick a framework. Configure. Launch in 60 seconds. No code, no infrastructure.
+          </p>
         </div>
 
-        <div className="space-y-8">
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center flex-shrink-0">
-              <Rocket className="w-5 h-5 text-[var(--color-accent)]" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Deploy AI agents in 60 seconds</h3>
-              <p className="text-xs text-[var(--text-muted)] leading-relaxed">Pick a framework, configure your agent, and launch. No infrastructure to manage.</p>
-            </div>
+        <div className="grid grid-cols-3 gap-8 pt-8 border-t border-[var(--border-default)] max-w-md">
+          <div>
+            <p className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] tabular-nums">
+              {stats ? stats.totalUsers.toLocaleString() : '—'}
+            </p>
+            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">Users</p>
           </div>
-
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center flex-shrink-0">
-              <Layers className="w-5 h-5 text-[var(--color-accent)]" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">4 frameworks, 20+ platforms</h3>
-              <p className="text-xs text-[var(--text-muted)] leading-relaxed">OpenClaw, Hermes, ElizaOS, and more. Connect to Telegram, Discord, WhatsApp, Slack, and others.</p>
-            </div>
+          <div>
+            <p className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] tabular-nums">
+              {stats ? stats.totalAgents.toLocaleString() : '—'}
+            </p>
+            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">Agents</p>
           </div>
-
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center flex-shrink-0">
-              <Zap className="w-5 h-5 text-green-400" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Free tier available</h3>
-              <p className="text-xs text-[var(--text-muted)] leading-relaxed">Start with a free agent. Bring your own LLM key for unlimited messages at no extra cost.</p>
-            </div>
+          <div>
+            <p className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] tabular-nums flex items-baseline gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse self-center" />
+              {stats ? stats.activeAgents.toLocaleString() : '—'}
+            </p>
+            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">Online now</p>
           </div>
         </div>
       </div>

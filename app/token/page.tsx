@@ -56,23 +56,22 @@ export default function TokenPage() {
     <div className="relative overflow-hidden min-h-screen">
       {/* ── HERO ───────────────────────────────────────────── */}
       <section className="relative py-28 md:py-36 px-4 text-center">
-        {/* Background glows */}
+        {/* Single subtle background glow — toned down from 3-layer
+            gradient stack to one restrained radial. */}
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[550px] rounded-full bg-gradient-to-br from-[var(--color-accent)]/12 via-[var(--color-accent)]/6 to-transparent blur-3xl" />
-          <div className="absolute top-20 right-1/4 w-[400px] h-[400px] rounded-full bg-[#0891b2]/5 blur-3xl" />
-          <div className="absolute -bottom-20 left-1/4 w-[300px] h-[300px] rounded-full bg-[var(--color-accent)]/4 blur-3xl" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full bg-[var(--color-accent)]/8 blur-3xl" />
         </div>
 
         <div className="mx-auto max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={fadeUpTransition}
-            className="mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#14F195]/25 bg-[#14F195]/8 text-[#14F195] text-sm font-medium"
+            className="mb-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#14F195] inline-flex items-center gap-2 justify-center"
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#14F195] animate-pulse" />
             Live on Solana
-          </motion.div>
+          </motion.p>
 
           {/* Token hero logo — Hatcher mascot cropped into a round coin
               shape so it reads as "token" rather than a rectangular
@@ -114,9 +113,10 @@ export default function TokenPage() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...fadeUpTransition, delay: 0.06 }}
-            className="text-5xl md:text-7xl font-extrabold mb-5 tracking-tight"
+            className="text-5xl md:text-7xl font-bold mb-5 tracking-tight text-[var(--text-primary)]"
+            style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
-            <span className="text-[var(--text-primary)]">$HATCHER</span>
+            $HATCHER
           </motion.h1>
 
           <motion.p

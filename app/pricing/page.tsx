@@ -273,40 +273,43 @@ export default function PricingPage() {
           glow is now scoped to the hero section itself so content below
           sits on the normal page background, same as every other
           dashboard page. */}
-      <div className="mx-auto max-w-7xl px-4 pt-6 sm:pt-10 pb-16 relative">
-        {/* HERO */}
-        <div className="text-center mb-16 relative">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.12),transparent_60%)] pointer-events-none" />
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#8b5cf6]/10 border border-[#8b5cf6]/20 text-[#8b5cf6] text-xs font-medium mb-6">
-            <Sparkles className="w-3.5 h-3.5" />
-            Simple, Transparent Pricing
-          </div>
+      <div className="mx-auto max-w-7xl px-4 pt-12 sm:pt-16 pb-16 relative">
+        {/* HERO — editorial, left-aligned, consistent with landing */}
+        <div className="mb-14">
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]"
+          >
+            Pricing
+          </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="text-4xl sm:text-5xl font-extrabold mb-5 relative text-[var(--text-primary)]"
+            className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] mb-5 text-[var(--text-primary)] max-w-3xl"
+            style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
-            Choose Your Plan
+            Choose your plan
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="text-[var(--text-secondary)] text-lg max-w-2xl mx-auto leading-relaxed relative"
+            className="text-lg text-[var(--text-secondary)] max-w-2xl leading-relaxed"
           >
-            Start free with any framework. Scale when you are ready.
-            All integrations included on every tier. BYOK always unlimited.
+            Start free with any framework. Scale when ready. All integrations included on every tier. BYOK always unlimited.
           </motion.p>
 
-          {/* Monthly / Annual toggle — annual = 15% off (pay for ~10.2 months, get 12) */}
-          <div className="inline-flex items-center gap-3 mt-8 p-1 rounded-full bg-[var(--bg-card)] border border-[var(--border-default)]">
+          {/* Monthly / Annual toggle — segmented control, editorial square */}
+          <div className="inline-flex items-center mt-8 p-1 rounded-md bg-[var(--bg-card)] border border-[var(--border-default)]">
             <button
               onClick={() => setIsAnnual(false)}
               className={cn(
-                'px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200',
+                'px-4 py-1.5 rounded text-[13px] font-semibold transition-colors',
                 !isAnnual
-                  ? 'bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm'
+                  ? 'bg-[var(--bg-base)] text-[var(--text-primary)]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
               )}
             >
@@ -315,78 +318,62 @@ export default function PricingPage() {
             <button
               onClick={() => setIsAnnual(true)}
               className={cn(
-                'px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-2',
+                'px-4 py-1.5 rounded text-[13px] font-semibold transition-colors flex items-center gap-1.5',
                 isAnnual
-                  ? 'bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm'
+                  ? 'bg-[var(--bg-base)] text-[var(--text-primary)]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
               )}
             >
               Annual
-              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-green-500/15 text-green-400 text-[10px] font-bold leading-none">
-                -15%
-              </span>
+              <span className="text-[10px] font-semibold text-[var(--color-accent)]">−15%</span>
             </button>
           </div>
         </div>
 
-        {/* TIER CARDS */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mb-20">
+        {/* TIER CARDS — unified editorial cards, single accent.
+            Pro highlighted with accent border, Founding with accent eyebrow. */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-20">
           {TIERS_DATA.map((tier) => {
             const isLifetime = tier.key === 'founding_member';
             const monthlyPrice = tier.price;
             const annualMonthlyPrice = monthlyPrice === 0 || isLifetime ? monthlyPrice : parseFloat((monthlyPrice * 0.85).toFixed(2));
             const displayPrice = isLifetime ? monthlyPrice : (isAnnual ? annualMonthlyPrice : monthlyPrice);
             const annualTotal = isAnnual && monthlyPrice > 0 && !isLifetime ? parseFloat((annualMonthlyPrice * 12).toFixed(2)) : null;
-            const billingParam = isLifetime ? 'lifetime' : (isAnnual ? 'annual' : 'monthly');
 
             return (
               <motion.div
                 key={tier.key}
-                whileHover={{ y: -4 }}
-                transition={{ duration: 0.2 }}
+                initial={{ y: 20 }}
+                whileInView={{ y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ duration: 0.4 }}
                 className={cn(
-                  'card glass-noise p-7 flex flex-col relative',
-                  tier.highlighted && 'border-[#8b5cf6]/40 shadow-[0_0_40px_rgba(139,92,246,0.15)]'
+                  'relative rounded-xl p-6 flex flex-col',
+                  tier.highlighted
+                    ? 'border-2 border-[var(--color-accent)] bg-[var(--bg-card)]'
+                    : isLifetime
+                      ? 'border border-[var(--color-accent)]/40 bg-[var(--bg-card)]'
+                      : 'border border-[var(--border-default)] bg-[var(--bg-card)]/40'
                 )}
               >
-                {/* Popular / Founding badge — short pill sits above the
-                    card. The live slot count gets its own row inside the
-                    card body (see below) because it's too wide for the
-                    badge. */}
-                {tier.badge && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                    <span className={cn(
-                      'inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-white text-[11px] font-bold uppercase tracking-wider whitespace-nowrap',
-                      isLifetime
-                        ? 'bg-gradient-to-r from-[#e11d48] to-[#be123c] shadow-[0_0_20px_rgba(225,29,72,0.5)]'
-                        : 'bg-gradient-to-r from-[#8b5cf6] to-[#7c3aed] shadow-[0_0_20px_rgba(139,92,246,0.5)]'
-                    )}>
-                      {isLifetime ? <Gem className="w-3.5 h-3.5" /> : <Crown className="w-3.5 h-3.5" />}
-                      {isLifetime ? 'Limited' : tier.badge}
-                    </span>
-                  </div>
-                )}
+                {/* Header — tier label + optional small badge */}
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-[var(--text-muted)]">{tier.name}</p>
+                  {tier.highlighted && <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">Popular</span>}
+                  {isLifetime && <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">Limited</span>}
+                </div>
 
-                {/* Header */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-2.5 mb-2">
-                    <div
-                      className="w-9 h-9 rounded-lg flex items-center justify-center"
-                      style={{ background: tier.accent + '15', border: `1px solid ${tier.accent}30` }}
-                    >
-                      <div style={{ color: tier.accent }}>{tier.icon}</div>
-                    </div>
-                    <h3 className="text-lg font-bold text-[var(--text-primary)]">{tier.name}</h3>
-                  </div>
-                  <div className="flex items-baseline gap-1.5">
+                {/* Price */}
+                <div className="mb-5">
+                  <div className="flex items-baseline gap-1">
                     <AnimatePresence mode="wait">
                       <motion.span
                         key={`${tier.key}-price-${isAnnual}`}
-                        className="text-3xl font-extrabold text-[var(--text-primary)]"
-                        initial={{ opacity: 0, y: -8 }}
+                        className="text-[32px] font-bold text-[var(--text-primary)] tabular-nums leading-none"
+                        initial={{ opacity: 0, y: -6 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 8 }}
-                        transition={{ duration: 0.2 }}
+                        exit={{ opacity: 0, y: 6 }}
+                        transition={{ duration: 0.18 }}
                       >
                         {displayPrice === 0 ? '$0' : `$${displayPrice}`}
                       </motion.span>
@@ -396,43 +383,31 @@ export default function PricingPage() {
                     </span>
                   </div>
                   {annualTotal && (
-                    <p className="text-[10px] text-[var(--text-muted)] mt-1">
-                      ${annualTotal} billed annually
-                      {' '}
-                      <span className="text-green-400 font-semibold">
-                        (save ${(monthlyPrice * 12 - annualTotal).toFixed(2)})
-                      </span>
+                    <p className="text-[11px] text-[var(--text-muted)] mt-1.5">
+                      ${annualTotal}/year · save ${(monthlyPrice * 12 - annualTotal).toFixed(2)}
                     </p>
                   )}
                   {!isAnnual && monthlyPrice > 0 && !isLifetime && (
-                    <p className="text-[10px] text-[var(--text-muted)] mt-1">
-                      Switch to annual and save 15%
-                    </p>
+                    <p className="text-[11px] text-[var(--text-muted)] mt-1.5">Switch to annual, save 15%</p>
                   )}
                   {isLifetime && (
-                    <p className="text-[10px] text-[#e11d48] font-semibold mt-1">
-                      Pay once, keep forever
-                    </p>
+                    <p className="text-[11px] text-[var(--color-accent)] font-medium mt-1.5">Pay once, keep forever</p>
                   )}
                 </div>
 
-                {/* Founding: live slot availability — dedicated row so
-                    the text has room to breathe and the progress bar is
-                    fully visible (not clipped behind the badge). */}
+                {/* Founding availability */}
                 {isLifetime && (
-                  <div className="mb-5 p-3 rounded-lg bg-[#e11d48]/5 border border-[#e11d48]/20">
+                  <div className="mb-5">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] uppercase tracking-wider font-bold text-[var(--text-muted)]">
-                        Availability
-                      </span>
+                      <span className="text-[10px] uppercase tracking-[0.15em] font-semibold text-[var(--text-muted)]">Availability</span>
                       {foundingRemaining === null ? (
-                        <span className="text-[10px] text-[var(--text-muted)] inline-flex items-center gap-1.5">
+                        <span className="text-[11px] text-[var(--text-muted)] inline-flex items-center gap-1.5">
                           <span className="w-2.5 h-2.5 border-2 border-[var(--text-muted)]/30 border-t-[var(--text-muted)] rounded-full animate-spin" />
-                          Loading…
+                          Loading
                         </span>
                       ) : (
                         <span className={cn(
-                          'text-[11px] font-bold tabular-nums',
+                          'text-[11px] font-semibold tabular-nums',
                           foundingRemaining === 0 ? 'text-red-400'
                             : foundingRemaining <= 3 ? 'text-orange-400'
                             : 'text-[var(--text-primary)]'
@@ -441,71 +416,43 @@ export default function PricingPage() {
                         </span>
                       )}
                     </div>
-                    <div className="relative h-2 rounded-full bg-[var(--bg-elevated)] overflow-hidden">
+                    <div className="relative h-1.5 rounded-full bg-[var(--bg-elevated)] overflow-hidden">
                       {foundingRemaining === null ? (
-                        <div
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-[#e11d48]/40 to-transparent animate-[shimmer_1.4s_ease-in-out_infinite]"
-                          style={{ backgroundSize: '200% 100%' }}
-                        />
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--color-accent)]/40 to-transparent animate-[shimmer_1.4s_ease-in-out_infinite]" style={{ backgroundSize: '200% 100%' }} />
                       ) : (
-                        <div
-                          className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#e11d48] to-[#be123c] transition-all duration-700"
-                          style={{ width: `${((FOUNDING_MEMBER_MAX_SLOTS - foundingRemaining) / FOUNDING_MEMBER_MAX_SLOTS) * 100}%` }}
-                        />
+                        <div className="absolute inset-y-0 left-0 bg-[var(--color-accent)] transition-all duration-700" style={{ width: `${((FOUNDING_MEMBER_MAX_SLOTS - foundingRemaining) / FOUNDING_MEMBER_MAX_SLOTS) * 100}%` }} />
                       )}
                     </div>
                   </div>
                 )}
 
-                {/* Highlights */}
-                <div className="space-y-2.5 flex-1 mb-7">
-                  <FeatureCheck color={tier.accent}>{tier.agents}</FeatureCheck>
-                  <FeatureCheck color={tier.accent}>{tier.messages}</FeatureCheck>
-                  <FeatureCheck color={tier.accent}>{tier.cpu} / {tier.ram}</FeatureCheck>
-                  <FeatureCheck color={tier.accent}>{tier.storage}</FeatureCheck>
-                  <FeatureCheck color={tier.accent}>{tier.sleep}</FeatureCheck>
+                {/* Features */}
+                <div className="space-y-2 flex-1 mb-7">
+                  <FeatureCheck color="var(--color-accent)">{tier.agents}</FeatureCheck>
+                  <FeatureCheck color="var(--color-accent)">{tier.messages}</FeatureCheck>
+                  <FeatureCheck color="var(--color-accent)">{tier.cpu} / {tier.ram}</FeatureCheck>
+                  <FeatureCheck color="var(--color-accent)">{tier.storage}</FeatureCheck>
+                  <FeatureCheck color="var(--color-accent)">{tier.sleep}</FeatureCheck>
                   {tier.features.map((f) => (
-                    <FeatureCheck key={f} color={tier.accent}>{f}</FeatureCheck>
+                    <FeatureCheck key={f} color="var(--color-accent)">{f}</FeatureCheck>
                   ))}
                   {tier.missing.map((f) => (
                     <FeatureMissing key={f}>{f}</FeatureMissing>
                   ))}
                 </div>
 
-                {/* CTA */}
-                {tier.key === 'free' ? (
-                  <Link
-                    href="/register"
-                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all bg-green-600 text-white hover:bg-green-500"
-                  >
-                    <Rocket className="w-4 h-4" />
-                    Get Started Free
-                  </Link>
-                ) : tier.highlighted ? (
-                  <Link
-                    href={`/dashboard/billing?upgrade=${tier.key}`}
-                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all text-white"
-                    style={{
-                      background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
-                      boxShadow: '0 4px 16px rgba(139,92,246,0.35)',
-                    }}
-                  >
-                    <Zap className="w-4 h-4" />
-                    Get {tier.name}
-                  </Link>
-                ) : (
-                  <Link
-                    href={`/dashboard/billing?upgrade=${tier.key}`}
-                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all text-white"
-                    style={{
-                      background: tier.accent,
-                      boxShadow: `0 4px 16px ${tier.accent}40`,
-                    }}
-                  >
-                    <Zap className="w-4 h-4" />
-                    Get {tier.name}
-                  </Link>
-                )}
+                {/* CTA — unified styling, highlighted tiers get solid fill */}
+                <Link
+                  href={tier.key === 'free' ? '/register' : `/dashboard/billing?upgrade=${tier.key}`}
+                  className={cn(
+                    'block text-center font-semibold px-5 py-2.5 rounded-md text-sm transition-opacity',
+                    tier.highlighted || isLifetime
+                      ? 'bg-[var(--text-primary)] text-[var(--bg-base)] hover:opacity-90'
+                      : 'border border-[var(--border-hover)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
+                  )}
+                >
+                  {tier.key === 'free' ? 'Get started' : `Choose ${tier.name}`}
+                </Link>
               </motion.div>
             );
           })}

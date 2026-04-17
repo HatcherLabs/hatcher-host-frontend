@@ -27,8 +27,14 @@ import { DOCS_URL } from '@/lib/config';
 import { FOUNDING_MEMBER_MAX_SLOTS } from '@hatcher/shared';
 
 // ─── Shared animation config ──────────────────────────────────
+// Slide-only animation (no opacity gate). Sections render fully
+// visible in SSR + headless screenshots + reduced-motion users — the
+// scroll-triggered animation is just a polish slide-up, not a
+// visibility prerequisite. Previous opacity:0 caused crawlers, OG
+// preview generators, and static screenshots to see ~2000px of
+// empty page below the hero.
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
-const fadeUp = { initial: { opacity: 0, y: 30 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true } };
+const fadeUp = { initial: { y: 30 }, whileInView: { y: 0 }, viewport: { once: true, amount: 0.1 } };
 
 // ─── Public stats (users / agents / active) ──────────────────
 interface PlatformStats {
@@ -52,9 +58,9 @@ function StatProofCard({
 }) {
   return (
     <div className="card glass-noise p-4 sm:p-5">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.08em] font-semibold block mb-1.5 text-[var(--text-muted)] truncate">
+          <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.08em] font-semibold block mb-1.5 text-[var(--text-muted)] whitespace-nowrap">
             {label}
           </span>
           {loading ? (
@@ -65,8 +71,10 @@ function StatProofCard({
             </span>
           )}
         </div>
+        {/* Icon hidden on xs — mobile cards are ~100px wide and an icon
+            box eats the space we need for the label + value. */}
         <div
-          className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+          className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-xl items-center justify-center flex-shrink-0"
           style={{ background: iconColor + '18' }}
         >
           <Icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: iconColor }} />
@@ -169,9 +177,9 @@ function Typewriter() {
     <span className="relative inline-block align-baseline">
       {/* Invisible spacer reserves space for the longest word so layout never reflows. */}
       <span aria-hidden="true" className="invisible whitespace-nowrap">{LONGEST_WORD}</span>
-      <span className="absolute inset-0 bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent whitespace-nowrap">
+      <span className="absolute inset-0 text-[var(--color-accent)] whitespace-nowrap">
         {displayed}
-        <span className="animate-pulse text-purple-400">|</span>
+        <span className="animate-pulse opacity-70">|</span>
       </span>
     </span>
   );
@@ -258,15 +266,15 @@ function AgentPreview() {
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border border-[var(--border-default)] rounded-xl overflow-hidden bg-[var(--bg-card)] hover:border-[var(--border-hover)] transition-colors">
-      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between gap-4 px-6 py-4 text-left">
-        <span className="text-sm font-medium text-[var(--text-primary)]">{question}</span>
+    <div className="border-b border-[var(--border-default)]">
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between gap-4 py-5 text-left group">
+        <span className="text-base font-semibold text-[var(--text-primary)] group-hover:text-[var(--color-accent)] transition-colors">{question}</span>
         <ChevronDown className={`w-4 h-4 text-[var(--text-muted)] shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
       </button>
       <AnimatePresence initial={false}>
         {open && (
           <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
-            <p className="px-6 pb-4 text-sm text-[var(--text-secondary)] leading-relaxed">{answer}</p>
+            <p className="pb-5 text-[15px] text-[var(--text-secondary)] leading-relaxed max-w-3xl">{answer}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -323,77 +331,66 @@ export default function LandingPage() {
           page (between pricing and FAQ), not as a top banner. This
           gives it room to breathe and show what's included. */}
 
-      {/* ── Token Banner ──────────────────────────────────── */}
-      <div className="w-full bg-gradient-to-r from-[#9945FF]/90 to-[#14F195]/90 text-white text-center py-2.5 px-4 text-sm font-medium">
-        <span className="mr-1">&#x1FA99;</span> <strong>$HATCHER</strong> is live{tokenData && <> — <span className="font-mono">{tokenData.price}</span> · MCap <span className="font-mono">{tokenData.mcap}</span></>} — <span className="hidden sm:inline">CA: <code className="font-mono text-xs bg-white/15 px-1.5 py-0.5 rounded select-all">Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump</code></span> <Link href="/token" className="inline-block underline underline-offset-2 hover:text-white/80 transition-colors ml-1 py-1">Learn more</Link>
+      {/* ── Token Banner — slim editorial line, single live-dot ──── */}
+      <div className="w-full border-b border-[var(--border-default)] bg-[var(--bg-card-solid)] text-[var(--text-secondary)] py-2 px-4 text-[12px] sm:text-[13px]">
+        <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 sm:gap-3 flex-nowrap overflow-hidden">
+          <span className="inline-flex items-center gap-1.5 shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-semibold text-[var(--text-primary)]">$HATCHER</span>
+          </span>
+          {tokenData && (
+            <>
+              <span className="text-[var(--text-muted)] shrink-0">·</span>
+              <span className="font-mono tabular-nums text-[var(--text-primary)] shrink-0">{tokenData.price}</span>
+              <span className="hidden sm:inline text-[var(--text-muted)] shrink-0">MCap</span>
+              <span className="hidden sm:inline font-mono tabular-nums text-[var(--text-primary)] shrink-0">{tokenData.mcap}</span>
+            </>
+          )}
+          <span className="hidden md:inline text-[var(--text-muted)]">·</span>
+          <code className="hidden md:inline font-mono text-[11px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] select-all transition-colors truncate">Cntmo5...zZpump</code>
+          <Link href="/token" className="text-[var(--color-accent)] hover:underline underline-offset-2 shrink-0 ml-auto sm:ml-0">Learn more →</Link>
+        </div>
       </div>
 
       {/* ── 1. HERO ─────────────────────────────────────── */}
       <section className="relative pt-20 sm:pt-28 md:pt-36 pb-20 sm:pb-28 px-4 sm:px-6 overflow-hidden">
-        {/* Ambient glow */}
+        {/* Single subtle ambient — one accent color, calm not busy.
+            Replaces previous purple+cyan radial pair + dot grid + 5 floating
+            emojis (decoration without purpose, AI-slop pattern). */}
         <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'radial-gradient(ellipse 60% 50% at 50% 30%, rgba(139,92,246,0.12), transparent 70%), radial-gradient(ellipse 40% 40% at 70% 60%, rgba(6,182,212,0.06), transparent 60%)',
+          background: 'radial-gradient(ellipse 50% 40% at 50% 30%, rgba(6,182,212,0.06), transparent 70%)',
         }} />
-        <div className="absolute inset-0 pointer-events-none" style={{
-          backgroundImage: 'radial-gradient(circle, rgba(139,92,246,0.15) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-          opacity: 0.3,
-          maskImage: 'radial-gradient(ellipse 70% 50% at 50% 30%, black, transparent)',
-          WebkitMaskImage: 'radial-gradient(ellipse 70% 50% at 50% 30%, black, transparent)',
-        }} />
-
-        {/* Floating platform icons */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {[
-            { icon: '💬', x: '10%', y: '20%', delay: 0, size: 'text-2xl' },
-            { icon: '🤖', x: '85%', y: '15%', delay: 1.5, size: 'text-3xl' },
-            { icon: '📱', x: '75%', y: '70%', delay: 3, size: 'text-2xl' },
-            { icon: '🔗', x: '15%', y: '75%', delay: 2, size: 'text-xl' },
-            { icon: '⚡', x: '50%', y: '10%', delay: 0.8, size: 'text-xl' },
-          ].map((item, i) => (
-            <motion.span
-              key={i}
-              className={`absolute ${item.size} landing-float-emoji`}
-              style={{ left: item.x, top: item.y }}
-              animate={{ y: [0, -15, 0], rotate: [0, 5, -5, 0] }}
-              transition={{ duration: 6, repeat: Infinity, delay: item.delay, ease: 'easeInOut' }}
-            >
-              {item.icon}
-            </motion.span>
-          ))}
-        </div>
 
         <div className="relative z-10 max-w-5xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div>
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }} className="mb-5">
-                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-medium text-purple-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-                  4 AI frameworks, 20+ platforms
-                </span>
-              </motion.div>
+              <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }} className="mb-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
+                Managed AI agent hosting · Crypto-native
+              </motion.p>
 
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease }}
-                className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6"
+                className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] mb-6 text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
                 Hatch Your{' '}<br />
                 <Typewriter />
               </motion.h1>
 
-              <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1, ease }} className="text-lg text-[var(--text-secondary)] leading-relaxed mb-8 max-w-lg">
-                Your personal AI assistant — for crypto, research, customer support, or anything else. Pick a framework, configure, and launch in 60 seconds. No code required.
+              <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1, ease }} className="text-lg text-[var(--text-secondary)] leading-relaxed mb-10 max-w-lg">
+                Pick a framework. Configure. Launch in 60 seconds. No code required, no infrastructure to manage. 4 frameworks, 20+ platforms, free tier with BYOK.
               </motion.p>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2, ease }} className="flex flex-wrap items-center gap-4">
-                <Link href="/register" className="clay-btn-primary clay-btn-lg text-base">
-                  Get Started Free <ArrowRight className="w-4 h-4" />
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2, ease }} className="flex flex-wrap items-center gap-5">
+                <Link href="/register" className="inline-flex items-center gap-2 h-11 px-5 rounded-md bg-[var(--text-primary)] text-[var(--bg-base)] text-sm font-semibold hover:opacity-90 transition-opacity">
+                  Get started free
+                  <ArrowRight className="w-4 h-4" />
                 </Link>
-                <Link href={DOCS_URL} className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-1.5">
-                  View Docs <ArrowRight className="w-3.5 h-3.5" />
+                <Link href={DOCS_URL} className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors inline-flex items-center gap-1.5 group">
+                  Read docs
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </motion.div>
             </div>
@@ -412,40 +409,45 @@ export default function LandingPage() {
 
       {/* ── 2. HOW IT WORKS ─────────────────────────────── */}
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden">
-        <div className="max-w-4xl mx-auto">
-          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+        <div className="max-w-5xl mx-auto">
+          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="mb-16 max-w-2xl">
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">How it works</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
               3 steps. 60 seconds.
             </h2>
-            <p className="mt-4 text-[var(--text-secondary)] max-w-md mx-auto">No coding, no setup guides, no configuration files.</p>
+            <p className="mt-4 text-lg text-[var(--text-secondary)]">No coding, no setup guides, no configuration files.</p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* Editorial numbered rows — typography-led, not card-grid.
+              Big outline numerals carry the rhythm, spacing between rows
+              gives the eye time to land on each step. */}
+          <div className="divide-y divide-[var(--border-default)] border-t border-b border-[var(--border-default)]">
             {[
-              { num: '1', title: 'Pick a Framework', desc: 'OpenClaw, Hermes, ElizaOS, or Milady. Each has unique strengths.' },
-              { num: '2', title: 'Configure', desc: 'Name, personality, integrations. Fill a simple form.' },
-              { num: '3', title: 'Deploy', desc: 'One click. Your agent is live on all connected platforms.' },
+              { num: '01', title: 'Pick a framework', desc: 'OpenClaw, Hermes, ElizaOS, or Milady. Each has unique strengths — browser control, memory, multi-agent, on-chain.' },
+              { num: '02', title: 'Configure', desc: 'Name, personality, integrations. Fill a simple form — no config files, no YAML.' },
+              { num: '03', title: 'Deploy', desc: 'One click. Your agent is live on every connected platform in under 60 seconds.' },
             ].map((step, i) => (
               <motion.div
                 key={step.num}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.15, ease }}
-                className="relative rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-6 hover:border-[var(--border-hover)] transition-colors"
+                initial={{ y: 20 }}
+                whileInView={{ y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ duration: 0.5, delay: i * 0.1, ease }}
+                className="grid grid-cols-[auto_1fr] md:grid-cols-[8rem_1fr_2fr] gap-x-6 md:gap-x-10 py-8"
               >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-cyan-500/20 border border-purple-500/20 flex items-center justify-center mb-4">
-                  <span className="text-sm font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">{step.num}</span>
+                <div className="text-[48px] md:text-[72px] font-bold leading-none text-[var(--text-muted)] opacity-30 tabular-nums" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+                  {step.num}
                 </div>
-                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">{step.title}</h3>
-                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{step.desc}</p>
+                <h3 className="self-center text-xl md:text-2xl font-semibold text-[var(--text-primary)]">{step.title}</h3>
+                <p className="col-start-2 md:col-start-3 self-center text-[15px] text-[var(--text-secondary)] leading-relaxed max-w-xl">{step.desc}</p>
               </motion.div>
             ))}
           </div>
 
-          <motion.div {...fadeUp} transition={{ duration: 0.5, delay: 0.4, ease }} className="text-center mt-10">
-            <Link href="/create" className="text-sm text-[var(--color-accent)] hover:brightness-125 transition-all inline-flex items-center gap-1.5">
-              Try it now <ArrowRight className="w-3.5 h-3.5" />
+          <motion.div {...fadeUp} transition={{ duration: 0.5, delay: 0.2, ease }} className="mt-10">
+            <Link href="/register" className="text-sm font-medium text-[var(--color-accent)] hover:underline underline-offset-4 inline-flex items-center gap-1.5 group">
+              Try it now
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </motion.div>
         </div>
@@ -453,85 +455,96 @@ export default function LandingPage() {
 
       {/* ── USE CASES ─────────────────────────────────── */}
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden">
-        <div className="max-w-4xl mx-auto">
-          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+        <div className="max-w-5xl mx-auto">
+          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="mb-16 max-w-2xl">
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Use cases</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
               What will you hatch?
             </h2>
-            <p className="mt-4 text-[var(--text-secondary)] text-lg max-w-2xl mx-auto">
-              From personal productivity to business automation — your AI agent, your rules.
+            <p className="mt-4 text-lg text-[var(--text-secondary)]">
+              From personal productivity to business automation — your agent, your rules.
             </p>
           </motion.div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Editorial 2-column with asymmetric weight — typography over emoji.
+              Each row: title + inline desc. Lets the reader scan 9 use-cases
+              without each one shouting with decorative color. */}
+          <div className="grid sm:grid-cols-2 gap-x-10 md:gap-x-16 gap-y-1">
             {[
-              { emoji: '🧑‍💼', title: 'Personal Assistant', desc: 'Manage your calendar, emails, and reminders — all from Telegram' },
-              { emoji: '💪', title: 'Fitness Coach', desc: 'Track workouts, suggest routines, and keep you accountable daily' },
-              { emoji: '🍽️', title: 'Food & Nutrition', desc: 'Log meals, count calories, suggest recipes based on your goals' },
-              { emoji: '📈', title: 'Crypto Tracker', desc: 'Monitor token prices, get alerts when your portfolio moves' },
-              { emoji: '📚', title: 'Study Buddy', desc: 'Quiz you on any topic, summarize textbooks, help with homework' },
-              { emoji: '✈️', title: 'Travel Planner', desc: 'Find flights, plan itineraries, and get local recommendations' },
-              { emoji: '💰', title: 'Budget Manager', desc: 'Track expenses, set savings goals, get weekly spending reports' },
-              { emoji: '🔬', title: 'Research Assistant', desc: 'Search the web, summarize articles, compile reports for you' },
-              { emoji: '💬', title: 'Customer Support', desc: 'Answer FAQs on Discord or WhatsApp 24/7 for your business' },
+              { title: 'Personal assistant', desc: 'Calendar, emails, reminders — from Telegram.' },
+              { title: 'Fitness coach', desc: 'Workouts, routines, daily accountability.' },
+              { title: 'Food & nutrition', desc: 'Log meals, count calories, recipe suggestions.' },
+              { title: 'Crypto tracker', desc: 'Token prices, portfolio alerts, on-chain data.' },
+              { title: 'Study buddy', desc: 'Quiz you, summarize textbooks, help with homework.' },
+              { title: 'Travel planner', desc: 'Find flights, plan itineraries, local picks.' },
+              { title: 'Budget manager', desc: 'Track expenses, savings goals, weekly reports.' },
+              { title: 'Research assistant', desc: 'Web search, summarize articles, compile reports.' },
+              { title: 'Customer support', desc: 'Answer FAQs on Discord or WhatsApp, 24/7.' },
             ].map((uc, i) => (
               <motion.div
                 key={uc.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.08, ease }}
-                className="p-5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] hover:border-[var(--border-hover)] transition-colors"
+                initial={{ y: 12 }}
+                whileInView={{ y: 0 }}
+                viewport={{ once: true, amount: 0.05 }}
+                transition={{ duration: 0.4, delay: i * 0.04, ease }}
+                className="grid grid-cols-[auto_1fr] items-baseline gap-4 border-b border-[var(--border-default)]/60 py-5"
               >
-                <span className="text-2xl mb-3 block">{uc.emoji}</span>
-                <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1">{uc.title}</h3>
-                <p className="text-xs text-[var(--text-muted)] leading-relaxed">{uc.desc}</p>
+                <h3 className="text-base font-semibold text-[var(--text-primary)] whitespace-nowrap">{uc.title}</h3>
+                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{uc.desc}</p>
               </motion.div>
             ))}
           </div>
+
+          <motion.p {...fadeUp} transition={{ duration: 0.5, delay: 0.2, ease }} className="mt-10 text-sm text-[var(--text-muted)]">
+            And anything else you can describe in plain English.
+          </motion.p>
         </div>
       </section>
 
       {/* ── 3. FRAMEWORKS ───────────────────────────────── */}
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden" id="frameworks">
-        <div className="max-w-4xl mx-auto">
-          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              4 Frameworks. One Platform.
+        <div className="max-w-5xl mx-auto">
+          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="mb-16 max-w-2xl">
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Frameworks</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+              Four frameworks. One platform.
             </h2>
+            <p className="mt-4 text-lg text-[var(--text-secondary)]">
+              Pick the one that fits your agent. Switch whenever you want.
+            </p>
           </motion.div>
 
-          <div className="space-y-3">
+          <div className="divide-y divide-[var(--border-default)] border-t border-b border-[var(--border-default)]">
             {[
-              { icon: Cpu, name: 'OpenClaw', desc: 'The all-rounder — powerful tools, plugins, and browser control', features: ['2500+ skills', 'Browser automation', 'File management'], color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'hover:border-amber-500/30', href: `${DOCS_URL}/frameworks/openclaw` },
-              { icon: Brain, name: 'Hermes', desc: 'Smart-first design for rich memory and reasoning', features: ['77 bundled skills', 'Deep memory', 'Multi-model'], color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'hover:border-purple-500/30', href: `${DOCS_URL}/frameworks/hermes` },
-              { icon: Bot, name: 'ElizaOS', desc: 'Multi-agent coordination with 90+ plugins', features: ['90+ plugins', 'Multi-agent', 'Knowledge base'], color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'hover:border-cyan-500/30', href: `${DOCS_URL}/frameworks/elizaos` },
-              { icon: Sparkles, name: 'Milady', desc: 'Crypto-native with on-chain awareness', features: ['DeFi tools', 'On-chain data', 'Token tracking'], color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'hover:border-rose-500/30', href: `${DOCS_URL}/frameworks/milady` },
+              { icon: Cpu, name: 'OpenClaw', tag: 'all-rounder', desc: 'Powerful tools, plugins, and browser control.', features: '2500+ skills · Browser automation · File management', href: `${DOCS_URL}/frameworks/openclaw` },
+              { icon: Brain, name: 'Hermes', tag: 'reasoning', desc: 'Smart-first design for rich memory and reasoning.', features: '77 bundled skills · Deep memory · Multi-model', href: `${DOCS_URL}/frameworks/hermes` },
+              { icon: Bot, name: 'ElizaOS', tag: 'multi-agent', desc: 'Multi-agent coordination with 90+ plugins.', features: '90+ plugins · Multi-agent · Knowledge base', href: `${DOCS_URL}/frameworks/elizaos` },
+              { icon: Sparkles, name: 'Milady', tag: 'crypto-native', desc: 'On-chain awareness, DeFi tools, token tracking.', features: 'DeFi tools · On-chain data · Token tracking', href: `${DOCS_URL}/frameworks/milady` },
             ].map((fw, i) => (
               <motion.div
                 key={fw.name}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1, ease }}
+                initial={{ x: -20 }}
+                whileInView={{ x: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ duration: 0.5, delay: i * 0.08, ease }}
               >
                 <Link
                   href={fw.href}
-                  className={`group flex items-center gap-4 p-4 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] ${fw.border} transition-all hover:translate-x-1 duration-200`}
+                  className="group flex items-start gap-4 md:gap-6 py-6 hover:bg-[var(--bg-card)]/40 transition-colors px-2 -mx-2 rounded"
                 >
-                  <div className={`w-10 h-10 rounded-lg ${fw.bg} flex items-center justify-center shrink-0`}>
-                    <fw.icon size={20} className={fw.color} />
+                  <fw.icon size={20} className="text-[var(--text-muted)] group-hover:text-[var(--color-accent)] transition-colors shrink-0 mt-0.5" />
+                  {/* Name + tag stacked so each row has identical height
+                      regardless of tag length ("ALL-ROUNDER" vs "REASONING"
+                      vs "MULTI-AGENT" wrap inconsistently when inline). */}
+                  <div className="w-36 md:w-40 shrink-0">
+                    <h3 className="text-xl md:text-2xl font-semibold text-[var(--text-primary)] leading-tight">{fw.name}</h3>
+                    <span className="block mt-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)] whitespace-nowrap">{fw.tag}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-bold text-[var(--text-primary)]">{fw.name}</h3>
-                    <p className="text-sm text-[var(--text-secondary)] truncate">{fw.desc}</p>
-                    <div className="flex gap-2 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      {fw.features.map((f: string) => (
-                        <span key={f} className={`text-[10px] px-1.5 py-0.5 rounded ${fw.bg} ${fw.color} font-medium`}>{f}</span>
-                      ))}
-                    </div>
+                    <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{fw.desc}</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-1">{fw.features}</p>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-[var(--text-muted)] shrink-0 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--text-primary)] group-hover:translate-x-1 transition-all shrink-0 mt-1.5" />
                 </Link>
               </motion.div>
             ))}
@@ -542,46 +555,37 @@ export default function LandingPage() {
       {/* ── 4. WHY HATCHER ──────────────────────────────── */}
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden" id="features">
         <div className="max-w-4xl mx-auto">
-          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="mb-16 max-w-2xl">
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Platform</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
               Everything your agent needs
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Single-accent feature grid. Icons stroke-only in muted grey,
+              stripe/linear restraint — no colored icon boxes, no 5-color
+              palette shouting. Title + description carry the weight. */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-10">
             {[
-              { icon: Zap, title: 'Instant Deploy', desc: 'From zero to running agent in under 60 seconds', color: 'purple' },
-              { icon: Globe, title: 'All Platforms', desc: 'Telegram, Discord, Twitter, WhatsApp, Slack', color: 'cyan' },
-              { icon: Key, title: 'Bring Your Own Key', desc: 'Use your own LLM API keys for unlimited messages', color: 'amber' },
-              { icon: Shield, title: 'Secure by Default', desc: 'Isolated containers, encrypted secrets, no shared data', color: 'emerald' },
-              { icon: BarChart3, title: 'Live Analytics', desc: 'Real-time stats, usage tracking, performance metrics', color: 'rose' },
-              { icon: MessageSquare, title: 'Chat & Voice', desc: 'Text chat, voice calls, real-time streaming', color: 'purple' },
-            ].map((feature, i) => {
-              const colors: Record<string, { icon: string; iconBg: string; border: string }> = {
-                purple: { icon: 'text-purple-400', iconBg: 'bg-purple-500/10', border: 'hover:border-purple-500/20' },
-                cyan: { icon: 'text-cyan-400', iconBg: 'bg-cyan-500/10', border: 'hover:border-cyan-500/20' },
-                emerald: { icon: 'text-emerald-400', iconBg: 'bg-emerald-500/10', border: 'hover:border-emerald-500/20' },
-                amber: { icon: 'text-amber-400', iconBg: 'bg-amber-500/10', border: 'hover:border-amber-500/20' },
-                rose: { icon: 'text-rose-400', iconBg: 'bg-rose-500/10', border: 'hover:border-rose-500/20' },
-              };
-              const c = colors[feature.color] || colors.purple;
-              return (
-                <motion.div
-                  key={feature.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.08, ease }}
-                  className={`rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-5 ${c.border} transition-colors duration-200`}
-                >
-                  <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-3`}>
-                    <feature.icon className={c.icon} size={18} />
-                  </div>
-                  <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1.5">{feature.title}</h3>
-                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{feature.desc}</p>
-                </motion.div>
-              );
-            })}
+              { icon: Zap, title: 'Instant deploy', desc: 'From zero to running agent in under 60 seconds.' },
+              { icon: Globe, title: 'All platforms', desc: 'Telegram, Discord, Twitter, WhatsApp, Slack.' },
+              { icon: Key, title: 'Bring your own key', desc: 'Use your own LLM API key for unlimited messages on any tier.' },
+              { icon: Shield, title: 'Secure by default', desc: 'Isolated containers, encrypted secrets, no shared data.' },
+              { icon: BarChart3, title: 'Live analytics', desc: 'Real-time stats, usage tracking, performance metrics.' },
+              { icon: MessageSquare, title: 'Chat & voice', desc: 'Text chat, voice calls, real-time streaming — out of the box.' },
+            ].map((feature, i) => (
+              <motion.div
+                key={feature.title}
+                initial={{ y: 20 }}
+                whileInView={{ y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ duration: 0.5, delay: i * 0.05, ease }}
+              >
+                <feature.icon className="w-5 h-5 text-[var(--color-accent)] mb-4" strokeWidth={1.75} />
+                <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1.5">{feature.title}</h3>
+                <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed">{feature.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -589,83 +593,86 @@ export default function LandingPage() {
       {/* ── 5. PRICING ──────────────────────────────────── */}
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden" id="pricing">
         <div className="max-w-5xl mx-auto">
-          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="mb-16 max-w-2xl">
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Pricing</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
               Start free, grow when ready
             </h2>
-            <p className="mt-4 text-[var(--text-secondary)] max-w-lg mx-auto">All platforms included on every plan. Bring your own AI key = unlimited messages.</p>
+            <p className="mt-4 text-lg text-[var(--text-secondary)]">All platforms included on every plan. Bring your own AI key for unlimited messages on any tier.</p>
           </motion.div>
 
+          {/* Unified tier cards — no 4-color tier coding, no neon badges.
+              The Pro tier is marked only by a subtle accent border + a
+              single small "Popular" label (matching the eyebrow typography
+              style used elsewhere). Rest stays calm and scannable. */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               {
-                name: 'Free', price: '$0', sub: 'No credit card', color: 'emerald', highlight: false,
+                name: 'Free', price: '$0', sub: '/month',
                 features: ['1 AI agent', '20 messages/day', 'All platforms', 'Free AI included'],
-                cta: 'Get Started', href: '/register',
+                cta: 'Get started', href: '/register', highlight: false,
               },
               {
-                name: 'Starter', price: '$6.99', sub: '/month', color: 'purple', highlight: false,
+                name: 'Starter', price: '$6.99', sub: '/month',
                 features: ['1 AI agent', '50 messages/day', 'BYOK = unlimited', 'Longer active time'],
-                cta: 'Subscribe', href: '/pricing',
+                cta: 'Choose Starter', href: '/pricing', highlight: false,
               },
               {
-                name: 'Pro', price: '$19.99', sub: '/month', color: 'cyan', highlight: true,
+                name: 'Pro', price: '$19.99', sub: '/month',
                 features: ['3 AI agents', '100 messages/day', 'BYOK = unlimited', 'Dedicated resources'],
-                cta: 'Go Pro', href: '/pricing',
+                cta: 'Choose Pro', href: '/pricing', highlight: true,
               },
               {
-                name: 'Business', price: '$49.99', sub: '/month', color: 'amber', highlight: false,
-                features: ['10 AI agents', '300 messages/day', 'Always-on containers', 'Dedicated resources'],
-                cta: 'Go Business', href: '/pricing',
+                name: 'Business', price: '$49.99', sub: '/month',
+                features: ['10 AI agents', '300 messages/day', 'Always-on containers', 'Priority support'],
+                cta: 'Choose Business', href: '/pricing', highlight: false,
               },
-            ].map((tier, i) => {
-              const colorMap: Record<string, { label: string; check: string; border: string; ctaBg: string }> = {
-                emerald: { label: 'text-emerald-400', check: 'text-emerald-400', border: 'border-[var(--border-default)]', ctaBg: 'border border-[var(--border-hover)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)]' },
-                purple: { label: 'text-purple-400', check: 'text-emerald-400', border: 'border-[var(--border-default)]', ctaBg: 'border border-[var(--border-hover)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)]' },
-                cyan: { label: 'text-cyan-400', check: 'text-cyan-400', border: 'border-cyan-500/30', ctaBg: 'bg-white text-black hover:bg-white/90' },
-                amber: { label: 'text-amber-400', check: 'text-amber-400', border: 'border-amber-500/20', ctaBg: 'bg-amber-500 text-white hover:bg-amber-400' },
-              };
-              const c = colorMap[tier.color];
-              return (
-                <motion.div
-                  key={tier.name}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.1, ease }}
-                  whileHover={{ y: -4 }}
-                  className={`bg-[var(--bg-sidebar)] ${c.border} border rounded-2xl p-6 relative overflow-hidden transition-colors duration-200`}
+            ].map((tier, i) => (
+              <motion.div
+                key={tier.name}
+                initial={{ y: 30 }}
+                whileInView={{ y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ duration: 0.5, delay: i * 0.1, ease }}
+                className={`relative rounded-xl p-6 flex flex-col ${
+                  tier.highlight
+                    ? 'border-2 border-[var(--color-accent)] bg-[var(--bg-card)]'
+                    : 'border border-[var(--border-default)] bg-[var(--bg-card)]/40'
+                } transition-colors`}
+              >
+                <div className="flex items-center justify-between mb-5">
+                  <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-[var(--text-muted)]">{tier.name}</p>
+                  {tier.highlight && <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">Popular</span>}
+                </div>
+                <div className="flex items-baseline gap-1 mb-6">
+                  <span className="text-[32px] font-bold text-[var(--text-primary)] tabular-nums leading-none">{tier.price}</span>
+                  <span className="text-sm text-[var(--text-muted)]">{tier.sub}</span>
+                </div>
+                <ul className="space-y-2.5 mb-8 flex-1">
+                  {tier.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-sm text-[var(--text-secondary)] leading-relaxed">
+                      <Check className="w-4 h-4 text-[var(--color-accent)] shrink-0 mt-0.5" strokeWidth={2.5} />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href={tier.href}
+                  className={`block text-center font-semibold px-5 py-2.5 rounded-md text-sm transition-opacity ${
+                    tier.highlight
+                      ? 'bg-[var(--text-primary)] text-[var(--bg-base)] hover:opacity-90'
+                      : 'border border-[var(--border-hover)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
+                  }`}
                 >
-                  {tier.highlight && <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />}
-                  <div className="flex items-center gap-2 mb-2">
-                    <p className={`text-xs font-semibold tracking-[0.2em] uppercase ${c.label}`}>{tier.name}</p>
-                    {tier.highlight && <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-400 border border-cyan-500/20">POPULAR</span>}
-                  </div>
-                  <div className="flex items-baseline gap-1 mb-1">
-                    <p className="text-3xl font-bold text-[var(--text-primary)]">{tier.price}</p>
-                    {tier.sub !== 'No credit card' && <span className="text-sm text-[var(--text-muted)]">{tier.sub}</span>}
-                  </div>
-                  {tier.sub === 'No credit card' && <p className="text-xs text-emerald-400/70 mb-4">No credit card required</p>}
-                  {tier.sub !== 'No credit card' && <div className="mb-4" />}
-                  <ul className="space-y-2.5 mb-6">
-                    {tier.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)]">
-                        <Check className={`w-3.5 h-3.5 ${c.check} shrink-0`} />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href={tier.href} className={`block text-center font-medium px-6 py-2.5 rounded-full ${c.ctaBg} hover:scale-[1.02] active:scale-[0.97] transition-all duration-200 text-sm`}>
-                    {tier.cta}
-                  </Link>
-                </motion.div>
-              );
-            })}
+                  {tier.cta}
+                </Link>
+              </motion.div>
+            ))}
           </div>
 
-          <p className="text-center text-xs text-[var(--text-muted)] mt-6">
-            Need more agents? Add extras with stackable packs.{' '}
-            <Link href="/pricing" className="text-[var(--color-accent)] hover:underline">See full pricing</Link>
+          <p className="text-sm text-[var(--text-muted)] mt-8">
+            Need more agents, messages, or storage? Add stackable packs — all tiers get add-on flexibility.{' '}
+            <Link href="/pricing" className="text-[var(--color-accent)] hover:underline underline-offset-2">See full pricing →</Link>
           </p>
         </div>
       </section>
@@ -673,23 +680,20 @@ export default function LandingPage() {
       {/* ── 5b. FOUNDING MEMBER ─────────────────────────── */}
       <section className="py-20 sm:py-24 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden relative">
         <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'radial-gradient(ellipse 50% 50% at 50% 50%, rgba(139,92,246,0.12), transparent 70%)',
+          background: 'radial-gradient(ellipse 40% 40% at 50% 50%, rgba(6,182,212,0.05), transparent 70%)',
         }} />
-        <div className="max-w-4xl mx-auto relative">
-          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-[#8b5cf6]/15 to-[#06b6d4]/15 border border-[#8b5cf6]/30 mb-5">
-              <span className="text-lg">👑</span>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-primary)]">Limited offer</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-3">
-              Founding Member
+        <div className="max-w-5xl mx-auto relative">
+          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="mb-12 max-w-2xl">
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">Limited offer · Founding member</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+              Pay once, keep forever.
             </h2>
-            <div className="flex items-baseline justify-center gap-2 mb-3">
-              <span className="text-5xl font-extrabold text-[var(--text-primary)]">$99</span>
+            <div className="mt-6 flex items-baseline gap-2">
+              <span className="text-5xl md:text-6xl font-bold text-[var(--text-primary)] tabular-nums leading-none">$99</span>
               <span className="text-lg text-[var(--text-muted)]">one-time</span>
             </div>
-            <p className="text-[var(--text-secondary)] max-w-xl mx-auto">
-              Pay once, keep forever. No monthly fees. Locked-in price that never changes.
+            <p className="mt-4 text-lg text-[var(--text-secondary)]">
+              Locked-in price, no monthly fees, all Business-tier features forever. Only 20 spots.
             </p>
           </motion.div>
 
@@ -723,7 +727,7 @@ export default function LandingPage() {
                   whileInView={{ width: `${((FOUNDING_MEMBER_MAX_SLOTS - foundingRemaining) / FOUNDING_MEMBER_MAX_SLOTS) * 100}%` }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, ease }}
-                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#8b5cf6] via-[#a855f7] to-[#06b6d4]"
+                  className="absolute inset-y-0 left-0 bg-[var(--color-accent)]"
                 />
               )}
             </div>
@@ -759,23 +763,24 @@ export default function LandingPage() {
                 'Locked-in price forever',
               ].map((item) => (
                 <div key={item} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
-                  <Check className="w-4 h-4 text-green-400 shrink-0 mt-0.5" />
+                  <Check className="w-4 h-4 text-[var(--color-accent)] shrink-0 mt-0.5" strokeWidth={2.5} />
                   <span>{item}</span>
                 </div>
               ))}
             </div>
           </motion.div>
 
-          <motion.div {...fadeUp} transition={{ duration: 0.6, delay: 0.2, ease }} className="text-center">
+          <motion.div {...fadeUp} transition={{ duration: 0.6, delay: 0.2, ease }}>
             <Link
               href="/pricing"
-              className={`inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold text-white transition-all ${
+              className={`inline-flex items-center justify-center gap-2 h-11 px-6 rounded-md font-semibold text-sm transition-opacity ${
                 foundingRemaining === 0
-                  ? 'bg-[var(--text-muted)]/50 pointer-events-none'
-                  : 'bg-gradient-to-r from-[#8b5cf6] to-[#06b6d4] hover:shadow-[0_0_40px_rgba(139,92,246,0.4)] hover:scale-[1.02]'
+                  ? 'bg-[var(--text-muted)]/50 text-[var(--text-muted)] pointer-events-none'
+                  : 'bg-[var(--text-primary)] text-[var(--bg-base)] hover:opacity-90'
               }`}
             >
-              {foundingRemaining === 0 ? 'Sold out' : 'Claim your spot →'}
+              {foundingRemaining === 0 ? 'Sold out' : 'Claim your spot'}
+              {foundingRemaining !== 0 && <ArrowRight className="w-4 h-4" />}
             </Link>
           </motion.div>
         </div>
@@ -783,14 +788,17 @@ export default function LandingPage() {
 
       {/* ── 6. FAQ ──────────────────────────────────────── */}
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden" id="faq">
-        <div className="max-w-3xl mx-auto">
-          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-4">Common questions</h2>
+        <div className="max-w-4xl mx-auto">
+          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="mb-14 max-w-2xl">
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">FAQ</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+              Common questions
+            </h2>
           </motion.div>
 
           <div className="space-y-3">
             {[
-              { q: 'Is it really free?', a: 'Yes. The free plan gives you 1 agent, 10 messages per day, and access to all platforms. No credit card required.' },
+              { q: 'Is it really free?', a: 'Yes. The free plan gives you 1 agent, 20 messages per day, and access to all platforms. No credit card required. BYOK (bring your own LLM key) = unlimited messages on any tier.' },
               { q: 'Do I need to know how to code?', a: 'Not at all! Creating an agent is like filling out a form — choose a name, describe what you want it to do, pick platforms, and launch.' },
               { q: 'What is "Bring Your Own Key"?', a: 'Connect your own OpenAI, Anthropic, Google, or Groq key for unlimited messages. You only pay your AI provider directly.' },
               { q: 'Where does my agent run?', a: 'On our cloud servers 24/7. No need to keep your computer on or install anything.' },
@@ -803,30 +811,31 @@ export default function LandingPage() {
 
       {/* ── 7. FINAL CTA ────────────────────────────────── */}
       <section className="relative py-24 sm:py-32 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] rounded-full bg-purple-500/8 blur-[120px]" />
-          <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] rounded-full bg-cyan-500/5 blur-[80px]" />
-        </div>
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse 50% 40% at 50% 50%, rgba(6,182,212,0.06), transparent 70%)',
+        }} />
         <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="relative z-10 max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] mb-6 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
             Ready to deploy your first agent?
           </h2>
-          <p className="text-lg text-[var(--text-secondary)] mb-10 max-w-lg mx-auto">
-            Get started free — no credit card required.
+          <p className="text-lg text-[var(--text-secondary)] mb-10 max-w-xl mx-auto">
+            Free tier includes 1 agent with 20 messages/day. BYOK = unlimited. No credit card required.
           </p>
-          <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
-            <Link href="/create" className="clay-btn-primary clay-btn-lg text-lg">
-              Create Your Agent <ArrowRight className="w-5 h-5" />
+          <div className="flex flex-wrap items-center justify-center gap-5">
+            <Link href="/register" className="inline-flex items-center gap-2 h-12 px-6 rounded-md bg-[var(--text-primary)] text-[var(--bg-base)] text-sm font-semibold hover:opacity-90 transition-opacity">
+              Create your agent
+              <ArrowRight className="w-4 h-4" />
             </Link>
-          </motion.div>
-          <p className="mt-6 text-xs text-[var(--text-muted)]">
-            Free tier includes 1 agent with 10 messages/day
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[var(--text-muted)]">
-            <span className="flex items-center gap-1.5"><Check className="w-3 h-3 text-emerald-400" /> No credit card</span>
-            <span className="flex items-center gap-1.5"><Check className="w-3 h-3 text-emerald-400" /> Free AI included</span>
-            <span className="flex items-center gap-1.5"><Check className="w-3 h-3 text-emerald-400" /> Deploy in 60s</span>
-            <span className="flex items-center gap-1.5"><Check className="w-3 h-3 text-emerald-400" /> All platforms</span>
+            <Link href="/pricing" className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors inline-flex items-center gap-1.5 group">
+              See pricing
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[var(--text-muted)]">
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[var(--color-accent)]" strokeWidth={2.5} /> No credit card</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[var(--color-accent)]" strokeWidth={2.5} /> Free AI included</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[var(--color-accent)]" strokeWidth={2.5} /> Deploy in 60s</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[var(--color-accent)]" strokeWidth={2.5} /> All platforms</span>
           </div>
         </motion.div>
       </section>
