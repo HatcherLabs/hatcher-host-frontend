@@ -118,12 +118,12 @@ export default function BlogPage() {
           >
             <Link
               href={`/blog/${featuredPost.slug}`}
-              className="group block rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] hover:bg-[var(--bg-card)] hover:border-purple-500/20 transition-all duration-300 overflow-hidden"
+              className="group block rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] hover:border-[var(--color-accent)]/30 transition-colors overflow-hidden"
             >
-              <div className="h-1.5 w-full bg-gradient-to-r from-purple-600/60 via-purple-500/30 to-transparent" />
+              <div className="h-0.5 w-full bg-[var(--color-accent)]/40" />
               <div className="p-6 sm:p-8">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                  <span className="px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20">
                     {featuredPost.category}
                   </span>
                   <span className="text-[11px] text-[var(--text-muted)]">{featuredPost.readTime} read</span>
@@ -171,15 +171,14 @@ export default function BlogPage() {
               >
                 <Link
                   href={`/blog/${post.slug}`}
-                  className="group flex flex-col h-full rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] hover:bg-[var(--bg-card)] hover:border-purple-500/20 transition-all duration-300 overflow-hidden"
+                  className="group flex flex-col h-full rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] hover:border-[var(--color-accent)]/30 transition-colors overflow-hidden"
                 >
-                  {/* Gradient top accent */}
-                  <div className="h-1 w-full bg-gradient-to-r from-purple-600/40 via-purple-500/20 to-transparent" />
+                  <div className="h-0.5 w-full bg-[var(--color-accent)]/30" />
 
                   <div className="flex flex-col flex-1 p-5">
                     {/* Meta */}
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                      <span className="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20">
                         {post.category}
                       </span>
                       <span className="text-[11px] text-[var(--text-muted)]">{post.readTime} read</span>

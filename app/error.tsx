@@ -17,15 +17,8 @@ export default function Error({
   return (
     <div className="min-h-screen bg-[var(--bg-base)] flex items-center justify-center px-4">
       <div className="text-center max-w-md">
-        <div className="mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500/20 to-orange-500/10 border border-red-500/20 flex items-center justify-center mx-auto">
-            <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-            </svg>
-          </div>
-        </div>
-
-        <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mb-3">Something went wrong</h1>
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-red-400">Error</p>
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Something went wrong</h1>
         <p className="text-sm text-[var(--text-secondary)] mb-8 leading-relaxed">
           An unexpected error occurred. Please try again or contact support if the problem persists.
         </p>
@@ -33,15 +26,15 @@ export default function Error({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <button
             onClick={reset}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium px-6 py-2.5 rounded-full text-sm hover:from-purple-500 hover:to-purple-400 transition-all duration-200"
+            className="inline-flex items-center gap-2 h-10 px-5 rounded-md bg-[var(--text-primary)] text-[var(--bg-base)] font-semibold text-sm hover:opacity-90 transition-opacity"
           >
-            Try Again
+            Try again
           </button>
           <Link
             href="/support"
-            className="inline-flex items-center gap-2 border border-[var(--border-hover)] text-[var(--text-secondary)] font-medium px-6 py-2.5 rounded-full text-sm hover:bg-[var(--bg-card)] hover:border-white/20 transition-all duration-200"
+            className="inline-flex items-center gap-2 h-10 px-5 rounded-md border border-[var(--border-hover)] text-[var(--text-secondary)] font-medium text-sm hover:bg-[var(--bg-card)] hover:text-[var(--text-primary)] transition-colors"
           >
-            Contact Support
+            Contact support
           </Link>
         </div>
 

@@ -5,10 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bot, MessageSquare, Settings, Sparkles } from 'lucide-react';
 
 const FRAMEWORKS = [
-  { name: 'OpenClaw', color: 'from-amber-500 to-orange-600' },
-  { name: 'Hermes', color: 'from-purple-500 to-violet-600' },
-  { name: 'ElizaOS', color: 'from-cyan-500 to-blue-600' },
-  { name: 'Milady', color: 'from-pink-500 to-rose-600' },
+  { name: 'OpenClaw' },
+  { name: 'Hermes' },
+  { name: 'ElizaOS' },
+  { name: 'Milady' },
 ];
 
 const TYPING_NAME = 'my-trading-bot';
@@ -21,8 +21,7 @@ function FrameworkScreen() {
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-1.5 mb-3">
-        <Bot className="w-3.5 h-3.5 text-purple-400" />
-        <span className="text-[11px] font-semibold text-purple-400 uppercase tracking-wider">Step 1</span>
+        <span className="text-[11px] font-semibold text-[var(--color-accent)] uppercase tracking-[0.15em]">Step 1</span>
         <span className="text-[11px] text-[var(--text-muted)]">Pick a framework</span>
       </div>
       <div className="grid grid-cols-2 gap-1.5">
@@ -34,14 +33,12 @@ function FrameworkScreen() {
             transition={{ delay: i * 0.12, duration: 0.3 }}
             className={`flex items-center gap-2 p-2 rounded-lg border ${
               i === 0
-                ? 'border-purple-500/40 bg-purple-500/[0.08]'
+                ? 'border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10'
                 : 'border-[var(--border-default)] bg-[var(--bg-card)]'
             }`}
           >
-            <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${fw.color} flex items-center justify-center shrink-0`}>
-              <Bot className="w-3 h-3 text-white" />
-            </div>
-            <span className="text-[11px] font-medium text-white truncate">{fw.name}</span>
+            <Bot className={`w-3.5 h-3.5 shrink-0 ${i === 0 ? 'text-[var(--color-accent)]' : 'text-[var(--text-muted)]'}`} strokeWidth={1.75} />
+            <span className="text-[11px] font-medium text-[var(--text-primary)] truncate">{fw.name}</span>
           </motion.div>
         ))}
       </div>
@@ -205,12 +202,10 @@ export function OnboardingDemo() {
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500/20 to-cyan-500/10 border border-purple-500/20 flex items-center justify-center">
-            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-          </div>
+        <div className="flex items-center gap-2.5">
+          <Sparkles className="w-4 h-4 text-[var(--color-accent)]" strokeWidth={1.75} />
           <div>
-            <h3 className="text-xs font-semibold text-white">How it works</h3>
+            <h3 className="text-xs font-semibold text-[var(--text-primary)]">How it works</h3>
             <p className="text-[10px] text-[var(--text-muted)]">Deploy an agent in 60 seconds</p>
           </div>
         </div>

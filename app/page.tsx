@@ -238,7 +238,7 @@ function AgentPreview() {
             <div
               className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                 msg.role === 'user'
-                  ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-br-md'
+                  ? 'bg-[var(--color-accent)] text-white rounded-br-md'
                   : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-default)] rounded-bl-md'
               }`}
             >
