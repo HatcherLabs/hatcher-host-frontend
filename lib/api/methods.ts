@@ -816,6 +816,46 @@ export const api = {
     }>(`/agents/${id}/hermes-cron`),
 
   /**
+   * Create a Hermes cron job. Proxies to the container's /api/jobs.
+   */
+  createHermesCron: (
+    id: string,
+    body: { name: string; schedule: string; prompt?: string; deliver?: string; skills?: string[]; repeat?: number },
+  ) =>
+    req<{ job: Record<string, unknown> | null }>(
+      `/agents/${id}/hermes-cron`,
+      { method: 'POST', body: JSON.stringify(body) },
+    ),
+
+  /** Delete a Hermes cron job by id. */
+  deleteHermesCron: (id: string, jobId: string) =>
+    req<{ deleted: true }>(
+      `/agents/${id}/hermes-cron/${encodeURIComponent(jobId)}`,
+      { method: 'DELETE' },
+    ),
+
+  /** Pause a Hermes cron job. */
+  pauseHermesCron: (id: string, jobId: string) =>
+    req<{ job: Record<string, unknown> | null }>(
+      `/agents/${id}/hermes-cron/${encodeURIComponent(jobId)}/pause`,
+      { method: 'POST' },
+    ),
+
+  /** Resume a paused Hermes cron job. */
+  resumeHermesCron: (id: string, jobId: string) =>
+    req<{ job: Record<string, unknown> | null }>(
+      `/agents/${id}/hermes-cron/${encodeURIComponent(jobId)}/resume`,
+      { method: 'POST' },
+    ),
+
+  /** Trigger a Hermes cron job to run immediately. */
+  runHermesCron: (id: string, jobId: string) =>
+    req<{ job: Record<string, unknown> | null }>(
+      `/agents/${id}/hermes-cron/${encodeURIComponent(jobId)}/run`,
+      { method: 'POST' },
+    ),
+
+  /**
    * Hermes bundled skills catalog — walks the `skills/` directory in
    * the container and returns categories + individual skill metadata
    * parsed from SKILL.md frontmatter. Managed-mode only.
