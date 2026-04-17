@@ -437,7 +437,7 @@ export default function LandingPage() {
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-cyan-500/20 border border-purple-500/20 flex items-center justify-center mb-4">
                   <span className="text-sm font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">{step.num}</span>
                 </div>
-                <h3 className="text-base font-semibold text-[var(--text-primary)] mb-2">{step.title}</h3>
+                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">{step.title}</h3>
                 <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{step.desc}</p>
               </motion.div>
             ))}
@@ -484,7 +484,7 @@ export default function LandingPage() {
                 className="p-5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] hover:border-[var(--border-hover)] transition-colors"
               >
                 <span className="text-2xl mb-3 block">{uc.emoji}</span>
-                <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">{uc.title}</h3>
+                <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1">{uc.title}</h3>
                 <p className="text-xs text-[var(--text-muted)] leading-relaxed">{uc.desc}</p>
               </motion.div>
             ))}
@@ -523,7 +523,7 @@ export default function LandingPage() {
                     <fw.icon size={20} className={fw.color} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-bold text-[var(--text-primary)]">{fw.name}</h3>
+                    <h3 className="text-base font-bold text-[var(--text-primary)]">{fw.name}</h3>
                     <p className="text-sm text-[var(--text-secondary)] truncate">{fw.desc}</p>
                     <div className="flex gap-2 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                       {fw.features.map((f: string) => (
@@ -577,7 +577,7 @@ export default function LandingPage() {
                   <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-3`}>
                     <feature.icon className={c.icon} size={18} />
                   </div>
-                  <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1.5">{feature.title}</h3>
+                  <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1.5">{feature.title}</h3>
                   <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{feature.desc}</p>
                 </motion.div>
               );
