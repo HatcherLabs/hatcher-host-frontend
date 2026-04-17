@@ -23,7 +23,18 @@ export function getIntegrationsForFramework(framework: string): IntegrationDef[]
 /** Get extra integrations filtered by framework.
  *  Extra platforms use OpenClaw's npm channel extensions — available for openclaw, milady, and hermes (subset). */
 export function getExtraIntegrationsForFramework(framework: string): IntegrationDef[] {
-  if (framework === 'openclaw') return EXTRA_PLATFORM_INTEGRATIONS;
+  if (framework === 'openclaw') {
+    // OpenClaw adapter + init.mjs only wire these 13 channels. Hermes-only
+    // platforms (Signal/Email/SMS/DingTalk/WeCom/Weixin/QQBot/HomeAssistant)
+    // have no OpenClaw equivalent — showing them here would let users paste
+    // credentials that silently get dropped.
+    const openclawSupported = [
+      'extra.twitch', 'extra.irc', 'extra.googlechat', 'extra.msteams',
+      'extra.mattermost', 'extra.line', 'extra.matrix', 'extra.nostr',
+      'extra.feishu', 'extra.zalo', 'extra.nextcloud', 'extra.bluebubbles',
+    ];
+    return EXTRA_PLATFORM_INTEGRATIONS.filter(i => i.stateKey && openclawSupported.includes(i.stateKey));
+  }
   if (framework === 'milady') {
     // Milady supports most extra channels too (built on elizaOS with 29 connectors)
     const miladySupported = ['extra.twitch', 'extra.mattermost', 'extra.line', 'extra.matrix', 'extra.nostr', 'extra.feishu', 'extra.bluebubbles'];
