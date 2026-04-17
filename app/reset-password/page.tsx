@@ -53,7 +53,7 @@ function ResetForm() {
         </p>
         <Link
           href="/login"
-          className="inline-flex items-center justify-center gap-2 w-full h-10 rounded-lg text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-500 transition-colors"
+          className="inline-flex items-center justify-center gap-2 w-full h-10 rounded-lg text-sm font-medium text-white bg-purple-600 hover:bg-purple-500 transition-colors"
         >
           Sign In
         </Link>
@@ -143,7 +143,7 @@ function ResetForm() {
         <button
           type="submit"
           disabled={loading || !passwordValid || !passwordsMatch}
-          className="w-full h-10 rounded-lg text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+          className="w-full h-10 rounded-lg text-sm font-medium text-white bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
         >
           {loading ? (
             <>
