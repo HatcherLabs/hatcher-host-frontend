@@ -72,17 +72,15 @@ export default async function ChangelogPage() {
 
         {/* Header */}
         <div className="mb-12">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 tracking-wide">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              BETA
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-400 inline-flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Beta
+          </p>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] text-[var(--text-primary)] mb-4" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
             Changelog
           </h1>
-          <p className="text-[var(--text-secondary)] text-base leading-relaxed">
-            We ship improvements every day. Here's what's changed.
+          <p className="text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl">
+            We ship improvements every day. Here&apos;s what&apos;s changed.
           </p>
         </div>
 

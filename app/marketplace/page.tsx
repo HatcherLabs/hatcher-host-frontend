@@ -242,18 +242,19 @@ export default function MarketplacePage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <Store className="w-3.5 h-3.5" />
-              Community Templates
+              <Store className="w-3.5 h-3.5 hidden" />
+              <span className="hidden">Community Templates</span>
             </motion.div>
-            <div className="flex items-center justify-center gap-4 mb-3">
-              <h1 className="text-4xl sm:text-5xl font-extrabold text-[var(--text-primary)]">
-                Community Templates
+            <div className="mb-4">
+              <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Marketplace</p>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+                Community templates
               </h1>
             </div>
-            <p className="text-[var(--text-muted)] text-lg max-w-xl mx-auto">
+            <p className="text-lg text-[var(--text-secondary)] max-w-2xl">
               {loading
-                ? 'Loading templates...'
-                : `${total} template${total !== 1 ? 's' : ''} shared by the community`}
+                ? 'Loading templates…'
+                : `${total} template${total !== 1 ? 's' : ''} shared by the community.`}
             </p>
           </div>
         </motion.div>

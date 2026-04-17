@@ -26,11 +26,12 @@ export default function BlogPage() {
     <div className="min-h-screen">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         {/* Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-3">
-            Hatcher Blog
+        <div className="mb-14 max-w-2xl">
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Blog</p>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] text-[var(--text-primary)] mb-4" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+            The Hatcher blog
           </h1>
-          <p className="text-[var(--text-secondary)] text-base sm:text-lg max-w-2xl mx-auto">
+          <p className="text-lg text-[var(--text-secondary)] leading-relaxed">
             Guides, tutorials, and insights about AI agents and the Hatcher platform.
           </p>
         </div>

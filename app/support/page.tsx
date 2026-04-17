@@ -237,20 +237,21 @@ export default function SupportPage() {
         <motion.div variants={itemVariants}>
           <div className="flex items-center gap-3 mb-1">
             <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              className="w-10 h-10 rounded-xl flex items-center justify-center hidden"
               style={{ background: 'rgba(6,182,212,0.12)' }}
             >
               <LifeBuoy size={20} className="text-[var(--color-accent)]" />
             </div>
             <div>
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Help</p>
               <h1
-                className="text-2xl font-bold text-[var(--text-primary)]"
+                className="text-3xl font-bold tracking-tight text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
                 Support
               </h1>
-              <p className="text-sm text-[var(--text-secondary)]">
-                Get help with your agents, billing, or anything else
+              <p className="text-sm text-[var(--text-secondary)] mt-2">
+                Get help with your agents, billing, or anything else.
               </p>
             </div>
           </div>

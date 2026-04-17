@@ -263,19 +263,14 @@ export default function HelpPage() {
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <motion.div variants={cardVariants} className="relative">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(6,182,212,0.06),transparent_60%)] pointer-events-none rounded-2xl" />
-          <div className="flex items-center gap-3 mb-1">
-            <div className="w-10 h-10 rounded-xl bg-[var(--color-accent)]/15 flex items-center justify-center">
-              <LifeBuoy size={20} className="text-[var(--color-accent)]" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-[var(--text-primary)]">
-                Help Center
-              </h1>
-              <p className="text-sm mt-0.5 text-[var(--text-secondary)]">
-                Find answers, browse guides, and get in touch with support
-              </p>
-            </div>
+          <div>
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Resources</p>
+            <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+              Help center
+            </h1>
+            <p className="text-sm mt-2 text-[var(--text-secondary)]">
+              Find answers, browse guides, and get in touch with support.
+            </p>
           </div>
         </motion.div>
 

@@ -19,14 +19,12 @@ export default function PrivacyPolicyPage() {
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         {/* Header */}
         <div className="mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#06b6d4]/10 border border-[#06b6d4]/20 text-[#06b6d4] text-[11px] font-semibold uppercase tracking-wider mb-4">
-            GDPR-aligned
-          </div>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">GDPR-aligned</p>
           <h1
-            className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-3"
+            className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] text-[var(--text-primary)] mb-4"
             style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
-            Privacy Policy
+            Privacy policy
           </h1>
           <p className="text-sm text-[var(--text-muted)]">Last updated: {LAST_UPDATED}</p>
         </div>

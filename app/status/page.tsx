@@ -170,10 +170,11 @@ export default function StatusPage() {
 
       <div className="max-w-4xl mx-auto px-6 py-12 space-y-8">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Platform Status</h1>
-          <p className="text-[var(--text-muted)] text-sm">
-            Real-time health of Hatcher infrastructure
+        <div className="max-w-2xl">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Status</p>
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.05] text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Platform status</h1>
+          <p className="text-[var(--text-secondary)] text-base mt-3">
+            Real-time health of Hatcher infrastructure.
           </p>
         </div>
 

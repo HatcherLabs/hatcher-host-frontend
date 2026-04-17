@@ -24,12 +24,9 @@ export default function ImpressumPage() {
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         {/* Header */}
         <div className="mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#8b5cf6]/10 border border-[#8b5cf6]/20 text-[#8b5cf6] text-[11px] font-semibold uppercase tracking-wider mb-4">
-            <Scale className="w-3 h-3" />
-            Legal Notice
-          </div>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Legal notice</p>
           <h1
-            className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-3"
+            className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] text-[var(--text-primary)] mb-4"
             style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
             Impressum

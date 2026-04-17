@@ -13,17 +13,15 @@ export default function SecurityPage() {
 
         {/* Header */}
         <div className="mb-12">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 tracking-wide">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-              AUDIT OPEN
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-            Security Audit
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-400 inline-flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+            Audit open
+          </p>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] text-[var(--text-primary)] mb-4" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+            Security audit
           </h1>
-          <p className="text-[var(--text-secondary)] text-base leading-relaxed">
-            We're inviting security researchers to audit Hatcher. We host AI agents in Docker containers with LLM access, shell access, and messaging platform connections — and we need to make sure our isolation is bulletproof.
+          <p className="text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl">
+            We&apos;re inviting security researchers to audit Hatcher. We host AI agents in Docker containers with LLM access, shell access, and messaging platform connections — and we need to make sure our isolation is bulletproof.
           </p>
         </div>
 

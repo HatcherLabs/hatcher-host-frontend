@@ -20,15 +20,12 @@ export default function CookiePolicyPage() {
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         {/* Header */}
         <div className="mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f59e0b]/10 border border-[#f59e0b]/20 text-[#f59e0b] text-[11px] font-semibold uppercase tracking-wider mb-4">
-            <Cookie className="w-3 h-3" />
-            Cookie Policy
-          </div>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Legal</p>
           <h1
-            className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)] mb-3"
+            className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] text-[var(--text-primary)] mb-4"
             style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
-            Cookie Policy
+            Cookie policy
           </h1>
           <p className="text-sm text-[var(--text-muted)]">Last updated: {LAST_UPDATED}</p>
         </div>

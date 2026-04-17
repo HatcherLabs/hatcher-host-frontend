@@ -711,18 +711,14 @@ export default function AdminPage() {
           className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
           variants={cardVariants}
         >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[var(--color-accent)]/15 flex items-center justify-center flex-shrink-0">
-              <Shield size={20} className="text-[var(--color-accent)]" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-[var(--text-primary)]">
-                Admin Panel
-              </h1>
-              <p className="text-sm mt-0.5 text-[var(--text-secondary)]">
-                Platform management and controls
-              </p>
-            </div>
+          <div>
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Internal</p>
+            <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+              Admin panel
+            </h1>
+            <p className="text-sm mt-2 text-[var(--text-secondary)]">
+              Platform management and controls.
+            </p>
           </div>
 
           <button
