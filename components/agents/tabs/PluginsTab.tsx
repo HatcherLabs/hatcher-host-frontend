@@ -525,10 +525,15 @@ export function PluginsTab() {
         <GlassCard className="!p-3 flex items-center gap-3 border-amber-500/20">
           <AlertTriangle size={16} className="text-amber-400 shrink-0" />
           <p className="text-sm text-[var(--text-secondary)]">
-            You've reached the limit of {limits.max} plugins.{' '}
+            You've reached the limit of {limits.max} plugin+skill slots for this agent.{' '}
             <a href="/dashboard/settings/billing" className="text-[var(--color-accent)] hover:underline inline-flex items-center gap-0.5">
-              Upgrade <ArrowUpRight size={12} />
+              Upgrade tier <ArrowUpRight size={12} />
             </a>
+            {' '}or buy the{' '}
+            <a href="/dashboard/settings/billing?addon=extra_plugins" className="text-[var(--color-accent)] hover:underline">
+              +10 plugins addon
+            </a>
+            .
           </p>
         </GlassCard>
       )}

@@ -30,7 +30,15 @@ export function getExtraIntegrationsForFramework(framework: string): Integration
     return EXTRA_PLATFORM_INTEGRATIONS.filter(i => i.stateKey && miladySupported.includes(i.stateKey));
   }
   if (framework === 'hermes') {
-    const hermesSupported = ['extra.mattermost', 'extra.matrix'];
+    // Full list of platforms supported by upstream hermes-agent gateway
+    // at the pinned commit. WhatsApp intentionally excluded — pairing
+    // needs a TTY flow the dashboard can't drive yet.
+    const hermesSupported = [
+      'extra.signal', 'extra.matrix', 'extra.email', 'extra.sms',
+      'extra.mattermost', 'extra.bluebubbles', 'extra.homeassistant',
+      'extra.feishu', 'extra.dingtalk', 'extra.wecom', 'extra.weixin',
+      'extra.qqbot',
+    ];
     return EXTRA_PLATFORM_INTEGRATIONS.filter(i => i.stateKey && hermesSupported.includes(i.stateKey));
   }
   return [];
