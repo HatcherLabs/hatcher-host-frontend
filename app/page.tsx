@@ -133,6 +133,9 @@ function HeroStats() {
 
 // ─── Typewriter effect ───────────────────────────────────────
 const TYPEWRITER_WORDS = ['AI Agent', 'Fitness Coach', 'Crypto Tracker', 'Study Buddy', 'Travel Planner', 'Personal Assistant'];
+// Longest word reserves layout space so the headline never reflows mid-cycle
+// (which causes CLS + the trailing chat-preview card to jitter).
+const LONGEST_WORD = TYPEWRITER_WORDS.reduce((a, b) => (b.length > a.length ? b : a));
 
 function Typewriter() {
   const [wordIndex, setWordIndex] = useState(0);
@@ -163,9 +166,13 @@ function Typewriter() {
   const displayed = word.slice(0, charIndex);
 
   return (
-    <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-      {displayed}
-      <span className="animate-pulse text-purple-400">|</span>
+    <span className="relative inline-block align-baseline">
+      {/* Invisible spacer reserves space for the longest word so layout never reflows. */}
+      <span aria-hidden="true" className="invisible whitespace-nowrap">{LONGEST_WORD}</span>
+      <span className="absolute inset-0 bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent whitespace-nowrap">
+        {displayed}
+        <span className="animate-pulse text-purple-400">|</span>
+      </span>
     </span>
   );
 }
