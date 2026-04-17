@@ -247,6 +247,60 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
+        {/* Google Ads — respects Google Consent Mode v2. Defaults both ad_storage
+            and analytics_storage to 'denied' until the user accepts analytics in
+            the cookie banner, which dispatches hatcher:consent-changed. */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-18098396723"
+          strategy="afterInteractive"
+        />
+        <Script id="google-ads-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            window.gtag = gtag;
+            gtag('consent', 'default', {
+              ad_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied',
+              analytics_storage: 'denied',
+            });
+            gtag('js', new Date());
+            gtag('config', 'AW-18098396723');
+            try {
+              var raw = localStorage.getItem('hatcher-cookie-consent');
+              if (raw) {
+                var saved = JSON.parse(raw);
+                if (saved && saved.analytics) {
+                  gtag('consent', 'update', {
+                    ad_storage: 'granted',
+                    ad_user_data: 'granted',
+                    ad_personalization: 'granted',
+                    analytics_storage: 'granted',
+                  });
+                }
+              }
+            } catch (_) {}
+            window.addEventListener('hatcher:consent-changed', function (e) {
+              var detail = (e && e.detail) || {};
+              if (detail.analytics) {
+                gtag('consent', 'update', {
+                  ad_storage: 'granted',
+                  ad_user_data: 'granted',
+                  ad_personalization: 'granted',
+                  analytics_storage: 'granted',
+                });
+              } else {
+                gtag('consent', 'update', {
+                  ad_storage: 'denied',
+                  ad_user_data: 'denied',
+                  ad_personalization: 'denied',
+                  analytics_storage: 'denied',
+                });
+              }
+            });
+          `}
+        </Script>
         <Script src="/register-sw.js" strategy="afterInteractive" />
         <PosthogProvider>
           <ThemeProvider>
