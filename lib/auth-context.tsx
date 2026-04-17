@@ -99,6 +99,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       setError((e as Error).message);
       setAuthed(false);
+      // Re-throw so the caller can distinguish success (→ /verify-email)
+      // from failure (→ stay on form, show inline error).
+      throw e;
     } finally {
       setIsLoading(false);
     }

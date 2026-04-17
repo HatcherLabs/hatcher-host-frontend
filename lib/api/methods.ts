@@ -44,6 +44,17 @@ export const api = {
       body: JSON.stringify({ email, username, password, ...(referralCode ? { referralCode } : {}) }),
     }),
 
+  /** Live check if email / username are already taken. Either param is optional. */
+  checkAvailability: (params: { email?: string; username?: string }) => {
+    const qs = new URLSearchParams();
+    if (params.email) qs.set('email', params.email);
+    if (params.username) qs.set('username', params.username);
+    return req<{
+      email: { taken: boolean; valid: boolean } | null;
+      username: { taken: boolean; valid: boolean } | null;
+    }>(`/auth/check-availability?${qs.toString()}`);
+  },
+
   /** Login with email + password */
   login: (email: string, password: string) =>
     req<{
