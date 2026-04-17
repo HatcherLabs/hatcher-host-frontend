@@ -435,7 +435,7 @@ export default function TeamPage() {
                       className="flex items-center justify-between py-2.5 px-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] hover:border-[var(--border-default)] transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-xs font-bold text-white">
+                        <div className="w-8 h-8 rounded-full bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/30 flex items-center justify-center text-xs font-semibold text-[var(--color-accent)]">
                           {member.user.username.charAt(0).toUpperCase()}
                         </div>
                         <div>

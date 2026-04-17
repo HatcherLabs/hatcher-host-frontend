@@ -244,10 +244,11 @@ export default function AnalyticsPage() {
               <ArrowLeft size={16} />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'Sora, sans-serif' }}>
+              <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Dashboard</p>
+              <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'Sora, sans-serif' }}>
                 Analytics
               </h1>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">Account-wide usage insights</p>
+              <p className="text-xs text-[var(--text-muted)] mt-1">Account-wide usage insights.</p>
             </div>
           </div>
           <button

@@ -308,15 +308,11 @@ export default function ApiKeysPage() {
 
         {/* ── Page header ─────────────────────────────────── */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-1">
-            <div className="w-9 h-9 rounded-xl bg-[var(--primary-500)]/10 border border-[var(--primary-500)]/20 flex items-center justify-center">
-              <Key size={18} className="text-[var(--primary-400)]" />
-            </div>
-            <h1 className="text-2xl font-bold text-[var(--text-primary)]" style={displayFont}>
-              API Keys
-            </h1>
-          </div>
-          <p className="text-sm text-[var(--text-secondary)] ml-12">
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Settings</p>
+          <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={displayFont}>
+            API keys
+          </h1>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
             Manage programmatic access keys for the{' '}
             <Link
               href="https://docs.hatcher.host"
@@ -422,7 +418,7 @@ export default function ApiKeysPage() {
             <button
               onClick={handleCreate}
               disabled={creating || !newLabel.trim()}
-              className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-gradient-to-r from-purple-600 to-purple-500 text-white text-sm font-medium hover:from-purple-500 hover:to-purple-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex-shrink-0"
+              className="inline-flex items-center gap-1.5 h-9 px-4 rounded-md bg-[var(--text-primary)] text-[var(--bg-base)] text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex-shrink-0"
             >
               {creating ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
               {creating ? 'Creating...' : 'Create Key'}

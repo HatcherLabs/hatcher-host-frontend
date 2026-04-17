@@ -209,14 +209,15 @@ export default function NewAgentPage() {
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* ── Header ──────────────────────────────────────── */}
-        <motion.div variants={itemVariants} className="text-center max-w-2xl mx-auto">
+        <motion.div variants={itemVariants} className="max-w-2xl">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">New agent</p>
           <h1
-            className="text-3xl sm:text-4xl font-bold text-white mb-3"
+            className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] mb-3"
             style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
-            Choose a Template
+            Choose a template
           </h1>
-          <p className="text-[var(--text-secondary)] text-sm sm:text-base">
+          <p className="text-[var(--text-secondary)] text-sm sm:text-base leading-relaxed">
             Start from a pre-configured template or build from scratch.
             Each template comes with a personality, system prompt, and suggested integrations.
           </p>
