@@ -43,7 +43,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: 'https://hatcher.host/pricing', lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: 'https://hatcher.host/create', lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: 'https://hatcher.host/token', lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
-    { url: 'https://hatcher.host/marketplace', lastModified: now, changeFrequency: 'daily', priority: 0.7 },
     { url: 'https://hatcher.host/frameworks', lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: 'https://hatcher.host/docs', lastModified: now, changeFrequency: 'weekly', priority: 0.6 },
     { url: 'https://hatcher.host/support', lastModified: now, changeFrequency: 'monthly', priority: 0.5 },

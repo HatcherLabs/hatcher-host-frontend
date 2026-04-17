@@ -6,7 +6,6 @@ const PRODUCT_LINKS = [
   { label: 'Dashboard', href: '/dashboard' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Status', href: '/status' },
-  { label: 'Security', href: '/security' },
 ];
 
 const RESOURCE_LINKS = [
