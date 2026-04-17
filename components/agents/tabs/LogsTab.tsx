@@ -205,7 +205,7 @@ export function LogsTab() {
           </div>
           <Link
             href={`/dashboard/agent/${agent.id}?tab=addons`}
-            className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-gradient-to-r from-[#8b5cf6] to-[#06b6d4] text-white hover:shadow-[0_0_12px_rgba(139,92,246,0.3)] transition-all"
+            className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-[11px] font-semibold bg-[var(--text-primary)] text-[var(--bg-base)] hover:opacity-90 transition-opacity"
           >
             <Sparkles size={11} />
             Unlock

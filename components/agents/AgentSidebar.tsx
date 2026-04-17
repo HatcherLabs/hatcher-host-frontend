@@ -87,13 +87,18 @@ function getTabs(framework?: string): TabDef[] {
   ];
 }
 
+// Flat single-accent avatars — was 4-color gradients
+// (amber / purple / cyan / rose) which created a color-coded
+// framework mosaic across the sidebar. Now uniform cyan-tint so
+// the sidebar reads as one calm surface; framework is signaled
+// by the icon + the agent name, not by color.
 const FRAMEWORK_AVATAR_COLORS: Record<string, { bg: string; text: string }> = {
-  openclaw: { bg: 'from-amber-600 to-amber-400', text: 'text-amber-100' },
-  hermes: { bg: 'from-purple-600 to-purple-400', text: 'text-purple-100' },
-  elizaos: { bg: 'from-cyan-600 to-cyan-400', text: 'text-cyan-100' },
-  milady: { bg: 'from-rose-600 to-rose-400', text: 'text-rose-100' },
+  openclaw: { bg: 'bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/30', text: 'text-[var(--color-accent)]' },
+  hermes:   { bg: 'bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/30', text: 'text-[var(--color-accent)]' },
+  elizaos:  { bg: 'bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/30', text: 'text-[var(--color-accent)]' },
+  milady:   { bg: 'bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/30', text: 'text-[var(--color-accent)]' },
 };
-const DEFAULT_AVATAR = { bg: 'from-slate-600 to-slate-400', text: 'text-slate-100' };
+const DEFAULT_AVATAR = { bg: 'bg-[var(--bg-hover)] border border-[var(--border-default)]', text: 'text-[var(--text-muted)]' };
 
 const FRAMEWORK_ICONS: Record<string, LucideIcon> = {
   openclaw: Cpu,

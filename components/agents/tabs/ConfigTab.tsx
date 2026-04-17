@@ -431,7 +431,7 @@ export function ConfigTab() {
                   type="range" min={0} max={100}
                   value={personality.formality}
                   onChange={(e) => setPersonality(p => ({ ...p, formality: parseInt(e.target.value, 10) }))}
-                  className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-cyan-500/30 to-purple-500/30 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#A78BFA] [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(167,139,250,0.4)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#A78BFA] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+                  className="w-full h-1 rounded-full appearance-none cursor-pointer bg-[var(--border-default)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--color-accent)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[var(--color-accent)] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
                 />
                 <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.formality}</span>
               </div>
@@ -449,7 +449,7 @@ export function ConfigTab() {
                   type="range" min={0} max={100}
                   value={personality.verbosity}
                   onChange={(e) => setPersonality(p => ({ ...p, verbosity: parseInt(e.target.value, 10) }))}
-                  className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-emerald-500/30 to-blue-500/30 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#A78BFA] [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(167,139,250,0.4)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#A78BFA] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+                  className="w-full h-1 rounded-full appearance-none cursor-pointer bg-[var(--border-default)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--color-accent)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[var(--color-accent)] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
                 />
                 <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.verbosity}</span>
               </div>
@@ -467,7 +467,7 @@ export function ConfigTab() {
                   type="range" min={0} max={100}
                   value={personality.creativity}
                   onChange={(e) => setPersonality(p => ({ ...p, creativity: parseInt(e.target.value, 10) }))}
-                  className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-amber-500/30 to-rose-500/30 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#A78BFA] [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(167,139,250,0.4)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#A78BFA] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+                  className="w-full h-1 rounded-full appearance-none cursor-pointer bg-[var(--border-default)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--color-accent)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[var(--color-accent)] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
                 />
                 <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.creativity}</span>
               </div>
@@ -485,7 +485,7 @@ export function ConfigTab() {
                   type="range" min={0} max={100}
                   value={personality.friendliness}
                   onChange={(e) => setPersonality(p => ({ ...p, friendliness: parseInt(e.target.value, 10) }))}
-                  className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-sky-500/30 to-pink-500/30 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#A78BFA] [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(167,139,250,0.4)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#A78BFA] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+                  className="w-full h-1 rounded-full appearance-none cursor-pointer bg-[var(--border-default)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--color-accent)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[var(--color-accent)] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
                 />
                 <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.friendliness}</span>
               </div>
@@ -503,7 +503,7 @@ export function ConfigTab() {
                   type="range" min={0} max={100}
                   value={personality.expertise}
                   onChange={(e) => setPersonality(p => ({ ...p, expertise: parseInt(e.target.value, 10) }))}
-                  className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-gradient-to-r from-teal-500/30 to-indigo-500/30 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#A78BFA] [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(167,139,250,0.4)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#A78BFA] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
+                  className="w-full h-1 rounded-full appearance-none cursor-pointer bg-[var(--border-default)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--color-accent)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[var(--color-accent)] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
                 />
                 <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.expertise}</span>
               </div>

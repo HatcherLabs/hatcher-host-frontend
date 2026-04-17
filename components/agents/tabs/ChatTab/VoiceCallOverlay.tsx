@@ -47,18 +47,8 @@ export function VoiceCallOverlay({ agent, messages, sending, voice, callDuration
       {/* Agent avatar + name */}
       <div className="flex flex-col items-center gap-4 mb-8">
         <div className="relative">
-          <div className={`w-24 h-24 rounded-full bg-gradient-to-br ${
-            agent.framework === 'openclaw' ? 'from-amber-500/20 to-amber-600/10' :
-            agent.framework === 'hermes' ? 'from-purple-500/20 to-purple-600/10' :
-            agent.framework === 'elizaos' ? 'from-cyan-500/20 to-cyan-600/10' :
-            'from-rose-500/20 to-rose-600/10'
-          } flex items-center justify-center border border-white/10`}>
-            <Bot size={40} className={
-              agent.framework === 'openclaw' ? 'text-amber-400' :
-              agent.framework === 'hermes' ? 'text-purple-400' :
-              agent.framework === 'elizaos' ? 'text-cyan-400' :
-              'text-rose-400'
-            } />
+          <div className="w-24 h-24 rounded-full bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/30 flex items-center justify-center">
+            <Bot size={40} className="text-[var(--color-accent)]" strokeWidth={1.75} />
           </div>
           {/* Pulsing ring when listening */}
           {voice.isListening && (
