@@ -233,6 +233,7 @@ export const EXTRA_PLATFORM_INTEGRATIONS: IntegrationDef[] = [
     name: 'Mattermost',
     description: 'Connect to a self-hosted Mattermost instance.',
     secretPrefix: 'MATTERMOST',
+    hasChannelSettings: true,
     fields: [
       { key: 'MATTERMOST_BASE_URL', label: 'Server URL', type: 'text', placeholder: 'https://mattermost.example.com', required: true },
       { key: 'MATTERMOST_BOT_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'Bot access token', helper: 'From Mattermost > Integrations > Bot Accounts', required: true },
@@ -255,6 +256,7 @@ export const EXTRA_PLATFORM_INTEGRATIONS: IntegrationDef[] = [
     name: 'Matrix',
     description: 'Connect to Matrix/Element rooms.',
     secretPrefix: 'MATRIX',
+    hasChannelSettings: true,
     fields: [
       { key: 'MATRIX_HOMESERVER', label: 'Homeserver URL', type: 'text', placeholder: 'https://matrix.org', required: true },
       { key: 'MATRIX_ACCESS_TOKEN', label: 'Access Token', type: 'password', placeholder: 'Bot user access token', helper: 'Create a bot user and get an access token from Element settings' },
@@ -287,6 +289,7 @@ export const EXTRA_PLATFORM_INTEGRATIONS: IntegrationDef[] = [
     name: 'Zalo',
     description: 'Connect your agent to Zalo (popular in Vietnam).',
     secretPrefix: 'ZALO',
+    hasChannelSettings: true,
     fields: [
       { key: 'ZALO_BOT_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'Zalo Bot Token', helper: 'From Zalo Developer Portal', required: true },
     ],
@@ -297,6 +300,7 @@ export const EXTRA_PLATFORM_INTEGRATIONS: IntegrationDef[] = [
     name: 'Nextcloud Talk',
     description: 'Connect to Nextcloud Talk rooms. Requires creating a bot on your Nextcloud server first.',
     secretPrefix: 'NEXTCLOUD_TALK',
+    hasChannelSettings: true,
     fields: [
       { key: 'NEXTCLOUD_TALK_BASE_URL', label: 'Server URL', type: 'text', placeholder: 'https://cloud.example.com', helper: 'Your Nextcloud server base URL', required: true },
       { key: 'NEXTCLOUD_TALK_BOT_SECRET', label: 'Bot Secret', type: 'password', placeholder: 'Shared secret from occ talk:bot:install', helper: 'The shared secret used when creating the bot via occ talk:bot:install', required: true },
@@ -308,6 +312,7 @@ export const EXTRA_PLATFORM_INTEGRATIONS: IntegrationDef[] = [
     name: 'BlueBubbles',
     description: 'iMessage bridge via BlueBubbles (requires macOS server running BlueBubbles app).',
     secretPrefix: 'BLUEBUBBLES',
+    hasChannelSettings: true,
     fields: [
       { key: 'BLUEBUBBLES_SERVER_URL', label: 'Server URL', type: 'text', placeholder: 'http://192.168.1.100:1234', helper: 'BlueBubbles macOS server address', required: true },
       { key: 'BLUEBUBBLES_PASSWORD', label: 'Server Password', type: 'password', placeholder: 'BlueBubbles server password', helper: 'Set in BlueBubbles app web API settings', required: true },
