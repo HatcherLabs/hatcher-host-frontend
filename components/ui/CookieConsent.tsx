@@ -20,7 +20,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { X, Check, Shield, BarChart3, Cookie as CookieIcon } from 'lucide-react';
+import { Shield, BarChart3, Cookie as CookieIcon } from 'lucide-react';
 
 const CONSENT_KEY = 'hatcher-cookie-consent';
 const CONSENT_VERSION = 2; // bump when categories change so the banner re-prompts
@@ -151,6 +151,62 @@ export function CookieConsent() {
 
   if (!visible) return null;
 
+  // Collapsed state: slim full-width bottom bar so we don't block the page
+  // (hero CTAs, form fields, pricing tables). Expanded state: centered card
+  // for the granular controls — invoked explicitly via "Customize", so a
+  // modal-like layout is appropriate there.
+  if (!expanded) {
+    return (
+      <div
+        className="fixed inset-x-0 bottom-0 z-[9999] pointer-events-none"
+        style={{ animation: 'cookieSlideUp 0.35s ease-out' }}
+        role="dialog"
+        aria-label="Cookie consent"
+        aria-modal="false"
+      >
+        <div className="pointer-events-auto border-t border-[var(--border-default)] bg-[var(--bg-card-solid)]/95 backdrop-blur-md shadow-[0_-4px_16px_rgba(0,0,0,0.25)]">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+            <div className="flex items-center gap-2.5 flex-1 min-w-0">
+              <CookieIcon className="w-4 h-4 text-[#f59e0b] shrink-0" />
+              <p className="text-[13px] text-[var(--text-secondary)] leading-snug">
+                We use strictly necessary cookies + optional analytics (PostHog) with your consent.{' '}
+                <Link href="/cookies" className="text-[var(--color-accent)] hover:underline">Cookie Policy</Link>
+                {' · '}
+                <Link href="/privacy" className="text-[var(--color-accent)] hover:underline">Privacy Policy</Link>.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => setExpanded(true)}
+                className="text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors underline underline-offset-2 px-2"
+              >
+                Customize
+              </button>
+              <button
+                onClick={() => persist(false)}
+                className="px-3 py-1.5 rounded-md text-[12px] font-semibold border border-[var(--border-default)] text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+              >
+                Reject optional
+              </button>
+              <button
+                onClick={() => persist(true)}
+                className="px-3 py-1.5 rounded-md text-[12px] font-semibold bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white transition-colors"
+              >
+                Accept all
+              </button>
+            </div>
+          </div>
+        </div>
+        <style jsx global>{`
+          @keyframes cookieSlideUp {
+            from { opacity: 0; transform: translateY(100%); }
+            to   { opacity: 1; transform: translateY(0); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
   return (
     <div
       className="fixed inset-x-0 bottom-0 z-[9999] p-3 sm:p-5 pointer-events-none"
@@ -214,57 +270,28 @@ export function CookieConsent() {
             </div>
           )}
 
-          {/* Buttons — all same weight per EU guidance (accept-all not emphasized over reject-all) */}
+          {/* Buttons (expanded view) — equal weight per EU guidance */}
           <div className="mt-4 flex flex-wrap items-center gap-2 justify-end">
-            {!expanded ? (
-              <>
-                <button
-                  onClick={() => setExpanded(true)}
-                  className="text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors underline underline-offset-2 order-1 sm:order-none"
-                >
-                  Customize
-                </button>
-                <div className="flex gap-2 ml-auto">
-                  <button
-                    onClick={() => persist(false)}
-                    className="px-4 py-2 rounded-lg text-[12px] font-semibold border border-[var(--border-default)] text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-                  >
-                    <X className="w-3 h-3 inline mr-1 -mt-px" />
-                    Reject optional
-                  </button>
-                  <button
-                    onClick={() => persist(true)}
-                    className="px-4 py-2 rounded-lg text-[12px] font-semibold bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white transition-colors"
-                  >
-                    <Check className="w-3 h-3 inline mr-1 -mt-px" />
-                    Accept all
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => setExpanded(false)}
-                  className="text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors underline underline-offset-2"
-                >
-                  Back
-                </button>
-                <div className="flex gap-2 ml-auto">
-                  <button
-                    onClick={() => persist(false)}
-                    className="px-4 py-2 rounded-lg text-[12px] font-semibold border border-[var(--border-default)] text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
-                  >
-                    Essential only
-                  </button>
-                  <button
-                    onClick={() => persist(analyticsChoice)}
-                    className="px-4 py-2 rounded-lg text-[12px] font-semibold bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white transition-colors"
-                  >
-                    Save preferences
-                  </button>
-                </div>
-              </>
-            )}
+            <button
+              onClick={() => setExpanded(false)}
+              className="text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors underline underline-offset-2"
+            >
+              Back
+            </button>
+            <div className="flex gap-2 ml-auto">
+              <button
+                onClick={() => persist(false)}
+                className="px-4 py-2 rounded-lg text-[12px] font-semibold border border-[var(--border-default)] text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition-colors"
+              >
+                Essential only
+              </button>
+              <button
+                onClick={() => persist(analyticsChoice)}
+                className="px-4 py-2 rounded-lg text-[12px] font-semibold bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white transition-colors"
+              >
+                Save preferences
+              </button>
+            </div>
           </div>
         </div>
       </div>
