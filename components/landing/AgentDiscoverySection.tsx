@@ -1,17 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Bot, Copy, Check, Github, FileText, ArrowRight } from 'lucide-react';
 
 const SKILL_URL = 'https://hatcher.host/skill.md';
 const GITHUB_URL = 'https://github.com/HatcherLabs/hatcher-skill';
+const PROMPT = `Read ${SKILL_URL} and follow the instructions to deploy AI agents on Hatcher.`;
 
-const EXAMPLE_TASKS = [
-  'a Telegram bot that answers FAQ about my startup',
-  'a research agent that summarizes my industry news every morning',
-  'a trading monitor that pings me with daily price alerts',
-  'a customer support agent that handles my Discord questions',
+const STEPS = [
+  { num: '01', text: 'Send this prompt to your AI agent (Claude Code, Cursor, ChatGPT, OpenClaw — any).' },
+  { num: '02', text: 'Agent registers an account with your email and sends you a verification link.' },
+  { num: '03', text: 'Click verify. Your agent picks a template, deploys, and hands you a running AI.' },
 ];
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -23,20 +23,10 @@ const fadeUp = {
 
 export function AgentDiscoverySection() {
   const [copied, setCopied] = useState(false);
-  const [taskIdx, setTaskIdx] = useState(0);
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setTaskIdx((i) => (i + 1) % EXAMPLE_TASKS.length);
-    }, 3500);
-    return () => clearInterval(id);
-  }, []);
-
-  const prompt = `Read ${SKILL_URL} and deploy ${EXAMPLE_TASKS[taskIdx]} for me.`;
 
   const onCopy = async () => {
     try {
-      await navigator.clipboard.writeText(prompt);
+      await navigator.clipboard.writeText(PROMPT);
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch {
@@ -66,14 +56,14 @@ export function AgentDiscoverySection() {
             Send your agent to Hatcher
           </h2>
           <p className="mt-4 text-lg text-[var(--text-secondary)]">
-            Paste this prompt into Claude Code, Cursor, ChatGPT, or any agent — it'll register, deploy, and hand you back a running AI.
+            Paste this prompt into any AI agent. It'll read our skill file, register an account in your name, and deploy a working AI — all you do is click one verification email.
           </p>
         </motion.div>
 
         <motion.div
           {...fadeUp}
           transition={{ duration: 0.6, delay: 0.1, ease }}
-          className="mb-8"
+          className="mb-10"
         >
           <div className="rounded-lg border border-[var(--border-default)] bg-[var(--surface-raised)] overflow-hidden">
             <div className="flex items-center justify-between border-b border-[var(--border-default)] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)]">
@@ -96,14 +86,11 @@ export function AgentDiscoverySection() {
                 )}
               </button>
             </div>
-            <div className="px-4 py-5 sm:py-6 font-mono text-sm sm:text-base text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-mono), monospace' }}>
-              <span>Read </span>
-              <span className="text-[var(--color-accent)]">{SKILL_URL}</span>
-              <span> and deploy </span>
-              <span key={taskIdx} className="inline-block transition-opacity duration-500">
-                {EXAMPLE_TASKS[taskIdx]}
-              </span>
-              <span> for me.</span>
+            <div
+              className="px-4 py-5 sm:py-6 font-mono text-sm sm:text-base text-[var(--text-primary)] break-words"
+              style={{ fontFamily: 'var(--font-mono), monospace' }}
+            >
+              Read <span className="text-[var(--color-accent)]">{SKILL_URL}</span> and follow the instructions to deploy AI agents on Hatcher.
             </div>
           </div>
         </motion.div>
@@ -111,13 +98,9 @@ export function AgentDiscoverySection() {
         <motion.div
           {...fadeUp}
           transition={{ duration: 0.6, delay: 0.15, ease }}
-          className="mb-10 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6"
+          className="mb-10 grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6"
         >
-          {[
-            { num: '01', text: 'Send the prompt to your agent. It reads the skill file and asks for your email.' },
-            { num: '02', text: 'You click one verification email. Agent registers an account in your name.' },
-            { num: '03', text: 'Agent picks a template, configures integrations, deploys. You get a working AI.' },
-          ].map((step) => (
+          {STEPS.map((step) => (
             <div key={step.num} className="flex gap-3">
               <span className="font-mono text-sm font-semibold text-[var(--color-accent)] tabular-nums shrink-0 pt-0.5">
                 {step.num}
@@ -151,10 +134,6 @@ export function AgentDiscoverySection() {
             <Github className="w-4 h-4" strokeWidth={1.75} />
             GitHub source
           </a>
-          <span className="text-[var(--text-muted)]">·</span>
-          <span className="text-[var(--text-muted)]">
-            Works with Claude Code, Cursor, ChatGPT, OpenClaw, Hermes
-          </span>
         </motion.div>
       </div>
     </section>
