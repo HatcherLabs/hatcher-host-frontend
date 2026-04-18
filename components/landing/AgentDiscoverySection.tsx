@@ -9,7 +9,7 @@ const GITHUB_URL = 'https://github.com/HatcherLabs/hatcher-skill';
 const PROMPT = `Read ${SKILL_URL} and follow the instructions to deploy AI agents on Hatcher.`;
 
 const STEPS = [
-  { num: '01', text: 'Send this prompt to your AI agent (Claude Code, Cursor, ChatGPT, OpenClaw — any).' },
+  { num: '01', text: 'Send this prompt to your AI coding agent — Claude Code, Cursor, OpenClaw, Hermes, or any agent that can fetch URLs and run shell commands.' },
   { num: '02', text: 'Agent registers an account with your email and sends you a verification link.' },
   { num: '03', text: 'Click verify. Your agent picks a template, deploys, and hands you a running AI.' },
 ];
