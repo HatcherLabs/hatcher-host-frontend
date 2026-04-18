@@ -43,6 +43,9 @@ jobs:
               npm ci
             fi
 
+            echo "==> Fetching skill files (agent-discoverable docs)..."
+            node prebuild.js
+
             echo "==> Building frontend..."
             npx next build
 
