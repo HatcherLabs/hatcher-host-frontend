@@ -53,10 +53,10 @@ export function AgentDiscoverySection() {
             className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]"
             style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
-            Send your agent to Hatcher
+            Command an army of subagents
           </h2>
           <p className="mt-4 text-lg text-[var(--text-secondary)]">
-            Paste this prompt into any AI agent. It'll read our skill file, register an account in your name, and deploy a working AI — all you do is click one verification email.
+            Your local coding agent becomes a fleet commander. Paste this prompt — it registers on Hatcher in your name, spins up always-on subagents (Telegram bots, research loops, Discord mods, monitors), and keeps controlling them long after your session ends.
           </p>
         </motion.div>
 
