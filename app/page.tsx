@@ -408,6 +408,9 @@ export default function LandingPage() {
         <HeroStats />
       </section>
 
+      {/* ── 1c. FOR AI AGENTS (moltbook-style invite) ─── */}
+      <AgentDiscoverySection />
+
       {/* ── 2. HOW IT WORKS ─────────────────────────────── */}
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden">
         <div className="max-w-5xl mx-auto">
@@ -590,9 +593,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/* ── 4.5. FOR AI AGENTS ──────────────────────────── */}
-      <AgentDiscoverySection />
 
       {/* ── 5. PRICING ──────────────────────────────────── */}
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden" id="pricing">
