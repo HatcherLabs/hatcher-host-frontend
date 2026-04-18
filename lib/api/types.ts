@@ -74,6 +74,30 @@ export interface Agent {
 }
 
 /**
+ * Payment row as returned by the admin /payments endpoint.
+ * Richer than the user-facing Payment shape — includes user + agent joins,
+ * paymentToken, tokenAmount, and failureReason.
+ */
+export interface AdminPayment {
+  id: string;
+  userId: string;
+  userEmail: string | null;
+  userUsername: string | null;
+  agentId: string | null;
+  agentName: string | null;
+  agentFramework: string | null;
+  featureKey: string;
+  usdAmount: number;
+  hatchAmount: number;
+  paymentToken: string | null;
+  tokenAmount: number | null;
+  txSignature: string;
+  status: 'pending' | 'confirmed' | 'failed' | 'refunded';
+  failureReason: string | null;
+  createdAt: string;
+}
+
+/**
  * TicketMessage as returned by the API.
  * Differs from shared TicketMessage which has no id/ticketId and uses 'system' role.
  */

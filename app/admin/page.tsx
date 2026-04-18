@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
-import type { Agent } from '@/lib/api';
+import type { Agent, AdminPayment } from '@/lib/api';
 import { shortenAddress, timeAgo } from '@/lib/utils';
 import { formatFeatureKey } from '@/lib/feature-labels';
 import { motion } from 'framer-motion';
@@ -220,23 +220,7 @@ export default function AdminPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health'>('overview');
-  const [payments, setPayments] = useState<Array<{
-    id: string;
-    userId: string;
-    userEmail: string | null;
-    userUsername: string | null;
-    agentId: string | null;
-    agentName: string | null;
-    agentFramework: string | null;
-    featureKey: string;
-    usdAmount: number;
-    hatchAmount: number;
-    paymentToken?: 'sol' | 'usdc' | 'hatch' | 'stripe' | null;
-    tokenAmount?: number | null;
-    txSignature: string;
-    status: string;
-    createdAt: string;
-  }>>([]);
+  const [payments, setPayments] = useState<AdminPayment[]>([]);
   const [paymentsLoading, setPaymentsLoading] = useState(false);
   const [ticketFilter, setTicketFilter] = useState<'all' | 'open' | 'in_progress' | 'resolved'>('all');
   const [searchQuery, setSearchQuery] = useState('');
