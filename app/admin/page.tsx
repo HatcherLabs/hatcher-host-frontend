@@ -227,6 +227,7 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health'>('overview');
   const [payments, setPayments] = useState<AdminPayment[]>([]);
   const [paymentsLoading, setPaymentsLoading] = useState(false);
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState<'all' | 'confirmed' | 'failed' | 'pending' | 'refunded'>('all');
   const [ticketFilter, setTicketFilter] = useState<'all' | 'open' | 'in_progress' | 'resolved'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
@@ -352,16 +353,24 @@ export default function AdminPage() {
     return () => clearInterval(interval);
   }, [isAuthenticated, isAdmin, activeTab]);
 
-  // ── Lazy-load payments when the Purchases tab is opened ──────
+  // ── Lazy-load payments when the Purchases tab is opened or filter changes ──
   useEffect(() => {
     if (!isAuthenticated || !isAdmin || activeTab !== 'purchases') return;
-    if (payments.length > 0) return;
-    setPaymentsLoading(true);
-    api.adminGetPayments().then((res) => {
-      if (res.success) setPayments(res.data.payments ?? []);
-      setPaymentsLoading(false);
-    });
-  }, [isAuthenticated, isAdmin, activeTab, payments.length]);
+    let cancelled = false;
+    async function load() {
+      setPaymentsLoading(true);
+      try {
+        const res = await api.adminGetPayments({ status: paymentStatusFilter, limit: 100 });
+        if (!cancelled && res.success) setPayments(res.data.payments ?? []);
+      } catch (e) {
+        if (!cancelled) console.warn('payments load failed', e);
+      } finally {
+        if (!cancelled) setPaymentsLoading(false);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [isAuthenticated, isAdmin, activeTab, paymentStatusFilter]);
 
   // ── Backup handler ──────────────────────────────────────────
   async function handleRunBackup() {
@@ -1659,6 +1668,21 @@ export default function AdminPage() {
           {/* ── Purchases Tab ────────────────────────────────── */}
           {activeTab === 'purchases' && (
             <div className="space-y-4">
+              <div className="flex flex-wrap gap-2 mb-3">
+                {(['all', 'confirmed', 'failed', 'pending', 'refunded'] as const).map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setPaymentStatusFilter(s)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                      paymentStatusFilter === s
+                        ? 'bg-[var(--color-accent)]/15 border-[var(--color-accent)] text-[var(--color-accent)]'
+                        : 'bg-transparent border-[var(--border-primary)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
+                  </button>
+                ))}
+              </div>
               {paymentsLoading && payments.length === 0 ? (
                 <div className="space-y-2">
                   {[1, 2, 3, 4, 5].map((i) => (
@@ -1680,6 +1704,7 @@ export default function AdminPage() {
                         <th className="py-2 pr-3">Feature</th>
                         <th className="py-2 pr-3 text-right">USD</th>
                         <th className="py-2 pr-3 text-right">Paid</th>
+                        <th className="py-2 pr-3">Reason</th>
                         <th className="py-2 pr-3">Status · Tx</th>
                       </tr>
                     </thead>
@@ -1711,6 +1736,9 @@ export default function AdminPage() {
                                     : p.hatchAmount
                                       ? `${p.hatchAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })} $HATCHER`
                                       : '—'}
+                          </td>
+                          <td className="py-2 pr-4 text-xs text-[var(--text-muted)]">
+                            {p.failureReason ?? (p.status === 'confirmed' ? '—' : '')}
                           </td>
                           <td className="py-3 pr-3">
                             <div className="flex items-center gap-2 min-w-0">
