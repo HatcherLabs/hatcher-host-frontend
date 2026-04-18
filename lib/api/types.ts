@@ -128,3 +128,51 @@ export interface Ticket {
   createdAt: string;
   updatedAt: string;
 }
+
+// ── Analytics response types ─────────────────────────────────
+
+export interface FunnelResponse {
+  stages: Array<{ key: string; label: string; count: number; percent: number }>;
+  windowDays: number;
+  generatedAt: string;
+}
+
+export interface ChurnRadarResponse {
+  atRisk: Array<{ userId: string; email: string; tier: string; lastAgentActivity: string | null; createdAt: string }>;
+  thresholdDays: number;
+  generatedAt: string;
+}
+
+export interface ReferralLeaderboardResponse {
+  leaderboard: Array<{ userId: string; email: string; username: string | null; referralCode: string | null; referralCount: number }>;
+  generatedAt: string;
+}
+
+export interface SignupHeatmapResponse {
+  cells: Array<{ dow: number; hour: number; count: number }>;
+  max: number;
+  generatedAt: string;
+}
+
+export interface ErrorRateResponse {
+  current24h: number;
+  previous24h: number;
+  deltaPct: number;
+  generatedAt: string;
+}
+
+export interface WsCountResponse {
+  chat: number;
+  logs: number;
+  terminal: number;
+  total: number;
+  generatedAt: string;
+}
+
+export interface LlmStatsResponse {
+  perDay: Array<{ date: string; messages: number }>;
+  topUsers: Array<{ userId: string; email: string; username: string | null; tier: string; messagesLast7d: number }>;
+  rateLimitHitsToday: number;
+  rateLimitHitsYesterday: number;
+  generatedAt: string;
+}

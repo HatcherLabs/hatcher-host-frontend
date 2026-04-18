@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
-import type { Agent, AdminPayment } from '@/lib/api';
+import type { Agent, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse } from '@/lib/api';
 import { shortenAddress, timeAgo } from '@/lib/utils';
 import { formatFeatureKey } from '@/lib/feature-labels';
 import { motion } from 'framer-motion';
@@ -45,7 +45,7 @@ import {
   Flame,
   PiggyBank,
 } from 'lucide-react';
-import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip as ReTooltip } from 'recharts';
+import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip as ReTooltip, BarChart, Bar, XAxis, YAxis } from 'recharts';
 import type { AdminOverviewExtras } from '@hatcher/shared';
 
 
@@ -165,6 +165,207 @@ type AdminAgent = Agent & { ownerUsername?: string; ownerWallet: string | null }
 // ═════════════════════════════════════════════════════════════
 // Admin Page
 // ═════════════════════════════════════════════════════════════
+// ── Analytics Tab ─────────────────────────────────────────────
+function AnalyticsTab() {
+  const [funnel, setFunnel] = useState<FunnelResponse | null>(null);
+  const [churn, setChurn] = useState<ChurnRadarResponse | null>(null);
+  const [referrals, setReferrals] = useState<ReferralLeaderboardResponse | null>(null);
+  const [heatmap, setHeatmap] = useState<SignupHeatmapResponse | null>(null);
+  const [errorRate, setErrorRate] = useState<ErrorRateResponse | null>(null);
+  const [wsCount, setWsCount] = useState<WsCountResponse | null>(null);
+  const [llmStats, setLlmStats] = useState<LlmStatsResponse | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      const [f, c, r, h, e, w, l] = await Promise.all([
+        api.adminGetFunnel().catch(() => null),
+        api.adminGetChurnRadar().catch(() => null),
+        api.adminGetReferrals().catch(() => null),
+        api.adminGetSignupHeatmap().catch(() => null),
+        api.adminGetErrorRate().catch(() => null),
+        api.adminGetWsCount().catch(() => null),
+        api.adminGetLlmStats().catch(() => null),
+      ]);
+      if (cancelled) return;
+      if (f?.success) setFunnel(f.data);
+      if (c?.success) setChurn(c.data);
+      if (r?.success) setReferrals(r.data);
+      if (h?.success) setHeatmap(h.data);
+      if (e?.success) setErrorRate(e.data);
+      if (w?.success) setWsCount(w.data);
+      if (l?.success) setLlmStats(l.data);
+    }
+    load();
+    const t = setInterval(load, 60_000);
+    return () => { cancelled = true; clearInterval(t); };
+  }, []);
+
+  return (
+    <div className="space-y-6">
+      {/* Top KPI row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+          <div className="flex items-center gap-2 mb-2">
+            <Activity size={14} className="text-[#4ADE80]" />
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Active WebSockets</span>
+          </div>
+          <div className="text-2xl font-bold text-[var(--text-primary)]">{wsCount ? wsCount.total : '—'}</div>
+          <div className="text-[11px] text-[var(--text-muted)] mt-1">
+            {wsCount ? `${wsCount.chat} chat / ${wsCount.logs} logs / ${wsCount.terminal} term` : ''}
+          </div>
+        </div>
+        <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangle size={14} className={errorRate && errorRate.deltaPct > 20 ? 'text-[#F87171]' : 'text-[#FBBF24]'} />
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Errors (24h)</span>
+          </div>
+          <div className="text-2xl font-bold text-[var(--text-primary)]">{errorRate ? errorRate.current24h : '—'}</div>
+          <div className="text-[11px] text-[var(--text-muted)] mt-1">
+            {errorRate ? `${errorRate.deltaPct >= 0 ? '↑' : '↓'} ${Math.abs(errorRate.deltaPct)}% vs prev 24h` : ''}
+          </div>
+        </div>
+        <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+          <div className="flex items-center gap-2 mb-2">
+            <Zap size={14} className="text-[#F472B6]" />
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Rate-limit hits (today)</span>
+          </div>
+          <div className="text-2xl font-bold text-[var(--text-primary)]">{llmStats ? llmStats.rateLimitHitsToday : '—'}</div>
+          <div className="text-[11px] text-[var(--text-muted)] mt-1">
+            {llmStats ? `yesterday: ${llmStats.rateLimitHitsYesterday}` : ''}
+          </div>
+        </div>
+      </div>
+
+      {/* Funnel */}
+      {funnel && (
+        <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+          <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)] mb-3">Signup Funnel (last {funnel.windowDays}d)</div>
+          <div className="space-y-2">
+            {funnel.stages.map((s, i) => (
+              <div key={s.key} className="flex items-center gap-3">
+                <span className="w-32 text-xs text-[var(--text-muted)]">{s.label}</span>
+                <div className="flex-1 h-6 rounded bg-[var(--bg-tertiary)] relative overflow-hidden">
+                  <div className="h-full bg-[var(--color-accent)]" style={{ width: `${s.percent}%` }} />
+                  <span className="absolute inset-0 flex items-center px-2 text-xs font-mono text-[var(--text-primary)]">
+                    {s.count} ({s.percent}%)
+                    {i > 0 && funnel.stages[i - 1].count > 0 && (
+                      <span className="ml-2 text-[var(--text-muted)]">
+                        {Math.round((s.count / funnel.stages[i - 1].count) * 100)}% conv
+                      </span>
+                    )}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Churn + Referrals side by side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {churn && (
+          <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+            <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)] mb-3">Churn Radar (paying, idle ≥{churn.thresholdDays}d)</div>
+            {churn.atRisk.length === 0 ? (
+              <div className="text-xs text-[var(--text-muted)]">No at-risk paying users</div>
+            ) : (
+              <div className="space-y-1 max-h-64 overflow-y-auto">
+                {churn.atRisk.slice(0, 10).map(u => (
+                  <div key={u.userId} className="flex items-center justify-between text-xs border-b border-[var(--border-primary)]/40 py-1">
+                    <span className="truncate text-[var(--text-primary)]">{u.email}</span>
+                    <span className="text-[var(--text-muted)] font-mono">
+                      {u.tier} · {u.lastAgentActivity
+                        ? `${Math.floor((Date.now() - new Date(u.lastAgentActivity).getTime()) / (24 * 3600 * 1000))}d ago`
+                        : 'never'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        {referrals && (
+          <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+            <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)] mb-3">Referral Leaderboard (top 10)</div>
+            {referrals.leaderboard.length === 0 ? (
+              <div className="text-xs text-[var(--text-muted)]">No referrals yet</div>
+            ) : (
+              <div className="space-y-1">
+                {referrals.leaderboard.map((r, i) => (
+                  <div key={r.userId} className="flex items-center justify-between text-xs border-b border-[var(--border-primary)]/40 py-1">
+                    <span className="truncate text-[var(--text-primary)]">
+                      <span className="text-[var(--text-muted)] mr-2">#{i + 1}</span>{r.email}
+                    </span>
+                    <span className="font-mono text-[var(--color-accent)]">{r.referralCount}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* LLM proxy stats */}
+      {llmStats && (
+        <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+          <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)] mb-3">LLM Proxy — messages/day (last 7d)</div>
+          <ResponsiveContainer width="100%" height={140}>
+            <BarChart data={llmStats.perDay}>
+              <XAxis dataKey="date" tick={{ fontSize: 10 }} stroke="var(--text-muted)" />
+              <YAxis tick={{ fontSize: 10 }} stroke="var(--text-muted)" />
+              <ReTooltip contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-primary)' }} />
+              <Bar dataKey="messages" fill="var(--color-accent)" />
+            </BarChart>
+          </ResponsiveContainer>
+          <div className="mt-3 pt-3 border-t border-[var(--border-primary)]/40">
+            <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-2">Top 10 users (last 7d)</div>
+            {llmStats.topUsers.length === 0 ? (
+              <div className="text-xs text-[var(--text-muted)]">No activity yet</div>
+            ) : llmStats.topUsers.map(u => (
+              <div key={u.userId} className="flex justify-between text-xs py-0.5">
+                <span className="truncate text-[var(--text-primary)]">{u.email}</span>
+                <span className="font-mono text-[var(--text-muted)]">{u.messagesLast7d.toLocaleString()} · {u.tier}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Heatmap */}
+      {heatmap && (
+        <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+          <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)] mb-3">Signup Heatmap (all time, day × hour UTC)</div>
+          <div className="grid grid-cols-[auto_repeat(24,1fr)] gap-0.5 text-[9px]">
+            <div />
+            {Array.from({ length: 24 }, (_, h) => (
+              <div key={h} className="text-center text-[var(--text-muted)]">{h}</div>
+            ))}
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, dow) => (
+              <>
+                <div key={`label-${dow}`} className="text-[var(--text-muted)] pr-1">{day}</div>
+                {Array.from({ length: 24 }, (_, h) => {
+                  const cell = heatmap.cells.find(c => c.dow === dow && c.hour === h);
+                  const count = cell?.count ?? 0;
+                  const intensity = heatmap.max > 0 ? count / heatmap.max : 0;
+                  return (
+                    <div
+                      key={`${dow}-${h}`}
+                      title={`${day} ${h}:00 UTC — ${count} signups`}
+                      className="aspect-square rounded-sm"
+                      style={{ backgroundColor: `rgba(139, 92, 246, ${0.08 + intensity * 0.92})` }}
+                    />
+                  );
+                })}
+              </>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const { isAuthenticated, isLoading: authLoading, user } = useAuth();
 
@@ -224,7 +425,7 @@ export default function AdminPage() {
   const [agentsPagination, setAgentsPagination] = useState<{ total: number; hasMore: boolean }>({ total: 0, hasMore: false });
   const [error, setError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health' | 'analytics'>('overview');
   const [payments, setPayments] = useState<AdminPayment[]>([]);
   const [paymentsLoading, setPaymentsLoading] = useState(false);
   const [paymentStatusFilter, setPaymentStatusFilter] = useState<'all' | 'confirmed' | 'failed' | 'pending' | 'refunded'>('all');
@@ -947,10 +1148,10 @@ export default function AdminPage() {
           {/* Tab switcher */}
           <div className="flex items-center gap-4 mb-5 overflow-x-auto -mx-1 px-1">
             <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)] overflow-x-auto min-w-0">
-              {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health'] as const).map((tab) => {
-                const tabIcons: Record<string, React.ElementType> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse };
+              {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics'] as const).map((tab) => {
+                const tabIcons: Record<string, React.ElementType> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp };
                 const TabIcon = tabIcons[tab] ?? BarChart3;
-                const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health' };
+                const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health', analytics: 'Analytics' };
                 return (
                   <button
                     key={tab}
@@ -2081,6 +2282,8 @@ export default function AdminPage() {
               </div>
             );
           })()}
+
+          {activeTab === 'analytics' && <AnalyticsTab />}
         </motion.div>
 
         {/* ── Error display ─────────────────────────────────── */}

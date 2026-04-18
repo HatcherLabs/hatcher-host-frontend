@@ -4,7 +4,7 @@
 
 import { API_URL } from '@/lib/config';
 import { getToken, setToken, clearToken, req } from './core';
-import type { Agent, Payment, AgentFeature, ChatMessage, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment } from './types';
+import type { Agent, Payment, AgentFeature, ChatMessage, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse } from './types';
 import type { TierConfig, AdminOverviewExtras } from '@hatcher/shared';
 
 const API_BASE = API_URL;
@@ -1260,6 +1260,27 @@ export const api = {
   /** Admin: list backup files */
   adminGetBackups: () =>
     req<{ backups: Array<{ filename: string; size: string; date: string }> }>('/admin/backups'),
+
+  /** Admin analytics: conversion funnel */
+  adminGetFunnel: () => req<FunnelResponse>('/admin/analytics/funnel'),
+
+  /** Admin analytics: churn radar (paying users idle ≥ threshold days) */
+  adminGetChurnRadar: () => req<ChurnRadarResponse>('/admin/analytics/churn-radar'),
+
+  /** Admin analytics: referral leaderboard */
+  adminGetReferrals: () => req<ReferralLeaderboardResponse>('/admin/analytics/referrals'),
+
+  /** Admin analytics: signup heatmap (day-of-week × hour) */
+  adminGetSignupHeatmap: () => req<SignupHeatmapResponse>('/admin/analytics/signup-heatmap'),
+
+  /** Admin analytics: API error rate delta */
+  adminGetErrorRate: () => req<ErrorRateResponse>('/admin/analytics/error-rate'),
+
+  /** Admin: live WebSocket connection counts */
+  adminGetWsCount: () => req<WsCountResponse>('/admin/ws-count'),
+
+  /** Admin: LLM proxy usage stats */
+  adminGetLlmStats: () => req<LlmStatsResponse>('/admin/llm-stats'),
 
   /** List files in agent's running container */
   listContainerFiles: (agentId: string, path?: string) =>
