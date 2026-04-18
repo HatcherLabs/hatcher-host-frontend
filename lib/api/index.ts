@@ -7,7 +7,6 @@ export type {
   Payment,
   AgentFeature,
   Agent,
-  AdminPayment,
   ChatMessage,
   TicketStatus,
   TicketCategory,

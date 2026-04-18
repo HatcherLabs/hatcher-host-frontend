@@ -4,8 +4,8 @@
 
 import { API_URL } from '@/lib/config';
 import { getToken, setToken, clearToken, req } from './core';
-import type { Agent, Payment, AgentFeature, ChatMessage, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment } from './types';
-import type { TierConfig, AdminOverviewExtras } from '@hatcher/shared';
+import type { Agent, Payment, AgentFeature, ChatMessage, Ticket, TicketMessage, TicketCategory, TicketPriority } from './types';
+import type { TierConfig } from '@hatcher/shared';
 
 const API_BASE = API_URL;
 
@@ -1212,18 +1212,25 @@ export const api = {
       }>;
     }>('/admin/tickets?limit=100&offset=0'),
 
-  /** Admin: payments list — optionally filtered by status and/or limited in count */
-  adminGetPayments: (params: { status?: 'all' | 'confirmed' | 'failed' | 'pending' | 'refunded'; limit?: number } = {}) => {
-    const qs = new URLSearchParams();
-    if (params.status && params.status !== 'all') qs.set('status', params.status);
-    if (params.limit !== undefined) qs.set('limit', String(params.limit));
-    const query = qs.toString() ? `?${qs.toString()}` : '';
-    return req<{ payments: AdminPayment[] }>(`/admin/payments${query}`);
-  },
-
-  /** Admin: overview-extras (revenue breakdown, founding slots, top users, etc.) */
-  adminGetOverviewExtras: () =>
-    req<AdminOverviewExtras>('/admin/overview-extras'),
+  /** Admin: last 25 payments for the Recent Purchases tab */
+  adminGetPayments: () =>
+    req<{
+      payments: Array<{
+        id: string;
+        userId: string;
+        userEmail: string | null;
+        userUsername: string | null;
+        agentId: string | null;
+        agentName: string | null;
+        agentFramework: string | null;
+        featureKey: string;
+        usdAmount: number;
+        hatchAmount: number;
+        txSignature: string;
+        status: string;
+        createdAt: string;
+      }>;
+    }>('/admin/payments'),
 
   /** Admin: reply to a ticket */
   adminReplyTicket: (ticketId: string, message: string) =>

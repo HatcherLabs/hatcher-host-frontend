@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
-import type { Agent, AdminPayment } from '@/lib/api';
+import type { Agent } from '@/lib/api';
 import { shortenAddress, timeAgo } from '@/lib/utils';
 import { formatFeatureKey } from '@/lib/feature-labels';
 import { motion } from 'framer-motion';
@@ -42,11 +42,7 @@ import {
   Eye,
   Globe,
   Radio,
-  Flame,
-  PiggyBank,
 } from 'lucide-react';
-import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip as ReTooltip } from 'recharts';
-import type { AdminOverviewExtras } from '@hatcher/shared';
 
 
 // ── Status filters ───────────────────────────────────────────
@@ -218,16 +214,30 @@ export default function AdminPage() {
     uniqueVisitors: number;
     timestamp: string;
   } | null>(null);
-  const [extras, setExtras] = useState<AdminOverviewExtras | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingMoreAgents, setLoadingMoreAgents] = useState(false);
   const [agentsPagination, setAgentsPagination] = useState<{ total: number; hasMore: boolean }>({ total: 0, hasMore: false });
   const [error, setError] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health'>('overview');
-  const [payments, setPayments] = useState<AdminPayment[]>([]);
+  const [payments, setPayments] = useState<Array<{
+    id: string;
+    userId: string;
+    userEmail: string | null;
+    userUsername: string | null;
+    agentId: string | null;
+    agentName: string | null;
+    agentFramework: string | null;
+    featureKey: string;
+    usdAmount: number;
+    hatchAmount: number;
+    paymentToken?: 'sol' | 'usdc' | 'hatch' | 'stripe' | null;
+    tokenAmount?: number | null;
+    txSignature: string;
+    status: string;
+    createdAt: string;
+  }>>([]);
   const [paymentsLoading, setPaymentsLoading] = useState(false);
-  const [paymentStatusFilter, setPaymentStatusFilter] = useState<'all' | 'confirmed' | 'failed' | 'pending' | 'refunded'>('all');
   const [ticketFilter, setTicketFilter] = useState<'all' | 'open' | 'in_progress' | 'resolved'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
@@ -319,23 +329,6 @@ export default function AdminPage() {
     return () => { cancelled = true; clearInterval(interval); };
   }, [isAuthenticated, isAdmin]);
 
-  // ── Overview extras (revenue by rail, founding slots, etc.) — auto-refresh 60s ──
-  useEffect(() => {
-    if (!isAuthenticated || !isAdmin) return;
-    let cancelled = false;
-    async function load() {
-      try {
-        const res = await api.adminGetOverviewExtras();
-        if (!cancelled && res.success) setExtras(res.data);
-      } catch (e) {
-        if (!cancelled) console.warn('overview-extras load failed', e);
-      }
-    }
-    load();
-    const t = setInterval(load, 60_000);
-    return () => { cancelled = true; clearInterval(t); };
-  }, [isAuthenticated, isAdmin]);
-
   // ── Fetch health data when Health tab is active ────────────
   useEffect(() => {
     if (!isAuthenticated || !isAdmin || activeTab !== 'health') return;
@@ -353,24 +346,16 @@ export default function AdminPage() {
     return () => clearInterval(interval);
   }, [isAuthenticated, isAdmin, activeTab]);
 
-  // ── Lazy-load payments when the Purchases tab is opened or filter changes ──
+  // ── Lazy-load payments when the Purchases tab is opened ──────
   useEffect(() => {
     if (!isAuthenticated || !isAdmin || activeTab !== 'purchases') return;
-    let cancelled = false;
-    async function load() {
-      setPaymentsLoading(true);
-      try {
-        const res = await api.adminGetPayments({ status: paymentStatusFilter, limit: 100 });
-        if (!cancelled && res.success) setPayments(res.data.payments ?? []);
-      } catch (e) {
-        if (!cancelled) console.warn('payments load failed', e);
-      } finally {
-        if (!cancelled) setPaymentsLoading(false);
-      }
-    }
-    load();
-    return () => { cancelled = true; };
-  }, [isAuthenticated, isAdmin, activeTab, paymentStatusFilter]);
+    if (payments.length > 0) return;
+    setPaymentsLoading(true);
+    api.adminGetPayments().then((res) => {
+      if (res.success) setPayments(res.data.payments ?? []);
+      setPaymentsLoading(false);
+    });
+  }, [isAuthenticated, isAdmin, activeTab, payments.length]);
 
   // ── Backup handler ──────────────────────────────────────────
   async function handleRunBackup() {
@@ -789,144 +774,6 @@ export default function AdminPage() {
               </div>
             </motion.div>
           </div>
-        )}
-
-        {/* ── Overview Extras Cards ───────────────────────────── */}
-        {extras && (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mt-4"
-          >
-            {/* Revenue by rail — pie */}
-            <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
-              <div className="flex items-center gap-2 mb-2">
-                <PieChart size={14} className="text-[#FBBF24]" />
-                <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Revenue by Rail</span>
-              </div>
-              <ResponsiveContainer width="100%" height={120}>
-                <RePieChart>
-                  <Pie
-                    data={Object.entries(extras.revenueByRail)
-                      .filter(([, v]) => v.usd > 0)
-                      .map(([name, v]) => ({ name, value: v.usd, txs: v.txs }))}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={28}
-                    outerRadius={50}
-                  >
-                    {['#9945FF', '#2775CA', '#FBBF24', '#635BFF', '#4ADE80'].map((c, i) => (
-                      <Cell key={i} fill={c} />
-                    ))}
-                  </Pie>
-                  <ReTooltip
-                    formatter={((v: unknown, _n: unknown, p: { payload: { name: string; txs: number } }) =>
-                      [`$${(v as number).toFixed(2)} (${p.payload.txs} txs)`, p.payload.name]) as (v: unknown, n: unknown, p: object) => [string, string]}
-                  />
-                </RePieChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Founding Member slots */}
-            <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
-              <div className="flex items-center gap-2 mb-2">
-                <Flame size={14} className="text-[#A78BFA]" />
-                <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Founding Slots</span>
-              </div>
-              <div className="text-2xl font-bold text-[var(--text-primary)]">
-                {extras.foundingSlots.remaining} <span className="text-base text-[var(--text-muted)]">/ {extras.foundingSlots.max}</span>
-              </div>
-              <div className="text-[11px] text-[var(--text-muted)] mt-1">{extras.foundingSlots.taken} taken</div>
-              <div className="mt-2 h-1.5 rounded-full bg-[var(--bg-tertiary)] overflow-hidden">
-                <div
-                  className="h-full bg-[#A78BFA]"
-                  style={{ width: `${(extras.foundingSlots.taken / extras.foundingSlots.max) * 100}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Active paying users */}
-            <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
-              <div className="flex items-center gap-2 mb-2">
-                <PiggyBank size={14} className="text-[#34D399]" />
-                <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Active Paying Users</span>
-              </div>
-              <div className="text-2xl font-bold text-[var(--text-primary)]">{extras.activePayingUsers.toLocaleString()}</div>
-              <div className="text-[11px] text-[var(--text-muted)] mt-1">active features</div>
-            </div>
-
-            {/* New vs renewal 30d */}
-            <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp size={14} className="text-[#FBBF24]" />
-                <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Revenue 30d</span>
-              </div>
-              <div className="text-base font-bold text-[var(--text-primary)]">
-                <span className="text-[#34D399]">${extras.revenueNewVsRenewal30d.newUsd.toFixed(0)}</span>
-                <span className="text-[var(--text-muted)] text-xs"> new</span>
-              </div>
-              <div className="text-base font-bold text-[var(--text-primary)]">
-                <span className="text-[#60A5FA]">${extras.revenueNewVsRenewal30d.renewalUsd.toFixed(0)}</span>
-                <span className="text-[var(--text-muted)] text-xs"> renewal</span>
-              </div>
-            </div>
-
-            {/* Expiring 7d */}
-            <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock size={14} className="text-[#F472B6]" />
-                <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Expiring 7d</span>
-              </div>
-              <div className="text-2xl font-bold text-[var(--text-primary)]">{extras.expiringSoon.length}</div>
-              <div className="text-[11px] text-[var(--text-muted)] mt-1">
-                {extras.expiringSoon.length > 0
-                  ? `next: ${new Date(extras.expiringSoon[0].expiresAt).toLocaleDateString()}`
-                  : 'no upcoming expirations'}
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* ── Container Resource Top 10 ────────────────────────── */}
-        {extras && extras.containerTopN.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4 p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]"
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <Server size={14} className="text-[var(--color-accent)]" />
-              <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Container Resource Top 10</span>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-[10px] uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-primary)]">
-                    <th className="py-2 pr-4">Agent</th>
-                    <th className="py-2 pr-4">Framework</th>
-                    <th className="py-2 pr-4 text-right">CPU %</th>
-                    <th className="py-2 pr-0 text-right">Memory</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {extras.containerTopN.map((c) => (
-                    <tr key={c.agentId} className="border-b border-[var(--border-primary)]/40 hover:bg-[var(--bg-tertiary)]/50">
-                      <td className="py-2 pr-4">
-                        <Link href={`/dashboard/agent/${c.agentId}`} className="text-[var(--color-accent)] hover:underline">
-                          {c.agentName}
-                        </Link>
-                      </td>
-                      <td className="py-2 pr-4 text-[var(--text-muted)]">{c.framework}</td>
-                      <td className="py-2 pr-4 text-right font-mono tabular-nums">{c.cpuPercent.toFixed(1)}%</td>
-                      <td className="py-2 pr-0 text-right font-mono tabular-nums">
-                        {c.memoryUsageMb.toFixed(0)} / {c.memoryLimitMb.toFixed(0)} MB
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </motion.div>
         )}
 
         {/* ── Quick Stats Row (always visible) ────────────────── */}
@@ -1668,21 +1515,6 @@ export default function AdminPage() {
           {/* ── Purchases Tab ────────────────────────────────── */}
           {activeTab === 'purchases' && (
             <div className="space-y-4">
-              <div className="flex flex-wrap gap-2 mb-3">
-                {(['all', 'confirmed', 'failed', 'pending', 'refunded'] as const).map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setPaymentStatusFilter(s)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                      paymentStatusFilter === s
-                        ? 'bg-[var(--color-accent)]/15 border-[var(--color-accent)] text-[var(--color-accent)]'
-                        : 'bg-transparent border-[var(--border-primary)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                    }`}
-                  >
-                    {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
-                  </button>
-                ))}
-              </div>
               {paymentsLoading && payments.length === 0 ? (
                 <div className="space-y-2">
                   {[1, 2, 3, 4, 5].map((i) => (
@@ -1704,7 +1536,6 @@ export default function AdminPage() {
                         <th className="py-2 pr-3">Feature</th>
                         <th className="py-2 pr-3 text-right">USD</th>
                         <th className="py-2 pr-3 text-right">Paid</th>
-                        <th className="py-2 pr-3">Reason</th>
                         <th className="py-2 pr-3">Status · Tx</th>
                       </tr>
                     </thead>
@@ -1736,9 +1567,6 @@ export default function AdminPage() {
                                     : p.hatchAmount
                                       ? `${p.hatchAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })} $HATCHER`
                                       : '—'}
-                          </td>
-                          <td className="py-2 pr-4 text-xs text-[var(--text-muted)]">
-                            {p.failureReason ?? (p.status === 'confirmed' ? '—' : '')}
                           </td>
                           <td className="py-3 pr-3">
                             <div className="flex items-center gap-2 min-w-0">
