@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 import { FOUNDING_MEMBER_MAX_SLOTS } from '@hatcher/shared';
+import { AgentDiscoverySection } from '@/components/landing/AgentDiscoverySection';
 
 // ─── Shared animation config ──────────────────────────────────
 // Slide-only animation (no opacity gate). Sections render fully
@@ -589,6 +590,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ── 4.5. FOR AI AGENTS ──────────────────────────── */}
+      <AgentDiscoverySection />
 
       {/* ── 5. PRICING ──────────────────────────────────── */}
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden" id="pricing">
