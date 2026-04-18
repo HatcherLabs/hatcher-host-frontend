@@ -46,3 +46,6 @@ content/
 test-*.png
 e2e-*.png
 .gstack/
+
+# Skill files fetched from HatcherLabs/hatcher-skill at build time
+/public/skill/
