@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
+import { Select } from '@/components/ui/Select';
 
 // Copy of the server regex (kept in sync manually — see file header).
 const SOL_ADDRESS_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
@@ -698,29 +699,15 @@ function ApplyForm({
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Field label="Platform type" required>
-                      <select
+                      {/* Custom <Select> — native <select> on Linux Chrome
+                          renders options white-on-white even with
+                          color-scheme: dark. See components/ui/Select.tsx. */}
+                      <Select<PlatformType>
                         value={p.type}
-                        onChange={(e) =>
-                          updatePlatform(idx, { type: e.target.value as PlatformType })
-                        }
-                        // color-scheme: dark tells the browser to render the
-                        // native <option> popup using dark UA styles. Without
-                        // this, Chrome + Firefox on dark theme render open
-                        // dropdowns with white-on-white options. Keep the
-                        // explicit bg/text on the select itself too.
-                        style={{ colorScheme: 'dark' }}
-                        className="w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-primary)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] [color-scheme:dark]"
-                      >
-                        {PLATFORM_OPTIONS.map((opt) => (
-                          <option
-                            key={opt.value}
-                            value={opt.value}
-                            className="bg-[var(--bg-card)] text-[var(--text-primary)]"
-                          >
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
+                        onChange={(v) => updatePlatform(idx, { type: v })}
+                        options={PLATFORM_OPTIONS}
+                        ariaLabel="Platform type"
+                      />
                     </Field>
 
                     <Field label="Handle" required error={handleErr}>
