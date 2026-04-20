@@ -53,6 +53,7 @@ import {
 } from 'lucide-react';
 import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip as ReTooltip, BarChart, Bar, XAxis, YAxis } from 'recharts';
 import type { AdminOverviewExtras } from '@hatcher/shared';
+import AffiliateTab from './_components/AffiliateTab';
 
 
 // ── Status filters ───────────────────────────────────────────
@@ -898,7 +899,13 @@ export default function AdminPage() {
   const [agentsPagination, setAgentsPagination] = useState<{ total: number; hasMore: boolean }>({ total: 0, hasMore: false });
   const [error, setError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health' | 'analytics' | 'audit'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health' | 'analytics' | 'audit' | 'affiliate'>(() => {
+    if (typeof window === 'undefined') return 'overview';
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get('tab');
+    if (t === 'affiliate' || t === 'overview' || t === 'agents' || t === 'users' || t === 'tickets' || t === 'purchases' || t === 'health' || t === 'analytics' || t === 'audit') return t;
+    return 'overview';
+  });
   const [payments, setPayments] = useState<AdminPayment[]>([]);
   const [paymentsLoading, setPaymentsLoading] = useState(false);
   const [paymentStatusFilter, setPaymentStatusFilter] = useState<'all' | 'confirmed' | 'failed' | 'pending' | 'refunded'>('all');
@@ -1621,14 +1628,23 @@ export default function AdminPage() {
           {/* Tab switcher */}
           <div className="flex items-center gap-4 mb-5 overflow-x-auto -mx-1 px-1">
             <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)] overflow-x-auto min-w-0">
-              {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics', 'audit'] as const).map((tab) => {
-                const tabIcons: Record<string, React.ElementType> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp, audit: ScrollText };
+              {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics', 'audit', 'affiliate'] as const).map((tab) => {
+                const tabIcons: Record<string, React.ElementType> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp, audit: ScrollText, affiliate: UserPlus };
                 const TabIcon = tabIcons[tab] ?? BarChart3;
-                const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health', analytics: 'Analytics', audit: 'Audit Log' };
+                const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health', analytics: 'Analytics', audit: 'Audit Log', affiliate: 'Affiliate' };
                 return (
                   <button
                     key={tab}
-                    onClick={() => setActiveTab(tab)}
+                    onClick={() => {
+                      setActiveTab(tab);
+                      if (typeof window !== 'undefined') {
+                        const params = new URLSearchParams(window.location.search);
+                        params.set('tab', tab);
+                        // Reset sub-tab param when switching top-level tab.
+                        if (tab !== 'affiliate') params.delete('sub');
+                        window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+                      }
+                    }}
                     className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-150 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${
                       activeTab === tab
                         ? 'text-[var(--text-primary)] bg-[var(--color-accent)]/20'
@@ -2759,6 +2775,8 @@ export default function AdminPage() {
           {activeTab === 'analytics' && <AnalyticsTab />}
 
           {activeTab === 'audit' && <AuditLogTab />}
+
+          {activeTab === 'affiliate' && <AffiliateTab />}
         </motion.div>
 
         {/* ── Error display ─────────────────────────────────── */}
