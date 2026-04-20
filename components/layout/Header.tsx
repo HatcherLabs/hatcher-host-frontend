@@ -92,6 +92,14 @@ export function Header() {
   type AffiliateMenuState = 'affiliate' | 'pending' | 'rejected' | 'none';
   const [affiliateState, setAffiliateState] = useState<AffiliateMenuState | null>(null);
 
+  // Reset per-user caches when the signed-in identity changes (login→logout→
+  // login as different user). Without this, the dropdown keeps the previous
+  // user's affiliate/credit state until a hard refresh.
+  useEffect(() => {
+    setAffiliateState(null);
+    setCreditBalance(null);
+  }, [user?.id]);
+
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (mobileOpen) {
