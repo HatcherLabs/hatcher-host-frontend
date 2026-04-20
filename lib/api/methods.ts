@@ -1992,4 +1992,106 @@ export const api = {
       method: 'DELETE',
     }),
 
+  // ─── Affiliate (self-service dashboard) ──────────────────────
+  // Shapes kept inline — we don't bump @hatcherlabs/shared for a
+  // partner-only surface. Callers typically narrow with `if (success)`
+  // before touching `data`; 403 on non-affiliate is surfaced as a
+  // failed response + error === 'Not an active affiliate'.
+  getAffiliateMe: () =>
+    req<{
+      affiliate: {
+        id: string;
+        referralCode: string;
+        payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
+        payoutAddress: string | null;
+        isActive: boolean;
+        isFrozen: boolean;
+        frozenReason: string | null;
+        totalReferrals: number;
+        totalPaidRefs: number;
+        lifetimeEarnedCashUsd: number;
+        lifetimeEarnedCredits: number;
+        createdAt: string;
+      };
+      shareLink: string;
+    }>('/affiliate/me'),
+
+  getAffiliateReferrals: (params: { limit?: number; cursor?: string } = {}) => {
+    const qs = new URLSearchParams();
+    if (params.limit) qs.set('limit', String(params.limit));
+    if (params.cursor) qs.set('cursor', params.cursor);
+    return req<{
+      referrals: Array<{
+        id: string;
+        referredAt: string;
+        maskedEmail: string;
+        isPaid: boolean;
+        tier: string | null;
+        isFlagged: boolean;
+        flagReason: string | null;
+      }>;
+      nextCursor: string | null;
+    }>(`/affiliate/me/referrals${qs.toString() ? `?${qs}` : ''}`);
+  },
+
+  getAffiliateCommissions: (
+    params: { limit?: number; cursor?: string; status?: 'PENDING' | 'PAYABLE' | 'PAID' | 'VOIDED' } = {},
+  ) => {
+    const qs = new URLSearchParams();
+    if (params.limit) qs.set('limit', String(params.limit));
+    if (params.cursor) qs.set('cursor', params.cursor);
+    if (params.status) qs.set('status', params.status);
+    return req<{
+      commissions: Array<{
+        id: string;
+        createdAt: string;
+        sourceType: 'SUBSCRIPTION' | 'FOUNDING_MEMBER';
+        sourceAmountUsd: number;
+        cashAmountUsd: number;
+        creditsAmount: number;
+        status: 'PENDING' | 'PAYABLE' | 'PAID' | 'VOIDED';
+        payableAt: string;
+        paidOutAt: string | null;
+        payoutId: string | null;
+      }>;
+      nextCursor: string | null;
+    }>(`/affiliate/me/commissions${qs.toString() ? `?${qs}` : ''}`);
+  },
+
+  getAffiliatePayouts: (params: { limit?: number; cursor?: string } = {}) => {
+    const qs = new URLSearchParams();
+    if (params.limit) qs.set('limit', String(params.limit));
+    if (params.cursor) qs.set('cursor', params.cursor);
+    return req<{
+      payouts: Array<{
+        id: string;
+        processedAt: string;
+        cashAmountUsd: number;
+        cashTxHash: string | null;
+        cashCurrency: string | null;
+        creditsAmount: number;
+        creditsAppliedAt: string | null;
+        adminNote: string;
+        commissionCount: number;
+      }>;
+      nextCursor: string | null;
+    }>(`/affiliate/me/payouts${qs.toString() ? `?${qs}` : ''}`);
+  },
+
+  getAffiliateStats: () =>
+    req<{
+      totalReferrals: number;
+      paidReferrals: number;
+      pending: { cashUsd: number; credits: number };
+      payable: { cashUsd: number; credits: number };
+      paid: { cashUsd: number; credits: number };
+      voided: { count: number };
+      lifetime: {
+        cashUsdEarned: number;
+        creditsEarned: number;
+        cashUsdPaidOut: number;
+        creditsPaidOut: number;
+      };
+    }>('/affiliate/me/stats'),
+
 };
