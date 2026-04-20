@@ -5,6 +5,7 @@ const PRODUCT_LINKS = [
   { label: 'Create Agent', href: '/create' },
   { label: 'Dashboard', href: '/dashboard' },
   { label: 'Pricing', href: '/pricing' },
+  { label: 'Affiliate', href: '/affiliate' },
   { label: 'Status', href: '/status' },
 ];
 
@@ -177,6 +178,7 @@ export function Footer() {
           </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--text-muted)]">
             <Link href="/pricing" className="hover:text-[var(--text-primary)] transition-colors duration-200">Pricing</Link>
+            <Link href="/affiliate" className="hover:text-[var(--text-primary)] transition-colors duration-200">Affiliate</Link>
             <Link href="/support" className="hover:text-[var(--text-primary)] transition-colors duration-200">Support</Link>
             <a href={DOCS_URL} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--text-primary)] transition-colors duration-200">Docs</a>
             <Link href="/terms" className="hover:text-[var(--text-primary)] transition-colors duration-200">Terms</Link>

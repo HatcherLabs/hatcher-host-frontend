@@ -703,7 +703,13 @@ function ApplyForm({
                         onChange={(e) =>
                           updatePlatform(idx, { type: e.target.value as PlatformType })
                         }
-                        className="w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-primary)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                        // color-scheme: dark tells the browser to render the
+                        // native <option> popup using dark UA styles. Without
+                        // this, Chrome + Firefox on dark theme render open
+                        // dropdowns with white-on-white options. Keep the
+                        // explicit bg/text on the select itself too.
+                        style={{ colorScheme: 'dark' }}
+                        className="w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-primary)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] [color-scheme:dark]"
                       >
                         {PLATFORM_OPTIONS.map((opt) => (
                           <option
