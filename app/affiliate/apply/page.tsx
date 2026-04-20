@@ -11,9 +11,9 @@
 //
 // Form validation mirrors the server-side Zod schema in
 // apps/api/src/routes/affiliate.ts so bad input fails client-side
-// first. The SOL address regex is copied (not shared) — Phase I
-// didn't bump @hatcherlabs/shared for a single regex and we're not
-// starting now.
+// first. The SOL address regex + slug rules are copied (not shared)
+// — Phase I didn't bump @hatcherlabs/shared for a single regex and
+// we're not starting now.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -29,6 +29,8 @@ import {
   Sparkles,
   AlertCircle,
   Loader2,
+  Plus,
+  Trash2,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
@@ -36,19 +38,48 @@ import { api } from '@/lib/api';
 // Copy of the server regex (kept in sync manually — see file header).
 const SOL_ADDRESS_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
+// Slug rules (mirror backend):
+//   - 3–30 chars
+//   - lowercase letters, digits, hyphens
+//   - cannot start or end with a hyphen
+//   - cannot appear in RESERVED_SLUGS
+const SLUG_RE = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/;
+const RESERVED_SLUGS = new Set<string>([
+  'admin', 'api', 'app', 'auth', 'affiliate', 'affiliates',
+  'dashboard', 'docs', 'help', 'login', 'logout', 'register', 'signup',
+  'pricing', 'r', 'robots', 'sitemap', 'settings', 'status', 'support',
+  'terms', 'privacy', 'cookies', 'impressum',
+  'cristian', 'hatcher', 'hatcherlabs', 'claude', 'anthropic',
+  'test', 'demo', 'example',
+]);
+
+const MAX_PLATFORMS = 5;
+
 type PlatformType = 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
 type PayoutMode = 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
+
+type PlatformEntry = {
+  type: PlatformType;
+  handle: string;
+  audienceSize: string; // kept as string so empty = optional
+  url: string;
+};
+
+type ApplicationPlatform = {
+  type: PlatformType;
+  handle: string;
+  audienceSize: number | null;
+  url: string | null;
+};
 
 type Application = {
   id: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
-  platformHandle: string;
-  platformType: PlatformType;
-  audienceSize: number | null;
-  audienceUrl: string | null;
+  platforms: ApplicationPlatform[];
   pitch: string;
   payoutMode: PayoutMode;
   payoutAddress: string | null;
+  desiredSlug: string | null;
   createdAt: string;
   reviewedAt: string | null;
   reviewNotes: string | null;
@@ -91,6 +122,18 @@ const PAYOUT_OPTIONS: Array<{
     accent: '#8b5cf6',
   },
 ];
+
+// ============================================================
+// Slug validation — returns null if valid, else a specific reason.
+function validateSlug(raw: string): string | null {
+  const slug = raw.trim().toLowerCase();
+  if (slug.length === 0) return null; // optional
+  if (slug.length < 3) return 'Too short — min 3 characters';
+  if (slug.length > 30) return 'Too long — max 30 characters';
+  if (!SLUG_RE.test(slug)) return 'Only a–z, 0–9, and hyphens (cannot start/end with -)';
+  if (RESERVED_SLUGS.has(slug)) return 'That slug is reserved — pick another';
+  return null;
+}
 
 // ============================================================
 
@@ -213,26 +256,56 @@ function PendingRecap({ application }: { application: Application }) {
 
         <dl className="space-y-4 text-sm border-t border-[var(--border-default)] pt-5">
           <Row label="Submitted">{new Date(application.createdAt).toLocaleString()}</Row>
-          <Row label="Platform">
-            {PLATFORM_OPTIONS.find((p) => p.value === application.platformType)?.label ??
-              application.platformType}
-          </Row>
-          <Row label="Handle">{application.platformHandle}</Row>
-          {application.audienceSize !== null && (
-            <Row label="Audience size">{application.audienceSize.toLocaleString()}</Row>
-          )}
-          {application.audienceUrl && (
-            <Row label="Audience URL">
-              <a
-                href={application.audienceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--color-accent)] hover:underline break-all"
-              >
-                {application.audienceUrl}
-              </a>
+
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)] mb-2">
+              Platforms
+            </p>
+            <ul className="space-y-2">
+              {application.platforms.map((p, i) => (
+                <li
+                  key={i}
+                  className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)]/40 p-3"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm text-[var(--text-primary)]">
+                      <span className="text-[var(--color-accent)] font-mono text-xs uppercase mr-2">
+                        {PLATFORM_OPTIONS.find((o) => o.value === p.type)?.label ?? p.type}
+                      </span>
+                      {p.handle}
+                    </span>
+                    {p.audienceSize !== null && (
+                      <span className="text-xs text-[var(--text-muted)]">
+                        {p.audienceSize.toLocaleString()} followers
+                      </span>
+                    )}
+                  </div>
+                  {p.url && (
+                    <a
+                      href={p.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 block text-xs text-[var(--color-accent)] hover:underline break-all"
+                    >
+                      {p.url}
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {application.desiredSlug && (
+            <Row label="Requested slug">
+              <span className="font-mono text-xs">
+                {application.desiredSlug}
+              </span>
+              <span className="block text-xs text-[var(--text-muted)] mt-0.5">
+                preview: hatcher.host/r/{application.desiredSlug}
+              </span>
             </Row>
           )}
+
           <Row label="Payout mode">
             {PAYOUT_OPTIONS.find((p) => p.value === application.payoutMode)?.label ??
               application.payoutMode}
@@ -271,16 +344,26 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 // Form state
 // ============================================================
 type FormState = {
-  platformHandle: string;
-  platformType: PlatformType;
-  audienceSize: string; // kept as string so empty = optional
-  audienceUrl: string;
+  platforms: PlatformEntry[];
+  desiredSlug: string;
   pitch: string;
   payoutMode: PayoutMode;
   payoutAddress: string;
 };
 
-type FieldErrors = Partial<Record<keyof FormState, string>>;
+type FieldErrors = {
+  platforms?: string; // generic list-level error
+  platformHandles?: string[]; // per-row handle errors
+  platformAudience?: string[]; // per-row audience errors
+  platformUrl?: string[]; // per-row url errors
+  desiredSlug?: string;
+  pitch?: string;
+  payoutAddress?: string;
+};
+
+function makeEmptyPlatform(): PlatformEntry {
+  return { type: 'x', handle: '', audienceSize: '', url: '' };
+}
 
 function ApplyForm({
   previousApplication,
@@ -294,10 +377,16 @@ function ApplyForm({
   // Seed the form from the previous (rejected) submission so users don't
   // have to retype everything. Rejection notes are surfaced above the form.
   const [form, setForm] = useState<FormState>(() => ({
-    platformHandle: previousApplication?.platformHandle ?? '',
-    platformType: previousApplication?.platformType ?? 'x',
-    audienceSize: previousApplication?.audienceSize?.toString() ?? '',
-    audienceUrl: previousApplication?.audienceUrl ?? '',
+    platforms:
+      previousApplication && previousApplication.platforms.length > 0
+        ? previousApplication.platforms.map((p) => ({
+            type: p.type,
+            handle: p.handle,
+            audienceSize: p.audienceSize?.toString() ?? '',
+            url: p.url ?? '',
+          }))
+        : [makeEmptyPlatform()],
+    desiredSlug: previousApplication?.desiredSlug ?? '',
     pitch: previousApplication?.pitch ?? '',
     payoutMode: previousApplication?.payoutMode ?? 'CASH_ONLY',
     payoutAddress: previousApplication?.payoutAddress ?? '',
@@ -317,23 +406,82 @@ function ApplyForm({
     return 'text-[#22c55e]';
   }, [pitchLen]);
 
+  // Slug: live validation + preview. The slug is lowercased on blur
+  // (not on each keystroke) so users can type naturally — we still
+  // strip whitespace immediately and lowercase before submit.
+  const slugTrimmed = form.desiredSlug.trim().toLowerCase();
+  const slugError = useMemo(() => validateSlug(form.desiredSlug), [form.desiredSlug]);
+
+  // ── Platform list helpers ──
+  function updatePlatform(idx: number, patch: Partial<PlatformEntry>) {
+    setForm((f) => ({
+      ...f,
+      platforms: f.platforms.map((p, i) => (i === idx ? { ...p, ...patch } : p)),
+    }));
+  }
+  function addPlatform() {
+    setForm((f) =>
+      f.platforms.length >= MAX_PLATFORMS
+        ? f
+        : { ...f, platforms: [...f.platforms, makeEmptyPlatform()] },
+    );
+  }
+  function removePlatform(idx: number) {
+    setForm((f) =>
+      f.platforms.length <= 1
+        ? f
+        : { ...f, platforms: f.platforms.filter((_, i) => i !== idx) },
+    );
+  }
+
   const validate = useCallback((): FieldErrors => {
     const next: FieldErrors = {};
-    if (!form.platformHandle.trim()) next.platformHandle = 'Required';
-    else if (form.platformHandle.length > 100) next.platformHandle = 'Max 100 characters';
+    const handleErrs: string[] = [];
+    const audienceErrs: string[] = [];
+    const urlErrs: string[] = [];
+    let anyPlatformErr = false;
 
-    if (form.audienceSize.trim() && !/^\d+$/.test(form.audienceSize.trim())) {
-      next.audienceSize = 'Must be a whole number';
+    if (form.platforms.length === 0) {
+      next.platforms = 'Add at least one platform';
+    }
+    if (form.platforms.length > MAX_PLATFORMS) {
+      next.platforms = `Max ${MAX_PLATFORMS} platforms`;
     }
 
-    if (form.audienceUrl.trim()) {
-      try {
-        // URL constructor is strict enough for the basic validity check.
-        new URL(form.audienceUrl.trim());
-      } catch {
-        next.audienceUrl = 'Must be a valid URL';
+    form.platforms.forEach((p, i) => {
+      const h = p.handle.trim();
+      if (!h) {
+        handleErrs[i] = 'Required';
+        anyPlatformErr = true;
+      } else if (h.length > 100) {
+        handleErrs[i] = 'Max 100 characters';
+        anyPlatformErr = true;
       }
+
+      if (p.audienceSize.trim() && !/^\d+$/.test(p.audienceSize.trim())) {
+        audienceErrs[i] = 'Must be a whole number';
+        anyPlatformErr = true;
+      }
+
+      if (p.url.trim()) {
+        try {
+          new URL(p.url.trim());
+        } catch {
+          urlErrs[i] = 'Must be a valid URL';
+          anyPlatformErr = true;
+        }
+      }
+    });
+
+    if (anyPlatformErr) {
+      next.platformHandles = handleErrs;
+      next.platformAudience = audienceErrs;
+      next.platformUrl = urlErrs;
     }
+
+    // Desired slug (optional)
+    const slugErr = validateSlug(form.desiredSlug);
+    if (slugErr) next.desiredSlug = slugErr;
 
     const pitch = form.pitch.trim();
     if (pitch.length < 50) next.pitch = 'Pitch must be at least 50 characters';
@@ -349,26 +497,48 @@ function ApplyForm({
     return next;
   }, [form, needsPayoutAddress]);
 
+  const hasErrors = (e: FieldErrors): boolean => {
+    if (e.platforms || e.desiredSlug || e.pitch || e.payoutAddress) return true;
+    if (e.platformHandles?.some(Boolean)) return true;
+    if (e.platformAudience?.some(Boolean)) return true;
+    if (e.platformUrl?.some(Boolean)) return true;
+    return false;
+  };
+
   const onSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
+      if (submitting) return; // hard stop on double-submit
       setSubmitError(null);
       const validationErrors = validate();
       setErrors(validationErrors);
-      if (Object.keys(validationErrors).length > 0) return;
+      if (hasErrors(validationErrors)) return;
+
+      const desiredSlugFinal = form.desiredSlug.trim().toLowerCase();
+
+      const platformsPayload = form.platforms.map((p) => {
+        const payload: {
+          type: PlatformType;
+          handle: string;
+          audienceSize?: number;
+          url?: string;
+        } = {
+          type: p.type,
+          handle: p.handle.trim(),
+        };
+        if (p.audienceSize.trim()) payload.audienceSize = Number(p.audienceSize.trim());
+        if (p.url.trim()) payload.url = p.url.trim();
+        return payload;
+      });
 
       setSubmitting(true);
       try {
         const res = await api.submitAffiliateApplication({
-          platformHandle: form.platformHandle.trim(),
-          platformType: form.platformType,
-          audienceSize: form.audienceSize.trim()
-            ? Number(form.audienceSize.trim())
-            : undefined,
-          audienceUrl: form.audienceUrl.trim() || undefined,
+          platforms: platformsPayload,
           pitch: form.pitch.trim(),
           payoutMode: form.payoutMode,
           payoutAddress: needsPayoutAddress ? form.payoutAddress.trim() : undefined,
+          desiredSlug: desiredSlugFinal || undefined,
         });
 
         if (res.success) {
@@ -376,21 +546,30 @@ function ApplyForm({
           onSubmitted({
             id: res.data.application.id,
             status: res.data.application.status,
-            platformHandle: form.platformHandle.trim(),
-            platformType: form.platformType,
-            audienceSize: form.audienceSize.trim() ? Number(form.audienceSize.trim()) : null,
-            audienceUrl: form.audienceUrl.trim() || null,
+            platforms: platformsPayload.map((p) => ({
+              type: p.type,
+              handle: p.handle,
+              audienceSize: p.audienceSize ?? null,
+              url: p.url ?? null,
+            })),
             pitch: form.pitch.trim(),
             payoutMode: form.payoutMode,
             payoutAddress: needsPayoutAddress ? form.payoutAddress.trim() : null,
+            desiredSlug: desiredSlugFinal || null,
             createdAt: res.data.application.createdAt,
             reviewedAt: null,
             reviewNotes: null,
           });
         } else {
-          // 409 "Application already submitted" → parent will re-fetch
-          // via its polling pattern. For now just surface the message.
-          setSubmitError(res.error || 'Could not submit application');
+          // Map known server errors to the appropriate field.
+          const msg = res.error || 'Could not submit application';
+          if (/slug/i.test(msg) && /taken/i.test(msg)) {
+            setErrors((prev) => ({ ...prev, desiredSlug: msg }));
+          } else if (/slug/i.test(msg)) {
+            setErrors((prev) => ({ ...prev, desiredSlug: msg }));
+          } else {
+            setSubmitError(msg);
+          }
         }
       } catch (err) {
         setSubmitError((err as Error).message);
@@ -398,7 +577,7 @@ function ApplyForm({
         setSubmitting(false);
       }
     },
-    [form, needsPayoutAddress, onSubmitted, validate],
+    [form, needsPayoutAddress, onSubmitted, submitting, validate],
   );
 
   if (success) {
@@ -447,7 +626,7 @@ function ApplyForm({
           Tell us about you.
         </h1>
         <p className="mt-3 text-sm text-[var(--text-secondary)] max-w-xl leading-relaxed">
-          A few details about your platform and audience. We review every application manually — be
+          A few details about your platforms and audience. We review every application manually — be
           honest, be specific.
         </p>
       </div>
@@ -477,57 +656,169 @@ function ApplyForm({
         </div>
       )}
 
-      <form onSubmit={onSubmit} noValidate className="space-y-6">
-        <Field label="Platform handle" error={errors.platformHandle} required>
-          <input
-            type="text"
-            value={form.platformHandle}
-            onChange={(e) => setForm({ ...form, platformHandle: e.target.value })}
-            placeholder="@cristian"
-            className="input"
-            maxLength={100}
-            required
-          />
-        </Field>
+      <form onSubmit={onSubmit} noValidate className="space-y-8">
+        {/* ───────────── Platforms ───────────── */}
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
+              Your platforms <span className="text-red-400">*</span>
+            </h2>
+            <span className="text-[11px] text-[var(--text-muted)]">
+              {form.platforms.length} / {MAX_PLATFORMS}
+            </span>
+          </div>
 
-        <Field label="Platform type" required>
-          <select
-            value={form.platformType}
-            onChange={(e) =>
-              setForm({ ...form, platformType: e.target.value as PlatformType })
-            }
-            className="input"
+          <div className="space-y-3">
+            {form.platforms.map((p, idx) => {
+              const handleErr = errors.platformHandles?.[idx];
+              const audienceErr = errors.platformAudience?.[idx];
+              const urlErr = errors.platformUrl?.[idx];
+              const showRemove = form.platforms.length > 1;
+              return (
+                <div
+                  key={idx}
+                  className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)]/40 p-4"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)]">
+                      Platform {idx + 1}
+                    </span>
+                    {showRemove && (
+                      <button
+                        type="button"
+                        onClick={() => removePlatform(idx)}
+                        className="inline-flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-red-400 transition-colors"
+                        aria-label={`Remove platform ${idx + 1}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Remove
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <Field label="Platform type" required>
+                      <select
+                        value={p.type}
+                        onChange={(e) =>
+                          updatePlatform(idx, { type: e.target.value as PlatformType })
+                        }
+                        className="w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-primary)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                      >
+                        {PLATFORM_OPTIONS.map((opt) => (
+                          <option
+                            key={opt.value}
+                            value={opt.value}
+                            className="bg-[var(--bg-card)] text-[var(--text-primary)]"
+                          >
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    </Field>
+
+                    <Field label="Handle" required error={handleErr}>
+                      <input
+                        type="text"
+                        value={p.handle}
+                        onChange={(e) => updatePlatform(idx, { handle: e.target.value })}
+                        placeholder="@hatcher"
+                        className="input"
+                        maxLength={100}
+                        required
+                      />
+                      <p className="mt-1 text-[11px] text-[var(--text-muted)]">
+                        e.g. @hatcher, @solana, /channel/xyz
+                      </p>
+                    </Field>
+
+                    <Field label="Audience size (optional)" error={audienceErr}>
+                      <input
+                        type="number"
+                        min={0}
+                        value={p.audienceSize}
+                        onChange={(e) => updatePlatform(idx, { audienceSize: e.target.value })}
+                        placeholder="e.g. 12000"
+                        className="input"
+                      />
+                    </Field>
+
+                    <Field label="URL (optional)" error={urlErr}>
+                      <input
+                        type="url"
+                        value={p.url}
+                        onChange={(e) => updatePlatform(idx, { url: e.target.value })}
+                        placeholder="https://x.com/hatcher"
+                        className="input"
+                      />
+                    </Field>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {errors.platforms && (
+            <p className="mt-2 text-xs text-red-400">{errors.platforms}</p>
+          )}
+
+          <button
+            type="button"
+            onClick={addPlatform}
+            disabled={form.platforms.length >= MAX_PLATFORMS}
+            className="mt-3 inline-flex items-center gap-1.5 h-9 px-3 rounded-md border border-dashed border-[var(--border-default)] text-sm text-[var(--text-secondary)] hover:border-[var(--color-accent)] hover:text-[var(--text-primary)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {PLATFORM_OPTIONS.map((p) => (
-              <option key={p.value} value={p.value}>
-                {p.label}
-              </option>
-            ))}
-          </select>
+            <Plus className="w-4 h-4" />
+            Add another platform
+          </button>
+        </section>
+
+        {/* ───────────── Desired slug ───────────── */}
+        <Field label="Custom referral link (optional)" error={errors.desiredSlug}>
+          <div className="flex items-stretch rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] focus-within:border-[var(--color-accent)] transition-colors">
+            <span className="inline-flex items-center px-3 text-xs font-mono text-[var(--text-muted)] border-r border-[var(--border-default)] select-none">
+              hatcher.host/r/
+            </span>
+            <input
+              type="text"
+              value={form.desiredSlug}
+              onChange={(e) =>
+                // Strip whitespace immediately; lowercase on blur for UX.
+                setForm({ ...form, desiredSlug: e.target.value.replace(/\s+/g, '') })
+              }
+              onBlur={() =>
+                setForm((f) => ({ ...f, desiredSlug: f.desiredSlug.trim().toLowerCase() }))
+              }
+              placeholder="yourname"
+              className="flex-1 bg-transparent px-3 py-2 text-sm text-[var(--text-primary)] focus:outline-none placeholder:text-[var(--text-muted)]"
+              maxLength={30}
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+            />
+          </div>
+          {/* Live preview / status */}
+          {(() => {
+            if (errors.desiredSlug) return null; // field-level error takes over
+            if (slugTrimmed.length === 0) {
+              return (
+                <p className="mt-1.5 text-xs text-[var(--text-muted)]">
+                  Leave blank for an auto-generated code
+                </p>
+              );
+            }
+            if (slugError) {
+              return <p className="mt-1.5 text-xs text-red-400">{slugError}</p>;
+            }
+            return (
+              <p className="mt-1.5 text-xs text-[#22c55e]">
+                Your link will be hatcher.host/r/{slugTrimmed}
+              </p>
+            );
+          })()}
         </Field>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field label="Audience size (optional)" error={errors.audienceSize}>
-            <input
-              type="number"
-              min={0}
-              value={form.audienceSize}
-              onChange={(e) => setForm({ ...form, audienceSize: e.target.value })}
-              placeholder="e.g. 12000"
-              className="input"
-            />
-          </Field>
-          <Field label="Audience URL (optional)" error={errors.audienceUrl}>
-            <input
-              type="url"
-              value={form.audienceUrl}
-              onChange={(e) => setForm({ ...form, audienceUrl: e.target.value })}
-              placeholder="https://x.com/yourhandle"
-              className="input"
-            />
-          </Field>
-        </div>
-
+        {/* ───────────── Pitch ───────────── */}
         <Field label="Pitch" error={errors.pitch} required>
           <textarea
             value={form.pitch}
@@ -545,6 +836,7 @@ function ApplyForm({
           </div>
         </Field>
 
+        {/* ───────────── Payout mode ───────────── */}
         <fieldset>
           <legend className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)] mb-3">
             Payout mode <span className="text-red-400">*</span>

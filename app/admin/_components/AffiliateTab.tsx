@@ -24,16 +24,24 @@ type AppStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'ALL';
 // naive conditional extraction. Re-declaring keeps the component
 // self-contained and easy to read.
 
+type PlatformType = 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
+
+type ApplicationPlatform = {
+  type: PlatformType;
+  handle: string;
+  audienceSize: number | null;
+  url: string | null;
+};
+
 type ApplicationRow = {
   id: string;
   userId: string;
   userEmail: string;
   username: string;
-  platformHandle: string;
-  platformType: 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
-  audienceSize: number | null;
+  platforms: ApplicationPlatform[];
   payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
   pitch: string;
+  desiredSlug: string | null;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   createdAt: string;
 };
@@ -42,13 +50,11 @@ type ApplicationDetail = {
   application: {
     id: string;
     userId: string;
-    platformHandle: string;
-    platformType: string;
-    audienceSize: number | null;
-    audienceUrl: string | null;
+    platforms: ApplicationPlatform[];
     pitch: string;
     payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
     payoutAddress: string | null;
+    desiredSlug: string | null;
     status: 'PENDING' | 'APPROVED' | 'REJECTED';
     reviewedBy: string | null;
     reviewedAt: string | null;
@@ -329,14 +335,45 @@ function ApplicationsView() {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((r) => (
+                {rows.map((r) => {
+                  // First platform gets the table cell; extra ones show as
+                  // a +N badge with a tooltip listing them all. `|| null`
+                  // is defensive — backend should always return at least 1.
+                  const first = r.platforms[0];
+                  const extra = r.platforms.length - 1;
+                  const totalAudience = r.platforms.reduce(
+                    (s, p) => s + (p.audienceSize ?? 0),
+                    0,
+                  );
+                  const tooltip = r.platforms
+                    .map((p) => `${p.type} · ${p.handle}`)
+                    .join('\n');
+                  return (
                   <tr key={r.id} className="border-b border-[var(--border-primary)]/20 hover:bg-[var(--bg-card)]/40">
                     <td className="py-2 px-3 text-[var(--text-muted)] whitespace-nowrap">{timeAgo(r.createdAt)}</td>
                     <td className="py-2 px-3 text-[var(--text-primary)]">{r.userEmail}</td>
-                    <td className="py-2 px-3 text-[var(--text-primary)]">
-                      <span className="font-mono text-[var(--color-accent)]">{r.platformType}</span> · {r.platformHandle}
+                    <td className="py-2 px-3 text-[var(--text-primary)]" title={tooltip}>
+                      {first ? (
+                        <>
+                          <span className="font-mono text-[var(--color-accent)]">{first.type}</span>
+                          {' · '}
+                          {first.handle}
+                        </>
+                      ) : (
+                        <span className="text-[var(--text-muted)]">—</span>
+                      )}
+                      {extra > 0 && (
+                        <span
+                          className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] text-[10px] font-medium"
+                          title={tooltip}
+                        >
+                          +{extra}
+                        </span>
+                      )}
                     </td>
-                    <td className="py-2 px-3 text-[var(--text-muted)]">{r.audienceSize?.toLocaleString() ?? '—'}</td>
+                    <td className="py-2 px-3 text-[var(--text-muted)]">
+                      {totalAudience > 0 ? totalAudience.toLocaleString() : '—'}
+                    </td>
                     <td className="py-2 px-3 text-[var(--text-muted)]">{r.payoutMode}</td>
                     <td className="py-2 px-3"><StatusPill status={r.status} /></td>
                     <td className="py-2 px-3">
@@ -358,7 +395,8 @@ function ApplicationsView() {
                       </button>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -384,6 +422,7 @@ function ApplicationPanel({ id, onClose, onActionComplete }: { id: string; onClo
   const [loading, setLoading] = useState(true);
   const [rejectNotes, setRejectNotes] = useState('');
   const [approveNotes, setApproveNotes] = useState('');
+  const [overrideSlug, setOverrideSlug] = useState('');
   const [mode, setMode] = useState<'view' | 'approve' | 'reject'>('view');
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -404,7 +443,11 @@ function ApplicationPanel({ id, onClose, onActionComplete }: { id: string; onClo
 
   async function handleApprove() {
     setSubmitting(true);
-    const res = await api.adminApproveAffiliateApplication(id, approveNotes.trim() || undefined);
+    const slugInput = overrideSlug.trim().toLowerCase();
+    const res = await api.adminApproveAffiliateApplication(id, {
+      notes: approveNotes.trim() || undefined,
+      overrideSlug: slugInput || undefined,
+    });
     setSubmitting(false);
     if (res.success) {
       setToast(`Approved — code: ${res.data.affiliate.referralCode}`);
@@ -442,9 +485,44 @@ function ApplicationPanel({ id, onClose, onActionComplete }: { id: string; onClo
             </div>
           </section>
 
+          <section>
+            <h3 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-2">
+              Platforms ({detail.application.platforms.length})
+            </h3>
+            <ul className="space-y-1.5">
+              {detail.application.platforms.map((p, i) => (
+                <li
+                  key={i}
+                  className="text-xs p-2 rounded bg-[var(--bg-card)] border border-[var(--border-primary)]"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[var(--text-primary)]">
+                      <span className="font-mono text-[var(--color-accent)] uppercase">{p.type}</span>
+                      {' · '}
+                      {p.handle}
+                    </span>
+                    {p.audienceSize !== null && (
+                      <span className="text-[var(--text-muted)]">
+                        {p.audienceSize.toLocaleString()} followers
+                      </span>
+                    )}
+                  </div>
+                  {p.url && (
+                    <a
+                      href={p.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-0.5 text-[var(--color-accent)] hover:underline flex items-center gap-1 break-all text-[10px]"
+                    >
+                      {p.url} <ExternalLink size={10} />
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+
           <section className="grid grid-cols-2 gap-2 text-xs">
-            <DataCell label="Platform" value={`${detail.application.platformType} · ${detail.application.platformHandle}`} />
-            <DataCell label="Audience" value={detail.application.audienceSize?.toLocaleString() ?? '—'} />
             <DataCell label="Payout mode" value={detail.application.payoutMode} />
             <DataCell
               label="Payout address"
@@ -452,17 +530,17 @@ function ApplicationPanel({ id, onClose, onActionComplete }: { id: string; onClo
             />
           </section>
 
-          {detail.application.audienceUrl && (
-            <section>
-              <h3 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1">Audience URL</h3>
-              <a
-                href={detail.application.audienceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-[var(--color-accent)] hover:underline flex items-center gap-1 break-all"
-              >
-                {detail.application.audienceUrl} <ExternalLink size={11} />
-              </a>
+          {detail.application.desiredSlug && (
+            <section className="p-3 rounded-lg bg-[var(--color-accent)]/5 border border-[var(--color-accent)]/20">
+              <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-0.5">
+                User requested slug
+              </div>
+              <div className="text-sm text-[var(--text-primary)] font-mono">
+                {detail.application.desiredSlug}
+                <span className="ml-2 text-xs text-[var(--text-muted)]">
+                  → hatcher.host/r/{detail.application.desiredSlug}
+                </span>
+              </div>
             </section>
           )}
 
@@ -512,7 +590,36 @@ function ApplicationPanel({ id, onClose, onActionComplete }: { id: string; onClo
 
               {mode === 'approve' && (
                 <div className="space-y-2">
-                  <label className="text-xs text-[var(--text-muted)]">Internal notes (optional)</label>
+                  <label className="text-xs text-[var(--text-muted)]">Override slug (optional)</label>
+                  <div className="flex items-stretch rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-primary)] focus-within:border-[var(--color-accent)] transition-colors">
+                    <span className="inline-flex items-center px-2.5 text-[11px] font-mono text-[var(--text-muted)] border-r border-[var(--border-primary)] select-none">
+                      hatcher.host/r/
+                    </span>
+                    <input
+                      type="text"
+                      value={overrideSlug}
+                      onChange={(e) =>
+                        setOverrideSlug(e.target.value.replace(/\s+/g, ''))
+                      }
+                      onBlur={() => setOverrideSlug((s) => s.trim().toLowerCase())}
+                      className="flex-1 bg-transparent px-2.5 py-2 text-sm text-[var(--text-primary)] font-mono focus:outline-none placeholder:text-[var(--text-muted)]"
+                      placeholder="Leave blank to use user's desired or auto-generate"
+                      maxLength={30}
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck={false}
+                    />
+                  </div>
+                  {detail.application.desiredSlug && !overrideSlug.trim() && (
+                    <div className="text-[10px] text-[var(--text-muted)]">
+                      Will attempt user&apos;s requested slug:{' '}
+                      <code className="font-mono text-[var(--text-primary)]">
+                        {detail.application.desiredSlug}
+                      </code>
+                    </div>
+                  )}
+
+                  <label className="text-xs text-[var(--text-muted)] mt-2 block">Internal notes (optional)</label>
                   <textarea
                     value={approveNotes}
                     onChange={(e) => setApproveNotes(e.target.value)}

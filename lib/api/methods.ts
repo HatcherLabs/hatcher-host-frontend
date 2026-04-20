@@ -2104,13 +2104,16 @@ export const api = {
       application: {
         id: string;
         status: 'PENDING' | 'APPROVED' | 'REJECTED';
-        platformHandle: string;
-        platformType: 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
-        audienceSize: number | null;
-        audienceUrl: string | null;
+        platforms: Array<{
+          type: 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
+          handle: string;
+          audienceSize: number | null;
+          url: string | null;
+        }>;
         pitch: string;
         payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
         payoutAddress: string | null;
+        desiredSlug: string | null;
         createdAt: string;
         reviewedAt: string | null;
         reviewNotes: string | null;
@@ -2118,13 +2121,16 @@ export const api = {
     }>('/affiliate/application'),
 
   submitAffiliateApplication: (body: {
-    platformHandle: string;
-    platformType: 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
-    audienceSize?: number;
-    audienceUrl?: string;
+    platforms: Array<{
+      type: 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
+      handle: string;
+      audienceSize?: number;
+      url?: string;
+    }>;
     pitch: string;
     payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
     payoutAddress?: string;
+    desiredSlug?: string;
   }) =>
     req<{
       application: {
@@ -2155,11 +2161,15 @@ export const api = {
         userId: string;
         userEmail: string;
         username: string;
-        platformHandle: string;
-        platformType: 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
-        audienceSize: number | null;
+        platforms: Array<{
+          type: 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
+          handle: string;
+          audienceSize: number | null;
+          url: string | null;
+        }>;
         payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
         pitch: string;
+        desiredSlug: string | null;
         status: 'PENDING' | 'APPROVED' | 'REJECTED';
         createdAt: string;
       }>;
@@ -2172,13 +2182,16 @@ export const api = {
       application: {
         id: string;
         userId: string;
-        platformHandle: string;
-        platformType: string;
-        audienceSize: number | null;
-        audienceUrl: string | null;
+        platforms: Array<{
+          type: 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
+          handle: string;
+          audienceSize: number | null;
+          url: string | null;
+        }>;
         pitch: string;
         payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
         payoutAddress: string | null;
+        desiredSlug: string | null;
         status: 'PENDING' | 'APPROVED' | 'REJECTED';
         reviewedBy: string | null;
         reviewedAt: string | null;
@@ -2212,13 +2225,20 @@ export const api = {
       }>;
     }>(`/admin/affiliate/applications/${id}`),
 
-  adminApproveAffiliateApplication: (id: string, notes?: string) =>
-    req<{
+  adminApproveAffiliateApplication: (
+    id: string,
+    opts?: { notes?: string; overrideSlug?: string },
+  ) => {
+    const body: { notes?: string; overrideSlug?: string } = {};
+    if (opts?.notes) body.notes = opts.notes;
+    if (opts?.overrideSlug) body.overrideSlug = opts.overrideSlug;
+    return req<{
       affiliate: { id: string; referralCode: string; payoutMode: string; createdAt: string };
     }>(`/admin/affiliate/applications/${id}/approve`, {
       method: 'POST',
-      body: JSON.stringify(notes ? { notes } : {}),
-    }),
+      body: JSON.stringify(body),
+    });
+  },
 
   adminRejectAffiliateApplication: (id: string, notes: string) =>
     req<{ application: { id: string; status: string; reviewNotes: string | null } }>(
