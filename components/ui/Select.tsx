@@ -127,7 +127,7 @@ export function Select<T extends string>({
         <div
           ref={menuRef}
           role="listbox"
-          className="absolute z-50 mt-1 w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] shadow-lg overflow-hidden"
+          className="absolute z-50 mt-1 w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-xl overflow-hidden"
         >
           {options.map((opt, i) => (
             <button
