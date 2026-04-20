@@ -2094,6 +2094,49 @@ export const api = {
       };
     }>('/affiliate/me/stats'),
 
+  // ─── Affiliate Application (public marketing + apply flow) ───
+  // Used by `/affiliate/apply` to detect an existing application
+  // (PENDING / APPROVED / REJECTED / none) and submit a new one.
+  // The apply page renders different states based on the result.
+
+  getMyAffiliateApplication: () =>
+    req<{
+      application: {
+        id: string;
+        status: 'PENDING' | 'APPROVED' | 'REJECTED';
+        platformHandle: string;
+        platformType: 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
+        audienceSize: number | null;
+        audienceUrl: string | null;
+        pitch: string;
+        payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
+        payoutAddress: string | null;
+        createdAt: string;
+        reviewedAt: string | null;
+        reviewNotes: string | null;
+      } | null;
+    }>('/affiliate/application'),
+
+  submitAffiliateApplication: (body: {
+    platformHandle: string;
+    platformType: 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
+    audienceSize?: number;
+    audienceUrl?: string;
+    pitch: string;
+    payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
+    payoutAddress?: string;
+  }) =>
+    req<{
+      application: {
+        id: string;
+        status: 'PENDING' | 'APPROVED' | 'REJECTED';
+        createdAt: string;
+      };
+    }>('/affiliate/apply', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
   // ─── Admin Affiliate (Phase V) ───────────────────────────────
   // Types inline — this is an admin-only surface, not worth a shared
   // package bump. Every endpoint requires `isAdmin = true`; server
