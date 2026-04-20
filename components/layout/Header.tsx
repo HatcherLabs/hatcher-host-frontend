@@ -10,7 +10,7 @@ import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield, LogOut, Settings, ChevronDown,
-  Users, Wallet, Activity, MessageSquare,
+  Users, Wallet, Activity, MessageSquare, Award,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
@@ -81,6 +81,25 @@ export function Header() {
   const isAdmin = user?.isAdmin ?? false;
   const [creditBalance, setCreditBalance] = useState<number | null>(null);
 
+  // ── Affiliate menu state ───────────────────────────────────
+  // Three public states for the dropdown entry:
+  //   'affiliate'   → already an Affiliate → dashboard link
+  //   'pending'     → application under review (read-only)
+  //   'rejected'    → was rejected → offer re-apply
+  //   'none'        → no record yet → "Become an affiliate"
+  // Fetched lazily on first dropdown open (and only when logged in)
+  // so the header doesn't fire two extra requests on every page load.
+  type AffiliateMenuState = 'affiliate' | 'pending' | 'rejected' | 'none';
+  const [affiliateState, setAffiliateState] = useState<AffiliateMenuState | null>(null);
+
+  // Reset per-user caches when the signed-in identity changes (login→logout→
+  // login as different user). Without this, the dropdown keeps the previous
+  // user's affiliate/credit state until a hard refresh.
+  useEffect(() => {
+    setAffiliateState(null);
+    setCreditBalance(null);
+  }, [user?.id]);
+
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (mobileOpen) {
@@ -96,6 +115,59 @@ export function Header() {
       });
     }
   }, [isAuthenticated, dropdownOpen, creditBalance]);
+
+  // Affiliate state fetch — only when the dropdown is opened by a
+  // logged-in user, and only once per session. getAffiliateMe returns
+  // 403 (success: false) if the user has no Affiliate record; then we
+  // fall back to /affiliate/application to figure out pending/rejected.
+  useEffect(() => {
+    if (!isAuthenticated || !dropdownOpen || affiliateState !== null) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const me = await api.getAffiliateMe();
+        if (cancelled) return;
+        if (me.success) {
+          setAffiliateState('affiliate');
+          return;
+        }
+        const app = await api.getMyAffiliateApplication();
+        if (cancelled) return;
+        if (app.success && app.data.application) {
+          const status = app.data.application.status;
+          if (status === 'PENDING') setAffiliateState('pending');
+          else if (status === 'REJECTED') setAffiliateState('rejected');
+          else if (status === 'APPROVED') setAffiliateState('affiliate');
+          else setAffiliateState('none');
+        } else {
+          setAffiliateState('none');
+        }
+      } catch {
+        if (!cancelled) setAffiliateState('none');
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated, dropdownOpen, affiliateState]);
+
+  const affiliateMenuItem = (() => {
+    switch (affiliateState) {
+      case 'affiliate':
+        return { href: '/dashboard/affiliate', label: 'Affiliate Dashboard' };
+      case 'pending':
+        return { href: '/affiliate/apply', label: 'Application under review' };
+      case 'rejected':
+        return { href: '/affiliate/apply', label: 'Reapply as affiliate' };
+      case 'none':
+        return { href: '/affiliate', label: 'Become an affiliate' };
+      default:
+        // While loading, show the neutral "Become an affiliate" link —
+        // it never crashes and worst-case sends the user to the marketing
+        // page if our fetch fails or hasn't completed yet.
+        return { href: '/affiliate', label: 'Become an affiliate' };
+    }
+  })();
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -312,6 +384,21 @@ export function Header() {
                                 </span>
                               )}
                             </div>
+                          </Link>
+
+                          {/* Affiliate entry — state-aware */}
+                          <Link
+                            href={affiliateMenuItem.href}
+                            onClick={() => setDropdownOpen(false)}
+                            className={clsx(
+                              'flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium transition-colors duration-200',
+                              isActive(pathname, affiliateMenuItem.href)
+                                ? 'text-[var(--text-primary)] bg-[var(--bg-card)]'
+                                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)]'
+                            )}
+                          >
+                            <Award className="w-3.5 h-3.5" />
+                            {affiliateMenuItem.label}
                           </Link>
 
                           {/* Extra nav links */}

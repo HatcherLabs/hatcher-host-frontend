@@ -22,6 +22,7 @@ import {
   BarChart3,
   Users,
   Activity,
+  X,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 import { FOUNDING_MEMBER_MAX_SLOTS } from '@hatcher/shared';
@@ -294,6 +295,30 @@ export default function LandingPage() {
   // don't tease users with something they can't buy).
   const [foundingRemaining, setFoundingRemaining] = useState<number | null>(null);
 
+  // Affiliate program announcement banner — dismissed persistently
+  // via the `hx_aff_banner_dismissed=1` cookie so it stays gone across
+  // reloads and across devices that share cookies (SSR-friendly too).
+  // Default to `true` during the very first client tick so the banner
+  // doesn't flash in before we read the cookie — we flip to `false`
+  // inside useEffect if the cookie is missing.
+  const [affBannerHidden, setAffBannerHidden] = useState(true);
+
+  useEffect(() => {
+    const dismissed = document.cookie
+      .split('; ')
+      .some((c) => c.startsWith('hx_aff_banner_dismissed=1'));
+    if (!dismissed) setAffBannerHidden(false);
+  }, []);
+
+  function dismissAffBanner() {
+    // 180 days is long enough that returning visitors don't see the
+    // same banner again, short enough that we can run a new campaign
+    // later without stale dismissals suppressing it forever.
+    const maxAge = 60 * 60 * 24 * 180;
+    document.cookie = `hx_aff_banner_dismissed=1; path=/; max-age=${maxAge}; SameSite=Lax`;
+    setAffBannerHidden(true);
+  }
+
   useEffect(() => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.scrollTo(0, 0);
@@ -331,6 +356,41 @@ export default function LandingPage() {
       {/* Founding Member now lives as a full section further down the
           page (between pricing and FAQ), not as a top banner. This
           gives it room to breathe and show what's included. */}
+
+      {/* ── Affiliate Program Banner — dismissible, cookie-backed ── */}
+      {!affBannerHidden && (
+        <div
+          className="relative w-full border-b border-[var(--color-accent)]/30 text-[var(--text-primary)] text-[12px] sm:text-[13px]"
+          style={{
+            background:
+              'linear-gradient(90deg, color-mix(in srgb, var(--bg-card) 85%, transparent) 0%, color-mix(in srgb, var(--color-accent) 18%, var(--bg-card)) 50%, color-mix(in srgb, var(--bg-card) 85%, transparent) 100%)',
+          }}
+        >
+          <Link
+            href="/affiliate"
+            className="block w-full py-2 pl-4 pr-10 sm:pr-12 text-center hover:brightness-110 transition"
+          >
+            <span className="inline-flex items-center gap-2 flex-wrap justify-center">
+              <Sparkles className="w-3.5 h-3.5 text-[var(--color-accent)] flex-shrink-0" />
+              <span>
+                <strong className="font-semibold">Affiliate Program is live</strong>
+                <span className="text-[var(--text-secondary)]"> — earn up to </span>
+                <strong className="font-semibold">40%</strong>
+                <span className="text-[var(--text-secondary)]"> on every referral</span>
+              </span>
+              <span className="text-[var(--color-accent)] font-semibold">→</span>
+            </span>
+          </Link>
+          <button
+            type="button"
+            onClick={dismissAffBanner}
+            aria-label="Dismiss affiliate banner"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)]/60 transition-colors"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
 
       {/* ── Token Banner — slim editorial line, single live-dot ──── */}
       <div className="w-full border-b border-[var(--border-default)] bg-[var(--bg-card-solid)] text-[var(--text-secondary)] py-2 px-4 text-[12px] sm:text-[13px]">

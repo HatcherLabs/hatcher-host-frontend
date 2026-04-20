@@ -1992,4 +1992,412 @@ export const api = {
       method: 'DELETE',
     }),
 
+  // ─── Affiliate (self-service dashboard) ──────────────────────
+  // Shapes kept inline — we don't bump @hatcherlabs/shared for a
+  // partner-only surface. Callers typically narrow with `if (success)`
+  // before touching `data`; 403 on non-affiliate is surfaced as a
+  // failed response + error === 'Not an active affiliate'.
+  getAffiliateMe: () =>
+    req<{
+      affiliate: {
+        id: string;
+        referralCode: string;
+        payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
+        payoutAddress: string | null;
+        isActive: boolean;
+        isFrozen: boolean;
+        frozenReason: string | null;
+        totalReferrals: number;
+        totalPaidRefs: number;
+        lifetimeEarnedCashUsd: number;
+        lifetimeEarnedCredits: number;
+        createdAt: string;
+      };
+      shareLink: string;
+    }>('/affiliate/me'),
+
+  getAffiliateReferrals: (params: { limit?: number; cursor?: string } = {}) => {
+    const qs = new URLSearchParams();
+    if (params.limit) qs.set('limit', String(params.limit));
+    if (params.cursor) qs.set('cursor', params.cursor);
+    return req<{
+      referrals: Array<{
+        id: string;
+        referredAt: string;
+        maskedEmail: string;
+        isPaid: boolean;
+        tier: string | null;
+        isFlagged: boolean;
+        flagReason: string | null;
+      }>;
+      nextCursor: string | null;
+    }>(`/affiliate/me/referrals${qs.toString() ? `?${qs}` : ''}`);
+  },
+
+  getAffiliateCommissions: (
+    params: { limit?: number; cursor?: string; status?: 'PENDING' | 'PAYABLE' | 'PAID' | 'VOIDED' } = {},
+  ) => {
+    const qs = new URLSearchParams();
+    if (params.limit) qs.set('limit', String(params.limit));
+    if (params.cursor) qs.set('cursor', params.cursor);
+    if (params.status) qs.set('status', params.status);
+    return req<{
+      commissions: Array<{
+        id: string;
+        createdAt: string;
+        sourceType: 'SUBSCRIPTION' | 'FOUNDING_MEMBER';
+        sourceAmountUsd: number;
+        cashAmountUsd: number;
+        creditsAmount: number;
+        status: 'PENDING' | 'PAYABLE' | 'PAID' | 'VOIDED';
+        payableAt: string;
+        paidOutAt: string | null;
+        payoutId: string | null;
+      }>;
+      nextCursor: string | null;
+    }>(`/affiliate/me/commissions${qs.toString() ? `?${qs}` : ''}`);
+  },
+
+  getAffiliatePayouts: (params: { limit?: number; cursor?: string } = {}) => {
+    const qs = new URLSearchParams();
+    if (params.limit) qs.set('limit', String(params.limit));
+    if (params.cursor) qs.set('cursor', params.cursor);
+    return req<{
+      payouts: Array<{
+        id: string;
+        processedAt: string;
+        cashAmountUsd: number;
+        cashTxHash: string | null;
+        cashCurrency: string | null;
+        creditsAmount: number;
+        creditsAppliedAt: string | null;
+        adminNote: string;
+        commissionCount: number;
+      }>;
+      nextCursor: string | null;
+    }>(`/affiliate/me/payouts${qs.toString() ? `?${qs}` : ''}`);
+  },
+
+  getAffiliateStats: () =>
+    req<{
+      totalReferrals: number;
+      paidReferrals: number;
+      pending: { cashUsd: number; credits: number };
+      payable: { cashUsd: number; credits: number };
+      paid: { cashUsd: number; credits: number };
+      voided: { count: number };
+      lifetime: {
+        cashUsdEarned: number;
+        creditsEarned: number;
+        cashUsdPaidOut: number;
+        creditsPaidOut: number;
+      };
+    }>('/affiliate/me/stats'),
+
+  // ─── Affiliate Application (public marketing + apply flow) ───
+  // Used by `/affiliate/apply` to detect an existing application
+  // (PENDING / APPROVED / REJECTED / none) and submit a new one.
+  // The apply page renders different states based on the result.
+
+  getMyAffiliateApplication: () =>
+    req<{
+      application: {
+        id: string;
+        status: 'PENDING' | 'APPROVED' | 'REJECTED';
+        platforms: Array<{
+          type: 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
+          handle: string;
+          audienceSize: number | null;
+          url: string | null;
+        }>;
+        pitch: string;
+        payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
+        payoutAddress: string | null;
+        desiredSlug: string | null;
+        createdAt: string;
+        reviewedAt: string | null;
+        reviewNotes: string | null;
+      } | null;
+    }>('/affiliate/application'),
+
+  submitAffiliateApplication: (body: {
+    platforms: Array<{
+      type: 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
+      handle: string;
+      audienceSize?: number;
+      url?: string;
+    }>;
+    pitch: string;
+    payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
+    payoutAddress?: string;
+    desiredSlug?: string;
+  }) =>
+    req<{
+      application: {
+        id: string;
+        status: 'PENDING' | 'APPROVED' | 'REJECTED';
+        createdAt: string;
+      };
+    }>('/affiliate/apply', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  // ─── Admin Affiliate (Phase V) ───────────────────────────────
+  // Types inline — this is an admin-only surface, not worth a shared
+  // package bump. Every endpoint requires `isAdmin = true`; server
+  // returns 403 "Admin access required" otherwise.
+
+  adminListAffiliateApplications: (
+    params: { status?: 'PENDING' | 'APPROVED' | 'REJECTED'; limit?: number; cursor?: string } = {},
+  ) => {
+    const qs = new URLSearchParams();
+    if (params.status) qs.set('status', params.status);
+    if (params.limit) qs.set('limit', String(params.limit));
+    if (params.cursor) qs.set('cursor', params.cursor);
+    return req<{
+      applications: Array<{
+        id: string;
+        userId: string;
+        userEmail: string;
+        username: string;
+        platforms: Array<{
+          type: 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
+          handle: string;
+          audienceSize: number | null;
+          url: string | null;
+        }>;
+        payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
+        pitch: string;
+        desiredSlug: string | null;
+        status: 'PENDING' | 'APPROVED' | 'REJECTED';
+        createdAt: string;
+      }>;
+      nextCursor: string | null;
+    }>(`/admin/affiliate/applications${qs.toString() ? `?${qs}` : ''}`);
+  },
+
+  adminGetAffiliateApplication: (id: string) =>
+    req<{
+      application: {
+        id: string;
+        userId: string;
+        platforms: Array<{
+          type: 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
+          handle: string;
+          audienceSize: number | null;
+          url: string | null;
+        }>;
+        pitch: string;
+        payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
+        payoutAddress: string | null;
+        desiredSlug: string | null;
+        status: 'PENDING' | 'APPROVED' | 'REJECTED';
+        reviewedBy: string | null;
+        reviewedAt: string | null;
+        reviewNotes: string | null;
+        createdAt: string;
+        user: {
+          id: string;
+          email: string;
+          username: string;
+          tier: string;
+          createdAt: string;
+          emailVerified: boolean;
+          walletAddress: string | null;
+        };
+      };
+      existingAffiliate: {
+        id: string;
+        referralCode: string;
+        payoutMode: string;
+        isActive: boolean;
+        isFrozen: boolean;
+        totalReferrals: number;
+        createdAt: string;
+      } | null;
+      priorApplications: Array<{
+        id: string;
+        status: string;
+        createdAt: string;
+        reviewedAt: string | null;
+        reviewNotes: string | null;
+      }>;
+    }>(`/admin/affiliate/applications/${id}`),
+
+  adminApproveAffiliateApplication: (
+    id: string,
+    opts?: { notes?: string; overrideSlug?: string },
+  ) => {
+    const body: { notes?: string; overrideSlug?: string } = {};
+    if (opts?.notes) body.notes = opts.notes;
+    if (opts?.overrideSlug) body.overrideSlug = opts.overrideSlug;
+    return req<{
+      affiliate: { id: string; referralCode: string; payoutMode: string; createdAt: string };
+    }>(`/admin/affiliate/applications/${id}/approve`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  adminRejectAffiliateApplication: (id: string, notes: string) =>
+    req<{ application: { id: string; status: string; reviewNotes: string | null } }>(
+      `/admin/affiliate/applications/${id}/reject`,
+      { method: 'POST', body: JSON.stringify({ notes }) },
+    ),
+
+  adminListAffiliates: (
+    params: { status?: 'active' | 'frozen' | 'all'; limit?: number; cursor?: string } = {},
+  ) => {
+    const qs = new URLSearchParams();
+    if (params.status) qs.set('status', params.status);
+    if (params.limit) qs.set('limit', String(params.limit));
+    if (params.cursor) qs.set('cursor', params.cursor);
+    return req<{
+      affiliates: Array<{
+        id: string;
+        referralCode: string;
+        userId: string;
+        userEmail: string;
+        userUsername: string;
+        payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
+        isActive: boolean;
+        isFrozen: boolean;
+        frozenReason: string | null;
+        totalReferrals: number;
+        totalPaidRefs: number;
+        lifetimeEarnedCashUsd: number;
+        lifetimeEarnedCredits: number;
+        payableCashUsd: number;
+        payableCredits: number;
+        createdAt: string;
+      }>;
+      nextCursor: string | null;
+    }>(`/admin/affiliate/affiliates${qs.toString() ? `?${qs}` : ''}`);
+  },
+
+  adminGetAffiliate: (id: string) =>
+    req<{
+      affiliate: {
+        id: string;
+        referralCode: string;
+        payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
+        payoutAddress: string | null;
+        isActive: boolean;
+        isFrozen: boolean;
+        frozenReason: string | null;
+        totalReferrals: number;
+        totalPaidRefs: number;
+        lifetimeEarnedCashUsd: number;
+        lifetimeEarnedCredits: number;
+        createdAt: string;
+        user: {
+          id: string;
+          email: string;
+          username: string;
+          tier: string;
+          createdAt: string;
+          emailVerified: boolean;
+          walletAddress: string | null;
+        };
+      };
+      referrals: Array<{
+        id: string;
+        referredAt: string;
+        referredEmail: string;
+        referredTier: string | null;
+        isFlagged: boolean;
+        flagReason: string | null;
+      }>;
+      commissions: Array<{
+        id: string;
+        createdAt: string;
+        sourceType: 'SUBSCRIPTION' | 'FOUNDING_MEMBER';
+        sourceAmountUsd: number;
+        cashAmountUsd: number;
+        creditsAmount: number;
+        status: 'PENDING' | 'PAYABLE' | 'PAID' | 'VOIDED';
+        payableAt: string;
+        paidOutAt: string | null;
+        payoutId: string | null;
+      }>;
+      payouts: Array<{
+        id: string;
+        processedAt: string;
+        processedBy: string;
+        cashAmountUsd: number;
+        cashTxHash: string | null;
+        cashCurrency: string | null;
+        creditsAmount: number;
+        creditsAppliedAt: string | null;
+        adminNote: string;
+        commissionCount: number;
+      }>;
+      stats: {
+        totalReferrals: number;
+        paidReferrals: number;
+        pending: { cashUsd: number; credits: number };
+        payable: { cashUsd: number; credits: number };
+        paid: { cashUsd: number; credits: number };
+        voided: { count: number };
+        lifetime: {
+          cashUsdEarned: number;
+          creditsEarned: number;
+          cashUsdPaidOut: number;
+          creditsPaidOut: number;
+        };
+      };
+    }>(`/admin/affiliate/affiliates/${id}`),
+
+  adminFreezeAffiliate: (id: string, reason: string) =>
+    req<{ affiliate: { id: string; isFrozen: boolean; frozenReason: string | null } }>(
+      `/admin/affiliate/affiliates/${id}/freeze`,
+      { method: 'POST', body: JSON.stringify({ reason }) },
+    ),
+
+  adminUnfreezeAffiliate: (id: string) =>
+    req<{ affiliate: { id: string; isFrozen: boolean; frozenReason: string | null } }>(
+      `/admin/affiliate/affiliates/${id}/unfreeze`,
+      { method: 'POST', body: JSON.stringify({}) },
+    ),
+
+  adminListPendingPayouts: () =>
+    req<{
+      pending: Array<{
+        affiliateId: string;
+        referralCode: string;
+        userEmail: string;
+        payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
+        payoutAddress: string | null;
+        isFrozen: boolean;
+        payableCashUsd: number;
+        payableCredits: number;
+        commissionCount: number;
+        oldestPayableAt: string | null;
+      }>;
+    }>('/admin/affiliate/payouts/pending'),
+
+  adminProcessAffiliatePayout: (
+    id: string,
+    body: {
+      commissionIds: string[];
+      cashTxHash?: string;
+      cashCurrency?: 'SOL' | 'USDC' | 'HATCHER';
+      creditsAppliedAt?: string;
+      adminNote?: string;
+    },
+  ) =>
+    req<{
+      payout: {
+        id: string;
+        cashAmountUsd: number;
+        creditsAmount: number;
+        commissionCount: number;
+        processedAt: string;
+      };
+    }>(`/admin/affiliate/affiliates/${id}/payout`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
 };
