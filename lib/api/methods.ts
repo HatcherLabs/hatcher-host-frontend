@@ -1261,6 +1261,102 @@ export const api = {
   adminGetBackups: () =>
     req<{ backups: Array<{ filename: string; size: string; date: string }> }>('/admin/backups'),
 
+  /**
+   * Admin: download a backup file (C18).
+   *
+   * Returns a browser URL that — when opened in a new tab or used as an
+   * `<a href={url} download>` target — streams the gzipped backup with the
+   * right Content-Disposition. Auth is carried via the httpOnly cookie, so
+   * this works for browser-initiated downloads even though `req()` isn't
+   * involved. Falls back to a Bearer query param only if we're running in a
+   * context without cookies (not expected on the admin panel).
+   *
+   * If you need to fetch the bytes programmatically, prefer the URL-only
+   * helper and wrap it with fetch(..., { credentials: 'include' }).
+   */
+  adminBackupDownloadUrl: (filename: string) =>
+    `${API_BASE}/admin/backups/${encodeURIComponent(filename)}`,
+
+  /**
+   * Admin: 10 most recent Stripe disputes (C17).
+   *
+   * Backend always returns `{disputes, error?}` at 200. `error` is present
+   * when the Stripe API is unavailable or STRIPE_SECRET_KEY is missing — the
+   * UI should display a small warning but otherwise render an empty card.
+   */
+  adminGetStripeDisputes: () =>
+    req<{
+      disputes: Array<{
+        id: string;
+        amount: number;
+        currency: string;
+        reason: string;
+        status: string;
+        evidenceDueBy: string | null;
+        chargeId: string | null;
+        createdAt: string;
+      }>;
+      error?: string;
+      generatedAt?: string;
+    }>('/admin/stripe-disputes'),
+
+  /**
+   * Admin: recent entries from the Redis-backed admin audit log.
+   * `?limit` = 1..500 (default 100). `?action` narrows to entries whose
+   * action equals or starts with the given string.
+   */
+  adminGetAuditLog: (opts: { limit?: number; action?: string } = {}) => {
+    const qs = new URLSearchParams();
+    if (opts.limit !== undefined) qs.set('limit', String(opts.limit));
+    if (opts.action) qs.set('action', opts.action);
+    const query = qs.toString() ? `?${qs.toString()}` : '';
+    return req<{
+      entries: Array<{
+        ts: string;
+        adminId: string;
+        adminEmail: string | null;
+        action: string;
+        details: Record<string, unknown>;
+      }>;
+      total: number;
+      limit: number;
+    }>(`/admin/audit-log${query}`);
+  },
+
+  /**
+   * Admin: weekly retention cohorts (C14). Up to 8 rows, each with D1/D7/
+   * D14/D30 counts. Cells are `null` when the window hasn't elapsed yet —
+   * render "—" in the UI rather than "0 / N".
+   */
+  adminGetRetentionCohort: () =>
+    req<{
+      cohorts: Array<{
+        cohortWeek: string;
+        cohortSize: number;
+        day1: number | null;
+        day7: number | null;
+        day14: number | null;
+        day30: number | null;
+      }>;
+      generatedAt?: string;
+    }>('/admin/retention-cohort'),
+
+  /**
+   * Admin: per-platform integration delivery health (C15). Empty array if
+   * no deliveries in the last 24h.
+   */
+  adminGetIntegrationHealth: () =>
+    req<{
+      health: Array<{
+        platform: string;
+        successCount: number;
+        failureCount: number;
+        totalDeliveries: number;
+        successRate: number;
+      }>;
+      generatedAt?: string;
+    }>('/admin/integration-health'),
+
   /** Admin analytics: conversion funnel */
   adminGetFunnel: () => req<FunnelResponse>('/admin/analytics/funnel'),
 

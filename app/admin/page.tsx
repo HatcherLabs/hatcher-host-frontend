@@ -44,6 +44,12 @@ import {
   Radio,
   Flame,
   PiggyBank,
+  ChevronDown,
+  ChevronRight,
+  ScrollText,
+  CreditCard,
+  Network,
+  Archive,
 } from 'lucide-react';
 import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip as ReTooltip, BarChart, Bar, XAxis, YAxis } from 'recharts';
 import type { AdminOverviewExtras } from '@hatcher/shared';
@@ -166,6 +172,66 @@ type AdminAgent = Agent & { ownerUsername?: string; ownerWallet: string | null }
 // Admin Page
 // ═════════════════════════════════════════════════════════════
 // ── Analytics Tab ─────────────────────────────────────────────
+
+// Shared types for Phase C cards. Kept inline so we don't leak admin-only
+// response shapes into the shared package.
+type RetentionCohortRow = {
+  cohortWeek: string;
+  cohortSize: number;
+  day1: number | null;
+  day7: number | null;
+  day14: number | null;
+  day30: number | null;
+};
+type IntegrationHealthRow = {
+  platform: string;
+  successCount: number;
+  failureCount: number;
+  totalDeliveries: number;
+  successRate: number;
+};
+type StripeDisputeRow = {
+  id: string;
+  amount: number;
+  currency: string;
+  reason: string;
+  status: string;
+  evidenceDueBy: string | null;
+  chargeId: string | null;
+  createdAt: string;
+};
+type BackupRow = { filename: string; size: string; date: string };
+type LiveStatsShape = {
+  onlineUsers: number;
+  pageViewsToday: number;
+  uniqueVisitors: number;
+  timestamp: string;
+};
+
+// Small helper: Tailwind-ish pct pill colour based on D30 ordering.
+function cohortPctClass(pct: number): string {
+  if (pct >= 40) return 'text-emerald-400 bg-emerald-500/10';
+  if (pct >= 20) return 'text-amber-400 bg-amber-500/10';
+  if (pct > 0) return 'text-orange-400 bg-orange-500/10';
+  return 'text-[var(--text-muted)] bg-[rgba(46,43,74,0.3)]';
+}
+
+// Card skeleton — kept deliberately short. Matches the p-4 rounded-xl
+// layout used by every other card in this tab so loading states don't
+// shift the grid.
+function AnalyticsCardSkeleton({ label }: { label: string }) {
+  return (
+    <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+      <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)] mb-3">{label}</div>
+      <div className="space-y-2">
+        <div className="h-4 rounded shimmer" />
+        <div className="h-4 rounded w-3/4 shimmer" />
+        <div className="h-4 rounded w-1/2 shimmer" />
+      </div>
+    </div>
+  );
+}
+
 function AnalyticsTab() {
   const [funnel, setFunnel] = useState<FunnelResponse | null>(null);
   const [churn, setChurn] = useState<ChurnRadarResponse | null>(null);
@@ -175,10 +241,18 @@ function AnalyticsTab() {
   const [wsCount, setWsCount] = useState<WsCountResponse | null>(null);
   const [llmStats, setLlmStats] = useState<LlmStatsResponse | null>(null);
 
+  // Phase C additions. All independent of Phase B — any one failing
+  // doesn't block the others.
+  const [cohorts, setCohorts] = useState<RetentionCohortRow[] | null>(null);
+  const [integrationHealth, setIntegrationHealth] = useState<IntegrationHealthRow[] | null>(null);
+  const [disputes, setDisputes] = useState<{ rows: StripeDisputeRow[]; error?: string } | null>(null);
+  const [backups, setBackups] = useState<BackupRow[] | null>(null);
+  const [landingStats, setLandingStats] = useState<LiveStatsShape | null>(null);
+
   useEffect(() => {
     let cancelled = false;
     async function load() {
-      const [f, c, r, h, e, w, l] = await Promise.all([
+      const [f, c, r, h, e, w, l, coh, ih, dis, bks, live] = await Promise.all([
         api.adminGetFunnel().catch(() => null),
         api.adminGetChurnRadar().catch(() => null),
         api.adminGetReferrals().catch(() => null),
@@ -186,6 +260,11 @@ function AnalyticsTab() {
         api.adminGetErrorRate().catch(() => null),
         api.adminGetWsCount().catch(() => null),
         api.adminGetLlmStats().catch(() => null),
+        api.adminGetRetentionCohort().catch(() => null),
+        api.adminGetIntegrationHealth().catch(() => null),
+        api.adminGetStripeDisputes().catch(() => null),
+        api.adminGetBackups().catch(() => null),
+        api.adminGetLiveStats().catch(() => null),
       ]);
       if (cancelled) return;
       if (f?.success) setFunnel(f.data);
@@ -195,11 +274,31 @@ function AnalyticsTab() {
       if (e?.success) setErrorRate(e.data);
       if (w?.success) setWsCount(w.data);
       if (l?.success) setLlmStats(l.data);
+      if (coh?.success) setCohorts(coh.data.cohorts);
+      if (ih?.success) setIntegrationHealth(ih.data.health);
+      if (dis?.success) setDisputes({ rows: dis.data.disputes, error: dis.data.error });
+      if (bks?.success) setBackups(bks.data.backups);
+      if (live?.success) setLandingStats(live.data);
     }
     load();
     const t = setInterval(load, 60_000);
     return () => { cancelled = true; clearInterval(t); };
   }, []);
+
+  // Identify highest-D30 cohort so we can highlight its row. Null D30
+  // cells (un-elapsed windows) never win — we only consider numbers.
+  const bestD30Idx = useMemo(() => {
+    if (!cohorts || cohorts.length === 0) return -1;
+    let best = -1;
+    let bestRate = -1;
+    cohorts.forEach((c, i) => {
+      if (c.day30 != null && c.cohortSize > 0) {
+        const rate = c.day30 / c.cohortSize;
+        if (rate > bestRate) { bestRate = rate; best = i; }
+      }
+    });
+    return best;
+  }, [cohorts]);
 
   return (
     <div className="space-y-6">
@@ -362,6 +461,380 @@ function AnalyticsTab() {
           </div>
         </div>
       )}
+
+      {/* ─── Phase C cards ──────────────────────────────────── */}
+
+      {/* Landing Traffic + Recent Backups side by side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {landingStats ? (
+          <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+            <div className="flex items-center gap-2 mb-3">
+              <Globe size={14} className="text-violet-400" />
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Landing Traffic (today, UTC)</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
+                <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Pageviews</div>
+                <div className="text-2xl font-bold text-[var(--text-primary)]">{landingStats.pageViewsToday.toLocaleString()}</div>
+              </div>
+              <div className="p-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
+                <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Unique Visitors</div>
+                <div className="text-2xl font-bold text-[var(--text-primary)]">{landingStats.uniqueVisitors.toLocaleString()}</div>
+              </div>
+            </div>
+            <div className="text-[10px] text-[var(--text-muted)] mt-2">
+              Beacon: <code className="font-mono">/analytics/pageview</code> · HLL-hashed IPs, zero PII
+            </div>
+          </div>
+        ) : (
+          <AnalyticsCardSkeleton label="Landing Traffic (today, UTC)" />
+        )}
+
+        {backups ? (
+          <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+            <div className="flex items-center gap-2 mb-3">
+              <Archive size={14} className="text-[var(--color-accent)]" />
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Recent Backups (last 10)</span>
+            </div>
+            {backups.length === 0 ? (
+              <div className="text-xs text-[var(--text-muted)]">No backups yet. Use the Health tab to trigger one.</div>
+            ) : (
+              <div className="space-y-1 max-h-64 overflow-y-auto">
+                {backups.slice(0, 10).map((b) => (
+                  <div key={b.filename} className="flex items-center justify-between gap-2 text-xs border-b border-[var(--border-primary)]/40 py-1.5">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-mono text-[var(--text-primary)] truncate">{b.filename}</div>
+                      <div className="text-[10px] text-[var(--text-muted)]">{b.date} · {b.size}</div>
+                    </div>
+                    <a
+                      href={api.adminBackupDownloadUrl(b.filename)}
+                      download={b.filename}
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium bg-[var(--color-accent)]/15 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/25 transition-colors"
+                      title="Download backup"
+                    >
+                      <Download size={10} />
+                      Download
+                    </a>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <AnalyticsCardSkeleton label="Recent Backups (last 10)" />
+        )}
+      </div>
+
+      {/* Retention Cohort grid */}
+      {cohorts ? (
+        <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp size={14} className="text-emerald-400" />
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Retention Cohort (last 8 weeks)</span>
+          </div>
+          {cohorts.length === 0 ? (
+            <div className="text-xs text-[var(--text-muted)]">No cohort data yet — insufficient signup volume.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-primary)]/40">
+                    <th className="text-left font-semibold py-2 pr-3">Cohort Week</th>
+                    <th className="text-right font-semibold py-2 px-3">Size</th>
+                    <th className="text-right font-semibold py-2 px-3">D1</th>
+                    <th className="text-right font-semibold py-2 px-3">D7</th>
+                    <th className="text-right font-semibold py-2 px-3">D14</th>
+                    <th className="text-right font-semibold py-2 px-3">D30</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cohorts.map((row, i) => {
+                    const isBest = i === bestD30Idx;
+                    const renderCell = (val: number | null) => {
+                      if (val == null) return <span className="text-[var(--text-muted)]">—</span>;
+                      const pct = row.cohortSize > 0 ? Math.round((val / row.cohortSize) * 100) : 0;
+                      return (
+                        <span className="inline-flex items-center gap-1.5">
+                          <span className="font-mono text-[var(--text-primary)]">{val} / {row.cohortSize}</span>
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${cohortPctClass(pct)}`}>{pct}%</span>
+                        </span>
+                      );
+                    };
+                    return (
+                      <tr
+                        key={row.cohortWeek}
+                        className={`border-b border-[var(--border-primary)]/20 ${isBest ? 'bg-[var(--color-accent)]/5' : ''}`}
+                        style={isBest ? { borderLeft: '2px solid var(--color-accent)' } : undefined}
+                      >
+                        <td className="py-2 pr-3 font-mono text-[var(--text-primary)]">{row.cohortWeek}</td>
+                        <td className="py-2 px-3 text-right font-mono text-[var(--text-muted)]">{row.cohortSize}</td>
+                        <td className="py-2 px-3 text-right">{renderCell(row.day1)}</td>
+                        <td className="py-2 px-3 text-right">{renderCell(row.day7)}</td>
+                        <td className="py-2 px-3 text-right">{renderCell(row.day14)}</td>
+                        <td className="py-2 px-3 text-right">{renderCell(row.day30)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      ) : (
+        <AnalyticsCardSkeleton label="Retention Cohort (last 8 weeks)" />
+      )}
+
+      {/* Integration Health + Stripe Disputes side by side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {integrationHealth ? (
+          <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+            <div className="flex items-center gap-2 mb-3">
+              <Network size={14} className="text-cyan-400" />
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Integration Health (last 24h)</span>
+            </div>
+            {integrationHealth.length === 0 ? (
+              <div className="text-xs text-[var(--text-muted)]">No integration deliveries in the last 24h.</div>
+            ) : (
+              <div className="space-y-2">
+                {integrationHealth.map((row) => {
+                  const pct = Math.round(row.successRate * 100);
+                  // Degraded threshold = 95%. Below that, flag red.
+                  const degraded = pct < 95;
+                  return (
+                    <div key={row.platform} className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xs font-semibold text-[var(--text-primary)] capitalize">{row.platform}</span>
+                        <span className={`text-xs font-mono font-semibold ${degraded ? 'text-red-400' : 'text-emerald-400'}`}>
+                          {pct}%
+                        </span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-[var(--bg-tertiary)] overflow-hidden">
+                        <div
+                          className={`h-full ${degraded ? 'bg-red-500' : 'bg-emerald-500'}`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between mt-1 text-[10px] text-[var(--text-muted)]">
+                        <span>{row.successCount} ok · {row.failureCount} fail</span>
+                        <span>{row.totalDeliveries} total</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ) : (
+          <AnalyticsCardSkeleton label="Integration Health (last 24h)" />
+        )}
+
+        {disputes ? (
+          <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+            <div className="flex items-center gap-2 mb-3">
+              <CreditCard size={14} className="text-red-400" />
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Stripe Disputes (recent 10)</span>
+            </div>
+            {disputes.error && (
+              <div className="mb-3 p-2 rounded-md bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-400 flex items-start gap-2">
+                <AlertTriangle size={12} className="mt-0.5 flex-shrink-0" />
+                <span>{disputes.error}</span>
+              </div>
+            )}
+            {disputes.rows.length === 0 ? (
+              <div className="text-xs text-[var(--text-muted)] flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-emerald-400" />
+                No recent disputes · Stripe clean
+              </div>
+            ) : (
+              <div className="space-y-1.5 max-h-64 overflow-y-auto">
+                {disputes.rows.map((d) => {
+                  // Evidence countdown — humans grok "3 days left" faster than
+                  // an ISO timestamp. Negative values mean already past due.
+                  let evidenceLabel: string | null = null;
+                  if (d.evidenceDueBy) {
+                    const diffMs = new Date(d.evidenceDueBy).getTime() - Date.now();
+                    const days = Math.round(diffMs / 86_400_000);
+                    if (diffMs < 0) evidenceLabel = `${Math.abs(days)}d overdue`;
+                    else if (days === 0) evidenceLabel = 'due today';
+                    else evidenceLabel = `${days}d left`;
+                  }
+                  const statusColor =
+                    d.status === 'won' ? 'bg-emerald-500/10 text-emerald-400'
+                    : d.status === 'lost' ? 'bg-red-500/10 text-red-400'
+                    : 'bg-amber-500/10 text-amber-400';
+                  return (
+                    <div key={d.id} className="p-2 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)] text-xs">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-mono text-[var(--text-primary)]">
+                          {(d.amount / 100).toFixed(2)} {d.currency.toUpperCase()}
+                        </span>
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${statusColor}`}>{d.status}</span>
+                      </div>
+                      <div className="text-[var(--text-muted)] truncate">{d.reason.replace(/_/g, ' ')}</div>
+                      <div className="flex justify-between text-[10px] text-[var(--text-muted)] mt-0.5">
+                        <span>{new Date(d.createdAt).toLocaleDateString()}</span>
+                        {evidenceLabel && (
+                          <span className={evidenceLabel.includes('overdue') ? 'text-red-400' : 'text-amber-400'}>
+                            evidence: {evidenceLabel}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ) : (
+          <AnalyticsCardSkeleton label="Stripe Disputes (recent 10)" />
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Audit Log Tab ─────────────────────────────────────────────
+// Renders the Redis-backed admin audit log with basic filter + expand.
+// Server-side filter: hits `/admin/audit-log?action=` on Apply (not debounced).
+// Details cell collapses JSON to 1 line until clicked — prevents the table
+// from ballooning when most rows have large payloads.
+type AuditEntry = {
+  ts: string;
+  adminId: string;
+  adminEmail: string | null;
+  action: string;
+  details: Record<string, unknown>;
+};
+
+function AuditLogTab() {
+  const [entries, setEntries] = useState<AuditEntry[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [actionFilter, setActionFilter] = useState('');
+  const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const load = async (action?: string) => {
+    setLoading(true);
+    setError(null);
+    const res = await api.adminGetAuditLog({ limit: 100, action: action?.trim() || undefined });
+    setLoading(false);
+    if (res.success) {
+      setEntries(res.data.entries);
+    } else {
+      setError(res.error);
+      setEntries([]);
+    }
+  };
+
+  useEffect(() => {
+    load();
+    // Manual refresh only — audit data is compliance-sensitive and we'd
+    // rather admins see exactly what they requested than have it update
+    // under them mid-investigation.
+  }, []);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+        <form
+          onSubmit={(e) => { e.preventDefault(); load(actionFilter); }}
+          className="flex-1 flex items-center gap-2"
+        >
+          <div className="relative flex-1">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+            <input
+              type="text"
+              value={actionFilter}
+              onChange={(e) => setActionFilter(e.target.value)}
+              onBlur={() => load(actionFilter)}
+              placeholder="Filter by action (e.g. user:ban, system:backup_download)"
+              className="w-full pl-9 pr-3 py-2 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-primary)] text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50"
+            />
+          </div>
+          <button type="submit" className="btn-secondary text-xs px-3 py-2">Apply</button>
+        </form>
+        <button onClick={() => load(actionFilter)} disabled={loading} className="btn-secondary text-xs px-3 py-2 whitespace-nowrap">
+          <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
+          Refresh
+        </button>
+      </div>
+
+      {error && (
+        <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 flex items-center gap-2">
+          <AlertTriangle size={14} />
+          {error}
+        </div>
+      )}
+
+      <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] overflow-hidden">
+        {entries == null ? (
+          <div className="p-4 space-y-2">
+            <div className="h-5 rounded shimmer" />
+            <div className="h-5 rounded w-5/6 shimmer" />
+            <div className="h-5 rounded w-3/4 shimmer" />
+          </div>
+        ) : entries.length === 0 ? (
+          <div className="p-6 text-xs text-[var(--text-muted)] text-center">No audit entries match this filter.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-primary)]/40 bg-[var(--bg-tertiary)]/30">
+                  <th className="text-left font-semibold py-2.5 px-3">Time</th>
+                  <th className="text-left font-semibold py-2.5 px-3">Admin</th>
+                  <th className="text-left font-semibold py-2.5 px-3">Action</th>
+                  <th className="text-left font-semibold py-2.5 px-3">Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {entries.map((e, i) => {
+                  const isExpanded = expandedIdx === i;
+                  const detailsStr = JSON.stringify(e.details);
+                  const hasDetails = detailsStr !== '{}';
+                  return (
+                    <tr key={`${e.ts}-${i}`} className="border-b border-[var(--border-primary)]/20 hover:bg-[var(--bg-card)]/40">
+                      <td className="py-2 px-3 align-top whitespace-nowrap text-[var(--text-muted)] font-mono text-[11px]">
+                        {new Date(e.ts).toLocaleString()}
+                      </td>
+                      <td className="py-2 px-3 align-top text-[var(--text-primary)]">
+                        {e.adminEmail ?? <span className="text-[var(--text-muted)] font-mono">{e.adminId.slice(0, 8)}…</span>}
+                      </td>
+                      <td className="py-2 px-3 align-top">
+                        <code className="font-mono text-[var(--color-accent)] text-[11px]">{e.action}</code>
+                      </td>
+                      <td className="py-2 px-3 align-top">
+                        {!hasDetails ? (
+                          <span className="text-[var(--text-muted)]">—</span>
+                        ) : (
+                          <button
+                            onClick={() => setExpandedIdx(isExpanded ? null : i)}
+                            className="flex items-start gap-1 text-left w-full group"
+                          >
+                            {isExpanded ? (
+                              <ChevronDown size={12} className="mt-0.5 flex-shrink-0 text-[var(--text-muted)]" />
+                            ) : (
+                              <ChevronRight size={12} className="mt-0.5 flex-shrink-0 text-[var(--text-muted)]" />
+                            )}
+                            <code className={`font-mono text-[11px] text-[var(--text-muted)] group-hover:text-[var(--text-primary)] transition-colors ${isExpanded ? 'whitespace-pre-wrap break-all' : 'truncate block max-w-md'}`}>
+                              {isExpanded ? JSON.stringify(e.details, null, 2) : detailsStr}
+                            </code>
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {entries && entries.length > 0 && (
+        <div className="text-[10px] text-[var(--text-muted)] text-center">
+          Showing {entries.length} entries · filter: {actionFilter || 'none'} · Redis list <code className="font-mono">admin:audit:log</code>
+        </div>
+      )}
     </div>
   );
 }
@@ -425,7 +898,7 @@ export default function AdminPage() {
   const [agentsPagination, setAgentsPagination] = useState<{ total: number; hasMore: boolean }>({ total: 0, hasMore: false });
   const [error, setError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health' | 'analytics'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health' | 'analytics' | 'audit'>('overview');
   const [payments, setPayments] = useState<AdminPayment[]>([]);
   const [paymentsLoading, setPaymentsLoading] = useState(false);
   const [paymentStatusFilter, setPaymentStatusFilter] = useState<'all' | 'confirmed' | 'failed' | 'pending' | 'refunded'>('all');
@@ -1148,10 +1621,10 @@ export default function AdminPage() {
           {/* Tab switcher */}
           <div className="flex items-center gap-4 mb-5 overflow-x-auto -mx-1 px-1">
             <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)] overflow-x-auto min-w-0">
-              {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics'] as const).map((tab) => {
-                const tabIcons: Record<string, React.ElementType> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp };
+              {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics', 'audit'] as const).map((tab) => {
+                const tabIcons: Record<string, React.ElementType> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp, audit: ScrollText };
                 const TabIcon = tabIcons[tab] ?? BarChart3;
-                const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health', analytics: 'Analytics' };
+                const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health', analytics: 'Analytics', audit: 'Audit Log' };
                 return (
                   <button
                     key={tab}
@@ -2284,6 +2757,8 @@ export default function AdminPage() {
           })()}
 
           {activeTab === 'analytics' && <AnalyticsTab />}
+
+          {activeTab === 'audit' && <AuditLogTab />}
         </motion.div>
 
         {/* ── Error display ─────────────────────────────────── */}
