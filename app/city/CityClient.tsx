@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { API_URL } from '@/lib/config';
 import { CityHud } from '@/components/city/CityHud';
 import { CitySound, type CitySoundControls } from '@/components/city/CitySound';
+import { CityReplay, type ReplayOverlay } from '@/components/city/CityReplay';
 import {
   CityFilters,
   type FilterState,
@@ -32,6 +33,7 @@ export function CityClient({ initial }: Props) {
   const searchParams = useSearchParams();
   const [data, setData] = useState<CityResponse | null>(initial);
   const [hovered, setHovered] = useState<CityAgent | null>(null);
+  const [replayOverlay, setReplayOverlay] = useState<ReplayOverlay | null>(null);
   const sceneRef = useRef<CitySceneHandle | null>(null);
   const soundRef = useRef<CitySoundControls | null>(null);
 
@@ -64,6 +66,24 @@ export function CityClient({ initial }: Props) {
         if (j?.success && j.data?.viewerId) setData(j.data);
       })
       .catch(() => {});
+  }, []);
+
+  // Live-ish refresh: poll every 20s for status/count changes so the
+  // city stays in sync with the fleet without us building a dedicated
+  // WebSocket channel. Backend caches /public/city for 60s, so the
+  // hot path is a single Redis read — cheap at scale.
+  useEffect(() => {
+    const POLL_MS = 20_000;
+    const timer = setInterval(() => {
+      if (document.hidden) return; // skip while tab is backgrounded
+      fetch(`${API_URL}/public/city`, { credentials: 'include' })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((j: { success?: boolean; data?: CityResponse } | null) => {
+          if (j?.success && j.data) setData(j.data);
+        })
+        .catch(() => {});
+    }, POLL_MS);
+    return () => clearInterval(timer);
   }, []);
 
   // Sync filter state back to the URL so copy-paste shares the same view.
@@ -108,10 +128,18 @@ export function CityClient({ initial }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  const filteredAgents = useMemo(
-    () => (data ? applyFilters(data.agents, filters) : []),
-    [data, filters],
-  );
+  const filteredAgents = useMemo(() => {
+    if (!data) return [];
+    const base = applyFilters(data.agents, filters);
+    // When scrubbing the replay, override each agent's status from the
+    // historical snapshot. Unknown agents in that hour keep their live
+    // status — they may not have existed yet.
+    if (!replayOverlay) return base;
+    return base.map((a) => {
+      const historical = replayOverlay.statuses[a.id];
+      return historical ? { ...a, status: historical } : a;
+    });
+  }, [data, filters, replayOverlay]);
 
   const mineAgents = useMemo(
     () => (data?.agents ?? []).filter((a) => a.mine),
@@ -165,6 +193,7 @@ export function CityClient({ initial }: Props) {
         onFlyToDistrict={flyToDistrict}
         onFlyHome={flyHome}
       />
+      <CityReplay baseAgents={data.agents} onOverlay={setReplayOverlay} />
       <CitySound onReady={(api) => (soundRef.current = api)} />
     </div>
   );
