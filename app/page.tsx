@@ -616,6 +616,51 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── 3b. CITY SHOWCASE ──────────────────────────── */}
+      <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden relative" id="city">
+        <div className="max-w-5xl mx-auto">
+          <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="mb-10 max-w-2xl">
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-500">★ NEW</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+              See every agent in&nbsp;Hatcher City.
+            </h2>
+            <p className="mt-4 text-lg text-[var(--text-secondary)]">
+              A live 3D city where every public agent is a building. Districts by category, colors by framework, gold beams mark yours. Drag, zoom, click any building to open it.
+            </p>
+          </motion.div>
+          <motion.div
+            {...fadeUp}
+            transition={{ duration: 0.6, delay: 0.15, ease }}
+            className="relative overflow-hidden border border-[var(--border-default)] bg-[#050814]"
+            style={{ aspectRatio: '16/9' }}
+          >
+            <Link
+              href="/city"
+              className="group absolute inset-0 block"
+              aria-label="Open Hatcher City"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/city-preview.png"
+                alt="Hatcher City — 3D fleet view"
+                className="h-full w-full object-cover opacity-90 transition group-hover:opacity-100"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#050814]/80 via-transparent to-[#050814]/20" />
+              <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between gap-4">
+                <div>
+                  <div className="font-mono text-[10px] uppercase tracking-[3px] text-amber-400">HATCHER CITY</div>
+                  <div className="mt-1 text-xl font-bold text-white sm:text-2xl">Explore the full fleet →</div>
+                </div>
+                <div className="hidden sm:block rounded-full border border-amber-400 bg-amber-400 px-5 py-2 font-mono text-xs uppercase tracking-widest text-black transition group-hover:bg-transparent group-hover:text-amber-400">
+                  Enter city
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ── 4. WHY HATCHER ──────────────────────────────── */}
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden" id="features">
         <div className="max-w-4xl mx-auto">

@@ -1,14 +1,22 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { API_URL } from '@/lib/config';
 import { CityHud } from '@/components/city/CityHud';
+import {
+  CityFilters,
+  type FilterState,
+  applyFilters,
+  defaultFilters,
+  filtersFromSearchParams,
+  filtersToSearchParams,
+} from '@/components/city/CityFilters';
 import type { CitySceneHandle } from '@/components/city/CityScene';
 import type { CityAgent, CityResponse, Category } from '@/components/city/types';
+import { CATEGORIES } from '@/components/city/types';
 
-// Three.js must only run client-side; keep it out of the SSR bundle.
 const CityScene = dynamic(
   () => import('@/components/city/CityScene').then((m) => m.CityScene),
   { ssr: false },
@@ -20,10 +28,17 @@ interface Props {
 
 export function CityClient({ initial }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [data, setData] = useState<CityResponse | null>(initial);
   const [hovered, setHovered] = useState<CityAgent | null>(null);
   const sceneRef = useRef<CitySceneHandle | null>(null);
 
+  // ── Filters, seeded from URL ──
+  const [filters, setFilters] = useState<FilterState>(() =>
+    filtersFromSearchParams(new URLSearchParams(searchParams?.toString() ?? '')),
+  );
+
+  // Refresh on mount if SSR missed it (e.g. empty initial list).
   useEffect(() => {
     if (initial && initial.agents.length) return;
     fetch(`${API_URL}/public/city`, { credentials: 'include' })
@@ -31,12 +46,75 @@ export function CityClient({ initial }: Props) {
       .then((j: { success?: boolean; data?: CityResponse } | null) => {
         if (j?.success && j.data) setData(j.data);
       })
-      .catch(() => {
-        /* noop */
-      });
+      .catch(() => {});
   }, [initial]);
 
-  const mineAgents = useMemo(() => (data?.agents ?? []).filter((a) => a.mine), [data]);
+  // Even when initial SSR succeeded, the server-rendered payload always
+  // has mine=false (no JWT cookie on the server fetch). Re-hydrate once
+  // on the client with credentials so owner agents light up gold.
+  const hydratedMineRef = useRef(false);
+  useEffect(() => {
+    if (hydratedMineRef.current) return;
+    hydratedMineRef.current = true;
+    fetch(`${API_URL}/public/city`, { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j: { success?: boolean; data?: CityResponse } | null) => {
+        if (j?.success && j.data?.viewerId) setData(j.data);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Sync filter state back to the URL so copy-paste shares the same view.
+  useEffect(() => {
+    const next = filtersToSearchParams(filters).toString();
+    const current = searchParams?.toString() ?? '';
+    // Preserve focus/agent deep-link params that aren't owned by filters.
+    const preserved = new URLSearchParams(current);
+    ['fw', 'status', 'tier', 'mine'].forEach((k) => preserved.delete(k));
+    const merged = new URLSearchParams([
+      ...filtersToSearchParams(filters).entries(),
+      ...preserved.entries(),
+    ]);
+    const q = merged.toString();
+    router.replace(q ? `/city?${q}` : '/city', { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
+
+  // ── Deep-link focus on load ──
+  // ?agent=<id|slug>  → fly to building + open hover card
+  // ?focus=<category> → fly to district
+  useEffect(() => {
+    if (!data) return;
+    const agentParam = searchParams?.get('agent');
+    const focusParam = searchParams?.get('focus');
+    const timer = setTimeout(() => {
+      if (agentParam) {
+        const a = data.agents.find((x) => x.id === agentParam || x.slug === agentParam);
+        if (a) {
+          sceneRef.current?.flyToAgent(a.id, 1400);
+          setHovered(a);
+          return;
+        }
+      }
+      if (focusParam && CATEGORIES.includes(focusParam as Category)) {
+        sceneRef.current?.flyToDistrict(focusParam as Category, 1400);
+      }
+    }, 400); // let canvas + scene API mount first
+    return () => clearTimeout(timer);
+    // Only runs once per data load; we explicitly don't want to refly on
+    // every filter change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
+
+  const filteredAgents = useMemo(
+    () => (data ? applyFilters(data.agents, filters) : []),
+    [data, filters],
+  );
+
+  const mineAgents = useMemo(
+    () => (data?.agents ?? []).filter((a) => a.mine),
+    [data],
+  );
 
   const flyToDistrict = useCallback((c: Category) => {
     sceneRef.current?.flyToDistrict(c);
@@ -58,9 +136,15 @@ export function CityClient({ initial }: Props) {
     <div className="relative h-[calc(100vh-4rem)] min-h-[560px] overflow-hidden bg-[#050814]">
       <CityScene
         ref={sceneRef}
-        agents={data.agents}
+        agents={filteredAgents}
         onHover={setHovered}
         onPick={(a) => router.push(`/agent/${a.id}`)}
+      />
+      <CityFilters
+        filters={filters}
+        onChange={setFilters}
+        counts={data.counts}
+        hasMine={mineAgents.length > 0}
       />
       <CityHud
         counts={data.counts}
