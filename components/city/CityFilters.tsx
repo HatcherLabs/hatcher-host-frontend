@@ -94,8 +94,11 @@ export function CityFilters({ filters, onChange, counts, hasMine }: Props) {
     return n;
   }, [filters.frameworks, counts]);
 
+  // On mobile we only show the compact framework-chip row — the tier
+  // and status filters are pulled into a small details panel below so
+  // the bar never stacks and covers the map.
   return (
-    <div className="pointer-events-auto absolute left-1/2 top-4 z-20 flex -translate-x-1/2 flex-wrap items-center gap-2 border border-slate-800 bg-[#050814]/85 px-3 py-2 backdrop-blur">
+    <div className="pointer-events-auto absolute bottom-2 left-1/2 z-20 flex -translate-x-1/2 flex-wrap items-center justify-center gap-1.5 border border-slate-800 bg-[#050814]/90 px-2 py-1.5 backdrop-blur sm:bottom-auto sm:top-4 sm:gap-2 sm:px-3 sm:py-2">
       {/* Framework chips */}
       {ALL_FRAMEWORKS.map((fw) => {
         const on = filters.frameworks.has(fw);

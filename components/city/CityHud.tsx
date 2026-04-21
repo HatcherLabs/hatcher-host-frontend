@@ -34,6 +34,8 @@ const TOUR_STEP_MS = 3500;
 export function CityHud({ counts, hovered, mineAgents, onFlyToDistrict, onFlyHome }: Props) {
   const [tourOn, setTourOn] = useState(false);
   const [tourIdx, setTourIdx] = useState(0);
+  const [legendOpen, setLegendOpen] = useState(false); // mobile collapsed state
+  const [mineOpen, setMineOpen] = useState(false); // mobile collapsed state
   const tourTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Advance tour: at each tick, fly to next populated district. Skip
@@ -80,38 +82,46 @@ export function CityHud({ counts, hovered, mineAgents, onFlyToDistrict, onFlyHom
 
   return (
     <>
-      {/* Floating stats card — site header sits above, we tuck under it. */}
-      <div className="pointer-events-auto absolute left-4 top-4 z-20 flex items-center gap-5 border border-slate-800 bg-[#050814]/80 px-4 py-2.5 backdrop-blur">
+      {/* Floating stats card — responsive: compact on mobile, wider on desktop. */}
+      <div className="pointer-events-auto absolute left-2 top-2 z-20 flex items-center gap-2 border border-slate-800 bg-[#050814]/85 px-2 py-2 backdrop-blur sm:left-4 sm:top-4 sm:gap-5 sm:px-4 sm:py-2.5">
         <button
           onClick={onFlyHome}
-          className="font-['Press_Start_2P',monospace] text-[10px] tracking-[2px] text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.5)] hover:text-amber-300"
+          className="font-['Press_Start_2P',monospace] text-[8px] tracking-[1.5px] text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.5)] hover:text-amber-300 sm:text-[10px] sm:tracking-[2px]"
           title="Fly back to overview"
         >
           HATCHER CITY
         </button>
-        <div className="h-4 w-px bg-slate-700" />
-        <div className="flex items-center gap-4 font-mono text-sm text-slate-300">
+        <div className="hidden h-4 w-px bg-slate-700 sm:block" />
+        <div className="flex items-center gap-2 font-mono text-xs text-slate-300 sm:gap-4 sm:text-sm">
           <Stat k="agents" v={counts.total.toLocaleString()} />
-          <Stat k="running" v={counts.running.toLocaleString()} />
-          <Stat k="districts" v="13" />
+          <Stat k="run" v={counts.running.toLocaleString()} />
         </div>
-        <div className="h-4 w-px bg-slate-700" />
+        <div className="hidden h-4 w-px bg-slate-700 sm:block" />
         <button
           onClick={toggleTour}
-          className={`font-['Press_Start_2P',monospace] text-[9px] tracking-[2px] px-2 py-1 border ${
+          className={`font-['Press_Start_2P',monospace] text-[7px] tracking-[1px] px-1.5 py-1 border sm:text-[9px] sm:tracking-[2px] sm:px-2 ${
             tourOn
               ? 'border-amber-400 bg-amber-400 text-black'
               : 'border-slate-700 text-slate-300 hover:border-amber-400 hover:text-amber-400'
           }`}
           title="Auto-pan through every district"
         >
-          {tourOn ? '■ STOP TOUR' : '▶ TAKE TOUR'}
+          {tourOn ? '■ STOP' : '▶ TOUR'}
         </button>
       </div>
 
       {/* Framework + district legend. District entries click to fly-to. */}
-      <div className="pointer-events-auto absolute bottom-4 left-4 z-20 border border-slate-800 bg-[#050814]/85 p-3 font-mono text-sm text-slate-400 backdrop-blur">
-        <div className="mb-2 font-['Press_Start_2P',monospace] text-[8px] tracking-[2px] text-amber-400">
+      <div className="pointer-events-auto absolute bottom-16 left-2 z-20 border border-slate-800 bg-[#050814]/90 p-2 font-mono text-sm text-slate-400 backdrop-blur sm:bottom-4 sm:left-4 sm:p-3">
+        <button
+          onClick={() => setLegendOpen((o) => !o)}
+          className="mb-0 flex w-full items-center justify-between gap-2 font-['Press_Start_2P',monospace] text-[8px] tracking-[2px] text-amber-400 sm:mb-2"
+          aria-expanded={legendOpen}
+        >
+          <span>LEGEND</span>
+          <span className="sm:hidden">{legendOpen ? '▾' : '▸'}</span>
+        </button>
+        <div className={`${legendOpen ? 'block' : 'hidden'} sm:block`}>
+        <div className="mb-2 mt-2 font-['Press_Start_2P',monospace] text-[8px] tracking-[2px] text-amber-400">
           FRAMEWORKS
         </div>
         {(Object.keys(FW_COLORS) as Framework[]).map((fw) => (
@@ -146,10 +156,11 @@ export function CityHud({ counts, hovered, mineAgents, onFlyToDistrict, onFlyHom
             );
           })}
         </div>
+        </div>
       </div>
 
-      {/* Controls hint */}
-      <div className="pointer-events-none absolute bottom-4 left-1/2 z-20 -translate-x-1/2 border border-slate-800 bg-[#050814]/80 px-4 py-2 font-['Press_Start_2P',monospace] text-[8px] tracking-[2px] text-slate-400">
+      {/* Controls hint — hidden on mobile to save precious screen real-estate */}
+      <div className="pointer-events-none absolute bottom-4 left-1/2 z-20 hidden -translate-x-1/2 border border-slate-800 bg-[#050814]/80 px-4 py-2 font-['Press_Start_2P',monospace] text-[8px] tracking-[2px] text-slate-400 sm:block">
         <kbd className="rounded border border-slate-700 bg-slate-800 px-1.5 py-0.5 text-slate-200">
           DRAG
         </kbd>{' '}
@@ -164,13 +175,17 @@ export function CityHud({ counts, hovered, mineAgents, onFlyToDistrict, onFlyHom
         open
       </div>
 
-      {/* My City panel */}
+      {/* My City panel — collapsible on mobile to free the canvas */}
       {mineAgents.length > 0 && (
-        <div className="pointer-events-auto absolute right-3 top-4 z-20 w-60 border-2 border-amber-400 bg-[#0a0e1a]/95 p-3 shadow-[4px_4px_0_#000]">
-          <h3 className="mb-2 font-['Press_Start_2P',monospace] text-[10px] tracking-[1px] text-amber-400">
-            ★ MY CITY ({mineAgents.length})
-          </h3>
-          <div className="max-h-64 space-y-0 overflow-y-auto">
+        <div className="pointer-events-auto absolute right-2 top-2 z-20 w-48 border-2 border-amber-400 bg-[#0a0e1a]/95 p-2 shadow-[4px_4px_0_#000] sm:right-3 sm:top-4 sm:w-60 sm:p-3">
+          <button
+            onClick={() => setMineOpen((o) => !o)}
+            className="mb-2 flex w-full items-center justify-between font-['Press_Start_2P',monospace] text-[9px] tracking-[1px] text-amber-400 sm:text-[10px]"
+          >
+            <span>★ MY CITY ({mineAgents.length})</span>
+            <span className="sm:hidden">{mineOpen ? '▾' : '▸'}</span>
+          </button>
+          <div className={`${mineOpen ? 'block' : 'hidden'} max-h-64 space-y-0 overflow-y-auto sm:block`}>
             {mineAgents.map((a) => (
               <Link
                 key={a.id}

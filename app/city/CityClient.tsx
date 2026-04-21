@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { API_URL } from '@/lib/config';
 import { CityHud } from '@/components/city/CityHud';
+import { CitySound, type CitySoundControls } from '@/components/city/CitySound';
 import {
   CityFilters,
   type FilterState,
@@ -32,6 +33,7 @@ export function CityClient({ initial }: Props) {
   const [data, setData] = useState<CityResponse | null>(initial);
   const [hovered, setHovered] = useState<CityAgent | null>(null);
   const sceneRef = useRef<CitySceneHandle | null>(null);
+  const soundRef = useRef<CitySoundControls | null>(null);
 
   // ── Filters, seeded from URL ──
   const [filters, setFilters] = useState<FilterState>(() =>
@@ -118,10 +120,17 @@ export function CityClient({ initial }: Props) {
 
   const flyToDistrict = useCallback((c: Category) => {
     sceneRef.current?.flyToDistrict(c);
+    soundRef.current?.chirp('tour');
   }, []);
 
   const flyHome = useCallback(() => {
     sceneRef.current?.flyHome();
+    soundRef.current?.chirp('click');
+  }, []);
+
+  const onHoverWithSound = useCallback((a: CityAgent | null) => {
+    if (a) soundRef.current?.chirp('hover');
+    setHovered(a);
   }, []);
 
   if (!data) {
@@ -137,8 +146,11 @@ export function CityClient({ initial }: Props) {
       <CityScene
         ref={sceneRef}
         agents={filteredAgents}
-        onHover={setHovered}
-        onPick={(a) => router.push(`/agent/${a.id}`)}
+        onHover={onHoverWithSound}
+        onPick={(a) => {
+          soundRef.current?.chirp('click');
+          router.push(`/agent/${a.id}`);
+        }}
       />
       <CityFilters
         filters={filters}
@@ -153,6 +165,7 @@ export function CityClient({ initial }: Props) {
         onFlyToDistrict={flyToDistrict}
         onFlyHome={flyHome}
       />
+      <CitySound onReady={(api) => (soundRef.current = api)} />
     </div>
   );
 }
