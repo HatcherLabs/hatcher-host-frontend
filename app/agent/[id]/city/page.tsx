@@ -1,15 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import { API_URL } from '@/lib/config';
 import { CATEGORY_LABELS } from '@/components/city/types';
 import type { CityAgent, CityResponse } from '@/components/city/types';
-
-const PerAgentScene = dynamic(
-  () => import('@/components/city/PerAgentScene').then((m) => m.PerAgentScene),
-  { ssr: false },
-);
+import { AgentCityClient } from './AgentCityClient';
 
 async function fetchAgent(id: string): Promise<CityAgent | null> {
   try {
@@ -78,7 +73,7 @@ export default async function AgentCityPage({
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
           <div className="relative aspect-video overflow-hidden border border-[var(--border-default)] bg-[#050814] shadow-[6px_6px_0_#000]">
-            <PerAgentScene agent={agent} />
+            <AgentCityClient agent={agent} />
           </div>
           <aside className="flex flex-col gap-4">
             <div>
