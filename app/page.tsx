@@ -639,12 +639,15 @@ export default function LandingPage() {
               className="group absolute inset-0 block"
               aria-label="Open Hatcher City"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/city-preview.png"
-                alt="Hatcher City — 3D fleet view"
+              <video
+                src="/city-hero.mp4"
+                poster="/city-preview.png"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
                 className="h-full w-full object-cover opacity-90 transition group-hover:opacity-100"
-                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#050814]/80 via-transparent to-[#050814]/20" />
               <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between gap-4">

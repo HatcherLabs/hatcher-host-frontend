@@ -89,3 +89,33 @@ export const FRAMEWORK_EMISSIVE: Record<Framework, number> = {
 
 // Building heights by tier index (0..4).
 export const TIER_HEIGHT: number[] = [3, 5, 8, 14, 22];
+
+// One emoji per district — makes the map legible at a glance without
+// requiring the user to read 25 labels.
+export const CATEGORY_ICON: Record<Category, string> = {
+  automation: '⚙️',
+  business: '💼',
+  compliance: '📜',
+  creative: '🎨',
+  'customer-success': '💬',
+  data: '📊',
+  development: '💻',
+  devops: '🔧',
+  ecommerce: '🛒',
+  education: '🎓',
+  finance: '💰',
+  freelance: '🧰',
+  healthcare: '🩺',
+  hr: '🧑‍💼',
+  legal: '⚖️',
+  marketing: '📣',
+  moltbook: '📘',
+  ollama: '🦙',
+  personal: '⭐',
+  productivity: '✅',
+  'real-estate': '🏠',
+  saas: '☁️',
+  security: '🔒',
+  'supply-chain': '🚚',
+  voice: '🎙️',
+};

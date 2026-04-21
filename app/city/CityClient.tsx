@@ -151,6 +151,11 @@ export function CityClient({ initial }: Props) {
     soundRef.current?.chirp('tour');
   }, []);
 
+  const flyToAgent = useCallback((id: string) => {
+    sceneRef.current?.flyToAgent(id);
+    soundRef.current?.chirp('click');
+  }, []);
+
   const flyHome = useCallback(() => {
     sceneRef.current?.flyHome();
     soundRef.current?.chirp('click');
@@ -190,7 +195,9 @@ export function CityClient({ initial }: Props) {
         counts={data.counts}
         hovered={hovered}
         mineAgents={mineAgents}
+        agents={data.agents}
         onFlyToDistrict={flyToDistrict}
+        onFlyToAgent={flyToAgent}
         onFlyHome={flyHome}
       />
       <CityReplay baseAgents={data.agents} onOverlay={setReplayOverlay} />

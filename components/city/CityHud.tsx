@@ -1,16 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CityAgent, CityResponse, Framework, Category } from './types';
-import { CATEGORIES, CATEGORY_LABELS } from './types';
+import { CATEGORIES, CATEGORY_LABELS, CATEGORY_ICON } from './types';
+import { useCityFavorites } from './useCityFavorites';
 
 interface Props {
   counts: CityResponse['counts'];
   hovered: CityAgent | null;
   mineAgents: CityAgent[];
+  agents: CityAgent[];
   /** Caller injects the scene API so HUD buttons can drive the camera. */
   onFlyToDistrict?: (c: Category) => void;
+  onFlyToAgent?: (id: string) => void;
   onFlyHome?: () => void;
 }
 
@@ -31,12 +34,26 @@ const FW_COLORS: Record<Framework, string> = {
 // Step durations for tour mode (ms per district + final return home).
 const TOUR_STEP_MS = 3500;
 
-export function CityHud({ counts, hovered, mineAgents, onFlyToDistrict, onFlyHome }: Props) {
+export function CityHud({
+  counts,
+  hovered,
+  mineAgents,
+  agents,
+  onFlyToDistrict,
+  onFlyToAgent,
+  onFlyHome,
+}: Props) {
   const [tourOn, setTourOn] = useState(false);
   const [tourIdx, setTourIdx] = useState(0);
   const [legendOpen, setLegendOpen] = useState(false); // mobile collapsed state
   const [mineOpen, setMineOpen] = useState(false); // mobile collapsed state
+  const favorites = useCityFavorites();
   const tourTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const pinnedAgents = useMemo(
+    () => agents.filter((a) => favorites.has(a.id)),
+    [agents, favorites],
+  );
 
   // Advance tour: at each tick, fly to next populated district. Skip
   // empty districts so we don't stop on blank ground.
@@ -175,6 +192,26 @@ export function CityHud({ counts, hovered, mineAgents, onFlyToDistrict, onFlyHom
         open
       </div>
 
+      {/* Pinned favorites panel — shown if the viewer has pinned agents,
+          even when they don't own any. */}
+      {pinnedAgents.length > 0 && mineAgents.length === 0 && (
+        <div className="pointer-events-auto absolute right-2 top-2 z-20 w-48 border-2 border-amber-400 bg-[#0a0e1a]/95 p-2 shadow-[4px_4px_0_#000] sm:right-3 sm:top-4 sm:w-60 sm:p-3">
+          <h3 className="mb-2 font-['Press_Start_2P',monospace] text-[9px] tracking-[1px] text-amber-400 sm:text-[10px]">
+            ★ PINNED ({pinnedAgents.length})
+          </h3>
+          <div className="max-h-48 overflow-y-auto">
+            {pinnedAgents.map((a) => (
+              <PinRow
+                key={a.id}
+                a={a}
+                onFly={() => onFlyToAgent?.(a.id)}
+                onUnpin={() => favorites.toggle(a.id)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* My City panel — collapsible on mobile to free the canvas */}
       {mineAgents.length > 0 && (
         <div className="pointer-events-auto absolute right-2 top-2 z-20 w-48 border-2 border-amber-400 bg-[#0a0e1a]/95 p-2 shadow-[4px_4px_0_#000] sm:right-3 sm:top-4 sm:w-60 sm:p-3">
@@ -218,10 +255,22 @@ export function CityHud({ counts, hovered, mineAgents, onFlyToDistrict, onFlyHom
 
       {/* Hover card */}
       {hovered && (
-        <div className="pointer-events-none absolute left-1/2 top-4 z-30 -translate-x-1/2 border-2 border-amber-400 bg-[#0a0e1a]/95 p-3 font-mono text-sm shadow-[4px_4px_0_#000,0_0_18px_rgba(251,191,36,0.2)]">
-          <div className="mb-1 font-['Press_Start_2P',monospace] text-[9px] tracking-[1px] text-amber-400">
-            {hovered.name.toUpperCase()}
-            {hovered.mine && ' ★'}
+        <div className="pointer-events-auto absolute left-1/2 top-4 z-30 -translate-x-1/2 border-2 border-amber-400 bg-[#0a0e1a]/95 p-3 font-mono text-sm shadow-[4px_4px_0_#000,0_0_18px_rgba(251,191,36,0.2)]">
+          <div className="mb-1 flex items-center gap-2">
+            <span className="flex-1 font-['Press_Start_2P',monospace] text-[9px] tracking-[1px] text-amber-400">
+              {hovered.name.toUpperCase()}
+              {hovered.mine && ' ★'}
+            </span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                favorites.toggle(hovered.id);
+              }}
+              className="text-base leading-none text-amber-400 hover:text-amber-200"
+              title={favorites.has(hovered.id) ? 'Unpin from favorites' : 'Pin to favorites'}
+            >
+              {favorites.has(hovered.id) ? '★' : '☆'}
+            </button>
           </div>
           <div className="text-slate-400">
             {FW_LABEL[hovered.framework]} · {tierLabel(hovered.tier)}
@@ -236,6 +285,47 @@ export function CityHud({ counts, hovered, mineAgents, onFlyToDistrict, onFlyHom
         </div>
       )}
     </>
+  );
+}
+
+function PinRow({
+  a,
+  onFly,
+  onUnpin,
+}: {
+  a: CityAgent;
+  onFly: () => void;
+  onUnpin: () => void;
+}) {
+  return (
+    <div className="group flex items-center gap-2 border-t border-slate-700/30 px-1 py-1.5 font-mono text-sm">
+      <button
+        onClick={onFly}
+        className="flex min-w-0 flex-1 items-center gap-2 text-left"
+      >
+        <span
+          className="flex h-6 w-6 shrink-0 items-center justify-center border-2 border-black text-xs"
+          style={{ background: fwColor(a.framework) }}
+        >
+          {CATEGORY_ICON[a.category] ?? a.name[0]?.toUpperCase() ?? '?'}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-slate-100 group-hover:text-amber-300">
+            {a.name}
+          </span>
+          <span className="block truncate text-[11px] text-slate-500">
+            {a.category}
+          </span>
+        </span>
+      </button>
+      <button
+        onClick={onUnpin}
+        className="text-amber-400 hover:text-amber-200"
+        title="Unpin"
+      >
+        ★
+      </button>
+    </div>
   );
 }
 

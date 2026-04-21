@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { BLOG_POSTS } from '@/lib/blog';
 import { API_URL } from '@/lib/config';
+import { CATEGORIES } from '@/components/city/types';
 
 export const dynamic = 'force-static';
 
@@ -49,6 +50,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: 'https://hatcher.host/help', lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
     { url: 'https://hatcher.host/blog', lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
     { url: 'https://hatcher.host/changelog', lastModified: now, changeFrequency: 'weekly', priority: 0.6 },
+    { url: 'https://hatcher.host/city', lastModified: now, changeFrequency: 'daily', priority: 0.9 },
+    ...CATEGORIES.map((category) => ({
+      url: `https://hatcher.host/city/${category}`,
+      lastModified: now,
+      changeFrequency: 'daily' as const,
+      priority: 0.6,
+    })),
     ...blogPostEntries,
     ...agentEntries,
   ];

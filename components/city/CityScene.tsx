@@ -15,6 +15,7 @@ import type { CityAgent, Framework, Category } from './types';
 import {
   CATEGORIES,
   CATEGORY_LABELS,
+  CATEGORY_ICON,
   FRAMEWORK_COLORS,
   FRAMEWORK_EMISSIVE,
   TIER_HEIGHT,
@@ -113,26 +114,33 @@ function DistrictPad({
 }) {
   const pos = districtPosition(idx);
   const label = CATEGORY_LABELS[category];
+  const icon = CATEGORY_ICON[category];
 
   const sprite = useMemo(() => {
     const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 96;
+    canvas.width = 640;
+    canvas.height = 128;
     const ctx = canvas.getContext('2d')!;
     ctx.fillStyle = 'rgba(5,8,20,0.88)';
-    ctx.fillRect(0, 0, 512, 96);
+    ctx.fillRect(0, 0, 640, 128);
     ctx.strokeStyle = '#fbbf24';
     ctx.lineWidth = 2;
-    ctx.strokeRect(4, 4, 504, 88);
+    ctx.strokeRect(4, 4, 632, 120);
+    // Emoji on the left — slightly larger than label so it reads at
+    // distance even without pressing into the label.
+    ctx.font = '72px sans-serif';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    ctx.fillText(icon, 72, 64);
     ctx.font = 'bold 42px "Press Start 2P", monospace';
     ctx.fillStyle = '#fbbf24';
-    ctx.textAlign = 'center';
+    ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(label.toUpperCase(), 256, 48);
+    ctx.fillText(label.toUpperCase(), 140, 64);
     const tex = new THREE.CanvasTexture(canvas);
     tex.colorSpace = THREE.SRGBColorSpace;
     return new THREE.SpriteMaterial({ map: tex, depthTest: false });
-  }, [label]);
+  }, [label, icon]);
 
   return (
     <group>
@@ -142,7 +150,7 @@ function DistrictPad({
       </mesh>
       <sprite
         position={[pos.x, 30, pos.z]}
-        scale={[20, 4, 1]}
+        scale={[24, 4.8, 1]}
         material={sprite}
         onClick={(e) => { e.stopPropagation(); onClick?.(category); }}
       />
@@ -217,6 +225,93 @@ function AvatarBillboard({ b }: { b: BuildingData }) {
   // even from the default camera distance (~300 units out).
   const size = Math.max(2.6, b.w * 1.6);
   return <sprite position={[b.x, b.h + size * 0.6, b.z]} scale={[size, size, 1]} material={mat} />;
+}
+
+// ─── Volumetric-ish cloud layer ──────────────────────────────────
+// A stack of two large translucent planes with a procedural noise
+// texture that pan in opposite directions. Adds a massive amount of
+// perceived depth for essentially zero performance cost.
+
+function makeNoiseTexture(size = 256): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  const image = ctx.createImageData(size, size);
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      // Smooth blotches via sampled sine — cheap and seamless enough
+      // when the plane is panned continuously.
+      const n =
+        Math.sin(x * 0.06) * Math.cos(y * 0.06) +
+        Math.sin(x * 0.02 + y * 0.03) * 0.8 +
+        Math.sin(x * 0.11 - y * 0.07) * 0.5;
+      const v = Math.max(0, Math.min(1, (n + 2) / 4));
+      const alpha = Math.pow(v, 3.5) * 200; // long tail so clouds look wispy
+      const i = (y * size + x) * 4;
+      image.data[i] = 180;
+      image.data[i + 1] = 200;
+      image.data[i + 2] = 255;
+      image.data[i + 3] = alpha;
+    }
+  }
+  ctx.putImageData(image, 0, 0);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+function CloudLayer() {
+  const texRef = useRef<THREE.Texture | null>(null);
+  const mat1Ref = useRef<THREE.MeshBasicMaterial | null>(null);
+  const mat2Ref = useRef<THREE.MeshBasicMaterial | null>(null);
+
+  const { tex1, tex2 } = useMemo(() => {
+    const t1 = makeNoiseTexture();
+    const t2 = makeNoiseTexture();
+    t1.repeat.set(2, 2);
+    t2.repeat.set(1.5, 1.5);
+    texRef.current = t1;
+    return { tex1: t1, tex2: t2 };
+  }, []);
+
+  useFrame((_, dt) => {
+    if (tex1 && mat1Ref.current) {
+      tex1.offset.x += dt * 0.004;
+      tex1.offset.y += dt * 0.002;
+    }
+    if (tex2 && mat2Ref.current) {
+      tex2.offset.x -= dt * 0.002;
+      tex2.offset.y += dt * 0.001;
+    }
+  });
+
+  return (
+    <group>
+      <mesh position={[0, 120, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[1400, 1400]} />
+        <meshBasicMaterial
+          ref={mat1Ref}
+          map={tex1}
+          transparent
+          opacity={0.35}
+          depthWrite={false}
+        />
+      </mesh>
+      <mesh position={[0, 145, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[1600, 1600]} />
+        <meshBasicMaterial
+          ref={mat2Ref}
+          map={tex2}
+          transparent
+          opacity={0.22}
+          depthWrite={false}
+        />
+      </mesh>
+    </group>
+  );
 }
 
 // ─── Sparkle particles above running buildings ───────────────────
@@ -699,6 +794,7 @@ function SceneInner({
 
       <Buildings data={buildings} onHover={onHover} onPick={onPick} />
       <SparkleField positions={sparklePositions} />
+      <CloudLayer />
 
       <OrbitControls
         ref={(r) => {
