@@ -54,7 +54,7 @@ function StatProofCard({
 }: {
   label: string;
   value: string | number;
-  icon: React.ElementType;
+  icon: React.ComponentType<any>;
   iconColor: string;
   loading: boolean;
 }) {

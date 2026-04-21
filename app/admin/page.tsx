@@ -89,7 +89,7 @@ function StatCard({
 }: {
   label: string;
   value: string | number;
-  icon: React.ElementType;
+  icon: React.ComponentType<any>;
   iconColor: string;
 }) {
   return (
@@ -1629,7 +1629,7 @@ export default function AdminPage() {
           <div className="flex items-center gap-4 mb-5 overflow-x-auto -mx-1 px-1">
             <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)] overflow-x-auto min-w-0">
               {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics', 'audit', 'affiliate'] as const).map((tab) => {
-                const tabIcons: Record<string, React.ElementType> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp, audit: ScrollText, affiliate: UserPlus };
+                const tabIcons: Record<string, React.ComponentType<any>> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp, audit: ScrollText, affiliate: UserPlus };
                 const TabIcon = tabIcons[tab] ?? BarChart3;
                 const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health', analytics: 'Analytics', audit: 'Audit Log', affiliate: 'Affiliate' };
                 return (

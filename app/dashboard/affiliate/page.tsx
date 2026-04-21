@@ -142,7 +142,7 @@ function StatCard({
   label: string;
   value: string;
   sub?: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<any>;
   iconColor: string;
   highlight?: boolean;
 }) {

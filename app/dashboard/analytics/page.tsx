@@ -72,7 +72,7 @@ function StatCard({
   sub,
   color = 'var(--color-accent)',
 }: {
-  icon: React.ElementType;
+  icon: React.ComponentType<any>;
   label: string;
   value: string | number;
   sub?: string;

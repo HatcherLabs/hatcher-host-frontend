@@ -46,7 +46,7 @@ const PER_AGENT_ADDONS = PER_AGENT_ADDON_KEYS
   .map((k) => ADDONS.find((a) => a.key === k))
   .filter((a): a is typeof ADDONS[number] => Boolean(a));
 
-const ADDON_ICONS: Record<string, React.ElementType> = {
+const ADDON_ICONS: Record<string, React.ComponentType<any>> = {
   'addon.always_on': Zap,
   'addon.file_manager': HardDrive,
   'addon.full_logs': FileText,

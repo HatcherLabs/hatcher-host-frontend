@@ -235,7 +235,7 @@ export default function AdminAgentDetailPage() {
   );
 }
 
-function InfoItem({ icon: Icon, label, value, mono }: { icon?: React.ElementType; label: string; value: string; mono?: boolean }) {
+function InfoItem({ icon: Icon, label, value, mono }: { icon?: React.ComponentType<any>; label: string; value: string; mono?: boolean }) {
   return (
     <div className="min-w-0">
       <div className="flex items-center gap-1.5 mb-0.5">

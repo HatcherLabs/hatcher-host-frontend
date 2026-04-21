@@ -35,7 +35,7 @@ export interface ActivityEvent {
   timestamp: string;
 }
 
-const ACTIVITY_ICON: Record<ActivityEventType, React.ElementType> = {
+const ACTIVITY_ICON: Record<ActivityEventType, React.ComponentType<any>> = {
   started: Play,
   stopped: Square,
   restarted: RotateCcw,
