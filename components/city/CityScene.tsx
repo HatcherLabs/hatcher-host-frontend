@@ -41,6 +41,7 @@ interface Props {
   agents: CityAgent[];
   onHover?: (agent: CityAgent | null) => void;
   onPick?: (agent: CityAgent) => void;
+  onContext?: (agent: CityAgent, screen: { x: number; y: number }) => void;
   timeOfDay?: TimeOfDay;
   heatmapOn?: boolean;
   /** Agent IDs created within the current session — animated in with a
@@ -532,12 +533,14 @@ function Buildings({
   data,
   onHover,
   onPick,
+  onContext,
   dim = false,
   freshIds,
 }: {
   data: BuildingData[];
   onHover?: (agent: CityAgent | null) => void;
   onPick?: (agent: CityAgent) => void;
+  onContext?: (agent: CityAgent, screen: { x: number; y: number }) => void;
   dim?: boolean;
   freshIds?: Set<string>;
 }) {
@@ -642,6 +645,11 @@ function Buildings({
             onClick={(e) => {
               e.stopPropagation();
               onPick?.(b);
+            }}
+            onContextMenu={(e) => {
+              e.stopPropagation();
+              e.nativeEvent.preventDefault();
+              onContext?.(b, { x: e.nativeEvent.clientX, y: e.nativeEvent.clientY });
             }}
           >
             <boxGeometry args={[1, 1, 1]} />
@@ -860,6 +868,7 @@ function SceneInner({
   agents,
   onHover,
   onPick,
+  onContext,
   timeOfDay = 'auto',
   heatmapOn = false,
   freshIds,
@@ -1041,6 +1050,7 @@ function SceneInner({
         data={buildings}
         onHover={onHover}
         onPick={onPick}
+        onContext={onContext}
         dim={heatmapOn}
         freshIds={freshIds}
       />
@@ -1077,7 +1087,7 @@ function SceneInner({
 }
 
 export const CityScene = forwardRef<CitySceneHandle, Props>(function CityScene(
-  { agents, onHover, onPick, timeOfDay, heatmapOn, freshIds, pulseAts },
+  { agents, onHover, onPick, onContext, timeOfDay, heatmapOn, freshIds, pulseAts },
   ref,
 ) {
   const [mounted, setMounted] = useState(false);
@@ -1105,6 +1115,7 @@ export const CityScene = forwardRef<CitySceneHandle, Props>(function CityScene(
         agents={agents}
         onHover={onHover}
         onPick={onPick}
+        onContext={onContext}
         timeOfDay={timeOfDay}
         heatmapOn={heatmapOn}
         freshIds={freshIds}

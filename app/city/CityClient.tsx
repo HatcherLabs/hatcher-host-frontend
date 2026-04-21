@@ -8,6 +8,10 @@ import { CityHud } from '@/components/city/CityHud';
 import { CitySound, type CitySoundControls } from '@/components/city/CitySound';
 import { CityReplay, type ReplayOverlay } from '@/components/city/CityReplay';
 import { CityLeaderboard } from '@/components/city/CityLeaderboard';
+import { CitySearch } from '@/components/city/CitySearch';
+import { CityRadialMenu, type RadialMenuState } from '@/components/city/CityRadialMenu';
+import { useCityFavorites } from '@/components/city/useCityFavorites';
+import { CityOnboarding } from '@/components/city/CityOnboarding';
 import {
   CityFilters,
   type FilterState,
@@ -46,6 +50,8 @@ export function CityClient({ initial }: Props) {
   // time an agent's tally ticks up between polls.
   const msgCountRef = useRef<Map<string, number>>(new Map());
   const [pulseAts, setPulseAts] = useState<Map<string, number>>(new Map());
+  const [radial, setRadial] = useState<RadialMenuState | null>(null);
+  const favorites = useCityFavorites();
   const sceneRef = useRef<CitySceneHandle | null>(null);
   const soundRef = useRef<CitySoundControls | null>(null);
 
@@ -238,6 +244,25 @@ export function CityClient({ initial }: Props) {
           soundRef.current?.chirp('click');
           router.push(`/agent/${a.id}`);
         }}
+        onContext={(agent, screen) =>
+          setRadial({ agent, screenX: screen.x, screenY: screen.y })
+        }
+      />
+      <CityRadialMenu
+        state={radial}
+        onClose={() => setRadial(null)}
+        onOpen={(a) => router.push(`/agent/${a.id}`)}
+        onFocus={(a) => flyToAgent(a.id)}
+        onShare={(a) => {
+          const url = `${window.location.origin}/city?agent=${a.id}`;
+          try {
+            navigator.clipboard.writeText(url);
+          } catch {
+            /* browsers that block clipboard without user gesture will noop */
+          }
+        }}
+        onPin={(a) => favorites.toggle(a.id)}
+        isPinned={radial ? favorites.has(radial.agent.id) : false}
       />
       <CityFilters
         filters={filters}
@@ -259,8 +284,14 @@ export function CityClient({ initial }: Props) {
         onFlyHome={flyHome}
       />
       <CityLeaderboard agents={data.agents} onFlyToAgent={flyToAgent} />
+      <CitySearch
+        agents={data.agents}
+        onPickAgent={flyToAgent}
+        onPickDistrict={flyToDistrict}
+      />
       <CityReplay baseAgents={data.agents} onOverlay={setReplayOverlay} />
       <CitySound onReady={(api) => (soundRef.current = api)} />
+      <CityOnboarding />
     </div>
   );
 }
