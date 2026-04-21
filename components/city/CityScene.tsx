@@ -46,6 +46,9 @@ interface Props {
   /** Agent IDs created within the current session — animated in with a
       short grow-from-ground motion on first render. */
   freshIds?: Set<string>;
+  /** Map of agent id → performance.now() at the moment the agent's
+      messageCount ticked up, drives the expanding-ring pulse. */
+  pulseAts?: Map<string, number>;
 }
 
 // Resolve auto → day/night based on the local hour. 6-18 = day.
@@ -394,6 +397,76 @@ function CloudLayer() {
           depthWrite={false}
         />
       </mesh>
+    </group>
+  );
+}
+
+// ─── Pulse rings above recently active buildings ────────────────
+// Spawned whenever an agent's messageCount ticks up. Expanding torus
+// + fade over 1.8s using a single shared geometry + material.
+
+function PulseRings({
+  buildings,
+  pulseAts,
+}: {
+  buildings: BuildingData[];
+  pulseAts?: Map<string, number>;
+}) {
+  const groupRef = useRef<THREE.Group>(null);
+  const buildingById = useMemo(() => {
+    const m = new Map<string, BuildingData>();
+    buildings.forEach((b) => m.set(b.id, b));
+    return m;
+  }, [buildings]);
+
+  const material = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: 0xfbbf24,
+        transparent: true,
+        opacity: 1,
+        side: THREE.DoubleSide,
+      }),
+    [],
+  );
+
+  useFrame(() => {
+    if (!groupRef.current) return;
+    const now = performance.now();
+    groupRef.current.children.forEach((child) => {
+      const startMs = child.userData.startMs as number | undefined;
+      if (startMs === undefined) return;
+      const DURATION = 1800;
+      const t = Math.min(1, (now - startMs) / DURATION);
+      const scale = 0.5 + t * 5;
+      child.scale.set(scale, 1, scale);
+      const mat = (child as THREE.Mesh).material as THREE.MeshBasicMaterial;
+      mat.opacity = 0.9 * (1 - t);
+    });
+  });
+
+  if (!pulseAts || pulseAts.size === 0) return null;
+
+  const rings: Array<{ key: string; x: number; y: number; z: number; startMs: number }> = [];
+  pulseAts.forEach((startMs, id) => {
+    const b = buildingById.get(id);
+    if (!b) return;
+    rings.push({ key: id + ':' + startMs, x: b.x, y: b.h + 0.5, z: b.z, startMs });
+  });
+
+  return (
+    <group ref={groupRef}>
+      {rings.map((r) => (
+        <mesh
+          key={r.key}
+          position={[r.x, r.y, r.z]}
+          rotation={[-Math.PI / 2, 0, 0]}
+          userData={{ startMs: r.startMs }}
+          material={material}
+        >
+          <torusGeometry args={[1.2, 0.08, 8, 32]} />
+        </mesh>
+      ))}
     </group>
   );
 }
@@ -790,6 +863,7 @@ function SceneInner({
   timeOfDay = 'auto',
   heatmapOn = false,
   freshIds,
+  pulseAts,
   sceneApiRef,
 }: Props & { sceneApiRef: React.MutableRefObject<CitySceneHandle | null> }) {
   const resolvedTime = resolveTimeOfDay(timeOfDay);
@@ -970,6 +1044,7 @@ function SceneInner({
         dim={heatmapOn}
         freshIds={freshIds}
       />
+      <PulseRings buildings={buildings} pulseAts={pulseAts} />
       <SparkleField positions={sparklePositions} />
       <CloudLayer />
 
@@ -1002,7 +1077,7 @@ function SceneInner({
 }
 
 export const CityScene = forwardRef<CitySceneHandle, Props>(function CityScene(
-  { agents, onHover, onPick, timeOfDay, heatmapOn, freshIds },
+  { agents, onHover, onPick, timeOfDay, heatmapOn, freshIds, pulseAts },
   ref,
 ) {
   const [mounted, setMounted] = useState(false);
@@ -1033,6 +1108,7 @@ export const CityScene = forwardRef<CitySceneHandle, Props>(function CityScene(
         timeOfDay={timeOfDay}
         heatmapOn={heatmapOn}
         freshIds={freshIds}
+        pulseAts={pulseAts}
         sceneApiRef={sceneApiRef}
       />
     </Canvas>

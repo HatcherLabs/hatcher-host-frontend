@@ -7,6 +7,7 @@ import { API_URL } from '@/lib/config';
 import { CityHud } from '@/components/city/CityHud';
 import { CitySound, type CitySoundControls } from '@/components/city/CitySound';
 import { CityReplay, type ReplayOverlay } from '@/components/city/CityReplay';
+import { CityLeaderboard } from '@/components/city/CityLeaderboard';
 import {
   CityFilters,
   type FilterState,
@@ -41,6 +42,10 @@ export function CityClient({ initial }: Props) {
   // clear them after a couple seconds so filters don't retrigger it.
   const seenIdsRef = useRef<Set<string>>(new Set());
   const [freshIds, setFreshIds] = useState<Set<string>>(new Set());
+  // Track last-seen messageCount so we can spawn a ring pulse every
+  // time an agent's tally ticks up between polls.
+  const msgCountRef = useRef<Map<string, number>>(new Map());
+  const [pulseAts, setPulseAts] = useState<Map<string, number>>(new Map());
   const sceneRef = useRef<CitySceneHandle | null>(null);
   const soundRef = useRef<CitySoundControls | null>(null);
 
@@ -101,17 +106,32 @@ export function CityClient({ initial }: Props) {
     const seen = seenIdsRef.current;
     const bootstrap = seen.size === 0;
     const fresh = new Set<string>();
+    const pulses = new Map<string, number>();
+    const now = performance.now();
+    const counts = msgCountRef.current;
+
     for (const a of data.agents) {
       if (!seen.has(a.id)) {
         seen.add(a.id);
         if (!bootstrap) fresh.add(a.id);
       }
+      const prev = counts.get(a.id);
+      if (prev !== undefined && a.messageCount > prev) {
+        pulses.set(a.id, now);
+      }
+      counts.set(a.id, a.messageCount);
     }
     if (fresh.size > 0) {
       setFreshIds(fresh);
-      // Clear the set after the grow animation finishes so future
-      // renders treat them as permanent residents.
       const t = setTimeout(() => setFreshIds(new Set()), 2000);
+      if (pulses.size > 0) setPulseAts(pulses);
+      return () => clearTimeout(t);
+    }
+    if (pulses.size > 0) {
+      setPulseAts(pulses);
+      // Ring animations finish in ~1.8s; drop the entries so the scene
+      // doesn't keep spamming the same pulse on re-render.
+      const t = setTimeout(() => setPulseAts(new Map()), 2000);
       return () => clearTimeout(t);
     }
   }, [data]);
@@ -212,6 +232,7 @@ export function CityClient({ initial }: Props) {
         timeOfDay={timeOfDay}
         heatmapOn={heatmapOn}
         freshIds={freshIds}
+        pulseAts={pulseAts}
         onHover={onHoverWithSound}
         onPick={(a) => {
           soundRef.current?.chirp('click');
@@ -237,6 +258,7 @@ export function CityClient({ initial }: Props) {
         onFlyToAgent={flyToAgent}
         onFlyHome={flyHome}
       />
+      <CityLeaderboard agents={data.agents} onFlyToAgent={flyToAgent} />
       <CityReplay baseAgents={data.agents} onOverlay={setReplayOverlay} />
       <CitySound onReady={(api) => (soundRef.current = api)} />
     </div>
