@@ -6,11 +6,17 @@ import type { CityAgent, CityResponse, Framework, Category } from './types';
 import { CATEGORIES, CATEGORY_LABELS, CATEGORY_ICON } from './types';
 import { useCityFavorites } from './useCityFavorites';
 
+import type { TimeOfDay } from './CityScene';
+
 interface Props {
   counts: CityResponse['counts'];
   hovered: CityAgent | null;
   mineAgents: CityAgent[];
   agents: CityAgent[];
+  timeOfDay: TimeOfDay;
+  onTimeOfDayChange: (t: TimeOfDay) => void;
+  heatmapOn: boolean;
+  onHeatmapToggle: () => void;
   /** Caller injects the scene API so HUD buttons can drive the camera. */
   onFlyToDistrict?: (c: Category) => void;
   onFlyToAgent?: (id: string) => void;
@@ -39,10 +45,17 @@ export function CityHud({
   hovered,
   mineAgents,
   agents,
+  timeOfDay,
+  onTimeOfDayChange,
+  heatmapOn,
+  onHeatmapToggle,
   onFlyToDistrict,
   onFlyToAgent,
   onFlyHome,
 }: Props) {
+  const nextTime: TimeOfDay =
+    timeOfDay === 'auto' ? 'day' : timeOfDay === 'day' ? 'night' : 'auto';
+  const timeLabel = timeOfDay === 'auto' ? '◐ AUTO' : timeOfDay === 'day' ? '☀ DAY' : '☾ NIGHT';
   const [tourOn, setTourOn] = useState(false);
   const [tourIdx, setTourIdx] = useState(0);
   const [legendOpen, setLegendOpen] = useState(false); // mobile collapsed state
@@ -124,6 +137,24 @@ export function CityHud({
           title="Auto-pan through every district"
         >
           {tourOn ? '■ STOP' : '▶ TOUR'}
+        </button>
+        <button
+          onClick={() => onTimeOfDayChange(nextTime)}
+          className="font-['Press_Start_2P',monospace] text-[7px] tracking-[1px] px-1.5 py-1 border border-slate-700 text-slate-300 hover:border-amber-400 hover:text-amber-400 sm:text-[9px] sm:tracking-[2px] sm:px-2"
+          title="Toggle day / night / auto"
+        >
+          {timeLabel}
+        </button>
+        <button
+          onClick={onHeatmapToggle}
+          className={`font-['Press_Start_2P',monospace] text-[7px] tracking-[1px] px-1.5 py-1 border sm:text-[9px] sm:tracking-[2px] sm:px-2 ${
+            heatmapOn
+              ? 'border-rose-400 bg-rose-400 text-black'
+              : 'border-slate-700 text-slate-300 hover:border-rose-400 hover:text-rose-400'
+          }`}
+          title="Heatmap of running agents per district"
+        >
+          {heatmapOn ? '■ HEAT' : '◉ HEAT'}
         </button>
       </div>
 

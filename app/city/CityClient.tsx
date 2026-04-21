@@ -15,7 +15,7 @@ import {
   filtersFromSearchParams,
   filtersToSearchParams,
 } from '@/components/city/CityFilters';
-import type { CitySceneHandle } from '@/components/city/CityScene';
+import type { CitySceneHandle, TimeOfDay } from '@/components/city/CityScene';
 import type { CityAgent, CityResponse, Category } from '@/components/city/types';
 import { CATEGORIES } from '@/components/city/types';
 
@@ -34,6 +34,13 @@ export function CityClient({ initial }: Props) {
   const [data, setData] = useState<CityResponse | null>(initial);
   const [hovered, setHovered] = useState<CityAgent | null>(null);
   const [replayOverlay, setReplayOverlay] = useState<ReplayOverlay | null>(null);
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>('auto');
+  const [heatmapOn, setHeatmapOn] = useState(false);
+  // Agents that weren't in the previous poll snapshot get tagged as
+  // "fresh" so the scene plays the rise-from-ground animation. We also
+  // clear them after a couple seconds so filters don't retrigger it.
+  const seenIdsRef = useRef<Set<string>>(new Set());
+  const [freshIds, setFreshIds] = useState<Set<string>>(new Set());
   const sceneRef = useRef<CitySceneHandle | null>(null);
   const soundRef = useRef<CitySoundControls | null>(null);
 
@@ -75,7 +82,7 @@ export function CityClient({ initial }: Props) {
   useEffect(() => {
     const POLL_MS = 20_000;
     const timer = setInterval(() => {
-      if (document.hidden) return; // skip while tab is backgrounded
+      if (document.hidden) return;
       fetch(`${API_URL}/public/city`, { credentials: 'include' })
         .then((r) => (r.ok ? r.json() : null))
         .then((j: { success?: boolean; data?: CityResponse } | null) => {
@@ -85,6 +92,29 @@ export function CityClient({ initial }: Props) {
     }, POLL_MS);
     return () => clearInterval(timer);
   }, []);
+
+  // Track which agents are "freshly arrived" — anything in the current
+  // payload we hadn't seen in our session before. Skip the very first
+  // hydration so we don't grow-in 718 buildings on page load.
+  useEffect(() => {
+    if (!data) return;
+    const seen = seenIdsRef.current;
+    const bootstrap = seen.size === 0;
+    const fresh = new Set<string>();
+    for (const a of data.agents) {
+      if (!seen.has(a.id)) {
+        seen.add(a.id);
+        if (!bootstrap) fresh.add(a.id);
+      }
+    }
+    if (fresh.size > 0) {
+      setFreshIds(fresh);
+      // Clear the set after the grow animation finishes so future
+      // renders treat them as permanent residents.
+      const t = setTimeout(() => setFreshIds(new Set()), 2000);
+      return () => clearTimeout(t);
+    }
+  }, [data]);
 
   // Sync filter state back to the URL so copy-paste shares the same view.
   useEffect(() => {
@@ -179,6 +209,9 @@ export function CityClient({ initial }: Props) {
       <CityScene
         ref={sceneRef}
         agents={filteredAgents}
+        timeOfDay={timeOfDay}
+        heatmapOn={heatmapOn}
+        freshIds={freshIds}
         onHover={onHoverWithSound}
         onPick={(a) => {
           soundRef.current?.chirp('click');
@@ -196,6 +229,10 @@ export function CityClient({ initial }: Props) {
         hovered={hovered}
         mineAgents={mineAgents}
         agents={data.agents}
+        timeOfDay={timeOfDay}
+        onTimeOfDayChange={setTimeOfDay}
+        heatmapOn={heatmapOn}
+        onHeatmapToggle={() => setHeatmapOn((v) => !v)}
         onFlyToDistrict={flyToDistrict}
         onFlyToAgent={flyToAgent}
         onFlyHome={flyHome}

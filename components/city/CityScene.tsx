@@ -10,6 +10,7 @@ import {
 } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
+import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import type { CityAgent, Framework, Category } from './types';
 import {
@@ -34,10 +35,24 @@ export interface CitySceneHandle {
   getDistrictPosition: (category: Category) => { x: number; z: number } | null;
 }
 
+export type TimeOfDay = 'day' | 'night' | 'auto';
+
 interface Props {
   agents: CityAgent[];
   onHover?: (agent: CityAgent | null) => void;
   onPick?: (agent: CityAgent) => void;
+  timeOfDay?: TimeOfDay;
+  heatmapOn?: boolean;
+  /** Agent IDs created within the current session — animated in with a
+      short grow-from-ground motion on first render. */
+  freshIds?: Set<string>;
+}
+
+// Resolve auto → day/night based on the local hour. 6-18 = day.
+export function resolveTimeOfDay(t: TimeOfDay): 'day' | 'night' {
+  if (t !== 'auto') return t;
+  const h = new Date().getHours();
+  return h >= 6 && h < 18 ? 'day' : 'night';
 }
 
 interface BuildingData extends CityAgent {
@@ -103,18 +118,32 @@ function layoutBuildings(agents: CityAgent[]): BuildingData[] {
 
 // ─── District labels ─────────────────────────────────────────────
 
+function heatmapColor(ratio: number): THREE.Color {
+  // cold blue 0,0.2,0.5 → hot red 1,0.3,0.2
+  return new THREE.Color().setRGB(
+    0.1 + ratio * 0.9,
+    0.2 + (1 - ratio) * 0.3,
+    0.6 - ratio * 0.5,
+  );
+}
+
 function DistrictPad({
   idx,
   category,
   onClick,
+  heat,
 }: {
   idx: number;
   category: Category;
   onClick?: (c: Category) => void;
+  heat?: number; // null/undefined = default grey pad, 0..1 = heatmap value
 }) {
   const pos = districtPosition(idx);
   const label = CATEGORY_LABELS[category];
   const icon = CATEGORY_ICON[category];
+  const padColor =
+    typeof heat === 'number' ? heatmapColor(heat).getHex() : 0x111827;
+  const padOpacity = typeof heat === 'number' ? 0.85 : 0.5;
 
   const sprite = useMemo(() => {
     const canvas = document.createElement('canvas');
@@ -146,7 +175,14 @@ function DistrictPad({
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[pos.x, 0.02, pos.z]}>
         <planeGeometry args={[DISTRICT_SIZE, DISTRICT_SIZE]} />
-        <meshStandardMaterial color={0x111827} roughness={0.9} transparent opacity={0.5} />
+        <meshStandardMaterial
+          color={padColor}
+          roughness={0.9}
+          transparent
+          opacity={padOpacity}
+          emissive={typeof heat === 'number' ? padColor : 0x000000}
+          emissiveIntensity={typeof heat === 'number' ? 0.35 : 0}
+        />
       </mesh>
       <sprite
         position={[pos.x, 30, pos.z]}
@@ -263,6 +299,54 @@ function makeNoiseTexture(size = 256): THREE.CanvasTexture {
   return tex;
 }
 
+// ─── Streets between districts ───────────────────────────────────
+// Two orthogonal grids of thin emissive strips sit just above the
+// ground, one per axis. Positions are derived from the district grid
+// so roads always land between pads instead of cutting through them.
+
+function Streets() {
+  const totalRows = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
+  const step = DISTRICT_SIZE + DISTRICT_GAP;
+  const longEdge = Math.max(DISTRICT_COLS, totalRows) * step;
+
+  const mat = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: 0x1e3a8a,
+        transparent: true,
+        opacity: 0.55,
+      }),
+    [],
+  );
+
+  // Vertical roads: one per gap between columns, plus edges.
+  const verticalXs: number[] = [];
+  for (let c = 0; c <= DISTRICT_COLS; c++) {
+    verticalXs.push((c - DISTRICT_COLS / 2) * step);
+  }
+  const horizontalZs: number[] = [];
+  for (let r = 0; r <= totalRows; r++) {
+    horizontalZs.push((r - totalRows / 2) * step);
+  }
+
+  return (
+    <group position={[0, 0.03, 0]}>
+      {verticalXs.map((x, i) => (
+        <mesh key={`v${i}`} position={[x, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[1.2, longEdge]} />
+          <primitive object={mat} attach="material" />
+        </mesh>
+      ))}
+      {horizontalZs.map((z, i) => (
+        <mesh key={`h${i}`} position={[0, 0, z]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[longEdge, 1.2]} />
+          <primitive object={mat} attach="material" />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 function CloudLayer() {
   const texRef = useRef<THREE.Texture | null>(null);
   const mat1Ref = useRef<THREE.MeshBasicMaterial | null>(null);
@@ -375,10 +459,14 @@ function Buildings({
   data,
   onHover,
   onPick,
+  dim = false,
+  freshIds,
 }: {
   data: BuildingData[];
   onHover?: (agent: CityAgent | null) => void;
   onPick?: (agent: CityAgent) => void;
+  dim?: boolean;
+  freshIds?: Set<string>;
 }) {
   const roofMats = useMemo(() => {
     const m: Record<Framework, THREE.Material> = {} as Record<Framework, THREE.Material>;
@@ -431,7 +519,16 @@ function Buildings({
     });
   }
 
-  const bodyMats = useMemo(() => data.map(bodyMaterial), [data]);
+  const bodyMats = useMemo(() => {
+    const mats = data.map(bodyMaterial);
+    if (dim) {
+      mats.forEach((m) => {
+        (m as THREE.MeshStandardMaterial).transparent = true;
+        (m as THREE.MeshStandardMaterial).opacity = 0.18;
+      });
+    }
+    return mats;
+  }, [data, dim]);
 
   // Emissive strip that runs around the body of a running building —
   // reads as lit windows. Shared material since colour is fixed.
@@ -454,7 +551,7 @@ function Buildings({
   return (
     <group>
       {data.map((b, i) => (
-        <group key={b.id}>
+        <FreshInGroup key={b.id} fresh={freshIds?.has(b.id) ?? false}>
           {/* Body */}
           <mesh
             position={[b.x, b.h / 2, b.z]}
@@ -559,10 +656,43 @@ function Buildings({
             </mesh>
           )}
           <AvatarBillboard b={b} />
-        </group>
+        </FreshInGroup>
       ))}
     </group>
   );
+}
+
+// Tiny helper that slides a group up from Y=-h to Y=0 over ~1.2s when
+// marked fresh. Skipped entirely for non-fresh agents so we don't pay
+// the useFrame cost for hundreds of buildings after the initial paint.
+function FreshInGroup({
+  fresh,
+  children,
+}: {
+  fresh: boolean;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<THREE.Group>(null);
+  const startMsRef = useRef<number | null>(null);
+  const doneRef = useRef<boolean>(!fresh);
+
+  useFrame(() => {
+    if (doneRef.current) return;
+    if (!ref.current) return;
+    if (startMsRef.current === null) startMsRef.current = performance.now();
+    const elapsed = performance.now() - startMsRef.current;
+    const DURATION = 1200;
+    const progress = Math.min(1, elapsed / DURATION);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    // translate the whole group from below ground plane to natural rest.
+    ref.current.position.y = -80 * (1 - eased);
+    if (progress >= 1) {
+      ref.current.position.y = 0;
+      doneRef.current = true;
+    }
+  });
+
+  return <group ref={ref}>{children}</group>;
 }
 
 // How tall the framework-specific roof adds on top of the body. Used
@@ -657,8 +787,30 @@ function SceneInner({
   agents,
   onHover,
   onPick,
+  timeOfDay = 'auto',
+  heatmapOn = false,
+  freshIds,
   sceneApiRef,
 }: Props & { sceneApiRef: React.MutableRefObject<CitySceneHandle | null> }) {
+  const resolvedTime = resolveTimeOfDay(timeOfDay);
+  const isNight = resolvedTime === 'night';
+
+  // Per-district heat value for the heatmap overlay — running agents /
+  // district population. Computed once per agents change.
+  const heatByCategory = useMemo(() => {
+    const running: Record<string, number> = {};
+    const total: Record<string, number> = {};
+    for (const a of agents) {
+      total[a.category] = (total[a.category] ?? 0) + 1;
+      if (a.status === 'running') running[a.category] = (running[a.category] ?? 0) + 1;
+    }
+    const max = Math.max(1, ...Object.values(running));
+    const out: Record<string, number> = {};
+    for (const c of CATEGORIES) {
+      out[c] = (running[c] ?? 0) / max;
+    }
+    return out;
+  }, [agents]);
   const buildings = useMemo(() => layoutBuildings(agents), [agents]);
   const sparklePositions = useMemo<Array<[number, number, number]>>(
     () =>
@@ -768,20 +920,38 @@ function SceneInner({
     [camera, buildings, HOME_POS, HOME_TARGET],
   );
 
+  // Pre-compute lighting for day vs night. Night is the hero look —
+  // darker ground, colder ambient, dim sun standing in for moonlight,
+  // which lets the bloom pass and emissive windows carry the image.
+  const bgColor = isNight ? 0x040610 : 0x0a1325;
+  const fogNear = isNight ? 160 : 220;
+  const fogFar = isNight ? 620 : 900;
+  const ambientColor = isNight ? 0x6677aa : 0xaabbcc;
+  const ambientIntensity = isNight ? 0.18 : 0.55;
+  const sunColor = isNight ? 0x8fa4ff : 0xfff4d6;
+  const sunIntensity = isNight ? 0.3 : 1.1;
+  const hemiSky = isNight ? 0x1e293b : 0x7799ff;
+
   return (
     <>
-      <fog attach="fog" args={[0x050814, 180, 700]} />
-      <color attach="background" args={[0x050814]} />
+      <fog attach="fog" args={[bgColor, fogNear, fogFar]} />
+      <color attach="background" args={[bgColor]} />
 
-      <ambientLight intensity={0.45} color={0xaabbcc} />
-      <directionalLight ref={sunRef} position={[100, 200, 80]} intensity={0.9} color={0xfff4d6} />
-      <hemisphereLight args={[0x7799ff, 0x1a0f2a, 0.35]} />
+      <ambientLight intensity={ambientIntensity} color={ambientColor} />
+      <directionalLight
+        ref={sunRef}
+        position={[100, 200, 80]}
+        intensity={sunIntensity}
+        color={sunColor}
+      />
+      <hemisphereLight args={[hemiSky, 0x1a0f2a, isNight ? 0.15 : 0.4]} />
 
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[2000, 2000]} />
         <meshStandardMaterial color={0x0a0e1a} roughness={0.95} />
       </mesh>
       <gridHelper args={[1500, 150, 0x1f2937, 0x111827]} position={[0, 0.01, 0]} />
+      <Streets />
 
       {CATEGORIES.map((cat, i) => (
         <DistrictPad
@@ -789,10 +959,17 @@ function SceneInner({
           idx={i}
           category={cat}
           onClick={(c) => sceneApiRef.current?.flyToDistrict(c)}
+          heat={heatmapOn ? heatByCategory[cat] : undefined}
         />
       ))}
 
-      <Buildings data={buildings} onHover={onHover} onPick={onPick} />
+      <Buildings
+        data={buildings}
+        onHover={onHover}
+        onPick={onPick}
+        dim={heatmapOn}
+        freshIds={freshIds}
+      />
       <SparkleField positions={sparklePositions} />
       <CloudLayer />
 
@@ -806,12 +983,26 @@ function SceneInner({
         minDistance={10}
         maxDistance={800}
       />
+
+      {/* Bloom pass — biases toward emissive surfaces (window strips,
+          Milady spires, gold halos, founding crowns) so the city reads
+          cinematic at any framerate. Luminance threshold keeps the
+          ground plane and matte bodies from blooming. */}
+      <EffectComposer multisampling={0} enableNormalPass={false}>
+        <Bloom
+          intensity={0.9}
+          luminanceThreshold={0.35}
+          luminanceSmoothing={0.15}
+          mipmapBlur
+          radius={0.8}
+        />
+      </EffectComposer>
     </>
   );
 }
 
 export const CityScene = forwardRef<CitySceneHandle, Props>(function CityScene(
-  { agents, onHover, onPick },
+  { agents, onHover, onPick, timeOfDay, heatmapOn, freshIds },
   ref,
 ) {
   const [mounted, setMounted] = useState(false);
@@ -839,6 +1030,9 @@ export const CityScene = forwardRef<CitySceneHandle, Props>(function CityScene(
         agents={agents}
         onHover={onHover}
         onPick={onPick}
+        timeOfDay={timeOfDay}
+        heatmapOn={heatmapOn}
+        freshIds={freshIds}
         sceneApiRef={sceneApiRef}
       />
     </Canvas>
