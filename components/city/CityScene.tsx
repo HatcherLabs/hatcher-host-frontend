@@ -21,8 +21,10 @@ import {
 } from './types';
 
 const DISTRICT_COLS = 5;
-const DISTRICT_SIZE = 60;
-const DISTRICT_GAP = 18;
+// Tighter pad + smaller gap keeps the 25-district grid from pushing
+// the far corners past the default camera frustum.
+const DISTRICT_SIZE = 52;
+const DISTRICT_GAP = 14;
 
 export interface CitySceneHandle {
   flyToDistrict: (category: Category, durationMs?: number) => void;
@@ -65,7 +67,13 @@ function districtPosition(idx: number): { x: number; z: number } {
 function layoutBuildings(agents: CityAgent[]): BuildingData[] {
   const byCategory = new Map<Category, CityAgent[]>();
   for (const c of CATEGORIES) byCategory.set(c, []);
-  for (const a of agents) (byCategory.get(a.category) ?? byCategory.get('other')!).push(a);
+  for (const a of agents) {
+    // If the agent's category isn't in our current bucket list, drop
+    // it in the first district so the map still renders every agent.
+    // This is only a safety net — backend always normalises to the 25.
+    const bucket = byCategory.get(a.category) ?? byCategory.get(CATEGORIES[0])!;
+    bucket.push(a);
+  }
 
   const out: BuildingData[] = [];
   CATEGORIES.forEach((cat, di) => {
@@ -330,10 +338,29 @@ function Buildings({
 
   const bodyMats = useMemo(() => data.map(bodyMaterial), [data]);
 
+  // Emissive strip that runs around the body of a running building —
+  // reads as lit windows. Shared material since colour is fixed.
+  const windowStripMat = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: 0xfde68a,
+        emissive: 0xfbbf24,
+        emissiveIntensity: 1.4,
+        roughness: 0.3,
+      }),
+    [],
+  );
+
+  const antennaMat = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.6, metalness: 0.9 }),
+    [],
+  );
+
   return (
     <group>
       {data.map((b, i) => (
         <group key={b.id}>
+          {/* Body */}
           <mesh
             position={[b.x, b.h / 2, b.z]}
             scale={[b.w, b.h, b.w]}
@@ -354,13 +381,62 @@ function Buildings({
           >
             <boxGeometry args={[1, 1, 1]} />
           </mesh>
+
+          {/* Window band on running buildings — two emissive stripes
+              at ~40% and ~75% of the body height, all four sides. */}
+          {b.status === 'running' && b.h > 4 && (
+            <>
+              <mesh
+                position={[b.x, b.h * 0.4, b.z]}
+                scale={[b.w * 1.02, 0.18, b.w * 1.02]}
+                material={windowStripMat}
+              >
+                <boxGeometry args={[1, 1, 1]} />
+              </mesh>
+              {b.h > 8 && (
+                <mesh
+                  position={[b.x, b.h * 0.75, b.z]}
+                  scale={[b.w * 1.02, 0.18, b.w * 1.02]}
+                  material={windowStripMat}
+                >
+                  <boxGeometry args={[1, 1, 1]} />
+                </mesh>
+              )}
+            </>
+          )}
+
+          {/* Roof geometry varies per framework so the skyline isn't flat. */}
+          <FrameworkRoof b={b} mat={roofMats[b.framework]} />
+
+          {/* Rooftop detail (antenna / dish). Only on taller buildings
+              so tiny free-tier shacks don't get hats. */}
+          {b.h > 6 && (
+            <mesh
+              position={[b.x, b.h + roofHeight(b) + 1.4, b.z + b.w * 0.1]}
+              material={antennaMat}
+            >
+              <cylinderGeometry args={[0.05, 0.05, 2.4, 6]} />
+            </mesh>
+          )}
+          {b.h > 10 && (
+            <mesh
+              position={[b.x - b.w * 0.25, b.h + roofHeight(b) + 0.35, b.z]}
+              material={antennaMat}
+              rotation={[Math.PI / 2.4, 0, 0]}
+            >
+              <cylinderGeometry args={[b.w * 0.18, b.w * 0.18, 0.1, 12]} />
+            </mesh>
+          )}
+
+          {/* Door — small dark panel at the base */}
           <mesh
-            position={[b.x, b.h + 0.09, b.z]}
-            scale={[b.w, 1, b.w]}
-            material={roofMats[b.framework]}
+            position={[b.x, 0.55, b.z + b.w * 0.5 + 0.01]}
+            scale={[b.w * 0.28, 1.1, 0.05]}
           >
-            <boxGeometry args={[1.06, 0.18, 1.06]} />
+            <boxGeometry args={[1, 1, 1]} />
+            <meshStandardMaterial color={0x0a0e1a} roughness={0.9} />
           </mesh>
+
           {b.mine && (
             <>
               <mesh
@@ -376,7 +452,7 @@ function Buildings({
             </>
           )}
           {b.tier === 4 && (
-            <mesh position={[b.x, b.h + 0.7, b.z]}>
+            <mesh position={[b.x, b.h + roofHeight(b) + 0.9, b.z]}>
               <coneGeometry args={[b.w * 0.55, b.w * 0.8, 5]} />
               <meshStandardMaterial
                 color={0xfbbf24}
@@ -387,13 +463,78 @@ function Buildings({
               />
             </mesh>
           )}
-          {/* Avatar billboard — skipped when zoomed far out will fade
-              due to small screen size, cheap enough to always render */}
           <AvatarBillboard b={b} />
         </group>
       ))}
     </group>
   );
+}
+
+// How tall the framework-specific roof adds on top of the body. Used
+// to place antennas / crown above it without intersecting.
+function roofHeight(b: BuildingData): number {
+  switch (b.framework) {
+    case 'hermes':   return b.w * 0.55; // pitched
+    case 'elizaos':  return b.w * 0.5;  // dome
+    case 'milady':   return b.w * 0.9;  // spire
+    case 'openclaw': return 0.35;       // flat with water tank
+  }
+}
+
+/**
+ * Framework-specific roof silhouette. The building body is a shared box
+ * so we can unify interactions; the roof on top carries the "character":
+ *
+ *   openclaw  flat slab + small water tank
+ *   hermes    pitched four-sided pyramid (ConeGeometry with radialSegments=4)
+ *   elizaos   low dome (SphereGeometry hemisphere)
+ *   milady    tall spire (ConeGeometry with radialSegments=6)
+ */
+function FrameworkRoof({ b, mat }: { b: BuildingData; mat: THREE.Material }) {
+  const baseY = b.h;
+  switch (b.framework) {
+    case 'openclaw':
+      return (
+        <>
+          <mesh position={[b.x, baseY + 0.09, b.z]} scale={[b.w, 1, b.w]} material={mat}>
+            <boxGeometry args={[1.06, 0.18, 1.06]} />
+          </mesh>
+          {/* Water tank offset from centre */}
+          <mesh
+            position={[b.x + b.w * 0.15, baseY + 0.55, b.z - b.w * 0.1]}
+            material={mat}
+          >
+            <cylinderGeometry args={[b.w * 0.2, b.w * 0.2, 0.6, 8]} />
+          </mesh>
+        </>
+      );
+    case 'hermes':
+      return (
+        <mesh
+          position={[b.x, baseY + b.w * 0.3, b.z]}
+          rotation={[0, Math.PI / 4, 0]}
+          material={mat}
+        >
+          <coneGeometry args={[b.w * 0.82, b.w * 0.6, 4]} />
+        </mesh>
+      );
+    case 'elizaos':
+      return (
+        <mesh
+          position={[b.x, baseY, b.z]}
+          material={mat}
+          scale={[1, 0.6, 1]}
+        >
+          <sphereGeometry args={[b.w * 0.58, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        </mesh>
+      );
+    case 'milady':
+      return (
+        <mesh position={[b.x, baseY + b.w * 0.45, b.z]} material={mat}>
+          <coneGeometry args={[b.w * 0.45, b.w * 0.9, 6]} />
+        </mesh>
+      );
+  }
 }
 
 // ─── Camera fly-to controller ────────────────────────────────────

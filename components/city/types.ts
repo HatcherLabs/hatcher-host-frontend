@@ -1,8 +1,12 @@
 export type Framework = 'openclaw' | 'hermes' | 'elizaos' | 'milady';
+// Aligned 1:1 with AgentTemplate.category on prod (25 buckets). Keep
+// in sync with routes/city.ts on the backend.
 export type Category =
-  | 'research' | 'creative' | 'data' | 'coding' | 'support'
-  | 'social' | 'writing' | 'trading' | 'devops' | 'education'
-  | 'marketing' | 'productivity' | 'other';
+  | 'automation' | 'business' | 'compliance' | 'creative' | 'customer-success'
+  | 'data' | 'development' | 'devops' | 'ecommerce' | 'education'
+  | 'finance' | 'freelance' | 'healthcare' | 'hr' | 'legal'
+  | 'marketing' | 'moltbook' | 'ollama' | 'personal' | 'productivity'
+  | 'real-estate' | 'saas' | 'security' | 'supply-chain' | 'voice';
 export type CityStatus = 'running' | 'sleeping' | 'paused' | 'crashed';
 
 export interface CityAgent {
@@ -31,26 +35,42 @@ export interface CityResponse {
 }
 
 // UI constants — must stay in sync with backend routes/city.ts.
+// Ordered for a 5×5 district grid. Heavy-volume districts are clustered
+// toward the centre so zoom-out presents the densest buildings first.
 export const CATEGORIES: Category[] = [
-  'research','creative','data','coding','support',
-  'social','writing','trading','devops',
-  'education','marketing','productivity','other',
+  'personal', 'productivity', 'automation', 'voice', 'moltbook',
+  'marketing', 'business', 'customer-success', 'hr', 'freelance',
+  'creative', 'development', 'data', 'devops', 'ollama',
+  'finance', 'ecommerce', 'saas', 'security', 'compliance',
+  'education', 'healthcare', 'real-estate', 'supply-chain', 'legal',
 ];
 
 export const CATEGORY_LABELS: Record<Category, string> = {
-  research: 'Research',
+  automation: 'Automation',
+  business: 'Business',
+  compliance: 'Compliance',
   creative: 'Creative',
+  'customer-success': 'Customer Success',
   data: 'Data',
-  coding: 'Coding',
-  support: 'Support',
-  social: 'Social',
-  writing: 'Writing',
-  trading: 'Trading',
+  development: 'Development',
   devops: 'DevOps',
+  ecommerce: 'E-commerce',
   education: 'Education',
+  finance: 'Finance',
+  freelance: 'Freelance',
+  healthcare: 'Healthcare',
+  hr: 'HR',
+  legal: 'Legal',
   marketing: 'Marketing',
+  moltbook: 'Moltbook',
+  ollama: 'Ollama',
+  personal: 'Personal',
   productivity: 'Productivity',
-  other: 'Other',
+  'real-estate': 'Real Estate',
+  saas: 'SaaS',
+  security: 'Security',
+  'supply-chain': 'Supply Chain',
+  voice: 'Voice',
 };
 
 export const FRAMEWORK_COLORS: Record<Framework, number> = {
