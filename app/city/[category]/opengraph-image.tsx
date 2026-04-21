@@ -3,7 +3,7 @@ import { API_URL } from '@/lib/config';
 import { CATEGORIES, CATEGORY_LABELS, CATEGORY_ICON } from '@/components/city/types';
 import type { Category, CityResponse } from '@/components/city/types';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 export const alt = 'Hatcher City district';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
@@ -26,17 +26,18 @@ async function fetchCounts(): Promise<CityResponse['counts'] | null> {
 export default async function OpengraphImage({
   params,
 }: {
-  params: { category: string };
+  params: Promise<{ category: string }>;
 }) {
-  if (!isCategory(params.category)) {
+  const { category } = await params;
+  if (!isCategory(category)) {
     return new ImageResponse(<div>Not found</div>, size);
   }
 
   const counts = await fetchCounts();
-  const myCount = counts?.byCategory?.[params.category] ?? 0;
+  const myCount = counts?.byCategory?.[category] ?? 0;
   const total = counts?.total ?? 0;
-  const label = CATEGORY_LABELS[params.category];
-  const icon = CATEGORY_ICON[params.category];
+  const label = CATEGORY_LABELS[category];
+  const icon = CATEGORY_ICON[category];
   const share = total > 0 ? Math.round((myCount / total) * 100) : 0;
 
   return new ImageResponse(
@@ -48,8 +49,9 @@ export default async function OpengraphImage({
           display: 'flex',
           flexDirection: 'column',
           padding: '64px',
-          background:
-            'radial-gradient(circle at 20% 15%, rgba(168,85,247,0.25), transparent 50%), radial-gradient(circle at 80% 85%, rgba(56,189,248,0.22), transparent 50%), #050814',
+          backgroundColor: '#050814',
+          backgroundImage:
+            'radial-gradient(circle at 20% 15%, rgba(168,85,247,0.25), transparent 50%), radial-gradient(circle at 80% 85%, rgba(56,189,248,0.22), transparent 50%)',
           color: '#e5e7eb',
           fontFamily: '"Inter", "Segoe UI", sans-serif',
           position: 'relative',
