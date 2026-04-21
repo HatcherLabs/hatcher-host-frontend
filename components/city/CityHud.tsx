@@ -1,12 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import type { CityAgent, CityResponse, Framework } from './types';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { CityAgent, CityResponse, Framework, Category } from './types';
+import { CATEGORIES, CATEGORY_LABELS } from './types';
 
 interface Props {
   counts: CityResponse['counts'];
   hovered: CityAgent | null;
   mineAgents: CityAgent[];
+  /** Caller injects the scene API so HUD buttons can drive the camera. */
+  onFlyToDistrict?: (c: Category) => void;
+  onFlyHome?: () => void;
 }
 
 const FW_LABEL: Record<Framework, string> = {
@@ -16,34 +21,131 @@ const FW_LABEL: Record<Framework, string> = {
   milady: 'Milady',
 };
 
-export function CityHud({ counts, hovered, mineAgents }: Props) {
+const FW_COLORS: Record<Framework, string> = {
+  openclaw: '#10b981',
+  hermes: '#38bdf8',
+  elizaos: '#a855f7',
+  milady: '#ec4899',
+};
+
+// Step durations for tour mode (ms per district + final return home).
+const TOUR_STEP_MS = 3500;
+
+export function CityHud({ counts, hovered, mineAgents, onFlyToDistrict, onFlyHome }: Props) {
+  const [tourOn, setTourOn] = useState(false);
+  const [tourIdx, setTourIdx] = useState(0);
+  const tourTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Advance tour: at each tick, fly to next populated district. Skip
+  // empty districts so we don't stop on blank ground.
+  const tourCategories = CATEGORIES.filter((c) => (counts.byCategory[c] ?? 0) > 0);
+
+  useEffect(() => {
+    if (!tourOn) {
+      if (tourTimerRef.current) {
+        clearTimeout(tourTimerRef.current);
+        tourTimerRef.current = null;
+      }
+      return;
+    }
+    if (!tourCategories.length) {
+      setTourOn(false);
+      return;
+    }
+    const c = tourCategories[tourIdx % tourCategories.length];
+    onFlyToDistrict?.(c);
+    tourTimerRef.current = setTimeout(() => {
+      setTourIdx((i) => {
+        const next = i + 1;
+        if (next >= tourCategories.length) {
+          // End tour after one full loop — fly back home.
+          setTimeout(() => {
+            onFlyHome?.();
+            setTourOn(false);
+          }, 200);
+          return 0;
+        }
+        return next;
+      });
+    }, TOUR_STEP_MS);
+    return () => {
+      if (tourTimerRef.current) clearTimeout(tourTimerRef.current);
+    };
+  }, [tourOn, tourIdx, onFlyToDistrict, onFlyHome, tourCategories]);
+
+  const toggleTour = useCallback(() => {
+    setTourIdx(0);
+    setTourOn((v) => !v);
+  }, []);
+
   return (
     <>
-      {/* Floating stats card — site header stays on top so we tuck
-          stats in the top-left under it, sized compact. */}
-      <div className="pointer-events-none absolute left-4 top-4 z-20 flex items-center gap-5 border border-slate-800 bg-[#050814]/80 px-4 py-2.5 backdrop-blur">
-        <div className="font-['Press_Start_2P',monospace] text-[10px] tracking-[2px] text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]">
+      {/* Floating stats card — site header sits above, we tuck under it. */}
+      <div className="pointer-events-auto absolute left-4 top-4 z-20 flex items-center gap-5 border border-slate-800 bg-[#050814]/80 px-4 py-2.5 backdrop-blur">
+        <button
+          onClick={onFlyHome}
+          className="font-['Press_Start_2P',monospace] text-[10px] tracking-[2px] text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.5)] hover:text-amber-300"
+          title="Fly back to overview"
+        >
           HATCHER CITY
-        </div>
+        </button>
         <div className="h-4 w-px bg-slate-700" />
         <div className="flex items-center gap-4 font-mono text-sm text-slate-300">
           <Stat k="agents" v={counts.total.toLocaleString()} />
           <Stat k="running" v={counts.running.toLocaleString()} />
           <Stat k="districts" v="13" />
         </div>
+        <div className="h-4 w-px bg-slate-700" />
+        <button
+          onClick={toggleTour}
+          className={`font-['Press_Start_2P',monospace] text-[9px] tracking-[2px] px-2 py-1 border ${
+            tourOn
+              ? 'border-amber-400 bg-amber-400 text-black'
+              : 'border-slate-700 text-slate-300 hover:border-amber-400 hover:text-amber-400'
+          }`}
+          title="Auto-pan through every district"
+        >
+          {tourOn ? '■ STOP TOUR' : '▶ TAKE TOUR'}
+        </button>
       </div>
 
-      {/* Framework legend */}
-      <div className="pointer-events-none absolute bottom-4 left-4 z-20 border border-slate-800 bg-[#050814]/80 p-3 font-mono text-sm text-slate-400">
+      {/* Framework + district legend. District entries click to fly-to. */}
+      <div className="pointer-events-auto absolute bottom-4 left-4 z-20 border border-slate-800 bg-[#050814]/85 p-3 font-mono text-sm text-slate-400 backdrop-blur">
         <div className="mb-2 font-['Press_Start_2P',monospace] text-[8px] tracking-[2px] text-amber-400">
           FRAMEWORKS
         </div>
-        <LegendRow color="#10b981" label="OpenClaw" />
-        <LegendRow color="#38bdf8" label="Hermes" />
-        <LegendRow color="#a855f7" label="ElizaOS" />
-        <LegendRow color="#ec4899" label="Milady" />
+        {(Object.keys(FW_COLORS) as Framework[]).map((fw) => (
+          <div key={fw} className="flex items-center gap-2 py-0.5">
+            <span
+              className="inline-block h-2.5 w-4 border border-black"
+              style={{ background: FW_COLORS[fw] }}
+            />
+            {FW_LABEL[fw]}
+            <span className="ml-auto text-slate-500">{counts.byFramework[fw] ?? 0}</span>
+          </div>
+        ))}
         <div className="my-2 h-px bg-slate-800" />
         <LegendRow color="#fbbf24" label="My agents" glow />
+
+        <div className="mb-2 mt-3 font-['Press_Start_2P',monospace] text-[8px] tracking-[2px] text-amber-400">
+          DISTRICTS
+        </div>
+        <div className="grid max-w-[220px] grid-cols-2 gap-x-3">
+          {CATEGORIES.map((c) => {
+            const count = counts.byCategory[c] ?? 0;
+            if (!count) return null;
+            return (
+              <button
+                key={c}
+                onClick={() => onFlyToDistrict?.(c)}
+                className="flex items-center gap-1 py-0.5 text-left text-[13px] text-slate-400 hover:text-amber-400"
+              >
+                <span className="flex-1 truncate">{CATEGORY_LABELS[c]}</span>
+                <span className="text-slate-600">{count}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Controls hint */}
@@ -69,10 +171,10 @@ export function CityHud({ counts, hovered, mineAgents }: Props) {
             ★ MY CITY ({mineAgents.length})
           </h3>
           <div className="max-h-64 space-y-0 overflow-y-auto">
-            {mineAgents.map(a => (
+            {mineAgents.map((a) => (
               <Link
                 key={a.id}
-                href={a.slug ? `/dashboard/agent/${a.id}` : `/agent/${a.id}`}
+                href={`/dashboard/agent/${a.id}`}
                 className="flex items-center gap-2 border-t border-slate-700/30 px-1 py-1.5 font-mono text-sm hover:bg-amber-400/10"
               >
                 <div
@@ -166,12 +268,7 @@ function StatusDot({ status }: { status: CityAgent['status'] }) {
 }
 
 function fwColor(fw: Framework): string {
-  switch (fw) {
-    case 'openclaw': return '#10b981';
-    case 'hermes':   return '#38bdf8';
-    case 'elizaos':  return '#a855f7';
-    case 'milady':   return '#ec4899';
-  }
+  return FW_COLORS[fw];
 }
 
 function tierLabel(t: number): string {

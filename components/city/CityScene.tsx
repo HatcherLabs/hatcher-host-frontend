@@ -1,6 +1,13 @@
 'use client';
 
-import { useMemo, useRef, useState, useEffect } from 'react';
+import {
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  forwardRef,
+} from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
@@ -17,6 +24,13 @@ const DISTRICT_COLS = 5;
 const DISTRICT_SIZE = 60;
 const DISTRICT_GAP = 18;
 
+export interface CitySceneHandle {
+  flyToDistrict: (category: Category, durationMs?: number) => void;
+  flyToAgent: (agentId: string, durationMs?: number) => void;
+  flyHome: (durationMs?: number) => void;
+  getDistrictPosition: (category: Category) => { x: number; z: number } | null;
+}
+
 interface Props {
   agents: CityAgent[];
   onHover?: (agent: CityAgent | null) => void;
@@ -30,7 +44,6 @@ interface BuildingData extends CityAgent {
   h: number;
 }
 
-// Cheap seeded RNG — same layout every time for the same agent list.
 function hashStr(s: string): number {
   let h = 2166136261;
   for (let i = 0; i < s.length; i++) {
@@ -79,8 +92,20 @@ function layoutBuildings(agents: CityAgent[]): BuildingData[] {
   return out;
 }
 
-function DistrictPad({ idx, label }: { idx: number; label: string }) {
+// ─── District labels ─────────────────────────────────────────────
+
+function DistrictPad({
+  idx,
+  category,
+  onClick,
+}: {
+  idx: number;
+  category: Category;
+  onClick?: (c: Category) => void;
+}) {
   const pos = districtPosition(idx);
+  const label = CATEGORY_LABELS[category];
+
   const sprite = useMemo(() => {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
@@ -98,8 +123,7 @@ function DistrictPad({ idx, label }: { idx: number; label: string }) {
     ctx.fillText(label.toUpperCase(), 256, 48);
     const tex = new THREE.CanvasTexture(canvas);
     tex.colorSpace = THREE.SRGBColorSpace;
-    const mat = new THREE.SpriteMaterial({ map: tex, depthTest: false });
-    return mat;
+    return new THREE.SpriteMaterial({ map: tex, depthTest: false });
   }, [label]);
 
   return (
@@ -108,10 +132,141 @@ function DistrictPad({ idx, label }: { idx: number; label: string }) {
         <planeGeometry args={[DISTRICT_SIZE, DISTRICT_SIZE]} />
         <meshStandardMaterial color={0x111827} roughness={0.9} transparent opacity={0.5} />
       </mesh>
-      <sprite position={[pos.x, 30, pos.z]} scale={[20, 4, 1]} material={sprite} />
+      <sprite
+        position={[pos.x, 30, pos.z]}
+        scale={[20, 4, 1]}
+        material={sprite}
+        onClick={(e) => { e.stopPropagation(); onClick?.(category); }}
+      />
     </group>
   );
 }
+
+// ─── Avatar billboard (plane with user avatar texture, faces camera) ─
+
+const AVATAR_CACHE = new Map<string, THREE.Texture>();
+function loadAvatar(url: string): THREE.Texture | null {
+  if (AVATAR_CACHE.has(url)) return AVATAR_CACHE.get(url)!;
+  try {
+    const loader = new THREE.TextureLoader();
+    loader.setCrossOrigin('anonymous');
+    const tex = loader.load(url);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    AVATAR_CACHE.set(url, tex);
+    return tex;
+  } catch {
+    return null;
+  }
+}
+
+// Fallback: render the agent's initial on a small canvas texture.
+const INITIAL_CACHE = new Map<string, THREE.Texture>();
+function loadInitialTexture(letter: string, framework: Framework): THREE.Texture {
+  const key = `${framework}:${letter}`;
+  if (INITIAL_CACHE.has(key)) return INITIAL_CACHE.get(key)!;
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d')!;
+  const bg = `#${FRAMEWORK_COLORS[framework].toString(16).padStart(6, '0')}`;
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, 128, 128);
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(3, 3, 122, 122);
+  ctx.font = 'bold 72px "Press Start 2P", monospace';
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(letter, 64, 68);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  INITIAL_CACHE.set(key, tex);
+  return tex;
+}
+
+function AvatarBillboard({ b }: { b: BuildingData }) {
+  const texture = useMemo(() => {
+    if (b.avatarUrl) {
+      const t = loadAvatar(b.avatarUrl);
+      if (t) return t;
+    }
+    const letter = (b.name[0] ?? '?').toUpperCase();
+    return loadInitialTexture(letter, b.framework);
+  }, [b.avatarUrl, b.name, b.framework]);
+
+  const mat = useMemo(
+    () =>
+      new THREE.SpriteMaterial({
+        map: texture,
+        depthTest: true,
+        depthWrite: false,
+      }),
+    [texture],
+  );
+
+  // Slightly larger than the building width so the avatar is readable
+  // even from the default camera distance (~300 units out).
+  const size = Math.max(2.6, b.w * 1.6);
+  return <sprite position={[b.x, b.h + size * 0.6, b.z]} scale={[size, size, 1]} material={mat} />;
+}
+
+// ─── Sparkle particles above running buildings ───────────────────
+
+function SparkleField({ positions }: { positions: Array<[number, number, number]> }) {
+  const geomRef = useRef<THREE.BufferGeometry>(null);
+
+  const { basePositions, phases } = useMemo(() => {
+    const bp = new Float32Array(positions.length * 3);
+    const ph = new Float32Array(positions.length);
+    positions.forEach((p, i) => {
+      bp[i * 3] = p[0];
+      bp[i * 3 + 1] = p[1];
+      bp[i * 3 + 2] = p[2];
+      ph[i] = Math.random() * Math.PI * 2;
+    });
+    return { basePositions: bp, phases: ph };
+  }, [positions]);
+
+  useFrame((state) => {
+    if (!geomRef.current) return;
+    const t = state.clock.elapsedTime;
+    const arr = geomRef.current.attributes.position.array as Float32Array;
+    for (let i = 0; i < phases.length; i++) {
+      const phase = phases[i];
+      arr[i * 3] = basePositions[i * 3] + Math.cos(t * 1.5 + phase) * 0.35;
+      arr[i * 3 + 1] = basePositions[i * 3 + 1] + ((Math.sin(t * 1.2 + phase) + 1) / 2) * 1.2;
+      arr[i * 3 + 2] = basePositions[i * 3 + 2] + Math.sin(t * 1.7 + phase) * 0.35;
+    }
+    geomRef.current.attributes.position.needsUpdate = true;
+  });
+
+  if (!positions.length) return null;
+
+  return (
+    <points>
+      <bufferGeometry ref={geomRef}>
+        <bufferAttribute
+          attach="attributes-position"
+          args={[basePositions.slice(), 3]}
+          count={positions.length}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.6}
+        color={0xfde68a}
+        sizeAttenuation
+        transparent
+        opacity={0.85}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </points>
+  );
+}
+
+// ─── Building meshes ─────────────────────────────────────────────
 
 function Buildings({
   data,
@@ -122,11 +277,9 @@ function Buildings({
   onHover?: (agent: CityAgent | null) => void;
   onPick?: (agent: CityAgent) => void;
 }) {
-  const groupRef = useRef<THREE.Group>(null);
-
   const roofMats = useMemo(() => {
     const m: Record<Framework, THREE.Material> = {} as Record<Framework, THREE.Material>;
-    (Object.keys(FRAMEWORK_COLORS) as Framework[]).forEach(fw => {
+    (Object.keys(FRAMEWORK_COLORS) as Framework[]).forEach((fw) => {
       m[fw] = new THREE.MeshStandardMaterial({
         color: FRAMEWORK_COLORS[fw],
         emissive: FRAMEWORK_EMISSIVE[fw],
@@ -175,30 +328,46 @@ function Buildings({
     });
   }
 
-  // Pre-build body materials so every mesh doesn't allocate a new one
-  // on every render.
   const bodyMats = useMemo(() => data.map(bodyMaterial), [data]);
 
   return (
-    <group ref={groupRef}>
+    <group>
       {data.map((b, i) => (
         <group key={b.id}>
           <mesh
             position={[b.x, b.h / 2, b.z]}
             scale={[b.w, b.h, b.w]}
             material={bodyMats[i]}
-            onPointerOver={(e) => { e.stopPropagation(); onHover?.(b); document.body.style.cursor = 'pointer'; }}
-            onPointerOut={() => { onHover?.(null); document.body.style.cursor = 'auto'; }}
-            onClick={(e) => { e.stopPropagation(); onPick?.(b); }}
+            onPointerOver={(e) => {
+              e.stopPropagation();
+              onHover?.(b);
+              document.body.style.cursor = 'pointer';
+            }}
+            onPointerOut={() => {
+              onHover?.(null);
+              document.body.style.cursor = 'auto';
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onPick?.(b);
+            }}
           >
             <boxGeometry args={[1, 1, 1]} />
           </mesh>
-          <mesh position={[b.x, b.h + 0.09, b.z]} scale={[b.w, 1, b.w]} material={roofMats[b.framework]}>
+          <mesh
+            position={[b.x, b.h + 0.09, b.z]}
+            scale={[b.w, 1, b.w]}
+            material={roofMats[b.framework]}
+          >
             <boxGeometry args={[1.06, 0.18, 1.06]} />
           </mesh>
           {b.mine && (
             <>
-              <mesh position={[b.x, b.h / 2, b.z]} scale={[b.w * 1.05, b.h * 1.02, b.w * 1.05]} material={halo}>
+              <mesh
+                position={[b.x, b.h / 2, b.z]}
+                scale={[b.w * 1.05, b.h * 1.02, b.w * 1.05]}
+                material={halo}
+              >
                 <boxGeometry args={[1, 1, 1]} />
               </mesh>
               <mesh position={[b.x, b.h + 30, b.z]} material={beam}>
@@ -218,30 +387,150 @@ function Buildings({
               />
             </mesh>
           )}
+          {/* Avatar billboard — skipped when zoomed far out will fade
+              due to small screen size, cheap enough to always render */}
+          <AvatarBillboard b={b} />
         </group>
       ))}
     </group>
   );
 }
 
-function SceneInner({ agents, onHover, onPick }: Props) {
-  const buildings = useMemo(() => layoutBuildings(agents), [agents]);
-  const { camera } = useThree();
+// ─── Camera fly-to controller ────────────────────────────────────
 
-  // Gentle sun rotation.
+interface FlyState {
+  fromPos: THREE.Vector3;
+  fromTarget: THREE.Vector3;
+  toPos: THREE.Vector3;
+  toTarget: THREE.Vector3;
+  startMs: number;
+  durationMs: number;
+}
+
+type ControlsWithTarget = {
+  target: THREE.Vector3;
+  enabled: boolean;
+  update: () => void;
+};
+
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function SceneInner({
+  agents,
+  onHover,
+  onPick,
+  sceneApiRef,
+}: Props & { sceneApiRef: React.MutableRefObject<CitySceneHandle | null> }) {
+  const buildings = useMemo(() => layoutBuildings(agents), [agents]);
+  const sparklePositions = useMemo<Array<[number, number, number]>>(
+    () =>
+      buildings
+        .filter((b) => b.status === 'running')
+        .flatMap((b) => {
+          // 2 sparkles per running building, offset randomly above the roof.
+          const y = b.h + 1.6;
+          return [
+            [b.x - 0.4, y, b.z + 0.2],
+            [b.x + 0.3, y + 0.5, b.z - 0.3],
+          ] as Array<[number, number, number]>;
+        }),
+    [buildings],
+  );
+
+  const { camera } = useThree();
+  const controlsRef = useRef<ControlsWithTarget | null>(null);
+  const flyStateRef = useRef<FlyState | null>(null);
+
+  // Default camera position — also the target for "fly home".
+  const HOME_POS = useMemo(() => new THREE.Vector3(220, 180, 220), []);
+  const HOME_TARGET = useMemo(() => new THREE.Vector3(0, 0, 0), []);
+
   const sunRef = useRef<THREE.DirectionalLight>(null);
+
   useFrame((state) => {
     const t = state.clock.elapsedTime;
     if (sunRef.current) {
       sunRef.current.position.x = Math.cos(t * 0.05) * 140;
       sunRef.current.position.z = Math.sin(t * 0.05) * 140;
     }
+
+    // Advance active fly-to animation.
+    const fs = flyStateRef.current;
+    if (fs) {
+      const now = performance.now();
+      const progress = Math.min(1, (now - fs.startMs) / fs.durationMs);
+      const eased = easeInOutCubic(progress);
+      camera.position.lerpVectors(fs.fromPos, fs.toPos, eased);
+      if (controlsRef.current) {
+        controlsRef.current.target.lerpVectors(fs.fromTarget, fs.toTarget, eased);
+        controlsRef.current.update();
+      }
+      if (progress >= 1) {
+        flyStateRef.current = null;
+        if (controlsRef.current) controlsRef.current.enabled = true;
+      }
+    }
   });
 
   useEffect(() => {
-    camera.position.set(220, 180, 220);
-    camera.lookAt(0, 0, 0);
-  }, [camera]);
+    camera.position.copy(HOME_POS);
+    camera.lookAt(HOME_TARGET);
+  }, [camera, HOME_POS, HOME_TARGET]);
+
+  // Expose a small imperative API for HUD buttons (legend click, tour,
+  // deep-link focus). Keeping it outside React state avoids rerenders
+  // on every camera move.
+  useImperativeHandle(
+    sceneApiRef,
+    () => {
+      function flyTo(toPos: THREE.Vector3, toTarget: THREE.Vector3, durationMs: number) {
+        const fromPos = camera.position.clone();
+        const fromTarget =
+          controlsRef.current?.target.clone() ?? new THREE.Vector3(0, 0, 0);
+        flyStateRef.current = {
+          fromPos,
+          fromTarget,
+          toPos: toPos.clone(),
+          toTarget: toTarget.clone(),
+          startMs: performance.now(),
+          durationMs,
+        };
+        if (controlsRef.current) controlsRef.current.enabled = false;
+      }
+      return {
+        flyToDistrict(category, durationMs = 1200) {
+          const idx = CATEGORIES.indexOf(category);
+          if (idx < 0) return;
+          const p = districtPosition(idx);
+          flyTo(
+            new THREE.Vector3(p.x + 40, 60, p.z + 40),
+            new THREE.Vector3(p.x, 8, p.z),
+            durationMs,
+          );
+        },
+        flyToAgent(agentId, durationMs = 1400) {
+          const b = buildings.find((x) => x.id === agentId);
+          if (!b) return;
+          flyTo(
+            new THREE.Vector3(b.x + 18, b.h + 18, b.z + 18),
+            new THREE.Vector3(b.x, b.h / 2, b.z),
+            durationMs,
+          );
+        },
+        flyHome(durationMs = 1400) {
+          flyTo(HOME_POS, HOME_TARGET, durationMs);
+        },
+        getDistrictPosition(category) {
+          const idx = CATEGORIES.indexOf(category);
+          if (idx < 0) return null;
+          return districtPosition(idx);
+        },
+      };
+    },
+    [camera, buildings, HOME_POS, HOME_TARGET],
+  );
 
   return (
     <>
@@ -252,7 +541,6 @@ function SceneInner({ agents, onHover, onPick }: Props) {
       <directionalLight ref={sunRef} position={[100, 200, 80]} intensity={0.9} color={0xfff4d6} />
       <hemisphereLight args={[0x7799ff, 0x1a0f2a, 0.35]} />
 
-      {/* Ground */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[2000, 2000]} />
         <meshStandardMaterial color={0x0a0e1a} roughness={0.95} />
@@ -260,25 +548,47 @@ function SceneInner({ agents, onHover, onPick }: Props) {
       <gridHelper args={[1500, 150, 0x1f2937, 0x111827]} position={[0, 0.01, 0]} />
 
       {CATEGORIES.map((cat, i) => (
-        <DistrictPad key={cat} idx={i} label={CATEGORY_LABELS[cat]} />
+        <DistrictPad
+          key={cat}
+          idx={i}
+          category={cat}
+          onClick={(c) => sceneApiRef.current?.flyToDistrict(c)}
+        />
       ))}
 
       <Buildings data={buildings} onHover={onHover} onPick={onPick} />
+      <SparkleField positions={sparklePositions} />
 
       <OrbitControls
+        ref={(r) => {
+          controlsRef.current = r as unknown as ControlsWithTarget;
+        }}
         enableDamping
         dampingFactor={0.08}
         maxPolarAngle={Math.PI * 0.48}
-        minDistance={50}
+        minDistance={10}
         maxDistance={800}
       />
     </>
   );
 }
 
-export function CityScene({ agents, onHover, onPick }: Props) {
+export const CityScene = forwardRef<CitySceneHandle, Props>(function CityScene(
+  { agents, onHover, onPick },
+  ref,
+) {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  const sceneApiRef = useRef<CitySceneHandle | null>(null);
+  useImperativeHandle(ref, () => ({
+    flyToDistrict: (c, d) => sceneApiRef.current?.flyToDistrict(c, d),
+    flyToAgent: (id, d) => sceneApiRef.current?.flyToAgent(id, d),
+    flyHome: (d) => sceneApiRef.current?.flyHome(d),
+    getDistrictPosition: (c) => sceneApiRef.current?.getDistrictPosition(c) ?? null,
+  }));
+
   if (!mounted) return null;
 
   return (
@@ -288,7 +598,12 @@ export function CityScene({ agents, onHover, onPick }: Props) {
       dpr={[1, 2]}
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
     >
-      <SceneInner agents={agents} onHover={onHover} onPick={onPick} />
+      <SceneInner
+        agents={agents}
+        onHover={onHover}
+        onPick={onPick}
+        sceneApiRef={sceneApiRef}
+      />
     </Canvas>
   );
-}
+});

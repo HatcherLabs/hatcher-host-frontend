@@ -2,14 +2,15 @@
 
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { API_URL } from '@/lib/config';
 import { CityHud } from '@/components/city/CityHud';
-import type { CityAgent, CityResponse } from '@/components/city/types';
+import type { CitySceneHandle } from '@/components/city/CityScene';
+import type { CityAgent, CityResponse, Category } from '@/components/city/types';
 
 // Three.js must only run client-side; keep it out of the SSR bundle.
 const CityScene = dynamic(
-  () => import('@/components/city/CityScene').then(m => m.CityScene),
+  () => import('@/components/city/CityScene').then((m) => m.CityScene),
   { ssr: false },
 );
 
@@ -21,23 +22,29 @@ export function CityClient({ initial }: Props) {
   const router = useRouter();
   const [data, setData] = useState<CityResponse | null>(initial);
   const [hovered, setHovered] = useState<CityAgent | null>(null);
+  const sceneRef = useRef<CitySceneHandle | null>(null);
 
-  // If the server-rendered fetch failed (e.g. static prerender) or we want
-  // fresh "mine" flags after the user logs in, re-fetch on mount.
   useEffect(() => {
     if (initial && initial.agents.length) return;
     fetch(`${API_URL}/public/city`, { credentials: 'include' })
-      .then(r => r.ok ? r.json() : null)
+      .then((r) => (r.ok ? r.json() : null))
       .then((j: { success?: boolean; data?: CityResponse } | null) => {
         if (j?.success && j.data) setData(j.data);
       })
-      .catch(() => { /* noop — scene handles empty agent list gracefully */ });
+      .catch(() => {
+        /* noop */
+      });
   }, [initial]);
 
-  const mineAgents = useMemo(
-    () => (data?.agents ?? []).filter(a => a.mine),
-    [data],
-  );
+  const mineAgents = useMemo(() => (data?.agents ?? []).filter((a) => a.mine), [data]);
+
+  const flyToDistrict = useCallback((c: Category) => {
+    sceneRef.current?.flyToDistrict(c);
+  }, []);
+
+  const flyHome = useCallback(() => {
+    sceneRef.current?.flyHome();
+  }, []);
 
   if (!data) {
     return (
@@ -47,17 +54,21 @@ export function CityClient({ initial }: Props) {
     );
   }
 
-  // Reserve space for the sticky site header (~57px). Footer sits
-  // below the canvas in the normal document flow — users who want to
-  // reach it can click outside the map and scroll normally.
   return (
     <div className="relative h-[calc(100vh-4rem)] min-h-[560px] overflow-hidden bg-[#050814]">
       <CityScene
+        ref={sceneRef}
         agents={data.agents}
         onHover={setHovered}
         onPick={(a) => router.push(`/agent/${a.id}`)}
       />
-      <CityHud counts={data.counts} hovered={hovered} mineAgents={mineAgents} />
+      <CityHud
+        counts={data.counts}
+        hovered={hovered}
+        mineAgents={mineAgents}
+        onFlyToDistrict={flyToDistrict}
+        onFlyHome={flyHome}
+      />
     </div>
   );
 }
