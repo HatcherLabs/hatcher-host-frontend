@@ -360,6 +360,9 @@ export function ConfigTab() {
         )}
       </div>
 
+      {/* Hatcher City visibility toggle */}
+      <HatcherCityVisibility />
+
       {/* Agent basic info */}
       <GlassCard>
         <div className="flex items-center gap-2 mb-4">
@@ -2218,6 +2221,94 @@ function ConfigHistory({ agentId }: { agentId?: string }) {
           </motion.div>
         )}
       </AnimatePresence>
+    </GlassCard>
+  );
+}
+
+// ─── Hatcher City visibility toggle ─────────────────────────────
+// Owners can opt any of their agents out of the public /city map. Field
+// is stored on Agent.isPublic; backend busts the city:v1 Redis cache on
+// change so the toggle takes effect immediately.
+function HatcherCityVisibility() {
+  const { agent, loadAgent } = useAgentContext();
+  const [isPublic, setIsPublic] = useState<boolean>(agent?.isPublic !== false);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    setIsPublic(agent?.isPublic !== false);
+  }, [agent?.isPublic]);
+
+  async function toggle() {
+    if (!agent || saving) return;
+    const next = !isPublic;
+    setSaving(true);
+    setMsg(null);
+    try {
+      const res = await api.updateAgent(agent.id, {
+        isPublic: next,
+      } as Parameters<typeof api.updateAgent>[1]);
+      if ('error' in res && res.error) {
+        setMsg(`Error: ${res.error}`);
+      } else {
+        setIsPublic(next);
+        setMsg(next ? 'Now visible on Hatcher City' : 'Hidden from Hatcher City');
+        await loadAgent?.();
+      }
+    } catch (e) {
+      setMsg(`Error: ${e instanceof Error ? e.message : 'Failed to save'}`);
+    } finally {
+      setSaving(false);
+      setTimeout(() => setMsg(null), 3500);
+    }
+  }
+
+  return (
+    <GlassCard>
+      <div className="flex items-start gap-3">
+        <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+          <Globe size={14} className="text-amber-500" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="text-sm font-semibold text-[var(--text-primary)]">Hatcher City</h3>
+            <span className="text-[10px] uppercase tracking-widest text-amber-500">public</span>
+          </div>
+          <p className="text-xs text-[var(--text-secondary)] mb-3">
+            Show this agent on the public 3D map at{' '}
+            <a href="/city" target="_blank" rel="noreferrer" className="text-[var(--color-accent)] hover:underline">
+              hatcher.host/city
+            </a>
+            . Name, framework, and category are visible. No config, no secrets, no chats are ever exposed.
+          </p>
+          <button
+            type="button"
+            onClick={toggle}
+            disabled={saving}
+            role="switch"
+            aria-checked={isPublic}
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full border transition-colors ${
+              isPublic
+                ? 'bg-amber-500 border-amber-500'
+                : 'bg-[var(--bg-card)] border-[var(--border-default)]'
+            } ${saving ? 'opacity-60 cursor-wait' : 'cursor-pointer'}`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                isPublic ? 'translate-x-6' : 'translate-x-1'
+              }`}
+            />
+          </button>
+          <span className="ml-3 text-xs text-[var(--text-secondary)] align-middle">
+            {isPublic ? 'Visible' : 'Hidden'}
+          </span>
+          {msg && (
+            <p className={`text-xs font-medium mt-2 ${msg.startsWith('Error') ? 'text-red-400' : 'text-emerald-400'}`}>
+              {msg}
+            </p>
+          )}
+        </div>
+      </div>
     </GlassCard>
   );
 }

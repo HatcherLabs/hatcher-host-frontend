@@ -69,6 +69,7 @@ export interface Agent {
   owner?: { username?: string; walletAddress?: string | null };
   config?: Record<string, unknown>;
   features?: Array<{ featureKey: string }>;
+  isPublic?: boolean;
   createdAt: string;
   updatedAt?: string;
 }
