@@ -20,12 +20,14 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 const AUTH_NAV_LINKS = [
   { href: '/dashboard/agents',    label: 'My Agents' },
   { href: '/create',              label: 'Create' },
+  { href: '/city',                label: 'City' },
   { href: '/frameworks',          label: 'Frameworks' },
   { href: '/token',               label: 'Token' },
 ];
 
 // ── Nav links when logged OUT ──
 const GUEST_NAV_LINKS = [
+  { href: '/city',                label: 'City' },
   { href: '/frameworks',          label: 'Frameworks' },
   { href: '/token',               label: 'Token' },
 ];
@@ -47,9 +49,12 @@ const USER_EXTRA_LINKS = [
 ];
 
 // ── Mobile links (when logged in) ──
+// Docs is rendered separately (external link block below the map), so
+// we intentionally don't include it here.
 const MOBILE_AUTH_LINKS = [
   { href: '/dashboard/agents',    label: 'My Agents' },
   { href: '/create',              label: 'Create' },
+  { href: '/city',                label: 'City' },
   { href: '/frameworks',          label: 'Frameworks' },
   { href: '/token',               label: 'Token' },
   { href: '/pricing',             label: 'Pricing' },
@@ -59,10 +64,14 @@ const MOBILE_AUTH_LINKS = [
 ];
 
 // ── Mobile links (when logged out) ──
+// Must stay in sync with GUEST_NAV_LINKS + AUX_LINKS on desktop so
+// hamburger users see the same surface. Docs is rendered separately.
 const MOBILE_GUEST_LINKS = [
+  { href: '/city',       label: 'City' },
   { href: '/frameworks', label: 'Frameworks' },
   { href: '/token',      label: 'Token' },
   { href: '/pricing',    label: 'Pricing' },
+  { href: '/roadmap',    label: 'Roadmap' },
 ];
 
 function isActive(pathname: string, href: string) {

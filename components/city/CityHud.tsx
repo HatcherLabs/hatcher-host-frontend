@@ -19,27 +19,22 @@ const FW_LABEL: Record<Framework, string> = {
 export function CityHud({ counts, hovered, mineAgents }: Props) {
   return (
     <>
-      {/* Top bar */}
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-20 flex items-center gap-4 border-b border-slate-800/60 bg-[#050814]/80 px-4 py-3 backdrop-blur">
-        <Link
-          href="/"
-          className="pointer-events-auto font-['Press_Start_2P',monospace] text-sm tracking-[2px] text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]"
-        >
+      {/* Floating stats card — site header stays on top so we tuck
+          stats in the top-left under it, sized compact. */}
+      <div className="pointer-events-none absolute left-4 top-4 z-20 flex items-center gap-5 border border-slate-800 bg-[#050814]/80 px-4 py-2.5 backdrop-blur">
+        <div className="font-['Press_Start_2P',monospace] text-[10px] tracking-[2px] text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]">
           HATCHER CITY
-        </Link>
-        <span className="font-mono text-[10px] tracking-[2px] text-slate-500">
-          LIVE · hatcher.host fleet
-        </span>
-        <div className="ml-auto flex items-center gap-4 font-mono text-sm text-slate-300">
+        </div>
+        <div className="h-4 w-px bg-slate-700" />
+        <div className="flex items-center gap-4 font-mono text-sm text-slate-300">
           <Stat k="agents" v={counts.total.toLocaleString()} />
           <Stat k="running" v={counts.running.toLocaleString()} />
-          <Stat k="frameworks" v="4" />
           <Stat k="districts" v="13" />
         </div>
       </div>
 
       {/* Framework legend */}
-      <div className="pointer-events-none fixed bottom-4 left-4 z-20 border border-slate-800 bg-[#050814]/80 p-3 font-mono text-sm text-slate-400">
+      <div className="pointer-events-none absolute bottom-4 left-4 z-20 border border-slate-800 bg-[#050814]/80 p-3 font-mono text-sm text-slate-400">
         <div className="mb-2 font-['Press_Start_2P',monospace] text-[8px] tracking-[2px] text-amber-400">
           FRAMEWORKS
         </div>
@@ -52,7 +47,7 @@ export function CityHud({ counts, hovered, mineAgents }: Props) {
       </div>
 
       {/* Controls hint */}
-      <div className="pointer-events-none fixed bottom-4 left-1/2 z-20 -translate-x-1/2 border border-slate-800 bg-[#050814]/80 px-4 py-2 font-['Press_Start_2P',monospace] text-[8px] tracking-[2px] text-slate-400">
+      <div className="pointer-events-none absolute bottom-4 left-1/2 z-20 -translate-x-1/2 border border-slate-800 bg-[#050814]/80 px-4 py-2 font-['Press_Start_2P',monospace] text-[8px] tracking-[2px] text-slate-400">
         <kbd className="rounded border border-slate-700 bg-slate-800 px-1.5 py-0.5 text-slate-200">
           DRAG
         </kbd>{' '}
@@ -69,7 +64,7 @@ export function CityHud({ counts, hovered, mineAgents }: Props) {
 
       {/* My City panel */}
       {mineAgents.length > 0 && (
-        <div className="pointer-events-auto fixed right-3 top-16 z-20 w-60 border-2 border-amber-400 bg-[#0a0e1a]/95 p-3 shadow-[4px_4px_0_#000]">
+        <div className="pointer-events-auto absolute right-3 top-4 z-20 w-60 border-2 border-amber-400 bg-[#0a0e1a]/95 p-3 shadow-[4px_4px_0_#000]">
           <h3 className="mb-2 font-['Press_Start_2P',monospace] text-[10px] tracking-[1px] text-amber-400">
             ★ MY CITY ({mineAgents.length})
           </h3>
@@ -106,7 +101,7 @@ export function CityHud({ counts, hovered, mineAgents }: Props) {
 
       {/* Hover card */}
       {hovered && (
-        <div className="pointer-events-none fixed left-1/2 top-20 z-30 -translate-x-1/2 border-2 border-amber-400 bg-[#0a0e1a]/95 p-3 font-mono text-sm shadow-[4px_4px_0_#000,0_0_18px_rgba(251,191,36,0.2)]">
+        <div className="pointer-events-none absolute left-1/2 top-4 z-30 -translate-x-1/2 border-2 border-amber-400 bg-[#0a0e1a]/95 p-3 font-mono text-sm shadow-[4px_4px_0_#000,0_0_18px_rgba(251,191,36,0.2)]">
           <div className="mb-1 font-['Press_Start_2P',monospace] text-[9px] tracking-[1px] text-amber-400">
             {hovered.name.toUpperCase()}
             {hovered.mine && ' ★'}

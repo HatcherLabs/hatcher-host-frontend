@@ -6,8 +6,10 @@ import { Footer } from './Footer';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
 
 // Routes that own the full viewport — the Header/Footer chrome would
-// cover the 3D canvas. Extend this list as we add more immersive views.
-const IMMERSIVE_ROUTES = ['/city'];
+// cover their canvas. Extend this list as we add more immersive views.
+// Note: /city keeps the site chrome so the map feels part of hatcher.host
+// rather than a standalone app; the canvas sits inside the main content area.
+const IMMERSIVE_ROUTES: string[] = [];
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

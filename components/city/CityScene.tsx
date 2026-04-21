@@ -286,7 +286,7 @@ export function CityScene({ agents, onHover, onPick }: Props) {
       camera={{ fov: 55, near: 0.1, far: 2500, position: [220, 180, 220] }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
       dpr={[1, 2]}
-      style={{ width: '100vw', height: '100vh' }}
+      style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
     >
       <SceneInner agents={agents} onHover={onHover} onPick={onPick} />
     </Canvas>

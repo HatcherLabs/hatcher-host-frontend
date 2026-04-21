@@ -41,18 +41,21 @@ export function CityClient({ initial }: Props) {
 
   if (!data) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[#050814] font-['Press_Start_2P',monospace] text-amber-400 tracking-[3px]">
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-[#050814] font-['Press_Start_2P',monospace] tracking-[3px] text-amber-400">
         LOADING HATCHER CITY…
       </div>
     );
   }
 
+  // Reserve space for the sticky site header (~57px). Footer sits
+  // below the canvas in the normal document flow — users who want to
+  // reach it can click outside the map and scroll normally.
   return (
-    <div className="fixed inset-0 overflow-hidden bg-[#050814]">
+    <div className="relative h-[calc(100vh-4rem)] min-h-[560px] overflow-hidden bg-[#050814]">
       <CityScene
         agents={data.agents}
         onHover={setHovered}
-        onPick={(a) => router.push(a.slug ? `/agent/${a.id}` : `/agent/${a.id}`)}
+        onPick={(a) => router.push(`/agent/${a.id}`)}
       />
       <CityHud counts={data.counts} hovered={hovered} mineAgents={mineAgents} />
     </div>
