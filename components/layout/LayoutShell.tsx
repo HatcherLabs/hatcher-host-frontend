@@ -1,10 +1,24 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
 
+// Routes that own the full viewport — the Header/Footer chrome would
+// cover the 3D canvas. Extend this list as we add more immersive views.
+const IMMERSIVE_ROUTES = ['/city'];
+
 export function LayoutShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const immersive = IMMERSIVE_ROUTES.some(r => pathname === r || pathname.startsWith(`${r}/`));
+
+  if (immersive) {
+    // No skip-link, no header, no footer — the page owns the screen.
+    // Individual pages are responsible for accessible navigation back.
+    return <>{children}</>;
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Skip to content -- accessibility */}

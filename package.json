@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "@hatcher/shared": "npm:@hatcherlabs/shared@^1.3.2",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.0",
     "@sentry/nextjs": "^10.46.0",
     "@solana/spl-token": "^0.4.14",
     "@solana/wallet-adapter-base": "^0.9.25",
@@ -42,7 +44,8 @@
     "react-markdown": "^10.1.0",
     "reactflow": "^11.11.4",
     "recharts": "^3.8.0",
-    "tailwind-merge": "^2.6.0"
+    "tailwind-merge": "^2.6.0",
+    "three": "^0.184.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
@@ -52,6 +55,7 @@
     "@types/node": "^22.10.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.184.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.39.4",
     "eslint-config-next": "^15.5.14",
