@@ -37,11 +37,13 @@ jobs:
             # deploys (anything important must be committed and pushed first).
             git reset --hard origin/main
 
-            echo "==> Checking if dependencies changed..."
-            if git diff HEAD~1 --name-only | grep -q 'package-lock.json'; then
-              echo "==> Installing dependencies..."
-              npm ci
-            fi
+            # Always install. The previous HEAD~1 heuristic silently
+            # skipped npm ci when a package-lock change landed in a run
+            # that failed typecheck; the next successful push didn't
+            # touch package-lock and deps never got onto the server.
+            # +20s is worth a never-broken pipeline.
+            echo "==> Installing dependencies..."
+            npm ci
 
             echo "==> Fetching skill files (agent-discoverable docs)..."
             node prebuild.js

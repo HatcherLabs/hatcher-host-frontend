@@ -563,6 +563,9 @@ export function Header() {
                     <Link href="/dashboard/team" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
                       <Users className="w-4 h-4" /> Team
                     </Link>
+                    <Link href={affiliateMenuItem.href} className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
+                      <Award className="w-4 h-4" /> {affiliateMenuItem.label}
+                    </Link>
                     <Link href="/dashboard/settings" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
                       <Settings className="w-4 h-4" /> Settings
                     </Link>
