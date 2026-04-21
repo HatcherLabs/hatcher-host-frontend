@@ -81,7 +81,8 @@ export default async function OpengraphImage({
         >
           <span
             style={{
-              background: '#fbbf24',
+              display: 'flex',
+              backgroundColor: '#fbbf24',
               color: '#050814',
               padding: '6px 14px',
               letterSpacing: 4,
@@ -91,7 +92,7 @@ export default async function OpengraphImage({
           >
             HATCHER CITY
           </span>
-          <span style={{ color: '#94a3b8', fontSize: 18, letterSpacing: 2 }}>/ district</span>
+          <span style={{ display: 'flex', color: '#94a3b8', fontSize: 18, letterSpacing: 2 }}>/ district</span>
         </div>
 
         <div
@@ -104,9 +105,9 @@ export default async function OpengraphImage({
         >
           <div
             style={{
+              display: 'flex',
               fontSize: 180,
               lineHeight: 1,
-              filter: 'drop-shadow(0 6px 24px rgba(251,191,36,0.35))',
             }}
           >
             {icon}
@@ -114,17 +115,18 @@ export default async function OpengraphImage({
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div
               style={{
+                display: 'flex',
                 fontSize: 90,
                 fontWeight: 800,
                 color: '#ffffff',
                 letterSpacing: -1,
-                textShadow: '0 0 24px rgba(251,191,36,0.2)',
               }}
             >
               {label}
             </div>
             <div
               style={{
+                display: 'flex',
                 marginTop: 10,
                 fontSize: 32,
                 color: '#cbd5e1',
@@ -147,8 +149,8 @@ export default async function OpengraphImage({
             letterSpacing: 2,
           }}
         >
-          <div>
-            Explore the live 3D city at{' '}
+          <div style={{ display: 'flex', gap: 6 }}>
+            <span>Explore the live 3D city at</span>
             <span style={{ color: '#fbbf24', fontWeight: 700 }}>
               hatcher.host/city
             </span>
@@ -162,9 +164,9 @@ export default async function OpengraphImage({
               fontSize: 20,
             }}
           >
-            <span>4 frameworks</span>
-            <span style={{ color: '#475569' }}>·</span>
-            <span>25 districts</span>
+            <span style={{ display: 'flex' }}>4 frameworks</span>
+            <span style={{ display: 'flex', color: '#475569' }}>·</span>
+            <span style={{ display: 'flex' }}>25 districts</span>
           </div>
         </div>
       </div>
