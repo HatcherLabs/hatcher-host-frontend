@@ -3,15 +3,18 @@ import type { RoomSkill } from '../types';
 
 interface Props {
   skills: RoomSkill[];
+  onSkillClick?: (key: string) => void;
 }
 
-export function SkillsColumn({ skills }: Props) {
+export function SkillsColumn({ skills, onSkillClick }: Props) {
   return (
     <div className="pointer-events-auto absolute top-1/2 left-5 z-10 flex -translate-y-1/2 flex-col gap-2">
       {skills.map((s) => (
-        <div
+        <button
           key={s.key}
-          className="cursor-pointer rounded-xl border px-3.5 py-2.5 transition-all backdrop-blur-xl"
+          type="button"
+          onClick={() => onSkillClick?.(s.key)}
+          className="group cursor-pointer rounded-xl border px-3.5 py-2.5 text-left transition-all backdrop-blur-xl hover:translate-x-1.5 hover:scale-[1.02]"
           style={{
             minWidth: 170,
             background: 'rgba(12, 14, 22, 0.72)',
@@ -27,7 +30,7 @@ export function SkillsColumn({ skills }: Props) {
             {s.active ? 'ACTIVE' : 'IDLE'}
             {typeof s.calls === 'number' ? ` · ${s.calls} calls` : ''}
           </div>
-        </div>
+        </button>
       ))}
     </div>
   );

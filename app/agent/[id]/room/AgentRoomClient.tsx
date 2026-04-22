@@ -1,6 +1,7 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { AgentRoomScene } from '@/components/agent-room/AgentRoomScene';
 import { StatsHud } from '@/components/agent-room/hud/StatsHud';
 import { LogsHud } from '@/components/agent-room/hud/LogsHud';
@@ -143,6 +144,7 @@ function parseLogs(
 }
 
 export function AgentRoomClient({ id }: Props) {
+  const router = useRouter();
   const [agent, setAgent] = useState<RoomAgent | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -236,6 +238,20 @@ export function AgentRoomClient({ id }: Props) {
     [send],
   );
 
+  const handleIntegrationClick = useCallback(
+    (_key: string) => {
+      router.push(`/dashboard/agent/${id}?tab=integrations`);
+    },
+    [id, router],
+  );
+
+  const handleSkillClick = useCallback(
+    (_key: string) => {
+      router.push(`/dashboard/agent/${id}?tab=skills`);
+    },
+    [id, router],
+  );
+
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-black text-gray-400">
@@ -299,10 +315,15 @@ export function AgentRoomClient({ id }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black text-gray-100" style={cssVars}>
-      <AgentRoomScene palette={palette} integrations={integrations} snapTrigger={snapTrigger} />
+      <AgentRoomScene
+        palette={palette}
+        integrations={integrations}
+        snapTrigger={snapTrigger}
+        onIntegrationClick={handleIntegrationClick}
+      />
       <StatsHud agent={agent} level={level} uptimeLabel={uptime} />
       <LogsHud logs={logs} />
-      <SkillsColumn skills={skills} />
+      <SkillsColumn skills={skills} onSkillClick={handleSkillClick} />
       <ChatBubble text={bubbleText} typing={bubbleTyping} />
       <XpBar level={level} xp={xp} max={max} />
       <ChatInput onSend={handleSend} disabled={!isConnected} />

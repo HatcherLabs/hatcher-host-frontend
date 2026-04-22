@@ -14,9 +14,10 @@ interface Props {
   palette: FrameworkPalette;
   integrations: RoomIntegration[];
   snapTrigger: number;
+  onIntegrationClick?: (key: string) => void;
 }
 
-export function AgentRoomScene({ palette, integrations, snapTrigger }: Props) {
+export function AgentRoomScene({ palette, integrations, snapTrigger, onIntegrationClick }: Props) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
@@ -42,7 +43,11 @@ export function AgentRoomScene({ palette, integrations, snapTrigger }: Props) {
 
       <Platform palette={palette} />
       <MechLobster palette={palette} snapTrigger={snapTrigger} />
-      <IntegrationsOrbit palette={palette} integrations={integrations} />
+      <IntegrationsOrbit
+        palette={palette}
+        integrations={integrations}
+        onIntegrationClick={onIntegrationClick}
+      />
       <Sparkles palette={palette} />
 
       <OrbitControls
