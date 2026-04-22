@@ -1083,6 +1083,16 @@ export default function AgentManagePage() {
                 <Share2 size={13} />
                 <span className="hidden sm:inline">Share</span>
               </button>
+              {agent?.framework === 'openclaw' && (
+                <Link
+                  href={`/agent/${id}/room`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-yellow-500/30 text-yellow-400 hover:border-yellow-500/60 hover:bg-yellow-500/10 transition-all"
+                  title="Enter 3D Agent Room"
+                >
+                  <span>🦞</span>
+                  <span className="hidden sm:inline">Room</span>
+                </Link>
+              )}
               <button
                 onClick={() => setPortModalOpen(true)}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-300 transition-all"
