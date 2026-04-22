@@ -1083,20 +1083,39 @@ export default function AgentManagePage() {
                 <Share2 size={13} />
                 <span className="hidden sm:inline">Share</span>
               </button>
-              {(agent?.framework === 'openclaw' || agent?.framework === 'hermes') && (
-                <Link
-                  href={`/agent/${id}/room`}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border transition-all ${
-                    agent?.framework === 'openclaw'
-                      ? 'border-yellow-500/30 text-yellow-400 hover:border-yellow-500/60 hover:bg-yellow-500/10'
-                      : 'border-purple-500/30 text-purple-300 hover:border-purple-500/60 hover:bg-purple-500/10'
-                  }`}
-                  title="Enter 3D Agent Room"
-                >
-                  <span>{agent?.framework === 'openclaw' ? '🦞' : '🪶'}</span>
-                  <span className="hidden sm:inline">Room</span>
-                </Link>
-              )}
+              {(() => {
+                const fw = agent?.framework;
+                if (!fw || !['openclaw', 'hermes', 'elizaos', 'milady'].includes(fw)) return null;
+                const META: Record<string, { icon: string; cls: string }> = {
+                  openclaw: {
+                    icon: '🦞',
+                    cls: 'border-yellow-500/30 text-yellow-400 hover:border-yellow-500/60 hover:bg-yellow-500/10',
+                  },
+                  hermes: {
+                    icon: '🪶',
+                    cls: 'border-purple-500/30 text-purple-300 hover:border-purple-500/60 hover:bg-purple-500/10',
+                  },
+                  elizaos: {
+                    icon: '🐙',
+                    cls: 'border-blue-500/30 text-blue-300 hover:border-blue-500/60 hover:bg-blue-500/10',
+                  },
+                  milady: {
+                    icon: '🎨',
+                    cls: 'border-pink-500/30 text-pink-300 hover:border-pink-500/60 hover:bg-pink-500/10',
+                  },
+                };
+                const m = META[fw]!;
+                return (
+                  <Link
+                    href={`/agent/${id}/room`}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border transition-all ${m.cls}`}
+                    title="Enter 3D Agent Room"
+                  >
+                    <span>{m.icon}</span>
+                    <span className="hidden sm:inline">Room</span>
+                  </Link>
+                );
+              })()}
               <button
                 onClick={() => setPortModalOpen(true)}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-300 transition-all"

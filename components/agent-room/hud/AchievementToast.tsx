@@ -28,6 +28,24 @@ const ACHIEVEMENTS_BY_FRAMEWORK: Record<string, Achievement[]> = {
     { key: 'master', threshold: 5000, label: 'Master of Missives', desc: '5,000 dispatches — canon tier.', icon: '🏛️' },
     { key: 'oracle', threshold: 10000, label: 'Silent Oracle', desc: '10,000 messages — mythic reach.', icon: '🔮' },
   ],
+  elizaos: [
+    { key: 'first_spark', threshold: 1, label: 'First Spark', desc: 'Your oracle answered its first call.', icon: '✨' },
+    { key: 'warming_up', threshold: 50, label: 'Social Glow', desc: '50 conversations kindled.', icon: '💬' },
+    { key: 'busy_oracle', threshold: 100, label: 'Busy Oracle', desc: '100 messages through the lattice.', icon: '🔮' },
+    { key: 'chatty', threshold: 500, label: 'Many-Tongued', desc: 'Half a thousand voices heard.', icon: '🌊' },
+    { key: 'completionist', threshold: 1000, label: 'Nexus Keeper', desc: '1,000 messages — grove tier.', icon: '🐙' },
+    { key: 'master', threshold: 5000, label: 'Hive Mind', desc: '5,000 messages — swarm-level reach.', icon: '🧠' },
+    { key: 'legend', threshold: 10000, label: 'Deep Current', desc: '10,000 messages — abyssal oracle.', icon: '🌌' },
+  ],
+  milady: [
+    { key: 'first_stroke', threshold: 1, label: 'First Stroke', desc: 'Your muse made her opening mark.', icon: '🌸' },
+    { key: 'warming_up', threshold: 50, label: 'Rough Sketch', desc: '50 creations in the gallery.', icon: '✏️' },
+    { key: 'busy_brush', threshold: 100, label: 'Busy Brush', desc: '100 pieces rendered.', icon: '🖌️' },
+    { key: 'chatty', threshold: 500, label: 'Half-Thousand Palette', desc: '500 works — prolific.', icon: '🎨' },
+    { key: 'completionist', threshold: 1000, label: 'Studio Star', desc: '1,000 messages — studio darling.', icon: '⭐' },
+    { key: 'master', threshold: 5000, label: 'Iconic Muse', desc: '5,000 — cult status.', icon: '💖' },
+    { key: 'legend', threshold: 10000, label: 'Eternal Muse', desc: '10,000 — timeless legend.', icon: '👑' },
+  ],
 };
 
 function achievementsFor(framework: string): Achievement[] {

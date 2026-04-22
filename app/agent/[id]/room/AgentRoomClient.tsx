@@ -192,7 +192,7 @@ export function AgentRoomClient({ id }: Props) {
 
   // log poller
   useEffect(() => {
-    if (!agent || !['openclaw', 'hermes'].includes(agent.framework)) return;
+    if (!agent || !['openclaw', 'hermes', 'elizaos', 'milady'].includes(agent.framework)) return;
     let alive = true;
     let timer: ReturnType<typeof setTimeout> | null = null;
     async function poll() {
@@ -216,7 +216,7 @@ export function AgentRoomClient({ id }: Props) {
 
   const { send, isConnected } = useWebSocketChat({
     agentId: id,
-    enabled: !!agent && ['openclaw', 'hermes'].includes(agent.framework),
+    enabled: !!agent && ['openclaw', 'hermes', 'elizaos', 'milady'].includes(agent.framework),
     onToken: (tok) => {
       bubbleStreamRef.current += tok;
       setBubbleText(bubbleStreamRef.current);
@@ -309,7 +309,7 @@ export function AgentRoomClient({ id }: Props) {
     );
   }
 
-  const SUPPORTED_FRAMEWORKS = new Set(['openclaw', 'hermes']);
+  const SUPPORTED_FRAMEWORKS = new Set(['openclaw', 'hermes', 'elizaos', 'milady']);
   if (!SUPPORTED_FRAMEWORKS.has(agent.framework)) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-black p-6 text-gray-100">

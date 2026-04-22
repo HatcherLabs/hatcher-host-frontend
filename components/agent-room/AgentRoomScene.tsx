@@ -7,6 +7,8 @@ import { Platform } from './Platform';
 import { Sparkles } from './Sparkles';
 import { MechLobster } from './MechLobster';
 import { MechMessenger } from './MechMessenger';
+import { MechHydra } from './MechHydra';
+import { MechMuse } from './MechMuse';
 import { IntegrationsOrbit } from './IntegrationsOrbit';
 import type { FrameworkPalette } from './colors';
 import type { RoomIntegration } from './types';
@@ -31,6 +33,10 @@ function Avatar({
   switch (framework) {
     case 'hermes':
       return <MechMessenger palette={palette} snapTrigger={snapTrigger} />;
+    case 'elizaos':
+      return <MechHydra palette={palette} snapTrigger={snapTrigger} />;
+    case 'milady':
+      return <MechMuse palette={palette} snapTrigger={snapTrigger} />;
     case 'openclaw':
     default:
       return <MechLobster palette={palette} snapTrigger={snapTrigger} />;
@@ -48,9 +54,11 @@ export function AgentRoomScene({
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 
-  // Hermes sits taller than lobster — nudge orbit target up a touch
-  const orbitTargetY = framework === 'hermes' ? 1.4 : 1.2;
-  const cameraZ = framework === 'hermes' ? 7.6 : 7.2;
+  // Per-framework camera framing — some avatars are taller/shorter than the lobster baseline
+  const orbitTargetY =
+    framework === 'hermes' ? 1.4 : framework === 'elizaos' ? 1.3 : framework === 'milady' ? 1.3 : 1.2;
+  const cameraZ =
+    framework === 'hermes' ? 7.6 : framework === 'elizaos' ? 7.4 : framework === 'milady' ? 7.0 : 7.2;
 
   return (
     <Canvas
