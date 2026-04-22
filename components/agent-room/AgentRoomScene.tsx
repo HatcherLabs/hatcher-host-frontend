@@ -5,6 +5,7 @@ import { OrbitControls } from '@react-three/drei';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { Platform } from './Platform';
 import { Sparkles } from './Sparkles';
+import { Environment } from './Environment';
 import { MechLobster } from './MechLobster';
 import { MechMessenger } from './MechMessenger';
 import { MechHydra } from './MechHydra';
@@ -89,6 +90,7 @@ export function AgentRoomScene({
       <pointLight position={[0, 5, 0]} intensity={0.6} distance={12} decay={1.6} color={0xffffff} />
 
       <Platform palette={palette} />
+      <Environment framework={framework} palette={palette} />
       <Avatar framework={framework} palette={palette} snapTrigger={snapTrigger} />
       <IntegrationsOrbit
         palette={palette}
