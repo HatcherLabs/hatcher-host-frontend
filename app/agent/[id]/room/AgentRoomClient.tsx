@@ -14,6 +14,7 @@ import { MoodMeter } from '@/components/agent-room/hud/MoodMeter';
 import { AchievementToast } from '@/components/agent-room/hud/AchievementToast';
 import { StatusBanner } from '@/components/agent-room/hud/StatusBanner';
 import { ShareButton } from '@/components/agent-room/hud/ShareButton';
+import { EmbedButton } from '@/components/agent-room/hud/EmbedButton';
 import { VoiceButton } from '@/components/agent-room/hud/VoiceButton';
 import { Leaderboard } from '@/components/agent-room/hud/Leaderboard';
 import { useVoice } from '@/hooks/useVoice';
@@ -465,6 +466,7 @@ export function AgentRoomClient({ id }: Props) {
       <StatsHud agent={agent} level={level} uptimeLabel={uptime} />
       {!viewerMode && <StatusBanner status={agent.status} />}
       <ShareButton agentName={agent.name} framework={agent.framework} />
+      {agent.isPublic && <EmbedButton agentId={agent.id} />}
       <Leaderboard currentAgentId={agent.id} framework={agent.framework} />
       {!viewerMode && <LogsHud logs={logs} />}
       <SkillsColumn skills={skills} onSkillClick={viewerMode ? undefined : handleSkillClick} />
