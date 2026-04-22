@@ -14,6 +14,8 @@ import { MoodMeter } from '@/components/agent-room/hud/MoodMeter';
 import { AchievementToast } from '@/components/agent-room/hud/AchievementToast';
 import { StatusBanner } from '@/components/agent-room/hud/StatusBanner';
 import { ShareButton } from '@/components/agent-room/hud/ShareButton';
+import { VoiceButton } from '@/components/agent-room/hud/VoiceButton';
+import { useVoice } from '@/hooks/useVoice';
 import { paletteFor } from '@/components/agent-room/colors';
 import type {
   RoomAgent,
@@ -23,6 +25,7 @@ import type {
 } from '@/components/agent-room/types';
 import { useWebSocketChat } from '@/hooks/useWebSocketChat';
 import { api } from '@/lib/api';
+import { API_URL } from '@/lib/config';
 import type { Agent } from '@/lib/api/types';
 
 interface Props {
@@ -172,6 +175,7 @@ export function AgentRoomClient({ id }: Props) {
   const [agent, setAgent] = useState<RoomAgent | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [viewerMode, setViewerMode] = useState(false);
   const [integrations, setIntegrations] = useState<RoomIntegration[]>([]);
   const [skills, setSkills] = useState<RoomSkill[]>([]);
   const [logs, setLogs] = useState<RoomLogLine[]>([]);
@@ -197,21 +201,53 @@ export function AgentRoomClient({ id }: Props) {
     async function fetchAgentOnce() {
       const res = await api.getAgent(id);
       if (!alive) return;
-      if (!res.success) {
-        setNotFound(true);
+      if (res.success) {
+        const mapped = toRoomAgent(res.data);
+        rawConfigRef.current = res.data.config;
+        setAgent(mapped);
+        setIntegrations(extractIntegrations(res.data.config));
+        setSkills(extractSkills(res.data.config));
+        setViewerMode(false);
         setLoading(false);
+        const isActive = ['active', 'running'].includes(mapped.status);
+        if (!isActive && alive) {
+          timer = setTimeout(fetchAgentOnce, 5000);
+        }
         return;
       }
-      const mapped = toRoomAgent(res.data);
-      rawConfigRef.current = res.data.config;
-      setAgent(mapped);
-      setIntegrations(extractIntegrations(res.data.config));
-      setSkills(extractSkills(res.data.config));
-      setLoading(false);
-      // Keep polling while not active — typical start takes 2-4 min.
-      const isActive = ['active', 'running'].includes(mapped.status);
-      if (!isActive && alive) {
-        timer = setTimeout(fetchAgentOnce, 5000);
+      // Auth failed or not owner — try public fallback via /public/city.
+      try {
+        const cityRes = await fetch(`${API_URL}/public/city`, { cache: 'no-store' });
+        if (!cityRes.ok) throw new Error('city not reachable');
+        const json = (await cityRes.json()) as {
+          success?: boolean;
+          data?: { agents?: Array<{ id: string; slug?: string | null; name: string; framework: string; status: string; messageCount?: number; createdAt: string; avatarUrl?: string | null; isPublic?: boolean }> };
+        };
+        const match = json.data?.agents?.find((a) => a.id === id || a.slug === id);
+        if (!match) {
+          setNotFound(true);
+          setLoading(false);
+          return;
+        }
+        const mapped: RoomAgent = {
+          id: match.id,
+          slug: match.slug ?? match.id,
+          name: match.name,
+          framework: match.framework,
+          status: match.status,
+          messageCount: match.messageCount ?? 0,
+          createdAt: match.createdAt,
+          isPublic: true,
+          avatarUrl: match.avatarUrl,
+        };
+        setAgent(mapped);
+        setIntegrations(extractIntegrations(undefined));
+        setSkills(extractSkills(undefined));
+        setViewerMode(true);
+        setLoading(false);
+      } catch {
+        setNotFound(true);
+        setLoading(false);
       }
     }
 
@@ -228,9 +264,10 @@ export function AgentRoomClient({ id }: Props) {
     if (agent && !bubbleText) setBubbleText(`${agent.name} standing by.`);
   }, [agent, bubbleText]);
 
-  // log poller
+  // log poller — owners only (viewers don't get the logs stream)
   useEffect(() => {
-    if (!agent || !['openclaw', 'hermes', 'elizaos', 'milady'].includes(agent.framework)) return;
+    if (!agent || viewerMode) return;
+    if (!['openclaw', 'hermes', 'elizaos', 'milady'].includes(agent.framework)) return;
     let alive = true;
     let timer: ReturnType<typeof setTimeout> | null = null;
     async function poll() {
@@ -263,7 +300,7 @@ export function AgentRoomClient({ id }: Props) {
 
   const { send, isConnected } = useWebSocketChat({
     agentId: id,
-    enabled: !!agent && ['openclaw', 'hermes', 'elizaos', 'milady'].includes(agent.framework),
+    enabled: !!agent && !viewerMode && ['openclaw', 'hermes', 'elizaos', 'milady'].includes(agent.framework),
     onToken: (tok) => {
       bubbleStreamRef.current += tok;
       setBubbleText(bubbleStreamRef.current);
@@ -296,6 +333,20 @@ export function AgentRoomClient({ id }: Props) {
     },
     [send],
   );
+
+  const voice = useVoice();
+  // Auto-speak streamed replies when the user has voice-replies on.
+  // Speak on chat_done so the TTS gets the full sentence with proper
+  // prosody (speaking each streamed token individually sounds robotic).
+  const lastSpokenRef = useRef('');
+  useEffect(() => {
+    if (!voice.autoSpeak) return;
+    if (bubbleTyping) return;
+    if (!bubbleText || bubbleText === lastSpokenRef.current) return;
+    if (/^(Error:|Agent|Can't reach|.+ standing by\.)/.test(bubbleText)) return;
+    lastSpokenRef.current = bubbleText;
+    voice.speak(bubbleText);
+  }, [bubbleText, bubbleTyping, voice]);
 
   const handleIntegrationClick = useCallback((key: string) => {
     setActiveIntegrationKey(key);
@@ -408,32 +459,66 @@ export function AgentRoomClient({ id }: Props) {
         integrations={integrations}
         snapTrigger={snapTrigger}
         framework={agent.framework}
-        onIntegrationClick={handleIntegrationClick}
+        onIntegrationClick={viewerMode ? undefined : handleIntegrationClick}
       />
       <StatsHud agent={agent} level={level} uptimeLabel={uptime} />
-      <StatusBanner status={agent.status} />
+      {!viewerMode && <StatusBanner status={agent.status} />}
       <ShareButton agentName={agent.name} framework={agent.framework} />
-      <LogsHud logs={logs} />
-      <SkillsColumn skills={skills} onSkillClick={handleSkillClick} />
+      {!viewerMode && <LogsHud logs={logs} />}
+      <SkillsColumn skills={skills} onSkillClick={viewerMode ? undefined : handleSkillClick} />
       <ChatBubble text={bubbleText} typing={bubbleTyping} />
-      <MoodMeter logs={logs} />
+      {!viewerMode && <MoodMeter logs={logs} />}
       <XpBar level={level} xp={xp} max={max} />
-      <ChatInput onSend={handleSend} disabled={!isConnected} />
-      <AchievementToast
-        agentId={agent.id}
-        messageCount={agent.messageCount}
-        framework={agent.framework}
-      />
-      <IntegrationModal
-        integration={
-          activeIntegrationKey ? integrations.find((i) => i.key === activeIntegrationKey) ?? null : null
-        }
-        onClose={() => setActiveIntegrationKey(null)}
-        onManage={handleIntegrationManage}
-        onToggle={handleIntegrationToggle}
-      />
+      {viewerMode ? (
+        <Link
+          href={`/login?next=${encodeURIComponent(`/agent/${id}/room`)}`}
+          className="pointer-events-auto absolute bottom-5 left-1/2 z-10 flex w-[min(640px,90vw)] -translate-x-1/2 items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-xs font-semibold uppercase tracking-[2px] backdrop-blur-xl transition-all hover:scale-[1.02]"
+          style={{
+            background: 'rgba(12, 14, 22, 0.82)',
+            borderColor: 'var(--room-primary)',
+            color: 'var(--room-bright)',
+            boxShadow: '0 0 24px color-mix(in srgb, var(--room-primary) 22%, transparent)',
+          }}
+        >
+          <span>🔐</span>
+          <span>Sign in to chat with {agent.name}</span>
+          <span aria-hidden>→</span>
+        </Link>
+      ) : (
+        <>
+          <ChatInput onSend={handleSend} disabled={!isConnected} />
+          <VoiceButton
+            isListening={voice.isListening}
+            sttSupported={voice.sttSupported}
+            isSpeaking={voice.isSpeaking}
+            autoSpeak={voice.autoSpeak}
+            onToggleListen={() => {
+              if (voice.isListening) voice.stopListening();
+              else voice.startListening((text) => { if (text.trim()) handleSend(text.trim()); });
+            }}
+            onToggleAutoSpeak={voice.toggleAutoSpeak}
+          />
+        </>
+      )}
+      {!viewerMode && (
+        <AchievementToast
+          agentId={agent.id}
+          messageCount={agent.messageCount}
+          framework={agent.framework}
+        />
+      )}
+      {!viewerMode && (
+        <IntegrationModal
+          integration={
+            activeIntegrationKey ? integrations.find((i) => i.key === activeIntegrationKey) ?? null : null
+          }
+          onClose={() => setActiveIntegrationKey(null)}
+          onManage={handleIntegrationManage}
+          onToggle={handleIntegrationToggle}
+        />
+      )}
       <Link
-        href={`/dashboard/agent/${id}`}
+        href={viewerMode ? '/city' : `/dashboard/agent/${id}`}
         className="pointer-events-auto absolute top-5 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[2px] backdrop-blur-xl transition-all hover:scale-105"
         style={{
           background: 'rgba(12, 14, 22, 0.82)',
@@ -443,7 +528,7 @@ export function AgentRoomClient({ id }: Props) {
         }}
       >
         <span aria-hidden>←</span>
-        <span>Back to Dashboard</span>
+        <span>{viewerMode ? 'Back to City' : 'Back to Dashboard'}</span>
       </Link>
     </div>
   );
