@@ -232,16 +232,25 @@ export function AgentRoomClient({ id }: Props) {
       const res = await api.getAgent(id);
       if (!alive) return;
       if (res.success) {
-        const mapped = toRoomAgent(res.data);
-        rawConfigRef.current = res.data.config;
+        // Backend GET /agents/:id returns 200 for non-owners too, but strips
+        // ownerId and secrets. Use the presence of ownerId as the owner
+        // signal — no ownerId → we're just a viewer of a public agent.
+        const data = res.data as typeof res.data & { ownerId?: string };
+        const isOwner = typeof data.ownerId === 'string' && data.ownerId.length > 0;
+        const mapped = toRoomAgent(data);
+        rawConfigRef.current = isOwner ? data.config : undefined;
         setAgent(mapped);
-        setIntegrations(extractIntegrations(res.data.config));
-        setSkills(extractSkills(res.data.config));
-        setViewerMode(false);
+        setIntegrations(extractIntegrations(isOwner ? data.config : undefined));
+        setSkills(extractSkills(isOwner ? data.config : undefined));
+        setViewerMode(!isOwner);
         setLoading(false);
-        const isActive = ['active', 'running'].includes(mapped.status);
-        if (!isActive && alive) {
-          timer = setTimeout(fetchAgentOnce, 5000);
+        // Only owners re-poll for status transitions — viewers see a
+        // single snapshot.
+        if (isOwner) {
+          const isActive = ['active', 'running'].includes(mapped.status);
+          if (!isActive && alive) {
+            timer = setTimeout(fetchAgentOnce, 5000);
+          }
         }
         return;
       }
