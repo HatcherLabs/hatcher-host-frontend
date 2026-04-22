@@ -9,6 +9,9 @@ import { SkillsColumn } from '@/components/agent-room/hud/SkillsColumn';
 import { ChatBubble } from '@/components/agent-room/hud/ChatBubble';
 import { XpBar } from '@/components/agent-room/hud/XpBar';
 import { ChatInput } from '@/components/agent-room/hud/ChatInput';
+import { IntegrationModal } from '@/components/agent-room/hud/IntegrationModal';
+import { MoodMeter } from '@/components/agent-room/hud/MoodMeter';
+import { AchievementToast } from '@/components/agent-room/hud/AchievementToast';
 import { paletteFor } from '@/components/agent-room/colors';
 import type {
   RoomAgent,
@@ -154,7 +157,9 @@ export function AgentRoomClient({ id }: Props) {
   const [bubbleText, setBubbleText] = useState('');
   const [bubbleTyping, setBubbleTyping] = useState(false);
   const [snapTrigger, setSnapTrigger] = useState(0);
+  const [activeIntegrationKey, setActiveIntegrationKey] = useState<string | null>(null);
   const bubbleStreamRef = useRef('');
+  const rawConfigRef = useRef<Record<string, unknown> | undefined>(undefined);
 
   const palette = useMemo(
     () => paletteFor(agent?.framework ?? 'openclaw'),
@@ -173,6 +178,7 @@ export function AgentRoomClient({ id }: Props) {
         return;
       }
       const mapped = toRoomAgent(res.data);
+      rawConfigRef.current = res.data.config;
       setAgent(mapped);
       setIntegrations(extractIntegrations(res.data.config));
       setSkills(extractSkills(res.data.config));
@@ -238,18 +244,42 @@ export function AgentRoomClient({ id }: Props) {
     [send],
   );
 
-  const handleIntegrationClick = useCallback(
-    (_key: string) => {
-      router.push(`/dashboard/agent/${id}?tab=integrations`);
-    },
-    [id, router],
-  );
+  const handleIntegrationClick = useCallback((key: string) => {
+    setActiveIntegrationKey(key);
+  }, []);
 
   const handleSkillClick = useCallback(
     (_key: string) => {
       router.push(`/dashboard/agent/${id}?tab=skills`);
     },
     [id, router],
+  );
+
+  const handleIntegrationManage = useCallback(
+    (_key: string) => {
+      router.push(`/dashboard/agent/${id}?tab=integrations`);
+    },
+    [id, router],
+  );
+
+  const handleIntegrationToggle = useCallback(
+    async (key: string, active: boolean) => {
+      const current = rawConfigRef.current ?? {};
+      const platformsRoot = (current.platforms ?? current.integrations ?? {}) as Record<
+        string,
+        unknown
+      >;
+      const existing = (platformsRoot[key] ?? {}) as Record<string, unknown>;
+      const rootKey = 'platforms' in current || !('integrations' in current) ? 'platforms' : 'integrations';
+      const nextPlatforms = { ...platformsRoot, [key]: { ...existing, enabled: active } };
+      const nextConfig = { ...current, [rootKey]: nextPlatforms };
+      const res = await api.updateAgent(id, { config: nextConfig as Record<string, unknown> });
+      if (res.success) {
+        rawConfigRef.current = nextConfig;
+        setIntegrations(extractIntegrations(nextConfig));
+      }
+    },
+    [id],
   );
 
   if (loading) {
@@ -325,8 +355,18 @@ export function AgentRoomClient({ id }: Props) {
       <LogsHud logs={logs} />
       <SkillsColumn skills={skills} onSkillClick={handleSkillClick} />
       <ChatBubble text={bubbleText} typing={bubbleTyping} />
+      <MoodMeter logs={logs} />
       <XpBar level={level} xp={xp} max={max} />
       <ChatInput onSend={handleSend} disabled={!isConnected} />
+      <AchievementToast agentId={agent.id} messageCount={agent.messageCount} />
+      <IntegrationModal
+        integration={
+          activeIntegrationKey ? integrations.find((i) => i.key === activeIntegrationKey) ?? null : null
+        }
+        onClose={() => setActiveIntegrationKey(null)}
+        onManage={handleIntegrationManage}
+        onToggle={handleIntegrationToggle}
+      />
       <Link
         href={`/agent/${id}`}
         className="pointer-events-auto absolute top-5 left-1/2 z-10 -translate-x-1/2 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[10px] uppercase tracking-[2px] text-gray-400 backdrop-blur hover:border-white/30 hover:text-gray-200"
