@@ -1,0 +1,317 @@
+'use client';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
+import { AgentRoomScene } from '@/components/agent-room/AgentRoomScene';
+import { StatsHud } from '@/components/agent-room/hud/StatsHud';
+import { LogsHud } from '@/components/agent-room/hud/LogsHud';
+import { SkillsColumn } from '@/components/agent-room/hud/SkillsColumn';
+import { ChatBubble } from '@/components/agent-room/hud/ChatBubble';
+import { XpBar } from '@/components/agent-room/hud/XpBar';
+import { ChatInput } from '@/components/agent-room/hud/ChatInput';
+import { paletteFor } from '@/components/agent-room/colors';
+import type {
+  RoomAgent,
+  RoomIntegration,
+  RoomLogLine,
+  RoomSkill,
+} from '@/components/agent-room/types';
+import { useWebSocketChat } from '@/hooks/useWebSocketChat';
+import { api } from '@/lib/api';
+import type { Agent } from '@/lib/api/types';
+
+interface Props {
+  id: string;
+}
+
+const INTEGRATION_META: Array<{ key: string; label: string; color: string }> = [
+  { key: 'telegram', label: 'TG', color: '#2aabee' },
+  { key: 'discord', label: 'DC', color: '#5865f2' },
+  { key: 'twitter', label: 'X', color: '#ffffff' },
+  { key: 'whatsapp', label: 'WA', color: '#25d366' },
+  { key: 'slack', label: 'SL', color: '#e01e5a' },
+  { key: 'webhook', label: 'WH', color: '#FACC15' },
+];
+
+const SKILL_ICONS: Record<string, string> = {
+  browser: '🕸️',
+  files: '📁',
+  file: '📁',
+  'web-search': '🔍',
+  search: '🔍',
+  memory: '📝',
+  webhook: '⚡',
+};
+
+function uptimeLabel(createdAt: string): string {
+  const ms = Date.now() - new Date(createdAt).getTime();
+  const days = Math.floor(ms / 86400000);
+  const hours = Math.floor((ms % 86400000) / 3600000);
+  return `${days}d ${hours}h`;
+}
+
+function levelFromMessages(n: number): { level: number; xp: number; max: number } {
+  let level = 1;
+  let required = 50;
+  let xp = n;
+  while (xp >= required && level < 99) {
+    xp -= required;
+    level += 1;
+    required = Math.floor(required * 1.4);
+  }
+  return { level, xp, max: required };
+}
+
+function toRoomAgent(a: Agent): RoomAgent {
+  return {
+    id: a.id,
+    slug: a.slug ?? a.id,
+    name: a.name,
+    framework: a.framework,
+    status: a.status,
+    messageCount: a.messageCount ?? 0,
+    createdAt: a.createdAt,
+    isPublic: a.isPublic,
+    avatarUrl: a.avatarUrl,
+  };
+}
+
+function extractIntegrations(config: Record<string, unknown> | undefined): RoomIntegration[] {
+  const enabled = new Set<string>();
+  const platforms = (config?.platforms ?? config?.integrations) as
+    | Record<string, unknown>
+    | undefined;
+  if (platforms) {
+    for (const k of Object.keys(platforms)) {
+      const v = platforms[k];
+      if (v && typeof v === 'object' && (v as { enabled?: boolean }).enabled) {
+        enabled.add(k.toLowerCase());
+      }
+    }
+  }
+  return INTEGRATION_META.map((m) => ({
+    key: m.key,
+    label: m.label,
+    colorHex: m.color,
+    active: enabled.has(m.key),
+  }));
+}
+
+function extractSkills(config: Record<string, unknown> | undefined): RoomSkill[] {
+  const raw = (config?.skills ?? config?.plugins ?? []) as
+    | Array<{ key?: string; name?: string; enabled?: boolean }>
+    | undefined;
+  if (!Array.isArray(raw) || raw.length === 0) {
+    return [
+      { key: 'browser', label: 'Browser', icon: '🕸️', active: true },
+      { key: 'memory', label: 'Memory', icon: '📝', active: true },
+      { key: 'webhook', label: 'Webhook', icon: '⚡', active: false },
+    ];
+  }
+  return raw.slice(0, 6).map((s) => {
+    const key = (s.key || s.name || 'skill').toLowerCase();
+    return {
+      key,
+      label: s.name || key,
+      icon: SKILL_ICONS[key] ?? '🧩',
+      active: s.enabled !== false,
+    };
+  });
+}
+
+function parseLogs(
+  raw: Array<{ timestamp: string; level: string; message: string }>,
+): RoomLogLine[] {
+  return raw
+    .slice(-8)
+    .reverse()
+    .map((l) => {
+      const msg = l.message.slice(0, 120);
+      const lvl: RoomLogLine['level'] = /tool[_ ]call|tool\./i.test(msg)
+        ? 'tool'
+        : l.level === 'error'
+          ? 'error'
+          : l.level === 'warn'
+            ? 'warn'
+            : /\[llm|stream/i.test(msg)
+              ? 'llm'
+              : /\bok\b|done|success/i.test(msg)
+                ? 'ok'
+                : 'info';
+      const time = new Date(l.timestamp).toLocaleTimeString('en-GB');
+      return { time, level: lvl, text: msg };
+    });
+}
+
+export function AgentRoomClient({ id }: Props) {
+  const [agent, setAgent] = useState<RoomAgent | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [integrations, setIntegrations] = useState<RoomIntegration[]>([]);
+  const [skills, setSkills] = useState<RoomSkill[]>([]);
+  const [logs, setLogs] = useState<RoomLogLine[]>([]);
+  const [bubbleText, setBubbleText] = useState('');
+  const [bubbleTyping, setBubbleTyping] = useState(false);
+  const [snapTrigger, setSnapTrigger] = useState(0);
+  const bubbleStreamRef = useRef('');
+
+  const palette = useMemo(
+    () => paletteFor(agent?.framework ?? 'openclaw'),
+    [agent?.framework],
+  );
+
+  // initial fetch
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const res = await api.getAgent(id);
+      if (!alive) return;
+      if (!res.success) {
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
+      const mapped = toRoomAgent(res.data);
+      setAgent(mapped);
+      setIntegrations(extractIntegrations(res.data.config));
+      setSkills(extractSkills(res.data.config));
+      setBubbleText(`${mapped.name} standing by.`);
+      setLoading(false);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [id]);
+
+  // log poller
+  useEffect(() => {
+    if (!agent || agent.framework !== 'openclaw') return;
+    let alive = true;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    async function poll() {
+      const res = await api.getAgentLogs(id);
+      if (!alive) return;
+      if (res.success && Array.isArray(res.data?.logs)) {
+        const parsed = parseLogs(res.data.logs);
+        setLogs(parsed);
+        if (parsed.some((l) => l.level === 'tool')) {
+          setSnapTrigger((n) => n + 1);
+        }
+      }
+      if (alive) timer = setTimeout(poll, 8000);
+    }
+    poll();
+    return () => {
+      alive = false;
+      if (timer) clearTimeout(timer);
+    };
+  }, [id, agent]);
+
+  const { send, isConnected } = useWebSocketChat({
+    agentId: id,
+    enabled: !!agent && agent.framework === 'openclaw',
+    onToken: (tok) => {
+      bubbleStreamRef.current += tok;
+      setBubbleText(bubbleStreamRef.current);
+      setBubbleTyping(true);
+    },
+    onDone: (content) => {
+      setBubbleText(content || bubbleStreamRef.current);
+      bubbleStreamRef.current = '';
+      setBubbleTyping(false);
+    },
+    onError: (err) => {
+      setBubbleText(`Error: ${err}`);
+      setBubbleTyping(false);
+    },
+  });
+
+  const handleSend = useCallback(
+    (text: string) => {
+      bubbleStreamRef.current = '';
+      setBubbleText('');
+      setBubbleTyping(true);
+      const ok = send(text);
+      if (!ok) setBubbleText("Can't reach agent right now — reconnecting...");
+    },
+    [send],
+  );
+
+  if (loading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-black text-gray-400">
+        <div className="text-sm">Entering agent room…</div>
+      </main>
+    );
+  }
+
+  if (notFound || !agent) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-black p-6 text-gray-100">
+        <div className="max-w-md space-y-3 text-center">
+          <h1 className="text-2xl font-bold">Agent not found</h1>
+          <p className="text-gray-400">
+            Either this agent doesn&apos;t exist or you don&apos;t have access.
+          </p>
+          <Link
+            href="/dashboard"
+            className="mt-4 inline-block text-yellow-400 underline underline-offset-4 hover:text-yellow-300"
+          >
+            ← Back to dashboard
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  if (agent.framework !== 'openclaw') {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-black p-6 text-gray-100">
+        <div className="max-w-md space-y-3 text-center">
+          <div className="text-xs uppercase tracking-[3px] text-yellow-400">
+            AGENT ROOM · PREVIEW
+          </div>
+          <h1 className="text-2xl font-bold">{agent.name}</h1>
+          <p className="text-gray-400">
+            Agent Room is rolling out one framework at a time. Rooms for{' '}
+            <b className="text-white">{agent.framework}</b> are coming next.
+          </p>
+          <Link
+            href={`/agent/${id}`}
+            className="mt-4 inline-block text-yellow-400 underline underline-offset-4 hover:text-yellow-300"
+          >
+            ← Back to agent dashboard
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  const { level, xp, max } = levelFromMessages(agent.messageCount);
+  const uptime = uptimeLabel(agent.createdAt);
+
+  const cssVars: React.CSSProperties = {
+    // @ts-expect-error CSS custom properties
+    '--room-primary': palette.primaryHex,
+    '--room-dim': palette.dimHex,
+    '--room-bright': palette.brightHex,
+    '--room-border': `color-mix(in srgb, ${palette.primaryHex} 32%, transparent)`,
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black text-gray-100" style={cssVars}>
+      <AgentRoomScene palette={palette} integrations={integrations} snapTrigger={snapTrigger} />
+      <StatsHud agent={agent} level={level} uptimeLabel={uptime} />
+      <LogsHud logs={logs} />
+      <SkillsColumn skills={skills} />
+      <ChatBubble text={bubbleText} typing={bubbleTyping} />
+      <XpBar level={level} xp={xp} max={max} />
+      <ChatInput onSend={handleSend} disabled={!isConnected} />
+      <Link
+        href={`/agent/${id}`}
+        className="pointer-events-auto absolute top-5 left-1/2 z-10 -translate-x-1/2 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[10px] uppercase tracking-[2px] text-gray-400 backdrop-blur hover:border-white/30 hover:text-gray-200"
+      >
+        ← Exit Room
+      </Link>
+    </div>
+  );
+}
