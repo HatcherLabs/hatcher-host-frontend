@@ -192,7 +192,7 @@ export function AgentRoomClient({ id }: Props) {
 
   // log poller
   useEffect(() => {
-    if (!agent || agent.framework !== 'openclaw') return;
+    if (!agent || !['openclaw', 'hermes'].includes(agent.framework)) return;
     let alive = true;
     let timer: ReturnType<typeof setTimeout> | null = null;
     async function poll() {
@@ -216,7 +216,7 @@ export function AgentRoomClient({ id }: Props) {
 
   const { send, isConnected } = useWebSocketChat({
     agentId: id,
-    enabled: !!agent && agent.framework === 'openclaw',
+    enabled: !!agent && ['openclaw', 'hermes'].includes(agent.framework),
     onToken: (tok) => {
       bubbleStreamRef.current += tok;
       setBubbleText(bubbleStreamRef.current);
@@ -309,11 +309,15 @@ export function AgentRoomClient({ id }: Props) {
     );
   }
 
-  if (agent.framework !== 'openclaw') {
+  const SUPPORTED_FRAMEWORKS = new Set(['openclaw', 'hermes']);
+  if (!SUPPORTED_FRAMEWORKS.has(agent.framework)) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-black p-6 text-gray-100">
         <div className="max-w-md space-y-3 text-center">
-          <div className="text-xs uppercase tracking-[3px] text-yellow-400">
+          <div
+            className="text-xs uppercase tracking-[3px]"
+            style={{ color: palette.primaryHex }}
+          >
             AGENT ROOM · PREVIEW
           </div>
           <h1 className="text-2xl font-bold">{agent.name}</h1>
@@ -323,7 +327,8 @@ export function AgentRoomClient({ id }: Props) {
           </p>
           <Link
             href={`/agent/${id}`}
-            className="mt-4 inline-block text-yellow-400 underline underline-offset-4 hover:text-yellow-300"
+            className="mt-4 inline-block underline underline-offset-4"
+            style={{ color: palette.primaryHex }}
           >
             ← Back to agent dashboard
           </Link>
@@ -349,6 +354,7 @@ export function AgentRoomClient({ id }: Props) {
         palette={palette}
         integrations={integrations}
         snapTrigger={snapTrigger}
+        framework={agent.framework}
         onIntegrationClick={handleIntegrationClick}
       />
       <StatsHud agent={agent} level={level} uptimeLabel={uptime} />
@@ -358,7 +364,11 @@ export function AgentRoomClient({ id }: Props) {
       <MoodMeter logs={logs} />
       <XpBar level={level} xp={xp} max={max} />
       <ChatInput onSend={handleSend} disabled={!isConnected} />
-      <AchievementToast agentId={agent.id} messageCount={agent.messageCount} />
+      <AchievementToast
+        agentId={agent.id}
+        messageCount={agent.messageCount}
+        framework={agent.framework}
+      />
       <IntegrationModal
         integration={
           activeIntegrationKey ? integrations.find((i) => i.key === activeIntegrationKey) ?? null : null

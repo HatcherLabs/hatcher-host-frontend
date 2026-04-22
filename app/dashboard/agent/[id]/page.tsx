@@ -1083,13 +1083,17 @@ export default function AgentManagePage() {
                 <Share2 size={13} />
                 <span className="hidden sm:inline">Share</span>
               </button>
-              {agent?.framework === 'openclaw' && (
+              {(agent?.framework === 'openclaw' || agent?.framework === 'hermes') && (
                 <Link
                   href={`/agent/${id}/room`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-yellow-500/30 text-yellow-400 hover:border-yellow-500/60 hover:bg-yellow-500/10 transition-all"
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border transition-all ${
+                    agent?.framework === 'openclaw'
+                      ? 'border-yellow-500/30 text-yellow-400 hover:border-yellow-500/60 hover:bg-yellow-500/10'
+                      : 'border-purple-500/30 text-purple-300 hover:border-purple-500/60 hover:bg-purple-500/10'
+                  }`}
                   title="Enter 3D Agent Room"
                 >
-                  <span>🦞</span>
+                  <span>{agent?.framework === 'openclaw' ? '🦞' : '🪶'}</span>
                   <span className="hidden sm:inline">Room</span>
                 </Link>
               )}
