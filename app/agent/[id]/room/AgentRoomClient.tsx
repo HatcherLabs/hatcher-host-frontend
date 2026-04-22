@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AgentRoomScene } from '@/components/agent-room/AgentRoomScene';
 import { StatsHud } from '@/components/agent-room/hud/StatsHud';
 import { LogsHud } from '@/components/agent-room/hud/LogsHud';
@@ -202,6 +202,9 @@ function classifyLine(msg: string, backendLevel?: string): RoomLogLine['level'] 
 
 export function AgentRoomClient({ id }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const avatarStyle: 'procedural' | 'expressive' =
+    searchParams?.get('avatar') === 'expressive' ? 'expressive' : 'procedural';
   const [agent, setAgent] = useState<RoomAgent | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -517,6 +520,7 @@ export function AgentRoomClient({ id }: Props) {
         integrations={integrations}
         snapTrigger={snapTrigger}
         framework={agent.framework}
+        avatarStyle={avatarStyle}
         onIntegrationClick={viewerMode ? undefined : handleIntegrationClick}
       />
       <StatsHud agent={agent} level={level} uptimeLabel={uptime} />

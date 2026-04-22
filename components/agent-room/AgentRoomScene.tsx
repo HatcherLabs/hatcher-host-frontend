@@ -1,16 +1,19 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
-import { Platform } from './Platform';
+import { HexPlatform } from './HexPlatform';
 import { Sparkles } from './Sparkles';
+import { Starfield } from './Starfield';
+import { LightRay } from './LightRay';
 import { Environment } from './Environment';
 import { Pet } from './Pet';
 import { MechLobster } from './MechLobster';
 import { MechMessenger } from './MechMessenger';
 import { MechHydra } from './MechHydra';
 import { MechMuse } from './MechMuse';
+import { GlbRobot } from './GlbRobot';
 import { IntegrationsOrbit } from './IntegrationsOrbit';
 import type { FrameworkPalette } from './colors';
 import type { RoomIntegration } from './types';
@@ -20,6 +23,7 @@ interface Props {
   integrations: RoomIntegration[];
   snapTrigger: number;
   framework: string;
+  avatarStyle?: 'procedural' | 'expressive';
   onIntegrationClick?: (key: string) => void;
 }
 
@@ -27,11 +31,22 @@ function Avatar({
   framework,
   palette,
   snapTrigger,
+  avatarStyle = 'procedural',
 }: {
   framework: string;
   palette: FrameworkPalette;
   snapTrigger: number;
+  avatarStyle?: 'procedural' | 'expressive';
 }) {
+  // Expressive path wraps in a Suspense so the scene stays mounted while
+  // the glTF loads from the three.js examples CDN (first visit ~800ms).
+  if (avatarStyle === 'expressive') {
+    return (
+      <Suspense fallback={null}>
+        <GlbRobot palette={palette} snapTrigger={snapTrigger} framework={framework} />
+      </Suspense>
+    );
+  }
   switch (framework) {
     case 'hermes':
       return <MechMessenger palette={palette} snapTrigger={snapTrigger} />;
@@ -84,6 +99,7 @@ export function AgentRoomScene({
   integrations,
   snapTrigger,
   framework,
+  avatarStyle = 'procedural',
   onIntegrationClick,
 }: Props) {
   const [mounted, setMounted] = useState(false);
@@ -125,9 +141,16 @@ export function AgentRoomScene({
       <pointLight position={[3, 1.5, 3]} intensity={0.9} distance={16} decay={1.8} color={0x6688cc} />
       <pointLight position={[0, 5, 0]} intensity={0.6} distance={12} decay={1.6} color={0xffffff} />
 
-      <Platform palette={palette} />
+      <Starfield />
+      <LightRay palette={palette} />
+      <HexPlatform palette={palette} />
       <Environment framework={framework} palette={palette} />
-      <Avatar framework={framework} palette={palette} snapTrigger={snapTrigger} />
+      <Avatar
+        framework={framework}
+        palette={palette}
+        snapTrigger={snapTrigger}
+        avatarStyle={avatarStyle}
+      />
       <Pet framework={framework} palette={palette} />
       <IntegrationsOrbit
         palette={palette}
