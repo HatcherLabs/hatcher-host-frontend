@@ -17,7 +17,7 @@ interface PublicAgent {
   framework: string;
   status: string;
   messageCount?: number;
-  createdAt: string;
+  createdAt?: string;
   avatarUrl?: string | null;
 }
 
@@ -56,7 +56,7 @@ export function EmbedRoomClient({ id }: Props) {
           framework: match.framework,
           status: match.status,
           messageCount: match.messageCount ?? 0,
-          createdAt: match.createdAt,
+          createdAt: match.createdAt ?? '',
           isPublic: true,
           avatarUrl: match.avatarUrl,
         });

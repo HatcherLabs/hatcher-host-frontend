@@ -56,8 +56,12 @@ const SKILL_ICONS: Record<string, string> = {
   webhook: '⚡',
 };
 
-function uptimeLabel(createdAt: string): string {
-  const ms = Date.now() - new Date(createdAt).getTime();
+function uptimeLabel(createdAt: string | null | undefined): string {
+  if (!createdAt) return '—';
+  const t = new Date(createdAt).getTime();
+  if (Number.isNaN(t)) return '—';
+  const ms = Date.now() - t;
+  if (ms < 0) return '—';
   const days = Math.floor(ms / 86400000);
   const hours = Math.floor((ms % 86400000) / 3600000);
   return `${days}d ${hours}h`;
@@ -151,28 +155,49 @@ function extractSkills(config: Record<string, unknown> | undefined): RoomSkill[]
   });
 }
 
-function parseLogs(
-  raw: Array<{ timestamp: string; level: string; message: string }>,
-): RoomLogLine[] {
-  return raw
-    .slice(-8)
-    .reverse()
-    .map((l) => {
-      const msg = l.message.slice(0, 120);
-      const lvl: RoomLogLine['level'] = /tool[_ ]call|tool\./i.test(msg)
-        ? 'tool'
-        : l.level === 'error'
-          ? 'error'
-          : l.level === 'warn'
-            ? 'warn'
-            : /\[llm|stream/i.test(msg)
-              ? 'llm'
-              : /\bok\b|done|success/i.test(msg)
-                ? 'ok'
-                : 'info';
-      const time = new Date(l.timestamp).toLocaleTimeString('en-GB');
-      return { time, level: lvl, text: msg };
-    });
+// The /agents/:id/logs endpoint returns `logs` as either a string[] (docker
+// plaintext lines — the common path) or — on very old routes — an array of
+// { timestamp, level, message } objects. Handle both, plus guess the level
+// from message content when the backend doesn't tag it.
+function parseLogs(raw: unknown[]): RoomLogLine[] {
+  const lines = raw.slice(-12).reverse();
+  return lines.map((entry): RoomLogLine => {
+    // Object shape: { timestamp, level, message }
+    if (entry && typeof entry === 'object' && 'message' in entry) {
+      const o = entry as { timestamp?: string; level?: string; message: string };
+      const msg = (o.message ?? '').slice(0, 120);
+      const lvl = classifyLine(msg, o.level);
+      const time = o.timestamp
+        ? new Date(o.timestamp).toLocaleTimeString('en-GB')
+        : new Date().toLocaleTimeString('en-GB');
+      return { time, level: lvl, text: stripTsPrefix(msg) };
+    }
+    // String shape: "2026-04-22T07:18:13.423Z [info] Agent started"
+    const line = String(entry);
+    const tsMatch = line.match(/^(\d{4}-\d{2}-\d{2}T[\d:.]+Z?)\s+(.*)$/);
+    const rest = tsMatch ? tsMatch[2]! : line;
+    const time = tsMatch
+      ? new Date(tsMatch[1]!).toLocaleTimeString('en-GB')
+      : new Date().toLocaleTimeString('en-GB');
+    const levelMatch = rest.match(/^\[(info|warn|warning|error|debug|llm|tool|ok)\]\s+(.*)$/i);
+    const tagLevel = levelMatch?.[1]?.toLowerCase();
+    const bodyText = levelMatch ? levelMatch[2]! : rest;
+    const lvl = classifyLine(bodyText, tagLevel);
+    return { time, level: lvl, text: bodyText.slice(0, 120) };
+  });
+}
+
+function stripTsPrefix(msg: string): string {
+  return msg.replace(/^\d{4}-\d{2}-\d{2}T[\d:.]+Z?\s+/, '').slice(0, 120);
+}
+
+function classifyLine(msg: string, backendLevel?: string): RoomLogLine['level'] {
+  if (/tool[_ ]call|\[tool\]|tool\.\w+\(|browser\.\w+\(|webhook\./i.test(msg)) return 'tool';
+  if (backendLevel === 'error' || /\berror\b|failed|exception/i.test(msg)) return 'error';
+  if (backendLevel === 'warn' || backendLevel === 'warning' || /\bwarn/i.test(msg)) return 'warn';
+  if (backendLevel === 'llm' || /\[llm|stream|token/i.test(msg)) return 'llm';
+  if (backendLevel === 'ok' || /\bok\b|done|success|ready/i.test(msg)) return 'ok';
+  return 'info';
 }
 
 export function AgentRoomClient({ id }: Props) {
@@ -241,7 +266,9 @@ export function AgentRoomClient({ id }: Props) {
           framework: match.framework,
           status: match.status,
           messageCount: match.messageCount ?? 0,
-          createdAt: match.createdAt,
+          // /public/city doesn't include createdAt; fall back to empty string
+          // so uptimeLabel returns "—" instead of "NaN d NaN h".
+          createdAt: match.createdAt ?? '',
           isPublic: true,
           avatarUrl: match.avatarUrl,
         };
@@ -278,11 +305,14 @@ export function AgentRoomClient({ id }: Props) {
     async function poll() {
       const res = await api.getAgentLogs(id);
       if (!alive) return;
-      if (res.success && Array.isArray(res.data?.logs)) {
-        const parsed = parseLogs(res.data.logs);
-        setLogs(parsed);
-        if (parsed.some((l) => l.level === 'tool')) {
-          setSnapTrigger((n) => n + 1);
+      if (res.success) {
+        const rawLogs = (res.data as { logs?: unknown } | undefined)?.logs;
+        if (Array.isArray(rawLogs)) {
+          const parsed = parseLogs(rawLogs);
+          setLogs(parsed);
+          if (parsed.some((l) => l.level === 'tool')) {
+            setSnapTrigger((n) => n + 1);
+          }
         }
       }
       if (alive) timer = setTimeout(poll, 8000);
