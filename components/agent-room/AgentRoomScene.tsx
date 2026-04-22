@@ -57,19 +57,28 @@ export function AgentRoomScene({
       camera={{ position: [3.2, 2.2, cameraZ], fov: 42, near: 0.1, far: 200 }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
       dpr={[1, 2]}
-      style={{ width: '100%', height: '100%', position: 'absolute', inset: 0, background: '#05060a' }}
+      style={{
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        inset: 0,
+        background: 'radial-gradient(ellipse at 50% 50%, #1a1f36 0%, #08090f 55%, #050608 100%)',
+      }}
     >
-      <fog attach="fog" args={[0x050810, 8, 30]} />
-      <ambientLight intensity={0.4} color={0x3a3f55} />
-      <directionalLight position={[5, 8, 4]} intensity={1.4} color={0xffe899} />
+      <fog attach="fog" args={[0x080b16, 14, 40]} />
+      <ambientLight intensity={0.75} color={0x4c5272} />
+      <hemisphereLight args={[0xa9b4ff, 0x2a2030, 0.55]} />
+      <directionalLight position={[5, 8, 4]} intensity={2.0} color={0xfff0c8} />
+      <directionalLight position={[-4, 6, -2]} intensity={0.8} color={0xb0c4ff} />
       <pointLight
         position={[-3, 2.6, -3]}
-        intensity={2.0}
-        distance={18}
+        intensity={2.6}
+        distance={22}
         decay={1.6}
         color={palette.primary}
       />
-      <pointLight position={[3, 1.5, 3]} intensity={0.6} distance={16} decay={1.8} color={0x4466aa} />
+      <pointLight position={[3, 1.5, 3]} intensity={0.9} distance={16} decay={1.8} color={0x6688cc} />
+      <pointLight position={[0, 5, 0]} intensity={0.6} distance={12} decay={1.6} color={0xffffff} />
 
       <Platform palette={palette} />
       <Avatar framework={framework} palette={palette} snapTrigger={snapTrigger} />

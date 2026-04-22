@@ -378,10 +378,17 @@ export function AgentRoomClient({ id }: Props) {
         onToggle={handleIntegrationToggle}
       />
       <Link
-        href={`/agent/${id}`}
-        className="pointer-events-auto absolute top-5 left-1/2 z-10 -translate-x-1/2 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[10px] uppercase tracking-[2px] text-gray-400 backdrop-blur hover:border-white/30 hover:text-gray-200"
+        href={`/dashboard/agent/${id}`}
+        className="pointer-events-auto absolute top-5 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[2px] backdrop-blur-xl transition-all hover:scale-105"
+        style={{
+          background: 'rgba(12, 14, 22, 0.82)',
+          borderColor: 'var(--room-primary)',
+          color: 'var(--room-bright)',
+          boxShadow: '0 0 24px color-mix(in srgb, var(--room-primary) 25%, transparent)',
+        }}
       >
-        ← Exit Room
+        <span aria-hidden>←</span>
+        <span>Back to Dashboard</span>
       </Link>
     </div>
   );

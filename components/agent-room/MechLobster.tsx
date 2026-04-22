@@ -21,14 +21,14 @@ export function MechLobster({ palette, snapTrigger = 0 }: Props) {
   const materials = useMemo(
     () => ({
       shell: new THREE.MeshStandardMaterial({
-        color: 0x404452,
-        metalness: 0.82,
+        color: 0x6a6f86,
+        metalness: 0.78,
         roughness: 0.32,
-        emissive: 0x0a0a10,
-        emissiveIntensity: 0.15,
+        emissive: 0x1a1520,
+        emissiveIntensity: 0.22,
       }),
-      shellDeep: new THREE.MeshStandardMaterial({ color: 0x2a2d38, metalness: 0.88, roughness: 0.42 }),
-      steel: new THREE.MeshStandardMaterial({ color: 0x3d4150, metalness: 0.92, roughness: 0.28 }),
+      shellDeep: new THREE.MeshStandardMaterial({ color: 0x3e4254, metalness: 0.85, roughness: 0.42 }),
+      steel: new THREE.MeshStandardMaterial({ color: 0x54586a, metalness: 0.9, roughness: 0.28 }),
       joint: new THREE.MeshStandardMaterial({ color: 0x12141a, metalness: 0.95, roughness: 0.18 }),
       copper: new THREE.MeshStandardMaterial({ color: 0x8b5a2b, metalness: 0.85, roughness: 0.36 }),
       glow: new THREE.MeshBasicMaterial({ color: palette.bright }),
