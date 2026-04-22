@@ -13,6 +13,7 @@ interface Props {
   state: RadialMenuState | null;
   onClose: () => void;
   onOpen: (agent: CityAgent) => void;
+  onRoom?: (agent: CityAgent) => void;
   onFocus: (agent: CityAgent) => void;
   onShare: (agent: CityAgent) => void;
   onPin: (agent: CityAgent) => void;
@@ -31,6 +32,7 @@ export function CityRadialMenu({
   state,
   onClose,
   onOpen,
+  onRoom,
   onFocus,
   onShare,
   onPin,
@@ -46,8 +48,12 @@ export function CityRadialMenu({
 
   if (!state) return null;
 
+  const ROOM_FRAMEWORKS = new Set(['openclaw', 'hermes', 'elizaos', 'milady']);
   const actions: Action[] = [
     { label: 'Open', icon: '↗', run: () => onOpen(state.agent) },
+    ...(onRoom && ROOM_FRAMEWORKS.has(state.agent.framework)
+      ? [{ label: 'Room', icon: '⌂', run: () => onRoom(state.agent) }]
+      : []),
     { label: 'Focus', icon: '◎', run: () => onFocus(state.agent) },
     { label: 'Share', icon: '⤴', run: () => onShare(state.agent) },
     { label: isPinned ? 'Unpin' : 'Pin', icon: '★', run: () => onPin(state.agent) },

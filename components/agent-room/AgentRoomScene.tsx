@@ -63,7 +63,7 @@ export function AgentRoomScene({
   return (
     <Canvas
       camera={{ position: [3.2, 2.2, cameraZ], fov: 42, near: 0.1, far: 200 }}
-      gl={{ antialias: true, powerPreference: 'high-performance' }}
+      gl={{ antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: true }}
       dpr={[1, 2]}
       style={{
         width: '100%',

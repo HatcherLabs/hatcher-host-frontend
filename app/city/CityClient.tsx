@@ -252,6 +252,7 @@ export function CityClient({ initial }: Props) {
         state={radial}
         onClose={() => setRadial(null)}
         onOpen={(a) => router.push(`/agent/${a.id}`)}
+        onRoom={(a) => router.push(`/agent/${a.id}/room`)}
         onFocus={(a) => flyToAgent(a.id)}
         onShare={(a) => {
           const url = `${window.location.origin}/city?agent=${a.id}`;

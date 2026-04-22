@@ -13,6 +13,7 @@ import { IntegrationModal } from '@/components/agent-room/hud/IntegrationModal';
 import { MoodMeter } from '@/components/agent-room/hud/MoodMeter';
 import { AchievementToast } from '@/components/agent-room/hud/AchievementToast';
 import { StatusBanner } from '@/components/agent-room/hud/StatusBanner';
+import { ShareButton } from '@/components/agent-room/hud/ShareButton';
 import { paletteFor } from '@/components/agent-room/colors';
 import type {
   RoomAgent,
@@ -251,6 +252,15 @@ export function AgentRoomClient({ id }: Props) {
     };
   }, [id, agent]);
 
+  // Regex that flags a tool call in the streaming LLM output. Covers
+  // Anthropic-style ("tool_use"), OpenAI-style ("function":"), plus a
+  // handful of plaintext indicators that common openclaw/hermes flows
+  // emit in their reasoning (e.g. [TOOL] browser.fetch(...)). Matching
+  // anywhere in the rolling buffer is enough — we only care about the
+  // *first* hit per turn, which is cleared on chat_done.
+  const TOOL_CALL_RE = /\b(tool_use|tool_call|function"\s*:|\[TOOL\]|<tool>|browser\.\w+\(|web_search\(|files\.\w+\(|webhook\.\w+\()/i;
+  const toolCallFiredThisTurnRef = useRef(false);
+
   const { send, isConnected } = useWebSocketChat({
     agentId: id,
     enabled: !!agent && ['openclaw', 'hermes', 'elizaos', 'milady'].includes(agent.framework),
@@ -258,15 +268,21 @@ export function AgentRoomClient({ id }: Props) {
       bubbleStreamRef.current += tok;
       setBubbleText(bubbleStreamRef.current);
       setBubbleTyping(true);
+      if (!toolCallFiredThisTurnRef.current && TOOL_CALL_RE.test(bubbleStreamRef.current)) {
+        toolCallFiredThisTurnRef.current = true;
+        setSnapTrigger((n) => n + 1);
+      }
     },
     onDone: (content) => {
       setBubbleText(content || bubbleStreamRef.current);
       bubbleStreamRef.current = '';
       setBubbleTyping(false);
+      toolCallFiredThisTurnRef.current = false;
     },
     onError: (err) => {
       setBubbleText(`Error: ${err}`);
       setBubbleTyping(false);
+      toolCallFiredThisTurnRef.current = false;
     },
   });
 
@@ -396,6 +412,7 @@ export function AgentRoomClient({ id }: Props) {
       />
       <StatsHud agent={agent} level={level} uptimeLabel={uptime} />
       <StatusBanner status={agent.status} />
+      <ShareButton agentName={agent.name} framework={agent.framework} />
       <LogsHud logs={logs} />
       <SkillsColumn skills={skills} onSkillClick={handleSkillClick} />
       <ChatBubble text={bubbleText} typing={bubbleTyping} />
