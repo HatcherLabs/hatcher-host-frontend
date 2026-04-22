@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import { AgentRoomScene } from '@/components/agent-room/AgentRoomScene';
+import { LiveViewers } from '@/components/agent-room/hud/LiveViewers';
 import { paletteFor } from '@/components/agent-room/colors';
 import type { RoomAgent, RoomIntegration } from '@/components/agent-room/types';
 import { API_URL } from '@/lib/config';
@@ -134,6 +135,7 @@ export function EmbedRoomClient({ id }: Props) {
         </div>
       </div>
       {/* Open-in-Hatcher CTA */}
+      <LiveViewers agentId={agent.id} />
       <a
         href={`https://hatcher.host/agent/${agent.id}/room`}
         target="_blank"

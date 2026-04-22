@@ -23,9 +23,10 @@ interface PublicAgent {
 interface Props {
   currentAgentId: string;
   framework: string;
+  onOpen?: () => void;
 }
 
-export function Leaderboard({ currentAgentId, framework }: Props) {
+export function Leaderboard({ currentAgentId, framework, onOpen }: Props) {
   const [open, setOpen] = useState(false);
   const [agents, setAgents] = useState<PublicAgent[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -69,7 +70,7 @@ export function Leaderboard({ currentAgentId, framework }: Props) {
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => { setOpen(true); onOpen?.(); }}
         className="pointer-events-auto absolute top-3 right-[120px] z-20 flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[1.5px] backdrop-blur-xl transition-all hover:scale-105 md:top-5 md:right-[430px] md:gap-2 md:px-3.5 md:py-2 md:text-[11px] md:tracking-[2px]"
         style={{
           background: 'rgba(12, 14, 22, 0.82)',

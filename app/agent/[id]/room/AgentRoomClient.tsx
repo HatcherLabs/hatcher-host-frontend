@@ -17,6 +17,9 @@ import { ShareButton } from '@/components/agent-room/hud/ShareButton';
 import { EmbedButton } from '@/components/agent-room/hud/EmbedButton';
 import { VoiceButton } from '@/components/agent-room/hud/VoiceButton';
 import { Leaderboard } from '@/components/agent-room/hud/Leaderboard';
+import { MemoryPanel } from '@/components/agent-room/hud/MemoryPanel';
+import { DailyQuestsButton, useDailyQuests } from '@/components/agent-room/hud/DailyQuests';
+import { LiveViewers } from '@/components/agent-room/hud/LiveViewers';
 import { useVoice } from '@/hooks/useVoice';
 import { paletteFor } from '@/components/agent-room/colors';
 import type {
@@ -325,6 +328,16 @@ export function AgentRoomClient({ id }: Props) {
     },
   });
 
+  const voice = useVoice();
+  const quests = useDailyQuests(id);
+  // Visit-the-room quest — fires once per mount. Safe to bump on render
+  // because bump() ignores unknown quest keys and also no-ops when the
+  // target is already reached.
+  useEffect(() => {
+    if (agent && !viewerMode) quests.bump('visit');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [agent?.id, viewerMode]);
+
   const handleSend = useCallback(
     (text: string) => {
       bubbleStreamRef.current = '';
@@ -332,11 +345,15 @@ export function AgentRoomClient({ id }: Props) {
       setBubbleTyping(true);
       const ok = send(text);
       if (!ok) setBubbleText("Can't reach agent right now — reconnecting...");
+      // One chat send bumps every chat-count-target quest key at once —
+      // DailyQuests ignores keys not in today's active list, so this is a
+      // cheap way to cover chat5 / chat10 / chat20 without branching here.
+      quests.bump('chat5');
+      quests.bump('chat10');
+      quests.bump('chat20');
     },
-    [send],
+    [send, quests],
   );
-
-  const voice = useVoice();
   // Auto-speak streamed replies when the user has voice-replies on.
   // Speak on chat_done so the TTS gets the full sentence with proper
   // prosody (speaking each streamed token individually sounds robotic).
@@ -467,7 +484,22 @@ export function AgentRoomClient({ id }: Props) {
       {!viewerMode && <StatusBanner status={agent.status} />}
       <ShareButton agentName={agent.name} framework={agent.framework} />
       {agent.isPublic && <EmbedButton agentId={agent.id} />}
-      <Leaderboard currentAgentId={agent.id} framework={agent.framework} />
+      <Leaderboard
+        currentAgentId={agent.id}
+        framework={agent.framework}
+        onOpen={() => quests.bump('leaderboard')}
+      />
+      {!viewerMode && (
+        <MemoryPanel
+          config={rawConfigRef.current}
+          framework={agent.framework}
+          onOpen={() => quests.bump('memory')}
+        />
+      )}
+      {!viewerMode && (
+        <DailyQuestsButton agentId={agent.id} state={quests.state} onClaim={quests.claim} />
+      )}
+      {agent.isPublic && <LiveViewers agentId={agent.id} />}
       {!viewerMode && <LogsHud logs={logs} />}
       <SkillsColumn skills={skills} onSkillClick={viewerMode ? undefined : handleSkillClick} />
       <ChatBubble text={bubbleText} typing={bubbleTyping} />
