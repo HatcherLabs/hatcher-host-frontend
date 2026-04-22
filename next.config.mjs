@@ -54,7 +54,11 @@ const nextConfig = {
         ],
       },
       {
-        source: '/(.*)',
+        // Strict default for every path EXCEPT /embed/* — the `missing` key
+        // tells Next to skip this block when the URL starts with /embed/.
+        // Without it, /(.*) would also match /embed/* and (per Next's
+        // headers() merge rules) override the relaxed frame-ancestors.
+        source: '/((?!embed).*)',
         headers: [
           {
             key: 'Content-Security-Policy',
