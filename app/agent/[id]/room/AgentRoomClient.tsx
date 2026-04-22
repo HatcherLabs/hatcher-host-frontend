@@ -12,6 +12,7 @@ import { ChatInput } from '@/components/agent-room/hud/ChatInput';
 import { IntegrationModal } from '@/components/agent-room/hud/IntegrationModal';
 import { MoodMeter } from '@/components/agent-room/hud/MoodMeter';
 import { AchievementToast } from '@/components/agent-room/hud/AchievementToast';
+import { StatusBanner } from '@/components/agent-room/hud/StatusBanner';
 import { paletteFor } from '@/components/agent-room/colors';
 import type {
   RoomAgent,
@@ -81,15 +82,34 @@ function toRoomAgent(a: Agent): RoomAgent {
 
 function extractIntegrations(config: Record<string, unknown> | undefined): RoomIntegration[] {
   const enabled = new Set<string>();
-  const platforms = (config?.platforms ?? config?.integrations) as
-    | Record<string, unknown>
-    | undefined;
-  if (platforms) {
-    for (const k of Object.keys(platforms)) {
-      const v = platforms[k];
-      if (v && typeof v === 'object' && (v as { enabled?: boolean }).enabled) {
+  if (config) {
+    // Shape 1: platforms / integrations is an ARRAY of channel keys
+    for (const field of ['platforms', 'integrations'] as const) {
+      const v = config[field];
+      if (Array.isArray(v)) {
+        for (const item of v) {
+          if (typeof item === 'string') enabled.add(item.toLowerCase());
+        }
+      } else if (v && typeof v === 'object') {
+        // Shape 2: object keyed by channel name with {enabled} flag
+        for (const [k, cv] of Object.entries(v as Record<string, unknown>)) {
+          if (cv && typeof cv === 'object' && (cv as { enabled?: boolean }).enabled) {
+            enabled.add(k.toLowerCase());
+          }
+        }
+      }
+    }
+    // Shape 3: fallback — channelSettings[key] existing implies the channel is wired up
+    const channelSettings = config.channelSettings;
+    if (channelSettings && typeof channelSettings === 'object') {
+      for (const k of Object.keys(channelSettings as Record<string, unknown>)) {
         enabled.add(k.toLowerCase());
       }
+    }
+    // Shape 4: presence of <KEY>_BOT_TOKEN (e.g. TELEGRAM_BOT_TOKEN) implies configured
+    for (const k of Object.keys(config)) {
+      const m = k.match(/^([A-Z]+)_BOT_TOKEN$/);
+      if (m && config[k]) enabled.add(m[1]!.toLowerCase());
     }
   }
   return INTEGRATION_META.map((m) => ({
@@ -166,10 +186,14 @@ export function AgentRoomClient({ id }: Props) {
     [agent?.framework],
   );
 
-  // initial fetch
+  // Initial fetch + status poller.
+  // Re-poll every 5s while status is not active (starting / paused / error) so the
+  // UI flips to live state automatically without a manual refresh.
   useEffect(() => {
     let alive = true;
-    (async () => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    async function fetchAgentOnce() {
       const res = await api.getAgent(id);
       if (!alive) return;
       if (!res.success) {
@@ -182,13 +206,26 @@ export function AgentRoomClient({ id }: Props) {
       setAgent(mapped);
       setIntegrations(extractIntegrations(res.data.config));
       setSkills(extractSkills(res.data.config));
-      setBubbleText(`${mapped.name} standing by.`);
       setLoading(false);
-    })();
+      // Keep polling while not active — typical start takes 2-4 min.
+      const isActive = ['active', 'running'].includes(mapped.status);
+      if (!isActive && alive) {
+        timer = setTimeout(fetchAgentOnce, 5000);
+      }
+    }
+
+    fetchAgentOnce();
+
     return () => {
       alive = false;
+      if (timer) clearTimeout(timer);
     };
   }, [id]);
+
+  // First-render bubble text once we have the agent name
+  useEffect(() => {
+    if (agent && !bubbleText) setBubbleText(`${agent.name} standing by.`);
+  }, [agent, bubbleText]);
 
   // log poller
   useEffect(() => {
@@ -358,6 +395,7 @@ export function AgentRoomClient({ id }: Props) {
         onIntegrationClick={handleIntegrationClick}
       />
       <StatsHud agent={agent} level={level} uptimeLabel={uptime} />
+      <StatusBanner status={agent.status} />
       <LogsHud logs={logs} />
       <SkillsColumn skills={skills} onSkillClick={handleSkillClick} />
       <ChatBubble text={bubbleText} typing={bubbleTyping} />
