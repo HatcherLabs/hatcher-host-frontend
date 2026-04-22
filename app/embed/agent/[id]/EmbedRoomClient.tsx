@@ -114,6 +114,7 @@ export function EmbedRoomClient({ id }: Props) {
         integrations={integrations}
         snapTrigger={0}
         framework={agent.framework}
+        avatarStyle="expressive"
       />
       {/* Minimal tag chip — name + framework badge */}
       <div

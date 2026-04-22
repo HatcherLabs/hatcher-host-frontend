@@ -203,8 +203,10 @@ function classifyLine(msg: string, backendLevel?: string): RoomLogLine['level'] 
 export function AgentRoomClient({ id }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  // Default: modern glTF avatar. Opt-out via ?avatar=procedural for the
+  // original procedural silhouettes (kept as a fallback / nostalgia mode).
   const avatarStyle: 'procedural' | 'expressive' =
-    searchParams?.get('avatar') === 'expressive' ? 'expressive' : 'procedural';
+    searchParams?.get('avatar') === 'procedural' ? 'procedural' : 'expressive';
   const [agent, setAgent] = useState<RoomAgent | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
