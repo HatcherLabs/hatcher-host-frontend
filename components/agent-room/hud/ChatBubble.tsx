@@ -7,7 +7,7 @@ interface Props {
 
 export function ChatBubble({ text, typing }: Props) {
   return (
-    <div className="pointer-events-none absolute left-1/2 top-[18%] z-10 max-w-[460px] -translate-x-1/2 text-center">
+    <div className="pointer-events-none absolute left-1/2 top-[22%] z-10 max-w-[min(460px,calc(100vw-32px))] -translate-x-1/2 px-3 text-center md:top-[18%] md:px-0">
       <div
         className="relative rounded-2xl rounded-bl-sm border px-5 py-3.5 text-sm leading-relaxed text-gray-100 backdrop-blur-xl"
         style={{

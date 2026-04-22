@@ -60,7 +60,7 @@ export function ShareButton({ agentName, framework }: Props) {
     <button
       onClick={handle}
       disabled={busy}
-      className="pointer-events-auto absolute top-5 right-[315px] z-20 flex items-center gap-2 rounded-full border px-3.5 py-2 text-[11px] font-semibold uppercase tracking-[2px] backdrop-blur-xl transition-all hover:scale-105 disabled:opacity-50"
+      className="pointer-events-auto absolute top-3 right-3 z-20 flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[1.5px] backdrop-blur-xl transition-all hover:scale-105 disabled:opacity-50 md:top-5 md:right-[315px] md:gap-2 md:px-3.5 md:py-2 md:text-[11px] md:tracking-[2px]"
       style={{
         background: 'rgba(12, 14, 22, 0.82)',
         borderColor: 'var(--room-primary)',

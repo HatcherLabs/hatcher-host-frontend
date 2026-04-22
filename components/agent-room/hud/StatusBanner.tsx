@@ -64,7 +64,7 @@ export function StatusBanner({ status }: Props) {
 
   return (
     <div
-      className="pointer-events-auto absolute top-24 left-1/2 z-30 flex w-[min(520px,92vw)] -translate-x-1/2 items-center gap-3 rounded-xl border px-4 py-3 backdrop-blur-xl"
+      className="pointer-events-auto absolute top-[74px] left-1/2 z-30 flex w-[min(520px,calc(100vw-16px))] -translate-x-1/2 items-center gap-3 rounded-xl border px-3 py-2.5 backdrop-blur-xl md:top-24 md:px-4 md:py-3"
       style={{
         background: 'rgba(12, 14, 22, 0.85)',
         borderColor: color,

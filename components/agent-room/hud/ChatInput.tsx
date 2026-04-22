@@ -18,7 +18,7 @@ export function ChatInput({ onSend, disabled }: Props) {
 
   return (
     <div
-      className="pointer-events-auto absolute bottom-5 left-1/2 z-10 flex w-[min(640px,90vw)] -translate-x-1/2 items-center gap-2.5 rounded-2xl border px-3.5 py-2.5 backdrop-blur-xl"
+      className="pointer-events-auto absolute bottom-3 left-1/2 z-10 flex w-[min(640px,calc(100vw-16px))] -translate-x-1/2 items-center gap-2 rounded-2xl border px-3 py-2 backdrop-blur-xl md:bottom-5 md:gap-2.5 md:px-3.5 md:py-2.5"
       style={{
         background: 'rgba(12, 14, 22, 0.72)',
         borderColor: 'var(--room-border)',
@@ -42,7 +42,7 @@ export function ChatInput({ onSend, disabled }: Props) {
       <button
         onClick={handle}
         disabled={disabled}
-        className="rounded-lg px-5 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-opacity disabled:opacity-50"
+        className="shrink-0 rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-wider transition-opacity disabled:opacity-50 md:px-5 md:py-2.5 md:text-[11px]"
         style={{ background: 'var(--room-primary)', color: '#1a1400' }}
       >
         SEND

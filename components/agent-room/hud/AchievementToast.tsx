@@ -104,7 +104,7 @@ export function AchievementToast({ agentId, messageCount, framework }: Props) {
 
   return (
     <div
-      className="pointer-events-auto absolute top-[200px] right-5 z-20 w-[300px] rounded-2xl border px-4 py-3 pl-14 backdrop-blur-xl"
+      className="pointer-events-auto absolute top-[140px] right-3 z-20 w-[min(300px,calc(100vw-24px))] rounded-2xl border px-3 py-2.5 pl-12 backdrop-blur-xl md:top-[200px] md:right-5 md:px-4 md:py-3 md:pl-14"
       style={{
         background:
           'linear-gradient(135deg, color-mix(in srgb, var(--room-primary) 14%, transparent), color-mix(in srgb, var(--room-primary) 4%, transparent))',

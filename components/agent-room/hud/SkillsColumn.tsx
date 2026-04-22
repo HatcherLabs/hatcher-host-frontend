@@ -8,7 +8,7 @@ interface Props {
 
 export function SkillsColumn({ skills, onSkillClick }: Props) {
   return (
-    <div className="pointer-events-auto absolute top-1/2 left-5 z-10 flex -translate-y-1/2 flex-col gap-2">
+    <div className="pointer-events-auto absolute top-1/2 left-5 z-10 hidden -translate-y-1/2 flex-col gap-2 md:flex">
       {skills.map((s) => (
         <button
           key={s.key}

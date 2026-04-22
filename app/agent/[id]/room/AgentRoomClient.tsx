@@ -15,6 +15,7 @@ import { AchievementToast } from '@/components/agent-room/hud/AchievementToast';
 import { StatusBanner } from '@/components/agent-room/hud/StatusBanner';
 import { ShareButton } from '@/components/agent-room/hud/ShareButton';
 import { VoiceButton } from '@/components/agent-room/hud/VoiceButton';
+import { Leaderboard } from '@/components/agent-room/hud/Leaderboard';
 import { useVoice } from '@/hooks/useVoice';
 import { paletteFor } from '@/components/agent-room/colors';
 import type {
@@ -464,6 +465,7 @@ export function AgentRoomClient({ id }: Props) {
       <StatsHud agent={agent} level={level} uptimeLabel={uptime} />
       {!viewerMode && <StatusBanner status={agent.status} />}
       <ShareButton agentName={agent.name} framework={agent.framework} />
+      <Leaderboard currentAgentId={agent.id} framework={agent.framework} />
       {!viewerMode && <LogsHud logs={logs} />}
       <SkillsColumn skills={skills} onSkillClick={viewerMode ? undefined : handleSkillClick} />
       <ChatBubble text={bubbleText} typing={bubbleTyping} />
@@ -519,7 +521,7 @@ export function AgentRoomClient({ id }: Props) {
       )}
       <Link
         href={viewerMode ? '/city' : `/dashboard/agent/${id}`}
-        className="pointer-events-auto absolute top-5 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[2px] backdrop-blur-xl transition-all hover:scale-105"
+        className="pointer-events-auto absolute top-3 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[1.5px] backdrop-blur-xl transition-all hover:scale-105 md:top-5 md:gap-2 md:px-4 md:py-2 md:text-xs md:tracking-[2px]"
         style={{
           background: 'rgba(12, 14, 22, 0.82)',
           borderColor: 'var(--room-primary)',
@@ -528,7 +530,8 @@ export function AgentRoomClient({ id }: Props) {
         }}
       >
         <span aria-hidden>←</span>
-        <span>{viewerMode ? 'Back to City' : 'Back to Dashboard'}</span>
+        <span className="hidden md:inline">{viewerMode ? 'Back to City' : 'Back to Dashboard'}</span>
+        <span className="md:hidden">{viewerMode ? 'City' : 'Dashboard'}</span>
       </Link>
     </div>
   );

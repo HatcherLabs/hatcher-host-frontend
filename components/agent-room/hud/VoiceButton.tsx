@@ -23,7 +23,7 @@ export function VoiceButton({
   onToggleAutoSpeak,
 }: Props) {
   return (
-    <div className="pointer-events-auto absolute bottom-5 left-5 z-10 flex items-center gap-2">
+    <div className="pointer-events-auto absolute bottom-[92px] left-3 z-10 flex items-center gap-2 md:bottom-5 md:left-5">
       {sttSupported && (
         <button
           onClick={onToggleListen}

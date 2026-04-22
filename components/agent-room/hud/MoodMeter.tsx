@@ -24,7 +24,7 @@ export function MoodMeter({ logs }: Props) {
   const pct = Math.round(score * 100);
   return (
     <div
-      className="pointer-events-auto absolute bottom-[130px] left-1/2 z-10 flex w-[min(500px,80vw)] -translate-x-1/2 items-center gap-3 rounded-full border px-3.5 py-1.5 backdrop-blur-xl"
+      className="pointer-events-auto absolute bottom-[130px] left-1/2 z-10 hidden w-[min(500px,calc(100vw-24px))] -translate-x-1/2 items-center gap-3 rounded-full border px-3.5 py-1.5 backdrop-blur-xl md:flex"
       style={{
         background: 'rgba(12, 14, 22, 0.72)',
         borderColor: 'var(--room-border)',

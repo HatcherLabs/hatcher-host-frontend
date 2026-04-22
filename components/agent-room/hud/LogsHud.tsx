@@ -8,7 +8,7 @@ interface Props {
 export function LogsHud({ logs }: Props) {
   return (
     <div
-      className="pointer-events-auto absolute top-5 right-5 z-10 w-[280px] rounded-2xl border px-3.5 py-3 backdrop-blur-xl"
+      className="pointer-events-auto absolute top-3 right-3 z-10 hidden w-[280px] rounded-2xl border px-3.5 py-3 backdrop-blur-xl md:top-5 md:right-5 md:block"
       style={{
         background: 'rgba(12, 14, 22, 0.72)',
         borderColor: 'var(--room-border)',
