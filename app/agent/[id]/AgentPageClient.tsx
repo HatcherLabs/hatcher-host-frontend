@@ -1,8 +1,52 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+
+/**
+ * Back button that picks its destination based on where the user came
+ * from: referrer-based when the landing was from /city or /dashboard,
+ * else falls back to "My Agents" (owner) / "City" (everyone else).
+ */
+function BackLink({ isOwner }: { isOwner: boolean }) {
+  const target = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return isOwner
+        ? { href: '/dashboard/agents', label: 'Back to My Agents' }
+        : { href: '/city', label: 'Back to City' };
+    }
+    const ref = document.referrer;
+    if (ref) {
+      try {
+        const u = new URL(ref);
+        if (u.origin === window.location.origin) {
+          if (u.pathname === '/city' || u.pathname.startsWith('/city/')) {
+            return { href: '/city', label: 'Back to City' };
+          }
+          if (u.pathname === '/dashboard/agents') {
+            return { href: '/dashboard/agents', label: 'Back to My Agents' };
+          }
+          if (u.pathname === '/dashboard') {
+            return { href: '/dashboard', label: 'Back to Dashboard' };
+          }
+        }
+      } catch { /* ignore */ }
+    }
+    return isOwner
+      ? { href: '/dashboard/agents', label: 'Back to My Agents' }
+      : { href: '/city', label: 'Back to City' };
+  }, [isOwner]);
+  return (
+    <Link
+      href={target.href}
+      className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--color-accent)] transition-colors duration-200"
+    >
+      <ArrowLeft className="w-4 h-4" />
+      {target.label}
+    </Link>
+  );
+}
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
@@ -180,15 +224,9 @@ export function AgentPageClient() {
       initial="hidden"
       animate="visible"
     >
-      {/* Back navigation */}
+      {/* Back navigation — destination depends on how the user arrived */}
       <motion.div variants={itemVariants} className="mb-6">
-        <Link
-          href="/dashboard/agents"
-          className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--color-accent)] transition-colors duration-200"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to My Agents
-        </Link>
+        <BackLink isOwner={isOwner} />
       </motion.div>
 
       {/* Agent Profile Card */}
