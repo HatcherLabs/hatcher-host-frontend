@@ -102,6 +102,22 @@ function PrimitiveInstance({
   const ref = useRef<THREE.InstancedMesh>(null);
   const count = layouts.length;
 
+  // Apply a subtle framework-colored emissive to the cloned material
+  // so Bloom picks up the cyber tint without drowning the structural
+  // detail. Only runs once per material; per-instance colour multiplier
+  // still comes from instanceColor below.
+  useMemo(() => {
+    const std = material as THREE.MeshStandardMaterial & {
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
+    };
+    if ('emissive' in std && std.emissive instanceof THREE.Color) {
+      std.emissive.set(0x223355);
+      std.emissiveIntensity = 0.25;
+      std.needsUpdate = true;
+    }
+  }, [material]);
+
   useEffect(() => {
     if (!ref.current) return;
     const obj = new THREE.Object3D();
