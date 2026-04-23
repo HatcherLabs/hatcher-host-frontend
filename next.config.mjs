@@ -87,6 +87,25 @@ const nextConfig = {
             key: 'Strict-Transport-Security',
             value: 'max-age=63072000; includeSubDomains; preload',
           },
+          // Cross-origin isolation trio (recon I-004, 2026-04-23). Using
+          // the "-allow-popups" variant of COOP so Solana wallet adapters
+          // can still open wallet popups. CORP=same-origin blocks other
+          // sites from embedding our resources as subresources. COEP is
+          // intentionally omitted because Three.js/drei load textures
+          // from CDNs (e.g. threejs.org) that don't send CORP, and
+          // enabling COEP would break those fetches.
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin-allow-popups',
+          },
+          {
+            key: 'Cross-Origin-Resource-Policy',
+            value: 'same-origin',
+          },
+          {
+            key: 'X-Permitted-Cross-Domain-Policies',
+            value: 'none',
+          },
         ],
       },
     ];
