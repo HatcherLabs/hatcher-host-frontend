@@ -71,7 +71,8 @@
       "docs": "Docs"
     },
     "copyright": "© {year} HatcherLabs. Toate drepturile rezervate.",
-    "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România"
+    "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România",
+    "legalNotice": "Paginile legale (Confidențialitate, Termeni, Impressum, Cookies) sunt disponibile doar în limba engleză."
   },
   "landing": {
     "affiliateBanner": {
@@ -1520,12 +1521,30 @@
     "deployFirstAgent": "Deployează primul tău agent",
     "viewPricing": "Vezi prețurile",
     "decisions": [
-      { "condition": "Vreau numărul maxim de unelte și automatizare", "pick": "OpenClaw" },
-      { "condition": "Vreau un agent care învață în timp", "pick": "Hermes" },
-      { "condition": "Vreau un bot pentru social media sau comunitate", "pick": "ElizaOS" },
-      { "condition": "Abia am început și vreau ceva simplu", "pick": "Milady" },
-      { "condition": "Am nevoie de mesagerie multi-canal (Telegram + Discord + WhatsApp)", "pick": "OpenClaw sau Hermes" },
-      { "condition": "Vreau un bot cu personalitate de personaj", "pick": "ElizaOS sau Milady" }
+      {
+        "condition": "Vreau numărul maxim de unelte și automatizare",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "Vreau un agent care învață în timp",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "Vreau un bot pentru social media sau comunitate",
+        "pick": "ElizaOS"
+      },
+      {
+        "condition": "Abia am început și vreau ceva simplu",
+        "pick": "Milady"
+      },
+      {
+        "condition": "Am nevoie de mesagerie multi-canal (Telegram + Discord + WhatsApp)",
+        "pick": "OpenClaw sau Hermes"
+      },
+      {
+        "condition": "Vreau un bot cu personalitate de personaj",
+        "pick": "ElizaOS sau Milady"
+      }
     ]
   },
   "token": {
@@ -1834,60 +1853,159 @@
     "contactSupport": "Contactează suportul",
     "helpCenter": "Centru de ajutor",
     "quickLinks": [
-      { "title": "Primii pași", "description": "Configurează primul tău agent AI în mai puțin de 60 de secunde. Ghid de start rapid, cerințe preliminare și primul deploy." },
-      { "title": "Configurarea agentului", "description": "Configurează personalitate, modele, memorie, cron jobs, webhook-uri și rutare multi-agent." },
-      { "title": "Integrări de platforme", "description": "Conectează-te la Telegram, Discord, WhatsApp, Slack și 20+ platforme de mesagerie." },
-      { "title": "Configurare BYOK", "description": "Aduce-ți propriile chei API pentru OpenAI, Anthropic, Google, xAI și altele. Mereu gratuit." },
-      { "title": "Facturare & Prețuri", "description": "Înțelege plățile cu token, deblocarea funcțiilor, creditele găzduite și gestionarea abonamentelor." },
-      { "title": "Referință API", "description": "Endpoint-uri REST API pentru agenți, funcții, plăți și operații de administrare." }
+      {
+        "title": "Primii pași",
+        "description": "Configurează primul tău agent AI în mai puțin de 60 de secunde. Ghid de start rapid, cerințe preliminare și primul deploy."
+      },
+      {
+        "title": "Configurarea agentului",
+        "description": "Configurează personalitate, modele, memorie, cron jobs, webhook-uri și rutare multi-agent."
+      },
+      {
+        "title": "Integrări de platforme",
+        "description": "Conectează-te la Telegram, Discord, WhatsApp, Slack și 20+ platforme de mesagerie."
+      },
+      {
+        "title": "Configurare BYOK",
+        "description": "Aduce-ți propriile chei API pentru OpenAI, Anthropic, Google, xAI și altele. Mereu gratuit."
+      },
+      {
+        "title": "Facturare & Prețuri",
+        "description": "Înțelege plățile cu token, deblocarea funcțiilor, creditele găzduite și gestionarea abonamentelor."
+      },
+      {
+        "title": "Referință API",
+        "description": "Endpoint-uri REST API pentru agenți, funcții, plăți și operații de administrare."
+      }
     ],
     "topics": [
-      { "label": "Cum să deployezi primul tău agent" },
-      { "label": "Furnizori LLM suportați" },
-      { "label": "Configurarea framework-ului agentului" },
-      { "label": "Ciclul de viață al containerului & coduri de stare" },
-      { "label": "Configurarea integrării Telegram" },
-      { "label": "Înțelegerea plăților cu token" }
+      {
+        "label": "Cum să deployezi primul tău agent"
+      },
+      {
+        "label": "Furnizori LLM suportați"
+      },
+      {
+        "label": "Configurarea framework-ului agentului"
+      },
+      {
+        "label": "Ciclul de viață al containerului & coduri de stare"
+      },
+      {
+        "label": "Configurarea integrării Telegram"
+      },
+      {
+        "label": "Înțelegerea plăților cu token"
+      }
     ]
   },
   "shared": {
     "tiers": {
-      "free":            { "name": "Gratuit",          "description": "1 agent, 20 mesaje/zi, 50 MB stocare" },
-      "starter":         { "name": "Starter",           "description": "1 agent, 50 mesaje/zi, 150 MB stocare" },
-      "pro":             { "name": "Pro",               "description": "3 agenți, 100 mesaje/zi, 500 MB stocare" },
-      "business":        { "name": "Business",          "description": "10 agenți, 300 mesaje/zi, 1 GB stocare, mereu activ" },
-      "founding_member": { "name": "Founding Member",   "description": "10 agenți, 300 mesaje/zi, 2 GB stocare, acces pe viață" }
+      "free": {
+        "name": "Gratuit",
+        "description": "1 agent, 20 mesaje/zi, 50 MB stocare"
+      },
+      "starter": {
+        "name": "Starter",
+        "description": "1 agent, 50 mesaje/zi, 150 MB stocare"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "3 agenți, 100 mesaje/zi, 500 MB stocare"
+      },
+      "business": {
+        "name": "Business",
+        "description": "10 agenți, 300 mesaje/zi, 1 GB stocare, mereu activ"
+      },
+      "founding_member": {
+        "name": "Founding Member",
+        "description": "10 agenți, 300 mesaje/zi, 2 GB stocare, acces pe viață"
+      }
     },
     "addons": {
-      "agents_plus1":    { "name": "+1 Agent",          "description": "1 slot suplimentar de agent" },
-      "agents_plus3":    { "name": "+3 Agenți",         "description": "3 sloturi suplimentare de agent" },
-      "agents_plus5":    { "name": "+5 Agenți",         "description": "5 sloturi suplimentare de agent" },
-      "agents_plus10":   { "name": "+10 Agenți",        "description": "10 sloturi suplimentare de agent" },
-      "messages_plus20": { "name": "+20 msg/zi",        "description": "20 mesaje suplimentare pe zi" },
-      "messages_plus50": { "name": "+50 msg/zi",        "description": "50 mesaje suplimentare pe zi" },
-      "messages_plus100":{ "name": "+100 msg/zi",       "description": "100 mesaje suplimentare pe zi" },
-      "messages_plus200":{ "name": "+200 msg/zi",       "description": "200 mesaje suplimentare pe zi" },
-      "searches_plus25": { "name": "+25 căutări/zi",    "description": "25 căutări web suplimentare pe zi" },
-      "searches_plus50": { "name": "+50 căutări/zi",    "description": "50 căutări web suplimentare pe zi" },
-      "always_on":       { "name": "Always On",         "description": "Menține agentul activ 24/7" },
-      "file_manager":    { "name": "File Manager",      "description": "Navighează, editează și descarcă fișierele din spațiul de lucru" },
-      "full_logs":       { "name": "Full Logs",         "description": "Deblochează vizualizatorul complet de jurnale pentru acest agent" },
-      "plugins_plus10":  { "name": "+10 Plugins",       "description": "10 sloturi suplimentare de plugin+abilitate pentru acest agent" }
+      "agents_plus1": {
+        "name": "+1 Agent",
+        "description": "1 slot suplimentar de agent"
+      },
+      "agents_plus3": {
+        "name": "+3 Agenți",
+        "description": "3 sloturi suplimentare de agent"
+      },
+      "agents_plus5": {
+        "name": "+5 Agenți",
+        "description": "5 sloturi suplimentare de agent"
+      },
+      "agents_plus10": {
+        "name": "+10 Agenți",
+        "description": "10 sloturi suplimentare de agent"
+      },
+      "messages_plus20": {
+        "name": "+20 msg/zi",
+        "description": "20 mesaje suplimentare pe zi"
+      },
+      "messages_plus50": {
+        "name": "+50 msg/zi",
+        "description": "50 mesaje suplimentare pe zi"
+      },
+      "messages_plus100": {
+        "name": "+100 msg/zi",
+        "description": "100 mesaje suplimentare pe zi"
+      },
+      "messages_plus200": {
+        "name": "+200 msg/zi",
+        "description": "200 mesaje suplimentare pe zi"
+      },
+      "searches_plus25": {
+        "name": "+25 căutări/zi",
+        "description": "25 căutări web suplimentare pe zi"
+      },
+      "searches_plus50": {
+        "name": "+50 căutări/zi",
+        "description": "50 căutări web suplimentare pe zi"
+      },
+      "always_on": {
+        "name": "Always On",
+        "description": "Menține agentul activ 24/7"
+      },
+      "file_manager": {
+        "name": "File Manager",
+        "description": "Navighează, editează și descarcă fișierele din spațiul de lucru"
+      },
+      "full_logs": {
+        "name": "Full Logs",
+        "description": "Deblochează vizualizatorul complet de jurnale pentru acest agent"
+      },
+      "plugins_plus10": {
+        "name": "+10 Plugins",
+        "description": "10 sloturi suplimentare de plugin+abilitate pentru acest agent"
+      }
     },
     "frameworks": {
-      "openclaw": { "name": "OpenClaw",     "description": "Asistent AI self-hosted cu 3.200+ abilități comunitare, gateway de mesagerie multi-canal și execuție autonomă de sarcini." },
-      "hermes":   { "name": "Hermes Agent", "description": "Agent AI autonom de la Nous Research cu memorie persistentă, 40+ unelte, sistem de abilități și gateway de mesagerie multi-platformă." },
-      "elizaos":  { "name": "ElizaOS",      "description": "Framework open-source pentru agenți AI cu personalități bazate pe personaje, ecosistem de plugin-uri și suport multi-client pentru platforme sociale și de mesagerie." },
-      "milady":   { "name": "Milady",       "description": "Framework ușor pentru agenți AI axat pe personalitate, conceput pentru agenți conversaționali expresivi, culturalmente conștienți, cu capabilități modulare." }
+      "openclaw": {
+        "name": "OpenClaw",
+        "description": "Asistent AI self-hosted cu 3.200+ abilități comunitare, gateway de mesagerie multi-canal și execuție autonomă de sarcini."
+      },
+      "hermes": {
+        "name": "Hermes Agent",
+        "description": "Agent AI autonom de la Nous Research cu memorie persistentă, 40+ unelte, sistem de abilități și gateway de mesagerie multi-platformă."
+      },
+      "elizaos": {
+        "name": "ElizaOS",
+        "description": "Framework open-source pentru agenți AI cu personalități bazate pe personaje, ecosistem de plugin-uri și suport multi-client pentru platforme sociale și de mesagerie."
+      },
+      "milady": {
+        "name": "Milady",
+        "description": "Framework ușor pentru agenți AI axat pe personalitate, conceput pentru agenți conversaționali expresivi, culturalmente conștienți, cu capabilități modulare."
+      }
     },
     "agentStatus": {
-      "active":     "Activ",
-      "sleeping":   "Adormit",
-      "paused":     "Pauză",
-      "error":      "Eroare",
-      "killed":     "Oprit forțat",
+      "active": "Activ",
+      "sleeping": "Adormit",
+      "paused": "Pauză",
+      "error": "Eroare",
+      "killed": "Oprit forțat",
       "restarting": "Se repornește",
-      "stopping":   "Se oprește"
+      "stopping": "Se oprește"
     }
   },
   "localeSwitcher": {

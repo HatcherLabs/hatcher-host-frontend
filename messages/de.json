@@ -71,7 +71,8 @@
       "docs": "Docs"
     },
     "copyright": "© {year} HatcherLabs. Alle Rechte vorbehalten.",
-    "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România"
+    "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România",
+    "legalNotice": "Rechtliche Seiten (Datenschutz, Nutzungsbedingungen, Impressum, Cookies) sind nur in englischer Sprache verfügbar."
   },
   "landing": {
     "affiliateBanner": {
@@ -1520,12 +1521,30 @@
     "deployFirstAgent": "Ersten Agenten deployen",
     "viewPricing": "Preise anzeigen",
     "decisions": [
-      { "condition": "Ich möchte maximale Tools und Automatisierung", "pick": "OpenClaw" },
-      { "condition": "Ich möchte einen Agenten, der im Laufe der Zeit lernt", "pick": "Hermes" },
-      { "condition": "Ich möchte einen Social-Media- oder Community-Bot", "pick": "ElizaOS" },
-      { "condition": "Ich fange gerade erst an und möchte etwas Einfaches", "pick": "Milady" },
-      { "condition": "Ich benötige Multi-Channel-Messaging (Telegram + Discord + WhatsApp)", "pick": "OpenClaw oder Hermes" },
-      { "condition": "Ich möchte einen charaktergesteuerten Persona-Bot", "pick": "ElizaOS oder Milady" }
+      {
+        "condition": "Ich möchte maximale Tools und Automatisierung",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "Ich möchte einen Agenten, der im Laufe der Zeit lernt",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "Ich möchte einen Social-Media- oder Community-Bot",
+        "pick": "ElizaOS"
+      },
+      {
+        "condition": "Ich fange gerade erst an und möchte etwas Einfaches",
+        "pick": "Milady"
+      },
+      {
+        "condition": "Ich benötige Multi-Channel-Messaging (Telegram + Discord + WhatsApp)",
+        "pick": "OpenClaw oder Hermes"
+      },
+      {
+        "condition": "Ich möchte einen charaktergesteuerten Persona-Bot",
+        "pick": "ElizaOS oder Milady"
+      }
     ]
   },
   "token": {
@@ -1834,60 +1853,159 @@
     "contactSupport": "Support kontaktieren",
     "helpCenter": "Hilfecenter",
     "quickLinks": [
-      { "title": "Erste Schritte", "description": "Richten Sie Ihren ersten KI-Agenten in unter 60 Sekunden ein. Schnellstartanleitung, Voraussetzungen und erstes Deployment." },
-      { "title": "Agenten-Konfiguration", "description": "Persönlichkeit, Modelle, Gedächtnis, Cron-Jobs, Webhooks und Multi-Agent-Routing konfigurieren." },
-      { "title": "Plattform-Integrationen", "description": "Verbindung zu Telegram, Discord, WhatsApp, Slack und 20+ Messaging-Plattformen." },
-      { "title": "BYOK-Setup", "description": "Eigene API-Keys für OpenAI, Anthropic, Google, xAI und mehr mitbringen. Immer kostenlos." },
-      { "title": "Abrechnung & Preise", "description": "Token-Zahlungen, Funktionsfreischaltungen, gehostetes Guthaben und Abonnementverwaltung verstehen." },
-      { "title": "API-Referenz", "description": "REST-API-Endpunkte für Agenten, Funktionen, Zahlungen und Admin-Operationen." }
+      {
+        "title": "Erste Schritte",
+        "description": "Richten Sie Ihren ersten KI-Agenten in unter 60 Sekunden ein. Schnellstartanleitung, Voraussetzungen und erstes Deployment."
+      },
+      {
+        "title": "Agenten-Konfiguration",
+        "description": "Persönlichkeit, Modelle, Gedächtnis, Cron-Jobs, Webhooks und Multi-Agent-Routing konfigurieren."
+      },
+      {
+        "title": "Plattform-Integrationen",
+        "description": "Verbindung zu Telegram, Discord, WhatsApp, Slack und 20+ Messaging-Plattformen."
+      },
+      {
+        "title": "BYOK-Setup",
+        "description": "Eigene API-Keys für OpenAI, Anthropic, Google, xAI und mehr mitbringen. Immer kostenlos."
+      },
+      {
+        "title": "Abrechnung & Preise",
+        "description": "Token-Zahlungen, Funktionsfreischaltungen, gehostetes Guthaben und Abonnementverwaltung verstehen."
+      },
+      {
+        "title": "API-Referenz",
+        "description": "REST-API-Endpunkte für Agenten, Funktionen, Zahlungen und Admin-Operationen."
+      }
     ],
     "topics": [
-      { "label": "So deployen Sie Ihren ersten Agenten" },
-      { "label": "Unterstützte LLM-Anbieter" },
-      { "label": "Agenten-Framework-Konfiguration" },
-      { "label": "Container-Lebenszyklus & Statuscodes" },
-      { "label": "Telegram-Integration einrichten" },
-      { "label": "Token-Zahlungen verstehen" }
+      {
+        "label": "So deployen Sie Ihren ersten Agenten"
+      },
+      {
+        "label": "Unterstützte LLM-Anbieter"
+      },
+      {
+        "label": "Agenten-Framework-Konfiguration"
+      },
+      {
+        "label": "Container-Lebenszyklus & Statuscodes"
+      },
+      {
+        "label": "Telegram-Integration einrichten"
+      },
+      {
+        "label": "Token-Zahlungen verstehen"
+      }
     ]
   },
   "shared": {
     "tiers": {
-      "free":            { "name": "Free",                "description": "1 Agent, 20 Nachrichten/Tag, 50 MB Speicher" },
-      "starter":         { "name": "Starter",             "description": "1 Agent, 50 Nachrichten/Tag, 150 MB Speicher" },
-      "pro":             { "name": "Pro",                  "description": "3 Agenten, 100 Nachrichten/Tag, 500 MB Speicher" },
-      "business":        { "name": "Business",            "description": "10 Agenten, 300 Nachrichten/Tag, 1 GB Speicher, immer aktiv" },
-      "founding_member": { "name": "Gründungsmitglied",   "description": "10 Agenten, 300 Nachrichten/Tag, 2 GB Speicher, lebenslanger Zugang" }
+      "free": {
+        "name": "Free",
+        "description": "1 Agent, 20 Nachrichten/Tag, 50 MB Speicher"
+      },
+      "starter": {
+        "name": "Starter",
+        "description": "1 Agent, 50 Nachrichten/Tag, 150 MB Speicher"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "3 Agenten, 100 Nachrichten/Tag, 500 MB Speicher"
+      },
+      "business": {
+        "name": "Business",
+        "description": "10 Agenten, 300 Nachrichten/Tag, 1 GB Speicher, immer aktiv"
+      },
+      "founding_member": {
+        "name": "Gründungsmitglied",
+        "description": "10 Agenten, 300 Nachrichten/Tag, 2 GB Speicher, lebenslanger Zugang"
+      }
     },
     "addons": {
-      "agents_plus1":    { "name": "+1 Agent",            "description": "1 zusätzlicher Agenten-Platz" },
-      "agents_plus3":    { "name": "+3 Agenten",          "description": "3 zusätzliche Agenten-Plätze" },
-      "agents_plus5":    { "name": "+5 Agenten",          "description": "5 zusätzliche Agenten-Plätze" },
-      "agents_plus10":   { "name": "+10 Agenten",         "description": "10 zusätzliche Agenten-Plätze" },
-      "messages_plus20": { "name": "+20 Nachr./Tag",      "description": "20 zusätzliche Nachrichten pro Tag" },
-      "messages_plus50": { "name": "+50 Nachr./Tag",      "description": "50 zusätzliche Nachrichten pro Tag" },
-      "messages_plus100":{ "name": "+100 Nachr./Tag",     "description": "100 zusätzliche Nachrichten pro Tag" },
-      "messages_plus200":{ "name": "+200 Nachr./Tag",     "description": "200 zusätzliche Nachrichten pro Tag" },
-      "searches_plus25": { "name": "+25 Suchen/Tag",      "description": "25 zusätzliche Web-Suchen pro Tag" },
-      "searches_plus50": { "name": "+50 Suchen/Tag",      "description": "50 zusätzliche Web-Suchen pro Tag" },
-      "always_on":       { "name": "Immer aktiv",         "description": "Diesen Agenten 24/7 laufen lassen" },
-      "file_manager":    { "name": "Dateimanager",        "description": "Arbeitsbereich-Dateien durchsuchen, bearbeiten & herunterladen" },
-      "full_logs":       { "name": "Vollständige Logs",   "description": "Vollständigen Log-Viewer für diesen Agenten freischalten" },
-      "plugins_plus10":  { "name": "+10 Plugins",         "description": "10 zusätzliche Plugin+Fähigkeiten-Plätze für diesen Agenten" }
+      "agents_plus1": {
+        "name": "+1 Agent",
+        "description": "1 zusätzlicher Agenten-Platz"
+      },
+      "agents_plus3": {
+        "name": "+3 Agenten",
+        "description": "3 zusätzliche Agenten-Plätze"
+      },
+      "agents_plus5": {
+        "name": "+5 Agenten",
+        "description": "5 zusätzliche Agenten-Plätze"
+      },
+      "agents_plus10": {
+        "name": "+10 Agenten",
+        "description": "10 zusätzliche Agenten-Plätze"
+      },
+      "messages_plus20": {
+        "name": "+20 Nachr./Tag",
+        "description": "20 zusätzliche Nachrichten pro Tag"
+      },
+      "messages_plus50": {
+        "name": "+50 Nachr./Tag",
+        "description": "50 zusätzliche Nachrichten pro Tag"
+      },
+      "messages_plus100": {
+        "name": "+100 Nachr./Tag",
+        "description": "100 zusätzliche Nachrichten pro Tag"
+      },
+      "messages_plus200": {
+        "name": "+200 Nachr./Tag",
+        "description": "200 zusätzliche Nachrichten pro Tag"
+      },
+      "searches_plus25": {
+        "name": "+25 Suchen/Tag",
+        "description": "25 zusätzliche Web-Suchen pro Tag"
+      },
+      "searches_plus50": {
+        "name": "+50 Suchen/Tag",
+        "description": "50 zusätzliche Web-Suchen pro Tag"
+      },
+      "always_on": {
+        "name": "Immer aktiv",
+        "description": "Diesen Agenten 24/7 laufen lassen"
+      },
+      "file_manager": {
+        "name": "Dateimanager",
+        "description": "Arbeitsbereich-Dateien durchsuchen, bearbeiten & herunterladen"
+      },
+      "full_logs": {
+        "name": "Vollständige Logs",
+        "description": "Vollständigen Log-Viewer für diesen Agenten freischalten"
+      },
+      "plugins_plus10": {
+        "name": "+10 Plugins",
+        "description": "10 zusätzliche Plugin+Fähigkeiten-Plätze für diesen Agenten"
+      }
     },
     "frameworks": {
-      "openclaw": { "name": "OpenClaw",     "description": "Selbst gehosteter KI-Assistent mit 3.200+ Community-Fähigkeiten, Multi-Channel-Messaging-Gateway und autonomer Aufgabenausführung." },
-      "hermes":   { "name": "Hermes Agent", "description": "Autonomer KI-Agent von Nous Research mit dauerhaftem Gedächtnis, 40+ Tools, Fähigkeitensystem und Multi-Plattform-Messaging-Gateway." },
-      "elizaos":  { "name": "ElizaOS",      "description": "Open-Source-KI-Agent-Framework mit charaktergesteuerten Personas, Plugin-Ökosystem und Multi-Client-Unterstützung für Social- und Messaging-Plattformen." },
-      "milady":   { "name": "Milady",       "description": "Leichtgewichtiges, persönlichkeitsorientiertes KI-Agent-Framework, das für ausdrucksstarke, kulturell bewusste Konversationsagenten mit modularen Fähigkeiten entwickelt wurde." }
+      "openclaw": {
+        "name": "OpenClaw",
+        "description": "Selbst gehosteter KI-Assistent mit 3.200+ Community-Fähigkeiten, Multi-Channel-Messaging-Gateway und autonomer Aufgabenausführung."
+      },
+      "hermes": {
+        "name": "Hermes Agent",
+        "description": "Autonomer KI-Agent von Nous Research mit dauerhaftem Gedächtnis, 40+ Tools, Fähigkeitensystem und Multi-Plattform-Messaging-Gateway."
+      },
+      "elizaos": {
+        "name": "ElizaOS",
+        "description": "Open-Source-KI-Agent-Framework mit charaktergesteuerten Personas, Plugin-Ökosystem und Multi-Client-Unterstützung für Social- und Messaging-Plattformen."
+      },
+      "milady": {
+        "name": "Milady",
+        "description": "Leichtgewichtiges, persönlichkeitsorientiertes KI-Agent-Framework, das für ausdrucksstarke, kulturell bewusste Konversationsagenten mit modularen Fähigkeiten entwickelt wurde."
+      }
     },
     "agentStatus": {
-      "active":     "Aktiv",
-      "sleeping":   "Ruhezustand",
-      "paused":     "Pausiert",
-      "error":      "Fehler",
-      "killed":     "Beendet",
+      "active": "Aktiv",
+      "sleeping": "Ruhezustand",
+      "paused": "Pausiert",
+      "error": "Fehler",
+      "killed": "Beendet",
       "restarting": "Neustart",
-      "stopping":   "Wird gestoppt"
+      "stopping": "Wird gestoppt"
     }
   },
   "localeSwitcher": {

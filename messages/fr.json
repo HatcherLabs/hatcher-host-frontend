@@ -71,7 +71,8 @@
       "docs": "Docs"
     },
     "copyright": "© {year} HatcherLabs. Tous droits réservés.",
-    "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România"
+    "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România",
+    "legalNotice": "Les pages légales (Confidentialité, Conditions, Mentions légales, Cookies) sont disponibles uniquement en anglais."
   },
   "landing": {
     "affiliateBanner": {
@@ -1520,12 +1521,30 @@
     "deployFirstAgent": "Déployer votre premier agent",
     "viewPricing": "Voir les tarifs",
     "decisions": [
-      { "condition": "Je veux un maximum d'outils et d'automatisation", "pick": "OpenClaw" },
-      { "condition": "Je veux un agent qui apprend au fil du temps", "pick": "Hermes" },
-      { "condition": "Je veux un bot pour les réseaux sociaux ou une communauté", "pick": "ElizaOS" },
-      { "condition": "Je débute et je veux quelque chose de simple", "pick": "Milady" },
-      { "condition": "J'ai besoin de messagerie multi-canal (Telegram + Discord + WhatsApp)", "pick": "OpenClaw ou Hermes" },
-      { "condition": "Je veux un bot avec une personnalité développée", "pick": "ElizaOS ou Milady" }
+      {
+        "condition": "Je veux un maximum d'outils et d'automatisation",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "Je veux un agent qui apprend au fil du temps",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "Je veux un bot pour les réseaux sociaux ou une communauté",
+        "pick": "ElizaOS"
+      },
+      {
+        "condition": "Je débute et je veux quelque chose de simple",
+        "pick": "Milady"
+      },
+      {
+        "condition": "J'ai besoin de messagerie multi-canal (Telegram + Discord + WhatsApp)",
+        "pick": "OpenClaw ou Hermes"
+      },
+      {
+        "condition": "Je veux un bot avec une personnalité développée",
+        "pick": "ElizaOS ou Milady"
+      }
     ]
   },
   "token": {
@@ -1834,60 +1853,159 @@
     "contactSupport": "Contacter le support",
     "helpCenter": "Centre d'aide",
     "quickLinks": [
-      { "title": "Premiers pas", "description": "Configurez votre premier agent IA en moins de 60 secondes. Guide de démarrage rapide, prérequis et premier déploiement." },
-      { "title": "Configuration de l'agent", "description": "Configurez la personnalité, les modèles, la mémoire, les tâches cron, les webhooks et le routage multi-agent." },
-      { "title": "Intégrations de plateformes", "description": "Connectez-vous à Telegram, Discord, WhatsApp, Slack et 20+ plateformes de messagerie." },
-      { "title": "Configuration BYOK", "description": "Apportez vos propres clés API pour OpenAI, Anthropic, Google, xAI et plus. Toujours gratuit." },
-      { "title": "Facturation & tarifs", "description": "Comprenez les paiements en tokens, les déverrouillages de fonctionnalités, les crédits hébergés et la gestion des abonnements." },
-      { "title": "Référence API", "description": "Endpoints REST API pour les agents, les fonctionnalités, les paiements et les opérations d'administration." }
+      {
+        "title": "Premiers pas",
+        "description": "Configurez votre premier agent IA en moins de 60 secondes. Guide de démarrage rapide, prérequis et premier déploiement."
+      },
+      {
+        "title": "Configuration de l'agent",
+        "description": "Configurez la personnalité, les modèles, la mémoire, les tâches cron, les webhooks et le routage multi-agent."
+      },
+      {
+        "title": "Intégrations de plateformes",
+        "description": "Connectez-vous à Telegram, Discord, WhatsApp, Slack et 20+ plateformes de messagerie."
+      },
+      {
+        "title": "Configuration BYOK",
+        "description": "Apportez vos propres clés API pour OpenAI, Anthropic, Google, xAI et plus. Toujours gratuit."
+      },
+      {
+        "title": "Facturation & tarifs",
+        "description": "Comprenez les paiements en tokens, les déverrouillages de fonctionnalités, les crédits hébergés et la gestion des abonnements."
+      },
+      {
+        "title": "Référence API",
+        "description": "Endpoints REST API pour les agents, les fonctionnalités, les paiements et les opérations d'administration."
+      }
     ],
     "topics": [
-      { "label": "Comment déployer votre premier agent" },
-      { "label": "Fournisseurs LLM pris en charge" },
-      { "label": "Configuration du framework d'agent" },
-      { "label": "Cycle de vie du conteneur et codes de statut" },
-      { "label": "Configuration de l'intégration Telegram" },
-      { "label": "Comprendre les paiements en tokens" }
+      {
+        "label": "Comment déployer votre premier agent"
+      },
+      {
+        "label": "Fournisseurs LLM pris en charge"
+      },
+      {
+        "label": "Configuration du framework d'agent"
+      },
+      {
+        "label": "Cycle de vie du conteneur et codes de statut"
+      },
+      {
+        "label": "Configuration de l'intégration Telegram"
+      },
+      {
+        "label": "Comprendre les paiements en tokens"
+      }
     ]
   },
   "shared": {
     "tiers": {
-      "free":            { "name": "Gratuit",           "description": "1 agent, 20 messages/jour, 50 MB de stockage" },
-      "starter":         { "name": "Starter",           "description": "1 agent, 50 messages/jour, 150 MB de stockage" },
-      "pro":             { "name": "Pro",                "description": "3 agents, 100 messages/jour, 500 MB de stockage" },
-      "business":        { "name": "Business",          "description": "10 agents, 300 messages/jour, 1 GB de stockage, toujours actif" },
-      "founding_member": { "name": "Membre fondateur",  "description": "10 agents, 300 messages/jour, 2 GB de stockage, accès à vie" }
+      "free": {
+        "name": "Gratuit",
+        "description": "1 agent, 20 messages/jour, 50 MB de stockage"
+      },
+      "starter": {
+        "name": "Starter",
+        "description": "1 agent, 50 messages/jour, 150 MB de stockage"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "3 agents, 100 messages/jour, 500 MB de stockage"
+      },
+      "business": {
+        "name": "Business",
+        "description": "10 agents, 300 messages/jour, 1 GB de stockage, toujours actif"
+      },
+      "founding_member": {
+        "name": "Membre fondateur",
+        "description": "10 agents, 300 messages/jour, 2 GB de stockage, accès à vie"
+      }
     },
     "addons": {
-      "agents_plus1":    { "name": "+1 agent",             "description": "1 emplacement d'agent supplémentaire" },
-      "agents_plus3":    { "name": "+3 agents",            "description": "3 emplacements d'agents supplémentaires" },
-      "agents_plus5":    { "name": "+5 agents",            "description": "5 emplacements d'agents supplémentaires" },
-      "agents_plus10":   { "name": "+10 agents",           "description": "10 emplacements d'agents supplémentaires" },
-      "messages_plus20": { "name": "+20 msg/jour",         "description": "20 messages supplémentaires par jour" },
-      "messages_plus50": { "name": "+50 msg/jour",         "description": "50 messages supplémentaires par jour" },
-      "messages_plus100":{ "name": "+100 msg/jour",        "description": "100 messages supplémentaires par jour" },
-      "messages_plus200":{ "name": "+200 msg/jour",        "description": "200 messages supplémentaires par jour" },
-      "searches_plus25": { "name": "+25 recherches/jour",  "description": "25 recherches web supplémentaires par jour" },
-      "searches_plus50": { "name": "+50 recherches/jour",  "description": "50 recherches web supplémentaires par jour" },
-      "always_on":       { "name": "Toujours actif",       "description": "Garder cet agent actif 24h/24" },
-      "file_manager":    { "name": "Gestionnaire de fichiers", "description": "Parcourir, modifier et télécharger les fichiers de l'espace de travail" },
-      "full_logs":       { "name": "Journaux complets",    "description": "Déverrouiller la visionneuse de journaux complète pour cet agent" },
-      "plugins_plus10":  { "name": "+10 plugins",          "description": "10 emplacements de plugins et compétences supplémentaires pour cet agent" }
+      "agents_plus1": {
+        "name": "+1 agent",
+        "description": "1 emplacement d'agent supplémentaire"
+      },
+      "agents_plus3": {
+        "name": "+3 agents",
+        "description": "3 emplacements d'agents supplémentaires"
+      },
+      "agents_plus5": {
+        "name": "+5 agents",
+        "description": "5 emplacements d'agents supplémentaires"
+      },
+      "agents_plus10": {
+        "name": "+10 agents",
+        "description": "10 emplacements d'agents supplémentaires"
+      },
+      "messages_plus20": {
+        "name": "+20 msg/jour",
+        "description": "20 messages supplémentaires par jour"
+      },
+      "messages_plus50": {
+        "name": "+50 msg/jour",
+        "description": "50 messages supplémentaires par jour"
+      },
+      "messages_plus100": {
+        "name": "+100 msg/jour",
+        "description": "100 messages supplémentaires par jour"
+      },
+      "messages_plus200": {
+        "name": "+200 msg/jour",
+        "description": "200 messages supplémentaires par jour"
+      },
+      "searches_plus25": {
+        "name": "+25 recherches/jour",
+        "description": "25 recherches web supplémentaires par jour"
+      },
+      "searches_plus50": {
+        "name": "+50 recherches/jour",
+        "description": "50 recherches web supplémentaires par jour"
+      },
+      "always_on": {
+        "name": "Toujours actif",
+        "description": "Garder cet agent actif 24h/24"
+      },
+      "file_manager": {
+        "name": "Gestionnaire de fichiers",
+        "description": "Parcourir, modifier et télécharger les fichiers de l'espace de travail"
+      },
+      "full_logs": {
+        "name": "Journaux complets",
+        "description": "Déverrouiller la visionneuse de journaux complète pour cet agent"
+      },
+      "plugins_plus10": {
+        "name": "+10 plugins",
+        "description": "10 emplacements de plugins et compétences supplémentaires pour cet agent"
+      }
     },
     "frameworks": {
-      "openclaw": { "name": "OpenClaw",     "description": "Assistant IA auto-hébergé avec 3 200+ compétences communautaires, passerelle de messagerie multi-canal et exécution autonome de tâches." },
-      "hermes":   { "name": "Hermes Agent", "description": "Agent IA autonome par Nous Research avec mémoire persistante, 40+ outils, système de compétences et passerelle de messagerie multi-plateforme." },
-      "elizaos":  { "name": "ElizaOS",      "description": "Framework d'agent IA open-source avec personnages guidés, écosystème de plugins et support multi-client pour les plateformes sociales et de messagerie." },
-      "milady":   { "name": "Milady",       "description": "Framework d'agent IA léger, axé sur la personnalité, conçu pour des agents conversationnels expressifs et culturellement conscients avec des capacités modulaires." }
+      "openclaw": {
+        "name": "OpenClaw",
+        "description": "Assistant IA auto-hébergé avec 3 200+ compétences communautaires, passerelle de messagerie multi-canal et exécution autonome de tâches."
+      },
+      "hermes": {
+        "name": "Hermes Agent",
+        "description": "Agent IA autonome par Nous Research avec mémoire persistante, 40+ outils, système de compétences et passerelle de messagerie multi-plateforme."
+      },
+      "elizaos": {
+        "name": "ElizaOS",
+        "description": "Framework d'agent IA open-source avec personnages guidés, écosystème de plugins et support multi-client pour les plateformes sociales et de messagerie."
+      },
+      "milady": {
+        "name": "Milady",
+        "description": "Framework d'agent IA léger, axé sur la personnalité, conçu pour des agents conversationnels expressifs et culturellement conscients avec des capacités modulaires."
+      }
     },
     "agentStatus": {
-      "active":     "Actif",
-      "sleeping":   "En veille",
-      "paused":     "En pause",
-      "error":      "Erreur",
-      "killed":     "Arrêté",
+      "active": "Actif",
+      "sleeping": "En veille",
+      "paused": "En pause",
+      "error": "Erreur",
+      "killed": "Arrêté",
       "restarting": "Redémarrage",
-      "stopping":   "Arrêt en cours"
+      "stopping": "Arrêt en cours"
     }
   },
   "localeSwitcher": {

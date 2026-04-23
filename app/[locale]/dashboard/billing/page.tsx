@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useFormatter } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
@@ -65,11 +65,7 @@ function StatusBadge({ status }: { status: Payment['status'] }) {
   );
 }
 
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    year: 'numeric', month: 'short', day: 'numeric',
-  });
-}
+/* formatDate is now locale-aware — provided via useFormatter inside the page component */
 
 /* ── Payment method modal ─────────────────────────────────── */
 interface PaymentModalProps {
@@ -267,6 +263,9 @@ export default function BillingPage() {
   const t  = useTranslations('dashboard.billing');
   const tc = useTranslations('dashboard.common');
   const tTiers = useTranslations('shared.tiers');
+  const format = useFormatter();
+  const formatDate = (dateStr: string) =>
+    format.dateTime(new Date(dateStr), { year: 'numeric', month: 'short', day: 'numeric' });
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const searchParams = useSearchParams();
   const {
@@ -965,9 +964,8 @@ export default function BillingPage() {
             <div>
               <div className="flex items-baseline gap-1">
                 <span className="text-3xl font-extrabold text-green-400 tabular-nums" style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}>
-                  ${creditBalance.toFixed(2)}
+                  {format.number(creditBalance, { style: 'currency', currency: 'USD' })}
                 </span>
-                <span className="text-sm text-[var(--text-muted)]">USD</span>
               </div>
               <p className="text-xs text-[var(--text-muted)] mt-1">
                 {t('creditsDesc')}

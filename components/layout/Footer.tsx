@@ -1,7 +1,7 @@
 'use client';
 
 import { Link } from '@/i18n/routing';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { DOCS_URL, SOCIAL_LINKS } from '@/lib/config';
 
 const SOCIAL_ICONS = [
@@ -69,6 +69,7 @@ const SOCIAL_LABEL_MAP: Record<string, string> = {
 
 export function Footer() {
   const t = useTranslations('footer');
+  const locale = useLocale();
   const year = new Date().getFullYear();
 
   const PRODUCT_LINKS = [
@@ -207,6 +208,15 @@ export function Footer() {
             <Link href="/impressum" className="hover:text-[var(--text-primary)] transition-colors duration-200">{t('links.impressum')}</Link>
           </div>
         </div>
+
+        {/* Legal notice — only for non-EN locales */}
+        {locale !== 'en' && (
+          <div className="mt-4 border-t border-[var(--border-default)] pt-4">
+            <p className="text-xs text-[var(--text-tertiary)]">
+              {t('legalNotice')}
+            </p>
+          </div>
+        )}
       </div>
     </footer>
   );

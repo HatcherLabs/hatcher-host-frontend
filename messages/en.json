@@ -71,7 +71,8 @@
       "docs": "Docs"
     },
     "copyright": "© {year} HatcherLabs. All rights reserved.",
-    "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România"
+    "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România",
+    "legalNotice": "Legal pages (Privacy, Terms, Impressum, Cookies) are available in English only."
   },
   "landing": {
     "affiliateBanner": {
@@ -1520,12 +1521,30 @@
     "deployFirstAgent": "Deploy your first agent",
     "viewPricing": "View pricing",
     "decisions": [
-      { "condition": "I want maximum tools and automation", "pick": "OpenClaw" },
-      { "condition": "I want an agent that learns over time", "pick": "Hermes" },
-      { "condition": "I want a social media or community bot", "pick": "ElizaOS" },
-      { "condition": "I'm just getting started and want simple", "pick": "Milady" },
-      { "condition": "I need multi-channel messaging (Telegram + Discord + WhatsApp)", "pick": "OpenClaw or Hermes" },
-      { "condition": "I want a character-driven persona bot", "pick": "ElizaOS or Milady" }
+      {
+        "condition": "I want maximum tools and automation",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "I want an agent that learns over time",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "I want a social media or community bot",
+        "pick": "ElizaOS"
+      },
+      {
+        "condition": "I'm just getting started and want simple",
+        "pick": "Milady"
+      },
+      {
+        "condition": "I need multi-channel messaging (Telegram + Discord + WhatsApp)",
+        "pick": "OpenClaw or Hermes"
+      },
+      {
+        "condition": "I want a character-driven persona bot",
+        "pick": "ElizaOS or Milady"
+      }
     ]
   },
   "token": {
@@ -1834,60 +1853,159 @@
     "contactSupport": "Contact Support",
     "helpCenter": "Help Center",
     "quickLinks": [
-      { "title": "Getting Started", "description": "Set up your first AI agent in under 60 seconds. Quick start guide, prerequisites, and first deploy." },
-      { "title": "Agent Configuration", "description": "Configure personality, models, memory, cron jobs, webhooks, and multi-agent routing." },
-      { "title": "Platform Integrations", "description": "Connect to Telegram, Discord, WhatsApp, Slack, and 20+ messaging platforms." },
-      { "title": "BYOK Setup", "description": "Bring your own API keys for OpenAI, Anthropic, Google, xAI, and more. Always free." },
-      { "title": "Billing & Pricing", "description": "Understand token payments, feature unlocks, hosted credits, and subscription management." },
-      { "title": "API Reference", "description": "REST API endpoints for agents, features, payments, and admin operations." }
+      {
+        "title": "Getting Started",
+        "description": "Set up your first AI agent in under 60 seconds. Quick start guide, prerequisites, and first deploy."
+      },
+      {
+        "title": "Agent Configuration",
+        "description": "Configure personality, models, memory, cron jobs, webhooks, and multi-agent routing."
+      },
+      {
+        "title": "Platform Integrations",
+        "description": "Connect to Telegram, Discord, WhatsApp, Slack, and 20+ messaging platforms."
+      },
+      {
+        "title": "BYOK Setup",
+        "description": "Bring your own API keys for OpenAI, Anthropic, Google, xAI, and more. Always free."
+      },
+      {
+        "title": "Billing & Pricing",
+        "description": "Understand token payments, feature unlocks, hosted credits, and subscription management."
+      },
+      {
+        "title": "API Reference",
+        "description": "REST API endpoints for agents, features, payments, and admin operations."
+      }
     ],
     "topics": [
-      { "label": "How to deploy your first agent" },
-      { "label": "Supported LLM providers" },
-      { "label": "Agent framework configuration" },
-      { "label": "Container lifecycle & status codes" },
-      { "label": "Setting up Telegram integration" },
-      { "label": "Understanding token payments" }
+      {
+        "label": "How to deploy your first agent"
+      },
+      {
+        "label": "Supported LLM providers"
+      },
+      {
+        "label": "Agent framework configuration"
+      },
+      {
+        "label": "Container lifecycle & status codes"
+      },
+      {
+        "label": "Setting up Telegram integration"
+      },
+      {
+        "label": "Understanding token payments"
+      }
     ]
   },
   "shared": {
     "tiers": {
-      "free":            { "name": "Free",           "description": "1 agent, 20 messages/day, 50 MB storage" },
-      "starter":         { "name": "Starter",        "description": "1 agent, 50 messages/day, 150 MB storage" },
-      "pro":             { "name": "Pro",             "description": "3 agents, 100 messages/day, 500 MB storage" },
-      "business":        { "name": "Business",       "description": "10 agents, 300 messages/day, 1 GB storage, always-on" },
-      "founding_member": { "name": "Founding Member","description": "10 agents, 300 messages/day, 2 GB storage, lifetime access" }
+      "free": {
+        "name": "Free",
+        "description": "1 agent, 20 messages/day, 50 MB storage"
+      },
+      "starter": {
+        "name": "Starter",
+        "description": "1 agent, 50 messages/day, 150 MB storage"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "3 agents, 100 messages/day, 500 MB storage"
+      },
+      "business": {
+        "name": "Business",
+        "description": "10 agents, 300 messages/day, 1 GB storage, always-on"
+      },
+      "founding_member": {
+        "name": "Founding Member",
+        "description": "10 agents, 300 messages/day, 2 GB storage, lifetime access"
+      }
     },
     "addons": {
-      "agents_plus1":    { "name": "+1 Agent",          "description": "1 additional agent slot" },
-      "agents_plus3":    { "name": "+3 Agents",         "description": "3 additional agent slots" },
-      "agents_plus5":    { "name": "+5 Agents",         "description": "5 additional agent slots" },
-      "agents_plus10":   { "name": "+10 Agents",        "description": "10 additional agent slots" },
-      "messages_plus20": { "name": "+20 msg/day",       "description": "20 extra messages per day" },
-      "messages_plus50": { "name": "+50 msg/day",       "description": "50 extra messages per day" },
-      "messages_plus100":{ "name": "+100 msg/day",      "description": "100 extra messages per day" },
-      "messages_plus200":{ "name": "+200 msg/day",      "description": "200 extra messages per day" },
-      "searches_plus25": { "name": "+25 searches/day",  "description": "25 extra web searches per day" },
-      "searches_plus50": { "name": "+50 searches/day",  "description": "50 extra web searches per day" },
-      "always_on":       { "name": "Always On",         "description": "Keep this agent running 24/7" },
-      "file_manager":    { "name": "File Manager",      "description": "Browse, edit & download workspace files" },
-      "full_logs":       { "name": "Full Logs",         "description": "Unlock full log viewer for this agent" },
-      "plugins_plus10":  { "name": "+10 Plugins",       "description": "10 extra plugin+skill slots for this agent" }
+      "agents_plus1": {
+        "name": "+1 Agent",
+        "description": "1 additional agent slot"
+      },
+      "agents_plus3": {
+        "name": "+3 Agents",
+        "description": "3 additional agent slots"
+      },
+      "agents_plus5": {
+        "name": "+5 Agents",
+        "description": "5 additional agent slots"
+      },
+      "agents_plus10": {
+        "name": "+10 Agents",
+        "description": "10 additional agent slots"
+      },
+      "messages_plus20": {
+        "name": "+20 msg/day",
+        "description": "20 extra messages per day"
+      },
+      "messages_plus50": {
+        "name": "+50 msg/day",
+        "description": "50 extra messages per day"
+      },
+      "messages_plus100": {
+        "name": "+100 msg/day",
+        "description": "100 extra messages per day"
+      },
+      "messages_plus200": {
+        "name": "+200 msg/day",
+        "description": "200 extra messages per day"
+      },
+      "searches_plus25": {
+        "name": "+25 searches/day",
+        "description": "25 extra web searches per day"
+      },
+      "searches_plus50": {
+        "name": "+50 searches/day",
+        "description": "50 extra web searches per day"
+      },
+      "always_on": {
+        "name": "Always On",
+        "description": "Keep this agent running 24/7"
+      },
+      "file_manager": {
+        "name": "File Manager",
+        "description": "Browse, edit & download workspace files"
+      },
+      "full_logs": {
+        "name": "Full Logs",
+        "description": "Unlock full log viewer for this agent"
+      },
+      "plugins_plus10": {
+        "name": "+10 Plugins",
+        "description": "10 extra plugin+skill slots for this agent"
+      }
     },
     "frameworks": {
-      "openclaw": { "name": "OpenClaw",     "description": "Self-hosted AI assistant with 3,200+ community skills, multi-channel messaging gateway, and autonomous task execution." },
-      "hermes":   { "name": "Hermes Agent", "description": "Autonomous AI agent by Nous Research with persistent memory, 40+ tools, skills system, and multi-platform messaging gateway." },
-      "elizaos":  { "name": "ElizaOS",      "description": "Open-source AI agent framework with character-driven personas, plugin ecosystem, and multi-client support for social and messaging platforms." },
-      "milady":   { "name": "Milady",       "description": "Lightweight, personality-first AI agent framework designed for expressive, culturally-aware conversational agents with modular capabilities." }
+      "openclaw": {
+        "name": "OpenClaw",
+        "description": "Self-hosted AI assistant with 3,200+ community skills, multi-channel messaging gateway, and autonomous task execution."
+      },
+      "hermes": {
+        "name": "Hermes Agent",
+        "description": "Autonomous AI agent by Nous Research with persistent memory, 40+ tools, skills system, and multi-platform messaging gateway."
+      },
+      "elizaos": {
+        "name": "ElizaOS",
+        "description": "Open-source AI agent framework with character-driven personas, plugin ecosystem, and multi-client support for social and messaging platforms."
+      },
+      "milady": {
+        "name": "Milady",
+        "description": "Lightweight, personality-first AI agent framework designed for expressive, culturally-aware conversational agents with modular capabilities."
+      }
     },
     "agentStatus": {
-      "active":     "Active",
-      "sleeping":   "Sleeping",
-      "paused":     "Paused",
-      "error":      "Error",
-      "killed":     "Killed",
+      "active": "Active",
+      "sleeping": "Sleeping",
+      "paused": "Paused",
+      "error": "Error",
+      "killed": "Killed",
       "restarting": "Restarting",
-      "stopping":   "Stopping"
+      "stopping": "Stopping"
     }
   },
   "localeSwitcher": {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useFormatter } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Link } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth-context';
@@ -34,15 +34,7 @@ interface AccountAnalytics {
 }
 
 // ─── Helpers ─────────────────────────────────────────────────
-function formatChartDate(dateStr: string): string {
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
-
-function formatWeekday(dateStr: string): string {
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-US', { weekday: 'short' });
-}
+/* formatChartDate / formatWeekday are locale-aware — provided via useFormatter inside BarChartSection */
 
 function formatNumber(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -100,6 +92,9 @@ function StatCard({
 
 // ─── Bar Chart ───────────────────────────────────────────────
 function BarChartSection({ data, color = 'var(--color-accent)' }: { data: Array<{ date: string; count: number }>; color?: string }) {
+  const format = useFormatter();
+  const formatChartDate = (dateStr: string) =>
+    format.dateTime(new Date(dateStr + 'T00:00:00'), { month: 'short', day: 'numeric' });
   const maxCount = Math.max(...data.map(d => d.count), 1);
   const today = new Date().toISOString().slice(0, 10);
   const W = 600;
@@ -180,6 +175,7 @@ function Skeleton({ className }: { className?: string }) {
 export default function AnalyticsPage() {
   const t = useTranslations('dashboard.analytics');
   const tc = useTranslations('dashboard.common');
+  const format = useFormatter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [data, setData] = useState<AccountAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -448,7 +444,7 @@ export default function AnalyticsPage() {
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <span className="text-[10px] capitalize px-1.5 py-0.5 rounded-md shrink-0" style={{ background: `${color}15`, color }}>{agent.framework}</span>
-                        <span className="text-sm font-semibold text-[var(--text-primary)] tabular-nums">{agent.count.toLocaleString()}</span>
+                        <span className="text-sm font-semibold text-[var(--text-primary)] tabular-nums">{format.number(agent.count)}</span>
                       </div>
                     </div>
                     <div className="h-1.5 rounded-full bg-[var(--bg-card)] overflow-hidden">

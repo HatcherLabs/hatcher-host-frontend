@@ -71,7 +71,8 @@
       "docs": "文档"
     },
     "copyright": "© {year} HatcherLabs. 保留所有权利。",
-    "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România"
+    "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România",
+    "legalNotice": "法律页面（隐私政策、服务条款、法律声明、Cookie 政策）仅提供英文版本。"
   },
   "landing": {
     "affiliateBanner": {
@@ -1520,12 +1521,30 @@
     "deployFirstAgent": "部署您的第一个智能体",
     "viewPricing": "查看定价",
     "decisions": [
-      { "condition": "我想要最多工具和自动化能力", "pick": "OpenClaw" },
-      { "condition": "我想要一个随时间学习的智能体", "pick": "Hermes" },
-      { "condition": "我想要一个社交媒体或社区机器人", "pick": "ElizaOS" },
-      { "condition": "我刚开始入门，想要简单易用的", "pick": "Milady" },
-      { "condition": "我需要多渠道消息（Telegram + Discord + WhatsApp）", "pick": "OpenClaw 或 Hermes" },
-      { "condition": "我想要一个角色驱动的人格机器人", "pick": "ElizaOS 或 Milady" }
+      {
+        "condition": "我想要最多工具和自动化能力",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "我想要一个随时间学习的智能体",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "我想要一个社交媒体或社区机器人",
+        "pick": "ElizaOS"
+      },
+      {
+        "condition": "我刚开始入门，想要简单易用的",
+        "pick": "Milady"
+      },
+      {
+        "condition": "我需要多渠道消息（Telegram + Discord + WhatsApp）",
+        "pick": "OpenClaw 或 Hermes"
+      },
+      {
+        "condition": "我想要一个角色驱动的人格机器人",
+        "pick": "ElizaOS 或 Milady"
+      }
     ]
   },
   "token": {
@@ -1834,60 +1853,159 @@
     "contactSupport": "联系支持",
     "helpCenter": "帮助中心",
     "quickLinks": [
-      { "title": "快速入门", "description": "60秒内设置您的第一个AI智能体。快速入门指南、前提条件和首次部署。" },
-      { "title": "智能体配置", "description": "配置人格、模型、记忆、定时任务、Webhook和多智能体路由。" },
-      { "title": "平台集成", "description": "连接至Telegram、Discord、WhatsApp、Slack及20+消息平台。" },
-      { "title": "BYOK 设置", "description": "为OpenAI、Anthropic、Google、xAI等携带自己的API密钥，始终免费。" },
-      { "title": "账单与定价", "description": "了解代币付款、功能解锁、托管积分和订阅管理。" },
-      { "title": "API 参考", "description": "智能体、功能、付款和管理操作的REST API端点。" }
+      {
+        "title": "快速入门",
+        "description": "60秒内设置您的第一个AI智能体。快速入门指南、前提条件和首次部署。"
+      },
+      {
+        "title": "智能体配置",
+        "description": "配置人格、模型、记忆、定时任务、Webhook和多智能体路由。"
+      },
+      {
+        "title": "平台集成",
+        "description": "连接至Telegram、Discord、WhatsApp、Slack及20+消息平台。"
+      },
+      {
+        "title": "BYOK 设置",
+        "description": "为OpenAI、Anthropic、Google、xAI等携带自己的API密钥，始终免费。"
+      },
+      {
+        "title": "账单与定价",
+        "description": "了解代币付款、功能解锁、托管积分和订阅管理。"
+      },
+      {
+        "title": "API 参考",
+        "description": "智能体、功能、付款和管理操作的REST API端点。"
+      }
     ],
     "topics": [
-      { "label": "如何部署您的第一个智能体" },
-      { "label": "支持的LLM提供商" },
-      { "label": "智能体框架配置" },
-      { "label": "容器生命周期与状态码" },
-      { "label": "设置Telegram集成" },
-      { "label": "了解代币付款" }
+      {
+        "label": "如何部署您的第一个智能体"
+      },
+      {
+        "label": "支持的LLM提供商"
+      },
+      {
+        "label": "智能体框架配置"
+      },
+      {
+        "label": "容器生命周期与状态码"
+      },
+      {
+        "label": "设置Telegram集成"
+      },
+      {
+        "label": "了解代币付款"
+      }
     ]
   },
   "shared": {
     "tiers": {
-      "free":            { "name": "免费",           "description": "1个智能体，每日20条消息，50 MB存储" },
-      "starter":         { "name": "Starter",        "description": "1个智能体，每日50条消息，150 MB存储" },
-      "pro":             { "name": "Pro",             "description": "3个智能体，每日100条消息，500 MB存储" },
-      "business":        { "name": "Business",       "description": "10个智能体，每日300条消息，1 GB存储，始终在线" },
-      "founding_member": { "name": "创始会员",        "description": "10个智能体，每日300条消息，2 GB存储，终身访问" }
+      "free": {
+        "name": "免费",
+        "description": "1个智能体，每日20条消息，50 MB存储"
+      },
+      "starter": {
+        "name": "Starter",
+        "description": "1个智能体，每日50条消息，150 MB存储"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "3个智能体，每日100条消息，500 MB存储"
+      },
+      "business": {
+        "name": "Business",
+        "description": "10个智能体，每日300条消息，1 GB存储，始终在线"
+      },
+      "founding_member": {
+        "name": "创始会员",
+        "description": "10个智能体，每日300条消息，2 GB存储，终身访问"
+      }
     },
     "addons": {
-      "agents_plus1":    { "name": "+1个智能体",        "description": "1个额外智能体名额" },
-      "agents_plus3":    { "name": "+3个智能体",        "description": "3个额外智能体名额" },
-      "agents_plus5":    { "name": "+5个智能体",        "description": "5个额外智能体名额" },
-      "agents_plus10":   { "name": "+10个智能体",       "description": "10个额外智能体名额" },
-      "messages_plus20": { "name": "+20条消息/天",      "description": "每日额外20条消息" },
-      "messages_plus50": { "name": "+50条消息/天",      "description": "每日额外50条消息" },
-      "messages_plus100":{ "name": "+100条消息/天",     "description": "每日额外100条消息" },
-      "messages_plus200":{ "name": "+200条消息/天",     "description": "每日额外200条消息" },
-      "searches_plus25": { "name": "+25次搜索/天",      "description": "每日额外25次网络搜索" },
-      "searches_plus50": { "name": "+50次搜索/天",      "description": "每日额外50次网络搜索" },
-      "always_on":       { "name": "始终在线",          "description": "保持此智能体全天候运行" },
-      "file_manager":    { "name": "文件管理器",        "description": "浏览、编辑和下载工作区文件" },
-      "full_logs":       { "name": "完整日志",          "description": "解锁此智能体的完整日志查看器" },
-      "plugins_plus10":  { "name": "+10个插件",         "description": "此智能体额外10个插件+技能名额" }
+      "agents_plus1": {
+        "name": "+1个智能体",
+        "description": "1个额外智能体名额"
+      },
+      "agents_plus3": {
+        "name": "+3个智能体",
+        "description": "3个额外智能体名额"
+      },
+      "agents_plus5": {
+        "name": "+5个智能体",
+        "description": "5个额外智能体名额"
+      },
+      "agents_plus10": {
+        "name": "+10个智能体",
+        "description": "10个额外智能体名额"
+      },
+      "messages_plus20": {
+        "name": "+20条消息/天",
+        "description": "每日额外20条消息"
+      },
+      "messages_plus50": {
+        "name": "+50条消息/天",
+        "description": "每日额外50条消息"
+      },
+      "messages_plus100": {
+        "name": "+100条消息/天",
+        "description": "每日额外100条消息"
+      },
+      "messages_plus200": {
+        "name": "+200条消息/天",
+        "description": "每日额外200条消息"
+      },
+      "searches_plus25": {
+        "name": "+25次搜索/天",
+        "description": "每日额外25次网络搜索"
+      },
+      "searches_plus50": {
+        "name": "+50次搜索/天",
+        "description": "每日额外50次网络搜索"
+      },
+      "always_on": {
+        "name": "始终在线",
+        "description": "保持此智能体全天候运行"
+      },
+      "file_manager": {
+        "name": "文件管理器",
+        "description": "浏览、编辑和下载工作区文件"
+      },
+      "full_logs": {
+        "name": "完整日志",
+        "description": "解锁此智能体的完整日志查看器"
+      },
+      "plugins_plus10": {
+        "name": "+10个插件",
+        "description": "此智能体额外10个插件+技能名额"
+      }
     },
     "frameworks": {
-      "openclaw": { "name": "OpenClaw",     "description": "自托管AI助手，拥有3200+社区技能、多渠道消息网关和自主任务执行能力。" },
-      "hermes":   { "name": "Hermes Agent", "description": "Nous Research出品的自主AI智能体，具备持久记忆、40+工具、技能系统和多平台消息网关。" },
-      "elizaos":  { "name": "ElizaOS",      "description": "开源AI智能体框架，支持角色驱动人格、插件生态和多客户端社交及消息平台接入。" },
-      "milady":   { "name": "Milady",       "description": "轻量级人格优先AI智能体框架，专为有表现力、具文化感知的对话智能体设计，支持模块化能力扩展。" }
+      "openclaw": {
+        "name": "OpenClaw",
+        "description": "自托管AI助手，拥有3200+社区技能、多渠道消息网关和自主任务执行能力。"
+      },
+      "hermes": {
+        "name": "Hermes Agent",
+        "description": "Nous Research出品的自主AI智能体，具备持久记忆、40+工具、技能系统和多平台消息网关。"
+      },
+      "elizaos": {
+        "name": "ElizaOS",
+        "description": "开源AI智能体框架，支持角色驱动人格、插件生态和多客户端社交及消息平台接入。"
+      },
+      "milady": {
+        "name": "Milady",
+        "description": "轻量级人格优先AI智能体框架，专为有表现力、具文化感知的对话智能体设计，支持模块化能力扩展。"
+      }
     },
     "agentStatus": {
-      "active":     "活跃",
-      "sleeping":   "休眠中",
-      "paused":     "已暂停",
-      "error":      "错误",
-      "killed":     "已停止",
+      "active": "活跃",
+      "sleeping": "休眠中",
+      "paused": "已暂停",
+      "error": "错误",
+      "killed": "已停止",
       "restarting": "重启中",
-      "stopping":   "停止中"
+      "stopping": "停止中"
     }
   },
   "localeSwitcher": {
