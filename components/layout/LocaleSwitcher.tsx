@@ -1,10 +1,19 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { useTransition } from 'react';
-import { usePathname as useRawPathname } from 'next/navigation';
-import { useRouter } from '@/i18n/routing';
-import { locales, localeLabels, localeFlags, type Locale } from '@/i18n/config';
+import { useEffect, useRef, useState, useTransition } from 'react';
+import {
+  usePathname as useRawPathname,
+  useRouter as useRawRouter,
+} from 'next/navigation';
+import { ChevronDown } from 'lucide-react';
+import {
+  locales,
+  localeLabels,
+  localeFlags,
+  defaultLocale,
+  type Locale,
+} from '@/i18n/config';
 
 // Paths outside the [locale] segment — no localized version exists.
 // Keep in sync with NON_LOCALE_PREFIXES in middleware.ts.
@@ -25,8 +34,6 @@ function isNonLocalePath(rawPath: string): boolean {
   );
 }
 
-// Strip a leading locale segment (e.g., "/de/pricing" → "/pricing", "/de" → "/")
-// so router.replace gets a clean path — next-intl prepends the target locale.
 function stripLocalePrefix(raw: string, currentLocale: Locale): string {
   const prefix = `/${currentLocale}`;
   if (raw === prefix) return '/';
@@ -34,54 +41,115 @@ function stripLocalePrefix(raw: string, currentLocale: Locale): string {
   return raw;
 }
 
+function buildLocaleUrl(cleanPath: string, targetLocale: Locale): string {
+  // localePrefix: 'as-needed' — the default locale has no URL prefix.
+  const prefix = targetLocale === defaultLocale ? '' : `/${targetLocale}`;
+  const path = cleanPath === '/' ? '' : cleanPath;
+  return prefix + path || '/';
+}
+
 export function LocaleSwitcher() {
   const locale = useLocale() as Locale;
-  const router = useRouter();
+  const router = useRawRouter();
   const rawPathname = useRawPathname();
   const t = useTranslations('localeSwitcher');
   const [isPending, startTransition] = useTransition();
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
 
-  function onChange(next: Locale) {
-    if (next === locale) return;
-    startTransition(() => {
-      // Non-locale routes (legal pages, admin) have no localized version —
-      // jump to the homepage in the target locale instead of a dead 404.
-      if (isNonLocalePath(rawPathname)) {
-        router.replace('/', { locale: next });
-        return;
+  useEffect(() => {
+    if (!open) return;
+    function onDoc(e: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false);
       }
-      // Strip the current locale prefix from the raw URL pathname ourselves.
-      // next-intl's usePathname() can return the prefixed path in some cases
-      // (notably on the locale homepage, where "/de" is returned instead of
-      // "/"), which would cause router.replace to produce "/ro/de" — a 404.
-      const cleanPath = stripLocalePrefix(rawPathname, locale);
-      router.replace(cleanPath, { locale: next });
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false);
+    }
+    document.addEventListener('mousedown', onDoc);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDoc);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  function onPick(next: Locale) {
+    setOpen(false);
+    if (next === locale) return;
+    // Construct the exact target URL ourselves and navigate via the raw Next
+    // router. This avoids quirks in next-intl's router.replace where the
+    // locale homepage can yield "/ro/de" on switch.
+    const cleanPath = isNonLocalePath(rawPathname)
+      ? '/'
+      : stripLocalePrefix(rawPathname, locale);
+    const target = buildLocaleUrl(cleanPath, next);
+    // Also set the cookie immediately so middleware respects it on the next
+    // request in case next-intl doesn't catch up before navigation.
+    document.cookie = `HATCHER_LOCALE=${next}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+    startTransition(() => {
+      router.replace(target);
     });
   }
 
   return (
-    <label className="relative inline-flex items-center">
-      <span className="sr-only">{t('label')}</span>
-      <select
-        value={locale}
-        onChange={(e) => onChange(e.target.value as Locale)}
+    <div ref={wrapperRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
         disabled={isPending}
         aria-label={t('label')}
-        className="appearance-none bg-transparent pr-6 pl-2 py-1 rounded-md text-sm hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] cursor-pointer text-[var(--text-primary)] disabled:opacity-50"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] disabled:opacity-50 transition-colors"
       >
-        {locales.map((loc) => (
-          <option key={loc} value={loc} className="bg-[var(--bg-card)] text-[var(--text-primary)]">
-            {localeFlags[loc]} {localeLabels[loc]}
-          </option>
-        ))}
-      </select>
-      <svg
-        aria-hidden="true"
-        className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 h-3 w-3 opacity-60"
-        viewBox="0 0 12 12"
-      >
-        <path d="M3 5l3 3 3-3" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </label>
+        <span aria-hidden="true" className="text-base leading-none">
+          {localeFlags[locale]}
+        </span>
+        <span className="hidden sm:inline">{localeLabels[locale]}</span>
+        <ChevronDown
+          size={12}
+          className={`opacity-60 transition-transform ${open ? 'rotate-180' : ''}`}
+          aria-hidden="true"
+        />
+      </button>
+      {open && (
+        <ul
+          role="listbox"
+          aria-label={t('label')}
+          className="absolute right-0 top-full mt-1 min-w-[10rem] rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-lg backdrop-blur-xl py-1 z-50"
+        >
+          {locales.map((loc) => {
+            const active = loc === locale;
+            return (
+              <li key={loc}>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={active}
+                  onClick={() => onPick(loc)}
+                  className={`w-full flex items-center gap-2 px-3 py-1.5 text-sm text-left transition-colors ${
+                    active
+                      ? 'bg-[var(--color-accent)]/15 text-[var(--text-primary)]'
+                      : 'text-[var(--text-secondary)] hover:bg-white/5 hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  <span aria-hidden="true" className="text-base leading-none">
+                    {localeFlags[loc]}
+                  </span>
+                  <span className="flex-1">{localeLabels[loc]}</span>
+                  {active && (
+                    <span aria-hidden="true" className="text-[var(--color-accent)]">
+                      ✓
+                    </span>
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
   );
 }
