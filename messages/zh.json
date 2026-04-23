@@ -1,0 +1,13 @@
+{
+  "common": {
+    "appName": "Hatcher",
+    "tagline": "[zh] Managed AI agent hosting · Crypto-native"
+  },
+  "nav": {
+    "pricing": "[zh] Pricing",
+    "docs": "[zh] Docs",
+    "roadmap": "[zh] Roadmap",
+    "login": "[zh] Log in",
+    "signup": "[zh] Sign up"
+  }
+}
