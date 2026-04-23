@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
+import { getTranslations } from 'next-intl/server';
 import { API_URL } from '@/lib/config';
 import { generateAgentAvatar } from '@/lib/avatar-generator';
 import { FRAMEWORKS } from '@hatcher/shared';
@@ -79,7 +80,6 @@ export async function generateMetadata({
 }
 
 const STATUS_CONFIG: Record<string, {
-  label: string;
   color: string;
   bg: string;
   border: string;
@@ -88,7 +88,6 @@ const STATUS_CONFIG: Record<string, {
   pulse: boolean;
 }> = {
   active: {
-    label: 'Online',
     color: 'text-green-400',
     bg: 'bg-green-500/10',
     border: 'border-green-500/25',
@@ -97,7 +96,6 @@ const STATUS_CONFIG: Record<string, {
     pulse: true,
   },
   sleeping: {
-    label: 'Sleeping',
     color: 'text-blue-400',
     bg: 'bg-blue-500/10',
     border: 'border-blue-500/25',
@@ -106,7 +104,6 @@ const STATUS_CONFIG: Record<string, {
     pulse: false,
   },
   paused: {
-    label: 'Paused',
     color: 'text-amber-400',
     bg: 'bg-amber-500/10',
     border: 'border-amber-500/25',
@@ -115,7 +112,6 @@ const STATUS_CONFIG: Record<string, {
     pulse: false,
   },
   error: {
-    label: 'Error',
     color: 'text-red-400',
     bg: 'bg-red-500/10',
     border: 'border-red-500/25',
@@ -124,7 +120,6 @@ const STATUS_CONFIG: Record<string, {
     pulse: false,
   },
   killed: {
-    label: 'Stopped',
     color: 'text-zinc-400',
     bg: 'bg-zinc-500/10',
     border: 'border-zinc-500/25',
@@ -133,7 +128,6 @@ const STATUS_CONFIG: Record<string, {
     pulse: false,
   },
   restarting: {
-    label: 'Restarting',
     color: 'text-amber-400',
     bg: 'bg-amber-500/10',
     border: 'border-amber-500/25',
@@ -143,7 +137,7 @@ const STATUS_CONFIG: Record<string, {
   },
 };
 
-function UptimeBar({ percent }: { percent: number }) {
+function UptimeBar({ percent, label }: { percent: number; label: string }) {
   const segments = 24;
   const filled = Math.round((percent / 100) * segments);
   const color = percent >= 90 ? 'bg-green-500/80' : percent >= 70 ? 'bg-amber-500/80' : 'bg-red-500/80';
@@ -152,7 +146,7 @@ function UptimeBar({ percent }: { percent: number }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider">24h uptime</span>
+        <span className="text-xs text-[var(--text-muted)] uppercase tracking-wider">{label}</span>
         <span className={`text-sm font-bold tabular-nums ${textColor}`}>{percent}%</span>
       </div>
       <div className="flex gap-1" role="meter" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100} aria-label="Uptime bar">
@@ -173,6 +167,8 @@ export default async function AgentStatusPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const t = await getTranslations('agentPublic.statusPage');
+  const tStatus = await getTranslations('agentPublic.status');
   const [stats, agent] = await Promise.all([fetchPublicStats(id), fetchAgentBasic(id)]);
 
   if (!stats) {
@@ -182,12 +178,12 @@ export default async function AgentStatusPage({
           <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-4">
             <span className="w-3 h-3 rounded-full bg-red-400" />
           </div>
-          <h1 className="text-lg font-semibold text-[var(--text-primary)] mb-2">Agent Not Found</h1>
+          <h1 className="text-lg font-semibold text-[var(--text-primary)] mb-2">{t('notFound.heading')}</h1>
           <p className="text-sm text-[var(--text-muted)] mb-6">
-            This agent does not exist or is not publicly visible.
+            {t('notFound.body')}
           </p>
           <Link href="/dashboard/agents" className="btn-secondary text-sm inline-flex items-center gap-2 justify-center">
-            Browse Agents
+            {t('notFound.browseAgents')}
           </Link>
         </div>
       </div>
@@ -200,6 +196,17 @@ export default async function AgentStatusPage({
   const isOnline = stats.status === 'active';
   const lastActive = stats.lastActiveAt ? new Date(stats.lastActiveAt) : null;
   const createdAt = new Date(stats.createdAt);
+
+  // Build status label from translation
+  const statusKeyMap: Record<string, string> = {
+    active: 'active',
+    sleeping: 'sleeping',
+    paused: 'paused',
+    error: 'error',
+    killed: 'killed',
+    restarting: 'restarting',
+  };
+  const statusKey = statusKeyMap[stats.status] ?? 'paused';
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
@@ -221,7 +228,7 @@ export default async function AgentStatusPage({
             href={`/agent/${id}`}
             className="inline-flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors duration-200"
           >
-            Powered by
+            {t('poweredBy')}
             <span className="font-semibold text-[var(--text-secondary)]">Hatcher</span>
             <ExternalLink className="w-3 h-3" />
           </Link>
@@ -246,6 +253,7 @@ export default async function AgentStatusPage({
               )}
             </div>
 
+            {/* agent.name is user-generated content — not wrapped */}
             <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-1">{stats.name}</h1>
 
             {stats.ownerUsername && (
@@ -255,13 +263,13 @@ export default async function AgentStatusPage({
             {/* Status badge */}
             <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border ${statusCfg.bg} ${statusCfg.color} ${statusCfg.border}`}>
               <span className={`w-2 h-2 rounded-full ${statusCfg.dotColor} ${statusCfg.pulse ? 'animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.6)]' : ''}`} aria-hidden="true" />
-              {statusCfg.label}
+              {tStatus(statusKey)}
             </span>
           </div>
 
           {/* Uptime bar */}
           <div className="mb-6">
-            <UptimeBar percent={stats.uptimePercent} />
+            <UptimeBar percent={stats.uptimePercent} label={t('uptimeLabel')} />
           </div>
 
           {/* Stats grid */}
@@ -269,7 +277,7 @@ export default async function AgentStatusPage({
             <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
               <div className="flex items-center justify-center gap-1 text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-2">
                 <MessageSquare className="w-3 h-3" aria-hidden="true" />
-                Messages
+                {t('messages')}
               </div>
               <div className="text-xl font-bold text-[var(--color-accent)] tabular-nums">
                 {stats.messagesProcessed >= 1000
@@ -281,7 +289,7 @@ export default async function AgentStatusPage({
             <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
               <div className="flex items-center justify-center gap-1 text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-2">
                 <Clock className="w-3 h-3" aria-hidden="true" />
-                Days
+                {t('days')}
               </div>
               <div className="text-xl font-bold text-[var(--text-primary)] tabular-nums">
                 {stats.daysActive}
@@ -291,7 +299,7 @@ export default async function AgentStatusPage({
             <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
               <div className="flex items-center justify-center gap-1 text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-2">
                 <Calendar className="w-3 h-3" aria-hidden="true" />
-                Since
+                {t('since')}
               </div>
               <div className="text-xl font-bold text-[var(--text-primary)]">
                 {createdAt.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })}
@@ -306,9 +314,10 @@ export default async function AgentStatusPage({
             {frameworkMeta && (
               <div className="flex items-center gap-2 mb-3">
                 <span className="fw-tag">{frameworkMeta.name}</span>
-                <span className="text-xs text-[var(--text-muted)]">framework</span>
+                <span className="text-xs text-[var(--text-muted)]">{t('framework')}</span>
               </div>
             )}
+            {/* stats.description is user-generated content — not wrapped */}
             {stats.description && (
               <p className="text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-3">
                 {stats.description}
@@ -316,8 +325,10 @@ export default async function AgentStatusPage({
             )}
             {lastActive && (
               <p className="text-[10px] text-[var(--text-muted)] mt-3">
-                Last active: {lastActive.toLocaleDateString()} at{' '}
-                {lastActive.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                {t('lastActive', {
+                  date: lastActive.toLocaleDateString(),
+                  time: lastActive.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                })}
               </p>
             )}
           </div>
@@ -327,7 +338,7 @@ export default async function AgentStatusPage({
         <div className="flex items-center justify-center gap-4 text-xs text-[var(--text-muted)]">
           <Link href={`/agent/${id}`} className="hover:text-[var(--text-secondary)] transition-colors flex items-center gap-1">
             <Activity className="w-3 h-3" aria-hidden="true" />
-            View Profile
+            {t('viewProfile')}
           </Link>
           <span aria-hidden="true">·</span>
           <Link href="/" className="hover:text-[var(--text-secondary)] transition-colors">

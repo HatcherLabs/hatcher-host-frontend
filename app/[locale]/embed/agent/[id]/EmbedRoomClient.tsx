@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { AgentRoomScene } from '@/components/agent-room/AgentRoomScene';
 import { LiveViewers } from '@/components/agent-room/hud/LiveViewers';
 import { paletteFor } from '@/components/agent-room/colors';
@@ -29,6 +30,7 @@ const FW_META: Record<string, { icon: string; label: string }> = {
 };
 
 export function EmbedRoomClient({ id }: Props) {
+  const t = useTranslations('embed');
   const [agent, setAgent] = useState<RoomAgent | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -76,7 +78,7 @@ export function EmbedRoomClient({ id }: Props) {
   if (loading) {
     return (
       <main className="flex h-screen w-screen items-center justify-center bg-black text-gray-500">
-        <div className="text-xs uppercase tracking-[2px]">loading agent…</div>
+        <div className="text-xs uppercase tracking-[2px]">{t('loading')}</div>
       </main>
     );
   }
@@ -84,13 +86,13 @@ export function EmbedRoomClient({ id }: Props) {
     return (
       <main className="flex h-screen w-screen items-center justify-center bg-black text-gray-300">
         <div className="text-center">
-          <div className="text-sm">Agent not found or not public.</div>
+          <div className="text-sm">{t('notFound')}</div>
           <a
             href="https://hatcher.host"
             target="_parent"
             className="mt-2 inline-block text-xs uppercase tracking-[2px] text-yellow-400 underline"
           >
-            → hatcher.host
+            {t('visitHatcher')}
           </a>
         </div>
       </main>
@@ -130,9 +132,10 @@ export function EmbedRoomClient({ id }: Props) {
         >
           {meta.icon} {meta.label}
         </div>
+        {/* agent.name is user-generated content — not wrapped */}
         <div className="mt-0.5 text-sm font-bold text-gray-100">{agent.name}</div>
         <div className="text-[10px] text-gray-400">
-          {agent.messageCount.toLocaleString()} messages
+          {agent.messageCount.toLocaleString()} {t('messages')}
         </div>
       </div>
       {/* Open-in-Hatcher CTA */}
@@ -149,14 +152,14 @@ export function EmbedRoomClient({ id }: Props) {
           boxShadow: `0 0 18px ${palette.primaryHex}44`,
         }}
       >
-        <span>Open in Hatcher</span>
+        <span>{t('openInHatcher')}</span>
         <span aria-hidden>↗</span>
       </a>
       {/* Tiny watermark */}
       <div
         className="pointer-events-none absolute bottom-3 left-3 z-10 text-[9px] uppercase tracking-[2px] text-gray-500"
       >
-        powered by <span className="text-gray-300">hatcher.host</span>
+        {t('poweredBy')} <span className="text-gray-300">hatcher.host</span>
       </div>
     </div>
   );

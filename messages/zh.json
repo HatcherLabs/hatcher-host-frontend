@@ -1161,5 +1161,114 @@
   },
   "settings": {
     "redirect": "[ZH] Redirecting to settings..."
+  },
+  "agentPublic": {
+    "back": {
+      "toCity": "[zh] Back to City",
+      "toMyAgents": "[zh] Back to My Agents",
+      "toDashboard": "[zh] Back to Dashboard"
+    },
+    "status": {
+      "active": "[zh] Active",
+      "sleeping": "[zh] Sleeping",
+      "paused": "[zh] Paused",
+      "error": "[zh] Error",
+      "killed": "[zh] Killed",
+      "restarting": "[zh] Restarting"
+    },
+    "profile": {
+      "featuresCount": "[zh] {count} feature",
+      "featuresCountPlural": "[zh] {count} features",
+      "frameworkFeatures": "[zh] Framework Features",
+      "by": "[zh] by"
+    },
+    "share": {
+      "button": "[zh] Share",
+      "copied": "[zh] Copied!"
+    },
+    "errors": {
+      "connectionError": "[zh] Connection Error",
+      "notFound": "[zh] Agent Not Found",
+      "somethingWrong": "[zh] Something Went Wrong",
+      "defaultMessage": "[zh] This agent doesn't exist or has been removed.",
+      "goBack": "[zh] Go Back",
+      "myAgents": "[zh] My Agents"
+    },
+    "owner": {
+      "heading": "[zh] Manage {name}",
+      "body": "[zh] You own this agent. Head to your dashboard to chat or configure it.",
+      "manageAgent": "[zh] Manage Agent",
+      "openChat": "[zh] Open Chat"
+    },
+    "analytics": {
+      "heading": "[zh] Agent Analytics",
+      "messages": "[zh] Messages",
+      "daysActive": "[zh] Days Active",
+      "uptime": "[zh] Uptime",
+      "status": "[zh] Status",
+      "framework": "[zh] Framework",
+      "created": "[zh] Created"
+    },
+    "deploy": {
+      "heading": "[zh] Deploy a similar agent",
+      "body": "[zh] Create your own {framework} agent on Hatcher. Free to start, deploy in 60 seconds.",
+      "cta": "[zh] Deploy Similar Agent",
+      "myAgents": "[zh] My Agents"
+    },
+    "errorPage": {
+      "heading": "[zh] Failed to Load Agent",
+      "body": "[zh] We couldn't load this agent's details. It may have been removed or there's a connection issue.",
+      "errorId": "[zh] Error ID: {id}",
+      "tryAgain": "[zh] Try Again",
+      "browseAgents": "[zh] Browse Agents"
+    },
+    "statusPage": {
+      "poweredBy": "[zh] Powered by",
+      "uptimeLabel": "[zh] 24h uptime",
+      "messages": "[zh] Messages",
+      "days": "[zh] Days",
+      "since": "[zh] Since",
+      "framework": "[zh] framework",
+      "lastActive": "[zh] Last active: {date} at {time}",
+      "viewProfile": "[zh] View Profile",
+      "notFound": {
+        "heading": "[zh] Agent Not Found",
+        "body": "[zh] This agent does not exist or is not publicly visible.",
+        "browseAgents": "[zh] Browse Agents"
+      }
+    }
+  },
+  "city": {
+    "loading": "[zh] LOADING HATCHER CITY…",
+    "category": {
+      "district": "[zh] District",
+      "breadcrumbCity": "[zh] Hatcher City",
+      "statAgents": "[zh] agents",
+      "statRunning": "[zh] running",
+      "statShareOfCity": "[zh] share of city",
+      "seeIn3d": "[zh] See it in 3D →",
+      "emptyState": "[zh] No agents in this district yet.",
+      "emptyStateCta": "[zh] Be the first to build one.",
+      "otherDistricts": "[zh] Other districts",
+      "msgs": "[zh] msgs"
+    },
+    "agentCity": {
+      "breadcrumbCity": "[zh] Hatcher City",
+      "openAgent": "[zh] Open agent →",
+      "seeInFullCity": "[zh] See in full city",
+      "shareableLink": "[zh] Shareable link:",
+      "kvFramework": "[zh] framework",
+      "kvTier": "[zh] tier",
+      "kvStatus": "[zh] status",
+      "kvMessages": "[zh] messages"
+    }
+  },
+  "embed": {
+    "loading": "[zh] loading agent…",
+    "notFound": "[zh] Agent not found or not public.",
+    "visitHatcher": "[zh] → hatcher.host",
+    "openInHatcher": "[zh] Open in Hatcher",
+    "poweredBy": "[zh] powered by",
+    "messages": "[zh] messages"
   }
 }

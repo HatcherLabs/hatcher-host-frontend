@@ -1161,5 +1161,114 @@
   },
   "settings": {
     "redirect": "Redirecting to settings..."
+  },
+  "agentPublic": {
+    "back": {
+      "toCity": "Back to City",
+      "toMyAgents": "Back to My Agents",
+      "toDashboard": "Back to Dashboard"
+    },
+    "status": {
+      "active": "Active",
+      "sleeping": "Sleeping",
+      "paused": "Paused",
+      "error": "Error",
+      "killed": "Killed",
+      "restarting": "Restarting"
+    },
+    "profile": {
+      "featuresCount": "{count} feature",
+      "featuresCountPlural": "{count} features",
+      "frameworkFeatures": "Framework Features",
+      "by": "by"
+    },
+    "share": {
+      "button": "Share",
+      "copied": "Copied!"
+    },
+    "errors": {
+      "connectionError": "Connection Error",
+      "notFound": "Agent Not Found",
+      "somethingWrong": "Something Went Wrong",
+      "defaultMessage": "This agent doesn't exist or has been removed.",
+      "goBack": "Go Back",
+      "myAgents": "My Agents"
+    },
+    "owner": {
+      "heading": "Manage {name}",
+      "body": "You own this agent. Head to your dashboard to chat or configure it.",
+      "manageAgent": "Manage Agent",
+      "openChat": "Open Chat"
+    },
+    "analytics": {
+      "heading": "Agent Analytics",
+      "messages": "Messages",
+      "daysActive": "Days Active",
+      "uptime": "Uptime",
+      "status": "Status",
+      "framework": "Framework",
+      "created": "Created"
+    },
+    "deploy": {
+      "heading": "Deploy a similar agent",
+      "body": "Create your own {framework} agent on Hatcher. Free to start, deploy in 60 seconds.",
+      "cta": "Deploy Similar Agent",
+      "myAgents": "My Agents"
+    },
+    "errorPage": {
+      "heading": "Failed to Load Agent",
+      "body": "We couldn't load this agent's details. It may have been removed or there's a connection issue.",
+      "errorId": "Error ID: {id}",
+      "tryAgain": "Try Again",
+      "browseAgents": "Browse Agents"
+    },
+    "statusPage": {
+      "poweredBy": "Powered by",
+      "uptimeLabel": "24h uptime",
+      "messages": "Messages",
+      "days": "Days",
+      "since": "Since",
+      "framework": "framework",
+      "lastActive": "Last active: {date} at {time}",
+      "viewProfile": "View Profile",
+      "notFound": {
+        "heading": "Agent Not Found",
+        "body": "This agent does not exist or is not publicly visible.",
+        "browseAgents": "Browse Agents"
+      }
+    }
+  },
+  "city": {
+    "loading": "LOADING HATCHER CITY…",
+    "category": {
+      "district": "District",
+      "breadcrumbCity": "Hatcher City",
+      "statAgents": "agents",
+      "statRunning": "running",
+      "statShareOfCity": "share of city",
+      "seeIn3d": "See it in 3D →",
+      "emptyState": "No agents in this district yet.",
+      "emptyStateCta": "Be the first to build one.",
+      "otherDistricts": "Other districts",
+      "msgs": "msgs"
+    },
+    "agentCity": {
+      "breadcrumbCity": "Hatcher City",
+      "openAgent": "Open agent →",
+      "seeInFullCity": "See in full city",
+      "shareableLink": "Shareable link:",
+      "kvFramework": "framework",
+      "kvTier": "tier",
+      "kvStatus": "status",
+      "kvMessages": "messages"
+    }
+  },
+  "embed": {
+    "loading": "loading agent…",
+    "notFound": "Agent not found or not public.",
+    "visitHatcher": "→ hatcher.host",
+    "openInHatcher": "Open in Hatcher",
+    "poweredBy": "powered by",
+    "messages": "messages"
   }
 }

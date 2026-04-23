@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
+import { getTranslations } from 'next-intl/server';
 import { API_URL } from '@/lib/config';
 import { CATEGORY_LABELS } from '@/components/city/types';
 import type { CityAgent, CityResponse } from '@/components/city/types';
@@ -55,6 +56,7 @@ export default async function AgentCityPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const t = await getTranslations('city.agentCity');
   const agent = await fetchAgent(id);
   if (!agent) notFound();
 
@@ -62,12 +64,13 @@ export default async function AgentCityPage({
     <div className="min-h-[calc(100vh-4rem)] bg-[#050814]">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl flex-col gap-6 px-4 py-10 sm:px-6">
         <nav className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-          <Link href="/city" className="hover:text-[var(--text-primary)]">Hatcher City</Link>
+          <Link href="/city" className="hover:text-[var(--text-primary)]">{t('breadcrumbCity')}</Link>
           <span>›</span>
           <Link href={`/city/${agent.category}`} className="hover:text-[var(--text-primary)]">
             {CATEGORY_LABELS[agent.category]}
           </Link>
           <span>›</span>
+          {/* agent.name is user-generated content — not wrapped */}
           <span className="text-[var(--text-secondary)]">{agent.name}</span>
         </nav>
 
@@ -80,32 +83,33 @@ export default async function AgentCityPage({
               <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-500">
                 {CATEGORY_LABELS[agent.category]}
               </p>
+              {/* agent.name is user-generated content — not wrapped */}
               <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">
                 {agent.name}
               </h1>
             </div>
             <dl className="grid grid-cols-2 gap-3 text-sm text-[var(--text-secondary)]">
-              <Kv k="framework" v={agent.framework} />
-              <Kv k="tier" v={tierLabel(agent.tier)} />
-              <Kv k="status" v={agent.status} />
-              <Kv k="messages" v={agent.messageCount.toLocaleString()} />
+              <Kv k={t('kvFramework')} v={agent.framework} />
+              <Kv k={t('kvTier')} v={tierLabel(agent.tier)} />
+              <Kv k={t('kvStatus')} v={agent.status} />
+              <Kv k={t('kvMessages')} v={agent.messageCount.toLocaleString()} />
             </dl>
             <div className="flex gap-2">
               <Link
                 href={`/agent/${agent.id}`}
                 className="inline-flex items-center rounded-full border border-amber-400 bg-amber-400 px-4 py-2 font-mono text-xs uppercase tracking-widest text-black hover:bg-transparent hover:text-amber-400"
               >
-                Open agent →
+                {t('openAgent')}
               </Link>
               <Link
                 href={`/city?agent=${agent.id}`}
                 className="inline-flex items-center rounded-full border border-[var(--border-default)] px-4 py-2 font-mono text-xs uppercase tracking-widest text-[var(--text-secondary)] hover:border-amber-400 hover:text-amber-400"
               >
-                See in full city
+                {t('seeInFullCity')}
               </Link>
             </div>
             <p className="text-xs text-[var(--text-muted)]">
-              Shareable link: <code className="text-[var(--text-secondary)]">hatcher.host/agent/{agent.id}/city</code>
+              {t('shareableLink')} <code className="text-[var(--text-secondary)]">hatcher.host/agent/{agent.id}/city</code>
             </p>
           </aside>
         </div>

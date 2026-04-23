@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { API_URL } from '@/lib/config';
 import type {
   Category,
@@ -114,6 +115,7 @@ export default async function CategoryPage({
   const { category } = await params;
   if (!isCategory(category)) notFound();
 
+  const t = await getTranslations('city.category');
   const city = await fetchCity();
   const agents = (city?.agents ?? []).filter((a) => a.category === category);
   const counts = city?.counts;
@@ -131,7 +133,7 @@ export default async function CategoryPage({
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
         {/* Breadcrumb */}
         <nav className="mb-6 flex items-center gap-2 text-xs text-[var(--text-muted)]">
-          <Link href="/city" className="hover:text-[var(--text-primary)]">Hatcher City</Link>
+          <Link href="/city" className="hover:text-[var(--text-primary)]">{t('breadcrumbCity')}</Link>
           <span>›</span>
           <span className="text-[var(--text-secondary)]">{label}</span>
         </nav>
@@ -139,8 +141,9 @@ export default async function CategoryPage({
         {/* Hero */}
         <div className="mb-10">
           <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-500">
-            District
+            {t('district')}
           </p>
+          {/* label is the category label (e.g. "Development") — translated via CATEGORY_LABELS */}
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[var(--text-primary)]">
             {label} agents
           </h1>
@@ -148,22 +151,22 @@ export default async function CategoryPage({
             {CATEGORY_TAGLINE[category]}
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-6 text-sm">
-            <Stat label="agents" v={agents.length.toLocaleString()} />
+            <Stat label={t('statAgents')} v={agents.length.toLocaleString()} />
             <Stat
-              label="running"
+              label={t('statRunning')}
               v={agents.filter((a) => a.status === 'running').length.toLocaleString()}
             />
             {counts && (
               <>
                 <Stat
-                  label="share of city"
+                  label={t('statShareOfCity')}
                   v={counts.total ? `${Math.round((agents.length / counts.total) * 100)}%` : '—'}
                 />
                 <Link
                   href={`/city?focus=${category}`}
                   className="ml-auto inline-flex items-center gap-2 rounded-full border border-amber-400 bg-amber-400 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-black hover:bg-transparent hover:text-amber-400 transition"
                 >
-                  See it in 3D →
+                  {t('seeIn3d')}
                 </Link>
               </>
             )}
@@ -173,12 +176,12 @@ export default async function CategoryPage({
         {/* Grid */}
         {sorted.length === 0 ? (
           <div className="rounded border border-[var(--border-default)] bg-[var(--bg-card)] p-10 text-center text-[var(--text-secondary)]">
-            No agents in this district yet. <Link href="/create" className="text-[var(--color-accent)] hover:underline">Be the first to build one.</Link>
+            {t('emptyState')} <Link href="/create" className="text-[var(--color-accent)] hover:underline">{t('emptyStateCta')}</Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {sorted.map((a) => (
-              <AgentCard key={a.id} a={a} />
+              <AgentCard key={a.id} a={a} msgsLabel={t('msgs')} />
             ))}
           </div>
         )}
@@ -186,7 +189,7 @@ export default async function CategoryPage({
         {/* Other districts link row */}
         <div className="mt-14 border-t border-[var(--border-default)] pt-8">
           <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)]">
-            Other districts
+            {t('otherDistricts')}
           </p>
           <div className="flex flex-wrap gap-2">
             {CATEGORIES.filter((c) => c !== category).map((c) => {
@@ -221,7 +224,7 @@ function Stat({ label, v }: { label: string; v: string }) {
   );
 }
 
-function AgentCard({ a }: { a: CityAgent }) {
+function AgentCard({ a, msgsLabel }: { a: CityAgent; msgsLabel: string }) {
   return (
     <Link
       href={`/agent/${a.id}`}
@@ -240,6 +243,7 @@ function AgentCard({ a }: { a: CityAgent }) {
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
+          {/* a.name is user-generated content — not wrapped */}
           <span className="truncate font-semibold text-[var(--text-primary)] group-hover:text-amber-400">
             {a.name}
           </span>
@@ -252,7 +256,7 @@ function AgentCard({ a }: { a: CityAgent }) {
             {FW_LABEL[a.framework]}
           </span>
           <span className="mx-1.5">·</span>
-          {a.messageCount.toLocaleString()} msgs
+          {a.messageCount.toLocaleString()} {msgsLabel}
         </div>
       </div>
     </Link>

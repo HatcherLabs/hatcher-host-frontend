@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams } from 'next/navigation';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 
 /**
  * Back button that picks its destination based on where the user came
@@ -10,11 +11,12 @@ import Link from 'next/link';
  * else falls back to "My Agents" (owner) / "City" (everyone else).
  */
 function BackLink({ isOwner }: { isOwner: boolean }) {
+  const t = useTranslations('agentPublic.back');
   const target = useMemo(() => {
     if (typeof window === 'undefined') {
       return isOwner
-        ? { href: '/dashboard/agents', label: 'Back to My Agents' }
-        : { href: '/city', label: 'Back to City' };
+        ? { href: '/dashboard/agents', label: t('toMyAgents') }
+        : { href: '/city', label: t('toCity') };
     }
     const ref = document.referrer;
     if (ref) {
@@ -22,21 +24,21 @@ function BackLink({ isOwner }: { isOwner: boolean }) {
         const u = new URL(ref);
         if (u.origin === window.location.origin) {
           if (u.pathname === '/city' || u.pathname.startsWith('/city/')) {
-            return { href: '/city', label: 'Back to City' };
+            return { href: '/city', label: t('toCity') };
           }
           if (u.pathname === '/dashboard/agents') {
-            return { href: '/dashboard/agents', label: 'Back to My Agents' };
+            return { href: '/dashboard/agents', label: t('toMyAgents') };
           }
           if (u.pathname === '/dashboard') {
-            return { href: '/dashboard', label: 'Back to Dashboard' };
+            return { href: '/dashboard', label: t('toDashboard') };
           }
         }
       } catch { /* ignore */ }
     }
     return isOwner
-      ? { href: '/dashboard/agents', label: 'Back to My Agents' }
-      : { href: '/city', label: 'Back to City' };
-  }, [isOwner]);
+      ? { href: '/dashboard/agents', label: t('toMyAgents') }
+      : { href: '/city', label: t('toCity') };
+  }, [isOwner, t]);
   return (
     <Link
       href={target.href}
@@ -82,13 +84,13 @@ const FRAMEWORK_AVATAR: Record<string, { gradient: string; icon: React.Component
 };
 
 
-const STATUS_STYLES: Record<string, { bg: string; text: string; border: string; dot: string; pulse: boolean; label: string }> = {
-  active:   { bg: 'bg-green-500/10',  text: 'text-green-400',  border: 'border-green-500/20',  dot: 'bg-green-400',  pulse: true,  label: 'Active' },
-  sleeping: { bg: 'bg-blue-500/10',   text: 'text-blue-400',   border: 'border-blue-500/20',   dot: 'bg-blue-400',   pulse: false, label: 'Sleeping' },
-  paused:   { bg: 'bg-amber-500/10',  text: 'text-amber-400',  border: 'border-amber-500/20',  dot: 'bg-amber-400',  pulse: false, label: 'Paused' },
-  error:    { bg: 'bg-red-500/10',    text: 'text-red-400',    border: 'border-red-500/20',    dot: 'bg-red-400',    pulse: false, label: 'Error' },
-  killed:      { bg: 'bg-red-500/10',    text: 'text-red-400',    border: 'border-red-500/20',    dot: 'bg-red-400',    pulse: false, label: 'Killed' },
-  restarting:  { bg: 'bg-amber-500/10',  text: 'text-amber-400',  border: 'border-amber-500/20',  dot: 'bg-amber-400',  pulse: true,  label: 'Restarting' },
+const STATUS_STYLES: Record<string, { bg: string; text: string; border: string; dot: string; pulse: boolean; key: string }> = {
+  active:   { bg: 'bg-green-500/10',  text: 'text-green-400',  border: 'border-green-500/20',  dot: 'bg-green-400',  pulse: true,  key: 'active' },
+  sleeping: { bg: 'bg-blue-500/10',   text: 'text-blue-400',   border: 'border-blue-500/20',   dot: 'bg-blue-400',   pulse: false, key: 'sleeping' },
+  paused:   { bg: 'bg-amber-500/10',  text: 'text-amber-400',  border: 'border-amber-500/20',  dot: 'bg-amber-400',  pulse: false, key: 'paused' },
+  error:    { bg: 'bg-red-500/10',    text: 'text-red-400',    border: 'border-red-500/20',    dot: 'bg-red-400',    pulse: false, key: 'error' },
+  killed:      { bg: 'bg-red-500/10',    text: 'text-red-400',    border: 'border-red-500/20',    dot: 'bg-red-400',    pulse: false, key: 'killed' },
+  restarting:  { bg: 'bg-amber-500/10',  text: 'text-amber-400',  border: 'border-amber-500/20',  dot: 'bg-amber-400',  pulse: true,  key: 'restarting' },
 };
 
 const cardClass = 'card glass-noise';
@@ -105,6 +107,7 @@ const itemVariants = {
 
 export function AgentPageClient() {
   const { id } = useParams<{ id: string }>();
+  const t = useTranslations('agentPublic');
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -171,10 +174,10 @@ export function AgentPageClient() {
   if (error || !agent) {
     const isNetworkError = error?.toLowerCase().includes('network');
     const title = isNetworkError
-      ? 'Connection Error'
+      ? t('errors.connectionError')
       : error?.toLowerCase().includes('not found') || !error
-        ? 'Agent Not Found'
-        : 'Something Went Wrong';
+        ? t('errors.notFound')
+        : t('errors.somethingWrong');
 
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
@@ -188,7 +191,7 @@ export function AgentPageClient() {
           </div>
           <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">{title}</h1>
           <p className="mb-6 text-[var(--text-secondary)]">
-            {error || "This agent doesn't exist or has been removed."}
+            {error || t('errors.defaultMessage')}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
@@ -196,10 +199,10 @@ export function AgentPageClient() {
               className="btn-secondary inline-flex items-center gap-2 justify-center"
             >
               <ArrowLeft className="w-4 h-4" />
-              Go Back
+              {t('errors.goBack')}
             </button>
             <Link href="/dashboard/agents" className="btn-secondary inline-flex items-center gap-2 justify-center">
-              My Agents
+              {t('errors.myAgents')}
             </Link>
           </div>
         </motion.div>
@@ -245,7 +248,7 @@ export function AgentPageClient() {
               <h1 className="text-2xl font-bold text-[var(--text-primary)]">{agent.name}</h1>
               <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full ${statusStyle.bg} ${statusStyle.text} border ${statusStyle.border}`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.dot} ${statusStyle.pulse ? 'animate-pulse shadow-[0_0_6px_rgba(74,222,128,0.5)]' : ''}`} />
-                {statusStyle.label}
+                {t(`status.${statusStyle.key}`)}
               </span>
             </div>
 
@@ -259,13 +262,13 @@ export function AgentPageClient() {
               {featureCount > 0 && (
                 <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20">
                   <Layers className="w-3 h-3" />
-                  {featureCount} feature{featureCount !== 1 ? 's' : ''}
+                  {featureCount !== 1 ? t('profile.featuresCountPlural', { count: featureCount }) : t('profile.featuresCount', { count: featureCount })}
                 </span>
               )}
             </div>
 
             <div className="text-xs text-[var(--text-muted)]">
-              by <span className="font-medium text-[var(--text-secondary)]">{ownerDisplay}</span>
+              {t('profile.by')} <span className="font-medium text-[var(--text-secondary)]">{ownerDisplay}</span>
             </div>
           </div>
         </div>
@@ -278,7 +281,7 @@ export function AgentPageClient() {
         {/* Framework features */}
         {frameworkMeta && (
           <div className="mb-6">
-            <div className="section-label mb-2">Framework Features</div>
+            <div className="section-label mb-2">{t('profile.frameworkFeatures')}</div>
             <div className="flex flex-wrap gap-2">
               {frameworkMeta.features.map((feat) => (
                 <span key={feat} className="fw-tag">
@@ -308,12 +311,12 @@ export function AgentPageClient() {
             {copied ? (
               <>
                 <Check className="w-3.5 h-3.5 text-green-400" />
-                <span className="text-green-400">Copied!</span>
+                <span className="text-green-400">{t('share.copied')}</span>
               </>
             ) : (
               <>
                 <Share2 className="w-3.5 h-3.5" />
-                Share
+                {t('share.button')}
               </>
             )}
           </button>
@@ -325,19 +328,19 @@ export function AgentPageClient() {
         <motion.div className={`${cardClass} p-6`} variants={itemVariants}>
           <div className="text-center">
             <h2 className="text-lg font-semibold mb-2 text-[var(--text-primary)]">
-              Manage {agent.name}
+              {t('owner.heading', { name: agent.name })}
             </h2>
             <p className="text-sm mb-5 text-[var(--text-muted)]">
-              You own this agent. Head to your dashboard to chat or configure it.
+              {t('owner.body')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href={`/dashboard/agent/${id}?tab=config`} className="btn-primary inline-flex items-center gap-2 justify-center">
                 <Settings className="w-4 h-4" />
-                Manage Agent
+                {t('owner.manageAgent')}
               </Link>
               <Link href={`/dashboard/agent/${id}?tab=chat`} className="btn-secondary inline-flex items-center gap-2 justify-center">
                 <MessageSquare className="w-4 h-4" />
-                Open Chat
+                {t('owner.openChat')}
               </Link>
             </div>
           </div>
@@ -348,14 +351,14 @@ export function AgentPageClient() {
           <motion.div className={`${cardClass} p-6 mb-6`} variants={itemVariants}>
             <h2 className="text-lg font-semibold mb-4 text-[var(--text-primary)] flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-[var(--color-accent)]" />
-              Agent Analytics
+              {t('analytics.heading')}
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {/* Messages Processed — big stat */}
               <div className="rounded-xl bg-[var(--bg-elevated)] p-5 text-center col-span-2 sm:col-span-1">
                 <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-2 flex items-center justify-center gap-1">
                   <MessageSquare className="w-3 h-3" />
-                  Messages
+                  {t('analytics.messages')}
                 </div>
                 <div className="text-3xl font-bold text-[var(--color-accent)]">
                   {publicStats ? publicStats.messagesProcessed.toLocaleString() : (agent.messageCount ?? 0).toLocaleString()}
@@ -366,7 +369,7 @@ export function AgentPageClient() {
               <div className="rounded-xl bg-[var(--bg-elevated)] p-5 text-center">
                 <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-2 flex items-center justify-center gap-1">
                   <Clock className="w-3 h-3" />
-                  Days Active
+                  {t('analytics.daysActive')}
                 </div>
                 <div className="text-3xl font-bold text-[var(--text-primary)]">
                   {publicStats?.daysActive ?? Math.max(1, Math.floor((Date.now() - new Date(agent.createdAt).getTime()) / (1000 * 60 * 60 * 24)))}
@@ -377,7 +380,7 @@ export function AgentPageClient() {
               <div className="rounded-xl bg-[var(--bg-elevated)] p-5 text-center">
                 <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-2 flex items-center justify-center gap-1">
                   <Activity className="w-3 h-3" />
-                  Uptime
+                  {t('analytics.uptime')}
                 </div>
                 <div className="text-3xl font-bold text-emerald-400">
                   {publicStats ? `${publicStats.uptimePercent}%` : '--'}
@@ -386,22 +389,22 @@ export function AgentPageClient() {
 
               {/* Status */}
               <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
-                <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Status</div>
+                <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">{t('analytics.status')}</div>
                 <span className={`inline-flex items-center gap-1.5 text-sm font-semibold ${statusStyle.text}`}>
                   <span className={`w-2 h-2 rounded-full ${statusStyle.dot} ${statusStyle.pulse ? 'animate-pulse' : ''}`} />
-                  {statusStyle.label}
+                  {t(`status.${statusStyle.key}`)}
                 </span>
               </div>
 
               {/* Framework */}
               <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
-                <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Framework</div>
+                <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">{t('analytics.framework')}</div>
                 <div className="text-sm font-semibold text-[var(--text-primary)]">{frameworkMeta?.name ?? agent.framework}</div>
               </div>
 
               {/* Created */}
               <div className="rounded-xl bg-[var(--bg-elevated)] p-4 text-center">
-                <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">Created</div>
+                <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-1">{t('analytics.created')}</div>
                 <div className="text-sm font-semibold text-[var(--text-primary)]">{timeAgo(agent.createdAt)}</div>
               </div>
             </div>
@@ -412,10 +415,10 @@ export function AgentPageClient() {
             <div className="text-center">
               <Rocket className="w-8 h-8 text-purple-400 mx-auto mb-3" />
               <h2 className="text-lg font-semibold mb-2 text-[var(--text-primary)]">
-                Deploy a similar agent
+                {t('deploy.heading')}
               </h2>
               <p className="text-sm mb-5 text-[var(--text-muted)]">
-                Create your own {frameworkMeta?.name ?? agent.framework} agent on Hatcher. Free to start, deploy in 60 seconds.
+                {t('deploy.body', { framework: frameworkMeta?.name ?? agent.framework })}
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
@@ -423,10 +426,10 @@ export function AgentPageClient() {
                   className="btn-primary inline-flex items-center gap-2 justify-center"
                 >
                   <Rocket className="w-4 h-4" />
-                  Deploy Similar Agent
+                  {t('deploy.cta')}
                 </Link>
                 <Link href="/dashboard/agents" className="btn-secondary inline-flex items-center gap-2 justify-center">
-                  My Agents
+                  {t('deploy.myAgents')}
                 </Link>
               </div>
             </div>

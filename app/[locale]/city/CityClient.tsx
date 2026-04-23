@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { API_URL } from '@/lib/config';
 import { CityHud } from '@/components/city/CityHud';
 import { CitySound, type CitySoundControls } from '@/components/city/CitySound';
@@ -34,6 +35,7 @@ interface Props {
 }
 
 export function CityClient({ initial }: Props) {
+  const t = useTranslations('city');
   const router = useRouter();
   const searchParams = useSearchParams();
   const [data, setData] = useState<CityResponse | null>(initial);
@@ -225,7 +227,7 @@ export function CityClient({ initial }: Props) {
   if (!data) {
     return (
       <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-[#050814] font-['Press_Start_2P',monospace] tracking-[3px] text-amber-400">
-        LOADING HATCHER CITY…
+        {t('loading')}
       </div>
     );
   }
