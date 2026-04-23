@@ -2,20 +2,47 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 import { useTransition } from 'react';
+import { usePathname as useRawPathname } from 'next/navigation';
 import { useRouter, usePathname } from '@/i18n/routing';
 import { locales, localeLabels, localeFlags, type Locale } from '@/i18n/config';
+
+// Paths outside the [locale] segment — no localized version exists.
+// Keep in sync with NON_LOCALE_PREFIXES in middleware.ts.
+const NON_LOCALE_PREFIXES = [
+  '/admin',
+  '/privacy',
+  '/terms',
+  '/impressum',
+  '/cookies',
+  '/og',
+  '/skill',
+  '/.well-known',
+];
+
+function isNonLocalePath(rawPath: string): boolean {
+  return NON_LOCALE_PREFIXES.some(
+    (p) => rawPath === p || rawPath.startsWith(p + '/'),
+  );
+}
 
 export function LocaleSwitcher() {
   const locale = useLocale() as Locale;
   const router = useRouter();
   const pathname = usePathname();
+  const rawPathname = useRawPathname();
   const t = useTranslations('localeSwitcher');
   const [isPending, startTransition] = useTransition();
 
   function onChange(next: Locale) {
     if (next === locale) return;
     startTransition(() => {
-      router.replace(pathname, { locale: next });
+      // Non-locale routes (legal pages, admin) have no localized version —
+      // jump to the homepage in the target locale instead of a dead 404.
+      if (isNonLocalePath(rawPathname)) {
+        router.replace('/', { locale: next });
+      } else {
+        router.replace(pathname, { locale: next });
+      }
     });
   }
 
