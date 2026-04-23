@@ -19,6 +19,7 @@ import { Buildings } from './world/Buildings';
 import {
   CharacterController,
   CharacterMesh,
+  MouseLook,
   type CharacterState,
 } from './character/CharacterController';
 import { FollowCamera } from './character/FollowCamera';
@@ -44,6 +45,8 @@ export function CitySceneV2({ agents = [] }: Props) {
   const charState = useRef<CharacterState>({
     position: new THREE.Vector3(0, 0, 0),
     heading: 0,
+    cameraYaw: 0,
+    cameraPitch: 0.35,
   });
 
   // Esc exits walk mode from anywhere on the page
@@ -143,6 +146,7 @@ function CanvasInner({
       ) : (
         <>
           <CharacterController state={charState} />
+          <MouseLook state={charState} />
           <FollowCamera state={charState} />
         </>
       )}

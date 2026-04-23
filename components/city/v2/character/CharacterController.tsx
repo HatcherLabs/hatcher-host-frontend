@@ -5,25 +5,30 @@ import * as THREE from 'three';
 
 export interface CharacterState {
   position: THREE.Vector3;
-  heading: number; // radians, 0 = +x
+  heading: number; // radians, used to face the character mesh
+  // Camera orbit controlled by the mouse. Decoupled from character
+  // heading so you can look one way while walking another.
+  cameraYaw: number;   // radians, 0 = camera behind +z character (looks +x default)
+  cameraPitch: number; // radians, 0 = horizontal, + = above character
 }
 
 interface Props {
   state: CharacterState;
-  speed?: number; // units / second
+  speed?: number;
 }
 
 /**
- * Kinematic walking controller — reads WASD + Shift from the window
- * and writes into a shared `CharacterState` ref so both the character
- * mesh and FollowCamera can read from the same source without
- * prop-drilling or state broadcasts.
+ * Kinematic walking controller — reads WASD/Arrows + Shift from the
+ * window, drives movement camera-relative (so W = forward regardless
+ * of the character's current facing). Writes into a shared
+ * CharacterState ref shared with FollowCamera.
  *
- * Movement is camera-relative: W moves the character in the direction
- * the camera is facing (projected to the ground plane), A/D strafe,
- * S backpedals. Shift doubles speed. No jump, no collision — buildings
- * just pass through for this first pass. Rapier integration lands in a
- * later commit if we need proper collision.
+ * Strafe math note: "camera right" in Three.js right-handed Y-up
+ * (forward=-z default) is +x, computed as cross(forward, up). The
+ * shortcut that works for any forward on the x/z plane is
+ *     right = ( -forward.z, 0,  forward.x )
+ * NOT ( forward.z, 0, -forward.x ). A previous version had the sign
+ * flipped, which made A/D feel swapped.
  */
 export function CharacterController({ state, speed = 12 }: Props) {
   const { camera } = useThree();
@@ -97,12 +102,13 @@ export function CharacterController({ state, speed = 12 }: Props) {
     const { forward, back, left, right, sprint } = keys.current;
     if (!forward && !back && !left && !right) return;
 
-    // Camera-forward projected to ground plane
+    // Camera forward projected to the ground plane.
     const camDir = new THREE.Vector3();
     camera.getWorldDirection(camDir);
     camDir.y = 0;
     camDir.normalize();
-    const camRight = new THREE.Vector3(camDir.z, 0, -camDir.x);
+    // Right vector — see the doc comment on this component for why.
+    const camRight = new THREE.Vector3(-camDir.z, 0, camDir.x);
 
     const move = new THREE.Vector3();
     if (forward) move.add(camDir);
@@ -115,7 +121,7 @@ export function CharacterController({ state, speed = 12 }: Props) {
 
     const stepDist = (sprint ? speed * 1.8 : speed) * dt;
     state.position.addScaledVector(move, stepDist);
-    // Clamp to a 270u radius so the character can't walk off the map
+    // Clamp to a 270u radius so the character can't walk off the map.
     const r = Math.sqrt(state.position.x ** 2 + state.position.z ** 2);
     const MAX = 270;
     if (r > MAX) {
@@ -129,9 +135,54 @@ export function CharacterController({ state, speed = 12 }: Props) {
 }
 
 /**
- * Visible avatar for the character. A simple emissive capsule for
- * now — later phases swap this for a Meshy-generated framework robot.
+ * Mouse-drag-to-look — read mouse deltas while the primary button is
+ * held and apply them to CharacterState.cameraYaw/cameraPitch. Pitch
+ * clamped so you can't flip over the top. No pointer lock — a drag
+ * feels less intrusive for a survey-to-walk toggle.
  */
+export function MouseLook({
+  state,
+  domElement,
+  sensitivity = 0.0035,
+}: {
+  state: CharacterState;
+  domElement?: HTMLElement | null;
+  sensitivity?: number;
+}) {
+  const dragging = useRef(false);
+  useEffect(() => {
+    const el = domElement ?? window;
+    const down = (e: Event) => {
+      const pe = e as PointerEvent;
+      if (pe.button !== 0) return;
+      dragging.current = true;
+    };
+    const up = () => {
+      dragging.current = false;
+    };
+    const move = (e: Event) => {
+      if (!dragging.current) return;
+      const pe = e as PointerEvent;
+      state.cameraYaw -= pe.movementX * sensitivity;
+      state.cameraPitch = Math.max(
+        -0.45,
+        Math.min(0.95, state.cameraPitch - pe.movementY * sensitivity),
+      );
+    };
+    el.addEventListener('pointerdown', down as EventListener);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointermove', move as EventListener);
+    return () => {
+      el.removeEventListener('pointerdown', down as EventListener);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointermove', move as EventListener);
+    };
+  }, [state, domElement, sensitivity]);
+  return null;
+}
+
+/** Visible avatar for the character. Emissive capsule placeholder —
+ *  framework robot lands in a later commit. */
 export function CharacterMesh({ state }: { state: CharacterState }) {
   const ref = useRef<THREE.Mesh>(null);
   useFrame(() => {
