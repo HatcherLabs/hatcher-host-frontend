@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import {
   BookOpen,
   MessageCircle,
@@ -36,48 +37,6 @@ const cardVariants = {
 
 // ── Quick Links ────────────────────────────────────────────────
 
-const QUICK_LINKS = [
-  {
-    label: 'Documentation',
-    href: DOCS_URL,
-    icon: BookOpen,
-    emoji: '\uD83D\uDCD6',
-    color: 'var(--color-accent)',
-    external: true,
-  },
-  {
-    label: 'Discord Community',
-    href: 'https://discord.gg/7tY3HjKjMc',
-    icon: MessageCircle,
-    emoji: '\uD83D\uDCAC',
-    color: '#7289da',
-    external: true,
-  },
-  {
-    label: 'Telegram Group',
-    href: 'https://t.me/HatcherLabs',
-    icon: MessageCircle,
-    emoji: '\u2708\uFE0F',
-    color: '#29a9eb',
-    external: true,
-  },
-  {
-    label: 'Submit Ticket',
-    href: '/support',
-    icon: Ticket,
-    emoji: '\uD83C\uDFAB',
-    color: '#f59e0b',
-    external: false,
-  },
-  {
-    label: 'Email Support',
-    href: 'mailto:support@hatcher.host',
-    icon: Mail,
-    emoji: '\u2709\uFE0F',
-    color: '#10b981',
-    external: true,
-  },
-];
 
 // ── FAQ Sections ───────────────────────────────────────────────
 
@@ -214,6 +173,7 @@ const ALL_FAQ_ITEMS = FAQ_SECTIONS.flatMap((section) =>
 // ── Page Component ──────────────────────────────────────────────
 
 export default function HelpPage() {
+  const t = useTranslations('help');
   const [searchQuery, setSearchQuery] = useState('');
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
@@ -264,12 +224,12 @@ export default function HelpPage() {
         {/* Header */}
         <motion.div variants={cardVariants} className="relative">
           <div>
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Resources</p>
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('eyebrow')}</p>
             <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              Help center
+              {t('heading')}
             </h1>
             <p className="text-sm mt-2 text-[var(--text-secondary)]">
-              Find answers, browse guides, and get in touch with support.
+              {t('subheading')}
             </p>
           </div>
         </motion.div>
@@ -277,7 +237,13 @@ export default function HelpPage() {
         {/* Quick Links */}
         <motion.div variants={cardVariants}>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {QUICK_LINKS.map((link, index) => {
+            {[
+              { label: t('quickLinks.documentation'), href: DOCS_URL, icon: BookOpen, color: 'var(--color-accent)', external: true },
+              { label: t('quickLinks.discord'), href: 'https://discord.gg/7tY3HjKjMc', icon: MessageCircle, color: '#7289da', external: true },
+              { label: t('quickLinks.telegram'), href: 'https://t.me/HatcherLabs', icon: MessageCircle, color: '#29a9eb', external: true },
+              { label: t('quickLinks.submitTicket'), href: '/support', icon: Ticket, color: '#f59e0b', external: false },
+              { label: t('quickLinks.emailSupport'), href: 'mailto:support@hatcher.host', icon: Mail, color: '#10b981', external: true },
+            ].map((link, index) => {
               const inner = (
                 <motion.div
                   className="group card glass-noise p-4 flex flex-col items-center gap-2.5 text-center transition-all duration-200 hover:border-[rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.06)] cursor-pointer"
@@ -323,7 +289,7 @@ export default function HelpPage() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search all questions... e.g. &quot;BYOK&quot;, &quot;rate limit&quot;, &quot;Telegram&quot;"
+            placeholder={t('searchPlaceholder')}
             className="w-full pl-11 pr-20 py-3.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-default)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all duration-200"
           />
           {searchQuery && (
@@ -332,7 +298,7 @@ export default function HelpPage() {
               className="absolute inset-y-0 right-4 flex items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
             >
               <span className="text-xs text-[var(--text-secondary)]">
-                {filteredItems.length} {filteredItems.length === 1 ? 'result' : 'results'}
+                {filteredItems.length === 1 ? t('resultCount', { count: filteredItems.length }) : t('resultCountPlural', { count: filteredItems.length })}
               </span>
               <X size={14} />
             </button>
@@ -362,7 +328,7 @@ export default function HelpPage() {
                     </h2>
                     {isSearching && (
                       <span className="text-xs text-[var(--text-muted)] ml-auto">
-                        {section.items.length} {section.items.length === 1 ? 'match' : 'matches'}
+                        {section.items.length === 1 ? t('matchCount', { count: section.items.length }) : t('matchCountPlural', { count: section.items.length })}
                       </span>
                     )}
                   </div>
@@ -395,17 +361,17 @@ export default function HelpPage() {
             >
               <HelpCircle size={36} className="mx-auto text-[var(--text-muted)] mb-3" />
               <p className="text-sm text-[var(--text-secondary)]">
-                No matching questions found for &ldquo;{searchQuery}&rdquo;
+                {t('noMatchHeading')}
               </p>
               <p className="text-xs text-[var(--text-muted)] mt-2">
-                Try different keywords or browse the{' '}
+                {t('noMatchBody')}{' '}
                 <a
                   href={DOCS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[var(--color-accent)] hover:underline"
                 >
-                  documentation
+                  {t('documentationLink')}
                 </a>
               </p>
             </motion.div>
@@ -420,19 +386,19 @@ export default function HelpPage() {
               <Mail size={16} className="text-[var(--color-accent)]" />
             </div>
             <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-              Contact Us
+              {t('contactHeading')}
             </h2>
           </div>
           <div className="space-y-3 text-sm text-[var(--text-secondary)] leading-relaxed relative">
             <p>
-              Can&apos;t find what you&apos;re looking for?{' '}
+              {t('contactBody')}{' '}
               <Link
                 href="/support"
                 className="font-medium text-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors underline decoration-[var(--color-accent)]/30 underline-offset-2"
               >
-                Open a support ticket
+                {t('openTicket')}
               </Link>{' '}
-              or reach out directly:
+              {t('contactOr')}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
               <a
@@ -442,7 +408,7 @@ export default function HelpPage() {
                 <Mail size={14} className="text-[var(--color-accent)] flex-shrink-0" />
                 <div>
                   <p className="text-xs font-medium text-[var(--text-primary)] group-hover:text-[var(--color-accent)] transition-colors">support@hatcher.host</p>
-                  <p className="text-[10px] text-[var(--text-muted)]">Technical help</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">{t('technicalHelp')}</p>
                 </div>
               </a>
               <a
@@ -452,7 +418,7 @@ export default function HelpPage() {
                 <Mail size={14} className="text-[#10b981] flex-shrink-0" />
                 <div>
                   <p className="text-xs font-medium text-[var(--text-primary)] group-hover:text-[var(--color-accent)] transition-colors">contact@hatcher.host</p>
-                  <p className="text-[10px] text-[var(--text-muted)]">General inquiries</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">{t('generalInquiries')}</p>
                 </div>
               </a>
               <a
@@ -464,7 +430,7 @@ export default function HelpPage() {
                 <MessageCircle size={14} className="text-[#7289da] flex-shrink-0" />
                 <div>
                   <p className="text-xs font-medium text-[var(--text-primary)] group-hover:text-[var(--color-accent)] transition-colors">Discord</p>
-                  <p className="text-[10px] text-[var(--text-muted)]">Community support</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">{t('communitySupport')}</p>
                 </div>
               </a>
               <a
@@ -476,7 +442,7 @@ export default function HelpPage() {
                 <MessageCircle size={14} className="text-[#29a9eb] flex-shrink-0" />
                 <div>
                   <p className="text-xs font-medium text-[var(--text-primary)] group-hover:text-[var(--color-accent)] transition-colors">Telegram</p>
-                  <p className="text-[10px] text-[var(--text-muted)]">Community chat</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">{t('communityChat')}</p>
                 </div>
               </a>
             </div>
@@ -495,10 +461,10 @@ export default function HelpPage() {
             </div>
             <div className="flex-1 min-w-0 relative">
               <p className="text-base font-semibold text-[var(--text-primary)] group-hover:text-[var(--color-accent)] transition-colors">
-                Still need help?
+                {t('stillNeedHelp')}
               </p>
               <p className="text-sm mt-0.5 text-[var(--text-secondary)]">
-                Submit a support ticket and our team will get back to you within 24 hours.
+                {t('ticketResponse')}
               </p>
             </div>
             <ArrowRight size={20} className="flex-shrink-0 text-[var(--text-muted)] group-hover:text-[var(--color-accent)] transition-all duration-200 group-hover:translate-x-1 relative" />

@@ -17,7 +17,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -53,6 +54,7 @@ const RESERVED_SLUGS = new Set<string>([
   'cristian', 'hatcher', 'hatcherlabs', 'claude', 'anthropic',
   'test', 'demo', 'example',
 ]);
+
 
 const MAX_PLATFORMS = 5;
 
@@ -125,20 +127,22 @@ const PAYOUT_OPTIONS: Array<{
 ];
 
 // ============================================================
-// Slug validation — returns null if valid, else a specific reason.
-function validateSlug(raw: string): string | null {
+// Slug validation — returns null if valid, else a translation key.
+type SlugErrorKey = 'slugTooShort' | 'slugTooLong' | 'slugInvalidChars' | 'slugReserved';
+function validateSlug(raw: string): SlugErrorKey | null {
   const slug = raw.trim().toLowerCase();
   if (slug.length === 0) return null; // optional
-  if (slug.length < 3) return 'Too short — min 3 characters';
-  if (slug.length > 30) return 'Too long — max 30 characters';
-  if (!SLUG_RE.test(slug)) return 'Only a–z, 0–9, and hyphens (cannot start/end with -)';
-  if (RESERVED_SLUGS.has(slug)) return 'That slug is reserved — pick another';
+  if (slug.length < 3) return 'slugTooShort';
+  if (slug.length > 30) return 'slugTooLong';
+  if (!SLUG_RE.test(slug)) return 'slugInvalidChars';
+  if (RESERVED_SLUGS.has(slug)) return 'slugReserved';
   return null;
 }
 
 // ============================================================
 
 export default function AffiliateApplyPage() {
+  const t = useTranslations('affiliate.apply');
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
@@ -190,7 +194,7 @@ export default function AffiliateApplyPage() {
     return (
       <CenteredMessage>
         <Loader2 className="w-5 h-5 animate-spin text-[var(--text-muted)]" />
-        <p className="text-sm text-[var(--text-muted)]">Loading…</p>
+        <p className="text-sm text-[var(--text-muted)]">{t('loading')}</p>
       </CenteredMessage>
     );
   }
@@ -227,6 +231,7 @@ export default function AffiliateApplyPage() {
 // Pending state — read-only recap
 // ============================================================
 function PendingRecap({ application }: { application: Application }) {
+  const t = useTranslations('affiliate.apply');
   return (
     <div className="mx-auto max-w-2xl px-4 pt-12 sm:pt-16 pb-20">
       <BackLink />
@@ -243,24 +248,24 @@ function PendingRecap({ application }: { application: Application }) {
           </div>
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
-              Application submitted
+              {t('submitted')}
             </p>
             <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">
-              Under review — we&apos;ll be in touch.
+              {t('underReview')}
             </h1>
           </div>
         </div>
         <p className="text-sm text-[var(--text-secondary)] mb-6">
-          Expected review time: <strong className="text-[var(--text-primary)]">3–5 days</strong>.
-          You&apos;ll get an email the moment a decision lands.
+          {t('reviewTime')} <strong className="text-[var(--text-primary)]">{t('reviewDays')}</strong>.
+          {t('reviewEmailNote')}
         </p>
 
         <dl className="space-y-4 text-sm border-t border-[var(--border-default)] pt-5">
-          <Row label="Submitted">{new Date(application.createdAt).toLocaleString()}</Row>
+          <Row label={t('submittedDate')}>{new Date(application.createdAt).toLocaleString()}</Row>
 
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)] mb-2">
-              Platforms
+              {t('platformsLabel')}
             </p>
             <ul className="space-y-2">
               {application.platforms.map((p, i) => (
@@ -277,7 +282,7 @@ function PendingRecap({ application }: { application: Application }) {
                     </span>
                     {p.audienceSize !== null && (
                       <span className="text-xs text-[var(--text-muted)]">
-                        {p.audienceSize.toLocaleString()} followers
+                        {p.audienceSize.toLocaleString()} {t('followers')}
                       </span>
                     )}
                   </div>
@@ -297,28 +302,28 @@ function PendingRecap({ application }: { application: Application }) {
           </div>
 
           {application.desiredSlug && (
-            <Row label="Requested slug">
+            <Row label={t('slugLabel')}>
               <span className="font-mono text-xs">
                 {application.desiredSlug}
               </span>
               <span className="block text-xs text-[var(--text-muted)] mt-0.5">
-                preview: hatcher.host/r/{application.desiredSlug}
+                {t('slugPreview', { slug: application.desiredSlug })}
               </span>
             </Row>
           )}
 
-          <Row label="Payout mode">
+          <Row label={t('payoutModeLabel')}>
             {PAYOUT_OPTIONS.find((p) => p.value === application.payoutMode)?.label ??
               application.payoutMode}
           </Row>
           {application.payoutAddress && (
-            <Row label="Payout address">
+            <Row label={t('payoutAddressLabel')}>
               <span className="font-mono text-xs break-all">{application.payoutAddress}</span>
             </Row>
           )}
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)] mb-1.5">
-              Pitch
+              {t('pitchLabel')}
             </p>
             <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap leading-relaxed">
               {application.pitch}
@@ -373,6 +378,7 @@ function ApplyForm({
   previousApplication: Application | null;
   onSubmitted: (app: Application) => void;
 }) {
+  const t = useTranslations('affiliate.apply');
   const wasRejected = previousApplication?.status === 'REJECTED';
 
   // Seed the form from the previous (rejected) submission so users don't
@@ -411,7 +417,8 @@ function ApplyForm({
   // (not on each keystroke) so users can type naturally — we still
   // strip whitespace immediately and lowercase before submit.
   const slugTrimmed = form.desiredSlug.trim().toLowerCase();
-  const slugError = useMemo(() => validateSlug(form.desiredSlug), [form.desiredSlug]);
+  const slugErrorKey = useMemo(() => validateSlug(form.desiredSlug), [form.desiredSlug]);
+  const slugError = slugErrorKey ? t(slugErrorKey) : null;
 
   // ── Platform list helpers ──
   function updatePlatform(idx: number, patch: Partial<PlatformEntry>) {
@@ -443,24 +450,24 @@ function ApplyForm({
     let anyPlatformErr = false;
 
     if (form.platforms.length === 0) {
-      next.platforms = 'Add at least one platform';
+      next.platforms = t('validatePlatformMin');
     }
     if (form.platforms.length > MAX_PLATFORMS) {
-      next.platforms = `Max ${MAX_PLATFORMS} platforms`;
+      next.platforms = t('validatePlatformMax', { max: MAX_PLATFORMS });
     }
 
     form.platforms.forEach((p, i) => {
       const h = p.handle.trim();
       if (!h) {
-        handleErrs[i] = 'Required';
+        handleErrs[i] = t('validateHandleRequired');
         anyPlatformErr = true;
       } else if (h.length > 100) {
-        handleErrs[i] = 'Max 100 characters';
+        handleErrs[i] = t('validateHandleMax');
         anyPlatformErr = true;
       }
 
       if (p.audienceSize.trim() && !/^\d+$/.test(p.audienceSize.trim())) {
-        audienceErrs[i] = 'Must be a whole number';
+        audienceErrs[i] = t('validateAudienceNumber');
         anyPlatformErr = true;
       }
 
@@ -468,7 +475,7 @@ function ApplyForm({
         try {
           new URL(p.url.trim());
         } catch {
-          urlErrs[i] = 'Must be a valid URL';
+          urlErrs[i] = t('validateUrlInvalid');
           anyPlatformErr = true;
         }
       }
@@ -481,22 +488,22 @@ function ApplyForm({
     }
 
     // Desired slug (optional)
-    const slugErr = validateSlug(form.desiredSlug);
-    if (slugErr) next.desiredSlug = slugErr;
+    const slugErrKey = validateSlug(form.desiredSlug);
+    if (slugErrKey) next.desiredSlug = t(slugErrKey);
 
     const pitch = form.pitch.trim();
-    if (pitch.length < 50) next.pitch = 'Pitch must be at least 50 characters';
-    else if (pitch.length > 2000) next.pitch = 'Pitch must be at most 2000 characters';
+    if (pitch.length < 50) next.pitch = t('validatePitchMin');
+    else if (pitch.length > 2000) next.pitch = t('validatePitchMax');
 
     if (needsPayoutAddress) {
       const addr = form.payoutAddress.trim();
-      if (!addr) next.payoutAddress = 'Required for CASH_ONLY and HYBRID';
+      if (!addr) next.payoutAddress = t('validateAddressRequired');
       else if (!SOL_ADDRESS_RE.test(addr))
-        next.payoutAddress = 'Must be a valid Solana base58 address (32–44 chars)';
+        next.payoutAddress = t('validateAddressFormat');
     }
 
     return next;
-  }, [form, needsPayoutAddress]);
+  }, [form, needsPayoutAddress, t]);
 
   const hasErrors = (e: FieldErrors): boolean => {
     if (e.platforms || e.desiredSlug || e.pitch || e.payoutAddress) return true;
@@ -594,17 +601,16 @@ function ApplyForm({
             <Check className="w-7 h-7 text-[var(--color-accent)]" />
           </div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
-            Application submitted.
+            {t('successHeading')}
           </h1>
           <p className="text-sm text-[var(--text-secondary)] max-w-md mx-auto mb-6">
-            We&apos;ll review within <strong>3–5 days</strong> and email you the result. In the meantime
-            feel free to spec out what you&apos;ll share once you&apos;re approved.
+            {t('successBody')}
           </p>
           <Link
             href="/affiliate"
             className="inline-flex items-center gap-2 h-10 px-4 rounded-md border border-[var(--border-hover)] text-[var(--text-primary)] text-sm font-semibold hover:bg-[var(--bg-hover)] transition-colors"
           >
-            Back to Affiliate Program
+            {t('backToAffiliate')}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </motion.div>
@@ -618,17 +624,16 @@ function ApplyForm({
 
       <div className="mb-8">
         <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
-          Apply to Hatcher Affiliates
+          {t('eyebrow')}
         </p>
         <h1
           className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)]"
           style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
         >
-          Tell us about you.
+          {t('heading')}
         </h1>
         <p className="mt-3 text-sm text-[var(--text-secondary)] max-w-xl leading-relaxed">
-          A few details about your platforms and audience. We review every application manually — be
-          honest, be specific.
+          {t('subheading')}
         </p>
       </div>
 
@@ -638,7 +643,7 @@ function ApplyForm({
             <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-red-400 mb-1">
-                Previous application rejected
+                {t('rejectedLabel')}
               </p>
               <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
                 {previousApplication.reviewNotes}
@@ -662,10 +667,10 @@ function ApplyForm({
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
-              Your platforms <span className="text-red-400">*</span>
+              {t('yourPlatforms')} <span className="text-red-400">*</span>
             </h2>
             <span className="text-[11px] text-[var(--text-muted)]">
-              {form.platforms.length} / {MAX_PLATFORMS}
+              {t('platformCount', { count: form.platforms.length, max: MAX_PLATFORMS })}
             </span>
           </div>
 
@@ -682,7 +687,7 @@ function ApplyForm({
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)]">
-                      Platform {idx + 1}
+                      {t('platformLabel', { n: idx + 1 })}
                     </span>
                     {showRemove && (
                       <button
@@ -692,13 +697,13 @@ function ApplyForm({
                         aria-label={`Remove platform ${idx + 1}`}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
-                        Remove
+                        {t('removeLabel')}
                       </button>
                     )}
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <Field label="Platform type" required>
+                    <Field label={t('platformTypeField')} required>
                       {/* Custom <Select> — native <select> on Linux Chrome
                           renders options white-on-white even with
                           color-scheme: dark. See components/ui/Select.tsx. */}
@@ -706,11 +711,11 @@ function ApplyForm({
                         value={p.type}
                         onChange={(v) => updatePlatform(idx, { type: v })}
                         options={PLATFORM_OPTIONS}
-                        ariaLabel="Platform type"
+                        ariaLabel={t('platformTypeField')}
                       />
                     </Field>
 
-                    <Field label="Handle" required error={handleErr}>
+                    <Field label={t('handleField')} required error={handleErr}>
                       <input
                         type="text"
                         value={p.handle}
@@ -721,11 +726,11 @@ function ApplyForm({
                         required
                       />
                       <p className="mt-1 text-[11px] text-[var(--text-muted)]">
-                        e.g. @hatcher, @solana, /channel/xyz
+                        {t('handleHint')}
                       </p>
                     </Field>
 
-                    <Field label="Audience size (optional)" error={audienceErr}>
+                    <Field label={t('audienceField')} error={audienceErr}>
                       <input
                         type="number"
                         min={0}
@@ -736,7 +741,7 @@ function ApplyForm({
                       />
                     </Field>
 
-                    <Field label="URL (optional)" error={urlErr}>
+                    <Field label={t('urlField')} error={urlErr}>
                       <input
                         type="url"
                         value={p.url}
@@ -762,15 +767,15 @@ function ApplyForm({
             className="mt-3 inline-flex items-center gap-1.5 h-9 px-3 rounded-md border border-dashed border-[var(--border-default)] text-sm text-[var(--text-secondary)] hover:border-[var(--color-accent)] hover:text-[var(--text-primary)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Plus className="w-4 h-4" />
-            Add another platform
+            {t('addPlatform')}
           </button>
         </section>
 
         {/* ───────────── Desired slug ───────────── */}
-        <Field label="Custom referral link (optional)" error={errors.desiredSlug}>
+        <Field label={t('slugField')} error={errors.desiredSlug}>
           <div className="flex items-stretch rounded-md border border-[var(--border-default)] bg-[var(--bg-card)] focus-within:border-[var(--color-accent)] transition-colors">
             <span className="inline-flex items-center px-3 text-xs font-mono text-[var(--text-muted)] border-r border-[var(--border-default)] select-none">
-              hatcher.host/r/
+              {t('slugPrefix')}
             </span>
             <input
               type="text"
@@ -782,7 +787,7 @@ function ApplyForm({
               onBlur={() =>
                 setForm((f) => ({ ...f, desiredSlug: f.desiredSlug.trim().toLowerCase() }))
               }
-              placeholder="yourname"
+              placeholder={t('slugPlaceholder')}
               className="flex-1 bg-transparent px-3 py-2 text-sm text-[var(--text-primary)] focus:outline-none placeholder:text-[var(--text-muted)]"
               maxLength={30}
               autoCorrect="off"
@@ -796,7 +801,7 @@ function ApplyForm({
             if (slugTrimmed.length === 0) {
               return (
                 <p className="mt-1.5 text-xs text-[var(--text-muted)]">
-                  Leave blank for an auto-generated code
+                  {t('slugBlankHint')}
                 </p>
               );
             }
@@ -805,24 +810,24 @@ function ApplyForm({
             }
             return (
               <p className="mt-1.5 text-xs text-[#22c55e]">
-                Your link will be hatcher.host/r/{slugTrimmed}
+                {t('slugPreviewGood', { slug: slugTrimmed })}
               </p>
             );
           })()}
         </Field>
 
         {/* ───────────── Pitch ───────────── */}
-        <Field label="Pitch" error={errors.pitch} required>
+        <Field label={t('pitchField')} error={errors.pitch} required>
           <textarea
             value={form.pitch}
             onChange={(e) => setForm({ ...form, pitch: e.target.value })}
-            placeholder="Why do you want to partner with Hatcher? What kind of content or audience will you reach?"
+            placeholder={t('pitchPlaceholder')}
             className="input min-h-[140px] resize-y"
             maxLength={2000}
             required
           />
           <div className="mt-1.5 flex items-center justify-between text-xs">
-            <span className="text-[var(--text-muted)]">50–2000 characters</span>
+            <span className="text-[var(--text-muted)]">{t('pitchCharHint')}</span>
             <span className={`tabular-nums font-medium ${pitchCountClass}`}>
               {pitchLen} / 2000
             </span>
@@ -832,7 +837,7 @@ function ApplyForm({
         {/* ───────────── Payout mode ───────────── */}
         <fieldset>
           <legend className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)] mb-3">
-            Payout mode <span className="text-red-400">*</span>
+            {t('payoutModeField')} <span className="text-red-400">*</span>
           </legend>
           <div className="space-y-2.5">
             {PAYOUT_OPTIONS.map((opt) => {
@@ -886,7 +891,7 @@ function ApplyForm({
 
         {needsPayoutAddress && (
           <Field
-            label="SOL wallet address (base58, 32–44 chars)"
+            label={t('solAddressField')}
             error={errors.payoutAddress}
             required
           >
@@ -894,7 +899,7 @@ function ApplyForm({
               type="text"
               value={form.payoutAddress}
               onChange={(e) => setForm({ ...form, payoutAddress: e.target.value })}
-              placeholder="e.g. 21L6VVRAuxk87sXggz8exhPCm1w4qWyKEs6SDauyyRAW"
+              placeholder={t('solAddressPlaceholder')}
               className="input font-mono text-xs"
               spellCheck={false}
               autoCorrect="off"
@@ -912,11 +917,11 @@ function ApplyForm({
           {submitting ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              Submitting…
+              {t('submitting')}
             </>
           ) : (
             <>
-              Submit application
+              {t('submitBtn')}
               <ArrowRight className="w-4 h-4" />
             </>
           )}
@@ -977,13 +982,14 @@ function Field({
 }
 
 function BackLink() {
+  const t = useTranslations('affiliate.apply');
   return (
     <Link
       href="/affiliate"
       className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors mb-6"
     >
       <ArrowLeft className="w-4 h-4" />
-      Back to Affiliate Program
+      {t('backLink')}
     </Link>
   );
 }

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
@@ -280,6 +281,7 @@ function MemoryBar({ mb, max }: { mb: number; max: number }) {
 // ── Main page ─────────────────────────────────────────────────
 
 export default function FrameworksPage() {
+  const t = useTranslations('frameworks');
   const [activeCode, setActiveCode] = useState<string>('openclaw');
   const [expandedFramework, setExpandedFramework] = useState<string | null>(null);
 
@@ -294,19 +296,19 @@ export default function FrameworksPage() {
 
         {/* ── Hero — editorial, left-aligned ───────────────────── */}
         <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Frameworks</p>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('eyebrow')}</p>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] text-[var(--text-primary)] max-w-3xl" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-            Pick the right framework
+            {t('heading')}
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-[var(--text-secondary)] leading-relaxed">
-            Hatcher supports 4 battle-tested agent frameworks. Each has unique strengths — here&apos;s how to choose.
+            {t('subheading')}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-5">
             <Link
               href="/register"
               className="inline-flex items-center gap-2 h-11 px-5 rounded-md bg-[var(--text-primary)] text-[var(--bg-base)] text-sm font-semibold hover:opacity-90 transition-opacity"
             >
-              Deploy an agent
+              {t('deployCta')}
               <ArrowRight className="h-4 w-4" />
             </Link>
             <a
@@ -315,7 +317,7 @@ export default function FrameworksPage() {
               rel="noopener noreferrer"
               className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors inline-flex items-center gap-1.5 group"
             >
-              Full docs
+              {t('docsLink')}
               <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
             </a>
           </div>
@@ -330,7 +332,7 @@ export default function FrameworksPage() {
             transition={{ duration: 0.3 }}
             className="mb-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]"
           >
-            At a glance
+            {t('atAGlance')}
           </motion.p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {FRAMEWORKS.map((fw) => (
@@ -369,7 +371,7 @@ export default function FrameworksPage() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-accent)] hover:underline underline-offset-2 mt-auto"
                 >
-                  Docs
+                  {t('docsSuffix')}
                   <ArrowRight className="h-3.5 w-3.5" />
                 </a>
               </motion.div>
@@ -386,13 +388,13 @@ export default function FrameworksPage() {
             transition={{ duration: 0.3 }}
             className="mb-6 text-xl font-bold text-[var(--text-primary)]"
           >
-            Feature matrix
+            {t('featureMatrix')}
           </motion.h2>
           <div className="overflow-x-auto rounded-2xl border border-[var(--border-default)]">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[var(--border-default)] bg-[var(--bg-card)]">
-                  <th className="px-5 py-4 text-left font-semibold text-[var(--text-secondary)]">Feature</th>
+                  <th className="px-5 py-4 text-left font-semibold text-[var(--text-secondary)]">{t('featureCol')}</th>
                   {FRAMEWORKS.map((fw) => (
                     <th key={fw.key} className="px-4 py-4 text-center">
                       <span className={cn('font-bold', fw.text)}>{fw.emoji} {fw.name}</span>
@@ -438,10 +440,10 @@ export default function FrameworksPage() {
             transition={{ duration: 0.3 }}
             className="mb-2 text-xl font-bold text-[var(--text-primary)]"
           >
-            Best for...
+            {t('bestFor')}
           </motion.h2>
           <p className="mb-6 text-sm text-[var(--text-secondary)]">
-            Not sure which framework to pick? Match your use case.
+            {t('bestForSubheading')}
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
             {FRAMEWORKS.map((fw) => (
@@ -500,10 +502,10 @@ export default function FrameworksPage() {
             transition={{ duration: 0.3 }}
             className="mb-2 text-xl font-bold text-[var(--text-primary)]"
           >
-            Performance benchmarks
+            {t('benchmarks')}
           </motion.h2>
           <p className="mb-6 text-sm text-[var(--text-secondary)]">
-            Cold-start time and baseline memory usage on Hatcher shared infrastructure. Actual values vary by config.
+            {t('benchmarksSubheading')}
           </p>
           <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-6">
             <div className="grid gap-8 sm:grid-cols-2">
@@ -511,7 +513,7 @@ export default function FrameworksPage() {
               <div>
                 <div className="mb-4 flex items-center gap-2">
                   <Clock className="h-4 w-4 text-[var(--color-accent)]" />
-                  <h3 className="font-semibold text-[var(--text-primary)]">Cold-start time</h3>
+                  <h3 className="font-semibold text-[var(--text-primary)]">{t('coldStart')}</h3>
                 </div>
                 <div className="space-y-4">
                   {FRAMEWORKS.map((fw) => (
@@ -525,14 +527,14 @@ export default function FrameworksPage() {
                     </div>
                   ))}
                 </div>
-                <p className="mt-3 text-xs text-[var(--text-muted)]">Lower is faster</p>
+                <p className="mt-3 text-xs text-[var(--text-muted)]">{t('lowerFaster')}</p>
               </div>
 
               {/* Memory */}
               <div>
                 <div className="mb-4 flex items-center gap-2">
                   <Cpu className="h-4 w-4 text-[#a78bfa]" />
-                  <h3 className="font-semibold text-[var(--text-primary)]">Baseline memory usage</h3>
+                  <h3 className="font-semibold text-[var(--text-primary)]">{t('memoryUsage')}</h3>
                 </div>
                 <div className="space-y-4">
                   {FRAMEWORKS.map((fw) => (
@@ -546,14 +548,13 @@ export default function FrameworksPage() {
                     </div>
                   ))}
                 </div>
-                <p className="mt-3 text-xs text-[var(--text-muted)]">Lower is leaner</p>
+                <p className="mt-3 text-xs text-[var(--text-muted)]">{t('lowerLeaner')}</p>
               </div>
             </div>
 
             {/* Summary callout */}
             <div className="mt-6 rounded-xl border border-[#f472b6]/20 bg-[#f472b6]/5 px-4 py-3 text-sm text-[var(--text-secondary)]">
-              <span className="font-semibold text-[#f472b6]">🌸 Milady</span> is the fastest and lightest — ideal for free-tier deployments.
-              {' '}<span className="font-semibold text-[var(--color-accent)]">🦞 OpenClaw</span> packs the most tools but needs more resources.
+              {t('benchmarkCallout')}
             </div>
           </div>
         </section>
@@ -567,10 +568,10 @@ export default function FrameworksPage() {
             transition={{ duration: 0.3 }}
             className="mb-2 text-xl font-bold text-[var(--text-primary)]"
           >
-            Configuration examples
+            {t('configExamples')}
           </motion.h2>
           <p className="mb-6 text-sm text-[var(--text-secondary)]">
-            Each framework has its own config format. Here&apos;s what a typical setup looks like.
+            {t('configSubheading')}
           </p>
 
           {/* Tab bar */}
@@ -608,7 +609,7 @@ export default function FrameworksPage() {
 
             <div className="mt-4 flex items-center justify-between border-t border-[var(--border-default)] pt-4">
               <span className="text-xs text-[var(--text-muted)]">
-                Full configuration reference →
+                {t('configRef')}
               </span>
               <a
                 href={activeFramework.docsUrl}
@@ -616,7 +617,7 @@ export default function FrameworksPage() {
                 rel="noopener noreferrer"
                 className={cn('inline-flex items-center gap-1 text-xs font-medium', activeFramework.text)}
               >
-                {activeFramework.name} docs
+                {activeFramework.name} {t('docsSuffix')}
                 <ExternalLink className="h-3 w-3" />
               </a>
             </div>
@@ -632,10 +633,10 @@ export default function FrameworksPage() {
             transition={{ duration: 0.3 }}
             className="mb-2 text-xl font-bold text-[var(--text-primary)]"
           >
-            LLM support
+            {t('llmSupport')}
           </motion.h2>
           <p className="mb-6 text-sm text-[var(--text-secondary)]">
-            All frameworks support BYOK (Bring Your Own Key) for unlimited messages. On the hosted LLM, every tier runs Llama 4 Scout (17B) on Groq — tool-call reliability and latency are the same across Free, Starter, Pro, Business, and Founding Member. Only the daily message quota changes per tier.
+            {t('llmSubheading')}
           </p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {FRAMEWORKS.map((fw) => (
@@ -658,9 +659,9 @@ export default function FrameworksPage() {
             ))}
           </div>
           <p className="mt-3 text-xs text-[var(--text-muted)]">
-            * BYOK always free — unlimited messages on any framework.{' '}
+            {t('byokNote')}{' '}
             <Link href="/docs/api" className="text-[var(--color-accent)] underline-offset-2 hover:underline">
-              View BYOK setup guide →
+              {t('byokSetupLink')}
             </Link>
           </p>
         </section>
@@ -668,46 +669,16 @@ export default function FrameworksPage() {
         {/* ── Decision guide ────────────────────────────────── */}
         <section>
           <div className="rounded-2xl border border-[var(--color-accent)]/20 bg-gradient-to-br from-[var(--color-accent)]/5 to-[#a78bfa]/5 p-8">
-            <h2 className="mb-6 text-xl font-bold text-[var(--text-primary)]">Quick decision guide</h2>
+            <h2 className="mb-6 text-xl font-bold text-[var(--text-primary)]">{t('decisionGuide')}</h2>
             <div className="grid gap-4 sm:grid-cols-2">
-              {[
-                {
-                  condition: 'I want maximum tools and automation',
-                  pick: 'OpenClaw',
-                  emoji: '🦞',
-                  color: 'text-[var(--color-accent)]',
-                },
-                {
-                  condition: 'I want an agent that learns over time',
-                  pick: 'Hermes',
-                  emoji: '🪽',
-                  color: 'text-[#a78bfa]',
-                },
-                {
-                  condition: 'I want a social media or community bot',
-                  pick: 'ElizaOS',
-                  emoji: '🎭',
-                  color: 'text-[#4ade80]',
-                },
-                {
-                  condition: "I'm just getting started and want simple",
-                  pick: 'Milady',
-                  emoji: '🌸',
-                  color: 'text-[#f472b6]',
-                },
-                {
-                  condition: 'I need multi-channel messaging (Telegram + Discord + WhatsApp)',
-                  pick: 'OpenClaw or Hermes',
-                  emoji: '🦞🪽',
-                  color: 'text-[var(--color-accent)]',
-                },
-                {
-                  condition: 'I want a character-driven persona bot',
-                  pick: 'ElizaOS or Milady',
-                  emoji: '🎭🌸',
-                  color: 'text-[#4ade80]',
-                },
-              ].map((item) => (
+              {([
+                { condition: t('decisions.0.condition'), pick: t('decisions.0.pick'), emoji: '🦞', color: 'text-[var(--color-accent)]' },
+                { condition: t('decisions.1.condition'), pick: t('decisions.1.pick'), emoji: '🪽', color: 'text-[#a78bfa]' },
+                { condition: t('decisions.2.condition'), pick: t('decisions.2.pick'), emoji: '🎭', color: 'text-[#4ade80]' },
+                { condition: t('decisions.3.condition'), pick: t('decisions.3.pick'), emoji: '🌸', color: 'text-[#f472b6]' },
+                { condition: t('decisions.4.condition'), pick: t('decisions.4.pick'), emoji: '🦞🪽', color: 'text-[var(--color-accent)]' },
+                { condition: t('decisions.5.condition'), pick: t('decisions.5.pick'), emoji: '🎭🌸', color: 'text-[#4ade80]' },
+              ] as Array<{ condition: string; pick: string; emoji: string; color: string }>).map((item) => (
                 <div
                   key={item.condition}
                   className="flex items-start gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-4"
@@ -729,9 +700,9 @@ export default function FrameworksPage() {
         <section className="text-center">
           <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-10">
             <Bot className="mx-auto mb-4 h-10 w-10 text-[var(--text-muted)]" />
-            <h2 className="mb-2 text-2xl font-bold text-[var(--text-primary)]">Ready to deploy?</h2>
+            <h2 className="mb-2 text-2xl font-bold text-[var(--text-primary)]">{t('readyCta')}</h2>
             <p className="mx-auto mb-8 max-w-md text-[var(--text-secondary)]">
-              Pick a framework, configure your agent, and go live in under 60 seconds. Free tier included.
+              {t('readySubheading')}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link
@@ -739,13 +710,13 @@ export default function FrameworksPage() {
                 className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[var(--color-accent)]/20 transition-all duration-200 hover:bg-[#0891b2]"
               >
                 <Rocket className="h-4 w-4" />
-                Deploy your first agent
+                {t('deployFirstAgent')}
               </Link>
               <Link
                 href="/pricing"
                 className="inline-flex items-center gap-2 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] px-6 py-3 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-200 hover:border-[var(--border-hover)] hover:text-[var(--text-primary)]"
               >
-                View pricing
+                {t('viewPricing')}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>

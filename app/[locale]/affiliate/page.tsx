@@ -11,7 +11,8 @@
 // cards, lucide icons. No new tokens introduced.
 
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
+import { Link } from '@/i18n/routing';
 import {
   ArrowRight,
   Wallet,
@@ -135,39 +136,39 @@ const HOW_IT_WORKS = [
   },
 ];
 
-export default function AffiliatePage() {
+export default async function AffiliatePage() {
+  const t = await getTranslations('affiliate');
+
   return (
     <div className="relative">
       <div className="mx-auto max-w-7xl px-4 pt-12 sm:pt-16 pb-20">
         {/* ── HERO ────────────────────────────────────────────── */}
         <section className="mb-16">
           <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
-            Affiliate Program
+            {t('eyebrow')}
           </p>
           <h1
             className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] mb-5 text-[var(--text-primary)] max-w-3xl"
             style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
-            Earn from every user you bring to Hatcher.
+            {t('heading')}
           </h1>
           <p className="text-lg text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-            Up to 40% recurring commissions on every paid user you refer. Cash in your wallet, credits
-            to fund your own agents, or a hybrid split — your call. Attribution is link-based and sticks
-            for the lifetime of the referred account.
+            {t('subheading')}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <Link
               href="/affiliate/apply"
               className="inline-flex items-center gap-2 h-11 px-5 rounded-md bg-[var(--text-primary)] text-[var(--bg-base)] text-sm font-semibold hover:opacity-90 transition-opacity"
             >
-              Apply now
+              {t('applyNowCta')}
               <ArrowRight className="h-4 w-4" />
             </Link>
             <a
               href="#how-it-works"
               className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors inline-flex items-center gap-1.5"
             >
-              How it works
+              {t('howItWorksLink')}
               <ArrowRight className="h-3.5 w-3.5" />
             </a>
           </div>
@@ -177,14 +178,13 @@ export default function AffiliatePage() {
         <section className="mb-20">
           <div className="mb-8">
             <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
-              Pick your payout
+              {t('pickYourPayout')}
             </p>
             <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] max-w-2xl">
-              Three ways to get paid.
+              {t('threeWays')}
             </h2>
             <p className="mt-2 text-sm text-[var(--text-secondary)] max-w-2xl">
-              Same eligible revenue, different split. Pick the mode that matches how you want value out
-              of the program — you can switch later by contacting support.
+              {t('threeWaysSubheading')}
             </p>
           </div>
 
@@ -212,7 +212,7 @@ export default function AffiliatePage() {
                     </div>
                     {mode.highlighted && (
                       <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">
-                        Popular
+                        {t('popularLabel')}
                       </span>
                     )}
                   </div>
@@ -266,22 +266,20 @@ export default function AffiliatePage() {
               </div>
               <div className="flex-1">
                 <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#e11d48]">
-                  Founding Member bonus
+                  {t('foundingBonusLabel')}
                 </p>
                 <h3 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mb-2">
-                  Refer a Founding Member → flat $20 cash bonus.
+                  {t('foundingBonusHeading')}
                 </h3>
                 <p className="text-sm text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-                  The $99 lifetime tier pays a one-time flat $20 to the referring affiliate — in addition
-                  to anything they earn from that user&apos;s later addon or agent purchases. Paid in cash
-                  regardless of your default payout mode.
+                  {t('foundingBonusBody')}
                 </p>
               </div>
               <Link
                 href="/affiliate/apply"
                 className="inline-flex items-center gap-2 h-11 px-5 rounded-md bg-[var(--text-primary)] text-[var(--bg-base)] text-sm font-semibold hover:opacity-90 transition-opacity flex-shrink-0"
               >
-                Apply
+                {t('applyLabel')}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -292,10 +290,10 @@ export default function AffiliatePage() {
         <section id="how-it-works" className="mb-20 scroll-mt-20">
           <div className="mb-8">
             <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
-              How it works
+              {t('howItWorksLabel')}
             </p>
             <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
-              Four steps, zero surprises.
+              {t('fourSteps')}
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -333,10 +331,10 @@ export default function AffiliatePage() {
         <section className="mb-20">
           <div className="mb-8 text-center">
             <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
-              Frequently asked
+              {t('faqLabel')}
             </p>
             <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
-              Everything you&apos;d ask before applying.
+              {t('everythingYoudAsk')}
             </h2>
           </div>
           <div className="max-w-3xl mx-auto">
@@ -349,11 +347,10 @@ export default function AffiliatePage() {
           <div className="card glass-noise p-10 sm:p-14 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(6,182,212,0.08),transparent_60%)] pointer-events-none" />
             <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 relative text-[var(--text-primary)]">
-              Ready to partner with Hatcher?
+              {t('readyHeading')}
             </h2>
             <p className="text-[var(--text-secondary)] text-base max-w-lg mx-auto mb-8 leading-relaxed relative">
-              Applications take a few minutes. Approvals in 3–5 days. Recurring commissions for the
-              lifetime of every user you bring in.
+              {t('readyBody')}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 relative">
               <Link
@@ -361,13 +358,13 @@ export default function AffiliatePage() {
                 className="btn-primary px-10 py-4 text-base font-bold inline-flex items-center gap-2"
               >
                 <Rocket className="w-5 h-5" />
-                Apply now
+                {t('applyNowCta')}
               </Link>
               <Link
                 href="/pricing"
                 className="inline-flex items-center gap-2 px-6 py-4 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
               >
-                See pricing
+                {t('seePricing')}
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

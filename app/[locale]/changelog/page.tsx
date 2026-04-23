@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { ChangelogAutoRefresh } from './ChangelogAutoRefresh';
 
 export const metadata: Metadata = {
@@ -62,6 +63,7 @@ function groupByDay(commits: Commit[]): Array<{ label: string; commits: Commit[]
 }
 
 export default async function ChangelogPage() {
+  const t = await getTranslations('changelog');
   const commits = await fetchCommits();
   const groups = groupByDay(commits);
 
@@ -74,13 +76,13 @@ export default async function ChangelogPage() {
         <div className="mb-12">
           <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-400 inline-flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Beta
+            {t('betaLabel')}
           </p>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] text-[var(--text-primary)] mb-4" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-            Changelog
+            {t('heading')}
           </h1>
           <p className="text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl">
-            We ship improvements every day. Here&apos;s what&apos;s changed.
+            {t('subheading')}
           </p>
         </div>
 
@@ -96,7 +98,7 @@ export default async function ChangelogPage() {
         {/* Commits */}
         {groups.length === 0 ? (
           <div className="text-center py-20 text-[var(--text-muted)] text-sm">
-            No commits found.
+            {t('noCommits')}
           </div>
         ) : (
           <div className="space-y-10">

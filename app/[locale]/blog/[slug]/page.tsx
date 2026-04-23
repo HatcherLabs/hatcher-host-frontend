@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
+import { Link } from '@/i18n/routing';
 import type { Metadata } from 'next';
 import { BLOG_POSTS, getBlogPost, getRelatedPosts } from '@/lib/blog';
 
@@ -44,6 +45,7 @@ export default async function BlogArticlePage({ params }: Props) {
   const post = getBlogPost(slug);
   if (!post) notFound();
 
+  const t = await getTranslations('blog');
   const related = getRelatedPosts(slug, 3);
 
   const articleJsonLd = {
@@ -79,7 +81,7 @@ export default async function BlogArticlePage({ params }: Props) {
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
-          Back to Blog
+          {t('backToBlog')}
         </Link>
 
         {/* Header */}
@@ -88,7 +90,7 @@ export default async function BlogArticlePage({ params }: Props) {
             <span className="px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
               {post.category}
             </span>
-            <span className="text-xs text-[var(--text-muted)]">{post.readTime} read</span>
+            <span className="text-xs text-[var(--text-muted)]">{post.readTime} {t('readLabel')}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight mb-4">
             {post.title}
@@ -128,7 +130,7 @@ export default async function BlogArticlePage({ params }: Props) {
         {/* Related articles */}
         {related.length > 0 && (
           <section>
-            <h2 className="text-lg font-semibold text-white mb-6">Related Articles</h2>
+            <h2 className="text-lg font-semibold text-white mb-6">{t('relatedArticles')}</h2>
             <div className="grid gap-4 sm:grid-cols-3">
               {related.map((r) => (
                 <Link

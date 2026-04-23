@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import { BLOG_POSTS, BLOG_CATEGORIES, searchPosts } from '@/lib/blog';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function BlogPage() {
+  const t = useTranslations('blog');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -27,12 +29,12 @@ export default function BlogPage() {
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         {/* Header */}
         <div className="mb-14 max-w-2xl">
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Blog</p>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('eyebrow')}</p>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] text-[var(--text-primary)] mb-4" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-            The Hatcher blog
+            {t('heading')}
           </h1>
           <p className="text-lg text-[var(--text-secondary)] leading-relaxed">
-            Guides, tutorials, and insights about AI agents and the Hatcher platform.
+            {t('subheading')}
           </p>
         </div>
 
@@ -54,7 +56,7 @@ export default function BlogPage() {
             </svg>
             <input
               type="text"
-              placeholder="Search articles..."
+              placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 text-sm bg-[var(--bg-card)] border border-[var(--border-default)] rounded-lg text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-purple-500/40 focus:ring-1 focus:ring-purple-500/20 transition-all duration-200"
@@ -82,7 +84,7 @@ export default function BlogPage() {
                 : 'border-white/10 text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-white/20'
             }`}
           >
-            All
+            {t('allCategory')}
           </button>
           {BLOG_CATEGORIES.map((cat) => (
             <button
@@ -103,7 +105,9 @@ export default function BlogPage() {
         {searchQuery && (
           <div className="text-center mb-6">
             <p className="text-sm text-[var(--text-muted)]">
-              {filtered.length} {filtered.length === 1 ? 'result' : 'results'} for &ldquo;{searchQuery}&rdquo;
+              {filtered.length === 1
+                ? t('resultsCount', { count: filtered.length, query: searchQuery })
+                : t('resultsCountPlural', { count: filtered.length, query: searchQuery })}
             </p>
           </div>
         )}
@@ -126,9 +130,9 @@ export default function BlogPage() {
                   <span className="px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20">
                     {featuredPost.category}
                   </span>
-                  <span className="text-[11px] text-[var(--text-muted)]">{featuredPost.readTime} read</span>
+                  <span className="text-[11px] text-[var(--text-muted)]">{featuredPost.readTime} {t('readLabel')}</span>
                   <span className="px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider rounded-full bg-[var(--bg-card)] text-[var(--text-secondary)]">
-                    Latest
+                    {t('latestLabel')}
                   </span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] group-hover:text-purple-300 transition-colors duration-200 mb-3 leading-snug">
@@ -181,7 +185,7 @@ export default function BlogPage() {
                       <span className="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] rounded-full bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20">
                         {post.category}
                       </span>
-                      <span className="text-[11px] text-[var(--text-muted)]">{post.readTime} read</span>
+                      <span className="text-[11px] text-[var(--text-muted)]">{post.readTime} {t('readLabel')}</span>
                     </div>
 
                     {/* Title */}
@@ -215,7 +219,9 @@ export default function BlogPage() {
         {filtered.length === 0 && (
           <div className="text-center py-16">
             <p className="text-[var(--text-muted)] text-sm mb-3">
-              No articles found{searchQuery ? ` for "${searchQuery}"` : ' in this category'}.
+              {searchQuery
+                ? t('noArticlesSearch', { query: searchQuery })
+                : t('noArticlesCategory')}
             </p>
             <button
               onClick={() => {
@@ -224,7 +230,7 @@ export default function BlogPage() {
               }}
               className="text-sm text-purple-400 hover:text-purple-300 transition-colors duration-200"
             >
-              Clear filters
+              {t('clearFilters')}
             </button>
           </div>
         )}

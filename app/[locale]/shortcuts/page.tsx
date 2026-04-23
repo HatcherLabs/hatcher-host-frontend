@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import { Keyboard, ArrowLeft, Command } from 'lucide-react';
 
 // ─── Shortcut Data ──────────────────────────────────────────
@@ -44,8 +45,8 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
   {
     title: 'Command Palette',
     shortcuts: [
-      { keys: ['\u2191', '\u2193'], description: 'Navigate through results' },
-      { keys: ['\u21B5'], description: 'Execute selected command' },
+      { keys: ['↑', '↓'], description: 'Navigate through results' },
+      { keys: ['↵'], description: 'Execute selected command' },
       { keys: ['Escape'], description: 'Close palette' },
     ],
   },
@@ -87,6 +88,8 @@ function Kbd({ children }: { children: React.ReactNode }) {
 // ─── Page ───────────────────────────────────────────────────
 
 export default function ShortcutsPage() {
+  const t = useTranslations('shortcuts');
+
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-10">
       <motion.div
@@ -102,7 +105,7 @@ export default function ShortcutsPage() {
             className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--color-accent)] transition-colors"
           >
             <ArrowLeft size={14} />
-            Back to Dashboard
+            {t('backToDashboard')}
           </Link>
         </motion.div>
 
@@ -120,10 +123,10 @@ export default function ShortcutsPage() {
                 className="text-2xl font-bold text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
-                Keyboard Shortcuts
+                {t('heading')}
               </h1>
               <p className="text-sm text-[var(--text-secondary)]">
-                Navigate Hatcher faster with keyboard shortcuts
+                {t('subheading')}
               </p>
             </div>
           </div>
@@ -146,10 +149,10 @@ export default function ShortcutsPage() {
             </div>
             <div>
               <p className="text-sm font-medium text-[var(--text-primary)]">
-                Quick tip
+                {t('quickTipLabel')}
               </p>
               <p className="text-sm text-[var(--text-secondary)] mt-0.5">
-                Press{' '}
+                {t('quickTipBody')}{' '}
                 <Kbd>Ctrl</Kbd>
                 <span className="mx-1 text-[var(--text-muted)]">+</span>
                 <Kbd>K</Kbd>
@@ -202,8 +205,7 @@ export default function ShortcutsPage() {
         {/* Footer note */}
         <motion.div variants={itemVariants}>
           <p className="text-center text-xs text-[var(--text-muted)] pb-8">
-            Shortcuts are disabled when typing in text fields.
-            On macOS, use Cmd instead of Ctrl.
+            {t('footerNote')}
           </p>
         </motion.div>
       </motion.div>

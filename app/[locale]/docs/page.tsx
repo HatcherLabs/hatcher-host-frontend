@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import {
   Rocket,
   Bot,
@@ -46,56 +47,20 @@ const staggerItem = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const } },
 };
 
-// ── Quick link cards ────────────────────────────────────────────
-
-const QUICK_LINKS = [
-  {
-    icon: Rocket,
-    title: 'Getting Started',
-    description: 'Set up your first AI agent in under 60 seconds. Quick start guide, prerequisites, and first deploy.',
-    href: '/getting-started',
-    color: 'var(--color-accent)',
-  },
-  {
-    icon: Bot,
-    title: 'Agent Configuration',
-    description: 'Configure personality, models, memory, cron jobs, webhooks, and multi-agent routing.',
-    href: '/agent-configuration',
-    color: '#22d3ee',
-  },
-  {
-    icon: Globe,
-    title: 'Platform Integrations',
-    description: 'Connect to Telegram, Discord, WhatsApp, Slack, and 20+ messaging platforms.',
-    href: '/integrations',
-    color: '#a78bfa',
-  },
-  {
-    icon: KeyRound,
-    title: 'BYOK Setup',
-    description: 'Bring your own API keys for OpenAI, Anthropic, Google, xAI, and more. Always free.',
-    href: '/byok',
-    color: '#4ade80',
-  },
-  {
-    icon: CreditCard,
-    title: 'Billing & Pricing',
-    description: 'Understand token payments, feature unlocks, hosted credits, and subscription management.',
-    href: '/billing',
-    color: '#fbbf24',
-  },
-  {
-    icon: Code,
-    title: 'API Reference',
-    description: 'REST API endpoints for agents, features, payments, and admin operations.',
-    href: '/api-reference',
-    color: '#f87171',
-  },
+// ── Quick link icons + hrefs (titles/descriptions come from i18n) ──
+const QUICK_LINKS_ICONS = [
+  { icon: Rocket, href: '/getting-started', color: 'var(--color-accent)' },
+  { icon: Bot, href: '/agent-configuration', color: '#22d3ee' },
+  { icon: Globe, href: '/integrations', color: '#a78bfa' },
+  { icon: KeyRound, href: '/byok', color: '#4ade80' },
+  { icon: CreditCard, href: '/billing', color: '#fbbf24' },
+  { icon: Code, href: '/api-reference', color: '#f87171' },
 ];
 
 // ── Page ────────────────────────────────────────────────────────
 
 export default function DocsPage() {
+  const t = useTranslations('docs');
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
@@ -111,13 +76,13 @@ export default function DocsPage() {
         <motion.div variants={cardVariants} className="mb-12 text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5 px-4 py-1.5 text-sm font-medium text-[var(--color-accent)]">
             <BookOpen className="h-4 w-4" />
-            Documentation
+            {t('eyebrow')}
           </div>
           <h1 className="font-[var(--font-display)] text-4xl font-extrabold tracking-tight text-[var(--text-primary)] sm:text-5xl">
-            Documentation
+            {t('heading')}
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-[var(--text-secondary)]">
-            Everything you need to build, deploy, and manage AI agents with Hatcher.
+            {t('subheading')}
           </p>
         </motion.div>
 
@@ -129,12 +94,12 @@ export default function DocsPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search documentation..."
+              placeholder={t('searchPlaceholder')}
               className="w-full rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] py-3 pl-12 pr-4 text-[var(--text-primary)] placeholder-[#6B6890] outline-none transition-all duration-200 focus:border-[var(--color-accent)]/40 focus:ring-2 focus:ring-[var(--color-accent)]/10"
             />
             {searchQuery && (
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[var(--text-muted)]">
-                Search coming soon
+                {t('searchComingSoon')}
               </span>
             )}
           </div>
@@ -157,13 +122,13 @@ export default function DocsPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="mb-1 text-base font-semibold text-[var(--text-primary)] group-hover:text-[var(--color-accent)] transition-colors">
-                  API Reference
+                  {t('apiReferenceHeading')}
                 </h3>
                 <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
-                  Full endpoint documentation with examples in cURL, JavaScript, and Python. Auth, rate limits, and error codes.
+                  {t('apiReferenceBody')}
                 </p>
                 <div className="mt-3 flex items-center gap-1 text-xs font-medium text-[var(--color-accent)]">
-                  Explore endpoints
+                  {t('apiReferenceLink')}
                   <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5" />
                 </div>
               </div>
@@ -179,13 +144,13 @@ export default function DocsPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="mb-1 text-base font-semibold text-[var(--text-primary)] group-hover:text-[#a78bfa] transition-colors">
-                  Integration Guides
+                  {t('integrationsHeading')}
                 </h3>
                 <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
-                  Step-by-step setup for Telegram, Discord, WhatsApp, Slack, Twitter/X, and Signal. From credentials to first message.
+                  {t('integrationsBody')}
                 </p>
                 <div className="mt-3 flex items-center gap-1 text-xs font-medium text-[#a78bfa]">
-                  Browse platforms
+                  {t('integrationsLink')}
                   <ArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5" />
                 </div>
               </div>
@@ -200,11 +165,13 @@ export default function DocsPage() {
           animate="visible"
           className="mb-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {QUICK_LINKS.map((link) => {
+          {QUICK_LINKS_ICONS.map((link, idx) => {
             const Icon = link.icon;
+            const ql = t.raw('quickLinks') as Array<{ title: string; description: string }>;
+            const { title, description } = ql[idx] ?? { title: '', description: '' };
             return (
               <motion.a
-                key={link.title}
+                key={title}
                 variants={staggerItem}
                 href={`${DOCS_URL}${link.href}`}
                 target="_blank"
@@ -219,16 +186,16 @@ export default function DocsPage() {
                 </div>
 
                 <h3 className="mb-2 flex items-center gap-2 text-base font-semibold text-[var(--text-primary)]">
-                  {link.title}
+                  {title}
                   <ExternalLink className="h-3.5 w-3.5 text-[var(--text-muted)] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
                 </h3>
 
                 <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
-                  {link.description}
+                  {description}
                 </p>
 
                 <div className="mt-4 flex items-center gap-1 text-xs font-medium text-[var(--color-accent)] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                  Read more
+                  {t('readMore')}
                   <ArrowRight className="h-3 w-3" />
                 </div>
               </motion.a>
@@ -238,28 +205,31 @@ export default function DocsPage() {
 
         {/* ── Popular topics ───────────────────────────────── */}
         <motion.div variants={cardVariants} className="mb-16">
-          <h2 className="mb-6 text-lg font-semibold text-[var(--text-primary)]">Popular topics</h2>
+          <h2 className="mb-6 text-lg font-semibold text-[var(--text-primary)]">{t('popularTopics')}</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            {[
-              { label: 'How to deploy your first agent', href: '/getting-started#deploy' },
-              { label: 'Supported LLM providers', href: '/byok#providers' },
-              { label: 'Agent framework configuration', href: '/agent-configuration#openclaw' },
-              { label: 'Container lifecycle & status codes', href: '/api-reference#containers' },
-              { label: 'Setting up Telegram integration', href: '/integrations#telegram' },
-              { label: 'Understanding token payments', href: '/billing#hatch-payments' },
-            ].map((topic) => (
-              <a
-                key={topic.label}
-                href={`${DOCS_URL}${topic.href}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] px-4 py-3 text-sm text-[var(--text-secondary)] transition-all duration-200 hover:border-[var(--color-accent)]/20 hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]/60 transition-colors duration-200 group-hover:bg-[var(--color-accent)]" />
-                {topic.label}
-                <ExternalLink className="ml-auto h-3.5 w-3.5 text-[var(--text-muted)] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-              </a>
-            ))}
+            {(t.raw('topics') as Array<{ label: string }>).map((topic, idx) => {
+              const topicHrefs = [
+                '/getting-started#deploy',
+                '/byok#providers',
+                '/agent-configuration#openclaw',
+                '/api-reference#containers',
+                '/integrations#telegram',
+                '/billing#hatch-payments',
+              ];
+              return (
+                <a
+                  key={idx}
+                  href={`${DOCS_URL}${topicHrefs[idx] ?? ''}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] px-4 py-3 text-sm text-[var(--text-secondary)] transition-all duration-200 hover:border-[var(--color-accent)]/20 hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]/60 transition-colors duration-200 group-hover:bg-[var(--color-accent)]" />
+                  {topic.label}
+                  <ExternalLink className="ml-auto h-3.5 w-3.5 text-[var(--text-muted)] opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                </a>
+              );
+            })}
           </div>
         </motion.div>
 
@@ -270,10 +240,10 @@ export default function DocsPage() {
         >
           <HelpCircle className="mx-auto mb-4 h-8 w-8 text-[var(--text-muted)]" />
           <h2 className="mb-2 text-lg font-semibold text-[var(--text-primary)]">
-            Can&apos;t find what you&apos;re looking for?
+            {t('cantFind')}
           </h2>
           <p className="mx-auto mb-6 max-w-md text-sm text-[var(--text-secondary)]">
-            Our support team and community are here to help you get the most out of Hatcher.
+            {t('cantFindBody')}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
@@ -281,14 +251,14 @@ export default function DocsPage() {
               className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[var(--color-accent)]/20 transition-all duration-200 hover:bg-[#0891b2] hover:shadow-[var(--color-accent)]/30"
             >
               <LifeBuoy className="h-4 w-4" />
-              Contact Support
+              {t('contactSupport')}
             </Link>
             <Link
               href="/help"
               className="inline-flex items-center gap-2 rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] px-5 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-200 hover:border-[var(--color-accent)]/30 hover:text-[var(--text-primary)]"
             >
               <HelpCircle className="h-4 w-4" />
-              Help Center
+              {t('helpCenter')}
             </Link>
           </div>
         </motion.div>

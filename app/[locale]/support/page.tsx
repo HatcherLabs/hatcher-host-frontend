@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LifeBuoy,
@@ -47,29 +48,12 @@ const PRIORITIES: { value: Priority; label: string }[] = [
 
 // ─── Quick Links ─────────────────────────────────────────────
 
-const QUICK_LINKS = [
-  {
-    icon: BookOpen,
-    label: 'Documentation',
-    description: 'Browse guides and API reference',
-    href: 'https://docs.hatcher.host',
-    external: true,
-  },
-  {
-    icon: HelpCircle,
-    label: 'FAQ',
-    description: 'Common questions answered',
-    href: '/help',
-    external: false,
-  },
-  {
-    icon: Users,
-    label: 'Follow Us',
-    description: 'Updates and announcements',
-    href: 'https://x.com/HatcherLabs',
-    external: true,
-  },
-];
+// QUICK_LINKS labels/descriptions are resolved with t() in the component
+const QUICK_LINKS_CONFIG = [
+  { icon: BookOpen, labelKey: 'quickLinks.documentation', descKey: 'quickLinks.documentationDesc', href: 'https://docs.hatcher.host', external: true },
+  { icon: HelpCircle, labelKey: 'quickLinks.faq', descKey: 'quickLinks.faqDesc', href: '/help', external: false },
+  { icon: Users, labelKey: 'quickLinks.followUs', descKey: 'quickLinks.followUsDesc', href: 'https://x.com/HatcherLabs', external: true },
+] as const;
 
 // ─── Stagger animation variants ─────────────────────────────
 
@@ -128,6 +112,7 @@ function SelectField({
 // ─── Main Component ──────────────────────────────────────────
 
 export default function SupportPage() {
+  const t = useTranslations('support');
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
 
@@ -176,13 +161,13 @@ export default function SupportPage() {
     e.preventDefault();
 
     if (!isAuthenticated) {
-      setFormError('Please sign in to submit a ticket.');
+      setFormError(t('signInError'));
       return;
     }
 
     // Validate
     if (!subject.trim()) {
-      setFormError('Subject is required.');
+      setFormError(t('subjectRequired'));
       return;
     }
     if (subject.length > SUBJECT_MAX) {
@@ -190,7 +175,7 @@ export default function SupportPage() {
       return;
     }
     if (!message.trim()) {
-      setFormError('Message is required.');
+      setFormError(t('messageRequired'));
       return;
     }
     if (message.length > MESSAGE_MAX) {
@@ -211,7 +196,7 @@ export default function SupportPage() {
       });
       if (res.success) {
         setSubmitted(true);
-        toast('success', 'Ticket submitted successfully');
+        toast('success', t('ticketSubmitted'));
         // Refresh tickets list
         const ticketRes = await api.getTickets();
         if (ticketRes.success) setTickets(ticketRes.data);
@@ -219,7 +204,7 @@ export default function SupportPage() {
         setFormError(res.error || 'Failed to submit ticket');
       }
     } catch {
-      setFormError('Failed to submit ticket. Please try again.');
+      setFormError(t('failedSubmit'));
     } finally {
       setSubmitting(false);
     }
@@ -243,15 +228,15 @@ export default function SupportPage() {
               <LifeBuoy size={20} className="text-[var(--color-accent)]" />
             </div>
             <div>
-              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Help</p>
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('eyebrow')}</p>
               <h1
                 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
-                Support
+                {t('heading')}
               </h1>
               <p className="text-sm text-[var(--text-secondary)] mt-2">
-                Get help with your agents, billing, or anything else.
+                {t('subheading')}
               </p>
             </div>
           </div>
@@ -259,8 +244,10 @@ export default function SupportPage() {
 
         {/* ─── Quick Links ─────────────────────────────────────── */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {QUICK_LINKS.map((link) => {
+          {QUICK_LINKS_CONFIG.map((link) => {
             const LinkIcon = link.icon;
+            const label = t(link.labelKey);
+            const description = t(link.descKey);
             const sharedClassName = "group flex items-center gap-3 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl p-4 transition-all duration-200 hover:border-[var(--color-accent)]/30 hover:bg-[var(--bg-card)] hover:-translate-y-[3px]";
             const inner = (
               <>
@@ -273,23 +260,23 @@ export default function SupportPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
                     <span className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-[var(--color-accent)] transition-colors">
-                      {link.label}
+                      {label}
                     </span>
                     {link.external && (
                       <ExternalLink size={12} className="text-[var(--text-muted)] group-hover:text-[var(--color-accent)]/60 transition-colors" />
                     )}
                   </div>
-                  <span className="text-xs text-[var(--text-muted)]">{link.description}</span>
+                  <span className="text-xs text-[var(--text-muted)]">{description}</span>
                 </div>
               </>
             );
 
             return link.external ? (
-              <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className={sharedClassName}>
+              <a key={label} href={link.href} target="_blank" rel="noopener noreferrer" className={sharedClassName}>
                 {inner}
               </a>
             ) : (
-              <Link key={link.label} href={link.href} className={sharedClassName}>
+              <Link key={label} href={link.href} className={sharedClassName}>
                 {inner}
               </Link>
             );
@@ -300,7 +287,7 @@ export default function SupportPage() {
         <motion.div variants={itemVariants}>
           <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-elevated)] backdrop-blur-xl p-5">
             <p className="text-sm text-[var(--text-secondary)]">
-              Or email us directly at{' '}
+              {t('directContact')}{' '}
               <a href="mailto:support@hatcher.host" className="text-[var(--color-accent)] hover:underline font-medium">
                 support@hatcher.host
               </a>
@@ -311,7 +298,7 @@ export default function SupportPage() {
                 rel="noopener noreferrer"
                 className="text-[var(--color-accent)] hover:underline font-medium"
               >
-                Join our Discord
+                {t('joinDiscord')}
               </a>{' '}&middot;{' '}
               <a
                 href="https://t.me/HatcherLabs"
@@ -319,9 +306,9 @@ export default function SupportPage() {
                 rel="noopener noreferrer"
                 className="text-[var(--color-accent)] hover:underline font-medium"
               >
-                Telegram
+                {t('telegramLabel')}
               </a>{' '}
-              for community support
+              {t('communitySupport')}
             </p>
           </div>
         </motion.div>
@@ -336,16 +323,16 @@ export default function SupportPage() {
                 className="text-base font-semibold text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
-                Submit a Ticket
+                {t('submitTicketHeading')}
               </h2>
             </div>
 
             <div className="p-6">
               {!isAuthenticated ? (
                 <div className="text-center py-8">
-                  <p className="text-sm text-[var(--text-secondary)] mb-4">Sign in to submit a support ticket.</p>
+                  <p className="text-sm text-[var(--text-secondary)] mb-4">{t('signInPrompt')}</p>
                   <Link href="/login" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-colors">
-                    Sign In
+                    {t('signIn')}
                   </Link>
                 </div>
               ) : (
@@ -393,7 +380,7 @@ export default function SupportPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
                     >
-                      Ticket Submitted
+                      {t('ticketSubmitted')}
                     </motion.h3>
                     <motion.p
                       className="text-sm text-[var(--text-secondary)] mb-6 max-w-sm"
@@ -401,8 +388,7 @@ export default function SupportPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
                     >
-                      We have received your request and will get back to you shortly.
-                      You will be notified when there is an update.
+                      {t('ticketSubmittedBody')}
                     </motion.p>
                     <motion.button
                       onClick={resetForm}
@@ -415,7 +401,7 @@ export default function SupportPage() {
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.5 }}
                     >
-                      Submit Another Ticket
+                      {t('submitAnother')}
                     </motion.button>
                   </motion.div>
                 ) : (
@@ -452,7 +438,7 @@ export default function SupportPage() {
                     {/* Subject */}
                     <div>
                       <label className="block text-xs font-medium uppercase tracking-wider text-[var(--text-secondary)] mb-2">
-                        Subject <span className="text-[#F87171]">*</span>
+                        {t('subjectLabel')} <span className="text-[#F87171]">*</span>
                       </label>
                       <input
                         type="text"
@@ -462,7 +448,7 @@ export default function SupportPage() {
                             setSubject(e.target.value);
                           }
                         }}
-                        placeholder="Brief description of your issue"
+                        placeholder={t('subjectPlaceholder')}
                         className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50 focus:ring-1 focus:ring-[var(--color-accent)]/20 transition-colors"
                         maxLength={SUBJECT_MAX}
                       />
@@ -476,13 +462,13 @@ export default function SupportPage() {
                     {/* Category & Priority */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <SelectField
-                        label="Category"
+                        label={t('categoryLabel')}
                         value={category}
                         onChange={(val) => setCategory(val as Category)}
                         options={CATEGORIES}
                       />
                       <SelectField
-                        label="Priority"
+                        label={t('priorityLabel')}
                         value={priority}
                         onChange={(val) => setPriority(val as Priority)}
                         options={PRIORITIES}
@@ -492,7 +478,7 @@ export default function SupportPage() {
                     {/* Agent selector (optional) */}
                     <div>
                       <label className="block text-xs font-medium uppercase tracking-wider text-[var(--text-secondary)] mb-2">
-                        Related Agent <span className="text-[var(--text-muted)] normal-case tracking-normal">(optional)</span>
+                        {t('relatedAgentLabel')} <span className="text-[var(--text-muted)] normal-case tracking-normal">{t('relatedAgentOptional')}</span>
                       </label>
                       <div className="relative">
                         <select
@@ -500,7 +486,7 @@ export default function SupportPage() {
                           onChange={(e) => setAgentId(e.target.value)}
                           className="w-full appearance-none bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--color-accent)]/50 focus:ring-1 focus:ring-[var(--color-accent)]/20 transition-colors cursor-pointer"
                         >
-                          <option value="">Select an agent...</option>
+                          <option value="">{t('selectAgent')}</option>
                           {agents.map((a) => (
                             <option key={a.id} value={a.id}>
                               {a.name} ({a.status})
@@ -517,7 +503,7 @@ export default function SupportPage() {
                     {/* Message */}
                     <div>
                       <label className="block text-xs font-medium uppercase tracking-wider text-[var(--text-secondary)] mb-2">
-                        Message <span className="text-[#F87171]">*</span>
+                        {t('messageLabel')} <span className="text-[#F87171]">*</span>
                       </label>
                       <textarea
                         value={message}
@@ -526,7 +512,7 @@ export default function SupportPage() {
                             setMessage(e.target.value);
                           }
                         }}
-                        placeholder="Describe your issue in detail..."
+                        placeholder={t('messagePlaceholder')}
                         rows={6}
                         className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl px-4 py-3 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50 focus:ring-1 focus:ring-[var(--color-accent)]/20 transition-colors resize-y min-h-[120px]"
                         maxLength={MESSAGE_MAX}
@@ -552,12 +538,12 @@ export default function SupportPage() {
                         {submitting ? (
                           <>
                             <div className="w-4 h-4 rounded-full border-2 border-white/80 border-t-transparent animate-spin" />
-                            Submitting...
+                            {t('submitting')}
                           </>
                         ) : (
                           <>
                             <Send size={15} />
-                            Submit Ticket
+                            {t('submitTicket')}
                           </>
                         )}
                       </button>
@@ -580,11 +566,11 @@ export default function SupportPage() {
                 className="text-base font-semibold text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
-                Recent Tickets
+                {t('recentTickets')}
               </h2>
               {tickets.length > 0 && (
                 <span className="ml-auto text-xs font-medium text-[var(--text-muted)]">
-                  {tickets.length} ticket{tickets.length !== 1 ? 's' : ''}
+                  {tickets.length === 1 ? t('ticketCount', { count: tickets.length }) : t('ticketCountPlural', { count: tickets.length })}
                 </span>
               )}
             </div>
@@ -606,9 +592,9 @@ export default function SupportPage() {
               ) : tickets.length === 0 ? (
                 <EmptyState
                   icon={LifeBuoy}
-                  title="No tickets yet"
-                  description="Your submitted support tickets will appear here. Create your first ticket above to get started."
-                  actionLabel="Back to Top"
+                  title={t('noTickets')}
+                  description={t('noTicketsDesc')}
+                  actionLabel={t('backToTop')}
                   actionHref="#"
                 />
               ) : (

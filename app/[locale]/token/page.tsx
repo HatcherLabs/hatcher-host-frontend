@@ -1,6 +1,7 @@
 'use client';
 
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
 import {
@@ -52,6 +53,7 @@ const PLANNED_USE_CASES: UseCase[] = [
 
 /* ── Page ──────────────────────────────────────────────── */
 export default function TokenPage() {
+  const t = useTranslations('token');
   return (
     <div className="relative overflow-hidden min-h-screen">
       {/* ── HERO ───────────────────────────────────────────── */}
@@ -70,7 +72,7 @@ export default function TokenPage() {
             className="mb-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#14F195] inline-flex items-center gap-2 justify-center"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-[#14F195] animate-pulse" />
-            Live on Solana
+            {t('liveLabel')}
           </motion.p>
 
           {/* Token hero logo — Hatcher mascot cropped into a round coin
@@ -116,7 +118,7 @@ export default function TokenPage() {
             className="text-5xl md:text-7xl font-bold mb-5 tracking-tight text-[var(--text-primary)]"
             style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
-            $HATCHER
+            {t('heading')}
           </motion.h1>
 
           <motion.p
@@ -125,8 +127,7 @@ export default function TokenPage() {
             transition={{ ...fadeUpTransition, delay: 0.12 }}
             className="text-lg md:text-xl mb-6 max-w-2xl mx-auto leading-relaxed text-[var(--text-secondary)]"
           >
-            The ecosystem token of Hatcher.
-            Powers tier subscriptions, agent add-ons, and governance on Solana.
+            {t('subheading')}
           </motion.p>
 
           <motion.div
@@ -136,7 +137,7 @@ export default function TokenPage() {
             className="flex flex-col items-center gap-3"
           >
             <div className="px-5 py-3 rounded-xl bg-[var(--bg-elevated)] border border-[var(--solana-green)]/30 text-sm">
-              <span className="text-[var(--text-muted)] mr-2">CA:</span>
+              <span className="text-[var(--text-muted)] mr-2">{t('caLabel')}</span>
               <code className="text-[var(--solana-green)] font-mono text-xs sm:text-sm select-all font-semibold">Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump</code>
             </div>
             <div className="flex items-center justify-center gap-3 text-xs">
@@ -146,7 +147,7 @@ export default function TokenPage() {
                 rel="noopener noreferrer"
                 className="text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
               >
-                View on Dexscreener
+                {t('viewDexscreener')}
               </a>
               {/* Thin vertical rule — previously a raw `|` glyph which
                   rendered lower than the surrounding text baseline on
@@ -158,7 +159,7 @@ export default function TokenPage() {
                 rel="noopener noreferrer"
                 className="text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors underline underline-offset-2"
               >
-                View on Solscan
+                {t('viewSolscan')}
               </a>
             </div>
           </motion.div>
@@ -175,16 +176,16 @@ export default function TokenPage() {
             className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#f59e0b]/30 bg-[#f59e0b]/[0.08] text-[11px] font-medium text-[#f59e0b]"
           >
             <span className="text-sm">🔥</span>
-            <span>10% of every $HATCHER payment is burned on-chain, in the same transaction.</span>
+            <span>{t('burnBadge')}</span>
           </motion.div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
             <Link href="/create" className="btn-primary text-base px-8 py-3.5 inline-flex items-center gap-2">
-              Create Free Agent
+              {t('createAgentCta')}
               <Rocket className="w-4 h-4" />
             </Link>
             <Link href="/pricing" className="btn-secondary text-base px-8 py-3.5 inline-flex items-center gap-2 border-[var(--border-hover)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]">
-              View Pricing
+              {t('viewPricing')}
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -195,7 +196,7 @@ export default function TokenPage() {
       <section className="py-12 sm:py-20 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="text-center mb-12">
-            <div className="section-label mb-3">Planned Utility</div>
+            <div className="section-label mb-3">{t('plannedUtilityLabel')}</div>
             <motion.h2
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -203,10 +204,10 @@ export default function TokenPage() {
               transition={{ duration: 0.3 }}
               className="text-4xl font-bold mb-4 text-[var(--text-primary)]"
             >
-              What the Token Will Power
+              {t('whatPowers')}
             </motion.h2>
             <p className="text-[var(--text-secondary)] max-w-lg mx-auto">
-              $HATCHER is the native currency of the Hatcher ecosystem.
+              {t('ecosystemDesc')}
             </p>
           </div>
 
@@ -256,32 +257,32 @@ export default function TokenPage() {
               transition={{ duration: 0.3 }}
               className="text-2xl font-bold mb-6 text-[var(--text-primary)]"
             >
-              Key Details
+              {t('keyDetails')}
             </motion.h2>
             <div className="grid gap-5">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pb-5 border-b border-[var(--border-default)]">
-                <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">Network</span>
+                <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">{t('networkLabel')}</span>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#9945FF]" />
-                  <span className="text-[var(--text-primary)] font-medium">Solana</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-[#9945FF]/10 text-[#9945FF] border border-[#9945FF]/20 font-medium">SPL Token</span>
+                  <span className="text-[var(--text-primary)] font-medium">{t('networkValue')}</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-[#9945FF]/10 text-[#9945FF] border border-[#9945FF]/20 font-medium">{t('splToken')}</span>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pb-5 border-b border-[var(--border-default)]">
-                <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">Status</span>
+                <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">{t('statusLabel')}</span>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#14F195]" />
-                  <span className="text-[#14F195] font-medium">Live</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-[#14F195]/10 text-[#14F195] border border-[#14F195]/20 font-medium">Trading</span>
+                  <span className="text-[#14F195] font-medium">{t('statusValue')}</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-[#14F195]/10 text-[#14F195] border border-[#14F195]/20 font-medium">{t('trading')}</span>
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pb-5 border-b border-[var(--border-default)]">
-                <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">Contract</span>
+                <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">{t('contractLabel')}</span>
                 <code className="text-[var(--text-primary)] font-mono text-xs select-all">Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump</code>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">Platform</span>
-                <span className="text-[var(--text-primary)] font-medium">Free tier available now &mdash; token enables paid tiers &amp; add-ons</span>
+                <span className="text-sm text-[var(--text-muted)] uppercase tracking-wider font-medium w-40 flex-shrink-0">{t('platformLabel')}</span>
+                <span className="text-[var(--text-primary)] font-medium">{t('platformValue')}</span>
               </div>
             </div>
           </div>
@@ -299,14 +300,14 @@ export default function TokenPage() {
 
             <div className="relative text-center px-8 py-16">
               <h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-[var(--text-primary)]">
-                Stay in the Loop
+                {t('stayInLoop')}
               </h2>
               <p className="text-lg mb-10 max-w-xl mx-auto text-[var(--text-secondary)]">
-                The token is live and the platform is ready. Deploy your first agent in minutes.
+                {t('stayInLoopBody')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/create" className="btn-primary text-base px-10 py-4 inline-flex items-center gap-2">
-                  Create Free Agent
+                  {t('createAgentCta')}
                   <Rocket className="w-5 h-5" />
                 </Link>
                 <a
@@ -315,7 +316,7 @@ export default function TokenPage() {
                   rel="noopener noreferrer"
                   className="btn-secondary text-base px-8 py-4 inline-flex items-center gap-2"
                 >
-                  Follow on X
+                  {t('followOnX')}
                   <ArrowRight className="w-4 h-4" />
                 </a>
               </div>

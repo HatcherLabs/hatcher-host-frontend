@@ -1,10 +1,14 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
+import { Link } from '@/i18n/routing';
 
-export const metadata: Metadata = {
-  title: 'Roadmap — Hatcher',
-  description: "Where Hatcher is headed. See what we shipped, what's launching this week, and what's coming next.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'Roadmap — Hatcher',
+    description:
+      "Where Hatcher is headed. See what we shipped, what's launching this week, and what's coming next.",
+  };
+}
 
 type Status = 'done' | 'launching' | 'soon' | 'planned';
 
@@ -127,7 +131,9 @@ function CircleIcon() {
   );
 }
 
-export default function RoadmapPage() {
+export default async function RoadmapPage() {
+  const t = await getTranslations('roadmap');
+
   return (
     <main className="min-h-screen">
       <div className="mx-auto max-w-2xl px-4 sm:px-6 py-16 sm:py-20">
@@ -136,20 +142,19 @@ export default function RoadmapPage() {
         <div className="mb-14">
           <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-400 inline-flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Live
+            {t('liveLabel')}
           </p>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-[var(--text-primary)] mb-4 tracking-tight leading-[1.05]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-            Roadmap
+            {t('heading')}
           </h1>
           <p className="text-[var(--text-secondary)] text-base leading-relaxed">
-            What we've built, what's shipping now, and where we're headed.
-            We build in public — follow along on{' '}
+            {t('subheading')}{' '}
             <Link href="https://x.com/hatcherlabs" target="_blank" rel="noopener noreferrer" className="text-[var(--text-primary)] underline underline-offset-2 hover:text-[var(--color-accent)] transition-colors">
-              X&nbsp;/@hatcherlabs
+              {t('followHandle')}
             </Link>
             {' '}or check the{' '}
             <Link href="/changelog" className="text-[var(--text-primary)] underline underline-offset-2 hover:text-[var(--color-accent)] transition-colors">
-              live changelog
+              {t('checkChangelog')}
             </Link>
             .
           </p>
@@ -214,14 +219,14 @@ export default function RoadmapPage() {
         {/* Footer CTA */}
         <div className="mt-14 pt-8 border-t border-[var(--border-default)]">
           <p className="text-sm text-[var(--text-secondary)] mb-4">
-            Have a feature request? We read everything.
+            {t('featureRequest')}
           </p>
           <div className="flex flex-wrap gap-3">
             <Link
               href="/support"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-sm font-medium text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-colors"
             >
-              Submit a request
+              {t('submitRequest')}
             </Link>
             <Link
               href="https://x.com/hatcherlabs"
@@ -229,7 +234,7 @@ export default function RoadmapPage() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)] transition-colors"
             >
-              Follow on X
+              {t('followOnX')}
             </Link>
           </div>
         </div>
