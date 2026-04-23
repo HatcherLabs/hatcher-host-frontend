@@ -232,6 +232,18 @@ export function CityClient({ initial }: Props) {
     setHovered(a);
   }, []);
 
+  const useV2 = CITY_V2_FLAG || searchParams.get('v') === '2';
+
+  // V2 skeleton doesn't read the legacy data prop — render it early so
+  // a missing/slow API doesn't block the new scene.
+  if (useV2) {
+    return (
+      <div className="relative h-[calc(100vh-4rem)] min-h-[560px] overflow-hidden bg-[#050814]">
+        <CitySceneV2 />
+      </div>
+    );
+  }
+
   if (!data) {
     return (
       <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-[#050814] font-['Press_Start_2P',monospace] tracking-[3px] text-amber-400">
@@ -240,30 +252,24 @@ export function CityClient({ initial }: Props) {
     );
   }
 
-  const useV2 = CITY_V2_FLAG || searchParams.get('v') === '2';
-
   return (
     <div className="relative h-[calc(100vh-4rem)] min-h-[560px] overflow-hidden bg-[#050814]">
-      {useV2 ? (
-        <CitySceneV2 />
-      ) : (
-        <CityScene
-          ref={sceneRef}
-          agents={filteredAgents}
-          timeOfDay={timeOfDay}
-          heatmapOn={heatmapOn}
-          freshIds={freshIds}
-          pulseAts={pulseAts}
-          onHover={onHoverWithSound}
-          onPick={(a) => {
-            soundRef.current?.chirp('click');
-            router.push(`/agent/${a.id}`);
-          }}
-          onContext={(agent, screen) =>
-            setRadial({ agent, screenX: screen.x, screenY: screen.y })
-          }
-        />
-      )}
+      <CityScene
+        ref={sceneRef}
+        agents={filteredAgents}
+        timeOfDay={timeOfDay}
+        heatmapOn={heatmapOn}
+        freshIds={freshIds}
+        pulseAts={pulseAts}
+        onHover={onHoverWithSound}
+        onPick={(a) => {
+          soundRef.current?.chirp('click');
+          router.push(`/agent/${a.id}`);
+        }}
+        onContext={(agent, screen) =>
+          setRadial({ agent, screenX: screen.x, screenY: screen.y })
+        }
+      />
       <CityRadialMenu
         state={radial}
         onClose={() => setRadial(null)}
