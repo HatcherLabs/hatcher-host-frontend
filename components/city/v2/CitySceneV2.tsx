@@ -24,6 +24,7 @@ import {
 } from './character/CharacterController';
 import { FollowCamera } from './character/FollowCamera';
 import { WalkSurveyToggle, type CityMode } from './hud/WalkSurveyToggle';
+import { Minimap } from './hud/Minimap';
 
 interface Props {
   agents?: CityAgent[];
@@ -65,6 +66,11 @@ export function CitySceneV2({ agents = [] }: Props) {
         <CanvasInner agents={agents} mode={mode} charState={charState.current} />
         <QualityToggle />
         <WalkSurveyToggle mode={mode} onChange={setMode} />
+        <Minimap
+          state={charState.current}
+          agents={agents}
+          showCharacter={mode === 'walk'}
+        />
       </div>
     </QualityProvider>
   );
