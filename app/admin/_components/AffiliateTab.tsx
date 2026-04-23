@@ -501,7 +501,10 @@ function ApplicationPanel({ id, onClose, onActionComplete }: { id: string; onClo
                       {' · '}
                       {p.handle}
                     </span>
-                    {p.audienceSize !== null && (
+                    {/* `!= null` (loose) so undefined also skips — older
+                        applications stored in JSONB sometimes omit the
+                        field entirely instead of setting it to null. */}
+                    {p.audienceSize != null && (
                       <span className="text-[var(--text-muted)]">
                         {p.audienceSize.toLocaleString()} followers
                       </span>
