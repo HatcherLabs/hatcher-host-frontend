@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildLanguagesMap } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Help Center — FAQ & Documentation',
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
     description: 'Guides, FAQs, and documentation for AI agents on Hatcher.',
     images: ['https://hatcher.host/og?title=Help+Center&subtitle=Guides%2C+FAQs%2C+and+documentation+for+creating%2C+deploying%2C+and+managing+your+AI+agents+on+Hatcher.&tag=Documentation'],
   },
-  alternates: { canonical: 'https://hatcher.host/help' },
+  alternates: { canonical: 'https://hatcher.host/help', languages: buildLanguagesMap('/help') },
 };
 
 export default function HelpLayout({ children }: { children: React.ReactNode }) {

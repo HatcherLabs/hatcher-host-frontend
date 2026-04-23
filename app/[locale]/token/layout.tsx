@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildLanguagesMap } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: '$HATCHER Token — Solana SPL Token',
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
     description: 'The SPL token powering the Hatcher AI agent hosting platform.',
     images: ['https://hatcher.host/og?title=Hatcher+Platform+Token&subtitle=Solana+SPL+token+powering+AI+agent+hosting.+Use+tokens+to+unlock+features+and+pay+for+subscriptions.&tag=Solana'],
   },
-  alternates: { canonical: 'https://hatcher.host/token' },
+  alternates: { canonical: 'https://hatcher.host/token', languages: buildLanguagesMap('/token') },
 };
 
 export default function TokenLayout({ children }: { children: React.ReactNode }) {

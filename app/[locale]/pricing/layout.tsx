@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildLanguagesMap } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Pricing — Free Tier, Starter, Pro & Business Plans',
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
     description: 'Deploy AI agents free. Upgrade for more messages and dedicated resources.',
     images: ['https://hatcher.host/og?title=Hatcher+Pricing&subtitle=Free+tier+included.+Starter+%244.99%2Fmo.+Pro+%2414.99%2Fmo.+Business+%2439.99%2Fmo.+BYOK+for+unlimited+messages.&tag=Pricing'],
   },
-  alternates: { canonical: 'https://hatcher.host/pricing' },
+  alternates: { canonical: 'https://hatcher.host/pricing', languages: buildLanguagesMap('/pricing') },
 };
 
 export default function PricingLayout({ children }: { children: React.ReactNode }) {

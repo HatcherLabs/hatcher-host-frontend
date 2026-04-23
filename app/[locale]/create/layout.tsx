@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildLanguagesMap } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Create Agent — Deploy in 60 Seconds',
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
     description: 'Pick a template, configure platforms, and deploy. 23+ templates on Hatcher.',
     images: ['https://hatcher.host/og?title=Create+Your+AI+Agent&subtitle=Pick+a+template%2C+configure+platforms%2C+and+deploy+in+60+seconds.+23%2B+templates+available.&tag=Get+Started'],
   },
-  alternates: { canonical: 'https://hatcher.host/create' },
+  alternates: { canonical: 'https://hatcher.host/create', languages: buildLanguagesMap('/create') },
 };
 
 export default function CreateLayout({ children }: { children: React.ReactNode }) {

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildLanguagesMap } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Sign In',
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
     images: ['https://hatcher.host/og?title=Sign+In&subtitle=Sign+in+to+manage+your+AI+agents&tag=Hatcher'],
   },
   robots: { index: false, follow: true },
-  alternates: { canonical: 'https://hatcher.host/login' },
+  alternates: { canonical: 'https://hatcher.host/login', languages: buildLanguagesMap('/login') },
 };
 
 export default function LoginLayout({ children }: { children: React.ReactNode }) {

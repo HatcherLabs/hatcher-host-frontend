@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { buildLanguagesMap } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Support — Help & Contact',
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
     description: 'Get help with Hatcher — submit tickets, report bugs, or request features.',
     images: ['https://hatcher.host/og?title=Hatcher+Support&subtitle=Submit+tickets%2C+report+bugs%2C+or+request+features.+Our+team+is+here+to+help.&tag=Support'],
   },
-  alternates: { canonical: 'https://hatcher.host/support' },
+  alternates: { canonical: 'https://hatcher.host/support', languages: buildLanguagesMap('/support') },
 };
 
 export default function SupportLayout({ children }: { children: React.ReactNode }) {
