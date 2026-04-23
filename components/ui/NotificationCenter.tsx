@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import {
@@ -105,6 +106,7 @@ function saveDismissed(ids: Set<string>) {
 export function NotificationCenter() {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
+  const t = useTranslations('notifications');
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [readAt, setReadAt] = useState<string | null>(null);
@@ -191,7 +193,7 @@ export function NotificationCenter() {
       <button
         onClick={() => setOpen((o) => { if (!o && unreadCount > 0) markAllRead(); return !o; })}
         className="relative h-9 w-9 flex items-center justify-center rounded-lg hover:bg-[var(--bg-card)] transition-colors"
-        aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'}
+        aria-label={unreadCount > 0 ? t('unreadAriaLabel', { count: unreadCount }) : t('allReadAriaLabel')}
         aria-expanded={open}
         aria-haspopup="true"
       >
@@ -214,26 +216,26 @@ export function NotificationCenter() {
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)]">
-              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Notifications</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">{t('heading')}</h3>
               <div className="flex items-center gap-2">
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllRead}
-                    aria-label="Mark all notifications as read"
+                    aria-label={t('markReadAriaLabel')}
                     className="flex items-center gap-1 text-[10px] text-purple-400 hover:text-purple-300 transition-colors"
                   >
                     <Check size={10} aria-hidden="true" />
-                    Mark read
+                    {t('markRead')}
                   </button>
                 )}
                 {visibleNotifications.length > 0 && (
                   <button
                     onClick={clearAll}
-                    aria-label="Clear all notifications"
+                    aria-label={t('clearAriaLabel')}
                     className="flex items-center gap-1 text-[10px] text-[var(--text-muted)] hover:text-red-400 transition-colors"
                   >
                     <Trash2 size={10} aria-hidden="true" />
-                    Clear
+                    {t('clear')}
                   </button>
                 )}
               </div>
@@ -244,7 +246,7 @@ export function NotificationCenter() {
               {visibleNotifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 px-4">
                   <Activity size={24} className="text-[var(--text-muted)] mb-2" />
-                  <p className="text-xs text-[var(--text-muted)]">No notifications</p>
+                  <p className="text-xs text-[var(--text-muted)]">{t('empty')}</p>
                 </div>
               ) : (
                 visibleNotifications.map((n) => {

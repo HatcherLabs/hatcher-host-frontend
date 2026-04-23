@@ -1,26 +1,13 @@
-import Link from 'next/link';
+'use client';
+
+import { Link } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 import { DOCS_URL, SOCIAL_LINKS } from '@/lib/config';
-
-const PRODUCT_LINKS = [
-  { label: 'Create Agent', href: '/create' },
-  { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Pricing', href: '/pricing' },
-  { label: 'Affiliate', href: '/affiliate' },
-  { label: 'Status', href: '/status' },
-];
-
-const RESOURCE_LINKS = [
-  { label: 'Documentation', href: DOCS_URL, external: true },
-  { label: 'Support', href: '/support' },
-  { label: 'Blog', href: '/blog' },
-  { label: 'Changelog', href: '/changelog' },
-  { label: 'Roadmap', href: '/roadmap' },
-];
 
 const SOCIAL_ICONS = [
   {
     href: SOCIAL_LINKS.twitter,
-    label: 'X (Twitter)',
+    labelKey: 'xTwitter' as const,
     hoverClass: 'hover:text-sky-400',
     icon: (
       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -30,7 +17,7 @@ const SOCIAL_ICONS = [
   },
   {
     href: SOCIAL_LINKS.github,
-    label: 'GitHub',
+    labelKey: 'github' as const,
     hoverClass: 'hover:text-[var(--text-primary)]',
     icon: (
       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -40,7 +27,7 @@ const SOCIAL_ICONS = [
   },
   {
     href: 'https://discord.gg/7tY3HjKjMc',
-    label: 'Discord',
+    labelKey: 'discord' as const,
     hoverClass: 'hover:text-indigo-400',
     icon: (
       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -50,7 +37,7 @@ const SOCIAL_ICONS = [
   },
   {
     href: SOCIAL_LINKS.telegram,
-    label: 'Telegram',
+    labelKey: 'telegram' as const,
     hoverClass: 'hover:text-sky-400',
     icon: (
       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -60,21 +47,51 @@ const SOCIAL_ICONS = [
   },
 ];
 
-const COMMUNITY_ICONS = [
-  ...SOCIAL_ICONS,
-  {
-    href: 'mailto:contact@hatcher.host',
-    label: 'Contact Us',
-    hoverClass: 'hover:text-emerald-400',
-    icon: (
-      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-      </svg>
-    ),
-  },
-];
+const CONTACT_ICON = {
+  href: 'mailto:contact@hatcher.host',
+  labelKey: 'contactUs' as const,
+  hoverClass: 'hover:text-emerald-400',
+  icon: (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+    </svg>
+  ),
+};
+
+// Social labels are static (brand names / proper nouns) — not translated
+const SOCIAL_LABEL_MAP: Record<string, string> = {
+  xTwitter: 'X (Twitter)',
+  github: 'GitHub',
+  discord: 'Discord',
+  telegram: 'Telegram',
+  contactUs: 'Contact Us',
+};
 
 export function Footer() {
+  const t = useTranslations('footer');
+  const year = new Date().getFullYear();
+
+  const PRODUCT_LINKS = [
+    { label: t('links.createAgent'), href: '/create', external: false },
+    { label: t('links.dashboard'),   href: '/dashboard', external: false },
+    { label: t('links.pricing'),     href: '/pricing', external: false },
+    { label: t('links.affiliate'),   href: '/affiliate', external: false },
+    { label: t('links.status'),      href: '/status', external: false },
+  ];
+
+  const RESOURCE_LINKS = [
+    { label: t('links.documentation'), href: DOCS_URL, external: true },
+    { label: t('links.support'),        href: '/support', external: false },
+    { label: t('links.blog'),           href: '/blog', external: false },
+    { label: t('links.changelog'),      href: '/changelog', external: false },
+    { label: t('links.roadmap'),        href: '/roadmap', external: false },
+  ];
+
+  const COMMUNITY_ICONS = [
+    ...SOCIAL_ICONS,
+    CONTACT_ICON,
+  ];
+
   return (
     <footer className="mt-auto">
       <div className="h-px bg-[var(--border-default)]" />
@@ -108,7 +125,7 @@ export function Footer() {
           {/* Product */}
           <div className="flex justify-center md:justify-start">
             <div>
-              <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">Product</p>
+              <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">{t('columns.product')}</p>
               <ul className="space-y-2">
                 {PRODUCT_LINKS.map((link) => (
                   <li key={link.href}>
@@ -124,7 +141,7 @@ export function Footer() {
           {/* Resources */}
           <div className="flex justify-center md:justify-start">
             <div>
-              <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">Resources</p>
+              <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">{t('columns.resources')}</p>
               <ul className="space-y-2">
                 {RESOURCE_LINKS.map((link) => (
                   <li key={link.href}>
@@ -150,21 +167,24 @@ export function Footer() {
 
           {/* Community */}
           <div className="col-span-2 md:col-span-1 text-center md:text-left">
-            <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">Community</p>
+            <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-[var(--text-muted)] mb-3">{t('columns.community')}</p>
             <div className="flex flex-nowrap gap-1 justify-center md:justify-start">
-              {COMMUNITY_ICONS.map((s) => (
-                <a
-                  key={s.href}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={s.label}
-                  title={s.label}
-                  className={`w-7 h-7 rounded-lg flex items-center justify-center text-[var(--text-muted)] ${s.hoverClass} hover:bg-[var(--bg-card)] transition-colors duration-200`}
-                >
-                  {s.icon}
-                </a>
-              ))}
+              {COMMUNITY_ICONS.map((s) => {
+                const label = SOCIAL_LABEL_MAP[s.labelKey];
+                return (
+                  <a
+                    key={s.href}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    title={label}
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center text-[var(--text-muted)] ${s.hoverClass} hover:bg-[var(--bg-card)] transition-colors duration-200`}
+                  >
+                    {s.icon}
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -172,19 +192,19 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-[var(--border-default)] pt-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-3 text-xs text-[var(--text-muted)] text-center sm:text-left">
-            <span>&copy; {new Date().getFullYear()} HatcherLabs. All rights reserved.</span>
+            <span>{t('copyright', { year })}</span>
             <span className="hidden sm:inline text-[var(--border-default)]">·</span>
-            <span>HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România</span>
+            <span>{t('companyInfo')}</span>
           </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--text-muted)]">
-            <Link href="/pricing" className="hover:text-[var(--text-primary)] transition-colors duration-200">Pricing</Link>
-            <Link href="/affiliate" className="hover:text-[var(--text-primary)] transition-colors duration-200">Affiliate</Link>
-            <Link href="/support" className="hover:text-[var(--text-primary)] transition-colors duration-200">Support</Link>
-            <a href={DOCS_URL} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--text-primary)] transition-colors duration-200">Docs</a>
-            <Link href="/terms" className="hover:text-[var(--text-primary)] transition-colors duration-200">Terms</Link>
-            <Link href="/privacy" className="hover:text-[var(--text-primary)] transition-colors duration-200">Privacy</Link>
-            <Link href="/cookies" className="hover:text-[var(--text-primary)] transition-colors duration-200">Cookies</Link>
-            <Link href="/impressum" className="hover:text-[var(--text-primary)] transition-colors duration-200">Impressum</Link>
+            <Link href="/pricing" className="hover:text-[var(--text-primary)] transition-colors duration-200">{t('links.pricing')}</Link>
+            <Link href="/affiliate" className="hover:text-[var(--text-primary)] transition-colors duration-200">{t('links.affiliate')}</Link>
+            <Link href="/support" className="hover:text-[var(--text-primary)] transition-colors duration-200">{t('links.support')}</Link>
+            <a href={DOCS_URL} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--text-primary)] transition-colors duration-200">{t('links.docs')}</a>
+            <Link href="/terms" className="hover:text-[var(--text-primary)] transition-colors duration-200">{t('links.terms')}</Link>
+            <Link href="/privacy" className="hover:text-[var(--text-primary)] transition-colors duration-200">{t('links.privacy')}</Link>
+            <Link href="/cookies" className="hover:text-[var(--text-primary)] transition-colors duration-200">{t('links.cookies')}</Link>
+            <Link href="/impressum" className="hover:text-[var(--text-primary)] transition-colors duration-200">{t('links.impressum')}</Link>
           </div>
         </div>
       </div>

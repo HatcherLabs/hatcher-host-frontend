@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
+import { Link } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { clsx } from 'clsx';
@@ -16,64 +18,6 @@ import { DOCS_URL } from '@/lib/config';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
-// ── Nav links when logged IN ──
-const AUTH_NAV_LINKS = [
-  { href: '/dashboard/agents',    label: 'My Agents' },
-  { href: '/create',              label: 'Create' },
-  { href: '/city',                label: 'City' },
-  { href: '/frameworks',          label: 'Frameworks' },
-  { href: '/token',               label: 'Token' },
-];
-
-// ── Nav links when logged OUT ──
-const GUEST_NAV_LINKS = [
-  { href: '/city',                label: 'City' },
-  { href: '/frameworks',          label: 'Frameworks' },
-  { href: '/token',               label: 'Token' },
-];
-
-// ── Auxiliary links (visible in both states, after a divider) ──
-const AUX_LINKS = [
-  { href: '/pricing',           label: 'Pricing',   external: false, badge: null, authOnly: false },
-  { href: '/roadmap',           label: 'Roadmap',   external: false, badge: null, authOnly: false },
-  { href: DOCS_URL,             label: 'Docs',      external: true,  badge: null, authOnly: false },
-  { href: '/dashboard/billing', label: 'Billing',   external: false, badge: null, authOnly: true },
-];
-
-// ── User dropdown links ──
-const USER_EXTRA_LINKS = [
-  { href: '/dashboard/analytics', label: 'Analytics', icon: Activity },
-  { href: '/dashboard/team', label: 'Team', icon: Users },
-  { href: '/support', label: 'Support', icon: MessageSquare },
-  { href: '/dashboard/settings', label: 'Settings', icon: Settings },
-];
-
-// ── Mobile links (when logged in) ──
-// Docs is rendered separately (external link block below the map), so
-// we intentionally don't include it here.
-const MOBILE_AUTH_LINKS = [
-  { href: '/dashboard/agents',    label: 'My Agents' },
-  { href: '/create',              label: 'Create' },
-  { href: '/city',                label: 'City' },
-  { href: '/frameworks',          label: 'Frameworks' },
-  { href: '/token',               label: 'Token' },
-  { href: '/pricing',             label: 'Pricing' },
-  { href: '/roadmap',             label: 'Roadmap' },
-  { href: '/dashboard/billing',   label: 'Billing' },
-  { href: '/support',             label: 'Support' },
-];
-
-// ── Mobile links (when logged out) ──
-// Must stay in sync with GUEST_NAV_LINKS + AUX_LINKS on desktop so
-// hamburger users see the same surface. Docs is rendered separately.
-const MOBILE_GUEST_LINKS = [
-  { href: '/city',       label: 'City' },
-  { href: '/frameworks', label: 'Frameworks' },
-  { href: '/token',      label: 'Token' },
-  { href: '/pricing',    label: 'Pricing' },
-  { href: '/roadmap',    label: 'Roadmap' },
-];
-
 function isActive(pathname: string, href: string) {
   if (pathname === href) return true;
   if (href === '/dashboard/agents' && (pathname.startsWith('/dashboard/agent/') || pathname === '/dashboard')) return true;
@@ -83,6 +27,7 @@ function isActive(pathname: string, href: string) {
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations('nav');
   const [mobileOpen, setMobileOpen] = useState(false);
   const { isAuthenticated, isLoading: authLoading, user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -163,18 +108,18 @@ export function Header() {
   const affiliateMenuItem = (() => {
     switch (affiliateState) {
       case 'affiliate':
-        return { href: '/dashboard/affiliate', label: 'Affiliate Dashboard' };
+        return { href: '/dashboard/affiliate', label: t('affiliateDashboard') };
       case 'pending':
-        return { href: '/affiliate/apply', label: 'Application under review' };
+        return { href: '/affiliate/apply', label: t('affiliatePending') };
       case 'rejected':
-        return { href: '/affiliate/apply', label: 'Reapply as affiliate' };
+        return { href: '/affiliate/apply', label: t('affiliateRejected') };
       case 'none':
-        return { href: '/affiliate', label: 'Become an affiliate' };
+        return { href: '/affiliate', label: t('affiliateBecome') };
       default:
         // While loading, show the neutral "Become an affiliate" link —
         // it never crashes and worst-case sends the user to the marketing
         // page if our fetch fails or hasn't completed yet.
-        return { href: '/affiliate', label: 'Become an affiliate' };
+        return { href: '/affiliate', label: t('affiliateBecome') };
     }
   })();
 
@@ -200,6 +145,64 @@ export function Header() {
     setDropdownOpen(false);
     router.push('/');
   };
+
+  // ── Nav links when logged IN ──
+  const AUTH_NAV_LINKS = [
+    { href: '/dashboard/agents', label: t('myAgents') },
+    { href: '/create',           label: t('create') },
+    { href: '/city',             label: t('city') },
+    { href: '/frameworks',       label: t('frameworks') },
+    { href: '/token',            label: t('token') },
+  ];
+
+  // ── Nav links when logged OUT ──
+  const GUEST_NAV_LINKS = [
+    { href: '/city',        label: t('city') },
+    { href: '/frameworks',  label: t('frameworks') },
+    { href: '/token',       label: t('token') },
+  ];
+
+  // ── Auxiliary links (visible in both states, after a divider) ──
+  const AUX_LINKS = [
+    { href: '/pricing',           label: t('pricing'),  external: false, badge: null, authOnly: false },
+    { href: '/roadmap',           label: t('roadmap'),  external: false, badge: null, authOnly: false },
+    { href: DOCS_URL,             label: t('docs'),     external: true,  badge: null, authOnly: false },
+    { href: '/dashboard/billing', label: t('billing'),  external: false, badge: null, authOnly: true },
+  ];
+
+  // ── User dropdown links ──
+  const USER_EXTRA_LINKS = [
+    { href: '/dashboard/analytics', label: t('analytics'), icon: Activity },
+    { href: '/dashboard/team',      label: t('team'),      icon: Users },
+    { href: '/support',             label: t('support'),   icon: MessageSquare },
+    { href: '/dashboard/settings',  label: t('settings'),  icon: Settings },
+  ];
+
+  // ── Mobile links (when logged in) ──
+  // Docs is rendered separately (external link block below the map), so
+  // we intentionally don't include it here.
+  const MOBILE_AUTH_LINKS = [
+    { href: '/dashboard/agents',    label: t('myAgents') },
+    { href: '/create',              label: t('create') },
+    { href: '/city',                label: t('city') },
+    { href: '/frameworks',          label: t('frameworks') },
+    { href: '/token',               label: t('token') },
+    { href: '/pricing',             label: t('pricing') },
+    { href: '/roadmap',             label: t('roadmap') },
+    { href: '/dashboard/billing',   label: t('billing') },
+    { href: '/support',             label: t('support') },
+  ];
+
+  // ── Mobile links (when logged out) ──
+  // Must stay in sync with GUEST_NAV_LINKS + AUX_LINKS on desktop so
+  // hamburger users see the same surface. Docs is rendered separately.
+  const MOBILE_GUEST_LINKS = [
+    { href: '/city',        label: t('city') },
+    { href: '/frameworks',  label: t('frameworks') },
+    { href: '/token',       label: t('token') },
+    { href: '/pricing',     label: t('pricing') },
+    { href: '/roadmap',     label: t('roadmap') },
+  ];
 
   // Desktop nav links depend on auth state
   const primaryLinks = isAuthenticated ? AUTH_NAV_LINKS : GUEST_NAV_LINKS;
@@ -252,7 +255,7 @@ export function Header() {
                 )}
               >
                 <Shield className="w-3.5 h-3.5" />
-                Admin
+                {t('admin')}
               </Link>
             )}
           </div>
@@ -389,7 +392,7 @@ export function Header() {
                                 >
                                   <Wallet className="w-3 h-3" />
                                   <span className="font-semibold">${creditBalance.toFixed(2)}</span>
-                                  <span className="text-[var(--text-secondary)]">credits</span>
+                                  <span className="text-[var(--text-secondary)]">{t('credits')}</span>
                                 </span>
                               )}
                             </div>
@@ -438,7 +441,7 @@ export function Header() {
                               className="w-full flex items-center gap-2.5 text-left px-4 py-2.5 text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors duration-200"
                             >
                               <LogOut className="w-3.5 h-3.5" />
-                              Sign Out
+                              {t('logout')}
                             </button>
                           </div>
                         </motion.div>
@@ -449,10 +452,10 @@ export function Header() {
               ) : (
                 <div className="flex items-center gap-2">
                   <Link href="/login" className="h-9 px-4 text-[var(--text-primary)] font-medium text-xs rounded-full border border-[var(--border-default)] bg-transparent hover:bg-[var(--bg-card)] transition-all duration-200 flex items-center">
-                    Sign In
+                    {t('signIn')}
                   </Link>
                   <Link href="/register" className="h-9 px-4 text-white font-medium text-xs rounded-full bg-purple-600 hover:bg-purple-500 transition-all duration-200 flex items-center">
-                    Sign Up
+                    {t('signUp')}
                   </Link>
                 </div>
               )}
@@ -472,7 +475,7 @@ export function Header() {
             <button
               className="lg:hidden flex flex-col justify-center items-center w-10 h-10 rounded-lg hover:bg-[rgba(139,92,246,0.1)] transition-colors gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
               onClick={() => setMobileOpen(o => !o)}
-              aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-label={mobileOpen ? t('closeNav') : t('openNav')}
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav-menu"
             >
@@ -523,7 +526,7 @@ export function Header() {
                   className="block px-3 py-2.5 text-sm rounded-lg transition-colors duration-200 text-[var(--text-muted)] hover:text-[var(--text-primary)] border-l-2 border-transparent"
                   onClick={() => setMobileOpen(false)}
                 >
-                  Docs
+                  {t('docs')}
                 </a>
               </motion.div>
 
@@ -534,7 +537,7 @@ export function Header() {
                     className={clsx('flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-colors border-l-2', pathname === '/admin' ? 'text-purple-400 bg-purple-500/10 border-purple-500' : 'text-[var(--text-muted)] hover:text-purple-400 border-transparent')}
                     onClick={() => setMobileOpen(false)}
                   >
-                    <Shield className="w-4 h-4" /> Admin Panel
+                    <Shield className="w-4 h-4" /> {t('adminPanel')}
                   </Link>
                 </motion.div>
               )}
@@ -558,28 +561,28 @@ export function Header() {
                       <span className="text-[10px] text-[var(--text-secondary)] ml-auto truncate max-w-[150px]">{user.email}</span>
                     </div>
                     <Link href="/dashboard/analytics" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
-                      <Activity className="w-4 h-4" /> Analytics
+                      <Activity className="w-4 h-4" /> {t('analytics')}
                     </Link>
                     <Link href="/dashboard/team" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
-                      <Users className="w-4 h-4" /> Team
+                      <Users className="w-4 h-4" /> {t('team')}
                     </Link>
                     <Link href={affiliateMenuItem.href} className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
                       <Award className="w-4 h-4" /> {affiliateMenuItem.label}
                     </Link>
                     <Link href="/dashboard/settings" className="flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" onClick={() => setMobileOpen(false)}>
-                      <Settings className="w-4 h-4" /> Settings
+                      <Settings className="w-4 h-4" /> {t('settings')}
                     </Link>
                     <button
                       onClick={() => { handleLogout(); setMobileOpen(false); }}
                       className="w-full flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
                     >
-                      <LogOut className="w-4 h-4" /> Sign Out
+                      <LogOut className="w-4 h-4" /> {t('logout')}
                     </button>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 px-3">
-                    <Link href="/login" className="flex-1 h-10 text-[var(--text-primary)] font-medium text-sm rounded-lg border border-[var(--border-default)] flex items-center justify-center" onClick={() => setMobileOpen(false)}>Sign In</Link>
-                    <Link href="/register" className="flex-1 h-10 text-white font-medium text-sm rounded-lg bg-purple-600 hover:bg-purple-500 flex items-center justify-center" onClick={() => setMobileOpen(false)}>Sign Up</Link>
+                    <Link href="/login" className="flex-1 h-10 text-[var(--text-primary)] font-medium text-sm rounded-lg border border-[var(--border-default)] flex items-center justify-center" onClick={() => setMobileOpen(false)}>{t('signIn')}</Link>
+                    <Link href="/register" className="flex-1 h-10 text-white font-medium text-sm rounded-lg bg-purple-600 hover:bg-purple-500 flex items-center justify-center" onClick={() => setMobileOpen(false)}>{t('signUp')}</Link>
                   </div>
                 )}
               </motion.div>
