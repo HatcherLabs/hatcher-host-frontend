@@ -21,21 +21,15 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'common' });
 
-  const languages: Record<string, string> = {};
-  for (const loc of routing.locales) {
-    languages[loc] = loc === routing.defaultLocale ? '/' : `/${loc}`;
-  }
-  languages['x-default'] = '/';
-
   return {
     title: {
       default: t('appName'),
       template: `%s · ${t('appName')}`,
     },
     description: t('tagline'),
+    // languages are set per-route via buildLanguagesMap() in each route's metadata
     alternates: {
       canonical: locale === routing.defaultLocale ? '/' : `/${locale}`,
-      languages,
     },
     openGraph: {
       locale: OG_LOCALE_MAP[locale] ?? 'en_US',

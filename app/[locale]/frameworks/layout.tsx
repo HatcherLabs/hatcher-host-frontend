@@ -1,10 +1,15 @@
 import type { Metadata } from 'next';
+import { buildLanguagesMap } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'AI Frameworks — OpenClaw, Hermes, ElizaOS, Milady',
   description:
     'Compare 4 AI agent frameworks on Hatcher: OpenClaw (tools + memory), Hermes (ultra-fast), ElizaOS (multi-agent), Milady (personality-driven). Deploy any framework in 60 seconds.',
   keywords: ['OpenClaw', 'Hermes', 'ElizaOS', 'Milady', 'AI frameworks', 'agent framework comparison'],
+  alternates: {
+    canonical: '/frameworks',
+    languages: buildLanguagesMap('/frameworks'),
+  },
   openGraph: {
     title: 'AI Agent Frameworks — OpenClaw, Hermes, ElizaOS, Milady',
     description: 'Compare 4 AI agent frameworks. Deploy any framework in 60 seconds on Hatcher.',

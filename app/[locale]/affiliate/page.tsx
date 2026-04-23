@@ -13,6 +13,7 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
+import { buildLanguagesMap } from '@/lib/seo';
 import {
   ArrowRight,
   Wallet,
@@ -32,6 +33,10 @@ export const metadata: Metadata = {
   title: 'Affiliate Program — Hatcher',
   description:
     'Earn up to 40% recurring commissions referring developers and AI builders to Hatcher. Pick cash, credits, or a hybrid split. Flat $20 bonus on every Founding Member signup.',
+  alternates: {
+    canonical: '/affiliate',
+    languages: buildLanguagesMap('/affiliate'),
+  },
   openGraph: {
     title: 'Affiliate Program — Hatcher',
     description:

@@ -3,8 +3,6 @@ import Script from 'next/script';
 import { Inter, JetBrains_Mono, Sora } from 'next/font/google';
 import '@solana/wallet-adapter-react-ui/styles.css';
 import './globals.css';
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
 import { WalletProvider } from '@/components/providers/WalletProvider';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { AuthProvider } from '@/lib/auth-context';
@@ -227,8 +225,7 @@ const faqJsonLd = {
   ],
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const messages = await getMessages();
+export default function RootLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <html lang="en" className={`scroll-smooth ${inter.variable} ${jetbrainsMono.variable} ${sora.variable}`} suppressHydrationWarning>
@@ -306,20 +303,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           `}
         </Script>
         <Script src="/register-sw.js" strategy="afterInteractive" />
-        <NextIntlClientProvider messages={messages} locale="en">
-          <PosthogProvider>
-            <ThemeProvider>
-              <AuthProvider>
-                <WalletProvider>
-                  <ToastProvider>
-                    <LayoutShell>{children}</LayoutShell>
-                    <CommandPalette />
-                  </ToastProvider>
-                </WalletProvider>
-              </AuthProvider>
-            </ThemeProvider>
-          </PosthogProvider>
-        </NextIntlClientProvider>
+        <PosthogProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <WalletProvider>
+                <ToastProvider>
+                  <LayoutShell>{children}</LayoutShell>
+                  <CommandPalette />
+                </ToastProvider>
+              </WalletProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </PosthogProvider>
         <CookieConsent />
       </body>
     </html>

@@ -1,12 +1,17 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
+import { buildLanguagesMap } from '@/lib/seo';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Roadmap — Hatcher',
     description:
       "Where Hatcher is headed. See what we shipped, what's launching this week, and what's coming next.",
+    alternates: {
+      canonical: '/roadmap',
+      languages: buildLanguagesMap('/roadmap'),
+    },
   };
 }
 

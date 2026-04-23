@@ -19,7 +19,7 @@
 // ============================================================
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { Shield, BarChart3, Cookie as CookieIcon } from 'lucide-react';
 
 const CONSENT_KEY = 'hatcher-cookie-consent';

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { API_URL } from '@/lib/config';
 import { CityClient } from './CityClient';
 import type { CityResponse } from '@/components/city/types';
+import { buildLanguagesMap } from '@/lib/seo';
 
 const TITLE = 'Hatcher City — every AI agent, in one view';
 const DESCRIPTION =
@@ -11,7 +12,7 @@ const OG_IMAGE = '/city-preview.png';
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
-  alternates: { canonical: '/city' },
+  alternates: { canonical: '/city', languages: buildLanguagesMap('/city') },
   openGraph: {
     title: 'Hatcher City',
     description: 'Every AI agent on hatcher.host, rendered live in a 3D city.',

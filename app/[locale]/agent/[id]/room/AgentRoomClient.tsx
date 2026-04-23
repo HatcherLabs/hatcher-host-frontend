@@ -2,7 +2,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
 import { AgentRoomScene } from '@/components/agent-room/AgentRoomScene';
 import { StatsHud } from '@/components/agent-room/hud/StatsHud';
 import { LogsHud } from '@/components/agent-room/hud/LogsHud';

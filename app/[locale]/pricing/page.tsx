@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { FOUNDING_MEMBER_MAX_SLOTS } from '@hatcher/shared';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';

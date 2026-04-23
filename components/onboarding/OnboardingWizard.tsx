@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
 import { X, ArrowRight, ArrowLeft, Check, MessageSquare, Plug, BarChart3, Key, Cpu, Brain, Bot, Sparkles } from 'lucide-react';
 
 // Editorial onboarding wizard — replaces the prior gradient-heavy

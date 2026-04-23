@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CityAgent, CityResponse, Framework, Category } from './types';
 import { CATEGORIES, CATEGORY_LABELS, CATEGORY_ICON } from './types';

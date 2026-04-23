@@ -1,10 +1,15 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { ChangelogAutoRefresh } from './ChangelogAutoRefresh';
+import { buildLanguagesMap } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: 'Changelog — Hatcher',
   description: 'Live updates from the Hatcher team. We ship improvements every day.',
+  alternates: {
+    canonical: '/changelog',
+    languages: buildLanguagesMap('/changelog'),
+  },
 };
 
 export const dynamic = 'force-dynamic'; // always fetch fresh — changelog should be live
