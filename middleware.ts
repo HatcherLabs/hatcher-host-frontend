@@ -17,7 +17,8 @@
 // ============================================================
 
 import createMiddleware from 'next-intl/middleware';
-import type { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 import { routing } from './i18n/routing';
 import { locales } from './i18n/config';
 
@@ -25,6 +26,27 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 // next-intl middleware instance — runs first to handle locale detection/rewrites.
 const intlMiddleware = createMiddleware(routing);
+
+// Paths that live at app root and are NOT under [locale] — they must bypass the
+// intl middleware entirely, otherwise next-intl rewrites /privacy → /en/privacy
+// which produces a 404 (there is no [locale]/privacy route).
+// Keep this in sync with the folders kept at app/ root (not moved under [locale]).
+const NON_LOCALE_PREFIXES = [
+  '/admin',
+  '/privacy',
+  '/terms',
+  '/impressum',
+  '/cookies',
+  '/og',
+  '/skill',
+  '/.well-known',
+];
+
+function isNonLocalePath(pathname: string): boolean {
+  return NON_LOCALE_PREFIXES.some(
+    (p) => pathname === p || pathname.startsWith(p + '/'),
+  );
+}
 
 // Regex matching any supported locale prefix at the start of the pathname.
 // Derived from locales in i18n/config.ts at compile time.
@@ -63,6 +85,14 @@ function isTrackablePath(pathname: string): boolean {
 }
 
 export default function middleware(req: NextRequest): NextResponse {
+  const { pathname } = req.nextUrl;
+
+  // Non-locale paths (admin, legal pages, og, skill) bypass the intl middleware.
+  // They live at app/ root (not under [locale]) so next-intl must not rewrite them.
+  if (isNonLocalePath(pathname)) {
+    return NextResponse.next();
+  }
+
   // Step 1: Run next-intl first so it can handle locale detection/rewrites/redirects
   // and set the HATCHER_LOCALE cookie.
   const response = intlMiddleware(req);
