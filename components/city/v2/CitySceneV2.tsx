@@ -12,6 +12,7 @@ import { Ground } from './world/Ground';
 import { SceneErrorBoundary } from './world/SceneErrorBoundary';
 import { Streets } from './world/Streets';
 import { DistrictPads } from './world/DistrictPads';
+import { Landmarks } from './world/Landmarks';
 import { Buildings } from './world/Buildings';
 
 // Rapier is installed (Phase 5) but not mounted here — walking
@@ -80,6 +81,9 @@ function CanvasInner({ agents }: { agents: CityAgent[] }) {
         </SceneErrorBoundary>
         <SceneErrorBoundary label="Streets">
           <Streets />
+        </SceneErrorBoundary>
+        <SceneErrorBoundary label="Landmarks">
+          <Landmarks />
         </SceneErrorBoundary>
         <SceneErrorBoundary label="Buildings">
           <Buildings agents={agents} />
