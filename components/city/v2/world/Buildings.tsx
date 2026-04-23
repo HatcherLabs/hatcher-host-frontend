@@ -118,16 +118,26 @@ function PrimitiveInstance({
 
   // Apply a subtle framework-colored emissive to the cloned material
   // so Bloom picks up the cyber tint without drowning the structural
-  // detail. Only runs once per material; per-instance colour multiplier
-  // still comes from instanceColor below.
+  // detail. Material names that look like windows get a brighter
+  // emissive so they read as lit windows at night without any extra
+  // geometry. Only runs once per material; per-instance colour
+  // multiplier still comes from instanceColor below.
   useMemo(() => {
     const std = material as THREE.MeshStandardMaterial & {
       emissive?: THREE.Color;
       emissiveIntensity?: number;
+      name?: string;
     };
     if ('emissive' in std && std.emissive instanceof THREE.Color) {
-      std.emissive.set(0x223355);
-      std.emissiveIntensity = 0.25;
+      const n = (std.name ?? '').toLowerCase();
+      const looksLikeWindow = /window|glass|light|neon|emissive/.test(n);
+      if (looksLikeWindow) {
+        std.emissive.set(0xfff4c8);
+        std.emissiveIntensity = 1.6;
+      } else {
+        std.emissive.set(0x223355);
+        std.emissiveIntensity = 0.25;
+      }
       std.needsUpdate = true;
     }
   }, [material]);

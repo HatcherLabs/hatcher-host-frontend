@@ -15,6 +15,10 @@ export interface CharacterState {
 interface Props {
   state: CharacterState;
   speed?: number;
+  /** External analog vector, usually the mobile virtual joystick.
+   *  Range (-1..1, -1..1). Keyboard and analog stack — whichever is
+   *  larger on each axis wins. */
+  analog?: { x: number; y: number };
 }
 
 /**
@@ -30,7 +34,7 @@ interface Props {
  * NOT ( forward.z, 0, -forward.x ). A previous version had the sign
  * flipped, which made A/D feel swapped.
  */
-export function CharacterController({ state, speed = 12 }: Props) {
+export function CharacterController({ state, speed = 12, analog }: Props) {
   const { camera } = useThree();
   const keys = useRef({
     forward: false,
@@ -100,7 +104,11 @@ export function CharacterController({ state, speed = 12 }: Props) {
 
   useFrame((_, dt) => {
     const { forward, back, left, right, sprint } = keys.current;
-    if (!forward && !back && !left && !right) return;
+    const ax = analog?.x ?? 0;
+    const ay = analog?.y ?? 0;
+    const hasKey = forward || back || left || right;
+    const hasAnalog = Math.abs(ax) > 0.05 || Math.abs(ay) > 0.05;
+    if (!hasKey && !hasAnalog) return;
 
     // Camera forward projected to the ground plane.
     const camDir = new THREE.Vector3();
@@ -115,6 +123,12 @@ export function CharacterController({ state, speed = 12 }: Props) {
     if (back) move.addScaledVector(camDir, -1);
     if (right) move.add(camRight);
     if (left) move.addScaledVector(camRight, -1);
+    // Analog joystick: x = strafe, y = forward/back (y inverted
+    // because touch Y grows downward on screen).
+    if (hasAnalog) {
+      move.addScaledVector(camDir, -ay);
+      move.addScaledVector(camRight, ax);
+    }
 
     if (move.lengthSq() === 0) return;
     move.normalize();

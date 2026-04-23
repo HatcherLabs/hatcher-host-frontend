@@ -19,6 +19,7 @@ import { TravelPads } from './world/TravelPads';
 import { Traffic } from './world/Traffic';
 import { NPCs } from './world/NPCs';
 import { Buildings } from './world/Buildings';
+import { ActivityPulses } from './world/ActivityPulses';
 import {
   CharacterController,
   CharacterMesh,
@@ -30,10 +31,15 @@ import { WalkSurveyToggle, type CityMode } from './hud/WalkSurveyToggle';
 import { Minimap } from './hud/Minimap';
 import { WalkOnboarding } from './hud/WalkOnboarding';
 import { AgentPopup } from './hud/AgentPopup';
+import { MobileJoystick } from './character/MobileJoystick';
 import { CATEGORIES } from '@/components/city/types';
 
 interface Props {
   agents?: CityAgent[];
+  /** Optional live-activity pulses — keyed by agentId → timestamp, as
+   *  emitted by CityClient. If omitted, the activity-pulse ring pool
+   *  stays dormant. */
+  pulseAts?: Map<string, number>;
 }
 
 /**
@@ -45,7 +51,9 @@ interface Props {
  * Bloom post-processing. Toggle between aerial Survey (OrbitControls)
  * and first-person Walk (WASD + FollowCamera).
  */
-export function CitySceneV2({ agents = [] }: Props) {
+const EMPTY_PULSES: Map<string, number> = new Map();
+
+export function CitySceneV2({ agents = [], pulseAts = EMPTY_PULSES }: Props) {
   const [mode, setMode] = useState<CityMode>('survey');
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const charState = useRef<CharacterState>({
@@ -54,6 +62,9 @@ export function CitySceneV2({ agents = [] }: Props) {
     cameraYaw: 0,
     cameraPitch: 0.35,
   });
+  // Analog vector from the mobile joystick; shared with CanvasInner
+  // via ref so updating it doesn't cause re-renders.
+  const analogRef = useRef({ x: 0, y: 0 });
   const selectedAgent =
     selectedAgentId ? agents.find((a) => a.id === selectedAgentId) ?? null : null;
 
@@ -95,7 +106,9 @@ export function CitySceneV2({ agents = [] }: Props) {
           agents={agents}
           mode={mode}
           charState={charState.current}
+          pulseAts={pulseAts}
           onBuildingClick={setSelectedAgentId}
+          analogRef={analogRef}
         />
         <QualityToggle />
         <WalkSurveyToggle mode={mode} onChange={setMode} />
@@ -113,6 +126,14 @@ export function CitySceneV2({ agents = [] }: Props) {
             window.location.href = `/agent/${id}`;
           }}
         />
+        {mode === 'walk' && (
+          <MobileJoystick
+            onVector={(x, y) => {
+              analogRef.current.x = x;
+              analogRef.current.y = y;
+            }}
+          />
+        )}
       </div>
     </QualityProvider>
   );
@@ -122,12 +143,16 @@ function CanvasInner({
   agents,
   mode,
   charState,
+  pulseAts,
   onBuildingClick,
+  analogRef,
 }: {
   agents: CityAgent[];
   mode: CityMode;
   charState: CharacterState;
+  pulseAts: Map<string, number>;
   onBuildingClick?: (agentId: string) => void;
+  analogRef: React.MutableRefObject<{ x: number; y: number }>;
 }) {
   const quality = useQuality();
   return (
@@ -186,6 +211,9 @@ function CanvasInner({
         <SceneErrorBoundary label="Buildings">
           <Buildings agents={agents} onBuildingClick={onBuildingClick} />
         </SceneErrorBoundary>
+        <SceneErrorBoundary label="ActivityPulses">
+          <ActivityPulses agents={agents} pulseAts={pulseAts} />
+        </SceneErrorBoundary>
         <SceneErrorBoundary label="DistrictLabels">
           <DistrictLabels agents={agents} />
         </SceneErrorBoundary>
@@ -204,7 +232,7 @@ function CanvasInner({
         />
       ) : (
         <>
-          <CharacterController state={charState} />
+          <CharacterController state={charState} analog={analogRef.current} />
           <MouseLook state={charState} />
           <FollowCamera state={charState} />
         </>

@@ -239,7 +239,7 @@ export function CityClient({ initial }: Props) {
   if (useV2) {
     return (
       <div className="relative h-[calc(100vh-4rem)] min-h-[560px] overflow-hidden bg-[#050814]">
-        <CitySceneV2 agents={data?.agents ?? []} />
+        <CitySceneV2 agents={data?.agents ?? []} pulseAts={pulseAts} />
       </div>
     );
   }
