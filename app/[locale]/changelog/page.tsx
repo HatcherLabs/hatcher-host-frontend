@@ -17,7 +17,10 @@ export const dynamic = 'force-dynamic'; // always fetch fresh — changelog shou
 type Tag = 'frontend' | 'backend' | 'shared' | 'infrastructure' | 'docs';
 
 interface Commit {
-  sha: string;
+  /** Stable local ID from the API — no longer the raw git SHA. Used
+   *  only as a React key. Backend derives it from short SHA + date so
+   *  the full hash is never sent over the wire (security H-002). */
+  id: string;
   message: string;
   date: string;
   tag: Tag;
@@ -116,7 +119,13 @@ export default async function ChangelogPage() {
                   {dayCommits.map(c => {
                     const tag = TAG_CONFIG[c.tag];
                     return (
-                      <li key={c.sha} className="flex items-start gap-3">
+                      <li
+                        // Fallback to date+message slice while the API
+                        // rollout of the `id` field is mid-flight; drop
+                        // the `??` once the backend is fully deployed.
+                        key={c.id ?? `${c.date}-${c.message.slice(0, 16)}`}
+                        className="flex items-start gap-3"
+                      >
                         <span className={`mt-0.5 shrink-0 inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium border ${tag.className}`}>
                           {tag.label}
                         </span>

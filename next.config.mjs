@@ -29,9 +29,20 @@ const nextConfig = {
   },
   async headers() {
     // CSP shared between default and embed routes, except for frame-ancestors.
+    //
+    // Security notes (recon M-003, 2026-04-23):
+    //   - `'unsafe-eval'` dropped in favour of `'wasm-unsafe-eval'`.
+    //     Three.js / drei use WebAssembly (Draco/KTX2 decoders) which
+    //     needs wasm-unsafe-eval; no first-party code path uses plain
+    //     `eval()` or `new Function(string)` (grep-verified).
+    //   - `'unsafe-inline'` is still allowed for scripts because Next.js
+    //     App Router injects inline hydration scripts without a stable
+    //     nonce hook as of Next 15. A nonce-based CSP migration is its
+    //     own effort (custom middleware + per-request nonces for every
+    //     <Script>/<script>). Tracked separately.
     const baseCspParts = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https://*.ipfs.nftstorage.link https://arweave.net https://raw.githubusercontent.com",
@@ -86,6 +97,25 @@ const nextConfig = {
           {
             key: 'Strict-Transport-Security',
             value: 'max-age=63072000; includeSubDomains; preload',
+          },
+          // Cross-origin isolation trio (recon I-004, 2026-04-23). Using
+          // the "-allow-popups" variant of COOP so Solana wallet adapters
+          // can still open wallet popups. CORP=same-origin blocks other
+          // sites from embedding our resources as subresources. COEP is
+          // intentionally omitted because Three.js/drei load textures
+          // from CDNs (e.g. threejs.org) that don't send CORP, and
+          // enabling COEP would break those fetches.
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin-allow-popups',
+          },
+          {
+            key: 'Cross-Origin-Resource-Policy',
+            value: 'same-origin',
+          },
+          {
+            key: 'X-Permitted-Cross-Domain-Policies',
+            value: 'none',
           },
         ],
       },
