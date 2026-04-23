@@ -29,9 +29,20 @@ const nextConfig = {
   },
   async headers() {
     // CSP shared between default and embed routes, except for frame-ancestors.
+    //
+    // Security notes (recon M-003, 2026-04-23):
+    //   - `'unsafe-eval'` dropped in favour of `'wasm-unsafe-eval'`.
+    //     Three.js / drei use WebAssembly (Draco/KTX2 decoders) which
+    //     needs wasm-unsafe-eval; no first-party code path uses plain
+    //     `eval()` or `new Function(string)` (grep-verified).
+    //   - `'unsafe-inline'` is still allowed for scripts because Next.js
+    //     App Router injects inline hydration scripts without a stable
+    //     nonce hook as of Next 15. A nonce-based CSP migration is its
+    //     own effort (custom middleware + per-request nonces for every
+    //     <Script>/<script>). Tracked separately.
     const baseCspParts = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https://*.ipfs.nftstorage.link https://arweave.net https://raw.githubusercontent.com",

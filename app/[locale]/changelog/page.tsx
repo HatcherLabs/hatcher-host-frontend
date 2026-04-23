@@ -119,7 +119,13 @@ export default async function ChangelogPage() {
                   {dayCommits.map(c => {
                     const tag = TAG_CONFIG[c.tag];
                     return (
-                      <li key={c.id} className="flex items-start gap-3">
+                      <li
+                        // Fallback to date+message slice while the API
+                        // rollout of the `id` field is mid-flight; drop
+                        // the `??` once the backend is fully deployed.
+                        key={c.id ?? `${c.date}-${c.message.slice(0, 16)}`}
+                        className="flex items-start gap-3"
+                      >
                         <span className={`mt-0.5 shrink-0 inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium border ${tag.className}`}>
                           {tag.label}
                         </span>
