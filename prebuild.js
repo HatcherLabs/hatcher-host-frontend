@@ -27,7 +27,21 @@ function fetch(url) {
   });
 }
 
+function checkPublicEnv() {
+  // Cheap guard against pasting a private key into NEXT_PUBLIC_* —
+  // those vars are baked into the client bundle and become public.
+  // See scripts/check-public-env.mjs for the actual patterns.
+  const { spawnSync } = require('node:child_process');
+  const r = spawnSync('node', [path.join(__dirname, 'scripts', 'check-public-env.mjs')], {
+    stdio: 'inherit',
+  });
+  if (r.status !== 0) {
+    process.exit(r.status ?? 1);
+  }
+}
+
 async function main() {
+  checkPublicEnv();
   fs.mkdirSync(OUT_DIR, { recursive: true });
   const results = [];
   for (const file of FILES) {
