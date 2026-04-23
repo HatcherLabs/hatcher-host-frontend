@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { TIER_KEYS } from '@hatcher/shared';
 import { motion } from 'framer-motion';
 import { Activity, Bot, Crown, Zap, Building2, Star, Rocket, User } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -12,13 +13,8 @@ interface QuickStatsProps {
   activeCount: number;
 }
 
-const TIER_LABELS: Record<string, string> = {
-  free:            'Free',
-  starter:         'Starter',
-  pro:             'Pro',
-  business:        'Business',
-  founding_member: 'Founding',
-};
+// Tier display names are resolved via useTranslations('shared.tiers') at render time.
+// TIER_KEYS from @hatcher/shared provides the stable key paths.
 
 // text color per tier
 const TIER_COLORS: Record<string, string> = {
@@ -56,6 +52,7 @@ const cardVariants = {
 
 export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
   const t = useTranslations('dashboard.quickStats');
+  const tTiers = useTranslations('shared.tiers');
   const [tier, setTier]             = useState<string>('free');
   const [agentLimit, setAgentLimit] = useState<number>(1);
   // Live tier limit from the server (includes active `+N msg/day` addons).
@@ -75,7 +72,8 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
   }, []);
 
   const rawLimit: number | 'unlimited' = chatLimit === 0 ? 'unlimited' : chatLimit;
-  const tierLabel = TIER_LABELS[tier]  ?? tier;
+  const validTierKey = (tier in TIER_KEYS) ? tier as keyof typeof TIER_KEYS : 'free';
+  const tierLabel = tTiers(`${validTierKey}.name`);
   const tierColor = TIER_COLORS[tier]  ?? 'text-[var(--text-muted)]';
   const tierBg    = TIER_BG[tier]      ?? 'bg-zinc-500/10';
   const agentPct  = agentLimit > 0 ? Math.min(100, (agentCount / agentLimit) * 100) : 0;
@@ -155,7 +153,6 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
       </motion.div>
 
       {/* Account Tier */}
-      {/* TODO(i18n-T13): tierLabel comes from @hatcher/shared TIERS constants */}
       <motion.div className="card glass-noise p-5" variants={cardVariants}>
         <div className="flex items-center gap-3 mb-3">
           <div className={`w-9 h-9 rounded-lg ${tierBg} flex items-center justify-center flex-shrink-0`}>

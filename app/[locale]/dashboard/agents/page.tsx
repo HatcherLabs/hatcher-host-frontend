@@ -116,36 +116,19 @@ function FrameworkAvatar({ framework, size = 48 }: { framework: string; size?: n
   );
 }
 
-// ── Status filter options ────────────────────────────────────
-// TODO(i18n-T13): status labels come from @hatcher/shared AGENT_STATUS_CONFIG
-const STATUS_FILTERS = [
-  { key: 'all', label: 'All' },
-  ...AGENT_STATUSES.filter(s => s !== 'killed').map(s => ({
-    key: s,
-    label: AGENT_STATUS_CONFIG[s].label,
-  })),
-];
+// ── Filter/sort key arrays (labels resolved at render time via useTranslations) ──
+const STATUS_FILTER_KEYS = [
+  'all',
+  ...AGENT_STATUSES.filter(s => s !== 'killed'),
+] as const;
 
 type StatusFilter = 'all' | 'active' | 'sleeping' | 'paused' | 'error' | 'restarting';
 type FrameworkFilter = 'all' | 'openclaw' | 'hermes' | 'elizaos' | 'milady';
 type SortOption = 'newest' | 'az' | 'messages' | 'active';
 
-// TODO(i18n-T13): framework names come from @hatcher/shared FRAMEWORKS constants
-const FRAMEWORK_FILTERS = [
-  { key: 'all', label: 'All Frameworks' },
-  { key: 'openclaw', label: 'OpenClaw' },
-  { key: 'hermes', label: 'Hermes' },
-  { key: 'elizaos', label: 'ElizaOS' },
-  { key: 'milady', label: 'Milady' },
-];
+const FRAMEWORK_FILTER_KEYS = ['all', 'openclaw', 'hermes', 'elizaos', 'milady'] as const;
 
-// TODO(i18n-T13): sort labels — move into component using useTranslations once T13 lands
-const SORT_OPTIONS = [
-  { key: 'newest', label: 'Newest' },
-  { key: 'az', label: 'A-Z' },
-  { key: 'messages', label: 'Most Messages' },
-  { key: 'active', label: 'Last Active' },
-];
+const SORT_OPTION_KEYS = ['newest', 'az', 'messages', 'active'] as const;
 
 const TOUR_STEPS: TourStep[] = [
   {
@@ -248,6 +231,8 @@ function getStatusGlowClass(status: string): string {
 export default function MyAgentsPage() {
   const t  = useTranslations('dashboard.agents');
   const tc = useTranslations('dashboard.common');
+  const tSharedStatus    = useTranslations('shared.agentStatus');
+  const tSharedFramework = useTranslations('shared.frameworks');
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
@@ -458,17 +443,17 @@ export default function MyAgentsPage() {
         >
           {/* Row 1: Status filters */}
           <div className="inline-flex items-center gap-0.5 p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-default)] overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            {STATUS_FILTERS.map((f) => (
+            {STATUS_FILTER_KEYS.map((key) => (
               <button
-                key={f.key}
-                onClick={() => setStatusFilter(f.key as StatusFilter)}
+                key={key}
+                onClick={() => setStatusFilter(key as StatusFilter)}
                 className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200 cursor-pointer ${
-                  statusFilter === f.key
+                  statusFilter === key
                     ? 'bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm ring-1 ring-[var(--border-default)]'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
                 }`}
               >
-                {f.label}
+                {key === 'all' ? t('filterAll') : tSharedStatus(key as 'active' | 'sleeping' | 'paused' | 'error' | 'restarting' | 'stopping' | 'killed')}
               </button>
             ))}
           </div>
@@ -483,8 +468,10 @@ export default function MyAgentsPage() {
               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center' }}
               data-tour="framework-filter"
             >
-              {FRAMEWORK_FILTERS.map((f) => (
-                <option key={f.key} value={f.key}>{f.label}</option>
+              {FRAMEWORK_FILTER_KEYS.map((key) => (
+                <option key={key} value={key}>
+                  {key === 'all' ? t('frameworkAll') : tSharedFramework(`${key as 'openclaw' | 'hermes' | 'elizaos' | 'milady'}.name`)}
+                </option>
               ))}
             </select>
 
@@ -508,8 +495,13 @@ export default function MyAgentsPage() {
               className="h-9 px-3 rounded-xl text-xs font-medium bg-[var(--bg-elevated)] border border-[var(--border-default)] text-[var(--text-secondary)] outline-none cursor-pointer appearance-none pr-7"
               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 8px center' }}
             >
-              {SORT_OPTIONS.map((s) => (
-                <option key={s.key} value={s.key}>{s.label}</option>
+              {SORT_OPTION_KEYS.map((key) => (
+                <option key={key} value={key}>{
+                  key === 'newest'   ? t('sortNewest') :
+                  key === 'az'       ? t('sortAZ') :
+                  key === 'messages' ? t('sortMessages') :
+                                       t('sortActive')
+                }</option>
               ))}
             </select>
 
@@ -613,7 +605,6 @@ export default function MyAgentsPage() {
                     {agent.features && agent.features.length > 0 && (
                       <span className="badge-feature text-[10px]">
                         <Layers size={10} className="mr-1" />
-                        {/* TODO(i18n-T13): feature count from agent model */}
                         {agent.features.length !== 1 ? t('featuresCountPlural').replace('{count}', String(agent.features.length)) : t('featuresCount').replace('{count}', String(agent.features.length))}
                       </span>
                     )}

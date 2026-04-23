@@ -81,7 +81,6 @@ function getCategoryIcon(key: string): React.ComponentType<{ size?: number; clas
   return CATEGORY_ICON_MAP[key] ?? Bot;
 }
 
-// TODO(i18n-T13): category labels come from @hatcher/shared FRAMEWORKS or API
 function getCategoryLabel(key: string): string {
   if (key === 'all') return 'All Templates';
   return key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());

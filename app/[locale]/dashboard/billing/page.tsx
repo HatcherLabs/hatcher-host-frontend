@@ -266,6 +266,7 @@ interface AccountFeatures {
 export default function BillingPage() {
   const t  = useTranslations('dashboard.billing');
   const tc = useTranslations('dashboard.common');
+  const tTiers = useTranslations('shared.tiers');
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const searchParams = useSearchParams();
   const {
@@ -1037,18 +1038,16 @@ export default function BillingPage() {
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <h2 className="text-2xl font-bold text-[var(--text-primary)]">{tierConfig.name}</h2>
+                  <h2 className="text-2xl font-bold text-[var(--text-primary)]">{tTiers(`${currentTier as 'free' | 'starter' | 'pro' | 'business' | 'founding_member'}.name`)}</h2>
                   <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
                     currentTier === 'free'
                       ? 'text-green-400 bg-green-500/10 border border-green-500/20'
                       : 'text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20'
                   }`}>
-                    {/* TODO(i18n-T13): tier name from @hatcher/shared TIERS constants */}
                     {currentTier === 'free' ? t('freeTier') : t('active')}
                   </span>
                 </div>
                 <p className="text-sm text-[var(--text-muted)]">
-                  {/* TODO(i18n-T13): tier name from @hatcher/shared TIERS constants */}
                 {tierConfig.usdPrice === 0 ? t('noCharge') : currentTier === 'founding_member' ? `$${tierConfig.usdPrice} ${t('lifetimePrice')}` : `$${tierConfig.usdPrice} ${t('monthSuffix')}`}
                   {` -- ${tierConfig.messagesPerDay === 0 ? 'unlimited' : tierConfig.messagesPerDay} messages/day`}{tierConfig.usdPrice > 0 && ' (BYOK = unlimited)'}
                 </p>

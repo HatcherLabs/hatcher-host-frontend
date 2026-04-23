@@ -119,7 +119,6 @@ function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-// TODO(i18n-T13): payoutModeLabel strings are affiliate-specific, not from shared constants
 function payoutModeLabel(mode: AffiliateMe['affiliate']['payoutMode'], t: (key: string) => string): string {
   switch (mode) {
     case 'CASH_ONLY': return t('modeCashOnly');
@@ -129,7 +128,6 @@ function payoutModeLabel(mode: AffiliateMe['affiliate']['payoutMode'], t: (key: 
 }
 
 // sourceLabel is called within the component so will receive t from closure
-// TODO(i18n-T13): sourceType labels tie to shared constants
 function sourceLabel(s: Commission['sourceType'], t: (key: string) => string): string {
   return s === 'FOUNDING_MEMBER' ? t('sourceFoundingMember') : t('sourceSubscription');
 }

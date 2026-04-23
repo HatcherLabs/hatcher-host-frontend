@@ -30,7 +30,6 @@ import {
 
 interface TierDef {
   key: string;
-  // TODO(i18n-T13): use shared translation keys
   name: string;
   price: number;
   icon: React.ReactNode;
@@ -42,7 +41,6 @@ interface TierDef {
 const TIERS_META: TierDef[] = [
   {
     key: 'free',
-    // TODO(i18n-T13): use shared translation keys
     name: 'Free',
     price: 0,
     icon: <Rocket className="w-5 h-5" />,
@@ -50,7 +48,6 @@ const TIERS_META: TierDef[] = [
   },
   {
     key: 'starter',
-    // TODO(i18n-T13): use shared translation keys
     name: 'Starter',
     price: 6.99,
     icon: <Zap className="w-5 h-5" />,
@@ -58,7 +55,6 @@ const TIERS_META: TierDef[] = [
   },
   {
     key: 'pro',
-    // TODO(i18n-T13): use shared translation keys
     name: 'Pro',
     price: 19.99,
     icon: <Crown className="w-5 h-5" />,
@@ -67,7 +63,6 @@ const TIERS_META: TierDef[] = [
   },
   {
     key: 'business',
-    // TODO(i18n-T13): use shared translation keys
     name: 'Business',
     price: 49.99,
     icon: <Building2 className="w-5 h-5" />,
@@ -75,7 +70,6 @@ const TIERS_META: TierDef[] = [
   },
   {
     key: 'founding_member',
-    // TODO(i18n-T13): use shared translation keys
     name: 'Founding Member',
     price: 99,
     icon: <Gem className="w-5 h-5" />,
@@ -117,6 +111,7 @@ const ADDON_PRICES: Record<AddonGroupKey, { price: string; isSubscription: boole
 /* ── Page ─────────────────────────────────────────────────── */
 export default function PricingPage() {
   const t = useTranslations('pricing');
+  const tTiers = useTranslations('shared.tiers');
   const [isAnnual, setIsAnnual] = useState(false);
   // Founding Member availability — fetched from /features (public).
   // null = still loading; a number = actual remaining slots.
@@ -235,8 +230,7 @@ export default function PricingPage() {
               >
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
-                  {/* TODO(i18n-T13): use shared translation keys */}
-                  <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-[var(--text-muted)]">{tier.name}</p>
+                  <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-[var(--text-muted)]">{tTiers(`${tier.key as 'free' | 'starter' | 'pro' | 'business' | 'founding_member'}.name`)}</p>
                   {tier.highlighted && <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">{t('tierBadges.popular')}</span>}
                   {isLifetime && <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">{t('tierBadges.limited')}</span>}
                 </div>
@@ -331,8 +325,7 @@ export default function PricingPage() {
                       : 'border border-[var(--border-hover)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
                   )}
                 >
-                  {/* TODO(i18n-T13): use shared translation keys for tier.name inside tierCta.paid */}
-                  {tier.key === 'free' ? t('tierCta.free') : t('tierCta.paid', { tierName: tier.name })}
+                  {tier.key === 'free' ? t('tierCta.free') : t('tierCta.paid', { tierName: tTiers(`${tier.key as 'free' | 'starter' | 'pro' | 'business' | 'founding_member'}.name`) })}
                 </Link>
               </motion.div>
             );
@@ -453,28 +446,23 @@ export default function PricingPage() {
                   <tr className="border-b border-[var(--border-default)]">
                     <th className="text-left px-2.5 py-3 sm:p-5 text-[var(--text-muted)] font-medium text-[10px] sm:text-xs uppercase tracking-wider">{t('compareTable.featureColumn')}</th>
                     <th className="text-center px-2 py-3 sm:p-5 text-green-400 font-semibold">
-                      {/* TODO(i18n-T13): use shared translation keys */}
-                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Free</div>
+                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('free.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold">$0</div>
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[var(--color-accent)] font-semibold">
-                      {/* TODO(i18n-T13): use shared translation keys */}
-                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Starter</div>
+                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('starter.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$6.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('priceUnit.perMonth')}</span></div>
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[#8b5cf6] font-semibold">
-                      {/* TODO(i18n-T13): use shared translation keys */}
-                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Pro</div>
+                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('pro.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$19.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('priceUnit.perMonth')}</span></div>
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[#f59e0b] font-semibold">
-                      {/* TODO(i18n-T13): use shared translation keys */}
-                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Business</div>
+                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('business.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$49.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('priceUnit.perMonth')}</span></div>
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[#e11d48] font-semibold">
-                      {/* TODO(i18n-T13): use shared translation keys */}
-                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Founding</div>
+                      <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('founding_member.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('compareTable.onceSuffix')}</span></div>
                     </th>
                   </tr>

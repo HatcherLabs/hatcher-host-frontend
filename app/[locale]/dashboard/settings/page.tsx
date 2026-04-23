@@ -145,7 +145,6 @@ function Section({ title, icon, iconColor = 'text-cyan-400', iconBg = 'bg-cyan-5
 }
 
 // ── Tab definition ──────────────────────────────────────────
-// TODO(i18n-T13): tab labels translated at render time via t('tabs.*')
 const TABS = [
   { id: 'profile',       icon: User },
   { id: 'security',      icon: Shield },

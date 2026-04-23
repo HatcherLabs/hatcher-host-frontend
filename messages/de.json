@@ -1487,5 +1487,114 @@
       "voiceOn": "[de] Voice On",
       "voice": "[de] Voice"
     }
+  },
+  "shared": {
+    "tiers": {
+      "free": {
+        "name": "[de] Free",
+        "description": "[de] 1 agent, 20 messages/day, 50 MB storage"
+      },
+      "starter": {
+        "name": "[de] Starter",
+        "description": "[de] 1 agent, 50 messages/day, 150 MB storage"
+      },
+      "pro": {
+        "name": "[de] Pro",
+        "description": "[de] 3 agents, 100 messages/day, 500 MB storage"
+      },
+      "business": {
+        "name": "[de] Business",
+        "description": "[de] 10 agents, 300 messages/day, 1 GB storage, always-on"
+      },
+      "founding_member": {
+        "name": "[de] Founding Member",
+        "description": "[de] 10 agents, 300 messages/day, 2 GB storage, lifetime access"
+      }
+    },
+    "addons": {
+      "agents_plus1": {
+        "name": "[de] +1 Agent",
+        "description": "[de] 1 additional agent slot"
+      },
+      "agents_plus3": {
+        "name": "[de] +3 Agents",
+        "description": "[de] 3 additional agent slots"
+      },
+      "agents_plus5": {
+        "name": "[de] +5 Agents",
+        "description": "[de] 5 additional agent slots"
+      },
+      "agents_plus10": {
+        "name": "[de] +10 Agents",
+        "description": "[de] 10 additional agent slots"
+      },
+      "messages_plus20": {
+        "name": "[de] +20 msg/day",
+        "description": "[de] 20 extra messages per day"
+      },
+      "messages_plus50": {
+        "name": "[de] +50 msg/day",
+        "description": "[de] 50 extra messages per day"
+      },
+      "messages_plus100": {
+        "name": "[de] +100 msg/day",
+        "description": "[de] 100 extra messages per day"
+      },
+      "messages_plus200": {
+        "name": "[de] +200 msg/day",
+        "description": "[de] 200 extra messages per day"
+      },
+      "searches_plus25": {
+        "name": "[de] +25 searches/day",
+        "description": "[de] 25 extra web searches per day"
+      },
+      "searches_plus50": {
+        "name": "[de] +50 searches/day",
+        "description": "[de] 50 extra web searches per day"
+      },
+      "always_on": {
+        "name": "[de] Always On",
+        "description": "[de] Keep this agent running 24/7"
+      },
+      "file_manager": {
+        "name": "[de] File Manager",
+        "description": "[de] Browse, edit & download workspace files"
+      },
+      "full_logs": {
+        "name": "[de] Full Logs",
+        "description": "[de] Unlock full log viewer for this agent"
+      },
+      "plugins_plus10": {
+        "name": "[de] +10 Plugins",
+        "description": "[de] 10 extra plugin+skill slots for this agent"
+      }
+    },
+    "frameworks": {
+      "openclaw": {
+        "name": "[de] OpenClaw",
+        "description": "[de] Self-hosted AI assistant with 3,200+ community skills, multi-channel messaging gateway, and autonomous task execution."
+      },
+      "hermes": {
+        "name": "[de] Hermes Agent",
+        "description": "[de] Autonomous AI agent by Nous Research with persistent memory, 40+ tools, skills system, and multi-platform messaging gateway."
+      },
+      "elizaos": {
+        "name": "[de] ElizaOS",
+        "description": "[de] Open-source AI agent framework with character-driven personas, plugin ecosystem, and multi-client support for social and messaging platforms."
+      },
+      "milady": {
+        "name": "[de] Milady",
+        "description": "[de] Lightweight, personality-first AI agent framework designed for expressive, culturally-aware conversational agents with modular capabilities."
+      }
+    },
+    "agentStatus": {
+      "active": "[de] Active",
+      "sleeping": "[de] Sleeping",
+      "paused": "[de] Paused",
+      "error": "[de] Error",
+      "killed": "[de] Killed",
+      "restarting": "[de] Restarting",
+      "stopping": "[de] Stopping"
+    }
   }
 }
