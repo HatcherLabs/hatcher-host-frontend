@@ -2,7 +2,7 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import type { CityAgent } from '@/components/city/types';
 import { QualityProvider, useQuality } from './quality/QualityContext';
@@ -16,9 +16,13 @@ import { Landmarks } from './world/Landmarks';
 import { Traffic } from './world/Traffic';
 import { NPCs } from './world/NPCs';
 import { Buildings } from './world/Buildings';
-
-// Rapier is installed (Phase 5) but not mounted here — walking
-// character controller lands in a later phase.
+import {
+  CharacterController,
+  CharacterMesh,
+  type CharacterState,
+} from './character/CharacterController';
+import { FollowCamera } from './character/FollowCamera';
+import { WalkSurveyToggle, type CityMode } from './hud/WalkSurveyToggle';
 
 interface Props {
   agents?: CityAgent[];
@@ -27,24 +31,51 @@ interface Props {
 /**
  * Top-level Canvas for City V2.
  *
- * Phase 2 + cyber pass: HDRI skybox + PBR ground with emissive grid
- * overlay + 25 themed district pads + street grid + InstancedMesh
- * buildings (one per agent, coloured by framework) + Bloom post-
- * processing for the neon glow. Survey-only camera; walking mode is
- * Phase 5.
+ * Phase 2 + cyber pass + Phase 5 walk mode: HDRI skybox + PBR ground
+ * with emissive grid overlay + 25 themed district pads + street grid
+ * + InstancedMesh buildings + ambient traffic + wandering NPCs +
+ * Bloom post-processing. Toggle between aerial Survey (OrbitControls)
+ * and first-person Walk (WASD + FollowCamera).
  */
 export function CitySceneV2({ agents = [] }: Props) {
+  const [mode, setMode] = useState<CityMode>('survey');
+  // Shared kinematic state — mutable so both CharacterController and
+  // FollowCamera can read/write without triggering re-renders.
+  const charState = useRef<CharacterState>({
+    position: new THREE.Vector3(0, 0, 0),
+    heading: 0,
+  });
+
+  // Esc exits walk mode from anywhere on the page
+  useEffect(() => {
+    if (mode !== 'walk') return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMode('survey');
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mode]);
+
   return (
     <QualityProvider>
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-        <CanvasInner agents={agents} />
+        <CanvasInner agents={agents} mode={mode} charState={charState.current} />
         <QualityToggle />
+        <WalkSurveyToggle mode={mode} onChange={setMode} />
       </div>
     </QualityProvider>
   );
 }
 
-function CanvasInner({ agents }: { agents: CityAgent[] }) {
+function CanvasInner({
+  agents,
+  mode,
+  charState,
+}: {
+  agents: CityAgent[];
+  mode: CityMode;
+  charState: CharacterState;
+}) {
   const quality = useQuality();
   return (
     <Canvas
@@ -96,13 +127,25 @@ function CanvasInner({ agents }: { agents: CityAgent[] }) {
         <SceneErrorBoundary label="Buildings">
           <Buildings agents={agents} />
         </SceneErrorBoundary>
+        {mode === 'walk' && (
+          <SceneErrorBoundary label="Character">
+            <CharacterMesh state={charState} />
+          </SceneErrorBoundary>
+        )}
       </Suspense>
-      <OrbitControls
-        enableDamping
-        target={[0, 0, 0]}
-        minDistance={30}
-        maxDistance={400}
-      />
+      {mode === 'survey' ? (
+        <OrbitControls
+          enableDamping
+          target={[0, 0, 0]}
+          minDistance={30}
+          maxDistance={400}
+        />
+      ) : (
+        <>
+          <CharacterController state={charState} />
+          <FollowCamera state={charState} />
+        </>
+      )}
       {/* Bloom picks up the emissive building tint + district pad edges
           and the HDRI neon highlights. HIGH gets a punchier pass; LOW
           keeps it cheap. */}
