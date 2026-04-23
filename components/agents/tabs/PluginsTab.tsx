@@ -28,6 +28,7 @@ import {
 } from '../AgentContext';
 import { useToast } from '@/components/ui/ToastProvider';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -528,13 +529,13 @@ export function PluginsTab() {
           <AlertTriangle size={16} className="text-amber-400 shrink-0" />
           <p className="text-sm text-[var(--text-secondary)]">
             You've reached the limit of {limits.max} plugin+skill slots for this agent.{' '}
-            <a href="/dashboard/settings/billing" className="text-[var(--color-accent)] hover:underline inline-flex items-center gap-0.5">
+            <Link href="/dashboard/settings/billing" className="text-[var(--color-accent)] hover:underline inline-flex items-center gap-0.5">
               Upgrade tier <ArrowUpRight size={12} />
-            </a>
+            </Link>
             {' '}or buy the{' '}
-            <a href="/dashboard/settings/billing?addon=extra_plugins" className="text-[var(--color-accent)] hover:underline">
+            <Link href="/dashboard/settings/billing?addon=extra_plugins" className="text-[var(--color-accent)] hover:underline">
               +10 plugins addon
-            </a>
+            </Link>
             .
           </p>
         </GlassCard>
