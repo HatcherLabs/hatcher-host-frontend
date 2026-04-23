@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import type { RoomSkill } from '../types';
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export function SkillsColumn({ skills, onSkillClick }: Props) {
+  const t = useTranslations('agentRoom.hud');
   return (
     <div className="pointer-events-auto absolute top-1/2 left-5 z-10 hidden -translate-y-1/2 flex-col gap-2 md:flex">
       {skills.map((s) => (
@@ -27,8 +29,8 @@ export function SkillsColumn({ skills, onSkillClick }: Props) {
           <span className="mr-2 text-base">{s.icon}</span>
           <span className="text-xs font-semibold text-gray-100">{s.label}</span>
           <div className="mt-0.5 text-[9px] uppercase tracking-wider text-gray-400">
-            {s.active ? 'ACTIVE' : 'IDLE'}
-            {typeof s.calls === 'number' ? ` · ${s.calls} calls` : ''}
+            {s.active ? t('skillActive') : t('skillIdle')}
+            {typeof s.calls === 'number' ? ` · ${t('skillCalls', { calls: s.calls })}` : ''}
           </div>
         </button>
       ))}

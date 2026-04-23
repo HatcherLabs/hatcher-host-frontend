@@ -1,0 +1,2658 @@
+{
+  "common": {
+    "appName": "Hatcher",
+    "tagline": "托管AI智能体平台 · 加密原生"
+  },
+  "nav": {
+    "pricing": "定价",
+    "docs": "文档",
+    "roadmap": "路线图",
+    "login": "登录",
+    "signup": "注册",
+    "frameworks": "框架",
+    "token": "代币",
+    "blog": "博客",
+    "changelog": "更新日志",
+    "help": "帮助",
+    "dashboard": "控制台",
+    "myAgents": "我的智能体",
+    "create": "创建",
+    "city": "城市",
+    "analytics": "数据分析",
+    "team": "团队",
+    "billing": "账单",
+    "settings": "设置",
+    "support": "客服支持",
+    "logout": "退出登录",
+    "signIn": "登录",
+    "signUp": "注册",
+    "credits": "积分",
+    "affiliate": "推广计划",
+    "admin": "管理",
+    "adminPanel": "管理面板",
+    "openNav": "打开导航菜单",
+    "closeNav": "关闭导航菜单",
+    "affiliateDashboard": "推广控制台",
+    "affiliatePending": "申请审核中",
+    "affiliateRejected": "重新申请推广",
+    "affiliateBecome": "成为推广合作伙伴"
+  },
+  "notifications": {
+    "heading": "通知",
+    "empty": "暂无通知",
+    "markRead": "标为已读",
+    "markReadAriaLabel": "将所有通知标为已读",
+    "clear": "清除",
+    "clearAriaLabel": "清除所有通知",
+    "unreadAriaLabel": "通知，{count} 条未读",
+    "allReadAriaLabel": "通知"
+  },
+  "footer": {
+    "columns": {
+      "product": "产品",
+      "resources": "资源",
+      "community": "社区"
+    },
+    "links": {
+      "createAgent": "创建智能体",
+      "dashboard": "控制台",
+      "pricing": "定价",
+      "affiliate": "推广计划",
+      "status": "服务状态",
+      "documentation": "文档",
+      "support": "客服支持",
+      "blog": "博客",
+      "changelog": "更新日志",
+      "roadmap": "路线图",
+      "terms": "服务条款",
+      "privacy": "隐私政策",
+      "cookies": "Cookie 政策",
+      "impressum": "法律声明",
+      "docs": "文档"
+    },
+    "copyright": "© {year} HatcherLabs. 保留所有权利。",
+    "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România",
+    "legalNotice": "法律页面（隐私政策、服务条款、法律声明、Cookie 政策）仅提供英文版本。"
+  },
+  "landing": {
+    "affiliateBanner": {
+      "live": "推广计划已上线",
+      "earn": " — 每次推荐最高获得 ",
+      "pct": "40%",
+      "perReferral": " 佣金",
+      "dismissAriaLabel": "关闭推广横幅"
+    },
+    "tokenBanner": {
+      "learnMore": "了解更多 →"
+    },
+    "hero": {
+      "eyebrow": "托管AI智能体平台 · 加密原生",
+      "headlinePrefix": "孵化您的",
+      "typewriterWords": [
+        "AI智能体",
+        "健身教练",
+        "加密追踪器",
+        "学习伙伴",
+        "旅行规划师",
+        "个人助理"
+      ],
+      "body": "选择框架，配置，60秒内上线。无需编码，无需管理基础设施。4种框架，20+平台，免费套餐支持BYOK。",
+      "ctaPrimary": "免费开始",
+      "ctaSecondary": "查阅文档",
+      "agentPreviewOnline": "CryptoHelper — 在线"
+    },
+    "stats": {
+      "users": "用户",
+      "agents": "智能体",
+      "activeNow": "当前在线"
+    },
+    "agentDiscovery": {
+      "eyebrow": "面向AI智能体",
+      "heading": "指挥一支子智能体大军",
+      "body": "您的本地编程智能体成为舰队指挥官。粘贴此提示词——它将以您的名义在Hatcher注册，启动始终在线的子智能体（Telegram机器人、研究循环、Discord版主、监控器），并在您的会话结束后持续控制它们。",
+      "promptLabel": "提示词",
+      "copyLabel": "复制",
+      "copiedLabel": "已复制",
+      "copyAriaLabel": "复制提示词",
+      "copiedAriaLabel": "已复制",
+      "step01": "将此提示词发送给您的AI编程智能体——Claude Code、Cursor、OpenClaw、Hermes，或任何能够获取URL并运行shell命令的智能体。",
+      "step02": "智能体用您的邮箱注册账户，并向您发送验证链接。",
+      "step03": "点击验证。您的智能体选择模板，完成部署，并交付一个运行中的AI给您。",
+      "viewSkillMd": "查看 skill.md",
+      "githubSource": "GitHub 源码"
+    },
+    "howItWorks": {
+      "eyebrow": "工作原理",
+      "heading": "3步，60秒。",
+      "subheading": "无需编码，无需配置指南，无需配置文件。",
+      "steps": [
+        {
+          "num": "01",
+          "title": "选择框架",
+          "desc": "OpenClaw、Hermes、ElizaOS 或 Milady。各有独特优势——浏览器控制、记忆、多智能体、链上能力。"
+        },
+        {
+          "num": "02",
+          "title": "配置",
+          "desc": "名称、人格、集成平台。填写简单表单——无需配置文件，无需 YAML。"
+        },
+        {
+          "num": "03",
+          "title": "部署",
+          "desc": "一键部署。您的智能体在60秒内上线所有已连接的平台。"
+        }
+      ],
+      "cta": "立即体验"
+    },
+    "useCases": {
+      "eyebrow": "使用场景",
+      "heading": "您想孵化什么？",
+      "subheading": "从个人效率到商业自动化——您的智能体，您的规则。",
+      "items": [
+        {
+          "title": "个人助理",
+          "desc": "日历、邮件、提醒——通过 Telegram 管理。"
+        },
+        {
+          "title": "健身教练",
+          "desc": "训练计划、日常锻炼、每日打卡。"
+        },
+        {
+          "title": "饮食营养",
+          "desc": "记录餐食、计算卡路里、食谱推荐。"
+        },
+        {
+          "title": "加密追踪器",
+          "desc": "代币价格、投资组合提醒、链上数据。"
+        },
+        {
+          "title": "学习伙伴",
+          "desc": "随堂测验、总结教材、辅助作业。"
+        },
+        {
+          "title": "旅行规划师",
+          "desc": "查询航班、规划行程、本地推荐。"
+        },
+        {
+          "title": "预算管理",
+          "desc": "跟踪支出、储蓄目标、每周报告。"
+        },
+        {
+          "title": "研究助手",
+          "desc": "网络搜索、摘要文章、汇编报告。"
+        },
+        {
+          "title": "客户支持",
+          "desc": "在 Discord 或 WhatsApp 全天候解答常见问题。"
+        }
+      ],
+      "footer": "以及任何您能用日常语言描述的需求。"
+    },
+    "frameworks": {
+      "eyebrow": "框架",
+      "heading": "四大框架，一个平台。",
+      "subheading": "选择最适合您智能体的框架，随时切换。",
+      "items": [
+        {
+          "name": "OpenClaw",
+          "tag": "全能型",
+          "desc": "强大的工具、插件和浏览器控制能力。",
+          "features": "2500+ 技能 · 浏览器自动化 · 文件管理"
+        },
+        {
+          "name": "Hermes",
+          "tag": "推理型",
+          "desc": "智能优先设计，支持丰富记忆与推理能力。",
+          "features": "77 个内置技能 · 深度记忆 · 多模型支持"
+        },
+        {
+          "name": "ElizaOS",
+          "tag": "多智能体",
+          "desc": "多智能体协调，90+ 插件生态。",
+          "features": "90+ 插件 · 多智能体 · 知识库"
+        },
+        {
+          "name": "Milady",
+          "tag": "加密原生",
+          "desc": "链上感知、DeFi工具、代币追踪。",
+          "features": "DeFi 工具 · 链上数据 · 代币追踪"
+        }
+      ]
+    },
+    "city": {
+      "eyebrow": "★ 全新上线",
+      "heading": "在 Hatcher 城市中看到每一个智能体。",
+      "body": "一座实时3D城市，每个公开智能体都是一栋建筑。按类别划分区域，颜色代表框架，金色光柱标记您的智能体。拖动、缩放、点击任意建筑即可打开。",
+      "videoAriaLabel": "打开 Hatcher 城市",
+      "label": "HATCHER CITY",
+      "exploreCta": "探索完整舰队 →",
+      "enterCta": "进入城市"
+    },
+    "features": {
+      "eyebrow": "平台",
+      "heading": "您的智能体所需的一切",
+      "items": [
+        {
+          "title": "即时部署",
+          "desc": "从零到运行中的智能体，60秒内完成。"
+        },
+        {
+          "title": "全平台覆盖",
+          "desc": "Telegram、Discord、Twitter、WhatsApp、Slack。"
+        },
+        {
+          "title": "携带自己的密钥",
+          "desc": "使用您自己的LLM API密钥，在任意套餐下获得无限消息。"
+        },
+        {
+          "title": "默认安全",
+          "desc": "隔离容器、加密密钥、数据不共享。"
+        },
+        {
+          "title": "实时分析",
+          "desc": "实时统计、使用量追踪、性能指标。"
+        },
+        {
+          "title": "聊天与语音",
+          "desc": "文字聊天、语音通话、实时流式响应——开箱即用。"
+        }
+      ]
+    },
+    "pricing": {
+      "eyebrow": "定价",
+      "heading": "免费开始，按需扩展",
+      "subheading": "每个套餐均包含所有平台。携带自己的AI密钥，在任意套餐下获得无限消息。",
+      "popularLabel": "热门",
+      "tiers": [
+        {
+          "name": "免费",
+          "price": "$0",
+          "sub": "/月",
+          "features": [
+            "1个AI智能体",
+            "每日20条消息",
+            "全平台覆盖",
+            "免费AI已包含"
+          ],
+          "cta": "立即开始"
+        },
+        {
+          "name": "Starter",
+          "price": "$6.99",
+          "sub": "/月",
+          "features": [
+            "1个AI智能体",
+            "每日50条消息",
+            "BYOK = 无限制",
+            "更长活跃时间"
+          ],
+          "cta": "选择 Starter"
+        },
+        {
+          "name": "Pro",
+          "price": "$19.99",
+          "sub": "/月",
+          "features": [
+            "3个AI智能体",
+            "每日100条消息",
+            "BYOK = 无限制",
+            "专属资源"
+          ],
+          "cta": "选择 Pro"
+        },
+        {
+          "name": "Business",
+          "price": "$49.99",
+          "sub": "/月",
+          "features": [
+            "10个AI智能体",
+            "每日300条消息",
+            "始终在线容器",
+            "优先支持"
+          ],
+          "cta": "选择 Business"
+        }
+      ],
+      "addonsNote": "需要更多智能体、消息或存储？添加可叠加的扩展包——所有套餐均支持灵活扩展。",
+      "addonsCta": "查看完整定价 →"
+    },
+    "founding": {
+      "eyebrow": "限时优惠 · 创始会员",
+      "heading": "一次付款，永久使用。",
+      "oneTime": "一次性",
+      "subheading": "锁定价格，无月费，永久享有所有Business套餐功能。仅限20个名额。",
+      "availableSpotsLabel": "剩余名额",
+      "checking": "查询中…",
+      "soldOut": "已售罄",
+      "spotsLeft": "剩余 {remaining}/{max} 个",
+      "loadingAvailability": "加载可用性…",
+      "allTaken": "全部 {max} 个创始名额已被认领。标准套餐仍可使用。",
+      "claimed": "已认领 {claimed}/{max} 个 · 售完即止。",
+      "includedHeading": "永久包含以下所有内容",
+      "includedItems": [
+        "10个智能体",
+        "始终在线（不休眠）",
+        "每账户每日300条消息",
+        "每日200次网络搜索",
+        "每智能体 2 CPU · 4 GB RAM",
+        "每智能体 2 GB 工作区",
+        "文件管理器 + 完整日志",
+        "团队协作 + 优先支持",
+        "创始会员徽章",
+        "永久锁定价格"
+      ],
+      "ctaSoldOut": "已售罄",
+      "ctaClaim": "认领您的名额"
+    },
+    "faq": {
+      "eyebrow": "常见问题",
+      "heading": "常见问题",
+      "items": [
+        {
+          "q": "真的是免费的吗？",
+          "a": "是的。免费套餐提供1个智能体、每日20条消息，以及所有平台的访问权限。无需信用卡。BYOK（携带自己的LLM密钥）= 在任意套餐下无限消息。"
+        },
+        {
+          "q": "我需要会编程吗？",
+          "a": "完全不需要！创建智能体就像填写表单一样——选择名称，描述您想要它做什么，选择平台，然后上线。"
+        },
+        {
+          "q": "什么是「携带自己的密钥」？",
+          "a": "连接您自己的OpenAI、Anthropic、Google或Groq密钥，获得无限消息。您只需直接向AI提供商付费。"
+        },
+        {
+          "q": "我的智能体在哪里运行？",
+          "a": "在我们的云服务器上全天候运行。无需保持电脑开机或安装任何软件。"
+        }
+      ]
+    },
+    "finalCta": {
+      "heading": "准备好部署您的第一个智能体了吗？",
+      "body": "免费套餐包含1个智能体，每日20条消息。BYOK = 无限制。无需信用卡。",
+      "ctaPrimary": "创建您的智能体",
+      "ctaSecondary": "查看定价",
+      "trustNoCreditCard": "无需信用卡",
+      "trustFreeAi": "免费AI已包含",
+      "trustDeploy60s": "60秒内部署",
+      "trustAllPlatforms": "全平台覆盖"
+    }
+  },
+  "auth": {
+    "login": {
+      "heading": "欢迎回来",
+      "subheading": "登录您的 Hatcher 账户",
+      "panelTagline": "Hatcher",
+      "panelHeadlinePrefix": "孵化您的",
+      "panelHeadlineAccent": "AI智能体。",
+      "panelBody": "选择框架，配置，60秒内上线。无需代码，无需基础设施。",
+      "statsUsers": "用户",
+      "statsAgents": "智能体",
+      "statsOnline": "当前在线",
+      "emailLabel": "邮箱",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "密码",
+      "passwordPlaceholder": "输入您的密码",
+      "forgotLink": "忘记密码？",
+      "submit": "登录",
+      "submitLoading": "登录中...",
+      "registerPrompt": "没有账户？",
+      "registerLink": "注册"
+    },
+    "register": {
+      "heading": "创建账户",
+      "subheading": "开始使用 Hatcher",
+      "panelTagline": "Hatcher",
+      "panelHeadlinePrefix": "孵化您的",
+      "panelHeadlineAccent": "AI智能体。",
+      "panelBody": "免费套餐 + BYOK = 无限消息。无需信用卡。",
+      "statsUsers": "用户",
+      "statsAgents": "智能体",
+      "statsOnline": "当前在线",
+      "referralBadge": "由 {referrer} 推荐——您们双方各获得 {credit} 积分！",
+      "emailLabel": "邮箱",
+      "emailPlaceholder": "you@example.com",
+      "emailTaken": "已注册。",
+      "emailTakenLink": "去登录",
+      "emailInvalid": "请输入有效的邮箱地址。",
+      "usernameLabel": "用户名",
+      "usernamePlaceholder": "cooluser123",
+      "usernameTaken": "此用户名已被使用，请选择其他名称。",
+      "usernameInvalid": "3–30个字母、数字、连字符或下划线。",
+      "usernameHint": "仅限字母、数字、连字符和下划线",
+      "passwordLabel": "密码",
+      "passwordPlaceholder": "输入强密码",
+      "passwordHint": "必须包含：8个以上字符、大写字母、小写字母和数字",
+      "confirmPasswordLabel": "确认密码",
+      "confirmPasswordPlaceholder": "再次输入密码",
+      "strengthLabels": {
+        "veryWeak": "非常弱",
+        "weak": "弱",
+        "fair": "一般",
+        "strong": "强",
+        "veryStrong": "非常强"
+      },
+      "strengthChecks": {
+        "length": "8个以上字符",
+        "lowercase": "小写字母",
+        "uppercase": "大写字母",
+        "number": "数字",
+        "special": "特殊字符"
+      },
+      "submit": "创建账户",
+      "submitLoading": "创建中...",
+      "loginPrompt": "已有账户？",
+      "loginLink": "登录",
+      "errors": {
+        "emailTaken": "此邮箱已注册，请尝试登录。",
+        "usernameTaken": "此用户名已被使用，请选择其他名称。",
+        "passwordMismatch": "两次输入的密码不一致",
+        "passwordTooShort": "密码至少需要8个字符",
+        "passwordComplexity": "密码必须包含大写字母、小写字母和数字"
+      }
+    },
+    "forgotPassword": {
+      "heading": "忘记密码？",
+      "subheading": "输入您的邮箱，我们将发送重置链接",
+      "emailLabel": "邮箱",
+      "emailPlaceholder": "you@example.com",
+      "submit": "发送重置链接",
+      "submitLoading": "发送中...",
+      "backToLogin": "返回登录",
+      "successHeading": "请查看您的邮箱",
+      "successBody": "如果 <bold>{email}</bold> 存在对应账户，我们已发送密码重置链接。请检查收件箱和垃圾邮件文件夹。",
+      "successBackLink": "返回登录",
+      "genericError": "出现错误，请重试。"
+    },
+    "resetPassword": {
+      "heading": "设置新密码",
+      "subheading": "在下方输入您的新密码",
+      "newPasswordLabel": "新密码",
+      "newPasswordPlaceholder": "至少8个字符",
+      "confirmPasswordLabel": "确认密码",
+      "confirmPasswordPlaceholder": "再次输入密码",
+      "passwordMismatch": "两次输入的密码不一致",
+      "submit": "重置密码",
+      "submitLoading": "重置中...",
+      "backToLogin": "返回登录",
+      "successHeading": "密码已重置",
+      "successBody": "您的密码已更新，现在可以使用新密码登录。",
+      "successCta": "登录",
+      "invalidHeading": "重置链接无效",
+      "invalidBody": "此重置链接缺失或无效，请重新请求。",
+      "invalidCta": "重新请求重置链接",
+      "genericError": "重置失败，链接可能已过期。"
+    },
+    "verifyEmail": {
+      "loadingHeading": "正在验证您的邮箱...",
+      "successHeading": "邮箱已验证！",
+      "successBody": "您的账户现已激活，可以开始创建智能体了。",
+      "successCta": "前往控制台",
+      "errorHeading": "验证失败",
+      "errorBody": "验证链接无效或已过期。",
+      "errorCta": "前往登录",
+      "noTokenHeading": "请查看您的邮箱",
+      "noTokenBody": "我们已向您的邮箱发送验证链接，点击链接即可激活账户。",
+      "noTokenHint": "未收到？请检查垃圾邮件文件夹，或尝试登录以重新发送。"
+    }
+  },
+  "pricing": {
+    "eyebrow": "定价",
+    "heading": "选择您的套餐",
+    "subheading": "任意框架免费开始。准备好后随时扩展。每个套餐均包含所有集成。BYOK 始终无限制。",
+    "billingToggle": {
+      "monthly": "按月",
+      "annual": "按年",
+      "annualDiscount": "−15%"
+    },
+    "tierBadges": {
+      "popular": "热门",
+      "limited": "限量"
+    },
+    "priceUnit": {
+      "perMonth": "/月",
+      "once": " 一次性"
+    },
+    "annualSavings": "${annualTotal}/年 · 节省 ${saved}",
+    "switchToAnnual": "切换至年付，节省15%",
+    "payOnce": "一次付款，永久使用",
+    "availability": "名额",
+    "availabilityLoading": "加载中",
+    "soldOut": "已售罄",
+    "slotsLeft": "剩余 {remaining}/{max} 个",
+    "tierCta": {
+      "free": "立即开始",
+      "paid": "选择 {tierName}"
+    },
+    "tiers": {
+      "free": {
+        "agents": "包含1个智能体",
+        "messages": "每日20条消息",
+        "cpu": "0.5 CPU",
+        "ram": "1 GB RAM",
+        "storage": "50 MB 工作区",
+        "sleep": "闲置1小时后自动休眠",
+        "features": [
+          "Groq 上的 Llama 4 Scout",
+          "BYOK = 无限消息",
+          "每日3次网络搜索",
+          "所有集成（Telegram、Discord、Twitter等）"
+        ],
+        "missing": [
+          "日志、文件管理器可作为扩展项添加"
+        ]
+      },
+      "starter": {
+        "agents": "包含1个智能体",
+        "messages": "每日50条消息",
+        "cpu": "1 CPU",
+        "ram": "1.5 GB RAM",
+        "storage": "150 MB 工作区",
+        "sleep": "闲置4小时后自动休眠",
+        "features": [
+          "BYOK = 无限消息",
+          "每日10次网络搜索",
+          "所有集成"
+        ],
+        "missing": [
+          "日志、文件管理器可作为扩展项添加"
+        ]
+      },
+      "pro": {
+        "agents": "包含3个智能体",
+        "messages": "每日100条消息",
+        "cpu": "1.5 CPU",
+        "ram": "2 GB RAM",
+        "storage": "500 MB 工作区",
+        "sleep": "闲置12小时后自动休眠",
+        "features": [
+          "BYOK = 无限消息",
+          "每日50次网络搜索",
+          "所有集成",
+          "按智能体购买始终在线以实现24/7运行"
+        ],
+        "missing": [
+          "日志、文件管理器可作为扩展项添加"
+        ]
+      },
+      "business": {
+        "agents": "包含10个智能体",
+        "messages": "每日300条消息",
+        "cpu": "2 CPU",
+        "ram": "3 GB RAM",
+        "storage": "1 GB 工作区",
+        "sleep": "始终在线（不自动休眠）",
+        "features": [
+          "BYOK = 无限消息",
+          "每日200次网络搜索",
+          "已包含文件管理器",
+          "已包含完整日志",
+          "优先支持",
+          "团队协作",
+          "所有集成"
+        ],
+        "missing": []
+      },
+      "founding_member": {
+        "agents": "包含10个智能体",
+        "messages": "每日300条消息",
+        "cpu": "2 CPU",
+        "ram": "4 GB RAM",
+        "storage": "2 GB 工作区",
+        "sleep": "始终在线（不自动休眠）",
+        "features": [
+          "$99 一次性付款——终身访问",
+          "每日200次网络搜索",
+          "已包含文件管理器 + 完整日志",
+          "优先支持",
+          "团队协作",
+          "所有集成",
+          "创始会员徽章"
+        ],
+        "missing": []
+      }
+    },
+    "addons": {
+      "heading": "扩展项",
+      "subheading": "自定义您的套餐。在任意套餐上叠加扩展项，按需搭配。",
+      "annualDiscount": "年付享85折",
+      "groups": {
+        "extraAgents": {
+          "label": "额外智能体",
+          "items": [
+            {
+              "name": "+1个智能体",
+              "period": "/月",
+              "description": "1个额外名额"
+            },
+            {
+              "name": "+3个智能体",
+              "period": "/月",
+              "description": "3个额外名额"
+            },
+            {
+              "name": "+5个智能体",
+              "period": "/月",
+              "description": "5个额外名额"
+            },
+            {
+              "name": "+10个智能体",
+              "period": "/月",
+              "description": "10个额外名额"
+            }
+          ]
+        },
+        "extraMessages": {
+          "label": "额外消息（账户级）",
+          "items": [
+            {
+              "name": "+20条消息/天",
+              "period": "/月",
+              "description": "可叠加"
+            },
+            {
+              "name": "+50条消息/天",
+              "period": "/月",
+              "description": "可叠加"
+            },
+            {
+              "name": "+100条消息/天",
+              "period": "/月",
+              "description": "可叠加"
+            },
+            {
+              "name": "+200条消息/天",
+              "period": "/月",
+              "description": "可叠加"
+            }
+          ]
+        },
+        "extraSearches": {
+          "label": "额外搜索（账户级）",
+          "items": [
+            {
+              "name": "+25次搜索/天",
+              "period": "/月",
+              "description": "可叠加"
+            },
+            {
+              "name": "+50次搜索/天",
+              "period": "/月",
+              "description": "可叠加"
+            }
+          ]
+        },
+        "perAgent": {
+          "label": "按智能体",
+          "items": [
+            {
+              "name": "始终在线",
+              "period": "/月/智能体",
+              "description": "保持全天候运行"
+            },
+            {
+              "name": "文件管理器",
+              "period": "一次性/智能体",
+              "description": "浏览和编辑文件"
+            },
+            {
+              "name": "完整日志",
+              "period": "/月/智能体",
+              "description": "解锁日志查看器"
+            },
+            {
+              "name": "+10个插件",
+              "period": "/月/智能体",
+              "description": "叠加额外插件名额"
+            }
+          ]
+        }
+      }
+    },
+    "integrations": {
+      "heading": "所有集成免费",
+      "badge": "每个套餐",
+      "body": "Telegram、Discord、WhatsApp、Slack、Signal、iMessage 及14+个平台在所有套餐中均免费包含，永不额外收费。",
+      "note": "所有价格以USD计，可用 SOL 或 $HATCHER 支付。BYOK（携带自己的密钥）= 在任意套餐下使用您自己的LLM API密钥获得无限消息。"
+    },
+    "compareTable": {
+      "heading": "套餐对比",
+      "subheading": "一览各套餐包含内容",
+      "featureColumn": "功能",
+      "onceSuffix": " 一次性",
+      "rows": {
+        "agents": "包含智能体数量",
+        "messages": "每日消息数（账户）",
+        "searches": "每日网络搜索次数",
+        "byok": "BYOK 消息",
+        "cpuRam": "CPU / RAM",
+        "storage": "存储空间",
+        "autoSleep": "自动休眠",
+        "fileManager": "文件管理器",
+        "fullLogs": "完整日志",
+        "teamCollab": "团队协作",
+        "prioritySupport": "优先支持",
+        "plugins": "插件 + 技能",
+        "integrations": "所有集成",
+        "byokKey": "BYOK（自带LLM密钥）",
+        "defaultLlm": "默认LLM（Groq）"
+      },
+      "values": {
+        "unlimited": "无限制",
+        "alwaysOn": "始终在线",
+        "addon": "扩展项",
+        "llama4Scout": "Llama 4 Scout"
+      }
+    },
+    "faq": {
+      "heading": "常见问题",
+      "items": [
+        {
+          "q": "什么是BYOK（携带自己的密钥）？",
+          "a": "BYOK允许您为任意LLM提供商（OpenAI、Anthropic、Google、xAI、Groq、OpenRouter）使用自己的API密钥。在所有套餐中均完全免费——您直接向提供商付费，Hatcher不收取差价。使用自己密钥的消息数量无限制。"
+        },
+        {
+          "q": "扩展项如何使用？",
+          "a": "扩展项可在任意套餐上叠加。例如，若您使用Starter套餐（1个智能体）并购买+3个智能体扩展项，则共可运行4个智能体。您可以叠加多个扩展项。"
+        },
+        {
+          "q": "共享资源与专属资源有何区别？",
+          "a": "共享资源意味着您的智能体与同一服务器上的其他用户共享CPU和RAM——性能仍然良好，但在高负载下可能有所波动。专属资源（Pro和Business）为您的智能体提供有保障的CPU和RAM，不与任何人共享。"
+        },
+        {
+          "q": "支持哪些付款方式？",
+          "a": "您可以使用 SOL 或 $HATCHER 付款。价格以USD列示，通过Jupiter按实时汇率换算。"
+        },
+        {
+          "q": "我可以降级套餐吗？",
+          "a": "可以。您可以随时取消订阅，套餐将在计费周期结束时恢复为免费套餐。超出免费限额的智能体将被暂停。"
+        },
+        {
+          "q": "什么是自动休眠？",
+          "a": "免费智能体闲置1小时后进入休眠，Starter为4小时，Pro为12小时。Business和创始会员智能体始终在线，不自动休眠。收到下一条消息时即刻唤醒。您可以为任意智能体添加始终在线扩展项，每月$7.99。"
+        },
+        {
+          "q": "免费套餐提供哪种LLM？",
+          "a": "免费和Starter套餐在Groq上使用GPT-OSS 20B。Pro、Business和创始会员套餐在Groq上使用Llama 3.3 70B——能力更强的模型。消息限制按账户计算：免费20条/天，Starter 50条/天，Pro 100条/天，Business 300条/天，创始会员300条/天。BYOK（携带自己的LLM密钥）在任意套餐下绕过所有限制。"
+        },
+        {
+          "q": "什么是创始会员套餐？",
+          "a": "创始会员是一次性$99付款，提供Hatcher终身访问权限：10个智能体、每日300条消息、4 GB RAM、2 GB工作区、始终在线，以及所有高级功能（文件管理器、完整日志、优先支持）。永不收月费。限量20个名额——售完即止。"
+        }
+      ]
+    },
+    "help": {
+      "text": "需要帮助选择套餐？",
+      "emailLabel": "发送邮件",
+      "discordLabel": "Discord",
+      "telegramLabel": "Telegram"
+    },
+    "cta": {
+      "heading": "准备好部署您的智能体了吗？",
+      "body": "选择框架，选择模板，几秒内完成部署。使用内置LLM免费开始，需要更多功能时随时升级。",
+      "createAgent": "创建智能体",
+      "seeFrameworks": "查看框架"
+    },
+    "footerNote": "所有价格以USD计，可用 SOL 或 $HATCHER 支付。BYOK（携带自己的密钥）= 在任意套餐下使用您自己的LLM API密钥获得无限消息。"
+  },
+  "dashboard": {
+    "common": {
+      "loading": "加载中...",
+      "authenticating": "验证身份中...",
+      "signInRequired": "需要登录",
+      "signIn": "登录",
+      "refresh": "刷新",
+      "save": "保存",
+      "cancel": "取消",
+      "delete": "删除",
+      "create": "创建",
+      "invite": "邀请",
+      "share": "分享",
+      "unshare": "取消分享",
+      "copy": "复制",
+      "copied": "已复制！",
+      "close": "关闭",
+      "confirm": "确认",
+      "back": "返回",
+      "noDescription": "暂无描述",
+      "clear": "清除"
+    },
+    "agents": {
+      "eyebrow": "控制台",
+      "heading": "我的智能体",
+      "subtitleEmpty": "创建您的第一个智能体以开始使用。",
+      "createCta": "创建智能体",
+      "searchPlaceholder": "搜索智能体...（/）",
+      "filterAll": "全部",
+      "frameworkAll": "所有框架",
+      "sortNewest": "最新",
+      "sortAZ": "A-Z",
+      "sortMessages": "消息最多",
+      "sortActive": "最近活跃",
+      "emptyTitle": "暂无智能体",
+      "emptyDescription": "创建您的第一个AI智能体，60秒内完成部署。",
+      "emptyActionLabel": "创建智能体",
+      "emptySecondaryLabel": "查看框架",
+      "noMatchTitle": "无匹配的智能体",
+      "noMatchDescription": "请尝试调整搜索词或筛选条件。",
+      "signInDescription": "登录您的账户以访问智能体。",
+      "featuresCount": "{count} 个功能",
+      "featuresCountPlural": "{count} 个功能",
+      "agentsCount": "共 {count} 个智能体 · {active} 个活跃",
+      "agentsCountPlural": "共 {count} 个智能体 · {active} 个活跃",
+      "details": "详情",
+      "tourCreateTitle": "创建您的第一个智能体",
+      "tourCreateDescription": "点击此处孵化您的第一个AI智能体，从4种框架中选择。",
+      "tourFilterTitle": "按框架筛选",
+      "tourFilterDescription": "OpenClaw、Hermes、ElizaOS 或 Milady——各有独特优势。",
+      "tourSearchTitle": "搜索与探索",
+      "tourSearchDescription": "搜索智能体或浏览200+模板，快速开始。",
+      "tourPlanTitle": "您的套餐",
+      "tourPlanDescription": "免费开始，包含1个智能体和每日20条消息。随时升级。"
+    },
+    "newAgent": {
+      "eyebrow": "新建智能体",
+      "heading": "选择模板",
+      "subheading": "从预配置模板开始，或从零开始构建。每个模板都带有人格设定、系统提示词和建议集成。",
+      "searchPlaceholder": "搜索模板...",
+      "allTemplates": "所有模板",
+      "startFromScratch": "从零开始",
+      "startFromScratchDesc": "完全控制每项设置",
+      "noTemplatesTitle": "未找到模板",
+      "noTemplatesDesc": "请尝试不同的搜索词或类别。",
+      "footerHint": "所有模板在部署后均可完全自定义——随时更改名称、系统提示词、模型和集成。"
+    },
+    "billing": {
+      "eyebrow": "账户",
+      "heading": "账单与套餐",
+      "breadcrumbDashboard": "控制台",
+      "breadcrumbBilling": "账单",
+      "connectWallet": "连接钱包",
+      "connectedWallet": "已连接钱包",
+      "switchWallet": "切换钱包",
+      "disconnect": "断开连接",
+      "loadingBilling": "加载账单中...",
+      "signInDescription": "登录以管理您的套餐和账单。",
+      "creditsBalance": "积分余额",
+      "creditsUsd": "USD",
+      "creditsDesc": "积分可用于订阅、扩展项和托管LLM使用。",
+      "recentTransactions": "近期交易",
+      "currentTier": "当前套餐",
+      "freeTier": "免费套餐",
+      "active": "活跃",
+      "agentUsage": "智能体用量",
+      "agentsOf": "已使用 {count}/{limit} 个智能体",
+      "agentsOver": "超出限额 {over} 个",
+      "slotsRemaining": "剩余 {slots} 个名额",
+      "slotsRemainingPlural": "剩余 {slots} 个名额",
+      "activeAddons": "已激活的扩展项",
+      "expires": "到期：{date}",
+      "extend": "续期",
+      "extend30Days": "续期 +30天（${price}）",
+      "upgradeAnnual": "升级至年付（${price}）",
+      "annualDiscount": "-15%",
+      "renew": "续费",
+      "renewFor": "以 ${price} 续费",
+      "planExpired": "套餐已到期——续费以保留您的套餐",
+      "planExpiring": "将在 {days} 天后到期——立即续费",
+      "planExpiringPlural": "将在 {days} 天后到期——立即续费",
+      "planActiveUntil": "有效至 {date}",
+      "noCharge": "不收费",
+      "lifetimePrice": "终身",
+      "lifetimePriceFull": "${price} 终身",
+      "monthlyPrice": "${price} / 30天",
+      "unlimitedMessages": "无限制",
+      "messagesPerDay": "每日 {count} 条消息",
+      "byokUnlimited": "（BYOK = 无限制）",
+      "upgradeSection": "升级您的套餐",
+      "upgradeDesc": "获取更多智能体、消息和计算能力。",
+      "addonsSection": "扩展项",
+      "addonsDesc": "在当前套餐上叠加额外容量。",
+      "accountAddons": "账户级扩展项",
+      "perAgentAddons": "按智能体扩展项",
+      "annualBilling": "年付账单",
+      "annualBillingDesc": "85折——所有订阅扩展项",
+      "monthly": "按月",
+      "annual": "按年",
+      "monthSuffix": "/ 30天",
+      "annualSuffix": "/ 年",
+      "yearSuffix": "/ 年",
+      "paymentHistory": "付款历史",
+      "noPaymentsYet": "暂无付款记录",
+      "noPaymentsDesc": "您的付款历史将显示在此处。",
+      "status": {
+        "confirmed": "已确认",
+        "pending": "处理中",
+        "failed": "失败",
+        "refunded": "已退款"
+      },
+      "selectAgent": "选择智能体",
+      "choosePayment": "选择付款方式",
+      "applyToAgent": "应用至智能体：",
+      "noAgentsFound": "未找到智能体，请先创建智能体。",
+      "payWithCredits": "用积分付款",
+      "payWithSol": "用 SOL 付款",
+      "solDesc": "Solana 钱包付款",
+      "payWithHatcher": "用 $HATCHER 付款",
+      "hatcherDesc": "Solana 上的 HATCHER 代币",
+      "payWithUsdc": "用 USDC 付款",
+      "usdcDesc": "稳定币——1 USDC = $1",
+      "payWithCard": "用银行卡付款",
+      "cardDesc": "通过 Stripe 使用信用卡/借记卡",
+      "creditAvailable": "可用 ${balance}——即时到账",
+      "creditInsufficient": "余额不足——需要 ${need}，当前 ${have}",
+      "foundingSlots": "剩余 {remaining}/{max} 个名额",
+      "foundingSoldOut": "已售罄",
+      "oneTimeSuffix": "一次性",
+      "oneTimeAgent": "一次性/智能体",
+      "annualAgent": "/ 年/智能体",
+      "monthAgent": "/ 30天/智能体",
+      "manageBilling": "管理账单",
+      "successPayment": "付款成功！您的账户正在升级，可能需要片刻时间生效。",
+      "canceledPayment": "付款已取消，未产生任何费用。"
+    },
+    "analytics": {
+      "eyebrow": "控制台",
+      "heading": "数据分析",
+      "subheading": "账户整体使用情况概览。",
+      "signInDescription": "登录以查看数据分析。",
+      "messageVolume": "消息量",
+      "last14Days": "近14天",
+      "frameworks": "框架",
+      "agentStatus": "智能体状态",
+      "totalMessages": "各智能体消息总量",
+      "noMessageData": "暂无消息数据——开始与您的智能体聊天吧！",
+      "noAgentsYet": "暂无智能体",
+      "noAgentsEmpty": "暂无智能体。创建您的第一个智能体以开始查看数据分析。",
+      "createAgent": "创建智能体",
+      "totalAgents": "智能体总数",
+      "totalAgentsSub": "{active} 个活跃",
+      "messages": "消息",
+      "messagesAllTime": "全部时间",
+      "llmCalls": "LLM 调用",
+      "llmCallsAllTime": "全部时间",
+      "last14DaysLabel": "近14天",
+      "last14DaysSub": "用户消息",
+      "today": "今天",
+      "noDataYet": "暂无消息数据"
+    },
+    "team": {
+      "eyebrow": "协作",
+      "heading": "团队",
+      "subheading": "创建团队以共享智能体并与他人协作。",
+      "signInTitle": "登录以访问团队功能",
+      "signInDesc": "团队功能允许您与他人协作管理AI智能体。",
+      "createTeamTitle": "创建您的团队",
+      "createTeamDesc": "通过创建团队开始协作。然后您可以邀请成员并共享您的智能体。",
+      "teamNamePlaceholder": "团队名称...",
+      "createBtn": "创建",
+      "creating": "创建中...",
+      "membersHeading": "成员",
+      "inviteMemberHeading": "邀请成员",
+      "emailPlaceholder": "邮箱地址...",
+      "invite": "邀请",
+      "roleAdmin": "管理员",
+      "roleMember": "成员",
+      "roleViewer": "观察者",
+      "roleOwner": "所有者",
+      "you": "（您）",
+      "sharedAgentsHeading": "共享智能体",
+      "noSharedAgents": "暂未与此团队共享任何智能体。",
+      "yourAgentsHeading": "您的智能体",
+      "byLabel": "作者：{username}",
+      "memberCount": "{count} 位成员",
+      "memberCountPlural": "{count} 位成员",
+      "agentSharedCount": "{count} 个智能体已共享",
+      "agentSharedCountPlural": "{count} 个智能体已共享",
+      "leaveTeam": "退出",
+      "leaveTeamTitle": "退出团队",
+      "leaveTeamDesc": "您确定要退出此团队吗？您将失去所有共享智能体的访问权限。",
+      "leaveTeamConfirm": "退出团队",
+      "deleteTeam": "删除团队",
+      "deleteTeamTitle": "删除团队",
+      "deleteTeamDesc": "您确定要永久删除此团队吗？所有共享智能体将被取消共享。",
+      "deleteTeamConfirm": "删除团队",
+      "errors": {
+        "loadFailed": "加载团队数据失败",
+        "createFailed": "创建团队失败",
+        "inviteFailed": "邀请成员失败",
+        "removeFailed": "移除成员失败",
+        "leaveFailed": "退出团队失败",
+        "deleteFailed": "删除团队失败",
+        "shareFailed": "共享智能体失败",
+        "unshareFailed": "取消共享智能体失败",
+        "roleFailed": "更新角色失败"
+      }
+    },
+    "affiliate": {
+      "eyebrow": "控制台",
+      "heading": "推广控制台",
+      "signInTitle": "需要登录",
+      "signInDesc": "登录以查看您的推广控制台。",
+      "yourReferralLink": "您的推广链接",
+      "referralLinkDesc": "通过此链接注册的新用户将终身归属于您。",
+      "shareOnX": "分享到 X",
+      "telegram": "Telegram",
+      "copyLink": "复制",
+      "copiedLink": "已复制",
+      "refresh": "刷新",
+      "frozenTitle": "账户已冻结",
+      "codeLabel": "代码",
+      "totalReferrals": "推广总数",
+      "paidLabel": "{count} 位付费",
+      "pending30d": "待结算（30天保留期）",
+      "payableNow": "当前可提现",
+      "lifetimeEarned": "累计收益",
+      "paidOut": "已提现 {amount}",
+      "referralsTable": "推广记录",
+      "noReferrals": "暂无推广记录，分享您的链接吧！",
+      "commissionsTable": "佣金记录",
+      "noCommissions": "暂无佣金记录。",
+      "payoutsTable": "提现记录",
+      "noPayouts": "暂无提现记录。",
+      "loadMore": "加载更多",
+      "signupCol": "注册时间",
+      "emailCol": "邮箱",
+      "statusCol": "状态",
+      "tierCol": "套餐",
+      "dateCol": "日期",
+      "sourceCol": "来源",
+      "amountCol": "金额",
+      "cashCol": "现金",
+      "creditsCol": "积分",
+      "noteCol": "备注",
+      "statusPaid": "已付费",
+      "statusFree": "免费",
+      "statusPending": "处理中",
+      "statusPayable": "可提现",
+      "statusPaidOut": "已提现",
+      "statusVoided": "已作废",
+      "flagged": "已标记",
+      "untilDate": "至 {date}",
+      "sourceSubscription": "订阅",
+      "sourceFoundingMember": "创始会员",
+      "payoutSettings": "提现设置",
+      "payoutMode": "模式",
+      "payoutAddress": "提现地址",
+      "creditsOnly": "仅积分——无地址",
+      "changePrefs": "需要更改提现偏好？",
+      "contactSupport": "联系客服",
+      "modeCashOnly": "仅现金（20%）",
+      "modeCreditsOnly": "仅积分（40%）",
+      "modeHybrid": "混合模式（15%现金 + 25%积分）"
+    },
+    "settings": {
+      "eyebrow": "账户",
+      "heading": "设置",
+      "subheading": "管理您的账户、安全和偏好设置。",
+      "tabs": {
+        "profile": "资料",
+        "security": "安全",
+        "notifications": "通知",
+        "billing": "账单",
+        "danger": "危险操作"
+      },
+      "profile": {
+        "sectionTitle": "资料",
+        "changePhoto": "更换头像",
+        "uploadPhoto": "上传头像",
+        "remove": "移除",
+        "joinedLabel": "加入于 {date}",
+        "usernameLabel": "用户名",
+        "usernamePlaceholder": "your_username",
+        "usernameHint": "3–30个字符，可使用字母、数字、_ 或 -",
+        "emailLabel": "邮箱地址",
+        "emailPlaceholder": "you@example.com",
+        "saveChanges": "保存更改",
+        "saving": "保存中...",
+        "walletTitle": "已连接钱包",
+        "walletLinkedDesc": "首次链上付款时自动关联，用于SOL、USDC或$HATCHER付款。",
+        "walletViewSolscan": "Solscan",
+        "walletDisconnect": "断开钱包连接",
+        "walletNone": "暂未关联钱包。您的Solana钱包在首次从账单页面进行链上付款时自动关联。",
+        "referralTitle": "推荐计划",
+        "referralDesc": "邀请朋友使用Hatcher。当他们创建第一个智能体时，您们双方各获得 {credit} 积分。",
+        "referralCode": "推荐码",
+        "shareLink": "分享链接",
+        "referred": "已推荐",
+        "earned": "已获得",
+        "claimRewards": "领取待结算奖励",
+        "claiming": "领取中..."
+      },
+      "security": {
+        "changePasswordTitle": "更改密码",
+        "currentPassword": "当前密码",
+        "currentPasswordPlaceholder": "输入当前密码",
+        "newPassword": "新密码",
+        "newPasswordPlaceholder": "至少8个字符，含大小写和数字",
+        "confirmPassword": "确认新密码",
+        "confirmPasswordPlaceholder": "再次输入新密码",
+        "changePasswordBtn": "更改密码",
+        "changing": "更改中...",
+        "apiKeysTitle": "API 密钥",
+        "apiKeysDesc": "创建多个API密钥用于程序化访问。每个密钥使用 {prefix} 前缀。完整密钥{emphasis}在创建时显示。",
+        "apiKeysEmphasis": "仅",
+        "manageKeys": "管理密钥",
+        "newKeyCreated": "新密钥已创建——立即复制！",
+        "noKeysYet": "暂无API密钥，请在下方创建。",
+        "keyLabelPlaceholder": "标签（例如「生产环境」）",
+        "createKey": "创建密钥",
+        "creating": "创建中...",
+        "keysLimit": "最多10个有效密钥，每个密钥具有完整API访问权限。",
+        "reqToday": "今日 {count} 次请求 · 本周 {week} 次",
+        "lastUsed": "上次使用：{date}",
+        "save": "保存"
+      },
+      "notifications": {
+        "sectionTitle": "通知",
+        "pushLabel": "推送通知",
+        "pushDesc": "实时更新的浏览器推送通知",
+        "agentsLabel": "智能体提醒",
+        "agentsDesc": "智能体状态变更、崩溃或需要关注时通知您",
+        "billingLabel": "账单提醒",
+        "billingDesc": "付款确认、订阅续费和积分相关通知"
+      },
+      "billing": {
+        "sectionTitle": "账单",
+        "currentPlan": "当前套餐",
+        "hatcherCredits": "HATCHER 积分",
+        "creditsAutoApplied": "结账时自动应用",
+        "manageBilling": "管理账单"
+      },
+      "danger": {
+        "sectionTitle": "危险操作",
+        "exportTitle": "导出我的数据",
+        "exportDesc": "下载包含所有账户数据的JSON文件：资料、智能体、聊天记录、付款、推荐、支持工单等。",
+        "exportBtn": "导出我的数据",
+        "exporting": "导出中...",
+        "deleteTitle": "删除账户",
+        "deleteDesc": "永久删除您的账户、所有智能体、付款历史和配置。此操作不可撤销。",
+        "deleteBtn": "删除账户",
+        "deleting": "删除中...",
+        "dialogTitle": "删除您的账户？",
+        "dialogDesc": "这将永久删除您的所有智能体、数据和付款历史。此操作{emphasis}撤销。",
+        "dialogEmphasis": "无法",
+        "confirmPassword": "确认您的密码",
+        "passwordPlaceholder": "您的当前密码",
+        "cancelBtn": "取消"
+      }
+    },
+    "apiKeys": {
+      "eyebrow": "设置",
+      "heading": "API 密钥",
+      "subheading": "管理 {docsLink} 的程序化访问密钥。每个密钥以 {prefix} 开头。",
+      "docsLinkLabel": "Hatcher API",
+      "backToSettings": "返回设置",
+      "newKeyAlert": "密钥已创建——立即复制！",
+      "newKeyAlertSub": "这是唯一一次显示完整密钥，请妥善保存。",
+      "noKeysTitle": "暂无API密钥",
+      "noKeysDesc": "创建您的第一个密钥以开始使用",
+      "loading": "加载密钥中...",
+      "createSectionTitle": "创建新密钥",
+      "createSectionDesc": "为您的密钥起一个描述性名称（例如「本地开发」、「CI/CD流水线」）。",
+      "keyLabelPlaceholder": "密钥标签...",
+      "createKey": "创建密钥",
+      "creating": "创建中...",
+      "usageNote": "在 {header} 请求头中使用您的API密钥。所有可用端点请参见 {docsLink}。",
+      "headerExample": "Authorization: Bearer hk_...",
+      "docsLinkLabel2": "API 参考文档",
+      "copiedLabel": "已复制！",
+      "copyLabel": "复制",
+      "dismissLabel": "关闭",
+      "revokeTitle": "撤销 API 密钥",
+      "revokeDesc": "此密钥将被永久废止，所有使用它的应用程序将立即停止工作。此操作不可撤销。",
+      "revokeConfirm": "撤销密钥",
+      "neverUsed": "从未使用",
+      "lastUsed": "上次使用：{time}",
+      "created": "创建于 {date}",
+      "reqStats": "今日 {today} 次请求 · 本周 {week} 次",
+      "saveBtn": "保存",
+      "cancelBtn": "取消"
+    },
+    "quickStats": {
+      "totalAgents": "智能体总数",
+      "dailyMessages": "每日消息",
+      "unlimited": "∞",
+      "accountWide": "账户整体 · BYOK = 无限制",
+      "activeNow": "当前活跃",
+      "noAgentsRunning": "无运行中的智能体",
+      "agentsOnline": "{count} 个智能体在线",
+      "agentsOnlinePlural": "{count} 个智能体在线",
+      "accountTier": "账户套餐",
+      "lifetimeAccess": "终身访问",
+      "prioritySupport": "优先支持",
+      "upgradePlan": "升级套餐"
+    },
+    "agentDetail": {
+      "tabs": {
+        "dashboard": "仪表板",
+        "chat": "聊天",
+        "terminal": "终端",
+        "config": "配置",
+        "integrations": "集成",
+        "plugins": "插件与技能",
+        "logs": "日志",
+        "stats": "统计",
+        "memory": "记忆",
+        "sessions": "会话",
+        "knowledge": "知识库",
+        "addons": "附加功能",
+        "files": "文件",
+        "workspace": "工作区",
+        "schedules": "计划任务",
+        "workflows": "工作流"
+      },
+      "sidebarGroups": {
+        "configure": "配置",
+        "monitor": "监控",
+        "advanced": "高级"
+      },
+      "nav": {
+        "allAgents": "所有智能体"
+      },
+      "header": {
+        "easy": "简单",
+        "advanced": "高级",
+        "restart": "重启",
+        "restarting": "重启中...",
+        "stop": "停止",
+        "stopping": "停止中...",
+        "start": "启动",
+        "starting": "启动中...",
+        "share": "分享",
+        "room": "房间",
+        "clone": "克隆",
+        "delete": "删除",
+        "deleting": "删除中...",
+        "confirm": "确认",
+        "cancel": "取消"
+      },
+      "notFound": {
+        "code": "404",
+        "title": "智能体未找到",
+        "description": "ID 为\"{id}\"的智能体不存在。",
+        "backToAgents": "返回智能体列表"
+      },
+      "statusPoll": {
+        "agentReady": "智能体已准备好聊天！"
+      },
+      "chat": {
+        "live": "实时",
+        "liveTitle": "通过 WebSocket 实时流式传输",
+        "voiceButton": "语音",
+        "voiceCallTitle": "开始语音通话",
+        "autoRead": "自动朗读",
+        "autoReadTitle": "自动朗读回复",
+        "emptyTitle": "开始与 {agentName} 对话",
+        "emptySubtitle": "回复实时显示",
+        "loadEarlier": "加载更早的消息（{count} 条更早）",
+        "listening": "正在聆听...",
+        "thinking": "正在思考...",
+        "speaking": "正在说话...",
+        "tapToSpeak": "点击麦克风说话",
+        "agentStartingUp": "智能体正在启动，请稍候...",
+        "uploading": "上传中…",
+        "poweredBy": "由 {provider} 驱动",
+        "today": "今日",
+        "unlimited": "无限制",
+        "enterToSend": "Enter 发送，Shift+Enter 换行",
+        "signInToChat": "请登录后与此智能体聊天。",
+        "limitReached": "每日消息限额已达到。",
+        "upgradeToPro": "升级到 Pro",
+        "limitReachedSuffix": "以获取更多，或使用您自己的密钥无限制使用。",
+        "agentNotRunning": "智能体未运行。",
+        "startFromOverview": "请从概览标签页启动智能体后再聊天。",
+        "waitingForAgent": "等待智能体启动...",
+        "messagePlaceholder": "给 {agentName} 发消息...",
+        "sendMessage": "发送消息",
+        "attachFiles": "附加文件 — 保存到智能体知识库",
+        "stopRecording": "停止录音",
+        "startVoice": "开始语音输入",
+        "errors": {
+          "rateLimit": "每日消息限额已达到。",
+          "llmDown": "AI 服务暂时不可用，通常一分钟内恢复。",
+          "timeout": "智能体响应超时。",
+          "network": "连接中断，请检查网络连接。",
+          "generic": "出现错误。",
+          "retry": "重试"
+        },
+        "voiceCall": {
+          "listening": "正在聆听...",
+          "thinking": "正在思考...",
+          "speaking": "正在说话...",
+          "tapToSpeak": "点击麦克风说话"
+        }
+      },
+      "logs": {
+        "searchPlaceholder": "搜索日志...",
+        "all": "全部",
+        "connected": "已连接",
+        "reconnecting": "重新连接中",
+        "pinned": "已固定",
+        "scroll": "滚动",
+        "refresh": "刷新",
+        "loading": "加载中...",
+        "download": "下载",
+        "pinnedToBottom": "固定到底部",
+        "noLogs": "暂无日志。",
+        "noLogsMatching": "没有匹配\"{query}\"的日志。",
+        "noLevelLogs": "没有 {level} 级别的日志。",
+        "entries": "{count} 条记录",
+        "autoScrollEnabled": "自动滚动已启用 — 固定到底部",
+        "autoScrollDisabled": "自动滚动已禁用",
+        "fullLogsGate": {
+          "title": "显示最后 {count} 行日志",
+          "description": "此智能体共有 {total} 条记录。解锁完整日志以浏览完整历史并导出每一行。",
+          "descriptionEmpty": "解锁此智能体的完整日志，超出最后 {count} 行后仍可查看和导出。",
+          "unlock": "解锁"
+        }
+      },
+      "integrations": {
+        "showingFor": "显示与 {framework} 兼容的集成",
+        "connected": "{configured}/{total} 已连接",
+        "encryptedNote": "API 密钥和令牌在存储前使用 AES-256-GCM 加密。保存后，密钥值不再显示 — 仅显示掩码占位符。",
+        "mainIntegrations": "主要集成",
+        "mainIntegrationsFree": "所有套餐免费",
+        "otherPlatforms": "其他平台",
+        "communityExtensions": "社区扩展",
+        "allPlatformsFree": "所有平台免费 — 在下方配置凭据",
+        "allFreeNote": "所有集成在所有套餐中均免费。只需添加您的凭据即可使用。",
+        "howToGetKey": "如何获取 API 密钥 →",
+        "howToSetup": "如何设置 {name} →",
+        "saving": "保存中...",
+        "saveCredentials": "保存凭据",
+        "badges": {
+          "recommended": "推荐",
+          "native": "原生",
+          "community": "社区",
+          "planned": "计划中",
+          "quickSetup": "快速设置",
+          "qrPairing": "二维码配对",
+          "free": "免费",
+          "connected": "已连接",
+          "alwaysActive": "始终在线"
+        },
+        "legend": {
+          "native": "原生 — 内置支持",
+          "community": "社区 — npm 扩展",
+          "planned": "计划中 — 即将推出"
+        },
+        "pairing": {
+          "whoCanMessage": "谁可以给您的智能体发消息？",
+          "everyone": "所有人",
+          "specificNumbers": "特定号码",
+          "save": "保存",
+          "anyoneCanMessage": "任何人均可给您的智能体发消息。",
+          "onlyListedNumbers": "仅列出的号码可以给您的智能体发消息。",
+          "restartAfterChange": "更改后请重启智能体。",
+          "setBeforePairing": "配对前请先设置。电话号码使用 E.164 格式（+1234567890）。",
+          "savedRestart": "已保存！重启智能体以应用更改。",
+          "connected": "{name} 已连接",
+          "disconnected": "{name} 已断开",
+          "messagesForwarded": "消息将转发到您的智能体",
+          "sessionExpired": "会话已过期。请重新配对或断开连接以清理。",
+          "rePair": "重新配对",
+          "disconnect": "断开连接",
+          "disconnectConfirm": "断开 {name} 连接？您需要重新配对才能再次使用。",
+          "agentMustRun": "您的智能体必须运行才能配对 {name}。请先启动智能体。",
+          "generatingQr": "正在生成二维码，约需 30 秒...",
+          "pairButton": "配对 {name}",
+          "refreshQr": "刷新二维码",
+          "tapOutsideToClose": "点击外部关闭"
+        },
+        "webhook": {
+          "label": "Webhook",
+          "inboundHttp": "入站 HTTP",
+          "triggerFrom": "从外部服务（Zapier、GitHub 等）触发您的智能体",
+          "webhookUrl": "Webhook URL",
+          "bearerToken": "Bearer Token",
+          "exampleRequest": "示例请求",
+          "revealToken": "显示令牌",
+          "hideToken": "隐藏令牌",
+          "copyUrl": "复制 URL",
+          "copyToken": "复制令牌",
+          "note": "使用此 URL 从外部服务（Zapier、GitHub、n8n 等）触发您的智能体。发送包含 message 字段的 JSON POST 请求。如需要，智能体将自动从睡眠状态唤醒。",
+          "alreadyConfigured": "已配置"
+        },
+        "domains": {
+          "channelBehavior": "频道行为",
+          "allowedUserIds": "允许的用户 ID（逗号分隔）",
+          "allowedGroupIds": "允许的群组 ID（逗号分隔）"
+        }
+      },
+      "memory": {
+        "refresh": "刷新",
+        "noMemory": "未找到记忆文件。",
+        "noMemoryDescription": "您的智能体尚未创建任何记忆文件。",
+        "dailyLogs": "每日日志",
+        "noDailyLogs": "暂无每日日志。",
+        "loading": "加载记忆中...",
+        "error": "加载记忆失败"
+      },
+      "knowledge": {
+        "uploadTitle": "上传知识文件",
+        "filename": "文件名",
+        "filenamePlaceholder": "例如 company-info.txt",
+        "content": "内容",
+        "contentPlaceholder": "在此粘贴您的知识内容...",
+        "upload": "上传",
+        "uploading": "上传中...",
+        "cancel": "取消",
+        "addFile": "添加文件",
+        "noFiles": "暂无知识文件。",
+        "noFilesDescription": "上传您的智能体可以参考的文档。",
+        "preview": "预览",
+        "delete": "删除",
+        "loading": "加载中...",
+        "error": "加载知识文件失败",
+        "refresh": "刷新"
+      },
+      "stats": {
+        "range7d": "7 天",
+        "range30d": "30 天",
+        "totalMessages": "总消息数",
+        "avgPerDay": "日均",
+        "peakDay": "峰值日",
+        "framework": "框架",
+        "noData": "暂无分析数据。",
+        "noDataDescription": "发送一些消息后即可查看统计。",
+        "errorRate": "错误率",
+        "responseTimes": "响应时间",
+        "avgResponse": "平均响应",
+        "p50": "P50",
+        "p95": "P95",
+        "topTopics": "热门话题",
+        "hourlyActivity": "每小时活动",
+        "byokActive": "BYOK 已启用",
+        "totalTokens": "总 Token 数",
+        "estimatedCost": "预估费用",
+        "refresh": "刷新"
+      },
+      "terminal": {
+        "connecting": "连接中...",
+        "connected": "已连接",
+        "disconnected": "已断开",
+        "error": "连接错误",
+        "reconnect": "重新连接",
+        "agentNotActive": "智能体必须处于活跃状态才能使用终端。",
+        "startAgent": "启动智能体",
+        "sendMessage": "发送消息...",
+        "send": "发送",
+        "sending": "发送中..."
+      },
+      "plugins": {
+        "skillsTab": "技能",
+        "pluginsTab": "插件",
+        "searchPlaceholder": "搜索技能和插件...",
+        "install": "安装",
+        "installing": "安装中...",
+        "installed": "已安装",
+        "uninstall": "卸载",
+        "uninstalling": "卸载中...",
+        "noInstalled": "未安装任何技能或插件。",
+        "noInstalledDescription": "从下方市场浏览并安装。",
+        "recommended": "推荐",
+        "available": "可用",
+        "source": "来源",
+        "requiresRestart": "需要重启",
+        "refresh": "刷新",
+        "limitReached": "插件数量已达上限。请升级套餐或添加插件附加功能。"
+      },
+      "workflows": {
+        "new": "新建工作流",
+        "noWorkflows": "暂无工作流。",
+        "noWorkflowsDescription": "创建您的第一个工作流以自动化智能体。",
+        "enable": "启用",
+        "disable": "禁用",
+        "delete": "删除",
+        "save": "保存",
+        "run": "运行",
+        "running": "运行中...",
+        "name": "工作流名称",
+        "trigger": "触发器",
+        "lastRun": "上次运行",
+        "status": "状态",
+        "active": "活跃",
+        "inactive": "非活跃"
+      },
+      "files": {
+        "noFiles": "未找到文件。",
+        "noFilesDescription": "文件管理器为空。",
+        "upload": "上传",
+        "delete": "删除",
+        "download": "下载",
+        "refresh": "刷新",
+        "locked": "文件管理器需要 Business 套餐或文件管理器附加功能。",
+        "unlock": "解锁"
+      },
+      "workspace": {
+        "noFiles": "未找到工作区文件。",
+        "refresh": "刷新",
+        "loading": "加载工作区中..."
+      },
+      "addons": {
+        "title": "附加功能",
+        "description": "使用额外功能扩展您的智能体。",
+        "noAddons": "尚未购买任何附加功能。",
+        "purchase": "购买",
+        "active": "活跃",
+        "expires": "到期时间 {date}",
+        "lifetime": "终身"
+      },
+      "schedules": {
+        "new": "新建计划",
+        "noSchedules": "暂无计划任务。",
+        "noSchedulesDescription": "创建计划任务以自动运行您的智能体。",
+        "enable": "启用",
+        "disable": "禁用",
+        "delete": "删除",
+        "save": "保存",
+        "name": "计划名称",
+        "cron": "Cron 表达式",
+        "nextRun": "下次运行",
+        "lastRun": "上次运行",
+        "status": "状态",
+        "active": "活跃",
+        "inactive": "非活跃"
+      }
+    }
+  },
+  "settings": {
+    "redirect": "正在跳转至设置..."
+  },
+  "agentPublic": {
+    "back": {
+      "toCity": "返回城市",
+      "toMyAgents": "返回我的智能体",
+      "toDashboard": "返回控制台"
+    },
+    "status": {
+      "active": "活跃",
+      "sleeping": "休眠中",
+      "paused": "已暂停",
+      "error": "错误",
+      "killed": "已停止",
+      "restarting": "重启中"
+    },
+    "profile": {
+      "featuresCount": "{count} 个功能",
+      "featuresCountPlural": "{count} 个功能",
+      "frameworkFeatures": "框架功能",
+      "by": "作者："
+    },
+    "share": {
+      "button": "分享",
+      "copied": "已复制！"
+    },
+    "errors": {
+      "connectionError": "连接错误",
+      "notFound": "未找到智能体",
+      "somethingWrong": "出现问题",
+      "defaultMessage": "此智能体不存在或已被移除。",
+      "goBack": "返回",
+      "myAgents": "我的智能体"
+    },
+    "owner": {
+      "heading": "管理 {name}",
+      "body": "您是此智能体的所有者。前往控制台进行聊天或配置。",
+      "manageAgent": "管理智能体",
+      "openChat": "打开聊天"
+    },
+    "analytics": {
+      "heading": "智能体数据分析",
+      "messages": "消息",
+      "daysActive": "活跃天数",
+      "uptime": "在线时长",
+      "status": "状态",
+      "framework": "框架",
+      "created": "创建时间"
+    },
+    "deploy": {
+      "heading": "部署类似的智能体",
+      "body": "在Hatcher上创建您自己的 {framework} 智能体。免费开始，60秒内完成部署。",
+      "cta": "部署类似智能体",
+      "myAgents": "我的智能体"
+    },
+    "errorPage": {
+      "heading": "加载智能体失败",
+      "body": "无法加载此智能体的详情，它可能已被移除或存在连接问题。",
+      "errorId": "错误 ID：{id}",
+      "tryAgain": "重试",
+      "browseAgents": "浏览智能体"
+    },
+    "statusPage": {
+      "poweredBy": "技术支持",
+      "uptimeLabel": "24小时在线率",
+      "messages": "消息",
+      "days": "天",
+      "since": "自",
+      "framework": "框架",
+      "lastActive": "最后活跃：{date} {time}",
+      "viewProfile": "查看资料",
+      "notFound": {
+        "heading": "未找到智能体",
+        "body": "此智能体不存在或未公开。",
+        "browseAgents": "浏览智能体"
+      }
+    }
+  },
+  "city": {
+    "loading": "HATCHER 城市加载中…",
+    "category": {
+      "district": "区域",
+      "breadcrumbCity": "Hatcher 城市",
+      "statAgents": "智能体",
+      "statRunning": "运行中",
+      "statShareOfCity": "城市占比",
+      "seeIn3d": "在3D中查看 →",
+      "emptyState": "此区域暂无智能体。",
+      "emptyStateCta": "成为第一个在此建设的人。",
+      "otherDistricts": "其他区域",
+      "msgs": "条消息"
+    },
+    "agentCity": {
+      "breadcrumbCity": "Hatcher 城市",
+      "openAgent": "打开智能体 →",
+      "seeInFullCity": "在完整城市中查看",
+      "shareableLink": "可分享链接：",
+      "kvFramework": "框架",
+      "kvTier": "套餐",
+      "kvStatus": "状态",
+      "kvMessages": "消息"
+    }
+  },
+  "embed": {
+    "loading": "加载智能体中…",
+    "notFound": "未找到智能体或智能体未公开。",
+    "visitHatcher": "→ hatcher.host",
+    "openInHatcher": "在 Hatcher 中打开",
+    "poweredBy": "技术支持",
+    "messages": "条消息"
+  },
+  "agentRoom": {
+    "loading": "正在进入智能体房间…",
+    "notFound": "未找到智能体",
+    "notFoundBody": "此智能体不存在或您没有访问权限。",
+    "backToDashboard": "← 返回控制台",
+    "backToCity": "返回城市",
+    "backToDashboardFull": "返回控制台",
+    "cityShort": "城市",
+    "dashboardShort": "控制台",
+    "previewBadge": "智能体房间 · 预览",
+    "frameworkComingSoon": "智能体房间正在逐个框架推出。{framework} 的房间即将上线。",
+    "backToAgent": "← 返回智能体控制台",
+    "signInToChat": "登录以与 {name} 聊天",
+    "cantReach": "暂时无法连接智能体——重新连接中...",
+    "standingBy": "{name} 待命中。",
+    "hud": {
+      "statsAgentLabel": "{framework} 智能体 · LV {level}",
+      "uptimeLabel": "在线时长 {uptime}",
+      "messagesLabel": "消息",
+      "statusLabel": "状态",
+      "liveLogs": "◆ 实时日志",
+      "waitingForLogs": "等待日志...",
+      "xpLabel": "XP",
+      "moodLabel": "情绪",
+      "skillActive": "活跃",
+      "skillIdle": "空闲",
+      "skillCalls": "{calls} 次调用",
+      "viewersWatch": "{count, plural, =1 {# 人观看中} other {# 人观看中}}",
+      "viewersTitle": "{count, plural, =1 {当前 # 位观看者} other {当前 # 位观看者}}",
+      "chatPlaceholder": "给您的智能体发消息...",
+      "chatSend": "发送"
+    },
+    "share": {
+      "button": "分享",
+      "capturing": "截图中...",
+      "saved": "图片已保存 + X 已打开",
+      "failed": "无法截取场景",
+      "title": "截取房间并分享到 X"
+    },
+    "embed": {
+      "button": "嵌入",
+      "copied": "已复制！",
+      "failed": "失败",
+      "title": "复制 iframe 嵌入代码"
+    },
+    "leaderboard": {
+      "button": "排名",
+      "buttonWithRank": "排名 #{rank}",
+      "heading": "排行榜",
+      "loading": "加载中…",
+      "empty": "暂无公开的 {framework} 智能体。",
+      "you": "· 您",
+      "footer": "按发送消息数排名 · 仅限公开智能体",
+      "title": "各框架顶级智能体"
+    },
+    "memory": {
+      "button": "记忆",
+      "title": "查看智能体记忆与配置",
+      "whatKnows": "您的智能体知道什么",
+      "sectionPersona": "人格 / 系统提示词",
+      "sectionModel": "模型与运行时",
+      "sectionSkills": "技能（{count}）",
+      "sectionIntegrations": "集成（{count}）",
+      "sectionRaw": "原始配置（JSON）",
+      "noPrompt": "未设置系统提示词。",
+      "noSkills": "未配置技能。",
+      "noIntegrations": "未接入集成。",
+      "editingComingSoon": "记忆编辑功能即将上线。目前请从控制台管理智能体配置。",
+      "rowProvider": "提供商",
+      "rowModel": "模型",
+      "rowSessionScope": "会话范围",
+      "rowFramework": "框架",
+      "frameworkLabel": {
+        "openclaw": "OpenClaw 配置",
+        "hermes": "Hermes SOUL",
+        "elizaos": "ElizaOS 角色",
+        "milady": "Milady 配置",
+        "default": "智能体记忆"
+      }
+    },
+    "quests": {
+      "buttonTitle": "每日任务",
+      "heading": "每日任务",
+      "buildStreak": "建立连续打卡",
+      "streakDays": "🔥 {count} 天连续打卡",
+      "close": "ESC",
+      "progressFraction": "{current} / {target}",
+      "claimed": "已领取——明天再来 🌙",
+      "claimButton": "领取 · 连续打卡延续至 {next} 天 🔥",
+      "completeAll": "完成所有任务后领取奖励",
+      "agentFooter": "智能体：{agentId}… · 每天午夜刷新"
+    },
+    "achievements": {
+      "unlocked": "★ 成就解锁"
+    },
+    "integration": {
+      "heading": "集成",
+      "statusActive": "● 已激活",
+      "statusOff": "○ 已关闭",
+      "descActive": "您的智能体正在监听 {label}。关闭以停止响应，或管理以更改配置。",
+      "descInactive": "{label} 未配置。点击「管理」以添加凭据并启用。",
+      "disabling": "关闭中...",
+      "disable": "关闭",
+      "manage": "管理 →",
+      "configure": "配置 →",
+      "escClose": "ESC 关闭"
+    },
+    "status": {
+      "paused": {
+        "title": "智能体已暂停",
+        "hint": "前往控制台，点击「启动」以唤醒它。"
+      },
+      "stopped": {
+        "title": "智能体已停止",
+        "hint": "从控制台启动以开始聊天。"
+      },
+      "starting": {
+        "title": "智能体正在启动",
+        "hint": "首次启动需要2–4分钟，就绪后即可聊天。"
+      },
+      "initializing": {
+        "title": "正在初始化智能体",
+        "hint": "正在写入配置和技能——通常需要2分钟，首次启动可能更长。"
+      },
+      "pending": {
+        "title": "智能体等待中",
+        "hint": "等待启动信号..."
+      },
+      "error": {
+        "title": "智能体处于错误状态",
+        "hint": "请检查集成选项卡或联系支持——上次启动失败。"
+      },
+      "crashed": {
+        "title": "智能体已崩溃",
+        "hint": "自动重启将重试。如果持续崩溃，请检查日志。"
+      }
+    },
+    "mood": {
+      "warmingUp": "预热中",
+      "thriving": "蓬勃运作",
+      "upbeat": "状态良好",
+      "steady": "稳定运行",
+      "struggling": "运行吃力",
+      "overheating": "过载运行"
+    },
+    "voice": {
+      "stopListening": "停止监听",
+      "startVoice": "开始语音输入",
+      "turnOffVoice": "关闭语音回复",
+      "agentSpeakReplies": "让智能体朗读回复",
+      "voiceOn": "语音已开启",
+      "voice": "语音"
+    }
+  },
+  "frameworks": {
+    "eyebrow": "框架",
+    "heading": "选择合适的框架",
+    "subheading": "Hatcher 支持4种久经考验的智能体框架，各有独特优势——以下是选择指南。",
+    "deployCta": "部署智能体",
+    "docsLink": "完整文档",
+    "atAGlance": "快速概览",
+    "featureMatrix": "功能矩阵",
+    "featureCol": "功能",
+    "bestFor": "最适合...",
+    "bestForSubheading": "不确定选哪个框架？根据使用场景进行匹配。",
+    "benchmarks": "性能基准",
+    "benchmarksSubheading": "在Hatcher共享基础设施上的冷启动时间和基准内存用量，实际值因配置而异。",
+    "coldStart": "冷启动时间",
+    "memoryUsage": "基准内存用量",
+    "lowerFaster": "越低越快",
+    "lowerLeaner": "越低越轻量",
+    "benchmarkCallout": "🌸 Milady 最快最轻量——最适合免费套餐部署。🦞 OpenClaw 工具最全面，但需要更多资源。",
+    "configExamples": "配置示例",
+    "configSubheading": "每个框架都有自己的配置格式，以下是典型设置示例。",
+    "configRef": "完整配置参考 →",
+    "docsSuffix": "文档",
+    "llmSupport": "LLM 支持",
+    "llmSubheading": "所有框架均支持BYOK（携带自己的密钥）以获得无限消息。在托管LLM上，所有套餐均在Groq上运行Llama 4 Scout（17B）——工具调用可靠性和延迟在免费、Starter、Pro、Business和创始会员之间保持一致，只有每日消息配额因套餐而异。",
+    "byokNote": "* BYOK 始终免费——在任意框架下获得无限消息。",
+    "byokSetupLink": "查看 BYOK 设置指南 →",
+    "decisionGuide": "快速决策指南",
+    "readyCta": "准备好部署了吗？",
+    "readySubheading": "选择框架，配置您的智能体，60秒内上线。免费套餐已包含。",
+    "deployFirstAgent": "部署您的第一个智能体",
+    "viewPricing": "查看定价",
+    "decisions": [
+      {
+        "condition": "我想要最多工具和自动化能力",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "我想要一个随时间学习的智能体",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "我想要一个社交媒体或社区机器人",
+        "pick": "ElizaOS"
+      },
+      {
+        "condition": "我刚开始入门，想要简单易用的",
+        "pick": "Milady"
+      },
+      {
+        "condition": "我需要多渠道消息（Telegram + Discord + WhatsApp）",
+        "pick": "OpenClaw 或 Hermes"
+      },
+      {
+        "condition": "我想要一个角色驱动的人格机器人",
+        "pick": "ElizaOS 或 Milady"
+      }
+    ]
+  },
+  "token": {
+    "liveLabel": "已在Solana上线",
+    "heading": "$HATCHER",
+    "subheading": "Hatcher 的生态代币，在Solana上支持套餐订阅、智能体扩展项和治理。",
+    "caLabel": "合约地址：",
+    "viewDexscreener": "在 Dexscreener 上查看",
+    "viewSolscan": "在 Solscan 上查看",
+    "burnBadge": "每笔 $HATCHER 付款的10%在同一笔交易中链上销毁。",
+    "createAgentCta": "创建免费智能体",
+    "viewPricing": "查看定价",
+    "plannedUtilityLabel": "规划中的用途",
+    "whatPowers": "代币将支持什么",
+    "ecosystemDesc": "$HATCHER 是 Hatcher 生态系统的原生货币。",
+    "keyDetails": "关键信息",
+    "networkLabel": "网络",
+    "networkValue": "Solana",
+    "splToken": "SPL 代币",
+    "statusLabel": "状态",
+    "statusValue": "已上线",
+    "trading": "交易",
+    "contractLabel": "合约",
+    "platformLabel": "平台",
+    "platformValue": "免费套餐现已开放——代币解锁付费套餐及扩展项",
+    "stayInLoop": "保持关注",
+    "stayInLoopBody": "代币已上线，平台已就绪。几分钟内部署您的第一个智能体。",
+    "followOnX": "在 X 上关注"
+  },
+  "roadmap": {
+    "liveLabel": "已上线",
+    "heading": "路线图",
+    "subheading": "我们已构建的内容、正在发布的功能，以及未来的方向。我们公开开发——关注",
+    "followHandle": "X /@hatcherlabs",
+    "checkChangelog": "实时更新日志",
+    "featureRequest": "有功能需求？我们会认真阅读每一条。",
+    "submitRequest": "提交需求",
+    "followOnX": "在 X 上关注"
+  },
+  "blog": {
+    "eyebrow": "博客",
+    "heading": "Hatcher 博客",
+    "subheading": "关于AI智能体和Hatcher平台的指南、教程和见解。",
+    "searchPlaceholder": "搜索文章...",
+    "allCategory": "全部",
+    "latestLabel": "最新",
+    "readLabel": "阅读",
+    "resultsCount": "搜索「{query}」找到 {count} 个结果",
+    "resultsCountPlural": "搜索「{query}」找到 {count} 个结果",
+    "noArticles": "未找到文章",
+    "noArticlesCategory": "此分类下未找到文章。",
+    "noArticlesSearch": "搜索「{query}」未找到文章。",
+    "clearFilters": "清除筛选",
+    "backToBlog": "返回博客",
+    "relatedArticles": "相关文章"
+  },
+  "changelog": {
+    "betaLabel": "Beta",
+    "heading": "更新日志",
+    "subheading": "我们每天都在改进，以下是最新变更。",
+    "noCommits": "未找到提交记录。",
+    "errorMessage": "出现错误。",
+    "tryAgain": "重试"
+  },
+  "help": {
+    "eyebrow": "资源",
+    "heading": "帮助中心",
+    "subheading": "查找答案、浏览指南，并联系支持团队。",
+    "searchPlaceholder": "搜索所有问题... 例如「BYOK」、「速率限制」、「Telegram」",
+    "resultCount": "{count} 个结果",
+    "resultCountPlural": "{count} 个结果",
+    "matchCount": "{count} 个匹配",
+    "matchCountPlural": "{count} 个匹配",
+    "noMatchHeading": "未找到匹配的问题",
+    "noMatchBody": "请尝试不同的关键词或浏览文档。",
+    "documentationLink": "文档",
+    "contactHeading": "联系我们",
+    "contactBody": "找不到您需要的内容？",
+    "openTicket": "提交支持工单",
+    "contactOr": "或直接联系：",
+    "technicalHelp": "技术帮助",
+    "generalInquiries": "一般咨询",
+    "communitySupport": "社区支持",
+    "communityChat": "社区聊天",
+    "stillNeedHelp": "仍需帮助？",
+    "ticketResponse": "提交支持工单，我们的团队将在24小时内回复。",
+    "quickLinks": {
+      "documentation": "文档",
+      "discord": "Discord 社区",
+      "telegram": "Telegram 群组",
+      "submitTicket": "提交工单",
+      "emailSupport": "邮件支持"
+    }
+  },
+  "status": {
+    "eyebrow": "状态",
+    "heading": "平台状态",
+    "subheading": "Hatcher 基础设施实时健康状况。",
+    "navLabel": "Hatcher 状态",
+    "autoRefresh": "每30秒自动刷新",
+    "operational": "所有系统正常运行",
+    "degraded": "部分系统性能下降",
+    "down": "检测到服务中断",
+    "statusOperational": "正常",
+    "statusDegraded": "性能下降",
+    "statusDown": "已中断",
+    "lastChecked": "上次检查：",
+    "refresh": "刷新",
+    "checking": "检查系统中...",
+    "errorMessage": "无法连接API，状态不可用。",
+    "activeAgents": "活跃智能体",
+    "totalAgents": "智能体总数",
+    "components": "组件",
+    "updatedAt": "更新于 {time}",
+    "loading": "加载中...",
+    "backToHatcher": "← 返回 Hatcher"
+  },
+  "shortcuts": {
+    "backToDashboard": "返回控制台",
+    "heading": "键盘快捷键",
+    "subheading": "使用键盘快捷键更快地浏览 Hatcher",
+    "quickTipLabel": "快速提示",
+    "quickTipBody": "在任意位置按下即可打开命令面板，即时搜索页面、智能体或操作。",
+    "footerNote": "在文本框中输入时快捷键不可用。在 macOS 上，请使用 Cmd 替代 Ctrl。"
+  },
+  "create": {
+    "eyebrow": "创建智能体",
+    "heading": "创建您的智能体",
+    "subheading": "2分钟内启动免费AI智能体。",
+    "stepsAriaLabel": "创建步骤",
+    "stepLabels": {
+      "style": "风格",
+      "category": "分类",
+      "template": "模板",
+      "setUp": "设置",
+      "launch": "启动"
+    },
+    "authLoading": "验证身份中...",
+    "authRequired": "创建您的智能体",
+    "authRequiredBody": "请登录您的账户以创建和部署AI智能体。",
+    "signIn": "登录",
+    "back": "返回",
+    "continue": "继续",
+    "step1Heading": "您想要什么类型的智能体？",
+    "step1Subheading": "各框架有不同优势——选择最适合您的。",
+    "step2Heading": "什么类型的智能体？",
+    "step2Subheading": "选择一个分类——我们将为您推荐最佳模板",
+    "searchTemplates": "搜索200+模板...",
+    "clearSearch": "清除搜索",
+    "noTemplatesFound": "未找到「{query}」相关模板",
+    "clearSearchLink": "清除搜索",
+    "categoryCount": "{count} 个模板",
+    "step3Heading": "选择模板",
+    "step3Subheading": "选择模板——下一步可自定义所有内容",
+    "customAgent": "自定义智能体",
+    "customAgentDesc": "使用您自己的系统提示从零开始",
+    "customOption": "从零开始",
+    "customOptionDesc": "完全控制每项设置",
+    "step4Heading": "个性化您的智能体",
+    "step4Subheading": "为智能体命名并选择思维方式",
+    "agentNameLabel": "智能体名称",
+    "agentNamePlaceholder": "例如 AlphaResearcher、TweetLord...",
+    "agentNameHintCount": "{count}/50 个字符",
+    "agentNameTooShort": "名称至少需要3个字符",
+    "agentNameInvalidChars": "只允许字母、数字、空格、连字符、冒号、撤号",
+    "descriptionLabel": "描述",
+    "descriptionPlaceholder": "简要描述您的智能体功能...",
+    "descriptionHint": "智能体的简短标语",
+    "platformsHeading": "您的智能体应该在哪里运行？",
+    "platformsSubheading": "选择平台并添加API密鑰。之后可在设置中添加更多。",
+    "noPlatformsNote": "未选择平台？没关系——随时可在智能体的设置选项卡中添加。",
+    "hideValue": "隐藏値",
+    "showValue": "显示値",
+    "llmModelLabel": "AI模型",
+    "llmModelAria": "AI模型选择",
+    "llmFreeLabel": "免费AI模型",
+    "llmFreeTag": "免费",
+    "llmFreeSubtext": "由Groq提供支持——无需API密鑰",
+    "llmByokLabel": "使用您自己的AI密鑰",
+    "llmByokTag": "始终免费",
+    "llmByokSubtext": "连接您自己的OpenAI、Anthropic或其他API密鑰",
+    "byokProviderLabel": "提供商",
+    "byokModelLabel": "模型",
+    "byokModelPlaceholder": "模型标识符...",
+    "byokBackToList": "返回模型列表",
+    "byokSelectModel": "选择模型...",
+    "byokCustomModel": "自定义模型...",
+    "byokApiKeyLabel": "API密鑰",
+    "byokApiKeyEncrypted": "加密存储",
+    "byokBaseUrlLabel": "Base URL",
+    "skillsHeading": "智能体技能",
+    "skillsSubheading": "选择智能体可以执行的操作",
+    "toolsHeading": "智能体工具",
+    "toolsSubheading": "选择智能体可以执行的操作",
+    "pluginsHeading": "插件",
+    "pluginsSubheading": "选择智能体可以执行的操作",
+    "capabilitiesHeading": "能力",
+    "capabilitiesSubheading": "选择智能体可以执行的操作",
+    "templateSkillsHeading": "此模板包含",
+    "templateSkillsSubheading": "这些ClawHub技能在智能体首次启动时自动安装。",
+    "systemPromptLabel": "系统提示",
+    "systemPromptCustomNote": "您的自定义指令将替换模板默认値",
+    "systemPromptDefaultNote": "智能体的个性已预先配置。如需更改请自定义。",
+    "systemPromptCustomize": "自定义",
+    "systemPromptUseDefault": "使用模板默认値",
+    "systemPromptPlaceholder": "在此处编写自定义系统提示。这将完全替换模板默认値。",
+    "systemPromptHint": "定义智能体的个性、能力和规则",
+    "systemPromptCount": "{count}/8000",
+    "systemPromptWarning": "建议添加系统提示以获得更好效果",
+    "elizaBioLabel": "简介",
+    "elizaBioHint": "定义智能体的个性和背景。每行一条陌述。",
+    "elizaBioPlaceholder": "专门从事...的知识型AI助手",
+    "elizaLoreLabel": "背景知识",
+    "elizaLoreHint": "智能体的背景知识和历史。每行一个事实。",
+    "elizaStyleLabel": "风格说明",
+    "elizaStyleHint": "智能体应如何沟通。每行一条指令。",
+    "elizaTopicsLabel": "主题",
+    "elizaTopicsPlaceholder": "technology, AI, crypto, research",
+    "elizaTopicsHint": "智能体了解的主题，逗号分隔",
+    "elizaAdjectivesLabel": "形容词",
+    "elizaAdjectivesPlaceholder": "helpful, analytical, concise",
+    "elizaAdjectivesHint": "个性特征，逗号分隔",
+    "miladyPersonalityLabel": "个性预设",
+    "miladyPersonalityHint": "为您的Milady智能体选择个性风格。",
+    "miladyPersonalityHelpful": "热心 - 友好且专业",
+    "miladyPersonalityTsundere": "傲娇 - 表面冷淡内心关心",
+    "miladyPersonalityUnhinged": "混乱 - 随机不可预测",
+    "miladyPersonalityCustom": "自定义 - 使用您的系统提示",
+    "moreOptionsLabel": "更多选项",
+    "moreOptionsHints": {
+      "openclaw": "搜索、语音、会话",
+      "hermes": "个性、记忆、审批",
+      "elizaos": "数据库、图像生成、语音",
+      "milady": "数据库、隐私、预设"
+    },
+    "sessionScopeLabel": "会话范围",
+    "sessionScopeHint": "用户之间共享对话上下文的方式",
+    "sessionScopePerUser": "按用户",
+    "sessionScopeGlobal": "全局",
+    "webSearchLabel": "启用网络搜索",
+    "webSearchHint": "允许智能体搜索网络获取实时信息",
+    "searchProviderLabel": "搜索提供商",
+    "searchProviderHint": "使用哪个搜索API",
+    "ttsLabel": "启用语音(TTS)",
+    "ttsHint": "语音回复的文字转语音输出",
+    "ttsProviderLabel": "TTS提供商",
+    "ttsProviderHint": "语音合成引擎",
+    "hermesPersonalityLabel": "个性",
+    "hermesPersonalityHint": "对话语气和风格",
+    "hermesPersonalityDefault": "默认",
+    "hermesPersonalityHelpful": "热心",
+    "hermesPersonalityTechnical": "技术型",
+    "hermesPersonalityCreative": "创意型",
+    "hermesPersonalityConcise": "简洁型",
+    "memoryLabel": "启用记忆",
+    "memoryHint": "在对话之间保持上下文",
+    "approvalModeLabel": "审批模式",
+    "approvalModeHint": "执行前如何授权操作",
+    "approvalModeAuto": "自动",
+    "approvalModeAsk": "执行前询问",
+    "approvalModeManual": "手动",
+    "databaseLabel": "数据库",
+    "databaseHint": "智能体状态和记忆的存储后端",
+    "databaseHintMilady": "智能体状态的存储后端",
+    "imageGenLabel": "启用图像生成",
+    "imageGenHint": "允许智能体生成图像",
+    "voiceLabel": "启用语音",
+    "voiceHint": "语音转文字和文字转语音功能",
+    "localFirstLabel": "本地优先模式",
+    "localFirstHint": "在同步之前在本地处理数据",
+    "miladyPersonalitySelectedHint": "上方已选择——控制智能体语气",
+    "step5Heading": "准备启动？",
+    "step5Subheading": "启动前检查您的配置",
+    "summaryAgentType": "智能体类型",
+    "summaryTemplate": "模板",
+    "summaryTemplateCustom": "自定义",
+    "summaryAiModel": "AI模型",
+    "summaryDescription": "描述",
+    "summaryPlatforms": "平台",
+    "summaryPersonality": "个性",
+    "summaryPersonalityDefault": "模板默认",
+    "summaryPersonalityCustom": "自定义指令",
+    "summaryCost": "费用",
+    "summaryCostFree": "$0.00 — 免费套餐",
+    "summaryCostByok": "$0.00 — 使用您自己的密鑰",
+    "summaryFrameworkLabels": {
+      "openclaw": "多技能助手",
+      "hermes": "自主智能体",
+      "elizaos": "多智能体框架",
+      "milady": "隐私优先运行时"
+    },
+    "testChatLabel": "测试您的智能体",
+    "testChatSubtext": "预览智能体的响应方式",
+    "testChatPreviewLabel": "聊天预览",
+    "testChatSimulated": "这是模拟预览。部署智能体后开始真实对话。",
+    "testChatEmpty": "发送消息以预览您的智能体",
+    "testChatEmptyHint": "尝试「你好」或「你能做什么？」",
+    "testChatPlaceholder": "输入消息...",
+    "launchedHeading": "您的智能体已上线！",
+    "launchedSubtext": "正在跳转到您的智能体控制台...",
+    "launchCtaLabel": "启动智能体",
+    "launchCtaCreating": "创建智能体中...",
+    "launchCtaCreated": "智能体创建成功",
+    "launchCta": "启动我的智能体！",
+    "launching": "孵化中...",
+    "launched": "已孵化！",
+    "frameworkFeatures": {
+      "openclaw": {
+        "desc": "多功能AI助手，拥有数千个社区技能和多渠道消息功能。",
+        "f1": "数千种技能",
+        "f2": "网页浏览",
+        "f3": "定时任务"
+      },
+      "hermes": {
+        "desc": "智能AI智能体，能跨对话记住上下文并持续学习。",
+        "f1": "长期记忆",
+        "f2": "40+内置工具",
+        "f3": "自我提升"
+      },
+      "elizaos": {
+        "desc": "ai16z开源多智能体框架。90+插件、持久记忆、Web3原生。",
+        "f1": "90+插件",
+        "f2": "向量记忆",
+        "f3": "Web3原生"
+      },
+      "milady": {
+        "desc": "隐私优先AI运行时，拥有20+连接器、VRM虚拟形象和DeFi集成。",
+        "f1": "20+连接器",
+        "f2": "个性预设",
+        "f3": "隐私优先"
+      }
+    },
+    "skills": {
+      "webSearch": {
+        "name": "网络搜索",
+        "desc": "搜索网络获取实时信息"
+      },
+      "calculator": {
+        "name": "计算器",
+        "desc": "数学和计算"
+      },
+      "weather": {
+        "name": "天气",
+        "desc": "天气预报"
+      },
+      "codeInterpreter": {
+        "name": "代码运行",
+        "desc": "执行代码片段"
+      },
+      "fileManager": {
+        "name": "文件管理器",
+        "desc": "读写文件"
+      },
+      "imageGen": {
+        "name": "图像生成",
+        "desc": "根据文本生成图像"
+      }
+    },
+    "tools": {
+      "webSearch": {
+        "name": "网络搜索",
+        "desc": "搜索互联网获取信息"
+      },
+      "calculator": {
+        "name": "计算器",
+        "desc": "数学计算"
+      },
+      "codeExecution": {
+        "name": "代码运行",
+        "desc": "执行代码片段"
+      },
+      "fileOperations": {
+        "name": "文件操作",
+        "desc": "读写文件"
+      },
+      "memory": {
+        "name": "记忆",
+        "desc": "记住对话和事实"
+      },
+      "summarize": {
+        "name": "摘要",
+        "desc": "总结长文本"
+      },
+      "translate": {
+        "name": "翻译",
+        "desc": "在语言间翻译"
+      },
+      "weather": {
+        "name": "天气",
+        "desc": "天气预报"
+      }
+    },
+    "plugins": {
+      "database": {
+        "name": "数据库",
+        "desc": "SQL数据库访问"
+      },
+      "imageGen": {
+        "name": "图像生成",
+        "desc": "生成图像"
+      },
+      "video": {
+        "name": "视频",
+        "desc": "视频处理"
+      },
+      "tts": {
+        "name": "文字转语音",
+        "desc": "语音输出"
+      },
+      "nodeRuntime": {
+        "name": "Node运行时",
+        "desc": "服务端操作"
+      },
+      "bootstrap": {
+        "name": "Bootstrap",
+        "desc": "核心工具"
+      }
+    },
+    "capabilities": {
+      "chat": {
+        "name": "聊天",
+        "desc": "核心对话"
+      },
+      "defi": {
+        "name": "DeFi",
+        "desc": "DeFi协议交互"
+      },
+      "social": {
+        "name": "社交",
+        "desc": "社交媒体集成"
+      },
+      "analysis": {
+        "name": "分析",
+        "desc": "数据分析"
+      },
+      "privacy": {
+        "name": "隐私",
+        "desc": "隐私工具"
+      },
+      "memes": {
+        "name": "表情包",
+        "desc": "表情包生成"
+      }
+    },
+    "platforms": {
+      "telegram": {
+        "desc": "部署为Telegram机器人",
+        "helperField": "在Telegram上给@BotFather发消息 → /newbot → 复制令牌"
+      },
+      "discord": {
+        "desc": "部署为Discord机器人",
+        "helperField": "Discord开发者门户 → 新建应用 → Bot → 复制Token"
+      },
+      "whatsapp": {
+        "desc": "通过二维码连接",
+        "note": "部署后将提供二维码配对"
+      },
+      "slack": {
+        "desc": "在Slack工作区部署",
+        "helperField": "Slack API → 创建应用 → OAuth和权限 → Bot Token"
+      },
+      "twitter": {
+        "desc": "在X上发布、回复和互动"
+      }
+    },
+    "llmFreeSummary": "免费AI模型 (Groq)",
+    "llmByokSummary": "自带密鑰: {provider}{model}",
+    "errorHeading": "创建错误",
+    "errorBody": "设置智能体时出现问题。您的进度未丢失。",
+    "errorIdLabel": "错误ID：",
+    "tryAgain": "重试",
+    "dashboard": "控制台"
+  },
+  "support": {
+    "eyebrow": "帮助",
+    "heading": "客服支持",
+    "subheading": "获取智能体、账单或其他方面的帮助。",
+    "quickLinks": {
+      "documentation": "文档",
+      "documentationDesc": "浏览指南和API参考",
+      "faq": "常见问题",
+      "faqDesc": "常见问题解答",
+      "followUs": "关注我们",
+      "followUsDesc": "更新和公告"
+    },
+    "directContact": "或直接发送邮件至",
+    "joinDiscord": "加入我们的 Discord",
+    "telegramLabel": "Telegram",
+    "communitySupport": "社区支持",
+    "submitTicketHeading": "提交工单",
+    "signInPrompt": "请登录以提交支持工单。",
+    "signIn": "登录",
+    "ticketSubmitted": "工单已提交",
+    "ticketSubmittedBody": "我们已收到您的请求，将尽快回复。有更新时会及时通知您。",
+    "submitAnother": "再提交一个工单",
+    "subjectLabel": "主题",
+    "subjectPlaceholder": "简述您的问题",
+    "categoryLabel": "类别",
+    "priorityLabel": "优先级",
+    "relatedAgentLabel": "相关智能体",
+    "relatedAgentOptional": "（可选）",
+    "selectAgent": "选择智能体...",
+    "messageLabel": "消息",
+    "messagePlaceholder": "请详细描述您的问题...",
+    "submitTicket": "提交工单",
+    "submitting": "提交中...",
+    "signInError": "请登录后再提交工单。",
+    "subjectRequired": "主题为必填项。",
+    "messageRequired": "消息为必填项。",
+    "failedSubmit": "提交工单失败，请重试。",
+    "recentTickets": "近期工单",
+    "noTickets": "暂无工单",
+    "noTicketsDesc": "您提交的支持工单将显示在此处。在上方创建您的第一个工单以开始使用。",
+    "backToTop": "返回顶部",
+    "ticketCount": "{count} 个工单",
+    "ticketCountPlural": "{count} 个工单"
+  },
+  "affiliate": {
+    "eyebrow": "推广计划",
+    "heading": "从您带来Hatcher的每位用户中获得收益。",
+    "subheading": "每位付费用户最高可获得40%的循环佣金。现金入账到您的钱包、积分为自己的智能体充值，或混合分配——由您决定。归因基于链接，归属于被推荐账户的终身。",
+    "applyNowCta": "立即申请",
+    "howItWorksLink": "工作原理",
+    "pickYourPayout": "选择提现方式",
+    "threeWays": "三种收款方式。",
+    "threeWaysSubheading": "相同的可计费收入，不同的分配方式。选择与您希望从计划中获得价值相匹配的模式——稍后可通过联系支持进行切换。",
+    "popularLabel": "热门",
+    "foundingBonusLabel": "创始会员奖励",
+    "foundingBonusHeading": "推荐创始会员 → 固定 $20 现金奖励。",
+    "foundingBonusBody": "$99终身套餐向推荐推广者一次性支付固定$20——除此之外，还有该用户后续插件或智能体购买所带来的收益。无论您的默认提现模式如何，均以现金支付。",
+    "applyLabel": "申请",
+    "howItWorksLabel": "工作原理",
+    "fourSteps": "四个步骤，零意外。",
+    "faqLabel": "常见问题",
+    "everythingYoudAsk": "申请前您会问的所有问题。",
+    "readyHeading": "准备好与Hatcher合作了吗？",
+    "readyBody": "申请只需几分钟。审核3–5天，每位您带来的用户终身享有循环佣金。",
+    "seePricing": "查看定价",
+    "apply": {
+      "backLink": "返回推广计划",
+      "loading": "加载中…",
+      "eyebrow": "申请成为 Hatcher 推广伙伴",
+      "heading": "告诉我们关于您的信息。",
+      "subheading": "提供您的平台和受众的相关信息。我们手动审核每份申请——请如实、具体地填写。",
+      "underReview": "审核中——我们会与您联系。",
+      "reviewTime": "预计审核时间：",
+      "reviewDays": "3–5天",
+      "reviewEmailNote": "决定一出即刻发送邮件通知。",
+      "submitted": "申请已提交",
+      "submittedDate": "提交时间",
+      "platformsLabel": "平台",
+      "followers": "粉丝",
+      "slugLabel": "申请的自定义链接",
+      "slugPreview": "预览：hatcher.host/r/{slug}",
+      "payoutModeLabel": "提现模式",
+      "payoutAddressLabel": "提现地址",
+      "pitchLabel": "申请说明",
+      "successHeading": "申请已提交。",
+      "successBody": "我们将在3–5天内审核并邮件通知您结果。在此期间，欢迎提前规划通过审核后要分享的内容。",
+      "backToAffiliate": "返回推广计划",
+      "yourPlatforms": "您的平台",
+      "platformCount": "{count} / {max}",
+      "platformLabel": "平台 {n}",
+      "removeLabel": "移除",
+      "addPlatform": "添加另一个平台",
+      "platformTypeField": "平台类型",
+      "handleField": "账号",
+      "handleHint": "例如 @hatcher、@solana、/channel/xyz",
+      "audienceField": "受众规模（可选）",
+      "urlField": "URL（可选）",
+      "slugField": "自定义推广链接（可选）",
+      "slugPrefix": "hatcher.host/r/",
+      "slugPlaceholder": "yourname",
+      "slugBlankHint": "留空则自动生成代码",
+      "slugPreviewGood": "您的链接将是 hatcher.host/r/{slug}",
+      "pitchField": "申请说明",
+      "pitchPlaceholder": "您为什么想与Hatcher合作？您将触达什么类型的内容或受众？",
+      "pitchCharHint": "50–2000个字符",
+      "payoutModeField": "提现模式",
+      "solAddressField": "SOL 钱包地址（base58，32–44位字符）",
+      "solAddressPlaceholder": "例如 21L6VVRAuxk87sXggz8exhPCm1w4qWyKEs6SDauyyRAW",
+      "submitBtn": "提交申请",
+      "submitting": "提交中…",
+      "rejectedLabel": "上次申请已被拒绝",
+      "validatePlatformMin": "请至少添加一个平台",
+      "validatePlatformMax": "最多 {max} 个平台",
+      "validateHandleRequired": "必填",
+      "validateHandleMax": "最多100个字符",
+      "validateAudienceNumber": "必须为整数",
+      "validateUrlInvalid": "必须为有效URL",
+      "validatePitchMin": "申请说明至少50个字符",
+      "validatePitchMax": "申请说明最多2000个字符",
+      "validateAddressRequired": "CASH_ONLY 和 HYBRID 模式为必填",
+      "validateAddressFormat": "必须是有效的Solana base58地址（32–44位字符）",
+      "slugTooShort": "太短——至少3个字符",
+      "slugTooLong": "太长——最多30个字符",
+      "slugInvalidChars": "仅限 a–z、0–9 和连字符（不能以 - 开头或结尾）",
+      "slugReserved": "此链接已被保留——请选择其他"
+    }
+  },
+  "docs": {
+    "eyebrow": "文档",
+    "heading": "文档",
+    "subheading": "使用Hatcher构建、部署和管理AI智能体所需的一切。",
+    "searchPlaceholder": "搜索文档...",
+    "searchComingSoon": "搜索功能即将上线",
+    "apiReferenceHeading": "API 参考",
+    "apiReferenceBody": "完整端点文档，含cURL、JavaScript和Python示例。认证、速率限制和错误代码。",
+    "apiReferenceLink": "浏览端点",
+    "integrationsHeading": "集成指南",
+    "integrationsBody": "Telegram、Discord、WhatsApp、Slack、Twitter/X 和 Signal 的分步设置指南，从凭据配置到首条消息。",
+    "integrationsLink": "浏览平台",
+    "popularTopics": "热门主题",
+    "readMore": "了解更多",
+    "cantFind": "找不到您需要的内容？",
+    "cantFindBody": "我们的支持团队和社区将帮助您充分利用Hatcher。",
+    "contactSupport": "联系支持",
+    "helpCenter": "帮助中心",
+    "quickLinks": [
+      {
+        "title": "快速入门",
+        "description": "60秒内设置您的第一个AI智能体。快速入门指南、前提条件和首次部署。"
+      },
+      {
+        "title": "智能体配置",
+        "description": "配置人格、模型、记忆、定时任务、Webhook和多智能体路由。"
+      },
+      {
+        "title": "平台集成",
+        "description": "连接至Telegram、Discord、WhatsApp、Slack及20+消息平台。"
+      },
+      {
+        "title": "BYOK 设置",
+        "description": "为OpenAI、Anthropic、Google、xAI等携带自己的API密钥，始终免费。"
+      },
+      {
+        "title": "账单与定价",
+        "description": "了解代币付款、功能解锁、托管积分和订阅管理。"
+      },
+      {
+        "title": "API 参考",
+        "description": "智能体、功能、付款和管理操作的REST API端点。"
+      }
+    ],
+    "topics": [
+      {
+        "label": "如何部署您的第一个智能体"
+      },
+      {
+        "label": "支持的LLM提供商"
+      },
+      {
+        "label": "智能体框架配置"
+      },
+      {
+        "label": "容器生命周期与状态码"
+      },
+      {
+        "label": "设置Telegram集成"
+      },
+      {
+        "label": "了解代币付款"
+      }
+    ]
+  },
+  "shared": {
+    "tiers": {
+      "free": {
+        "name": "免费",
+        "description": "1个智能体，每日20条消息，50 MB存储"
+      },
+      "starter": {
+        "name": "Starter",
+        "description": "1个智能体，每日50条消息，150 MB存储"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "3个智能体，每日100条消息，500 MB存储"
+      },
+      "business": {
+        "name": "Business",
+        "description": "10个智能体，每日300条消息，1 GB存储，始终在线"
+      },
+      "founding_member": {
+        "name": "创始会员",
+        "description": "10个智能体，每日300条消息，2 GB存储，终身访问"
+      }
+    },
+    "addons": {
+      "agents_plus1": {
+        "name": "+1个智能体",
+        "description": "1个额外智能体名额"
+      },
+      "agents_plus3": {
+        "name": "+3个智能体",
+        "description": "3个额外智能体名额"
+      },
+      "agents_plus5": {
+        "name": "+5个智能体",
+        "description": "5个额外智能体名额"
+      },
+      "agents_plus10": {
+        "name": "+10个智能体",
+        "description": "10个额外智能体名额"
+      },
+      "messages_plus20": {
+        "name": "+20条消息/天",
+        "description": "每日额外20条消息"
+      },
+      "messages_plus50": {
+        "name": "+50条消息/天",
+        "description": "每日额外50条消息"
+      },
+      "messages_plus100": {
+        "name": "+100条消息/天",
+        "description": "每日额外100条消息"
+      },
+      "messages_plus200": {
+        "name": "+200条消息/天",
+        "description": "每日额外200条消息"
+      },
+      "searches_plus25": {
+        "name": "+25次搜索/天",
+        "description": "每日额外25次网络搜索"
+      },
+      "searches_plus50": {
+        "name": "+50次搜索/天",
+        "description": "每日额外50次网络搜索"
+      },
+      "always_on": {
+        "name": "始终在线",
+        "description": "保持此智能体全天候运行"
+      },
+      "file_manager": {
+        "name": "文件管理器",
+        "description": "浏览、编辑和下载工作区文件"
+      },
+      "full_logs": {
+        "name": "完整日志",
+        "description": "解锁此智能体的完整日志查看器"
+      },
+      "plugins_plus10": {
+        "name": "+10个插件",
+        "description": "此智能体额外10个插件+技能名额"
+      }
+    },
+    "frameworks": {
+      "openclaw": {
+        "name": "OpenClaw",
+        "description": "自托管AI助手，拥有3200+社区技能、多渠道消息网关和自主任务执行能力。"
+      },
+      "hermes": {
+        "name": "Hermes Agent",
+        "description": "Nous Research出品的自主AI智能体，具备持久记忆、40+工具、技能系统和多平台消息网关。"
+      },
+      "elizaos": {
+        "name": "ElizaOS",
+        "description": "开源AI智能体框架，支持角色驱动人格、插件生态和多客户端社交及消息平台接入。"
+      },
+      "milady": {
+        "name": "Milady",
+        "description": "轻量级人格优先AI智能体框架，专为有表现力、具文化感知的对话智能体设计，支持模块化能力扩展。"
+      }
+    },
+    "agentStatus": {
+      "active": "活跃",
+      "sleeping": "休眠中",
+      "paused": "已暂停",
+      "error": "错误",
+      "killed": "已停止",
+      "restarting": "重启中",
+      "stopping": "停止中"
+    }
+  },
+  "localeSwitcher": {
+    "label": "切换语言"
+  }
+}

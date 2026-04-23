@@ -1,26 +1,30 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import type { RoomLogLine } from '../types';
 
 interface Props {
   logs: RoomLogLine[];
 }
 
-function moodFromLogs(logs: RoomLogLine[]): { score: number; label: string; emoji: string } {
-  if (logs.length === 0) return { score: 0.5, label: 'WARMING UP', emoji: '😐' };
+type MoodKey = 'warmingUp' | 'thriving' | 'upbeat' | 'steady' | 'struggling' | 'overheating';
+
+function moodFromLogs(logs: RoomLogLine[]): { score: number; moodKey: MoodKey; emoji: string } {
+  if (logs.length === 0) return { score: 0.5, moodKey: 'warmingUp', emoji: '😐' };
   const recent = logs.slice(0, 20);
   const ok = recent.filter((l) => l.level === 'ok' || l.level === 'info').length;
   const bad = recent.filter((l) => l.level === 'error' || l.level === 'warn').length;
   const total = recent.length;
   const score = Math.max(0, Math.min(1, (ok - bad * 2) / total / 2 + 0.5));
-  if (score > 0.75) return { score, label: 'THRIVING', emoji: '😎' };
-  if (score > 0.55) return { score, label: 'UPBEAT', emoji: '🙂' };
-  if (score > 0.4) return { score, label: 'STEADY', emoji: '😐' };
-  if (score > 0.25) return { score, label: 'STRUGGLING', emoji: '😕' };
-  return { score, label: 'OVERHEATING', emoji: '🥵' };
+  if (score > 0.75) return { score, moodKey: 'thriving', emoji: '😎' };
+  if (score > 0.55) return { score, moodKey: 'upbeat', emoji: '🙂' };
+  if (score > 0.4) return { score, moodKey: 'steady', emoji: '😐' };
+  if (score > 0.25) return { score, moodKey: 'struggling', emoji: '😕' };
+  return { score, moodKey: 'overheating', emoji: '🥵' };
 }
 
 export function MoodMeter({ logs }: Props) {
-  const { score, label, emoji } = moodFromLogs(logs);
+  const t = useTranslations('agentRoom');
+  const { score, moodKey, emoji } = moodFromLogs(logs);
   const pct = Math.round(score * 100);
   return (
     <div
@@ -31,7 +35,7 @@ export function MoodMeter({ logs }: Props) {
       }}
     >
       <span className="text-base leading-none">{emoji}</span>
-      <span className="text-[10px] uppercase tracking-[2px] text-gray-400">MOOD</span>
+      <span className="text-[10px] uppercase tracking-[2px] text-gray-400">{t('hud.moodLabel')}</span>
       <div className="flex-1 h-1 overflow-hidden rounded-full bg-white/[0.08]">
         <div
           className="h-full rounded-full transition-all duration-700"
@@ -53,7 +57,7 @@ export function MoodMeter({ logs }: Props) {
         />
       </div>
       <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--room-bright)' }}>
-        {label}
+        {t(`mood.${moodKey}`)}
       </span>
     </div>
   );

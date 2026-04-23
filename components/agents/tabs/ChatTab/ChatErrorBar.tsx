@@ -1,6 +1,7 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 import type { ChatMsg } from './types';
 import type { Dispatch, SetStateAction } from 'react';
 
@@ -53,6 +54,7 @@ export function ChatErrorBar({
   setMessages,
   sendMessage,
 }: ChatErrorBarProps) {
+  const t = useTranslations('dashboard.agentDetail.chat');
   if (!chatError) return null;
 
   const info = ERROR_MESSAGES[chatErrorType ?? 'generic'] ?? ERROR_MESSAGES.generic;
@@ -62,14 +64,14 @@ export function ChatErrorBar({
       <span className="flex-1">
         {chatErrorType === 'ratelimit' ? (
           <>
-            {info.icon} Daily message limit reached.{' '}
+            {info.icon} {t('errors.rateLimit')}{' '}
             <Link
               className="underline hover:opacity-80 transition-opacity text-[var(--color-accent)]"
               href="/dashboard/billing"
             >
-              Upgrade to Pro
+              {t('upgradeToPro')}
             </Link>
-            {' '}for more, or bring your own key for unlimited.
+            {' '}{t('limitReachedSuffix')}
           </>
         ) : (
           <>{info.icon} {info.message}</>
@@ -88,7 +90,7 @@ export function ChatErrorBar({
             }
           }}
         >
-          Retry
+          {t('errors.retry')}
         </button>
       )}
     </div>

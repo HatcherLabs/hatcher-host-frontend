@@ -1,23 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { TIER_KEYS } from '@hatcher/shared';
 import { motion } from 'framer-motion';
 import { Activity, Bot, Crown, Zap, Building2, Star, Rocket, User } from 'lucide-react';
 import { api } from '@/lib/api';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 
 interface QuickStatsProps {
   agentCount: number;
   activeCount: number;
 }
 
-const TIER_LABELS: Record<string, string> = {
-  free:            'Free',
-  starter:         'Starter',
-  pro:             'Pro',
-  business:        'Business',
-  founding_member: 'Founding',
-};
+// Tier display names are resolved via useTranslations('shared.tiers') at render time.
+// TIER_KEYS from @hatcher/shared provides the stable key paths.
 
 // text color per tier
 const TIER_COLORS: Record<string, string> = {
@@ -54,6 +51,8 @@ const cardVariants = {
 };
 
 export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
+  const t = useTranslations('dashboard.quickStats');
+  const tTiers = useTranslations('shared.tiers');
   const [tier, setTier]             = useState<string>('free');
   const [agentLimit, setAgentLimit] = useState<number>(1);
   // Live tier limit from the server (includes active `+N msg/day` addons).
@@ -73,7 +72,8 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
   }, []);
 
   const rawLimit: number | 'unlimited' = chatLimit === 0 ? 'unlimited' : chatLimit;
-  const tierLabel = TIER_LABELS[tier]  ?? tier;
+  const validTierKey = (tier in TIER_KEYS) ? tier as keyof typeof TIER_KEYS : 'free';
+  const tierLabel = tTiers(`${validTierKey}.name`);
   const tierColor = TIER_COLORS[tier]  ?? 'text-[var(--text-muted)]';
   const tierBg    = TIER_BG[tier]      ?? 'bg-zinc-500/10';
   const agentPct  = agentLimit > 0 ? Math.min(100, (agentCount / agentLimit) * 100) : 0;
@@ -100,7 +100,7 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
           <div className="w-9 h-9 rounded-lg bg-[var(--color-accent)]/15 flex items-center justify-center flex-shrink-0">
             <Bot size={16} className="text-[var(--color-accent)]" />
           </div>
-          <div className="text-xs text-[var(--text-muted)] leading-tight">Total Agents</div>
+          <div className="text-xs text-[var(--text-muted)] leading-tight">{t('totalAgents')}</div>
         </div>
         <div className="text-2xl font-bold text-[var(--text-primary)] mb-1.5">
           {agentCount}
@@ -120,14 +120,14 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
           <div className="w-9 h-9 rounded-lg bg-amber-500/15 flex items-center justify-center flex-shrink-0">
             <Zap size={16} className="text-amber-400" />
           </div>
-          <div className="text-xs text-[var(--text-muted)] leading-tight">Daily Messages</div>
+          <div className="text-xs text-[var(--text-muted)] leading-tight">{t('dailyMessages')}</div>
         </div>
         {rawLimit === 'unlimited' ? (
-          <div className="text-2xl font-bold text-emerald-400">∞</div>
+          <div className="text-2xl font-bold text-emerald-400">{t('unlimited')}</div>
         ) : (
           <div className="text-2xl font-bold text-[var(--text-primary)]">{rawLimit}</div>
         )}
-        <div className="text-[10px] text-[var(--text-muted)] mt-1">account-wide · BYOK = unlimited</div>
+        <div className="text-[10px] text-[var(--text-muted)] mt-1">{t('accountWide')}</div>
       </motion.div>
 
       {/* Active Agents */}
@@ -136,7 +136,7 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
           <div className="w-9 h-9 rounded-lg bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
             <Activity size={16} className="text-emerald-400" />
           </div>
-          <div className="text-xs text-[var(--text-muted)] leading-tight">Active Now</div>
+          <div className="text-xs text-[var(--text-muted)] leading-tight">{t('activeNow')}</div>
         </div>
         <div className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2">
           {activeCount}
@@ -148,7 +148,7 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
           )}
         </div>
         <div className="text-[10px] text-[var(--text-muted)] mt-1">
-          {activeCount === 0 ? 'No agents running' : `${activeCount} agent${activeCount !== 1 ? 's' : ''} online`}
+          {activeCount === 0 ? t('noAgentsRunning') : activeCount !== 1 ? t('agentsOnlinePlural').replace('{count}', String(activeCount)) : t('agentsOnline').replace('{count}', String(activeCount))}
         </div>
       </motion.div>
 
@@ -158,19 +158,19 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
           <div className={`w-9 h-9 rounded-lg ${tierBg} flex items-center justify-center flex-shrink-0`}>
             <TierIcon tier={tier} className={`w-4 h-4 ${tierColor}`} />
           </div>
-          <div className="text-xs text-[var(--text-muted)] leading-tight">Account Tier</div>
+          <div className="text-xs text-[var(--text-muted)] leading-tight">{t('accountTier')}</div>
         </div>
         <div className={`text-2xl font-bold ${tierColor}`}>{tierLabel}</div>
         {isTopTier ? (
           <div className="text-[10px] text-[var(--text-muted)] mt-1">
-            {tier === 'founding_member' ? 'Lifetime access' : 'Priority support'}
+            {tier === 'founding_member' ? t('lifetimeAccess') : t('prioritySupport')}
           </div>
         ) : (
           <Link
             href="/dashboard/billing"
             className="text-[10px] text-[var(--color-accent)] hover:opacity-80 transition-opacity mt-1 block"
           >
-            Upgrade plan
+            {t('upgradePlan')}
           </Link>
         )}
       </motion.div>

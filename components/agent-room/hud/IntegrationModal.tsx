@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import type { RoomIntegration } from '../types';
 
 const INTEGRATION_LABELS: Record<string, string> = {
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export function IntegrationModal({ integration, onClose, onManage, onToggle }: Props) {
+  const t = useTranslations('agentRoom.integration');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -60,7 +62,7 @@ export function IntegrationModal({ integration, onClose, onManage, onToggle }: P
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-[10px] uppercase tracking-[3px]" style={{ color: 'var(--room-primary)' }}>
-          INTEGRATION
+          {t('heading')}
         </div>
         <div className="mt-1 flex items-baseline gap-3">
           <span className="text-2xl font-bold text-gray-100">{label}</span>
@@ -73,13 +75,13 @@ export function IntegrationModal({ integration, onClose, onManage, onToggle }: P
               color: integration.active ? 'var(--room-bright)' : '#9ca3af',
             }}
           >
-            {integration.active ? '● ACTIVE' : '○ OFF'}
+            {integration.active ? t('statusActive') : t('statusOff')}
           </span>
         </div>
         <p className="mt-4 text-sm text-gray-400">
           {integration.active
-            ? `Your agent is listening on ${label}. Disable to stop responding, or manage to change the config.`
-            : `${label} is not configured. Click Manage to add credentials and enable.`}
+            ? t('descActive', { label })
+            : t('descInactive', { label })}
         </p>
         <div className="mt-5 flex gap-2">
           {integration.active && (
@@ -88,7 +90,7 @@ export function IntegrationModal({ integration, onClose, onManage, onToggle }: P
               disabled={busy}
               className="flex-1 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-xs font-semibold text-red-300 transition hover:bg-red-500/20 disabled:opacity-40"
             >
-              {busy ? 'Disabling...' : 'Disable'}
+              {busy ? t('disabling') : t('disable')}
             </button>
           )}
           <button
@@ -96,14 +98,14 @@ export function IntegrationModal({ integration, onClose, onManage, onToggle }: P
             className="flex-1 rounded-lg px-4 py-2.5 text-xs font-semibold transition"
             style={{ background: 'var(--room-primary)', color: '#1a1400' }}
           >
-            {integration.active ? 'Manage →' : 'Configure →'}
+            {integration.active ? t('manage') : t('configure')}
           </button>
         </div>
         <button
           onClick={onClose}
           className="mt-3 w-full text-center text-[10px] uppercase tracking-wider text-gray-500 hover:text-gray-300"
         >
-          ESC to close
+          {t('escClose')}
         </button>
       </div>
     </div>

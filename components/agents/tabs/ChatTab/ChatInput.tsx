@@ -1,7 +1,8 @@
 'use client';
 
 import { type RefObject, useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 import { Send, Mic, MicOff, MessageSquare, Terminal, Paperclip, X, Loader2, FileText } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { GlassCard } from '../../AgentContext';
@@ -101,6 +102,7 @@ export function ChatInput({
   onAttachFiles,
   onRemoveAttachment,
 }: ChatInputProps) {
+  const t = useTranslations('dashboard.agentDetail.chat');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
 
@@ -183,7 +185,7 @@ export function ChatInput({
     return (
       <GlassCard className="text-center">
         <p className="text-sm text-[var(--text-muted)]">
-          Sign in to chat with this agent.
+          {t('signInToChat')}
         </p>
       </GlassCard>
     );
@@ -193,14 +195,14 @@ export function ChatInput({
     return (
       <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-4 py-3 text-center">
         <p className="text-sm text-amber-400">
-          Daily message limit reached.{' '}
+          {t('limitReached')}{' '}
           <Link
             className="underline hover:opacity-80 transition-opacity text-[var(--color-accent)]"
             href="/dashboard/billing"
           >
-            Upgrade to Pro
+            {t('upgradeToPro')}
           </Link>
-          {' '}for more, or bring your own key for unlimited.
+          {' '}{t('limitReachedSuffix')}
         </p>
       </div>
     );
@@ -212,8 +214,8 @@ export function ChatInput({
     return (
       <div className="bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-lg px-4 py-3 text-center">
         <p className="text-sm text-[var(--text-muted)]">
-          Agent is not running.{' '}
-          <span className="text-[var(--text-secondary)]">Start it from the Overview tab to chat.</span>
+          {t('agentNotRunning')}{' '}
+          <span className="text-[var(--text-secondary)]">{t('startFromOverview')}</span>
         </p>
       </div>
     );
@@ -226,7 +228,7 @@ export function ChatInput({
       {agentStarting && (
         <div className="flex items-center justify-center gap-2 px-3 py-2 mb-2 rounded-xl bg-[var(--color-accent)]/5 border border-[var(--color-accent)]/15">
           <div className="w-3 h-3 rounded-full border-2 border-[var(--color-accent)]/40 border-t-[var(--color-accent)] animate-spin flex-shrink-0" />
-          <span className="text-xs text-[var(--text-muted)]">Agent is starting up, please wait...</span>
+          <span className="text-xs text-[var(--text-muted)]">{t('agentStartingUp')}</span>
         </div>
       )}
       {/* Attachment chip row — renders above the input bar when files
@@ -334,7 +336,7 @@ export function ChatInput({
           ref={inputRef}
           className="flex-1 bg-transparent border-none outline-none resize-none min-h-[36px] max-h-32 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] leading-relaxed"
           rows={1}
-          placeholder={agentStarting ? 'Waiting for agent to start...' : `Message ${agent.name}...`}
+          placeholder={agentStarting ? t('waitingForAgent') : t('messagePlaceholder', { agentName: agent.name })}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleSlashKeyDown}
@@ -372,8 +374,8 @@ export function ChatInput({
           type="button"
           onClick={() => fileInputRef.current?.click()}
           className="h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] border border-transparent hover:border-[var(--text-muted)]/30"
-          title="Attach files — saved to agent's knowledge"
-          aria-label="Attach files"
+          title={t('attachFiles')}
+          aria-label={t('attachFiles')}
           disabled={inputDisabled || uploadingAttachments}
         >
           {uploadingAttachments ? (
@@ -393,8 +395,8 @@ export function ChatInput({
                 ? 'bg-red-500/20 border border-red-500/40 shadow-[0_0_12px_rgba(239,68,68,0.3)] hover:bg-red-500/30'
                 : 'bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] border border-transparent hover:border-[var(--text-muted)]/30'
             }`}
-            title={isListening ? 'Stop recording' : 'Start voice input'}
-            aria-label={isListening ? 'Stop recording' : 'Start voice input'}
+            title={isListening ? t('stopRecording') : t('startVoice')}
+            aria-label={isListening ? t('stopRecording') : t('startVoice')}
             disabled={inputDisabled}
           >
             {isListening ? (
@@ -414,7 +416,7 @@ export function ChatInput({
               : 'bg-[var(--color-accent)]/30 opacity-50 cursor-not-allowed'
           }`}
           onClick={onSendMessage}
-          aria-label="Send message"
+          aria-label={t('sendMessage')}
           disabled={!input.trim() || inputDisabled}
         >
           {sending ? (
@@ -427,7 +429,7 @@ export function ChatInput({
 
       <div className="flex items-center justify-between mt-1.5 px-1">
         <span className="text-[10px] text-[var(--text-muted)]">
-          Powered by {llmProvider}
+          {t('poweredBy', { provider: llmProvider })}
         </span>
         <div className="flex items-center gap-3">
           {isAuthenticated && !hasUnlimitedChat && msgLimit > 0 && (
@@ -440,17 +442,17 @@ export function ChatInput({
                   ? 'text-amber-400'
                   : 'text-red-400'
               }`}>{msgCount}/{msgLimit}</span>
-              today
+              {t('today')}
             </span>
           )}
           {isAuthenticated && hasUnlimitedChat && (
             <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400/70">
               <MessageSquare size={9} />
-              unlimited
+              {t('unlimited')}
             </span>
           )}
           <span className="hidden sm:block text-[10px] text-[var(--text-muted)]">
-            Enter to send, Shift+Enter for new line
+            {t('enterToSend')}
           </span>
         </div>
       </div>

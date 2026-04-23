@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import {
   BarChart,
   Bar,
@@ -429,6 +430,7 @@ function SectionDivider() {
 // ─── Main StatsTab ──────────────────────────────────────────────
 
 export function StatsTab() {
+  const tStats = useTranslations('dashboard.agentDetail.stats');
   const { agent, isActive } = useAgentContext();
   const { user } = useAuth();
 
@@ -918,7 +920,7 @@ export function StatsTab() {
                 className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors disabled:opacity-50"
               >
                 <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
-                Refresh
+                {tStats('refresh')}
               </button>
             </div>
 

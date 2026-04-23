@@ -27,6 +27,8 @@ import {
   Skeleton,
 } from '../AgentContext';
 import { useToast } from '@/components/ui/ToastProvider';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -240,6 +242,7 @@ function ToggleSwitch({
 export function PluginsTab() {
   const { agent, loadAgent } = useAgentContext();
   const { toast } = useToast();
+  const t = useTranslations('dashboard.agentDetail.plugins');
 
   const [installed, setInstalled] = useState<InstalledItem[]>([]);
   const [availableSkills, setAvailableSkills] = useState<AvailableItem[]>([]);
@@ -514,7 +517,7 @@ export function PluginsTab() {
         <button
           onClick={() => { load(); loadBundled(); }}
           className="p-2 rounded-lg hover:bg-white/5 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-          title="Refresh"
+          title={t('refresh')}
         >
           <RefreshCw size={16} />
         </button>
@@ -526,13 +529,13 @@ export function PluginsTab() {
           <AlertTriangle size={16} className="text-amber-400 shrink-0" />
           <p className="text-sm text-[var(--text-secondary)]">
             You've reached the limit of {limits.max} plugin+skill slots for this agent.{' '}
-            <a href="/dashboard/settings/billing" className="text-[var(--color-accent)] hover:underline inline-flex items-center gap-0.5">
+            <Link href="/dashboard/settings/billing" className="text-[var(--color-accent)] hover:underline inline-flex items-center gap-0.5">
               Upgrade tier <ArrowUpRight size={12} />
-            </a>
+            </Link>
             {' '}or buy the{' '}
-            <a href="/dashboard/settings/billing?addon=extra_plugins" className="text-[var(--color-accent)] hover:underline">
+            <Link href="/dashboard/settings/billing?addon=extra_plugins" className="text-[var(--color-accent)] hover:underline">
               +10 plugins addon
-            </a>
+            </Link>
             .
           </p>
         </GlassCard>
@@ -766,7 +769,7 @@ export function PluginsTab() {
                       ) : (
                         <Download size={12} />
                       )}
-                      Install
+                      {t('install')}
                     </button>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
@@ -793,7 +796,7 @@ export function PluginsTab() {
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Star size={14} className="text-amber-400" />
-              <span className="text-xs font-medium text-amber-400 uppercase tracking-wider">Recommended</span>
+              <span className="text-xs font-medium text-amber-400 uppercase tracking-wider">{t('recommended')}</span>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               {recommendedItems.map((item) => (
@@ -814,7 +817,7 @@ export function PluginsTab() {
                       ) : (
                         <Download size={12} />
                       )}
-                      Install
+                      {t('install')}
                     </button>
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
@@ -865,7 +868,7 @@ export function PluginsTab() {
               className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium rounded-lg bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {installing ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
-              Install
+              {t('install')}
             </button>
           </div>
         </GlassCard>

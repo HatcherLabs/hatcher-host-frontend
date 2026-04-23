@@ -3,6 +3,7 @@
 import { type RefObject } from 'react';
 import { motion } from 'framer-motion';
 import { Bot } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { DEFAULT_PROMPTS } from '../../AgentContext';
 import ChatMessage from './ChatMessage';
 import { MESSAGES_WINDOW } from './constants';
@@ -45,6 +46,7 @@ export function MessageList({
   messagesContainerRef,
   bottomRef,
 }: MessageListProps) {
+  const t = useTranslations('dashboard.agentDetail.chat');
   return (
     <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overscroll-contain space-y-4 mb-4 pr-1" style={{ overflowAnchor: 'none' as const }}>
       {messages.length === 0 && (
@@ -58,10 +60,10 @@ export function MessageList({
             <Bot size={32} className="text-[var(--color-accent)]" />
           </div>
           <p className="text-sm mb-1 text-[var(--text-secondary)]">
-            Start a conversation with <span className="font-medium text-[var(--color-accent)]">{agentName}</span>
+            {t('emptyTitle', { agentName })}
           </p>
           <p className="text-xs mb-1 text-[var(--text-muted)]">
-            Responses appear in real time
+            {t('emptySubtitle')}
           </p>
 
           {/* Suggested prompts */}
@@ -88,7 +90,7 @@ export function MessageList({
             onClick={onLoadMore}
             className="text-xs px-3 py-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:border-[var(--text-muted)]/40 transition-all"
           >
-            Load earlier messages ({windowStart} older)
+            {t('loadEarlier', { count: windowStart })}
           </button>
         </div>
       )}

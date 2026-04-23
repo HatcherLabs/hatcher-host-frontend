@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import type { Agent } from '@/lib/api/types';
 
 interface Props {
@@ -13,13 +14,6 @@ interface Section {
   label: string;
   render: () => React.ReactNode;
 }
-
-const FRAMEWORK_MODEL_LABEL: Record<string, string> = {
-  openclaw: 'OpenClaw config',
-  hermes: 'Hermes SOUL',
-  elizaos: 'ElizaOS character',
-  milady: 'Milady config',
-};
 
 function prettyJson(v: unknown): string {
   try {
@@ -35,6 +29,7 @@ function truncated(s: string | undefined, max = 220): string {
 }
 
 export function MemoryPanel({ config, framework, onOpen }: Props) {
+  const t = useTranslations('agentRoom.memory');
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -74,7 +69,7 @@ export function MemoryPanel({ config, framework, onOpen }: Props) {
   const sections: Section[] = [
     {
       key: 'persona',
-      label: 'Persona / System Prompt',
+      label: t('sectionPersona'),
       render: () => (
         <div className="rounded-lg border border-white/5 bg-black/30 p-3 text-[12px] leading-relaxed text-gray-200">
           {systemPrompt ? (
@@ -82,26 +77,26 @@ export function MemoryPanel({ config, framework, onOpen }: Props) {
               {truncated(systemPrompt, 800)}
             </pre>
           ) : (
-            <span className="text-gray-500 italic">No system prompt set.</span>
+            <span className="text-gray-500 italic">{t('noPrompt')}</span>
           )}
         </div>
       ),
     },
     {
       key: 'model',
-      label: 'Model & Runtime',
+      label: t('sectionModel'),
       render: () => (
         <div className="space-y-1.5 text-[11px]">
-          <Row k="Provider" v={provider} />
-          <Row k="Model" v={model} />
-          <Row k="Session scope" v={sessionScope} />
-          <Row k="Framework" v={framework} />
+          <Row k={t('rowProvider')} v={provider} />
+          <Row k={t('rowModel')} v={model} />
+          <Row k={t('rowSessionScope')} v={sessionScope} />
+          <Row k={t('rowFramework')} v={framework} />
         </div>
       ),
     },
     {
       key: 'skills',
-      label: `Skills (${skills.length})`,
+      label: t('sectionSkills', { count: skills.length }),
       render: () =>
         skills.length ? (
           <div className="flex flex-wrap gap-1.5">
@@ -120,12 +115,12 @@ export function MemoryPanel({ config, framework, onOpen }: Props) {
             ))}
           </div>
         ) : (
-          <span className="text-[11px] text-gray-500 italic">No skills configured.</span>
+          <span className="text-[11px] text-gray-500 italic">{t('noSkills')}</span>
         ),
     },
     {
       key: 'platforms',
-      label: `Integrations (${platforms.length})`,
+      label: t('sectionIntegrations', { count: platforms.length }),
       render: () =>
         platforms.length ? (
           <div className="flex flex-wrap gap-1.5">
@@ -139,12 +134,12 @@ export function MemoryPanel({ config, framework, onOpen }: Props) {
             ))}
           </div>
         ) : (
-          <span className="text-[11px] text-gray-500 italic">No integrations wired.</span>
+          <span className="text-[11px] text-gray-500 italic">{t('noIntegrations')}</span>
         ),
     },
     {
       key: 'raw',
-      label: 'Raw config (JSON)',
+      label: t('sectionRaw'),
       render: () => (
         <pre className="max-h-60 overflow-auto rounded-lg border border-white/5 bg-black/40 p-3 font-mono text-[10px] leading-relaxed text-gray-400">
           {prettyJson(c)}
@@ -152,6 +147,13 @@ export function MemoryPanel({ config, framework, onOpen }: Props) {
       ),
     },
   ];
+
+  const fwLabelKey = (['openclaw', 'hermes', 'elizaos', 'milady'].includes(framework) ? framework : 'default') as
+    | 'openclaw'
+    | 'hermes'
+    | 'elizaos'
+    | 'milady'
+    | 'default';
 
   return (
     <>
@@ -163,10 +165,10 @@ export function MemoryPanel({ config, framework, onOpen }: Props) {
           borderColor: 'var(--room-border)',
           color: 'var(--room-bright)',
         }}
-        title="View agent memory & config"
+        title={t('title')}
       >
         <span aria-hidden>📜</span>
-        <span>Memory</span>
+        <span>{t('button')}</span>
       </button>
       {open && (
         <div
@@ -188,10 +190,10 @@ export function MemoryPanel({ config, framework, onOpen }: Props) {
                   className="text-[10px] uppercase tracking-[3px]"
                   style={{ color: 'var(--room-primary)' }}
                 >
-                  {FRAMEWORK_MODEL_LABEL[framework] ?? 'Agent Memory'}
+                  {t(`frameworkLabel.${fwLabelKey}`)}
                 </div>
                 <div className="mt-1 text-base font-bold text-gray-100">
-                  What your agent knows
+                  {t('whatKnows')}
                 </div>
               </div>
               <button
@@ -214,8 +216,7 @@ export function MemoryPanel({ config, framework, onOpen }: Props) {
                 </div>
               ))}
               <div className="rounded-lg border border-white/5 bg-white/[0.02] p-3 text-[10px] text-gray-400">
-                Memory editing is coming soon. For now, manage your agent&apos;s
-                config from the dashboard.
+                {t('editingComingSoon')}
               </div>
             </div>
           </div>

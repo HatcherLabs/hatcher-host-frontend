@@ -1,0 +1,2658 @@
+{
+  "common": {
+    "appName": "Hatcher",
+    "tagline": "Managed AI agent hosting · Crypto-native"
+  },
+  "nav": {
+    "pricing": "Pricing",
+    "docs": "Docs",
+    "roadmap": "Roadmap",
+    "login": "Log in",
+    "signup": "Sign up",
+    "frameworks": "Frameworks",
+    "token": "Token",
+    "blog": "Blog",
+    "changelog": "Changelog",
+    "help": "Help",
+    "dashboard": "Dashboard",
+    "myAgents": "My Agents",
+    "create": "Create",
+    "city": "City",
+    "analytics": "Analytics",
+    "team": "Team",
+    "billing": "Billing",
+    "settings": "Settings",
+    "support": "Support",
+    "logout": "Sign Out",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "credits": "credits",
+    "affiliate": "Affiliate",
+    "admin": "Admin",
+    "adminPanel": "Admin Panel",
+    "openNav": "Open navigation menu",
+    "closeNav": "Close navigation menu",
+    "affiliateDashboard": "Affiliate Dashboard",
+    "affiliatePending": "Application under review",
+    "affiliateRejected": "Reapply as affiliate",
+    "affiliateBecome": "Become an affiliate"
+  },
+  "notifications": {
+    "heading": "Notifications",
+    "empty": "No notifications",
+    "markRead": "Mark read",
+    "markReadAriaLabel": "Mark all notifications as read",
+    "clear": "Clear",
+    "clearAriaLabel": "Clear all notifications",
+    "unreadAriaLabel": "Notifications, {count} unread",
+    "allReadAriaLabel": "Notifications"
+  },
+  "footer": {
+    "columns": {
+      "product": "Product",
+      "resources": "Resources",
+      "community": "Community"
+    },
+    "links": {
+      "createAgent": "Create Agent",
+      "dashboard": "Dashboard",
+      "pricing": "Pricing",
+      "affiliate": "Affiliate",
+      "status": "Status",
+      "documentation": "Documentation",
+      "support": "Support",
+      "blog": "Blog",
+      "changelog": "Changelog",
+      "roadmap": "Roadmap",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "cookies": "Cookies",
+      "impressum": "Impressum",
+      "docs": "Docs"
+    },
+    "copyright": "© {year} HatcherLabs. All rights reserved.",
+    "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România",
+    "legalNotice": "Legal pages (Privacy, Terms, Impressum, Cookies) are available in English only."
+  },
+  "landing": {
+    "affiliateBanner": {
+      "live": "Affiliate Program is live",
+      "earn": " — earn up to ",
+      "pct": "40%",
+      "perReferral": " on every referral",
+      "dismissAriaLabel": "Dismiss affiliate banner"
+    },
+    "tokenBanner": {
+      "learnMore": "Learn more →"
+    },
+    "hero": {
+      "eyebrow": "Managed AI agent hosting · Crypto-native",
+      "headlinePrefix": "Hatch Your",
+      "typewriterWords": [
+        "AI Agent",
+        "Fitness Coach",
+        "Crypto Tracker",
+        "Study Buddy",
+        "Travel Planner",
+        "Personal Assistant"
+      ],
+      "body": "Pick a framework. Configure. Launch in 60 seconds. No code required, no infrastructure to manage. 4 frameworks, 20+ platforms, free tier with BYOK.",
+      "ctaPrimary": "Get started free",
+      "ctaSecondary": "Read docs",
+      "agentPreviewOnline": "CryptoHelper — Online"
+    },
+    "stats": {
+      "users": "Users",
+      "agents": "Agents",
+      "activeNow": "Active now"
+    },
+    "agentDiscovery": {
+      "eyebrow": "For AI Agents",
+      "heading": "Command an army of subagents",
+      "body": "Your local coding agent becomes a fleet commander. Paste this prompt — it registers on Hatcher in your name, spins up always-on subagents (Telegram bots, research loops, Discord mods, monitors), and keeps controlling them long after your session ends.",
+      "promptLabel": "Prompt",
+      "copyLabel": "Copy",
+      "copiedLabel": "Copied",
+      "copyAriaLabel": "Copy prompt",
+      "copiedAriaLabel": "Copied",
+      "step01": "Send this prompt to your AI coding agent — Claude Code, Cursor, OpenClaw, Hermes, or any agent that can fetch URLs and run shell commands.",
+      "step02": "Agent registers an account with your email and sends you a verification link.",
+      "step03": "Click verify. Your agent picks a template, deploys, and hands you a running AI.",
+      "viewSkillMd": "View skill.md",
+      "githubSource": "GitHub source"
+    },
+    "howItWorks": {
+      "eyebrow": "How it works",
+      "heading": "3 steps. 60 seconds.",
+      "subheading": "No coding, no setup guides, no configuration files.",
+      "steps": [
+        {
+          "num": "01",
+          "title": "Pick a framework",
+          "desc": "OpenClaw, Hermes, ElizaOS, or Milady. Each has unique strengths — browser control, memory, multi-agent, on-chain."
+        },
+        {
+          "num": "02",
+          "title": "Configure",
+          "desc": "Name, personality, integrations. Fill a simple form — no config files, no YAML."
+        },
+        {
+          "num": "03",
+          "title": "Deploy",
+          "desc": "One click. Your agent is live on every connected platform in under 60 seconds."
+        }
+      ],
+      "cta": "Try it now"
+    },
+    "useCases": {
+      "eyebrow": "Use cases",
+      "heading": "What will you hatch?",
+      "subheading": "From personal productivity to business automation — your agent, your rules.",
+      "items": [
+        {
+          "title": "Personal assistant",
+          "desc": "Calendar, emails, reminders — from Telegram."
+        },
+        {
+          "title": "Fitness coach",
+          "desc": "Workouts, routines, daily accountability."
+        },
+        {
+          "title": "Food & nutrition",
+          "desc": "Log meals, count calories, recipe suggestions."
+        },
+        {
+          "title": "Crypto tracker",
+          "desc": "Token prices, portfolio alerts, on-chain data."
+        },
+        {
+          "title": "Study buddy",
+          "desc": "Quiz you, summarize textbooks, help with homework."
+        },
+        {
+          "title": "Travel planner",
+          "desc": "Find flights, plan itineraries, local picks."
+        },
+        {
+          "title": "Budget manager",
+          "desc": "Track expenses, savings goals, weekly reports."
+        },
+        {
+          "title": "Research assistant",
+          "desc": "Web search, summarize articles, compile reports."
+        },
+        {
+          "title": "Customer support",
+          "desc": "Answer FAQs on Discord or WhatsApp, 24/7."
+        }
+      ],
+      "footer": "And anything else you can describe in plain English."
+    },
+    "frameworks": {
+      "eyebrow": "Frameworks",
+      "heading": "Four frameworks. One platform.",
+      "subheading": "Pick the one that fits your agent. Switch whenever you want.",
+      "items": [
+        {
+          "name": "OpenClaw",
+          "tag": "all-rounder",
+          "desc": "Powerful tools, plugins, and browser control.",
+          "features": "2500+ skills · Browser automation · File management"
+        },
+        {
+          "name": "Hermes",
+          "tag": "reasoning",
+          "desc": "Smart-first design for rich memory and reasoning.",
+          "features": "77 bundled skills · Deep memory · Multi-model"
+        },
+        {
+          "name": "ElizaOS",
+          "tag": "multi-agent",
+          "desc": "Multi-agent coordination with 90+ plugins.",
+          "features": "90+ plugins · Multi-agent · Knowledge base"
+        },
+        {
+          "name": "Milady",
+          "tag": "crypto-native",
+          "desc": "On-chain awareness, DeFi tools, token tracking.",
+          "features": "DeFi tools · On-chain data · Token tracking"
+        }
+      ]
+    },
+    "city": {
+      "eyebrow": "★ NEW",
+      "heading": "See every agent in Hatcher City.",
+      "body": "A live 3D city where every public agent is a building. Districts by category, colors by framework, gold beams mark yours. Drag, zoom, click any building to open it.",
+      "videoAriaLabel": "Open Hatcher City",
+      "label": "HATCHER CITY",
+      "exploreCta": "Explore the full fleet →",
+      "enterCta": "Enter city"
+    },
+    "features": {
+      "eyebrow": "Platform",
+      "heading": "Everything your agent needs",
+      "items": [
+        {
+          "title": "Instant deploy",
+          "desc": "From zero to running agent in under 60 seconds."
+        },
+        {
+          "title": "All platforms",
+          "desc": "Telegram, Discord, Twitter, WhatsApp, Slack."
+        },
+        {
+          "title": "Bring your own key",
+          "desc": "Use your own LLM API key for unlimited messages on any tier."
+        },
+        {
+          "title": "Secure by default",
+          "desc": "Isolated containers, encrypted secrets, no shared data."
+        },
+        {
+          "title": "Live analytics",
+          "desc": "Real-time stats, usage tracking, performance metrics."
+        },
+        {
+          "title": "Chat & voice",
+          "desc": "Text chat, voice calls, real-time streaming — out of the box."
+        }
+      ]
+    },
+    "pricing": {
+      "eyebrow": "Pricing",
+      "heading": "Start free, grow when ready",
+      "subheading": "All platforms included on every plan. Bring your own AI key for unlimited messages on any tier.",
+      "popularLabel": "Popular",
+      "tiers": [
+        {
+          "name": "Free",
+          "price": "$0",
+          "sub": "/month",
+          "features": [
+            "1 AI agent",
+            "20 messages/day",
+            "All platforms",
+            "Free AI included"
+          ],
+          "cta": "Get started"
+        },
+        {
+          "name": "Starter",
+          "price": "$6.99",
+          "sub": "/month",
+          "features": [
+            "1 AI agent",
+            "50 messages/day",
+            "BYOK = unlimited",
+            "Longer active time"
+          ],
+          "cta": "Choose Starter"
+        },
+        {
+          "name": "Pro",
+          "price": "$19.99",
+          "sub": "/month",
+          "features": [
+            "3 AI agents",
+            "100 messages/day",
+            "BYOK = unlimited",
+            "Dedicated resources"
+          ],
+          "cta": "Choose Pro"
+        },
+        {
+          "name": "Business",
+          "price": "$49.99",
+          "sub": "/month",
+          "features": [
+            "10 AI agents",
+            "300 messages/day",
+            "Always-on containers",
+            "Priority support"
+          ],
+          "cta": "Choose Business"
+        }
+      ],
+      "addonsNote": "Need more agents, messages, or storage? Add stackable packs — all tiers get add-on flexibility.",
+      "addonsCta": "See full pricing →"
+    },
+    "founding": {
+      "eyebrow": "Limited offer · Founding member",
+      "heading": "Pay once, keep forever.",
+      "oneTime": "one-time",
+      "subheading": "Locked-in price, no monthly fees, all Business-tier features forever. Only 20 spots.",
+      "availableSpotsLabel": "Available spots",
+      "checking": "Checking…",
+      "soldOut": "Sold out",
+      "spotsLeft": "{remaining} of {max} left",
+      "loadingAvailability": "Loading availability…",
+      "allTaken": "All {max} founding spots are taken. Standard tiers still available.",
+      "claimed": "{claimed} of {max} claimed · once they're gone, this offer is gone.",
+      "includedHeading": "Everything included, forever",
+      "includedItems": [
+        "10 agents included",
+        "Always-on (no sleep)",
+        "300 messages/day per account",
+        "200 web searches/day",
+        "2 CPU · 4 GB RAM per agent",
+        "2 GB workspace per agent",
+        "File Manager + Full Logs",
+        "Team collaboration + priority support",
+        "Founding badge",
+        "Locked-in price forever"
+      ],
+      "ctaSoldOut": "Sold out",
+      "ctaClaim": "Claim your spot"
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "heading": "Common questions",
+      "items": [
+        {
+          "q": "Is it really free?",
+          "a": "Yes. The free plan gives you 1 agent, 20 messages per day, and access to all platforms. No credit card required. BYOK (bring your own LLM key) = unlimited messages on any tier."
+        },
+        {
+          "q": "Do I need to know how to code?",
+          "a": "Not at all! Creating an agent is like filling out a form — choose a name, describe what you want it to do, pick platforms, and launch."
+        },
+        {
+          "q": "What is \"Bring Your Own Key\"?",
+          "a": "Connect your own OpenAI, Anthropic, Google, or Groq key for unlimited messages. You only pay your AI provider directly."
+        },
+        {
+          "q": "Where does my agent run?",
+          "a": "On our cloud servers 24/7. No need to keep your computer on or install anything."
+        }
+      ]
+    },
+    "finalCta": {
+      "heading": "Ready to deploy your first agent?",
+      "body": "Free tier includes 1 agent with 20 messages/day. BYOK = unlimited. No credit card required.",
+      "ctaPrimary": "Create your agent",
+      "ctaSecondary": "See pricing",
+      "trustNoCreditCard": "No credit card",
+      "trustFreeAi": "Free AI included",
+      "trustDeploy60s": "Deploy in 60s",
+      "trustAllPlatforms": "All platforms"
+    }
+  },
+  "auth": {
+    "login": {
+      "heading": "Welcome back",
+      "subheading": "Sign in to your Hatcher account",
+      "panelTagline": "Hatcher",
+      "panelHeadlinePrefix": "Hatch your",
+      "panelHeadlineAccent": "AI agent.",
+      "panelBody": "Pick a framework. Configure. Launch in 60 seconds. No code, no infrastructure.",
+      "statsUsers": "Users",
+      "statsAgents": "Agents",
+      "statsOnline": "Online now",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "forgotLink": "Forgot password?",
+      "submit": "Sign In",
+      "submitLoading": "Signing in...",
+      "registerPrompt": "Don't have an account?",
+      "registerLink": "Sign Up"
+    },
+    "register": {
+      "heading": "Create account",
+      "subheading": "Get started with Hatcher",
+      "panelTagline": "Hatcher",
+      "panelHeadlinePrefix": "Hatch your",
+      "panelHeadlineAccent": "AI agent.",
+      "panelBody": "Free tier with BYOK = unlimited messages. No credit card required.",
+      "statsUsers": "Users",
+      "statsAgents": "Agents",
+      "statsOnline": "Online now",
+      "referralBadge": "Referred by {referrer} — you both get {credit} credit!",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "emailTaken": "Already registered.",
+      "emailTakenLink": "Sign in instead",
+      "emailInvalid": "Enter a valid email address.",
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "cooluser123",
+      "usernameTaken": "This username is already taken. Pick another.",
+      "usernameInvalid": "3–30 letters, numbers, hyphens or underscores.",
+      "usernameHint": "Letters, numbers, hyphens and underscores only",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter a strong password",
+      "passwordHint": "Must include: 8+ characters, uppercase, lowercase, and a number",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Repeat your password",
+      "strengthLabels": {
+        "veryWeak": "Very weak",
+        "weak": "Weak",
+        "fair": "Fair",
+        "strong": "Strong",
+        "veryStrong": "Very strong"
+      },
+      "strengthChecks": {
+        "length": "8+ characters",
+        "lowercase": "Lowercase letter",
+        "uppercase": "Uppercase letter",
+        "number": "Number",
+        "special": "Special character"
+      },
+      "submit": "Create Account",
+      "submitLoading": "Creating account...",
+      "loginPrompt": "Already have an account?",
+      "loginLink": "Sign In",
+      "errors": {
+        "emailTaken": "This email is already registered. Try signing in instead.",
+        "usernameTaken": "This username is already taken. Pick a different one.",
+        "passwordMismatch": "Passwords do not match",
+        "passwordTooShort": "Password must be at least 8 characters",
+        "passwordComplexity": "Password must contain uppercase, lowercase, and a number"
+      }
+    },
+    "forgotPassword": {
+      "heading": "Forgot password?",
+      "subheading": "Enter your email and we'll send you a reset link",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Send Reset Link",
+      "submitLoading": "Sending...",
+      "backToLogin": "Back to sign in",
+      "successHeading": "Check your email",
+      "successBody": "If an account exists for <bold>{email}</bold>, we sent a password reset link. Check your inbox and spam folder.",
+      "successBackLink": "Back to sign in",
+      "genericError": "Something went wrong. Please try again."
+    },
+    "resetPassword": {
+      "heading": "Set new password",
+      "subheading": "Enter your new password below",
+      "newPasswordLabel": "New Password",
+      "newPasswordPlaceholder": "At least 8 characters",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Repeat your password",
+      "passwordMismatch": "Passwords do not match",
+      "submit": "Reset Password",
+      "submitLoading": "Resetting...",
+      "backToLogin": "Back to sign in",
+      "successHeading": "Password Reset",
+      "successBody": "Your password has been updated. You can now sign in with your new password.",
+      "successCta": "Sign In",
+      "invalidHeading": "Invalid Reset Link",
+      "invalidBody": "This reset link is missing or invalid. Please request a new one.",
+      "invalidCta": "Request new reset link",
+      "genericError": "Reset failed. The link may have expired."
+    },
+    "verifyEmail": {
+      "loadingHeading": "Verifying your email...",
+      "successHeading": "Email Verified!",
+      "successBody": "Your account is now active. You can start creating agents.",
+      "successCta": "Go to Dashboard",
+      "errorHeading": "Verification Failed",
+      "errorBody": "The verification link is invalid or has expired.",
+      "errorCta": "Go to Login",
+      "noTokenHeading": "Check Your Email",
+      "noTokenBody": "We sent a verification link to your email. Click the link to activate your account.",
+      "noTokenHint": "Didn't receive it? Check your spam folder or try logging in to resend."
+    }
+  },
+  "pricing": {
+    "eyebrow": "Pricing",
+    "heading": "Choose your plan",
+    "subheading": "Start free with any framework. Scale when ready. All integrations included on every tier. BYOK always unlimited.",
+    "billingToggle": {
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "annualDiscount": "−15%"
+    },
+    "tierBadges": {
+      "popular": "Popular",
+      "limited": "Limited"
+    },
+    "priceUnit": {
+      "perMonth": "/mo",
+      "once": " once"
+    },
+    "annualSavings": "${annualTotal}/year · save ${saved}",
+    "switchToAnnual": "Switch to annual, save 15%",
+    "payOnce": "Pay once, keep forever",
+    "availability": "Availability",
+    "availabilityLoading": "Loading",
+    "soldOut": "Sold out",
+    "slotsLeft": "{remaining} of {max} left",
+    "tierCta": {
+      "free": "Get started",
+      "paid": "Choose {tierName}"
+    },
+    "tiers": {
+      "free": {
+        "agents": "1 agent included",
+        "messages": "20 messages/day",
+        "cpu": "0.5 CPU",
+        "ram": "1 GB RAM",
+        "storage": "50 MB workspace",
+        "sleep": "Auto-sleep after 1h idle",
+        "features": [
+          "Llama 4 Scout on Groq",
+          "BYOK = unlimited messages",
+          "3 web searches/day",
+          "All integrations (Telegram, Discord, Twitter, etc)"
+        ],
+        "missing": [
+          "Logs, File Manager available as add-ons"
+        ]
+      },
+      "starter": {
+        "agents": "1 agent included",
+        "messages": "50 messages/day",
+        "cpu": "1 CPU",
+        "ram": "1.5 GB RAM",
+        "storage": "150 MB workspace",
+        "sleep": "Auto-sleep after 4h idle",
+        "features": [
+          "BYOK = unlimited messages",
+          "10 web searches/day",
+          "All integrations"
+        ],
+        "missing": [
+          "Logs, File Manager available as add-ons"
+        ]
+      },
+      "pro": {
+        "agents": "3 agents included",
+        "messages": "100 messages/day",
+        "cpu": "1.5 CPU",
+        "ram": "2 GB RAM",
+        "storage": "500 MB workspace",
+        "sleep": "Auto-sleep after 12h idle",
+        "features": [
+          "BYOK = unlimited messages",
+          "50 web searches/day",
+          "All integrations",
+          "Buy Always On per agent for 24/7"
+        ],
+        "missing": [
+          "Logs, File Manager available as add-ons"
+        ]
+      },
+      "business": {
+        "agents": "10 agents included",
+        "messages": "300 messages/day",
+        "cpu": "2 CPU",
+        "ram": "3 GB RAM",
+        "storage": "1 GB workspace",
+        "sleep": "Always-on (no auto-sleep)",
+        "features": [
+          "BYOK = unlimited messages",
+          "200 web searches/day",
+          "File Manager included",
+          "Full logs included",
+          "Priority support",
+          "Team collaboration",
+          "All integrations"
+        ],
+        "missing": []
+      },
+      "founding_member": {
+        "agents": "10 agents included",
+        "messages": "300 messages/day",
+        "cpu": "2 CPU",
+        "ram": "4 GB RAM",
+        "storage": "2 GB workspace",
+        "sleep": "Always-on (no auto-sleep)",
+        "features": [
+          "$99 one-time — lifetime access",
+          "200 web searches/day",
+          "File Manager + Full Logs included",
+          "Priority support",
+          "Team collaboration",
+          "All integrations",
+          "Founding badge"
+        ],
+        "missing": []
+      }
+    },
+    "addons": {
+      "heading": "Add-ons",
+      "subheading": "Customize your plan. Stack add-ons on any tier. Mix and match as needed.",
+      "annualDiscount": "15% off annual",
+      "groups": {
+        "extraAgents": {
+          "label": "Extra Agents",
+          "items": [
+            {
+              "name": "+1 Agent",
+              "period": "/mo",
+              "description": "1 extra slot"
+            },
+            {
+              "name": "+3 Agents",
+              "period": "/mo",
+              "description": "3 extra slots"
+            },
+            {
+              "name": "+5 Agents",
+              "period": "/mo",
+              "description": "5 extra slots"
+            },
+            {
+              "name": "+10 Agents",
+              "period": "/mo",
+              "description": "10 extra slots"
+            }
+          ]
+        },
+        "extraMessages": {
+          "label": "Extra Messages (account)",
+          "items": [
+            {
+              "name": "+20 msg/day",
+              "period": "/mo",
+              "description": "Stackable"
+            },
+            {
+              "name": "+50 msg/day",
+              "period": "/mo",
+              "description": "Stackable"
+            },
+            {
+              "name": "+100 msg/day",
+              "period": "/mo",
+              "description": "Stackable"
+            },
+            {
+              "name": "+200 msg/day",
+              "period": "/mo",
+              "description": "Stackable"
+            }
+          ]
+        },
+        "extraSearches": {
+          "label": "Extra Searches (account)",
+          "items": [
+            {
+              "name": "+25 searches/day",
+              "period": "/mo",
+              "description": "Stackable"
+            },
+            {
+              "name": "+50 searches/day",
+              "period": "/mo",
+              "description": "Stackable"
+            }
+          ]
+        },
+        "perAgent": {
+          "label": "Per-Agent",
+          "items": [
+            {
+              "name": "Always On",
+              "period": "/mo per agent",
+              "description": "Keep running 24/7"
+            },
+            {
+              "name": "File Manager",
+              "period": "one-time per agent",
+              "description": "Browse & edit files"
+            },
+            {
+              "name": "Full Logs",
+              "period": "/mo per agent",
+              "description": "Unlock log viewer"
+            },
+            {
+              "name": "+10 Plugins",
+              "period": "/mo per agent",
+              "description": "Stack extra plugin slots"
+            }
+          ]
+        }
+      }
+    },
+    "integrations": {
+      "heading": "All Integrations Free",
+      "badge": "every tier",
+      "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage, and 14+ more platforms are included free on all tiers. No extra charge, ever.",
+      "note": "All prices in USD, payable in SOL or $HATCHER. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier."
+    },
+    "compareTable": {
+      "heading": "Compare Plans",
+      "subheading": "See what each tier includes at a glance",
+      "featureColumn": "Feature",
+      "onceSuffix": " once",
+      "rows": {
+        "agents": "Agents included",
+        "messages": "Messages/day (account)",
+        "searches": "Web searches/day",
+        "byok": "BYOK messages",
+        "cpuRam": "CPU / RAM",
+        "storage": "Storage",
+        "autoSleep": "Auto-sleep",
+        "fileManager": "File Manager",
+        "fullLogs": "Full Logs",
+        "teamCollab": "Team collaboration",
+        "prioritySupport": "Priority support",
+        "plugins": "Plugins + Skills",
+        "integrations": "All integrations",
+        "byokKey": "BYOK (own LLM key)",
+        "defaultLlm": "Default LLM (Groq)"
+      },
+      "values": {
+        "unlimited": "Unlimited",
+        "alwaysOn": "Always-on",
+        "addon": "Add-on",
+        "llama4Scout": "Llama 4 Scout"
+      }
+    },
+    "faq": {
+      "heading": "Frequently Asked Questions",
+      "items": [
+        {
+          "q": "What is BYOK (Bring Your Own Key)?",
+          "a": "BYOK lets you use your own API key for any LLM provider (OpenAI, Anthropic, Google, xAI, Groq, OpenRouter). This is always free on all tiers -- you pay the provider directly, no Hatcher markup. Messages with your own key are unlimited."
+        },
+        {
+          "q": "How do add-ons work?",
+          "a": "Add-ons are stackable on any tier. For example, if you are on the Starter tier (1 agent) and purchase a +3 Agents add-on, you can run 4 agents total. You can stack multiple add-ons."
+        },
+        {
+          "q": "What is the difference between shared and dedicated resources?",
+          "a": "Shared resources mean your agent shares CPU and RAM with others on the same server -- still performant but may vary under load. Dedicated resources (Pro and Business) give your agent guaranteed CPU and RAM that no one else can use."
+        },
+        {
+          "q": "What payment methods are accepted?",
+          "a": "You can pay with SOL or $HATCHER. Prices are listed in USD and converted at live rates via Jupiter."
+        },
+        {
+          "q": "Can I downgrade my tier?",
+          "a": "Yes. You can cancel your subscription at any time and your tier will revert to Free at the end of the billing period. Agents beyond your free limit will be paused."
+        },
+        {
+          "q": "What is auto-sleep?",
+          "a": "Free agents sleep after 1 hour of inactivity, Starter after 4 hours, Pro after 12 hours. Business and Founding Member agents are always-on with no auto-sleep. They wake instantly on the next message. You can add Always On to any agent for $7.99/mo."
+        },
+        {
+          "q": "What LLM do I get with the free tier?",
+          "a": "Free and Starter tiers use GPT-OSS 20B on Groq. Pro, Business, and Founding Member tiers get Llama 3.3 70B on Groq — a more capable model. Message limits are account-wide: Free 20/day, Starter 50/day, Pro 100/day, Business 300/day, Founding 300/day. BYOK (bring your own LLM key) bypasses all limits on any tier."
+        },
+        {
+          "q": "What is the Founding Member tier?",
+          "a": "Founding Member is a one-time $99 payment that gives you lifetime access to Hatcher: 10 agents, 300 messages/day, 4 GB RAM, 2 GB workspace, always-on, and all premium features (File Manager, Full Logs, priority support) included. No monthly fees, ever. Limited to 20 spots — once they are gone, this tier is gone."
+        }
+      ]
+    },
+    "help": {
+      "text": "Need help choosing a plan?",
+      "emailLabel": "Email us",
+      "discordLabel": "Discord",
+      "telegramLabel": "Telegram"
+    },
+    "cta": {
+      "heading": "Ready to deploy your agent?",
+      "body": "Pick your framework, choose a template, and deploy in seconds. Start free with a built-in LLM. Upgrade when you need more power.",
+      "createAgent": "Create Agent",
+      "seeFrameworks": "See Frameworks"
+    },
+    "footerNote": "All prices in USD, payable in SOL or $HATCHER. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier."
+  },
+  "dashboard": {
+    "common": {
+      "loading": "Loading...",
+      "authenticating": "Authenticating...",
+      "signInRequired": "Sign In Required",
+      "signIn": "Sign In",
+      "refresh": "Refresh",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "create": "Create",
+      "invite": "Invite",
+      "share": "Share",
+      "unshare": "Unshare",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "close": "Close",
+      "confirm": "Confirm",
+      "back": "Back",
+      "noDescription": "No description",
+      "clear": "Clear"
+    },
+    "agents": {
+      "eyebrow": "Dashboard",
+      "heading": "My agents",
+      "subtitleEmpty": "Create your first agent to get started.",
+      "createCta": "Create agent",
+      "searchPlaceholder": "Search agents... ( / )",
+      "filterAll": "All",
+      "frameworkAll": "All Frameworks",
+      "sortNewest": "Newest",
+      "sortAZ": "A-Z",
+      "sortMessages": "Most Messages",
+      "sortActive": "Last Active",
+      "emptyTitle": "No agents yet",
+      "emptyDescription": "Create your first AI agent and deploy it in 60 seconds.",
+      "emptyActionLabel": "Create Agent",
+      "emptySecondaryLabel": "See Frameworks",
+      "noMatchTitle": "No matching agents",
+      "noMatchDescription": "Try adjusting your search or filter criteria.",
+      "signInDescription": "Sign in to your account to access your agents.",
+      "featuresCount": "{count} feature",
+      "featuresCountPlural": "{count} features",
+      "agentsCount": "{count} agent total · {active} active",
+      "agentsCountPlural": "{count} agents total · {active} active",
+      "details": "Details",
+      "tourCreateTitle": "Create Your First Agent",
+      "tourCreateDescription": "Click here to hatch your first AI agent. Choose from 4 frameworks.",
+      "tourFilterTitle": "Filter by Framework",
+      "tourFilterDescription": "OpenClaw, Hermes, ElizaOS, or Milady — each has unique strengths.",
+      "tourSearchTitle": "Search & Explore",
+      "tourSearchDescription": "Search agents or browse 200+ templates to get started quickly.",
+      "tourPlanTitle": "Your Plan",
+      "tourPlanDescription": "Start free with 1 agent and 20 messages/day. Upgrade anytime."
+    },
+    "newAgent": {
+      "eyebrow": "New agent",
+      "heading": "Choose a template",
+      "subheading": "Start from a pre-configured template or build from scratch. Each template comes with a personality, system prompt, and suggested integrations.",
+      "searchPlaceholder": "Search templates...",
+      "allTemplates": "All Templates",
+      "startFromScratch": "Start from Scratch",
+      "startFromScratchDesc": "Full control over every setting",
+      "noTemplatesTitle": "No templates found",
+      "noTemplatesDesc": "Try a different search or category.",
+      "footerHint": "All templates are fully customizable after deployment — change the name, system prompt, model, and integrations at any time."
+    },
+    "billing": {
+      "eyebrow": "Account",
+      "heading": "Billing & plans",
+      "breadcrumbDashboard": "Dashboard",
+      "breadcrumbBilling": "Billing",
+      "connectWallet": "Connect Wallet",
+      "connectedWallet": "Connected wallet",
+      "switchWallet": "Switch wallet",
+      "disconnect": "Disconnect",
+      "loadingBilling": "Loading billing...",
+      "signInDescription": "Sign in to manage your plan and billing.",
+      "creditsBalance": "Credits Balance",
+      "creditsUsd": "USD",
+      "creditsDesc": "Credits can be used for subscriptions, add-ons, and hosted LLM usage.",
+      "recentTransactions": "Recent Transactions",
+      "currentTier": "Current Plan",
+      "freeTier": "Free Tier",
+      "active": "Active",
+      "agentUsage": "Agent Usage",
+      "agentsOf": "{count} of {limit} agents used",
+      "agentsOver": "{over} over limit",
+      "slotsRemaining": "{slots} slot remaining",
+      "slotsRemainingPlural": "{slots} slots remaining",
+      "activeAddons": "Active Add-ons",
+      "expires": "Expires {date}",
+      "extend": "Extend",
+      "extend30Days": "Extend +30 days (${price})",
+      "upgradeAnnual": "Upgrade to annual (${price})",
+      "annualDiscount": "-15%",
+      "renew": "Renew",
+      "renewFor": "Renew for ${price}",
+      "planExpired": "Plan expired — renew to keep your tier",
+      "planExpiring": "Expires in {days} day — renew now",
+      "planExpiringPlural": "Expires in {days} days — renew now",
+      "planActiveUntil": "Active until {date}",
+      "noCharge": "No charge",
+      "lifetimePrice": "lifetime",
+      "lifetimePriceFull": "${price} lifetime",
+      "monthlyPrice": "${price} / 30 days",
+      "unlimitedMessages": "unlimited",
+      "messagesPerDay": "{count} messages/day",
+      "byokUnlimited": " (BYOK = unlimited)",
+      "upgradeSection": "Upgrade Your Plan",
+      "upgradeDesc": "Get more agents, messages, and compute power.",
+      "addonsSection": "Add-ons",
+      "addonsDesc": "Stack extra capacity on your current plan.",
+      "accountAddons": "Account-level Add-ons",
+      "perAgentAddons": "Per-agent Add-ons",
+      "annualBilling": "Annual billing",
+      "annualBillingDesc": "15% off — all subscription add-ons",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "monthSuffix": "/ 30 days",
+      "annualSuffix": "/ year",
+      "yearSuffix": "/ year",
+      "paymentHistory": "Payment History",
+      "noPaymentsYet": "No payments yet",
+      "noPaymentsDesc": "Your payment history will appear here.",
+      "status": {
+        "confirmed": "Confirmed",
+        "pending": "Pending",
+        "failed": "Failed",
+        "refunded": "Refunded"
+      },
+      "selectAgent": "Select Agent",
+      "choosePayment": "Choose Payment Method",
+      "applyToAgent": "Apply to agent:",
+      "noAgentsFound": "No agents found. Create an agent first.",
+      "payWithCredits": "Pay with Credits",
+      "payWithSol": "Pay with SOL",
+      "solDesc": "Solana wallet payment",
+      "payWithHatcher": "Pay with $HATCHER",
+      "hatcherDesc": "HATCHER token on Solana",
+      "payWithUsdc": "Pay with USDC",
+      "usdcDesc": "Stablecoin — 1 USDC = $1",
+      "payWithCard": "Pay with Card",
+      "cardDesc": "Credit/debit card via Stripe",
+      "creditAvailable": "${balance} available — instant",
+      "creditInsufficient": "Not enough — need ${need}, have ${have}",
+      "foundingSlots": "{remaining} of {max} slots remaining",
+      "foundingSoldOut": "Sold out",
+      "oneTimeSuffix": "one-time",
+      "oneTimeAgent": "one-time / agent",
+      "annualAgent": "/ year / agent",
+      "monthAgent": "/ 30 days / agent",
+      "manageBilling": "Manage Billing",
+      "successPayment": "Payment successful! Your account is being upgraded. It may take a moment to reflect.",
+      "canceledPayment": "Payment was canceled. No charges were made."
+    },
+    "analytics": {
+      "eyebrow": "Dashboard",
+      "heading": "Analytics",
+      "subheading": "Account-wide usage insights.",
+      "signInDescription": "Sign in to view analytics.",
+      "messageVolume": "Message Volume",
+      "last14Days": "Last 14 days",
+      "frameworks": "Frameworks",
+      "agentStatus": "Agent Status",
+      "totalMessages": "Total Messages by Agent",
+      "noMessageData": "No message data yet — start chatting with your agents!",
+      "noAgentsYet": "No agents yet",
+      "noAgentsEmpty": "No agents yet. Create your first agent to start seeing analytics.",
+      "createAgent": "Create Agent",
+      "totalAgents": "Total Agents",
+      "totalAgentsSub": "{active} active",
+      "messages": "Messages",
+      "messagesAllTime": "All time",
+      "llmCalls": "LLM Calls",
+      "llmCallsAllTime": "All time",
+      "last14DaysLabel": "Last 14 Days",
+      "last14DaysSub": "User messages",
+      "today": "Today",
+      "noDataYet": "No message data yet"
+    },
+    "team": {
+      "eyebrow": "Collaboration",
+      "heading": "Team",
+      "subheading": "Create a team to share agents and collaborate with others.",
+      "signInTitle": "Sign in to access Teams",
+      "signInDesc": "Teams let you collaborate with others on your AI agents.",
+      "createTeamTitle": "Create Your Team",
+      "createTeamDesc": "Start collaborating by creating a team. You can then invite members and share your agents.",
+      "teamNamePlaceholder": "Team name...",
+      "createBtn": "Create",
+      "creating": "Creating...",
+      "membersHeading": "Members",
+      "inviteMemberHeading": "Invite Member",
+      "emailPlaceholder": "Email address...",
+      "invite": "Invite",
+      "roleAdmin": "Admin",
+      "roleMember": "Member",
+      "roleViewer": "Viewer",
+      "roleOwner": "Owner",
+      "you": "(you)",
+      "sharedAgentsHeading": "Shared Agents",
+      "noSharedAgents": "No agents shared with this team yet.",
+      "yourAgentsHeading": "Your Agents",
+      "byLabel": "by {username}",
+      "memberCount": "{count} member",
+      "memberCountPlural": "{count} members",
+      "agentSharedCount": "{count} agent shared",
+      "agentSharedCountPlural": "{count} agents shared",
+      "leaveTeam": "Leave",
+      "leaveTeamTitle": "Leave Team",
+      "leaveTeamDesc": "Are you sure you want to leave this team? You will lose access to all shared agents.",
+      "leaveTeamConfirm": "Leave Team",
+      "deleteTeam": "Delete Team",
+      "deleteTeamTitle": "Delete Team",
+      "deleteTeamDesc": "Are you sure you want to permanently delete this team? All shared agents will be unshared.",
+      "deleteTeamConfirm": "Delete Team",
+      "errors": {
+        "loadFailed": "Failed to load team data",
+        "createFailed": "Failed to create team",
+        "inviteFailed": "Failed to invite member",
+        "removeFailed": "Failed to remove member",
+        "leaveFailed": "Failed to leave team",
+        "deleteFailed": "Failed to delete team",
+        "shareFailed": "Failed to share agent",
+        "unshareFailed": "Failed to unshare agent",
+        "roleFailed": "Failed to update role"
+      }
+    },
+    "affiliate": {
+      "eyebrow": "Dashboard",
+      "heading": "Affiliate Dashboard",
+      "signInTitle": "Sign In Required",
+      "signInDesc": "Sign in to view your affiliate dashboard.",
+      "yourReferralLink": "Your Referral Link",
+      "referralLinkDesc": "New signups via this link are attributed to you for life.",
+      "shareOnX": "Share on X",
+      "telegram": "Telegram",
+      "copyLink": "Copy",
+      "copiedLink": "Copied",
+      "refresh": "Refresh",
+      "frozenTitle": "Account frozen",
+      "codeLabel": "Code",
+      "totalReferrals": "Total Referrals",
+      "paidLabel": "{count} paid",
+      "pending30d": "Pending (30d hold)",
+      "payableNow": "Payable Now",
+      "lifetimeEarned": "Lifetime Earned",
+      "paidOut": "{amount} paid out",
+      "referralsTable": "Referrals",
+      "noReferrals": "No referrals yet. Share your link!",
+      "commissionsTable": "Commissions",
+      "noCommissions": "No commissions yet.",
+      "payoutsTable": "Payouts",
+      "noPayouts": "No payouts yet.",
+      "loadMore": "Load more",
+      "signupCol": "Signup",
+      "emailCol": "Email",
+      "statusCol": "Status",
+      "tierCol": "Tier",
+      "dateCol": "Date",
+      "sourceCol": "Source",
+      "amountCol": "Amount",
+      "cashCol": "Cash",
+      "creditsCol": "Credits",
+      "noteCol": "Note",
+      "statusPaid": "Paid",
+      "statusFree": "Free",
+      "statusPending": "Pending",
+      "statusPayable": "Payable",
+      "statusPaidOut": "Paid",
+      "statusVoided": "Voided",
+      "flagged": "Flagged",
+      "untilDate": "until {date}",
+      "sourceSubscription": "Subscription",
+      "sourceFoundingMember": "Founding Member",
+      "payoutSettings": "Payout Settings",
+      "payoutMode": "Mode",
+      "payoutAddress": "Payout Address",
+      "creditsOnly": "Credits only — no address",
+      "changePrefs": "Need to change payout preferences?",
+      "contactSupport": "Contact support",
+      "modeCashOnly": "Cash only (20%)",
+      "modeCreditsOnly": "Credits only (40%)",
+      "modeHybrid": "Hybrid (15% cash + 25% credits)"
+    },
+    "settings": {
+      "eyebrow": "Account",
+      "heading": "Settings",
+      "subheading": "Manage your account, security, and preferences.",
+      "tabs": {
+        "profile": "Profile",
+        "security": "Security",
+        "notifications": "Notifications",
+        "billing": "Billing",
+        "danger": "Danger Zone"
+      },
+      "profile": {
+        "sectionTitle": "Profile",
+        "changePhoto": "Change photo",
+        "uploadPhoto": "Upload photo",
+        "remove": "Remove",
+        "joinedLabel": "Joined {date}",
+        "usernameLabel": "Username",
+        "usernamePlaceholder": "your_username",
+        "usernameHint": "3–30 characters, letters, numbers, _ or -",
+        "emailLabel": "Email address",
+        "emailPlaceholder": "you@example.com",
+        "saveChanges": "Save Changes",
+        "saving": "Saving...",
+        "walletTitle": "Connected Wallet",
+        "walletLinkedDesc": "Linked automatically from your first on-chain payment. Used when paying with SOL, USDC, or $HATCHER.",
+        "walletViewSolscan": "Solscan",
+        "walletDisconnect": "Disconnect wallet",
+        "walletNone": "No wallet linked yet. Your Solana wallet connects automatically the first time you make an on-chain payment from the billing page.",
+        "referralTitle": "Referral Program",
+        "referralDesc": "Invite friends to Hatcher. You both get {credit} credit when they create their first agent.",
+        "referralCode": "Referral Code",
+        "shareLink": "Share Link",
+        "referred": "Referred",
+        "earned": "Earned",
+        "claimRewards": "Claim Pending Rewards",
+        "claiming": "Claiming..."
+      },
+      "security": {
+        "changePasswordTitle": "Change Password",
+        "currentPassword": "Current Password",
+        "currentPasswordPlaceholder": "Enter current password",
+        "newPassword": "New Password",
+        "newPasswordPlaceholder": "Min 8 chars, upper, lower, number",
+        "confirmPassword": "Confirm New Password",
+        "confirmPasswordPlaceholder": "Repeat new password",
+        "changePasswordBtn": "Change Password",
+        "changing": "Changing...",
+        "apiKeysTitle": "API Keys",
+        "apiKeysDesc": "Create multiple API keys for programmatic access. Each key uses the {prefix} prefix. The full key is shown {emphasis} at creation.",
+        "apiKeysEmphasis": "only once",
+        "manageKeys": "Manage keys",
+        "newKeyCreated": "New key created — copy it now!",
+        "noKeysYet": "No API keys yet. Create one below.",
+        "keyLabelPlaceholder": "Label (e.g. \"Production\")",
+        "createKey": "Create Key",
+        "creating": "Creating...",
+        "keysLimit": "Up to 10 active keys. Each key has full API access.",
+        "reqToday": "{count} req today · {week} this week",
+        "lastUsed": "Last used {date}",
+        "save": "Save"
+      },
+      "notifications": {
+        "sectionTitle": "Notifications",
+        "pushLabel": "Push Notifications",
+        "pushDesc": "Browser push notifications for real-time updates",
+        "agentsLabel": "Agent Alerts",
+        "agentsDesc": "Get notified when agents change status, crash, or need attention",
+        "billingLabel": "Billing Alerts",
+        "billingDesc": "Payment confirmations, subscription renewals, and credits"
+      },
+      "billing": {
+        "sectionTitle": "Billing",
+        "currentPlan": "Current Plan",
+        "hatcherCredits": "HATCHER Credits",
+        "creditsAutoApplied": "Automatically applied at checkout",
+        "manageBilling": "Manage Billing"
+      },
+      "danger": {
+        "sectionTitle": "Danger Zone",
+        "exportTitle": "Export My Data",
+        "exportDesc": "Download a JSON file containing all your account data: profile, agents, chat history, payments, referrals, support tickets, and more.",
+        "exportBtn": "Export My Data",
+        "exporting": "Exporting...",
+        "deleteTitle": "Delete Account",
+        "deleteDesc": "Permanently remove your account, all agents, payment history, and configuration. This action is irreversible.",
+        "deleteBtn": "Delete Account",
+        "deleting": "Deleting...",
+        "dialogTitle": "Delete Your Account?",
+        "dialogDesc": "This will permanently remove all your agents, data, and payment history. This action {emphasis} be undone.",
+        "dialogEmphasis": "cannot",
+        "confirmPassword": "Confirm your password",
+        "passwordPlaceholder": "Your current password",
+        "cancelBtn": "Cancel"
+      }
+    },
+    "apiKeys": {
+      "eyebrow": "Settings",
+      "heading": "API keys",
+      "subheading": "Manage programmatic access keys for the {docsLink}. Each key starts with {prefix}.",
+      "docsLinkLabel": "Hatcher API",
+      "backToSettings": "Back to Settings",
+      "newKeyAlert": "Key created — copy it now!",
+      "newKeyAlertSub": "This is the only time the full key will be shown. Store it somewhere safe.",
+      "noKeysTitle": "No API keys yet",
+      "noKeysDesc": "Create your first key to get started",
+      "loading": "Loading keys...",
+      "createSectionTitle": "Create new key",
+      "createSectionDesc": "Give your key a descriptive name (e.g. \"Local Dev\", \"CI/CD Pipeline\").",
+      "keyLabelPlaceholder": "Key label...",
+      "createKey": "Create Key",
+      "creating": "Creating...",
+      "usageNote": "Use your API key in the {header} header. See the {docsLink} for all available endpoints.",
+      "headerExample": "Authorization: Bearer hk_...",
+      "docsLinkLabel2": "API reference docs",
+      "copiedLabel": "Copied!",
+      "copyLabel": "Copy",
+      "dismissLabel": "Dismiss",
+      "revokeTitle": "Revoke API Key",
+      "revokeDesc": "This key will be permanently invalidated and any applications using it will stop working immediately. This cannot be undone.",
+      "revokeConfirm": "Revoke Key",
+      "neverUsed": "Never used",
+      "lastUsed": "Last used {time}",
+      "created": "Created {date}",
+      "reqStats": "{today} req today · {week} this week",
+      "saveBtn": "Save",
+      "cancelBtn": "Cancel"
+    },
+    "quickStats": {
+      "totalAgents": "Total Agents",
+      "dailyMessages": "Daily Messages",
+      "unlimited": "∞",
+      "accountWide": "account-wide · BYOK = unlimited",
+      "activeNow": "Active Now",
+      "noAgentsRunning": "No agents running",
+      "agentsOnline": "{count} agent online",
+      "agentsOnlinePlural": "{count} agents online",
+      "accountTier": "Account Tier",
+      "lifetimeAccess": "Lifetime access",
+      "prioritySupport": "Priority support",
+      "upgradePlan": "Upgrade plan"
+    },
+    "agentDetail": {
+      "tabs": {
+        "dashboard": "Dashboard",
+        "chat": "Chat",
+        "terminal": "Terminal",
+        "config": "Config",
+        "integrations": "Integrations",
+        "plugins": "Plugins & Skills",
+        "logs": "Logs",
+        "stats": "Stats",
+        "memory": "Memory",
+        "sessions": "Sessions",
+        "knowledge": "Knowledge",
+        "addons": "Add-ons",
+        "files": "Files",
+        "workspace": "Workspace",
+        "schedules": "Schedules",
+        "workflows": "Workflows"
+      },
+      "sidebarGroups": {
+        "configure": "Configure",
+        "monitor": "Monitor",
+        "advanced": "Advanced"
+      },
+      "nav": {
+        "allAgents": "All Agents"
+      },
+      "header": {
+        "easy": "Easy",
+        "advanced": "Advanced",
+        "restart": "Restart",
+        "restarting": "Restarting...",
+        "stop": "Stop",
+        "stopping": "Stopping...",
+        "start": "Start",
+        "starting": "Starting...",
+        "share": "Share",
+        "room": "Room",
+        "clone": "Clone",
+        "delete": "Delete",
+        "deleting": "Deleting...",
+        "confirm": "Confirm",
+        "cancel": "Cancel"
+      },
+      "notFound": {
+        "code": "404",
+        "title": "Agent Not Found",
+        "description": "The agent with ID \"{id}\" could not be found.",
+        "backToAgents": "Back to Agents"
+      },
+      "statusPoll": {
+        "agentReady": "Agent is ready to chat!"
+      },
+      "chat": {
+        "live": "Live",
+        "liveTitle": "Real-time streaming via WebSocket",
+        "voiceButton": "Voice",
+        "voiceCallTitle": "Start voice call",
+        "autoRead": "Auto-read",
+        "autoReadTitle": "Auto-read responses",
+        "emptyTitle": "Start a conversation with {agentName}",
+        "emptySubtitle": "Responses appear in real time",
+        "loadEarlier": "Load earlier messages ({count} older)",
+        "listening": "Listening...",
+        "thinking": "Thinking...",
+        "speaking": "Speaking...",
+        "tapToSpeak": "Tap mic to speak",
+        "agentStartingUp": "Agent is starting up, please wait...",
+        "uploading": "Uploading…",
+        "poweredBy": "Powered by {provider}",
+        "today": "today",
+        "unlimited": "unlimited",
+        "enterToSend": "Enter to send, Shift+Enter for new line",
+        "signInToChat": "Sign in to chat with this agent.",
+        "limitReached": "Daily message limit reached.",
+        "upgradeToPro": "Upgrade to Pro",
+        "limitReachedSuffix": "for more, or bring your own key for unlimited.",
+        "agentNotRunning": "Agent is not running.",
+        "startFromOverview": "Start it from the Overview tab to chat.",
+        "waitingForAgent": "Waiting for agent to start...",
+        "messagePlaceholder": "Message {agentName}...",
+        "sendMessage": "Send message",
+        "attachFiles": "Attach files — saved to agent’s knowledge",
+        "stopRecording": "Stop recording",
+        "startVoice": "Start voice input",
+        "errors": {
+          "rateLimit": "Daily message limit reached.",
+          "llmDown": "AI service is temporarily unavailable. This usually resolves within a minute.",
+          "timeout": "Agent took too long to respond.",
+          "network": "Connection lost. Check your internet connection.",
+          "generic": "Something went wrong.",
+          "retry": "Retry"
+        },
+        "voiceCall": {
+          "listening": "Listening...",
+          "thinking": "Thinking...",
+          "speaking": "Speaking...",
+          "tapToSpeak": "Tap mic to speak"
+        }
+      },
+      "logs": {
+        "searchPlaceholder": "Search logs...",
+        "all": "All",
+        "connected": "Connected",
+        "reconnecting": "Reconnecting",
+        "pinned": "Pinned",
+        "scroll": "Scroll",
+        "refresh": "Refresh",
+        "loading": "Loading...",
+        "download": "Download",
+        "pinnedToBottom": "pinned to bottom",
+        "noLogs": "No logs available yet.",
+        "noLogsMatching": "No logs matching \"{query}\".",
+        "noLevelLogs": "No {level} logs found.",
+        "entries": "{count} entries",
+        "autoScrollEnabled": "Auto-scroll enabled — pinned to bottom",
+        "autoScrollDisabled": "Auto-scroll disabled",
+        "fullLogsGate": {
+          "title": "Showing the last {count} log lines",
+          "description": "This agent has {total} total entries. Unlock Full Logs to scroll back through the complete history and export every line.",
+          "descriptionEmpty": "Unlock Full Logs on this agent to keep every entry available for scrollback and export, beyond the last {count} lines.",
+          "unlock": "Unlock"
+        }
+      },
+      "integrations": {
+        "showingFor": "Showing integrations compatible with {framework}",
+        "connected": "{configured}/{total} connected",
+        "encryptedNote": "API keys and tokens are encrypted with AES-256-GCM before storage. Once saved, secret values are never shown again — only masked placeholders will appear.",
+        "mainIntegrations": "Main Integrations",
+        "mainIntegrationsFree": "Free on all tiers",
+        "otherPlatforms": "Other Platforms",
+        "communityExtensions": "Community extensions",
+        "allPlatformsFree": "All platforms included free — configure credentials below",
+        "allFreeNote": "All integrations are free on every tier. Just add your credentials and go.",
+        "howToGetKey": "How to get your API key →",
+        "howToSetup": "How to set up {name} →",
+        "saving": "Saving...",
+        "saveCredentials": "Save Credentials",
+        "badges": {
+          "recommended": "Recommended",
+          "native": "Native",
+          "community": "Community",
+          "planned": "Planned",
+          "quickSetup": "Quick Setup",
+          "qrPairing": "QR Pairing",
+          "free": "Free",
+          "connected": "Connected",
+          "alwaysActive": "Always Active"
+        },
+        "legend": {
+          "native": "Native — built-in support",
+          "community": "Community — npm extensions",
+          "planned": "Planned — coming soon"
+        },
+        "pairing": {
+          "whoCanMessage": "Who can message your agent?",
+          "everyone": "Everyone",
+          "specificNumbers": "Specific numbers",
+          "save": "Save",
+          "anyoneCanMessage": "Anyone can message your agent.",
+          "onlyListedNumbers": "Only listed numbers can message your agent.",
+          "restartAfterChange": "Restart agent after changing.",
+          "setBeforePairing": "Set before pairing. Phone numbers in E.164 format (+1234567890).",
+          "savedRestart": "Saved! Restart agent to apply.",
+          "connected": "{name} Connected",
+          "disconnected": "{name} Disconnected",
+          "messagesForwarded": "Messages will be forwarded to your agent",
+          "sessionExpired": "Session expired. Re-pair or disconnect to clean up.",
+          "rePair": "Re-pair",
+          "disconnect": "Disconnect",
+          "disconnectConfirm": "Disconnect {name}? You will need to re-pair to use it again.",
+          "agentMustRun": "Your agent must be running to pair {name}. Start the agent first.",
+          "generatingQr": "Generating QR code — this takes ~30s...",
+          "pairButton": "Pair {name}",
+          "refreshQr": "Refresh QR Code",
+          "tapOutsideToClose": "Tap outside to close"
+        },
+        "webhook": {
+          "label": "Webhook",
+          "inboundHttp": "Inbound HTTP",
+          "triggerFrom": "Trigger your agent from external services (Zapier, GitHub, etc.)",
+          "webhookUrl": "Webhook URL",
+          "bearerToken": "Bearer Token",
+          "exampleRequest": "Example Request",
+          "revealToken": "Reveal token",
+          "hideToken": "Hide token",
+          "copyUrl": "Copy URL",
+          "copyToken": "Copy token",
+          "note": "Use this URL to trigger your agent from external services (Zapier, GitHub, n8n, etc.). Send a POST request with a JSON body containing a message field. The agent will auto-wake from sleep if needed.",
+          "alreadyConfigured": "already configured"
+        },
+        "domains": {
+          "channelBehavior": "Channel Behavior",
+          "allowedUserIds": "Allowed User IDs (comma-separated)",
+          "allowedGroupIds": "Allowed Group IDs (comma-separated)"
+        }
+      },
+      "memory": {
+        "refresh": "Refresh",
+        "noMemory": "No memory files found.",
+        "noMemoryDescription": "Your agent hasn’t created any memory files yet.",
+        "dailyLogs": "Daily Logs",
+        "noDailyLogs": "No daily logs yet.",
+        "loading": "Loading memory...",
+        "error": "Failed to load memories"
+      },
+      "knowledge": {
+        "uploadTitle": "Upload Knowledge File",
+        "filename": "Filename",
+        "filenamePlaceholder": "e.g. company-info.txt",
+        "content": "Content",
+        "contentPlaceholder": "Paste your knowledge content here...",
+        "upload": "Upload",
+        "uploading": "Uploading...",
+        "cancel": "Cancel",
+        "addFile": "Add File",
+        "noFiles": "No knowledge files yet.",
+        "noFilesDescription": "Upload documents your agent can reference.",
+        "preview": "Preview",
+        "delete": "Delete",
+        "loading": "Loading...",
+        "error": "Failed to load knowledge files",
+        "refresh": "Refresh"
+      },
+      "stats": {
+        "range7d": "7 days",
+        "range30d": "30 days",
+        "totalMessages": "Total Messages",
+        "avgPerDay": "Avg / Day",
+        "peakDay": "Peak Day",
+        "framework": "Framework",
+        "noData": "No analytics data yet.",
+        "noDataDescription": "Send some messages to start seeing stats.",
+        "errorRate": "Error Rate",
+        "responseTimes": "Response Times",
+        "avgResponse": "Avg Response",
+        "p50": "P50",
+        "p95": "P95",
+        "topTopics": "Top Topics",
+        "hourlyActivity": "Hourly Activity",
+        "byokActive": "BYOK Active",
+        "totalTokens": "Total Tokens",
+        "estimatedCost": "Est. Cost",
+        "refresh": "Refresh"
+      },
+      "terminal": {
+        "connecting": "Connecting...",
+        "connected": "Connected",
+        "disconnected": "Disconnected",
+        "error": "Connection error",
+        "reconnect": "Reconnect",
+        "agentNotActive": "Agent must be active to use the terminal.",
+        "startAgent": "Start Agent",
+        "sendMessage": "Send message...",
+        "send": "Send",
+        "sending": "Sending..."
+      },
+      "plugins": {
+        "skillsTab": "Skills",
+        "pluginsTab": "Plugins",
+        "searchPlaceholder": "Search skills & plugins...",
+        "install": "Install",
+        "installing": "Installing...",
+        "installed": "Installed",
+        "uninstall": "Uninstall",
+        "uninstalling": "Uninstalling...",
+        "noInstalled": "No skills or plugins installed.",
+        "noInstalledDescription": "Browse and install from the marketplace below.",
+        "recommended": "Recommended",
+        "available": "Available",
+        "source": "Source",
+        "requiresRestart": "Requires restart",
+        "refresh": "Refresh",
+        "limitReached": "Plugin limit reached. Upgrade your plan or add a plugin addon."
+      },
+      "workflows": {
+        "new": "New Workflow",
+        "noWorkflows": "No workflows yet.",
+        "noWorkflowsDescription": "Create your first workflow to automate your agent.",
+        "enable": "Enable",
+        "disable": "Disable",
+        "delete": "Delete",
+        "save": "Save",
+        "run": "Run",
+        "running": "Running...",
+        "name": "Workflow Name",
+        "trigger": "Trigger",
+        "lastRun": "Last Run",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "files": {
+        "noFiles": "No files found.",
+        "noFilesDescription": "The file manager is empty.",
+        "upload": "Upload",
+        "delete": "Delete",
+        "download": "Download",
+        "refresh": "Refresh",
+        "locked": "File Manager requires the Business plan or the File Manager add-on.",
+        "unlock": "Unlock"
+      },
+      "workspace": {
+        "noFiles": "No workspace files found.",
+        "refresh": "Refresh",
+        "loading": "Loading workspace..."
+      },
+      "addons": {
+        "title": "Add-ons",
+        "description": "Extend your agent with extra capabilities.",
+        "noAddons": "No add-ons purchased yet.",
+        "purchase": "Purchase",
+        "active": "Active",
+        "expires": "Expires {date}",
+        "lifetime": "Lifetime"
+      },
+      "schedules": {
+        "new": "New Schedule",
+        "noSchedules": "No schedules yet.",
+        "noSchedulesDescription": "Create a schedule to run your agent automatically.",
+        "enable": "Enable",
+        "disable": "Disable",
+        "delete": "Delete",
+        "save": "Save",
+        "name": "Schedule Name",
+        "cron": "Cron Expression",
+        "nextRun": "Next Run",
+        "lastRun": "Last Run",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive"
+      }
+    }
+  },
+  "settings": {
+    "redirect": "Redirecting to settings..."
+  },
+  "agentPublic": {
+    "back": {
+      "toCity": "Back to City",
+      "toMyAgents": "Back to My Agents",
+      "toDashboard": "Back to Dashboard"
+    },
+    "status": {
+      "active": "Active",
+      "sleeping": "Sleeping",
+      "paused": "Paused",
+      "error": "Error",
+      "killed": "Killed",
+      "restarting": "Restarting"
+    },
+    "profile": {
+      "featuresCount": "{count} feature",
+      "featuresCountPlural": "{count} features",
+      "frameworkFeatures": "Framework Features",
+      "by": "by"
+    },
+    "share": {
+      "button": "Share",
+      "copied": "Copied!"
+    },
+    "errors": {
+      "connectionError": "Connection Error",
+      "notFound": "Agent Not Found",
+      "somethingWrong": "Something Went Wrong",
+      "defaultMessage": "This agent doesn't exist or has been removed.",
+      "goBack": "Go Back",
+      "myAgents": "My Agents"
+    },
+    "owner": {
+      "heading": "Manage {name}",
+      "body": "You own this agent. Head to your dashboard to chat or configure it.",
+      "manageAgent": "Manage Agent",
+      "openChat": "Open Chat"
+    },
+    "analytics": {
+      "heading": "Agent Analytics",
+      "messages": "Messages",
+      "daysActive": "Days Active",
+      "uptime": "Uptime",
+      "status": "Status",
+      "framework": "Framework",
+      "created": "Created"
+    },
+    "deploy": {
+      "heading": "Deploy a similar agent",
+      "body": "Create your own {framework} agent on Hatcher. Free to start, deploy in 60 seconds.",
+      "cta": "Deploy Similar Agent",
+      "myAgents": "My Agents"
+    },
+    "errorPage": {
+      "heading": "Failed to Load Agent",
+      "body": "We couldn't load this agent's details. It may have been removed or there's a connection issue.",
+      "errorId": "Error ID: {id}",
+      "tryAgain": "Try Again",
+      "browseAgents": "Browse Agents"
+    },
+    "statusPage": {
+      "poweredBy": "Powered by",
+      "uptimeLabel": "24h uptime",
+      "messages": "Messages",
+      "days": "Days",
+      "since": "Since",
+      "framework": "framework",
+      "lastActive": "Last active: {date} at {time}",
+      "viewProfile": "View Profile",
+      "notFound": {
+        "heading": "Agent Not Found",
+        "body": "This agent does not exist or is not publicly visible.",
+        "browseAgents": "Browse Agents"
+      }
+    }
+  },
+  "city": {
+    "loading": "LOADING HATCHER CITY…",
+    "category": {
+      "district": "District",
+      "breadcrumbCity": "Hatcher City",
+      "statAgents": "agents",
+      "statRunning": "running",
+      "statShareOfCity": "share of city",
+      "seeIn3d": "See it in 3D →",
+      "emptyState": "No agents in this district yet.",
+      "emptyStateCta": "Be the first to build one.",
+      "otherDistricts": "Other districts",
+      "msgs": "msgs"
+    },
+    "agentCity": {
+      "breadcrumbCity": "Hatcher City",
+      "openAgent": "Open agent →",
+      "seeInFullCity": "See in full city",
+      "shareableLink": "Shareable link:",
+      "kvFramework": "framework",
+      "kvTier": "tier",
+      "kvStatus": "status",
+      "kvMessages": "messages"
+    }
+  },
+  "embed": {
+    "loading": "loading agent…",
+    "notFound": "Agent not found or not public.",
+    "visitHatcher": "→ hatcher.host",
+    "openInHatcher": "Open in Hatcher",
+    "poweredBy": "powered by",
+    "messages": "messages"
+  },
+  "agentRoom": {
+    "loading": "Entering agent room…",
+    "notFound": "Agent not found",
+    "notFoundBody": "Either this agent doesn't exist or you don't have access.",
+    "backToDashboard": "← Back to dashboard",
+    "backToCity": "Back to City",
+    "backToDashboardFull": "Back to Dashboard",
+    "cityShort": "City",
+    "dashboardShort": "Dashboard",
+    "previewBadge": "AGENT ROOM · PREVIEW",
+    "frameworkComingSoon": "Agent Room is rolling out one framework at a time. Rooms for {framework} are coming next.",
+    "backToAgent": "← Back to agent dashboard",
+    "signInToChat": "Sign in to chat with {name}",
+    "cantReach": "Can't reach agent right now — reconnecting...",
+    "standingBy": "{name} standing by.",
+    "hud": {
+      "statsAgentLabel": "{framework} AGENT · LV {level}",
+      "uptimeLabel": "uptime {uptime}",
+      "messagesLabel": "messages",
+      "statusLabel": "status",
+      "liveLogs": "◆ LIVE LOGS",
+      "waitingForLogs": "Waiting for logs...",
+      "xpLabel": "XP",
+      "moodLabel": "MOOD",
+      "skillActive": "ACTIVE",
+      "skillIdle": "IDLE",
+      "skillCalls": "{calls} calls",
+      "viewersWatch": "{count, plural, =1 {# watching} other {# watching}}",
+      "viewersTitle": "{count, plural, =1 {# viewer right now} other {# viewers right now}}",
+      "chatPlaceholder": "Message your agent...",
+      "chatSend": "SEND"
+    },
+    "share": {
+      "button": "Share",
+      "capturing": "Capturing...",
+      "saved": "Image saved + X opened",
+      "failed": "Could not capture scene",
+      "title": "Capture room + share on X"
+    },
+    "embed": {
+      "button": "Embed",
+      "copied": "Copied!",
+      "failed": "Failed",
+      "title": "Copy iframe embed snippet"
+    },
+    "leaderboard": {
+      "button": "Rank",
+      "buttonWithRank": "Rank #{rank}",
+      "heading": "LEADERBOARD",
+      "loading": "Loading…",
+      "empty": "No public {framework} agents yet.",
+      "you": "· you",
+      "footer": "Ranked by messages sent · public agents only",
+      "title": "Top agents per framework"
+    },
+    "memory": {
+      "button": "Memory",
+      "title": "View agent memory & config",
+      "whatKnows": "What your agent knows",
+      "sectionPersona": "Persona / System Prompt",
+      "sectionModel": "Model & Runtime",
+      "sectionSkills": "Skills ({count})",
+      "sectionIntegrations": "Integrations ({count})",
+      "sectionRaw": "Raw config (JSON)",
+      "noPrompt": "No system prompt set.",
+      "noSkills": "No skills configured.",
+      "noIntegrations": "No integrations wired.",
+      "editingComingSoon": "Memory editing is coming soon. For now, manage your agent's config from the dashboard.",
+      "rowProvider": "Provider",
+      "rowModel": "Model",
+      "rowSessionScope": "Session scope",
+      "rowFramework": "Framework",
+      "frameworkLabel": {
+        "openclaw": "OpenClaw config",
+        "hermes": "Hermes SOUL",
+        "elizaos": "ElizaOS character",
+        "milady": "Milady config",
+        "default": "Agent Memory"
+      }
+    },
+    "quests": {
+      "buttonTitle": "Daily quests",
+      "heading": "DAILY QUESTS",
+      "buildStreak": "Build your streak",
+      "streakDays": "🔥 {count}-day streak",
+      "close": "ESC",
+      "progressFraction": "{current} / {target}",
+      "claimed": "Claimed — come back tomorrow 🌙",
+      "claimButton": "Claim · extend streak to {next}d 🔥",
+      "completeAll": "Complete all quests to claim",
+      "agentFooter": "agent: {agentId}… · rotates at midnight"
+    },
+    "achievements": {
+      "unlocked": "★ ACHIEVEMENT UNLOCKED"
+    },
+    "integration": {
+      "heading": "INTEGRATION",
+      "statusActive": "● ACTIVE",
+      "statusOff": "○ OFF",
+      "descActive": "Your agent is listening on {label}. Disable to stop responding, or manage to change the config.",
+      "descInactive": "{label} is not configured. Click Manage to add credentials and enable.",
+      "disabling": "Disabling...",
+      "disable": "Disable",
+      "manage": "Manage →",
+      "configure": "Configure →",
+      "escClose": "ESC to close"
+    },
+    "status": {
+      "paused": {
+        "title": "Agent is paused",
+        "hint": "Go to the dashboard and click Start to wake it up."
+      },
+      "stopped": {
+        "title": "Agent is stopped",
+        "hint": "Start it from the dashboard to chat."
+      },
+      "starting": {
+        "title": "Agent is starting up",
+        "hint": "This takes 2–4 min on first boot. Chat will be live the moment it's ready."
+      },
+      "initializing": {
+        "title": "Initializing agent",
+        "hint": "Seeding config and skills — usually 2 min, first boot can be longer."
+      },
+      "pending": {
+        "title": "Agent pending",
+        "hint": "Waiting for start signal..."
+      },
+      "error": {
+        "title": "Agent in error state",
+        "hint": "Check Integrations tab or support — last boot failed."
+      },
+      "crashed": {
+        "title": "Agent crashed",
+        "hint": "Auto-restart will retry. If it keeps crashing, check logs."
+      }
+    },
+    "mood": {
+      "warmingUp": "WARMING UP",
+      "thriving": "THRIVING",
+      "upbeat": "UPBEAT",
+      "steady": "STEADY",
+      "struggling": "STRUGGLING",
+      "overheating": "OVERHEATING"
+    },
+    "voice": {
+      "stopListening": "Stop listening",
+      "startVoice": "Start voice input",
+      "turnOffVoice": "Turn off voice replies",
+      "agentSpeakReplies": "Have the agent speak replies",
+      "voiceOn": "Voice On",
+      "voice": "Voice"
+    }
+  },
+  "frameworks": {
+    "eyebrow": "Frameworks",
+    "heading": "Pick the right framework",
+    "subheading": "Hatcher supports 4 battle-tested agent frameworks. Each has unique strengths — here's how to choose.",
+    "deployCta": "Deploy an agent",
+    "docsLink": "Full docs",
+    "atAGlance": "At a glance",
+    "featureMatrix": "Feature matrix",
+    "featureCol": "Feature",
+    "bestFor": "Best for...",
+    "bestForSubheading": "Not sure which framework to pick? Match your use case.",
+    "benchmarks": "Performance benchmarks",
+    "benchmarksSubheading": "Cold-start time and baseline memory usage on Hatcher shared infrastructure. Actual values vary by config.",
+    "coldStart": "Cold-start time",
+    "memoryUsage": "Baseline memory usage",
+    "lowerFaster": "Lower is faster",
+    "lowerLeaner": "Lower is leaner",
+    "benchmarkCallout": "🌸 Milady is the fastest and lightest — ideal for free-tier deployments. 🦞 OpenClaw packs the most tools but needs more resources.",
+    "configExamples": "Configuration examples",
+    "configSubheading": "Each framework has its own config format. Here's what a typical setup looks like.",
+    "configRef": "Full configuration reference →",
+    "docsSuffix": "docs",
+    "llmSupport": "LLM support",
+    "llmSubheading": "All frameworks support BYOK (Bring Your Own Key) for unlimited messages. On the hosted LLM, every tier runs Llama 4 Scout (17B) on Groq — tool-call reliability and latency are the same across Free, Starter, Pro, Business, and Founding Member. Only the daily message quota changes per tier.",
+    "byokNote": "* BYOK always free — unlimited messages on any framework.",
+    "byokSetupLink": "View BYOK setup guide →",
+    "decisionGuide": "Quick decision guide",
+    "readyCta": "Ready to deploy?",
+    "readySubheading": "Pick a framework, configure your agent, and go live in under 60 seconds. Free tier included.",
+    "deployFirstAgent": "Deploy your first agent",
+    "viewPricing": "View pricing",
+    "decisions": [
+      {
+        "condition": "I want maximum tools and automation",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "I want an agent that learns over time",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "I want a social media or community bot",
+        "pick": "ElizaOS"
+      },
+      {
+        "condition": "I'm just getting started and want simple",
+        "pick": "Milady"
+      },
+      {
+        "condition": "I need multi-channel messaging (Telegram + Discord + WhatsApp)",
+        "pick": "OpenClaw or Hermes"
+      },
+      {
+        "condition": "I want a character-driven persona bot",
+        "pick": "ElizaOS or Milady"
+      }
+    ]
+  },
+  "token": {
+    "liveLabel": "Live on Solana",
+    "heading": "$HATCHER",
+    "subheading": "The ecosystem token of Hatcher. Powers tier subscriptions, agent add-ons, and governance on Solana.",
+    "caLabel": "CA:",
+    "viewDexscreener": "View on Dexscreener",
+    "viewSolscan": "View on Solscan",
+    "burnBadge": "10% of every $HATCHER payment is burned on-chain, in the same transaction.",
+    "createAgentCta": "Create Free Agent",
+    "viewPricing": "View Pricing",
+    "plannedUtilityLabel": "Planned Utility",
+    "whatPowers": "What the Token Will Power",
+    "ecosystemDesc": "$HATCHER is the native currency of the Hatcher ecosystem.",
+    "keyDetails": "Key Details",
+    "networkLabel": "Network",
+    "networkValue": "Solana",
+    "splToken": "SPL Token",
+    "statusLabel": "Status",
+    "statusValue": "Live",
+    "trading": "Trading",
+    "contractLabel": "Contract",
+    "platformLabel": "Platform",
+    "platformValue": "Free tier available now — token enables paid tiers & add-ons",
+    "stayInLoop": "Stay in the Loop",
+    "stayInLoopBody": "The token is live and the platform is ready. Deploy your first agent in minutes.",
+    "followOnX": "Follow on X"
+  },
+  "roadmap": {
+    "liveLabel": "Live",
+    "heading": "Roadmap",
+    "subheading": "What we've built, what's shipping now, and where we're headed. We build in public — follow along on",
+    "followHandle": "X /@hatcherlabs",
+    "checkChangelog": "live changelog",
+    "featureRequest": "Have a feature request? We read everything.",
+    "submitRequest": "Submit a request",
+    "followOnX": "Follow on X"
+  },
+  "blog": {
+    "eyebrow": "Blog",
+    "heading": "The Hatcher blog",
+    "subheading": "Guides, tutorials, and insights about AI agents and the Hatcher platform.",
+    "searchPlaceholder": "Search articles...",
+    "allCategory": "All",
+    "latestLabel": "Latest",
+    "readLabel": "read",
+    "resultsCount": "{count} result for \"{query}\"",
+    "resultsCountPlural": "{count} results for \"{query}\"",
+    "noArticles": "No articles found",
+    "noArticlesCategory": "No articles found in this category.",
+    "noArticlesSearch": "No articles found for \"{query}\".",
+    "clearFilters": "Clear filters",
+    "backToBlog": "Back to Blog",
+    "relatedArticles": "Related Articles"
+  },
+  "changelog": {
+    "betaLabel": "Beta",
+    "heading": "Changelog",
+    "subheading": "We ship improvements every day. Here's what's changed.",
+    "noCommits": "No commits found.",
+    "errorMessage": "Something went wrong.",
+    "tryAgain": "Try again"
+  },
+  "help": {
+    "eyebrow": "Resources",
+    "heading": "Help center",
+    "subheading": "Find answers, browse guides, and get in touch with support.",
+    "searchPlaceholder": "Search all questions... e.g. \"BYOK\", \"rate limit\", \"Telegram\"",
+    "resultCount": "{count} result",
+    "resultCountPlural": "{count} results",
+    "matchCount": "{count} match",
+    "matchCountPlural": "{count} matches",
+    "noMatchHeading": "No matching questions found",
+    "noMatchBody": "Try different keywords or browse the documentation.",
+    "documentationLink": "documentation",
+    "contactHeading": "Contact Us",
+    "contactBody": "Can't find what you're looking for?",
+    "openTicket": "Open a support ticket",
+    "contactOr": "or reach out directly:",
+    "technicalHelp": "Technical help",
+    "generalInquiries": "General inquiries",
+    "communitySupport": "Community support",
+    "communityChat": "Community chat",
+    "stillNeedHelp": "Still need help?",
+    "ticketResponse": "Submit a support ticket and our team will get back to you within 24 hours.",
+    "quickLinks": {
+      "documentation": "Documentation",
+      "discord": "Discord Community",
+      "telegram": "Telegram Group",
+      "submitTicket": "Submit Ticket",
+      "emailSupport": "Email Support"
+    }
+  },
+  "status": {
+    "eyebrow": "Status",
+    "heading": "Platform status",
+    "subheading": "Real-time health of Hatcher infrastructure.",
+    "navLabel": "Hatcher Status",
+    "autoRefresh": "Auto-refresh 30s",
+    "operational": "All systems operational",
+    "degraded": "Some systems degraded",
+    "down": "Service disruption detected",
+    "statusOperational": "Operational",
+    "statusDegraded": "Degraded",
+    "statusDown": "Down",
+    "lastChecked": "Last checked:",
+    "refresh": "Refresh",
+    "checking": "Checking systems...",
+    "errorMessage": "Unable to reach the API. Status unavailable.",
+    "activeAgents": "Active Agents",
+    "totalAgents": "Total Agents",
+    "components": "Components",
+    "updatedAt": "Updated {time}",
+    "loading": "Loading...",
+    "backToHatcher": "← Back to Hatcher"
+  },
+  "shortcuts": {
+    "backToDashboard": "Back to Dashboard",
+    "heading": "Keyboard Shortcuts",
+    "subheading": "Navigate Hatcher faster with keyboard shortcuts",
+    "quickTipLabel": "Quick tip",
+    "quickTipBody": "Press anywhere to open the command palette. Search for pages, agents, or actions instantly.",
+    "footerNote": "Shortcuts are disabled when typing in text fields. On macOS, use Cmd instead of Ctrl."
+  },
+  "create": {
+    "eyebrow": "Create agent",
+    "heading": "Create your agent",
+    "subheading": "Launch a free AI agent in under 2 minutes.",
+    "stepsAriaLabel": "Creation steps",
+    "stepLabels": {
+      "style": "Style",
+      "category": "Category",
+      "template": "Template",
+      "setUp": "Set Up",
+      "launch": "Launch"
+    },
+    "authLoading": "Authenticating...",
+    "authRequired": "Create Your Agent",
+    "authRequiredBody": "Sign in to your account to create and deploy AI agents.",
+    "signIn": "Sign In",
+    "back": "Back",
+    "continue": "Continue",
+    "step1Heading": "What kind of agent do you want?",
+    "step1Subheading": "Each framework has different strengths — pick the one that fits.",
+    "step2Heading": "What type of agent?",
+    "step2Subheading": "Choose a category — we'll show you the best templates",
+    "searchTemplates": "Search 200+ templates...",
+    "clearSearch": "Clear search",
+    "noTemplatesFound": "No templates found for \"{query}\"",
+    "clearSearchLink": "Clear search",
+    "categoryCount": "{count} templates",
+    "step3Heading": "Pick a template",
+    "step3Subheading": "Pick a template — you can customize everything in the next step",
+    "customAgent": "Custom Agent",
+    "customAgentDesc": "Start from scratch with your own system prompt",
+    "customOption": "Start from scratch",
+    "customOptionDesc": "Full control over every setting",
+    "step4Heading": "Personalize your agent",
+    "step4Subheading": "Give your agent a name and choose how it thinks",
+    "agentNameLabel": "Agent Name",
+    "agentNamePlaceholder": "e.g. AlphaResearcher, TweetLord...",
+    "agentNameHintCount": "{count}/50 characters",
+    "agentNameTooShort": "Name must be at least 3 characters",
+    "agentNameInvalidChars": "Only letters, numbers, spaces, hyphens, colons, apostrophes allowed",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Brief description of what your agent does...",
+    "descriptionHint": "Brief tagline for your agent",
+    "platformsHeading": "Where should your agent live?",
+    "platformsSubheading": "Select platforms and add your API keys. You can add more later in Settings.",
+    "noPlatformsNote": "No platforms selected? No problem — add them anytime from your agent's Settings tab.",
+    "hideValue": "Hide value",
+    "showValue": "Show value",
+    "llmModelLabel": "AI Model",
+    "llmModelAria": "AI Model selection",
+    "llmFreeLabel": "Free AI Model",
+    "llmFreeTag": "FREE",
+    "llmFreeSubtext": "Powered by Groq — no API key needed",
+    "llmByokLabel": "Use Your Own AI Key",
+    "llmByokTag": "always free",
+    "llmByokSubtext": "Connect your own OpenAI, Anthropic, or other API key",
+    "byokProviderLabel": "Provider",
+    "byokModelLabel": "Model",
+    "byokModelPlaceholder": "model identifier...",
+    "byokBackToList": "Back to model list",
+    "byokSelectModel": "Select a model...",
+    "byokCustomModel": "Custom model...",
+    "byokApiKeyLabel": "API Key",
+    "byokApiKeyEncrypted": "encrypted at rest",
+    "byokBaseUrlLabel": "Base URL",
+    "skillsHeading": "Agent Skills",
+    "skillsSubheading": "Choose what your agent can do",
+    "toolsHeading": "Agent Tools",
+    "toolsSubheading": "Choose what your agent can do",
+    "pluginsHeading": "Plugins",
+    "pluginsSubheading": "Choose what your agent can do",
+    "capabilitiesHeading": "Capabilities",
+    "capabilitiesSubheading": "Choose what your agent can do",
+    "templateSkillsHeading": "Included with this template",
+    "templateSkillsSubheading": "These ClawHub skills install automatically when your agent first starts.",
+    "systemPromptLabel": "System Prompt",
+    "systemPromptCustomNote": "Your custom instructions will replace the template default",
+    "systemPromptDefaultNote": "Your agent's personality is pre-configured. Customize if you want to change it.",
+    "systemPromptCustomize": "Customize",
+    "systemPromptUseDefault": "Use template default",
+    "systemPromptPlaceholder": "Write your custom system prompt here. This completely replaces the template default.",
+    "systemPromptHint": "Defines your agent's personality, capabilities, and rules",
+    "systemPromptCount": "{count}/8000",
+    "systemPromptWarning": "Consider adding a system prompt for better results",
+    "elizaBioLabel": "Bio",
+    "elizaBioHint": "Define your agent's personality and background. One statement per line.",
+    "elizaBioPlaceholder": "A knowledgeable AI assistant specializing in...",
+    "elizaLoreLabel": "Lore",
+    "elizaLoreHint": "Background knowledge and history for your agent. One fact per line.",
+    "elizaStyleLabel": "Style Instructions",
+    "elizaStyleHint": "How your agent should communicate. One instruction per line.",
+    "elizaTopicsLabel": "Topics",
+    "elizaTopicsPlaceholder": "technology, AI, crypto, research",
+    "elizaTopicsHint": "Comma-separated topics your agent knows about",
+    "elizaAdjectivesLabel": "Adjectives",
+    "elizaAdjectivesPlaceholder": "helpful, analytical, concise",
+    "elizaAdjectivesHint": "Personality traits, comma-separated",
+    "miladyPersonalityLabel": "Personality Preset",
+    "miladyPersonalityHint": "Choose a personality vibe for your Milady agent.",
+    "miladyPersonalityHelpful": "Helpful - Friendly and professional",
+    "miladyPersonalityTsundere": "Tsundere - Reluctant but secretly caring",
+    "miladyPersonalityUnhinged": "Unhinged - Chaotic and unpredictable",
+    "miladyPersonalityCustom": "Custom - Uses your system prompt",
+    "moreOptionsLabel": "More Options",
+    "moreOptionsHints": {
+      "openclaw": "Search, voice, sessions",
+      "hermes": "Personality, memory, approvals",
+      "elizaos": "Database, image gen, voice",
+      "milady": "Database, privacy, presets"
+    },
+    "sessionScopeLabel": "Session Scope",
+    "sessionScopeHint": "How conversation context is shared between users",
+    "sessionScopePerUser": "Per User",
+    "sessionScopeGlobal": "Global",
+    "webSearchLabel": "Enable Web Search",
+    "webSearchHint": "Allow your agent to search the web for real-time info",
+    "searchProviderLabel": "Search Provider",
+    "searchProviderHint": "Which search API to use",
+    "ttsLabel": "Enable Voice (TTS)",
+    "ttsHint": "Text-to-speech output for voice replies",
+    "ttsProviderLabel": "TTS Provider",
+    "ttsProviderHint": "Voice synthesis engine",
+    "hermesPersonalityLabel": "Personality",
+    "hermesPersonalityHint": "Conversation tone and style",
+    "hermesPersonalityDefault": "Default",
+    "hermesPersonalityHelpful": "Helpful",
+    "hermesPersonalityTechnical": "Technical",
+    "hermesPersonalityCreative": "Creative",
+    "hermesPersonalityConcise": "Concise",
+    "memoryLabel": "Enable Memory",
+    "memoryHint": "Persist context across conversations",
+    "approvalModeLabel": "Approval Mode",
+    "approvalModeHint": "How actions are authorized before execution",
+    "approvalModeAuto": "Auto",
+    "approvalModeAsk": "Ask Before Actions",
+    "approvalModeManual": "Manual",
+    "databaseLabel": "Database",
+    "databaseHint": "Storage backend for agent state and memory",
+    "databaseHintMilady": "Storage backend for agent state",
+    "imageGenLabel": "Enable Image Generation",
+    "imageGenHint": "Allow the agent to generate images",
+    "voiceLabel": "Enable Voice",
+    "voiceHint": "Speech-to-text and text-to-speech capabilities",
+    "localFirstLabel": "Local-First Mode",
+    "localFirstHint": "Process data locally before syncing",
+    "miladyPersonalitySelectedHint": "Selected above — controls agent tone",
+    "step5Heading": "Ready to launch?",
+    "step5Subheading": "Review your configuration before launching",
+    "summaryAgentType": "Agent Type",
+    "summaryTemplate": "Template",
+    "summaryTemplateCustom": "Custom",
+    "summaryAiModel": "AI Model",
+    "summaryDescription": "Description",
+    "summaryPlatforms": "Platforms",
+    "summaryPersonality": "Personality",
+    "summaryPersonalityDefault": "Template default",
+    "summaryPersonalityCustom": "Custom instructions",
+    "summaryCost": "Cost",
+    "summaryCostFree": "$0.00 — free tier",
+    "summaryCostByok": "$0.00 — using your own key",
+    "summaryFrameworkLabels": {
+      "openclaw": "Multi-skill assistant",
+      "hermes": "Autonomous agent",
+      "elizaos": "Multi-agent framework",
+      "milady": "Privacy-first runtime"
+    },
+    "testChatLabel": "Test Your Agent",
+    "testChatSubtext": "Preview how your agent will respond",
+    "testChatPreviewLabel": "Chat Preview",
+    "testChatSimulated": "This is a simulated preview. Deploy your agent for real conversations.",
+    "testChatEmpty": "Send a message to preview your agent",
+    "testChatEmptyHint": "Try \"Hello\" or \"What can you do?\"",
+    "testChatPlaceholder": "Type a message...",
+    "launchedHeading": "Your agent is alive!",
+    "launchedSubtext": "Redirecting to your agent's dashboard...",
+    "launchCtaLabel": "Launch your agent",
+    "launchCtaCreating": "Creating agent...",
+    "launchCtaCreated": "Agent created successfully",
+    "launchCta": "Launch My Agent!",
+    "launching": "Hatching...",
+    "launched": "Hatched!",
+    "frameworkFeatures": {
+      "openclaw": {
+        "desc": "Versatile AI assistant with thousands of community skills and multi-channel messaging.",
+        "f1": "Thousands of skills",
+        "f2": "Web browsing",
+        "f3": "Scheduled tasks"
+      },
+      "hermes": {
+        "desc": "Smart AI agent that remembers context across conversations and learns over time.",
+        "f1": "Long-term memory",
+        "f2": "40+ built-in tools",
+        "f3": "Self-improving"
+      },
+      "elizaos": {
+        "desc": "Open-source multi-agent framework by ai16z. 90+ plugins, persistent memory, Web3 native.",
+        "f1": "90+ plugins",
+        "f2": "Vector memory",
+        "f3": "Web3 native"
+      },
+      "milady": {
+        "desc": "Privacy-first AI runtime with 20+ connectors, VRM avatars, and DeFi integration.",
+        "f1": "20+ connectors",
+        "f2": "Personality presets",
+        "f3": "Privacy-first"
+      }
+    },
+    "skills": {
+      "webSearch": {
+        "name": "Web Search",
+        "desc": "Search the web for real-time info"
+      },
+      "calculator": {
+        "name": "Calculator",
+        "desc": "Math and calculations"
+      },
+      "weather": {
+        "name": "Weather",
+        "desc": "Weather forecasts"
+      },
+      "codeInterpreter": {
+        "name": "Code Runner",
+        "desc": "Execute code snippets"
+      },
+      "fileManager": {
+        "name": "File Manager",
+        "desc": "Read and write files"
+      },
+      "imageGen": {
+        "name": "Image Gen",
+        "desc": "Generate images from text"
+      }
+    },
+    "tools": {
+      "webSearch": {
+        "name": "Web Search",
+        "desc": "Search the internet for information"
+      },
+      "calculator": {
+        "name": "Calculator",
+        "desc": "Math calculations"
+      },
+      "codeExecution": {
+        "name": "Code Runner",
+        "desc": "Execute code snippets"
+      },
+      "fileOperations": {
+        "name": "File Operations",
+        "desc": "Read and write files"
+      },
+      "memory": {
+        "name": "Memory",
+        "desc": "Remember conversations and facts"
+      },
+      "summarize": {
+        "name": "Summarizer",
+        "desc": "Summarize long texts"
+      },
+      "translate": {
+        "name": "Translator",
+        "desc": "Translate between languages"
+      },
+      "weather": {
+        "name": "Weather",
+        "desc": "Weather forecasts"
+      }
+    },
+    "plugins": {
+      "database": {
+        "name": "Database",
+        "desc": "SQL database access"
+      },
+      "imageGen": {
+        "name": "Image Gen",
+        "desc": "Generate images"
+      },
+      "video": {
+        "name": "Video",
+        "desc": "Video processing"
+      },
+      "tts": {
+        "name": "Text-to-Speech",
+        "desc": "Voice output"
+      },
+      "nodeRuntime": {
+        "name": "Node Runtime",
+        "desc": "Server-side operations"
+      },
+      "bootstrap": {
+        "name": "Bootstrap",
+        "desc": "Core utilities"
+      }
+    },
+    "capabilities": {
+      "chat": {
+        "name": "Chat",
+        "desc": "Core conversation"
+      },
+      "defi": {
+        "name": "DeFi",
+        "desc": "DeFi protocol interactions"
+      },
+      "social": {
+        "name": "Social",
+        "desc": "Social media integration"
+      },
+      "analysis": {
+        "name": "Analysis",
+        "desc": "Data analysis"
+      },
+      "privacy": {
+        "name": "Privacy",
+        "desc": "Privacy tools"
+      },
+      "memes": {
+        "name": "Memes",
+        "desc": "Meme generation"
+      }
+    },
+    "platforms": {
+      "telegram": {
+        "desc": "Deploy as a Telegram bot",
+        "helperField": "Message @BotFather on Telegram → /newbot → copy the token"
+      },
+      "discord": {
+        "desc": "Deploy as a Discord bot",
+        "helperField": "Discord Developer Portal → New Application → Bot → Copy Token"
+      },
+      "whatsapp": {
+        "desc": "Connect via QR code",
+        "note": "QR pairing will be available after deployment"
+      },
+      "slack": {
+        "desc": "Deploy in Slack workspace",
+        "helperField": "Slack API → Create App → OAuth & Permissions → Bot Token"
+      },
+      "twitter": {
+        "desc": "Post, reply and engage on X"
+      }
+    },
+    "llmFreeSummary": "Free AI Model (Groq)",
+    "llmByokSummary": "Your key: {provider}{model}",
+    "errorHeading": "Creation Error",
+    "errorBody": "Something went wrong while setting up your agent. Your progress has not been lost.",
+    "errorIdLabel": "Error ID:",
+    "tryAgain": "Try Again",
+    "dashboard": "Dashboard"
+  },
+  "support": {
+    "eyebrow": "Help",
+    "heading": "Support",
+    "subheading": "Get help with your agents, billing, or anything else.",
+    "quickLinks": {
+      "documentation": "Documentation",
+      "documentationDesc": "Browse guides and API reference",
+      "faq": "FAQ",
+      "faqDesc": "Common questions answered",
+      "followUs": "Follow Us",
+      "followUsDesc": "Updates and announcements"
+    },
+    "directContact": "Or email us directly at",
+    "joinDiscord": "Join our Discord",
+    "telegramLabel": "Telegram",
+    "communitySupport": "for community support",
+    "submitTicketHeading": "Submit a Ticket",
+    "signInPrompt": "Sign in to submit a support ticket.",
+    "signIn": "Sign In",
+    "ticketSubmitted": "Ticket Submitted",
+    "ticketSubmittedBody": "We have received your request and will get back to you shortly. You will be notified when there is an update.",
+    "submitAnother": "Submit Another Ticket",
+    "subjectLabel": "Subject",
+    "subjectPlaceholder": "Brief description of your issue",
+    "categoryLabel": "Category",
+    "priorityLabel": "Priority",
+    "relatedAgentLabel": "Related Agent",
+    "relatedAgentOptional": "(optional)",
+    "selectAgent": "Select an agent...",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Describe your issue in detail...",
+    "submitTicket": "Submit Ticket",
+    "submitting": "Submitting...",
+    "signInError": "Please sign in to submit a ticket.",
+    "subjectRequired": "Subject is required.",
+    "messageRequired": "Message is required.",
+    "failedSubmit": "Failed to submit ticket. Please try again.",
+    "recentTickets": "Recent Tickets",
+    "noTickets": "No tickets yet",
+    "noTicketsDesc": "Your submitted support tickets will appear here. Create your first ticket above to get started.",
+    "backToTop": "Back to Top",
+    "ticketCount": "{count} ticket",
+    "ticketCountPlural": "{count} tickets"
+  },
+  "affiliate": {
+    "eyebrow": "Affiliate Program",
+    "heading": "Earn from every user you bring to Hatcher.",
+    "subheading": "Up to 40% recurring commissions on every paid user you refer. Cash in your wallet, credits to fund your own agents, or a hybrid split — your call. Attribution is link-based and sticks for the lifetime of the referred account.",
+    "applyNowCta": "Apply now",
+    "howItWorksLink": "How it works",
+    "pickYourPayout": "Pick your payout",
+    "threeWays": "Three ways to get paid.",
+    "threeWaysSubheading": "Same eligible revenue, different split. Pick the mode that matches how you want value out of the program — you can switch later by contacting support.",
+    "popularLabel": "Popular",
+    "foundingBonusLabel": "Founding Member bonus",
+    "foundingBonusHeading": "Refer a Founding Member → flat $20 cash bonus.",
+    "foundingBonusBody": "The $99 lifetime tier pays a one-time flat $20 to the referring affiliate — in addition to anything they earn from that user's later addon or agent purchases. Paid in cash regardless of your default payout mode.",
+    "applyLabel": "Apply",
+    "howItWorksLabel": "How it works",
+    "fourSteps": "Four steps, zero surprises.",
+    "faqLabel": "Frequently asked",
+    "everythingYoudAsk": "Everything you'd ask before applying.",
+    "readyHeading": "Ready to partner with Hatcher?",
+    "readyBody": "Applications take a few minutes. Approvals in 3–5 days. Recurring commissions for the lifetime of every user you bring in.",
+    "seePricing": "See pricing",
+    "apply": {
+      "backLink": "Back to Affiliate Program",
+      "loading": "Loading…",
+      "eyebrow": "Apply to Hatcher Affiliates",
+      "heading": "Tell us about you.",
+      "subheading": "A few details about your platforms and audience. We review every application manually — be honest, be specific.",
+      "underReview": "Under review — we'll be in touch.",
+      "reviewTime": "Expected review time:",
+      "reviewDays": "3–5 days",
+      "reviewEmailNote": "You'll get an email the moment a decision lands.",
+      "submitted": "Application submitted",
+      "submittedDate": "Submitted",
+      "platformsLabel": "Platforms",
+      "followers": "followers",
+      "slugLabel": "Requested slug",
+      "slugPreview": "preview: hatcher.host/r/{slug}",
+      "payoutModeLabel": "Payout mode",
+      "payoutAddressLabel": "Payout address",
+      "pitchLabel": "Pitch",
+      "successHeading": "Application submitted.",
+      "successBody": "We'll review within 3–5 days and email you the result. In the meantime feel free to spec out what you'll share once you're approved.",
+      "backToAffiliate": "Back to Affiliate Program",
+      "yourPlatforms": "Your platforms",
+      "platformCount": "{count} / {max}",
+      "platformLabel": "Platform {n}",
+      "removeLabel": "Remove",
+      "addPlatform": "Add another platform",
+      "platformTypeField": "Platform type",
+      "handleField": "Handle",
+      "handleHint": "e.g. @hatcher, @solana, /channel/xyz",
+      "audienceField": "Audience size (optional)",
+      "urlField": "URL (optional)",
+      "slugField": "Custom referral link (optional)",
+      "slugPrefix": "hatcher.host/r/",
+      "slugPlaceholder": "yourname",
+      "slugBlankHint": "Leave blank for an auto-generated code",
+      "slugPreviewGood": "Your link will be hatcher.host/r/{slug}",
+      "pitchField": "Pitch",
+      "pitchPlaceholder": "Why do you want to partner with Hatcher? What kind of content or audience will you reach?",
+      "pitchCharHint": "50–2000 characters",
+      "payoutModeField": "Payout mode",
+      "solAddressField": "SOL wallet address (base58, 32–44 chars)",
+      "solAddressPlaceholder": "e.g. 21L6VVRAuxk87sXggz8exhPCm1w4qWyKEs6SDauyyRAW",
+      "submitBtn": "Submit application",
+      "submitting": "Submitting…",
+      "rejectedLabel": "Previous application rejected",
+      "validatePlatformMin": "Add at least one platform",
+      "validatePlatformMax": "Max {max} platforms",
+      "validateHandleRequired": "Required",
+      "validateHandleMax": "Max 100 characters",
+      "validateAudienceNumber": "Must be a whole number",
+      "validateUrlInvalid": "Must be a valid URL",
+      "validatePitchMin": "Pitch must be at least 50 characters",
+      "validatePitchMax": "Pitch must be at most 2000 characters",
+      "validateAddressRequired": "Required for CASH_ONLY and HYBRID",
+      "validateAddressFormat": "Must be a valid Solana base58 address (32–44 chars)",
+      "slugTooShort": "Too short — min 3 characters",
+      "slugTooLong": "Too long — max 30 characters",
+      "slugInvalidChars": "Only a–z, 0–9, and hyphens (cannot start/end with -)",
+      "slugReserved": "That slug is reserved — pick another"
+    }
+  },
+  "docs": {
+    "eyebrow": "Documentation",
+    "heading": "Documentation",
+    "subheading": "Everything you need to build, deploy, and manage AI agents with Hatcher.",
+    "searchPlaceholder": "Search documentation...",
+    "searchComingSoon": "Search coming soon",
+    "apiReferenceHeading": "API Reference",
+    "apiReferenceBody": "Full endpoint documentation with examples in cURL, JavaScript, and Python. Auth, rate limits, and error codes.",
+    "apiReferenceLink": "Explore endpoints",
+    "integrationsHeading": "Integration Guides",
+    "integrationsBody": "Step-by-step setup for Telegram, Discord, WhatsApp, Slack, Twitter/X, and Signal. From credentials to first message.",
+    "integrationsLink": "Browse platforms",
+    "popularTopics": "Popular topics",
+    "readMore": "Read more",
+    "cantFind": "Can't find what you're looking for?",
+    "cantFindBody": "Our support team and community are here to help you get the most out of Hatcher.",
+    "contactSupport": "Contact Support",
+    "helpCenter": "Help Center",
+    "quickLinks": [
+      {
+        "title": "Getting Started",
+        "description": "Set up your first AI agent in under 60 seconds. Quick start guide, prerequisites, and first deploy."
+      },
+      {
+        "title": "Agent Configuration",
+        "description": "Configure personality, models, memory, cron jobs, webhooks, and multi-agent routing."
+      },
+      {
+        "title": "Platform Integrations",
+        "description": "Connect to Telegram, Discord, WhatsApp, Slack, and 20+ messaging platforms."
+      },
+      {
+        "title": "BYOK Setup",
+        "description": "Bring your own API keys for OpenAI, Anthropic, Google, xAI, and more. Always free."
+      },
+      {
+        "title": "Billing & Pricing",
+        "description": "Understand token payments, feature unlocks, hosted credits, and subscription management."
+      },
+      {
+        "title": "API Reference",
+        "description": "REST API endpoints for agents, features, payments, and admin operations."
+      }
+    ],
+    "topics": [
+      {
+        "label": "How to deploy your first agent"
+      },
+      {
+        "label": "Supported LLM providers"
+      },
+      {
+        "label": "Agent framework configuration"
+      },
+      {
+        "label": "Container lifecycle & status codes"
+      },
+      {
+        "label": "Setting up Telegram integration"
+      },
+      {
+        "label": "Understanding token payments"
+      }
+    ]
+  },
+  "shared": {
+    "tiers": {
+      "free": {
+        "name": "Free",
+        "description": "1 agent, 20 messages/day, 50 MB storage"
+      },
+      "starter": {
+        "name": "Starter",
+        "description": "1 agent, 50 messages/day, 150 MB storage"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "3 agents, 100 messages/day, 500 MB storage"
+      },
+      "business": {
+        "name": "Business",
+        "description": "10 agents, 300 messages/day, 1 GB storage, always-on"
+      },
+      "founding_member": {
+        "name": "Founding Member",
+        "description": "10 agents, 300 messages/day, 2 GB storage, lifetime access"
+      }
+    },
+    "addons": {
+      "agents_plus1": {
+        "name": "+1 Agent",
+        "description": "1 additional agent slot"
+      },
+      "agents_plus3": {
+        "name": "+3 Agents",
+        "description": "3 additional agent slots"
+      },
+      "agents_plus5": {
+        "name": "+5 Agents",
+        "description": "5 additional agent slots"
+      },
+      "agents_plus10": {
+        "name": "+10 Agents",
+        "description": "10 additional agent slots"
+      },
+      "messages_plus20": {
+        "name": "+20 msg/day",
+        "description": "20 extra messages per day"
+      },
+      "messages_plus50": {
+        "name": "+50 msg/day",
+        "description": "50 extra messages per day"
+      },
+      "messages_plus100": {
+        "name": "+100 msg/day",
+        "description": "100 extra messages per day"
+      },
+      "messages_plus200": {
+        "name": "+200 msg/day",
+        "description": "200 extra messages per day"
+      },
+      "searches_plus25": {
+        "name": "+25 searches/day",
+        "description": "25 extra web searches per day"
+      },
+      "searches_plus50": {
+        "name": "+50 searches/day",
+        "description": "50 extra web searches per day"
+      },
+      "always_on": {
+        "name": "Always On",
+        "description": "Keep this agent running 24/7"
+      },
+      "file_manager": {
+        "name": "File Manager",
+        "description": "Browse, edit & download workspace files"
+      },
+      "full_logs": {
+        "name": "Full Logs",
+        "description": "Unlock full log viewer for this agent"
+      },
+      "plugins_plus10": {
+        "name": "+10 Plugins",
+        "description": "10 extra plugin+skill slots for this agent"
+      }
+    },
+    "frameworks": {
+      "openclaw": {
+        "name": "OpenClaw",
+        "description": "Self-hosted AI assistant with 3,200+ community skills, multi-channel messaging gateway, and autonomous task execution."
+      },
+      "hermes": {
+        "name": "Hermes Agent",
+        "description": "Autonomous AI agent by Nous Research with persistent memory, 40+ tools, skills system, and multi-platform messaging gateway."
+      },
+      "elizaos": {
+        "name": "ElizaOS",
+        "description": "Open-source AI agent framework with character-driven personas, plugin ecosystem, and multi-client support for social and messaging platforms."
+      },
+      "milady": {
+        "name": "Milady",
+        "description": "Lightweight, personality-first AI agent framework designed for expressive, culturally-aware conversational agents with modular capabilities."
+      }
+    },
+    "agentStatus": {
+      "active": "Active",
+      "sleeping": "Sleeping",
+      "paused": "Paused",
+      "error": "Error",
+      "killed": "Killed",
+      "restarting": "Restarting",
+      "stopping": "Stopping"
+    }
+  },
+  "localeSwitcher": {
+    "label": "Change language"
+  }
+}

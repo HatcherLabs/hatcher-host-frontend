@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 interface RateLimitIndicatorProps {
   isAuthenticated: boolean;
   isLimitReached: boolean;
@@ -19,6 +21,7 @@ export function RateLimitIndicator({
   msgLimit,
   remaining,
 }: RateLimitIndicatorProps) {
+  const t = useTranslations('dashboard.agentDetail.chat');
   if (!isAuthenticated || isLimitReached) return null;
 
   return (
@@ -26,7 +29,7 @@ export function RateLimitIndicator({
       {hasUnlimitedChat ? (
         <div className="flex items-center gap-1.5 px-1">
           <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium">
-            {isByok ? 'Unlimited (BYOK)' : 'Unlimited'}
+            {t('unlimited')}
           </span>
         </div>
       ) : msgLimit > 0 && (
@@ -50,7 +53,7 @@ export function RateLimitIndicator({
               ? 'text-amber-400'
               : 'text-red-400'
           }`}>
-            {msgCount}/{msgLimit} today
+            {msgCount}/{msgLimit} {t('today')}
           </span>
         </div>
       )}

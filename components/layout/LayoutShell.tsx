@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/i18n/routing';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';

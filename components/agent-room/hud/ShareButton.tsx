@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   agentName: string;
@@ -33,6 +34,7 @@ function downloadFromDataUrl(dataUrl: string, filename: string) {
 }
 
 export function ShareButton({ agentName, framework }: Props) {
+  const t = useTranslations('agentRoom.share');
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -41,7 +43,7 @@ export function ShareButton({ agentName, framework }: Props) {
     setMsg(null);
     const dataUrl = captureCanvas();
     if (!dataUrl) {
-      setMsg('Could not capture scene');
+      setMsg(t('failed'));
       setBusy(false);
       setTimeout(() => setMsg(null), 2500);
       return;
@@ -51,7 +53,7 @@ export function ShareButton({ agentName, framework }: Props) {
     const tweet = TWEET_BY_FW[framework] ?? TWEET_BY_FW.openclaw!;
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
-    setMsg('Image saved + X opened');
+    setMsg(t('saved'));
     setBusy(false);
     setTimeout(() => setMsg(null), 3000);
   }
@@ -67,10 +69,10 @@ export function ShareButton({ agentName, framework }: Props) {
         color: 'var(--room-bright)',
         boxShadow: '0 0 18px color-mix(in srgb, var(--room-primary) 22%, transparent)',
       }}
-      title="Capture room + share on X"
+      title={t('title')}
     >
       <span aria-hidden>📸</span>
-      <span>{msg ?? (busy ? 'Capturing...' : 'Share')}</span>
+      <span>{msg ?? (busy ? t('capturing') : t('button'))}</span>
     </button>
   );
 }

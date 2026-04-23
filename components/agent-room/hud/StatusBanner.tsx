@@ -1,64 +1,45 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   status: string;
 }
 
-const LABELS: Record<string, { title: string; hint: string; tone: 'warn' | 'info' | 'err' }> = {
-  paused: {
-    title: 'Agent is paused',
-    hint: 'Go to the dashboard and click Start to wake it up.',
-    tone: 'warn',
-  },
-  stopped: {
-    title: 'Agent is stopped',
-    hint: 'Start it from the dashboard to chat.',
-    tone: 'warn',
-  },
-  starting: {
-    title: 'Agent is starting up',
-    hint: 'This takes 2–4 min on first boot. Chat will be live the moment it\'s ready.',
-    tone: 'info',
-  },
-  initializing: {
-    title: 'Initializing agent',
-    hint: 'Seeding config and skills — usually 2 min, first boot can be longer.',
-    tone: 'info',
-  },
-  pending: {
-    title: 'Agent pending',
-    hint: 'Waiting for start signal...',
-    tone: 'info',
-  },
-  error: {
-    title: 'Agent in error state',
-    hint: 'Check Integrations tab or support — last boot failed.',
-    tone: 'err',
-  },
-  crashed: {
-    title: 'Agent crashed',
-    hint: 'Auto-restart will retry. If it keeps crashing, check logs.',
-    tone: 'err',
-  },
+type StatusKey = 'paused' | 'stopped' | 'starting' | 'initializing' | 'pending' | 'error' | 'crashed';
+
+const STATUS_TONE: Record<string, 'warn' | 'info' | 'err'> = {
+  paused: 'warn',
+  stopped: 'warn',
+  starting: 'info',
+  initializing: 'info',
+  pending: 'info',
+  error: 'err',
+  crashed: 'err',
 };
 
+const KNOWN_STATUSES = new Set<string>(['paused', 'stopped', 'starting', 'initializing', 'pending', 'error', 'crashed']);
+
 export function StatusBanner({ status }: Props) {
+  const t = useTranslations('agentRoom.status');
   const [dot, setDot] = useState(0);
-  const meta = LABELS[status];
+  const tone = STATUS_TONE[status];
 
   useEffect(() => {
-    if (!meta || meta.tone !== 'info') return;
+    if (!tone || tone !== 'info') return;
     const i = setInterval(() => setDot((d) => (d + 1) % 4), 450);
     return () => clearInterval(i);
-  }, [meta]);
+  }, [tone]);
 
-  if (!meta || status === 'active' || status === 'running') return null;
+  if (!tone || status === 'active' || status === 'running') return null;
+  if (!KNOWN_STATUSES.has(status)) return null;
+
+  const sk = status as StatusKey;
 
   const color =
-    meta.tone === 'err'
+    tone === 'err'
       ? '#ef4444'
-      : meta.tone === 'warn'
+      : tone === 'warn'
         ? '#fbbf24'
         : 'var(--room-primary)';
 
@@ -75,16 +56,16 @@ export function StatusBanner({ status }: Props) {
         className="block h-2 w-2 rounded-full"
         style={{
           background: color,
-          animation: meta.tone === 'info' ? 'statusPulse 1.2s infinite' : undefined,
+          animation: tone === 'info' ? 'statusPulse 1.2s infinite' : undefined,
           boxShadow: `0 0 10px ${color}`,
         }}
       />
       <div className="flex-1">
         <div className="text-xs font-bold uppercase tracking-[2px]" style={{ color }}>
-          {meta.title}
-          {meta.tone === 'info' ? '.'.repeat(dot) : ''}
+          {t(`${sk}.title`)}
+          {tone === 'info' ? '.'.repeat(dot) : ''}
         </div>
-        <div className="mt-0.5 text-[11px] text-gray-300">{meta.hint}</div>
+        <div className="mt-0.5 text-[11px] text-gray-300">{t(`${sk}.hint`)}</div>
       </div>
       <style>{`
         @keyframes statusPulse {

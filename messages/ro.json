@@ -1,0 +1,2658 @@
+{
+  "common": {
+    "appName": "Hatcher",
+    "tagline": "Hosting gestionat pentru agenți AI · Crypto-nativ"
+  },
+  "nav": {
+    "pricing": "Prețuri",
+    "docs": "Docs",
+    "roadmap": "Roadmap",
+    "login": "Autentificare",
+    "signup": "Înregistrare",
+    "frameworks": "Frameworks",
+    "token": "Token",
+    "blog": "Blog",
+    "changelog": "Changelog",
+    "help": "Ajutor",
+    "dashboard": "Panou",
+    "myAgents": "Agenții mei",
+    "create": "Creează",
+    "city": "City",
+    "analytics": "Analytics",
+    "team": "Echipă",
+    "billing": "Facturare",
+    "settings": "Setări",
+    "support": "Suport",
+    "logout": "Deconectare",
+    "signIn": "Autentificare",
+    "signUp": "Înregistrare",
+    "credits": "credite",
+    "affiliate": "Afiliat",
+    "admin": "Admin",
+    "adminPanel": "Panou Admin",
+    "openNav": "Deschide meniul de navigare",
+    "closeNav": "Închide meniul de navigare",
+    "affiliateDashboard": "Panou Afiliat",
+    "affiliatePending": "Aplicație în curs de revizuire",
+    "affiliateRejected": "Reaplică ca afiliat",
+    "affiliateBecome": "Devino afiliat"
+  },
+  "notifications": {
+    "heading": "Notificări",
+    "empty": "Nicio notificare",
+    "markRead": "Marchează citit",
+    "markReadAriaLabel": "Marchează toate notificările ca citite",
+    "clear": "Șterge",
+    "clearAriaLabel": "Șterge toate notificările",
+    "unreadAriaLabel": "Notificări, {count} necitite",
+    "allReadAriaLabel": "Notificări"
+  },
+  "footer": {
+    "columns": {
+      "product": "Produs",
+      "resources": "Resurse",
+      "community": "Comunitate"
+    },
+    "links": {
+      "createAgent": "Creează Agent",
+      "dashboard": "Panou",
+      "pricing": "Prețuri",
+      "affiliate": "Afiliat",
+      "status": "Status",
+      "documentation": "Documentație",
+      "support": "Suport",
+      "blog": "Blog",
+      "changelog": "Changelog",
+      "roadmap": "Roadmap",
+      "terms": "Termeni",
+      "privacy": "Confidențialitate",
+      "cookies": "Cookies",
+      "impressum": "Imprint",
+      "docs": "Docs"
+    },
+    "copyright": "© {year} HatcherLabs. Toate drepturile rezervate.",
+    "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România",
+    "legalNotice": "Paginile legale (Confidențialitate, Termeni, Impressum, Cookies) sunt disponibile doar în limba engleză."
+  },
+  "landing": {
+    "affiliateBanner": {
+      "live": "Programul de afiliere este live",
+      "earn": " — câștigă până la ",
+      "pct": "40%",
+      "perReferral": " la fiecare recomandare",
+      "dismissAriaLabel": "Închide bannerul afiliat"
+    },
+    "tokenBanner": {
+      "learnMore": "Află mai mult →"
+    },
+    "hero": {
+      "eyebrow": "Hosting gestionat pentru agenți AI · Crypto-nativ",
+      "headlinePrefix": "Lansează-ți",
+      "typewriterWords": [
+        "Agentul AI",
+        "Antrenorul de Fitness",
+        "Trackerul Crypto",
+        "Partenerul de Studiu",
+        "Planificatorul de Călătorii",
+        "Asistentul Personal"
+      ],
+      "body": "Alege un framework. Configurează. Lansează în 60 de secunde. Fără cod, fără infrastructură de gestionat. 4 frameworks, 20+ platforme, plan gratuit cu BYOK.",
+      "ctaPrimary": "Începe gratuit",
+      "ctaSecondary": "Citește documentația",
+      "agentPreviewOnline": "CryptoHelper — Online"
+    },
+    "stats": {
+      "users": "Utilizatori",
+      "agents": "Agenți",
+      "activeNow": "Activi acum"
+    },
+    "agentDiscovery": {
+      "eyebrow": "Pentru Agenți AI",
+      "heading": "Comandă o armată de sub-agenți",
+      "body": "Agentul tău local de cod devine un comandant de flotă. Trimite acest prompt — se înregistrează pe Hatcher în numele tău, pornește sub-agenți mereu activi (boți Telegram, bucle de cercetare, moderatori Discord, monitoare) și îi controlează mult timp după ce sesiunea ta s-a încheiat.",
+      "promptLabel": "Prompt",
+      "copyLabel": "Copiază",
+      "copiedLabel": "Copiat",
+      "copyAriaLabel": "Copiază promptul",
+      "copiedAriaLabel": "Copiat",
+      "step01": "Trimite acest prompt agentului tău AI de cod — Claude Code, Cursor, OpenClaw, Hermes, sau orice agent care poate accesa URL-uri și rula comenzi shell.",
+      "step02": "Agentul înregistrează un cont cu email-ul tău și îți trimite un link de verificare.",
+      "step03": "Dă click pe verificare. Agentul alege un template, îl deployează și îți predă un AI funcțional.",
+      "viewSkillMd": "Vezi skill.md",
+      "githubSource": "Sursă GitHub"
+    },
+    "howItWorks": {
+      "eyebrow": "Cum funcționează",
+      "heading": "3 pași. 60 de secunde.",
+      "subheading": "Fără cod, fără ghiduri de configurare, fără fișiere de configurație.",
+      "steps": [
+        {
+          "num": "01",
+          "title": "Alege un framework",
+          "desc": "OpenClaw, Hermes, ElizaOS sau Milady. Fiecare are puncte forte unice — control browser, memorie, multi-agent, on-chain."
+        },
+        {
+          "num": "02",
+          "title": "Configurează",
+          "desc": "Nume, personalitate, integrări. Completează un formular simplu — fără fișiere de config, fără YAML."
+        },
+        {
+          "num": "03",
+          "title": "Deployează",
+          "desc": "Un singur click. Agentul tău e live pe toate platformele conectate în mai puțin de 60 de secunde."
+        }
+      ],
+      "cta": "Încearcă acum"
+    },
+    "useCases": {
+      "eyebrow": "Cazuri de utilizare",
+      "heading": "Ce vei lansa?",
+      "subheading": "De la productivitate personală la automatizare de business — agentul tău, regulile tale.",
+      "items": [
+        {
+          "title": "Asistent personal",
+          "desc": "Calendar, email-uri, remindere — din Telegram."
+        },
+        {
+          "title": "Antrenor de fitness",
+          "desc": "Antrenamente, rutine, responsabilitate zilnică."
+        },
+        {
+          "title": "Alimentație & nutriție",
+          "desc": "Înregistrează mese, numără calorii, sugestii de rețete."
+        },
+        {
+          "title": "Tracker crypto",
+          "desc": "Prețuri token, alerte portofoliu, date on-chain."
+        },
+        {
+          "title": "Partener de studiu",
+          "desc": "Te testează, rezumă manuale, ajutor la teme."
+        },
+        {
+          "title": "Planificator de călătorii",
+          "desc": "Caută zboruri, planifică itinerarii, recomandări locale."
+        },
+        {
+          "title": "Manager de buget",
+          "desc": "Urmărește cheltuieli, obiective de economii, rapoarte săptămânale."
+        },
+        {
+          "title": "Asistent de cercetare",
+          "desc": "Căutare web, rezumate de articole, compilează rapoarte."
+        },
+        {
+          "title": "Suport clienți",
+          "desc": "Răspunde la întrebări frecvente pe Discord sau WhatsApp, 24/7."
+        }
+      ],
+      "footer": "Și orice altceva poți descrie în cuvinte simple."
+    },
+    "frameworks": {
+      "eyebrow": "Frameworks",
+      "heading": "Patru frameworks. O singură platformă.",
+      "subheading": "Alege-l pe cel care se potrivește agentului tău. Schimbă oricând vrei.",
+      "items": [
+        {
+          "name": "OpenClaw",
+          "tag": "universal",
+          "desc": "Unelte puternice, plugins și control browser.",
+          "features": "2500+ abilități · Automatizare browser · Gestionare fișiere"
+        },
+        {
+          "name": "Hermes",
+          "tag": "raționament",
+          "desc": "Design axat pe inteligență, memorie bogată și raționament.",
+          "features": "77 abilități incluse · Memorie profundă · Multi-model"
+        },
+        {
+          "name": "ElizaOS",
+          "tag": "multi-agent",
+          "desc": "Coordonare multi-agent cu 90+ plugins.",
+          "features": "90+ plugins · Multi-agent · Bază de cunoștințe"
+        },
+        {
+          "name": "Milady",
+          "tag": "crypto-nativ",
+          "desc": "Conștientizare on-chain, unelte DeFi, urmărire tokenuri.",
+          "features": "Unelte DeFi · Date on-chain · Urmărire tokenuri"
+        }
+      ]
+    },
+    "city": {
+      "eyebrow": "★ NOU",
+      "heading": "Vezi toți agenții în Hatcher City.",
+      "body": "Un oraș 3D live unde fiecare agent public este o clădire. Districte pe categorii, culori după framework, raze aurii îți marchează pe ale tale. Trage, zoom, dă click pe orice clădire pentru a o deschide.",
+      "videoAriaLabel": "Deschide Hatcher City",
+      "label": "HATCHER CITY",
+      "exploreCta": "Explorează flota completă →",
+      "enterCta": "Intră în City"
+    },
+    "features": {
+      "eyebrow": "Platformă",
+      "heading": "Tot ce are nevoie agentul tău",
+      "items": [
+        {
+          "title": "Deploy instant",
+          "desc": "De la zero la agent funcțional în mai puțin de 60 de secunde."
+        },
+        {
+          "title": "Toate platformele",
+          "desc": "Telegram, Discord, Twitter, WhatsApp, Slack."
+        },
+        {
+          "title": "Aduce-ți propria cheie",
+          "desc": "Folosește-ți propria cheie API LLM pentru mesaje nelimitate pe orice plan."
+        },
+        {
+          "title": "Securizat implicit",
+          "desc": "Containere izolate, secrete criptate, fără date partajate."
+        },
+        {
+          "title": "Analytics live",
+          "desc": "Statistici în timp real, urmărirea utilizării, metrici de performanță."
+        },
+        {
+          "title": "Chat & voce",
+          "desc": "Chat text, apeluri vocale, streaming în timp real — din prima zi."
+        }
+      ]
+    },
+    "pricing": {
+      "eyebrow": "Prețuri",
+      "heading": "Începe gratuit, crești când ești gata",
+      "subheading": "Toate platformele incluse pe fiecare plan. Aduce-ți propria cheie AI pentru mesaje nelimitate pe orice plan.",
+      "popularLabel": "Popular",
+      "tiers": [
+        {
+          "name": "Gratuit",
+          "price": "$0",
+          "sub": "/lună",
+          "features": [
+            "1 agent AI",
+            "20 mesaje/zi",
+            "Toate platformele",
+            "AI gratuit inclus"
+          ],
+          "cta": "Începe acum"
+        },
+        {
+          "name": "Starter",
+          "price": "$6.99",
+          "sub": "/lună",
+          "features": [
+            "1 agent AI",
+            "50 mesaje/zi",
+            "BYOK = nelimitat",
+            "Timp activ mai lung"
+          ],
+          "cta": "Alege Starter"
+        },
+        {
+          "name": "Pro",
+          "price": "$19.99",
+          "sub": "/lună",
+          "features": [
+            "3 agenți AI",
+            "100 mesaje/zi",
+            "BYOK = nelimitat",
+            "Resurse dedicate"
+          ],
+          "cta": "Alege Pro"
+        },
+        {
+          "name": "Business",
+          "price": "$49.99",
+          "sub": "/lună",
+          "features": [
+            "10 agenți AI",
+            "300 mesaje/zi",
+            "Containere mereu active",
+            "Suport prioritar"
+          ],
+          "cta": "Alege Business"
+        }
+      ],
+      "addonsNote": "Ai nevoie de mai mulți agenți, mesaje sau stocare? Adaugă pachete suplimentare — toate planurile au flexibilitate add-on.",
+      "addonsCta": "Vezi prețurile complete →"
+    },
+    "founding": {
+      "eyebrow": "Ofertă limitată · Membru fondator",
+      "heading": "Plătești o dată, păstrezi pentru totdeauna.",
+      "oneTime": "o singură dată",
+      "subheading": "Preț blocat, fără taxe lunare, toate funcțiile planului Business pentru totdeauna. Doar 20 de locuri.",
+      "availableSpotsLabel": "Locuri disponibile",
+      "checking": "Se verifică…",
+      "soldOut": "Epuizat",
+      "spotsLeft": "{remaining} din {max} rămase",
+      "loadingAvailability": "Se încarcă disponibilitatea…",
+      "allTaken": "Toate cele {max} locuri de fondator sunt ocupate. Planurile standard sunt în continuare disponibile.",
+      "claimed": "{claimed} din {max} revendicate · odată ce sunt toate, oferta dispare.",
+      "includedHeading": "Totul inclus, pentru totdeauna",
+      "includedItems": [
+        "10 agenți incluși",
+        "Mereu activ (fără somn)",
+        "300 mesaje/zi per cont",
+        "200 căutări web/zi",
+        "2 CPU · 4 GB RAM per agent",
+        "2 GB spațiu de lucru per agent",
+        "File Manager + Jurnale complete",
+        "Colaborare în echipă + suport prioritar",
+        "Insignă de fondator",
+        "Preț blocat pentru totdeauna"
+      ],
+      "ctaSoldOut": "Epuizat",
+      "ctaClaim": "Revendică locul tău"
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "heading": "Întrebări frecvente",
+      "items": [
+        {
+          "q": "Este cu adevărat gratuit?",
+          "a": "Da. Planul gratuit îți oferă 1 agent, 20 de mesaje pe zi și acces la toate platformele. Nu este necesară cardul bancar. BYOK (aduce-ți propria cheie LLM) = mesaje nelimitate pe orice plan."
+        },
+        {
+          "q": "Trebuie să știu să programez?",
+          "a": "Deloc! Crearea unui agent e ca și completarea unui formular — alege un nume, descrie ce vrei să facă, selectează platformele și lansează."
+        },
+        {
+          "q": "Ce înseamnă \"Bring Your Own Key\"?",
+          "a": "Conectează-ți propria cheie OpenAI, Anthropic, Google sau Groq pentru mesaje nelimitate. Plătești direct furnizorul AI."
+        },
+        {
+          "q": "Unde rulează agentul meu?",
+          "a": "Pe serverele noastre cloud, 24/7. Nu trebuie să ții calculatorul pornit sau să instalezi nimic."
+        }
+      ]
+    },
+    "finalCta": {
+      "heading": "Gata să deployezi primul tău agent?",
+      "body": "Planul gratuit include 1 agent cu 20 mesaje/zi. BYOK = nelimitat. Nu este necesar cardul bancar.",
+      "ctaPrimary": "Creează-ți agentul",
+      "ctaSecondary": "Vezi prețurile",
+      "trustNoCreditCard": "Fără card bancar",
+      "trustFreeAi": "AI gratuit inclus",
+      "trustDeploy60s": "Deploy în 60s",
+      "trustAllPlatforms": "Toate platformele"
+    }
+  },
+  "auth": {
+    "login": {
+      "heading": "Bine ai revenit",
+      "subheading": "Autentifică-te în contul Hatcher",
+      "panelTagline": "Hatcher",
+      "panelHeadlinePrefix": "Lansează-ți",
+      "panelHeadlineAccent": "agentul AI.",
+      "panelBody": "Alege un framework. Configurează. Lansează în 60 de secunde. Fără cod, fără infrastructură.",
+      "statsUsers": "Utilizatori",
+      "statsAgents": "Agenți",
+      "statsOnline": "Online acum",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Parolă",
+      "passwordPlaceholder": "Introduceți parola",
+      "forgotLink": "Ai uitat parola?",
+      "submit": "Autentificare",
+      "submitLoading": "Se autentifică...",
+      "registerPrompt": "Nu ai cont?",
+      "registerLink": "Înregistrare"
+    },
+    "register": {
+      "heading": "Creează cont",
+      "subheading": "Începe cu Hatcher",
+      "panelTagline": "Hatcher",
+      "panelHeadlinePrefix": "Lansează-ți",
+      "panelHeadlineAccent": "agentul AI.",
+      "panelBody": "Plan gratuit cu BYOK = mesaje nelimitate. Nu este necesar cardul bancar.",
+      "statsUsers": "Utilizatori",
+      "statsAgents": "Agenți",
+      "statsOnline": "Online acum",
+      "referralBadge": "Recomandat de {referrer} — amândoi primiți {credit} credit!",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "emailTaken": "Deja înregistrat.",
+      "emailTakenLink": "Autentifică-te în schimb",
+      "emailInvalid": "Introdu o adresă de email validă.",
+      "usernameLabel": "Nume de utilizator",
+      "usernamePlaceholder": "cooluser123",
+      "usernameTaken": "Acest nume de utilizator este deja folosit. Alege altul.",
+      "usernameInvalid": "3–30 litere, cifre, cratimă sau liniuță de subliniere.",
+      "usernameHint": "Doar litere, cifre, cratimă și liniuță de subliniere",
+      "passwordLabel": "Parolă",
+      "passwordPlaceholder": "Introduceți o parolă puternică",
+      "passwordHint": "Trebuie să conțină: 8+ caractere, literă mare, literă mică și o cifră",
+      "confirmPasswordLabel": "Confirmă parola",
+      "confirmPasswordPlaceholder": "Repetați parola",
+      "strengthLabels": {
+        "veryWeak": "Foarte slabă",
+        "weak": "Slabă",
+        "fair": "Acceptabilă",
+        "strong": "Puternică",
+        "veryStrong": "Foarte puternică"
+      },
+      "strengthChecks": {
+        "length": "8+ caractere",
+        "lowercase": "Literă mică",
+        "uppercase": "Literă mare",
+        "number": "Cifră",
+        "special": "Caracter special"
+      },
+      "submit": "Creează Cont",
+      "submitLoading": "Se creează contul...",
+      "loginPrompt": "Ai deja cont?",
+      "loginLink": "Autentificare",
+      "errors": {
+        "emailTaken": "Acest email este deja înregistrat. Încearcă să te autentifici.",
+        "usernameTaken": "Acest nume de utilizator este deja folosit. Alege altul.",
+        "passwordMismatch": "Parolele nu se potrivesc",
+        "passwordTooShort": "Parola trebuie să aibă cel puțin 8 caractere",
+        "passwordComplexity": "Parola trebuie să conțină literă mare, literă mică și o cifră"
+      }
+    },
+    "forgotPassword": {
+      "heading": "Ai uitat parola?",
+      "subheading": "Introdu email-ul și îți trimitem un link de resetare",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Trimite link de resetare",
+      "submitLoading": "Se trimite...",
+      "backToLogin": "Înapoi la autentificare",
+      "successHeading": "Verifică email-ul",
+      "successBody": "Dacă există un cont pentru <bold>{email}</bold>, am trimis un link de resetare a parolei. Verifică inbox-ul și folderul spam.",
+      "successBackLink": "Înapoi la autentificare",
+      "genericError": "Ceva a mers greșit. Te rugăm să încerci din nou."
+    },
+    "resetPassword": {
+      "heading": "Setează parola nouă",
+      "subheading": "Introdu noua parolă mai jos",
+      "newPasswordLabel": "Parolă nouă",
+      "newPasswordPlaceholder": "Cel puțin 8 caractere",
+      "confirmPasswordLabel": "Confirmă parola",
+      "confirmPasswordPlaceholder": "Repetați parola",
+      "passwordMismatch": "Parolele nu se potrivesc",
+      "submit": "Resetează parola",
+      "submitLoading": "Se resetează...",
+      "backToLogin": "Înapoi la autentificare",
+      "successHeading": "Parolă resetată",
+      "successBody": "Parola a fost actualizată. Te poți autentifica cu noua parolă.",
+      "successCta": "Autentificare",
+      "invalidHeading": "Link de resetare invalid",
+      "invalidBody": "Acest link de resetare lipsește sau este invalid. Solicită unul nou.",
+      "invalidCta": "Solicită un nou link de resetare",
+      "genericError": "Resetarea a eșuat. Link-ul poate fi expirat."
+    },
+    "verifyEmail": {
+      "loadingHeading": "Se verifică email-ul...",
+      "successHeading": "Email verificat!",
+      "successBody": "Contul tău este acum activ. Poți începe să creezi agenți.",
+      "successCta": "Mergi la panou",
+      "errorHeading": "Verificare eșuată",
+      "errorBody": "Link-ul de verificare este invalid sau a expirat.",
+      "errorCta": "Mergi la autentificare",
+      "noTokenHeading": "Verifică email-ul",
+      "noTokenBody": "Am trimis un link de verificare la email-ul tău. Dă click pe link pentru a activa contul.",
+      "noTokenHint": "Nu l-ai primit? Verifică folderul spam sau încearcă să te autentifici pentru a-l retrimite."
+    }
+  },
+  "pricing": {
+    "eyebrow": "Prețuri",
+    "heading": "Alege planul tău",
+    "subheading": "Începe gratuit cu orice framework. Extinde când ești gata. Toate integrările incluse pe fiecare plan. BYOK mereu nelimitat.",
+    "billingToggle": {
+      "monthly": "Lunar",
+      "annual": "Anual",
+      "annualDiscount": "−15%"
+    },
+    "tierBadges": {
+      "popular": "Popular",
+      "limited": "Limitat"
+    },
+    "priceUnit": {
+      "perMonth": "/lună",
+      "once": " o dată"
+    },
+    "annualSavings": "${annualTotal}/an · economisești ${saved}",
+    "switchToAnnual": "Treci la anual, economisești 15%",
+    "payOnce": "Plătești o dată, păstrezi pentru totdeauna",
+    "availability": "Disponibilitate",
+    "availabilityLoading": "Se încarcă",
+    "soldOut": "Epuizat",
+    "slotsLeft": "{remaining} din {max} rămase",
+    "tierCta": {
+      "free": "Începe acum",
+      "paid": "Alege {tierName}"
+    },
+    "tiers": {
+      "free": {
+        "agents": "1 agent inclus",
+        "messages": "20 mesaje/zi",
+        "cpu": "0.5 CPU",
+        "ram": "1 GB RAM",
+        "storage": "50 MB spațiu de lucru",
+        "sleep": "Adormit automat după 1h inactiv",
+        "features": [
+          "Llama 4 Scout pe Groq",
+          "BYOK = mesaje nelimitate",
+          "3 căutări web/zi",
+          "Toate integrările (Telegram, Discord, Twitter, etc)"
+        ],
+        "missing": [
+          "Jurnale, File Manager disponibile ca add-on"
+        ]
+      },
+      "starter": {
+        "agents": "1 agent inclus",
+        "messages": "50 mesaje/zi",
+        "cpu": "1 CPU",
+        "ram": "1.5 GB RAM",
+        "storage": "150 MB spațiu de lucru",
+        "sleep": "Adormit automat după 4h inactiv",
+        "features": [
+          "BYOK = mesaje nelimitate",
+          "10 căutări web/zi",
+          "Toate integrările"
+        ],
+        "missing": [
+          "Jurnale, File Manager disponibile ca add-on"
+        ]
+      },
+      "pro": {
+        "agents": "3 agenți incluși",
+        "messages": "100 mesaje/zi",
+        "cpu": "1.5 CPU",
+        "ram": "2 GB RAM",
+        "storage": "500 MB spațiu de lucru",
+        "sleep": "Adormit automat după 12h inactiv",
+        "features": [
+          "BYOK = mesaje nelimitate",
+          "50 căutări web/zi",
+          "Toate integrările",
+          "Cumpără Always On per agent pentru 24/7"
+        ],
+        "missing": [
+          "Jurnale, File Manager disponibile ca add-on"
+        ]
+      },
+      "business": {
+        "agents": "10 agenți incluși",
+        "messages": "300 mesaje/zi",
+        "cpu": "2 CPU",
+        "ram": "3 GB RAM",
+        "storage": "1 GB spațiu de lucru",
+        "sleep": "Mereu activ (fără adormire automată)",
+        "features": [
+          "BYOK = mesaje nelimitate",
+          "200 căutări web/zi",
+          "File Manager inclus",
+          "Jurnale complete incluse",
+          "Suport prioritar",
+          "Colaborare în echipă",
+          "Toate integrările"
+        ],
+        "missing": []
+      },
+      "founding_member": {
+        "agents": "10 agenți incluși",
+        "messages": "300 mesaje/zi",
+        "cpu": "2 CPU",
+        "ram": "4 GB RAM",
+        "storage": "2 GB spațiu de lucru",
+        "sleep": "Mereu activ (fără adormire automată)",
+        "features": [
+          "$99 o singură dată — acces pe viață",
+          "200 căutări web/zi",
+          "File Manager + Jurnale complete incluse",
+          "Suport prioritar",
+          "Colaborare în echipă",
+          "Toate integrările",
+          "Insignă de fondator"
+        ],
+        "missing": []
+      }
+    },
+    "addons": {
+      "heading": "Add-on-uri",
+      "subheading": "Personalizează-ți planul. Adaugă add-on-uri pe orice plan. Combină după nevoie.",
+      "annualDiscount": "15% reducere anual",
+      "groups": {
+        "extraAgents": {
+          "label": "Agenți suplimentari",
+          "items": [
+            {
+              "name": "+1 Agent",
+              "period": "/lună",
+              "description": "1 slot suplimentar"
+            },
+            {
+              "name": "+3 Agenți",
+              "period": "/lună",
+              "description": "3 sloturi suplimentare"
+            },
+            {
+              "name": "+5 Agenți",
+              "period": "/lună",
+              "description": "5 sloturi suplimentare"
+            },
+            {
+              "name": "+10 Agenți",
+              "period": "/lună",
+              "description": "10 sloturi suplimentare"
+            }
+          ]
+        },
+        "extraMessages": {
+          "label": "Mesaje suplimentare (cont)",
+          "items": [
+            {
+              "name": "+20 msg/zi",
+              "period": "/lună",
+              "description": "Cumulabil"
+            },
+            {
+              "name": "+50 msg/zi",
+              "period": "/lună",
+              "description": "Cumulabil"
+            },
+            {
+              "name": "+100 msg/zi",
+              "period": "/lună",
+              "description": "Cumulabil"
+            },
+            {
+              "name": "+200 msg/zi",
+              "period": "/lună",
+              "description": "Cumulabil"
+            }
+          ]
+        },
+        "extraSearches": {
+          "label": "Căutări suplimentare (cont)",
+          "items": [
+            {
+              "name": "+25 căutări/zi",
+              "period": "/lună",
+              "description": "Cumulabil"
+            },
+            {
+              "name": "+50 căutări/zi",
+              "period": "/lună",
+              "description": "Cumulabil"
+            }
+          ]
+        },
+        "perAgent": {
+          "label": "Per agent",
+          "items": [
+            {
+              "name": "Always On",
+              "period": "/lună per agent",
+              "description": "Rulează non-stop 24/7"
+            },
+            {
+              "name": "File Manager",
+              "period": "o singură dată per agent",
+              "description": "Navighează & editează fișiere"
+            },
+            {
+              "name": "Full Logs",
+              "period": "/lună per agent",
+              "description": "Deblochează vizualizatorul de jurnale"
+            },
+            {
+              "name": "+10 Plugins",
+              "period": "/lună per agent",
+              "description": "Sloturi suplimentare de plugin"
+            }
+          ]
+        }
+      }
+    },
+    "integrations": {
+      "heading": "Toate integrările gratuite",
+      "badge": "fiecare plan",
+      "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage și 14+ alte platforme sunt incluse gratuit pe toate planurile. Niciun cost suplimentar, niciodată.",
+      "note": "Toate prețurile în USD, plătibile în SOL sau $HATCHER. BYOK (Bring Your Own Key) = mesaje nelimitate cu propria cheie API LLM pe orice plan."
+    },
+    "compareTable": {
+      "heading": "Compară planurile",
+      "subheading": "Vezi ce include fiecare plan dintr-o privire",
+      "featureColumn": "Funcție",
+      "onceSuffix": " o dată",
+      "rows": {
+        "agents": "Agenți incluși",
+        "messages": "Mesaje/zi (cont)",
+        "searches": "Căutări web/zi",
+        "byok": "Mesaje BYOK",
+        "cpuRam": "CPU / RAM",
+        "storage": "Stocare",
+        "autoSleep": "Adormire automată",
+        "fileManager": "File Manager",
+        "fullLogs": "Jurnale complete",
+        "teamCollab": "Colaborare în echipă",
+        "prioritySupport": "Suport prioritar",
+        "plugins": "Plugins + Abilități",
+        "integrations": "Toate integrările",
+        "byokKey": "BYOK (cheie LLM proprie)",
+        "defaultLlm": "LLM implicit (Groq)"
+      },
+      "values": {
+        "unlimited": "Nelimitat",
+        "alwaysOn": "Mereu activ",
+        "addon": "Add-on",
+        "llama4Scout": "Llama 4 Scout"
+      }
+    },
+    "faq": {
+      "heading": "Întrebări frecvente",
+      "items": [
+        {
+          "q": "Ce este BYOK (Bring Your Own Key)?",
+          "a": "BYOK îți permite să folosești propria cheie API pentru orice furnizor LLM (OpenAI, Anthropic, Google, xAI, Groq, OpenRouter). Este mereu gratuit pe toate planurile — plătești direct furnizorul, fără marjă Hatcher. Mesajele cu propria cheie sunt nelimitate."
+        },
+        {
+          "q": "Cum funcționează add-on-urile?",
+          "a": "Add-on-urile sunt cumulabile pe orice plan. De exemplu, dacă ești pe planul Starter (1 agent) și cumperi un add-on +3 Agenți, poți rula 4 agenți total. Poți cumula mai multe add-on-uri."
+        },
+        {
+          "q": "Care este diferența dintre resurse partajate și dedicate?",
+          "a": "Resursele partajate înseamnă că agentul tău împarte CPU și RAM cu alții pe același server — performant, dar poate varia sub sarcină. Resursele dedicate (Pro și Business) oferă agentului tău CPU și RAM garantat pe care nimeni altcineva nu le poate folosi."
+        },
+        {
+          "q": "Ce metode de plată sunt acceptate?",
+          "a": "Poți plăti cu SOL sau $HATCHER. Prețurile sunt în USD și convertite la cursuri live prin Jupiter."
+        },
+        {
+          "q": "Pot să cobor la un plan inferior?",
+          "a": "Da. Poți anula abonamentul oricând și planul tău va reveni la Gratuit la sfârșitul perioadei de facturare. Agenții care depășesc limita gratuită vor fi puși în pauză."
+        },
+        {
+          "q": "Ce este adormirea automată?",
+          "a": "Agenții gratuiți adorm după 1 oră de inactivitate, Starter după 4 ore, Pro după 12 ore. Agenții Business și Founding Member sunt mereu activi, fără adormire automată. Se trezesc instant la primul mesaj. Poți adăuga Always On la orice agent pentru $7.99/lună."
+        },
+        {
+          "q": "Ce LLM primesc pe planul gratuit?",
+          "a": "Planurile Gratuit și Starter folosesc GPT-OSS 20B pe Groq. Planurile Pro, Business și Founding Member beneficiază de Llama 3.3 70B pe Groq — un model mai capabil. Limitele de mesaje sunt la nivel de cont: Gratuit 20/zi, Starter 50/zi, Pro 100/zi, Business 300/zi, Founding 300/zi. BYOK (aduce-ți propria cheie LLM) depășește toate limitele pe orice plan."
+        },
+        {
+          "q": "Ce este planul Founding Member?",
+          "a": "Founding Member este o plată o singură dată de $99 care îți oferă acces pe viață la Hatcher: 10 agenți, 300 mesaje/zi, 4 GB RAM, 2 GB spațiu de lucru, mereu activ și toate funcțiile premium (File Manager, Jurnale complete, suport prioritar) incluse. Fără taxe lunare, niciodată. Limitat la 20 de locuri — odată ce s-au epuizat, acest plan dispare."
+        }
+      ]
+    },
+    "help": {
+      "text": "Ai nevoie de ajutor la alegerea unui plan?",
+      "emailLabel": "Scrie-ne",
+      "discordLabel": "Discord",
+      "telegramLabel": "Telegram"
+    },
+    "cta": {
+      "heading": "Gata să-ți deployezi agentul?",
+      "body": "Alege frameworkul, selectează un template și deployează în câteva secunde. Începe gratuit cu un LLM inclus. Extinde când ai nevoie de mai multă putere.",
+      "createAgent": "Creează Agent",
+      "seeFrameworks": "Vezi Frameworks"
+    },
+    "footerNote": "Toate prețurile în USD, plătibile în SOL sau $HATCHER. BYOK (Bring Your Own Key) = mesaje nelimitate cu propria cheie API LLM pe orice plan."
+  },
+  "dashboard": {
+    "common": {
+      "loading": "Se încarcă...",
+      "authenticating": "Se autentifică...",
+      "signInRequired": "Autentificare necesară",
+      "signIn": "Autentificare",
+      "refresh": "Reîmprospătare",
+      "save": "Salvează",
+      "cancel": "Anulează",
+      "delete": "Șterge",
+      "create": "Creează",
+      "invite": "Invită",
+      "share": "Partajează",
+      "unshare": "Retrage accesul",
+      "copy": "Copiază",
+      "copied": "Copiat!",
+      "close": "Închide",
+      "confirm": "Confirmă",
+      "back": "Înapoi",
+      "noDescription": "Fără descriere",
+      "clear": "Șterge"
+    },
+    "agents": {
+      "eyebrow": "Panou",
+      "heading": "Agenții mei",
+      "subtitleEmpty": "Creează primul tău agent pentru a începe.",
+      "createCta": "Creează agent",
+      "searchPlaceholder": "Caută agenți... ( / )",
+      "filterAll": "Toți",
+      "frameworkAll": "Toate Frameworks",
+      "sortNewest": "Cele mai noi",
+      "sortAZ": "A-Z",
+      "sortMessages": "Cele mai multe mesaje",
+      "sortActive": "Ultima activitate",
+      "emptyTitle": "Niciun agent încă",
+      "emptyDescription": "Creează primul tău agent AI și deployează-l în 60 de secunde.",
+      "emptyActionLabel": "Creează Agent",
+      "emptySecondaryLabel": "Vezi Frameworks",
+      "noMatchTitle": "Niciun agent corespunzător",
+      "noMatchDescription": "Încearcă să ajustezi criteriile de căutare sau filtrare.",
+      "signInDescription": "Autentifică-te în contul tău pentru a accesa agenții.",
+      "featuresCount": "{count} funcție",
+      "featuresCountPlural": "{count} funcții",
+      "agentsCount": "{count} agent total · {active} activ",
+      "agentsCountPlural": "{count} agenți total · {active} activi",
+      "details": "Detalii",
+      "tourCreateTitle": "Creează Primul Tău Agent",
+      "tourCreateDescription": "Dă click aici pentru a lansa primul tău agent AI. Alege din 4 frameworks.",
+      "tourFilterTitle": "Filtrează după Framework",
+      "tourFilterDescription": "OpenClaw, Hermes, ElizaOS sau Milady — fiecare are puncte forte unice.",
+      "tourSearchTitle": "Caută & Explorează",
+      "tourSearchDescription": "Caută agenți sau răsfoiește 200+ template-uri pentru a începe rapid.",
+      "tourPlanTitle": "Planul Tău",
+      "tourPlanDescription": "Începe gratuit cu 1 agent și 20 mesaje/zi. Extinde oricând."
+    },
+    "newAgent": {
+      "eyebrow": "Agent nou",
+      "heading": "Alege un template",
+      "subheading": "Pornește dintr-un template pre-configurat sau construiește de la zero. Fiecare template vine cu o personalitate, prompt de sistem și integrări sugerate.",
+      "searchPlaceholder": "Caută template-uri...",
+      "allTemplates": "Toate Template-urile",
+      "startFromScratch": "Pornește de la zero",
+      "startFromScratchDesc": "Control total asupra fiecărei setări",
+      "noTemplatesTitle": "Niciun template găsit",
+      "noTemplatesDesc": "Încearcă o altă căutare sau categorie.",
+      "footerHint": "Toate template-urile sunt complet personalizabile după deploy — schimbă numele, promptul de sistem, modelul și integrările oricând."
+    },
+    "billing": {
+      "eyebrow": "Cont",
+      "heading": "Facturare & planuri",
+      "breadcrumbDashboard": "Panou",
+      "breadcrumbBilling": "Facturare",
+      "connectWallet": "Conectează Portofel",
+      "connectedWallet": "Portofel conectat",
+      "switchWallet": "Schimbă portofelul",
+      "disconnect": "Deconectează",
+      "loadingBilling": "Se încarcă facturarea...",
+      "signInDescription": "Autentifică-te pentru a gestiona planul și facturarea.",
+      "creditsBalance": "Sold credite",
+      "creditsUsd": "USD",
+      "creditsDesc": "Creditele pot fi folosite pentru abonamente, add-on-uri și utilizarea LLM-ului găzduit.",
+      "recentTransactions": "Tranzacții recente",
+      "currentTier": "Plan curent",
+      "freeTier": "Plan gratuit",
+      "active": "Activ",
+      "agentUsage": "Utilizare agenți",
+      "agentsOf": "{count} din {limit} agenți folosiți",
+      "agentsOver": "{over} peste limită",
+      "slotsRemaining": "{slots} slot rămas",
+      "slotsRemainingPlural": "{slots} sloturi rămase",
+      "activeAddons": "Add-on-uri active",
+      "expires": "Expiră {date}",
+      "extend": "Extinde",
+      "extend30Days": "Extinde +30 zile (${price})",
+      "upgradeAnnual": "Treci la anual (${price})",
+      "annualDiscount": "-15%",
+      "renew": "Reînnoiește",
+      "renewFor": "Reînnoiește pentru ${price}",
+      "planExpired": "Planul a expirat — reînnoiește pentru a-ți păstra planul",
+      "planExpiring": "Expiră în {days} zi — reînnoiește acum",
+      "planExpiringPlural": "Expiră în {days} zile — reînnoiește acum",
+      "planActiveUntil": "Activ până la {date}",
+      "noCharge": "Fără taxă",
+      "lifetimePrice": "pe viață",
+      "lifetimePriceFull": "${price} pe viață",
+      "monthlyPrice": "${price} / 30 zile",
+      "unlimitedMessages": "nelimitat",
+      "messagesPerDay": "{count} mesaje/zi",
+      "byokUnlimited": " (BYOK = nelimitat)",
+      "upgradeSection": "Extinde-ți planul",
+      "upgradeDesc": "Obține mai mulți agenți, mesaje și putere de calcul.",
+      "addonsSection": "Add-on-uri",
+      "addonsDesc": "Adaugă capacitate suplimentară pe planul curent.",
+      "accountAddons": "Add-on-uri la nivel de cont",
+      "perAgentAddons": "Add-on-uri per agent",
+      "annualBilling": "Facturare anuală",
+      "annualBillingDesc": "15% reducere — toate add-on-urile de abonament",
+      "monthly": "Lunar",
+      "annual": "Anual",
+      "monthSuffix": "/ 30 zile",
+      "annualSuffix": "/ an",
+      "yearSuffix": "/ an",
+      "paymentHistory": "Istoricul plăților",
+      "noPaymentsYet": "Nicio plată încă",
+      "noPaymentsDesc": "Istoricul plăților va apărea aici.",
+      "status": {
+        "confirmed": "Confirmat",
+        "pending": "În așteptare",
+        "failed": "Eșuat",
+        "refunded": "Rambursat"
+      },
+      "selectAgent": "Selectează Agent",
+      "choosePayment": "Alege metoda de plată",
+      "applyToAgent": "Aplică la agent:",
+      "noAgentsFound": "Niciun agent găsit. Creează mai întâi un agent.",
+      "payWithCredits": "Plătește cu Credite",
+      "payWithSol": "Plătește cu SOL",
+      "solDesc": "Plată prin portofel Solana",
+      "payWithHatcher": "Plătește cu $HATCHER",
+      "hatcherDesc": "Token HATCHER pe Solana",
+      "payWithUsdc": "Plătește cu USDC",
+      "usdcDesc": "Stablecoin — 1 USDC = $1",
+      "payWithCard": "Plătește cu cardul",
+      "cardDesc": "Card credit/debit prin Stripe",
+      "creditAvailable": "${balance} disponibil — instant",
+      "creditInsufficient": "Insuficient — ai nevoie de ${need}, ai ${have}",
+      "foundingSlots": "{remaining} din {max} sloturi rămase",
+      "foundingSoldOut": "Epuizat",
+      "oneTimeSuffix": "o singură dată",
+      "oneTimeAgent": "o singură dată / agent",
+      "annualAgent": "/ an / agent",
+      "monthAgent": "/ 30 zile / agent",
+      "manageBilling": "Gestionează facturarea",
+      "successPayment": "Plată reușită! Contul tău este în curs de actualizare. Poate dura câteva momente.",
+      "canceledPayment": "Plata a fost anulată. Nu s-a efectuat nicio taxă."
+    },
+    "analytics": {
+      "eyebrow": "Panou",
+      "heading": "Analytics",
+      "subheading": "Statistici de utilizare la nivel de cont.",
+      "signInDescription": "Autentifică-te pentru a vedea analytics-ul.",
+      "messageVolume": "Volum mesaje",
+      "last14Days": "Ultimele 14 zile",
+      "frameworks": "Frameworks",
+      "agentStatus": "Stare agenți",
+      "totalMessages": "Total mesaje per agent",
+      "noMessageData": "Nicio date despre mesaje încă — începe să discuți cu agenții tăi!",
+      "noAgentsYet": "Niciun agent încă",
+      "noAgentsEmpty": "Niciun agent încă. Creează primul tău agent pentru a vedea analytics-ul.",
+      "createAgent": "Creează Agent",
+      "totalAgents": "Total Agenți",
+      "totalAgentsSub": "{active} activi",
+      "messages": "Mesaje",
+      "messagesAllTime": "Toate timpurile",
+      "llmCalls": "Apeluri LLM",
+      "llmCallsAllTime": "Toate timpurile",
+      "last14DaysLabel": "Ultimele 14 zile",
+      "last14DaysSub": "Mesaje utilizatori",
+      "today": "Astăzi",
+      "noDataYet": "Nicio date despre mesaje încă"
+    },
+    "team": {
+      "eyebrow": "Colaborare",
+      "heading": "Echipă",
+      "subheading": "Creează o echipă pentru a partaja agenți și a colabora cu alții.",
+      "signInTitle": "Autentifică-te pentru a accesa echipele",
+      "signInDesc": "Echipele îți permit să colaborezi cu alții pe agenții tăi AI.",
+      "createTeamTitle": "Creează-ți echipa",
+      "createTeamDesc": "Începe colaborarea creând o echipă. Poți invita membrii și partaja agenții.",
+      "teamNamePlaceholder": "Numele echipei...",
+      "createBtn": "Creează",
+      "creating": "Se creează...",
+      "membersHeading": "Membri",
+      "inviteMemberHeading": "Invită Membru",
+      "emailPlaceholder": "Adresă de email...",
+      "invite": "Invită",
+      "roleAdmin": "Admin",
+      "roleMember": "Membru",
+      "roleViewer": "Vizitator",
+      "roleOwner": "Proprietar",
+      "you": "(tu)",
+      "sharedAgentsHeading": "Agenți partajați",
+      "noSharedAgents": "Niciun agent partajat cu această echipă încă.",
+      "yourAgentsHeading": "Agenții tăi",
+      "byLabel": "de {username}",
+      "memberCount": "{count} membru",
+      "memberCountPlural": "{count} membri",
+      "agentSharedCount": "{count} agent partajat",
+      "agentSharedCountPlural": "{count} agenți partajați",
+      "leaveTeam": "Ieși",
+      "leaveTeamTitle": "Ieși din echipă",
+      "leaveTeamDesc": "Ești sigur că vrei să ieși din această echipă? Vei pierde accesul la toți agenții partajați.",
+      "leaveTeamConfirm": "Ieși din echipă",
+      "deleteTeam": "Șterge echipa",
+      "deleteTeamTitle": "Șterge echipa",
+      "deleteTeamDesc": "Ești sigur că vrei să ștergi permanent această echipă? Toți agenții partajați vor fi retrase accesul.",
+      "deleteTeamConfirm": "Șterge echipa",
+      "errors": {
+        "loadFailed": "Eroare la încărcarea datelor echipei",
+        "createFailed": "Eroare la crearea echipei",
+        "inviteFailed": "Eroare la invitarea membrului",
+        "removeFailed": "Eroare la eliminarea membrului",
+        "leaveFailed": "Eroare la ieșirea din echipă",
+        "deleteFailed": "Eroare la ștergerea echipei",
+        "shareFailed": "Eroare la partajarea agentului",
+        "unshareFailed": "Eroare la retragerea accesului agentului",
+        "roleFailed": "Eroare la actualizarea rolului"
+      }
+    },
+    "affiliate": {
+      "eyebrow": "Panou",
+      "heading": "Panou Afiliat",
+      "signInTitle": "Autentificare necesară",
+      "signInDesc": "Autentifică-te pentru a vedea panoul de afiliat.",
+      "yourReferralLink": "Link-ul tău de recomandare",
+      "referralLinkDesc": "Noile înregistrări prin acest link îți sunt atribuite pe viață.",
+      "shareOnX": "Distribuie pe X",
+      "telegram": "Telegram",
+      "copyLink": "Copiază",
+      "copiedLink": "Copiat",
+      "refresh": "Reîmprospătare",
+      "frozenTitle": "Cont suspendat",
+      "codeLabel": "Cod",
+      "totalReferrals": "Total recomandări",
+      "paidLabel": "{count} plătite",
+      "pending30d": "În așteptare (30 zile)",
+      "payableNow": "De plătit acum",
+      "lifetimeEarned": "Câștigat total",
+      "paidOut": "{amount} plătit",
+      "referralsTable": "Recomandări",
+      "noReferrals": "Nicio recomandare încă. Distribuie link-ul!",
+      "commissionsTable": "Comisioane",
+      "noCommissions": "Niciun comision încă.",
+      "payoutsTable": "Plăți",
+      "noPayouts": "Nicio plată încă.",
+      "loadMore": "Încarcă mai mult",
+      "signupCol": "Înregistrare",
+      "emailCol": "Email",
+      "statusCol": "Status",
+      "tierCol": "Plan",
+      "dateCol": "Dată",
+      "sourceCol": "Sursă",
+      "amountCol": "Sumă",
+      "cashCol": "Cash",
+      "creditsCol": "Credite",
+      "noteCol": "Notă",
+      "statusPaid": "Plătit",
+      "statusFree": "Gratuit",
+      "statusPending": "În așteptare",
+      "statusPayable": "De plătit",
+      "statusPaidOut": "Plătit",
+      "statusVoided": "Anulat",
+      "flagged": "Marcat",
+      "untilDate": "până la {date}",
+      "sourceSubscription": "Abonament",
+      "sourceFoundingMember": "Founding Member",
+      "payoutSettings": "Setări plată",
+      "payoutMode": "Mod",
+      "payoutAddress": "Adresă de plată",
+      "creditsOnly": "Doar credite — fără adresă",
+      "changePrefs": "Trebuie să schimbi preferințele de plată?",
+      "contactSupport": "Contactează suportul",
+      "modeCashOnly": "Doar cash (20%)",
+      "modeCreditsOnly": "Doar credite (40%)",
+      "modeHybrid": "Hibrid (15% cash + 25% credite)"
+    },
+    "settings": {
+      "eyebrow": "Cont",
+      "heading": "Setări",
+      "subheading": "Gestionează contul, securitatea și preferințele.",
+      "tabs": {
+        "profile": "Profil",
+        "security": "Securitate",
+        "notifications": "Notificări",
+        "billing": "Facturare",
+        "danger": "Zonă periculoasă"
+      },
+      "profile": {
+        "sectionTitle": "Profil",
+        "changePhoto": "Schimbă poza",
+        "uploadPhoto": "Încarcă poza",
+        "remove": "Elimină",
+        "joinedLabel": "Înregistrat {date}",
+        "usernameLabel": "Nume de utilizator",
+        "usernamePlaceholder": "username_tau",
+        "usernameHint": "3–30 caractere, litere, cifre, _ sau -",
+        "emailLabel": "Adresă de email",
+        "emailPlaceholder": "you@example.com",
+        "saveChanges": "Salvează modificările",
+        "saving": "Se salvează...",
+        "walletTitle": "Portofel conectat",
+        "walletLinkedDesc": "Conectat automat din prima plată on-chain. Folosit la plata cu SOL, USDC sau $HATCHER.",
+        "walletViewSolscan": "Solscan",
+        "walletDisconnect": "Deconectează portofelul",
+        "walletNone": "Niciun portofel conectat încă. Portofelul tău Solana se conectează automat prima dată când faci o plată on-chain din pagina de facturare.",
+        "referralTitle": "Program de recomandare",
+        "referralDesc": "Invită prieteni la Hatcher. Amândoi primiți {credit} credit când creează primul agent.",
+        "referralCode": "Cod de recomandare",
+        "shareLink": "Distribuie link",
+        "referred": "Recomandat",
+        "earned": "Câștigat",
+        "claimRewards": "Revendică recompensele în așteptare",
+        "claiming": "Se revendică..."
+      },
+      "security": {
+        "changePasswordTitle": "Schimbă parola",
+        "currentPassword": "Parola curentă",
+        "currentPasswordPlaceholder": "Introdu parola curentă",
+        "newPassword": "Parolă nouă",
+        "newPasswordPlaceholder": "Min. 8 caractere, maj., min., cifră",
+        "confirmPassword": "Confirmă parola nouă",
+        "confirmPasswordPlaceholder": "Repetați parola nouă",
+        "changePasswordBtn": "Schimbă parola",
+        "changing": "Se schimbă...",
+        "apiKeysTitle": "Chei API",
+        "apiKeysDesc": "Creează mai multe chei API pentru acces programatic. Fiecare cheie folosește prefixul {prefix}. Cheia completă este afișată {emphasis} la creare.",
+        "apiKeysEmphasis": "o singură dată",
+        "manageKeys": "Gestionează cheile",
+        "newKeyCreated": "Cheie nouă creată — copiaz-o acum!",
+        "noKeysYet": "Nicio cheie API încă. Creează una mai jos.",
+        "keyLabelPlaceholder": "Etichetă (ex. \"Producție\")",
+        "createKey": "Creează cheie",
+        "creating": "Se creează...",
+        "keysLimit": "Până la 10 chei active. Fiecare cheie are acces API complet.",
+        "reqToday": "{count} cereri astăzi · {week} săptămâna aceasta",
+        "lastUsed": "Ultima utilizare {date}",
+        "save": "Salvează"
+      },
+      "notifications": {
+        "sectionTitle": "Notificări",
+        "pushLabel": "Notificări push",
+        "pushDesc": "Notificări push browser pentru actualizări în timp real",
+        "agentsLabel": "Alerte agenți",
+        "agentsDesc": "Primești notificări când agenții își schimbă starea, se blochează sau au nevoie de atenție",
+        "billingLabel": "Alerte facturare",
+        "billingDesc": "Confirmări plăți, reînnoiri abonament și credite"
+      },
+      "billing": {
+        "sectionTitle": "Facturare",
+        "currentPlan": "Plan curent",
+        "hatcherCredits": "HATCHER Credite",
+        "creditsAutoApplied": "Aplicate automat la checkout",
+        "manageBilling": "Gestionează facturarea"
+      },
+      "danger": {
+        "sectionTitle": "Zonă periculoasă",
+        "exportTitle": "Exportă datele mele",
+        "exportDesc": "Descarcă un fișier JSON cu toate datele contului tău: profil, agenți, istoricul conversațiilor, plăți, recomandări, tichete de suport și altele.",
+        "exportBtn": "Exportă datele mele",
+        "exporting": "Se exportă...",
+        "deleteTitle": "Șterge contul",
+        "deleteDesc": "Elimină permanent contul, toți agenții, istoricul plăților și configurația. Această acțiune este ireversibilă.",
+        "deleteBtn": "Șterge contul",
+        "deleting": "Se șterge...",
+        "dialogTitle": "Ștergi contul?",
+        "dialogDesc": "Aceasta va elimina permanent toți agenții, datele și istoricul plăților. Această acțiune {emphasis} fi anulată.",
+        "dialogEmphasis": "nu poate",
+        "confirmPassword": "Confirmă parola",
+        "passwordPlaceholder": "Parola ta curentă",
+        "cancelBtn": "Anulează"
+      }
+    },
+    "apiKeys": {
+      "eyebrow": "Setări",
+      "heading": "Chei API",
+      "subheading": "Gestionează cheile de acces programatic pentru {docsLink}. Fiecare cheie începe cu {prefix}.",
+      "docsLinkLabel": "Hatcher API",
+      "backToSettings": "Înapoi la setări",
+      "newKeyAlert": "Cheie creată — copiaz-o acum!",
+      "newKeyAlertSub": "Aceasta este singura dată când cheia completă va fi afișată. Păstreaz-o în siguranță.",
+      "noKeysTitle": "Nicio cheie API încă",
+      "noKeysDesc": "Creează prima ta cheie pentru a începe",
+      "loading": "Se încarcă cheile...",
+      "createSectionTitle": "Creează cheie nouă",
+      "createSectionDesc": "Dă-i cheii un nume descriptiv (ex. \"Dev Local\", \"CI/CD Pipeline\").",
+      "keyLabelPlaceholder": "Eticheta cheii...",
+      "createKey": "Creează cheie",
+      "creating": "Se creează...",
+      "usageNote": "Folosește cheia API în antetul {header}. Consultă {docsLink} pentru toate endpoint-urile disponibile.",
+      "headerExample": "Authorization: Bearer hk_...",
+      "docsLinkLabel2": "Documentația API de referință",
+      "copiedLabel": "Copiat!",
+      "copyLabel": "Copiază",
+      "dismissLabel": "Respinge",
+      "revokeTitle": "Revocă cheia API",
+      "revokeDesc": "Această cheie va fi invalidată permanent și orice aplicație care o folosește va înceta să mai funcționeze imediat. Acțiunea este ireversibilă.",
+      "revokeConfirm": "Revocă cheia",
+      "neverUsed": "Niciodată folosită",
+      "lastUsed": "Ultima utilizare {time}",
+      "created": "Creată {date}",
+      "reqStats": "{today} cereri astăzi · {week} săptămâna aceasta",
+      "saveBtn": "Salvează",
+      "cancelBtn": "Anulează"
+    },
+    "quickStats": {
+      "totalAgents": "Total Agenți",
+      "dailyMessages": "Mesaje zilnice",
+      "unlimited": "∞",
+      "accountWide": "la nivel de cont · BYOK = nelimitat",
+      "activeNow": "Activi acum",
+      "noAgentsRunning": "Niciun agent rulează",
+      "agentsOnline": "{count} agent online",
+      "agentsOnlinePlural": "{count} agenți online",
+      "accountTier": "Plan cont",
+      "lifetimeAccess": "Acces pe viață",
+      "prioritySupport": "Suport prioritar",
+      "upgradePlan": "Extinde planul"
+    },
+    "agentDetail": {
+      "tabs": {
+        "dashboard": "Panou de control",
+        "chat": "Chat",
+        "terminal": "Terminal",
+        "config": "Configurare",
+        "integrations": "Integrări",
+        "plugins": "Plugin-uri & Abilități",
+        "logs": "Jurnale",
+        "stats": "Statistici",
+        "memory": "Memorie",
+        "sessions": "Sesiuni",
+        "knowledge": "Cunoștințe",
+        "addons": "Completări",
+        "files": "Fișiere",
+        "workspace": "Spațiu de lucru",
+        "schedules": "Programări",
+        "workflows": "Workflow-uri"
+      },
+      "sidebarGroups": {
+        "configure": "Configurare",
+        "monitor": "Monitorizare",
+        "advanced": "Avansat"
+      },
+      "nav": {
+        "allAgents": "Toți agenții"
+      },
+      "header": {
+        "easy": "Simplu",
+        "advanced": "Avansat",
+        "restart": "Repornește",
+        "restarting": "Se repornește...",
+        "stop": "Oprește",
+        "stopping": "Se oprește...",
+        "start": "Pornește",
+        "starting": "Se pornește...",
+        "share": "Distribuie",
+        "room": "Cameră",
+        "clone": "Clonează",
+        "delete": "Șterge",
+        "deleting": "Se șterge...",
+        "confirm": "Confirmă",
+        "cancel": "Anulează"
+      },
+      "notFound": {
+        "code": "404",
+        "title": "Agent negăsit",
+        "description": "Agentul cu ID-ul \"{id}\" nu a fost găsit.",
+        "backToAgents": "Înapoi la agenți"
+      },
+      "statusPoll": {
+        "agentReady": "Agentul este gata de chat!"
+      },
+      "chat": {
+        "live": "Live",
+        "liveTitle": "Streaming în timp real via WebSocket",
+        "voiceButton": "Voce",
+        "voiceCallTitle": "Pornește apel vocal",
+        "autoRead": "Citire automată",
+        "autoReadTitle": "Citește răspunsurile automat",
+        "emptyTitle": "Începe o conversație cu {agentName}",
+        "emptySubtitle": "Răspunsurile apar în timp real",
+        "loadEarlier": "Încarcă mesaje mai vechi ({count} mai vechi)",
+        "listening": "Ascultă...",
+        "thinking": "Gândește...",
+        "speaking": "Vorbește...",
+        "tapToSpeak": "Atinge microfonul pentru a vorbi",
+        "agentStartingUp": "Agentul pornește, te rog așteaptă...",
+        "uploading": "Se încarcă…",
+        "poweredBy": "Alimentat de {provider}",
+        "today": "azi",
+        "unlimited": "nelimitat",
+        "enterToSend": "Enter pentru trimitere, Shift+Enter pentru linie nouă",
+        "signInToChat": "Autentifică-te pentru a chata cu acest agent.",
+        "limitReached": "Limita zilnică de mesaje a fost atinsă.",
+        "upgradeToPro": "Treci la Pro",
+        "limitReachedSuffix": "pentru mai multe, sau adaugă propria cheie pentru acces nelimitat.",
+        "agentNotRunning": "Agentul nu rulează.",
+        "startFromOverview": "Pornește-l din fila Prezentare generală pentru a chata.",
+        "waitingForAgent": "Aștept pornirea agentului...",
+        "messagePlaceholder": "Mesaj pentru {agentName}...",
+        "sendMessage": "Trimite mesaj",
+        "attachFiles": "Atașează fișiere — salvate în cunoștințele agentului",
+        "stopRecording": "Oprește înregistrarea",
+        "startVoice": "Pornește introducerea vocală",
+        "errors": {
+          "rateLimit": "Limita zilnică de mesaje a fost atinsă.",
+          "llmDown": "Serviciul AI este temporar indisponibil. De obicei se rezolvă într-un minut.",
+          "timeout": "Agentul a durat prea mult să răspundă.",
+          "network": "Conexiune pierdută. Verifică conexiunea la internet.",
+          "generic": "Ceva nu a mers bine.",
+          "retry": "Reîncearcă"
+        },
+        "voiceCall": {
+          "listening": "Ascultă...",
+          "thinking": "Gândește...",
+          "speaking": "Vorbește...",
+          "tapToSpeak": "Atinge microfonul pentru a vorbi"
+        }
+      },
+      "logs": {
+        "searchPlaceholder": "Caută în jurnale...",
+        "all": "Toate",
+        "connected": "Conectat",
+        "reconnecting": "Reconectare",
+        "pinned": "Fixat",
+        "scroll": "Derulare",
+        "refresh": "Reîmprospătează",
+        "loading": "Se încarcă...",
+        "download": "Descarcă",
+        "pinnedToBottom": "fixat în jos",
+        "noLogs": "Niciun jurnal disponibil.",
+        "noLogsMatching": "Niciun jurnal pentru \"{query}\".",
+        "noLevelLogs": "Niciun jurnal {level} găsit.",
+        "entries": "{count} intrări",
+        "autoScrollEnabled": "Derulare automată activată — fixat în jos",
+        "autoScrollDisabled": "Derulare automată dezactivată",
+        "fullLogsGate": {
+          "title": "Afișând ultimele {count} rânduri de jurnal",
+          "description": "Acest agent are {total} intrări totale. Deblochează jurnalele complete pentru a derula prin istoricul complet și a exporta fiecare rând.",
+          "descriptionEmpty": "Deblochează jurnalele complete pentru a păstra toate intrările disponibile dincolo de ultimele {count} rânduri.",
+          "unlock": "Deblochează"
+        }
+      },
+      "integrations": {
+        "showingFor": "Afișând integrări compatibile cu {framework}",
+        "connected": "{configured}/{total} conectate",
+        "encryptedNote": "Cheile API și token-urile sunt criptate cu AES-256-GCM înainte de stocare. Odată salvate, valorile secrete nu mai sunt afișate — vor apărea doar substituenți mascați.",
+        "mainIntegrations": "Integrări principale",
+        "mainIntegrationsFree": "Gratuite pe toate planurile",
+        "otherPlatforms": "Alte platforme",
+        "communityExtensions": "Extensii comunitare",
+        "allPlatformsFree": "Toate platformele incluse gratuit — configurează datele de acces mai jos",
+        "allFreeNote": "Toate integrările sunt gratuite pe orice plan. Adaugă datele de acces și ești gata.",
+        "howToGetKey": "Cum obții cheia API →",
+        "howToSetup": "Cum configurezi {name} →",
+        "saving": "Se salvează...",
+        "saveCredentials": "Salvează datele de acces",
+        "badges": {
+          "recommended": "Recomandat",
+          "native": "Nativ",
+          "community": "Comunitate",
+          "planned": "Planificat",
+          "quickSetup": "Configurare rapidă",
+          "qrPairing": "Cuplare QR",
+          "free": "Gratuit",
+          "connected": "Conectat",
+          "alwaysActive": "Mereu activ"
+        },
+        "legend": {
+          "native": "Nativ — suport integrat",
+          "community": "Comunitate — extensii npm",
+          "planned": "Planificat — în curând"
+        },
+        "pairing": {
+          "whoCanMessage": "Cine poate trimite mesaje agentului tău?",
+          "everyone": "Toată lumea",
+          "specificNumbers": "Numere specifice",
+          "save": "Salvează",
+          "anyoneCanMessage": "Oricine poate trimite mesaje agentului tău.",
+          "onlyListedNumbers": "Doar numerele listate pot trimite mesaje agentului tău.",
+          "restartAfterChange": "Repornește agentul după modificare.",
+          "setBeforePairing": "Setează înainte de cuplare. Numerele de telefon în format E.164 (+1234567890).",
+          "savedRestart": "Salvat! Repornește agentul pentru a aplica.",
+          "connected": "{name} conectat",
+          "disconnected": "{name} deconectat",
+          "messagesForwarded": "Mesajele vor fi redirecționate către agentul tău",
+          "sessionExpired": "Sesiunea a expirat. Recuplează sau deconectează pentru a curăța.",
+          "rePair": "Recuplează",
+          "disconnect": "Deconectează",
+          "disconnectConfirm": "Deconectezi {name}? Va trebui să recuplezi pentru a-l folosi din nou.",
+          "agentMustRun": "Agentul trebuie să ruleze pentru a cupla {name}. Pornește-l mai întâi.",
+          "generatingQr": "Se generează codul QR — durează ~30 secunde...",
+          "pairButton": "Cuplează {name}",
+          "refreshQr": "Reîmprospătează codul QR",
+          "tapOutsideToClose": "Atinge în afară pentru a închide"
+        },
+        "webhook": {
+          "label": "Webhook",
+          "inboundHttp": "HTTP de intrare",
+          "triggerFrom": "Declanșează agentul din servicii externe (Zapier, GitHub, etc.)",
+          "webhookUrl": "URL Webhook",
+          "bearerToken": "Bearer Token",
+          "exampleRequest": "Exemplu de cerere",
+          "revealToken": "Arată token-ul",
+          "hideToken": "Ascunde token-ul",
+          "copyUrl": "Copiază URL",
+          "copyToken": "Copiază token",
+          "note": "Folosește acest URL pentru a declanșa agentul din servicii externe (Zapier, GitHub, n8n, etc.). Trimite o cerere POST cu un corp JSON care conține câmpul \"message\". Agentul se va trezi automat din somn dacă este necesar.",
+          "alreadyConfigured": "deja configurat"
+        },
+        "domains": {
+          "channelBehavior": "Comportamentul canalului",
+          "allowedUserIds": "ID-uri de utilizatori permise (separate prin virgulă)",
+          "allowedGroupIds": "ID-uri de grupuri permise (separate prin virgulă)"
+        }
+      },
+      "memory": {
+        "refresh": "Reîmprospătează",
+        "noMemory": "Niciun fișier de memorie găsit.",
+        "noMemoryDescription": "Agentul tău nu a creat încă fișiere de memorie.",
+        "dailyLogs": "Jurnale zilnice",
+        "noDailyLogs": "Niciun jurnal zilnic deocamdată.",
+        "loading": "Se încarcă memoria...",
+        "error": "Nu s-au putut încărca amintirile"
+      },
+      "knowledge": {
+        "uploadTitle": "Încarcă fișier de cunoștințe",
+        "filename": "Nume fișier",
+        "filenamePlaceholder": "ex. company-info.txt",
+        "content": "Conținut",
+        "contentPlaceholder": "Lipește conținutul de cunoștințe aici...",
+        "upload": "Încarcă",
+        "uploading": "Se încarcă...",
+        "cancel": "Anulează",
+        "addFile": "Adaugă fișier",
+        "noFiles": "Niciun fișier de cunoștințe.",
+        "noFilesDescription": "Încarcă documente la care agentul tău poate face referire.",
+        "preview": "Previzualizare",
+        "delete": "Șterge",
+        "loading": "Se încarcă...",
+        "error": "Nu s-au putut încărca fișierele de cunoștințe",
+        "refresh": "Reîmprospătează"
+      },
+      "stats": {
+        "range7d": "7 zile",
+        "range30d": "30 zile",
+        "totalMessages": "Total mesaje",
+        "avgPerDay": "Med. / zi",
+        "peakDay": "Zi de vârf",
+        "framework": "Framework",
+        "noData": "Nicio dată analitică.",
+        "noDataDescription": "Trimite câteva mesaje pentru a vedea statisticile.",
+        "errorRate": "Rata de erori",
+        "responseTimes": "Timpi de răspuns",
+        "avgResponse": "Răspuns mediu",
+        "p50": "P50",
+        "p95": "P95",
+        "topTopics": "Subiecte principale",
+        "hourlyActivity": "Activitate orară",
+        "byokActive": "BYOK activ",
+        "totalTokens": "Total token-uri",
+        "estimatedCost": "Cost estimat",
+        "refresh": "Reîmprospătează"
+      },
+      "terminal": {
+        "connecting": "Se conectează...",
+        "connected": "Conectat",
+        "disconnected": "Deconectat",
+        "error": "Eroare de conexiune",
+        "reconnect": "Reconectează",
+        "agentNotActive": "Agentul trebuie să fie activ pentru a folosi terminalul.",
+        "startAgent": "Pornește agentul",
+        "sendMessage": "Trimite mesaj...",
+        "send": "Trimite",
+        "sending": "Se trimite..."
+      },
+      "plugins": {
+        "skillsTab": "Abilități",
+        "pluginsTab": "Plugin-uri",
+        "searchPlaceholder": "Caută abilități și plugin-uri...",
+        "install": "Instalează",
+        "installing": "Se instalează...",
+        "installed": "Instalat",
+        "uninstall": "Dezinstalează",
+        "uninstalling": "Se dezinstalează...",
+        "noInstalled": "Niciun plugin sau abilitate instalat.",
+        "noInstalledDescription": "Navighează și instalează din piața de mai jos.",
+        "recommended": "Recomandat",
+        "available": "Disponibil",
+        "source": "Sursă",
+        "requiresRestart": "Necesită repornire",
+        "refresh": "Reîmprospătează",
+        "limitReached": "Limita de plugin-uri atinsă. Upgradează planul sau adaugă un addon de plugin-uri."
+      },
+      "workflows": {
+        "new": "Workflow nou",
+        "noWorkflows": "Niciun workflow.",
+        "noWorkflowsDescription": "Creează primul tău workflow pentru a automatiza agentul.",
+        "enable": "Activează",
+        "disable": "Dezactivează",
+        "delete": "Șterge",
+        "save": "Salvează",
+        "run": "Rulează",
+        "running": "Se rulează...",
+        "name": "Nume workflow",
+        "trigger": "Declanșator",
+        "lastRun": "Ultima rulare",
+        "status": "Stare",
+        "active": "Activ",
+        "inactive": "Inactiv"
+      },
+      "files": {
+        "noFiles": "Niciun fișier găsit.",
+        "noFilesDescription": "Managerul de fișiere este gol.",
+        "upload": "Încarcă",
+        "delete": "Șterge",
+        "download": "Descarcă",
+        "refresh": "Reîmprospătează",
+        "locked": "Managerul de fișiere necesită planul Business sau addon-ul Manager de fișiere.",
+        "unlock": "Deblochează"
+      },
+      "workspace": {
+        "noFiles": "Niciun fișier în spațiul de lucru.",
+        "refresh": "Reîmprospătează",
+        "loading": "Se încarcă spațiul de lucru..."
+      },
+      "addons": {
+        "title": "Completări",
+        "description": "Extinde agentul cu capabilități suplimentare.",
+        "noAddons": "Nicio completare achiziționată.",
+        "purchase": "Cumpără",
+        "active": "Activ",
+        "expires": "Expiră la {date}",
+        "lifetime": "Pe viață"
+      },
+      "schedules": {
+        "new": "Programare nouă",
+        "noSchedules": "Nicio programare.",
+        "noSchedulesDescription": "Creează o programare pentru a rula agentul automat.",
+        "enable": "Activează",
+        "disable": "Dezactivează",
+        "delete": "Șterge",
+        "save": "Salvează",
+        "name": "Nume programare",
+        "cron": "Expresie Cron",
+        "nextRun": "Următoarea rulare",
+        "lastRun": "Ultima rulare",
+        "status": "Stare",
+        "active": "Activ",
+        "inactive": "Inactiv"
+      }
+    }
+  },
+  "settings": {
+    "redirect": "Se redirecționează la setări..."
+  },
+  "agentPublic": {
+    "back": {
+      "toCity": "Înapoi la City",
+      "toMyAgents": "Înapoi la agenții mei",
+      "toDashboard": "Înapoi la panou"
+    },
+    "status": {
+      "active": "Activ",
+      "sleeping": "Adormit",
+      "paused": "Pauză",
+      "error": "Eroare",
+      "killed": "Oprit forțat",
+      "restarting": "Se repornește"
+    },
+    "profile": {
+      "featuresCount": "{count} funcție",
+      "featuresCountPlural": "{count} funcții",
+      "frameworkFeatures": "Funcții framework",
+      "by": "de"
+    },
+    "share": {
+      "button": "Partajează",
+      "copied": "Copiat!"
+    },
+    "errors": {
+      "connectionError": "Eroare de conexiune",
+      "notFound": "Agent negăsit",
+      "somethingWrong": "Ceva a mers greșit",
+      "defaultMessage": "Acest agent nu există sau a fost eliminat.",
+      "goBack": "Înapoi",
+      "myAgents": "Agenții mei"
+    },
+    "owner": {
+      "heading": "Gestionează {name}",
+      "body": "Deții acest agent. Mergi la panoul tău pentru a discuta sau a-l configura.",
+      "manageAgent": "Gestionează agentul",
+      "openChat": "Deschide chat"
+    },
+    "analytics": {
+      "heading": "Analytics agent",
+      "messages": "Mesaje",
+      "daysActive": "Zile active",
+      "uptime": "Uptime",
+      "status": "Stare",
+      "framework": "Framework",
+      "created": "Creat"
+    },
+    "deploy": {
+      "heading": "Deployează un agent similar",
+      "body": "Creează propriul tău agent {framework} pe Hatcher. Gratuit pentru a începe, deploy în 60 de secunde.",
+      "cta": "Deployează agent similar",
+      "myAgents": "Agenții mei"
+    },
+    "errorPage": {
+      "heading": "Eroare la încărcarea agentului",
+      "body": "Nu am putut încărca detaliile acestui agent. Poate a fost eliminat sau există o problemă de conexiune.",
+      "errorId": "ID eroare: {id}",
+      "tryAgain": "Încearcă din nou",
+      "browseAgents": "Răsfoiește agenți"
+    },
+    "statusPage": {
+      "poweredBy": "Alimentat de",
+      "uptimeLabel": "uptime 24h",
+      "messages": "Mesaje",
+      "days": "Zile",
+      "since": "Din",
+      "framework": "framework",
+      "lastActive": "Ultima activitate: {date} la {time}",
+      "viewProfile": "Vezi profilul",
+      "notFound": {
+        "heading": "Agent negăsit",
+        "body": "Acest agent nu există sau nu este vizibil public.",
+        "browseAgents": "Răsfoiește agenți"
+      }
+    }
+  },
+  "city": {
+    "loading": "SE ÎNCARCĂ HATCHER CITY…",
+    "category": {
+      "district": "District",
+      "breadcrumbCity": "Hatcher City",
+      "statAgents": "agenți",
+      "statRunning": "rulând",
+      "statShareOfCity": "din city",
+      "seeIn3d": "Vezi în 3D →",
+      "emptyState": "Niciun agent în acest district încă.",
+      "emptyStateCta": "Fii primul care construiește unul.",
+      "otherDistricts": "Alte districte",
+      "msgs": "msg"
+    },
+    "agentCity": {
+      "breadcrumbCity": "Hatcher City",
+      "openAgent": "Deschide agent →",
+      "seeInFullCity": "Vezi în city complet",
+      "shareableLink": "Link partajabil:",
+      "kvFramework": "framework",
+      "kvTier": "plan",
+      "kvStatus": "stare",
+      "kvMessages": "mesaje"
+    }
+  },
+  "embed": {
+    "loading": "se încarcă agentul…",
+    "notFound": "Agent negăsit sau nu este public.",
+    "visitHatcher": "→ hatcher.host",
+    "openInHatcher": "Deschide în Hatcher",
+    "poweredBy": "alimentat de",
+    "messages": "mesaje"
+  },
+  "agentRoom": {
+    "loading": "Se intră în camera agentului…",
+    "notFound": "Agent negăsit",
+    "notFoundBody": "Fie acest agent nu există, fie nu ai acces.",
+    "backToDashboard": "← Înapoi la panou",
+    "backToCity": "Înapoi la City",
+    "backToDashboardFull": "Înapoi la panou",
+    "cityShort": "City",
+    "dashboardShort": "Panou",
+    "previewBadge": "CAMERA AGENTULUI · PREVIZUALIZARE",
+    "frameworkComingSoon": "Camera agentului se lansează pe rând pe fiecare framework. Camerele pentru {framework} vin în curând.",
+    "backToAgent": "← Înapoi la panoul agentului",
+    "signInToChat": "Autentifică-te pentru a discuta cu {name}",
+    "cantReach": "Nu se poate contacta agentul acum — se reconectează...",
+    "standingBy": "{name} în așteptare.",
+    "hud": {
+      "statsAgentLabel": "AGENT {framework} · NV {level}",
+      "uptimeLabel": "uptime {uptime}",
+      "messagesLabel": "mesaje",
+      "statusLabel": "stare",
+      "liveLogs": "◆ JURNALE LIVE",
+      "waitingForLogs": "Se așteaptă jurnalele...",
+      "xpLabel": "XP",
+      "moodLabel": "STARE",
+      "skillActive": "ACTIV",
+      "skillIdle": "INACTIV",
+      "skillCalls": "{calls} apeluri",
+      "viewersWatch": "{count, plural, =1 {# vizionează} other {# vizionează}}",
+      "viewersTitle": "{count, plural, =1 {# vizitator acum} other {# vizitatori acum}}",
+      "chatPlaceholder": "Mesaj pentru agentul tău...",
+      "chatSend": "TRIMITE"
+    },
+    "share": {
+      "button": "Partajează",
+      "capturing": "Se capturează...",
+      "saved": "Imagine salvată + X deschis",
+      "failed": "Nu s-a putut captura scena",
+      "title": "Capturează camera + distribuie pe X"
+    },
+    "embed": {
+      "button": "Embed",
+      "copied": "Copiat!",
+      "failed": "Eroare",
+      "title": "Copiază fragmentul iframe embed"
+    },
+    "leaderboard": {
+      "button": "Clasament",
+      "buttonWithRank": "Loc #{rank}",
+      "heading": "CLASAMENT",
+      "loading": "Se încarcă…",
+      "empty": "Niciun agent public {framework} încă.",
+      "you": "· tu",
+      "footer": "Clasați după mesaje trimise · doar agenți publici",
+      "title": "Top agenți per framework"
+    },
+    "memory": {
+      "button": "Memorie",
+      "title": "Vezi memoria & configurația agentului",
+      "whatKnows": "Ce știe agentul tău",
+      "sectionPersona": "Personalitate / Prompt de sistem",
+      "sectionModel": "Model & Runtime",
+      "sectionSkills": "Abilități ({count})",
+      "sectionIntegrations": "Integrări ({count})",
+      "sectionRaw": "Config brut (JSON)",
+      "noPrompt": "Niciun prompt de sistem setat.",
+      "noSkills": "Nicio abilitate configurată.",
+      "noIntegrations": "Nicio integrare configurată.",
+      "editingComingSoon": "Editarea memoriei vine în curând. Deocamdată, gestionează configurația agentului din panou.",
+      "rowProvider": "Furnizor",
+      "rowModel": "Model",
+      "rowSessionScope": "Scop sesiune",
+      "rowFramework": "Framework",
+      "frameworkLabel": {
+        "openclaw": "Configurare OpenClaw",
+        "hermes": "SOUL Hermes",
+        "elizaos": "Caracter ElizaOS",
+        "milady": "Configurare Milady",
+        "default": "Memorie agent"
+      }
+    },
+    "quests": {
+      "buttonTitle": "Misiuni zilnice",
+      "heading": "MISIUNI ZILNICE",
+      "buildStreak": "Construiește-ți seria",
+      "streakDays": "🔥 Serie de {count} zile",
+      "close": "ESC",
+      "progressFraction": "{current} / {target}",
+      "claimed": "Revendicat — revino mâine 🌙",
+      "claimButton": "Revendică · extinde seria la {next} zile 🔥",
+      "completeAll": "Completează toate misiunile pentru a revendica",
+      "agentFooter": "agent: {agentId}… · se resetează la miezul nopții"
+    },
+    "achievements": {
+      "unlocked": "★ REALIZARE DEBLOCATĂ"
+    },
+    "integration": {
+      "heading": "INTEGRARE",
+      "statusActive": "● ACTIV",
+      "statusOff": "○ INACTIV",
+      "descActive": "Agentul tău ascultă pe {label}. Dezactivează pentru a opri răspunsurile sau gestionează pentru a schimba configurația.",
+      "descInactive": "{label} nu este configurat. Dă click pe Gestionează pentru a adăuga credențiale și a activa.",
+      "disabling": "Se dezactivează...",
+      "disable": "Dezactivează",
+      "manage": "Gestionează →",
+      "configure": "Configurează →",
+      "escClose": "ESC pentru a închide"
+    },
+    "status": {
+      "paused": {
+        "title": "Agentul este în pauză",
+        "hint": "Mergi la panou și dă click pe Start pentru a-l trezi."
+      },
+      "stopped": {
+        "title": "Agentul este oprit",
+        "hint": "Pornește-l din panou pentru a discuta."
+      },
+      "starting": {
+        "title": "Agentul pornește",
+        "hint": "Durează 2–4 min la prima pornire. Chat-ul va fi live în momentul în care e gata."
+      },
+      "initializing": {
+        "title": "Se inițializează agentul",
+        "hint": "Se configurează și se instalează abilitățile — de obicei 2 min, prima pornire poate fi mai lungă."
+      },
+      "pending": {
+        "title": "Agent în așteptare",
+        "hint": "Așteptare semnal de start..."
+      },
+      "error": {
+        "title": "Agent în stare de eroare",
+        "hint": "Verifică tab-ul Integrări sau suportul — ultima pornire a eșuat."
+      },
+      "crashed": {
+        "title": "Agentul s-a blocat",
+        "hint": "Repornirea automată va reîncerca. Dacă se blochează în continuare, verifică jurnalele."
+      }
+    },
+    "mood": {
+      "warmingUp": "SE ÎNCĂLZEȘTE",
+      "thriving": "ÎNFLORITOR",
+      "upbeat": "OPTIMIST",
+      "steady": "STABIL",
+      "struggling": "ÎN DIFICULTATE",
+      "overheating": "SUPRAÎNCĂLZIT"
+    },
+    "voice": {
+      "stopListening": "Oprește ascultarea",
+      "startVoice": "Activează intrarea vocală",
+      "turnOffVoice": "Dezactivează răspunsurile vocale",
+      "agentSpeakReplies": "Agentul să vorbească răspunsurile",
+      "voiceOn": "Voce activă",
+      "voice": "Voce"
+    }
+  },
+  "frameworks": {
+    "eyebrow": "Frameworks",
+    "heading": "Alege frameworkul potrivit",
+    "subheading": "Hatcher suportă 4 frameworks testate în producție. Fiecare are puncte forte unice — iată cum să alegi.",
+    "deployCta": "Deployează un agent",
+    "docsLink": "Documentație completă",
+    "atAGlance": "La prima vedere",
+    "featureMatrix": "Matrice de funcții",
+    "featureCol": "Funcție",
+    "bestFor": "Ideal pentru...",
+    "bestForSubheading": "Nu știi ce framework să alegi? Potrivește cazul de utilizare.",
+    "benchmarks": "Benchmarkuri de performanță",
+    "benchmarksSubheading": "Timp de pornire și consum de memorie de bază pe infrastructura partajată Hatcher. Valorile reale variază în funcție de configurație.",
+    "coldStart": "Timp de pornire la rece",
+    "memoryUsage": "Consum de memorie de bază",
+    "lowerFaster": "Mai mic = mai rapid",
+    "lowerLeaner": "Mai mic = mai eficient",
+    "benchmarkCallout": "🌸 Milady este cel mai rapid și mai ușor — ideal pentru deployuri pe planul gratuit. 🦞 OpenClaw are cele mai multe unelte, dar necesită mai multe resurse.",
+    "configExamples": "Exemple de configurare",
+    "configSubheading": "Fiecare framework are propriul format de configurare. Iată cum arată o configurare tipică.",
+    "configRef": "Referință configurare completă →",
+    "docsSuffix": "docs",
+    "llmSupport": "Suport LLM",
+    "llmSubheading": "Toate frameworks-urile suportă BYOK (Bring Your Own Key) pentru mesaje nelimitate. Pe LLM-ul găzduit, fiecare plan rulează Llama 4 Scout (17B) pe Groq — fiabilitatea apelurilor de unelte și latența sunt identice pe Gratuit, Starter, Pro, Business și Founding Member. Doar cota zilnică de mesaje diferă per plan.",
+    "byokNote": "* BYOK mereu gratuit — mesaje nelimitate pe orice framework.",
+    "byokSetupLink": "Vezi ghidul de configurare BYOK →",
+    "decisionGuide": "Ghid rapid de decizie",
+    "readyCta": "Gata să deployezi?",
+    "readySubheading": "Alege un framework, configurează-ți agentul și mergi live în mai puțin de 60 de secunde. Plan gratuit inclus.",
+    "deployFirstAgent": "Deployează primul tău agent",
+    "viewPricing": "Vezi prețurile",
+    "decisions": [
+      {
+        "condition": "Vreau numărul maxim de unelte și automatizare",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "Vreau un agent care învață în timp",
+        "pick": "Hermes"
+      },
+      {
+        "condition": "Vreau un bot pentru social media sau comunitate",
+        "pick": "ElizaOS"
+      },
+      {
+        "condition": "Abia am început și vreau ceva simplu",
+        "pick": "Milady"
+      },
+      {
+        "condition": "Am nevoie de mesagerie multi-canal (Telegram + Discord + WhatsApp)",
+        "pick": "OpenClaw sau Hermes"
+      },
+      {
+        "condition": "Vreau un bot cu personalitate de personaj",
+        "pick": "ElizaOS sau Milady"
+      }
+    ]
+  },
+  "token": {
+    "liveLabel": "Live pe Solana",
+    "heading": "$HATCHER",
+    "subheading": "Tokenul ecosistemului Hatcher. Alimentează abonamentele la planuri, add-on-urile de agenți și guvernanța pe Solana.",
+    "caLabel": "CA:",
+    "viewDexscreener": "Vezi pe Dexscreener",
+    "viewSolscan": "Vezi pe Solscan",
+    "burnBadge": "10% din fiecare plată $HATCHER este ars on-chain, în aceeași tranzacție.",
+    "createAgentCta": "Creează agent gratuit",
+    "viewPricing": "Vezi prețurile",
+    "plannedUtilityLabel": "Utilitate planificată",
+    "whatPowers": "Ce va alimenta tokenul",
+    "ecosystemDesc": "$HATCHER este moneda nativă a ecosistemului Hatcher.",
+    "keyDetails": "Detalii cheie",
+    "networkLabel": "Rețea",
+    "networkValue": "Solana",
+    "splToken": "SPL Token",
+    "statusLabel": "Status",
+    "statusValue": "Live",
+    "trading": "Tranzacționare",
+    "contractLabel": "Contract",
+    "platformLabel": "Platformă",
+    "platformValue": "Plan gratuit disponibil acum — tokenul activează planurile plătite și add-on-urile",
+    "stayInLoop": "Rămâi la curent",
+    "stayInLoopBody": "Tokenul este live și platforma este pregătită. Deployează primul tău agent în câteva minute.",
+    "followOnX": "Urmărește pe X"
+  },
+  "roadmap": {
+    "liveLabel": "Live",
+    "heading": "Roadmap",
+    "subheading": "Ce am construit, ce se lansează acum și încotro ne îndreptăm. Construim în public — urmărește pe",
+    "followHandle": "X /@hatcherlabs",
+    "checkChangelog": "changelog live",
+    "featureRequest": "Ai o sugestie de funcție? Citim tot.",
+    "submitRequest": "Trimite o sugestie",
+    "followOnX": "Urmărește pe X"
+  },
+  "blog": {
+    "eyebrow": "Blog",
+    "heading": "Blogul Hatcher",
+    "subheading": "Ghiduri, tutoriale și perspective despre agenți AI și platforma Hatcher.",
+    "searchPlaceholder": "Caută articole...",
+    "allCategory": "Toate",
+    "latestLabel": "Cele mai noi",
+    "readLabel": "citit",
+    "resultsCount": "{count} rezultat pentru \"{query}\"",
+    "resultsCountPlural": "{count} rezultate pentru \"{query}\"",
+    "noArticles": "Niciun articol găsit",
+    "noArticlesCategory": "Niciun articol găsit în această categorie.",
+    "noArticlesSearch": "Niciun articol găsit pentru \"{query}\".",
+    "clearFilters": "Șterge filtrele",
+    "backToBlog": "Înapoi la blog",
+    "relatedArticles": "Articole similare"
+  },
+  "changelog": {
+    "betaLabel": "Beta",
+    "heading": "Changelog",
+    "subheading": "Lansăm îmbunătățiri în fiecare zi. Iată ce s-a schimbat.",
+    "noCommits": "Niciun commit găsit.",
+    "errorMessage": "Ceva a mers greșit.",
+    "tryAgain": "Încearcă din nou"
+  },
+  "help": {
+    "eyebrow": "Resurse",
+    "heading": "Centru de ajutor",
+    "subheading": "Găsește răspunsuri, răsfoiește ghiduri și ia legătura cu suportul.",
+    "searchPlaceholder": "Caută în toate întrebările... ex. \"BYOK\", \"limită de rate\", \"Telegram\"",
+    "resultCount": "{count} rezultat",
+    "resultCountPlural": "{count} rezultate",
+    "matchCount": "{count} potrivire",
+    "matchCountPlural": "{count} potriviri",
+    "noMatchHeading": "Nicio întrebare corespunzătoare găsită",
+    "noMatchBody": "Încearcă alte cuvinte cheie sau răsfoiește documentația.",
+    "documentationLink": "documentație",
+    "contactHeading": "Contactează-ne",
+    "contactBody": "Nu găsești ce cauți?",
+    "openTicket": "Deschide un tichet de suport",
+    "contactOr": "sau contactează-ne direct:",
+    "technicalHelp": "Ajutor tehnic",
+    "generalInquiries": "Întrebări generale",
+    "communitySupport": "Suport comunitate",
+    "communityChat": "Chat comunitate",
+    "stillNeedHelp": "Mai ai nevoie de ajutor?",
+    "ticketResponse": "Trimite un tichet de suport și echipa noastră îți va răspunde în 24 de ore.",
+    "quickLinks": {
+      "documentation": "Documentație",
+      "discord": "Comunitate Discord",
+      "telegram": "Grup Telegram",
+      "submitTicket": "Trimite tichet",
+      "emailSupport": "Suport email"
+    }
+  },
+  "status": {
+    "eyebrow": "Status",
+    "heading": "Starea platformei",
+    "subheading": "Starea în timp real a infrastructurii Hatcher.",
+    "navLabel": "Status Hatcher",
+    "autoRefresh": "Auto-reîmprospătare 30s",
+    "operational": "Toate sistemele funcționează",
+    "degraded": "Unele sisteme degradate",
+    "down": "Perturbare de serviciu detectată",
+    "statusOperational": "Funcțional",
+    "statusDegraded": "Degradat",
+    "statusDown": "Jos",
+    "lastChecked": "Ultima verificare:",
+    "refresh": "Reîmprospătare",
+    "checking": "Se verifică sistemele...",
+    "errorMessage": "Nu s-a putut contacta API-ul. Status indisponibil.",
+    "activeAgents": "Agenți activi",
+    "totalAgents": "Total agenți",
+    "components": "Componente",
+    "updatedAt": "Actualizat la {time}",
+    "loading": "Se încarcă...",
+    "backToHatcher": "← Înapoi la Hatcher"
+  },
+  "shortcuts": {
+    "backToDashboard": "Înapoi la panou",
+    "heading": "Scurtături de tastatură",
+    "subheading": "Navighează mai rapid în Hatcher cu scurtături de tastatură",
+    "quickTipLabel": "Sfat rapid",
+    "quickTipBody": "Apasă oriunde pentru a deschide paleta de comenzi. Caută pagini, agenți sau acțiuni instant.",
+    "footerNote": "Scurtăturile sunt dezactivate când scrii în câmpuri text. Pe macOS, folosește Cmd în loc de Ctrl."
+  },
+  "create": {
+    "eyebrow": "Crează agent",
+    "heading": "Creează-ți agentul",
+    "subheading": "Pornește un agent AI gratuit în mai puțin de 2 minute.",
+    "stepsAriaLabel": "Pași de creare",
+    "stepLabels": {
+      "style": "Stil",
+      "category": "Categorie",
+      "template": "Șablon",
+      "setUp": "Configurare",
+      "launch": "Pornire"
+    },
+    "authLoading": "Autentificare...",
+    "authRequired": "Creează-ți agentul",
+    "authRequiredBody": "Conectează-te la cont pentru a crea și implementa agenți AI.",
+    "signIn": "Conectare",
+    "back": "Înapoi",
+    "continue": "Următorul",
+    "step1Heading": "Ce tip de agent dorești?",
+    "step1Subheading": "Fiecare framework are avantaje diferite — alege-l pe cel potrivit.",
+    "step2Heading": "Ce tip de agent?",
+    "step2Subheading": "Alege o categorie — îți vom arăta cele mai bune șabloane",
+    "searchTemplates": "Caută printre 200+ șabloane...",
+    "clearSearch": "Șterge căutarea",
+    "noTemplatesFound": "Niciun șablon găsit pentru \"{query}\"",
+    "clearSearchLink": "Șterge căutarea",
+    "categoryCount": "{count} șabloane",
+    "step3Heading": "Alege un șablon",
+    "step3Subheading": "Alege un șablon — poți personaliza totul la pasul următor",
+    "customAgent": "Agent personalizat",
+    "customAgentDesc": "Pornește de la zero cu propriul tău system prompt",
+    "customOption": "Pornește de la zero",
+    "customOptionDesc": "Control complet asupra fiecărei setări",
+    "step4Heading": "Personalizează-ți agentul",
+    "step4Subheading": "Dă-i un nume agentului și alege cum gândește",
+    "agentNameLabel": "Numele agentului",
+    "agentNamePlaceholder": "ex. AlphaResearcher, TweetLord...",
+    "agentNameHintCount": "{count}/50 de caractere",
+    "agentNameTooShort": "Numele trebuie să aibă cel puțin 3 caractere",
+    "agentNameInvalidChars": "Sunt permise doar litere, cifre, spații, cratime, două puncte, apostrofuri",
+    "descriptionLabel": "Descriere",
+    "descriptionPlaceholder": "Descriere scurtă a funcționalității agentului...",
+    "descriptionHint": "Scurt slogan pentru agentul tău",
+    "platformsHeading": "Unde să funcționeze agentul tău?",
+    "platformsSubheading": "Selectează platformele și adaugă cheile API. Poți adăuga mai multe oricând din Setări.",
+    "noPlatformsNote": "Nicio platformă selectată? Nu-i problemă — adaugă oricând din tab-ul Setări al agentului.",
+    "hideValue": "Ascunde valoarea",
+    "showValue": "Arată valoarea",
+    "llmModelLabel": "Model AI",
+    "llmModelAria": "Selecție model AI",
+    "llmFreeLabel": "Model AI gratuit",
+    "llmFreeTag": "GRATUIT",
+    "llmFreeSubtext": "Alimentat de Groq — nu necesită cheie API",
+    "llmByokLabel": "Folosește propria cheie AI",
+    "llmByokTag": "mereu gratuit",
+    "llmByokSubtext": "Conectează propria cheie API OpenAI, Anthropic sau altă platformă",
+    "byokProviderLabel": "Furnizor",
+    "byokModelLabel": "Model",
+    "byokModelPlaceholder": "identificator model...",
+    "byokBackToList": "Înapoi la lista de modele",
+    "byokSelectModel": "Selectează un model...",
+    "byokCustomModel": "Model personalizat...",
+    "byokApiKeyLabel": "Cheie API",
+    "byokApiKeyEncrypted": "criptată la stocare",
+    "byokBaseUrlLabel": "URL de bază",
+    "skillsHeading": "Abilități agent",
+    "skillsSubheading": "Alege ce poate face agentul tău",
+    "toolsHeading": "Instrumente agent",
+    "toolsSubheading": "Alege ce poate face agentul tău",
+    "pluginsHeading": "Plugin-uri",
+    "pluginsSubheading": "Alege ce poate face agentul tău",
+    "capabilitiesHeading": "Capacități",
+    "capabilitiesSubheading": "Alege ce poate face agentul tău",
+    "templateSkillsHeading": "Inclus în acest șablon",
+    "templateSkillsSubheading": "Aceste abilități ClawHub se instalează automat la prima pornire.",
+    "systemPromptLabel": "System Prompt",
+    "systemPromptCustomNote": "Instrucțiunile tale personalizate vor înlocui valoarea implicită a șablonului",
+    "systemPromptDefaultNote": "Personalitatea agentului este preconfigurată. Personalizează dacă dorești să o schimbi.",
+    "systemPromptCustomize": "Personalizează",
+    "systemPromptUseDefault": "Folosește șablonul implicit",
+    "systemPromptPlaceholder": "Scrie aici system prompt-ul personalizat. Înlocuiește complet valoarea implicită.",
+    "systemPromptHint": "Definește personalitatea, capacitățile și regulile agentului",
+    "systemPromptCount": "{count}/8000",
+    "systemPromptWarning": "Adaugă un system prompt pentru rezultate mai bune",
+    "elizaBioLabel": "Bio",
+    "elizaBioHint": "Definește personalitatea și contextul agentului. O afirmație per linie.",
+    "elizaBioPlaceholder": "Un asistent AI cu cunoștințe specializate în...",
+    "elizaLoreLabel": "Lore",
+    "elizaLoreHint": "Cunoștințe de bază și istoria agentului. Un fapt per linie.",
+    "elizaStyleLabel": "Instrucțiuni de stil",
+    "elizaStyleHint": "Cum trebuie să comunice agentul. O instrucțiune per linie.",
+    "elizaTopicsLabel": "Subiecte",
+    "elizaTopicsPlaceholder": "technology, AI, crypto, research",
+    "elizaTopicsHint": "Subiecte pe care le cunoaște agentul, separate prin virgulă",
+    "elizaAdjectivesLabel": "Adjective",
+    "elizaAdjectivesPlaceholder": "helpful, analytical, concise",
+    "elizaAdjectivesHint": "Trăsături de personalitate, separate prin virgulă",
+    "miladyPersonalityLabel": "Preset personalitate",
+    "miladyPersonalityHint": "Alege un stil de personalitate pentru agentul Milady.",
+    "miladyPersonalityHelpful": "Util - Prietenos și profesionist",
+    "miladyPersonalityTsundere": "Tsundere - Reticent dar grijuliu",
+    "miladyPersonalityUnhinged": "Haotic - Imprevizibil și spontan",
+    "miladyPersonalityCustom": "Personalizat - Folosește system prompt-ul tău",
+    "moreOptionsLabel": "Mai multe opțiuni",
+    "moreOptionsHints": {
+      "openclaw": "Căutare, voce, sesiuni",
+      "hermes": "Personalitate, memorie, aprobare",
+      "elizaos": "Bază de date, generare imagini, voce",
+      "milady": "Bază de date, confidențialitate, preset-uri"
+    },
+    "sessionScopeLabel": "Domeniu sesiune",
+    "sessionScopeHint": "Cum se partajează contextul conversației între utilizatori",
+    "sessionScopePerUser": "Per utilizator",
+    "sessionScopeGlobal": "Global",
+    "webSearchLabel": "Activează căutarea web",
+    "webSearchHint": "Permite agentului să caute informații în timp real",
+    "searchProviderLabel": "Furnizor căutare",
+    "searchProviderHint": "Ce API de căutare să folosești",
+    "ttsLabel": "Activează vocea (TTS)",
+    "ttsHint": "Ieșire text-în-voce pentru răspunsuri vocale",
+    "ttsProviderLabel": "Furnizor TTS",
+    "ttsProviderHint": "Motor de sinteză vocală",
+    "hermesPersonalityLabel": "Personalitate",
+    "hermesPersonalityHint": "Ton și stil de conversație",
+    "hermesPersonalityDefault": "Implicit",
+    "hermesPersonalityHelpful": "Util",
+    "hermesPersonalityTechnical": "Tehnic",
+    "hermesPersonalityCreative": "Creativ",
+    "hermesPersonalityConcise": "Concis",
+    "memoryLabel": "Activează memoria",
+    "memoryHint": "Păstrează contextul între conversații",
+    "approvalModeLabel": "Mod aprobare",
+    "approvalModeHint": "Cum sunt autorizate acțiunile înainte de execuție",
+    "approvalModeAuto": "Automat",
+    "approvalModeAsk": "Întreabă înainte de acțiuni",
+    "approvalModeManual": "Manual",
+    "databaseLabel": "Bază de date",
+    "databaseHint": "Backend stocare pentru starea și memoria agentului",
+    "databaseHintMilady": "Backend stocare pentru starea agentului",
+    "imageGenLabel": "Activează generarea de imagini",
+    "imageGenHint": "Permite agentului să genereze imagini",
+    "voiceLabel": "Activează vocea",
+    "voiceHint": "Capacități voce-în-text și text-în-voce",
+    "localFirstLabel": "Mod Local-First",
+    "localFirstHint": "Procesează datele local înainte de sincronizare",
+    "miladyPersonalitySelectedHint": "Selectat mai sus — controlează tonul agentului",
+    "step5Heading": "Gata de pornire?",
+    "step5Subheading": "Verifică configurația înainte de pornire",
+    "summaryAgentType": "Tip agent",
+    "summaryTemplate": "Șablon",
+    "summaryTemplateCustom": "Personalizat",
+    "summaryAiModel": "Model AI",
+    "summaryDescription": "Descriere",
+    "summaryPlatforms": "Platforme",
+    "summaryPersonality": "Personalitate",
+    "summaryPersonalityDefault": "Implicit șablon",
+    "summaryPersonalityCustom": "Instrucțiuni personalizate",
+    "summaryCost": "Cost",
+    "summaryCostFree": "$0.00 — gratuit",
+    "summaryCostByok": "$0.00 — cheie proprie",
+    "summaryFrameworkLabels": {
+      "openclaw": "Asistent multi-abilitate",
+      "hermes": "Agent autonom",
+      "elizaos": "Framework multi-agent",
+      "milady": "Runtime confidențialitate"
+    },
+    "testChatLabel": "Testează agentul",
+    "testChatSubtext": "Previzualizează cum va răspunde agentul",
+    "testChatPreviewLabel": "Previzualizare chat",
+    "testChatSimulated": "Previzualizare simulată. Implementează agentul pentru conversații reale.",
+    "testChatEmpty": "Trimite un mesaj pentru a previzualiza agentul",
+    "testChatEmptyHint": "Încearcă \"Salut\" sau \"Ce poți face?\"",
+    "testChatPlaceholder": "Scrie un mesaj...",
+    "launchedHeading": "Agentul tău este live!",
+    "launchedSubtext": "Redirecționare către dashboard-ul agentului...",
+    "launchCtaLabel": "Pornește agentul",
+    "launchCtaCreating": "Se creează agentul...",
+    "launchCtaCreated": "Agent creat cu succes",
+    "launchCta": "Pornește agentul meu!",
+    "launching": "Se eclozionează...",
+    "launched": "Eclozionat!",
+    "frameworkFeatures": {
+      "openclaw": {
+        "desc": "Asistent AI versatil cu mii de abilități din comunitate și mesagerie multi-canal.",
+        "f1": "Mii de abilități",
+        "f2": "Navigare web",
+        "f3": "Sarcini programate"
+      },
+      "hermes": {
+        "desc": "Agent AI inteligent care memorează contextul din conversații și învață în timp.",
+        "f1": "Memorie pe termen lung",
+        "f2": "40+ instrumente integrate",
+        "f3": "Auto-îmbunătățire"
+      },
+      "elizaos": {
+        "desc": "Framework multi-agent open-source de la ai16z. 90+ plugin-uri, memorie persistentă, Web3 nativ.",
+        "f1": "90+ plugin-uri",
+        "f2": "Memorie vectorială",
+        "f3": "Web3 nativ"
+      },
+      "milady": {
+        "desc": "Runtime AI axat pe confidențialitate cu 20+ conectori, avatare VRM și integrare DeFi.",
+        "f1": "20+ conectori",
+        "f2": "Preset-uri personalitate",
+        "f3": "Confidențialitate-first"
+      }
+    },
+    "skills": {
+      "webSearch": {
+        "name": "Căutare web",
+        "desc": "Caută informații în timp real"
+      },
+      "calculator": {
+        "name": "Calculator",
+        "desc": "Matematică și calcule"
+      },
+      "weather": {
+        "name": "Vreme",
+        "desc": "Prognoze meteo"
+      },
+      "codeInterpreter": {
+        "name": "Rulare cod",
+        "desc": "Execută fragmente de cod"
+      },
+      "fileManager": {
+        "name": "Manager fișiere",
+        "desc": "Citește și scrie fișiere"
+      },
+      "imageGen": {
+        "name": "Generare imagini",
+        "desc": "Generează imagini din text"
+      }
+    },
+    "tools": {
+      "webSearch": {
+        "name": "Căutare web",
+        "desc": "Caută informații pe internet"
+      },
+      "calculator": {
+        "name": "Calculator",
+        "desc": "Calcule matematice"
+      },
+      "codeExecution": {
+        "name": "Rulare cod",
+        "desc": "Execută fragmente de cod"
+      },
+      "fileOperations": {
+        "name": "Operațiuni fișiere",
+        "desc": "Citește și scrie fișiere"
+      },
+      "memory": {
+        "name": "Memorie",
+        "desc": "Ține minte conversații și fapte"
+      },
+      "summarize": {
+        "name": "Rezumat",
+        "desc": "Rezumă texte lungi"
+      },
+      "translate": {
+        "name": "Traducător",
+        "desc": "Traduce între limbi"
+      },
+      "weather": {
+        "name": "Vreme",
+        "desc": "Prognoze meteo"
+      }
+    },
+    "plugins": {
+      "database": {
+        "name": "Bază de date",
+        "desc": "Acces bază de date SQL"
+      },
+      "imageGen": {
+        "name": "Generare imagini",
+        "desc": "Generează imagini"
+      },
+      "video": {
+        "name": "Video",
+        "desc": "Procesare video"
+      },
+      "tts": {
+        "name": "Text-în-voce",
+        "desc": "Ieșire vocală"
+      },
+      "nodeRuntime": {
+        "name": "Runtime Node",
+        "desc": "Operațiuni pe server"
+      },
+      "bootstrap": {
+        "name": "Bootstrap",
+        "desc": "Utilități de bază"
+      }
+    },
+    "capabilities": {
+      "chat": {
+        "name": "Chat",
+        "desc": "Conversație principală"
+      },
+      "defi": {
+        "name": "DeFi",
+        "desc": "Interacțiuni protocoale DeFi"
+      },
+      "social": {
+        "name": "Social",
+        "desc": "Integrare rețele sociale"
+      },
+      "analysis": {
+        "name": "Analiză",
+        "desc": "Analiza datelor"
+      },
+      "privacy": {
+        "name": "Confidențialitate",
+        "desc": "Instrumente de confidențialitate"
+      },
+      "memes": {
+        "name": "Meme-uri",
+        "desc": "Generare meme-uri"
+      }
+    },
+    "platforms": {
+      "telegram": {
+        "desc": "Implementează ca bot Telegram",
+        "helperField": "Telegram → @BotFather → /newbot → copiază token-ul"
+      },
+      "discord": {
+        "desc": "Implementează ca bot Discord",
+        "helperField": "Portal dezvoltatori Discord → Aplicație nouă → Bot → Copiază token"
+      },
+      "whatsapp": {
+        "desc": "Conectare prin cod QR",
+        "note": "Asocierea QR va fi disponibilă după implementare"
+      },
+      "slack": {
+        "desc": "Implementează în spațiul Slack",
+        "helperField": "Slack API → Crează aplicație → OAuth și permisiuni → Bot Token"
+      },
+      "twitter": {
+        "desc": "Postează, răspunde și interacționează pe X"
+      }
+    },
+    "llmFreeSummary": "Model AI gratuit (Groq)",
+    "llmByokSummary": "Cheia ta: {provider}{model}",
+    "errorHeading": "Eroare la creare",
+    "errorBody": "A apărut o eroare la configurarea agentului. Progresul tău nu a fost pierdut.",
+    "errorIdLabel": "ID eroare:",
+    "tryAgain": "Încearcă din nou",
+    "dashboard": "Panou de control"
+  },
+  "support": {
+    "eyebrow": "Ajutor",
+    "heading": "Suport",
+    "subheading": "Obține ajutor pentru agenți, facturare sau orice altceva.",
+    "quickLinks": {
+      "documentation": "Documentație",
+      "documentationDesc": "Răsfoiește ghiduri și referința API",
+      "faq": "FAQ",
+      "faqDesc": "Răspunsuri la întrebări frecvente",
+      "followUs": "Urmărește-ne",
+      "followUsDesc": "Actualizări și anunțuri"
+    },
+    "directContact": "Sau scrie-ne direct la",
+    "joinDiscord": "Alătură-te Discord-ului nostru",
+    "telegramLabel": "Telegram",
+    "communitySupport": "pentru suport comunitate",
+    "submitTicketHeading": "Trimite un tichet",
+    "signInPrompt": "Autentifică-te pentru a trimite un tichet de suport.",
+    "signIn": "Autentificare",
+    "ticketSubmitted": "Tichet trimis",
+    "ticketSubmittedBody": "Am primit solicitarea ta și îți vom răspunde în curând. Vei fi notificat când există o actualizare.",
+    "submitAnother": "Trimite alt tichet",
+    "subjectLabel": "Subiect",
+    "subjectPlaceholder": "Scurtă descriere a problemei",
+    "categoryLabel": "Categorie",
+    "priorityLabel": "Prioritate",
+    "relatedAgentLabel": "Agent asociat",
+    "relatedAgentOptional": "(opțional)",
+    "selectAgent": "Selectează un agent...",
+    "messageLabel": "Mesaj",
+    "messagePlaceholder": "Descrie problema în detaliu...",
+    "submitTicket": "Trimite tichetul",
+    "submitting": "Se trimite...",
+    "signInError": "Te rugăm să te autentifici pentru a trimite un tichet.",
+    "subjectRequired": "Subiectul este obligatoriu.",
+    "messageRequired": "Mesajul este obligatoriu.",
+    "failedSubmit": "Eroare la trimiterea tichetului. Te rugăm să încerci din nou.",
+    "recentTickets": "Tichete recente",
+    "noTickets": "Niciun tichet încă",
+    "noTicketsDesc": "Tichetele de suport trimise vor apărea aici. Creează primul tichet de mai sus pentru a începe.",
+    "backToTop": "Înapoi sus",
+    "ticketCount": "{count} tichet",
+    "ticketCountPlural": "{count} tichete"
+  },
+  "affiliate": {
+    "eyebrow": "Program de afiliere",
+    "heading": "Câștigă din fiecare utilizator pe care îl aduci la Hatcher.",
+    "subheading": "Comisioane recurente de până la 40% pentru fiecare utilizator plătitor recomandat. Cash în portofelul tău, credite pentru propriii agenți sau o împărțire hibridă — tu decizi. Atribuirea este bazată pe link și rămâne pe viața contului recomandat.",
+    "applyNowCta": "Aplică acum",
+    "howItWorksLink": "Cum funcționează",
+    "pickYourPayout": "Alege-ți modalitatea de plată",
+    "threeWays": "Trei moduri de a fi plătit.",
+    "threeWaysSubheading": "Aceleași venituri eligibile, împărțire diferită. Alege modul care se potrivește cu cum vrei să profiți de pe urma programului — poți schimba mai târziu contactând suportul.",
+    "popularLabel": "Popular",
+    "foundingBonusLabel": "Bonus Founding Member",
+    "foundingBonusHeading": "Recomandă un Founding Member → bonus fix de $20 cash.",
+    "foundingBonusBody": "Planul lifetime de $99 plătește un bonus fix de $20 afiliantului care a recomandat — pe lângă orice câștigă din achizițiile ulterioare de add-on sau agent ale acelui utilizator. Plătit în cash indiferent de modul implicit de plată.",
+    "applyLabel": "Aplică",
+    "howItWorksLabel": "Cum funcționează",
+    "fourSteps": "Patru pași, zero surprize.",
+    "faqLabel": "Întrebări frecvente",
+    "everythingYoudAsk": "Tot ce ai întreba înainte de a aplica.",
+    "readyHeading": "Gata să parteneriezi cu Hatcher?",
+    "readyBody": "Aplicațiile durează câteva minute. Aprobare în 3–5 zile. Comisioane recurente pe toată durata de viață a fiecărui utilizator pe care îl aduci.",
+    "seePricing": "Vezi prețurile",
+    "apply": {
+      "backLink": "Înapoi la programul de afiliere",
+      "loading": "Se încarcă…",
+      "eyebrow": "Aplică la afiliații Hatcher",
+      "heading": "Spune-ne despre tine.",
+      "subheading": "Câteva detalii despre platformele și audiența ta. Revizuim fiecare aplicație manual — fii sincer, fii specific.",
+      "underReview": "În curs de revizuire — te vom contacta.",
+      "reviewTime": "Timp de revizuire estimat:",
+      "reviewDays": "3–5 zile",
+      "reviewEmailNote": "Vei primi un email în momentul în care se ia o decizie.",
+      "submitted": "Aplicație trimisă",
+      "submittedDate": "Trimisă",
+      "platformsLabel": "Platforme",
+      "followers": "urmăritori",
+      "slugLabel": "Slug solicitat",
+      "slugPreview": "previzualizare: hatcher.host/r/{slug}",
+      "payoutModeLabel": "Mod de plată",
+      "payoutAddressLabel": "Adresă de plată",
+      "pitchLabel": "Pitch",
+      "successHeading": "Aplicație trimisă.",
+      "successBody": "Vom revizui în 3–5 zile și îți vom trimite rezultatul pe email. Între timp, poți pregăti ce vei distribui odată aprobat.",
+      "backToAffiliate": "Înapoi la programul de afiliere",
+      "yourPlatforms": "Platformele tale",
+      "platformCount": "{count} / {max}",
+      "platformLabel": "Platforma {n}",
+      "removeLabel": "Elimină",
+      "addPlatform": "Adaugă altă platformă",
+      "platformTypeField": "Tip platformă",
+      "handleField": "Handle",
+      "handleHint": "ex. @hatcher, @solana, /channel/xyz",
+      "audienceField": "Dimensiune audiență (opțional)",
+      "urlField": "URL (opțional)",
+      "slugField": "Link de recomandare personalizat (opțional)",
+      "slugPrefix": "hatcher.host/r/",
+      "slugPlaceholder": "numetau",
+      "slugBlankHint": "Lasă gol pentru un cod generat automat",
+      "slugPreviewGood": "Link-ul tău va fi hatcher.host/r/{slug}",
+      "pitchField": "Pitch",
+      "pitchPlaceholder": "De ce vrei să parteneriezi cu Hatcher? Ce tip de conținut sau audiență vei atinge?",
+      "pitchCharHint": "50–2000 caractere",
+      "payoutModeField": "Mod de plată",
+      "solAddressField": "Adresă portofel SOL (base58, 32–44 caractere)",
+      "solAddressPlaceholder": "ex. 21L6VVRAuxk87sXggz8exhPCm1w4qWyKEs6SDauyyRAW",
+      "submitBtn": "Trimite aplicația",
+      "submitting": "Se trimite…",
+      "rejectedLabel": "Aplicație anterioară respinsă",
+      "validatePlatformMin": "Adaugă cel puțin o platformă",
+      "validatePlatformMax": "Maximum {max} platforme",
+      "validateHandleRequired": "Obligatoriu",
+      "validateHandleMax": "Maximum 100 de caractere",
+      "validateAudienceNumber": "Trebuie să fie un număr întreg",
+      "validateUrlInvalid": "Trebuie să fie un URL valid",
+      "validatePitchMin": "Pitch-ul trebuie să aibă cel puțin 50 de caractere",
+      "validatePitchMax": "Pitch-ul trebuie să aibă cel mult 2000 de caractere",
+      "validateAddressRequired": "Obligatoriu pentru CASH_ONLY și HYBRID",
+      "validateAddressFormat": "Trebuie să fie o adresă Solana base58 validă (32–44 caractere)",
+      "slugTooShort": "Prea scurt — minim 3 caractere",
+      "slugTooLong": "Prea lung — maximum 30 de caractere",
+      "slugInvalidChars": "Doar a–z, 0–9 și cratime (nu poate începe/termina cu -)",
+      "slugReserved": "Acel slug este rezervat — alege altul"
+    }
+  },
+  "docs": {
+    "eyebrow": "Documentație",
+    "heading": "Documentație",
+    "subheading": "Tot ce ai nevoie pentru a construi, deploya și gestiona agenți AI cu Hatcher.",
+    "searchPlaceholder": "Caută în documentație...",
+    "searchComingSoon": "Căutarea vine în curând",
+    "apiReferenceHeading": "Referință API",
+    "apiReferenceBody": "Documentație completă a endpoint-urilor cu exemple în cURL, JavaScript și Python. Autentificare, limite de rate și coduri de eroare.",
+    "apiReferenceLink": "Explorează endpoint-urile",
+    "integrationsHeading": "Ghiduri de integrare",
+    "integrationsBody": "Configurare pas cu pas pentru Telegram, Discord, WhatsApp, Slack, Twitter/X și Signal. De la credențiale la primul mesaj.",
+    "integrationsLink": "Răsfoiește platformele",
+    "popularTopics": "Subiecte populare",
+    "readMore": "Citește mai mult",
+    "cantFind": "Nu găsești ce cauți?",
+    "cantFindBody": "Echipa noastră de suport și comunitatea sunt aici pentru a te ajuta să obții maximum din Hatcher.",
+    "contactSupport": "Contactează suportul",
+    "helpCenter": "Centru de ajutor",
+    "quickLinks": [
+      {
+        "title": "Primii pași",
+        "description": "Configurează primul tău agent AI în mai puțin de 60 de secunde. Ghid de start rapid, cerințe preliminare și primul deploy."
+      },
+      {
+        "title": "Configurarea agentului",
+        "description": "Configurează personalitate, modele, memorie, cron jobs, webhook-uri și rutare multi-agent."
+      },
+      {
+        "title": "Integrări de platforme",
+        "description": "Conectează-te la Telegram, Discord, WhatsApp, Slack și 20+ platforme de mesagerie."
+      },
+      {
+        "title": "Configurare BYOK",
+        "description": "Aduce-ți propriile chei API pentru OpenAI, Anthropic, Google, xAI și altele. Mereu gratuit."
+      },
+      {
+        "title": "Facturare & Prețuri",
+        "description": "Înțelege plățile cu token, deblocarea funcțiilor, creditele găzduite și gestionarea abonamentelor."
+      },
+      {
+        "title": "Referință API",
+        "description": "Endpoint-uri REST API pentru agenți, funcții, plăți și operații de administrare."
+      }
+    ],
+    "topics": [
+      {
+        "label": "Cum să deployezi primul tău agent"
+      },
+      {
+        "label": "Furnizori LLM suportați"
+      },
+      {
+        "label": "Configurarea framework-ului agentului"
+      },
+      {
+        "label": "Ciclul de viață al containerului & coduri de stare"
+      },
+      {
+        "label": "Configurarea integrării Telegram"
+      },
+      {
+        "label": "Înțelegerea plăților cu token"
+      }
+    ]
+  },
+  "shared": {
+    "tiers": {
+      "free": {
+        "name": "Gratuit",
+        "description": "1 agent, 20 mesaje/zi, 50 MB stocare"
+      },
+      "starter": {
+        "name": "Starter",
+        "description": "1 agent, 50 mesaje/zi, 150 MB stocare"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "3 agenți, 100 mesaje/zi, 500 MB stocare"
+      },
+      "business": {
+        "name": "Business",
+        "description": "10 agenți, 300 mesaje/zi, 1 GB stocare, mereu activ"
+      },
+      "founding_member": {
+        "name": "Founding Member",
+        "description": "10 agenți, 300 mesaje/zi, 2 GB stocare, acces pe viață"
+      }
+    },
+    "addons": {
+      "agents_plus1": {
+        "name": "+1 Agent",
+        "description": "1 slot suplimentar de agent"
+      },
+      "agents_plus3": {
+        "name": "+3 Agenți",
+        "description": "3 sloturi suplimentare de agent"
+      },
+      "agents_plus5": {
+        "name": "+5 Agenți",
+        "description": "5 sloturi suplimentare de agent"
+      },
+      "agents_plus10": {
+        "name": "+10 Agenți",
+        "description": "10 sloturi suplimentare de agent"
+      },
+      "messages_plus20": {
+        "name": "+20 msg/zi",
+        "description": "20 mesaje suplimentare pe zi"
+      },
+      "messages_plus50": {
+        "name": "+50 msg/zi",
+        "description": "50 mesaje suplimentare pe zi"
+      },
+      "messages_plus100": {
+        "name": "+100 msg/zi",
+        "description": "100 mesaje suplimentare pe zi"
+      },
+      "messages_plus200": {
+        "name": "+200 msg/zi",
+        "description": "200 mesaje suplimentare pe zi"
+      },
+      "searches_plus25": {
+        "name": "+25 căutări/zi",
+        "description": "25 căutări web suplimentare pe zi"
+      },
+      "searches_plus50": {
+        "name": "+50 căutări/zi",
+        "description": "50 căutări web suplimentare pe zi"
+      },
+      "always_on": {
+        "name": "Always On",
+        "description": "Menține agentul activ 24/7"
+      },
+      "file_manager": {
+        "name": "File Manager",
+        "description": "Navighează, editează și descarcă fișierele din spațiul de lucru"
+      },
+      "full_logs": {
+        "name": "Full Logs",
+        "description": "Deblochează vizualizatorul complet de jurnale pentru acest agent"
+      },
+      "plugins_plus10": {
+        "name": "+10 Plugins",
+        "description": "10 sloturi suplimentare de plugin+abilitate pentru acest agent"
+      }
+    },
+    "frameworks": {
+      "openclaw": {
+        "name": "OpenClaw",
+        "description": "Asistent AI self-hosted cu 3.200+ abilități comunitare, gateway de mesagerie multi-canal și execuție autonomă de sarcini."
+      },
+      "hermes": {
+        "name": "Hermes Agent",
+        "description": "Agent AI autonom de la Nous Research cu memorie persistentă, 40+ unelte, sistem de abilități și gateway de mesagerie multi-platformă."
+      },
+      "elizaos": {
+        "name": "ElizaOS",
+        "description": "Framework open-source pentru agenți AI cu personalități bazate pe personaje, ecosistem de plugin-uri și suport multi-client pentru platforme sociale și de mesagerie."
+      },
+      "milady": {
+        "name": "Milady",
+        "description": "Framework ușor pentru agenți AI axat pe personalitate, conceput pentru agenți conversaționali expresivi, culturalmente conștienți, cu capabilități modulare."
+      }
+    },
+    "agentStatus": {
+      "active": "Activ",
+      "sleeping": "Adormit",
+      "paused": "Pauză",
+      "error": "Eroare",
+      "killed": "Oprit forțat",
+      "restarting": "Se repornește",
+      "stopping": "Se oprește"
+    }
+  },
+  "localeSwitcher": {
+    "label": "Schimbă limba"
+  }
+}

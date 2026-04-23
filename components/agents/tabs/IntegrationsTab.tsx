@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import {
   CheckCircle,
@@ -147,6 +148,7 @@ function IntegrationFieldsForm({
   integration: IntegrationDef;
   fieldIdPrefix: string;
 }) {
+  const t = useTranslations('dashboard.agentDetail.integrations');
   const ctx = useAgentContext();
   const {
     agent,
@@ -178,7 +180,7 @@ function IntegrationFieldsForm({
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 text-xs text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors"
         >
-          How to get your API key &rarr;
+          {t('howToGetKey')}
         </a>
       )}
       {[...integration.fields, ...(showChannelSettings ? CHANNEL_SETTINGS_FIELDS : [])].map((field) => {
@@ -284,7 +286,7 @@ function IntegrationFieldsForm({
           disabled={isSaving}
           className="px-4 py-2 rounded-lg text-xs font-medium text-[var(--text-primary)] transition-all disabled:opacity-40 hover:opacity-90 bg-[var(--color-accent)]"
         >
-          {isSaving ? 'Saving...' : 'Save Credentials'}
+          {isSaving ? t('saving') : t('saveCredentials')}
         </button>
         {msg && (
           <span className={`text-xs ${msg.startsWith('Error') || msg.startsWith('Missing') ? 'text-red-400' : 'text-emerald-400'}`}>
@@ -297,6 +299,7 @@ function IntegrationFieldsForm({
 }
 
 function PairingPanel({ integration }: { integration: IntegrationDef }) {
+  const t = useTranslations('dashboard.agentDetail.integrations');
   const { agent } = useAgentContext();
   const [loading, setLoading] = useState(false);
   const [qrCode, setQrCode] = useState<string | null>(null);
@@ -394,7 +397,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
       {/* AllowFrom — always visible */}
       <div>
         <label className="block text-xs font-medium text-[var(--text-secondary)] mb-2">
-          Who can message your agent?
+          {t('pairing.whoCanMessage')}
         </label>
         <div className="flex items-center gap-2 mb-2">
           <button
@@ -406,7 +409,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
                 : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-hover)]'
             }`}
           >
-            Everyone
+            {t('pairing.everyone')}
           </button>
           <button
             type="button"
@@ -417,7 +420,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
                 : allowFromValue === '' ? 'border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--text-primary)]' : 'border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-hover)]'
             }`}
           >
-            Specific numbers
+            {t('pairing.specificNumbers')}
           </button>
         </div>
         {allowFromValue !== '*' && (
@@ -437,16 +440,16 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             disabled={savingIntegration === sk || !allowFromValue.trim()}
             className="px-3 h-8 rounded-lg text-xs font-medium text-[var(--text-primary)] bg-[var(--color-accent)] hover:bg-[#0891b2] disabled:opacity-50 transition-colors"
           >
-            {savingIntegration === sk ? 'Saving...' : 'Save'}
+            {savingIntegration === sk ? t('saving') : t('pairing.save')}
           </button>
           <p className="text-[10px] text-[var(--text-muted)]">
-            {allowFromValue === '*' ? 'Anyone can message your agent.' : 'Only listed numbers can message your agent.'}
+            {allowFromValue === '*' ? t('pairing.anyoneCanMessage') : t('pairing.onlyListedNumbers')}
           </p>
         </div>
         <p className="text-[10px] text-[var(--text-muted)] mt-1">
           {existingAllowFrom
-            ? 'Restart agent after changing.'
-            : 'Set before pairing. Phone numbers in E.164 format (+1234567890).'}
+            ? t('pairing.restartAfterChange')
+            : t('pairing.setBeforePairing')}
         </p>
         {(integrationSaveMsg as unknown as string) === sk && (
           <p className="text-[10px] text-emerald-400 mt-1">Saved! Restart agent to apply.</p>
@@ -458,10 +461,10 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
           {connected ? <CheckCircle size={16} className="text-emerald-400 flex-shrink-0" /> : <AlertTriangle size={16} className="text-amber-400 flex-shrink-0" />}
           <div className="flex-1">
             <p className={`text-sm font-medium ${connected ? 'text-emerald-400' : 'text-amber-400'}`}>
-              {connected ? `${integration.name} Connected` : `${integration.name} Disconnected`}
+              {connected ? t('pairing.connected', { name: integration.name }) : t('pairing.disconnected', { name: integration.name })}
             </p>
             <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-              {connected ? 'Messages will be forwarded to your agent' : 'Session expired. Re-pair or disconnect to clean up.'}
+              {connected ? t('pairing.messagesForwarded') : t('pairing.sessionExpired')}
             </p>
           </div>
           <div className="flex gap-2">
@@ -470,11 +473,11 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
               disabled={loading}
               className="text-xs px-2 py-1 rounded border border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-colors"
             >
-              Re-pair
+              {t('pairing.rePair')}
             </button>
             <button
               onClick={async () => {
-                if (!confirm(`Disconnect ${integration.name}? You will need to re-pair to use it again.`)) return;
+                if (!confirm(t('pairing.disconnectConfirm', { name: integration.name }))) return;
                 const ch = integration.pairingChannel;
                 if (!ch) return;
                 await api.disconnectChannel(agent.id, ch);
@@ -483,7 +486,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
               }}
               className="text-xs px-2 py-1 rounded border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors"
             >
-              Disconnect
+              {t('pairing.disconnect')}
             </button>
           </div>
         </div>
@@ -493,7 +496,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
         <div className="flex items-start gap-2.5 p-3 rounded-lg border border-amber-500/20 bg-amber-500/5">
           <AlertTriangle size={14} className="text-amber-400 mt-0.5 flex-shrink-0" />
           <p className="text-xs leading-relaxed text-[var(--text-secondary)]">
-            Your agent must be running to pair {integration.name}. Start the agent first.
+            {t('pairing.agentMustRun', { name: integration.name })}
           </p>
         </div>
       )}
@@ -508,12 +511,12 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             {loading ? (
               <>
                 <Loader2 size={16} className="animate-spin" />
-                Generating QR code — this takes ~30s...
+                {t('pairing.generatingQr')}
               </>
             ) : (
               <>
                 <Smartphone size={16} />
-                Pair {integration.name}
+                {t('pairing.pairButton', { name: integration.name })}
               </>
             )}
           </button>
@@ -524,7 +527,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
               rel="noopener noreferrer"
               className="block text-center text-xs text-[var(--text-muted)] hover:text-[var(--color-accent)] transition-colors"
             >
-              How to set up {integration.name} &rarr;
+              {t('howToSetup', { name: integration.name })}
             </a>
           )}
         </div>
@@ -557,7 +560,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
                 >
                   {qrCode}
                 </pre>
-                <p className="text-xs text-center text-[var(--text-muted)] mt-4">Tap outside to close</p>
+                <p className="text-xs text-center text-[var(--text-muted)] mt-4">{t('pairing.tapOutsideToClose')}</p>
               </div>
             </div>,
             document.body
@@ -568,7 +571,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--text-primary)]/70 transition-all hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border-default)]"
           >
             {loading ? <Loader2 size={14} className="animate-spin" /> : null}
-            Refresh QR Code
+            {t('pairing.refreshQr')}
           </button>
         </div>
         );
@@ -585,6 +588,7 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
 }
 
 function WebhookSection() {
+  const t = useTranslations('dashboard.agentDetail.integrations');
   const { agent } = useAgentContext();
   const [webhookData, setWebhookData] = useState<{ url: string; token: string } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -616,8 +620,8 @@ function WebhookSection() {
   return (
     <div>
       <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
-        Webhook
-        <span className="ml-2 text-violet-400 normal-case tracking-normal font-normal">Inbound HTTP</span>
+        {t('webhook.label')}
+        <span className="ml-2 text-violet-400 normal-case tracking-normal font-normal">{t('webhook.inboundHttp')}</span>
       </h3>
       <GlassCard className="!p-0">
         <button
@@ -630,13 +634,13 @@ function WebhookSection() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-[var(--text-primary)]">Webhook URL</span>
+              <span className="text-sm font-medium text-[var(--text-primary)]">{t('webhook.webhookUrl')}</span>
               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                Always Active
+                {t('webhook.alwaysActive')}
               </span>
             </div>
             <p className="text-xs mt-0.5 truncate text-[var(--text-muted)]">
-              Trigger your agent from external services (Zapier, GitHub, etc.)
+              {t('webhook.triggerFrom')}
             </p>
           </div>
           {expanded
@@ -649,7 +653,7 @@ function WebhookSection() {
           <div className="border-t border-[var(--border-default)] p-5 space-y-4 bg-[var(--bg-card)]">
             {/* Webhook URL */}
             <div>
-              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Webhook URL</label>
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('webhook.webhookUrl')}</label>
               <div className="flex items-center gap-2">
                 <input
                   type="text"
@@ -660,7 +664,7 @@ function WebhookSection() {
                 <button
                   onClick={() => copyToClipboard(webhookData.url, setCopiedUrl)}
                   className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-[var(--bg-hover)] transition-colors"
-                  title="Copy URL"
+                  title={t('webhook.copyUrl')}
                 >
                   {copiedUrl ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
                 </button>
@@ -669,7 +673,7 @@ function WebhookSection() {
 
             {/* Webhook Token */}
             <div>
-              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Bearer Token</label>
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('webhook.bearerToken')}</label>
               <div className="flex items-center gap-2">
                 <input
                   type={tokenVisible ? 'text' : 'password'}
@@ -680,14 +684,14 @@ function WebhookSection() {
                 <button
                   onClick={() => setTokenVisible(!tokenVisible)}
                   className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-[var(--bg-hover)] transition-colors"
-                  title={tokenVisible ? 'Hide token' : 'Reveal token'}
+                  title={tokenVisible ? t('webhook.hideToken') : t('webhook.revealToken')}
                 >
                   {tokenVisible ? <EyeOff size={14} className="text-[var(--text-muted)]" /> : <Eye size={14} className="text-[var(--text-muted)]" />}
                 </button>
                 <button
                   onClick={() => copyToClipboard(webhookData.token, setCopiedToken)}
                   className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-[var(--bg-hover)] transition-colors"
-                  title="Copy token"
+                  title={t('webhook.copyToken')}
                 >
                   {copiedToken ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-[var(--text-muted)]" />}
                 </button>
@@ -696,7 +700,7 @@ function WebhookSection() {
 
             {/* Example */}
             <div>
-              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Example Request</label>
+              <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">{t('webhook.exampleRequest')}</label>
               <pre className="p-3 rounded-lg text-xs text-[var(--text-secondary)] bg-black/30 border border-[var(--border-default)] overflow-x-auto font-mono leading-relaxed whitespace-pre-wrap break-all">
                 {curlExample}
               </pre>
@@ -727,6 +731,7 @@ function IntegrationCard({
   framework: string;
   fieldIdPrefix: string;
 }) {
+  const t = useTranslations('dashboard.agentDetail.integrations');
   const { expandedIntegrations, toggleIntegrationExpanded, hasExistingSecret } = useAgentContext();
   const sk = integrationStateKey(integration);
   const isExpanded = expandedIntegrations.has(sk);
@@ -794,7 +799,7 @@ function IntegrationCard({
             {recommended && !isConfigured && (
               <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
                 <Star size={8} className="fill-amber-400" />
-                Recommended
+                {t('badges.recommended')}
               </span>
             )}
 
@@ -807,27 +812,27 @@ function IntegrationCard({
             {quickSetup && !isConfigured && !isPlanned && (
               <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
                 <Zap size={8} />
-                Quick Setup
+                {t('badges.quickSetup')}
               </span>
             )}
 
             {/* Pairing badge */}
             {isPairing && !isPlanned && (
               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
-                QR Pairing
+                {t('badges.qrPairing')}
               </span>
             )}
 
             {/* Free badge */}
             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              Free
+              {t('badges.free')}
             </span>
 
             {/* Configured badge */}
             {isConfigured && (
               <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
                 <Shield size={8} />
-                Connected
+                {t('badges.connected')}
               </span>
             )}
           </div>
@@ -861,6 +866,7 @@ function IntegrationCard({
 // ─── Main Tab ────────────────────────────────────────────────
 
 export function IntegrationsTab() {
+  const t = useTranslations('dashboard.agentDetail.integrations');
   const ctx = useAgentContext();
   const {
     agent,
@@ -894,12 +900,12 @@ export function IntegrationsTab() {
                 {fwLabel}
               </span>
               <span className="text-xs text-[var(--text-muted)]">
-                Showing integrations compatible with {fwLabel}
+                {t('showingFor', { framework: fwLabel })}
               </span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-xs text-[var(--text-muted)]">
-                {configuredCount}/{totalCount} connected
+                {t('connected', { configured: configuredCount, total: totalCount })}
               </span>
               <div className="w-16 h-1.5 rounded-full bg-[var(--bg-card)] overflow-hidden">
                 <div
@@ -915,7 +921,7 @@ export function IntegrationsTab() {
             <div className="flex items-start gap-2.5 p-3 rounded-lg border border-amber-500/20 bg-amber-500/5">
               <AlertTriangle size={14} className="text-amber-400 mt-0.5 flex-shrink-0" />
               <p className="text-xs leading-relaxed text-[var(--text-secondary)]">
-                API keys and tokens are encrypted with AES-256-GCM before storage. Once saved, secret values are never shown again — only masked placeholders will appear.
+                {t('encryptedNote')}
               </p>
             </div>
           )}
@@ -926,8 +932,8 @@ export function IntegrationsTab() {
           {/* Main integrations — all free on every tier */}
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
-              Main Integrations
-              <span className="ml-2 text-emerald-400 normal-case tracking-normal font-normal">Free on all tiers</span>
+              {t('mainIntegrations')}
+              <span className="ml-2 text-emerald-400 normal-case tracking-normal font-normal">{t('mainIntegrationsFree')}</span>
             </h3>
             <div className="space-y-3">
               {mainIntegrations.map((integration) => (
@@ -944,13 +950,13 @@ export function IntegrationsTab() {
           {/* Other Platforms section — all integrations are free (OpenClaw only) */}
           {extraIntegrations.length > 0 && <div>
             <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
-              Other Platforms
-              <span className="ml-2 text-blue-400 normal-case tracking-normal font-normal">Community extensions</span>
+              {t('otherPlatforms')}
+              <span className="ml-2 text-blue-400 normal-case tracking-normal font-normal">{t('communityExtensions')}</span>
             </h3>
             <div className="space-y-3">
               <div className="flex items-center gap-2 mb-1">
                 <CheckCircle size={14} className="text-emerald-400" />
-                <span className="text-xs text-emerald-400/80">All platforms included free — configure credentials below</span>
+                <span className="text-xs text-emerald-400/80">{t('allPlatformsFree')}</span>
               </div>
               {extraIntegrations.map((integration) => (
                 <IntegrationCard
@@ -973,14 +979,14 @@ export function IntegrationsTab() {
                 <span className={`inline-block w-1.5 h-1.5 rounded-full ${
                   level === 'native' ? 'bg-emerald-400' : level === 'community' ? 'bg-blue-400' : 'bg-zinc-500'
                 }`} />
-                {level === 'native' ? 'Native — built-in support' : level === 'community' ? 'Community — npm extensions' : 'Planned — coming soon'}
+                {level === 'native' ? t('legend.native') : level === 'community' ? t('legend.community') : t('legend.planned')}
               </span>
             ))}
           </div>
 
           {/* Note */}
           <p className="text-center text-xs text-[var(--text-muted)]">
-            All integrations are free on every tier. Just add your credentials and go.
+            {t('allFreeNote')}
           </p>
         </>
       )}

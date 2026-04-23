@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Brain, RotateCcw, ChevronDown, ChevronRight, Database, Clock, Hash, CircleDot, Info } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -48,6 +49,7 @@ const FRAMEWORK_MEMORY_INFO: Record<string, { description: string; color: string
 };
 
 export function MemoryTab() {
+  const tMemory = useTranslations('dashboard.agentDetail.memory');
   const { agent } = useAgentContext();
   const [memoryMd, setMemoryMd] = useState('');
   const [dailyLogs, setDailyLogs] = useState<DailyLog[]>([]);
@@ -135,7 +137,7 @@ export function MemoryTab() {
           className="text-xs px-3 py-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)] transition-all flex items-center gap-1.5"
         >
           <RotateCcw size={12} className={loading ? 'animate-spin' : ''} />
-          {loading ? 'Loading...' : 'Refresh'}
+          {loading ? tMemory('loading') : tMemory('refresh')}
         </button>
       </div>
 
@@ -220,7 +222,7 @@ export function MemoryTab() {
             <div className="w-16 h-16 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-4">
               <Brain size={28} className="text-purple-400" />
             </div>
-            <p className="text-base font-semibold text-white mb-1">No memories yet</p>
+            <p className="text-base font-semibold text-white mb-1">{tMemory('noMemory')}</p>
             <p className="text-sm text-[var(--text-muted)] max-w-xs">
               Your agent builds memory by chatting with users. Start a conversation and it will remember context across sessions.
             </p>
@@ -248,7 +250,7 @@ export function MemoryTab() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 px-1">
                 <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
-                  Daily Logs ({dailyLogs.length})
+                  {tMemory('dailyLogs')} ({dailyLogs.length})
                 </span>
               </div>
               {dailyLogs.map(log => {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookOpen,
@@ -46,6 +47,7 @@ function formatDate(iso: string): string {
 // ─── Component ───────────────────────────────────────────────
 
 export function KnowledgeTab() {
+  const tKnowledge = useTranslations('dashboard.agentDetail.knowledge');
   const { agent } = useAgentContext();
   const { toast } = useToast();
 
@@ -202,7 +204,7 @@ export function KnowledgeTab() {
         <div className="flex items-center gap-3">
           <BookOpen size={20} style={{ color: 'var(--color-accent)' }} />
           <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-            Knowledge Base
+            {tKnowledge('uploadTitle')}
           </h2>
           <span
             className="text-xs px-2 py-0.5 rounded-full"
@@ -217,7 +219,7 @@ export function KnowledgeTab() {
           style={{ background: 'var(--color-accent)', color: '#fff' }}
         >
           <Upload size={14} />
-          {showForm ? 'Cancel' : 'Upload'}
+          {showForm ? tKnowledge('cancel') : tKnowledge('upload')}
         </button>
       </div>
 

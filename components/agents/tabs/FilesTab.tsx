@@ -1,6 +1,7 @@
 'use client';
 
 import { useContext, useEffect, useState, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { AgentContext, FRAMEWORK_ROOT_PATH, FRAMEWORK_BADGE, GlassCard } from '../AgentContext';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
@@ -33,7 +34,7 @@ import {
   Settings,
   HardDrive,
 } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { AnimatePresence } from 'framer-motion';
 
 interface FileEntry {
@@ -110,6 +111,7 @@ function getFileTypeTag(name: string): { label: string; color: string } | null {
 export function FilesTab() {
   const ctx = useContext(AgentContext);
   const { user } = useAuth();
+  const t = useTranslations('dashboard.agentDetail.files');
   const { confirmState, closeConfirm, driveSol, driveUsdc, driveHatch } = usePaymentDrivers();
   const agentId = ctx?.agent?.id ?? '';
   const framework = ctx?.agent?.framework ?? 'openclaw';
@@ -562,7 +564,7 @@ export function FilesTab() {
                 )}
               </div>
             )}
-            <button onClick={() => loadFiles()} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors" title="Refresh">
+            <button onClick={() => loadFiles()} className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors" title={t('refresh')}>
               {loading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
             </button>
             <button
@@ -658,7 +660,7 @@ export function FilesTab() {
                       onClick={(e) => { e.stopPropagation(); handleDelete(entry); }}
                       disabled={deleting === entry.path}
                       className="p-1 rounded text-[var(--text-muted)] hover:text-red-400 hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100"
-                      title="Delete"
+                      title={t('delete')}
                     >
                       {deleting === entry.path ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
                     </button>

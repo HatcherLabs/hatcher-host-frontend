@@ -3,16 +3,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Bot, Copy, Check, Github, FileText, ArrowRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 const SKILL_URL = 'https://hatcher.host/skill.md';
 const GITHUB_URL = 'https://github.com/HatcherLabs/hatcher-skill';
 const PROMPT = `Read ${SKILL_URL} and follow the instructions to deploy AI agents on Hatcher.`;
-
-const STEPS = [
-  { num: '01', text: 'Send this prompt to your AI coding agent — Claude Code, Cursor, OpenClaw, Hermes, or any agent that can fetch URLs and run shell commands.' },
-  { num: '02', text: 'Agent registers an account with your email and sends you a verification link.' },
-  { num: '03', text: 'Click verify. Your agent picks a template, deploys, and hands you a running AI.' },
-];
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const fadeUp = {
@@ -22,6 +17,7 @@ const fadeUp = {
 };
 
 export function AgentDiscoverySection() {
+  const t = useTranslations('landing.agentDiscovery');
   const [copied, setCopied] = useState(false);
 
   const onCopy = async () => {
@@ -33,6 +29,12 @@ export function AgentDiscoverySection() {
       /* clipboard may be blocked — silently ignore */
     }
   };
+
+  const steps = [
+    { num: '01', text: t('step01') },
+    { num: '02', text: t('step02') },
+    { num: '03', text: t('step03') },
+  ];
 
   return (
     <section
@@ -47,16 +49,16 @@ export function AgentDiscoverySection() {
         >
           <p className="mb-4 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
             <Bot className="w-3.5 h-3.5" strokeWidth={2} />
-            For AI Agents
+            {t('eyebrow')}
           </p>
           <h2
             className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]"
             style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
-            Command an army of subagents
+            {t('heading')}
           </h2>
           <p className="mt-4 text-lg text-[var(--text-secondary)]">
-            Your local coding agent becomes a fleet commander. Paste this prompt — it registers on Hatcher in your name, spins up always-on subagents (Telegram bots, research loops, Discord mods, monitors), and keeps controlling them long after your session ends.
+            {t('body')}
           </p>
         </motion.div>
 
@@ -67,21 +69,21 @@ export function AgentDiscoverySection() {
         >
           <div className="rounded-lg border border-[var(--border-default)] bg-[var(--surface-raised)] overflow-hidden">
             <div className="flex items-center justify-between border-b border-[var(--border-default)] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)]">
-              <span>Prompt</span>
+              <span>{t('promptLabel')}</span>
               <button
                 onClick={onCopy}
-                aria-label={copied ? 'Copied' : 'Copy prompt'}
+                aria-label={copied ? t('copiedAriaLabel') : t('copyAriaLabel')}
                 className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[11px] font-medium text-[var(--text-primary)] transition hover:bg-[var(--surface-hover)]"
               >
                 {copied ? (
                   <>
                     <Check className="w-3 h-3" strokeWidth={2} />
-                    Copied
+                    {t('copiedLabel')}
                   </>
                 ) : (
                   <>
                     <Copy className="w-3 h-3" strokeWidth={1.75} />
-                    Copy
+                    {t('copyLabel')}
                   </>
                 )}
               </button>
@@ -100,7 +102,7 @@ export function AgentDiscoverySection() {
           transition={{ duration: 0.6, delay: 0.15, ease }}
           className="mb-10 grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6"
         >
-          {STEPS.map((step) => (
+          {steps.map((step) => (
             <div key={step.num} className="flex gap-3">
               <span className="font-mono text-sm font-semibold text-[var(--color-accent)] tabular-nums shrink-0 pt-0.5">
                 {step.num}
@@ -122,7 +124,7 @@ export function AgentDiscoverySection() {
             className="inline-flex items-center gap-1.5 font-medium text-[var(--color-accent)] hover:underline underline-offset-4"
           >
             <FileText className="w-4 h-4" strokeWidth={1.75} />
-            View skill.md
+            {t('viewSkillMd')}
             <ArrowRight className="w-3.5 h-3.5" strokeWidth={1.75} />
           </a>
           <a
@@ -132,7 +134,7 @@ export function AgentDiscoverySection() {
             className="inline-flex items-center gap-1.5 font-medium text-[var(--text-primary)] hover:text-[var(--color-accent)] transition"
           >
             <Github className="w-4 h-4" strokeWidth={1.75} />
-            GitHub source
+            {t('githubSource')}
           </a>
         </motion.div>
       </div>

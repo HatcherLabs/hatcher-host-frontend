@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Loader2, AlertTriangle, ArrowRight, Check } from 'lucide-react';
 import { FRAMEWORKS } from '@hatcher/shared';

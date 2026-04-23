@@ -14,7 +14,8 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import { Lock, Sparkles } from 'lucide-react';
 import {
   useAgentContext,
@@ -74,6 +75,7 @@ const LEVEL_BADGE_CONFIG: Record<string, { icon: typeof Info; color: string; bg:
 };
 
 export function LogsTab() {
+  const tLogs = useTranslations('dashboard.agentDetail.logs');
   const ctx = useAgentContext();
   const {
     agent,
@@ -195,12 +197,12 @@ export function LogsTab() {
           <Lock size={14} className="text-[#8b5cf6] mt-0.5 shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold text-[var(--text-primary)]">
-              Showing the last {FREE_LOG_LINE_CAP} log lines
+              {tLogs('fullLogsGate.title', { count: FREE_LOG_LINE_CAP })}
             </p>
             <p className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-relaxed">
               {capped
-                ? `This agent has ${logs.length.toLocaleString()} total entries. Unlock Full Logs to scroll back through the complete history and export every line.`
-                : `Unlock Full Logs on this agent to keep every entry available for scrollback and export, beyond the last ${FREE_LOG_LINE_CAP} lines.`}
+                ? tLogs('fullLogsGate.description', { total: logs.length.toLocaleString() })
+                : tLogs('fullLogsGate.descriptionEmpty', { count: FREE_LOG_LINE_CAP })}
             </p>
           </div>
           <Link
@@ -208,7 +210,7 @@ export function LogsTab() {
             className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-[11px] font-semibold bg-[var(--text-primary)] text-[var(--bg-base)] hover:opacity-90 transition-opacity"
           >
             <Sparkles size={11} />
-            Unlock
+            {tLogs('fullLogsGate.unlock')}
           </Link>
         </div>
       )}
@@ -222,7 +224,7 @@ export function LogsTab() {
             type="text"
             value={logSearch}
             onChange={(e) => setLogSearch(e.target.value)}
-            placeholder="Search logs..."
+            placeholder={tLogs('searchPlaceholder')}
             className="w-full bg-[var(--bg-card)] border border-[var(--border-default)] rounded-lg pl-8 pr-8 py-1.5 text-xs font-mono text-[var(--text-secondary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[#8b5cf6]/50 focus:bg-[var(--bg-elevated)] transition-all"
           />
           {logSearch && (
@@ -245,7 +247,7 @@ export function LogsTab() {
                 : 'border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
             }`}
           >
-            All <span className="opacity-60 text-[10px]">{logs.length}</span>
+            {tLogs('all')} <span className="opacity-60 text-[10px]">{logs.length}</span>
           </button>
           {(['info', 'warn', 'error', 'debug'] as const).map((level) => {
             const cfg = LEVEL_BADGE_CONFIG[level];
@@ -277,7 +279,7 @@ export function LogsTab() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
             </span>
-            Connected
+            {tLogs('connected')}
           </span>
         ) : isActive ? (
           <span className="flex items-center gap-1.5 text-[10px] text-amber-400 bg-amber-500/10 px-2 py-1 rounded-full border border-amber-500/20">
@@ -285,14 +287,14 @@ export function LogsTab() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400" />
             </span>
-            Reconnecting
+            {tLogs('reconnecting')}
           </span>
         ) : null}
 
         {/* Action buttons */}
         <button
           onClick={() => setAutoScroll(!autoScroll)}
-          title={autoScroll ? 'Auto-scroll enabled — pinned to bottom' : 'Auto-scroll disabled'}
+          title={autoScroll ? tLogs('autoScrollEnabled') : tLogs('autoScrollDisabled')}
           className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
             autoScroll
               ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
@@ -300,7 +302,7 @@ export function LogsTab() {
           }`}
         >
           <ArrowDownToLine size={12} />
-          {autoScroll ? 'Pinned' : 'Scroll'}
+          {autoScroll ? tLogs('pinned') : tLogs('scroll')}
         </button>
 
         <button
@@ -309,7 +311,7 @@ export function LogsTab() {
           className="text-xs px-2.5 py-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-all flex items-center gap-1.5 cursor-pointer"
         >
           <RotateCcw size={12} className={logsLoading ? 'animate-spin' : ''} />
-          {logsLoading ? 'Loading...' : 'Refresh'}
+          {logsLoading ? tLogs('loading') : tLogs('refresh')}
         </button>
 
         <button
@@ -318,7 +320,7 @@ export function LogsTab() {
           className="text-xs px-2.5 py-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <Download size={12} />
-          Download
+          {tLogs('download')}
         </button>
       </div>
 
@@ -330,12 +332,12 @@ export function LogsTab() {
           <span className="w-2.5 h-2.5 rounded-full bg-amber-500/60" />
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/60" />
           <span className="ml-3 text-[10px] font-mono text-[var(--text-muted)]">
-            {agent.name} -- {visibleFilteredLogs.length}{logSearch || logFilter !== 'all' ? ` / ${visibleLogs.length}` : ''} entries
+            {agent.name} -- {tLogs('entries', { count: `${visibleFilteredLogs.length}${logSearch || logFilter !== 'all' ? ` / ${visibleLogs.length}` : ''}` })}
           </span>
           {autoScroll && (
             <span className="ml-auto text-[10px] text-emerald-400/60 flex items-center gap-1">
               <ArrowDownToLine size={9} />
-              pinned to bottom
+              {tLogs('pinnedToBottom')}
             </span>
           )}
         </div>
@@ -349,10 +351,10 @@ export function LogsTab() {
               <ScrollText size={24} className="text-[var(--text-muted)]/50" />
               <p className="text-sm text-[var(--text-muted)]">
                 {logs.length === 0
-                  ? 'No logs available yet.'
+                  ? tLogs('noLogs')
                   : logSearch
-                    ? `No logs matching "${logSearch}".`
-                    : `No ${logFilter} logs found.`}
+                    ? tLogs('noLogsMatching', { query: logSearch })
+                    : tLogs('noLevelLogs', { level: logFilter })}
               </p>
             </div>
           ) : (

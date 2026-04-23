@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 export interface Achievement {
   key: string;
@@ -83,6 +84,7 @@ interface Props {
 }
 
 export function AchievementToast({ agentId, messageCount, framework }: Props) {
+  const t = useTranslations('agentRoom.achievements');
   const [current, setCurrent] = useState<Achievement | null>(null);
 
   useEffect(() => {
@@ -96,8 +98,8 @@ export function AchievementToast({ agentId, messageCount, framework }: Props) {
     setCurrent(next);
     seen.add(next.key);
     saveSeen(agentId, seen);
-    const t = setTimeout(() => setCurrent(null), 6000);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setCurrent(null), 6000);
+    return () => clearTimeout(timer);
   }, [agentId, messageCount, framework]);
 
   if (!current) return null;
@@ -114,7 +116,7 @@ export function AchievementToast({ agentId, messageCount, framework }: Props) {
     >
       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl">{current.icon}</div>
       <div className="text-[9px] uppercase tracking-[2px] font-bold" style={{ color: 'var(--room-primary)' }}>
-        ★ ACHIEVEMENT UNLOCKED
+        {t('unlocked')}
       </div>
       <div className="mt-0.5 text-sm font-bold text-gray-100">{current.label}</div>
       <div className="mt-0.5 text-[11px] text-gray-400 leading-snug">{current.desc}</div>

@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import { API_URL } from '@/lib/config';
 
 const FW_META: Record<string, { icon: string; primary: string; label: string }> = {
@@ -27,6 +28,7 @@ interface Props {
 }
 
 export function Leaderboard({ currentAgentId, framework, onOpen }: Props) {
+  const t = useTranslations('agentRoom.leaderboard');
   const [open, setOpen] = useState(false);
   const [agents, setAgents] = useState<PublicAgent[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -78,11 +80,13 @@ export function Leaderboard({ currentAgentId, framework, onOpen }: Props) {
           color: 'var(--room-bright)',
           boxShadow: '0 0 18px color-mix(in srgb, var(--room-primary) 22%, transparent)',
         }}
-        title="Top agents per framework"
+        title={t('title')}
       >
         <span aria-hidden>🏆</span>
         <span className="hidden sm:inline">
-          Rank{currentRank >= 0 && currentRank < 10 ? ` #${currentRank + 1}` : ''}
+          {currentRank >= 0 && currentRank < 10
+            ? t('buttonWithRank', { rank: currentRank + 1 })
+            : t('button')}
         </span>
       </button>
       {open && (
@@ -102,7 +106,7 @@ export function Leaderboard({ currentAgentId, framework, onOpen }: Props) {
             <div className="flex items-center justify-between border-b border-white/5 px-5 py-4">
               <div>
                 <div className="text-[10px] uppercase tracking-[3px]" style={{ color: meta.primary }}>
-                  LEADERBOARD
+                  {t('heading')}
                 </div>
                 <div className="mt-1 text-xl font-bold text-gray-100">
                   {meta.icon} {meta.label}
@@ -137,11 +141,11 @@ export function Leaderboard({ currentAgentId, framework, onOpen }: Props) {
             </div>
             <div className="max-h-[50vh] overflow-y-auto px-2 py-3">
               {!loaded && (
-                <div className="py-8 text-center text-sm text-gray-400">Loading…</div>
+                <div className="py-8 text-center text-sm text-gray-400">{t('loading')}</div>
               )}
               {loaded && ranked.length === 0 && (
                 <div className="py-8 text-center text-sm text-gray-400">
-                  No public {meta.label} agents yet.
+                  {t('empty', { framework: meta.label })}
                 </div>
               )}
               {ranked.map((a, i) => {
@@ -161,7 +165,7 @@ export function Leaderboard({ currentAgentId, framework, onOpen }: Props) {
                     </span>
                     <span className="flex-1 truncate text-sm font-semibold text-gray-100">
                       {a.name}
-                      {me && <span className="ml-1.5 text-[9px] font-normal text-gray-400">· you</span>}
+                      {me && <span className="ml-1.5 text-[9px] font-normal text-gray-400">{t('you')}</span>}
                     </span>
                     <span className="text-xs tabular-nums" style={{ color: meta.primary }}>
                       {(a.messageCount ?? 0).toLocaleString()}
@@ -171,7 +175,7 @@ export function Leaderboard({ currentAgentId, framework, onOpen }: Props) {
               })}
             </div>
             <div className="border-t border-white/5 px-5 py-3 text-[10px] uppercase tracking-wider text-gray-500">
-              Ranked by messages sent · public agents only
+              {t('footer')}
             </div>
           </div>
         </div>
