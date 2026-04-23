@@ -25,11 +25,16 @@ export function Skybox({ timeOfDay = 'auto' }: Props) {
     [timeOfDay],
   );
   const file = resolved === 'day' ? 'day.hdr' : 'night.hdr';
+  // Use HDRI only for ambient + PBR reflections. Do NOT render it as
+  // the page background — the neon-city HDRIs show real photographed
+  // skyscrapers at the horizon which dwarf our 600u ground plane and
+  // make the city feel like it sits "on a plank" inside someone
+  // else's city. CitySceneV2 sets a flat cyber-dark <color attach="
+  // background"> and <fog> blends the grid into it smoothly.
   return (
     <Environment
       files={`/assets/3d/city/skybox/${file}`}
-      background
-      ground={false}
+      background={false}
     />
   );
 }

@@ -51,15 +51,25 @@ function CanvasInner({ agents }: { agents: CityAgent[] }) {
       gl={{ antialias: quality === 'high', powerPreference: 'high-performance' }}
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
     >
-      {/* Cyber-cool lighting — low ambient, cold directional key from
-          behind-camera-right (tints building fronts teal), and a magenta
-          rim from the opposite side to pop silhouettes against the
-          skybox. Fog falls off at city edge to a deep indigo. */}
-      <color attach="background" args={['#050214']} />
-      <fog attach="fog" args={['#070420', 180, 520]} />
-      <ambientLight intensity={0.25} color={'#4866aa'} />
-      <directionalLight position={[100, 140, 80]} intensity={1.1} color={'#7ac8ff'} castShadow />
-      <directionalLight position={[-120, 60, -80]} intensity={0.55} color={'#d855ff'} />
+      {/* Cyber-cool lighting. Skybox HDRI supplies ambient/reflection
+          only (background={false}), so everything you see beyond the
+          city is the flat `<color>` below + fog falloff. Keeps the
+          scene calm and keeps our 600u ground from competing with real
+          photographed skyscrapers in the HDRI. */}
+      <color attach="background" args={['#030111']} />
+      <fog attach="fog" args={['#050418', 140, 450]} />
+      <ambientLight intensity={0.18} color={'#4866aa'} />
+      <directionalLight
+        position={[100, 140, 80]}
+        intensity={0.6}
+        color={'#7ac8ff'}
+        castShadow
+      />
+      <directionalLight
+        position={[-120, 60, -80]}
+        intensity={0.3}
+        color={'#d855ff'}
+      />
       <Suspense fallback={null}>
         <SceneErrorBoundary label="Skybox">
           <Skybox timeOfDay="auto" />
@@ -86,11 +96,11 @@ function CanvasInner({ agents }: { agents: CityAgent[] }) {
           keeps it cheap. */}
       <EffectComposer multisampling={quality === 'high' ? 4 : 0} enableNormalPass={false}>
         <Bloom
-          intensity={quality === 'high' ? 0.9 : 0.45}
-          luminanceThreshold={0.35}
-          luminanceSmoothing={0.18}
+          intensity={quality === 'high' ? 0.55 : 0.3}
+          luminanceThreshold={0.55}
+          luminanceSmoothing={0.2}
           mipmapBlur
-          radius={quality === 'high' ? 0.75 : 0.55}
+          radius={quality === 'high' ? 0.6 : 0.45}
         />
       </EffectComposer>
     </Canvas>
