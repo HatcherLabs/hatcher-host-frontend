@@ -5,9 +5,18 @@ export const DOCS_URL = process.env.NEXT_PUBLIC_DOCS_URL || 'http://localhost:30
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-// Solana mainnet RPC. Override with NEXT_PUBLIC_SOLANA_RPC to use
-// Helius/Quicknode/etc in dev. Public mainnet-beta is rate-limited but
-// fine for read-only wallet UX; the backend uses Helius for verification.
+// Solana mainnet RPC for read-only wallet UX. Public mainnet-beta is
+// rate-limited but adequate — the backend proxies anything that needs a
+// premium provider (Helius).
+//
+// ⚠ SECURITY: NEVER set NEXT_PUBLIC_SOLANA_RPC to a URL that contains a
+// private API key (e.g. `?api-key=...`). Anything with the NEXT_PUBLIC_
+// prefix is baked into the client bundle at build time and becomes
+// publicly readable. If you need an authenticated RPC, route the
+// request through a server-side proxy endpoint instead.
+//
+// The build fails (see scripts/check-public-env.mjs) if this var
+// contains a suspicious api-key parameter.
 export const SOLANA_RPC =
   process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com';
 

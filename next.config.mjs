@@ -29,10 +29,27 @@ const nextConfig = {
   },
   async headers() {
     // CSP shared between default and embed routes, except for frame-ancestors.
-    // Google Ads / GTM conversion tracking fans out to several
-    // sibling domains (doubleclick.net, googlesyndication.com, the
-    // google.com root, googleadservices.com). Enumerate them
-    // explicitly so CSP doesn't block the pixel requests in prod.
+    //
+    // Security notes (recon M-003, 2026-04-23):
+    //   - `'unsafe-eval'` dropped in favour of `'wasm-unsafe-eval'`.
+    //     Three.js / drei use WebAssembly (Draco/KTX2 decoders) which
+    //     needs wasm-unsafe-eval; no first-party code path uses plain
+    //     `eval()` or `new Function(string)` (grep-verified).
+    //   - `'unsafe-inline'` is still allowed for scripts because Next.js
+    //     App Router injects inline hydration scripts without a stable
+    //     nonce hook as of Next 15. A nonce-based CSP migration is its
+    //     own effort (custom middleware + per-request nonces for every
+    //     <Script>/<script>). Tracked separately.
+    //
+    // City V2 additions (2026-04-24):
+    //   - `worker-src 'self' blob:` — three.js DRACOLoader spins up a
+    //     decoder Web Worker from a blob URL; without this every GLB
+    //     fails to decompress.
+    //   - `blob:` in script-src for the same reason on browsers that
+    //     don't honour a separate worker-src yet.
+    //   - Google Ads / GTM conversion tracking fans out to several
+    //     sibling domains — enumerated so pixel fetches don't get
+    //     CSP-blocked on every page load.
     const GOOGLE_ADS_HOSTS = [
       'https://www.googletagmanager.com',
       'https://www.google-analytics.com',
@@ -43,10 +60,7 @@ const nextConfig = {
     ].join(' ');
     const baseCspParts = [
       "default-src 'self'",
-      // three.js DRACOLoader spins up a Web Worker from a blob URL, so
-      // script-src must allow blob:. Google Ads loads a couple of
-      // gtag/js scripts from googletagmanager + doubleclick.
-      `script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: ${GOOGLE_ADS_HOSTS}`,
+      `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: ${GOOGLE_ADS_HOSTS}`,
       "worker-src 'self' blob:",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
@@ -102,6 +116,25 @@ const nextConfig = {
           {
             key: 'Strict-Transport-Security',
             value: 'max-age=63072000; includeSubDomains; preload',
+          },
+          // Cross-origin isolation trio (recon I-004, 2026-04-23). Using
+          // the "-allow-popups" variant of COOP so Solana wallet adapters
+          // can still open wallet popups. CORP=same-origin blocks other
+          // sites from embedding our resources as subresources. COEP is
+          // intentionally omitted because Three.js/drei load textures
+          // from CDNs (e.g. threejs.org) that don't send CORP, and
+          // enabling COEP would break those fetches.
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin-allow-popups',
+          },
+          {
+            key: 'Cross-Origin-Resource-Policy',
+            value: 'same-origin',
+          },
+          {
+            key: 'X-Permitted-Cross-Domain-Policies',
+            value: 'none',
           },
         ],
       },

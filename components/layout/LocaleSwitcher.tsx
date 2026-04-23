@@ -78,8 +78,12 @@ export function LocaleSwitcher() {
       ? '/'
       : stripLocalePrefix(rawPathname, locale);
     const target = buildLocaleUrl(cleanPath, next);
-    // Set cookie so the middleware picks up the preference on the new request.
-    document.cookie = `HATCHER_LOCALE=${next}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+    // Set cookie so the middleware picks up the preference on the new
+    // request. Add `Secure` in production so the cookie never rides over
+    // plain HTTP (recon M-005, 2026-04-23). HttpOnly is intentionally
+    // NOT set — this component needs to read and write it from JS.
+    const secureFlag = window.location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `HATCHER_LOCALE=${next}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax${secureFlag}`;
     // Full page navigation — forces Next.js to re-render every layout with the
     // new locale (including NextIntlClientProvider). SPA navigation via
     // router.replace doesn't reliably re-run [locale]/layout.tsx, leaving the
