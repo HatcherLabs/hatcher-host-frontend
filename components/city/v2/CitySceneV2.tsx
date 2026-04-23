@@ -181,13 +181,13 @@ function CanvasInner({
           <Traffic />
         </SceneErrorBoundary>
         <SceneErrorBoundary label="NPCs">
-          <NPCs agents={agents} />
+          <NPCs agents={agents} onNpcClick={onBuildingClick} />
         </SceneErrorBoundary>
         <SceneErrorBoundary label="Buildings">
           <Buildings agents={agents} onBuildingClick={onBuildingClick} />
         </SceneErrorBoundary>
         <SceneErrorBoundary label="DistrictLabels">
-          <DistrictLabels />
+          <DistrictLabels agents={agents} />
         </SceneErrorBoundary>
         {mode === 'walk' && (
           <SceneErrorBoundary label="Character">

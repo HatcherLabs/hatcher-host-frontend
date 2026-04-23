@@ -136,16 +136,18 @@ function PrimitiveInstance({
     if (!ref.current) return;
     const obj = new THREE.Object3D();
     const color = new THREE.Color();
+    const goldHex = 0xffd24a;
     layouts.forEach((l, i) => {
       const scaleY = l.height / nativeHeight;
-      // Shift up by -minY*scaleY so the foundation sits on the ground
-      // plane regardless of where the source mesh's origin is.
       obj.position.set(l.x, -nativeMinY * scaleY, l.z);
       obj.rotation.set(0, l.rotation, 0);
       obj.scale.set(1, scaleY, 1);
       obj.updateMatrix();
       ref.current!.setMatrixAt(i, obj.matrix);
-      color.setHex(FRAMEWORK_COLORS[l.framework]);
+      // "mine" agents get a warm gold tint so the owner can spot their
+      // agents at a glance without having to click through the whole
+      // district. Normal agents keep the framework colour.
+      color.setHex(l.mine ? goldHex : FRAMEWORK_COLORS[l.framework]);
       ref.current!.setColorAt(i, color);
     });
     ref.current.instanceMatrix.needsUpdate = true;

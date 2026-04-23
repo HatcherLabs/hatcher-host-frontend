@@ -16,6 +16,7 @@ const WANDER_RADIUS = 18; // how far a NPC roams from its district centre
 
 interface Props {
   agents: CityAgent[];
+  onNpcClick?: (agentId: string) => void;
 }
 
 interface NpcState {
@@ -59,7 +60,7 @@ function hashStr(s: string): number {
  * district centre); no physics, no collision. One InstancedMesh per
  * framework — 4 draw calls for up to 100 NPCs.
  */
-export function NPCs({ agents }: Props) {
+export function NPCs({ agents, onNpcClick }: Props) {
   const quality = useQuality();
   const max = quality === 'high' ? 100 : 30;
 
@@ -108,7 +109,12 @@ export function NPCs({ agents }: Props) {
   return (
     <group>
       {(Object.keys(buckets) as Framework[]).map((fw) => (
-        <NpcBucket key={fw} framework={fw} states={buckets[fw]} />
+        <NpcBucket
+          key={fw}
+          framework={fw}
+          states={buckets[fw]}
+          onNpcClick={onNpcClick}
+        />
       ))}
     </group>
   );
@@ -117,9 +123,11 @@ export function NPCs({ agents }: Props) {
 function NpcBucket({
   framework,
   states,
+  onNpcClick,
 }: {
   framework: Framework;
   states: NpcState[];
+  onNpcClick?: (agentId: string) => void;
 }) {
   const ref = useRef<THREE.InstancedMesh>(null);
   const material = useMemo(
@@ -156,7 +164,19 @@ function NpcBucket({
 
   if (states.length === 0) return null;
   return (
-    <instancedMesh ref={ref} args={[undefined, undefined, states.length]}>
+    <instancedMesh
+      ref={ref}
+      args={[undefined, undefined, states.length]}
+      onClick={(e) => {
+        if (!onNpcClick) return;
+        const id = e.instanceId;
+        if (id == null) return;
+        const s = states[id];
+        if (!s) return;
+        e.stopPropagation();
+        onNpcClick(s.agentId);
+      }}
+    >
       <capsuleGeometry args={[0.35, 0.9, 4, 8]} />
       <primitive attach="material" object={material} />
     </instancedMesh>

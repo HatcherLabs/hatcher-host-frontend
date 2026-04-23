@@ -7,6 +7,7 @@ function mkAgent(
   category: CityAgent['category'],
   tier = 2,
   framework: CityAgent['framework'] = 'openclaw',
+  mine = false,
 ): CityAgent {
   return {
     id,
@@ -18,7 +19,7 @@ function mkAgent(
     tier,
     status: 'running',
     messageCount: 0,
-    mine: false,
+    mine,
   };
 }
 

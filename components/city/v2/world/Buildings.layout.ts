@@ -69,6 +69,9 @@ export interface BuildingLayout {
   framework: CityAgent['framework'];
   category: Category;
   tier: number;
+  /** Mirrored from CityAgent.mine so Buildings.tsx can colour owner
+   *  buildings gold without doing a second lookup. */
+  mine: boolean;
 }
 
 export function layoutBuildingsV2(agents: CityAgent[]): BuildingLayout[] {
@@ -140,6 +143,7 @@ export function layoutBuildingsV2(agents: CityAgent[]): BuildingLayout[] {
         framework: a.framework,
         category: a.category,
         tier: a.tier,
+        mine: a.mine,
       });
     });
   });
