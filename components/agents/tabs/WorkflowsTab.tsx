@@ -59,6 +59,7 @@ import {
   FRAMEWORK_BADGE,
 } from '../AgentContext';
 import { api } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 
 // ─── Framework Workflow Compatibility ─────────────────────────
 
@@ -582,6 +583,7 @@ function WorkflowEditor({
   onCancel: () => void;
   saving: boolean;
 }) {
+  const t = useTranslations('dashboard.agentDetail.workflows');
   const [name, setName] = useState(workflow?.name || 'New Workflow');
   const [nodes, setNodes, onNodesChange] = useNodesState(workflow?.nodes || []);
   const [edges, setEdges, onEdgesChange] = useEdgesState(workflow?.edges || []);
@@ -704,7 +706,7 @@ function WorkflowEditor({
             className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs rounded-lg bg-[var(--color-accent)] text-white hover:bg-[#0891b2] transition-all disabled:opacity-40"
           >
             {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-            Save
+            {t('save')}
           </button>
         </div>
       </div>
@@ -821,6 +823,7 @@ function WorkflowEditor({
 
 export function WorkflowsTab() {
   const { agent, id: agentId } = useAgentContext();
+  const t = useTranslations('dashboard.agentDetail.workflows');
   const [workflows, setWorkflows] = useState<WorkflowData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -965,7 +968,7 @@ export function WorkflowsTab() {
           className="inline-flex items-center gap-1.5 px-4 py-2 text-xs rounded-lg bg-[var(--color-accent)] text-white hover:bg-[#0891b2] transition-all"
         >
           <Plus size={14} />
-          New Workflow
+          {t('new')}
         </button>
       </div>
 
@@ -1197,7 +1200,7 @@ export function WorkflowsTab() {
                       onClick={() => handleDelete(wf.id)}
                       disabled={deletingId === wf.id}
                       className="p-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all disabled:opacity-40"
-                      title="Delete workflow"
+                      title={t('delete')}
                     >
                       {deletingId === wf.id ? (
                         <Loader2 size={14} className="animate-spin" />

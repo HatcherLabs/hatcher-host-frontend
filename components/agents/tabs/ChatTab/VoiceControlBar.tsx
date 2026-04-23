@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { Square } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { SoundWaveBars, RecordingDot } from './SoundWaveBars';
 
 interface VoiceControlBarProps {
@@ -11,6 +12,7 @@ interface VoiceControlBarProps {
 }
 
 export function VoiceControlBar({ isListening, isSpeaking, onStop }: VoiceControlBarProps) {
+  const t = useTranslations('dashboard.agentDetail.chat');
   return (
     <AnimatePresence>
       {(isListening || isSpeaking) && (
@@ -25,13 +27,13 @@ export function VoiceControlBar({ isListening, isSpeaking, onStop }: VoiceContro
               {isListening && (
                 <>
                   <RecordingDot />
-                  <span className="text-red-400">Listening...</span>
+                  <span className="text-red-400">{t('listening')}</span>
                 </>
               )}
               {isSpeaking && (
                 <>
                   <SoundWaveBars />
-                  <span className="text-[var(--color-accent)]">Speaking...</span>
+                  <span className="text-[var(--color-accent)]">{t('speaking')}</span>
                 </>
               )}
             </div>

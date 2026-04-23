@@ -27,6 +27,7 @@ import {
   GlassCard,
 } from '../AgentContext';
 import { api } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -269,6 +270,7 @@ function NextRunsPreview({ cronExpr }: { cronExpr: string }) {
 
 export function SchedulesTab() {
   const { agent } = useAgentContext();
+  const t = useTranslations('dashboard.agentDetail.schedules');
   const agentId = agent?.id;
   const framework = agent?.framework ?? 'openclaw';
   const fwColor = FRAMEWORK_COLORS[framework] ?? FRAMEWORK_COLORS.openclaw!;
@@ -420,7 +422,7 @@ export function SchedulesTab() {
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-[var(--color-accent)] text-white hover:bg-[#0891b2] transition-colors"
             >
               <Plus size={14} />
-              New Schedule
+              {t('new')}
             </button>
           )}
         </div>
@@ -776,7 +778,7 @@ export function SchedulesTab() {
                           )}
                           <button
                             onClick={() => handleDelete(job.id)}
-                            title="Delete"
+                            title={t('delete')}
                             className="p-1.5 rounded-md text-[var(--text-muted)] hover:text-red-400 hover:bg-[var(--bg-card)] transition-colors"
                           >
                             <Trash2 size={14} />

@@ -1,6 +1,7 @@
 'use client';
 
 import { Bot, Phone, Volume2, VolumeX } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { FRAMEWORKS, type AgentFramework } from '@hatcher/shared';
 import { FRAMEWORK_BADGE } from '../../AgentContext';
 
@@ -27,6 +28,7 @@ export function ChatHeader({
   onToggleAutoSpeak,
   onStartVoiceCall,
 }: ChatHeaderProps) {
+  const t = useTranslations('dashboard.agentDetail.chat');
   const frameworkMeta = FRAMEWORKS[agent.framework];
 
   return (
@@ -39,7 +41,7 @@ export function ChatHeader({
         {wsConnected && (
           <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 text-emerald-400 font-medium" title="Real-time streaming via WebSocket">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Live
+            {t('live')}
           </span>
         )}
       </div>
@@ -49,10 +51,10 @@ export function ChatHeader({
           <button
             onClick={onStartVoiceCall}
             className="flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-[var(--border-default)] bg-transparent text-[var(--text-muted)] hover:border-emerald-500/40 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all duration-200 cursor-pointer"
-            title="Start voice call"
+            title={t('voiceCallTitle')}
           >
             <Phone size={11} />
-            <span className="hidden sm:inline">Voice</span>
+            <span className="hidden sm:inline">{t('voiceButton')}</span>
           </button>
         )}
         {ttsSupported && (
@@ -63,10 +65,10 @@ export function ChatHeader({
                 ? 'border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--color-accent)]'
                 : 'border-[var(--border-default)] bg-transparent text-[var(--text-muted)] hover:border-[var(--text-muted)]/40 hover:text-[var(--text-secondary)]'
             }`}
-            title="Auto-read responses"
+            title={t('autoReadTitle')}
           >
             {autoSpeak ? <Volume2 size={11} /> : <VolumeX size={11} />}
-            <span>Auto-read</span>
+            <span>{t('autoRead')}</span>
           </button>
         )}
       </div>

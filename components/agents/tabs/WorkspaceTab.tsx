@@ -23,6 +23,7 @@
 // ============================================================
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import {
   FolderTree,
@@ -179,6 +180,7 @@ function TreeNodeView({
 
 export function WorkspaceTab() {
   const { agent } = useAgentContext();
+  const t = useTranslations('dashboard.agentDetail.workspace');
 
   const [entries, setEntries] = useState<TreeEntry[]>([]);
   const [truncated, setTruncated] = useState(false);
@@ -356,7 +358,7 @@ export function WorkspaceTab() {
           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-default)] hover:border-[var(--color-accent)] transition-colors text-sm disabled:opacity-50"
         >
           <RotateCcw className={`w-4 h-4 ${treeLoading ? 'animate-spin' : ''}`} />
-          Refresh
+          {t('refresh')}
         </button>
       </div>
 

@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Bot, Mic, MicOff, Square, Volume2, PhoneOff, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { SoundWaveBars, RecordingDot } from './SoundWaveBars';
 import type { ChatMsg } from './types';
 
@@ -28,6 +29,7 @@ function formatDuration(secs: number) {
 }
 
 export function VoiceCallOverlay({ agent, messages, sending, voice, callDuration, onEndCall, onSendMessage }: VoiceCallOverlayProps) {
+  const t = useTranslations('dashboard.agentDetail.chat');
   return (
     <motion.div
       key="voice-call-mode"
@@ -73,23 +75,23 @@ export function VoiceCallOverlay({ agent, messages, sending, voice, callDuration
         {voice.isListening && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
             <RecordingDot />
-            <span className="text-sm text-[var(--color-accent)]">Listening...</span>
+            <span className="text-sm text-[var(--color-accent)]">{t('voiceCall.listening')}</span>
           </motion.div>
         )}
         {sending && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
             <div className="w-3 h-3 border-2 border-[var(--color-accent)]/30 border-t-[var(--color-accent)] rounded-full animate-spin" />
-            <span className="text-sm text-[var(--text-muted)]">Thinking...</span>
+            <span className="text-sm text-[var(--text-muted)]">{t('voiceCall.thinking')}</span>
           </motion.div>
         )}
         {voice.isSpeaking && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
             <SoundWaveBars />
-            <span className="text-sm text-purple-400">Speaking...</span>
+            <span className="text-sm text-purple-400">{t('voiceCall.speaking')}</span>
           </motion.div>
         )}
         {!voice.isListening && !sending && !voice.isSpeaking && (
-          <span className="text-sm text-[var(--text-muted)]">Tap mic to speak</span>
+          <span className="text-sm text-[var(--text-muted)]">{t('voiceCall.tapToSpeak')}</span>
         )}
       </div>
 
