@@ -49,3 +49,8 @@ e2e-*.png
 
 # Skill files fetched from HatcherLabs/hatcher-skill at build time
 /public/skill/
+
+# 3D raw assets — local-only, processed into public/assets/3d/
+assets-raw/*
+!assets-raw/.gitkeep
+!assets-raw/README.md
