@@ -1,35 +1,44 @@
 // ============================================================
-// Next.js Middleware — landing pageview beacon (C13)
+// Next.js Middleware — next-intl locale routing + landing pageview beacon (C13)
 // ============================================================
 //
-// Fires a fire-and-forget POST /analytics/pageview to the API for every
-// navigation to a public landing page. The backend increments a daily
-// counter + a HyperLogLog of unique-visitor IP hashes in Redis, surfaced
-// on the admin panel as "Landing Traffic". Zero PII persisted.
+// Chain order:
+//   1. next-intl middleware — detects/rewrites locale prefix, sets HATCHER_LOCALE cookie
+//   2. Beacon logic — fires a fire-and-forget POST /analytics/pageview to the API
+//      for every navigation to a public landing page.
 //
-// Design choices:
-//   - Runs only on a curated allowlist of public routes. `/dashboard/*`,
-//     `/admin/*`, `/login`, `/register`, `/verify-email`, `/forgot-password`,
-//     `/reset-password`, `/settings/*`, `/og/*`, and any `_next`, API, or
-//     static asset are explicitly excluded by the `config.matcher` below.
-//   - `keepalive: true` so the request survives the page-transition boundary
-//     (browsers abort in-flight fetches on navigation otherwise).
-//   - `.catch(() => {})` — we never want a beacon failure to delay or
-//     break a page load. The middleware returns `NextResponse.next()`
-//     synchronously; the fetch is intentionally not awaited.
-//   - Forwards `x-forwarded-for` + `cf-connecting-ip` headers so the API
-//     can hash the *visitor's* IP (not the Next.js server's IP) into
-//     the HyperLogLog bucket. This matches how the existing live-stats
-//     tracker computes unique-visitors.
+// Beacon design choices (preserved from original):
+//   - Runs only on a curated allowlist of public routes. The check is done on the
+//     LOCALE-STRIPPED pathname so /zh/pricing, /de/pricing etc. all match /pricing.
+//   - `keepalive: true` so the request survives the page-transition boundary.
+//   - `.catch(() => {})` — beacon failures never delay or break page load.
+//   - Forwards `x-forwarded-for` + `cf-connecting-ip` headers so the API can hash
+//     the visitor's IP (not the Next.js server's IP) into the HyperLogLog bucket.
 // ============================================================
 
-import { NextResponse, type NextRequest } from 'next/server';
+import createMiddleware from 'next-intl/middleware';
+import type { NextRequest, NextResponse } from 'next/server';
+import { routing } from './i18n/routing';
+import { locales } from './i18n/config';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-// Only these exact prefixes fire the beacon. Everything else passes
-// through `NextResponse.next()` untouched. The root path `/` is handled
-// separately (it's the most common landing entry).
+// next-intl middleware instance — runs first to handle locale detection/rewrites.
+const intlMiddleware = createMiddleware(routing);
+
+// Regex matching any supported locale prefix at the start of the pathname.
+// Derived from locales in i18n/config.ts at compile time.
+const LOCALE_PREFIX_REGEX = new RegExp(`^/(${locales.join('|')})(/.*|$)`);
+
+function stripLocalePrefix(pathname: string): string {
+  const match = pathname.match(LOCALE_PREFIX_REGEX);
+  if (!match) return pathname;
+  // match[2] is the remainder after the locale segment, or empty string for bare /zh
+  return match[2] || '/';
+}
+
+// Only these exact prefixes fire the beacon. Everything else passes through
+// untouched. The root path `/` is handled separately (most common landing entry).
 const PUBLIC_PREFIXES = [
   '/frameworks',
   '/token',
@@ -53,17 +62,23 @@ function isTrackablePath(pathname: string): boolean {
   return PUBLIC_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'));
 }
 
-export function middleware(request: NextRequest): NextResponse {
-  const pathname = request.nextUrl.pathname;
+export default function middleware(req: NextRequest): NextResponse {
+  // Step 1: Run next-intl first so it can handle locale detection/rewrites/redirects
+  // and set the HATCHER_LOCALE cookie.
+  const response = intlMiddleware(req);
 
-  if (isTrackablePath(pathname)) {
+  // Step 2: Beacon logic — operate on the locale-stripped pathname so
+  // /zh/pricing, /de/pricing, etc. all match just like /pricing does.
+  const unprefixed = stripLocalePrefix(req.nextUrl.pathname);
+
+  if (isTrackablePath(unprefixed)) {
     // Forward visitor IP + referrer so the API can hash them into its
     // HLL unique-visitor bucket. We don't await — fire and forget.
     const ipForward =
-      request.headers.get('cf-connecting-ip')
-      || request.headers.get('x-forwarded-for')
+      req.headers.get('cf-connecting-ip')
+      || req.headers.get('x-forwarded-for')
       || '';
-    const referrer = request.headers.get('referer') || undefined;
+    const referrer = req.headers.get('referer') || undefined;
 
     // `keepalive` lets the request survive even if the page transition
     // aborts the fetch context. Any failure (network, CORS, 5xx) is
@@ -74,36 +89,21 @@ export function middleware(request: NextRequest): NextResponse {
         'Content-Type': 'application/json',
         ...(ipForward ? { 'x-forwarded-for': ipForward } : {}),
       },
-      body: JSON.stringify({ path: pathname, referrer }),
+      body: JSON.stringify({ path: unprefixed, referrer }),
       keepalive: true,
     }).catch(() => {
       /* swallow — beacon failures must never surface */
     });
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 // Route matcher — Next.js runs this middleware ONLY for paths that match.
-// We exclude `_next`, API routes, file assets (anything with a `.`), and
-// all known non-public routes. This is belt-and-braces alongside the
-// `isTrackablePath()` allowlist above.
+// Excludes: API routes, _next static/image, _vercel, and any path with a
+// file extension (covers /*.png, /*.svg, /*.css, /*.js, etc.).
+// next-intl requires a broad matcher; the beacon allowlist handles further
+// filtering internally via isTrackablePath().
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimisation)
-     * - favicon.ico, robots.txt, sitemap.xml, manifest.webmanifest
-     * - dashboard (authenticated area)
-     * - admin (admin panel)
-     * - login, register, forgot-password, reset-password, verify-email
-     * - settings (authenticated area)
-     * - agent, create, skill, support (authenticated areas)
-     * - og (OG image generation)
-     * - any path with a file extension (covers /*.png, /*.svg, etc.)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|dashboard|admin|login|register|forgot-password|reset-password|verify-email|settings|agent|create|skill|support|og|.*\\..*).*)',
-  ],
+  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };
