@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { Link, useRouter } from '@/i18n/routing';
+import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { track } from '@/lib/analytics';
@@ -22,22 +23,22 @@ interface PasswordStrength {
   checks: { label: string; met: boolean }[];
 }
 
-function getPasswordStrength(pw: string): PasswordStrength {
+function getPasswordStrength(pw: string, t: ReturnType<typeof useTranslations>): PasswordStrength {
   const checks = [
-    { label: '8+ characters', met: pw.length >= 8 },
-    { label: 'Lowercase letter', met: /[a-z]/.test(pw) },
-    { label: 'Uppercase letter', met: /[A-Z]/.test(pw) },
-    { label: 'Number', met: /[0-9]/.test(pw) },
-    { label: 'Special character', met: /[^a-zA-Z0-9]/.test(pw) },
+    { label: t('strengthChecks.length'), met: pw.length >= 8 },
+    { label: t('strengthChecks.lowercase'), met: /[a-z]/.test(pw) },
+    { label: t('strengthChecks.uppercase'), met: /[A-Z]/.test(pw) },
+    { label: t('strengthChecks.number'), met: /[0-9]/.test(pw) },
+    { label: t('strengthChecks.special'), met: /[^a-zA-Z0-9]/.test(pw) },
   ];
   const score = checks.filter((c) => c.met).length;
   const labels: Record<number, { label: string; color: string }> = {
     0: { label: '', color: 'transparent' },
-    1: { label: 'Very weak', color: '#ef4444' },
-    2: { label: 'Weak', color: 'var(--color-accent)' },
-    3: { label: 'Fair', color: '#eab308' },
-    4: { label: 'Strong', color: '#22c55e' },
-    5: { label: 'Very strong', color: '#10b981' },
+    1: { label: t('strengthLabels.veryWeak'), color: '#ef4444' },
+    2: { label: t('strengthLabels.weak'), color: 'var(--color-accent)' },
+    3: { label: t('strengthLabels.fair'), color: '#eab308' },
+    4: { label: t('strengthLabels.strong'), color: '#22c55e' },
+    5: { label: t('strengthLabels.veryStrong'), color: '#10b981' },
   };
   const info = labels[score] ?? labels[0];
   return { score, label: info.label, color: info.color, checks };
@@ -46,6 +47,7 @@ function getPasswordStrength(pw: string): PasswordStrength {
 export default function RegisterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations('auth.register');
   const { register, isAuthenticated, isLoading, error, clearError } = useAuth();
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -56,7 +58,7 @@ export default function RegisterPage() {
   const [usernameStatus, setUsernameStatus] = useState<FieldStatus>({ state: 'idle' });
   const [stats, setStats] = useState<{ totalUsers: number; totalAgents: number; activeAgents: number } | null>(null);
   const didSubmit = useRef(false);
-  const strength = useMemo(() => getPasswordStrength(password), [password]);
+  const strength = useMemo(() => getPasswordStrength(password, t), [password, t]);
 
   useEffect(() => {
     api.getPlatformStats().then((res) => {
@@ -125,23 +127,23 @@ export default function RegisterPage() {
     setLocalError(null);
 
     if (emailStatus.state === 'taken') {
-      setLocalError('This email is already registered. Try signing in instead.');
+      setLocalError(t('errors.emailTaken'));
       return;
     }
     if (usernameStatus.state === 'taken') {
-      setLocalError('This username is already taken. Pick a different one.');
+      setLocalError(t('errors.usernameTaken'));
       return;
     }
     if (password !== confirmPassword) {
-      setLocalError('Passwords do not match');
+      setLocalError(t('errors.passwordMismatch'));
       return;
     }
     if (password.length < 8) {
-      setLocalError('Password must be at least 8 characters');
+      setLocalError(t('errors.passwordTooShort'));
       return;
     }
     if (!/[a-z]/.test(password) || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
-      setLocalError('Password must contain uppercase, lowercase, and a number');
+      setLocalError(t('errors.passwordComplexity'));
       return;
     }
 
@@ -175,12 +177,12 @@ export default function RegisterPage() {
           platform stats; replaces the 3-icon-card panel pattern. */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between px-16 py-16 bg-[var(--bg-card)] border-r border-[var(--border-default)]">
         <div>
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Hatcher</p>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('panelTagline')}</p>
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.05] text-[var(--text-primary)] max-w-md" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-            Hatch your{' '}<span className="text-[var(--color-accent)]">AI agent.</span>
+            {t('panelHeadlinePrefix')}{' '}<span className="text-[var(--color-accent)]">{t('panelHeadlineAccent')}</span>
           </h2>
           <p className="mt-5 text-[15px] text-[var(--text-secondary)] leading-relaxed max-w-md">
-            Free tier with BYOK = unlimited messages. No credit card required.
+            {t('panelBody')}
           </p>
         </div>
 
@@ -189,20 +191,20 @@ export default function RegisterPage() {
             <p className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] tabular-nums">
               {stats ? stats.totalUsers.toLocaleString() : '—'}
             </p>
-            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">Users</p>
+            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">{t('statsUsers')}</p>
           </div>
           <div>
             <p className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] tabular-nums">
               {stats ? stats.totalAgents.toLocaleString() : '—'}
             </p>
-            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">Agents</p>
+            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">{t('statsAgents')}</p>
           </div>
           <div>
             <p className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] tabular-nums flex items-baseline gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse self-center" />
               {stats ? stats.activeAgents.toLocaleString() : '—'}
             </p>
-            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">Online now</p>
+            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">{t('statsOnline')}</p>
           </div>
         </div>
       </div>
@@ -214,9 +216,9 @@ export default function RegisterPage() {
         >
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-[var(--text-primary)]">
-              Create account
+              {t('heading')}
             </h1>
-            <p className="text-sm text-[var(--text-secondary)] mt-2">Get started with Hatcher</p>
+            <p className="text-sm text-[var(--text-secondary)] mt-2">{t('subheading')}</p>
           </div>
 
           {/* Referral badge */}
@@ -224,7 +226,7 @@ export default function RegisterPage() {
             <div className="flex items-center gap-2 px-3 py-2 mb-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
               <Gift size={14} className="text-emerald-400 flex-shrink-0" />
               <p className="text-xs text-emerald-300">
-                Referred by <span className="font-semibold">{referrerUsername}</span> — you both get <span className="font-semibold">$2 credit</span>!
+                {t('referralBadge', { referrer: referrerUsername, credit: '$2' })}
               </p>
             </div>
           )}
@@ -232,7 +234,7 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
-                Email
+                {t('emailLabel')}
               </label>
               <div className="relative">
                 <input
@@ -254,7 +256,7 @@ export default function RegisterPage() {
                       ? 'border-green-500/50 focus:border-green-500/60 focus:ring-green-500/30'
                       : 'border-[var(--border-default)] focus:border-cyan-500/50 focus:ring-cyan-500/30'
                   }`}
-                  placeholder="you@example.com"
+                  placeholder={t('emailPlaceholder')}
                 />
                 <div className="absolute inset-y-0 right-2.5 flex items-center pointer-events-none">
                   {emailStatus.state === 'checking' && <Loader2 className="w-4 h-4 text-[var(--text-muted)] animate-spin" />}
@@ -264,17 +266,18 @@ export default function RegisterPage() {
               </div>
               {emailStatus.state === 'taken' && (
                 <p className="text-[10px] text-red-400 mt-1">
-                  Already registered. <Link href="/login" className="underline hover:text-red-300">Sign in instead</Link>?
+                  {t('emailTaken')}{' '}
+                  <Link href="/login" className="underline hover:text-red-300">{t('emailTakenLink')}</Link>?
                 </p>
               )}
               {emailStatus.state === 'invalid' && email.length > 3 && (
-                <p className="text-[10px] text-red-400 mt-1">Enter a valid email address.</p>
+                <p className="text-[10px] text-red-400 mt-1">{t('emailInvalid')}</p>
               )}
             </div>
 
             <div>
               <label htmlFor="username" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
-                Username
+                {t('usernameLabel')}
               </label>
               <div className="relative">
                 <input
@@ -298,7 +301,7 @@ export default function RegisterPage() {
                       ? 'border-green-500/50 focus:border-green-500/60 focus:ring-green-500/30'
                       : 'border-[var(--border-default)] focus:border-cyan-500/50 focus:ring-cyan-500/30'
                   }`}
-                  placeholder="cooluser123"
+                  placeholder={t('usernamePlaceholder')}
                 />
                 <div className="absolute inset-y-0 right-2.5 flex items-center pointer-events-none">
                   {usernameStatus.state === 'checking' && <Loader2 className="w-4 h-4 text-[var(--text-muted)] animate-spin" />}
@@ -307,17 +310,17 @@ export default function RegisterPage() {
                 </div>
               </div>
               {usernameStatus.state === 'taken' ? (
-                <p className="text-[10px] text-red-400 mt-1">This username is already taken. Pick another.</p>
+                <p className="text-[10px] text-red-400 mt-1">{t('usernameTaken')}</p>
               ) : usernameStatus.state === 'invalid' && username.length > 0 ? (
-                <p className="text-[10px] text-red-400 mt-1">3–30 letters, numbers, hyphens or underscores.</p>
+                <p className="text-[10px] text-red-400 mt-1">{t('usernameInvalid')}</p>
               ) : (
-                <p className="text-[10px] text-[var(--text-muted)] mt-1">Letters, numbers, hyphens and underscores only</p>
+                <p className="text-[10px] text-[var(--text-muted)] mt-1">{t('usernameHint')}</p>
               )}
             </div>
 
             <div>
               <label htmlFor="password" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
-                Password
+                {t('passwordLabel')}
               </label>
               <input
                 id="password"
@@ -328,12 +331,12 @@ export default function RegisterPage() {
                 required
                 minLength={8}
                 className="w-full h-10 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[var(--text-muted)] transition-colors"
-                placeholder="Enter a strong password"
+                placeholder={t('passwordPlaceholder')}
               />
 
               {/* Password requirements — always visible as helper text */}
               <div className="mt-2 space-y-1.5">
-                <p className="text-[10px] text-[var(--text-muted)]">Must include: 8+ characters, uppercase, lowercase, and a number</p>
+                <p className="text-[10px] text-[var(--text-muted)]">{t('passwordHint')}</p>
 
                 {/* Strength indicator — only when typing */}
                 {password.length > 0 && (
@@ -384,7 +387,7 @@ export default function RegisterPage() {
 
             <div>
               <label htmlFor="confirmPassword" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
-                Confirm Password
+                {t('confirmPasswordLabel')}
               </label>
               <input
                 id="confirmPassword"
@@ -394,7 +397,7 @@ export default function RegisterPage() {
                 onChange={(e) => { setConfirmPassword(e.target.value); setLocalError(null); }}
                 required
                 className="w-full h-10 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[var(--text-muted)] transition-colors"
-                placeholder="Repeat your password"
+                placeholder={t('confirmPasswordPlaceholder')}
               />
             </div>
 
@@ -412,18 +415,18 @@ export default function RegisterPage() {
               {isLoading ? (
                 <>
                   <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Creating account...
+                  {t('submitLoading')}
                 </>
               ) : (
-                'Create Account'
+                t('submit')
               )}
             </button>
           </form>
 
           <p className="text-center text-xs text-[var(--text-secondary)] mt-6">
-            Already have an account?{' '}
+            {t('loginPrompt')}{' '}
             <Link href="/login" className="text-cyan-400 hover:text-cyan-300 transition-colors">
-              Sign In
+              {t('loginLink')}
             </Link>
           </p>
         </div>

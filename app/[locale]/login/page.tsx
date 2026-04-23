@@ -1,14 +1,15 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link, useRouter } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { track } from '@/lib/analytics';
 
 export default function LoginPage() {
   const router = useRouter();
+  const t = useTranslations('auth.login');
   const { login, isAuthenticated, isLoading, error, clearError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -45,12 +46,12 @@ export default function LoginPage() {
           from /stats — real numbers beat generic value props. */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between px-16 py-16 bg-[var(--bg-card)] border-r border-[var(--border-default)]">
         <div>
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Hatcher</p>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('panelTagline')}</p>
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.05] text-[var(--text-primary)] max-w-md" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-            Hatch your{' '}<span className="text-[var(--color-accent)]">AI agent.</span>
+            {t('panelHeadlinePrefix')}{' '}<span className="text-[var(--color-accent)]">{t('panelHeadlineAccent')}</span>
           </h2>
           <p className="mt-5 text-[15px] text-[var(--text-secondary)] leading-relaxed max-w-md">
-            Pick a framework. Configure. Launch in 60 seconds. No code, no infrastructure.
+            {t('panelBody')}
           </p>
         </div>
 
@@ -59,20 +60,20 @@ export default function LoginPage() {
             <p className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] tabular-nums">
               {stats ? stats.totalUsers.toLocaleString() : '—'}
             </p>
-            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">Users</p>
+            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">{t('statsUsers')}</p>
           </div>
           <div>
             <p className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] tabular-nums">
               {stats ? stats.totalAgents.toLocaleString() : '—'}
             </p>
-            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">Agents</p>
+            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">{t('statsAgents')}</p>
           </div>
           <div>
             <p className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] tabular-nums flex items-baseline gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse self-center" />
               {stats ? stats.activeAgents.toLocaleString() : '—'}
             </p>
-            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">Online now</p>
+            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">{t('statsOnline')}</p>
           </div>
         </div>
       </div>
@@ -84,15 +85,15 @@ export default function LoginPage() {
         >
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-[var(--text-primary)]">
-              Welcome back
+              {t('heading')}
             </h1>
-            <p className="text-sm text-[var(--text-secondary)] mt-2">Sign in to your Hatcher account</p>
+            <p className="text-sm text-[var(--text-secondary)] mt-2">{t('subheading')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
-                Email
+                {t('emailLabel')}
               </label>
               <input
                 id="email"
@@ -106,13 +107,13 @@ export default function LoginPage() {
                 required
                 autoFocus
                 className="w-full h-10 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[var(--text-muted)] transition-colors"
-                placeholder="you@example.com"
+                placeholder={t('emailPlaceholder')}
               />
             </div>
 
             <div>
               <label htmlFor="password" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
-                Password
+                {t('passwordLabel')}
               </label>
               <input
                 id="password"
@@ -122,7 +123,7 @@ export default function LoginPage() {
                 onChange={(e) => { setPassword(e.target.value); clearError(); }}
                 required
                 className="w-full h-10 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[var(--text-muted)] transition-colors"
-                placeholder="Enter your password"
+                placeholder={t('passwordPlaceholder')}
               />
             </div>
 
@@ -134,7 +135,7 @@ export default function LoginPage() {
 
             <div className="flex justify-end">
               <Link href="/forgot-password" className="text-xs text-[var(--color-accent)] hover:underline">
-                Forgot password?
+                {t('forgotLink')}
               </Link>
             </div>
 
@@ -146,18 +147,18 @@ export default function LoginPage() {
               {isLoading ? (
                 <>
                   <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Signing in...
+                  {t('submitLoading')}
                 </>
               ) : (
-                'Sign In'
+                t('submit')
               )}
             </button>
           </form>
 
           <p className="text-center text-xs text-[var(--text-secondary)] mt-6">
-            Don&apos;t have an account?{' '}
+            {t('registerPrompt')}{' '}
             <Link href="/register" className="text-cyan-400 hover:text-cyan-300 transition-colors">
-              Sign Up
+              {t('registerLink')}
             </Link>
           </p>
         </div>

@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 
 export default function ForgotPasswordPage() {
+  const t = useTranslations('auth.forgotPassword');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -20,7 +22,7 @@ export default function ForgotPasswordPage() {
     if (res.success) {
       setSent(true);
     } else {
-      setError(res.error ?? 'Something went wrong. Please try again.');
+      setError(res.error ?? t('genericError'));
     }
   };
 
@@ -35,17 +37,17 @@ export default function ForgotPasswordPage() {
               <CheckCircle className="w-6 h-6 text-emerald-400" />
             </div>
             <h1 className="text-xl font-bold text-[var(--text-primary)] mb-2" style={{ fontFamily: 'var(--font-display)' }}>
-              Check your email
+              {t('successHeading')}
             </h1>
             <p className="text-sm text-[var(--text-secondary)] mb-6">
-              If an account exists for <strong className="text-[var(--text-primary)]">{email}</strong>, we sent a password reset link. Check your inbox and spam folder.
+              {t('successBody', { email: <strong className="text-[var(--text-primary)]">{email}</strong> })}
             </p>
             <Link
               href="/login"
               className="inline-flex items-center gap-2 text-sm text-[var(--color-accent)] hover:underline"
             >
               <ArrowLeft size={14} />
-              Back to sign in
+              {t('successBackLink')}
             </Link>
           </div>
         ) : (
@@ -55,17 +57,17 @@ export default function ForgotPasswordPage() {
                 <Mail className="w-6 h-6 text-[var(--color-accent)]" />
               </div>
               <h1 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
-                Forgot password?
+                {t('heading')}
               </h1>
               <p className="text-sm text-[var(--text-secondary)] mt-2">
-                Enter your email and we&apos;ll send you a reset link
+                {t('subheading')}
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="email" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
-                  Email
+                  {t('emailLabel')}
                 </label>
                 <input
                   id="email"
@@ -79,7 +81,7 @@ export default function ForgotPasswordPage() {
                   required
                   autoFocus
                   className="w-full h-10 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[var(--text-muted)] transition-colors"
-                  placeholder="you@example.com"
+                  placeholder={t('emailPlaceholder')}
                 />
               </div>
 
@@ -97,10 +99,10 @@ export default function ForgotPasswordPage() {
                 {loading ? (
                   <>
                     <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Sending...
+                    {t('submitLoading')}
                   </>
                 ) : (
-                  'Send Reset Link'
+                  t('submit')
                 )}
               </button>
             </form>
@@ -108,7 +110,7 @@ export default function ForgotPasswordPage() {
             <p className="text-center text-xs text-[var(--text-secondary)] mt-6">
               <Link href="/login" className="text-cyan-400 hover:text-cyan-300 transition-colors inline-flex items-center gap-1">
                 <ArrowLeft size={12} />
-                Back to sign in
+                {t('backToLogin')}
               </Link>
             </p>
           </>

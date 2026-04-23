@@ -1,14 +1,16 @@
 'use client';
 
 import { useState, Suspense } from 'react';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { Link, useRouter } from '@/i18n/routing';
+import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import { Lock, ArrowLeft, CheckCircle, AlertTriangle } from 'lucide-react';
 
 function ResetForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations('auth.resetPassword');
   const token = searchParams.get('token');
 
   const [password, setPassword] = useState('');
@@ -24,16 +26,16 @@ function ResetForm() {
           <AlertTriangle className="w-6 h-6 text-amber-400" />
         </div>
         <h1 className="text-xl font-bold text-[var(--text-primary)] mb-2" style={{ fontFamily: 'var(--font-display)' }}>
-          Invalid Reset Link
+          {t('invalidHeading')}
         </h1>
         <p className="text-sm text-[var(--text-secondary)] mb-6">
-          This reset link is missing or invalid. Please request a new one.
+          {t('invalidBody')}
         </p>
         <Link
           href="/forgot-password"
           className="inline-flex items-center gap-2 text-sm text-[var(--color-accent)] hover:underline"
         >
-          Request new reset link
+          {t('invalidCta')}
         </Link>
       </div>
     );
@@ -46,16 +48,16 @@ function ResetForm() {
           <CheckCircle className="w-6 h-6 text-emerald-400" />
         </div>
         <h1 className="text-xl font-bold text-[var(--text-primary)] mb-2" style={{ fontFamily: 'var(--font-display)' }}>
-          Password Reset
+          {t('successHeading')}
         </h1>
         <p className="text-sm text-[var(--text-secondary)] mb-6">
-          Your password has been updated. You can now sign in with your new password.
+          {t('successBody')}
         </p>
         <Link
           href="/login"
           className="inline-flex items-center justify-center gap-2 w-full h-10 rounded-lg text-sm font-medium text-white bg-purple-600 hover:bg-purple-500 transition-colors"
         >
-          Sign In
+          {t('successCta')}
         </Link>
       </div>
     );
@@ -74,7 +76,7 @@ function ResetForm() {
     if (res.success) {
       setSuccess(true);
     } else {
-      setError(res.error ?? 'Reset failed. The link may have expired.');
+      setError(res.error ?? t('genericError'));
     }
   };
 
@@ -85,17 +87,17 @@ function ResetForm() {
           <Lock className="w-6 h-6 text-[var(--color-accent)]" />
         </div>
         <h1 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display)' }}>
-          Set new password
+          {t('heading')}
         </h1>
         <p className="text-sm text-[var(--text-secondary)] mt-2">
-          Enter your new password below
+          {t('subheading')}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="password" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
-            New Password
+            {t('newPasswordLabel')}
           </label>
           <input
             id="password"
@@ -107,13 +109,13 @@ function ResetForm() {
             minLength={8}
             autoFocus
             className="w-full h-10 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 placeholder:text-[var(--text-muted)] transition-colors"
-            placeholder="At least 8 characters"
+            placeholder={t('newPasswordPlaceholder')}
           />
         </div>
 
         <div>
           <label htmlFor="confirm" className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
-            Confirm Password
+            {t('confirmPasswordLabel')}
           </label>
           <input
             id="confirm"
@@ -127,10 +129,10 @@ function ResetForm() {
                 ? 'border-red-500/50 focus:border-red-500/50 focus:ring-red-500/30'
                 : 'border-[var(--border-default)] focus:border-cyan-500/50 focus:ring-cyan-500/30'
             }`}
-            placeholder="Repeat your password"
+            placeholder={t('confirmPasswordPlaceholder')}
           />
           {confirm && !passwordsMatch && (
-            <p className="text-[10px] text-red-400 mt-1">Passwords do not match</p>
+            <p className="text-[10px] text-red-400 mt-1">{t('passwordMismatch')}</p>
           )}
         </div>
 
@@ -148,10 +150,10 @@ function ResetForm() {
           {loading ? (
             <>
               <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              Resetting...
+              {t('submitLoading')}
             </>
           ) : (
-            'Reset Password'
+            t('submit')
           )}
         </button>
       </form>
@@ -159,7 +161,7 @@ function ResetForm() {
       <p className="text-center text-xs text-[var(--text-secondary)] mt-6">
         <Link href="/login" className="text-cyan-400 hover:text-cyan-300 transition-colors inline-flex items-center gap-1">
           <ArrowLeft size={12} />
-          Back to sign in
+          {t('backToLogin')}
         </Link>
       </p>
     </>
