@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState, useMemo, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link } from '@/i18n/routing';
+import { useRouter } from '@/i18n/routing';
 import { timeAgo } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -116,6 +117,7 @@ function FrameworkAvatar({ framework, size = 48 }: { framework: string; size?: n
 }
 
 // ── Status filter options ────────────────────────────────────
+// TODO(i18n-T13): status labels come from @hatcher/shared AGENT_STATUS_CONFIG
 const STATUS_FILTERS = [
   { key: 'all', label: 'All' },
   ...AGENT_STATUSES.filter(s => s !== 'killed').map(s => ({
@@ -128,6 +130,7 @@ type StatusFilter = 'all' | 'active' | 'sleeping' | 'paused' | 'error' | 'restar
 type FrameworkFilter = 'all' | 'openclaw' | 'hermes' | 'elizaos' | 'milady';
 type SortOption = 'newest' | 'az' | 'messages' | 'active';
 
+// TODO(i18n-T13): framework names come from @hatcher/shared FRAMEWORKS constants
 const FRAMEWORK_FILTERS = [
   { key: 'all', label: 'All Frameworks' },
   { key: 'openclaw', label: 'OpenClaw' },
@@ -136,6 +139,7 @@ const FRAMEWORK_FILTERS = [
   { key: 'milady', label: 'Milady' },
 ];
 
+// TODO(i18n-T13): sort labels — move into component using useTranslations once T13 lands
 const SORT_OPTIONS = [
   { key: 'newest', label: 'Newest' },
   { key: 'az', label: 'A-Z' },
@@ -242,6 +246,8 @@ function getStatusGlowClass(status: string): string {
 // My Agents Page
 // ═════════════════════════════════════════════════════════════
 export default function MyAgentsPage() {
+  const t  = useTranslations('dashboard.agents');
+  const tc = useTranslations('dashboard.common');
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
@@ -367,12 +373,12 @@ export default function MyAgentsPage() {
           <div className="w-20 h-20 rounded-2xl bg-[var(--color-accent)]/15 flex items-center justify-center mx-auto mb-6">
             <Zap size={40} className="text-[var(--color-accent)]" />
           </div>
-          <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">Sign In Required</h1>
+          <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">{tc('signInRequired')}</h1>
           <p className="mb-8 text-sm text-[var(--text-secondary)]">
-            Sign in to your account to access your agents.
+            {t('signInDescription')}
           </p>
           <Link href="/login" className="btn-primary px-8 py-3 inline-block">
-            Sign In
+            {tc('signIn')}
           </Link>
         </div>
       </motion.div>
@@ -424,18 +430,18 @@ export default function MyAgentsPage() {
           variants={cardVariants}
         >
           <div>
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Dashboard</p>
-            <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>My agents</h1>
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('eyebrow')}</p>
+            <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>{t('heading')}</h1>
             <p className="text-sm mt-2 text-[var(--text-secondary)]">
               {agents.length === 0
-                ? 'Create your first agent to get started.'
-                : `${agents.length} agent${agents.length !== 1 ? 's' : ''} total · ${activeCount} active`}
+                ? t('subtitleEmpty')
+                : (agents.length !== 1 ? t('agentsCountPlural').replace('{count}', String(agents.length)).replace('{active}', String(activeCount)) : t('agentsCount').replace('{count}', String(agents.length)).replace('{active}', String(activeCount)))}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/create" className="inline-flex items-center gap-2 h-10 px-4 rounded-md bg-[var(--text-primary)] text-[var(--bg-base)] text-sm font-semibold hover:opacity-90 transition-opacity" data-tour="create-agent">
               <PlusCircle size={16} />
-              Create agent
+              {t('createCta')}
             </Link>
           </div>
         </motion.div>
@@ -488,7 +494,7 @@ export default function MyAgentsPage() {
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder="Search agents... ( / )"
+                placeholder={t('searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="bg-transparent outline-none text-xs w-full text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
@@ -514,7 +520,7 @@ export default function MyAgentsPage() {
                 className="h-9 flex items-center gap-1 px-2.5 rounded-xl text-xs font-medium text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
               >
                 <X size={12} />
-                Clear
+                {tc('clear')}
               </button>
             )}
           </div>
@@ -529,11 +535,11 @@ export default function MyAgentsPage() {
             <div className="card glass-noise" data-tour="empty-state">
               <EmptyState
                 icon={Cpu}
-                title="No agents yet"
-                description="Create your first AI agent and deploy it in 60 seconds."
-                actionLabel="Create Agent"
+                title={t('emptyTitle')}
+                description={t('emptyDescription')}
+                actionLabel={t('emptyActionLabel')}
                 actionHref="/create"
-                secondaryLabel="See Frameworks"
+                secondaryLabel={t('emptySecondaryLabel')}
                 secondaryHref="/frameworks"
               />
             </div>
@@ -550,10 +556,10 @@ export default function MyAgentsPage() {
                 <Bot size={32} className="text-[var(--color-accent)]" />
               </div>
               <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
-                No matching agents
+                {t('noMatchTitle')}
               </h2>
               <p className="text-sm text-[var(--text-secondary)] max-w-sm mb-6">
-                Try adjusting your search or filter criteria.
+                {t('noMatchDescription')}
               </p>
             </motion.div>
           )
@@ -596,7 +602,7 @@ export default function MyAgentsPage() {
                           {agent.description}
                         </p>
                       ) : (
-                        <p className="text-xs text-[var(--text-muted)] mt-1 italic">No description</p>
+                        <p className="text-xs text-[var(--text-muted)] mt-1 italic">{tc('noDescription')}</p>
                       )}
                     </div>
                   </div>
@@ -607,7 +613,8 @@ export default function MyAgentsPage() {
                     {agent.features && agent.features.length > 0 && (
                       <span className="badge-feature text-[10px]">
                         <Layers size={10} className="mr-1" />
-                        {agent.features.length} feature{agent.features.length !== 1 ? 's' : ''}
+                        {/* TODO(i18n-T13): feature count from agent model */}
+                        {agent.features.length !== 1 ? t('featuresCountPlural').replace('{count}', String(agent.features.length)) : t('featuresCount').replace('{count}', String(agent.features.length))}
                       </span>
                     )}
                   </div>
@@ -651,7 +658,7 @@ export default function MyAgentsPage() {
                         </button>
                       ) : null}
                       <span className="text-xs text-[var(--color-accent)] ml-0.5">
-                        Details
+                        {t('details')}
                       </span>
                     </div>
                   </div>

@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import type { Payment } from '@/lib/api';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { TIERS, TIER_ORDER, ADDONS } from '@hatcher/shared';
@@ -90,6 +91,8 @@ interface PaymentModalProps {
 }
 
 function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithHATCHER, onPayWithUSDC, onPayWithCard, onPayWithCredits, creditBalance, loading, requiresAgent, agents, selectedAgentId, onSelectAgent }: PaymentModalProps) {
+  const t = useTranslations('dashboard.billing');
+  const tc = useTranslations('dashboard.common');
   if (!isOpen) return null;
   const hasEnoughCredits = creditBalance >= price && price > 0;
   const needsAgentSelection = requiresAgent && !selectedAgentId;
@@ -111,7 +114,7 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
           onClick={(e) => e.stopPropagation()}
         >
           <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
-            <h3 className="font-semibold text-[var(--text-primary)]">{requiresAgent ? 'Select Agent' : 'Choose Payment Method'}</h3>
+            <h3 className="font-semibold text-[var(--text-primary)]">{requiresAgent ? t('selectAgent') : t('choosePayment')}</h3>
             <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
               <X className="w-4 h-4" />
             </button>
@@ -124,7 +127,7 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
             {/* Agent selector for per-agent addons */}
             {requiresAgent && (
               <div className="mb-4">
-                <label className="block text-xs text-[var(--text-muted)] mb-2">Apply to agent:</label>
+                <label className="block text-xs text-[var(--text-muted)] mb-2">{t('applyToAgent')}</label>
                 <div className="space-y-1.5 max-h-48 overflow-y-auto">
                   {agents && agents.length > 0 ? agents.map(agent => (
                     <button
@@ -139,7 +142,7 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
                       {agent.name}
                     </button>
                   )) : (
-                    <p className="text-xs text-[var(--text-muted)] py-2">No agents found. Create an agent first.</p>
+                    <p className="text-xs text-[var(--text-muted)] py-2">{t('noAgentsFound')}</p>
                   )}
                 </div>
               </div>
@@ -166,11 +169,11 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
                   <span className={`font-bold text-sm ${hasEnoughCredits ? 'text-white' : 'text-[var(--text-muted)]'}`}>$</span>
                 </div>
                 <div className="text-left flex-1">
-                  <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with Credits</p>
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithCredits')}</p>
                   <p className="text-[11px] text-[var(--text-muted)]">
                     {hasEnoughCredits
-                      ? `$${creditBalance.toFixed(2)} available — instant`
-                      : `Not enough — need $${price.toFixed(2)}, have $${creditBalance.toFixed(2)}`}
+                      ? t('creditAvailable').replace('{balance}', creditBalance.toFixed(2))
+                      : t('creditInsufficient').replace('{need}', price.toFixed(2)).replace('{have}', creditBalance.toFixed(2))}
                   </p>
                 </div>
                 {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
@@ -187,8 +190,8 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
                 <span className="text-white font-bold text-sm">SOL</span>
               </div>
               <div className="text-left">
-                <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with SOL</p>
-                <p className="text-[11px] text-[var(--text-muted)]">Solana wallet payment</p>
+                <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithSol')}</p>
+                <p className="text-[11px] text-[var(--text-muted)]">{t('solDesc')}</p>
               </div>
               {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
             </button>
@@ -203,8 +206,8 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
                 <span className="text-white font-extrabold text-[7px] tracking-tight">HATCHER</span>
               </div>
               <div className="text-left">
-                <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with $HATCHER</p>
-                <p className="text-[11px] text-[var(--text-muted)]">HATCHER token on Solana</p>
+                <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithHatcher')}</p>
+                <p className="text-[11px] text-[var(--text-muted)]">{t('hatcherDesc')}</p>
               </div>
               {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
             </button>
@@ -219,8 +222,8 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
                 <span className="text-white font-bold text-[10px]">USDC</span>
               </div>
               <div className="text-left">
-                <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with USDC</p>
-                <p className="text-[11px] text-[var(--text-muted)]">Stablecoin — 1 USDC = $1</p>
+                <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithUsdc')}</p>
+                <p className="text-[11px] text-[var(--text-muted)]">{t('usdcDesc')}</p>
               </div>
               {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
             </button>
@@ -235,8 +238,8 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
                 <CreditCard className="w-5 h-5 text-white" />
               </div>
               <div className="text-left">
-                <p className="text-sm font-semibold text-[var(--text-primary)]">Pay with Card</p>
-                <p className="text-[11px] text-[var(--text-muted)]">Credit/debit card via Stripe</p>
+                <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithCard')}</p>
+                <p className="text-[11px] text-[var(--text-muted)]">{t('cardDesc')}</p>
               </div>
               {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
             </button>
@@ -261,6 +264,8 @@ interface AccountFeatures {
 
 /* ── Page ─────────────────────────────────────────────────── */
 export default function BillingPage() {
+  const t  = useTranslations('dashboard.billing');
+  const tc = useTranslations('dashboard.common');
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const searchParams = useSearchParams();
   const {
@@ -348,12 +353,12 @@ export default function BillingPage() {
   // Handle Stripe redirect success/cancel
   useEffect(() => {
     if (searchParams?.get('success') === 'true') {
-      showSuccess('Payment successful! Your account is being upgraded. It may take a moment to reflect.');
+      showSuccess(t('successPayment'));
       // Clean up URL params
       window.history.replaceState({}, '', '/dashboard/billing');
     }
     if (searchParams?.get('canceled') === 'true') {
-      setError('Payment was canceled. No charges were made.');
+      setError(t('canceledPayment'));
       window.history.replaceState({}, '', '/dashboard/billing');
     }
   }, [searchParams]);
@@ -821,7 +826,7 @@ export default function BillingPage() {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
         <Loader2 className="w-8 h-8 animate-spin text-[var(--color-accent)] mx-auto mb-4" />
-        <p className="text-[var(--text-secondary)]">Loading...</p>
+        <p className="text-[var(--text-secondary)]">{tc('loading')}</p>
       </div>
     );
   }
@@ -830,9 +835,9 @@ export default function BillingPage() {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
         <Shield className="w-12 h-12 text-[var(--text-muted)] mx-auto mb-4" />
-        <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">Sign In Required</h1>
-        <p className="mb-6 text-[var(--text-secondary)]">Sign in to manage your plan and billing.</p>
-        <Link href="/login" className="btn-primary">Sign In</Link>
+        <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">{tc('signInRequired')}</h1>
+        <p className="mb-6 text-[var(--text-secondary)]">{t('signInDescription')}</p>
+        <Link href="/login" className="btn-primary">{tc('signIn')}</Link>
       </div>
     );
   }
@@ -841,7 +846,7 @@ export default function BillingPage() {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
         <Loader2 className="w-8 h-8 animate-spin text-[var(--color-accent)] mx-auto mb-4" />
-        <p className="text-[var(--text-secondary)]">Loading billing...</p>
+        <p className="text-[var(--text-secondary)]">{t('loadingBilling')}</p>
       </div>
     );
   }
@@ -861,19 +866,19 @@ export default function BillingPage() {
     >
       {/* Breadcrumb */}
       <motion.div className="flex items-baseline gap-2 text-sm mb-8 text-[var(--text-muted)]" variants={itemVariants}>
-        <Link href="/dashboard" className="hover:text-[var(--color-accent)] transition-colors duration-200">Dashboard</Link>
+        <Link href="/dashboard" className="hover:text-[var(--color-accent)] transition-colors duration-200">{t('breadcrumbDashboard')}</Link>
         <span>/</span>
-        <span className="text-[var(--text-secondary)]">Billing</span>
+        <span className="text-[var(--text-secondary)]">{t('breadcrumbBilling')}</span>
       </motion.div>
 
       <div className="flex items-center justify-between gap-4 flex-wrap mb-8">
         <motion.div variants={itemVariants}>
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Account</p>
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('eyebrow')}</p>
           <h1
             className="text-3xl font-bold tracking-tight text-[var(--text-primary)]"
             style={displayFont}
           >
-            Billing &amp; plans
+            {t('heading')}
           </h1>
         </motion.div>
 
@@ -902,7 +907,7 @@ export default function BillingPage() {
                 >
                   <div className="px-3 py-2 border-b border-[var(--border-default)]">
                     <p className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">
-                      Connected wallet
+                      {t('connectedWallet')}
                     </p>
                     <p className="text-[11px] font-mono text-[var(--text-secondary)] truncate mt-0.5">
                       {walletAddress}
@@ -914,7 +919,7 @@ export default function BillingPage() {
                     role="menuitem"
                   >
                     <Clock className="w-3.5 h-3.5" />
-                    Switch wallet
+                    {t('switchWallet')}
                   </button>
                   <button
                     onClick={() => { setWalletMenuOpen(false); void disconnectWallet(); }}
@@ -923,7 +928,7 @@ export default function BillingPage() {
                     title="Forget this wallet in the dApp. To fully revoke access, remove the site from Phantom → Settings → Trusted Apps."
                   >
                     <X className="w-3.5 h-3.5" />
-                    Disconnect
+                    {t('disconnect')}
                   </button>
                 </div>
               )}
@@ -934,7 +939,7 @@ export default function BillingPage() {
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-xs font-semibold transition-colors"
             >
               <Wallet className="w-3.5 h-3.5" />
-              Connect Wallet
+              {t('connectWallet')}
             </button>
           )}
         </motion.div>
@@ -951,7 +956,7 @@ export default function BillingPage() {
         <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <Wallet className="w-4 h-4 text-green-400" />
-            <h2 className="font-semibold text-[var(--text-primary)]">Credits Balance</h2>
+            <h2 className="font-semibold text-[var(--text-primary)]">{t('creditsBalance')}</h2>
           </div>
         </div>
         <div className="p-4 sm:p-6">
@@ -964,7 +969,7 @@ export default function BillingPage() {
                 <span className="text-sm text-[var(--text-muted)]">USD</span>
               </div>
               <p className="text-xs text-[var(--text-muted)] mt-1">
-                Credits can be used for subscriptions, add-ons, and hosted LLM usage.
+                {t('creditsDesc')}
               </p>
             </div>
           </div>
@@ -972,7 +977,7 @@ export default function BillingPage() {
           {/* Recent credit transactions */}
           {creditHistory.length > 0 && (
             <div className="mt-4 pt-4 border-t border-[var(--border-default)]">
-              <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium mb-3">Recent Transactions</p>
+              <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium mb-3">{t('recentTransactions')}</p>
               <div className="space-y-2">
                 {creditHistory.slice(0, 5).map((tx) => (
                   <div key={tx.id} className="flex items-center justify-between text-sm">
@@ -1038,11 +1043,13 @@ export default function BillingPage() {
                       ? 'text-green-400 bg-green-500/10 border border-green-500/20'
                       : 'text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20'
                   }`}>
-                    {currentTier === 'free' ? 'Free Tier' : 'Active'}
+                    {/* TODO(i18n-T13): tier name from @hatcher/shared TIERS constants */}
+                    {currentTier === 'free' ? t('freeTier') : t('active')}
                   </span>
                 </div>
                 <p className="text-sm text-[var(--text-muted)]">
-                  {tierConfig.usdPrice === 0 ? 'No charge' : currentTier === 'founding_member' ? `$${tierConfig.usdPrice} lifetime` : `$${tierConfig.usdPrice} / 30 days`}
+                  {/* TODO(i18n-T13): tier name from @hatcher/shared TIERS constants */}
+                {tierConfig.usdPrice === 0 ? t('noCharge') : currentTier === 'founding_member' ? `$${tierConfig.usdPrice} ${t('lifetimePrice')}` : `$${tierConfig.usdPrice} ${t('monthSuffix')}`}
                   {` -- ${tierConfig.messagesPerDay === 0 ? 'unlimited' : tierConfig.messagesPerDay} messages/day`}{tierConfig.usdPrice > 0 && ' (BYOK = unlimited)'}
                 </p>
                 {accountData?.subscriptionExpiresAt && (() => {
@@ -1055,10 +1062,10 @@ export default function BillingPage() {
                       <div className={`flex items-center gap-1.5 text-xs ${isExpired ? 'text-red-400' : isExpiring ? 'text-amber-400' : 'text-[var(--text-muted)]'}`}>
                         <Clock className="w-3 h-3" />
                         {isExpired
-                          ? 'Plan expired — renew to keep your tier'
+                          ? t('planExpired')
                           : isExpiring
-                            ? `Expires in ${daysLeft} day${daysLeft > 1 ? 's' : ''} — renew now`
-                            : `Active until ${formatDate(accountData.subscriptionExpiresAt)}`}
+                            ? (daysLeft > 1 ? t('planExpiringPlural').replace('{days}', String(daysLeft)) : t('planExpiring').replace('{days}', String(daysLeft)))
+                            : t('planActiveUntil').replace('{date}', formatDate(accountData.subscriptionExpiresAt))}
                       </div>
                       {(isExpiring || isExpired) && (
                         <button
@@ -1067,7 +1074,7 @@ export default function BillingPage() {
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-[var(--color-accent)] hover:bg-[#0891b2] disabled:opacity-50 transition-colors"
                         >
                           {subscribing === currentTier ? <Loader2 className="w-3 h-3 animate-spin" /> : <ArrowRight className="w-3 h-3" />}
-                          Renew for ${tierConfig.usdPrice}
+                          {t('renewFor').replace('{price}', String(tierConfig.usdPrice))}
                         </button>
                       )}
                     </div>
@@ -1104,7 +1111,7 @@ export default function BillingPage() {
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white transition-colors"
                   >
                     <Clock className="w-3 h-3" />
-                    Extend +30 days (${tierMonthly})
+                    {t('extend30Days').replace('{price}', String(tierMonthly))}
                   </button>
                   <button
                     onClick={() => {
@@ -1115,7 +1122,7 @@ export default function BillingPage() {
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#8b5cf6] to-[#06b6d4] text-white hover:shadow-[0_0_20px_rgba(139,92,246,0.25)] transition-all"
                   >
                     <Clock className="w-3 h-3" />
-                    Upgrade to annual (${tierAnnual})
+                    {t('upgradeAnnual').replace('{price}', String(tierAnnual))}
                     <span className="inline-flex items-center px-1 py-px rounded-full bg-white/20 text-white text-[9px] font-bold leading-none">
                       -15%
                     </span>
@@ -1132,18 +1139,18 @@ export default function BillingPage() {
         <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 text-[var(--color-accent)]" />
-            <h2 className="font-semibold text-[var(--text-primary)]">Agent Usage</h2>
+            <h2 className="font-semibold text-[var(--text-primary)]">{t('agentUsage')}</h2>
           </div>
         </div>
         <div className="p-4 sm:p-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-[var(--text-secondary)]">
-              {agentCount} of {agentLimit} agents used
+              {t('agentsOf').replace('{count}', String(agentCount)).replace('{limit}', String(agentLimit))}
             </span>
             <span className={`text-xs ${agentCount > agentLimit ? 'text-red-400' : 'text-[var(--text-muted)]'}`}>
               {agentCount > agentLimit
-                ? `${agentCount - agentLimit} over limit`
-                : `${agentLimit - agentCount} slot${agentLimit - agentCount !== 1 ? 's' : ''} remaining`}
+                ? t('agentsOver').replace('{over}', String(agentCount - agentLimit))
+                : (agentLimit - agentCount !== 1 ? t('slotsRemainingPlural').replace('{slots}', String(agentLimit - agentCount)) : t('slotsRemaining').replace('{slots}', String(agentLimit - agentCount)))}
             </span>
           </div>
           <div className="w-full h-2.5 bg-white/5 rounded-full overflow-hidden">
@@ -1166,7 +1173,7 @@ export default function BillingPage() {
               have no expiry and are skipped. */}
           {activeAddons.length > 0 && (
             <div className="mt-4 pt-4 border-t border-[var(--border-default)]">
-              <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium mb-2">Active Add-ons</p>
+              <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium mb-2">{t('activeAddons')}</p>
               <div className="space-y-2">
                 {activeAddons.map((addon) => {
                   const isRenewable = addon.type === 'subscription';
@@ -1184,7 +1191,7 @@ export default function BillingPage() {
                       <div className="flex items-center gap-2 shrink-0">
                         {addon.expiresAt && (
                           <span className="text-xs text-[var(--text-muted)]">
-                            Expires {formatDate(addon.expiresAt)}
+                            {t('expires').replace('{date}', formatDate(addon.expiresAt))}
                           </span>
                         )}
                         {isRenewable && (
@@ -1197,7 +1204,7 @@ export default function BillingPage() {
                             title="Buy another 30 days. Days stack on top of the current expiry."
                           >
                             <Clock className="w-3 h-3" />
-                            Extend +30
+                            {t('extend')}
                           </button>
                         )}
                       </div>
@@ -1224,7 +1231,7 @@ export default function BillingPage() {
           <div className="px-4 sm:px-6 py-4 flex items-center justify-between gap-3 flex-wrap border-b border-[var(--border-default)]">
             <div className="flex items-center gap-2">
               <ArrowUpRight className="w-4 h-4 text-[var(--color-accent)]" />
-              <h2 className="font-semibold text-[var(--text-primary)]">Upgrade Your Tier</h2>
+              <h2 className="font-semibold text-[var(--text-primary)]">{t('upgradeSection')}</h2>
             </div>
             <div className="flex items-center gap-3">
               {/* Monthly / Annual toggle — drives pricing on both tier
@@ -1239,7 +1246,7 @@ export default function BillingPage() {
                       : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
                   }`}
                 >
-                  Monthly
+                  {t('monthly')}
                 </button>
                 <button
                   onClick={() => setBillingPeriod('annual')}
@@ -1249,7 +1256,7 @@ export default function BillingPage() {
                       : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
                   }`}
                 >
-                  Annual
+                  {t('annual')}
                   <span className="inline-flex items-center px-1 py-px rounded-full bg-green-500/15 text-green-400 text-[9px] font-bold leading-none">
                     -15%
                   </span>
@@ -1292,8 +1299,8 @@ export default function BillingPage() {
                                 : 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
                           }`}>
                             {foundingInfo.remaining === 0
-                              ? 'Sold out'
-                              : `${foundingInfo.remaining} of ${foundingInfo.maxSlots} left`}
+                              ? t('foundingSoldOut')
+                              : t('foundingSlots').replace('{remaining}', String(foundingInfo.remaining)).replace('{max}', String(foundingInfo.maxSlots))}
                           </span>
                         )}
                       </div>
@@ -1302,10 +1309,10 @@ export default function BillingPage() {
                         const monthly = tier.usdPrice;
                         const displayPrice = isLifetime ? monthly : (billingPeriod === 'annual' ? computePrice(monthly, true) : monthly);
                         const suffix = isLifetime
-                          ? 'lifetime'
+                          ? t('lifetimePrice')
                           : billingPeriod === 'annual'
-                            ? '/ year'
-                            : '/ 30 days';
+                            ? t('annualSuffix')
+                            : t('monthSuffix');
                         return (
                           <div className="flex flex-col items-end">
                             <span className="text-xl font-extrabold text-[var(--text-primary)]">
@@ -1356,10 +1363,10 @@ export default function BillingPage() {
                           {isSubscribing ? (
                             <>
                               <Loader2 className="w-4 h-4 animate-spin" />
-                              Processing...
+                              {tc('loading')}
                             </>
                           ) : foundingSoldOut ? (
-                            <>All spots taken</>
+                            <>{t('foundingSoldOut')}</>
                           ) : (
                             <>
                               <Zap className="w-4 h-4" />
@@ -1382,7 +1389,7 @@ export default function BillingPage() {
         <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <Plus className="w-4 h-4 text-[var(--color-accent)]" />
-            <h2 className="font-semibold text-[var(--text-primary)]">Account Add-ons</h2>
+            <h2 className="font-semibold text-[var(--text-primary)]">{t('accountAddons')}</h2>
           </div>
           <span className="text-[10px] text-[var(--text-muted)]">Stackable · shared across all agents</span>
         </div>
@@ -1413,8 +1420,8 @@ export default function BillingPage() {
                       ? computePrice(addon.usdPrice, true)
                       : addon.usdPrice;
                     const suffix = addon.type === 'one_time'
-                      ? 'one-time'
-                      : billingPeriod === 'annual' ? '/ year' : '/ 30 days';
+                      ? t('oneTimeSuffix')
+                      : billingPeriod === 'annual' ? t('annualSuffix') : t('monthSuffix');
 
                     return (
                       <div
@@ -1471,7 +1478,7 @@ export default function BillingPage() {
         <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-[var(--color-accent)]" />
-            <h2 className="font-semibold text-[var(--text-primary)]">Per-Agent Add-ons</h2>
+            <h2 className="font-semibold text-[var(--text-primary)]">{t('perAgentAddons')}</h2>
           </div>
           <span className="text-[10px] text-[var(--text-muted)]">Purchased per agent</span>
         </div>
@@ -1492,8 +1499,8 @@ export default function BillingPage() {
                 ? computePrice(addon.usdPrice, true)
                 : addon.usdPrice;
               const suffix = addon.type === 'one_time'
-                ? 'one-time / agent'
-                : billingPeriod === 'annual' ? '/ year / agent' : '/ 30 days / agent';
+                ? t('oneTimeAgent')
+                : billingPeriod === 'annual' ? t('annualAgent') : t('monthAgent');
               return (
                 <div
                   key={addon.key}
@@ -1549,7 +1556,7 @@ export default function BillingPage() {
         <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <Receipt className="w-4 h-4 text-[var(--text-muted)]" />
-            <h2 className="font-semibold text-[var(--text-primary)]">Payment History</h2>
+            <h2 className="font-semibold text-[var(--text-primary)]">{t('paymentHistory')}</h2>
             {payments.length > 0 && (
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-[var(--text-muted)] font-semibold">
                 {payments.length}
@@ -1564,9 +1571,9 @@ export default function BillingPage() {
         {payments.length === 0 ? (
           <EmptyState
             icon={Receipt}
-            title="No payments yet"
-            description="Your payment history will appear here once you purchase a plan or add-ons."
-            actionLabel="View Pricing"
+            title={t('noPaymentsYet')}
+            description={t('noPaymentsDesc')}
+            actionLabel={t('manageBilling')}
             actionHref="/pricing"
           />
         ) : (

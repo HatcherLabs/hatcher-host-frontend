@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { useToast } from '@/components/ui/ToastProvider';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import {
   ArrowLeft,
   Key,
@@ -83,6 +84,8 @@ function ApiKeyCard({
   copiedId: string | null;
   onCopy: (text: string, id: string) => void;
 }) {
+  const t  = useTranslations('dashboard.apiKeys');
+  const tc = useTranslations('dashboard.common');
   const [editing, setEditing] = useState(false);
   const [editLabel, setEditLabel] = useState(apiKey.label);
   const [saving, setSaving] = useState(false);
@@ -129,13 +132,13 @@ function ApiKeyCard({
                 disabled={saving}
                 className="h-7 px-2.5 text-xs rounded-lg bg-cyan-500/15 text-cyan-400 hover:bg-cyan-500/25 transition-colors cursor-pointer disabled:opacity-50"
               >
-                {saving ? <Loader2 size={11} className="animate-spin" /> : 'Save'}
+                {saving ? <Loader2 size={11} className="animate-spin" /> : t('saveBtn')}
               </button>
               <button
                 onClick={() => { setEditing(false); setEditLabel(apiKey.label); }}
                 className="h-7 px-2.5 text-xs rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] hover:bg-[var(--bg-card)] transition-colors cursor-pointer"
               >
-                Cancel
+                {tc('cancel')}
               </button>
             </div>
           ) : (
@@ -173,18 +176,18 @@ function ApiKeyCard({
           <div className="flex items-center gap-4 flex-wrap">
             <span className="flex items-center gap-1 text-[11px] text-[var(--text-muted)]">
               <Activity size={10} />
-              {apiKey.requestsToday} req today · {apiKey.requestsThisWeek} this week
+              {t('reqStats').replace('{today}', String(apiKey.requestsToday)).replace('{week}', String(apiKey.requestsThisWeek))}
             </span>
             {apiKey.lastUsedAt ? (
               <span className="flex items-center gap-1 text-[11px] text-[var(--text-muted)]">
                 <Clock size={10} />
-                Last used {relativeTime(apiKey.lastUsedAt)}
+                {t('lastUsed').replace('{time}', relativeTime(apiKey.lastUsedAt))}
               </span>
             ) : (
-              <span className="text-[11px] text-[var(--text-muted)] italic">Never used</span>
+              <span className="text-[11px] text-[var(--text-muted)] italic">{t('neverUsed')}</span>
             )}
             <span className="text-[11px] text-[var(--text-muted)]">
-              Created {new Date(apiKey.createdAt).toLocaleDateString()}
+              {t('created').replace('{date}', new Date(apiKey.createdAt).toLocaleDateString())}
             </span>
           </div>
         </div>
@@ -206,6 +209,8 @@ function ApiKeyCard({
 // API Keys Page
 // ═══════════════════════════════════════════════════════════
 export default function ApiKeysPage() {
+  const t  = useTranslations('dashboard.apiKeys');
+  const tc = useTranslations('dashboard.common');
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
@@ -303,26 +308,28 @@ export default function ApiKeysPage() {
           className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors mb-6"
         >
           <ArrowLeft size={14} />
-          Back to Settings
+          {t('backToSettings')}
         </Link>
 
         {/* ── Page header ─────────────────────────────────── */}
         <div className="mb-8">
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Settings</p>
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('eyebrow')}</p>
           <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={displayFont}>
-            API keys
+            {t('heading')}
           </h1>
           <p className="text-sm text-[var(--text-secondary)] mt-2">
-            Manage programmatic access keys for the{' '}
+            {t('subheading').split('{docsLink}')[0]}
             <Link
               href="https://docs.hatcher.host"
               target="_blank"
               rel="noopener noreferrer"
               className="text-cyan-400 hover:text-cyan-300 inline-flex items-center gap-0.5 transition-colors"
             >
-              Hatcher API <ExternalLink size={11} />
+              {t('docsLinkLabel')} <ExternalLink size={11} />
             </Link>
-            . Each key starts with <code className="font-mono text-xs bg-[var(--bg-card)] px-1 py-0.5 rounded text-cyan-400">hk_</code>.
+            {t('subheading').split('{docsLink}')[1]?.split('{prefix}')[0]}
+            <code className="font-mono text-xs bg-[var(--bg-card)] px-1 py-0.5 rounded text-cyan-400">hk_</code>
+            {t('subheading').split('{prefix}')[1]}
           </p>
         </div>
 
@@ -339,9 +346,9 @@ export default function ApiKeysPage() {
               <div className="flex items-start gap-2 mb-3">
                 <AlertTriangle size={14} className="text-amber-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-semibold text-emerald-400">Key created — copy it now!</p>
+                  <p className="text-sm font-semibold text-emerald-400">{t('newKeyAlert')}</p>
                   <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                    This is the only time the full key will be shown. Store it somewhere safe.
+                    {t('newKeyAlertSub')}
                   </p>
                 </div>
               </div>
@@ -355,7 +362,7 @@ export default function ApiKeysPage() {
                   className="h-9 px-3 rounded-lg border border-emerald-500/25 bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] flex items-center gap-1.5 text-xs text-emerald-400 transition-colors cursor-pointer flex-shrink-0"
                 >
                   {copiedId === 'new' ? <Check size={13} /> : <Copy size={13} />}
-                  {copiedId === 'new' ? 'Copied!' : 'Copy'}
+                  {copiedId === 'new' ? t('copiedLabel') : t('copyLabel')}
                 </button>
                 <button
                   onClick={() => setNewlyCreated(null)}
@@ -374,13 +381,13 @@ export default function ApiKeysPage() {
           {loading ? (
             <div className="flex items-center gap-2 py-8 justify-center text-[var(--text-muted)] text-sm">
               <Loader2 size={16} className="animate-spin" />
-              Loading keys...
+              {t('loading')}
             </div>
           ) : keys.length === 0 ? (
             <div className="card glass-noise p-8 text-center">
               <Key size={28} className="text-[var(--text-muted)] mx-auto mb-3 opacity-40" />
-              <p className="text-sm font-medium text-[var(--text-secondary)]">No API keys yet</p>
-              <p className="text-xs text-[var(--text-muted)] mt-1">Create your first key to get started</p>
+              <p className="text-sm font-medium text-[var(--text-secondary)]">{t('noKeysTitle')}</p>
+              <p className="text-xs text-[var(--text-muted)] mt-1">{t('noKeysDesc')}</p>
             </div>
           ) : (
             keys.map((k, i) => (
@@ -401,15 +408,15 @@ export default function ApiKeysPage() {
         <div className="card glass-noise p-5">
           <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1 flex items-center gap-2">
             <Plus size={14} className="text-[var(--primary-400)]" />
-            Create new key
+            {t('createSectionTitle')}
           </h3>
           <p className="text-xs text-[var(--text-muted)] mb-4">
-            Give your key a descriptive name (e.g. "Local Dev", "CI/CD Pipeline").
+            {t('createSectionDesc')}
           </p>
           <div className="flex items-center gap-2">
             <input
               className="input h-9 px-3 text-sm flex-1"
-              placeholder="Key label..."
+              placeholder={t('keyLabelPlaceholder')}
               value={newLabel}
               onChange={(e) => setNewLabel(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
@@ -421,7 +428,7 @@ export default function ApiKeysPage() {
               className="inline-flex items-center gap-1.5 h-9 px-4 rounded-md bg-[var(--text-primary)] text-[var(--bg-base)] text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex-shrink-0"
             >
               {creating ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
-              {creating ? 'Creating...' : 'Create Key'}
+              {creating ? t('creating') : t('createKey')}
             </button>
           </div>
         </div>
@@ -430,17 +437,18 @@ export default function ApiKeysPage() {
         <div className="mt-5 p-4 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] flex items-start gap-3">
           <ExternalLink size={14} className="text-cyan-400 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-            Use your API key in the <code className="font-mono text-cyan-400">Authorization: Bearer hk_...</code> header.
-            See the{' '}
+            {t('usageNote').split('{header}')[0]}
+            <code className="font-mono text-cyan-400">{t('headerExample')}</code>
+            {t('usageNote').split('{header}')[1]?.split('{docsLink}')[0]}
             <Link
               href="https://docs.hatcher.host"
               target="_blank"
               rel="noopener noreferrer"
               className="text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-2"
             >
-              API reference docs
-            </Link>{' '}
-            for all available endpoints.
+              {t('docsLinkLabel2')}
+            </Link>
+            {t('usageNote').split('{docsLink}')[1]}
           </p>
         </div>
 
@@ -449,9 +457,9 @@ export default function ApiKeysPage() {
       {/* ── Revoke confirmation ────────────────────────────── */}
       <ConfirmDialog
         open={!!revokeTarget}
-        title="Revoke API Key"
-        description="This key will be permanently invalidated and any applications using it will stop working immediately. This cannot be undone."
-        confirmLabel="Revoke Key"
+        title={t('revokeTitle')}
+        description={t('revokeDesc')}
+        confirmLabel={t('revokeConfirm')}
         variant="danger"
         onConfirm={() => revokeTarget && handleRevoke(revokeTarget)}
         onCancel={() => setRevokeTarget(null)}

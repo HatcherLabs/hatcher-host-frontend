@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import {
@@ -177,6 +178,8 @@ function Skeleton({ className }: { className?: string }) {
 
 // ─── Main Page ───────────────────────────────────────────────
 export default function AnalyticsPage() {
+  const t = useTranslations('dashboard.analytics');
+  const tc = useTranslations('dashboard.common');
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [data, setData] = useState<AccountAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -220,9 +223,9 @@ export default function AnalyticsPage() {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
         <Shield className="w-12 h-12 text-[var(--text-muted)] mx-auto mb-4" />
-        <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">Sign In Required</h1>
-        <p className="mb-6 text-[var(--text-secondary)]">Sign in to view analytics.</p>
-        <Link href="/login" className="btn-primary">Sign In</Link>
+        <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">{tc('signInRequired')}</h1>
+        <p className="mb-6 text-[var(--text-secondary)]">{t('signInDescription')}</p>
+        <Link href="/login" className="btn-primary">{tc('signIn')}</Link>
       </div>
     );
   }
@@ -244,11 +247,11 @@ export default function AnalyticsPage() {
               <ArrowLeft size={16} />
             </Link>
             <div>
-              <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Dashboard</p>
+              <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('eyebrow')}</p>
               <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'Sora, sans-serif' }}>
-                Analytics
+                {t('heading')}
               </h1>
-              <p className="text-xs text-[var(--text-muted)] mt-1">Account-wide usage insights.</p>
+              <p className="text-xs text-[var(--text-muted)] mt-1">{t('subheading')}</p>
             </div>
           </div>
           <button
@@ -279,10 +282,10 @@ export default function AnalyticsPage() {
             ))
           ) : (
             <>
-              <StatCard icon={Bot} label="Total Agents" value={data?.totalAgents ?? 0} sub={`${data?.activeAgents ?? 0} active`} color="#8b5cf6" />
-              <StatCard icon={MessageSquare} label="Messages" value={formatNumber(data?.totalMessages ?? 0)} sub="All time" color="var(--color-accent)" />
-              <StatCard icon={Zap} label="LLM Calls" value={formatNumber(data?.totalLlmCalls ?? 0)} sub="All time" color="#f59e0b" />
-              <StatCard icon={Activity} label="Last 14 Days" value={formatNumber(totalDailyMessages)} sub="User messages" color="#22c55e" />
+              <StatCard icon={Bot} label={t('totalAgents')} value={data?.totalAgents ?? 0} sub={`${data?.activeAgents ?? 0} active`} color="#8b5cf6" />
+              <StatCard icon={MessageSquare} label={t('messages')} value={formatNumber(data?.totalMessages ?? 0)} sub={t('messagesAllTime')} color="var(--color-accent)" />
+              <StatCard icon={Zap} label={t('llmCalls')} value={formatNumber(data?.totalLlmCalls ?? 0)} sub={t('llmCallsAllTime')} color="#f59e0b" />
+              <StatCard icon={Activity} label={t('last14DaysLabel')} value={formatNumber(totalDailyMessages)} sub={t('last14DaysSub')} color="#22c55e" />
             </>
           )}
         </div>
@@ -298,9 +301,9 @@ export default function AnalyticsPage() {
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
               <BarChart3 size={18} className="text-[var(--color-accent)]" />
-              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Message Volume</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">{t('messageVolume')}</h3>
             </div>
-            <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Last 14 days</span>
+            <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">{t('last14Days')}</span>
           </div>
           {loading ? (
             <div className="flex items-end gap-1 h-40">
@@ -314,7 +317,7 @@ export default function AnalyticsPage() {
             <BarChartSection data={data.dailyVolume} />
           ) : (
             <div className="h-40 flex items-center justify-center">
-              <p className="text-sm text-[var(--text-muted)]">No message data yet</p>
+              <p className="text-sm text-[var(--text-muted)]">{t('noDataYet')}</p>
             </div>
           )}
         </motion.div>
@@ -331,7 +334,7 @@ export default function AnalyticsPage() {
           >
             <div className="flex items-center gap-2 mb-5">
               <Cpu size={16} className="text-[var(--color-accent)]" />
-              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Frameworks</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">{t('frameworks')}</h3>
             </div>
             {loading ? (
               <div className="space-y-3">
@@ -361,7 +364,7 @@ export default function AnalyticsPage() {
                   })}
               </div>
             ) : (
-              <p className="text-sm text-[var(--text-muted)] text-center py-4">No agents yet</p>
+              <p className="text-sm text-[var(--text-muted)] text-center py-4">{t('noAgentsYet')}</p>
             )}
           </motion.div>
 
@@ -375,7 +378,7 @@ export default function AnalyticsPage() {
           >
             <div className="flex items-center gap-2 mb-5">
               <Activity size={16} className="text-[var(--color-accent)]" />
-              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Agent Status</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">{t('agentStatus')}</h3>
             </div>
             {loading ? (
               <div className="space-y-3">
@@ -405,7 +408,7 @@ export default function AnalyticsPage() {
                   })}
               </div>
             ) : (
-              <p className="text-sm text-[var(--text-muted)] text-center py-4">No agents yet</p>
+              <p className="text-sm text-[var(--text-muted)] text-center py-4">{t('noAgentsYet')}</p>
             )}
           </motion.div>
         </div>
@@ -420,7 +423,7 @@ export default function AnalyticsPage() {
         >
           <div className="flex items-center gap-2 mb-5">
             <Hash size={16} className="text-[var(--color-accent)]" />
-            <h3 className="text-sm font-semibold text-[var(--text-primary)]">Total Messages by Agent</h3>
+            <h3 className="text-sm font-semibold text-[var(--text-primary)]">{t('totalMessages')}</h3>
           </div>
           {loading ? (
             <div className="space-y-3">
@@ -456,7 +459,7 @@ export default function AnalyticsPage() {
               })}
             </div>
           ) : (
-            <p className="text-sm text-[var(--text-muted)] text-center py-4">No message data yet — start chatting with your agents!</p>
+            <p className="text-sm text-[var(--text-muted)] text-center py-4">{t('noMessageData')}</p>
           )}
         </motion.div>
 
@@ -464,9 +467,9 @@ export default function AnalyticsPage() {
         {!loading && !error && data?.totalAgents === 0 && (
           <div className="text-center py-16">
             <TrendingUp size={40} className="mx-auto text-[var(--text-muted)] mb-4" />
-            <p className="text-sm text-[var(--text-muted)]">No agents yet. Create your first agent to start seeing analytics.</p>
+            <p className="text-sm text-[var(--text-muted)]">{t('noAgentsEmpty')}</p>
             <Link href="/create" className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-xl text-sm font-medium bg-[#8b5cf6] text-white hover:bg-[#7c3aed] transition-colors">
-              Create Agent
+              {t('createAgent')}
             </Link>
           </div>
         )}

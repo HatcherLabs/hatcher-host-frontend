@@ -24,7 +24,14 @@
     "hero": {
       "eyebrow": "[zh] Managed AI agent hosting · Crypto-native",
       "headlinePrefix": "[zh] Hatch Your",
-      "typewriterWords": ["[zh] AI Agent", "[zh] Fitness Coach", "[zh] Crypto Tracker", "[zh] Study Buddy", "[zh] Travel Planner", "[zh] Personal Assistant"],
+      "typewriterWords": [
+        "[zh] AI Agent",
+        "[zh] Fitness Coach",
+        "[zh] Crypto Tracker",
+        "[zh] Study Buddy",
+        "[zh] Travel Planner",
+        "[zh] Personal Assistant"
+      ],
       "body": "[zh] Pick a framework. Configure. Launch in 60 seconds. No code required, no infrastructure to manage. 4 frameworks, 20+ platforms, free tier with BYOK.",
       "ctaPrimary": "[zh] Get started free",
       "ctaSecondary": "[zh] Read docs",
@@ -55,9 +62,21 @@
       "heading": "[zh] 3 steps. 60 seconds.",
       "subheading": "[zh] No coding, no setup guides, no configuration files.",
       "steps": [
-        { "num": "01", "title": "[zh] Pick a framework", "desc": "[zh] OpenClaw, Hermes, ElizaOS, or Milady. Each has unique strengths — browser control, memory, multi-agent, on-chain." },
-        { "num": "02", "title": "[zh] Configure", "desc": "[zh] Name, personality, integrations. Fill a simple form — no config files, no YAML." },
-        { "num": "03", "title": "[zh] Deploy", "desc": "[zh] One click. Your agent is live on every connected platform in under 60 seconds." }
+        {
+          "num": "01",
+          "title": "[zh] Pick a framework",
+          "desc": "[zh] OpenClaw, Hermes, ElizaOS, or Milady. Each has unique strengths — browser control, memory, multi-agent, on-chain."
+        },
+        {
+          "num": "02",
+          "title": "[zh] Configure",
+          "desc": "[zh] Name, personality, integrations. Fill a simple form — no config files, no YAML."
+        },
+        {
+          "num": "03",
+          "title": "[zh] Deploy",
+          "desc": "[zh] One click. Your agent is live on every connected platform in under 60 seconds."
+        }
       ],
       "cta": "[zh] Try it now"
     },
@@ -66,15 +85,42 @@
       "heading": "[zh] What will you hatch?",
       "subheading": "[zh] From personal productivity to business automation — your agent, your rules.",
       "items": [
-        { "title": "[zh] Personal assistant", "desc": "[zh] Calendar, emails, reminders — from Telegram." },
-        { "title": "[zh] Fitness coach", "desc": "[zh] Workouts, routines, daily accountability." },
-        { "title": "[zh] Food & nutrition", "desc": "[zh] Log meals, count calories, recipe suggestions." },
-        { "title": "[zh] Crypto tracker", "desc": "[zh] Token prices, portfolio alerts, on-chain data." },
-        { "title": "[zh] Study buddy", "desc": "[zh] Quiz you, summarize textbooks, help with homework." },
-        { "title": "[zh] Travel planner", "desc": "[zh] Find flights, plan itineraries, local picks." },
-        { "title": "[zh] Budget manager", "desc": "[zh] Track expenses, savings goals, weekly reports." },
-        { "title": "[zh] Research assistant", "desc": "[zh] Web search, summarize articles, compile reports." },
-        { "title": "[zh] Customer support", "desc": "[zh] Answer FAQs on Discord or WhatsApp, 24/7." }
+        {
+          "title": "[zh] Personal assistant",
+          "desc": "[zh] Calendar, emails, reminders — from Telegram."
+        },
+        {
+          "title": "[zh] Fitness coach",
+          "desc": "[zh] Workouts, routines, daily accountability."
+        },
+        {
+          "title": "[zh] Food & nutrition",
+          "desc": "[zh] Log meals, count calories, recipe suggestions."
+        },
+        {
+          "title": "[zh] Crypto tracker",
+          "desc": "[zh] Token prices, portfolio alerts, on-chain data."
+        },
+        {
+          "title": "[zh] Study buddy",
+          "desc": "[zh] Quiz you, summarize textbooks, help with homework."
+        },
+        {
+          "title": "[zh] Travel planner",
+          "desc": "[zh] Find flights, plan itineraries, local picks."
+        },
+        {
+          "title": "[zh] Budget manager",
+          "desc": "[zh] Track expenses, savings goals, weekly reports."
+        },
+        {
+          "title": "[zh] Research assistant",
+          "desc": "[zh] Web search, summarize articles, compile reports."
+        },
+        {
+          "title": "[zh] Customer support",
+          "desc": "[zh] Answer FAQs on Discord or WhatsApp, 24/7."
+        }
       ],
       "footer": "[zh] And anything else you can describe in plain English."
     },
@@ -83,10 +129,30 @@
       "heading": "[zh] Four frameworks. One platform.",
       "subheading": "[zh] Pick the one that fits your agent. Switch whenever you want.",
       "items": [
-        { "name": "OpenClaw", "tag": "[zh] all-rounder", "desc": "[zh] Powerful tools, plugins, and browser control.", "features": "[zh] 2500+ skills · Browser automation · File management" },
-        { "name": "Hermes", "tag": "[zh] reasoning", "desc": "[zh] Smart-first design for rich memory and reasoning.", "features": "[zh] 77 bundled skills · Deep memory · Multi-model" },
-        { "name": "ElizaOS", "tag": "[zh] multi-agent", "desc": "[zh] Multi-agent coordination with 90+ plugins.", "features": "[zh] 90+ plugins · Multi-agent · Knowledge base" },
-        { "name": "Milady", "tag": "[zh] crypto-native", "desc": "[zh] On-chain awareness, DeFi tools, token tracking.", "features": "[zh] DeFi tools · On-chain data · Token tracking" }
+        {
+          "name": "OpenClaw",
+          "tag": "[zh] all-rounder",
+          "desc": "[zh] Powerful tools, plugins, and browser control.",
+          "features": "[zh] 2500+ skills · Browser automation · File management"
+        },
+        {
+          "name": "Hermes",
+          "tag": "[zh] reasoning",
+          "desc": "[zh] Smart-first design for rich memory and reasoning.",
+          "features": "[zh] 77 bundled skills · Deep memory · Multi-model"
+        },
+        {
+          "name": "ElizaOS",
+          "tag": "[zh] multi-agent",
+          "desc": "[zh] Multi-agent coordination with 90+ plugins.",
+          "features": "[zh] 90+ plugins · Multi-agent · Knowledge base"
+        },
+        {
+          "name": "Milady",
+          "tag": "[zh] crypto-native",
+          "desc": "[zh] On-chain awareness, DeFi tools, token tracking.",
+          "features": "[zh] DeFi tools · On-chain data · Token tracking"
+        }
       ]
     },
     "city": {
@@ -102,12 +168,30 @@
       "eyebrow": "[zh] Platform",
       "heading": "[zh] Everything your agent needs",
       "items": [
-        { "title": "[zh] Instant deploy", "desc": "[zh] From zero to running agent in under 60 seconds." },
-        { "title": "[zh] All platforms", "desc": "[zh] Telegram, Discord, Twitter, WhatsApp, Slack." },
-        { "title": "[zh] Bring your own key", "desc": "[zh] Use your own LLM API key for unlimited messages on any tier." },
-        { "title": "[zh] Secure by default", "desc": "[zh] Isolated containers, encrypted secrets, no shared data." },
-        { "title": "[zh] Live analytics", "desc": "[zh] Real-time stats, usage tracking, performance metrics." },
-        { "title": "[zh] Chat & voice", "desc": "[zh] Text chat, voice calls, real-time streaming — out of the box." }
+        {
+          "title": "[zh] Instant deploy",
+          "desc": "[zh] From zero to running agent in under 60 seconds."
+        },
+        {
+          "title": "[zh] All platforms",
+          "desc": "[zh] Telegram, Discord, Twitter, WhatsApp, Slack."
+        },
+        {
+          "title": "[zh] Bring your own key",
+          "desc": "[zh] Use your own LLM API key for unlimited messages on any tier."
+        },
+        {
+          "title": "[zh] Secure by default",
+          "desc": "[zh] Isolated containers, encrypted secrets, no shared data."
+        },
+        {
+          "title": "[zh] Live analytics",
+          "desc": "[zh] Real-time stats, usage tracking, performance metrics."
+        },
+        {
+          "title": "[zh] Chat & voice",
+          "desc": "[zh] Text chat, voice calls, real-time streaming — out of the box."
+        }
       ]
     },
     "pricing": {
@@ -117,23 +201,51 @@
       "popularLabel": "[zh] Popular",
       "tiers": [
         {
-          "name": "[zh] Free", "price": "$0", "sub": "[zh] /month",
-          "features": ["[zh] 1 AI agent", "[zh] 20 messages/day", "[zh] All platforms", "[zh] Free AI included"],
+          "name": "[zh] Free",
+          "price": "$0",
+          "sub": "[zh] /month",
+          "features": [
+            "[zh] 1 AI agent",
+            "[zh] 20 messages/day",
+            "[zh] All platforms",
+            "[zh] Free AI included"
+          ],
           "cta": "[zh] Get started"
         },
         {
-          "name": "[zh] Starter", "price": "$6.99", "sub": "[zh] /month",
-          "features": ["[zh] 1 AI agent", "[zh] 50 messages/day", "[zh] BYOK = unlimited", "[zh] Longer active time"],
+          "name": "[zh] Starter",
+          "price": "$6.99",
+          "sub": "[zh] /month",
+          "features": [
+            "[zh] 1 AI agent",
+            "[zh] 50 messages/day",
+            "[zh] BYOK = unlimited",
+            "[zh] Longer active time"
+          ],
           "cta": "[zh] Choose Starter"
         },
         {
-          "name": "[zh] Pro", "price": "$19.99", "sub": "[zh] /month",
-          "features": ["[zh] 3 AI agents", "[zh] 100 messages/day", "[zh] BYOK = unlimited", "[zh] Dedicated resources"],
+          "name": "[zh] Pro",
+          "price": "$19.99",
+          "sub": "[zh] /month",
+          "features": [
+            "[zh] 3 AI agents",
+            "[zh] 100 messages/day",
+            "[zh] BYOK = unlimited",
+            "[zh] Dedicated resources"
+          ],
           "cta": "[zh] Choose Pro"
         },
         {
-          "name": "[zh] Business", "price": "$49.99", "sub": "[zh] /month",
-          "features": ["[zh] 10 AI agents", "[zh] 300 messages/day", "[zh] Always-on containers", "[zh] Priority support"],
+          "name": "[zh] Business",
+          "price": "$49.99",
+          "sub": "[zh] /month",
+          "features": [
+            "[zh] 10 AI agents",
+            "[zh] 300 messages/day",
+            "[zh] Always-on containers",
+            "[zh] Priority support"
+          ],
           "cta": "[zh] Choose Business"
         }
       ],
@@ -283,7 +395,7 @@
       "submitLoading": "[zh] Sending...",
       "backToLogin": "[zh] Back to sign in",
       "successHeading": "[zh] Check your email",
-      "successBody": "[zh] If an account exists for {email}, we sent a password reset link. Check your inbox and spam folder.",
+      "successBody": "[zh] If an account exists for <bold>{email}</bold>, we sent a password reset link. Check your inbox and spam folder.",
       "successBackLink": "[zh] Back to sign in",
       "genericError": "[zh] Something went wrong. Please try again."
     },
@@ -443,35 +555,91 @@
         "extraAgents": {
           "label": "[zh] Extra Agents",
           "items": [
-            { "name": "[zh] +1 Agent",   "period": "[zh] /mo", "description": "[zh] 1 extra slot" },
-            { "name": "[zh] +3 Agents",  "period": "[zh] /mo", "description": "[zh] 3 extra slots" },
-            { "name": "[zh] +5 Agents",  "period": "[zh] /mo", "description": "[zh] 5 extra slots" },
-            { "name": "[zh] +10 Agents", "period": "[zh] /mo", "description": "[zh] 10 extra slots" }
+            {
+              "name": "[zh] +1 Agent",
+              "period": "[zh] /mo",
+              "description": "[zh] 1 extra slot"
+            },
+            {
+              "name": "[zh] +3 Agents",
+              "period": "[zh] /mo",
+              "description": "[zh] 3 extra slots"
+            },
+            {
+              "name": "[zh] +5 Agents",
+              "period": "[zh] /mo",
+              "description": "[zh] 5 extra slots"
+            },
+            {
+              "name": "[zh] +10 Agents",
+              "period": "[zh] /mo",
+              "description": "[zh] 10 extra slots"
+            }
           ]
         },
         "extraMessages": {
           "label": "[zh] Extra Messages (account)",
           "items": [
-            { "name": "[zh] +20 msg/day",  "period": "[zh] /mo", "description": "[zh] Stackable" },
-            { "name": "[zh] +50 msg/day",  "period": "[zh] /mo", "description": "[zh] Stackable" },
-            { "name": "[zh] +100 msg/day", "period": "[zh] /mo", "description": "[zh] Stackable" },
-            { "name": "[zh] +200 msg/day", "period": "[zh] /mo", "description": "[zh] Stackable" }
+            {
+              "name": "[zh] +20 msg/day",
+              "period": "[zh] /mo",
+              "description": "[zh] Stackable"
+            },
+            {
+              "name": "[zh] +50 msg/day",
+              "period": "[zh] /mo",
+              "description": "[zh] Stackable"
+            },
+            {
+              "name": "[zh] +100 msg/day",
+              "period": "[zh] /mo",
+              "description": "[zh] Stackable"
+            },
+            {
+              "name": "[zh] +200 msg/day",
+              "period": "[zh] /mo",
+              "description": "[zh] Stackable"
+            }
           ]
         },
         "extraSearches": {
           "label": "[zh] Extra Searches (account)",
           "items": [
-            { "name": "[zh] +25 searches/day", "period": "[zh] /mo", "description": "[zh] Stackable" },
-            { "name": "[zh] +50 searches/day", "period": "[zh] /mo", "description": "[zh] Stackable" }
+            {
+              "name": "[zh] +25 searches/day",
+              "period": "[zh] /mo",
+              "description": "[zh] Stackable"
+            },
+            {
+              "name": "[zh] +50 searches/day",
+              "period": "[zh] /mo",
+              "description": "[zh] Stackable"
+            }
           ]
         },
         "perAgent": {
           "label": "[zh] Per-Agent",
           "items": [
-            { "name": "[zh] Always On",    "period": "[zh] /mo per agent",      "description": "[zh] Keep running 24/7" },
-            { "name": "[zh] File Manager", "period": "[zh] one-time per agent", "description": "[zh] Browse & edit files" },
-            { "name": "[zh] Full Logs",    "period": "[zh] /mo per agent",      "description": "[zh] Unlock log viewer" },
-            { "name": "[zh] +10 Plugins",  "period": "[zh] /mo per agent",      "description": "[zh] Stack extra plugin slots" }
+            {
+              "name": "[zh] Always On",
+              "period": "[zh] /mo per agent",
+              "description": "[zh] Keep running 24/7"
+            },
+            {
+              "name": "[zh] File Manager",
+              "period": "[zh] one-time per agent",
+              "description": "[zh] Browse & edit files"
+            },
+            {
+              "name": "[zh] Full Logs",
+              "period": "[zh] /mo per agent",
+              "description": "[zh] Unlock log viewer"
+            },
+            {
+              "name": "[zh] +10 Plugins",
+              "period": "[zh] /mo per agent",
+              "description": "[zh] Stack extra plugin slots"
+            }
           ]
         }
       }
@@ -561,5 +729,437 @@
       "seeFrameworks": "[zh] See Frameworks"
     },
     "footerNote": "[zh] All prices in USD, payable in SOL or $HATCHER. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier."
+  },
+  "dashboard": {
+    "common": {
+      "loading": "[ZH] Loading...",
+      "authenticating": "[ZH] Authenticating...",
+      "signInRequired": "[ZH] Sign In Required",
+      "signIn": "[ZH] Sign In",
+      "refresh": "[ZH] Refresh",
+      "save": "[ZH] Save",
+      "cancel": "[ZH] Cancel",
+      "delete": "[ZH] Delete",
+      "create": "[ZH] Create",
+      "invite": "[ZH] Invite",
+      "share": "[ZH] Share",
+      "unshare": "[ZH] Unshare",
+      "copy": "[ZH] Copy",
+      "copied": "[ZH] Copied!",
+      "close": "[ZH] Close",
+      "confirm": "[ZH] Confirm",
+      "back": "[ZH] Back",
+      "noDescription": "[ZH] No description",
+      "clear": "[ZH] Clear"
+    },
+    "agents": {
+      "eyebrow": "[ZH] Dashboard",
+      "heading": "[ZH] My agents",
+      "subtitleEmpty": "[ZH] Create your first agent to get started.",
+      "createCta": "[ZH] Create agent",
+      "searchPlaceholder": "[ZH] Search agents... ( / )",
+      "filterAll": "[ZH] All",
+      "frameworkAll": "[ZH] All Frameworks",
+      "sortNewest": "[ZH] Newest",
+      "sortAZ": "[ZH] A-Z",
+      "sortMessages": "[ZH] Most Messages",
+      "sortActive": "[ZH] Last Active",
+      "emptyTitle": "[ZH] No agents yet",
+      "emptyDescription": "[ZH] Create your first AI agent and deploy it in 60 seconds.",
+      "emptyActionLabel": "[ZH] Create Agent",
+      "emptySecondaryLabel": "[ZH] See Frameworks",
+      "noMatchTitle": "[ZH] No matching agents",
+      "noMatchDescription": "[ZH] Try adjusting your search or filter criteria.",
+      "signInDescription": "[ZH] Sign in to your account to access your agents.",
+      "featuresCount": "[ZH] {count} feature",
+      "featuresCountPlural": "[ZH] {count} features",
+      "tourCreateTitle": "[ZH] Create Your First Agent",
+      "tourCreateDescription": "[ZH] Click here to hatch your first AI agent. Choose from 4 frameworks.",
+      "tourFilterTitle": "[ZH] Filter by Framework",
+      "tourFilterDescription": "[ZH] OpenClaw, Hermes, ElizaOS, or Milady — each has unique strengths.",
+      "tourSearchTitle": "[ZH] Search & Explore",
+      "tourSearchDescription": "[ZH] Search agents or browse 200+ templates to get started quickly.",
+      "tourPlanTitle": "[ZH] Your Plan",
+      "tourPlanDescription": "[ZH] Start free with 1 agent and 20 messages/day. Upgrade anytime.",
+      "agentsCount": "[ZH] {count} agent total · {active} active",
+      "agentsCountPlural": "[ZH] {count} agents total · {active} active",
+      "details": "[ZH] Details"
+    },
+    "newAgent": {
+      "eyebrow": "[ZH] New agent",
+      "heading": "[ZH] Choose a template",
+      "subheading": "[ZH] Start from a pre-configured template or build from scratch. Each template comes with a personality, system prompt, and suggested integrations.",
+      "searchPlaceholder": "[ZH] Search templates...",
+      "allTemplates": "[ZH] All Templates",
+      "startFromScratch": "[ZH] Start from Scratch",
+      "startFromScratchDesc": "[ZH] Full control over every setting",
+      "noTemplatesTitle": "[ZH] No templates found",
+      "noTemplatesDesc": "[ZH] Try a different search or category.",
+      "footerHint": "[ZH] All templates are fully customizable after deployment — change the name, system prompt, model, and integrations at any time."
+    },
+    "billing": {
+      "eyebrow": "[ZH] Account",
+      "heading": "[ZH] Billing & plans",
+      "breadcrumbDashboard": "[ZH] Dashboard",
+      "breadcrumbBilling": "[ZH] Billing",
+      "connectWallet": "[ZH] Connect Wallet",
+      "connectedWallet": "[ZH] Connected wallet",
+      "switchWallet": "[ZH] Switch wallet",
+      "disconnect": "[ZH] Disconnect",
+      "loadingBilling": "[ZH] Loading billing...",
+      "signInDescription": "[ZH] Sign in to manage your plan and billing.",
+      "creditsBalance": "[ZH] Credits Balance",
+      "creditsUsd": "[ZH] USD",
+      "creditsDesc": "[ZH] Credits can be used for subscriptions, add-ons, and hosted LLM usage.",
+      "recentTransactions": "[ZH] Recent Transactions",
+      "currentTier": "[ZH] Current Plan",
+      "freeTier": "[ZH] Free Tier",
+      "active": "[ZH] Active",
+      "agentUsage": "[ZH] Agent Usage",
+      "agentsOf": "[ZH] {count} of {limit} agents used",
+      "agentsOver": "[ZH] {over} over limit",
+      "slotsRemaining": "[ZH] {slots} slot remaining",
+      "slotsRemainingPlural": "[ZH] {slots} slots remaining",
+      "activeAddons": "[ZH] Active Add-ons",
+      "expires": "[ZH] Expires {date}",
+      "extend": "[ZH] Extend",
+      "extend30Days": "[ZH] Extend +30 days (${price})",
+      "upgradeAnnual": "[ZH] Upgrade to annual (${price})",
+      "annualDiscount": "[ZH] -15%",
+      "renew": "[ZH] Renew",
+      "renewFor": "[ZH] Renew for ${price}",
+      "planExpired": "[ZH] Plan expired — renew to keep your tier",
+      "planExpiring": "[ZH] Expires in {days} day — renew now",
+      "planExpiringPlural": "[ZH] Expires in {days} days — renew now",
+      "planActiveUntil": "[ZH] Active until {date}",
+      "noCharge": "[ZH] No charge",
+      "lifetimePrice": "[ZH] ${price} lifetime",
+      "monthlyPrice": "[ZH] ${price} / 30 days",
+      "unlimitedMessages": "[ZH] unlimited",
+      "messagesPerDay": "[ZH] {count} messages/day",
+      "byokUnlimited": "[ZH]  (BYOK = unlimited)",
+      "upgradeSection": "[ZH] Upgrade Your Plan",
+      "upgradeDesc": "[ZH] Get more agents, messages, and compute power.",
+      "addonsSection": "[ZH] Add-ons",
+      "addonsDesc": "[ZH] Stack extra capacity on your current plan.",
+      "accountAddons": "[ZH] Account-level Add-ons",
+      "perAgentAddons": "[ZH] Per-agent Add-ons",
+      "annualBilling": "[ZH] Annual billing",
+      "annualBillingDesc": "[ZH] 15% off — all subscription add-ons",
+      "monthly": "[ZH] Monthly",
+      "annual": "[ZH] Annual",
+      "monthSuffix": "[ZH] /mo",
+      "annualSuffix": "[ZH] /yr",
+      "yearSuffix": "[ZH] /yr",
+      "paymentHistory": "[ZH] Payment History",
+      "noPaymentsYet": "[ZH] No payments yet",
+      "noPaymentsDesc": "[ZH] Your payment history will appear here.",
+      "status": {
+        "confirmed": "[ZH] Confirmed",
+        "pending": "[ZH] Pending",
+        "failed": "[ZH] Failed",
+        "refunded": "[ZH] Refunded"
+      },
+      "selectAgent": "[ZH] Select Agent",
+      "choosePayment": "[ZH] Choose Payment Method",
+      "applyToAgent": "[ZH] Apply to agent:",
+      "noAgentsFound": "[ZH] No agents found. Create an agent first.",
+      "payWithCredits": "[ZH] Pay with Credits",
+      "payWithSol": "[ZH] Pay with SOL",
+      "solDesc": "[ZH] Solana wallet payment",
+      "payWithHatcher": "[ZH] Pay with $HATCHER",
+      "hatcherDesc": "[ZH] HATCHER token on Solana",
+      "payWithUsdc": "[ZH] Pay with USDC",
+      "usdcDesc": "[ZH] Stablecoin — 1 USDC = $1",
+      "payWithCard": "[ZH] Pay with Card",
+      "cardDesc": "[ZH] Credit/debit card via Stripe",
+      "creditAvailable": "[ZH] ${balance} available — instant",
+      "creditInsufficient": "[ZH] Not enough — need ${need}, have ${have}",
+      "foundingSlots": "[ZH] {remaining} of {max} slots remaining",
+      "manageBilling": "[ZH] Manage Billing",
+      "successPayment": "[ZH] Payment successful! Your account is being upgraded. It may take a moment to reflect.",
+      "canceledPayment": "[ZH] Payment was canceled. No charges were made.",
+      "lifetimePriceFull": "[ZH] ${price} lifetime",
+      "foundingSoldOut": "[ZH] Sold out",
+      "oneTimeSuffix": "[ZH] one-time",
+      "oneTimeAgent": "[ZH] one-time / agent",
+      "annualAgent": "[ZH] / year / agent",
+      "monthAgent": "[ZH] / 30 days / agent"
+    },
+    "analytics": {
+      "eyebrow": "[ZH] Dashboard",
+      "heading": "[ZH] Analytics",
+      "subheading": "[ZH] Account-wide usage insights.",
+      "signInDescription": "[ZH] Sign in to view analytics.",
+      "messageVolume": "[ZH] Message Volume",
+      "last14Days": "[ZH] Last 14 days",
+      "frameworks": "[ZH] Frameworks",
+      "agentStatus": "[ZH] Agent Status",
+      "totalMessages": "[ZH] Total Messages by Agent",
+      "noMessageData": "[ZH] No message data yet — start chatting with your agents!",
+      "noAgentsYet": "[ZH] No agents yet",
+      "noAgentsEmpty": "[ZH] No agents yet. Create your first agent to start seeing analytics.",
+      "createAgent": "[ZH] Create Agent",
+      "totalAgents": "[ZH] Total Agents",
+      "totalAgentsSub": "[ZH] {active} active",
+      "messages": "[ZH] Messages",
+      "messagesAllTime": "[ZH] All time",
+      "llmCalls": "[ZH] LLM Calls",
+      "llmCallsAllTime": "[ZH] All time",
+      "last14DaysLabel": "[ZH] Last 14 Days",
+      "last14DaysSub": "[ZH] User messages",
+      "today": "[ZH] Today",
+      "noDataYet": "[ZH] No message data yet"
+    },
+    "team": {
+      "eyebrow": "[ZH] Collaboration",
+      "heading": "[ZH] Team",
+      "subheading": "[ZH] Create a team to share agents and collaborate with others.",
+      "signInTitle": "[ZH] Sign in to access Teams",
+      "signInDesc": "[ZH] Teams let you collaborate with others on your AI agents.",
+      "createTeamTitle": "[ZH] Create Your Team",
+      "createTeamDesc": "[ZH] Start collaborating by creating a team. You can then invite members and share your agents.",
+      "teamNamePlaceholder": "[ZH] Team name...",
+      "createBtn": "[ZH] Create",
+      "creating": "[ZH] Creating...",
+      "membersHeading": "[ZH] Members",
+      "inviteMemberHeading": "[ZH] Invite Member",
+      "emailPlaceholder": "[ZH] Email address...",
+      "roleAdmin": "[ZH] Admin",
+      "roleMember": "[ZH] Member",
+      "roleViewer": "[ZH] Viewer",
+      "roleOwner": "[ZH] Owner",
+      "you": "[ZH] (you)",
+      "sharedAgentsHeading": "[ZH] Shared Agents",
+      "noSharedAgents": "[ZH] No agents shared with this team yet.",
+      "yourAgentsHeading": "[ZH] Your Agents",
+      "byLabel": "[ZH] by {username}",
+      "memberCount": "[ZH] {count} member",
+      "memberCountPlural": "[ZH] {count} members",
+      "agentSharedCount": "[ZH] {count} agent shared",
+      "agentSharedCountPlural": "[ZH] {count} agents shared",
+      "leaveTeam": "[ZH] Leave",
+      "leaveTeamTitle": "[ZH] Leave Team",
+      "leaveTeamDesc": "[ZH] Are you sure you want to leave this team? You will lose access to all shared agents.",
+      "leaveTeamConfirm": "[ZH] Leave Team",
+      "deleteTeam": "[ZH] Delete Team",
+      "deleteTeamTitle": "[ZH] Delete Team",
+      "deleteTeamDesc": "[ZH] Are you sure you want to permanently delete this team? All shared agents will be unshared.",
+      "deleteTeamConfirm": "[ZH] Delete Team",
+      "errors": {
+        "loadFailed": "[ZH] Failed to load team data",
+        "createFailed": "[ZH] Failed to create team",
+        "inviteFailed": "[ZH] Failed to invite member",
+        "removeFailed": "[ZH] Failed to remove member",
+        "leaveFailed": "[ZH] Failed to leave team",
+        "deleteFailed": "[ZH] Failed to delete team",
+        "shareFailed": "[ZH] Failed to share agent",
+        "unshareFailed": "[ZH] Failed to unshare agent",
+        "roleFailed": "[ZH] Failed to update role"
+      },
+      "invite": "[ZH] Invite"
+    },
+    "affiliate": {
+      "eyebrow": "[ZH] Dashboard",
+      "heading": "[ZH] Affiliate Dashboard",
+      "signInTitle": "[ZH] Sign In Required",
+      "signInDesc": "[ZH] Sign in to view your affiliate dashboard.",
+      "yourReferralLink": "[ZH] Your Referral Link",
+      "referralLinkDesc": "[ZH] New signups via this link are attributed to you for life.",
+      "shareOnX": "[ZH] Share on X",
+      "telegram": "[ZH] Telegram",
+      "copyLink": "[ZH] Copy",
+      "copiedLink": "[ZH] Copied",
+      "refresh": "[ZH] Refresh",
+      "frozenTitle": "[ZH] Account frozen",
+      "codeLabel": "[ZH] Code",
+      "totalReferrals": "[ZH] Total Referrals",
+      "paidLabel": "[ZH] {count} paid",
+      "pending30d": "[ZH] Pending (30d hold)",
+      "payableNow": "[ZH] Payable Now",
+      "lifetimeEarned": "[ZH] Lifetime Earned",
+      "paidOut": "[ZH] {amount} paid out",
+      "referralsTable": "[ZH] Referrals",
+      "noReferrals": "[ZH] No referrals yet. Share your link!",
+      "commissionsTable": "[ZH] Commissions",
+      "noCommissions": "[ZH] No commissions yet.",
+      "payoutsTable": "[ZH] Payouts",
+      "noPayouts": "[ZH] No payouts yet.",
+      "loadMore": "[ZH] Load more",
+      "signupCol": "[ZH] Signup",
+      "emailCol": "[ZH] Email",
+      "statusCol": "[ZH] Status",
+      "tierCol": "[ZH] Tier",
+      "dateCol": "[ZH] Date",
+      "sourceCol": "[ZH] Source",
+      "amountCol": "[ZH] Amount",
+      "cashCol": "[ZH] Cash",
+      "creditsCol": "[ZH] Credits",
+      "noteCol": "[ZH] Note",
+      "statusPaid": "[ZH] Paid",
+      "statusFree": "[ZH] Free",
+      "statusPending": "[ZH] Pending",
+      "statusPayable": "[ZH] Payable",
+      "statusPaidOut": "[ZH] Paid",
+      "statusVoided": "[ZH] Voided",
+      "flagged": "[ZH] Flagged",
+      "untilDate": "[ZH] until {date}",
+      "sourceSubscription": "[ZH] Subscription",
+      "sourceFoundingMember": "[ZH] Founding Member",
+      "payoutSettings": "[ZH] Payout Settings",
+      "payoutMode": "[ZH] Mode",
+      "payoutAddress": "[ZH] Payout Address",
+      "creditsOnly": "[ZH] Credits only — no address",
+      "changePrefs": "[ZH] Need to change payout preferences?",
+      "contactSupport": "[ZH] Contact support",
+      "modeCashOnly": "[ZH] Cash only (20%)",
+      "modeCreditsOnly": "[ZH] Credits only (40%)",
+      "modeHybrid": "[ZH] Hybrid (15% cash + 25% credits)"
+    },
+    "settings": {
+      "eyebrow": "[ZH] Account",
+      "heading": "[ZH] Settings",
+      "subheading": "[ZH] Manage your account, security, and preferences.",
+      "tabs": {
+        "profile": "[ZH] Profile",
+        "security": "[ZH] Security",
+        "notifications": "[ZH] Notifications",
+        "billing": "[ZH] Billing",
+        "danger": "[ZH] Danger Zone"
+      },
+      "profile": {
+        "sectionTitle": "[ZH] Profile",
+        "changePhoto": "[ZH] Change photo",
+        "uploadPhoto": "[ZH] Upload photo",
+        "remove": "[ZH] Remove",
+        "joinedLabel": "[ZH] Joined {date}",
+        "usernameLabel": "[ZH] Username",
+        "usernamePlaceholder": "[ZH] your_username",
+        "usernameHint": "[ZH] 3–30 characters, letters, numbers, _ or -",
+        "emailLabel": "[ZH] Email address",
+        "emailPlaceholder": "[ZH] you@example.com",
+        "saveChanges": "[ZH] Save Changes",
+        "saving": "[ZH] Saving...",
+        "walletTitle": "[ZH] Connected Wallet",
+        "walletLinkedDesc": "[ZH] Linked automatically from your first on-chain payment. Used when paying with SOL, USDC, or $HATCHER.",
+        "walletViewSolscan": "[ZH] Solscan",
+        "walletDisconnect": "[ZH] Disconnect wallet",
+        "walletNone": "[ZH] No wallet linked yet. Your Solana wallet connects automatically the first time you make an on-chain payment from the billing page.",
+        "referralTitle": "[ZH] Referral Program",
+        "referralDesc": "[ZH] Invite friends to Hatcher. You both get {credit} credit when they create their first agent.",
+        "referralCode": "[ZH] Referral Code",
+        "shareLink": "[ZH] Share Link",
+        "referred": "[ZH] Referred",
+        "earned": "[ZH] Earned",
+        "claimRewards": "[ZH] Claim Pending Rewards",
+        "claiming": "[ZH] Claiming..."
+      },
+      "security": {
+        "changePasswordTitle": "[ZH] Change Password",
+        "currentPassword": "[ZH] Current Password",
+        "currentPasswordPlaceholder": "[ZH] Enter current password",
+        "newPassword": "[ZH] New Password",
+        "newPasswordPlaceholder": "[ZH] Min 8 chars, upper, lower, number",
+        "confirmPassword": "[ZH] Confirm New Password",
+        "confirmPasswordPlaceholder": "[ZH] Repeat new password",
+        "changePasswordBtn": "[ZH] Change Password",
+        "changing": "[ZH] Changing...",
+        "apiKeysTitle": "[ZH] API Keys",
+        "apiKeysDesc": "[ZH] Create multiple API keys for programmatic access. Each key uses the {prefix} prefix. The full key is shown {emphasis} at creation.",
+        "apiKeysEmphasis": "[ZH] only once",
+        "manageKeys": "[ZH] Manage keys",
+        "newKeyCreated": "[ZH] New key created — copy it now!",
+        "noKeysYet": "[ZH] No API keys yet. Create one below.",
+        "keyLabelPlaceholder": "[ZH] Label (e.g. \"Production\")",
+        "createKey": "[ZH] Create Key",
+        "creating": "[ZH] Creating...",
+        "keysLimit": "[ZH] Up to 10 active keys. Each key has full API access.",
+        "reqToday": "[ZH] {count} req today · {week} this week",
+        "lastUsed": "[ZH] Last used {date}",
+        "save": "[ZH] Save"
+      },
+      "notifications": {
+        "sectionTitle": "[ZH] Notifications",
+        "pushLabel": "[ZH] Push Notifications",
+        "pushDesc": "[ZH] Browser push notifications for real-time updates",
+        "agentsLabel": "[ZH] Agent Alerts",
+        "agentsDesc": "[ZH] Get notified when agents change status, crash, or need attention",
+        "billingLabel": "[ZH] Billing Alerts",
+        "billingDesc": "[ZH] Payment confirmations, subscription renewals, and credits"
+      },
+      "billing": {
+        "sectionTitle": "[ZH] Billing",
+        "currentPlan": "[ZH] Current Plan",
+        "hatcherCredits": "[ZH] HATCHER Credits",
+        "creditsAutoApplied": "[ZH] Automatically applied at checkout",
+        "manageBilling": "[ZH] Manage Billing"
+      },
+      "danger": {
+        "sectionTitle": "[ZH] Danger Zone",
+        "exportTitle": "[ZH] Export My Data",
+        "exportDesc": "[ZH] Download a JSON file containing all your account data: profile, agents, chat history, payments, referrals, support tickets, and more.",
+        "exportBtn": "[ZH] Export My Data",
+        "exporting": "[ZH] Exporting...",
+        "deleteTitle": "[ZH] Delete Account",
+        "deleteDesc": "[ZH] Permanently remove your account, all agents, payment history, and configuration. This action is irreversible.",
+        "deleteBtn": "[ZH] Delete Account",
+        "deleting": "[ZH] Deleting...",
+        "dialogTitle": "[ZH] Delete Your Account?",
+        "dialogDesc": "[ZH] This will permanently remove all your agents, data, and payment history. This action {emphasis} be undone.",
+        "dialogEmphasis": "[ZH] cannot",
+        "confirmPassword": "[ZH] Confirm your password",
+        "passwordPlaceholder": "[ZH] Your current password",
+        "cancelBtn": "[ZH] Cancel"
+      }
+    },
+    "apiKeys": {
+      "eyebrow": "[ZH] Settings",
+      "heading": "[ZH] API keys",
+      "subheading": "[ZH] Manage programmatic access keys for the {docsLink}. Each key starts with {prefix}.",
+      "docsLinkLabel": "[ZH] Hatcher API",
+      "backToSettings": "[ZH] Back to Settings",
+      "newKeyAlert": "[ZH] Key created — copy it now!",
+      "newKeyAlertSub": "[ZH] This is the only time the full key will be shown. Store it somewhere safe.",
+      "noKeysTitle": "[ZH] No API keys yet",
+      "noKeysDesc": "[ZH] Create your first key to get started",
+      "loading": "[ZH] Loading keys...",
+      "createSectionTitle": "[ZH] Create new key",
+      "createSectionDesc": "[ZH] Give your key a descriptive name (e.g. \"Local Dev\", \"CI/CD Pipeline\").",
+      "keyLabelPlaceholder": "[ZH] Key label...",
+      "createKey": "[ZH] Create Key",
+      "creating": "[ZH] Creating...",
+      "usageNote": "[ZH] Use your API key in the {header} header. See the {docsLink} for all available endpoints.",
+      "headerExample": "[ZH] Authorization: Bearer hk_...",
+      "docsLinkLabel2": "[ZH] API reference docs",
+      "copiedLabel": "[ZH] Copied!",
+      "copyLabel": "[ZH] Copy",
+      "dismissLabel": "[ZH] Dismiss",
+      "revokeTitle": "[ZH] Revoke API Key",
+      "revokeDesc": "[ZH] This key will be permanently invalidated and any applications using it will stop working immediately. This cannot be undone.",
+      "revokeConfirm": "[ZH] Revoke Key",
+      "neverUsed": "[ZH] Never used",
+      "lastUsed": "[ZH] Last used {time}",
+      "created": "[ZH] Created {date}",
+      "reqStats": "[ZH] {today} req today · {week} this week",
+      "saveBtn": "[ZH] Save",
+      "cancelBtn": "[ZH] Cancel"
+    },
+    "quickStats": {
+      "totalAgents": "[ZH] Total Agents",
+      "dailyMessages": "[ZH] Daily Messages",
+      "unlimited": "[ZH] ∞",
+      "accountWide": "[ZH] account-wide · BYOK = unlimited",
+      "activeNow": "[ZH] Active Now",
+      "noAgentsRunning": "[ZH] No agents running",
+      "agentsOnline": "[ZH] {count} agent online",
+      "agentsOnlinePlural": "[ZH] {count} agents online",
+      "accountTier": "[ZH] Account Tier",
+      "lifetimeAccess": "[ZH] Lifetime access",
+      "prioritySupport": "[ZH] Priority support",
+      "upgradePlan": "[ZH] Upgrade plan"
+    }
+  },
+  "settings": {
+    "redirect": "[ZH] Redirecting to settings..."
   }
 }

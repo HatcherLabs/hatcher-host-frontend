@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -96,6 +97,8 @@ function StatusDot({ status }: { status: string }) {
 
 /* ── Page ─────────────────────────────────────────────────── */
 export default function TeamPage() {
+  const t = useTranslations('dashboard.team');
+  const tc = useTranslations('dashboard.common');
   const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const [team, setTeam] = useState<Team | null>(null);
   const [teamAgents, setTeamAgents] = useState<TeamAgent[]>([]);
@@ -126,13 +129,13 @@ export default function TeamPage() {
     try {
       const teamsRes = await api.getMyTeams();
       if (teamsRes.success && teamsRes.data.length > 0) {
-        const t = teamsRes.data[0];
+        const firstTeam = teamsRes.data[0];
         // Fetch full team details
-        const teamRes = await api.getTeam(t.id);
+        const teamRes = await api.getTeam(firstTeam.id);
         if (teamRes.success) {
           setTeam(teamRes.data as Team);
           // Fetch team agents
-          const agentsRes = await api.getTeamAgents(t.id);
+          const agentsRes = await api.getTeamAgents(firstTeam.id);
           if (agentsRes.success) setTeamAgents(agentsRes.data as TeamAgent[]);
         }
       } else {
@@ -142,7 +145,7 @@ export default function TeamPage() {
       const myRes = await api.getMyAgents();
       if (myRes.success) setMyAgents(myRes.data as MyAgent[]);
     } catch {
-      setError('Failed to load team data');
+      setError(t('errors.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -165,7 +168,7 @@ export default function TeamPage() {
         setError(res.error);
       }
     } catch {
-      setError('Failed to create team');
+      setError(t('errors.createFailed'));
     } finally {
       setCreating(false);
     }
@@ -186,7 +189,7 @@ export default function TeamPage() {
         setInviteError(res.error);
       }
     } catch {
-      setInviteError('Failed to invite member');
+      setInviteError(t('errors.inviteFailed'));
     } finally {
       setInviting(false);
     }
@@ -200,7 +203,7 @@ export default function TeamPage() {
       if (res.success) await fetchData();
       else setError(res.error);
     } catch {
-      setError('Failed to remove member');
+      setError(t('errors.removeFailed'));
     } finally {
       setActionLoading(null);
     }
@@ -221,7 +224,7 @@ export default function TeamPage() {
         setError(res.error);
       }
     } catch {
-      setError('Failed to leave team');
+      setError(t('errors.leaveFailed'));
     } finally {
       setActionLoading(null);
     }
@@ -240,7 +243,7 @@ export default function TeamPage() {
         setError(res.error);
       }
     } catch {
-      setError('Failed to delete team');
+      setError(t('errors.deleteFailed'));
     } finally {
       setActionLoading(null);
     }
@@ -254,7 +257,7 @@ export default function TeamPage() {
       if (res.success) await fetchData();
       else setError(res.error);
     } catch {
-      setError('Failed to share agent');
+      setError(t('errors.shareFailed'));
     } finally {
       setActionLoading(null);
     }
@@ -268,7 +271,7 @@ export default function TeamPage() {
       if (res.success) await fetchData();
       else setError(res.error);
     } catch {
-      setError('Failed to unshare agent');
+      setError(t('errors.unshareFailed'));
     } finally {
       setActionLoading(null);
     }
@@ -282,7 +285,7 @@ export default function TeamPage() {
       if (res.success) await fetchData();
       else setError(res.error);
     } catch {
-      setError('Failed to update role');
+      setError(t('errors.roleFailed'));
     } finally {
       setActionLoading(null);
     }
@@ -302,8 +305,8 @@ export default function TeamPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className={cardClass + ' p-8 text-center max-w-sm'}>
           <Users className="w-10 h-10 text-cyan-400 mx-auto mb-3" />
-          <p className="text-[var(--text-primary)] font-medium mb-2">Sign in to access Teams</p>
-          <p className="text-sm text-[var(--text-secondary)]">Teams let you collaborate with others on your AI agents.</p>
+          <p className="text-[var(--text-primary)] font-medium mb-2">{t('signInTitle')}</p>
+          <p className="text-sm text-[var(--text-secondary)]">{t('signInDesc')}</p>
         </div>
       </div>
     );
@@ -321,12 +324,12 @@ export default function TeamPage() {
     >
       {/* Header */}
       <motion.div variants={itemVariants} className="mb-8">
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Collaboration</p>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('eyebrow')}</p>
         <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={displayFont}>
-          Team
+          {t('heading')}
         </h1>
         <p className="text-sm text-[var(--text-secondary)] mt-2">
-          Create a team to share agents and collaborate with others.
+          {t('subheading')}
         </p>
       </motion.div>
 
@@ -347,14 +350,14 @@ export default function TeamPage() {
           <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mx-auto mb-5">
             <Users className="w-8 h-8 text-cyan-400" />
           </div>
-          <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2" style={displayFont}>Create Your Team</h2>
+          <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2" style={displayFont}>{t('createTeamTitle')}</h2>
           <p className="text-sm text-[var(--text-secondary)] mb-6">
-            Start collaborating by creating a team. You can then invite members and share your agents.
+            {t('createTeamDesc')}
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
-              placeholder="Team name..."
+              placeholder={t('teamNamePlaceholder')}
               value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleCreateTeam()}
@@ -367,7 +370,7 @@ export default function TeamPage() {
               className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors flex items-center gap-2"
             >
               {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-              Create
+              {creating ? t('creating') : t('createBtn')}
             </button>
           </div>
         </motion.div>
@@ -419,7 +422,7 @@ export default function TeamPage() {
           <motion.div variants={itemVariants} className={cardClass + ' p-6'}>
             <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2" style={displayFont}>
               <User className="w-4 h-4 text-cyan-400" />
-              Members
+              {t('membersHeading')}
             </h3>
             <div className="space-y-2">
               {team.members
@@ -485,7 +488,7 @@ export default function TeamPage() {
               <div className="mt-5 pt-4 border-t border-[var(--border-default)]">
                 <h4 className="text-xs font-semibold text-[var(--text-secondary)] mb-3 flex items-center gap-1.5">
                   <UserPlus className="w-3.5 h-3.5" />
-                  Invite Member
+                  {t('inviteMemberHeading')}
                 </h4>
                 {inviteError && (
                   <div className="mb-3 p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
@@ -500,7 +503,7 @@ export default function TeamPage() {
                 <div className="flex gap-2">
                   <input
                     type="email"
-                    placeholder="Email address..."
+                    placeholder={t('emailPlaceholder')}
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
@@ -530,7 +533,7 @@ export default function TeamPage() {
                     className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors flex items-center gap-1.5"
                   >
                     {inviting ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
-                    Invite
+                    {t('invite')}
                   </button>
                 </div>
               </div>
@@ -541,11 +544,11 @@ export default function TeamPage() {
           <motion.div variants={itemVariants} className={cardClass + ' p-6'}>
             <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2" style={displayFont}>
               <Bot className="w-4 h-4 text-cyan-400" />
-              Shared Agents
+              {t('sharedAgentsHeading')}
             </h3>
 
             {teamAgents.length === 0 ? (
-              <p className="text-sm text-[var(--text-muted)] py-4 text-center">No agents shared with this team yet.</p>
+              <p className="text-sm text-[var(--text-muted)] py-4 text-center">{t('noSharedAgents')}</p>
             ) : (
               <div className="space-y-2 mb-4">
                 {teamAgents.map((agent) => (
@@ -583,7 +586,7 @@ export default function TeamPage() {
               <div className="mt-4 pt-4 border-t border-[var(--border-default)]">
                 <h4 className="text-xs font-semibold text-[var(--text-secondary)] mb-3 flex items-center gap-1.5">
                   <Share2 className="w-3.5 h-3.5" />
-                  Your Agents
+                  {t('yourAgentsHeading')}
                 </h4>
                 <div className="space-y-1.5">
                   {myAgents.map((agent) => {
@@ -626,9 +629,9 @@ export default function TeamPage() {
       {/* Confirm Dialogs */}
       <ConfirmDialog
         open={confirmDialog === 'leave'}
-        title="Leave Team"
-        description="Are you sure you want to leave this team? You will lose access to all shared agents."
-        confirmLabel="Leave Team"
+        title={t('leaveTeamTitle')}
+        description={t('leaveTeamDesc')}
+        confirmLabel={t('leaveTeamConfirm')}
         variant="warning"
         loading={actionLoading === 'leave'}
         onCancel={() => setConfirmDialog(null)}
@@ -636,9 +639,9 @@ export default function TeamPage() {
       />
       <ConfirmDialog
         open={confirmDialog === 'delete'}
-        title="Delete Team"
-        description="Are you sure you want to permanently delete this team? All shared agents will be unshared."
-        confirmLabel="Delete Team"
+        title={t('deleteTeamTitle')}
+        description={t('deleteTeamDesc')}
+        confirmLabel={t('deleteTeamConfirm')}
         variant="danger"
         loading={actionLoading === 'delete'}
         onCancel={() => setConfirmDialog(null)}

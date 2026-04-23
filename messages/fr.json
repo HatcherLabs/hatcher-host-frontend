@@ -24,7 +24,14 @@
     "hero": {
       "eyebrow": "[fr] Managed AI agent hosting · Crypto-native",
       "headlinePrefix": "[fr] Hatch Your",
-      "typewriterWords": ["[fr] AI Agent", "[fr] Fitness Coach", "[fr] Crypto Tracker", "[fr] Study Buddy", "[fr] Travel Planner", "[fr] Personal Assistant"],
+      "typewriterWords": [
+        "[fr] AI Agent",
+        "[fr] Fitness Coach",
+        "[fr] Crypto Tracker",
+        "[fr] Study Buddy",
+        "[fr] Travel Planner",
+        "[fr] Personal Assistant"
+      ],
       "body": "[fr] Pick a framework. Configure. Launch in 60 seconds. No code required, no infrastructure to manage. 4 frameworks, 20+ platforms, free tier with BYOK.",
       "ctaPrimary": "[fr] Get started free",
       "ctaSecondary": "[fr] Read docs",
@@ -55,9 +62,21 @@
       "heading": "[fr] 3 steps. 60 seconds.",
       "subheading": "[fr] No coding, no setup guides, no configuration files.",
       "steps": [
-        { "num": "01", "title": "[fr] Pick a framework", "desc": "[fr] OpenClaw, Hermes, ElizaOS, or Milady. Each has unique strengths — browser control, memory, multi-agent, on-chain." },
-        { "num": "02", "title": "[fr] Configure", "desc": "[fr] Name, personality, integrations. Fill a simple form — no config files, no YAML." },
-        { "num": "03", "title": "[fr] Deploy", "desc": "[fr] One click. Your agent is live on every connected platform in under 60 seconds." }
+        {
+          "num": "01",
+          "title": "[fr] Pick a framework",
+          "desc": "[fr] OpenClaw, Hermes, ElizaOS, or Milady. Each has unique strengths — browser control, memory, multi-agent, on-chain."
+        },
+        {
+          "num": "02",
+          "title": "[fr] Configure",
+          "desc": "[fr] Name, personality, integrations. Fill a simple form — no config files, no YAML."
+        },
+        {
+          "num": "03",
+          "title": "[fr] Deploy",
+          "desc": "[fr] One click. Your agent is live on every connected platform in under 60 seconds."
+        }
       ],
       "cta": "[fr] Try it now"
     },
@@ -66,15 +85,42 @@
       "heading": "[fr] What will you hatch?",
       "subheading": "[fr] From personal productivity to business automation — your agent, your rules.",
       "items": [
-        { "title": "[fr] Personal assistant", "desc": "[fr] Calendar, emails, reminders — from Telegram." },
-        { "title": "[fr] Fitness coach", "desc": "[fr] Workouts, routines, daily accountability." },
-        { "title": "[fr] Food & nutrition", "desc": "[fr] Log meals, count calories, recipe suggestions." },
-        { "title": "[fr] Crypto tracker", "desc": "[fr] Token prices, portfolio alerts, on-chain data." },
-        { "title": "[fr] Study buddy", "desc": "[fr] Quiz you, summarize textbooks, help with homework." },
-        { "title": "[fr] Travel planner", "desc": "[fr] Find flights, plan itineraries, local picks." },
-        { "title": "[fr] Budget manager", "desc": "[fr] Track expenses, savings goals, weekly reports." },
-        { "title": "[fr] Research assistant", "desc": "[fr] Web search, summarize articles, compile reports." },
-        { "title": "[fr] Customer support", "desc": "[fr] Answer FAQs on Discord or WhatsApp, 24/7." }
+        {
+          "title": "[fr] Personal assistant",
+          "desc": "[fr] Calendar, emails, reminders — from Telegram."
+        },
+        {
+          "title": "[fr] Fitness coach",
+          "desc": "[fr] Workouts, routines, daily accountability."
+        },
+        {
+          "title": "[fr] Food & nutrition",
+          "desc": "[fr] Log meals, count calories, recipe suggestions."
+        },
+        {
+          "title": "[fr] Crypto tracker",
+          "desc": "[fr] Token prices, portfolio alerts, on-chain data."
+        },
+        {
+          "title": "[fr] Study buddy",
+          "desc": "[fr] Quiz you, summarize textbooks, help with homework."
+        },
+        {
+          "title": "[fr] Travel planner",
+          "desc": "[fr] Find flights, plan itineraries, local picks."
+        },
+        {
+          "title": "[fr] Budget manager",
+          "desc": "[fr] Track expenses, savings goals, weekly reports."
+        },
+        {
+          "title": "[fr] Research assistant",
+          "desc": "[fr] Web search, summarize articles, compile reports."
+        },
+        {
+          "title": "[fr] Customer support",
+          "desc": "[fr] Answer FAQs on Discord or WhatsApp, 24/7."
+        }
       ],
       "footer": "[fr] And anything else you can describe in plain English."
     },
@@ -83,10 +129,30 @@
       "heading": "[fr] Four frameworks. One platform.",
       "subheading": "[fr] Pick the one that fits your agent. Switch whenever you want.",
       "items": [
-        { "name": "OpenClaw", "tag": "[fr] all-rounder", "desc": "[fr] Powerful tools, plugins, and browser control.", "features": "[fr] 2500+ skills · Browser automation · File management" },
-        { "name": "Hermes", "tag": "[fr] reasoning", "desc": "[fr] Smart-first design for rich memory and reasoning.", "features": "[fr] 77 bundled skills · Deep memory · Multi-model" },
-        { "name": "ElizaOS", "tag": "[fr] multi-agent", "desc": "[fr] Multi-agent coordination with 90+ plugins.", "features": "[fr] 90+ plugins · Multi-agent · Knowledge base" },
-        { "name": "Milady", "tag": "[fr] crypto-native", "desc": "[fr] On-chain awareness, DeFi tools, token tracking.", "features": "[fr] DeFi tools · On-chain data · Token tracking" }
+        {
+          "name": "OpenClaw",
+          "tag": "[fr] all-rounder",
+          "desc": "[fr] Powerful tools, plugins, and browser control.",
+          "features": "[fr] 2500+ skills · Browser automation · File management"
+        },
+        {
+          "name": "Hermes",
+          "tag": "[fr] reasoning",
+          "desc": "[fr] Smart-first design for rich memory and reasoning.",
+          "features": "[fr] 77 bundled skills · Deep memory · Multi-model"
+        },
+        {
+          "name": "ElizaOS",
+          "tag": "[fr] multi-agent",
+          "desc": "[fr] Multi-agent coordination with 90+ plugins.",
+          "features": "[fr] 90+ plugins · Multi-agent · Knowledge base"
+        },
+        {
+          "name": "Milady",
+          "tag": "[fr] crypto-native",
+          "desc": "[fr] On-chain awareness, DeFi tools, token tracking.",
+          "features": "[fr] DeFi tools · On-chain data · Token tracking"
+        }
       ]
     },
     "city": {
@@ -102,12 +168,30 @@
       "eyebrow": "[fr] Platform",
       "heading": "[fr] Everything your agent needs",
       "items": [
-        { "title": "[fr] Instant deploy", "desc": "[fr] From zero to running agent in under 60 seconds." },
-        { "title": "[fr] All platforms", "desc": "[fr] Telegram, Discord, Twitter, WhatsApp, Slack." },
-        { "title": "[fr] Bring your own key", "desc": "[fr] Use your own LLM API key for unlimited messages on any tier." },
-        { "title": "[fr] Secure by default", "desc": "[fr] Isolated containers, encrypted secrets, no shared data." },
-        { "title": "[fr] Live analytics", "desc": "[fr] Real-time stats, usage tracking, performance metrics." },
-        { "title": "[fr] Chat & voice", "desc": "[fr] Text chat, voice calls, real-time streaming — out of the box." }
+        {
+          "title": "[fr] Instant deploy",
+          "desc": "[fr] From zero to running agent in under 60 seconds."
+        },
+        {
+          "title": "[fr] All platforms",
+          "desc": "[fr] Telegram, Discord, Twitter, WhatsApp, Slack."
+        },
+        {
+          "title": "[fr] Bring your own key",
+          "desc": "[fr] Use your own LLM API key for unlimited messages on any tier."
+        },
+        {
+          "title": "[fr] Secure by default",
+          "desc": "[fr] Isolated containers, encrypted secrets, no shared data."
+        },
+        {
+          "title": "[fr] Live analytics",
+          "desc": "[fr] Real-time stats, usage tracking, performance metrics."
+        },
+        {
+          "title": "[fr] Chat & voice",
+          "desc": "[fr] Text chat, voice calls, real-time streaming — out of the box."
+        }
       ]
     },
     "pricing": {
@@ -117,23 +201,51 @@
       "popularLabel": "[fr] Popular",
       "tiers": [
         {
-          "name": "[fr] Free", "price": "$0", "sub": "[fr] /month",
-          "features": ["[fr] 1 AI agent", "[fr] 20 messages/day", "[fr] All platforms", "[fr] Free AI included"],
+          "name": "[fr] Free",
+          "price": "$0",
+          "sub": "[fr] /month",
+          "features": [
+            "[fr] 1 AI agent",
+            "[fr] 20 messages/day",
+            "[fr] All platforms",
+            "[fr] Free AI included"
+          ],
           "cta": "[fr] Get started"
         },
         {
-          "name": "[fr] Starter", "price": "$6.99", "sub": "[fr] /month",
-          "features": ["[fr] 1 AI agent", "[fr] 50 messages/day", "[fr] BYOK = unlimited", "[fr] Longer active time"],
+          "name": "[fr] Starter",
+          "price": "$6.99",
+          "sub": "[fr] /month",
+          "features": [
+            "[fr] 1 AI agent",
+            "[fr] 50 messages/day",
+            "[fr] BYOK = unlimited",
+            "[fr] Longer active time"
+          ],
           "cta": "[fr] Choose Starter"
         },
         {
-          "name": "[fr] Pro", "price": "$19.99", "sub": "[fr] /month",
-          "features": ["[fr] 3 AI agents", "[fr] 100 messages/day", "[fr] BYOK = unlimited", "[fr] Dedicated resources"],
+          "name": "[fr] Pro",
+          "price": "$19.99",
+          "sub": "[fr] /month",
+          "features": [
+            "[fr] 3 AI agents",
+            "[fr] 100 messages/day",
+            "[fr] BYOK = unlimited",
+            "[fr] Dedicated resources"
+          ],
           "cta": "[fr] Choose Pro"
         },
         {
-          "name": "[fr] Business", "price": "$49.99", "sub": "[fr] /month",
-          "features": ["[fr] 10 AI agents", "[fr] 300 messages/day", "[fr] Always-on containers", "[fr] Priority support"],
+          "name": "[fr] Business",
+          "price": "$49.99",
+          "sub": "[fr] /month",
+          "features": [
+            "[fr] 10 AI agents",
+            "[fr] 300 messages/day",
+            "[fr] Always-on containers",
+            "[fr] Priority support"
+          ],
           "cta": "[fr] Choose Business"
         }
       ],
@@ -283,7 +395,7 @@
       "submitLoading": "[fr] Sending...",
       "backToLogin": "[fr] Back to sign in",
       "successHeading": "[fr] Check your email",
-      "successBody": "[fr] If an account exists for {email}, we sent a password reset link. Check your inbox and spam folder.",
+      "successBody": "[fr] If an account exists for <bold>{email}</bold>, we sent a password reset link. Check your inbox and spam folder.",
       "successBackLink": "[fr] Back to sign in",
       "genericError": "[fr] Something went wrong. Please try again."
     },
@@ -443,35 +555,91 @@
         "extraAgents": {
           "label": "[fr] Extra Agents",
           "items": [
-            { "name": "[fr] +1 Agent",   "period": "[fr] /mo", "description": "[fr] 1 extra slot" },
-            { "name": "[fr] +3 Agents",  "period": "[fr] /mo", "description": "[fr] 3 extra slots" },
-            { "name": "[fr] +5 Agents",  "period": "[fr] /mo", "description": "[fr] 5 extra slots" },
-            { "name": "[fr] +10 Agents", "period": "[fr] /mo", "description": "[fr] 10 extra slots" }
+            {
+              "name": "[fr] +1 Agent",
+              "period": "[fr] /mo",
+              "description": "[fr] 1 extra slot"
+            },
+            {
+              "name": "[fr] +3 Agents",
+              "period": "[fr] /mo",
+              "description": "[fr] 3 extra slots"
+            },
+            {
+              "name": "[fr] +5 Agents",
+              "period": "[fr] /mo",
+              "description": "[fr] 5 extra slots"
+            },
+            {
+              "name": "[fr] +10 Agents",
+              "period": "[fr] /mo",
+              "description": "[fr] 10 extra slots"
+            }
           ]
         },
         "extraMessages": {
           "label": "[fr] Extra Messages (account)",
           "items": [
-            { "name": "[fr] +20 msg/day",  "period": "[fr] /mo", "description": "[fr] Stackable" },
-            { "name": "[fr] +50 msg/day",  "period": "[fr] /mo", "description": "[fr] Stackable" },
-            { "name": "[fr] +100 msg/day", "period": "[fr] /mo", "description": "[fr] Stackable" },
-            { "name": "[fr] +200 msg/day", "period": "[fr] /mo", "description": "[fr] Stackable" }
+            {
+              "name": "[fr] +20 msg/day",
+              "period": "[fr] /mo",
+              "description": "[fr] Stackable"
+            },
+            {
+              "name": "[fr] +50 msg/day",
+              "period": "[fr] /mo",
+              "description": "[fr] Stackable"
+            },
+            {
+              "name": "[fr] +100 msg/day",
+              "period": "[fr] /mo",
+              "description": "[fr] Stackable"
+            },
+            {
+              "name": "[fr] +200 msg/day",
+              "period": "[fr] /mo",
+              "description": "[fr] Stackable"
+            }
           ]
         },
         "extraSearches": {
           "label": "[fr] Extra Searches (account)",
           "items": [
-            { "name": "[fr] +25 searches/day", "period": "[fr] /mo", "description": "[fr] Stackable" },
-            { "name": "[fr] +50 searches/day", "period": "[fr] /mo", "description": "[fr] Stackable" }
+            {
+              "name": "[fr] +25 searches/day",
+              "period": "[fr] /mo",
+              "description": "[fr] Stackable"
+            },
+            {
+              "name": "[fr] +50 searches/day",
+              "period": "[fr] /mo",
+              "description": "[fr] Stackable"
+            }
           ]
         },
         "perAgent": {
           "label": "[fr] Per-Agent",
           "items": [
-            { "name": "[fr] Always On",    "period": "[fr] /mo per agent",      "description": "[fr] Keep running 24/7" },
-            { "name": "[fr] File Manager", "period": "[fr] one-time per agent", "description": "[fr] Browse & edit files" },
-            { "name": "[fr] Full Logs",    "period": "[fr] /mo per agent",      "description": "[fr] Unlock log viewer" },
-            { "name": "[fr] +10 Plugins",  "period": "[fr] /mo per agent",      "description": "[fr] Stack extra plugin slots" }
+            {
+              "name": "[fr] Always On",
+              "period": "[fr] /mo per agent",
+              "description": "[fr] Keep running 24/7"
+            },
+            {
+              "name": "[fr] File Manager",
+              "period": "[fr] one-time per agent",
+              "description": "[fr] Browse & edit files"
+            },
+            {
+              "name": "[fr] Full Logs",
+              "period": "[fr] /mo per agent",
+              "description": "[fr] Unlock log viewer"
+            },
+            {
+              "name": "[fr] +10 Plugins",
+              "period": "[fr] /mo per agent",
+              "description": "[fr] Stack extra plugin slots"
+            }
           ]
         }
       }
@@ -561,5 +729,437 @@
       "seeFrameworks": "[fr] See Frameworks"
     },
     "footerNote": "[fr] All prices in USD, payable in SOL or $HATCHER. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier."
+  },
+  "dashboard": {
+    "common": {
+      "loading": "[FR] Loading...",
+      "authenticating": "[FR] Authenticating...",
+      "signInRequired": "[FR] Sign In Required",
+      "signIn": "[FR] Sign In",
+      "refresh": "[FR] Refresh",
+      "save": "[FR] Save",
+      "cancel": "[FR] Cancel",
+      "delete": "[FR] Delete",
+      "create": "[FR] Create",
+      "invite": "[FR] Invite",
+      "share": "[FR] Share",
+      "unshare": "[FR] Unshare",
+      "copy": "[FR] Copy",
+      "copied": "[FR] Copied!",
+      "close": "[FR] Close",
+      "confirm": "[FR] Confirm",
+      "back": "[FR] Back",
+      "noDescription": "[FR] No description",
+      "clear": "[FR] Clear"
+    },
+    "agents": {
+      "eyebrow": "[FR] Dashboard",
+      "heading": "[FR] My agents",
+      "subtitleEmpty": "[FR] Create your first agent to get started.",
+      "createCta": "[FR] Create agent",
+      "searchPlaceholder": "[FR] Search agents... ( / )",
+      "filterAll": "[FR] All",
+      "frameworkAll": "[FR] All Frameworks",
+      "sortNewest": "[FR] Newest",
+      "sortAZ": "[FR] A-Z",
+      "sortMessages": "[FR] Most Messages",
+      "sortActive": "[FR] Last Active",
+      "emptyTitle": "[FR] No agents yet",
+      "emptyDescription": "[FR] Create your first AI agent and deploy it in 60 seconds.",
+      "emptyActionLabel": "[FR] Create Agent",
+      "emptySecondaryLabel": "[FR] See Frameworks",
+      "noMatchTitle": "[FR] No matching agents",
+      "noMatchDescription": "[FR] Try adjusting your search or filter criteria.",
+      "signInDescription": "[FR] Sign in to your account to access your agents.",
+      "featuresCount": "[FR] {count} feature",
+      "featuresCountPlural": "[FR] {count} features",
+      "tourCreateTitle": "[FR] Create Your First Agent",
+      "tourCreateDescription": "[FR] Click here to hatch your first AI agent. Choose from 4 frameworks.",
+      "tourFilterTitle": "[FR] Filter by Framework",
+      "tourFilterDescription": "[FR] OpenClaw, Hermes, ElizaOS, or Milady — each has unique strengths.",
+      "tourSearchTitle": "[FR] Search & Explore",
+      "tourSearchDescription": "[FR] Search agents or browse 200+ templates to get started quickly.",
+      "tourPlanTitle": "[FR] Your Plan",
+      "tourPlanDescription": "[FR] Start free with 1 agent and 20 messages/day. Upgrade anytime.",
+      "agentsCount": "[FR] {count} agent total · {active} active",
+      "agentsCountPlural": "[FR] {count} agents total · {active} active",
+      "details": "[FR] Details"
+    },
+    "newAgent": {
+      "eyebrow": "[FR] New agent",
+      "heading": "[FR] Choose a template",
+      "subheading": "[FR] Start from a pre-configured template or build from scratch. Each template comes with a personality, system prompt, and suggested integrations.",
+      "searchPlaceholder": "[FR] Search templates...",
+      "allTemplates": "[FR] All Templates",
+      "startFromScratch": "[FR] Start from Scratch",
+      "startFromScratchDesc": "[FR] Full control over every setting",
+      "noTemplatesTitle": "[FR] No templates found",
+      "noTemplatesDesc": "[FR] Try a different search or category.",
+      "footerHint": "[FR] All templates are fully customizable after deployment — change the name, system prompt, model, and integrations at any time."
+    },
+    "billing": {
+      "eyebrow": "[FR] Account",
+      "heading": "[FR] Billing & plans",
+      "breadcrumbDashboard": "[FR] Dashboard",
+      "breadcrumbBilling": "[FR] Billing",
+      "connectWallet": "[FR] Connect Wallet",
+      "connectedWallet": "[FR] Connected wallet",
+      "switchWallet": "[FR] Switch wallet",
+      "disconnect": "[FR] Disconnect",
+      "loadingBilling": "[FR] Loading billing...",
+      "signInDescription": "[FR] Sign in to manage your plan and billing.",
+      "creditsBalance": "[FR] Credits Balance",
+      "creditsUsd": "[FR] USD",
+      "creditsDesc": "[FR] Credits can be used for subscriptions, add-ons, and hosted LLM usage.",
+      "recentTransactions": "[FR] Recent Transactions",
+      "currentTier": "[FR] Current Plan",
+      "freeTier": "[FR] Free Tier",
+      "active": "[FR] Active",
+      "agentUsage": "[FR] Agent Usage",
+      "agentsOf": "[FR] {count} of {limit} agents used",
+      "agentsOver": "[FR] {over} over limit",
+      "slotsRemaining": "[FR] {slots} slot remaining",
+      "slotsRemainingPlural": "[FR] {slots} slots remaining",
+      "activeAddons": "[FR] Active Add-ons",
+      "expires": "[FR] Expires {date}",
+      "extend": "[FR] Extend",
+      "extend30Days": "[FR] Extend +30 days (${price})",
+      "upgradeAnnual": "[FR] Upgrade to annual (${price})",
+      "annualDiscount": "[FR] -15%",
+      "renew": "[FR] Renew",
+      "renewFor": "[FR] Renew for ${price}",
+      "planExpired": "[FR] Plan expired — renew to keep your tier",
+      "planExpiring": "[FR] Expires in {days} day — renew now",
+      "planExpiringPlural": "[FR] Expires in {days} days — renew now",
+      "planActiveUntil": "[FR] Active until {date}",
+      "noCharge": "[FR] No charge",
+      "lifetimePrice": "[FR] ${price} lifetime",
+      "monthlyPrice": "[FR] ${price} / 30 days",
+      "unlimitedMessages": "[FR] unlimited",
+      "messagesPerDay": "[FR] {count} messages/day",
+      "byokUnlimited": "[FR]  (BYOK = unlimited)",
+      "upgradeSection": "[FR] Upgrade Your Plan",
+      "upgradeDesc": "[FR] Get more agents, messages, and compute power.",
+      "addonsSection": "[FR] Add-ons",
+      "addonsDesc": "[FR] Stack extra capacity on your current plan.",
+      "accountAddons": "[FR] Account-level Add-ons",
+      "perAgentAddons": "[FR] Per-agent Add-ons",
+      "annualBilling": "[FR] Annual billing",
+      "annualBillingDesc": "[FR] 15% off — all subscription add-ons",
+      "monthly": "[FR] Monthly",
+      "annual": "[FR] Annual",
+      "monthSuffix": "[FR] /mo",
+      "annualSuffix": "[FR] /yr",
+      "yearSuffix": "[FR] /yr",
+      "paymentHistory": "[FR] Payment History",
+      "noPaymentsYet": "[FR] No payments yet",
+      "noPaymentsDesc": "[FR] Your payment history will appear here.",
+      "status": {
+        "confirmed": "[FR] Confirmed",
+        "pending": "[FR] Pending",
+        "failed": "[FR] Failed",
+        "refunded": "[FR] Refunded"
+      },
+      "selectAgent": "[FR] Select Agent",
+      "choosePayment": "[FR] Choose Payment Method",
+      "applyToAgent": "[FR] Apply to agent:",
+      "noAgentsFound": "[FR] No agents found. Create an agent first.",
+      "payWithCredits": "[FR] Pay with Credits",
+      "payWithSol": "[FR] Pay with SOL",
+      "solDesc": "[FR] Solana wallet payment",
+      "payWithHatcher": "[FR] Pay with $HATCHER",
+      "hatcherDesc": "[FR] HATCHER token on Solana",
+      "payWithUsdc": "[FR] Pay with USDC",
+      "usdcDesc": "[FR] Stablecoin — 1 USDC = $1",
+      "payWithCard": "[FR] Pay with Card",
+      "cardDesc": "[FR] Credit/debit card via Stripe",
+      "creditAvailable": "[FR] ${balance} available — instant",
+      "creditInsufficient": "[FR] Not enough — need ${need}, have ${have}",
+      "foundingSlots": "[FR] {remaining} of {max} slots remaining",
+      "manageBilling": "[FR] Manage Billing",
+      "successPayment": "[FR] Payment successful! Your account is being upgraded. It may take a moment to reflect.",
+      "canceledPayment": "[FR] Payment was canceled. No charges were made.",
+      "lifetimePriceFull": "[FR] ${price} lifetime",
+      "foundingSoldOut": "[FR] Sold out",
+      "oneTimeSuffix": "[FR] one-time",
+      "oneTimeAgent": "[FR] one-time / agent",
+      "annualAgent": "[FR] / year / agent",
+      "monthAgent": "[FR] / 30 days / agent"
+    },
+    "analytics": {
+      "eyebrow": "[FR] Dashboard",
+      "heading": "[FR] Analytics",
+      "subheading": "[FR] Account-wide usage insights.",
+      "signInDescription": "[FR] Sign in to view analytics.",
+      "messageVolume": "[FR] Message Volume",
+      "last14Days": "[FR] Last 14 days",
+      "frameworks": "[FR] Frameworks",
+      "agentStatus": "[FR] Agent Status",
+      "totalMessages": "[FR] Total Messages by Agent",
+      "noMessageData": "[FR] No message data yet — start chatting with your agents!",
+      "noAgentsYet": "[FR] No agents yet",
+      "noAgentsEmpty": "[FR] No agents yet. Create your first agent to start seeing analytics.",
+      "createAgent": "[FR] Create Agent",
+      "totalAgents": "[FR] Total Agents",
+      "totalAgentsSub": "[FR] {active} active",
+      "messages": "[FR] Messages",
+      "messagesAllTime": "[FR] All time",
+      "llmCalls": "[FR] LLM Calls",
+      "llmCallsAllTime": "[FR] All time",
+      "last14DaysLabel": "[FR] Last 14 Days",
+      "last14DaysSub": "[FR] User messages",
+      "today": "[FR] Today",
+      "noDataYet": "[FR] No message data yet"
+    },
+    "team": {
+      "eyebrow": "[FR] Collaboration",
+      "heading": "[FR] Team",
+      "subheading": "[FR] Create a team to share agents and collaborate with others.",
+      "signInTitle": "[FR] Sign in to access Teams",
+      "signInDesc": "[FR] Teams let you collaborate with others on your AI agents.",
+      "createTeamTitle": "[FR] Create Your Team",
+      "createTeamDesc": "[FR] Start collaborating by creating a team. You can then invite members and share your agents.",
+      "teamNamePlaceholder": "[FR] Team name...",
+      "createBtn": "[FR] Create",
+      "creating": "[FR] Creating...",
+      "membersHeading": "[FR] Members",
+      "inviteMemberHeading": "[FR] Invite Member",
+      "emailPlaceholder": "[FR] Email address...",
+      "roleAdmin": "[FR] Admin",
+      "roleMember": "[FR] Member",
+      "roleViewer": "[FR] Viewer",
+      "roleOwner": "[FR] Owner",
+      "you": "[FR] (you)",
+      "sharedAgentsHeading": "[FR] Shared Agents",
+      "noSharedAgents": "[FR] No agents shared with this team yet.",
+      "yourAgentsHeading": "[FR] Your Agents",
+      "byLabel": "[FR] by {username}",
+      "memberCount": "[FR] {count} member",
+      "memberCountPlural": "[FR] {count} members",
+      "agentSharedCount": "[FR] {count} agent shared",
+      "agentSharedCountPlural": "[FR] {count} agents shared",
+      "leaveTeam": "[FR] Leave",
+      "leaveTeamTitle": "[FR] Leave Team",
+      "leaveTeamDesc": "[FR] Are you sure you want to leave this team? You will lose access to all shared agents.",
+      "leaveTeamConfirm": "[FR] Leave Team",
+      "deleteTeam": "[FR] Delete Team",
+      "deleteTeamTitle": "[FR] Delete Team",
+      "deleteTeamDesc": "[FR] Are you sure you want to permanently delete this team? All shared agents will be unshared.",
+      "deleteTeamConfirm": "[FR] Delete Team",
+      "errors": {
+        "loadFailed": "[FR] Failed to load team data",
+        "createFailed": "[FR] Failed to create team",
+        "inviteFailed": "[FR] Failed to invite member",
+        "removeFailed": "[FR] Failed to remove member",
+        "leaveFailed": "[FR] Failed to leave team",
+        "deleteFailed": "[FR] Failed to delete team",
+        "shareFailed": "[FR] Failed to share agent",
+        "unshareFailed": "[FR] Failed to unshare agent",
+        "roleFailed": "[FR] Failed to update role"
+      },
+      "invite": "[FR] Invite"
+    },
+    "affiliate": {
+      "eyebrow": "[FR] Dashboard",
+      "heading": "[FR] Affiliate Dashboard",
+      "signInTitle": "[FR] Sign In Required",
+      "signInDesc": "[FR] Sign in to view your affiliate dashboard.",
+      "yourReferralLink": "[FR] Your Referral Link",
+      "referralLinkDesc": "[FR] New signups via this link are attributed to you for life.",
+      "shareOnX": "[FR] Share on X",
+      "telegram": "[FR] Telegram",
+      "copyLink": "[FR] Copy",
+      "copiedLink": "[FR] Copied",
+      "refresh": "[FR] Refresh",
+      "frozenTitle": "[FR] Account frozen",
+      "codeLabel": "[FR] Code",
+      "totalReferrals": "[FR] Total Referrals",
+      "paidLabel": "[FR] {count} paid",
+      "pending30d": "[FR] Pending (30d hold)",
+      "payableNow": "[FR] Payable Now",
+      "lifetimeEarned": "[FR] Lifetime Earned",
+      "paidOut": "[FR] {amount} paid out",
+      "referralsTable": "[FR] Referrals",
+      "noReferrals": "[FR] No referrals yet. Share your link!",
+      "commissionsTable": "[FR] Commissions",
+      "noCommissions": "[FR] No commissions yet.",
+      "payoutsTable": "[FR] Payouts",
+      "noPayouts": "[FR] No payouts yet.",
+      "loadMore": "[FR] Load more",
+      "signupCol": "[FR] Signup",
+      "emailCol": "[FR] Email",
+      "statusCol": "[FR] Status",
+      "tierCol": "[FR] Tier",
+      "dateCol": "[FR] Date",
+      "sourceCol": "[FR] Source",
+      "amountCol": "[FR] Amount",
+      "cashCol": "[FR] Cash",
+      "creditsCol": "[FR] Credits",
+      "noteCol": "[FR] Note",
+      "statusPaid": "[FR] Paid",
+      "statusFree": "[FR] Free",
+      "statusPending": "[FR] Pending",
+      "statusPayable": "[FR] Payable",
+      "statusPaidOut": "[FR] Paid",
+      "statusVoided": "[FR] Voided",
+      "flagged": "[FR] Flagged",
+      "untilDate": "[FR] until {date}",
+      "sourceSubscription": "[FR] Subscription",
+      "sourceFoundingMember": "[FR] Founding Member",
+      "payoutSettings": "[FR] Payout Settings",
+      "payoutMode": "[FR] Mode",
+      "payoutAddress": "[FR] Payout Address",
+      "creditsOnly": "[FR] Credits only — no address",
+      "changePrefs": "[FR] Need to change payout preferences?",
+      "contactSupport": "[FR] Contact support",
+      "modeCashOnly": "[FR] Cash only (20%)",
+      "modeCreditsOnly": "[FR] Credits only (40%)",
+      "modeHybrid": "[FR] Hybrid (15% cash + 25% credits)"
+    },
+    "settings": {
+      "eyebrow": "[FR] Account",
+      "heading": "[FR] Settings",
+      "subheading": "[FR] Manage your account, security, and preferences.",
+      "tabs": {
+        "profile": "[FR] Profile",
+        "security": "[FR] Security",
+        "notifications": "[FR] Notifications",
+        "billing": "[FR] Billing",
+        "danger": "[FR] Danger Zone"
+      },
+      "profile": {
+        "sectionTitle": "[FR] Profile",
+        "changePhoto": "[FR] Change photo",
+        "uploadPhoto": "[FR] Upload photo",
+        "remove": "[FR] Remove",
+        "joinedLabel": "[FR] Joined {date}",
+        "usernameLabel": "[FR] Username",
+        "usernamePlaceholder": "[FR] your_username",
+        "usernameHint": "[FR] 3–30 characters, letters, numbers, _ or -",
+        "emailLabel": "[FR] Email address",
+        "emailPlaceholder": "[FR] you@example.com",
+        "saveChanges": "[FR] Save Changes",
+        "saving": "[FR] Saving...",
+        "walletTitle": "[FR] Connected Wallet",
+        "walletLinkedDesc": "[FR] Linked automatically from your first on-chain payment. Used when paying with SOL, USDC, or $HATCHER.",
+        "walletViewSolscan": "[FR] Solscan",
+        "walletDisconnect": "[FR] Disconnect wallet",
+        "walletNone": "[FR] No wallet linked yet. Your Solana wallet connects automatically the first time you make an on-chain payment from the billing page.",
+        "referralTitle": "[FR] Referral Program",
+        "referralDesc": "[FR] Invite friends to Hatcher. You both get {credit} credit when they create their first agent.",
+        "referralCode": "[FR] Referral Code",
+        "shareLink": "[FR] Share Link",
+        "referred": "[FR] Referred",
+        "earned": "[FR] Earned",
+        "claimRewards": "[FR] Claim Pending Rewards",
+        "claiming": "[FR] Claiming..."
+      },
+      "security": {
+        "changePasswordTitle": "[FR] Change Password",
+        "currentPassword": "[FR] Current Password",
+        "currentPasswordPlaceholder": "[FR] Enter current password",
+        "newPassword": "[FR] New Password",
+        "newPasswordPlaceholder": "[FR] Min 8 chars, upper, lower, number",
+        "confirmPassword": "[FR] Confirm New Password",
+        "confirmPasswordPlaceholder": "[FR] Repeat new password",
+        "changePasswordBtn": "[FR] Change Password",
+        "changing": "[FR] Changing...",
+        "apiKeysTitle": "[FR] API Keys",
+        "apiKeysDesc": "[FR] Create multiple API keys for programmatic access. Each key uses the {prefix} prefix. The full key is shown {emphasis} at creation.",
+        "apiKeysEmphasis": "[FR] only once",
+        "manageKeys": "[FR] Manage keys",
+        "newKeyCreated": "[FR] New key created — copy it now!",
+        "noKeysYet": "[FR] No API keys yet. Create one below.",
+        "keyLabelPlaceholder": "[FR] Label (e.g. \"Production\")",
+        "createKey": "[FR] Create Key",
+        "creating": "[FR] Creating...",
+        "keysLimit": "[FR] Up to 10 active keys. Each key has full API access.",
+        "reqToday": "[FR] {count} req today · {week} this week",
+        "lastUsed": "[FR] Last used {date}",
+        "save": "[FR] Save"
+      },
+      "notifications": {
+        "sectionTitle": "[FR] Notifications",
+        "pushLabel": "[FR] Push Notifications",
+        "pushDesc": "[FR] Browser push notifications for real-time updates",
+        "agentsLabel": "[FR] Agent Alerts",
+        "agentsDesc": "[FR] Get notified when agents change status, crash, or need attention",
+        "billingLabel": "[FR] Billing Alerts",
+        "billingDesc": "[FR] Payment confirmations, subscription renewals, and credits"
+      },
+      "billing": {
+        "sectionTitle": "[FR] Billing",
+        "currentPlan": "[FR] Current Plan",
+        "hatcherCredits": "[FR] HATCHER Credits",
+        "creditsAutoApplied": "[FR] Automatically applied at checkout",
+        "manageBilling": "[FR] Manage Billing"
+      },
+      "danger": {
+        "sectionTitle": "[FR] Danger Zone",
+        "exportTitle": "[FR] Export My Data",
+        "exportDesc": "[FR] Download a JSON file containing all your account data: profile, agents, chat history, payments, referrals, support tickets, and more.",
+        "exportBtn": "[FR] Export My Data",
+        "exporting": "[FR] Exporting...",
+        "deleteTitle": "[FR] Delete Account",
+        "deleteDesc": "[FR] Permanently remove your account, all agents, payment history, and configuration. This action is irreversible.",
+        "deleteBtn": "[FR] Delete Account",
+        "deleting": "[FR] Deleting...",
+        "dialogTitle": "[FR] Delete Your Account?",
+        "dialogDesc": "[FR] This will permanently remove all your agents, data, and payment history. This action {emphasis} be undone.",
+        "dialogEmphasis": "[FR] cannot",
+        "confirmPassword": "[FR] Confirm your password",
+        "passwordPlaceholder": "[FR] Your current password",
+        "cancelBtn": "[FR] Cancel"
+      }
+    },
+    "apiKeys": {
+      "eyebrow": "[FR] Settings",
+      "heading": "[FR] API keys",
+      "subheading": "[FR] Manage programmatic access keys for the {docsLink}. Each key starts with {prefix}.",
+      "docsLinkLabel": "[FR] Hatcher API",
+      "backToSettings": "[FR] Back to Settings",
+      "newKeyAlert": "[FR] Key created — copy it now!",
+      "newKeyAlertSub": "[FR] This is the only time the full key will be shown. Store it somewhere safe.",
+      "noKeysTitle": "[FR] No API keys yet",
+      "noKeysDesc": "[FR] Create your first key to get started",
+      "loading": "[FR] Loading keys...",
+      "createSectionTitle": "[FR] Create new key",
+      "createSectionDesc": "[FR] Give your key a descriptive name (e.g. \"Local Dev\", \"CI/CD Pipeline\").",
+      "keyLabelPlaceholder": "[FR] Key label...",
+      "createKey": "[FR] Create Key",
+      "creating": "[FR] Creating...",
+      "usageNote": "[FR] Use your API key in the {header} header. See the {docsLink} for all available endpoints.",
+      "headerExample": "[FR] Authorization: Bearer hk_...",
+      "docsLinkLabel2": "[FR] API reference docs",
+      "copiedLabel": "[FR] Copied!",
+      "copyLabel": "[FR] Copy",
+      "dismissLabel": "[FR] Dismiss",
+      "revokeTitle": "[FR] Revoke API Key",
+      "revokeDesc": "[FR] This key will be permanently invalidated and any applications using it will stop working immediately. This cannot be undone.",
+      "revokeConfirm": "[FR] Revoke Key",
+      "neverUsed": "[FR] Never used",
+      "lastUsed": "[FR] Last used {time}",
+      "created": "[FR] Created {date}",
+      "reqStats": "[FR] {today} req today · {week} this week",
+      "saveBtn": "[FR] Save",
+      "cancelBtn": "[FR] Cancel"
+    },
+    "quickStats": {
+      "totalAgents": "[FR] Total Agents",
+      "dailyMessages": "[FR] Daily Messages",
+      "unlimited": "[FR] ∞",
+      "accountWide": "[FR] account-wide · BYOK = unlimited",
+      "activeNow": "[FR] Active Now",
+      "noAgentsRunning": "[FR] No agents running",
+      "agentsOnline": "[FR] {count} agent online",
+      "agentsOnlinePlural": "[FR] {count} agents online",
+      "accountTier": "[FR] Account Tier",
+      "lifetimeAccess": "[FR] Lifetime access",
+      "prioritySupport": "[FR] Priority support",
+      "upgradePlan": "[FR] Upgrade plan"
+    }
+  },
+  "settings": {
+    "redirect": "[FR] Redirecting to settings..."
   }
 }

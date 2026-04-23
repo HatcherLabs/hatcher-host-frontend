@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth-context';
 import { api, clearToken } from '@/lib/api';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ui/ToastProvider';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 import {
   User,
@@ -144,12 +145,13 @@ function Section({ title, icon, iconColor = 'text-cyan-400', iconBg = 'bg-cyan-5
 }
 
 // ── Tab definition ──────────────────────────────────────────
+// TODO(i18n-T13): tab labels translated at render time via t('tabs.*')
 const TABS = [
-  { id: 'profile',       label: 'Profile',       icon: User },
-  { id: 'security',      label: 'Security',      icon: Shield },
-  { id: 'notifications', label: 'Notifications', icon: Bell },
-  { id: 'billing',       label: 'Billing',       icon: CreditCard },
-  { id: 'danger',        label: 'Danger Zone',   icon: AlertTriangle },
+  { id: 'profile',       icon: User },
+  { id: 'security',      icon: Shield },
+  { id: 'notifications', icon: Bell },
+  { id: 'billing',       icon: CreditCard },
+  { id: 'danger',        icon: AlertTriangle },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -158,6 +160,8 @@ type TabId = (typeof TABS)[number]['id'];
 // Settings Page
 // ═══════════════════════════════════════════════════════════
 export default function SettingsPage() {
+  const t  = useTranslations('dashboard.settings');
+  const tc = useTranslations('dashboard.common');
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, user, logout, refreshUser } = useAuth();
   const { toast } = useToast();
@@ -347,7 +351,7 @@ export default function SettingsPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-10 h-10 rounded-full border-2 border-cyan-500 border-t-transparent animate-spin mx-auto mb-3" />
-          <p className="text-sm text-[var(--text-secondary)]">Loading...</p>
+          <p className="text-sm text-[var(--text-secondary)]">{tc('loading')}</p>
         </div>
       </div>
     );
@@ -378,9 +382,9 @@ export default function SettingsPage() {
       <div className="max-w-4xl mx-auto relative">
         {/* ── Page header ─────────────────────────────────── */}
         <div className="mb-8">
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Account</p>
-          <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={displayFont}>Settings</h1>
-          <p className="text-sm mt-2 text-[var(--text-secondary)]">Manage your account, security, and preferences.</p>
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('eyebrow')}</p>
+          <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={displayFont}>{t('heading')}</h1>
+          <p className="text-sm mt-2 text-[var(--text-secondary)]">{t('subheading')}</p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">
@@ -405,7 +409,7 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              {TABS.map(({ id, label, icon: Icon }) => (
+              {TABS.map(({ id, icon: Icon }) => (
                 <button
                   key={id}
                   onClick={() => setActiveTab(id)}
@@ -418,7 +422,7 @@ export default function SettingsPage() {
                   }`}
                 >
                   <Icon size={15} className={activeTab === id && id === 'danger' ? 'text-red-400' : undefined} />
-                  {label}
+                  {t(`tabs.${id}`)}
                 </button>
               ))}
             </div>
@@ -441,7 +445,7 @@ export default function SettingsPage() {
                     ════════════════════════════════════════ */}
                 {activeTab === 'profile' && (
                   <>
-                    <Section title="Profile" icon={<User size={16} />}>
+                    <Section title={t('profile.sectionTitle')} icon={<User size={16} />}>
                       {/* Avatar */}
                       <div className="flex items-center gap-4 mb-6 pb-6 border-b border-[var(--border-default)]">
                         <div className="relative flex-shrink-0 group">
@@ -494,14 +498,14 @@ export default function SettingsPage() {
                               onClick={() => avatarInputRef.current?.click()}
                               className="text-[11px] text-[var(--color-accent)] hover:underline cursor-pointer"
                             >
-                              {avatarUrl ? 'Change photo' : 'Upload photo'}
+                              {avatarUrl ? t('profile.changePhoto') : t('profile.uploadPhoto')}
                             </button>
                             {avatarUrl && (
                               <button
                                 onClick={() => setAvatarUrl(null)}
                                 className="text-[11px] text-red-400 hover:underline cursor-pointer"
                               >
-                                Remove
+                                {tc('delete')}
                               </button>
                             )}
                           </div>
@@ -510,15 +514,15 @@ export default function SettingsPage() {
 
                       {/* Edit fields */}
                       <div className="space-y-4">
-                        <Field label="Username" value={username} onChange={setUsername} placeholder="your_username" hint="3–30 characters, letters, numbers, _ or -" />
-                        <Field label="Email address" value={email} onChange={setEmail} type="email" placeholder="you@example.com" />
+                        <Field label={t('profile.usernameLabel')} value={username} onChange={setUsername} placeholder="your_username" hint={t('profile.usernameHint')} />
+                        <Field label={t('profile.emailLabel')} value={email} onChange={setEmail} type="email" placeholder="you@example.com" />
                         <button
                           onClick={handleSaveProfile}
                           disabled={savingProfile}
                           className="clay-btn-primary flex items-center gap-2 px-5 py-2.5 text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {savingProfile ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                          {savingProfile ? 'Saving...' : 'Save Changes'}
+                          {savingProfile ? t('profile.saving') : t('profile.saveChanges')}
                         </button>
                       </div>
                     </Section>
@@ -528,7 +532,7 @@ export default function SettingsPage() {
                         on-chain payment (features.ts subscribe/addon).
                         Disconnect just clears it; the next payment re-links
                         whichever wallet signs it. */}
-                    <Section title="Connected Wallet" icon={<Wallet size={16} />} iconColor="text-purple-400" iconBg="bg-purple-500/15">
+                    <Section title={t('profile.walletTitle')} icon={<Wallet size={16} />} iconColor="text-purple-400" iconBg="bg-purple-500/15">
                       {user?.walletAddress ? (
                         <div className="space-y-3">
                           <p className="text-xs text-[var(--text-muted)]">
@@ -578,7 +582,7 @@ export default function SettingsPage() {
                     </Section>
 
                     {/* Referral */}
-                    <Section title="Referral Program" icon={<Gift size={16} />} iconColor="text-emerald-400" iconBg="bg-emerald-500/15">
+                    <Section title={t('profile.referralTitle')} icon={<Gift size={16} />} iconColor="text-emerald-400" iconBg="bg-emerald-500/15">
                       <p className="text-sm text-[var(--text-secondary)] mb-5 leading-relaxed">
                         Invite friends to Hatcher. You both get <span className="text-emerald-400 font-semibold">$2 credit</span> when they create their first agent.
                       </p>
@@ -647,12 +651,12 @@ export default function SettingsPage() {
                 {activeTab === 'security' && (
                   <>
                     {/* Change Password */}
-                    <Section title="Change Password" icon={<Lock size={16} />}>
+                    <Section title={t('security.changePasswordTitle')} icon={<Lock size={16} />}>
                       <div className="space-y-4">
-                        <Field label="Current Password" value={currentPassword} onChange={setCurrentPassword} type="password" placeholder="Enter current password" />
+                        <Field label={t('security.currentPassword')} value={currentPassword} onChange={setCurrentPassword} type="password" placeholder={t('security.currentPasswordPlaceholder')} />
                         <div className="grid sm:grid-cols-2 gap-4">
-                          <Field label="New Password" value={newPassword} onChange={setNewPassword} type="password" placeholder="Min 8 chars, upper, lower, number" />
-                          <Field label="Confirm New Password" value={confirmPassword} onChange={setConfirmPassword} type="password" placeholder="Repeat new password" />
+                          <Field label={t('security.newPassword')} value={newPassword} onChange={setNewPassword} type="password" placeholder={t('security.newPasswordPlaceholder')} />
+                          <Field label={t('security.confirmPassword')} value={confirmPassword} onChange={setConfirmPassword} type="password" placeholder={t('security.confirmPasswordPlaceholder')} />
                         </div>
                         <button
                           onClick={handleChangePassword}
@@ -660,13 +664,13 @@ export default function SettingsPage() {
                           className="clay-btn-primary flex items-center gap-2 px-5 py-2.5 text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {savingPassword ? <Loader2 size={14} className="animate-spin" /> : <Shield size={14} />}
-                          {savingPassword ? 'Changing...' : 'Change Password'}
+                          {savingPassword ? t('security.changing') : t('security.changePasswordBtn')}
                         </button>
                       </div>
                     </Section>
 
                     {/* API Keys (multi-key) */}
-                    <Section title="API Keys" icon={<Key size={16} />}>
+                    <Section title={t('security.apiKeysTitle')} icon={<Key size={16} />}>
                       <div className="flex items-start justify-between gap-4 mb-5">
                         <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
                           Create multiple API keys for programmatic access. Each key uses the <code className="font-mono text-xs bg-[var(--bg-card)] px-1.5 py-0.5 rounded text-cyan-400">hk_</code> prefix.
@@ -676,7 +680,7 @@ export default function SettingsPage() {
                           href="/dashboard/settings/api-keys"
                           className="inline-flex items-center gap-1.5 text-xs font-medium text-cyan-400 hover:text-cyan-300 transition-colors whitespace-nowrap flex-shrink-0"
                         >
-                          Manage keys <ArrowRight size={12} />
+                          {t('security.manageKeys')} <ArrowRight size={12} />
                         </Link>
                       </div>
 
@@ -845,7 +849,7 @@ export default function SettingsPage() {
                           className="clay-btn-primary flex items-center gap-1.5 px-4 py-2 text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                         >
                           {creatingKey ? <Loader2 size={13} className="animate-spin" /> : <Key size={13} />}
-                          {creatingKey ? 'Creating...' : 'Create Key'}
+                          {creatingKey ? t('security.creating') : t('security.createKey')}
                         </button>
                       </div>
                       <p className="text-[11px] text-[var(--text-muted)] mt-2">Up to 10 active keys. Each key has full API access.</p>
@@ -857,7 +861,7 @@ export default function SettingsPage() {
                     NOTIFICATIONS TAB
                     ════════════════════════════════════════ */}
                 {activeTab === 'notifications' && (
-                  <Section title="Notifications" icon={<Bell size={16} />}>
+                  <Section title={t('notifications.sectionTitle')} icon={<Bell size={16} />}>
                     <div className="space-y-1">
                       {[
                         { key: 'push', label: 'Push Notifications', desc: 'Browser push notifications for real-time updates', value: notifPush, onChange: setNotifPush },
@@ -883,13 +887,13 @@ export default function SettingsPage() {
                     BILLING TAB
                     ════════════════════════════════════════ */}
                 {activeTab === 'billing' && (
-                  <Section title="Billing" icon={<CreditCard size={16} />}>
+                  <Section title={t('billing.sectionTitle')} icon={<CreditCard size={16} />}>
                     {profile && (
                       <>
                         {/* Current plan */}
                         <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] p-4 mb-5">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Current Plan</span>
+                            <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">{t('billing.currentPlan')}</span>
                             <TierBadge tier={profile.tier} />
                           </div>
                           <p className="text-2xl font-bold text-[var(--text-primary)] capitalize" style={displayFont}>
@@ -916,7 +920,7 @@ export default function SettingsPage() {
                           href="/dashboard/billing"
                           className="inline-flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-xl btn-cta cursor-pointer"
                         >
-                          Manage Billing
+                          {t('billing.manageBilling')}
                           <ArrowRight size={14} />
                         </Link>
                       </>
@@ -933,15 +937,15 @@ export default function SettingsPage() {
                       <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
                         <AlertTriangle size={16} className="text-red-400" />
                       </div>
-                      <h2 className="text-lg font-semibold text-red-400" style={displayFont}>Danger Zone</h2>
+                      <h2 className="text-lg font-semibold text-red-400" style={displayFont}>{t('danger.sectionTitle')}</h2>
                     </div>
 
                     <div className="space-y-4">
                       {/* ── Export Data (GDPR) ──────────────────────────── */}
                       <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-4">
-                        <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Export My Data</h3>
+                        <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">{t('danger.exportTitle')}</h3>
                         <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
-                          Download a JSON file containing all your account data: profile, agents, chat history, payments, referrals, support tickets, and more.
+                          {t('danger.exportDesc')}
                         </p>
                         <button
                           disabled={exporting}
@@ -969,16 +973,16 @@ export default function SettingsPage() {
                           {exporting ? (
                             <><span className="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" /> Exporting...</>
                           ) : (
-                            <><Download size={14} /> Export My Data</>
+                            <><Download size={14} /> {t('danger.exportBtn')}</>
                           )}
                         </button>
                       </div>
 
                       {/* ── Delete Account ──────────────────────────────── */}
                       <div className="rounded-xl border border-red-500/15 bg-red-500/[0.03] p-4">
-                        <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">Delete Account</h3>
+                        <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">{t('danger.deleteTitle')}</h3>
                         <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
-                          Permanently remove your account, all agents, payment history, and configuration. This action is irreversible.
+                          {t('danger.deleteDesc')}
                         </p>
                         <button
                           disabled={deleting}
@@ -986,7 +990,7 @@ export default function SettingsPage() {
                           className="flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500 hover:text-[var(--text-primary)] hover:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         >
                           <Trash2 size={14} />
-                          {deleting ? 'Deleting...' : 'Delete Account'}
+                          {deleting ? t('danger.deleting') : t('danger.deleteBtn')}
                         </button>
                       </div>
                     </div>
@@ -1021,13 +1025,13 @@ export default function SettingsPage() {
               <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4">
                 <AlertTriangle size={24} className="text-red-400" />
               </div>
-              <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">Delete Your Account?</h2>
+              <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">{t('danger.dialogTitle')}</h2>
               <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-5">
-                This will permanently remove all your agents, data, and payment history. This action <strong className="text-[var(--text-primary)]">cannot be undone</strong>.
+                {t('danger.dialogDesc').replace('{emphasis}', t('danger.dialogEmphasis'))}
               </p>
               <div className="mb-5">
                 <label className="block text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-1.5">
-                  Confirm your password
+                  {t('danger.confirmPassword')}
                 </label>
                 <div className="relative">
                   <input
@@ -1054,7 +1058,7 @@ export default function SettingsPage() {
                   disabled={deleting}
                   className="px-4 py-2.5 text-sm font-medium rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-all disabled:opacity-40"
                 >
-                  Cancel
+                  {tc('cancel')}
                 </button>
                 <button
                   onClick={handleDeleteAccount}
@@ -1064,7 +1068,7 @@ export default function SettingsPage() {
                   {deleting ? (
                     <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Deleting...</>
                   ) : (
-                    <><Trash2 size={14} /> Delete Account</>
+                    <><Trash2 size={14} /> {t('danger.deleteBtn')}</>
                   )}
                 </button>
               </div>

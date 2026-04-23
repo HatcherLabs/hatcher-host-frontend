@@ -10,8 +10,9 @@
 // payouts tables, and a read-only settings panel.
 
 import { useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/routing';
+import { Link } from '@/i18n/routing';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -118,16 +119,19 @@ function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-function payoutModeLabel(mode: AffiliateMe['affiliate']['payoutMode']): string {
+// TODO(i18n-T13): payoutModeLabel strings are affiliate-specific, not from shared constants
+function payoutModeLabel(mode: AffiliateMe['affiliate']['payoutMode'], t: (key: string) => string): string {
   switch (mode) {
-    case 'CASH_ONLY': return 'Cash only (20%)';
-    case 'CREDITS_ONLY': return 'Credits only (40%)';
-    case 'HYBRID': return 'Hybrid (15% cash + 25% credits)';
+    case 'CASH_ONLY': return t('modeCashOnly');
+    case 'CREDITS_ONLY': return t('modeCreditsOnly');
+    case 'HYBRID': return t('modeHybrid');
   }
 }
 
-function sourceLabel(s: Commission['sourceType']): string {
-  return s === 'FOUNDING_MEMBER' ? 'Founding Member' : 'Subscription';
+// sourceLabel is called within the component so will receive t from closure
+// TODO(i18n-T13): sourceType labels tie to shared constants
+function sourceLabel(s: Commission['sourceType'], t: (key: string) => string): string {
+  return s === 'FOUNDING_MEMBER' ? t('sourceFoundingMember') : t('sourceSubscription');
 }
 
 // ─── Stat Card (mirrors admin panel style) ───────────────────
@@ -311,6 +315,8 @@ function TableShell({
 
 // ─── Main Page ───────────────────────────────────────────────
 export default function AffiliateDashboardPage() {
+  const t = useTranslations('dashboard.affiliate');
+  const tc = useTranslations('dashboard.common');
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
@@ -419,9 +425,9 @@ export default function AffiliateDashboardPage() {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
         <Shield className="w-12 h-12 text-[var(--text-muted)] mx-auto mb-4" />
-        <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">Sign In Required</h1>
-        <p className="mb-6 text-[var(--text-secondary)]">Sign in to view your affiliate dashboard.</p>
-        <Link href="/login" className="btn-primary">Sign In</Link>
+        <h1 className="text-2xl font-bold mb-3 text-[var(--text-primary)]">{t('signInTitle')}</h1>
+        <p className="mb-6 text-[var(--text-secondary)]">{t('signInDesc')}</p>
+        <Link href="/login" className="btn-primary">{tc('signIn')}</Link>
       </div>
     );
   }
@@ -446,9 +452,9 @@ export default function AffiliateDashboardPage() {
               <ArrowLeft size={16} />
             </Link>
             <div>
-              <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Dashboard</p>
+              <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('eyebrow')}</p>
               <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'Sora, sans-serif' }}>
-                Affiliate Dashboard
+                {t('heading')}
               </h1>
               {aff && (
                 <p className="text-xs text-[var(--text-muted)] mt-1">
@@ -467,7 +473,7 @@ export default function AffiliateDashboardPage() {
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors disabled:opacity-50"
           >
             <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
-            Refresh
+            {t('refresh')}
           </button>
         </motion.div>
 
@@ -481,7 +487,7 @@ export default function AffiliateDashboardPage() {
           <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 mb-6 text-sm flex items-start gap-2">
             <AlertTriangle size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-amber-400">Account frozen</p>
+              <p className="font-semibold text-amber-400">{t('frozenTitle')}</p>
               <p className="text-xs text-[var(--text-muted)] mt-0.5">
                 {aff.frozenReason ?? 'Contact support for details.'}
               </p>
@@ -505,7 +511,7 @@ export default function AffiliateDashboardPage() {
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="min-w-0 flex-1">
                 <p className="text-[10px] uppercase tracking-[0.15em] font-semibold text-[var(--text-muted)] mb-1.5">
-                  Your Referral Link
+                  {t('yourReferralLink')}
                 </p>
                 <p className="font-mono text-base sm:text-lg font-semibold text-[var(--text-primary)] break-all">
                   {me.shareLink.replace(/^https?:\/\//, '')}
@@ -517,7 +523,7 @@ export default function AffiliateDashboardPage() {
               </div>
             </div>
             <p className="text-xs text-[var(--text-muted)] mt-3">
-              New signups via this link are attributed to you for life.
+              {t('referralLinkDesc')}
             </p>
           </motion.div>
         ) : null}
@@ -531,29 +537,29 @@ export default function AffiliateDashboardPage() {
           ) : (
             <>
               <StatCard
-                label="Total Referrals"
+                label={t('totalReferrals')}
                 value={stats.totalReferrals.toString()}
-                sub={`${stats.paidReferrals} paid`}
+                sub={`${stats.paidReferrals} ${t('statusPaid').toLowerCase()}`}
                 icon={Users}
                 iconColor="var(--color-accent)"
               />
               <StatCard
-                label="Pending (30d hold)"
+                label={t('pending30d')}
                 value={`${fmtUsd(stats.pending.cashUsd)} + ${fmtCredits(stats.pending.credits)} cr`}
                 icon={Clock}
                 iconColor="#f59e0b"
               />
               <StatCard
-                label="Payable Now"
+                label={t('payableNow')}
                 value={`${fmtUsd(stats.payable.cashUsd)} + ${fmtCredits(stats.payable.credits)} cr`}
                 icon={Wallet}
                 iconColor="#22c55e"
                 highlight={payableHighlight}
               />
               <StatCard
-                label="Lifetime Earned"
+                label={t('lifetimeEarned')}
                 value={`${fmtUsd(stats.lifetime.cashUsdEarned)} + ${fmtCredits(stats.lifetime.creditsEarned)} cr`}
-                sub={`${fmtUsd(stats.lifetime.cashUsdPaidOut)} paid out`}
+                sub={`${fmtUsd(stats.lifetime.cashUsdPaidOut)} ${t('statusPaid').toLowerCase()} out`}
                 icon={TrendingUp}
                 iconColor="#60a5fa"
               />
@@ -563,8 +569,8 @@ export default function AffiliateDashboardPage() {
 
         {/* Referrals Table */}
         <TableShell
-          title="Referrals"
-          empty="No referrals yet. Share your link!"
+          title={t('referralsTable')}
+          empty={t('noReferrals')}
           isEmpty={referrals.length === 0}
           loading={refsLoading && referrals.length === 0}
           onLoadMore={refsCursor ? () => loadReferrals(refsCursor) : undefined}
@@ -608,8 +614,8 @@ export default function AffiliateDashboardPage() {
 
         {/* Commissions Table */}
         <TableShell
-          title="Commissions"
-          empty="No commissions yet."
+          title={t('commissionsTable')}
+          empty={t('noCommissions')}
           isEmpty={commissions.length === 0}
           loading={comLoading && commissions.length === 0}
           onLoadMore={comCursor ? () => loadCommissions(comCursor) : undefined}
@@ -628,7 +634,7 @@ export default function AffiliateDashboardPage() {
               {commissions.map((c) => (
                 <tr key={c.id} className="border-b border-[var(--border-default)]/60 last:border-0 hover:bg-[var(--bg-card)]/40 transition-colors">
                   <td className="px-5 py-3 text-xs text-[var(--text-muted)]">{fmtDate(c.createdAt)}</td>
-                  <td className="px-5 py-3 text-xs text-[var(--text-primary)]">{sourceLabel(c.sourceType)}</td>
+                  <td className="px-5 py-3 text-xs text-[var(--text-primary)]">{sourceLabel(c.sourceType, t)}</td>
                   <td className="px-5 py-3 text-xs text-[var(--text-primary)] font-medium">
                     {fmtUsd(c.cashAmountUsd)}{c.creditsAmount > 0 && <span className="text-[var(--text-muted)]"> + {fmtCredits(c.creditsAmount)} cr</span>}
                   </td>
@@ -648,8 +654,8 @@ export default function AffiliateDashboardPage() {
 
         {/* Payouts Table */}
         <TableShell
-          title="Payouts"
-          empty="No payouts yet."
+          title={t('payoutsTable')}
+          empty={t('noPayouts')}
           isEmpty={payouts.length === 0}
           loading={payLoading && payouts.length === 0}
           onLoadMore={payCursor ? () => loadPayouts(payCursor) : undefined}
@@ -705,22 +711,22 @@ export default function AffiliateDashboardPage() {
           >
             <div className="flex items-center gap-2 mb-4">
               <DollarSign size={16} className="text-[var(--text-muted)]" />
-              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Payout Settings</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">{t('payoutSettings')}</h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">Mode</p>
-                <p className="text-sm text-[var(--text-primary)]">{payoutModeLabel(aff.payoutMode)}</p>
+                <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">{t('payoutMode')}</p>
+                <p className="text-sm text-[var(--text-primary)]">{payoutModeLabel(aff.payoutMode, t)}</p>
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">Payout Address</p>
+                <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">{t('payoutAddress')}</p>
                 <p className="text-xs font-mono text-[var(--text-primary)] break-all">
-                  {aff.payoutAddress ?? <span className="text-[var(--text-muted)]">Credits only — no address</span>}
+                  {aff.payoutAddress ?? <span className="text-[var(--text-muted)]">{t('creditsOnly')}</span>}
                 </p>
               </div>
             </div>
             <p className="text-xs text-[var(--text-muted)] mt-4">
-              Need to change payout preferences? <Link href="/support" className="text-[var(--color-accent)] hover:underline">Contact support</Link>.
+              {t('changePrefs')} <Link href="/support" className="text-[var(--color-accent)] hover:underline">{t('contactSupport')}</Link>.
             </p>
           </motion.div>
         )}

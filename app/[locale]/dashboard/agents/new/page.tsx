@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/routing';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TemplateCard } from '@/components/agents/TemplateCard';
 import type { TemplateCardData } from '@/components/agents/TemplateCard';
@@ -80,6 +81,7 @@ function getCategoryIcon(key: string): React.ComponentType<{ size?: number; clas
   return CATEGORY_ICON_MAP[key] ?? Bot;
 }
 
+// TODO(i18n-T13): category labels come from @hatcher/shared FRAMEWORKS or API
 function getCategoryLabel(key: string): string {
   if (key === 'all') return 'All Templates';
   return key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -130,6 +132,7 @@ const itemVariants = {
 // ── Page component ────────────────────────────────────────
 
 export default function NewAgentPage() {
+  const t = useTranslations('dashboard.newAgent');
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -210,16 +213,15 @@ export default function NewAgentPage() {
 
         {/* ── Header ──────────────────────────────────────── */}
         <motion.div variants={itemVariants} className="max-w-2xl">
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">New agent</p>
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('eyebrow')}</p>
           <h1
             className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] mb-3"
             style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
-            Choose a template
+            {t('heading')}
           </h1>
           <p className="text-[var(--text-secondary)] text-sm sm:text-base leading-relaxed">
-            Start from a pre-configured template or build from scratch.
-            Each template comes with a personality, system prompt, and suggested integrations.
+            {t('subheading')}
           </p>
         </motion.div>
 
@@ -229,7 +231,7 @@ export default function NewAgentPage() {
             <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
             <input
               type="text"
-              placeholder="Search templates..."
+              placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               className="w-full bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--color-accent)]/50 transition-colors"
@@ -284,8 +286,8 @@ export default function NewAgentPage() {
               className="card glass-noise flex flex-col items-center justify-center py-16 text-center"
             >
               <Bot size={40} className="text-[var(--text-muted)] mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-1">No templates found</h3>
-              <p className="text-sm text-[var(--text-secondary)]">Try a different search or category.</p>
+              <h3 className="text-lg font-semibold text-white mb-1">{t('noTemplatesTitle')}</h3>
+              <p className="text-sm text-[var(--text-secondary)]">{t('noTemplatesDesc')}</p>
             </motion.div>
           ) : (
             <motion.div
@@ -308,8 +310,8 @@ export default function NewAgentPage() {
                       <span className="text-2xl">+</span>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm font-semibold text-white group-hover:text-[var(--color-accent)] transition-colors">Start from Scratch</p>
-                      <p className="text-xs text-[var(--text-muted)] mt-0.5">Full control over every setting</p>
+                      <p className="text-sm font-semibold text-white group-hover:text-[var(--color-accent)] transition-colors">{t('startFromScratch')}</p>
+                      <p className="text-xs text-[var(--text-muted)] mt-0.5">{t('startFromScratchDesc')}</p>
                     </div>
                   </motion.button>
                 </motion.div>
@@ -332,7 +334,7 @@ export default function NewAgentPage() {
           variants={itemVariants}
           className="text-center text-xs text-[var(--text-muted)]"
         >
-          All templates are fully customizable after deployment &mdash; change the name, system prompt, model, and integrations at any time.
+          {t('footerHint')}
         </motion.p>
 
       </div>

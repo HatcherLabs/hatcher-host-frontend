@@ -40,7 +40,10 @@ export default function ForgotPasswordPage() {
               {t('successHeading')}
             </h1>
             <p className="text-sm text-[var(--text-secondary)] mb-6">
-              {t('successBody', { email: <strong className="text-[var(--text-primary)]">{email}</strong> })}
+              {t.rich('successBody', {
+                email,
+                bold: (chunks) => <strong className="text-[var(--text-primary)]">{chunks}</strong>,
+              })}
             </p>
             <Link
               href="/login"

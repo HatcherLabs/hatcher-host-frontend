@@ -24,7 +24,14 @@
     "hero": {
       "eyebrow": "[ro] Managed AI agent hosting · Crypto-native",
       "headlinePrefix": "[ro] Hatch Your",
-      "typewriterWords": ["[ro] AI Agent", "[ro] Fitness Coach", "[ro] Crypto Tracker", "[ro] Study Buddy", "[ro] Travel Planner", "[ro] Personal Assistant"],
+      "typewriterWords": [
+        "[ro] AI Agent",
+        "[ro] Fitness Coach",
+        "[ro] Crypto Tracker",
+        "[ro] Study Buddy",
+        "[ro] Travel Planner",
+        "[ro] Personal Assistant"
+      ],
       "body": "[ro] Pick a framework. Configure. Launch in 60 seconds. No code required, no infrastructure to manage. 4 frameworks, 20+ platforms, free tier with BYOK.",
       "ctaPrimary": "[ro] Get started free",
       "ctaSecondary": "[ro] Read docs",
@@ -55,9 +62,21 @@
       "heading": "[ro] 3 steps. 60 seconds.",
       "subheading": "[ro] No coding, no setup guides, no configuration files.",
       "steps": [
-        { "num": "01", "title": "[ro] Pick a framework", "desc": "[ro] OpenClaw, Hermes, ElizaOS, or Milady. Each has unique strengths — browser control, memory, multi-agent, on-chain." },
-        { "num": "02", "title": "[ro] Configure", "desc": "[ro] Name, personality, integrations. Fill a simple form — no config files, no YAML." },
-        { "num": "03", "title": "[ro] Deploy", "desc": "[ro] One click. Your agent is live on every connected platform in under 60 seconds." }
+        {
+          "num": "01",
+          "title": "[ro] Pick a framework",
+          "desc": "[ro] OpenClaw, Hermes, ElizaOS, or Milady. Each has unique strengths — browser control, memory, multi-agent, on-chain."
+        },
+        {
+          "num": "02",
+          "title": "[ro] Configure",
+          "desc": "[ro] Name, personality, integrations. Fill a simple form — no config files, no YAML."
+        },
+        {
+          "num": "03",
+          "title": "[ro] Deploy",
+          "desc": "[ro] One click. Your agent is live on every connected platform in under 60 seconds."
+        }
       ],
       "cta": "[ro] Try it now"
     },
@@ -66,15 +85,42 @@
       "heading": "[ro] What will you hatch?",
       "subheading": "[ro] From personal productivity to business automation — your agent, your rules.",
       "items": [
-        { "title": "[ro] Personal assistant", "desc": "[ro] Calendar, emails, reminders — from Telegram." },
-        { "title": "[ro] Fitness coach", "desc": "[ro] Workouts, routines, daily accountability." },
-        { "title": "[ro] Food & nutrition", "desc": "[ro] Log meals, count calories, recipe suggestions." },
-        { "title": "[ro] Crypto tracker", "desc": "[ro] Token prices, portfolio alerts, on-chain data." },
-        { "title": "[ro] Study buddy", "desc": "[ro] Quiz you, summarize textbooks, help with homework." },
-        { "title": "[ro] Travel planner", "desc": "[ro] Find flights, plan itineraries, local picks." },
-        { "title": "[ro] Budget manager", "desc": "[ro] Track expenses, savings goals, weekly reports." },
-        { "title": "[ro] Research assistant", "desc": "[ro] Web search, summarize articles, compile reports." },
-        { "title": "[ro] Customer support", "desc": "[ro] Answer FAQs on Discord or WhatsApp, 24/7." }
+        {
+          "title": "[ro] Personal assistant",
+          "desc": "[ro] Calendar, emails, reminders — from Telegram."
+        },
+        {
+          "title": "[ro] Fitness coach",
+          "desc": "[ro] Workouts, routines, daily accountability."
+        },
+        {
+          "title": "[ro] Food & nutrition",
+          "desc": "[ro] Log meals, count calories, recipe suggestions."
+        },
+        {
+          "title": "[ro] Crypto tracker",
+          "desc": "[ro] Token prices, portfolio alerts, on-chain data."
+        },
+        {
+          "title": "[ro] Study buddy",
+          "desc": "[ro] Quiz you, summarize textbooks, help with homework."
+        },
+        {
+          "title": "[ro] Travel planner",
+          "desc": "[ro] Find flights, plan itineraries, local picks."
+        },
+        {
+          "title": "[ro] Budget manager",
+          "desc": "[ro] Track expenses, savings goals, weekly reports."
+        },
+        {
+          "title": "[ro] Research assistant",
+          "desc": "[ro] Web search, summarize articles, compile reports."
+        },
+        {
+          "title": "[ro] Customer support",
+          "desc": "[ro] Answer FAQs on Discord or WhatsApp, 24/7."
+        }
       ],
       "footer": "[ro] And anything else you can describe in plain English."
     },
@@ -83,10 +129,30 @@
       "heading": "[ro] Four frameworks. One platform.",
       "subheading": "[ro] Pick the one that fits your agent. Switch whenever you want.",
       "items": [
-        { "name": "OpenClaw", "tag": "[ro] all-rounder", "desc": "[ro] Powerful tools, plugins, and browser control.", "features": "[ro] 2500+ skills · Browser automation · File management" },
-        { "name": "Hermes", "tag": "[ro] reasoning", "desc": "[ro] Smart-first design for rich memory and reasoning.", "features": "[ro] 77 bundled skills · Deep memory · Multi-model" },
-        { "name": "ElizaOS", "tag": "[ro] multi-agent", "desc": "[ro] Multi-agent coordination with 90+ plugins.", "features": "[ro] 90+ plugins · Multi-agent · Knowledge base" },
-        { "name": "Milady", "tag": "[ro] crypto-native", "desc": "[ro] On-chain awareness, DeFi tools, token tracking.", "features": "[ro] DeFi tools · On-chain data · Token tracking" }
+        {
+          "name": "OpenClaw",
+          "tag": "[ro] all-rounder",
+          "desc": "[ro] Powerful tools, plugins, and browser control.",
+          "features": "[ro] 2500+ skills · Browser automation · File management"
+        },
+        {
+          "name": "Hermes",
+          "tag": "[ro] reasoning",
+          "desc": "[ro] Smart-first design for rich memory and reasoning.",
+          "features": "[ro] 77 bundled skills · Deep memory · Multi-model"
+        },
+        {
+          "name": "ElizaOS",
+          "tag": "[ro] multi-agent",
+          "desc": "[ro] Multi-agent coordination with 90+ plugins.",
+          "features": "[ro] 90+ plugins · Multi-agent · Knowledge base"
+        },
+        {
+          "name": "Milady",
+          "tag": "[ro] crypto-native",
+          "desc": "[ro] On-chain awareness, DeFi tools, token tracking.",
+          "features": "[ro] DeFi tools · On-chain data · Token tracking"
+        }
       ]
     },
     "city": {
@@ -102,12 +168,30 @@
       "eyebrow": "[ro] Platform",
       "heading": "[ro] Everything your agent needs",
       "items": [
-        { "title": "[ro] Instant deploy", "desc": "[ro] From zero to running agent in under 60 seconds." },
-        { "title": "[ro] All platforms", "desc": "[ro] Telegram, Discord, Twitter, WhatsApp, Slack." },
-        { "title": "[ro] Bring your own key", "desc": "[ro] Use your own LLM API key for unlimited messages on any tier." },
-        { "title": "[ro] Secure by default", "desc": "[ro] Isolated containers, encrypted secrets, no shared data." },
-        { "title": "[ro] Live analytics", "desc": "[ro] Real-time stats, usage tracking, performance metrics." },
-        { "title": "[ro] Chat & voice", "desc": "[ro] Text chat, voice calls, real-time streaming — out of the box." }
+        {
+          "title": "[ro] Instant deploy",
+          "desc": "[ro] From zero to running agent in under 60 seconds."
+        },
+        {
+          "title": "[ro] All platforms",
+          "desc": "[ro] Telegram, Discord, Twitter, WhatsApp, Slack."
+        },
+        {
+          "title": "[ro] Bring your own key",
+          "desc": "[ro] Use your own LLM API key for unlimited messages on any tier."
+        },
+        {
+          "title": "[ro] Secure by default",
+          "desc": "[ro] Isolated containers, encrypted secrets, no shared data."
+        },
+        {
+          "title": "[ro] Live analytics",
+          "desc": "[ro] Real-time stats, usage tracking, performance metrics."
+        },
+        {
+          "title": "[ro] Chat & voice",
+          "desc": "[ro] Text chat, voice calls, real-time streaming — out of the box."
+        }
       ]
     },
     "pricing": {
@@ -117,23 +201,51 @@
       "popularLabel": "[ro] Popular",
       "tiers": [
         {
-          "name": "[ro] Free", "price": "$0", "sub": "[ro] /month",
-          "features": ["[ro] 1 AI agent", "[ro] 20 messages/day", "[ro] All platforms", "[ro] Free AI included"],
+          "name": "[ro] Free",
+          "price": "$0",
+          "sub": "[ro] /month",
+          "features": [
+            "[ro] 1 AI agent",
+            "[ro] 20 messages/day",
+            "[ro] All platforms",
+            "[ro] Free AI included"
+          ],
           "cta": "[ro] Get started"
         },
         {
-          "name": "[ro] Starter", "price": "$6.99", "sub": "[ro] /month",
-          "features": ["[ro] 1 AI agent", "[ro] 50 messages/day", "[ro] BYOK = unlimited", "[ro] Longer active time"],
+          "name": "[ro] Starter",
+          "price": "$6.99",
+          "sub": "[ro] /month",
+          "features": [
+            "[ro] 1 AI agent",
+            "[ro] 50 messages/day",
+            "[ro] BYOK = unlimited",
+            "[ro] Longer active time"
+          ],
           "cta": "[ro] Choose Starter"
         },
         {
-          "name": "[ro] Pro", "price": "$19.99", "sub": "[ro] /month",
-          "features": ["[ro] 3 AI agents", "[ro] 100 messages/day", "[ro] BYOK = unlimited", "[ro] Dedicated resources"],
+          "name": "[ro] Pro",
+          "price": "$19.99",
+          "sub": "[ro] /month",
+          "features": [
+            "[ro] 3 AI agents",
+            "[ro] 100 messages/day",
+            "[ro] BYOK = unlimited",
+            "[ro] Dedicated resources"
+          ],
           "cta": "[ro] Choose Pro"
         },
         {
-          "name": "[ro] Business", "price": "$49.99", "sub": "[ro] /month",
-          "features": ["[ro] 10 AI agents", "[ro] 300 messages/day", "[ro] Always-on containers", "[ro] Priority support"],
+          "name": "[ro] Business",
+          "price": "$49.99",
+          "sub": "[ro] /month",
+          "features": [
+            "[ro] 10 AI agents",
+            "[ro] 300 messages/day",
+            "[ro] Always-on containers",
+            "[ro] Priority support"
+          ],
           "cta": "[ro] Choose Business"
         }
       ],
@@ -283,7 +395,7 @@
       "submitLoading": "[ro] Sending...",
       "backToLogin": "[ro] Back to sign in",
       "successHeading": "[ro] Check your email",
-      "successBody": "[ro] If an account exists for {email}, we sent a password reset link. Check your inbox and spam folder.",
+      "successBody": "[ro] If an account exists for <bold>{email}</bold>, we sent a password reset link. Check your inbox and spam folder.",
       "successBackLink": "[ro] Back to sign in",
       "genericError": "[ro] Something went wrong. Please try again."
     },
@@ -443,35 +555,91 @@
         "extraAgents": {
           "label": "[ro] Extra Agents",
           "items": [
-            { "name": "[ro] +1 Agent",   "period": "[ro] /mo", "description": "[ro] 1 extra slot" },
-            { "name": "[ro] +3 Agents",  "period": "[ro] /mo", "description": "[ro] 3 extra slots" },
-            { "name": "[ro] +5 Agents",  "period": "[ro] /mo", "description": "[ro] 5 extra slots" },
-            { "name": "[ro] +10 Agents", "period": "[ro] /mo", "description": "[ro] 10 extra slots" }
+            {
+              "name": "[ro] +1 Agent",
+              "period": "[ro] /mo",
+              "description": "[ro] 1 extra slot"
+            },
+            {
+              "name": "[ro] +3 Agents",
+              "period": "[ro] /mo",
+              "description": "[ro] 3 extra slots"
+            },
+            {
+              "name": "[ro] +5 Agents",
+              "period": "[ro] /mo",
+              "description": "[ro] 5 extra slots"
+            },
+            {
+              "name": "[ro] +10 Agents",
+              "period": "[ro] /mo",
+              "description": "[ro] 10 extra slots"
+            }
           ]
         },
         "extraMessages": {
           "label": "[ro] Extra Messages (account)",
           "items": [
-            { "name": "[ro] +20 msg/day",  "period": "[ro] /mo", "description": "[ro] Stackable" },
-            { "name": "[ro] +50 msg/day",  "period": "[ro] /mo", "description": "[ro] Stackable" },
-            { "name": "[ro] +100 msg/day", "period": "[ro] /mo", "description": "[ro] Stackable" },
-            { "name": "[ro] +200 msg/day", "period": "[ro] /mo", "description": "[ro] Stackable" }
+            {
+              "name": "[ro] +20 msg/day",
+              "period": "[ro] /mo",
+              "description": "[ro] Stackable"
+            },
+            {
+              "name": "[ro] +50 msg/day",
+              "period": "[ro] /mo",
+              "description": "[ro] Stackable"
+            },
+            {
+              "name": "[ro] +100 msg/day",
+              "period": "[ro] /mo",
+              "description": "[ro] Stackable"
+            },
+            {
+              "name": "[ro] +200 msg/day",
+              "period": "[ro] /mo",
+              "description": "[ro] Stackable"
+            }
           ]
         },
         "extraSearches": {
           "label": "[ro] Extra Searches (account)",
           "items": [
-            { "name": "[ro] +25 searches/day", "period": "[ro] /mo", "description": "[ro] Stackable" },
-            { "name": "[ro] +50 searches/day", "period": "[ro] /mo", "description": "[ro] Stackable" }
+            {
+              "name": "[ro] +25 searches/day",
+              "period": "[ro] /mo",
+              "description": "[ro] Stackable"
+            },
+            {
+              "name": "[ro] +50 searches/day",
+              "period": "[ro] /mo",
+              "description": "[ro] Stackable"
+            }
           ]
         },
         "perAgent": {
           "label": "[ro] Per-Agent",
           "items": [
-            { "name": "[ro] Always On",    "period": "[ro] /mo per agent",      "description": "[ro] Keep running 24/7" },
-            { "name": "[ro] File Manager", "period": "[ro] one-time per agent", "description": "[ro] Browse & edit files" },
-            { "name": "[ro] Full Logs",    "period": "[ro] /mo per agent",      "description": "[ro] Unlock log viewer" },
-            { "name": "[ro] +10 Plugins",  "period": "[ro] /mo per agent",      "description": "[ro] Stack extra plugin slots" }
+            {
+              "name": "[ro] Always On",
+              "period": "[ro] /mo per agent",
+              "description": "[ro] Keep running 24/7"
+            },
+            {
+              "name": "[ro] File Manager",
+              "period": "[ro] one-time per agent",
+              "description": "[ro] Browse & edit files"
+            },
+            {
+              "name": "[ro] Full Logs",
+              "period": "[ro] /mo per agent",
+              "description": "[ro] Unlock log viewer"
+            },
+            {
+              "name": "[ro] +10 Plugins",
+              "period": "[ro] /mo per agent",
+              "description": "[ro] Stack extra plugin slots"
+            }
           ]
         }
       }
@@ -561,5 +729,437 @@
       "seeFrameworks": "[ro] See Frameworks"
     },
     "footerNote": "[ro] All prices in USD, payable in SOL or $HATCHER. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier."
+  },
+  "dashboard": {
+    "common": {
+      "loading": "[RO] Loading...",
+      "authenticating": "[RO] Authenticating...",
+      "signInRequired": "[RO] Sign In Required",
+      "signIn": "[RO] Sign In",
+      "refresh": "[RO] Refresh",
+      "save": "[RO] Save",
+      "cancel": "[RO] Cancel",
+      "delete": "[RO] Delete",
+      "create": "[RO] Create",
+      "invite": "[RO] Invite",
+      "share": "[RO] Share",
+      "unshare": "[RO] Unshare",
+      "copy": "[RO] Copy",
+      "copied": "[RO] Copied!",
+      "close": "[RO] Close",
+      "confirm": "[RO] Confirm",
+      "back": "[RO] Back",
+      "noDescription": "[RO] No description",
+      "clear": "[RO] Clear"
+    },
+    "agents": {
+      "eyebrow": "[RO] Dashboard",
+      "heading": "[RO] My agents",
+      "subtitleEmpty": "[RO] Create your first agent to get started.",
+      "createCta": "[RO] Create agent",
+      "searchPlaceholder": "[RO] Search agents... ( / )",
+      "filterAll": "[RO] All",
+      "frameworkAll": "[RO] All Frameworks",
+      "sortNewest": "[RO] Newest",
+      "sortAZ": "[RO] A-Z",
+      "sortMessages": "[RO] Most Messages",
+      "sortActive": "[RO] Last Active",
+      "emptyTitle": "[RO] No agents yet",
+      "emptyDescription": "[RO] Create your first AI agent and deploy it in 60 seconds.",
+      "emptyActionLabel": "[RO] Create Agent",
+      "emptySecondaryLabel": "[RO] See Frameworks",
+      "noMatchTitle": "[RO] No matching agents",
+      "noMatchDescription": "[RO] Try adjusting your search or filter criteria.",
+      "signInDescription": "[RO] Sign in to your account to access your agents.",
+      "featuresCount": "[RO] {count} feature",
+      "featuresCountPlural": "[RO] {count} features",
+      "tourCreateTitle": "[RO] Create Your First Agent",
+      "tourCreateDescription": "[RO] Click here to hatch your first AI agent. Choose from 4 frameworks.",
+      "tourFilterTitle": "[RO] Filter by Framework",
+      "tourFilterDescription": "[RO] OpenClaw, Hermes, ElizaOS, or Milady — each has unique strengths.",
+      "tourSearchTitle": "[RO] Search & Explore",
+      "tourSearchDescription": "[RO] Search agents or browse 200+ templates to get started quickly.",
+      "tourPlanTitle": "[RO] Your Plan",
+      "tourPlanDescription": "[RO] Start free with 1 agent and 20 messages/day. Upgrade anytime.",
+      "agentsCount": "[RO] {count} agent total · {active} active",
+      "agentsCountPlural": "[RO] {count} agents total · {active} active",
+      "details": "[RO] Details"
+    },
+    "newAgent": {
+      "eyebrow": "[RO] New agent",
+      "heading": "[RO] Choose a template",
+      "subheading": "[RO] Start from a pre-configured template or build from scratch. Each template comes with a personality, system prompt, and suggested integrations.",
+      "searchPlaceholder": "[RO] Search templates...",
+      "allTemplates": "[RO] All Templates",
+      "startFromScratch": "[RO] Start from Scratch",
+      "startFromScratchDesc": "[RO] Full control over every setting",
+      "noTemplatesTitle": "[RO] No templates found",
+      "noTemplatesDesc": "[RO] Try a different search or category.",
+      "footerHint": "[RO] All templates are fully customizable after deployment — change the name, system prompt, model, and integrations at any time."
+    },
+    "billing": {
+      "eyebrow": "[RO] Account",
+      "heading": "[RO] Billing & plans",
+      "breadcrumbDashboard": "[RO] Dashboard",
+      "breadcrumbBilling": "[RO] Billing",
+      "connectWallet": "[RO] Connect Wallet",
+      "connectedWallet": "[RO] Connected wallet",
+      "switchWallet": "[RO] Switch wallet",
+      "disconnect": "[RO] Disconnect",
+      "loadingBilling": "[RO] Loading billing...",
+      "signInDescription": "[RO] Sign in to manage your plan and billing.",
+      "creditsBalance": "[RO] Credits Balance",
+      "creditsUsd": "[RO] USD",
+      "creditsDesc": "[RO] Credits can be used for subscriptions, add-ons, and hosted LLM usage.",
+      "recentTransactions": "[RO] Recent Transactions",
+      "currentTier": "[RO] Current Plan",
+      "freeTier": "[RO] Free Tier",
+      "active": "[RO] Active",
+      "agentUsage": "[RO] Agent Usage",
+      "agentsOf": "[RO] {count} of {limit} agents used",
+      "agentsOver": "[RO] {over} over limit",
+      "slotsRemaining": "[RO] {slots} slot remaining",
+      "slotsRemainingPlural": "[RO] {slots} slots remaining",
+      "activeAddons": "[RO] Active Add-ons",
+      "expires": "[RO] Expires {date}",
+      "extend": "[RO] Extend",
+      "extend30Days": "[RO] Extend +30 days (${price})",
+      "upgradeAnnual": "[RO] Upgrade to annual (${price})",
+      "annualDiscount": "[RO] -15%",
+      "renew": "[RO] Renew",
+      "renewFor": "[RO] Renew for ${price}",
+      "planExpired": "[RO] Plan expired — renew to keep your tier",
+      "planExpiring": "[RO] Expires in {days} day — renew now",
+      "planExpiringPlural": "[RO] Expires in {days} days — renew now",
+      "planActiveUntil": "[RO] Active until {date}",
+      "noCharge": "[RO] No charge",
+      "lifetimePrice": "[RO] ${price} lifetime",
+      "monthlyPrice": "[RO] ${price} / 30 days",
+      "unlimitedMessages": "[RO] unlimited",
+      "messagesPerDay": "[RO] {count} messages/day",
+      "byokUnlimited": "[RO]  (BYOK = unlimited)",
+      "upgradeSection": "[RO] Upgrade Your Plan",
+      "upgradeDesc": "[RO] Get more agents, messages, and compute power.",
+      "addonsSection": "[RO] Add-ons",
+      "addonsDesc": "[RO] Stack extra capacity on your current plan.",
+      "accountAddons": "[RO] Account-level Add-ons",
+      "perAgentAddons": "[RO] Per-agent Add-ons",
+      "annualBilling": "[RO] Annual billing",
+      "annualBillingDesc": "[RO] 15% off — all subscription add-ons",
+      "monthly": "[RO] Monthly",
+      "annual": "[RO] Annual",
+      "monthSuffix": "[RO] /mo",
+      "annualSuffix": "[RO] /yr",
+      "yearSuffix": "[RO] /yr",
+      "paymentHistory": "[RO] Payment History",
+      "noPaymentsYet": "[RO] No payments yet",
+      "noPaymentsDesc": "[RO] Your payment history will appear here.",
+      "status": {
+        "confirmed": "[RO] Confirmed",
+        "pending": "[RO] Pending",
+        "failed": "[RO] Failed",
+        "refunded": "[RO] Refunded"
+      },
+      "selectAgent": "[RO] Select Agent",
+      "choosePayment": "[RO] Choose Payment Method",
+      "applyToAgent": "[RO] Apply to agent:",
+      "noAgentsFound": "[RO] No agents found. Create an agent first.",
+      "payWithCredits": "[RO] Pay with Credits",
+      "payWithSol": "[RO] Pay with SOL",
+      "solDesc": "[RO] Solana wallet payment",
+      "payWithHatcher": "[RO] Pay with $HATCHER",
+      "hatcherDesc": "[RO] HATCHER token on Solana",
+      "payWithUsdc": "[RO] Pay with USDC",
+      "usdcDesc": "[RO] Stablecoin — 1 USDC = $1",
+      "payWithCard": "[RO] Pay with Card",
+      "cardDesc": "[RO] Credit/debit card via Stripe",
+      "creditAvailable": "[RO] ${balance} available — instant",
+      "creditInsufficient": "[RO] Not enough — need ${need}, have ${have}",
+      "foundingSlots": "[RO] {remaining} of {max} slots remaining",
+      "manageBilling": "[RO] Manage Billing",
+      "successPayment": "[RO] Payment successful! Your account is being upgraded. It may take a moment to reflect.",
+      "canceledPayment": "[RO] Payment was canceled. No charges were made.",
+      "lifetimePriceFull": "[RO] ${price} lifetime",
+      "foundingSoldOut": "[RO] Sold out",
+      "oneTimeSuffix": "[RO] one-time",
+      "oneTimeAgent": "[RO] one-time / agent",
+      "annualAgent": "[RO] / year / agent",
+      "monthAgent": "[RO] / 30 days / agent"
+    },
+    "analytics": {
+      "eyebrow": "[RO] Dashboard",
+      "heading": "[RO] Analytics",
+      "subheading": "[RO] Account-wide usage insights.",
+      "signInDescription": "[RO] Sign in to view analytics.",
+      "messageVolume": "[RO] Message Volume",
+      "last14Days": "[RO] Last 14 days",
+      "frameworks": "[RO] Frameworks",
+      "agentStatus": "[RO] Agent Status",
+      "totalMessages": "[RO] Total Messages by Agent",
+      "noMessageData": "[RO] No message data yet — start chatting with your agents!",
+      "noAgentsYet": "[RO] No agents yet",
+      "noAgentsEmpty": "[RO] No agents yet. Create your first agent to start seeing analytics.",
+      "createAgent": "[RO] Create Agent",
+      "totalAgents": "[RO] Total Agents",
+      "totalAgentsSub": "[RO] {active} active",
+      "messages": "[RO] Messages",
+      "messagesAllTime": "[RO] All time",
+      "llmCalls": "[RO] LLM Calls",
+      "llmCallsAllTime": "[RO] All time",
+      "last14DaysLabel": "[RO] Last 14 Days",
+      "last14DaysSub": "[RO] User messages",
+      "today": "[RO] Today",
+      "noDataYet": "[RO] No message data yet"
+    },
+    "team": {
+      "eyebrow": "[RO] Collaboration",
+      "heading": "[RO] Team",
+      "subheading": "[RO] Create a team to share agents and collaborate with others.",
+      "signInTitle": "[RO] Sign in to access Teams",
+      "signInDesc": "[RO] Teams let you collaborate with others on your AI agents.",
+      "createTeamTitle": "[RO] Create Your Team",
+      "createTeamDesc": "[RO] Start collaborating by creating a team. You can then invite members and share your agents.",
+      "teamNamePlaceholder": "[RO] Team name...",
+      "createBtn": "[RO] Create",
+      "creating": "[RO] Creating...",
+      "membersHeading": "[RO] Members",
+      "inviteMemberHeading": "[RO] Invite Member",
+      "emailPlaceholder": "[RO] Email address...",
+      "roleAdmin": "[RO] Admin",
+      "roleMember": "[RO] Member",
+      "roleViewer": "[RO] Viewer",
+      "roleOwner": "[RO] Owner",
+      "you": "[RO] (you)",
+      "sharedAgentsHeading": "[RO] Shared Agents",
+      "noSharedAgents": "[RO] No agents shared with this team yet.",
+      "yourAgentsHeading": "[RO] Your Agents",
+      "byLabel": "[RO] by {username}",
+      "memberCount": "[RO] {count} member",
+      "memberCountPlural": "[RO] {count} members",
+      "agentSharedCount": "[RO] {count} agent shared",
+      "agentSharedCountPlural": "[RO] {count} agents shared",
+      "leaveTeam": "[RO] Leave",
+      "leaveTeamTitle": "[RO] Leave Team",
+      "leaveTeamDesc": "[RO] Are you sure you want to leave this team? You will lose access to all shared agents.",
+      "leaveTeamConfirm": "[RO] Leave Team",
+      "deleteTeam": "[RO] Delete Team",
+      "deleteTeamTitle": "[RO] Delete Team",
+      "deleteTeamDesc": "[RO] Are you sure you want to permanently delete this team? All shared agents will be unshared.",
+      "deleteTeamConfirm": "[RO] Delete Team",
+      "errors": {
+        "loadFailed": "[RO] Failed to load team data",
+        "createFailed": "[RO] Failed to create team",
+        "inviteFailed": "[RO] Failed to invite member",
+        "removeFailed": "[RO] Failed to remove member",
+        "leaveFailed": "[RO] Failed to leave team",
+        "deleteFailed": "[RO] Failed to delete team",
+        "shareFailed": "[RO] Failed to share agent",
+        "unshareFailed": "[RO] Failed to unshare agent",
+        "roleFailed": "[RO] Failed to update role"
+      },
+      "invite": "[RO] Invite"
+    },
+    "affiliate": {
+      "eyebrow": "[RO] Dashboard",
+      "heading": "[RO] Affiliate Dashboard",
+      "signInTitle": "[RO] Sign In Required",
+      "signInDesc": "[RO] Sign in to view your affiliate dashboard.",
+      "yourReferralLink": "[RO] Your Referral Link",
+      "referralLinkDesc": "[RO] New signups via this link are attributed to you for life.",
+      "shareOnX": "[RO] Share on X",
+      "telegram": "[RO] Telegram",
+      "copyLink": "[RO] Copy",
+      "copiedLink": "[RO] Copied",
+      "refresh": "[RO] Refresh",
+      "frozenTitle": "[RO] Account frozen",
+      "codeLabel": "[RO] Code",
+      "totalReferrals": "[RO] Total Referrals",
+      "paidLabel": "[RO] {count} paid",
+      "pending30d": "[RO] Pending (30d hold)",
+      "payableNow": "[RO] Payable Now",
+      "lifetimeEarned": "[RO] Lifetime Earned",
+      "paidOut": "[RO] {amount} paid out",
+      "referralsTable": "[RO] Referrals",
+      "noReferrals": "[RO] No referrals yet. Share your link!",
+      "commissionsTable": "[RO] Commissions",
+      "noCommissions": "[RO] No commissions yet.",
+      "payoutsTable": "[RO] Payouts",
+      "noPayouts": "[RO] No payouts yet.",
+      "loadMore": "[RO] Load more",
+      "signupCol": "[RO] Signup",
+      "emailCol": "[RO] Email",
+      "statusCol": "[RO] Status",
+      "tierCol": "[RO] Tier",
+      "dateCol": "[RO] Date",
+      "sourceCol": "[RO] Source",
+      "amountCol": "[RO] Amount",
+      "cashCol": "[RO] Cash",
+      "creditsCol": "[RO] Credits",
+      "noteCol": "[RO] Note",
+      "statusPaid": "[RO] Paid",
+      "statusFree": "[RO] Free",
+      "statusPending": "[RO] Pending",
+      "statusPayable": "[RO] Payable",
+      "statusPaidOut": "[RO] Paid",
+      "statusVoided": "[RO] Voided",
+      "flagged": "[RO] Flagged",
+      "untilDate": "[RO] until {date}",
+      "sourceSubscription": "[RO] Subscription",
+      "sourceFoundingMember": "[RO] Founding Member",
+      "payoutSettings": "[RO] Payout Settings",
+      "payoutMode": "[RO] Mode",
+      "payoutAddress": "[RO] Payout Address",
+      "creditsOnly": "[RO] Credits only — no address",
+      "changePrefs": "[RO] Need to change payout preferences?",
+      "contactSupport": "[RO] Contact support",
+      "modeCashOnly": "[RO] Cash only (20%)",
+      "modeCreditsOnly": "[RO] Credits only (40%)",
+      "modeHybrid": "[RO] Hybrid (15% cash + 25% credits)"
+    },
+    "settings": {
+      "eyebrow": "[RO] Account",
+      "heading": "[RO] Settings",
+      "subheading": "[RO] Manage your account, security, and preferences.",
+      "tabs": {
+        "profile": "[RO] Profile",
+        "security": "[RO] Security",
+        "notifications": "[RO] Notifications",
+        "billing": "[RO] Billing",
+        "danger": "[RO] Danger Zone"
+      },
+      "profile": {
+        "sectionTitle": "[RO] Profile",
+        "changePhoto": "[RO] Change photo",
+        "uploadPhoto": "[RO] Upload photo",
+        "remove": "[RO] Remove",
+        "joinedLabel": "[RO] Joined {date}",
+        "usernameLabel": "[RO] Username",
+        "usernamePlaceholder": "[RO] your_username",
+        "usernameHint": "[RO] 3–30 characters, letters, numbers, _ or -",
+        "emailLabel": "[RO] Email address",
+        "emailPlaceholder": "[RO] you@example.com",
+        "saveChanges": "[RO] Save Changes",
+        "saving": "[RO] Saving...",
+        "walletTitle": "[RO] Connected Wallet",
+        "walletLinkedDesc": "[RO] Linked automatically from your first on-chain payment. Used when paying with SOL, USDC, or $HATCHER.",
+        "walletViewSolscan": "[RO] Solscan",
+        "walletDisconnect": "[RO] Disconnect wallet",
+        "walletNone": "[RO] No wallet linked yet. Your Solana wallet connects automatically the first time you make an on-chain payment from the billing page.",
+        "referralTitle": "[RO] Referral Program",
+        "referralDesc": "[RO] Invite friends to Hatcher. You both get {credit} credit when they create their first agent.",
+        "referralCode": "[RO] Referral Code",
+        "shareLink": "[RO] Share Link",
+        "referred": "[RO] Referred",
+        "earned": "[RO] Earned",
+        "claimRewards": "[RO] Claim Pending Rewards",
+        "claiming": "[RO] Claiming..."
+      },
+      "security": {
+        "changePasswordTitle": "[RO] Change Password",
+        "currentPassword": "[RO] Current Password",
+        "currentPasswordPlaceholder": "[RO] Enter current password",
+        "newPassword": "[RO] New Password",
+        "newPasswordPlaceholder": "[RO] Min 8 chars, upper, lower, number",
+        "confirmPassword": "[RO] Confirm New Password",
+        "confirmPasswordPlaceholder": "[RO] Repeat new password",
+        "changePasswordBtn": "[RO] Change Password",
+        "changing": "[RO] Changing...",
+        "apiKeysTitle": "[RO] API Keys",
+        "apiKeysDesc": "[RO] Create multiple API keys for programmatic access. Each key uses the {prefix} prefix. The full key is shown {emphasis} at creation.",
+        "apiKeysEmphasis": "[RO] only once",
+        "manageKeys": "[RO] Manage keys",
+        "newKeyCreated": "[RO] New key created — copy it now!",
+        "noKeysYet": "[RO] No API keys yet. Create one below.",
+        "keyLabelPlaceholder": "[RO] Label (e.g. \"Production\")",
+        "createKey": "[RO] Create Key",
+        "creating": "[RO] Creating...",
+        "keysLimit": "[RO] Up to 10 active keys. Each key has full API access.",
+        "reqToday": "[RO] {count} req today · {week} this week",
+        "lastUsed": "[RO] Last used {date}",
+        "save": "[RO] Save"
+      },
+      "notifications": {
+        "sectionTitle": "[RO] Notifications",
+        "pushLabel": "[RO] Push Notifications",
+        "pushDesc": "[RO] Browser push notifications for real-time updates",
+        "agentsLabel": "[RO] Agent Alerts",
+        "agentsDesc": "[RO] Get notified when agents change status, crash, or need attention",
+        "billingLabel": "[RO] Billing Alerts",
+        "billingDesc": "[RO] Payment confirmations, subscription renewals, and credits"
+      },
+      "billing": {
+        "sectionTitle": "[RO] Billing",
+        "currentPlan": "[RO] Current Plan",
+        "hatcherCredits": "[RO] HATCHER Credits",
+        "creditsAutoApplied": "[RO] Automatically applied at checkout",
+        "manageBilling": "[RO] Manage Billing"
+      },
+      "danger": {
+        "sectionTitle": "[RO] Danger Zone",
+        "exportTitle": "[RO] Export My Data",
+        "exportDesc": "[RO] Download a JSON file containing all your account data: profile, agents, chat history, payments, referrals, support tickets, and more.",
+        "exportBtn": "[RO] Export My Data",
+        "exporting": "[RO] Exporting...",
+        "deleteTitle": "[RO] Delete Account",
+        "deleteDesc": "[RO] Permanently remove your account, all agents, payment history, and configuration. This action is irreversible.",
+        "deleteBtn": "[RO] Delete Account",
+        "deleting": "[RO] Deleting...",
+        "dialogTitle": "[RO] Delete Your Account?",
+        "dialogDesc": "[RO] This will permanently remove all your agents, data, and payment history. This action {emphasis} be undone.",
+        "dialogEmphasis": "[RO] cannot",
+        "confirmPassword": "[RO] Confirm your password",
+        "passwordPlaceholder": "[RO] Your current password",
+        "cancelBtn": "[RO] Cancel"
+      }
+    },
+    "apiKeys": {
+      "eyebrow": "[RO] Settings",
+      "heading": "[RO] API keys",
+      "subheading": "[RO] Manage programmatic access keys for the {docsLink}. Each key starts with {prefix}.",
+      "docsLinkLabel": "[RO] Hatcher API",
+      "backToSettings": "[RO] Back to Settings",
+      "newKeyAlert": "[RO] Key created — copy it now!",
+      "newKeyAlertSub": "[RO] This is the only time the full key will be shown. Store it somewhere safe.",
+      "noKeysTitle": "[RO] No API keys yet",
+      "noKeysDesc": "[RO] Create your first key to get started",
+      "loading": "[RO] Loading keys...",
+      "createSectionTitle": "[RO] Create new key",
+      "createSectionDesc": "[RO] Give your key a descriptive name (e.g. \"Local Dev\", \"CI/CD Pipeline\").",
+      "keyLabelPlaceholder": "[RO] Key label...",
+      "createKey": "[RO] Create Key",
+      "creating": "[RO] Creating...",
+      "usageNote": "[RO] Use your API key in the {header} header. See the {docsLink} for all available endpoints.",
+      "headerExample": "[RO] Authorization: Bearer hk_...",
+      "docsLinkLabel2": "[RO] API reference docs",
+      "copiedLabel": "[RO] Copied!",
+      "copyLabel": "[RO] Copy",
+      "dismissLabel": "[RO] Dismiss",
+      "revokeTitle": "[RO] Revoke API Key",
+      "revokeDesc": "[RO] This key will be permanently invalidated and any applications using it will stop working immediately. This cannot be undone.",
+      "revokeConfirm": "[RO] Revoke Key",
+      "neverUsed": "[RO] Never used",
+      "lastUsed": "[RO] Last used {time}",
+      "created": "[RO] Created {date}",
+      "reqStats": "[RO] {today} req today · {week} this week",
+      "saveBtn": "[RO] Save",
+      "cancelBtn": "[RO] Cancel"
+    },
+    "quickStats": {
+      "totalAgents": "[RO] Total Agents",
+      "dailyMessages": "[RO] Daily Messages",
+      "unlimited": "[RO] ∞",
+      "accountWide": "[RO] account-wide · BYOK = unlimited",
+      "activeNow": "[RO] Active Now",
+      "noAgentsRunning": "[RO] No agents running",
+      "agentsOnline": "[RO] {count} agent online",
+      "agentsOnlinePlural": "[RO] {count} agents online",
+      "accountTier": "[RO] Account Tier",
+      "lifetimeAccess": "[RO] Lifetime access",
+      "prioritySupport": "[RO] Priority support",
+      "upgradePlan": "[RO] Upgrade plan"
+    }
+  },
+  "settings": {
+    "redirect": "[RO] Redirecting to settings..."
   }
 }
