@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import type { RoomLogLine } from '../types';
 
 interface Props {
@@ -6,6 +7,7 @@ interface Props {
 }
 
 export function LogsHud({ logs }: Props) {
+  const t = useTranslations('agentRoom.hud');
   return (
     <div
       className="pointer-events-auto absolute top-3 right-3 z-10 hidden w-[280px] rounded-2xl border px-3.5 py-3 backdrop-blur-xl md:top-5 md:right-5 md:block"
@@ -18,7 +20,7 @@ export function LogsHud({ logs }: Props) {
         className="mb-2 text-[10px] font-bold uppercase tracking-[2px]"
         style={{ color: 'var(--room-primary)' }}
       >
-        ◆ LIVE LOGS
+        {t('liveLogs')}
       </div>
       <div className="h-[140px] overflow-hidden font-mono text-[10px] leading-snug text-gray-400">
         {logs.slice(0, 8).map((l, i) => (
@@ -39,7 +41,7 @@ export function LogsHud({ logs }: Props) {
           </div>
         ))}
         {logs.length === 0 && (
-          <div className="text-gray-600 italic">Waiting for logs...</div>
+          <div className="text-gray-600 italic">{t('waitingForLogs')}</div>
         )}
       </div>
     </div>

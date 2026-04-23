@@ -1270,5 +1270,159 @@
     "openInHatcher": "[ro] Open in Hatcher",
     "poweredBy": "[ro] powered by",
     "messages": "[ro] messages"
+  },
+  "agentRoom": {
+    "loading": "[ro] Entering agent room…",
+    "notFound": "[ro] Agent not found",
+    "notFoundBody": "[ro] Either this agent doesn't exist or you don't have access.",
+    "backToDashboard": "[ro] ← Back to dashboard",
+    "backToCity": "[ro] Back to City",
+    "backToDashboardFull": "[ro] Back to Dashboard",
+    "cityShort": "[ro] City",
+    "dashboardShort": "[ro] Dashboard",
+    "previewBadge": "[ro] AGENT ROOM · PREVIEW",
+    "frameworkComingSoon": "[ro] Agent Room is rolling out one framework at a time. Rooms for {framework} are coming next.",
+    "backToAgent": "[ro] ← Back to agent dashboard",
+    "signInToChat": "[ro] Sign in to chat with {name}",
+    "cantReach": "[ro] Can't reach agent right now — reconnecting...",
+    "standingBy": "[ro] {name} standing by.",
+    "hud": {
+      "statsAgentLabel": "[ro] {framework} AGENT · LV {level}",
+      "uptimeLabel": "[ro] uptime {uptime}",
+      "messagesLabel": "[ro] messages",
+      "statusLabel": "[ro] status",
+      "liveLogs": "[ro] ◆ LIVE LOGS",
+      "waitingForLogs": "[ro] Waiting for logs...",
+      "xpLabel": "[ro] XP",
+      "moodLabel": "[ro] MOOD",
+      "skillActive": "[ro] ACTIVE",
+      "skillIdle": "[ro] IDLE",
+      "skillCalls": "[ro] {calls} calls",
+      "viewersWatch": "[ro] {count, plural, =1 {# watching} other {# watching}}",
+      "viewersTitle": "[ro] {count, plural, =1 {# viewer right now} other {# viewers right now}}",
+      "chatPlaceholder": "[ro] Message your agent...",
+      "chatSend": "[ro] SEND"
+    },
+    "share": {
+      "button": "[ro] Share",
+      "capturing": "[ro] Capturing...",
+      "saved": "[ro] Image saved + X opened",
+      "failed": "[ro] Could not capture scene",
+      "title": "[ro] Capture room + share on X"
+    },
+    "embed": {
+      "button": "[ro] Embed",
+      "copied": "[ro] Copied!",
+      "failed": "[ro] Failed",
+      "title": "[ro] Copy iframe embed snippet"
+    },
+    "leaderboard": {
+      "button": "[ro] Rank",
+      "buttonWithRank": "[ro] Rank #{rank}",
+      "heading": "[ro] LEADERBOARD",
+      "loading": "[ro] Loading…",
+      "empty": "[ro] No public {framework} agents yet.",
+      "you": "[ro] · you",
+      "footer": "[ro] Ranked by messages sent · public agents only",
+      "title": "[ro] Top agents per framework"
+    },
+    "memory": {
+      "button": "[ro] Memory",
+      "title": "[ro] View agent memory & config",
+      "whatKnows": "[ro] What your agent knows",
+      "sectionPersona": "[ro] Persona / System Prompt",
+      "sectionModel": "[ro] Model & Runtime",
+      "sectionSkills": "[ro] Skills ({count})",
+      "sectionIntegrations": "[ro] Integrations ({count})",
+      "sectionRaw": "[ro] Raw config (JSON)",
+      "noPrompt": "[ro] No system prompt set.",
+      "noSkills": "[ro] No skills configured.",
+      "noIntegrations": "[ro] No integrations wired.",
+      "editingComingSoon": "[ro] Memory editing is coming soon. For now, manage your agent's config from the dashboard.",
+      "rowProvider": "[ro] Provider",
+      "rowModel": "[ro] Model",
+      "rowSessionScope": "[ro] Session scope",
+      "rowFramework": "[ro] Framework",
+      "frameworkLabel": {
+        "openclaw": "[ro] OpenClaw config",
+        "hermes": "[ro] Hermes SOUL",
+        "elizaos": "[ro] ElizaOS character",
+        "milady": "[ro] Milady config",
+        "default": "[ro] Agent Memory"
+      }
+    },
+    "quests": {
+      "buttonTitle": "[ro] Daily quests",
+      "heading": "[ro] DAILY QUESTS",
+      "buildStreak": "[ro] Build your streak",
+      "streakDays": "[ro] 🔥 {count}-day streak",
+      "close": "[ro] ESC",
+      "progressFraction": "[ro] {current} / {target}",
+      "claimed": "[ro] Claimed — come back tomorrow 🌙",
+      "claimButton": "[ro] Claim · extend streak to {next}d 🔥",
+      "completeAll": "[ro] Complete all quests to claim",
+      "agentFooter": "[ro] agent: {agentId}… · rotates at midnight"
+    },
+    "achievements": {
+      "unlocked": "[ro] ★ ACHIEVEMENT UNLOCKED"
+    },
+    "integration": {
+      "heading": "[ro] INTEGRATION",
+      "statusActive": "[ro] ● ACTIVE",
+      "statusOff": "[ro] ○ OFF",
+      "descActive": "[ro] Your agent is listening on {label}. Disable to stop responding, or manage to change the config.",
+      "descInactive": "[ro] {label} is not configured. Click Manage to add credentials and enable.",
+      "disabling": "[ro] Disabling...",
+      "disable": "[ro] Disable",
+      "manage": "[ro] Manage →",
+      "configure": "[ro] Configure →",
+      "escClose": "[ro] ESC to close"
+    },
+    "status": {
+      "paused": {
+        "title": "[ro] Agent is paused",
+        "hint": "[ro] Go to the dashboard and click Start to wake it up."
+      },
+      "stopped": {
+        "title": "[ro] Agent is stopped",
+        "hint": "[ro] Start it from the dashboard to chat."
+      },
+      "starting": {
+        "title": "[ro] Agent is starting up",
+        "hint": "[ro] This takes 2–4 min on first boot. Chat will be live the moment it's ready."
+      },
+      "initializing": {
+        "title": "[ro] Initializing agent",
+        "hint": "[ro] Seeding config and skills — usually 2 min, first boot can be longer."
+      },
+      "pending": {
+        "title": "[ro] Agent pending",
+        "hint": "[ro] Waiting for start signal..."
+      },
+      "error": {
+        "title": "[ro] Agent in error state",
+        "hint": "[ro] Check Integrations tab or support — last boot failed."
+      },
+      "crashed": {
+        "title": "[ro] Agent crashed",
+        "hint": "[ro] Auto-restart will retry. If it keeps crashing, check logs."
+      }
+    },
+    "mood": {
+      "warmingUp": "[ro] WARMING UP",
+      "thriving": "[ro] THRIVING",
+      "upbeat": "[ro] UPBEAT",
+      "steady": "[ro] STEADY",
+      "struggling": "[ro] STRUGGLING",
+      "overheating": "[ro] OVERHEATING"
+    },
+    "voice": {
+      "stopListening": "[ro] Stop listening",
+      "startVoice": "[ro] Start voice input",
+      "turnOffVoice": "[ro] Turn off voice replies",
+      "agentSpeakReplies": "[ro] Have the agent speak replies",
+      "voiceOn": "[ro] Voice On",
+      "voice": "[ro] Voice"
+    }
   }
 }

@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   onSend: (text: string) => void;
@@ -7,12 +8,13 @@ interface Props {
 }
 
 export function ChatInput({ onSend, disabled }: Props) {
+  const t = useTranslations('agentRoom');
   const [value, setValue] = useState('');
 
   function handle() {
-    const t = value.trim();
-    if (!t) return;
-    onSend(t);
+    const text = value.trim();
+    if (!text) return;
+    onSend(text);
     setValue('');
   }
 
@@ -26,7 +28,7 @@ export function ChatInput({ onSend, disabled }: Props) {
     >
       <input
         type="text"
-        placeholder="Message your agent..."
+        placeholder={t('hud.chatPlaceholder')}
         disabled={disabled}
         value={value}
         onChange={(e) => setValue(e.target.value)}
@@ -45,7 +47,7 @@ export function ChatInput({ onSend, disabled }: Props) {
         className="shrink-0 rounded-lg px-3 py-2 text-[10px] font-bold uppercase tracking-wider transition-opacity disabled:opacity-50 md:px-5 md:py-2.5 md:text-[11px]"
         style={{ background: 'var(--room-primary)', color: '#1a1400' }}
       >
-        SEND
+        {t('hud.chatSend')}
       </button>
     </div>
   );

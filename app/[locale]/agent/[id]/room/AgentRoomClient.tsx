@@ -1,6 +1,7 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AgentRoomScene } from '@/components/agent-room/AgentRoomScene';
 import { StatsHud } from '@/components/agent-room/hud/StatsHud';
@@ -201,6 +202,7 @@ function classifyLine(msg: string, backendLevel?: string): RoomLogLine['level'] 
 }
 
 export function AgentRoomClient({ id }: Props) {
+  const t = useTranslations('agentRoom');
   const router = useRouter();
   const searchParams = useSearchParams();
   // Default: modern glTF avatar. Opt-out via ?avatar=procedural for the
@@ -307,8 +309,8 @@ export function AgentRoomClient({ id }: Props) {
 
   // First-render bubble text once we have the agent name
   useEffect(() => {
-    if (agent && !bubbleText) setBubbleText(`${agent.name} standing by.`);
-  }, [agent, bubbleText]);
+    if (agent && !bubbleText) setBubbleText(t('standingBy', { name: agent.name }));
+  }, [agent, bubbleText, t]);
 
   // log poller — owners only (viewers don't get the logs stream)
   useEffect(() => {
@@ -388,7 +390,7 @@ export function AgentRoomClient({ id }: Props) {
       setBubbleText('');
       setBubbleTyping(true);
       const ok = send(text);
-      if (!ok) setBubbleText("Can't reach agent right now — reconnecting...");
+      if (!ok) setBubbleText(t('cantReach'));
       // One chat send bumps every chat-count-target quest key at once —
       // DailyQuests ignores keys not in today's active list, so this is a
       // cheap way to cover chat5 / chat10 / chat20 without branching here.
@@ -452,7 +454,7 @@ export function AgentRoomClient({ id }: Props) {
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-black text-gray-400">
-        <div className="text-sm">Entering agent room…</div>
+        <div className="text-sm">{t('loading')}</div>
       </main>
     );
   }
@@ -461,15 +463,13 @@ export function AgentRoomClient({ id }: Props) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-black p-6 text-gray-100">
         <div className="max-w-md space-y-3 text-center">
-          <h1 className="text-2xl font-bold">Agent not found</h1>
-          <p className="text-gray-400">
-            Either this agent doesn&apos;t exist or you don&apos;t have access.
-          </p>
+          <h1 className="text-2xl font-bold">{t('notFound')}</h1>
+          <p className="text-gray-400">{t('notFoundBody')}</p>
           <Link
             href="/dashboard"
             className="mt-4 inline-block text-yellow-400 underline underline-offset-4 hover:text-yellow-300"
           >
-            ← Back to dashboard
+            {t('backToDashboard')}
           </Link>
         </div>
       </main>
@@ -485,19 +485,18 @@ export function AgentRoomClient({ id }: Props) {
             className="text-xs uppercase tracking-[3px]"
             style={{ color: palette.primaryHex }}
           >
-            AGENT ROOM · PREVIEW
+            {t('previewBadge')}
           </div>
           <h1 className="text-2xl font-bold">{agent.name}</h1>
           <p className="text-gray-400">
-            Agent Room is rolling out one framework at a time. Rooms for{' '}
-            <b className="text-white">{agent.framework}</b> are coming next.
+            {t('frameworkComingSoon', { framework: agent.framework })}
           </p>
           <Link
             href={`/agent/${id}`}
             className="mt-4 inline-block underline underline-offset-4"
             style={{ color: palette.primaryHex }}
           >
-            ← Back to agent dashboard
+            {t('backToAgent')}
           </Link>
         </div>
       </main>
@@ -562,7 +561,7 @@ export function AgentRoomClient({ id }: Props) {
           }}
         >
           <span>🔐</span>
-          <span>Sign in to chat with {agent.name}</span>
+          <span>{t('signInToChat', { name: agent.name })}</span>
           <span aria-hidden>→</span>
         </Link>
       ) : (
@@ -609,8 +608,8 @@ export function AgentRoomClient({ id }: Props) {
         }}
       >
         <span aria-hidden>←</span>
-        <span className="hidden md:inline">{viewerMode ? 'Back to City' : 'Back to Dashboard'}</span>
-        <span className="md:hidden">{viewerMode ? 'City' : 'Dashboard'}</span>
+        <span className="hidden md:inline">{viewerMode ? t('backToCity') : t('backToDashboardFull')}</span>
+        <span className="md:hidden">{viewerMode ? t('cityShort') : t('dashboardShort')}</span>
       </Link>
     </div>
   );

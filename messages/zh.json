@@ -1270,5 +1270,159 @@
     "openInHatcher": "[zh] Open in Hatcher",
     "poweredBy": "[zh] powered by",
     "messages": "[zh] messages"
+  },
+  "agentRoom": {
+    "loading": "[zh] Entering agent room…",
+    "notFound": "[zh] Agent not found",
+    "notFoundBody": "[zh] Either this agent doesn't exist or you don't have access.",
+    "backToDashboard": "[zh] ← Back to dashboard",
+    "backToCity": "[zh] Back to City",
+    "backToDashboardFull": "[zh] Back to Dashboard",
+    "cityShort": "[zh] City",
+    "dashboardShort": "[zh] Dashboard",
+    "previewBadge": "[zh] AGENT ROOM · PREVIEW",
+    "frameworkComingSoon": "[zh] Agent Room is rolling out one framework at a time. Rooms for {framework} are coming next.",
+    "backToAgent": "[zh] ← Back to agent dashboard",
+    "signInToChat": "[zh] Sign in to chat with {name}",
+    "cantReach": "[zh] Can't reach agent right now — reconnecting...",
+    "standingBy": "[zh] {name} standing by.",
+    "hud": {
+      "statsAgentLabel": "[zh] {framework} AGENT · LV {level}",
+      "uptimeLabel": "[zh] uptime {uptime}",
+      "messagesLabel": "[zh] messages",
+      "statusLabel": "[zh] status",
+      "liveLogs": "[zh] ◆ LIVE LOGS",
+      "waitingForLogs": "[zh] Waiting for logs...",
+      "xpLabel": "[zh] XP",
+      "moodLabel": "[zh] MOOD",
+      "skillActive": "[zh] ACTIVE",
+      "skillIdle": "[zh] IDLE",
+      "skillCalls": "[zh] {calls} calls",
+      "viewersWatch": "[zh] {count, plural, =1 {# watching} other {# watching}}",
+      "viewersTitle": "[zh] {count, plural, =1 {# viewer right now} other {# viewers right now}}",
+      "chatPlaceholder": "[zh] Message your agent...",
+      "chatSend": "[zh] SEND"
+    },
+    "share": {
+      "button": "[zh] Share",
+      "capturing": "[zh] Capturing...",
+      "saved": "[zh] Image saved + X opened",
+      "failed": "[zh] Could not capture scene",
+      "title": "[zh] Capture room + share on X"
+    },
+    "embed": {
+      "button": "[zh] Embed",
+      "copied": "[zh] Copied!",
+      "failed": "[zh] Failed",
+      "title": "[zh] Copy iframe embed snippet"
+    },
+    "leaderboard": {
+      "button": "[zh] Rank",
+      "buttonWithRank": "[zh] Rank #{rank}",
+      "heading": "[zh] LEADERBOARD",
+      "loading": "[zh] Loading…",
+      "empty": "[zh] No public {framework} agents yet.",
+      "you": "[zh] · you",
+      "footer": "[zh] Ranked by messages sent · public agents only",
+      "title": "[zh] Top agents per framework"
+    },
+    "memory": {
+      "button": "[zh] Memory",
+      "title": "[zh] View agent memory & config",
+      "whatKnows": "[zh] What your agent knows",
+      "sectionPersona": "[zh] Persona / System Prompt",
+      "sectionModel": "[zh] Model & Runtime",
+      "sectionSkills": "[zh] Skills ({count})",
+      "sectionIntegrations": "[zh] Integrations ({count})",
+      "sectionRaw": "[zh] Raw config (JSON)",
+      "noPrompt": "[zh] No system prompt set.",
+      "noSkills": "[zh] No skills configured.",
+      "noIntegrations": "[zh] No integrations wired.",
+      "editingComingSoon": "[zh] Memory editing is coming soon. For now, manage your agent's config from the dashboard.",
+      "rowProvider": "[zh] Provider",
+      "rowModel": "[zh] Model",
+      "rowSessionScope": "[zh] Session scope",
+      "rowFramework": "[zh] Framework",
+      "frameworkLabel": {
+        "openclaw": "[zh] OpenClaw config",
+        "hermes": "[zh] Hermes SOUL",
+        "elizaos": "[zh] ElizaOS character",
+        "milady": "[zh] Milady config",
+        "default": "[zh] Agent Memory"
+      }
+    },
+    "quests": {
+      "buttonTitle": "[zh] Daily quests",
+      "heading": "[zh] DAILY QUESTS",
+      "buildStreak": "[zh] Build your streak",
+      "streakDays": "[zh] 🔥 {count}-day streak",
+      "close": "[zh] ESC",
+      "progressFraction": "[zh] {current} / {target}",
+      "claimed": "[zh] Claimed — come back tomorrow 🌙",
+      "claimButton": "[zh] Claim · extend streak to {next}d 🔥",
+      "completeAll": "[zh] Complete all quests to claim",
+      "agentFooter": "[zh] agent: {agentId}… · rotates at midnight"
+    },
+    "achievements": {
+      "unlocked": "[zh] ★ ACHIEVEMENT UNLOCKED"
+    },
+    "integration": {
+      "heading": "[zh] INTEGRATION",
+      "statusActive": "[zh] ● ACTIVE",
+      "statusOff": "[zh] ○ OFF",
+      "descActive": "[zh] Your agent is listening on {label}. Disable to stop responding, or manage to change the config.",
+      "descInactive": "[zh] {label} is not configured. Click Manage to add credentials and enable.",
+      "disabling": "[zh] Disabling...",
+      "disable": "[zh] Disable",
+      "manage": "[zh] Manage →",
+      "configure": "[zh] Configure →",
+      "escClose": "[zh] ESC to close"
+    },
+    "status": {
+      "paused": {
+        "title": "[zh] Agent is paused",
+        "hint": "[zh] Go to the dashboard and click Start to wake it up."
+      },
+      "stopped": {
+        "title": "[zh] Agent is stopped",
+        "hint": "[zh] Start it from the dashboard to chat."
+      },
+      "starting": {
+        "title": "[zh] Agent is starting up",
+        "hint": "[zh] This takes 2–4 min on first boot. Chat will be live the moment it's ready."
+      },
+      "initializing": {
+        "title": "[zh] Initializing agent",
+        "hint": "[zh] Seeding config and skills — usually 2 min, first boot can be longer."
+      },
+      "pending": {
+        "title": "[zh] Agent pending",
+        "hint": "[zh] Waiting for start signal..."
+      },
+      "error": {
+        "title": "[zh] Agent in error state",
+        "hint": "[zh] Check Integrations tab or support — last boot failed."
+      },
+      "crashed": {
+        "title": "[zh] Agent crashed",
+        "hint": "[zh] Auto-restart will retry. If it keeps crashing, check logs."
+      }
+    },
+    "mood": {
+      "warmingUp": "[zh] WARMING UP",
+      "thriving": "[zh] THRIVING",
+      "upbeat": "[zh] UPBEAT",
+      "steady": "[zh] STEADY",
+      "struggling": "[zh] STRUGGLING",
+      "overheating": "[zh] OVERHEATING"
+    },
+    "voice": {
+      "stopListening": "[zh] Stop listening",
+      "startVoice": "[zh] Start voice input",
+      "turnOffVoice": "[zh] Turn off voice replies",
+      "agentSpeakReplies": "[zh] Have the agent speak replies",
+      "voiceOn": "[zh] Voice On",
+      "voice": "[zh] Voice"
+    }
   }
 }

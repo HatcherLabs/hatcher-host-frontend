@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   level: number;
@@ -7,10 +8,11 @@ interface Props {
 }
 
 export function XpBar({ level, xp, max }: Props) {
+  const t = useTranslations('agentRoom.hud');
   const pct = Math.min(100, Math.round((xp / max) * 100));
   return (
     <div className="absolute bottom-[88px] left-1/2 z-10 flex w-[min(500px,calc(100vw-24px))] -translate-x-1/2 items-center gap-2.5 text-[10px] uppercase tracking-wider text-gray-400 md:bottom-[92px]">
-      <span>XP</span>
+      <span>{t('xpLabel')}</span>
       <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/[0.08]">
         <div
           className="h-full rounded-full"

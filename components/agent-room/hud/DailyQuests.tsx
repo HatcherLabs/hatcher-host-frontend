@@ -1,5 +1,6 @@
 'use client';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 export interface Quest {
   key: string;
@@ -35,12 +36,6 @@ function todayStr(): string {
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${y}-${m}-${day}`;
-}
-
-function yesterdayStr(today: string): string {
-  const d = new Date(today);
-  d.setDate(d.getDate() - 1);
-  return todayStr.call({}) !== today ? today : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 function storageKey(agentId: string) {
@@ -155,6 +150,7 @@ interface Props {
 }
 
 export function DailyQuestsButton({ agentId, state, onClaim }: Props) {
+  const t = useTranslations('agentRoom.quests');
   const [open, setOpen] = useState(false);
   const quests = useMemo(
     () => state.questKeys.map((k) => QUEST_POOL.find((q) => q.key === k)!).filter(Boolean),
@@ -183,11 +179,11 @@ export function DailyQuestsButton({ agentId, state, onClaim }: Props) {
             ? '0 0 20px color-mix(in srgb, var(--room-primary) 40%, transparent)'
             : '0 0 14px color-mix(in srgb, var(--room-primary) 16%, transparent)',
         }}
-        title="Daily quests"
+        title={t('buttonTitle')}
       >
         <span aria-hidden>{state.streak > 0 ? '🔥' : '📅'}</span>
         <span className="hidden sm:inline">
-          {state.streak > 0 ? `${state.streak}d` : 'Daily'} · {completeCount}/{quests.length}
+          {state.streak > 0 ? `${state.streak}d` : t('heading').split(' ')[0]} · {completeCount}/{quests.length}
         </span>
       </button>
       {open && (
@@ -210,13 +206,13 @@ export function DailyQuestsButton({ agentId, state, onClaim }: Props) {
                   className="text-[10px] uppercase tracking-[3px]"
                   style={{ color: 'var(--room-primary)' }}
                 >
-                  DAILY QUESTS
+                  {t('heading')}
                 </div>
                 <div className="mt-1 text-base font-bold text-gray-100">
                   {state.streak > 0 ? (
-                    <>🔥 {state.streak}-day streak</>
+                    t('streakDays', { count: state.streak })
                   ) : (
-                    <>Build your streak</>
+                    t('buildStreak')
                   )}
                 </div>
               </div>
@@ -224,7 +220,7 @@ export function DailyQuestsButton({ agentId, state, onClaim }: Props) {
                 onClick={() => setOpen(false)}
                 className="text-xs uppercase tracking-wider text-gray-400 hover:text-gray-200"
               >
-                ESC
+                {t('close')}
               </button>
             </div>
             <div className="space-y-2 px-5 py-4">
@@ -257,7 +253,7 @@ export function DailyQuestsButton({ agentId, state, onClaim }: Props) {
                         className="tabular-nums text-xs font-bold"
                         style={{ color: done ? 'var(--room-primary)' : '#9ca3af' }}
                       >
-                        {Math.min(progress, q.target)} / {q.target}
+                        {t('progressFraction', { current: Math.min(progress, q.target), target: q.target })}
                       </span>
                     </div>
                     <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/[0.05]">
@@ -284,13 +280,13 @@ export function DailyQuestsButton({ agentId, state, onClaim }: Props) {
                 }}
               >
                 {state.claimed
-                  ? `Claimed — come back tomorrow 🌙`
+                  ? t('claimed')
                   : allDone
-                    ? `Claim · extend streak to ${state.streak + 1}d 🔥`
-                    : `Complete all quests to claim`}
+                    ? t('claimButton', { next: state.streak + 1 })
+                    : t('completeAll')}
               </button>
               <div className="mt-2 text-center text-[10px] uppercase tracking-wider text-gray-500">
-                agent: {agentId.slice(0, 8)}… · rotates at midnight
+                {t('agentFooter', { agentId: agentId.slice(0, 8) })}
               </div>
             </div>
           </div>

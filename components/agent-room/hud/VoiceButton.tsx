@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   isListening: boolean;
@@ -22,6 +23,7 @@ export function VoiceButton({
   onToggleListen,
   onToggleAutoSpeak,
 }: Props) {
+  const t = useTranslations('agentRoom.voice');
   return (
     <div className="pointer-events-auto absolute bottom-[92px] left-3 z-10 flex items-center gap-2 md:bottom-5 md:left-5">
       {sttSupported && (
@@ -34,7 +36,7 @@ export function VoiceButton({
             boxShadow: isListening ? '0 0 20px #ef4444' : undefined,
             animation: isListening ? 'voicePulse 1.1s infinite' : undefined,
           }}
-          title={isListening ? 'Stop listening' : 'Start voice input'}
+          title={isListening ? t('stopListening') : t('startVoice')}
         >
           <span className="text-lg" aria-hidden>🎤</span>
         </button>
@@ -50,13 +52,13 @@ export function VoiceButton({
             ? '0 0 14px color-mix(in srgb, var(--room-primary) 25%, transparent)'
             : undefined,
         }}
-        title={autoSpeak ? 'Turn off voice replies' : 'Have the agent speak replies'}
+        title={autoSpeak ? t('turnOffVoice') : t('agentSpeakReplies')}
       >
         <span className="text-base" aria-hidden>
           {autoSpeak ? (isSpeaking ? '🔊' : '🔉') : '🔈'}
         </span>
         <span className="text-[10px] font-bold uppercase tracking-[2px]">
-          {autoSpeak ? 'Voice On' : 'Voice'}
+          {autoSpeak ? t('voiceOn') : t('voice')}
         </span>
       </button>
       <style>{`

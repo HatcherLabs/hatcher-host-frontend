@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   agentId: string;
@@ -15,6 +16,7 @@ function baseOrigin(): string {
 }
 
 export function EmbedButton({ agentId }: Props) {
+  const t = useTranslations('agentRoom.embed');
   const [state, setState] = useState<'idle' | 'copied' | 'err'>('idle');
 
   async function handle() {
@@ -42,11 +44,11 @@ export function EmbedButton({ agentId }: Props) {
         color: 'var(--room-bright)',
         boxShadow: '0 0 18px color-mix(in srgb, var(--room-primary) 22%, transparent)',
       }}
-      title="Copy iframe embed snippet"
+      title={t('title')}
     >
       <span aria-hidden>&lt;/&gt;</span>
       <span className="hidden sm:inline">
-        {state === 'copied' ? 'Copied!' : state === 'err' ? 'Failed' : 'Embed'}
+        {state === 'copied' ? t('copied') : state === 'err' ? t('failed') : t('button')}
       </span>
     </button>
   );

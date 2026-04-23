@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { API_URL } from '@/lib/config';
 
 interface Props {
@@ -25,6 +26,7 @@ function ensureSessionId(): string {
 }
 
 export function LiveViewers({ agentId }: Props) {
+  const t = useTranslations('agentRoom.hud');
   const [count, setCount] = useState<number | null>(null);
 
   useEffect(() => {
@@ -90,14 +92,14 @@ export function LiveViewers({ agentId }: Props) {
         borderColor: 'rgba(239, 68, 68, 0.35)',
         color: '#fca5a5',
       }}
-      title={`${count} ${count === 1 ? 'viewer' : 'viewers'} right now`}
+      title={t('viewersTitle', { count })}
     >
       <span
         className="block h-1.5 w-1.5 rounded-full bg-red-400"
         style={{ boxShadow: '0 0 8px #ef4444', animation: 'viewerBlink 1.4s infinite' }}
       />
       <span className="hidden sm:inline">
-        {count} {count === 1 ? 'watching' : 'watching'}
+        {t('viewersWatch', { count })}
       </span>
       <span className="sm:hidden tabular-nums">{count}</span>
       <style>{`
