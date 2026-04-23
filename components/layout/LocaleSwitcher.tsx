@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 import { usePathname as useRawPathname } from 'next/navigation';
-import { useRouter, usePathname } from '@/i18n/routing';
+import { useRouter } from '@/i18n/routing';
 import { locales, localeLabels, localeFlags, type Locale } from '@/i18n/config';
 
 // Paths outside the [locale] segment — no localized version exists.
@@ -25,10 +25,18 @@ function isNonLocalePath(rawPath: string): boolean {
   );
 }
 
+// Strip a leading locale segment (e.g., "/de/pricing" → "/pricing", "/de" → "/")
+// so router.replace gets a clean path — next-intl prepends the target locale.
+function stripLocalePrefix(raw: string, currentLocale: Locale): string {
+  const prefix = `/${currentLocale}`;
+  if (raw === prefix) return '/';
+  if (raw.startsWith(prefix + '/')) return raw.slice(prefix.length);
+  return raw;
+}
+
 export function LocaleSwitcher() {
   const locale = useLocale() as Locale;
   const router = useRouter();
-  const pathname = usePathname();
   const rawPathname = useRawPathname();
   const t = useTranslations('localeSwitcher');
   const [isPending, startTransition] = useTransition();
@@ -40,9 +48,14 @@ export function LocaleSwitcher() {
       // jump to the homepage in the target locale instead of a dead 404.
       if (isNonLocalePath(rawPathname)) {
         router.replace('/', { locale: next });
-      } else {
-        router.replace(pathname, { locale: next });
+        return;
       }
+      // Strip the current locale prefix from the raw URL pathname ourselves.
+      // next-intl's usePathname() can return the prefixed path in some cases
+      // (notably on the locale homepage, where "/de" is returned instead of
+      // "/"), which would cause router.replace to produce "/ro/de" — a 404.
+      const cleanPath = stripLocalePrefix(rawPathname, locale);
+      router.replace(cleanPath, { locale: next });
     });
   }
 
