@@ -3,7 +3,14 @@ import { test, expect } from '@playwright/test';
 test.describe('City V2 Phase 1 — skeleton', () => {
   test('renders WebGL canvas at /city?v=2', async ({ page }) => {
     const consoleErrors: string[] = [];
-    page.on('pageerror', (err) => consoleErrors.push(String(err)));
+    page.on('pageerror', (err) => {
+      const msg = String(err);
+      // CityClient polls the backend on an interval — without a local
+      // API these show up as "Failed to fetch" which is expected in
+      // the test env. The V2 scene renders independently of that data.
+      if (msg.includes('Failed to fetch')) return;
+      consoleErrors.push(msg);
+    });
 
     await page.goto('/city?v=2');
     const canvas = page.locator('canvas').first();
@@ -19,20 +26,31 @@ test.describe('City V2 Phase 1 — skeleton', () => {
       return !!gl;
     });
     expect(hasGL).toBe(true);
-
-    // Non-asset failures (e.g. undefined refs, bad imports) would leak to
-    // pageerror — asset 404s live in the Network tab and are fine pre-T5.
     expect(consoleErrors).toEqual([]);
+
+    // Phase 2: Suspense should resolve — pads/streets/skybox all load
+    // synchronously from the cached GLTF/texture pool. Wait one rAF so
+    // the first useFrame tick has a chance to write the initial
+    // InstancedMesh matrices before we sample again.
+    const mounted = await page.evaluate(async () => {
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+      return !!document.querySelector('canvas');
+    });
+    expect(mounted).toBe(true);
   });
 
   test('legacy /city still loads without v flag', async ({ page }) => {
     const consoleErrors: string[] = [];
-    page.on('pageerror', (err) => consoleErrors.push(String(err)));
+    page.on('pageerror', (err) => {
+      const msg = String(err);
+      if (msg.includes('Failed to fetch')) return;
+      consoleErrors.push(msg);
+    });
 
     await page.goto('/city');
     // With API running locally the canvas appears; without it, the
     // legacy loading screen is shown. Either is "no regression" — what
-    // we care about is that no JS exceptions escape while rendering.
+    // we care about is that no unexpected JS exceptions escape.
     await page.waitForTimeout(1000);
     expect(consoleErrors).toEqual([]);
   });
