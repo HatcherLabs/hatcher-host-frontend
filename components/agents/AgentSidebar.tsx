@@ -29,9 +29,10 @@ import { STATUS_STYLES, FRAMEWORK_BADGE, useAgentContext } from './AgentContext'
 import { FRAMEWORKS } from '@hatcher/shared';
 import type { LucideIcon } from 'lucide-react';
 import type { Agent } from '@/lib/api';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import Image from 'next/image';
 import { generateAgentAvatar } from '@/lib/avatar-generator';
+import { useTranslations } from 'next-intl';
 
 interface TabDef {
   id: Tab;
@@ -40,41 +41,41 @@ interface TabDef {
   group: 'main' | 'configure' | 'data' | 'advanced';
 }
 
-function getTabs(framework?: string): TabDef[] {
+function getTabs(framework: string | undefined, tTabs: ReturnType<typeof useTranslations<'dashboard.agentDetail.tabs'>>): TabDef[] {
   return [
     // Internal id stays 'overview' to preserve persisted tab state on clients
     // that saved the previous label — the display-only rename to "Dashboard"
     // landed with the Etapa 1 dashboard refactor. See
     // components/agents/dashboard/DashboardTab.tsx for the new entry point.
-    { id: 'overview', label: 'Dashboard', icon: <LayoutDashboard size={18} />, group: 'main' },
-    { id: 'chat', label: 'Chat', icon: <MessageSquare size={18} />, group: 'main' },
-    { id: 'terminal', label: 'Terminal', icon: <TerminalSquare size={18} />, group: 'main' },
-    { id: 'config', label: 'Config', icon: <Settings size={18} />, group: 'configure' },
-    { id: 'integrations', label: 'Integrations', icon: <Puzzle size={18} />, group: 'configure' },
-    { id: 'plugins', label: 'Plugins & Skills', icon: <Puzzle size={18} />, group: 'configure' },
-    { id: 'logs', label: 'Logs', icon: <ScrollText size={18} />, group: 'data' },
-    { id: 'stats', label: 'Stats', icon: <BarChart3 size={18} />, group: 'data' },
+    { id: 'overview', label: tTabs('dashboard'), icon: <LayoutDashboard size={18} />, group: 'main' },
+    { id: 'chat', label: tTabs('chat'), icon: <MessageSquare size={18} />, group: 'main' },
+    { id: 'terminal', label: tTabs('terminal'), icon: <TerminalSquare size={18} />, group: 'main' },
+    { id: 'config', label: tTabs('config'), icon: <Settings size={18} />, group: 'configure' },
+    { id: 'integrations', label: tTabs('integrations'), icon: <Puzzle size={18} />, group: 'configure' },
+    { id: 'plugins', label: tTabs('plugins'), icon: <Puzzle size={18} />, group: 'configure' },
+    { id: 'logs', label: tTabs('logs'), icon: <ScrollText size={18} />, group: 'data' },
+    { id: 'stats', label: tTabs('stats'), icon: <BarChart3 size={18} />, group: 'data' },
     // Memory tab: for openclaw/hermes reads files from the workspace,
     // for elizaos hits the elizaos REST API (PGLite-backed). Milady
     // doesn't expose a memory viewer yet.
-    ...(framework !== 'milady' ? [{ id: 'memory' as const, label: 'Memory', icon: <Brain size={18} />, group: 'data' as const }] : []),
+    ...(framework !== 'milady' ? [{ id: 'memory' as const, label: tTabs('memory'), icon: <Brain size={18} />, group: 'data' as const }] : []),
     // Sessions tab: framework-specific.
     //   elizaos → /api/agents/:uuid/rooms (PGLite-backed rooms)
     //   openclaw (managed) → /openclaw/sessions (reads agents/main/sessions/sessions.json)
     ...(framework === 'elizaos' || framework === 'openclaw'
-      ? [{ id: 'sessions' as const, label: 'Sessions', icon: <MessageSquare size={18} />, group: 'data' as const }]
+      ? [{ id: 'sessions' as const, label: tTabs('sessions'), icon: <MessageSquare size={18} />, group: 'data' as const }]
       : []),
     // Knowledge tab: uploaded documents / reference files the agent can
     // read on demand. Backend (routes/agents/knowledge.ts) targets each
     // framework's canonical workspace path — openclaw + hermes get a
     // `knowledge/` subfolder under their managed volume, elizaos/milady
     // store under `/data/` in-container.
-    { id: 'knowledge' as const, label: 'Knowledge', icon: <BookOpen size={18} />, group: 'data' as const },
-    { id: 'addons' as const, label: 'Add-ons', icon: <ShoppingCart size={18} />, group: 'data' as const },
-    { id: 'files', label: 'Files', icon: <FolderOpen size={18} />, group: 'data' },
+    { id: 'knowledge' as const, label: tTabs('knowledge'), icon: <BookOpen size={18} />, group: 'data' as const },
+    { id: 'addons' as const, label: tTabs('addons'), icon: <ShoppingCart size={18} />, group: 'data' as const },
+    { id: 'files', label: tTabs('files'), icon: <FolderOpen size={18} />, group: 'data' },
     // Workspace viewer — openclaw (managed) and managed hermes. Read-only
     // tree of the agent's workspace. Free for all users.
-    ...(framework === 'openclaw' || framework === 'hermes' ? [{ id: 'workspace' as const, label: 'Workspace', icon: <FolderTree size={18} />, group: 'data' as const }] : []),
+    ...(framework === 'openclaw' || framework === 'hermes' ? [{ id: 'workspace' as const, label: tTabs('workspace'), icon: <FolderTree size={18} />, group: 'data' as const }] : []),
     // Schedules + Workflows: both tabs render for all frameworks (the
     // components themselves gate on framework-specific support — e.g.
     // SchedulesTab has FRAMEWORK_SCHEDULE_SUPPORT that distinguishes
@@ -82,8 +83,8 @@ function getTabs(framework?: string): TabDef[] {
     // reachable only via the "Manage" button in OpenClawSchedulesCard
     // (deep-link). Exposing them here in the Advanced group surfaces
     // the feature to every operator without cluttering the main tabs.
-    { id: 'schedules', label: 'Schedules', icon: <Clock size={18} />, group: 'advanced' },
-    { id: 'workflows', label: 'Workflows', icon: <GitMerge size={18} />, group: 'advanced' },
+    { id: 'schedules', label: tTabs('schedules'), icon: <Clock size={18} />, group: 'advanced' },
+    { id: 'workflows', label: tTabs('workflows'), icon: <GitMerge size={18} />, group: 'advanced' },
   ];
 }
 
@@ -107,12 +108,7 @@ const FRAMEWORK_ICONS: Record<string, LucideIcon> = {
   milady: Sparkles,
 };
 
-const GROUP_LABELS: Record<string, string> = {
-  main: '',
-  configure: 'Configure',
-  data: 'Monitor',
-  advanced: 'Advanced',
-};
+// GROUP_LABELS are now provided via useTranslations inside the component
 
 interface AgentSidebarProps {
   agent: Agent;
@@ -124,12 +120,23 @@ const EASY_TABS: Tab[] = ['overview', 'chat', 'integrations', 'logs', 'stats'];
 
 export const AgentSidebar = memo(function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProps) {
   const { viewMode } = useAgentContext();
-  const allTabs = getTabs(agent.framework);
+  const t = useTranslations('dashboard.agentDetail');
+  const tTabs = useTranslations('dashboard.agentDetail.tabs');
+  const tSidebarGroups = useTranslations('dashboard.agentDetail.sidebarGroups');
+  const tNav = useTranslations('dashboard.agentDetail.nav');
+  const allTabs = getTabs(agent.framework, tTabs);
   const tabs = viewMode === 'easy' ? allTabs.filter(t => EASY_TABS.includes(t.id)) : allTabs;
   const statusInfo = STATUS_STYLES[agent.status] ?? STATUS_STYLES.paused;
   const frameworkMeta = FRAMEWORKS[agent.framework];
   const avatarColors = FRAMEWORK_AVATAR_COLORS[agent.framework] ?? DEFAULT_AVATAR;
   const FrameworkIcon = FRAMEWORK_ICONS[agent.framework] ?? Bot;
+
+  const GROUP_LABELS: Record<string, string> = {
+    main: '',
+    configure: tSidebarGroups('configure'),
+    data: tSidebarGroups('monitor'),
+    advanced: tSidebarGroups('advanced'),
+  };
 
   const groups = ['main', 'configure', 'data', 'advanced'] as const;
 
@@ -142,7 +149,7 @@ export const AgentSidebar = memo(function AgentSidebar({ agent, activeTab, onTab
           className="inline-flex items-center gap-1.5 text-xs mb-3 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
         >
           <ChevronLeft size={14} />
-          All Agents
+          {tNav('allAgents')}
         </Link>
         <div className="flex items-center gap-3">
           <Image

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAgentContext } from '../AgentContext';
 import { getToken } from '@/lib/api';
 import { API_URL } from '@/lib/config';
@@ -37,6 +38,7 @@ function getWsUrl(agentId: string, token: string | null): string {
 }
 
 export function TerminalTab() {
+  const tTerminal = useTranslations('dashboard.agentDetail.terminal');
   const { agent } = useAgentContext();
   const termRef = useRef<HTMLDivElement>(null);
   const termInstance = useRef<InstanceType<typeof import('@xterm/xterm').Terminal> | null>(null);
@@ -291,14 +293,14 @@ export function TerminalTab() {
         {isStarting ? (
           <>
             <div className="w-10 h-10 rounded-full border-2 border-[var(--color-accent)]/40 border-t-[var(--color-accent)] animate-spin" />
-            <p className="text-lg font-medium text-[var(--text-primary)]">Agent is starting up...</p>
+            <p className="text-lg font-medium text-[var(--text-primary)]">{tTerminal('agentNotActive')}</p>
             <p className="text-sm text-zinc-500">The terminal will connect automatically when ready</p>
           </>
         ) : (
           <>
             <div className="text-5xl opacity-50">⬛</div>
-            <p className="text-lg font-medium">Agent is not running</p>
-            <p className="text-sm text-zinc-500">Start the agent to access the terminal</p>
+            <p className="text-lg font-medium">{tTerminal('agentNotActive')}</p>
+            <p className="text-sm text-zinc-500">{tTerminal('startAgent')}</p>
           </>
         )}
       </div>
@@ -317,7 +319,7 @@ export function TerminalTab() {
               className={state === 'connected' ? 'text-green-400' : state === 'connecting' ? 'text-yellow-400' : 'text-red-400'}
             />
             <span className="text-xs font-mono text-[var(--text-muted)]">
-              {state === 'connected' ? 'connected' : state === 'connecting' ? 'connecting...' : 'disconnected'}
+              {state === 'connected' ? tTerminal('connected') : state === 'connecting' ? tTerminal('connecting') : tTerminal('disconnected')}
             </span>
           </div>
           <span className="text-xs text-[var(--border-default)]">|</span>
@@ -333,7 +335,7 @@ export function TerminalTab() {
               className="flex items-center gap-1.5 px-3 py-1 text-xs rounded-md bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] border border-[var(--border-default)] transition-colors"
             >
               <RotateCcw size={12} />
-              Reconnect
+              {tTerminal('reconnect')}
             </button>
           )}
           {state === 'connected' && (
@@ -361,7 +363,7 @@ export function TerminalTab() {
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-            placeholder={sending ? 'Waiting for response...' : 'Send a message to the agent...'}
+            placeholder={sending ? tTerminal('sending') : tTerminal('sendMessage')}
             disabled={sending}
             className="flex-1 bg-[var(--bg-card)] border border-[var(--border-default)] rounded-lg px-3 py-1.5 text-sm font-mono text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--border-hover)] disabled:opacity-50"
           />

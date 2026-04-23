@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 import { api, getToken } from '@/lib/api';
 import { API_URL } from '@/lib/config';
 import type { Agent, AgentFeature } from '@/lib/api';
@@ -205,6 +206,10 @@ export default function AgentManagePage() {
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
   const { toast } = useToast();
+  const t = useTranslations('dashboard.agentDetail');
+  const tHeader = useTranslations('dashboard.agentDetail.header');
+  const tNotFound = useTranslations('dashboard.agentDetail.notFound');
+  const tStatusPoll = useTranslations('dashboard.agentDetail.statusPoll');
 
   // View mode (easy = Chat/Integrations/Logs/Stats only, advanced = everything)
   const EASY_TABS: Tab[] = ['overview', 'chat', 'integrations', 'logs', 'stats'];
@@ -390,7 +395,7 @@ export default function AgentManagePage() {
       setAgent(res.data);
       if (res.data.status === 'active') {
         if (statusPollRef.current) { clearInterval(statusPollRef.current); statusPollRef.current = null; }
-        toast('success', 'Agent is ready to chat!');
+        toast('success', tStatusPoll('agentReady'));
       } else if (res.data.status === 'error') {
         if (statusPollRef.current) { clearInterval(statusPollRef.current); statusPollRef.current = null; }
       }
@@ -957,16 +962,16 @@ export default function AgentManagePage() {
   if (!agent) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center text-[var(--text-primary)]">
-        <div className="text-4xl mb-4 text-[var(--color-accent)]">404</div>
-        <h1 className="text-2xl font-bold mb-3">Agent Not Found</h1>
+        <div className="text-4xl mb-4 text-[var(--color-accent)]">{tNotFound('code')}</div>
+        <h1 className="text-2xl font-bold mb-3">{tNotFound('title')}</h1>
         <p className="mb-6 text-[var(--text-muted)]">
-          The agent with ID &quot;{id}&quot; could not be found.
+          {tNotFound('description', { id })}
         </p>
         <Link
           href="/dashboard/agents"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--color-accent)]/40 transition-colors"
         >
-          <ArrowLeft size={16} /> Back to Agents
+          <ArrowLeft size={16} /> {tNotFound('backToAgents')}
         </Link>
       </div>
     );
@@ -1010,14 +1015,14 @@ export default function AgentManagePage() {
                 onClick={() => setViewMode('easy')}
                 className={`px-2.5 py-1.5 transition-colors ${viewMode === 'easy' ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'}`}
               >
-                Easy
+                {tHeader('easy')}
               </button>
               <div className="w-px h-4 bg-[var(--border-default)]" aria-hidden="true" />
               <button
                 onClick={() => setViewMode('advanced')}
                 className={`px-2.5 py-1.5 transition-colors ${viewMode === 'advanced' ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'}`}
               >
-                Advanced
+                {tHeader('advanced')}
               </button>
             </div>
 
@@ -1032,7 +1037,7 @@ export default function AgentManagePage() {
                     title="Restart agent"
                   >
                     <RotateCcw size={13} className={actions.actionLoading === 'restart' ? 'animate-spin' : ''} />
-                    <span className="hidden sm:inline">{actions.actionLoading === 'restart' ? 'Restarting...' : 'Restart'}</span>
+                    <span className="hidden sm:inline">{actions.actionLoading === 'restart' ? tHeader('restarting') : tHeader('restart')}</span>
                   </button>
                   <button
                     onClick={() => actions.handleAction('stop')}
@@ -1045,7 +1050,7 @@ export default function AgentManagePage() {
                     ) : (
                       <Square size={13} />
                     )}
-                    <span className="hidden sm:inline">{actions.actionLoading === 'stop' ? 'Stopping...' : 'Stop'}</span>
+                    <span className="hidden sm:inline">{actions.actionLoading === 'stop' ? tHeader('stopping') : tHeader('stop')}</span>
                   </button>
                 </>
               )}
@@ -1061,7 +1066,7 @@ export default function AgentManagePage() {
                   ) : (
                     <Play size={13} />
                   )}
-                  <span className="hidden sm:inline">{actions.actionLoading === 'start' ? 'Starting...' : 'Start'}</span>
+                  <span className="hidden sm:inline">{actions.actionLoading === 'start' ? tHeader('starting') : tHeader('start')}</span>
                 </button>
               )}
               <button
@@ -1081,7 +1086,7 @@ export default function AgentManagePage() {
                 title="Share agent"
               >
                 <Share2 size={13} />
-                <span className="hidden sm:inline">Share</span>
+                <span className="hidden sm:inline">{tHeader('share')}</span>
               </button>
               {(() => {
                 const fw = agent?.framework;
@@ -1112,7 +1117,7 @@ export default function AgentManagePage() {
                     title="Enter 3D Agent Room"
                   >
                     <span>{m.icon}</span>
-                    <span className="hidden sm:inline">Room</span>
+                    <span className="hidden sm:inline">{tHeader('room')}</span>
                   </Link>
                 );
               })()}
@@ -1122,7 +1127,7 @@ export default function AgentManagePage() {
                 title="Clone to another framework"
               >
                 <Copy size={13} />
-                <span className="hidden sm:inline">Clone</span>
+                <span className="hidden sm:inline">{tHeader('clone')}</span>
               </button>
               <button
                 onClick={actions.handleDelete}
@@ -1135,14 +1140,14 @@ export default function AgentManagePage() {
                 title="Delete agent"
               >
                 <Trash2 size={13} />
-                <span className="hidden sm:inline">{actions.deleting ? 'Deleting...' : actions.deleteConfirm ? 'Confirm' : 'Delete'}</span>
+                <span className="hidden sm:inline">{actions.deleting ? tHeader('deleting') : actions.deleteConfirm ? tHeader('confirm') : tHeader('delete')}</span>
               </button>
               {actions.deleteConfirm && !actions.deleting && (
                 <button
                   onClick={() => { actions.setDeleteConfirm(false); actions.setDeleteError(null); }}
                   className="text-xs px-2 py-1 transition-colors text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
                 >
-                  Cancel
+                  {tHeader('cancel')}
                 </button>
               )}
             </div>
