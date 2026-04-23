@@ -45,6 +45,10 @@ export function pickBase(agentId: string, tier: number): BuildingBase {
 const DISTRICT_COLS = 5;
 const DISTRICT_SIZE = 52;
 const DISTRICT_GAP = 14;
+// Agents are pushed out of this radius around each pad centre so the
+// district's landmark sculpt (Landmarks.tsx) has clear air to breathe.
+// Landmark footprints top out around ~6u; 8u gives a tasteful gap.
+const LANDMARK_CLEAR_RADIUS = 8;
 
 function districtPosition(idx: number): { x: number; z: number } {
   const col = idx % DISTRICT_COLS;
@@ -91,20 +95,38 @@ export function layoutBuildingsV2(agents: CityAgent[]): BuildingLayout[] {
       const rh = hashStr(a.id + ':h');
       const rr = hashStr(a.id + ':r');
       const jitter = 0.15 * spacing;
-      const bx =
+      let bx =
         pos.x -
         DISTRICT_SIZE / 2 +
         3 +
         col * spacing +
         spacing / 2 +
         (rx - 0.5) * jitter;
-      const bz =
+      let bz =
         pos.z -
         DISTRICT_SIZE / 2 +
         3 +
         row * spacing +
         spacing / 2 +
         (rz - 0.5) * jitter;
+
+      // Keep agents out of the center circle reserved for the
+      // landmark sculpt (see Landmarks.tsx). Push the building out
+      // radially if its cell fell inside the clearance ring so
+      // Finance/$ tower, Security fortress, etc. never get clipped by
+      // an InstancedMesh building stacked on top of them.
+      const dx = bx - pos.x;
+      const dz = bz - pos.z;
+      const d = Math.sqrt(dx * dx + dz * dz);
+      if (d < LANDMARK_CLEAR_RADIUS) {
+        // If the cell is effectively at center (d ≈ 0), use the jitter
+        // direction (rx, rz) to pick a push angle that's still stable.
+        const angle =
+          d > 0.001 ? Math.atan2(dz, dx) : (rx + rz) * Math.PI * 2;
+        bx = pos.x + Math.cos(angle) * LANDMARK_CLEAR_RADIUS;
+        bz = pos.z + Math.sin(angle) * LANDMARK_CLEAR_RADIUS;
+      }
+
       const baseHeight = TIER_HEIGHT[a.tier] ?? 3;
       const height = baseHeight * (0.85 + rh * 0.3);
 
