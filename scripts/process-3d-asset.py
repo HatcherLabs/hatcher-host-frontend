@@ -46,6 +46,36 @@ for obj in bpy.data.objects:
     mod.ratio = DECIMATE_RATIO
     bpy.ops.object.modifier_apply(modifier="Decimate")
 
+# Force every material opaque with alpha=1.
+# Quaternius FBX exports sometimes ship with alpha=0 on the diffuse,
+# which GLTFLoader reads as baseColorFactor[3]=0. Combined with the
+# default `alphaMode=MASK` gltf exporter emits, fragments then discard
+# every pixel and the mesh renders invisible. Fix by normalising both
+# the Principled BSDF base-color alpha and the material blend mode.
+for mat in bpy.data.materials:
+    if not mat:
+        continue
+    mat.blend_method = 'OPAQUE'
+    # Diffuse color is the legacy Blender Internal / viewport color
+    if hasattr(mat, 'diffuse_color'):
+        dc = list(mat.diffuse_color)
+        if len(dc) >= 4:
+            dc[3] = 1.0
+            mat.diffuse_color = dc
+    # Principled BSDF base-color alpha (4th component)
+    if mat.use_nodes and mat.node_tree:
+        for node in mat.node_tree.nodes:
+            if node.type == 'BSDF_PRINCIPLED':
+                base = node.inputs.get('Base Color')
+                alpha = node.inputs.get('Alpha')
+                if base is not None and hasattr(base, 'default_value'):
+                    bv = list(base.default_value)
+                    if len(bv) >= 4:
+                        bv[3] = 1.0
+                        base.default_value = bv
+                if alpha is not None and hasattr(alpha, 'default_value'):
+                    alpha.default_value = 1.0
+
 # Resize all image textures to TEX_SIZE (square clamp)
 for img in bpy.data.images:
     if img.size[0] == 0 or img.size[1] == 0:
@@ -68,5 +98,6 @@ bpy.ops.export_scene.gltf(
     export_draco_normal_quantization=10,
     export_draco_texcoord_quantization=12,
     export_image_format="AUTO",
+    export_materials="EXPORT",
 )
 print(f"[process-3d-asset.py] wrote {output_path}")

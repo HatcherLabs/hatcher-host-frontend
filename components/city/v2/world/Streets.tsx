@@ -19,27 +19,38 @@ const LANE_WIDTH = DISTRICT_GAP - 2;
  * lanes.
  */
 export function Streets() {
-  const [asphaltDiff, asphaltNorm, asphaltRough, concreteDiff] = useTexture([
-    '/assets/3d/textures/asphalt_diff.jpg',
-    '/assets/3d/textures/asphalt_norm.jpg',
-    '/assets/3d/textures/asphalt_rough.jpg',
-    '/assets/3d/textures/concrete_diff.jpg',
-  ]);
+  const [asphaltDiffBase, asphaltNormBase, asphaltRoughBase, concreteDiffBase] =
+    useTexture([
+      '/assets/3d/textures/asphalt_diff.jpg',
+      '/assets/3d/textures/asphalt_norm.jpg',
+      '/assets/3d/textures/asphalt_rough.jpg',
+      '/assets/3d/textures/concrete_diff.jpg',
+    ]);
 
   const step = DISTRICT_SIZE + DISTRICT_GAP;
   const totalRows = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
   const longEdge = Math.max(DISTRICT_COLS, totalRows) * step + 20;
 
-  useMemo(() => {
-    for (const t of [asphaltDiff, asphaltNorm, asphaltRough]) {
+  // Clone shared textures before mutating repeat/wrap — Ground uses
+  // the same asphalt cache with a different repeat, and mutating the
+  // shared instance would leak config between the two.
+  const { asphaltDiff, asphaltNorm, asphaltRough, concreteDiff } = useMemo(() => {
+    const ad = asphaltDiffBase.clone();
+    const an = asphaltNormBase.clone();
+    const ar = asphaltRoughBase.clone();
+    const cd = concreteDiffBase.clone();
+    for (const t of [ad, an, ar]) {
       t.wrapS = t.wrapT = THREE.RepeatWrapping;
       t.repeat.set(longEdge / 8, 1);
+      t.needsUpdate = true;
     }
-    asphaltDiff.colorSpace = THREE.SRGBColorSpace;
-    concreteDiff.wrapS = concreteDiff.wrapT = THREE.RepeatWrapping;
-    concreteDiff.repeat.set(longEdge / 4, 1);
-    concreteDiff.colorSpace = THREE.SRGBColorSpace;
-  }, [asphaltDiff, asphaltNorm, asphaltRough, concreteDiff, longEdge]);
+    ad.colorSpace = THREE.SRGBColorSpace;
+    cd.wrapS = cd.wrapT = THREE.RepeatWrapping;
+    cd.repeat.set(longEdge / 4, 1);
+    cd.colorSpace = THREE.SRGBColorSpace;
+    cd.needsUpdate = true;
+    return { asphaltDiff: ad, asphaltNorm: an, asphaltRough: ar, concreteDiff: cd };
+  }, [asphaltDiffBase, asphaltNormBase, asphaltRoughBase, concreteDiffBase, longEdge]);
 
   const horizontal = useMemo(() => {
     const zs: number[] = [];

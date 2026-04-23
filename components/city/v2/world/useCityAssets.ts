@@ -5,37 +5,81 @@ import * as THREE from 'three';
 import { useQuality } from '../quality/QualityContext';
 import { BUILDING_BASES, type BuildingBase } from './Buildings.layout';
 
+export interface BuildingPrimitive {
+  geometry: THREE.BufferGeometry;
+  material: THREE.Material;
+}
+
+export interface BuildingAsset {
+  /** Every Mesh.primitives[] entry becomes one InstancedMesh at render
+   *  time. Quaternius FBX exports ship one material per structural
+   *  element (Bricks / Glass / Wood / Dark / ...), so each building
+   *  lands in 6-9 primitives. */
+  primitives: BuildingPrimitive[];
+  /** Native height of the source mesh (max Y - min Y), computed once
+   *  so Buildings.tsx can scale Y to target height without hardcoding
+   *  an assumed unit height. */
+  nativeHeight: number;
+  /** Min Y of the native bounding box — used to keep the building's
+   *  foundation on the ground plane after scaling. */
+  minY: number;
+}
+
+function collectPrimitives(root: THREE.Object3D): BuildingPrimitive[] {
+  const out: BuildingPrimitive[] = [];
+  root.traverse((obj) => {
+    const m = obj as THREE.Mesh;
+    if (!m.isMesh) return;
+    if (Array.isArray(m.material)) {
+      m.material.forEach((mat) => {
+        out.push({ geometry: m.geometry, material: mat.clone() });
+      });
+    } else if (m.material) {
+      out.push({ geometry: m.geometry, material: (m.material as THREE.Material).clone() });
+    }
+  });
+  return out;
+}
+
+function computeNativeBounds(root: THREE.Object3D): { height: number; minY: number } {
+  const box = new THREE.Box3().setFromObject(root);
+  if (!isFinite(box.min.y) || !isFinite(box.max.y)) {
+    return { height: 3, minY: 0 };
+  }
+  return { height: box.max.y - box.min.y, minY: box.min.y };
+}
+
 /**
- * Preload + expose the 8 base building meshes at the current quality
- * preset. Returns a map `base -> THREE.Mesh` the Buildings component
- * can pull geometry + material from. All GLBs are preloaded at module
- * load time so the scene mounts without pop-in.
+ * Preload + expose the 8 base building assets at the current quality
+ * preset. Returns each base's primitives (one per material) + native
+ * bounds for correct Y-scaling.
  */
-export function useCityBuildings(): Record<BuildingBase, THREE.Mesh | null> {
+export function useCityBuildings(): Record<BuildingBase, BuildingAsset | null> {
   const quality = useQuality();
   const urls = BUILDING_BASES.map(
     (b) => `/assets/3d/city/buildings/${b}.${quality}.glb`,
   );
-  // drei's useGLTF accepts an array and returns an array of gltf objs
   const gltfs = useGLTF(urls) as unknown as Array<{ scene: THREE.Object3D }>;
 
   return useMemo(() => {
-    const out = {} as Record<BuildingBase, THREE.Mesh | null>;
+    const out = {} as Record<BuildingBase, BuildingAsset | null>;
     BUILDING_BASES.forEach((base, i) => {
       const gltf = gltfs[i];
-      let mesh: THREE.Mesh | null = null;
-      gltf?.scene?.traverse((obj) => {
-        if (!mesh && (obj as THREE.Mesh).isMesh) {
-          mesh = obj as THREE.Mesh;
-        }
-      });
-      out[base] = mesh;
+      if (!gltf?.scene) {
+        out[base] = null;
+        return;
+      }
+      const primitives = collectPrimitives(gltf.scene);
+      const { height, minY } = computeNativeBounds(gltf.scene);
+      out[base] = { primitives, nativeHeight: height > 0 ? height : 3, minY };
     });
     return out;
   }, [gltfs]);
 }
 
-// Preload immediately so the first <Buildings> mount has zero wait.
+// Preload at module load — drei caches by URL so the first <Buildings>
+// mount doesn't pay a network cost. We intentionally preload both
+// variants because quality can toggle at runtime via QualityToggle.
 BUILDING_BASES.forEach((b) => {
   useGLTF.preload(`/assets/3d/city/buildings/${b}.high.glb`);
   useGLTF.preload(`/assets/3d/city/buildings/${b}.low.glb`);

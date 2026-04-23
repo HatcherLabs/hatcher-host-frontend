@@ -10,19 +10,27 @@ import * as THREE from 'three';
  * (DistrictPads.tsx) sit on top and override the look per category.
  */
 export function Ground() {
-  const [diff, norm, rough] = useTexture([
+  const [diffBase, normBase, roughBase] = useTexture([
     '/assets/3d/textures/asphalt_diff.jpg',
     '/assets/3d/textures/asphalt_norm.jpg',
     '/assets/3d/textures/asphalt_rough.jpg',
   ]);
 
-  useMemo(() => {
-    for (const t of [diff, norm, rough]) {
+  // drei's useTexture returns shared-cached THREE.Texture instances.
+  // Streets also tiles these with a different repeat; mutating the
+  // shared one leaks config between consumers, so clone here.
+  const { diff, norm, rough } = useMemo(() => {
+    const d = diffBase.clone();
+    const n = normBase.clone();
+    const r = roughBase.clone();
+    for (const t of [d, n, r]) {
       t.wrapS = t.wrapT = THREE.RepeatWrapping;
       t.repeat.set(40, 40);
+      t.needsUpdate = true;
     }
-    diff.colorSpace = THREE.SRGBColorSpace;
-  }, [diff, norm, rough]);
+    d.colorSpace = THREE.SRGBColorSpace;
+    return { diff: d, norm: n, rough: r };
+  }, [diffBase, normBase, roughBase]);
 
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
