@@ -2,35 +2,42 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { Suspense } from 'react';
+import type { CityAgent } from '@/components/city/types';
 import { QualityProvider, useQuality } from './quality/QualityContext';
 import { QualityToggle } from './quality/QualityToggle';
 import { Skybox } from './world/Skybox';
 import { Ground } from './world/Ground';
 import { SceneErrorBoundary } from './world/SceneErrorBoundary';
+import { Streets } from './world/Streets';
+import { DistrictPads } from './world/DistrictPads';
+import { Buildings } from './world/Buildings';
 
 // Rapier is installed (Phase 5) but not mounted here — walking
 // character controller lands in a later phase.
 
+interface Props {
+  agents?: CityAgent[];
+}
+
 /**
  * Top-level Canvas for City V2.
  *
- * Phase 1: empty world (skybox + ground + orbit camera) wrapped in a
- * QualityProvider. Descendants read `useQuality()` to branch HIGH/LOW
- * presets. Later phases add Buildings, Streets, NPCs, Traffic, the
- * character controller, etc.
+ * Phase 2: skybox + PBR ground + 25 themed district pads + street grid
+ * + InstancedMesh buildings (one per agent, coloured by framework).
+ * Survey-only camera; walking mode is Phase 5.
  */
-export function CitySceneV2() {
+export function CitySceneV2({ agents = [] }: Props) {
   return (
     <QualityProvider>
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-        <CanvasInner />
+        <CanvasInner agents={agents} />
         <QualityToggle />
       </div>
     </QualityProvider>
   );
 }
 
-function CanvasInner() {
+function CanvasInner({ agents }: { agents: CityAgent[] }) {
   const quality = useQuality();
   return (
     <Canvas
@@ -47,6 +54,15 @@ function CanvasInner() {
           <Skybox timeOfDay="auto" />
         </SceneErrorBoundary>
         <Ground />
+        <SceneErrorBoundary label="DistrictPads">
+          <DistrictPads />
+        </SceneErrorBoundary>
+        <SceneErrorBoundary label="Streets">
+          <Streets />
+        </SceneErrorBoundary>
+        <SceneErrorBoundary label="Buildings">
+          <Buildings agents={agents} />
+        </SceneErrorBoundary>
       </Suspense>
       <OrbitControls
         enableDamping
