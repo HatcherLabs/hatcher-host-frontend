@@ -13,6 +13,10 @@ import { useCityBuildings, type BuildingAsset } from './useCityAssets';
 
 interface Props {
   agents: CityAgent[];
+  /** Fires when a building is clicked in the 3D scene. The agent's
+   *  id is used by the parent to look up a full CityAgent for the
+   *  popup card. */
+  onBuildingClick?: (agentId: string) => void;
 }
 
 /**
@@ -27,7 +31,7 @@ interface Props {
  *     material in-shader, which keeps structural detail like window
  *     frames visible through the tint)
  */
-export function Buildings({ agents }: Props) {
+export function Buildings({ agents, onBuildingClick }: Props) {
   const assets = useCityBuildings();
 
   // Stable hash of agent identity + visual-relevant fields. Avoids
@@ -56,7 +60,12 @@ export function Buildings({ agents }: Props) {
         const list = buckets[base];
         if (!asset || list.length === 0) return null;
         return (
-          <BaseInstances key={base} asset={asset} layouts={list} />
+          <BaseInstances
+            key={base}
+            asset={asset}
+            layouts={list}
+            onBuildingClick={onBuildingClick}
+          />
         );
       })}
     </group>
@@ -66,9 +75,11 @@ export function Buildings({ agents }: Props) {
 function BaseInstances({
   asset,
   layouts,
+  onBuildingClick,
 }: {
   asset: BuildingAsset;
   layouts: BuildingLayout[];
+  onBuildingClick?: (agentId: string) => void;
 }) {
   return (
     <group>
@@ -80,6 +91,7 @@ function BaseInstances({
           layouts={layouts}
           nativeHeight={asset.nativeHeight}
           nativeMinY={asset.minY}
+          onBuildingClick={onBuildingClick}
         />
       ))}
     </group>
@@ -92,12 +104,14 @@ function PrimitiveInstance({
   layouts,
   nativeHeight,
   nativeMinY,
+  onBuildingClick,
 }: {
   geometry: THREE.BufferGeometry;
   material: THREE.Material;
   layouts: BuildingLayout[];
   nativeHeight: number;
   nativeMinY: number;
+  onBuildingClick?: (agentId: string) => void;
 }) {
   const ref = useRef<THREE.InstancedMesh>(null);
   const count = layouts.length;
@@ -144,6 +158,15 @@ function PrimitiveInstance({
       args={[geometry, material, count]}
       castShadow
       receiveShadow
+      onClick={(e) => {
+        if (!onBuildingClick) return;
+        const id = e.instanceId;
+        if (id == null) return;
+        const layout = layouts[id];
+        if (!layout) return;
+        e.stopPropagation();
+        onBuildingClick(layout.agentId);
+      }}
     />
   );
 }

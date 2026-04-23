@@ -13,6 +13,8 @@ import { SceneErrorBoundary } from './world/SceneErrorBoundary';
 import { Streets } from './world/Streets';
 import { DistrictPads } from './world/DistrictPads';
 import { Landmarks } from './world/Landmarks';
+import { DistrictLabels } from './world/DistrictLabels';
+import { Streetlights } from './world/Streetlights';
 import { TravelPads } from './world/TravelPads';
 import { Traffic } from './world/Traffic';
 import { NPCs } from './world/NPCs';
@@ -26,6 +28,8 @@ import {
 import { FollowCamera } from './character/FollowCamera';
 import { WalkSurveyToggle, type CityMode } from './hud/WalkSurveyToggle';
 import { Minimap } from './hud/Minimap';
+import { WalkOnboarding } from './hud/WalkOnboarding';
+import { AgentPopup } from './hud/AgentPopup';
 import { CATEGORIES } from '@/components/city/types';
 
 interface Props {
@@ -43,14 +47,15 @@ interface Props {
  */
 export function CitySceneV2({ agents = [] }: Props) {
   const [mode, setMode] = useState<CityMode>('survey');
-  // Shared kinematic state — mutable so both CharacterController and
-  // FollowCamera can read/write without triggering re-renders.
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const charState = useRef<CharacterState>({
     position: new THREE.Vector3(0, 0, 0),
     heading: 0,
     cameraYaw: 0,
     cameraPitch: 0.35,
   });
+  const selectedAgent =
+    selectedAgentId ? agents.find((a) => a.id === selectedAgentId) ?? null : null;
 
   // Esc exits walk mode from anywhere on the page
   useEffect(() => {
@@ -86,7 +91,12 @@ export function CitySceneV2({ agents = [] }: Props) {
   return (
     <QualityProvider>
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-        <CanvasInner agents={agents} mode={mode} charState={charState.current} />
+        <CanvasInner
+          agents={agents}
+          mode={mode}
+          charState={charState.current}
+          onBuildingClick={setSelectedAgentId}
+        />
         <QualityToggle />
         <WalkSurveyToggle mode={mode} onChange={setMode} />
         <Minimap
@@ -94,6 +104,14 @@ export function CitySceneV2({ agents = [] }: Props) {
           agents={agents}
           showCharacter={mode === 'walk'}
           onTravel={handleTravel}
+        />
+        <WalkOnboarding visible={mode === 'walk'} />
+        <AgentPopup
+          agent={selectedAgent}
+          onClose={() => setSelectedAgentId(null)}
+          onOpen={(id) => {
+            window.location.href = `/agent/${id}`;
+          }}
         />
       </div>
     </QualityProvider>
@@ -104,10 +122,12 @@ function CanvasInner({
   agents,
   mode,
   charState,
+  onBuildingClick,
 }: {
   agents: CityAgent[];
   mode: CityMode;
   charState: CharacterState;
+  onBuildingClick?: (agentId: string) => void;
 }) {
   const quality = useQuality();
   return (
@@ -151,6 +171,9 @@ function CanvasInner({
         <SceneErrorBoundary label="Landmarks">
           <Landmarks />
         </SceneErrorBoundary>
+        <SceneErrorBoundary label="Streetlights">
+          <Streetlights />
+        </SceneErrorBoundary>
         <SceneErrorBoundary label="TravelPads">
           <TravelPads />
         </SceneErrorBoundary>
@@ -161,7 +184,10 @@ function CanvasInner({
           <NPCs agents={agents} />
         </SceneErrorBoundary>
         <SceneErrorBoundary label="Buildings">
-          <Buildings agents={agents} />
+          <Buildings agents={agents} onBuildingClick={onBuildingClick} />
+        </SceneErrorBoundary>
+        <SceneErrorBoundary label="DistrictLabels">
+          <DistrictLabels />
         </SceneErrorBoundary>
         {mode === 'walk' && (
           <SceneErrorBoundary label="Character">
