@@ -9,5 +9,196 @@
     "roadmap": "[fr] Roadmap",
     "login": "[fr] Log in",
     "signup": "[fr] Sign up"
+  },
+  "landing": {
+    "affiliateBanner": {
+      "live": "[fr] Affiliate Program is live",
+      "earn": "[fr]  — earn up to ",
+      "pct": "[fr] 40%",
+      "perReferral": "[fr]  on every referral",
+      "dismissAriaLabel": "[fr] Dismiss affiliate banner"
+    },
+    "tokenBanner": {
+      "learnMore": "[fr] Learn more →"
+    },
+    "hero": {
+      "eyebrow": "[fr] Managed AI agent hosting · Crypto-native",
+      "headlinePrefix": "[fr] Hatch Your",
+      "typewriterWords": ["[fr] AI Agent", "[fr] Fitness Coach", "[fr] Crypto Tracker", "[fr] Study Buddy", "[fr] Travel Planner", "[fr] Personal Assistant"],
+      "body": "[fr] Pick a framework. Configure. Launch in 60 seconds. No code required, no infrastructure to manage. 4 frameworks, 20+ platforms, free tier with BYOK.",
+      "ctaPrimary": "[fr] Get started free",
+      "ctaSecondary": "[fr] Read docs",
+      "agentPreviewOnline": "[fr] CryptoHelper — Online"
+    },
+    "stats": {
+      "users": "[fr] Users",
+      "agents": "[fr] Agents",
+      "activeNow": "[fr] Active now"
+    },
+    "agentDiscovery": {
+      "eyebrow": "[fr] For AI Agents",
+      "heading": "[fr] Command an army of subagents",
+      "body": "[fr] Your local coding agent becomes a fleet commander. Paste this prompt — it registers on Hatcher in your name, spins up always-on subagents (Telegram bots, research loops, Discord mods, monitors), and keeps controlling them long after your session ends.",
+      "promptLabel": "[fr] Prompt",
+      "copyLabel": "[fr] Copy",
+      "copiedLabel": "[fr] Copied",
+      "copyAriaLabel": "[fr] Copy prompt",
+      "copiedAriaLabel": "[fr] Copied",
+      "step01": "[fr] Send this prompt to your AI coding agent — Claude Code, Cursor, OpenClaw, Hermes, or any agent that can fetch URLs and run shell commands.",
+      "step02": "[fr] Agent registers an account with your email and sends you a verification link.",
+      "step03": "[fr] Click verify. Your agent picks a template, deploys, and hands you a running AI.",
+      "viewSkillMd": "[fr] View skill.md",
+      "githubSource": "[fr] GitHub source"
+    },
+    "howItWorks": {
+      "eyebrow": "[fr] How it works",
+      "heading": "[fr] 3 steps. 60 seconds.",
+      "subheading": "[fr] No coding, no setup guides, no configuration files.",
+      "steps": [
+        { "num": "01", "title": "[fr] Pick a framework", "desc": "[fr] OpenClaw, Hermes, ElizaOS, or Milady. Each has unique strengths — browser control, memory, multi-agent, on-chain." },
+        { "num": "02", "title": "[fr] Configure", "desc": "[fr] Name, personality, integrations. Fill a simple form — no config files, no YAML." },
+        { "num": "03", "title": "[fr] Deploy", "desc": "[fr] One click. Your agent is live on every connected platform in under 60 seconds." }
+      ],
+      "cta": "[fr] Try it now"
+    },
+    "useCases": {
+      "eyebrow": "[fr] Use cases",
+      "heading": "[fr] What will you hatch?",
+      "subheading": "[fr] From personal productivity to business automation — your agent, your rules.",
+      "items": [
+        { "title": "[fr] Personal assistant", "desc": "[fr] Calendar, emails, reminders — from Telegram." },
+        { "title": "[fr] Fitness coach", "desc": "[fr] Workouts, routines, daily accountability." },
+        { "title": "[fr] Food & nutrition", "desc": "[fr] Log meals, count calories, recipe suggestions." },
+        { "title": "[fr] Crypto tracker", "desc": "[fr] Token prices, portfolio alerts, on-chain data." },
+        { "title": "[fr] Study buddy", "desc": "[fr] Quiz you, summarize textbooks, help with homework." },
+        { "title": "[fr] Travel planner", "desc": "[fr] Find flights, plan itineraries, local picks." },
+        { "title": "[fr] Budget manager", "desc": "[fr] Track expenses, savings goals, weekly reports." },
+        { "title": "[fr] Research assistant", "desc": "[fr] Web search, summarize articles, compile reports." },
+        { "title": "[fr] Customer support", "desc": "[fr] Answer FAQs on Discord or WhatsApp, 24/7." }
+      ],
+      "footer": "[fr] And anything else you can describe in plain English."
+    },
+    "frameworks": {
+      "eyebrow": "[fr] Frameworks",
+      "heading": "[fr] Four frameworks. One platform.",
+      "subheading": "[fr] Pick the one that fits your agent. Switch whenever you want.",
+      "items": [
+        { "name": "OpenClaw", "tag": "[fr] all-rounder", "desc": "[fr] Powerful tools, plugins, and browser control.", "features": "[fr] 2500+ skills · Browser automation · File management" },
+        { "name": "Hermes", "tag": "[fr] reasoning", "desc": "[fr] Smart-first design for rich memory and reasoning.", "features": "[fr] 77 bundled skills · Deep memory · Multi-model" },
+        { "name": "ElizaOS", "tag": "[fr] multi-agent", "desc": "[fr] Multi-agent coordination with 90+ plugins.", "features": "[fr] 90+ plugins · Multi-agent · Knowledge base" },
+        { "name": "Milady", "tag": "[fr] crypto-native", "desc": "[fr] On-chain awareness, DeFi tools, token tracking.", "features": "[fr] DeFi tools · On-chain data · Token tracking" }
+      ]
+    },
+    "city": {
+      "eyebrow": "★ NEW",
+      "heading": "[fr] See every agent in Hatcher City.",
+      "body": "[fr] A live 3D city where every public agent is a building. Districts by category, colors by framework, gold beams mark yours. Drag, zoom, click any building to open it.",
+      "videoAriaLabel": "[fr] Open Hatcher City",
+      "label": "HATCHER CITY",
+      "exploreCta": "[fr] Explore the full fleet →",
+      "enterCta": "[fr] Enter city"
+    },
+    "features": {
+      "eyebrow": "[fr] Platform",
+      "heading": "[fr] Everything your agent needs",
+      "items": [
+        { "title": "[fr] Instant deploy", "desc": "[fr] From zero to running agent in under 60 seconds." },
+        { "title": "[fr] All platforms", "desc": "[fr] Telegram, Discord, Twitter, WhatsApp, Slack." },
+        { "title": "[fr] Bring your own key", "desc": "[fr] Use your own LLM API key for unlimited messages on any tier." },
+        { "title": "[fr] Secure by default", "desc": "[fr] Isolated containers, encrypted secrets, no shared data." },
+        { "title": "[fr] Live analytics", "desc": "[fr] Real-time stats, usage tracking, performance metrics." },
+        { "title": "[fr] Chat & voice", "desc": "[fr] Text chat, voice calls, real-time streaming — out of the box." }
+      ]
+    },
+    "pricing": {
+      "eyebrow": "[fr] Pricing",
+      "heading": "[fr] Start free, grow when ready",
+      "subheading": "[fr] All platforms included on every plan. Bring your own AI key for unlimited messages on any tier.",
+      "popularLabel": "[fr] Popular",
+      "tiers": [
+        {
+          "name": "[fr] Free", "price": "$0", "sub": "[fr] /month",
+          "features": ["[fr] 1 AI agent", "[fr] 20 messages/day", "[fr] All platforms", "[fr] Free AI included"],
+          "cta": "[fr] Get started"
+        },
+        {
+          "name": "[fr] Starter", "price": "$6.99", "sub": "[fr] /month",
+          "features": ["[fr] 1 AI agent", "[fr] 50 messages/day", "[fr] BYOK = unlimited", "[fr] Longer active time"],
+          "cta": "[fr] Choose Starter"
+        },
+        {
+          "name": "[fr] Pro", "price": "$19.99", "sub": "[fr] /month",
+          "features": ["[fr] 3 AI agents", "[fr] 100 messages/day", "[fr] BYOK = unlimited", "[fr] Dedicated resources"],
+          "cta": "[fr] Choose Pro"
+        },
+        {
+          "name": "[fr] Business", "price": "$49.99", "sub": "[fr] /month",
+          "features": ["[fr] 10 AI agents", "[fr] 300 messages/day", "[fr] Always-on containers", "[fr] Priority support"],
+          "cta": "[fr] Choose Business"
+        }
+      ],
+      "addonsNote": "[fr] Need more agents, messages, or storage? Add stackable packs — all tiers get add-on flexibility.",
+      "addonsCta": "[fr] See full pricing →"
+    },
+    "founding": {
+      "eyebrow": "[fr] Limited offer · Founding member",
+      "heading": "[fr] Pay once, keep forever.",
+      "oneTime": "[fr] one-time",
+      "subheading": "[fr] Locked-in price, no monthly fees, all Business-tier features forever. Only 20 spots.",
+      "availableSpotsLabel": "[fr] Available spots",
+      "checking": "[fr] Checking…",
+      "soldOut": "[fr] Sold out",
+      "spotsLeft": "[fr] {remaining} of {max} left",
+      "loadingAvailability": "[fr] Loading availability…",
+      "allTaken": "[fr] All {max} founding spots are taken. Standard tiers still available.",
+      "claimed": "[fr] {claimed} of {max} claimed · once they're gone, this offer is gone.",
+      "includedHeading": "[fr] Everything included, forever",
+      "includedItems": [
+        "[fr] 10 agents included",
+        "[fr] Always-on (no sleep)",
+        "[fr] 300 messages/day per account",
+        "[fr] 200 web searches/day",
+        "[fr] 2 CPU · 4 GB RAM per agent",
+        "[fr] 2 GB workspace per agent",
+        "[fr] File Manager + Full Logs",
+        "[fr] Team collaboration + priority support",
+        "[fr] Founding badge",
+        "[fr] Locked-in price forever"
+      ],
+      "ctaSoldOut": "[fr] Sold out",
+      "ctaClaim": "[fr] Claim your spot"
+    },
+    "faq": {
+      "eyebrow": "[fr] FAQ",
+      "heading": "[fr] Common questions",
+      "items": [
+        {
+          "q": "[fr] Is it really free?",
+          "a": "[fr] Yes. The free plan gives you 1 agent, 20 messages per day, and access to all platforms. No credit card required. BYOK (bring your own LLM key) = unlimited messages on any tier."
+        },
+        {
+          "q": "[fr] Do I need to know how to code?",
+          "a": "[fr] Not at all! Creating an agent is like filling out a form — choose a name, describe what you want it to do, pick platforms, and launch."
+        },
+        {
+          "q": "[fr] What is \"Bring Your Own Key\"?",
+          "a": "[fr] Connect your own OpenAI, Anthropic, Google, or Groq key for unlimited messages. You only pay your AI provider directly."
+        },
+        {
+          "q": "[fr] Where does my agent run?",
+          "a": "[fr] On our cloud servers 24/7. No need to keep your computer on or install anything."
+        }
+      ]
+    },
+    "finalCta": {
+      "heading": "[fr] Ready to deploy your first agent?",
+      "body": "[fr] Free tier includes 1 agent with 20 messages/day. BYOK = unlimited. No credit card required.",
+      "ctaPrimary": "[fr] Create your agent",
+      "ctaSecondary": "[fr] See pricing",
+      "trustNoCreditCard": "[fr] No credit card",
+      "trustFreeAi": "[fr] Free AI included",
+      "trustDeploy60s": "[fr] Deploy in 60s",
+      "trustAllPlatforms": "[fr] All platforms"
+    }
   }
 }

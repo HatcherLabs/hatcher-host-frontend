@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 
 import {
   ArrowRight,
@@ -87,6 +88,7 @@ function StatProofCard({
 }
 
 function HeroStats() {
+  const t = useTranslations('landing.stats');
   const [stats, setStats] = useState<PlatformStats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -117,21 +119,21 @@ function HeroStats() {
       className="max-w-4xl mx-auto grid grid-cols-3 gap-3 sm:gap-4"
     >
       <StatProofCard
-        label="Users"
+        label={t('users')}
         value={stats ? fmt(stats.totalUsers) : '—'}
         icon={Users}
         iconColor="var(--color-accent)"
         loading={loading}
       />
       <StatProofCard
-        label="Agents"
+        label={t('agents')}
         value={stats ? fmt(stats.totalAgents) : '—'}
         icon={Bot}
         iconColor="#60A5FA"
         loading={loading}
       />
       <StatProofCard
-        label="Active now"
+        label={t('activeNow')}
         value={stats ? fmt(stats.activeAgents) : '—'}
         icon={Activity}
         iconColor="#4ADE80"
@@ -142,18 +144,17 @@ function HeroStats() {
 }
 
 // ─── Typewriter effect ───────────────────────────────────────
-const TYPEWRITER_WORDS = ['AI Agent', 'Fitness Coach', 'Crypto Tracker', 'Study Buddy', 'Travel Planner', 'Personal Assistant'];
-// Longest word reserves layout space so the headline never reflows mid-cycle
-// (which causes CLS + the trailing chat-preview card to jitter).
-const LONGEST_WORD = TYPEWRITER_WORDS.reduce((a, b) => (b.length > a.length ? b : a));
-
-function Typewriter() {
+function Typewriter({ words }: { words: string[] }) {
   const [wordIndex, setWordIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
   const [deleting, setDeleting] = useState(false);
 
+  // Longest word reserves layout space so the headline never reflows mid-cycle
+  // (which causes CLS + the trailing chat-preview card to jitter).
+  const longestWord = words.reduce((a, b) => (b.length > a.length ? b : a), '');
+
   useEffect(() => {
-    const word = TYPEWRITER_WORDS[wordIndex]!;
+    const word = words[wordIndex] ?? '';
     const speed = deleting ? 40 : 80;
 
     if (!deleting && charIndex === word.length) {
@@ -162,7 +163,7 @@ function Typewriter() {
     }
     if (deleting && charIndex === 0) {
       setDeleting(false);
-      setWordIndex((i) => (i + 1) % TYPEWRITER_WORDS.length);
+      setWordIndex((i) => (i + 1) % words.length);
       return;
     }
 
@@ -170,15 +171,15 @@ function Typewriter() {
       setCharIndex((c) => c + (deleting ? -1 : 1));
     }, speed);
     return () => clearTimeout(timer);
-  }, [charIndex, deleting, wordIndex]);
+  }, [charIndex, deleting, wordIndex, words]);
 
-  const word = TYPEWRITER_WORDS[wordIndex]!;
+  const word = words[wordIndex] ?? '';
   const displayed = word.slice(0, charIndex);
 
   return (
     <span className="relative inline-block align-baseline">
       {/* Invisible spacer reserves space for the longest word so layout never reflows. */}
-      <span aria-hidden="true" className="invisible whitespace-nowrap">{LONGEST_WORD}</span>
+      <span aria-hidden="true" className="invisible whitespace-nowrap">{longestWord}</span>
       <span className="absolute inset-0 text-[var(--color-accent)] whitespace-nowrap">
         {displayed}
         <span className="animate-pulse opacity-70">|</span>
@@ -189,6 +190,7 @@ function Typewriter() {
 
 // ─── Live agent demo preview ──────────────────────────────────
 function AgentPreview() {
+  const t = useTranslations('landing.hero');
   const [solPrice, setSolPrice] = useState<number | null>(null);
 
   useEffect(() => {
@@ -225,7 +227,7 @@ function AgentPreview() {
         </div>
         <div className="flex items-center gap-2 ml-3">
           <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-xs text-[var(--text-secondary)]">CryptoHelper — Online</span>
+          <span className="text-xs text-[var(--text-secondary)]">{t('agentPreviewOnline')}</span>
         </div>
       </div>
       <div className="p-4 space-y-3 min-h-[220px]">
@@ -289,6 +291,19 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 // ═══════════════════════════════════════════════════════════════
 export default function LandingPage() {
   const { isLoading: authLoading } = useAuth();
+  const tHero = useTranslations('landing.hero');
+  const tAff = useTranslations('landing.affiliateBanner');
+  const tToken = useTranslations('landing.tokenBanner');
+  const tHow = useTranslations('landing.howItWorks');
+  const tUse = useTranslations('landing.useCases');
+  const tFw = useTranslations('landing.frameworks');
+  const tCity = useTranslations('landing.city');
+  const tFeat = useTranslations('landing.features');
+  const tPricing = useTranslations('landing.pricing');
+  const tFounding = useTranslations('landing.founding');
+  const tFaq = useTranslations('landing.faq');
+  const tCta = useTranslations('landing.finalCta');
+
   const [tokenData, setTokenData] = useState<{ price: string; mcap: string } | null>(null);
   // Founding Member availability. Hidden by default; rendered as a
   // scarcity banner only while spots remain (no banner when sold out —
@@ -347,6 +362,33 @@ export default function LandingPage() {
       .catch(() => {});
   }, []);
 
+  // Read translated arrays
+  const typewriterWords = tHero.raw('typewriterWords') as string[];
+
+  const howItWorksSteps = tHow.raw('steps') as { num: string; title: string; desc: string }[];
+
+  const useCaseItems = tUse.raw('items') as { title: string; desc: string }[];
+
+  const frameworkIcons = [Cpu, Brain, Bot, Sparkles];
+  const frameworkHrefs = [
+    `${DOCS_URL}/frameworks/openclaw`,
+    `${DOCS_URL}/frameworks/hermes`,
+    `${DOCS_URL}/frameworks/elizaos`,
+    `${DOCS_URL}/frameworks/milady`,
+  ];
+  const frameworkItems = tFw.raw('items') as { name: string; tag: string; desc: string; features: string }[];
+
+  const featureIcons = [Zap, Globe, Key, Shield, BarChart3, MessageSquare];
+  const featureItems = tFeat.raw('items') as { title: string; desc: string }[];
+
+  const pricingTiers = tPricing.raw('tiers') as { name: string; price: string; sub: string; features: string[]; cta: string }[];
+  const pricingHrefs = ['/register', '/pricing', '/pricing', '/pricing'];
+  const pricingHighlight = [false, false, true, false];
+
+  const foundingIncludedItems = tFounding.raw('includedItems') as string[];
+
+  const faqItems = tFaq.raw('items') as { q: string; a: string }[];
+
   if (authLoading) return <div className="min-h-screen bg-[var(--bg-base)]" />;
 
   return (
@@ -373,10 +415,10 @@ export default function LandingPage() {
             <span className="inline-flex items-center gap-2 flex-wrap justify-center">
               <Sparkles className="w-3.5 h-3.5 text-[var(--color-accent)] flex-shrink-0" />
               <span>
-                <strong className="font-semibold">Affiliate Program is live</strong>
-                <span className="text-[var(--text-secondary)]"> — earn up to </span>
-                <strong className="font-semibold">40%</strong>
-                <span className="text-[var(--text-secondary)]"> on every referral</span>
+                <strong className="font-semibold">{tAff('live')}</strong>
+                <span className="text-[var(--text-secondary)]">{tAff('earn')}</span>
+                <strong className="font-semibold">{tAff('pct')}</strong>
+                <span className="text-[var(--text-secondary)]">{tAff('perReferral')}</span>
               </span>
               <span className="text-[var(--color-accent)] font-semibold">→</span>
             </span>
@@ -384,7 +426,7 @@ export default function LandingPage() {
           <button
             type="button"
             onClick={dismissAffBanner}
-            aria-label="Dismiss affiliate banner"
+            aria-label={tAff('dismissAriaLabel')}
             className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)]/60 transition-colors"
           >
             <X className="w-3.5 h-3.5" />
@@ -409,7 +451,7 @@ export default function LandingPage() {
           )}
           <span className="hidden md:inline text-[var(--text-muted)]">·</span>
           <code className="hidden md:inline font-mono text-[11px] text-[var(--text-muted)] hover:text-[var(--text-secondary)] select-all transition-colors truncate">Cntmo5...zZpump</code>
-          <Link href="/token" className="text-[var(--color-accent)] hover:underline underline-offset-2 shrink-0 ml-auto sm:ml-0">Learn more →</Link>
+          <Link href="/token" className="text-[var(--color-accent)] hover:underline underline-offset-2 shrink-0 ml-auto sm:ml-0">{tToken('learnMore')}</Link>
         </div>
       </div>
 
@@ -426,7 +468,7 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div>
               <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease }} className="mb-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">
-                Managed AI agent hosting · Crypto-native
+                {tHero('eyebrow')}
               </motion.p>
 
               <motion.h1
@@ -436,21 +478,21 @@ export default function LandingPage() {
                 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] mb-6 text-[var(--text-primary)]"
                 style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
               >
-                Hatch Your{' '}<br />
-                <Typewriter />
+                {tHero('headlinePrefix')}{' '}<br />
+                <Typewriter words={typewriterWords} />
               </motion.h1>
 
               <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1, ease }} className="text-lg text-[var(--text-secondary)] leading-relaxed mb-10 max-w-lg">
-                Pick a framework. Configure. Launch in 60 seconds. No code required, no infrastructure to manage. 4 frameworks, 20+ platforms, free tier with BYOK.
+                {tHero('body')}
               </motion.p>
 
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2, ease }} className="flex flex-wrap items-center gap-5">
                 <Link href="/register" className="inline-flex items-center gap-2 h-11 px-5 rounded-md bg-[var(--text-primary)] text-[var(--bg-base)] text-sm font-semibold hover:opacity-90 transition-opacity">
-                  Get started free
+                  {tHero('ctaPrimary')}
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link href={DOCS_URL} className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors inline-flex items-center gap-1.5 group">
-                  Read docs
+                  {tHero('ctaSecondary')}
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </motion.div>
@@ -475,22 +517,18 @@ export default function LandingPage() {
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden">
         <div className="max-w-5xl mx-auto">
           <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="mb-16 max-w-2xl">
-            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">How it works</p>
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{tHow('eyebrow')}</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              3 steps. 60 seconds.
+              {tHow('heading')}
             </h2>
-            <p className="mt-4 text-lg text-[var(--text-secondary)]">No coding, no setup guides, no configuration files.</p>
+            <p className="mt-4 text-lg text-[var(--text-secondary)]">{tHow('subheading')}</p>
           </motion.div>
 
           {/* Editorial numbered rows — typography-led, not card-grid.
               Big outline numerals carry the rhythm, spacing between rows
               gives the eye time to land on each step. */}
           <div className="divide-y divide-[var(--border-default)] border-t border-b border-[var(--border-default)]">
-            {[
-              { num: '01', title: 'Pick a framework', desc: 'OpenClaw, Hermes, ElizaOS, or Milady. Each has unique strengths — browser control, memory, multi-agent, on-chain.' },
-              { num: '02', title: 'Configure', desc: 'Name, personality, integrations. Fill a simple form — no config files, no YAML.' },
-              { num: '03', title: 'Deploy', desc: 'One click. Your agent is live on every connected platform in under 60 seconds.' },
-            ].map((step, i) => (
+            {howItWorksSteps.map((step, i) => (
               <motion.div
                 key={step.num}
                 initial={{ y: 20 }}
@@ -510,7 +548,7 @@ export default function LandingPage() {
 
           <motion.div {...fadeUp} transition={{ duration: 0.5, delay: 0.2, ease }} className="mt-10">
             <Link href="/register" className="text-sm font-medium text-[var(--color-accent)] hover:underline underline-offset-4 inline-flex items-center gap-1.5 group">
-              Try it now
+              {tHow('cta')}
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </motion.div>
@@ -521,12 +559,12 @@ export default function LandingPage() {
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden">
         <div className="max-w-5xl mx-auto">
           <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="mb-16 max-w-2xl">
-            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Use cases</p>
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{tUse('eyebrow')}</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              What will you hatch?
+              {tUse('heading')}
             </h2>
             <p className="mt-4 text-lg text-[var(--text-secondary)]">
-              From personal productivity to business automation — your agent, your rules.
+              {tUse('subheading')}
             </p>
           </motion.div>
 
@@ -534,17 +572,7 @@ export default function LandingPage() {
               Each row: title + inline desc. Lets the reader scan 9 use-cases
               without each one shouting with decorative color. */}
           <div className="grid sm:grid-cols-2 gap-x-10 md:gap-x-16 gap-y-1">
-            {[
-              { title: 'Personal assistant', desc: 'Calendar, emails, reminders — from Telegram.' },
-              { title: 'Fitness coach', desc: 'Workouts, routines, daily accountability.' },
-              { title: 'Food & nutrition', desc: 'Log meals, count calories, recipe suggestions.' },
-              { title: 'Crypto tracker', desc: 'Token prices, portfolio alerts, on-chain data.' },
-              { title: 'Study buddy', desc: 'Quiz you, summarize textbooks, help with homework.' },
-              { title: 'Travel planner', desc: 'Find flights, plan itineraries, local picks.' },
-              { title: 'Budget manager', desc: 'Track expenses, savings goals, weekly reports.' },
-              { title: 'Research assistant', desc: 'Web search, summarize articles, compile reports.' },
-              { title: 'Customer support', desc: 'Answer FAQs on Discord or WhatsApp, 24/7.' },
-            ].map((uc, i) => (
+            {useCaseItems.map((uc, i) => (
               <motion.div
                 key={uc.title}
                 initial={{ y: 12 }}
@@ -560,7 +588,7 @@ export default function LandingPage() {
           </div>
 
           <motion.p {...fadeUp} transition={{ duration: 0.5, delay: 0.2, ease }} className="mt-10 text-sm text-[var(--text-muted)]">
-            And anything else you can describe in plain English.
+            {tUse('footer')}
           </motion.p>
         </div>
       </section>
@@ -569,49 +597,47 @@ export default function LandingPage() {
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden" id="frameworks">
         <div className="max-w-5xl mx-auto">
           <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="mb-16 max-w-2xl">
-            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Frameworks</p>
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{tFw('eyebrow')}</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              Four frameworks. One platform.
+              {tFw('heading')}
             </h2>
             <p className="mt-4 text-lg text-[var(--text-secondary)]">
-              Pick the one that fits your agent. Switch whenever you want.
+              {tFw('subheading')}
             </p>
           </motion.div>
 
           <div className="divide-y divide-[var(--border-default)] border-t border-b border-[var(--border-default)]">
-            {[
-              { icon: Cpu, name: 'OpenClaw', tag: 'all-rounder', desc: 'Powerful tools, plugins, and browser control.', features: '2500+ skills · Browser automation · File management', href: `${DOCS_URL}/frameworks/openclaw` },
-              { icon: Brain, name: 'Hermes', tag: 'reasoning', desc: 'Smart-first design for rich memory and reasoning.', features: '77 bundled skills · Deep memory · Multi-model', href: `${DOCS_URL}/frameworks/hermes` },
-              { icon: Bot, name: 'ElizaOS', tag: 'multi-agent', desc: 'Multi-agent coordination with 90+ plugins.', features: '90+ plugins · Multi-agent · Knowledge base', href: `${DOCS_URL}/frameworks/elizaos` },
-              { icon: Sparkles, name: 'Milady', tag: 'crypto-native', desc: 'On-chain awareness, DeFi tools, token tracking.', features: 'DeFi tools · On-chain data · Token tracking', href: `${DOCS_URL}/frameworks/milady` },
-            ].map((fw, i) => (
-              <motion.div
-                key={fw.name}
-                initial={{ x: -20 }}
-                whileInView={{ x: 0 }}
-                viewport={{ once: true, amount: 0.1 }}
-                transition={{ duration: 0.5, delay: i * 0.08, ease }}
-              >
-                <Link
-                  href={fw.href}
-                  className="group flex items-start gap-4 md:gap-6 py-6 hover:bg-[var(--bg-card)]/40 transition-colors px-2 -mx-2 rounded"
+            {frameworkItems.map((fw, i) => {
+              const FwIcon = frameworkIcons[i]!;
+              return (
+                <motion.div
+                  key={fw.name}
+                  initial={{ x: -20 }}
+                  whileInView={{ x: 0 }}
+                  viewport={{ once: true, amount: 0.1 }}
+                  transition={{ duration: 0.5, delay: i * 0.08, ease }}
                 >
-                  <fw.icon size={20} className="text-[var(--text-muted)] group-hover:text-[var(--color-accent)] transition-colors shrink-0 mt-0.5" />
-                  {/* Name + tag stacked so each row has identical height
-                      regardless of tag length ("ALL-ROUNDER" vs "REASONING"
-                      vs "MULTI-AGENT" wrap inconsistently when inline). */}
-                  <div className="w-36 md:w-40 shrink-0">
-                    <h3 className="text-xl md:text-2xl font-semibold text-[var(--text-primary)] leading-tight">{fw.name}</h3>
-                    <span className="block mt-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)] whitespace-nowrap">{fw.tag}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{fw.desc}</p>
-                    <p className="text-xs text-[var(--text-muted)] mt-1">{fw.features}</p>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--text-primary)] group-hover:translate-x-1 transition-all shrink-0 mt-1.5" />
-                </Link>
-              </motion.div>
-            ))}
+                  <Link
+                    href={frameworkHrefs[i]!}
+                    className="group flex items-start gap-4 md:gap-6 py-6 hover:bg-[var(--bg-card)]/40 transition-colors px-2 -mx-2 rounded"
+                  >
+                    <FwIcon size={20} className="text-[var(--text-muted)] group-hover:text-[var(--color-accent)] transition-colors shrink-0 mt-0.5" />
+                    {/* Name + tag stacked so each row has identical height
+                        regardless of tag length ("ALL-ROUNDER" vs "REASONING"
+                        vs "MULTI-AGENT" wrap inconsistently when inline). */}
+                    <div className="w-36 md:w-40 shrink-0">
+                      <h3 className="text-xl md:text-2xl font-semibold text-[var(--text-primary)] leading-tight">{fw.name}</h3>
+                      <span className="block mt-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--text-muted)] whitespace-nowrap">{fw.tag}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{fw.desc}</p>
+                      <p className="text-xs text-[var(--text-muted)] mt-1">{fw.features}</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--text-primary)] group-hover:translate-x-1 transition-all shrink-0 mt-1.5" />
+                  </Link>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -620,12 +646,12 @@ export default function LandingPage() {
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden relative" id="city">
         <div className="max-w-5xl mx-auto">
           <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="mb-10 max-w-2xl">
-            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-500">★ NEW</p>
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-500">{tCity('eyebrow')}</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              See every agent in&nbsp;Hatcher City.
+              {tCity('heading')}
             </h2>
             <p className="mt-4 text-lg text-[var(--text-secondary)]">
-              A live 3D city where every public agent is a building. Districts by category, colors by framework, gold beams mark yours. Drag, zoom, click any building to open it.
+              {tCity('body')}
             </p>
           </motion.div>
           <motion.div
@@ -637,7 +663,7 @@ export default function LandingPage() {
             <Link
               href="/city"
               className="group absolute inset-0 block"
-              aria-label="Open Hatcher City"
+              aria-label={tCity('videoAriaLabel')}
             >
               <video
                 src="/city-hero.mp4"
@@ -652,11 +678,11 @@ export default function LandingPage() {
               <div className="absolute inset-0 bg-gradient-to-t from-[#050814]/80 via-transparent to-[#050814]/20" />
               <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between gap-4">
                 <div>
-                  <div className="font-mono text-[10px] uppercase tracking-[3px] text-amber-400">HATCHER CITY</div>
-                  <div className="mt-1 text-xl font-bold text-white sm:text-2xl">Explore the full fleet →</div>
+                  <div className="font-mono text-[10px] uppercase tracking-[3px] text-amber-400">{tCity('label')}</div>
+                  <div className="mt-1 text-xl font-bold text-white sm:text-2xl">{tCity('exploreCta')}</div>
                 </div>
                 <div className="hidden sm:block rounded-full border border-amber-400 bg-amber-400 px-5 py-2 font-mono text-xs uppercase tracking-widest text-black transition group-hover:bg-transparent group-hover:text-amber-400">
-                  Enter city
+                  {tCity('enterCta')}
                 </div>
               </div>
             </Link>
@@ -668,9 +694,9 @@ export default function LandingPage() {
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden" id="features">
         <div className="max-w-4xl mx-auto">
           <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="mb-16 max-w-2xl">
-            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Platform</p>
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{tFeat('eyebrow')}</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              Everything your agent needs
+              {tFeat('heading')}
             </h2>
           </motion.div>
 
@@ -678,26 +704,22 @@ export default function LandingPage() {
               stripe/linear restraint — no colored icon boxes, no 5-color
               palette shouting. Title + description carry the weight. */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-10">
-            {[
-              { icon: Zap, title: 'Instant deploy', desc: 'From zero to running agent in under 60 seconds.' },
-              { icon: Globe, title: 'All platforms', desc: 'Telegram, Discord, Twitter, WhatsApp, Slack.' },
-              { icon: Key, title: 'Bring your own key', desc: 'Use your own LLM API key for unlimited messages on any tier.' },
-              { icon: Shield, title: 'Secure by default', desc: 'Isolated containers, encrypted secrets, no shared data.' },
-              { icon: BarChart3, title: 'Live analytics', desc: 'Real-time stats, usage tracking, performance metrics.' },
-              { icon: MessageSquare, title: 'Chat & voice', desc: 'Text chat, voice calls, real-time streaming — out of the box.' },
-            ].map((feature, i) => (
-              <motion.div
-                key={feature.title}
-                initial={{ y: 20 }}
-                whileInView={{ y: 0 }}
-                viewport={{ once: true, amount: 0.1 }}
-                transition={{ duration: 0.5, delay: i * 0.05, ease }}
-              >
-                <feature.icon className="w-5 h-5 text-[var(--color-accent)] mb-4" strokeWidth={1.75} />
-                <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1.5">{feature.title}</h3>
-                <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed">{feature.desc}</p>
-              </motion.div>
-            ))}
+            {featureItems.map((feature, i) => {
+              const FeatIcon = featureIcons[i]!;
+              return (
+                <motion.div
+                  key={feature.title}
+                  initial={{ y: 20 }}
+                  whileInView={{ y: 0 }}
+                  viewport={{ once: true, amount: 0.1 }}
+                  transition={{ duration: 0.5, delay: i * 0.05, ease }}
+                >
+                  <FeatIcon className="w-5 h-5 text-[var(--color-accent)] mb-4" strokeWidth={1.75} />
+                  <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1.5">{feature.title}</h3>
+                  <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed">{feature.desc}</p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -706,11 +728,11 @@ export default function LandingPage() {
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden" id="pricing">
         <div className="max-w-5xl mx-auto">
           <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="mb-16 max-w-2xl">
-            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Pricing</p>
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{tPricing('eyebrow')}</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              Start free, grow when ready
+              {tPricing('heading')}
             </h2>
-            <p className="mt-4 text-lg text-[var(--text-secondary)]">All platforms included on every plan. Bring your own AI key for unlimited messages on any tier.</p>
+            <p className="mt-4 text-lg text-[var(--text-secondary)]">{tPricing('subheading')}</p>
           </motion.div>
 
           {/* Unified tier cards — no 4-color tier coding, no neon badges.
@@ -718,28 +740,7 @@ export default function LandingPage() {
               single small "Popular" label (matching the eyebrow typography
               style used elsewhere). Rest stays calm and scannable. */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              {
-                name: 'Free', price: '$0', sub: '/month',
-                features: ['1 AI agent', '20 messages/day', 'All platforms', 'Free AI included'],
-                cta: 'Get started', href: '/register', highlight: false,
-              },
-              {
-                name: 'Starter', price: '$6.99', sub: '/month',
-                features: ['1 AI agent', '50 messages/day', 'BYOK = unlimited', 'Longer active time'],
-                cta: 'Choose Starter', href: '/pricing', highlight: false,
-              },
-              {
-                name: 'Pro', price: '$19.99', sub: '/month',
-                features: ['3 AI agents', '100 messages/day', 'BYOK = unlimited', 'Dedicated resources'],
-                cta: 'Choose Pro', href: '/pricing', highlight: true,
-              },
-              {
-                name: 'Business', price: '$49.99', sub: '/month',
-                features: ['10 AI agents', '300 messages/day', 'Always-on containers', 'Priority support'],
-                cta: 'Choose Business', href: '/pricing', highlight: false,
-              },
-            ].map((tier, i) => (
+            {pricingTiers.map((tier, i) => (
               <motion.div
                 key={tier.name}
                 initial={{ y: 30 }}
@@ -747,14 +748,14 @@ export default function LandingPage() {
                 viewport={{ once: true, amount: 0.1 }}
                 transition={{ duration: 0.5, delay: i * 0.1, ease }}
                 className={`relative rounded-xl p-6 flex flex-col ${
-                  tier.highlight
+                  pricingHighlight[i]
                     ? 'border-2 border-[var(--color-accent)] bg-[var(--bg-card)]'
                     : 'border border-[var(--border-default)] bg-[var(--bg-card)]/40'
                 } transition-colors`}
               >
                 <div className="flex items-center justify-between mb-5">
                   <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-[var(--text-muted)]">{tier.name}</p>
-                  {tier.highlight && <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">Popular</span>}
+                  {pricingHighlight[i] && <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">{tPricing('popularLabel')}</span>}
                 </div>
                 <div className="flex items-baseline gap-1 mb-6">
                   <span className="text-[32px] font-bold text-[var(--text-primary)] tabular-nums leading-none">{tier.price}</span>
@@ -769,9 +770,9 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Link
-                  href={tier.href}
+                  href={pricingHrefs[i]!}
                   className={`block text-center font-semibold px-5 py-2.5 rounded-md text-sm transition-opacity ${
-                    tier.highlight
+                    pricingHighlight[i]
                       ? 'bg-[var(--text-primary)] text-[var(--bg-base)] hover:opacity-90'
                       : 'border border-[var(--border-hover)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
                   }`}
@@ -783,8 +784,8 @@ export default function LandingPage() {
           </div>
 
           <p className="text-sm text-[var(--text-muted)] mt-8">
-            Need more agents, messages, or storage? Add stackable packs — all tiers get add-on flexibility.{' '}
-            <Link href="/pricing" className="text-[var(--color-accent)] hover:underline underline-offset-2">See full pricing →</Link>
+            {tPricing('addonsNote')}{' '}
+            <Link href="/pricing" className="text-[var(--color-accent)] hover:underline underline-offset-2">{tPricing('addonsCta')}</Link>
           </p>
         </div>
       </section>
@@ -796,16 +797,16 @@ export default function LandingPage() {
         }} />
         <div className="max-w-5xl mx-auto relative">
           <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="mb-12 max-w-2xl">
-            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">Limited offer · Founding member</p>
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--color-accent)]">{tFounding('eyebrow')}</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              Pay once, keep forever.
+              {tFounding('heading')}
             </h2>
             <div className="mt-6 flex items-baseline gap-2">
               <span className="text-5xl md:text-6xl font-bold text-[var(--text-primary)] tabular-nums leading-none">$99</span>
-              <span className="text-lg text-[var(--text-muted)]">one-time</span>
+              <span className="text-lg text-[var(--text-muted)]">{tFounding('oneTime')}</span>
             </div>
             <p className="mt-4 text-lg text-[var(--text-secondary)]">
-              Locked-in price, no monthly fees, all Business-tier features forever. Only 20 spots.
+              {tFounding('subheading')}
             </p>
           </motion.div>
 
@@ -817,16 +818,18 @@ export default function LandingPage() {
           >
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs uppercase tracking-wider font-bold text-[var(--text-muted)]">
-                Available spots
+                {tFounding('availableSpotsLabel')}
               </span>
               {foundingRemaining === null ? (
                 <span className="text-xs text-[var(--text-muted)] inline-flex items-center gap-1.5">
                   <span className="w-3 h-3 border-2 border-[var(--text-muted)]/30 border-t-[var(--text-muted)] rounded-full animate-spin" />
-                  Checking…
+                  {tFounding('checking')}
                 </span>
               ) : (
                 <span className={`text-xs font-bold ${foundingRemaining === 0 ? 'text-red-400' : foundingRemaining <= 3 ? 'text-orange-400' : 'text-[var(--text-primary)]'}`}>
-                  {foundingRemaining === 0 ? 'Sold out' : `${foundingRemaining} of ${FOUNDING_MEMBER_MAX_SLOTS} left`}
+                  {foundingRemaining === 0
+                    ? tFounding('soldOut')
+                    : tFounding('spotsLeft', { remaining: foundingRemaining, max: FOUNDING_MEMBER_MAX_SLOTS })}
                 </span>
               )}
             </div>
@@ -845,10 +848,10 @@ export default function LandingPage() {
             </div>
             <p className="text-[10px] text-[var(--text-muted)] mt-2 text-center">
               {foundingRemaining === null
-                ? 'Loading availability…'
+                ? tFounding('loadingAvailability')
                 : foundingRemaining === 0
-                  ? `All ${FOUNDING_MEMBER_MAX_SLOTS} founding spots are taken. Standard tiers still available.`
-                  : `${FOUNDING_MEMBER_MAX_SLOTS - foundingRemaining} of ${FOUNDING_MEMBER_MAX_SLOTS} claimed · once they're gone, this offer is gone.`}
+                  ? tFounding('allTaken', { max: FOUNDING_MEMBER_MAX_SLOTS })
+                  : tFounding('claimed', { claimed: FOUNDING_MEMBER_MAX_SLOTS - foundingRemaining, max: FOUNDING_MEMBER_MAX_SLOTS })}
             </p>
           </motion.div>
 
@@ -859,21 +862,10 @@ export default function LandingPage() {
             className="card glass-noise p-6 sm:p-8 mb-6"
           >
             <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--text-muted)] mb-4">
-              Everything included, forever
+              {tFounding('includedHeading')}
             </h3>
             <div className="grid sm:grid-cols-2 gap-3">
-              {[
-                '10 agents included',
-                'Always-on (no sleep)',
-                '300 messages/day per account',
-                '200 web searches/day',
-                '2 CPU · 4 GB RAM per agent',
-                '2 GB workspace per agent',
-                'File Manager + Full Logs',
-                'Team collaboration + priority support',
-                'Founding badge',
-                'Locked-in price forever',
-              ].map((item) => (
+              {foundingIncludedItems.map((item) => (
                 <div key={item} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
                   <Check className="w-4 h-4 text-[var(--color-accent)] shrink-0 mt-0.5" strokeWidth={2.5} />
                   <span>{item}</span>
@@ -891,7 +883,7 @@ export default function LandingPage() {
                   : 'bg-[var(--text-primary)] text-[var(--bg-base)] hover:opacity-90'
               }`}
             >
-              {foundingRemaining === 0 ? 'Sold out' : 'Claim your spot'}
+              {foundingRemaining === 0 ? tFounding('ctaSoldOut') : tFounding('ctaClaim')}
               {foundingRemaining !== 0 && <ArrowRight className="w-4 h-4" />}
             </Link>
           </motion.div>
@@ -902,19 +894,14 @@ export default function LandingPage() {
       <section className="py-20 sm:py-28 px-4 sm:px-6 border-t border-[var(--border-default)] overflow-hidden" id="faq">
         <div className="max-w-4xl mx-auto">
           <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="mb-14 max-w-2xl">
-            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">FAQ</p>
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{tFaq('eyebrow')}</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-              Common questions
+              {tFaq('heading')}
             </h2>
           </motion.div>
 
           <div className="space-y-3">
-            {[
-              { q: 'Is it really free?', a: 'Yes. The free plan gives you 1 agent, 20 messages per day, and access to all platforms. No credit card required. BYOK (bring your own LLM key) = unlimited messages on any tier.' },
-              { q: 'Do I need to know how to code?', a: 'Not at all! Creating an agent is like filling out a form — choose a name, describe what you want it to do, pick platforms, and launch.' },
-              { q: 'What is "Bring Your Own Key"?', a: 'Connect your own OpenAI, Anthropic, Google, or Groq key for unlimited messages. You only pay your AI provider directly.' },
-              { q: 'Where does my agent run?', a: 'On our cloud servers 24/7. No need to keep your computer on or install anything.' },
-            ].map((item, i) => (
+            {faqItems.map((item, i) => (
               <FAQItem key={i} question={item.q} answer={item.a} />
             ))}
           </div>
@@ -928,26 +915,26 @@ export default function LandingPage() {
         }} />
         <motion.div {...fadeUp} transition={{ duration: 0.6, ease }} className="relative z-10 max-w-3xl mx-auto text-center">
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] mb-6 text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-            Ready to deploy your first agent?
+            {tCta('heading')}
           </h2>
           <p className="text-lg text-[var(--text-secondary)] mb-10 max-w-xl mx-auto">
-            Free tier includes 1 agent with 20 messages/day. BYOK = unlimited. No credit card required.
+            {tCta('body')}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-5">
             <Link href="/register" className="inline-flex items-center gap-2 h-12 px-6 rounded-md bg-[var(--text-primary)] text-[var(--bg-base)] text-sm font-semibold hover:opacity-90 transition-opacity">
-              Create your agent
+              {tCta('ctaPrimary')}
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link href="/pricing" className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors inline-flex items-center gap-1.5 group">
-              See pricing
+              {tCta('ctaSecondary')}
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[var(--text-muted)]">
-            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[var(--color-accent)]" strokeWidth={2.5} /> No credit card</span>
-            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[var(--color-accent)]" strokeWidth={2.5} /> Free AI included</span>
-            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[var(--color-accent)]" strokeWidth={2.5} /> Deploy in 60s</span>
-            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[var(--color-accent)]" strokeWidth={2.5} /> All platforms</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[var(--color-accent)]" strokeWidth={2.5} /> {tCta('trustNoCreditCard')}</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[var(--color-accent)]" strokeWidth={2.5} /> {tCta('trustFreeAi')}</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[var(--color-accent)]" strokeWidth={2.5} /> {tCta('trustDeploy60s')}</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[var(--color-accent)]" strokeWidth={2.5} /> {tCta('trustAllPlatforms')}</span>
           </div>
         </motion.div>
       </section>
