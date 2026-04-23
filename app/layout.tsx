@@ -11,6 +11,8 @@ import { ToastProvider } from '@/components/ui/ToastProvider';
 import { CommandPalette } from '@/components/ui/CommandPalette';
 import { PosthogProvider } from '@/components/providers/PosthogProvider';
 import { CookieConsent } from '@/components/ui/CookieConsent';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -225,7 +227,13 @@ const faqJsonLd = {
   ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Header/Footer/LayoutShell use useLocale() + useTranslations() which need a provider.
+  // Non-locale pages (admin, /privacy, not-found) rely on this provider to supply
+  // default-locale messages. Locale pages get their own nested provider in
+  // app/[locale]/layout.tsx which takes precedence for useTranslations.
+  const locale = await getLocale();
+  const messages = await getMessages();
 
   return (
     <html lang="en" className={`scroll-smooth ${inter.variable} ${jetbrainsMono.variable} ${sora.variable}`} suppressHydrationWarning>
@@ -303,18 +311,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           `}
         </Script>
         <Script src="/register-sw.js" strategy="afterInteractive" />
-        <PosthogProvider>
-          <ThemeProvider>
-            <AuthProvider>
-              <WalletProvider>
-                <ToastProvider>
-                  <LayoutShell>{children}</LayoutShell>
-                  <CommandPalette />
-                </ToastProvider>
-              </WalletProvider>
-            </AuthProvider>
-          </ThemeProvider>
-        </PosthogProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <PosthogProvider>
+            <ThemeProvider>
+              <AuthProvider>
+                <WalletProvider>
+                  <ToastProvider>
+                    <LayoutShell>{children}</LayoutShell>
+                    <CommandPalette />
+                  </ToastProvider>
+                </WalletProvider>
+              </AuthProvider>
+            </ThemeProvider>
+          </PosthogProvider>
+        </NextIntlClientProvider>
         <CookieConsent />
       </body>
     </html>
