@@ -39,4 +39,4 @@ environments/        — Agent Room V2 scenes (Phase 2+)
 | `city/skybox/day.hdr` | 5.2 MB | — | Poly Haven `kloofendal_48d_partly_cloudy_puresky_2k` |
 | `city/skybox/night.hdr` | 6.4 MB | — | Poly Haven `moonless_golf_2k` |
 | `textures/asphalt_{diff,norm,rough}.jpg` | 1K ea | — | Poly Haven `asphalt_02` |
-| `textures/concrete_diff.jpg` | 1K | — | Poly Haven `rough_concrete_wall_02` |
+| `textures/concrete_diff.jpg` | 1K | — | Poly Haven `concrete_floor_02` |
