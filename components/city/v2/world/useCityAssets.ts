@@ -5,6 +5,11 @@ import * as THREE from 'three';
 import { useQuality } from '../quality/QualityContext';
 import { BUILDING_BASES, type BuildingBase } from './Buildings.layout';
 
+// Self-host the Draco decoder so we don't depend on www.gstatic.com
+// (which is also not in our CSP connect-src). The decoder files are
+// copied from `three/examples/jsm/libs/draco/gltf/` into public/draco/.
+useGLTF.setDecoderPath('/draco/');
+
 export interface BuildingPrimitive {
   geometry: THREE.BufferGeometry;
   material: THREE.Material;
