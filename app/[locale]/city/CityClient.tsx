@@ -31,6 +31,13 @@ const CityScene = dynamic(
   { ssr: false },
 );
 
+const CitySceneV2 = dynamic(
+  () => import('@/components/city/v2/CitySceneV2').then((m) => m.CitySceneV2),
+  { ssr: false },
+);
+
+const CITY_V2_FLAG = process.env.NEXT_PUBLIC_CITY_V2 === 'true';
+
 interface Props {
   initial: CityResponse | null;
 }
@@ -233,24 +240,30 @@ export function CityClient({ initial }: Props) {
     );
   }
 
+  const useV2 = CITY_V2_FLAG || searchParams.get('v') === '2';
+
   return (
     <div className="relative h-[calc(100vh-4rem)] min-h-[560px] overflow-hidden bg-[#050814]">
-      <CityScene
-        ref={sceneRef}
-        agents={filteredAgents}
-        timeOfDay={timeOfDay}
-        heatmapOn={heatmapOn}
-        freshIds={freshIds}
-        pulseAts={pulseAts}
-        onHover={onHoverWithSound}
-        onPick={(a) => {
-          soundRef.current?.chirp('click');
-          router.push(`/agent/${a.id}`);
-        }}
-        onContext={(agent, screen) =>
-          setRadial({ agent, screenX: screen.x, screenY: screen.y })
-        }
-      />
+      {useV2 ? (
+        <CitySceneV2 />
+      ) : (
+        <CityScene
+          ref={sceneRef}
+          agents={filteredAgents}
+          timeOfDay={timeOfDay}
+          heatmapOn={heatmapOn}
+          freshIds={freshIds}
+          pulseAts={pulseAts}
+          onHover={onHoverWithSound}
+          onPick={(a) => {
+            soundRef.current?.chirp('click');
+            router.push(`/agent/${a.id}`);
+          }}
+          onContext={(agent, screen) =>
+            setRadial({ agent, screenX: screen.x, screenY: screen.y })
+          }
+        />
+      )}
       <CityRadialMenu
         state={radial}
         onClose={() => setRadial(null)}

@@ -6,6 +6,7 @@ import { QualityProvider, useQuality } from './quality/QualityContext';
 import { QualityToggle } from './quality/QualityToggle';
 import { Skybox } from './world/Skybox';
 import { Ground } from './world/Ground';
+import { SceneErrorBoundary } from './world/SceneErrorBoundary';
 
 // Rapier is installed (Phase 5) but not mounted here — walking
 // character controller lands in a later phase.
@@ -42,7 +43,9 @@ function CanvasInner() {
       <ambientLight intensity={0.3} />
       <directionalLight position={[100, 140, 80]} intensity={1.4} castShadow />
       <Suspense fallback={null}>
-        <Skybox timeOfDay="auto" />
+        <SceneErrorBoundary label="Skybox">
+          <Skybox timeOfDay="auto" />
+        </SceneErrorBoundary>
         <Ground />
       </Suspense>
       <OrbitControls
