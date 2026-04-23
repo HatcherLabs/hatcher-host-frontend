@@ -4,23 +4,9 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { Category } from '@/components/city/types';
 import { CATEGORIES } from '@/components/city/types';
+import { districtPosition } from './grid';
 
-// Must match Buildings.layout / Streets / DistrictPads
-const DISTRICT_COLS = 5;
-const DISTRICT_SIZE = 52;
-const DISTRICT_GAP = 14;
 const LANDMARK_Y = 0.1;
-
-function districtPosition(idx: number): { x: number; z: number } {
-  const col = idx % DISTRICT_COLS;
-  const row = Math.floor(idx / DISTRICT_COLS);
-  const totalRows = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
-  const step = DISTRICT_SIZE + DISTRICT_GAP;
-  return {
-    x: (col - (DISTRICT_COLS - 1) / 2) * step,
-    z: (row - (totalRows - 1) / 2) * step,
-  };
-}
 
 /** Color × emissive palette per category. Emissive is amplified by
  *  Bloom so each landmark reads as a neon beacon from across the

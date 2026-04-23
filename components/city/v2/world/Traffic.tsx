@@ -2,15 +2,16 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { CATEGORIES } from '@/components/city/types';
 import { useQuality } from '../quality/QualityContext';
+import {
+  DISTRICT_COLS,
+  DISTRICT_ROWS,
+  DISTRICT_STEP,
+  DISTRICT_GAP,
+} from './grid';
 
-// Must match Streets.tsx / Buildings.layout.ts / DistrictPads.tsx
-const DISTRICT_COLS = 5;
-const DISTRICT_SIZE = 52;
-const DISTRICT_GAP = 14;
-const STREET_Y = 0.18; // just above street plane (0.02) + sidewalk (0.1)
-const LANE_HALF = 2.5; // lateral offset from street centreline
+const STREET_Y = 0.18;
+const LANE_HALF = 2.5;
 
 /**
  * Ambient vehicle traffic moving along street centrelines. 40
@@ -140,8 +141,8 @@ interface Lane {
 }
 
 function buildLanes(n: number): Lane[] {
-  const step = DISTRICT_SIZE + DISTRICT_GAP;
-  const totalRows = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
+  const step = DISTRICT_STEP;
+  const totalRows = DISTRICT_ROWS;
   const longEdge = Math.max(DISTRICT_COLS, totalRows) * step + 20;
 
   // Street centrelines — same math as Streets.tsx

@@ -1,5 +1,10 @@
 import type { CityAgent, Category } from '@/components/city/types';
 import { CATEGORIES, TIER_HEIGHT } from '@/components/city/types';
+import {
+  DISTRICT_SIZE,
+  LANDMARK_CLEAR_RADIUS,
+  districtPosition,
+} from './grid';
 
 export const BUILDING_BASES = [
   'small-building-a',
@@ -40,24 +45,9 @@ export function pickBase(agentId: string, tier: number): BuildingBase {
   return mid[Math.floor(r * mid.length)]!;
 }
 
-// District grid constants — must match CityScene.tsx + Streets.tsx +
-// DistrictPads.tsx. If these ever change, update all four places.
-const DISTRICT_COLS = 5;
-const DISTRICT_SIZE = 52;
-const DISTRICT_GAP = 14;
-// Agents are pushed out of this radius around each pad centre so the
-// district's landmark sculpt (Landmarks.tsx) has clear air to breathe.
-// Landmark footprints top out around ~6u; 8u gives a tasteful gap.
-const LANDMARK_CLEAR_RADIUS = 8;
-
-function districtPosition(idx: number): { x: number; z: number } {
-  const col = idx % DISTRICT_COLS;
-  const row = Math.floor(idx / DISTRICT_COLS);
-  const totalRows = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
-  const x = (col - (DISTRICT_COLS - 1) / 2) * (DISTRICT_SIZE + DISTRICT_GAP);
-  const z = (row - (totalRows - 1) / 2) * (DISTRICT_SIZE + DISTRICT_GAP);
-  return { x, z };
-}
+// DISTRICT_COLS/SIZE/GAP + districtPosition imported from ./grid.ts so
+// every consumer (Streets/Pads/Landmarks/Traffic/NPCs/...) stays in
+// lockstep. If this scene ever drifts from the grid, that's a bug.
 
 export interface BuildingLayout {
   agentId: string;

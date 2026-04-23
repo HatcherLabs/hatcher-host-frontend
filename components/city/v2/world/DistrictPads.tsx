@@ -3,12 +3,9 @@ import { useMemo } from 'react';
 import * as THREE from 'three';
 import type { Category } from '@/components/city/types';
 import { CATEGORIES } from '@/components/city/types';
+import { DISTRICT_SIZE, districtPosition } from './grid';
 
-// Must match Buildings.layout.ts + Streets.tsx
-const DISTRICT_COLS = 5;
-const DISTRICT_SIZE = 52;
-const DISTRICT_GAP = 14;
-const PAD_Y = 0.01; // under streets (0.02) so sidewalks layer above
+const PAD_Y = 0.01;
 
 // One base color per category. Tuned for distinctiveness at survey
 // distance, not brand fidelity — each landmark (Phase 3) reinforces
@@ -40,17 +37,6 @@ const CATEGORY_PAD_COLOR: Record<Category, number> = {
   'supply-chain': 0xa16207,
   voice: 0xf472b6,
 };
-
-function districtPosition(idx: number): { x: number; z: number } {
-  const col = idx % DISTRICT_COLS;
-  const row = Math.floor(idx / DISTRICT_COLS);
-  const totalRows = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
-  const step = DISTRICT_SIZE + DISTRICT_GAP;
-  return {
-    x: (col - (DISTRICT_COLS - 1) / 2) * step,
-    z: (row - (totalRows - 1) / 2) * step,
-  };
-}
 
 /**
  * 25 themed ground pads, one per category. Sits on top of the asphalt

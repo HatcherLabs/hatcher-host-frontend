@@ -4,15 +4,14 @@ import * as THREE from 'three';
 import type { CityAgent, Category } from '@/components/city/types';
 import { CATEGORIES, FRAMEWORK_COLORS } from '@/components/city/types';
 import type { CharacterState } from '../character/CharacterController';
-
-// Must match Buildings.layout / Streets / DistrictPads / Traffic / NPCs
-const DISTRICT_COLS = 5;
-const DISTRICT_SIZE = 52;
-const DISTRICT_GAP = 14;
-
-// World radius the minimap covers — matches the character clamp in
-// CharacterController so "off-minimap" is also "off-world".
-const WORLD_HALF = 270;
+import {
+  DISTRICT_COLS,
+  DISTRICT_ROWS,
+  DISTRICT_SIZE,
+  DISTRICT_GAP,
+  DISTRICT_STEP,
+  WORLD_HALF,
+} from '../world/grid';
 
 // Minimap canvas size in CSS px. Doubled internally via DPR for
 // crisp strokes on HiDPI displays.
@@ -92,8 +91,8 @@ export function Minimap({ state, agents, showCharacter, onTravel }: Props) {
     const wx = (mx / MAP_PX) * WORLD_HALF * 2 - WORLD_HALF;
     const wz = (mz / MAP_PX) * WORLD_HALF * 2 - WORLD_HALF;
     // Find the nearest district
-    const step = DISTRICT_SIZE + DISTRICT_GAP;
-    const totalRows = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
+    const step = DISTRICT_STEP;
+    const totalRows = DISTRICT_ROWS;
     let best: { cat: Category; d2: number } | null = null;
     CATEGORIES.forEach((cat, idx) => {
       const col = idx % DISTRICT_COLS;
@@ -174,8 +173,8 @@ function draw(
   // ground grid in the scene.
   ctx.strokeStyle = 'rgba(80, 200, 255, 0.18)';
   ctx.lineWidth = 1;
-  const step = DISTRICT_SIZE + DISTRICT_GAP;
-  const totalRows = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
+  const step = DISTRICT_STEP;
+  const totalRows = DISTRICT_ROWS;
   ctx.beginPath();
   for (let r = 0; r <= totalRows; r++) {
     const z = (r - totalRows / 2) * step - DISTRICT_GAP / 2;

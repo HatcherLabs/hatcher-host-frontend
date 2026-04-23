@@ -33,6 +33,7 @@ import { WalkOnboarding } from './hud/WalkOnboarding';
 import { AgentPopup } from './hud/AgentPopup';
 import { MobileJoystick } from './character/MobileJoystick';
 import { CATEGORIES } from '@/components/city/types';
+import { DISTRICT_SIZE, districtPosition as gridDistrictPosition } from './world/grid';
 
 interface Props {
   agents?: CityAgent[];
@@ -81,20 +82,13 @@ export function CitySceneV2({ agents = [], pulseAts = EMPTY_PULSES }: Props) {
   // Minimap click handler — teleport character + enter walk mode so
   // the click immediately puts you somewhere you can explore.
   const handleTravel = (cat: (typeof CATEGORIES)[number]) => {
-    const DISTRICT_COLS = 5;
-    const DISTRICT_SIZE = 52;
-    const DISTRICT_GAP = 14;
-    const step = DISTRICT_SIZE + DISTRICT_GAP;
-    const totalRows = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
     const idx = CATEGORIES.indexOf(cat);
     if (idx < 0) return;
-    const col = idx % DISTRICT_COLS;
-    const row = Math.floor(idx / DISTRICT_COLS);
-    const cx = (col - (DISTRICT_COLS - 1) / 2) * step;
-    const cz = (row - (totalRows - 1) / 2) * step;
-    // Drop character at the district's travel pad corner so they're
-    // never inside a building after teleport.
-    charState.current.position.set(cx + 16, 0, cz + 16);
+    const { x: cx, z: cz } = gridDistrictPosition(idx);
+    // Drop the character at the SE travel-pad corner so they never
+    // appear inside the district's landmark sculpt.
+    const padOffset = DISTRICT_SIZE * 0.3;
+    charState.current.position.set(cx + padOffset, 0, cz + padOffset);
     charState.current.heading = 0;
     setMode('walk');
   };

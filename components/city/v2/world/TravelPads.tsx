@@ -3,23 +3,10 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CATEGORIES } from '@/components/city/types';
+import { DISTRICT_SIZE, districtPosition } from './grid';
 
-// Must match Buildings.layout / Streets / DistrictPads / Minimap
-const DISTRICT_COLS = 5;
-const DISTRICT_SIZE = 52;
-const DISTRICT_GAP = 14;
-const PAD_OFFSET = 16; // corner offset from district centre — past the landmark clearance
-
-function districtPosition(idx: number): { x: number; z: number } {
-  const col = idx % DISTRICT_COLS;
-  const row = Math.floor(idx / DISTRICT_COLS);
-  const totalRows = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
-  const step = DISTRICT_SIZE + DISTRICT_GAP;
-  return {
-    x: (col - (DISTRICT_COLS - 1) / 2) * step,
-    z: (row - (totalRows - 1) / 2) * step,
-  };
-}
+// Corner offset from district centre — past the landmark clearance.
+const PAD_OFFSET = DISTRICT_SIZE * 0.3;
 
 /**
  * Shimmering glow ring + core for each district. Purely visual —

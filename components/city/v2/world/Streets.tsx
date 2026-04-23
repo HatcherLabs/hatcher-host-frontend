@@ -2,13 +2,14 @@
 import { useTexture } from '@react-three/drei';
 import { useMemo } from 'react';
 import * as THREE from 'three';
-import { CATEGORIES } from '@/components/city/types';
+import {
+  DISTRICT_COLS,
+  DISTRICT_ROWS,
+  DISTRICT_STEP,
+  DISTRICT_GAP,
+} from './grid';
 
-// Must match Buildings.layout.ts constants
-const DISTRICT_COLS = 5;
-const DISTRICT_SIZE = 52;
-const DISTRICT_GAP = 14;
-const STREET_Y = 0.02; // above ground to avoid z-fighting
+const STREET_Y = 0.02;
 const LANE_WIDTH = DISTRICT_GAP - 2;
 
 /**
@@ -27,8 +28,8 @@ export function Streets() {
       '/assets/3d/textures/concrete_diff.jpg',
     ]);
 
-  const step = DISTRICT_SIZE + DISTRICT_GAP;
-  const totalRows = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
+  const step = DISTRICT_STEP;
+  const totalRows = DISTRICT_ROWS;
   const longEdge = Math.max(DISTRICT_COLS, totalRows) * step + 20;
 
   // Clone shared textures before mutating repeat/wrap — Ground uses

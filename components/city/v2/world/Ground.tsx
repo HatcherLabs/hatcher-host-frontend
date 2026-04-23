@@ -2,6 +2,7 @@
 import { useTexture } from '@react-three/drei';
 import { useMemo } from 'react';
 import * as THREE from 'three';
+import { GROUND_SIZE } from './grid';
 
 /**
  * 600×600 ground plane with a tiled PBR asphalt texture. Phase 2.
@@ -69,7 +70,7 @@ export function Ground() {
   return (
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-        <planeGeometry args={[600, 600]} />
+        <planeGeometry args={[GROUND_SIZE, GROUND_SIZE]} />
         <meshStandardMaterial
           map={diff}
           normalMap={norm}
@@ -80,7 +81,7 @@ export function Ground() {
         />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
-        <planeGeometry args={[600, 600]} />
+        <planeGeometry args={[GROUND_SIZE, GROUND_SIZE]} />
         <meshBasicMaterial
           map={gridTex}
           transparent

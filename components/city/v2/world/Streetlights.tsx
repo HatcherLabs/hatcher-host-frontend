@@ -2,11 +2,12 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { CATEGORIES } from '@/components/city/types';
-
-const DISTRICT_COLS = 5;
-const DISTRICT_SIZE = 52;
-const DISTRICT_GAP = 14;
+import {
+  DISTRICT_COLS,
+  DISTRICT_ROWS,
+  DISTRICT_STEP,
+  DISTRICT_GAP,
+} from './grid';
 
 /**
  * Street lamps at every district-grid intersection. Post + frosted
@@ -14,8 +15,8 @@ const DISTRICT_GAP = 14;
  * bulbs share one InstancedMesh → one draw call for the full grid.
  */
 export function Streetlights() {
-  const step = DISTRICT_SIZE + DISTRICT_GAP;
-  const totalRows = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
+  const step = DISTRICT_STEP;
+  const totalRows = DISTRICT_ROWS;
 
   const positions = useMemo(() => {
     const out: Array<[number, number]> = [];

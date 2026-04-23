@@ -3,22 +3,9 @@ import { useMemo } from 'react';
 import * as THREE from 'three';
 import type { CityAgent, Category } from '@/components/city/types';
 import { CATEGORIES, CATEGORY_LABELS, CATEGORY_ICON } from '@/components/city/types';
+import { districtPosition } from './grid';
 
-const DISTRICT_COLS = 5;
-const DISTRICT_SIZE = 52;
-const DISTRICT_GAP = 14;
 const LABEL_Y = 22;
-
-function districtPosition(idx: number): { x: number; z: number } {
-  const col = idx % DISTRICT_COLS;
-  const row = Math.floor(idx / DISTRICT_COLS);
-  const totalRows = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
-  const step = DISTRICT_SIZE + DISTRICT_GAP;
-  return {
-    x: (col - (DISTRICT_COLS - 1) / 2) * step,
-    z: (row - (totalRows - 1) / 2) * step,
-  };
-}
 
 interface Props {
   agents: CityAgent[];

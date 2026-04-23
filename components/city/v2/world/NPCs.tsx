@@ -6,13 +6,12 @@ import type { CityAgent, Framework } from '@/components/city/types';
 import { FRAMEWORK_COLORS } from '@/components/city/types';
 import { CATEGORIES } from '@/components/city/types';
 import { useQuality } from '../quality/QualityContext';
+import { DISTRICT_SIZE, districtPosition } from './grid';
 
-// Must match Buildings.layout / Streets / DistrictPads / Traffic
-const DISTRICT_COLS = 5;
-const DISTRICT_SIZE = 52;
-const DISTRICT_GAP = 14;
 const NPC_Y = 0.25;
-const WANDER_RADIUS = 18; // how far a NPC roams from its district centre
+// Wander radius scales with district size — keep NPCs within the
+// inner 80% of the pad so they don't walk through street gaps.
+const WANDER_RADIUS = DISTRICT_SIZE * 0.38;
 
 interface Props {
   agents: CityAgent[];
@@ -28,17 +27,6 @@ interface NpcState {
   speed: number;
   radius: number;
   bob: number; // vertical bob amplitude
-}
-
-function districtPosition(idx: number): { x: number; z: number } {
-  const col = idx % DISTRICT_COLS;
-  const row = Math.floor(idx / DISTRICT_COLS);
-  const totalRows = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
-  const step = DISTRICT_SIZE + DISTRICT_GAP;
-  return {
-    x: (col - (DISTRICT_COLS - 1) / 2) * step,
-    z: (row - (totalRows - 1) / 2) * step,
-  };
 }
 
 function hashStr(s: string): number {
