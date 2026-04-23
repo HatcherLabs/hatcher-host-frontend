@@ -130,7 +130,12 @@ function PrimitiveInstance({
     };
     if ('emissive' in std && std.emissive instanceof THREE.Color) {
       const n = (std.name ?? '').toLowerCase();
-      const looksLikeWindow = /window|glass|light|neon|emissive/.test(n);
+      // Tight regex: Quaternius buildings ship with a "Light" material
+      // that is beige structural paint, NOT lit windows. Including
+      // `light` in the window heuristic lit up three-quarters of the
+      // city (see review B1 on commit ff5142a). Windows are
+      // consistently named `Windows` or `Glass`.
+      const looksLikeWindow = /window|glass|neon|emissive/.test(n);
       if (looksLikeWindow) {
         std.emissive.set(0xfff4c8);
         std.emissiveIntensity = 1.6;

@@ -1,5 +1,5 @@
 'use client';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import type { CityAgent, Category } from '@/components/city/types';
 import { CATEGORIES, CATEGORY_LABELS, CATEGORY_ICON } from '@/components/city/types';
@@ -59,6 +59,18 @@ function DistrictLabel({
   icon: string;
   count: number;
 }) {
+  // See LiveBillboard for the same pattern — dispose the old
+  // SpriteMaterial + CanvasTexture when the count changes so agent
+  // growth over time doesn't leak GPU memory.
+  const prevRef = useRef<{ mat: THREE.Material; tex: THREE.Texture } | null>(null);
+  useEffect(() => {
+    return () => {
+      prevRef.current?.mat.dispose();
+      prevRef.current?.tex.dispose();
+      prevRef.current = null;
+    };
+  }, []);
+
   const material = useMemo(() => {
     const canvas = document.createElement('canvas');
     canvas.width = 768;
@@ -88,7 +100,11 @@ function DistrictLabel({
     const tex = new THREE.CanvasTexture(canvas);
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.needsUpdate = true;
-    return new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true });
+    const mat = new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true });
+    prevRef.current?.mat.dispose();
+    prevRef.current?.tex.dispose();
+    prevRef.current = { mat, tex };
+    return mat;
   }, [label, icon, count]);
 
   return (

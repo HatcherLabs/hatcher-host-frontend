@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import type { CityAgent } from '@/components/city/types';
 import { CATEGORIES } from '@/components/city/types';
@@ -32,6 +32,18 @@ export function LiveBillboard({ agents }: { agents: CityAgent[] }) {
     const id = setInterval(() => setIdx((i) => (i + 1) % top.length), ROTATE_MS);
     return () => clearInterval(id);
   }, [top]);
+
+  // Hold a ref to the previous material + its texture so we can dispose
+  // them when useMemo re-runs. Without this the 3s rotation leaks
+  // ~1MB of GPU memory per tick on an open tab.
+  const prevRef = useRef<{ mat: THREE.Material; tex: THREE.Texture } | null>(null);
+  useEffect(() => {
+    return () => {
+      prevRef.current?.mat.dispose();
+      prevRef.current?.tex.dispose();
+      prevRef.current = null;
+    };
+  }, []);
 
   const material = useMemo(() => {
     const canvas = document.createElement('canvas');
@@ -74,11 +86,17 @@ export function LiveBillboard({ agents }: { agents: CityAgent[] }) {
     const tex = new THREE.CanvasTexture(canvas);
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.needsUpdate = true;
-    return new THREE.MeshBasicMaterial({
+    const mat = new THREE.MeshBasicMaterial({
       map: tex,
       transparent: true,
       side: THREE.DoubleSide,
     });
+    // Release the previous bake before stashing the new one — without
+    // this the 3s rotation leaks ~1MB of GPU memory per tick.
+    prevRef.current?.mat.dispose();
+    prevRef.current?.tex.dispose();
+    prevRef.current = { mat, tex };
+    return mat;
   }, [top, idx]);
 
   // Bail if no qualifying agents — keep the district clean rather
