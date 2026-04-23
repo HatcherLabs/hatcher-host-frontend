@@ -31,6 +31,13 @@ const CityScene = dynamic(
   { ssr: false },
 );
 
+const CitySceneV2 = dynamic(
+  () => import('@/components/city/v2/CitySceneV2').then((m) => m.CitySceneV2),
+  { ssr: false },
+);
+
+const CITY_V2_FLAG = process.env.NEXT_PUBLIC_CITY_V2 === 'true';
+
 interface Props {
   initial: CityResponse | null;
 }
@@ -224,6 +231,18 @@ export function CityClient({ initial }: Props) {
     if (a) soundRef.current?.chirp('hover');
     setHovered(a);
   }, []);
+
+  const useV2 = CITY_V2_FLAG || searchParams.get('v') === '2';
+
+  // V2 skeleton doesn't read the legacy data prop — render it early so
+  // a missing/slow API doesn't block the new scene.
+  if (useV2) {
+    return (
+      <div className="relative h-[calc(100vh-4rem)] min-h-[560px] overflow-hidden bg-[#050814]">
+        <CitySceneV2 agents={data?.agents ?? []} pulseAts={pulseAts} />
+      </div>
+    );
+  }
 
   if (!data) {
     return (
