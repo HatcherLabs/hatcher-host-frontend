@@ -17,6 +17,7 @@ import {
 import { DOCS_URL } from '@/lib/config';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { LocaleSwitcher } from './LocaleSwitcher';
 
 function isActive(pathname: string, href: string) {
   if (pathname === href) return true;
@@ -332,6 +333,7 @@ export function Header() {
           {/* Right side: notifications + user menu + hamburger */}
           <div className="flex items-center gap-2">
             <div className="hidden lg:flex items-center gap-2">
+              <LocaleSwitcher />
               <ThemeToggle />
               {authLoading ? (
                 <div className="h-9 w-24 rounded-lg bg-[var(--bg-card)] animate-pulse" />
@@ -461,8 +463,9 @@ export function Header() {
               )}
             </div>
 
-            {/* Mobile theme toggle + notification bell */}
-            <div className="lg:hidden">
+            {/* Mobile theme toggle + locale switcher + notification bell */}
+            <div className="lg:hidden flex items-center gap-1">
+              <LocaleSwitcher />
               <ThemeToggle />
             </div>
             {isAuthenticated && user && (

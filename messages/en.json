@@ -1889,5 +1889,8 @@
       "restarting": "Restarting",
       "stopping":   "Stopping"
     }
+  },
+  "localeSwitcher": {
+    "label": "Change language"
   }
 }

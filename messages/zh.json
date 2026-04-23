@@ -2006,5 +2006,8 @@
       "restarting": "[zh] Restarting",
       "stopping": "[zh] Stopping"
     }
+  },
+  "localeSwitcher": {
+    "label": "[zh] Change language"
   }
 }

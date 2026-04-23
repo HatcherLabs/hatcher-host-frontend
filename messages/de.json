@@ -2006,5 +2006,8 @@
       "restarting": "[de] Restarting",
       "stopping": "[de] Stopping"
     }
+  },
+  "localeSwitcher": {
+    "label": "[de] Change language"
   }
 }
