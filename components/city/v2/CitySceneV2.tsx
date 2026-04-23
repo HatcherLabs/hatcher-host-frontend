@@ -20,6 +20,8 @@ import { Traffic } from './world/Traffic';
 import { NPCs } from './world/NPCs';
 import { Buildings } from './world/Buildings';
 import { ActivityPulses } from './world/ActivityPulses';
+import { Atmosphere } from './world/Atmosphere';
+import { LiveBillboard } from './world/LiveBillboard';
 import {
   CharacterController,
   CharacterMesh,
@@ -32,6 +34,7 @@ import { Minimap } from './hud/Minimap';
 import { WalkOnboarding } from './hud/WalkOnboarding';
 import { AgentPopup } from './hud/AgentPopup';
 import { MobileJoystick } from './character/MobileJoystick';
+import { AmbientAudio } from './hud/AmbientAudio';
 import { CATEGORIES } from '@/components/city/types';
 import { DISTRICT_SIZE, districtPosition as gridDistrictPosition } from './world/grid';
 
@@ -113,6 +116,7 @@ export function CitySceneV2({ agents = [], pulseAts = EMPTY_PULSES }: Props) {
           onTravel={handleTravel}
         />
         <WalkOnboarding visible={mode === 'walk'} />
+        <AmbientAudio />
         <AgentPopup
           agent={selectedAgent}
           onClose={() => setSelectedAgentId(null)}
@@ -207,6 +211,12 @@ function CanvasInner({
         </SceneErrorBoundary>
         <SceneErrorBoundary label="ActivityPulses">
           <ActivityPulses agents={agents} pulseAts={pulseAts} />
+        </SceneErrorBoundary>
+        <SceneErrorBoundary label="Atmosphere">
+          <Atmosphere />
+        </SceneErrorBoundary>
+        <SceneErrorBoundary label="LiveBillboard">
+          <LiveBillboard agents={agents} />
         </SceneErrorBoundary>
         <SceneErrorBoundary label="DistrictLabels">
           <DistrictLabels agents={agents} />
