@@ -6,6 +6,7 @@ import { FOUNDING_MEMBER_MAX_SLOTS } from '@hatcher/shared';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import {
   ArrowRight,
   Building2,
@@ -29,221 +30,93 @@ import {
 
 interface TierDef {
   key: string;
+  // TODO(i18n-T13): use shared translation keys
   name: string;
   price: number;
   icon: React.ReactNode;
   accent: string;
   badge?: string;
   highlighted?: boolean;
-  agents: string;
-  messages: string;
-  cpu: string;
-  ram: string;
-  storage: string;
-  sleep: string;
-  features: string[];
-  missing: string[];
 }
 
-const TIERS_DATA: TierDef[] = [
+const TIERS_META: TierDef[] = [
   {
     key: 'free',
+    // TODO(i18n-T13): use shared translation keys
     name: 'Free',
     price: 0,
     icon: <Rocket className="w-5 h-5" />,
     accent: '#22c55e',
-    agents: '1 agent included',
-    messages: '20 messages/day',
-    cpu: '0.5 CPU',
-    ram: '1 GB RAM',
-    storage: '50 MB workspace',
-    sleep: 'Auto-sleep after 1h idle',
-    features: [
-      'Llama 4 Scout on Groq',
-      'BYOK = unlimited messages',
-      '3 web searches/day',
-      'All integrations (Telegram, Discord, Twitter, etc)',
-    ],
-    missing: ['Logs, File Manager available as add-ons'],
   },
   {
     key: 'starter',
+    // TODO(i18n-T13): use shared translation keys
     name: 'Starter',
     price: 6.99,
     icon: <Zap className="w-5 h-5" />,
     accent: 'var(--color-accent)',
-    agents: '1 agent included',
-    messages: '50 messages/day',
-    cpu: '1 CPU',
-    ram: '1.5 GB RAM',
-    storage: '150 MB workspace',
-    sleep: 'Auto-sleep after 4h idle',
-    features: [
-      'BYOK = unlimited messages',
-      '10 web searches/day',
-      'All integrations',
-    ],
-    missing: ['Logs, File Manager available as add-ons'],
   },
   {
     key: 'pro',
+    // TODO(i18n-T13): use shared translation keys
     name: 'Pro',
     price: 19.99,
     icon: <Crown className="w-5 h-5" />,
     accent: '#8b5cf6',
-    badge: 'Most Popular',
     highlighted: true,
-    agents: '3 agents included',
-    messages: '100 messages/day',
-    cpu: '1.5 CPU',
-    ram: '2 GB RAM',
-    storage: '500 MB workspace',
-    sleep: 'Auto-sleep after 12h idle',
-    features: [
-      'BYOK = unlimited messages',
-      '50 web searches/day',
-      'All integrations',
-      'Buy Always On per agent for 24/7',
-    ],
-    missing: ['Logs, File Manager available as add-ons'],
   },
   {
     key: 'business',
+    // TODO(i18n-T13): use shared translation keys
     name: 'Business',
     price: 49.99,
     icon: <Building2 className="w-5 h-5" />,
     accent: '#f59e0b',
-    agents: '10 agents included',
-    messages: '300 messages/day',
-    cpu: '2 CPU',
-    ram: '3 GB RAM',
-    storage: '1 GB workspace',
-    sleep: 'Always-on (no auto-sleep)',
-    features: [
-      'BYOK = unlimited messages',
-      '200 web searches/day',
-      'File Manager included',
-      'Full logs included',
-      'Priority support',
-      'Team collaboration',
-      'All integrations',
-    ],
-    missing: [],
   },
   {
     key: 'founding_member',
+    // TODO(i18n-T13): use shared translation keys
     name: 'Founding Member',
     price: 99,
     icon: <Gem className="w-5 h-5" />,
     accent: '#e11d48',
-    badge: '20 spots only',
-    agents: '10 agents included',
-    messages: '300 messages/day',
-    cpu: '2 CPU',
-    ram: '4 GB RAM',
-    storage: '2 GB workspace',
-    sleep: 'Always-on (no auto-sleep)',
-    features: [
-      '$99 one-time — lifetime access',
-      '200 web searches/day',
-      'File Manager + Full Logs included',
-      'Priority support',
-      'Team collaboration',
-      'All integrations',
-      'Founding badge',
-    ],
-    missing: [],
   },
 ];
 
-/* ── Add-on definitions ──────────────────────────────────── */
+/* ── Add-on group keys (for messages lookup) ─────────────── */
 
-interface AddonDef {
-  name: string;
-  price: string;
-  period: string;
-  description: string;
-}
+const ADDON_GROUP_KEYS = ['extraAgents', 'extraMessages', 'extraSearches', 'perAgent'] as const;
+type AddonGroupKey = typeof ADDON_GROUP_KEYS[number];
 
-interface AddonGroup {
-  label: string;
-  items: AddonDef[];
-}
-
-const ADDON_GROUPS: AddonGroup[] = [
-  {
-    label: 'Extra Agents',
-    items: [
-      { name: '+1 Agent',  price: '$2.99',  period: '/mo', description: '1 extra slot' },
-      { name: '+3 Agents', price: '$6.99',  period: '/mo', description: '3 extra slots' },
-      { name: '+5 Agents', price: '$11.99', period: '/mo', description: '5 extra slots' },
-      { name: '+10 Agents', price: '$19.99', period: '/mo', description: '10 extra slots' },
-    ],
-  },
-  {
-    label: 'Extra Messages (account)',
-    items: [
-      { name: '+20 msg/day',  price: '$1.99', period: '/mo', description: 'Stackable' },
-      { name: '+50 msg/day',  price: '$3.99', period: '/mo', description: 'Stackable' },
-      { name: '+100 msg/day', price: '$5.99', period: '/mo', description: 'Stackable' },
-      { name: '+200 msg/day', price: '$9.99', period: '/mo', description: 'Stackable' },
-    ],
-  },
-  {
-    label: 'Extra Searches (account)',
-    items: [
-      { name: '+25 searches/day', price: '$3.99', period: '/mo', description: 'Stackable' },
-      { name: '+50 searches/day', price: '$6.99', period: '/mo', description: 'Stackable' },
-    ],
-  },
-  {
-    label: 'Per-Agent',
-    items: [
-      { name: 'Always On',    price: '$7.99', period: '/mo per agent',      description: 'Keep running 24/7' },
-      { name: 'File Manager', price: '$4.99', period: 'one-time per agent', description: 'Browse & edit files' },
-      { name: 'Full Logs',    price: '$2.99', period: '/mo per agent',      description: 'Unlock log viewer' },
-      { name: '+10 Plugins',  price: '$5.99', period: '/mo per agent',      description: 'Stack extra plugin slots' },
-    ],
-  },
-];
-
-/* ── Feature comparison data ─────────────────────────────── */
-
-interface FeatureRow {
-  label: string;
-  free: string | boolean;
-  starter: string | boolean;
-  pro: string | boolean;
-  business: string | boolean;
-  founding: string | boolean;
-}
-
-const FEATURE_ROWS: FeatureRow[] = [
-  { label: 'Agents included',       free: '1',         starter: '1',         pro: '3',           business: '10',         founding: '10' },
-  { label: 'Messages/day (account)', free: '20',       starter: '50',        pro: '100',         business: '300',        founding: '300' },
-  { label: 'Web searches/day',      free: '3',         starter: '10',        pro: '50',          business: '200',        founding: '200' },
-  { label: 'BYOK messages',         free: 'Unlimited', starter: 'Unlimited', pro: 'Unlimited',   business: 'Unlimited',  founding: 'Unlimited' },
-  { label: 'CPU / RAM',             free: '0.5 / 1GB', starter: '1 / 1.5GB', pro: '1.5 / 2GB',  business: '2 / 3GB',    founding: '2 / 4GB' },
-  { label: 'Storage',               free: '50 MB',     starter: '150 MB',    pro: '500 MB',      business: '1 GB',       founding: '2 GB' },
-  { label: 'Auto-sleep',            free: '1 hour',    starter: '4 hours',   pro: '12 hours',    business: 'Always-on',  founding: 'Always-on' },
-  { label: 'File Manager',          free: 'Add-on',    starter: 'Add-on',    pro: 'Add-on',      business: true,         founding: true },
-  { label: 'Full Logs',             free: 'Add-on',    starter: 'Add-on',    pro: 'Add-on',      business: true,         founding: true },
-  { label: 'Team collaboration',    free: false,        starter: false,       pro: false,         business: true,         founding: true },
-  { label: 'Priority support',      free: false,        starter: false,       pro: false,         business: true,         founding: true },
-  { label: 'Plugins + Skills',      free: '3',         starter: '10',        pro: '25',          business: '50',         founding: '50' },
-  { label: 'All integrations',      free: true,         starter: true,        pro: true,          business: true,         founding: true },
-  { label: 'BYOK (own LLM key)',    free: true,         starter: true,        pro: true,          business: true,         founding: true },
-  { label: 'Default LLM (Groq)',    free: 'Llama 4 Scout', starter: 'Llama 4 Scout', pro: 'Llama 4 Scout', business: 'Llama 4 Scout', founding: 'Llama 4 Scout' },
-];
-
-function renderCell(value: string | boolean) {
-  if (value === true) return <Check className="w-4 h-4 text-green-400 mx-auto" />;
-  if (value === false) return <X className="w-4 h-4 text-[var(--text-muted)] opacity-40 mx-auto" />;
-  return <span className="text-[var(--text-secondary)] text-xs font-medium">{value}</span>;
-}
+/* The prices stay hardcoded (USD amounts, not translatable) */
+const ADDON_PRICES: Record<AddonGroupKey, { price: string; isSubscription: boolean }[]> = {
+  extraAgents:   [
+    { price: '$2.99',  isSubscription: true },
+    { price: '$6.99',  isSubscription: true },
+    { price: '$11.99', isSubscription: true },
+    { price: '$19.99', isSubscription: true },
+  ],
+  extraMessages: [
+    { price: '$1.99', isSubscription: true },
+    { price: '$3.99', isSubscription: true },
+    { price: '$5.99', isSubscription: true },
+    { price: '$9.99', isSubscription: true },
+  ],
+  extraSearches: [
+    { price: '$3.99', isSubscription: true },
+    { price: '$6.99', isSubscription: true },
+  ],
+  perAgent: [
+    { price: '$7.99', isSubscription: true  },
+    { price: '$4.99', isSubscription: false },
+    { price: '$2.99', isSubscription: true  },
+    { price: '$5.99', isSubscription: true  },
+  ],
+};
 
 /* ── Page ─────────────────────────────────────────────────── */
 export default function PricingPage() {
+  const t = useTranslations('pricing');
   const [isAnnual, setIsAnnual] = useState(false);
   // Founding Member availability — fetched from /features (public).
   // null = still loading; a number = actual remaining slots.
@@ -266,15 +139,8 @@ export default function PricingPage() {
 
   return (
     <div className="relative">
-      {/* Subtle radial glow BEHIND the hero — no hard edge, fades into
-          `--bg-base` smoothly. Previously we had a fixed 420px-tall
-          ambient layer under the header that produced a visible colored
-          strip when the browser anti-aliased the transparent edge. The
-          glow is now scoped to the hero section itself so content below
-          sits on the normal page background, same as every other
-          dashboard page. */}
       <div className="mx-auto max-w-7xl px-4 pt-12 sm:pt-16 pb-16 relative">
-        {/* HERO — editorial, left-aligned, consistent with landing */}
+        {/* HERO */}
         <div className="mb-14">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
@@ -282,7 +148,7 @@ export default function PricingPage() {
             transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]"
           >
-            Pricing
+            {t('eyebrow')}
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 14 }}
@@ -291,7 +157,7 @@ export default function PricingPage() {
             className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.05] mb-5 text-[var(--text-primary)] max-w-3xl"
             style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}
           >
-            Choose your plan
+            {t('heading')}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 10 }}
@@ -299,10 +165,10 @@ export default function PricingPage() {
             transition={{ duration: 0.35, delay: 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="text-lg text-[var(--text-secondary)] max-w-2xl leading-relaxed"
           >
-            Start free with any framework. Scale when ready. All integrations included on every tier. BYOK always unlimited.
+            {t('subheading')}
           </motion.p>
 
-          {/* Monthly / Annual toggle — segmented control, editorial square */}
+          {/* Monthly / Annual toggle */}
           <div className="inline-flex items-center mt-8 p-1 rounded-md bg-[var(--bg-card)] border border-[var(--border-default)]">
             <button
               onClick={() => setIsAnnual(false)}
@@ -313,7 +179,7 @@ export default function PricingPage() {
                   : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
               )}
             >
-              Monthly
+              {t('billingToggle.monthly')}
             </button>
             <button
               onClick={() => setIsAnnual(true)}
@@ -324,21 +190,32 @@ export default function PricingPage() {
                   : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
               )}
             >
-              Annual
-              <span className="text-[10px] font-semibold text-[var(--color-accent)]">−15%</span>
+              {t('billingToggle.annual')}
+              <span className="text-[10px] font-semibold text-[var(--color-accent)]">{t('billingToggle.annualDiscount')}</span>
             </button>
           </div>
         </div>
 
-        {/* TIER CARDS — unified editorial cards, single accent.
-            Pro highlighted with accent border, Founding with accent eyebrow. */}
+        {/* TIER CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-20">
-          {TIERS_DATA.map((tier) => {
+          {TIERS_META.map((tier) => {
             const isLifetime = tier.key === 'founding_member';
             const monthlyPrice = tier.price;
             const annualMonthlyPrice = monthlyPrice === 0 || isLifetime ? monthlyPrice : parseFloat((monthlyPrice * 0.85).toFixed(2));
             const displayPrice = isLifetime ? monthlyPrice : (isAnnual ? annualMonthlyPrice : monthlyPrice);
             const annualTotal = isAnnual && monthlyPrice > 0 && !isLifetime ? parseFloat((annualMonthlyPrice * 12).toFixed(2)) : null;
+
+            // Tier-specific translated strings
+            const tierKey = tier.key as 'free' | 'starter' | 'pro' | 'business' | 'founding_member';
+            const tierAgents   = t(`tiers.${tierKey}.agents`);
+            const tierMessages = t(`tiers.${tierKey}.messages`);
+            const tierCpu      = t(`tiers.${tierKey}.cpu`);
+            const tierRam      = t(`tiers.${tierKey}.ram`);
+            const tierStorage  = t(`tiers.${tierKey}.storage`);
+            const tierSleep    = t(`tiers.${tierKey}.sleep`);
+            // Features and missing as raw arrays via JSON
+            const tierFeatures = t.raw(`tiers.${tierKey}.features`) as string[];
+            const tierMissing  = t.raw(`tiers.${tierKey}.missing`) as string[];
 
             return (
               <motion.div
@@ -356,11 +233,12 @@ export default function PricingPage() {
                       : 'border border-[var(--border-default)] bg-[var(--bg-card)]/40'
                 )}
               >
-                {/* Header — tier label + optional small badge */}
+                {/* Header */}
                 <div className="flex items-center justify-between mb-4">
+                  {/* TODO(i18n-T13): use shared translation keys */}
                   <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-[var(--text-muted)]">{tier.name}</p>
-                  {tier.highlighted && <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">Popular</span>}
-                  {isLifetime && <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">Limited</span>}
+                  {tier.highlighted && <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">{t('tierBadges.popular')}</span>}
+                  {isLifetime && <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--color-accent)]">{t('tierBadges.limited')}</span>}
                 </div>
 
                 {/* Price */}
@@ -379,19 +257,19 @@ export default function PricingPage() {
                       </motion.span>
                     </AnimatePresence>
                     <span className="text-sm text-[var(--text-muted)]">
-                      {displayPrice === 0 ? '/mo' : isLifetime ? ' once' : '/mo'}
+                      {displayPrice === 0 ? t('priceUnit.perMonth') : isLifetime ? t('priceUnit.once') : t('priceUnit.perMonth')}
                     </span>
                   </div>
                   {annualTotal && (
                     <p className="text-[11px] text-[var(--text-muted)] mt-1.5">
-                      ${annualTotal}/year · save ${(monthlyPrice * 12 - annualTotal).toFixed(2)}
+                      {t('annualSavings', { annualTotal, saved: (monthlyPrice * 12 - annualTotal).toFixed(2) })}
                     </p>
                   )}
                   {!isAnnual && monthlyPrice > 0 && !isLifetime && (
-                    <p className="text-[11px] text-[var(--text-muted)] mt-1.5">Switch to annual, save 15%</p>
+                    <p className="text-[11px] text-[var(--text-muted)] mt-1.5">{t('switchToAnnual')}</p>
                   )}
                   {isLifetime && (
-                    <p className="text-[11px] text-[var(--color-accent)] font-medium mt-1.5">Pay once, keep forever</p>
+                    <p className="text-[11px] text-[var(--color-accent)] font-medium mt-1.5">{t('payOnce')}</p>
                   )}
                 </div>
 
@@ -399,11 +277,11 @@ export default function PricingPage() {
                 {isLifetime && (
                   <div className="mb-5">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] uppercase tracking-[0.15em] font-semibold text-[var(--text-muted)]">Availability</span>
+                      <span className="text-[10px] uppercase tracking-[0.15em] font-semibold text-[var(--text-muted)]">{t('availability')}</span>
                       {foundingRemaining === null ? (
                         <span className="text-[11px] text-[var(--text-muted)] inline-flex items-center gap-1.5">
                           <span className="w-2.5 h-2.5 border-2 border-[var(--text-muted)]/30 border-t-[var(--text-muted)] rounded-full animate-spin" />
-                          Loading
+                          {t('availabilityLoading')}
                         </span>
                       ) : (
                         <span className={cn(
@@ -412,7 +290,9 @@ export default function PricingPage() {
                             : foundingRemaining <= 3 ? 'text-orange-400'
                             : 'text-[var(--text-primary)]'
                         )}>
-                          {foundingRemaining === 0 ? 'Sold out' : `${foundingRemaining} of ${FOUNDING_MEMBER_MAX_SLOTS} left`}
+                          {foundingRemaining === 0
+                            ? t('soldOut')
+                            : t('slotsLeft', { remaining: foundingRemaining, max: FOUNDING_MEMBER_MAX_SLOTS })}
                         </span>
                       )}
                     </div>
@@ -428,20 +308,20 @@ export default function PricingPage() {
 
                 {/* Features */}
                 <div className="space-y-2 flex-1 mb-7">
-                  <FeatureCheck color="var(--color-accent)">{tier.agents}</FeatureCheck>
-                  <FeatureCheck color="var(--color-accent)">{tier.messages}</FeatureCheck>
-                  <FeatureCheck color="var(--color-accent)">{tier.cpu} / {tier.ram}</FeatureCheck>
-                  <FeatureCheck color="var(--color-accent)">{tier.storage}</FeatureCheck>
-                  <FeatureCheck color="var(--color-accent)">{tier.sleep}</FeatureCheck>
-                  {tier.features.map((f) => (
+                  <FeatureCheck color="var(--color-accent)">{tierAgents}</FeatureCheck>
+                  <FeatureCheck color="var(--color-accent)">{tierMessages}</FeatureCheck>
+                  <FeatureCheck color="var(--color-accent)">{tierCpu} / {tierRam}</FeatureCheck>
+                  <FeatureCheck color="var(--color-accent)">{tierStorage}</FeatureCheck>
+                  <FeatureCheck color="var(--color-accent)">{tierSleep}</FeatureCheck>
+                  {tierFeatures.map((f) => (
                     <FeatureCheck key={f} color="var(--color-accent)">{f}</FeatureCheck>
                   ))}
-                  {tier.missing.map((f) => (
+                  {tierMissing.map((f) => (
                     <FeatureMissing key={f}>{f}</FeatureMissing>
                   ))}
                 </div>
 
-                {/* CTA — unified styling, highlighted tiers get solid fill */}
+                {/* CTA */}
                 <Link
                   href={tier.key === 'free' ? '/register' : `/dashboard/billing?upgrade=${tier.key}`}
                   className={cn(
@@ -451,7 +331,8 @@ export default function PricingPage() {
                       : 'border border-[var(--border-hover)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
                   )}
                 >
-                  {tier.key === 'free' ? 'Get started' : `Choose ${tier.name}`}
+                  {/* TODO(i18n-T13): use shared translation keys for tier.name inside tierCta.paid */}
+                  {tier.key === 'free' ? t('tierCta.free') : t('tierCta.paid', { tierName: tier.name })}
                 </Link>
               </motion.div>
             );
@@ -469,54 +350,59 @@ export default function PricingPage() {
               className="text-2xl font-bold mb-3 flex items-center justify-center gap-3"
             >
               <Plus className="w-6 h-6 text-[#8b5cf6]" />
-              <span className="text-[var(--text-primary)]">Add-ons</span>
+              <span className="text-[var(--text-primary)]">{t('addons.heading')}</span>
             </motion.h2>
             <p className="text-[var(--text-muted)] text-sm max-w-lg mx-auto">
-              Customize your plan. Stack add-ons on any tier. Mix and match as needed.
+              {t('addons.subheading')}
             </p>
           </div>
 
           <div className="max-w-6xl mx-auto space-y-6">
-            {ADDON_GROUPS.map((group) => (
-              <div key={group.label}>
-                <h3 className="text-xs uppercase tracking-wider font-bold text-[var(--text-muted)] mb-3 text-center">
-                  {group.label}
-                </h3>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                  {group.items.map((addon) => {
-                    // Only subscription-type addons get annual pricing.
-                    const isSubscription = addon.period.startsWith('/mo');
-                    const monthlyNum = parseFloat(addon.price.replace('$', ''));
-                    const annualMonthly = isSubscription && isAnnual ? parseFloat((monthlyNum * 0.85).toFixed(2)) : monthlyNum;
-                    const displayPrice = isAnnual && isSubscription ? `$${annualMonthly}` : addon.price;
-                    return (
-                      <motion.div
-                        key={addon.name}
-                        whileHover={{ y: -3 }}
-                        transition={{ duration: 0.2 }}
-                        className="card glass-noise p-4 text-center"
-                      >
-                        <h4 className="font-bold text-[var(--text-primary)] text-sm mb-2">{addon.name}</h4>
-                        <div className="text-xl font-extrabold mb-0.5 text-[var(--text-primary)]">
-                          {displayPrice}
-                        </div>
-                        <p className="text-[var(--text-muted)] text-[10px] mb-2 font-medium">
-                          {addon.period}
-                        </p>
-                        <p className="text-[11px] text-[var(--text-secondary)]">
-                          {addon.description}
-                        </p>
-                        {isAnnual && isSubscription && (
-                          <p className="text-[10px] text-green-400 font-semibold mt-2">
-                            15% off annual
+            {ADDON_GROUP_KEYS.map((groupKey) => {
+              const groupLabel = t(`addons.groups.${groupKey}.label`);
+              const groupItems = t.raw(`addons.groups.${groupKey}.items`) as { name: string; period: string; description: string }[];
+              const prices = ADDON_PRICES[groupKey];
+
+              return (
+                <div key={groupKey}>
+                  <h3 className="text-xs uppercase tracking-wider font-bold text-[var(--text-muted)] mb-3 text-center">
+                    {groupLabel}
+                  </h3>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {groupItems.map((addon, idx) => {
+                      const { price, isSubscription } = prices[idx];
+                      const monthlyNum = parseFloat(price.replace('$', ''));
+                      const annualMonthly = isSubscription && isAnnual ? parseFloat((monthlyNum * 0.85).toFixed(2)) : monthlyNum;
+                      const displayPrice = isAnnual && isSubscription ? `$${annualMonthly}` : price;
+                      return (
+                        <motion.div
+                          key={addon.name}
+                          whileHover={{ y: -3 }}
+                          transition={{ duration: 0.2 }}
+                          className="card glass-noise p-4 text-center"
+                        >
+                          <h4 className="font-bold text-[var(--text-primary)] text-sm mb-2">{addon.name}</h4>
+                          <div className="text-xl font-extrabold mb-0.5 text-[var(--text-primary)]">
+                            {displayPrice}
+                          </div>
+                          <p className="text-[var(--text-muted)] text-[10px] mb-2 font-medium">
+                            {addon.period}
                           </p>
-                        )}
-                      </motion.div>
-                    );
-                  })}
+                          <p className="text-[11px] text-[var(--text-secondary)]">
+                            {addon.description}
+                          </p>
+                          {isAnnual && isSubscription && (
+                            <p className="text-[10px] text-green-400 font-semibold mt-2">
+                              {t('addons.annualDiscount')}
+                            </p>
+                          )}
+                        </motion.div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
@@ -529,18 +415,17 @@ export default function PricingPage() {
                 <MessageSquare className="w-6 h-6 text-green-400" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-[var(--text-primary)]">All Integrations Free</h2>
+                <h2 className="text-xl font-bold text-[var(--text-primary)]">{t('integrations.heading')}</h2>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-green-400 border border-green-500/20 bg-green-500/10 px-2.5 py-0.5 rounded-full">
-                  every tier
+                  {t('integrations.badge')}
                 </span>
               </div>
             </div>
             <p className="text-[var(--text-muted)] text-sm mb-4">
-              Telegram, Discord, WhatsApp, Slack, Signal, iMessage, and 14+ more platforms
-              are included free on all tiers. No extra charge, ever.
+              {t('integrations.body')}
             </p>
             <p className="text-[var(--text-secondary)] text-sm font-medium p-4 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
-              All prices in USD, payable in SOL or $HATCHER. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier.
+              {t('integrations.note')}
             </p>
           </div>
         </section>
@@ -556,9 +441,9 @@ export default function PricingPage() {
               className="text-2xl font-bold mb-3 flex items-center justify-center gap-3"
             >
               <Shield className="w-6 h-6 text-[#8b5cf6]" />
-              <span className="text-[var(--text-primary)]">Compare Plans</span>
+              <span className="text-[var(--text-primary)]">{t('compareTable.heading')}</span>
             </motion.h2>
-            <p className="text-[var(--text-muted)] text-sm">See what each tier includes at a glance</p>
+            <p className="text-[var(--text-muted)] text-sm">{t('compareTable.subheading')}</p>
           </div>
 
           <div className="card glass-noise p-0 overflow-hidden">
@@ -566,44 +451,67 @@ export default function PricingPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-[var(--border-default)]">
-                    <th className="text-left px-2.5 py-3 sm:p-5 text-[var(--text-muted)] font-medium text-[10px] sm:text-xs uppercase tracking-wider">Feature</th>
+                    <th className="text-left px-2.5 py-3 sm:p-5 text-[var(--text-muted)] font-medium text-[10px] sm:text-xs uppercase tracking-wider">{t('compareTable.featureColumn')}</th>
                     <th className="text-center px-2 py-3 sm:p-5 text-green-400 font-semibold">
+                      {/* TODO(i18n-T13): use shared translation keys */}
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Free</div>
                       <div className="text-sm sm:text-lg font-extrabold">$0</div>
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[var(--color-accent)] font-semibold">
+                      {/* TODO(i18n-T13): use shared translation keys */}
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Starter</div>
-                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$6.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$6.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('priceUnit.perMonth')}</span></div>
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[#8b5cf6] font-semibold">
+                      {/* TODO(i18n-T13): use shared translation keys */}
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Pro</div>
-                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$19.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$19.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('priceUnit.perMonth')}</span></div>
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[#f59e0b] font-semibold">
+                      {/* TODO(i18n-T13): use shared translation keys */}
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Business</div>
-                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$49.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">/mo</span></div>
+                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$49.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('priceUnit.perMonth')}</span></div>
                     </th>
                     <th className="text-center px-2 py-3 sm:p-5 text-[#e11d48] font-semibold">
+                      {/* TODO(i18n-T13): use shared translation keys */}
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">Founding</div>
-                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal"> once</span></div>
+                      <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('compareTable.onceSuffix')}</span></div>
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {FEATURE_ROWS.map((row, i) => (
+                  {(
+                    [
+                      { rowKey: 'agents',         free: '1',         starter: '1',         pro: '3',    business: '10',  founding: '10' },
+                      { rowKey: 'messages',        free: '20',        starter: '50',        pro: '100',  business: '300', founding: '300' },
+                      { rowKey: 'searches',        free: '3',         starter: '10',        pro: '50',   business: '200', founding: '200' },
+                      { rowKey: 'byok',            free: 'unlimited', starter: 'unlimited', pro: 'unlimited', business: 'unlimited', founding: 'unlimited' },
+                      { rowKey: 'cpuRam',          free: '0.5 / 1GB', starter: '1 / 1.5GB', pro: '1.5 / 2GB', business: '2 / 3GB', founding: '2 / 4GB' },
+                      { rowKey: 'storage',         free: '50 MB',     starter: '150 MB',    pro: '500 MB', business: '1 GB', founding: '2 GB' },
+                      { rowKey: 'autoSleep',       free: '1h',        starter: '4h',        pro: '12h',  business: 'alwaysOn', founding: 'alwaysOn' },
+                      { rowKey: 'fileManager',     free: 'addon',     starter: 'addon',     pro: 'addon', business: true, founding: true },
+                      { rowKey: 'fullLogs',        free: 'addon',     starter: 'addon',     pro: 'addon', business: true, founding: true },
+                      { rowKey: 'teamCollab',      free: false,       starter: false,       pro: false,  business: true,  founding: true },
+                      { rowKey: 'prioritySupport', free: false,       starter: false,       pro: false,  business: true,  founding: true },
+                      { rowKey: 'plugins',         free: '3',         starter: '10',        pro: '25',   business: '50',  founding: '50' },
+                      { rowKey: 'integrations',    free: true,        starter: true,        pro: true,   business: true,  founding: true },
+                      { rowKey: 'byokKey',         free: true,        starter: true,        pro: true,   business: true,  founding: true },
+                      { rowKey: 'defaultLlm',      free: 'llama4Scout', starter: 'llama4Scout', pro: 'llama4Scout', business: 'llama4Scout', founding: 'llama4Scout' },
+                    ] as Array<{ rowKey: string; free: string | boolean; starter: string | boolean; pro: string | boolean; business: string | boolean; founding: string | boolean }>
+                  ).map((row, i) => (
                     <tr
-                      key={row.label}
+                      key={row.rowKey}
                       className={cn(
                         'border-b border-[var(--border-default)] transition-colors hover:bg-[var(--bg-card)]',
                         i % 2 === 0 && 'bg-[var(--bg-card)]'
                       )}
                     >
-                      <td className="px-2.5 py-3 sm:p-4 text-[var(--text-secondary)] text-xs sm:text-sm">{row.label}</td>
-                      <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.free)}</td>
-                      <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.starter)}</td>
-                      <td className="px-2 py-3 sm:p-4 text-center bg-[#8b5cf6]/[0.03]">{renderCell(row.pro)}</td>
-                      <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.business)}</td>
-                      <td className="px-2 py-3 sm:p-4 text-center bg-[#e11d48]/[0.03]">{renderCell(row.founding)}</td>
+                      <td className="px-2.5 py-3 sm:p-4 text-[var(--text-secondary)] text-xs sm:text-sm">{t(`compareTable.rows.${row.rowKey}`)}</td>
+                      <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.free, t)}</td>
+                      <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.starter, t)}</td>
+                      <td className="px-2 py-3 sm:p-4 text-center bg-[#8b5cf6]/[0.03]">{renderCell(row.pro, t)}</td>
+                      <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.business, t)}</td>
+                      <td className="px-2 py-3 sm:p-4 text-center bg-[#e11d48]/[0.03]">{renderCell(row.founding, t)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -623,11 +531,11 @@ export default function PricingPage() {
               className="text-2xl font-bold flex items-center justify-center gap-3"
             >
               <HelpCircle className="w-6 h-6 text-[#8b5cf6]" />
-              <span className="text-[var(--text-primary)]">Frequently Asked Questions</span>
+              <span className="text-[var(--text-primary)]">{t('faq.heading')}</span>
             </motion.h2>
           </div>
           <div className="max-w-3xl mx-auto space-y-3">
-            {FAQ.map((item) => (
+            {(t.raw('faq.items') as { q: string; a: string }[]).map((item) => (
               <FAQItem key={item.q} q={item.q} a={item.a} />
             ))}
           </div>
@@ -636,17 +544,17 @@ export default function PricingPage() {
         {/* NEED HELP */}
         <div className="text-center mb-20">
           <p className="text-[var(--text-muted)] text-sm">
-            Need help choosing a plan?{' '}
+            {t('help.text')}{' '}
             <a href="mailto:support@hatcher.host" className="text-[#8b5cf6] hover:underline font-medium">
-              Email us
+              {t('help.emailLabel')}
             </a>
-            {' '}or{' '}
+            {' '}{/* "or" — intentionally kept as a simple connector, not extracted */}or{' '}
             <a href="https://discord.gg/7tY3HjKjMc" target="_blank" rel="noopener noreferrer" className="text-[#8b5cf6] hover:underline font-medium">
-              Discord
+              {t('help.discordLabel')}
             </a>
             {' '}or{' '}
             <a href="https://t.me/HatcherLabs" target="_blank" rel="noopener noreferrer" className="text-[#8b5cf6] hover:underline font-medium">
-              Telegram
+              {t('help.telegramLabel')}
             </a>
           </p>
         </div>
@@ -655,22 +563,21 @@ export default function PricingPage() {
         <div className="card glass-noise p-10 sm:p-14 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.1),transparent_60%)] pointer-events-none" />
           <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 relative text-[var(--text-primary)]">
-            Ready to deploy your agent?
+            {t('cta.heading')}
           </h2>
           <p className="text-[var(--text-secondary)] text-base max-w-lg mx-auto mb-8 leading-relaxed relative">
-            Pick your framework, choose a template, and deploy in seconds.
-            Start free with a built-in LLM. Upgrade when you need more power.
+            {t('cta.body')}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 relative">
             <Link href="/create" className="btn-primary px-10 py-4 text-base font-bold">
               <Rocket className="w-5 h-5" />
-              Create Agent
+              {t('cta.createAgent')}
             </Link>
             <Link
               href="/frameworks"
               className="inline-flex items-center gap-2 px-6 py-4 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             >
-              See Frameworks
+              {t('cta.seeFrameworks')}
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -678,11 +585,26 @@ export default function PricingPage() {
 
         {/* FOOTER NOTE */}
         <p className="text-center text-xs text-[var(--text-muted)] mt-10 max-w-xl mx-auto leading-relaxed">
-          All prices in USD, payable in SOL or $HATCHER. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier.
+          {t('footerNote')}
         </p>
       </div>
     </div>
   );
+}
+
+/* ── renderCell ──────────────────────────────────────────── */
+
+type TranslationFn = ReturnType<typeof useTranslations<'pricing'>>;
+
+function renderCell(value: string | boolean, t: TranslationFn) {
+  if (value === true)  return <Check className="w-4 h-4 text-green-400 mx-auto" />;
+  if (value === false) return <X className="w-4 h-4 text-[var(--text-muted)] opacity-40 mx-auto" />;
+  // Special token strings mapped to translated values
+  if (value === 'unlimited')   return <span className="text-[var(--text-secondary)] text-xs font-medium">{t('compareTable.values.unlimited')}</span>;
+  if (value === 'alwaysOn')    return <span className="text-[var(--text-secondary)] text-xs font-medium">{t('compareTable.values.alwaysOn')}</span>;
+  if (value === 'addon')       return <span className="text-[var(--text-secondary)] text-xs font-medium">{t('compareTable.values.addon')}</span>;
+  if (value === 'llama4Scout') return <span className="text-[var(--text-secondary)] text-xs font-medium">{t('compareTable.values.llama4Scout')}</span>;
+  return <span className="text-[var(--text-secondary)] text-xs font-medium">{value}</span>;
 }
 
 /* ── Helper components ───────────────────────────────────── */
@@ -757,38 +679,3 @@ function FAQItem({ q, a }: { q: string; a: string }) {
     </div>
   );
 }
-
-const FAQ = [
-  {
-    q: 'What is BYOK (Bring Your Own Key)?',
-    a: 'BYOK lets you use your own API key for any LLM provider (OpenAI, Anthropic, Google, xAI, Groq, OpenRouter). This is always free on all tiers -- you pay the provider directly, no Hatcher markup. Messages with your own key are unlimited.',
-  },
-  {
-    q: 'How do add-ons work?',
-    a: 'Add-ons are stackable on any tier. For example, if you are on the Starter tier (1 agent) and purchase a +3 Agents add-on, you can run 4 agents total. You can stack multiple add-ons.',
-  },
-  {
-    q: 'What is the difference between shared and dedicated resources?',
-    a: 'Shared resources mean your agent shares CPU and RAM with others on the same server -- still performant but may vary under load. Dedicated resources (Pro and Business) give your agent guaranteed CPU and RAM that no one else can use.',
-  },
-  {
-    q: 'What payment methods are accepted?',
-    a: 'You can pay with SOL or $HATCHER. Prices are listed in USD and converted at live rates via Jupiter.',
-  },
-  {
-    q: 'Can I downgrade my tier?',
-    a: 'Yes. You can cancel your subscription at any time and your tier will revert to Free at the end of the billing period. Agents beyond your free limit will be paused.',
-  },
-  {
-    q: 'What is auto-sleep?',
-    a: 'Free agents sleep after 1 hour of inactivity, Starter after 4 hours, Pro after 12 hours. Business and Founding Member agents are always-on with no auto-sleep. They wake instantly on the next message. You can add Always On to any agent for $7.99/mo.',
-  },
-  {
-    q: 'What LLM do I get with the free tier?',
-    a: 'Free and Starter tiers use GPT-OSS 20B on Groq. Pro, Business, and Founding Member tiers get Llama 3.3 70B on Groq — a more capable model. Message limits are account-wide: Free 20/day, Starter 50/day, Pro 100/day, Business 300/day, Founding 300/day. BYOK (bring your own LLM key) bypasses all limits on any tier.',
-  },
-  {
-    q: 'What is the Founding Member tier?',
-    a: 'Founding Member is a one-time $99 payment that gives you lifetime access to Hatcher: 10 agents, 300 messages/day, 4 GB RAM, 2 GB workspace, always-on, and all premium features (File Manager, Full Logs, priority support) included. No monthly fees, ever. Limited to 20 spots — once they are gone, this tier is gone.',
-  },
-];

@@ -200,5 +200,248 @@
       "trustDeploy60s": "[zh] Deploy in 60s",
       "trustAllPlatforms": "[zh] All platforms"
     }
+  },
+  "pricing": {
+    "eyebrow": "[zh] Pricing",
+    "heading": "[zh] Choose your plan",
+    "subheading": "[zh] Start free with any framework. Scale when ready. All integrations included on every tier. BYOK always unlimited.",
+    "billingToggle": {
+      "monthly": "[zh] Monthly",
+      "annual": "[zh] Annual",
+      "annualDiscount": "[zh] −15%"
+    },
+    "tierBadges": {
+      "popular": "[zh] Popular",
+      "limited": "[zh] Limited"
+    },
+    "priceUnit": {
+      "perMonth": "[zh] /mo",
+      "once": "[zh]  once"
+    },
+    "annualSavings": "[zh] ${annualTotal}/year · save ${saved}",
+    "switchToAnnual": "[zh] Switch to annual, save 15%",
+    "payOnce": "[zh] Pay once, keep forever",
+    "availability": "[zh] Availability",
+    "availabilityLoading": "[zh] Loading",
+    "soldOut": "[zh] Sold out",
+    "slotsLeft": "[zh] {remaining} of {max} left",
+    "tierCta": {
+      "free": "[zh] Get started",
+      "paid": "[zh] Choose {tierName}"
+    },
+    "tiers": {
+      "free": {
+        "agents": "[zh] 1 agent included",
+        "messages": "[zh] 20 messages/day",
+        "cpu": "[zh] 0.5 CPU",
+        "ram": "[zh] 1 GB RAM",
+        "storage": "[zh] 50 MB workspace",
+        "sleep": "[zh] Auto-sleep after 1h idle",
+        "features": [
+          "[zh] Llama 4 Scout on Groq",
+          "[zh] BYOK = unlimited messages",
+          "[zh] 3 web searches/day",
+          "[zh] All integrations (Telegram, Discord, Twitter, etc)"
+        ],
+        "missing": [
+          "[zh] Logs, File Manager available as add-ons"
+        ]
+      },
+      "starter": {
+        "agents": "[zh] 1 agent included",
+        "messages": "[zh] 50 messages/day",
+        "cpu": "[zh] 1 CPU",
+        "ram": "[zh] 1.5 GB RAM",
+        "storage": "[zh] 150 MB workspace",
+        "sleep": "[zh] Auto-sleep after 4h idle",
+        "features": [
+          "[zh] BYOK = unlimited messages",
+          "[zh] 10 web searches/day",
+          "[zh] All integrations"
+        ],
+        "missing": [
+          "[zh] Logs, File Manager available as add-ons"
+        ]
+      },
+      "pro": {
+        "agents": "[zh] 3 agents included",
+        "messages": "[zh] 100 messages/day",
+        "cpu": "[zh] 1.5 CPU",
+        "ram": "[zh] 2 GB RAM",
+        "storage": "[zh] 500 MB workspace",
+        "sleep": "[zh] Auto-sleep after 12h idle",
+        "features": [
+          "[zh] BYOK = unlimited messages",
+          "[zh] 50 web searches/day",
+          "[zh] All integrations",
+          "[zh] Buy Always On per agent for 24/7"
+        ],
+        "missing": [
+          "[zh] Logs, File Manager available as add-ons"
+        ]
+      },
+      "business": {
+        "agents": "[zh] 10 agents included",
+        "messages": "[zh] 300 messages/day",
+        "cpu": "[zh] 2 CPU",
+        "ram": "[zh] 3 GB RAM",
+        "storage": "[zh] 1 GB workspace",
+        "sleep": "[zh] Always-on (no auto-sleep)",
+        "features": [
+          "[zh] BYOK = unlimited messages",
+          "[zh] 200 web searches/day",
+          "[zh] File Manager included",
+          "[zh] Full logs included",
+          "[zh] Priority support",
+          "[zh] Team collaboration",
+          "[zh] All integrations"
+        ],
+        "missing": []
+      },
+      "founding_member": {
+        "agents": "[zh] 10 agents included",
+        "messages": "[zh] 300 messages/day",
+        "cpu": "[zh] 2 CPU",
+        "ram": "[zh] 4 GB RAM",
+        "storage": "[zh] 2 GB workspace",
+        "sleep": "[zh] Always-on (no auto-sleep)",
+        "features": [
+          "[zh] $99 one-time — lifetime access",
+          "[zh] 200 web searches/day",
+          "[zh] File Manager + Full Logs included",
+          "[zh] Priority support",
+          "[zh] Team collaboration",
+          "[zh] All integrations",
+          "[zh] Founding badge"
+        ],
+        "missing": []
+      }
+    },
+    "addons": {
+      "heading": "[zh] Add-ons",
+      "subheading": "[zh] Customize your plan. Stack add-ons on any tier. Mix and match as needed.",
+      "annualDiscount": "[zh] 15% off annual",
+      "groups": {
+        "extraAgents": {
+          "label": "[zh] Extra Agents",
+          "items": [
+            { "name": "[zh] +1 Agent",   "period": "[zh] /mo", "description": "[zh] 1 extra slot" },
+            { "name": "[zh] +3 Agents",  "period": "[zh] /mo", "description": "[zh] 3 extra slots" },
+            { "name": "[zh] +5 Agents",  "period": "[zh] /mo", "description": "[zh] 5 extra slots" },
+            { "name": "[zh] +10 Agents", "period": "[zh] /mo", "description": "[zh] 10 extra slots" }
+          ]
+        },
+        "extraMessages": {
+          "label": "[zh] Extra Messages (account)",
+          "items": [
+            { "name": "[zh] +20 msg/day",  "period": "[zh] /mo", "description": "[zh] Stackable" },
+            { "name": "[zh] +50 msg/day",  "period": "[zh] /mo", "description": "[zh] Stackable" },
+            { "name": "[zh] +100 msg/day", "period": "[zh] /mo", "description": "[zh] Stackable" },
+            { "name": "[zh] +200 msg/day", "period": "[zh] /mo", "description": "[zh] Stackable" }
+          ]
+        },
+        "extraSearches": {
+          "label": "[zh] Extra Searches (account)",
+          "items": [
+            { "name": "[zh] +25 searches/day", "period": "[zh] /mo", "description": "[zh] Stackable" },
+            { "name": "[zh] +50 searches/day", "period": "[zh] /mo", "description": "[zh] Stackable" }
+          ]
+        },
+        "perAgent": {
+          "label": "[zh] Per-Agent",
+          "items": [
+            { "name": "[zh] Always On",    "period": "[zh] /mo per agent",      "description": "[zh] Keep running 24/7" },
+            { "name": "[zh] File Manager", "period": "[zh] one-time per agent", "description": "[zh] Browse & edit files" },
+            { "name": "[zh] Full Logs",    "period": "[zh] /mo per agent",      "description": "[zh] Unlock log viewer" },
+            { "name": "[zh] +10 Plugins",  "period": "[zh] /mo per agent",      "description": "[zh] Stack extra plugin slots" }
+          ]
+        }
+      }
+    },
+    "integrations": {
+      "heading": "[zh] All Integrations Free",
+      "badge": "[zh] every tier",
+      "body": "[zh] Telegram, Discord, WhatsApp, Slack, Signal, iMessage, and 14+ more platforms are included free on all tiers. No extra charge, ever.",
+      "note": "[zh] All prices in USD, payable in SOL or $HATCHER. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier."
+    },
+    "compareTable": {
+      "heading": "[zh] Compare Plans",
+      "subheading": "[zh] See what each tier includes at a glance",
+      "featureColumn": "[zh] Feature",
+      "onceSuffix": "[zh]  once",
+      "rows": {
+        "agents": "[zh] Agents included",
+        "messages": "[zh] Messages/day (account)",
+        "searches": "[zh] Web searches/day",
+        "byok": "[zh] BYOK messages",
+        "cpuRam": "[zh] CPU / RAM",
+        "storage": "[zh] Storage",
+        "autoSleep": "[zh] Auto-sleep",
+        "fileManager": "[zh] File Manager",
+        "fullLogs": "[zh] Full Logs",
+        "teamCollab": "[zh] Team collaboration",
+        "prioritySupport": "[zh] Priority support",
+        "plugins": "[zh] Plugins + Skills",
+        "integrations": "[zh] All integrations",
+        "byokKey": "[zh] BYOK (own LLM key)",
+        "defaultLlm": "[zh] Default LLM (Groq)"
+      },
+      "values": {
+        "unlimited": "[zh] Unlimited",
+        "alwaysOn": "[zh] Always-on",
+        "addon": "[zh] Add-on",
+        "llama4Scout": "[zh] Llama 4 Scout"
+      }
+    },
+    "faq": {
+      "heading": "[zh] Frequently Asked Questions",
+      "items": [
+        {
+          "q": "[zh] What is BYOK (Bring Your Own Key)?",
+          "a": "[zh] BYOK lets you use your own API key for any LLM provider (OpenAI, Anthropic, Google, xAI, Groq, OpenRouter). This is always free on all tiers -- you pay the provider directly, no Hatcher markup. Messages with your own key are unlimited."
+        },
+        {
+          "q": "[zh] How do add-ons work?",
+          "a": "[zh] Add-ons are stackable on any tier. For example, if you are on the Starter tier (1 agent) and purchase a +3 Agents add-on, you can run 4 agents total. You can stack multiple add-ons."
+        },
+        {
+          "q": "[zh] What is the difference between shared and dedicated resources?",
+          "a": "[zh] Shared resources mean your agent shares CPU and RAM with others on the same server -- still performant but may vary under load. Dedicated resources (Pro and Business) give your agent guaranteed CPU and RAM that no one else can use."
+        },
+        {
+          "q": "[zh] What payment methods are accepted?",
+          "a": "[zh] You can pay with SOL or $HATCHER. Prices are listed in USD and converted at live rates via Jupiter."
+        },
+        {
+          "q": "[zh] Can I downgrade my tier?",
+          "a": "[zh] Yes. You can cancel your subscription at any time and your tier will revert to Free at the end of the billing period. Agents beyond your free limit will be paused."
+        },
+        {
+          "q": "[zh] What is auto-sleep?",
+          "a": "[zh] Free agents sleep after 1 hour of inactivity, Starter after 4 hours, Pro after 12 hours. Business and Founding Member agents are always-on with no auto-sleep. They wake instantly on the next message. You can add Always On to any agent for $7.99/mo."
+        },
+        {
+          "q": "[zh] What LLM do I get with the free tier?",
+          "a": "[zh] Free and Starter tiers use GPT-OSS 20B on Groq. Pro, Business, and Founding Member tiers get Llama 3.3 70B on Groq — a more capable model. Message limits are account-wide: Free 20/day, Starter 50/day, Pro 100/day, Business 300/day, Founding 300/day. BYOK (bring your own LLM key) bypasses all limits on any tier."
+        },
+        {
+          "q": "[zh] What is the Founding Member tier?",
+          "a": "[zh] Founding Member is a one-time $99 payment that gives you lifetime access to Hatcher: 10 agents, 300 messages/day, 4 GB RAM, 2 GB workspace, always-on, and all premium features (File Manager, Full Logs, priority support) included. No monthly fees, ever. Limited to 20 spots — once they are gone, this tier is gone."
+        }
+      ]
+    },
+    "help": {
+      "text": "[zh] Need help choosing a plan?",
+      "emailLabel": "[zh] Email us",
+      "discordLabel": "[zh] Discord",
+      "telegramLabel": "[zh] Telegram"
+    },
+    "cta": {
+      "heading": "[zh] Ready to deploy your agent?",
+      "body": "[zh] Pick your framework, choose a template, and deploy in seconds. Start free with a built-in LLM. Upgrade when you need more power.",
+      "createAgent": "[zh] Create Agent",
+      "seeFrameworks": "[zh] See Frameworks"
+    },
+    "footerNote": "[zh] All prices in USD, payable in SOL or $HATCHER. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier."
   }
 }
