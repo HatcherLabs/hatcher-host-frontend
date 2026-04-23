@@ -2005,40 +2005,351 @@
   },
   "create": {
     "eyebrow": "Agent erstellen",
-    "heading": "Ihren Agenten erstellen",
-    "subheading": "Kostenlosen KI-Agenten in unter 2 Minuten starten.",
+    "heading": "Ihren Agent erstellen",
+    "subheading": "Kostenlosen AI-Agent in unter 2 Minuten starten.",
     "stepsAriaLabel": "Erstellungsschritte",
     "stepLabels": {
       "style": "Stil",
       "category": "Kategorie",
       "template": "Vorlage",
-      "setUp": "Einrichten",
+      "setUp": "Einrichtung",
       "launch": "Starten"
     },
     "authLoading": "Authentifizierung...",
-    "authRequired": "Ihren Agenten erstellen",
-    "authRequiredBody": "Melden Sie sich an, um KI-Agenten zu erstellen und zu deployen.",
+    "authRequired": "Ihren Agent erstellen",
+    "authRequiredBody": "Melden Sie sich an, um AI-Agents zu erstellen und bereitzustellen.",
     "signIn": "Anmelden",
-    "step1Heading": "Welche Art von Agent möchten Sie?",
-    "step1Subheading": "Jedes Framework hat unterschiedliche Stärken — wählen Sie das passende.",
+    "back": "Zurück",
     "continue": "Weiter",
-    "step2Heading": "Welche Art von Agent?",
+    "step1Heading": "Welche Art von Agent möchten Sie?",
+    "step1Subheading": "Jedes Framework hat andere Stärken — wählen Sie das passende.",
+    "step2Heading": "Welcher Agent-Typ?",
     "step2Subheading": "Kategorie wählen — wir zeigen Ihnen die besten Vorlagen",
-    "searchTemplates": "200+ Vorlagen suchen...",
+    "searchTemplates": "200+ Vorlagen durchsuchen...",
     "clearSearch": "Suche löschen",
     "noTemplatesFound": "Keine Vorlagen für \"{query}\" gefunden",
     "clearSearchLink": "Suche löschen",
+    "categoryCount": "{count} Vorlagen",
     "step3Heading": "Vorlage wählen",
-    "step3Subheading": "Startpunkt für Ihren Agenten wählen",
-    "customOption": "Von Grund auf beginnen",
-    "customOptionDesc": "Volle Kontrolle über jede Einstellung",
-    "step4Heading": "Agenten konfigurieren",
-    "step4Subheading": "Benennen Sie ihn, beschreiben Sie ihn, wählen Sie ein Modell.",
-    "step5Heading": "Starten!",
-    "step5Subheading": "Überprüfen Sie Ihre Konfiguration und deployen Sie.",
-    "launchCta": "Agenten starten",
+    "step3Subheading": "Vorlage wählen — alles im nächsten Schritt anpassbar",
+    "customAgent": "Eigener Agent",
+    "customAgentDesc": "Mit eigenem System-Prompt von Grund auf starten",
+    "customOption": "Von Grund auf",
+    "customOptionDesc": "Vollständige Kontrolle über alle Einstellungen",
+    "step4Heading": "Agent personalisieren",
+    "step4Subheading": "Namen vergeben und Denkweise festlegen",
+    "agentNameLabel": "Agent-Name",
+    "agentNamePlaceholder": "z. B. AlphaResearcher, TweetLord...",
+    "agentNameHintCount": "{count}/50 Zeichen",
+    "agentNameTooShort": "Name muss mindestens 3 Zeichen haben",
+    "agentNameInvalidChars": "Nur Buchstaben, Zahlen, Leerzeichen, Bindestriche, Doppelpunkte, Apostrophe erlaubt",
+    "descriptionLabel": "Beschreibung",
+    "descriptionPlaceholder": "Kurze Beschreibung Ihres Agents...",
+    "descriptionHint": "Kurzer Slogan für Ihren Agent",
+    "platformsHeading": "Wo soll Ihr Agent aktiv sein?",
+    "platformsSubheading": "Plattformen wählen und API-Schlüssel eingeben. Später in den Einstellungen erweiterbar.",
+    "noPlatformsNote": "Keine Plattform gewählt? Kein Problem — jederzeit im Einstellungs-Tab des Agents hinzufügbar.",
+    "hideValue": "Wert verbergen",
+    "showValue": "Wert anzeigen",
+    "llmModelLabel": "AI-Modell",
+    "llmModelAria": "AI-Modell-Auswahl",
+    "llmFreeLabel": "Kostenloses AI-Modell",
+    "llmFreeTag": "KOSTENLOS",
+    "llmFreeSubtext": "Powered by Groq — kein API-Schlüssel nötig",
+    "llmByokLabel": "Eigenen AI-Schlüssel verwenden",
+    "llmByokTag": "immer kostenlos",
+    "llmByokSubtext": "Eigenen OpenAI-, Anthropic- oder anderen API-Schlüssel verbinden",
+    "byokProviderLabel": "Anbieter",
+    "byokModelLabel": "Modell",
+    "byokModelPlaceholder": "Modell-Bezeichner...",
+    "byokBackToList": "Zurück zur Modellliste",
+    "byokSelectModel": "Modell auswählen...",
+    "byokCustomModel": "Eigenes Modell...",
+    "byokApiKeyLabel": "API-Schlüssel",
+    "byokApiKeyEncrypted": "verschlüsselt gespeichert",
+    "byokBaseUrlLabel": "Base URL",
+    "skillsHeading": "Agent-Fähigkeiten",
+    "skillsSubheading": "Wählen Sie, was Ihr Agent können soll",
+    "toolsHeading": "Agent-Werkzeuge",
+    "toolsSubheading": "Wählen Sie, was Ihr Agent können soll",
+    "pluginsHeading": "Plugins",
+    "pluginsSubheading": "Wählen Sie, was Ihr Agent können soll",
+    "capabilitiesHeading": "Fähigkeiten",
+    "capabilitiesSubheading": "Wählen Sie, was Ihr Agent können soll",
+    "templateSkillsHeading": "In dieser Vorlage enthalten",
+    "templateSkillsSubheading": "Diese ClawHub-Fähigkeiten werden beim ersten Start automatisch installiert.",
+    "systemPromptLabel": "System-Prompt",
+    "systemPromptCustomNote": "Ihre Anweisungen ersetzen den Vorlagen-Standard",
+    "systemPromptDefaultNote": "Die Persönlichkeit Ihres Agents ist vorkonfiguriert. Anpassen nach Bedarf.",
+    "systemPromptCustomize": "Anpassen",
+    "systemPromptUseDefault": "Vorlage verwenden",
+    "systemPromptPlaceholder": "Eigenen System-Prompt hier eingeben. Ersetzt vollständig den Vorlage-Standard.",
+    "systemPromptHint": "Definiert Persönlichkeit, Fähigkeiten und Regeln des Agents",
+    "systemPromptCount": "{count}/8000",
+    "systemPromptWarning": "System-Prompt empfohlen für bessere Ergebnisse",
+    "elizaBioLabel": "Biografie",
+    "elizaBioHint": "Persönlichkeit und Hintergrund des Agents. Ein Satz pro Zeile.",
+    "elizaBioPlaceholder": "Ein kenntnisreicher KI-Assistent spezialisiert auf...",
+    "elizaLoreLabel": "Hintergrundwissen",
+    "elizaLoreHint": "Hintergrundwissen und Geschichte des Agents. Ein Fakt pro Zeile.",
+    "elizaStyleLabel": "Stil-Anweisungen",
+    "elizaStyleHint": "Wie Ihr Agent kommunizieren soll. Eine Anweisung pro Zeile.",
+    "elizaTopicsLabel": "Themen",
+    "elizaTopicsPlaceholder": "technology, AI, crypto, research",
+    "elizaTopicsHint": "Kommagetrennte Themen, über die der Agent Bescheid weiß",
+    "elizaAdjectivesLabel": "Adjektive",
+    "elizaAdjectivesPlaceholder": "helpful, analytical, concise",
+    "elizaAdjectivesHint": "Persönlichkeitsmerkmale, kommagetrennt",
+    "miladyPersonalityLabel": "Persönlichkeits-Preset",
+    "miladyPersonalityHint": "Persönlichkeitsstil für Ihren Milady-Agent wählen.",
+    "miladyPersonalityHelpful": "Hilfsbereit - Freundlich und professionell",
+    "miladyPersonalityTsundere": "Tsundere - Widerwillig aber fürsorglich",
+    "miladyPersonalityUnhinged": "Chaotisch - Unberechenbar und spontan",
+    "miladyPersonalityCustom": "Eigene - Verwendet Ihren System-Prompt",
+    "moreOptionsLabel": "Weitere Optionen",
+    "moreOptionsHints": {
+      "openclaw": "Suche, Sprache, Sitzungen",
+      "hermes": "Persönlichkeit, Gedächtnis, Freigaben",
+      "elizaos": "Datenbank, Bildgenerierung, Sprache",
+      "milady": "Datenbank, Datenschutz, Presets"
+    },
+    "sessionScopeLabel": "Sitzungsumfang",
+    "sessionScopeHint": "Wie Konversationskontext zwischen Nutzern geteilt wird",
+    "sessionScopePerUser": "Pro Nutzer",
+    "sessionScopeGlobal": "Global",
+    "webSearchLabel": "Websuche aktivieren",
+    "webSearchHint": "Agent darf das Web nach Echtzeit-Infos durchsuchen",
+    "searchProviderLabel": "Suchanbieter",
+    "searchProviderHint": "Welche Such-API verwendet wird",
+    "ttsLabel": "Sprache aktivieren (TTS)",
+    "ttsHint": "Text-zu-Sprache für Sprachantworten",
+    "ttsProviderLabel": "TTS-Anbieter",
+    "ttsProviderHint": "Sprachsynthese-Engine",
+    "hermesPersonalityLabel": "Persönlichkeit",
+    "hermesPersonalityHint": "Gesprächston und -stil",
+    "hermesPersonalityDefault": "Standard",
+    "hermesPersonalityHelpful": "Hilfsbereit",
+    "hermesPersonalityTechnical": "Technisch",
+    "hermesPersonalityCreative": "Kreativ",
+    "hermesPersonalityConcise": "Prägnant",
+    "memoryLabel": "Gedächtnis aktivieren",
+    "memoryHint": "Kontext über Gespräche hinweg beibehalten",
+    "approvalModeLabel": "Freigabe-Modus",
+    "approvalModeHint": "Wie Aktionen vor der Ausführung genehmigt werden",
+    "approvalModeAuto": "Automatisch",
+    "approvalModeAsk": "Vor Aktionen fragen",
+    "approvalModeManual": "Manuell",
+    "databaseLabel": "Datenbank",
+    "databaseHint": "Speicher-Backend für Agent-Zustand und Gedächtnis",
+    "databaseHintMilady": "Speicher-Backend für Agent-Zustand",
+    "imageGenLabel": "Bildgenerierung aktivieren",
+    "imageGenHint": "Agent darf Bilder generieren",
+    "voiceLabel": "Sprache aktivieren",
+    "voiceHint": "Sprache-zu-Text und Text-zu-Sprache",
+    "localFirstLabel": "Local-First-Modus",
+    "localFirstHint": "Daten lokal verarbeiten vor der Synchronisierung",
+    "miladyPersonalitySelectedHint": "Oben ausgewählt — steuert den Agent-Ton",
+    "step5Heading": "Bereit zum Starten?",
+    "step5Subheading": "Konfiguration vor dem Start prüfen",
+    "summaryAgentType": "Agent-Typ",
+    "summaryTemplate": "Vorlage",
+    "summaryTemplateCustom": "Eigene",
+    "summaryAiModel": "AI-Modell",
+    "summaryDescription": "Beschreibung",
+    "summaryPlatforms": "Plattformen",
+    "summaryPersonality": "Persönlichkeit",
+    "summaryPersonalityDefault": "Vorlage-Standard",
+    "summaryPersonalityCustom": "Eigene Anweisungen",
+    "summaryCost": "Kosten",
+    "summaryCostFree": "$0.00 — Kostenlos",
+    "summaryCostByok": "$0.00 — Eigener Schlüssel",
+    "summaryFrameworkLabels": {
+      "openclaw": "Multi-Skill-Assistent",
+      "hermes": "Autonomer Agent",
+      "elizaos": "Multi-Agent-Framework",
+      "milady": "Datenschutz-Runtime"
+    },
+    "testChatLabel": "Agent testen",
+    "testChatSubtext": "Vorschau der Agent-Antworten",
+    "testChatPreviewLabel": "Chat-Vorschau",
+    "testChatSimulated": "Simulierte Vorschau. Agent deployen für echte Gespräche.",
+    "testChatEmpty": "Nachricht senden für Agent-Vorschau",
+    "testChatEmptyHint": "Versuchen Sie \"Hallo\" oder \"Was können Sie tun?\"",
+    "testChatPlaceholder": "Nachricht eingeben...",
+    "launchedHeading": "Ihr Agent ist live!",
+    "launchedSubtext": "Weiterleitung zum Agent-Dashboard...",
+    "launchCtaLabel": "Agent starten",
+    "launchCtaCreating": "Agent wird erstellt...",
+    "launchCtaCreated": "Agent erfolgreich erstellt",
+    "launchCta": "Agent starten!",
     "launching": "Wird gestartet...",
-    "launched": "Gestartet!"
+    "launched": "Gestartet!",
+    "frameworkFeatures": {
+      "openclaw": {
+        "desc": "Vielseitiger KI-Assistent mit tausenden Community-Fähigkeiten und Multi-Channel-Messaging.",
+        "f1": "Tausende Fähigkeiten",
+        "f2": "Websuche",
+        "f3": "Geplante Aufgaben"
+      },
+      "hermes": {
+        "desc": "Intelligenter KI-Agent mit kontextübergreifendem Gedächtnis und Lernfähigkeit.",
+        "f1": "Langzeitgedächtnis",
+        "f2": "40+ integrierte Tools",
+        "f3": "Selbstverbesserung"
+      },
+      "elizaos": {
+        "desc": "Open-Source Multi-Agent-Framework von ai16z. 90+ Plugins, persistentes Gedächtnis, Web3-nativ.",
+        "f1": "90+ Plugins",
+        "f2": "Vektorspeicher",
+        "f3": "Web3-nativ"
+      },
+      "milady": {
+        "desc": "Datenschutzorientierte KI-Runtime mit 20+ Konnektoren, VRM-Avataren und DeFi-Integration.",
+        "f1": "20+ Konnektoren",
+        "f2": "Persönlichkeits-Presets",
+        "f3": "Datenschutz-First"
+      }
+    },
+    "skills": {
+      "webSearch": {
+        "name": "Websuche",
+        "desc": "Web nach Echtzeit-Infos durchsuchen"
+      },
+      "calculator": {
+        "name": "Rechner",
+        "desc": "Mathematik und Berechnungen"
+      },
+      "weather": {
+        "name": "Wetter",
+        "desc": "Wettervorhersagen"
+      },
+      "codeInterpreter": {
+        "name": "Code-Ausführung",
+        "desc": "Code-Snippets ausführen"
+      },
+      "fileManager": {
+        "name": "Dateimanager",
+        "desc": "Dateien lesen und schreiben"
+      },
+      "imageGen": {
+        "name": "Bildgenerierung",
+        "desc": "Bilder aus Text generieren"
+      }
+    },
+    "tools": {
+      "webSearch": {
+        "name": "Websuche",
+        "desc": "Internet nach Informationen durchsuchen"
+      },
+      "calculator": {
+        "name": "Rechner",
+        "desc": "Mathematische Berechnungen"
+      },
+      "codeExecution": {
+        "name": "Code-Ausführung",
+        "desc": "Code-Snippets ausführen"
+      },
+      "fileOperations": {
+        "name": "Dateioperationen",
+        "desc": "Dateien lesen und schreiben"
+      },
+      "memory": {
+        "name": "Gedächtnis",
+        "desc": "Gespräche und Fakten merken"
+      },
+      "summarize": {
+        "name": "Zusammenfassung",
+        "desc": "Lange Texte zusammenfassen"
+      },
+      "translate": {
+        "name": "Übersetzer",
+        "desc": "Zwischen Sprachen übersetzen"
+      },
+      "weather": {
+        "name": "Wetter",
+        "desc": "Wettervorhersagen"
+      }
+    },
+    "plugins": {
+      "database": {
+        "name": "Datenbank",
+        "desc": "SQL-Datenbankzugriff"
+      },
+      "imageGen": {
+        "name": "Bildgenerierung",
+        "desc": "Bilder generieren"
+      },
+      "video": {
+        "name": "Video",
+        "desc": "Videoverarbeitung"
+      },
+      "tts": {
+        "name": "Text-zu-Sprache",
+        "desc": "Sprachausgabe"
+      },
+      "nodeRuntime": {
+        "name": "Node-Laufzeit",
+        "desc": "Serverseitige Operationen"
+      },
+      "bootstrap": {
+        "name": "Bootstrap",
+        "desc": "Kernhilfsprogramme"
+      }
+    },
+    "capabilities": {
+      "chat": {
+        "name": "Chat",
+        "desc": "Kernkonversation"
+      },
+      "defi": {
+        "name": "DeFi",
+        "desc": "DeFi-Protokollinteraktionen"
+      },
+      "social": {
+        "name": "Social",
+        "desc": "Social-Media-Integration"
+      },
+      "analysis": {
+        "name": "Analyse",
+        "desc": "Datenanalyse"
+      },
+      "privacy": {
+        "name": "Datenschutz",
+        "desc": "Datenschutz-Tools"
+      },
+      "memes": {
+        "name": "Memes",
+        "desc": "Meme-Generierung"
+      }
+    },
+    "platforms": {
+      "telegram": {
+        "desc": "Als Telegram-Bot bereitstellen",
+        "helperField": "Telegram → @BotFather → /newbot → Token kopieren"
+      },
+      "discord": {
+        "desc": "Als Discord-Bot bereitstellen",
+        "helperField": "Discord Entwicklerportal → Neue App → Bot → Token kopieren"
+      },
+      "whatsapp": {
+        "desc": "Via QR-Code verbinden",
+        "note": "QR-Kopplung nach Deployment verfügbar"
+      },
+      "slack": {
+        "desc": "Im Slack-Workspace bereitstellen",
+        "helperField": "Slack API → App erstellen → OAuth & Berechtigungen → Bot-Token"
+      },
+      "twitter": {
+        "desc": "Auf X posten, antworten und interagieren"
+      }
+    },
+    "llmFreeSummary": "Kostenloses AI-Modell (Groq)",
+    "llmByokSummary": "Eigener Schlüssel: {provider}{model}",
+    "errorHeading": "Erstellungsfehler",
+    "errorBody": "Beim Einrichten Ihres Agents ist ein Fehler aufgetreten. Ihr Fortschritt wurde nicht verloren.",
+    "errorIdLabel": "Fehler-ID:",
+    "tryAgain": "Erneut versuchen",
+    "dashboard": "Dashboard"
   },
   "support": {
     "eyebrow": "Hilfe",

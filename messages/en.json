@@ -2019,26 +2019,337 @@
     "authRequired": "Create Your Agent",
     "authRequiredBody": "Sign in to your account to create and deploy AI agents.",
     "signIn": "Sign In",
+    "back": "Back",
+    "continue": "Continue",
     "step1Heading": "What kind of agent do you want?",
     "step1Subheading": "Each framework has different strengths — pick the one that fits.",
-    "continue": "Continue",
     "step2Heading": "What type of agent?",
     "step2Subheading": "Choose a category — we'll show you the best templates",
     "searchTemplates": "Search 200+ templates...",
     "clearSearch": "Clear search",
     "noTemplatesFound": "No templates found for \"{query}\"",
     "clearSearchLink": "Clear search",
+    "categoryCount": "{count} templates",
     "step3Heading": "Pick a template",
-    "step3Subheading": "Choose a starting point for your agent",
+    "step3Subheading": "Pick a template — you can customize everything in the next step",
+    "customAgent": "Custom Agent",
+    "customAgentDesc": "Start from scratch with your own system prompt",
     "customOption": "Start from scratch",
     "customOptionDesc": "Full control over every setting",
-    "step4Heading": "Configure your agent",
-    "step4Subheading": "Name it, describe it, pick a model.",
-    "step5Heading": "Launch!",
-    "step5Subheading": "Review your configuration and deploy.",
-    "launchCta": "Launch agent",
-    "launching": "Launching...",
-    "launched": "Launched!"
+    "step4Heading": "Personalize your agent",
+    "step4Subheading": "Give your agent a name and choose how it thinks",
+    "agentNameLabel": "Agent Name",
+    "agentNamePlaceholder": "e.g. AlphaResearcher, TweetLord...",
+    "agentNameHintCount": "{count}/50 characters",
+    "agentNameTooShort": "Name must be at least 3 characters",
+    "agentNameInvalidChars": "Only letters, numbers, spaces, hyphens, colons, apostrophes allowed",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Brief description of what your agent does...",
+    "descriptionHint": "Brief tagline for your agent",
+    "platformsHeading": "Where should your agent live?",
+    "platformsSubheading": "Select platforms and add your API keys. You can add more later in Settings.",
+    "noPlatformsNote": "No platforms selected? No problem — add them anytime from your agent's Settings tab.",
+    "hideValue": "Hide value",
+    "showValue": "Show value",
+    "llmModelLabel": "AI Model",
+    "llmModelAria": "AI Model selection",
+    "llmFreeLabel": "Free AI Model",
+    "llmFreeTag": "FREE",
+    "llmFreeSubtext": "Powered by Groq — no API key needed",
+    "llmByokLabel": "Use Your Own AI Key",
+    "llmByokTag": "always free",
+    "llmByokSubtext": "Connect your own OpenAI, Anthropic, or other API key",
+    "byokProviderLabel": "Provider",
+    "byokModelLabel": "Model",
+    "byokModelPlaceholder": "model identifier...",
+    "byokBackToList": "Back to model list",
+    "byokSelectModel": "Select a model...",
+    "byokCustomModel": "Custom model...",
+    "byokApiKeyLabel": "API Key",
+    "byokApiKeyEncrypted": "encrypted at rest",
+    "byokBaseUrlLabel": "Base URL",
+    "skillsHeading": "Agent Skills",
+    "skillsSubheading": "Choose what your agent can do",
+    "toolsHeading": "Agent Tools",
+    "toolsSubheading": "Choose what your agent can do",
+    "pluginsHeading": "Plugins",
+    "pluginsSubheading": "Choose what your agent can do",
+    "capabilitiesHeading": "Capabilities",
+    "capabilitiesSubheading": "Choose what your agent can do",
+    "templateSkillsHeading": "Included with this template",
+    "templateSkillsSubheading": "These ClawHub skills install automatically when your agent first starts.",
+    "systemPromptLabel": "System Prompt",
+    "systemPromptCustomNote": "Your custom instructions will replace the template default",
+    "systemPromptDefaultNote": "Your agent's personality is pre-configured. Customize if you want to change it.",
+    "systemPromptCustomize": "Customize",
+    "systemPromptUseDefault": "Use template default",
+    "systemPromptPlaceholder": "Write your custom system prompt here. This completely replaces the template default.",
+    "systemPromptHint": "Defines your agent's personality, capabilities, and rules",
+    "systemPromptCount": "{count}/8000",
+    "systemPromptWarning": "Consider adding a system prompt for better results",
+    "elizaBioLabel": "Bio",
+    "elizaBioHint": "Define your agent's personality and background. One statement per line.",
+    "elizaBioPlaceholder": "A knowledgeable AI assistant specializing in...",
+    "elizaLoreLabel": "Lore",
+    "elizaLoreHint": "Background knowledge and history for your agent. One fact per line.",
+    "elizaStyleLabel": "Style Instructions",
+    "elizaStyleHint": "How your agent should communicate. One instruction per line.",
+    "elizaTopicsLabel": "Topics",
+    "elizaTopicsPlaceholder": "technology, AI, crypto, research",
+    "elizaTopicsHint": "Comma-separated topics your agent knows about",
+    "elizaAdjectivesLabel": "Adjectives",
+    "elizaAdjectivesPlaceholder": "helpful, analytical, concise",
+    "elizaAdjectivesHint": "Personality traits, comma-separated",
+    "miladyPersonalityLabel": "Personality Preset",
+    "miladyPersonalityHint": "Choose a personality vibe for your Milady agent.",
+    "miladyPersonalityHelpful": "Helpful - Friendly and professional",
+    "miladyPersonalityTsundere": "Tsundere - Reluctant but secretly caring",
+    "miladyPersonalityUnhinged": "Unhinged - Chaotic and unpredictable",
+    "miladyPersonalityCustom": "Custom - Uses your system prompt",
+    "moreOptionsLabel": "More Options",
+    "moreOptionsHints": {
+      "openclaw": "Search, voice, sessions",
+      "hermes": "Personality, memory, approvals",
+      "elizaos": "Database, image gen, voice",
+      "milady": "Database, privacy, presets"
+    },
+    "sessionScopeLabel": "Session Scope",
+    "sessionScopeHint": "How conversation context is shared between users",
+    "sessionScopePerUser": "Per User",
+    "sessionScopeGlobal": "Global",
+    "webSearchLabel": "Enable Web Search",
+    "webSearchHint": "Allow your agent to search the web for real-time info",
+    "searchProviderLabel": "Search Provider",
+    "searchProviderHint": "Which search API to use",
+    "ttsLabel": "Enable Voice (TTS)",
+    "ttsHint": "Text-to-speech output for voice replies",
+    "ttsProviderLabel": "TTS Provider",
+    "ttsProviderHint": "Voice synthesis engine",
+    "hermesPersonalityLabel": "Personality",
+    "hermesPersonalityHint": "Conversation tone and style",
+    "hermesPersonalityDefault": "Default",
+    "hermesPersonalityHelpful": "Helpful",
+    "hermesPersonalityTechnical": "Technical",
+    "hermesPersonalityCreative": "Creative",
+    "hermesPersonalityConcise": "Concise",
+    "memoryLabel": "Enable Memory",
+    "memoryHint": "Persist context across conversations",
+    "approvalModeLabel": "Approval Mode",
+    "approvalModeHint": "How actions are authorized before execution",
+    "approvalModeAuto": "Auto",
+    "approvalModeAsk": "Ask Before Actions",
+    "approvalModeManual": "Manual",
+    "databaseLabel": "Database",
+    "databaseHint": "Storage backend for agent state and memory",
+    "databaseHintMilady": "Storage backend for agent state",
+    "imageGenLabel": "Enable Image Generation",
+    "imageGenHint": "Allow the agent to generate images",
+    "voiceLabel": "Enable Voice",
+    "voiceHint": "Speech-to-text and text-to-speech capabilities",
+    "localFirstLabel": "Local-First Mode",
+    "localFirstHint": "Process data locally before syncing",
+    "miladyPersonalitySelectedHint": "Selected above — controls agent tone",
+    "step5Heading": "Ready to launch?",
+    "step5Subheading": "Review your configuration before launching",
+    "summaryAgentType": "Agent Type",
+    "summaryTemplate": "Template",
+    "summaryTemplateCustom": "Custom",
+    "summaryAiModel": "AI Model",
+    "summaryDescription": "Description",
+    "summaryPlatforms": "Platforms",
+    "summaryPersonality": "Personality",
+    "summaryPersonalityDefault": "Template default",
+    "summaryPersonalityCustom": "Custom instructions",
+    "summaryCost": "Cost",
+    "summaryCostFree": "$0.00 — free tier",
+    "summaryCostByok": "$0.00 — using your own key",
+    "summaryFrameworkLabels": {
+      "openclaw": "Multi-skill assistant",
+      "hermes": "Autonomous agent",
+      "elizaos": "Multi-agent framework",
+      "milady": "Privacy-first runtime"
+    },
+    "testChatLabel": "Test Your Agent",
+    "testChatSubtext": "Preview how your agent will respond",
+    "testChatPreviewLabel": "Chat Preview",
+    "testChatSimulated": "This is a simulated preview. Deploy your agent for real conversations.",
+    "testChatEmpty": "Send a message to preview your agent",
+    "testChatEmptyHint": "Try \"Hello\" or \"What can you do?\"",
+    "testChatPlaceholder": "Type a message...",
+    "launchedHeading": "Your agent is alive!",
+    "launchedSubtext": "Redirecting to your agent's dashboard...",
+    "launchCtaLabel": "Launch your agent",
+    "launchCtaCreating": "Creating agent...",
+    "launchCtaCreated": "Agent created successfully",
+    "launchCta": "Launch My Agent!",
+    "launching": "Hatching...",
+    "launched": "Hatched!",
+    "frameworkFeatures": {
+      "openclaw": {
+        "desc": "Versatile AI assistant with thousands of community skills and multi-channel messaging.",
+        "f1": "Thousands of skills",
+        "f2": "Web browsing",
+        "f3": "Scheduled tasks"
+      },
+      "hermes": {
+        "desc": "Smart AI agent that remembers context across conversations and learns over time.",
+        "f1": "Long-term memory",
+        "f2": "40+ built-in tools",
+        "f3": "Self-improving"
+      },
+      "elizaos": {
+        "desc": "Open-source multi-agent framework by ai16z. 90+ plugins, persistent memory, Web3 native.",
+        "f1": "90+ plugins",
+        "f2": "Vector memory",
+        "f3": "Web3 native"
+      },
+      "milady": {
+        "desc": "Privacy-first AI runtime with 20+ connectors, VRM avatars, and DeFi integration.",
+        "f1": "20+ connectors",
+        "f2": "Personality presets",
+        "f3": "Privacy-first"
+      }
+    },
+    "skills": {
+      "webSearch": {
+        "name": "Web Search",
+        "desc": "Search the web for real-time info"
+      },
+      "calculator": {
+        "name": "Calculator",
+        "desc": "Math and calculations"
+      },
+      "weather": {
+        "name": "Weather",
+        "desc": "Weather forecasts"
+      },
+      "codeInterpreter": {
+        "name": "Code Runner",
+        "desc": "Execute code snippets"
+      },
+      "fileManager": {
+        "name": "File Manager",
+        "desc": "Read and write files"
+      },
+      "imageGen": {
+        "name": "Image Gen",
+        "desc": "Generate images from text"
+      }
+    },
+    "tools": {
+      "webSearch": {
+        "name": "Web Search",
+        "desc": "Search the internet for information"
+      },
+      "calculator": {
+        "name": "Calculator",
+        "desc": "Math calculations"
+      },
+      "codeExecution": {
+        "name": "Code Runner",
+        "desc": "Execute code snippets"
+      },
+      "fileOperations": {
+        "name": "File Operations",
+        "desc": "Read and write files"
+      },
+      "memory": {
+        "name": "Memory",
+        "desc": "Remember conversations and facts"
+      },
+      "summarize": {
+        "name": "Summarizer",
+        "desc": "Summarize long texts"
+      },
+      "translate": {
+        "name": "Translator",
+        "desc": "Translate between languages"
+      },
+      "weather": {
+        "name": "Weather",
+        "desc": "Weather forecasts"
+      }
+    },
+    "plugins": {
+      "database": {
+        "name": "Database",
+        "desc": "SQL database access"
+      },
+      "imageGen": {
+        "name": "Image Gen",
+        "desc": "Generate images"
+      },
+      "video": {
+        "name": "Video",
+        "desc": "Video processing"
+      },
+      "tts": {
+        "name": "Text-to-Speech",
+        "desc": "Voice output"
+      },
+      "nodeRuntime": {
+        "name": "Node Runtime",
+        "desc": "Server-side operations"
+      },
+      "bootstrap": {
+        "name": "Bootstrap",
+        "desc": "Core utilities"
+      }
+    },
+    "capabilities": {
+      "chat": {
+        "name": "Chat",
+        "desc": "Core conversation"
+      },
+      "defi": {
+        "name": "DeFi",
+        "desc": "DeFi protocol interactions"
+      },
+      "social": {
+        "name": "Social",
+        "desc": "Social media integration"
+      },
+      "analysis": {
+        "name": "Analysis",
+        "desc": "Data analysis"
+      },
+      "privacy": {
+        "name": "Privacy",
+        "desc": "Privacy tools"
+      },
+      "memes": {
+        "name": "Memes",
+        "desc": "Meme generation"
+      }
+    },
+    "platforms": {
+      "telegram": {
+        "desc": "Deploy as a Telegram bot",
+        "helperField": "Message @BotFather on Telegram → /newbot → copy the token"
+      },
+      "discord": {
+        "desc": "Deploy as a Discord bot",
+        "helperField": "Discord Developer Portal → New Application → Bot → Copy Token"
+      },
+      "whatsapp": {
+        "desc": "Connect via QR code",
+        "note": "QR pairing will be available after deployment"
+      },
+      "slack": {
+        "desc": "Deploy in Slack workspace",
+        "helperField": "Slack API → Create App → OAuth & Permissions → Bot Token"
+      },
+      "twitter": {
+        "desc": "Post, reply and engage on X"
+      }
+    },
+    "llmFreeSummary": "Free AI Model (Groq)",
+    "llmByokSummary": "Your key: {provider}{model}",
+    "errorHeading": "Creation Error",
+    "errorBody": "Something went wrong while setting up your agent. Your progress has not been lost.",
+    "errorIdLabel": "Error ID:",
+    "tryAgain": "Try Again",
+    "dashboard": "Dashboard"
   },
   "support": {
     "eyebrow": "Help",

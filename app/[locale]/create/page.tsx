@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { track } from '@/lib/analytics';
@@ -38,14 +39,6 @@ import {
 // ── Types ────────────────────────────────────────────────────
 
 type Step = 1 | 2 | 3 | 4 | 5;
-
-const STEP_LABELS: Record<Step, string> = {
-  1: 'Style',
-  2: 'Category',
-  3: 'Template',
-  4: 'Set Up',
-  5: 'Launch',
-};
 
 type LLMChoice = 'free_groq' | 'byok';
 
@@ -189,6 +182,14 @@ const cardClass = 'card glass-noise';
 // ── Main Component ───────────────────────────────────────────
 
 export default function CreatePage() {
+  const t = useTranslations('create');
+  const STEP_LABELS: Record<Step, string> = {
+    1: t('stepLabels.style'),
+    2: t('stepLabels.category'),
+    3: t('stepLabels.template'),
+    4: t('stepLabels.setUp'),
+    5: t('stepLabels.launch'),
+  };
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
@@ -379,9 +380,9 @@ export default function CreatePage() {
   }
 
   function getLLMSummary(): string {
-    if (llmChoice === 'free_groq') return 'Free AI Model (Groq)';
+    if (llmChoice === 'free_groq') return t('llmFreeSummary');
     const prov = getBYOKProvider(byokProvider);
-    return `Your key: ${prov?.name ?? byokProvider}${byokModel ? ` / ${byokModel}` : ''}`;
+    return t('llmByokSummary', { provider: prov?.name ?? byokProvider, model: byokModel ? ` / ${byokModel}` : '' });
   }
 
   // ── Test Chat ──
@@ -539,7 +540,7 @@ export default function CreatePage() {
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className={cn(cardClass, 'p-10 max-w-md w-full text-center')}>
           <Loader2 className="w-10 h-10 text-[var(--color-accent)] animate-spin mx-auto mb-4" />
-          <p className="text-[var(--text-secondary)] text-sm">Authenticating...</p>
+          <p className="text-[var(--text-secondary)] text-sm">{t('authLoading')}</p>
         </div>
       </div>
     );
@@ -557,10 +558,10 @@ export default function CreatePage() {
           <div className="w-16 h-16 rounded-2xl bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center mx-auto mb-6">
             <Key className="w-8 h-8 text-[var(--color-accent)]" />
           </div>
-          <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Create Your Agent</h1>
-          <p className="text-[var(--text-secondary)] text-sm mb-8">Sign in to your account to create and deploy AI agents.</p>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-3" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>{t('authRequired')}</h1>
+          <p className="text-[var(--text-secondary)] text-sm mb-8">{t('authRequiredBody')}</p>
           <Link href="/login" className="btn-primary inline-block">
-            Sign In
+            {t('signIn')}
           </Link>
         </div>
       </motion.div>
@@ -589,9 +590,9 @@ export default function CreatePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Create agent</p>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] mb-2" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>Create your agent</h1>
-          <p className="text-[var(--text-secondary)]">Launch a free AI agent in under 2 minutes.</p>
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('eyebrow')}</p>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)] mb-2" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>{t('heading')}</h1>
+          <p className="text-[var(--text-secondary)]">{t('subheading')}</p>
         </motion.div>
 
         {/* ── STEP INDICATOR ─────────────────────────────────────── */}
@@ -607,7 +608,7 @@ export default function CreatePage() {
               />
             </div>
           </div>
-          <div className="grid grid-cols-5 w-full px-1" role="list" aria-label="Creation steps">
+          <div className="grid grid-cols-5 w-full px-1" role="list" aria-label={t('stepsAriaLabel')}>
             {([1, 2, 3, 4, 5] as Step[]).map((s, i) => (
               <div key={s} className="flex items-center" role="listitem" aria-current={s === step ? 'step' : undefined}>
                 {/* Step circle + label */}
@@ -668,21 +669,17 @@ export default function CreatePage() {
               animate="center"
               exit="exit"
             >
-              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2">What kind of agent do you want?</h2>
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2">{t('step1Heading')}</h2>
               <p className="text-[var(--text-secondary)] text-sm mb-8">
-                Each framework has different strengths — pick the one that fits.
+                {t('step1Subheading')}
               </p>
 
-              {/* Framework cards — unified editorial style, single cyan
-                  accent for the selected state. Was a 4-way color grid
-                  (amber/purple/cyan/rose) which shouted "generic SaaS
-                  grid"; now the choice itself is the visual signal. */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
                 {([
-                  { key: 'openclaw', name: 'OpenClaw', icon: Cpu, desc: 'Versatile AI assistant with thousands of community skills and multi-channel messaging.', features: ['Thousands of skills', 'Web browsing', 'Scheduled tasks'] },
-                  { key: 'hermes', name: 'Hermes', icon: Zap, desc: 'Smart AI agent that remembers context across conversations and learns over time.', features: ['Long-term memory', '40+ built-in tools', 'Self-improving'] },
-                  { key: 'elizaos', name: 'ElizaOS', icon: Bot, desc: 'Open-source multi-agent framework by ai16z. 90+ plugins, persistent memory, Web3 native.', features: ['90+ plugins', 'Vector memory', 'Web3 native'] },
-                  { key: 'milady', name: 'Milady', icon: Gem, desc: 'Privacy-first AI runtime with 20+ connectors, VRM avatars, and DeFi integration.', features: ['20+ connectors', 'Personality presets', 'Privacy-first'] },
+                  { key: 'openclaw', name: 'OpenClaw', icon: Cpu, descKey: 'frameworkFeatures.openclaw.desc', features: ['frameworkFeatures.openclaw.f1', 'frameworkFeatures.openclaw.f2', 'frameworkFeatures.openclaw.f3'] },
+                  { key: 'hermes', name: 'Hermes', icon: Zap, descKey: 'frameworkFeatures.hermes.desc', features: ['frameworkFeatures.hermes.f1', 'frameworkFeatures.hermes.f2', 'frameworkFeatures.hermes.f3'] },
+                  { key: 'elizaos', name: 'ElizaOS', icon: Bot, descKey: 'frameworkFeatures.elizaos.desc', features: ['frameworkFeatures.elizaos.f1', 'frameworkFeatures.elizaos.f2', 'frameworkFeatures.elizaos.f3'] },
+                  { key: 'milady', name: 'Milady', icon: Gem, descKey: 'frameworkFeatures.milady.desc', features: ['frameworkFeatures.milady.f1', 'frameworkFeatures.milady.f2', 'frameworkFeatures.milady.f3'] },
                 ] as const).map((fw) => {
                   const selected = selectedFramework === fw.key;
                   return (
@@ -705,8 +702,8 @@ export default function CreatePage() {
                       )}
                       <fw.icon className={cn('w-5 h-5 mb-4 transition-colors', selected ? 'text-[var(--color-accent)]' : 'text-[var(--text-muted)]')} strokeWidth={1.75} />
                       <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-1.5">{fw.name}</h3>
-                      <p className="text-sm text-[var(--text-secondary)] mb-4 leading-relaxed">{fw.desc}</p>
-                      <p className="text-xs text-[var(--text-muted)]">{fw.features.join(' · ')}</p>
+                      <p className="text-sm text-[var(--text-secondary)] mb-4 leading-relaxed">{t(fw.descKey)}</p>
+                      <p className="text-xs text-[var(--text-muted)]">{fw.features.map(k => t(k)).join(' · ')}</p>
                     </motion.button>
                   );
                 })}
@@ -714,7 +711,7 @@ export default function CreatePage() {
 
               <div className="mt-8 flex justify-end">
                 <button className="btn-primary" onClick={() => { setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-                  Continue
+                  {t('continue')}
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -724,9 +721,9 @@ export default function CreatePage() {
           {/* ── STEP 2: CATEGORY ───────────────────────────────────── */}
           {step === 2 && (
             <motion.div key="step2" variants={stepVariants} initial="enter" animate="center" exit="exit">
-              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">What type of agent?</h2>
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">{t('step2Heading')}</h2>
               <p className="text-[var(--text-muted)] text-sm mb-6 text-center">
-                Choose a category — we&apos;ll show you the best templates
+                {t('step2Subheading')}
               </p>
 
               {/* Search bar */}
@@ -735,14 +732,14 @@ export default function CreatePage() {
                 <input
                   type="text"
                   className="input pl-9 pr-9 w-full"
-                  placeholder="Search 200+ templates..."
+                  placeholder={t('searchTemplates')}
                   value={templateSearch}
                   onChange={e => setTemplateSearch(e.target.value)}
                 />
                 {templateSearch && (
                   <button
                     type="button"
-                    aria-label="Clear search"
+                    aria-label={t('clearSearch')}
                     onClick={() => setTemplateSearch('')}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
                   >
@@ -790,13 +787,13 @@ export default function CreatePage() {
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
                     <Search className="w-8 h-8 text-[var(--text-muted)] mb-3 opacity-40" />
-                    <p className="text-sm text-[var(--text-muted)]">No templates found for &ldquo;{templateSearch}&rdquo;</p>
+                    <p className="text-sm text-[var(--text-muted)]">{t('noTemplatesFound', { query: templateSearch })}</p>
                     <button
                       type="button"
                       className="mt-3 text-xs text-[var(--accent-400)] hover:underline"
                       onClick={() => setTemplateSearch('')}
                     >
-                      Clear search
+                      {t('clearSearchLink')}
                     </button>
                   </div>
                 )
@@ -838,7 +835,7 @@ export default function CreatePage() {
                         )}
                         <div className="text-2xl mb-2.5 leading-none">{icon}</div>
                         <div className="text-sm font-semibold leading-tight text-[var(--text-primary)] mb-0.5">{label}</div>
-                        <div className="text-[11px] text-[var(--text-muted)]">{count} templates</div>
+                        <div className="text-[11px] text-[var(--text-muted)]">{t('categoryCount', { count })}</div>
                       </motion.button>
                     );
                   })}
@@ -861,8 +858,8 @@ export default function CreatePage() {
                     ⚙️
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold">Custom Agent</div>
-                    <div className="text-xs text-[var(--text-muted)] mt-0.5">Start from scratch with your own system prompt</div>
+                    <div className="text-sm font-semibold">{t('customAgent')}</div>
+                    <div className="text-xs text-[var(--text-muted)] mt-0.5">{t('customAgentDesc')}</div>
                   </div>
                   {selectedTemplate === 'custom' && (
                     <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center flex-shrink-0">
@@ -875,7 +872,7 @@ export default function CreatePage() {
               <div className="mt-6 flex justify-between">
                 <button className="btn-secondary" onClick={() => { setStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                   <ChevronLeft className="w-4 h-4" />
-                  Back
+                  {t('back')}
                 </button>
                 <button
                   className="btn-primary"
@@ -889,7 +886,7 @@ export default function CreatePage() {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
                 >
-                  Continue
+                  {t('continue')}
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -903,7 +900,7 @@ export default function CreatePage() {
                 {selectedCategory.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
               </h2>
               <p className="text-[var(--text-muted)] text-sm mb-6 text-center">
-                Pick a template — you can customize everything in the next step
+                {t('step3Subheading')}
               </p>
 
               <motion.div
@@ -942,13 +939,13 @@ export default function CreatePage() {
               <div className="mt-6 flex justify-between">
                 <button className="btn-secondary" onClick={() => { setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                   <ChevronLeft className="w-4 h-4" />
-                  Back
+                  {t('back')}
                 </button>
                 <button
                   className="btn-primary"
                   onClick={() => { applyTemplate(); setStep(4); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 >
-                  Continue
+                  {t('continue')}
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -964,9 +961,9 @@ export default function CreatePage() {
               animate="center"
               exit="exit"
             >
-              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">Personalize your agent</h2>
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">{t('step4Heading')}</h2>
               <p className="text-[var(--text-muted)] text-sm mb-8 text-center">
-                Give your agent a name and choose how it thinks
+                {t('step4Subheading')}
               </p>
 
               <div className={cn(cardClass, 'p-6 sm:p-8 space-y-6')}>
@@ -974,7 +971,7 @@ export default function CreatePage() {
                 <div>
                   <label htmlFor="agent-name" className="flex items-center gap-2 text-sm font-medium text-[var(--text-primary)] mb-2">
                     <Bot className="w-4 h-4 text-[var(--accent-400)]" aria-hidden="true" />
-                    Agent Name <span className="text-[var(--accent-600)]" aria-hidden="true">*</span>
+                    {t('agentNameLabel')} <span className="text-[var(--accent-600)]" aria-hidden="true">*</span>
                     <span className="sr-only">(required)</span>
                   </label>
                   <input
@@ -984,7 +981,7 @@ export default function CreatePage() {
                       'input',
                       openclawForm.name.length > 0 && !nameValid && 'border-[#F87171]/50 focus:border-[#F87171]/70 focus:ring-[#F87171]/20',
                     )}
-                    placeholder="e.g. AlphaResearcher, TweetLord..."
+                    placeholder={t('agentNamePlaceholder')}
                     value={openclawForm.name}
                     onChange={(e) => setOpenclawForm((p) => ({ ...p, name: e.target.value }))}
                     minLength={3}
@@ -1002,30 +999,30 @@ export default function CreatePage() {
                       : 'text-[var(--text-muted)]'
                   )}>
                     {openclawForm.name.length > 0 && openclawForm.name.trim().length < 3
-                      ? 'Name must be at least 3 characters'
+                      ? t('agentNameTooShort')
                       : openclawForm.name.trim().length > 0 && !/^[a-zA-Z0-9 \-:'.()&]+$/.test(openclawForm.name.trim())
-                        ? 'Only letters, numbers, spaces, hyphens, colons, apostrophes allowed'
-                        : `${openclawForm.name.trim().length}/50 characters`}
+                        ? t('agentNameInvalidChars')
+                        : t('agentNameHintCount', { count: openclawForm.name.trim().length })}
                   </p>
                 </div>
 
                 {/* Description */}
                 <div>
                   <label htmlFor="agent-description" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                    Description
+                    {t('descriptionLabel')}
                   </label>
                   <textarea
                     id="agent-description"
                     className="input resize-none"
                     rows={2}
-                    placeholder="Brief description of what your agent does..."
+                    placeholder={t('descriptionPlaceholder')}
                     value={openclawForm.description}
                     onChange={(e) => setOpenclawForm((p) => ({ ...p, description: e.target.value }))}
                     maxLength={140}
                     aria-describedby="agent-desc-hint"
                   />
                   <div className="flex items-center justify-between mt-1">
-                    <p id="agent-desc-hint" className="text-xs text-[var(--text-muted)]">Brief tagline for your agent</p>
+                    <p id="agent-desc-hint" className="text-xs text-[var(--text-muted)]">{t('descriptionHint')}</p>
                     <span className="text-xs text-[var(--text-muted)]">{openclawForm.description.length}/140</span>
                   </div>
                 </div>
@@ -1035,10 +1032,10 @@ export default function CreatePage() {
                   <div className="mb-4">
                     <h3 className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-2">
                       <Rocket className="w-4 h-4 text-[var(--accent-400)]" />
-                      Where should your agent live?
+                      {t('platformsHeading')}
                     </h3>
                     <p className="text-xs text-[var(--text-muted)] mt-1">
-                      Select platforms and add your API keys. You can add more later in Settings.
+                      {t('platformsSubheading')}
                     </p>
                   </div>
 
@@ -1125,7 +1122,7 @@ export default function CreatePage() {
                                               type="button"
                                               onClick={() => setPlatformSecretVisibility(prev => ({ ...prev, [fieldVisKey]: !prev[fieldVisKey] }))}
                                               className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-[var(--bg-hover)] transition-colors"
-                                              aria-label={isVisible ? 'Hide value' : 'Show value'}
+                                              aria-label={isVisible ? t('hideValue') : t('showValue')}
                                             >
                                               {isVisible ? <EyeOff size={14} className="text-[var(--text-muted)]" /> : <Eye size={14} className="text-[var(--text-muted)]" />}
                                             </button>
@@ -1154,16 +1151,16 @@ export default function CreatePage() {
                   </div>
 
                   <p className="text-[11px] text-[var(--text-muted)] mt-3 text-center opacity-70">
-                    No platforms selected? No problem -- add them anytime from your agent&apos;s Settings tab.
+                    {t('noPlatformsNote')}
                   </p>
                 </div>
 
                 {/* LLM Choice */}
                 <fieldset>
                   <legend className="block text-sm font-medium text-[var(--text-primary)] mb-3">
-                    AI Model
+                    {t('llmModelLabel')}
                   </legend>
-                  <div className="space-y-3" role="radiogroup" aria-label="AI Model selection">
+                  <div className="space-y-3" role="radiogroup" aria-label={t('llmModelAria')}>
                     {/* Free Groq */}
                     <motion.button
                       whileHover={{ scale: 1.01 }}
@@ -1182,12 +1179,12 @@ export default function CreatePage() {
                         </div>
                         <div>
                           <div className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-2">
-                            Free AI Model
+                            {t('llmFreeLabel')}
                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
-                              FREE
+                              {t('llmFreeTag')}
                             </span>
                           </div>
-                          <div className="text-xs text-[var(--text-muted)] mt-0.5">Powered by Groq — no API key needed</div>
+                          <div className="text-xs text-[var(--text-muted)] mt-0.5">{t('llmFreeSubtext')}</div>
                         </div>
                       </div>
                     </motion.button>
@@ -1211,10 +1208,10 @@ export default function CreatePage() {
                           </div>
                           <div>
                             <div className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-2">
-                              Use Your Own AI Key
-                              <span className="text-[10px] text-green-400">always free</span>
+                              {t('llmByokLabel')}
+                              <span className="text-[10px] text-green-400">{t('llmByokTag')}</span>
                             </div>
-                            <div className="text-xs text-[var(--text-muted)] mt-0.5">Connect your own OpenAI, Anthropic, or other API key</div>
+                            <div className="text-xs text-[var(--text-muted)] mt-0.5">{t('llmByokSubtext')}</div>
                           </div>
                         </div>
                       </button>
@@ -1231,7 +1228,7 @@ export default function CreatePage() {
                             <div className="px-4 pb-4 space-y-4 border-t border-[var(--border-default)] pt-4">
                               {/* Provider */}
                               <div>
-                                <label className="block text-xs text-[var(--text-secondary)] mb-2 uppercase tracking-wider">Provider</label>
+                                <label className="block text-xs text-[var(--text-secondary)] mb-2 uppercase tracking-wider">{t('byokProviderLabel')}</label>
                                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                                   {BYOK_PROVIDERS.map((p) => (
                                     <motion.button
@@ -1263,7 +1260,7 @@ export default function CreatePage() {
                               {/* Model */}
                               <div>
                                 <label htmlFor="byok-model" className="block text-xs text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
-                                  Model
+                                  {t('byokModelLabel')}
                                 </label>
                                 {byokCustomModel ? (
                                   <div className="space-y-2">
@@ -1271,7 +1268,7 @@ export default function CreatePage() {
                                       id="byok-model"
                                       type="text"
                                       className="input"
-                                      placeholder="model identifier..."
+                                      placeholder={t('byokModelPlaceholder')}
                                       value={byokModel}
                                       onChange={(e) => setByokModel(e.target.value)}
                                       maxLength={100}
@@ -1281,7 +1278,7 @@ export default function CreatePage() {
                                       onClick={() => { setByokCustomModel(false); setByokModel(''); }}
                                       className="text-[11px] text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors"
                                     >
-                                      Back to model list
+                                      {t('byokBackToList')}
                                     </button>
                                   </div>
                                 ) : (
@@ -1299,13 +1296,13 @@ export default function CreatePage() {
                                         }
                                       }}
                                     >
-                                      <option value="" style={{ background: 'var(--bg-base)' }}>Select a model...</option>
+                                      <option value="" style={{ background: 'var(--bg-base)' }}>{t('byokSelectModel')}</option>
                                       {(getBYOKProvider(byokProvider)?.models ?? []).map((m) => (
                                         <option key={m.id} value={m.id} style={{ background: 'var(--bg-base)' }}>
                                           {m.name}{m.context ? ` (${m.context})` : ''}
                                         </option>
                                       ))}
-                                      <option value="__custom__" style={{ background: 'var(--bg-base)' }}>Custom model...</option>
+                                      <option value="__custom__" style={{ background: 'var(--bg-base)' }}>{t('byokCustomModel')}</option>
                                     </select>
                                     <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                                   </div>
@@ -1316,7 +1313,7 @@ export default function CreatePage() {
                               {(getBYOKProvider(byokProvider)?.requiresApiKey ?? true) && (
                                 <div>
                                   <label htmlFor="byok-api-key" className="block text-xs text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
-                                    API Key <span className="normal-case text-[var(--text-muted)] ml-1">encrypted at rest</span>
+                                    {t('byokApiKeyLabel')} <span className="normal-case text-[var(--text-muted)] ml-1">{t('byokApiKeyEncrypted')}</span>
                                   </label>
                                   <input
                                     id="byok-api-key"
@@ -1334,7 +1331,7 @@ export default function CreatePage() {
                               {(getBYOKProvider(byokProvider)?.requiresBaseUrl ?? false) && (
                                 <div>
                                   <label htmlFor="byok-base-url" className="block text-xs text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
-                                    Base URL
+                                    {t('byokBaseUrlLabel')}
                                   </label>
                                   <input
                                     id="byok-base-url"
@@ -1360,17 +1357,17 @@ export default function CreatePage() {
                 {selectedFramework === 'openclaw' && (
                   <fieldset>
                     <legend className="block text-sm font-medium text-[var(--text-primary)] mb-1">
-                      Agent Skills
+                      {t('skillsHeading')}
                     </legend>
-                    <p className="text-xs text-[var(--text-muted)] mb-4">Choose what your agent can do</p>
+                    <p className="text-xs text-[var(--text-muted)] mb-4">{t('skillsSubheading')}</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {([
-                        { id: 'web_search', emoji: '\uD83D\uDD0D', name: 'Web Search', desc: 'Search the web for real-time info' },
-                        { id: 'calculator', emoji: '\uD83E\uDDEE', name: 'Calculator', desc: 'Math and calculations' },
-                        { id: 'weather', emoji: '\uD83C\uDF24\uFE0F', name: 'Weather', desc: 'Weather forecasts' },
-                        { id: 'code_interpreter', emoji: '\uD83D\uDCBB', name: 'Code Runner', desc: 'Execute code snippets' },
-                        { id: 'file_manager', emoji: '\uD83D\uDCC1', name: 'File Manager', desc: 'Read and write files' },
-                        { id: 'image_gen', emoji: '\uD83C\uDFA8', name: 'Image Gen', desc: 'Generate images from text' },
+                        { id: 'web_search', emoji: '\uD83D\uDD0D', nameKey: 'skills.webSearch.name', descKey: 'skills.webSearch.desc' },
+                        { id: 'calculator', emoji: '\uD83E\uDDEE', nameKey: 'skills.calculator.name', descKey: 'skills.calculator.desc' },
+                        { id: 'weather', emoji: '\uD83C\uDF24\uFE0F', nameKey: 'skills.weather.name', descKey: 'skills.weather.desc' },
+                        { id: 'code_interpreter', emoji: '\uD83D\uDCBB', nameKey: 'skills.codeInterpreter.name', descKey: 'skills.codeInterpreter.desc' },
+                        { id: 'file_manager', emoji: '\uD83D\uDCC1', nameKey: 'skills.fileManager.name', descKey: 'skills.fileManager.desc' },
+                        { id: 'image_gen', emoji: '\uD83C\uDFA8', nameKey: 'skills.imageGen.name', descKey: 'skills.imageGen.desc' },
                       ] as const).map((skill) => {
                         const selected = openclawSkills.includes(skill.id);
                         return (
@@ -1397,8 +1394,8 @@ export default function CreatePage() {
                               </motion.div>
                             )}
                             <span className="text-xl mb-2 block">{skill.emoji}</span>
-                            <div className="text-sm font-medium text-[var(--text-primary)]">{skill.name}</div>
-                            <div className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-snug">{skill.desc}</div>
+                            <div className="text-sm font-medium text-[var(--text-primary)]">{t(skill.nameKey)}</div>
+                            <div className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-snug">{t(skill.descKey)}</div>
                           </motion.button>
                         );
                       })}
@@ -1410,19 +1407,19 @@ export default function CreatePage() {
                 {selectedFramework === 'hermes' && (
                   <fieldset>
                     <legend className="block text-sm font-medium text-[var(--text-primary)] mb-1">
-                      Agent Tools
+                      {t('toolsHeading')}
                     </legend>
-                    <p className="text-xs text-[var(--text-muted)] mb-4">Choose what your agent can do</p>
+                    <p className="text-xs text-[var(--text-muted)] mb-4">{t('toolsSubheading')}</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {([
-                        { id: 'web_search', emoji: '\uD83D\uDD0D', name: 'Web Search', desc: 'Search the internet for information' },
-                        { id: 'calculator', emoji: '\uD83E\uDDEE', name: 'Calculator', desc: 'Math calculations' },
-                        { id: 'code_execution', emoji: '\uD83D\uDCBB', name: 'Code Runner', desc: 'Execute code snippets' },
-                        { id: 'file_operations', emoji: '\uD83D\uDCC1', name: 'File Operations', desc: 'Read and write files' },
-                        { id: 'memory', emoji: '\uD83E\uDDE0', name: 'Memory', desc: 'Remember conversations and facts' },
-                        { id: 'summarize', emoji: '\uD83D\uDCDD', name: 'Summarizer', desc: 'Summarize long texts' },
-                        { id: 'translate', emoji: '\uD83C\uDF10', name: 'Translator', desc: 'Translate between languages' },
-                        { id: 'weather', emoji: '\uD83C\uDF24\uFE0F', name: 'Weather', desc: 'Weather forecasts' },
+                        { id: 'web_search', emoji: '\uD83D\uDD0D', nameKey: 'tools.webSearch.name', descKey: 'tools.webSearch.desc' },
+                        { id: 'calculator', emoji: '\uD83E\uDDEE', nameKey: 'tools.calculator.name', descKey: 'tools.calculator.desc' },
+                        { id: 'code_execution', emoji: '\uD83D\uDCBB', nameKey: 'tools.codeExecution.name', descKey: 'tools.codeExecution.desc' },
+                        { id: 'file_operations', emoji: '\uD83D\uDCC1', nameKey: 'tools.fileOperations.name', descKey: 'tools.fileOperations.desc' },
+                        { id: 'memory', emoji: '\uD83E\uDDE0', nameKey: 'tools.memory.name', descKey: 'tools.memory.desc' },
+                        { id: 'summarize', emoji: '\uD83D\uDCDD', nameKey: 'tools.summarize.name', descKey: 'tools.summarize.desc' },
+                        { id: 'translate', emoji: '\uD83C\uDF10', nameKey: 'tools.translate.name', descKey: 'tools.translate.desc' },
+                        { id: 'weather', emoji: '\uD83C\uDF24\uFE0F', nameKey: 'tools.weather.name', descKey: 'tools.weather.desc' },
                       ] as const).map((tool) => {
                         const selected = hermesTools.includes(tool.id);
                         return (
@@ -1449,8 +1446,8 @@ export default function CreatePage() {
                               </motion.div>
                             )}
                             <span className="text-xl mb-2 block">{tool.emoji}</span>
-                            <div className="text-sm font-medium text-[var(--text-primary)]">{tool.name}</div>
-                            <div className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-snug">{tool.desc}</div>
+                            <div className="text-sm font-medium text-[var(--text-primary)]">{t(tool.nameKey)}</div>
+                            <div className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-snug">{t(tool.descKey)}</div>
                           </motion.button>
                         );
                       })}
@@ -1462,17 +1459,17 @@ export default function CreatePage() {
                 {selectedFramework === 'elizaos' && (
                   <fieldset>
                     <legend className="block text-sm font-medium text-[var(--text-primary)] mb-1">
-                      Plugins
+                      {t('pluginsHeading')}
                     </legend>
-                    <p className="text-xs text-[var(--text-muted)] mb-4">Choose what your agent can do</p>
+                    <p className="text-xs text-[var(--text-muted)] mb-4">{t('pluginsSubheading')}</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {([
-                        { id: '@elizaos/plugin-sql', emoji: '\uD83D\uDDC3\uFE0F', name: 'Database', desc: 'SQL database access' },
-                        { id: '@elizaos/plugin-image', emoji: '\uD83C\uDFA8', name: 'Image Gen', desc: 'Generate images' },
-                        { id: '@elizaos/plugin-video', emoji: '\uD83C\uDFAC', name: 'Video', desc: 'Video processing' },
-                        { id: '@elizaos/plugin-tts', emoji: '\uD83D\uDD0A', name: 'Text-to-Speech', desc: 'Voice output' },
-                        { id: '@elizaos/plugin-node', emoji: '\u2699\uFE0F', name: 'Node Runtime', desc: 'Server-side operations' },
-                        { id: '@elizaos/plugin-bootstrap', emoji: '\uD83D\uDE80', name: 'Bootstrap', desc: 'Core utilities' },
+                        { id: '@elizaos/plugin-sql', emoji: '\uD83D\uDDC3\uFE0F', nameKey: 'plugins.database.name', descKey: 'plugins.database.desc' },
+                        { id: '@elizaos/plugin-image', emoji: '\uD83C\uDFA8', nameKey: 'plugins.imageGen.name', descKey: 'plugins.imageGen.desc' },
+                        { id: '@elizaos/plugin-video', emoji: '\uD83C\uDFAC', nameKey: 'plugins.video.name', descKey: 'plugins.video.desc' },
+                        { id: '@elizaos/plugin-tts', emoji: '\uD83D\uDD0A', nameKey: 'plugins.tts.name', descKey: 'plugins.tts.desc' },
+                        { id: '@elizaos/plugin-node', emoji: '\u2699\uFE0F', nameKey: 'plugins.nodeRuntime.name', descKey: 'plugins.nodeRuntime.desc' },
+                        { id: '@elizaos/plugin-bootstrap', emoji: '\uD83D\uDE80', nameKey: 'plugins.bootstrap.name', descKey: 'plugins.bootstrap.desc' },
                       ] as const).map((plugin) => {
                         const selected = elizaPlugins.includes(plugin.id);
                         return (
@@ -1499,8 +1496,8 @@ export default function CreatePage() {
                               </motion.div>
                             )}
                             <span className="text-xl mb-2 block">{plugin.emoji}</span>
-                            <div className="text-sm font-medium text-[var(--text-primary)]">{plugin.name}</div>
-                            <div className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-snug">{plugin.desc}</div>
+                            <div className="text-sm font-medium text-[var(--text-primary)]">{t(plugin.nameKey)}</div>
+                            <div className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-snug">{t(plugin.descKey)}</div>
                           </motion.button>
                         );
                       })}
@@ -1512,17 +1509,17 @@ export default function CreatePage() {
                 {selectedFramework === 'milady' && (
                   <fieldset>
                     <legend className="block text-sm font-medium text-[var(--text-primary)] mb-1">
-                      Capabilities
+                      {t('capabilitiesHeading')}
                     </legend>
-                    <p className="text-xs text-[var(--text-muted)] mb-4">Choose what your agent can do</p>
+                    <p className="text-xs text-[var(--text-muted)] mb-4">{t('capabilitiesSubheading')}</p>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {([
-                        { id: 'chat', emoji: '\uD83D\uDCAC', name: 'Chat', desc: 'Core conversation' },
-                        { id: 'defi', emoji: '\uD83D\uDCB0', name: 'DeFi', desc: 'DeFi protocol interactions' },
-                        { id: 'social', emoji: '\uD83D\uDCF1', name: 'Social', desc: 'Social media integration' },
-                        { id: 'analysis', emoji: '\uD83D\uDCCA', name: 'Analysis', desc: 'Data analysis' },
-                        { id: 'privacy', emoji: '\uD83D\uDD12', name: 'Privacy', desc: 'Privacy tools' },
-                        { id: 'memes', emoji: '\uD83C\uDFAD', name: 'Memes', desc: 'Meme generation' },
+                        { id: 'chat', emoji: '\uD83D\uDCAC', nameKey: 'capabilities.chat.name', descKey: 'capabilities.chat.desc' },
+                        { id: 'defi', emoji: '\uD83D\uDCB0', nameKey: 'capabilities.defi.name', descKey: 'capabilities.defi.desc' },
+                        { id: 'social', emoji: '\uD83D\uDCF1', nameKey: 'capabilities.social.name', descKey: 'capabilities.social.desc' },
+                        { id: 'analysis', emoji: '\uD83D\uDCCA', nameKey: 'capabilities.analysis.name', descKey: 'capabilities.analysis.desc' },
+                        { id: 'privacy', emoji: '\uD83D\uDD12', nameKey: 'capabilities.privacy.name', descKey: 'capabilities.privacy.desc' },
+                        { id: 'memes', emoji: '\uD83C\uDFAD', nameKey: 'capabilities.memes.name', descKey: 'capabilities.memes.desc' },
                       ] as const).map((cap) => {
                         const selected = miladyCapabilities.includes(cap.id);
                         return (
@@ -1549,8 +1546,8 @@ export default function CreatePage() {
                               </motion.div>
                             )}
                             <span className="text-xl mb-2 block">{cap.emoji}</span>
-                            <div className="text-sm font-medium text-[var(--text-primary)]">{cap.name}</div>
-                            <div className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-snug">{cap.desc}</div>
+                            <div className="text-sm font-medium text-[var(--text-primary)]">{t(cap.nameKey)}</div>
+                            <div className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-snug">{t(cap.descKey)}</div>
                           </motion.button>
                         );
                       })}
@@ -1567,10 +1564,10 @@ export default function CreatePage() {
                     <div className="rounded-xl border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5 p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <Sparkles size={14} className="text-[var(--color-accent)] flex-shrink-0" />
-                        <span className="text-sm font-medium text-[var(--text-primary)]">Included with this template</span>
+                        <span className="text-sm font-medium text-[var(--text-primary)]">{t('templateSkillsHeading')}</span>
                       </div>
                       <p className="text-xs text-[var(--text-muted)] mb-3">
-                        These ClawHub skills install automatically when your agent first starts.
+                        {t('templateSkillsSubheading')}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {recSkills.map(slug => (
@@ -1602,14 +1599,14 @@ export default function CreatePage() {
                   <>
                     <div>
                       <label htmlFor="eliza-bio" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                        Bio
+                        {t('elizaBioLabel')}
                       </label>
-                      <p className="text-xs text-[var(--text-muted)] mb-2">Define your agent&apos;s personality and background. One statement per line.</p>
+                      <p className="text-xs text-[var(--text-muted)] mb-2">{t('elizaBioHint')}</p>
                       <textarea
                         id="eliza-bio"
                         className="input resize-none"
                         rows={4}
-                        placeholder="A knowledgeable AI assistant specializing in..."
+                        placeholder={t('elizaBioPlaceholder')}
                         value={elizaBio}
                         onChange={(e) => setElizaBio(e.target.value)}
                         maxLength={2000}
@@ -1617,9 +1614,9 @@ export default function CreatePage() {
                     </div>
                     <div>
                       <label htmlFor="eliza-lore" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                        Lore
+                        {t('elizaLoreLabel')}
                       </label>
-                      <p className="text-xs text-[var(--text-muted)] mb-2">Background knowledge and history for your agent. One fact per line.</p>
+                      <p className="text-xs text-[var(--text-muted)] mb-2">{t('elizaLoreHint')}</p>
                       <textarea
                         id="eliza-lore"
                         className="input resize-none"
@@ -1632,9 +1629,9 @@ export default function CreatePage() {
                     </div>
                     <div>
                       <label htmlFor="eliza-style" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                        Style Instructions
+                        {t('elizaStyleLabel')}
                       </label>
-                      <p className="text-xs text-[var(--text-muted)] mb-2">How your agent should communicate. One instruction per line.</p>
+                      <p className="text-xs text-[var(--text-muted)] mb-2">{t('elizaStyleHint')}</p>
                       <textarea
                         id="eliza-style"
                         className="input resize-none"
@@ -1647,33 +1644,33 @@ export default function CreatePage() {
                     </div>
                     <div>
                       <label htmlFor="eliza-topics" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                        Topics
+                        {t('elizaTopicsLabel')}
                       </label>
                       <input
                         id="eliza-topics"
                         type="text"
                         className="input"
-                        placeholder="technology, AI, crypto, research"
+                        placeholder={t('elizaTopicsPlaceholder')}
                         value={elizaTopics}
                         onChange={(e) => setElizaTopics(e.target.value)}
                         maxLength={500}
                       />
-                      <p className="text-xs text-[var(--text-muted)] mt-1">Comma-separated topics your agent knows about</p>
+                      <p className="text-xs text-[var(--text-muted)] mt-1">{t('elizaTopicsHint')}</p>
                     </div>
                     <div>
                       <label htmlFor="eliza-adjectives" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                        Adjectives
+                        {t('elizaAdjectivesLabel')}
                       </label>
                       <input
                         id="eliza-adjectives"
                         type="text"
                         className="input"
-                        placeholder="helpful, analytical, concise"
+                        placeholder={t('elizaAdjectivesPlaceholder')}
                         value={elizaAdjectives}
                         onChange={(e) => setElizaAdjectives(e.target.value)}
                         maxLength={500}
                       />
-                      <p className="text-xs text-[var(--text-muted)] mt-1">Personality traits, comma-separated</p>
+                      <p className="text-xs text-[var(--text-muted)] mt-1">{t('elizaAdjectivesHint')}</p>
                     </div>
                   </>
                 )}
@@ -1682,19 +1679,19 @@ export default function CreatePage() {
                 {selectedFramework === 'milady' && (
                   <div>
                     <label htmlFor="milady-personality" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                      Personality Preset
+                      {t('miladyPersonalityLabel')}
                     </label>
-                    <p className="text-xs text-[var(--text-muted)] mb-2">Choose a personality vibe for your Milady agent.</p>
+                    <p className="text-xs text-[var(--text-muted)] mb-2">{t('miladyPersonalityHint')}</p>
                     <select
                       id="milady-personality"
                       className="input"
                       value={miladyPersonality}
                       onChange={(e) => setMiladyPersonality(e.target.value as typeof miladyPersonality)}
                     >
-                      <option value="helpful">Helpful - Friendly and professional</option>
-                      <option value="tsundere">Tsundere - Reluctant but secretly caring</option>
-                      <option value="unhinged">Unhinged - Chaotic and unpredictable</option>
-                      <option value="custom">Custom - Uses your system prompt</option>
+                      <option value="helpful">{t('miladyPersonalityHelpful')}</option>
+                      <option value="tsundere">{t('miladyPersonalityTsundere')}</option>
+                      <option value="unhinged">{t('miladyPersonalityUnhinged')}</option>
+                      <option value="custom">{t('miladyPersonalityCustom')}</option>
                     </select>
                   </div>
                 )}
@@ -1708,12 +1705,12 @@ export default function CreatePage() {
                   >
                     <div className="flex items-center gap-2">
                       <Settings2 className="w-4 h-4 text-[var(--accent-400)]" />
-                      <span className="text-sm font-medium text-[var(--text-primary)]">More Options</span>
+                      <span className="text-sm font-medium text-[var(--text-primary)]">{t('moreOptionsLabel')}</span>
                       <span className="text-xs text-[var(--text-muted)]">
-                        {selectedFramework === 'openclaw' ? 'Search, voice, sessions' :
-                         selectedFramework === 'hermes' ? 'Personality, memory, approvals' :
-                         selectedFramework === 'elizaos' ? 'Database, image gen, voice' :
-                         'Database, privacy, presets'}
+                        {selectedFramework === 'openclaw' ? t('moreOptionsHints.openclaw') :
+                         selectedFramework === 'hermes' ? t('moreOptionsHints.hermes') :
+                         selectedFramework === 'elizaos' ? t('moreOptionsHints.elizaos') :
+                         t('moreOptionsHints.milady')}
                       </span>
                     </div>
                     {showMoreOptions
@@ -1738,31 +1735,31 @@ export default function CreatePage() {
                             <>
                               {/* Session Scope */}
                               <OptionRow
-                                label="Session Scope"
-                                hint="How conversation context is shared between users"
+                                label={t('sessionScopeLabel')}
+                                hint={t('sessionScopeHint')}
                               >
                                 <OptionSelect
                                   value={sessionScope}
                                   onChange={setSessionScope}
                                   options={[
-                                    { value: 'per-peer', label: 'Per User' },
-                                    { value: 'global', label: 'Global' },
+                                    { value: 'per-peer', label: t('sessionScopePerUser') },
+                                    { value: 'global', label: t('sessionScopeGlobal') },
                                   ]}
                                 />
                               </OptionRow>
 
                               {/* Web Search */}
                               <OptionRow
-                                label="Enable Web Search"
-                                hint="Allow your agent to search the web for real-time info"
+                                label={t('webSearchLabel')}
+                                hint={t('webSearchHint')}
                               >
                                 <ToggleSwitch checked={enableWebSearch} onChange={setEnableWebSearch} />
                               </OptionRow>
 
                               {enableWebSearch && (
                                 <OptionRow
-                                  label="Search Provider"
-                                  hint="Which search API to use"
+                                  label={t('searchProviderLabel')}
+                                  hint={t('searchProviderHint')}
                                   indent
                                 >
                                   <OptionSelect
@@ -1780,16 +1777,16 @@ export default function CreatePage() {
 
                               {/* TTS */}
                               <OptionRow
-                                label="Enable Voice (TTS)"
-                                hint="Text-to-speech output for voice replies"
+                                label={t('ttsLabel')}
+                                hint={t('ttsHint')}
                               >
                                 <ToggleSwitch checked={enableTTS} onChange={setEnableTTS} />
                               </OptionRow>
 
                               {enableTTS && (
                                 <OptionRow
-                                  label="TTS Provider"
-                                  hint="Voice synthesis engine"
+                                  label={t('ttsProviderLabel')}
+                                  hint={t('ttsProviderHint')}
                                   indent
                                 >
                                   <OptionSelect
@@ -1810,42 +1807,42 @@ export default function CreatePage() {
                             <>
                               {/* Personality */}
                               <OptionRow
-                                label="Personality"
-                                hint="Conversation tone and style"
+                                label={t('hermesPersonalityLabel')}
+                                hint={t('hermesPersonalityHint')}
                               >
                                 <OptionSelect
                                   value={hermesPersonality}
                                   onChange={setHermesPersonality}
                                   options={[
-                                    { value: 'default', label: 'Default' },
-                                    { value: 'helpful', label: 'Helpful' },
-                                    { value: 'technical', label: 'Technical' },
-                                    { value: 'creative', label: 'Creative' },
-                                    { value: 'concise', label: 'Concise' },
+                                    { value: 'default', label: t('hermesPersonalityDefault') },
+                                    { value: 'helpful', label: t('hermesPersonalityHelpful') },
+                                    { value: 'technical', label: t('hermesPersonalityTechnical') },
+                                    { value: 'creative', label: t('hermesPersonalityCreative') },
+                                    { value: 'concise', label: t('hermesPersonalityConcise') },
                                   ]}
                                 />
                               </OptionRow>
 
                               {/* Memory */}
                               <OptionRow
-                                label="Enable Memory"
-                                hint="Persist context across conversations"
+                                label={t('memoryLabel')}
+                                hint={t('memoryHint')}
                               >
                                 <ToggleSwitch checked={enableMemory} onChange={setEnableMemory} />
                               </OptionRow>
 
                               {/* Approval Mode */}
                               <OptionRow
-                                label="Approval Mode"
-                                hint="How actions are authorized before execution"
+                                label={t('approvalModeLabel')}
+                                hint={t('approvalModeHint')}
                               >
                                 <OptionSelect
                                   value={approvalMode}
                                   onChange={setApprovalMode}
                                   options={[
-                                    { value: 'auto', label: 'Auto' },
-                                    { value: 'ask', label: 'Ask Before Actions' },
-                                    { value: 'manual', label: 'Manual' },
+                                    { value: 'auto', label: t('approvalModeAuto') },
+                                    { value: 'ask', label: t('approvalModeAsk') },
+                                    { value: 'manual', label: t('approvalModeManual') },
                                   ]}
                                 />
                               </OptionRow>
@@ -1857,8 +1854,8 @@ export default function CreatePage() {
                             <>
                               {/* Database */}
                               <OptionRow
-                                label="Database"
-                                hint="Storage backend for agent state and memory"
+                                label={t('databaseLabel')}
+                                hint={t('databaseHint')}
                               >
                                 <OptionSelect
                                   value={dbBackend}
@@ -1873,16 +1870,16 @@ export default function CreatePage() {
 
                               {/* Image Generation */}
                               <OptionRow
-                                label="Enable Image Generation"
-                                hint="Allow the agent to generate images"
+                                label={t('imageGenLabel')}
+                                hint={t('imageGenHint')}
                               >
                                 <ToggleSwitch checked={enableImageGen} onChange={setEnableImageGen} />
                               </OptionRow>
 
                               {/* Voice */}
                               <OptionRow
-                                label="Enable Voice"
-                                hint="Speech-to-text and text-to-speech capabilities"
+                                label={t('voiceLabel')}
+                                hint={t('voiceHint')}
                               >
                                 <ToggleSwitch checked={enableVoice} onChange={setEnableVoice} />
                               </OptionRow>
@@ -1894,25 +1891,25 @@ export default function CreatePage() {
                             <>
                               {/* Personality (already selected above, show summary) */}
                               <OptionRow
-                                label="Personality Preset"
-                                hint="Selected above -- controls agent tone"
+                                label={t('miladyPersonalityLabel')}
+                                hint={t('miladyPersonalitySelectedHint')}
                               >
                                 <OptionSelect
                                   value={miladyPersonality}
                                   onChange={(v) => setMiladyPersonality(v as typeof miladyPersonality)}
                                   options={[
-                                    { value: 'helpful', label: 'Helpful' },
+                                    { value: 'helpful', label: t('hermesPersonalityHelpful') },
                                     { value: 'tsundere', label: 'Tsundere' },
                                     { value: 'unhinged', label: 'Unhinged' },
-                                    { value: 'custom', label: 'Professional' },
+                                    { value: 'custom', label: t('hermesPersonalityTechnical') },
                                   ]}
                                 />
                               </OptionRow>
 
                               {/* Database */}
                               <OptionRow
-                                label="Database"
-                                hint="Storage backend for agent state"
+                                label={t('databaseLabel')}
+                                hint={t('databaseHintMilady')}
                               >
                                 <OptionSelect
                                   value={dbBackend}
@@ -1926,8 +1923,8 @@ export default function CreatePage() {
 
                               {/* Local-First Mode */}
                               <OptionRow
-                                label="Local-First Mode"
-                                hint="Process data locally before syncing"
+                                label={t('localFirstLabel')}
+                                hint={t('localFirstHint')}
                               >
                                 <ToggleSwitch checked={localFirst} onChange={setLocalFirst} />
                               </OptionRow>
@@ -1951,14 +1948,14 @@ export default function CreatePage() {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}>
                   <ChevronLeft className="w-4 h-4" />
-                  Back
+                  {t('back')}
                 </button>
                 <button
                   className="btn-primary"
                   disabled={!isConfigValid}
                   onClick={() => { setStep(5); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 >
-                  Continue
+                  {t('continue')}
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -1974,9 +1971,9 @@ export default function CreatePage() {
               animate="center"
               exit="exit"
             >
-              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">Ready to launch?</h2>
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2 text-center">{t('step5Heading')}</h2>
               <p className="text-[var(--text-muted)] text-sm mb-8 text-center">
-                Review your configuration before launching
+                {t('step5Subheading')}
               </p>
 
               <motion.div
@@ -1995,7 +1992,7 @@ export default function CreatePage() {
                     <div className="text-sm text-[var(--text-muted)]">
                       {selectedFramework === 'openclaw' ? 'OpenClaw' : selectedFramework === 'hermes' ? 'Hermes' : selectedFramework === 'milady' ? 'Milady' : 'ElizaOS'} agent
                       <span className="ml-1.5 text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-hover)] text-[var(--text-secondary)] border border-[var(--border-default)] align-middle">
-                        {selectedFramework === 'openclaw' ? 'Multi-skill assistant' : selectedFramework === 'hermes' ? 'Autonomous agent' : selectedFramework === 'milady' ? 'Privacy-first runtime' : 'Multi-agent framework'}
+                        {t(`summaryFrameworkLabels.${selectedFramework}`)}
                       </span>
                     </div>
                   </div>
@@ -2003,17 +2000,17 @@ export default function CreatePage() {
 
                 {/* Summary details */}
                 <div className="space-y-3 text-sm">
-                  <SummaryRow label="Agent Type" value={selectedFramework === 'openclaw' ? 'OpenClaw' : selectedFramework === 'hermes' ? 'Hermes' : selectedFramework === 'milady' ? 'Milady' : 'ElizaOS'} />
-                  <SummaryRow label="Template" value={templates.find(t => t.id === selectedTemplate)?.name ?? 'Custom'} />
-                  <SummaryRow label="AI Model" value={getLLMSummary()} />
+                  <SummaryRow label={t('summaryAgentType')} value={selectedFramework === 'openclaw' ? 'OpenClaw' : selectedFramework === 'hermes' ? 'Hermes' : selectedFramework === 'milady' ? 'Milady' : 'ElizaOS'} />
+                  <SummaryRow label={t('summaryTemplate')} value={templates.find(tpl => tpl.id === selectedTemplate)?.name ?? t('summaryTemplateCustom')} />
+                  <SummaryRow label={t('summaryAiModel')} value={getLLMSummary()} />
 
-                  {agentDesc && <SummaryRow label="Description" value={agentDesc} />}
+                  {agentDesc && <SummaryRow label={t('summaryDescription')} value={agentDesc} />}
 
                   {(() => {
                     const enabled = Object.entries(platformsEnabled).filter(([, v]) => v).map(([id]) => id);
                     if (enabled.length === 0) return null;
                     const names = enabled.map(id => PLATFORMS.find(p => p.id === id)?.name ?? id).join(', ');
-                    return <SummaryRow label="Platforms" value={names} highlight />;
+                    return <SummaryRow label={t('summaryPlatforms')} value={names} highlight />;
                   })()}
 
                   <PersonalitySummary
@@ -2025,11 +2022,11 @@ export default function CreatePage() {
 
                   <div className="pt-3 border-t border-[var(--border-default)]">
                     <SummaryRow
-                      label="Cost"
+                      label={t('summaryCost')}
                       value={
-                        llmChoice === 'free_groq' ? '$0.00 -- free tier' :
-                        llmChoice === 'byok' ? '$0.00 -- using your own key' :
-                        'Credits deducted per use'
+                        llmChoice === 'free_groq' ? t('summaryCostFree') :
+                        llmChoice === 'byok' ? t('summaryCostByok') :
+                        t('summaryCostFree')
                       }
                       valueClass="text-green-400"
                     />
@@ -2059,8 +2056,8 @@ export default function CreatePage() {
                       <MessageCircle className="w-5 h-5 text-[var(--color-accent)]" />
                     </div>
                     <div className="text-left">
-                      <span className="text-sm font-semibold text-[var(--text-primary)]">Test Your Agent</span>
-                      <p className="text-xs text-[var(--text-muted)]">Preview how your agent will respond</p>
+                      <span className="text-sm font-semibold text-[var(--text-primary)]">{t('testChatLabel')}</span>
+                      <p className="text-xs text-[var(--text-muted)]">{t('testChatSubtext')}</p>
                     </div>
                   </div>
                   <motion.div
@@ -2088,11 +2085,11 @@ export default function CreatePage() {
                               <Bot className="w-3.5 h-3.5 text-[var(--color-accent)]" />
                             </div>
                             <span className="text-xs font-medium text-[var(--text-secondary)]">
-                              Chat Preview &mdash; {openclawForm.name || 'Your Agent'}
+                              {t('testChatPreviewLabel')} &mdash; {openclawForm.name || 'Agent'}
                             </span>
                           </div>
                           <p className="text-[10px] text-[var(--text-muted)] mt-1 ml-8">
-                            This is a simulated preview. Deploy your agent for real conversations.
+                            {t('testChatSimulated')}
                           </p>
                         </div>
 
@@ -2103,8 +2100,8 @@ export default function CreatePage() {
                               <div className="w-12 h-12 rounded-full bg-[var(--bg-hover)] flex items-center justify-center mb-3">
                                 <MessageCircle className="w-6 h-6 text-[var(--text-muted)]" />
                               </div>
-                              <p className="text-sm text-[var(--text-muted)]">Send a message to preview your agent</p>
-                              <p className="text-xs text-[var(--text-muted)] mt-1 opacity-60">Try &quot;Hello&quot; or &quot;What can you do?&quot;</p>
+                              <p className="text-sm text-[var(--text-muted)]">{t('testChatEmpty')}</p>
+                              <p className="text-xs text-[var(--text-muted)] mt-1 opacity-60">{t('testChatEmptyHint')}</p>
                             </div>
                           )}
 
@@ -2172,7 +2169,7 @@ export default function CreatePage() {
                               type="text"
                               value={testInput}
                               onChange={(e) => setTestInput(e.target.value)}
-                              placeholder="Type a message..."
+                              placeholder={t('testChatPlaceholder')}
                               disabled={testLoading}
                               className="flex-1 bg-[var(--bg-hover)] border border-[rgba(46,43,74,0.5)] rounded-xl px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50 focus:ring-1 focus:ring-[var(--color-accent)]/20 transition-all disabled:opacity-50"
                             />
@@ -2205,8 +2202,8 @@ export default function CreatePage() {
                   className={cn(cardClass, 'p-6 mb-5 text-center border-green-500/30')}
                 >
                   <Rocket className="w-10 h-10 text-green-400 mx-auto mb-3" />
-                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">Your agent is alive!</h3>
-                  <p className="text-[var(--text-muted)] text-sm">Redirecting to your agent&apos;s dashboard...</p>
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">{t('launchedHeading')}</h3>
+                  <p className="text-[var(--text-muted)] text-sm">{t('launchedSubtext')}</p>
                 </motion.div>
               )}
 
@@ -2217,7 +2214,7 @@ export default function CreatePage() {
                   disabled={launching || launched}
                 >
                   <ChevronLeft className="w-4 h-4" />
-                  Back
+                  {t('back')}
                 </button>
                 <motion.button
                   className={cn(
@@ -2226,7 +2223,7 @@ export default function CreatePage() {
                   )}
                   onClick={handleLaunch}
                   disabled={launching || launched}
-                  aria-label={launching ? 'Creating agent...' : launched ? 'Agent created successfully' : 'Launch your agent'}
+                  aria-label={launching ? t('launchCtaCreating') : launched ? t('launchCtaCreated') : t('launchCtaLabel')}
                   whileHover={!launching && !launched ? { scale: 1.03 } : {}}
                   whileTap={!launching && !launched ? { scale: 0.98 } : {}}
                   animate={launching ? {
@@ -2246,17 +2243,17 @@ export default function CreatePage() {
                   {launching ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      Hatching...
+                      {t('launching')}
                     </>
                   ) : launched ? (
                     <>
                       <Check className="w-5 h-5" />
-                      Hatched!
+                      {t('launched')}
                     </>
                   ) : (
                     <>
                       <Rocket className="w-5 h-5" />
-                      Launch My Agent!
+                      {t('launchCta')}
                     </>
                   )}
                 </motion.button>
@@ -2284,15 +2281,16 @@ function SystemPromptSection({
   setShowCustom: (v: boolean) => void;
   inputClass: string;
 }) {
+  const t = useTranslations('create');
   return (
     <div className="border border-[var(--border-default)] bg-[var(--bg-card)] rounded-xl p-4">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-[var(--text-primary)]">System Prompt</p>
+          <p className="text-sm font-medium text-[var(--text-primary)]">{t('systemPromptLabel')}</p>
           <p className="text-xs text-[var(--text-muted)] mt-0.5">
             {showCustom
-              ? 'Your custom instructions will replace the template default'
-              : "Your agent's personality is pre-configured. Customize if you want to change it."}
+              ? t('systemPromptCustomNote')
+              : t('systemPromptDefaultNote')}
           </p>
         </div>
         <button
@@ -2310,7 +2308,7 @@ function SystemPromptSection({
           }}
           className="text-xs font-medium text-[var(--color-accent)] hover:text-[#22d3ee] transition-colors px-3 py-1.5 rounded-lg hover:bg-[var(--color-accent)]/10"
         >
-          {showCustom ? 'Use template default' : 'Customize'}
+          {showCustom ? t('systemPromptUseDefault') : t('systemPromptCustomize')}
         </button>
       </div>
 
@@ -2320,20 +2318,20 @@ function SystemPromptSection({
             id="system-prompt"
             className={cn(inputClass, 'resize-y min-h-[120px]')}
             rows={8}
-            placeholder="Write your custom system prompt here. This completely replaces the template default."
+            placeholder={t('systemPromptPlaceholder')}
             value={form.systemPrompt}
             onChange={(e) => update('systemPrompt', e.target.value)}
             maxLength={8000}
           />
           <div className="flex items-center justify-between mt-1">
             <p className="text-xs text-[var(--text-muted)]">
-              Defines your agent&apos;s personality, capabilities, and rules
+              {t('systemPromptHint')}
             </p>
-            <span className="text-xs text-[var(--text-muted)]">{form.systemPrompt.length}/8000</span>
+            <span className="text-xs text-[var(--text-muted)]">{t('systemPromptCount', { count: form.systemPrompt.length })}</span>
           </div>
           {form.systemPrompt.trim().length === 0 && (
             <p className="text-xs text-[#FBBF24] mt-2 ml-1">
-              Consider adding a system prompt for better results
+              {t('systemPromptWarning')}
             </p>
           )}
         </div>
@@ -2350,14 +2348,15 @@ function PersonalitySummary({ framework, miladyPersonality, hermesPersonality, s
   hermesPersonality: string;
   systemPrompt: string;
 }) {
+  const t = useTranslations('create');
   const isMiladyCustom = framework === 'milady' && miladyPersonality !== 'helpful';
   const isHermesCustom = framework === 'hermes' && hermesPersonality !== 'default';
   const hasCustomPrompt = systemPrompt.trim();
-  let label = 'Template default';
+  let label = t('summaryPersonalityDefault');
   if (isMiladyCustom) label = miladyPersonality.charAt(0).toUpperCase() + miladyPersonality.slice(1);
   else if (isHermesCustom) label = hermesPersonality.charAt(0).toUpperCase() + hermesPersonality.slice(1);
-  else if (hasCustomPrompt) label = 'Custom instructions';
-  return <SummaryRow label="Personality" value={label} highlight={!!hasCustomPrompt || isMiladyCustom || isHermesCustom} />;
+  else if (hasCustomPrompt) label = t('summaryPersonalityCustom');
+  return <SummaryRow label={t('summaryPersonality')} value={label} highlight={!!hasCustomPrompt || isMiladyCustom || isHermesCustom} />;
 }
 
 // ── Summary Row ─────────────────────────────────────────────

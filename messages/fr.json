@@ -2005,7 +2005,7 @@
   },
   "create": {
     "eyebrow": "Créer un agent",
-    "heading": "Créez votre agent",
+    "heading": "Créer votre agent",
     "subheading": "Lancez un agent IA gratuit en moins de 2 minutes.",
     "stepsAriaLabel": "Étapes de création",
     "stepLabels": {
@@ -2013,32 +2013,343 @@
       "category": "Catégorie",
       "template": "Modèle",
       "setUp": "Configuration",
-      "launch": "Lancement"
+      "launch": "Lancer"
     },
     "authLoading": "Authentification...",
-    "authRequired": "Créez votre agent",
-    "authRequiredBody": "Connectez-vous à votre compte pour créer et déployer des agents IA.",
+    "authRequired": "Créer votre agent",
+    "authRequiredBody": "Connectez-vous pour créer et déployer des agents IA.",
     "signIn": "Se connecter",
-    "step1Heading": "Quel type d'agent voulez-vous ?",
-    "step1Subheading": "Chaque framework a des points forts différents — choisissez celui qui convient.",
-    "continue": "Continuer",
+    "back": "Retour",
+    "continue": "Suivant",
+    "step1Heading": "Quel type d'agent souhaitez-vous ?",
+    "step1Subheading": "Chaque framework a ses forces — choisissez celui qui convient.",
     "step2Heading": "Quel type d'agent ?",
     "step2Subheading": "Choisissez une catégorie — nous vous montrerons les meilleurs modèles",
-    "searchTemplates": "Rechercher 200+ modèles...",
+    "searchTemplates": "Rechercher parmi 200+ modèles...",
     "clearSearch": "Effacer la recherche",
-    "noTemplatesFound": "Aucun modèle trouvé pour « {query} »",
+    "noTemplatesFound": "Aucun modèle trouvé pour \"{query}\"",
     "clearSearchLink": "Effacer la recherche",
-    "step3Heading": "Choisissez un modèle",
-    "step3Subheading": "Choisissez un point de départ pour votre agent",
+    "categoryCount": "{count} modèles",
+    "step3Heading": "Choisir un modèle",
+    "step3Subheading": "Choisissez un modèle — tout est personnalisable à l'étape suivante",
+    "customAgent": "Agent personnalisé",
+    "customAgentDesc": "Partir de zéro avec votre propre invite système",
     "customOption": "Partir de zéro",
     "customOptionDesc": "Contrôle total sur chaque paramètre",
-    "step4Heading": "Configurez votre agent",
-    "step4Subheading": "Nommez-le, décrivez-le, choisissez un modèle.",
-    "step5Heading": "Lancement !",
-    "step5Subheading": "Vérifiez votre configuration et déployez.",
-    "launchCta": "Lancer l'agent",
-    "launching": "Lancement en cours...",
-    "launched": "Lancé !"
+    "step4Heading": "Personnaliser votre agent",
+    "step4Subheading": "Donnez un nom à votre agent et choisissez son mode de réflexion",
+    "agentNameLabel": "Nom de l'agent",
+    "agentNamePlaceholder": "ex. AlphaResearcher, TweetLord...",
+    "agentNameHintCount": "{count}/50 caractères",
+    "agentNameTooShort": "Le nom doit comporter au moins 3 caractères",
+    "agentNameInvalidChars": "Seuls lettres, chiffres, espaces, tirets, deux-points, apostrophes autorisés",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Brève description de votre agent...",
+    "descriptionHint": "Accroche courte pour votre agent",
+    "platformsHeading": "Où votre agent doit-il vivre ?",
+    "platformsSubheading": "Sélectionnez les plateformes et ajoutez vos clés API. Ajout possible plus tard dans les Paramètres.",
+    "noPlatformsNote": "Aucune plateforme ? Pas de problème — ajoutez-en depuis l'onglet Paramètres.",
+    "hideValue": "Masquer la valeur",
+    "showValue": "Afficher la valeur",
+    "llmModelLabel": "Modèle IA",
+    "llmModelAria": "Sélection du modèle IA",
+    "llmFreeLabel": "Modèle IA gratuit",
+    "llmFreeTag": "GRATUIT",
+    "llmFreeSubtext": "Propulsé par Groq — aucune clé API requise",
+    "llmByokLabel": "Utiliser votre propre clé IA",
+    "llmByokTag": "toujours gratuit",
+    "llmByokSubtext": "Connectez votre propre clé API OpenAI, Anthropic ou autre",
+    "byokProviderLabel": "Fournisseur",
+    "byokModelLabel": "Modèle",
+    "byokModelPlaceholder": "identifiant du modèle...",
+    "byokBackToList": "Retour à la liste",
+    "byokSelectModel": "Choisir un modèle...",
+    "byokCustomModel": "Modèle personnalisé...",
+    "byokApiKeyLabel": "Clé API",
+    "byokApiKeyEncrypted": "chiffrée au repos",
+    "byokBaseUrlLabel": "URL de base",
+    "skillsHeading": "Compétences de l'agent",
+    "skillsSubheading": "Choisissez ce que votre agent peut faire",
+    "toolsHeading": "Outils de l'agent",
+    "toolsSubheading": "Choisissez ce que votre agent peut faire",
+    "pluginsHeading": "Plugins",
+    "pluginsSubheading": "Choisissez ce que votre agent peut faire",
+    "capabilitiesHeading": "Capacités",
+    "capabilitiesSubheading": "Choisissez ce que votre agent peut faire",
+    "templateSkillsHeading": "Inclus dans ce modèle",
+    "templateSkillsSubheading": "Ces compétences ClawHub s'installent automatiquement au premier démarrage.",
+    "systemPromptLabel": "Invite système",
+    "systemPromptCustomNote": "Vos instructions personnalisées remplaceront le modèle par défaut",
+    "systemPromptDefaultNote": "La personnalité de votre agent est préconfigurée. Personnalisez si vous souhaitez la modifier.",
+    "systemPromptCustomize": "Personnaliser",
+    "systemPromptUseDefault": "Utiliser le modèle par défaut",
+    "systemPromptPlaceholder": "Rédigez ici votre invite système. Remplace entièrement le modèle par défaut.",
+    "systemPromptHint": "Définit la personnalité, les capacités et les règles de l'agent",
+    "systemPromptCount": "{count}/8000",
+    "systemPromptWarning": "Ajoutez une invite système pour de meilleurs résultats",
+    "elizaBioLabel": "Biographie",
+    "elizaBioHint": "Définissez la personnalité et le contexte de l'agent. Une phrase par ligne.",
+    "elizaBioPlaceholder": "Un assistant IA expert en...",
+    "elizaLoreLabel": "Contexte",
+    "elizaLoreHint": "Connaissances et historique de l'agent. Un fait par ligne.",
+    "elizaStyleLabel": "Instructions de style",
+    "elizaStyleHint": "Comment votre agent doit communiquer. Une instruction par ligne.",
+    "elizaTopicsLabel": "Sujets",
+    "elizaTopicsPlaceholder": "technology, AI, crypto, research",
+    "elizaTopicsHint": "Sujets que l'agent connaît, séparés par des virgules",
+    "elizaAdjectivesLabel": "Adjectifs",
+    "elizaAdjectivesPlaceholder": "helpful, analytical, concise",
+    "elizaAdjectivesHint": "Traits de personnalité, séparés par des virgules",
+    "miladyPersonalityLabel": "Préréglage de personnalité",
+    "miladyPersonalityHint": "Choisissez un style de personnalité pour votre agent Milady.",
+    "miladyPersonalityHelpful": "Serviable - Amical et professionnel",
+    "miladyPersonalityTsundere": "Tsundere - Réticent mais attentionné",
+    "miladyPersonalityUnhinged": "Chaotique - Imprévisible et spontané",
+    "miladyPersonalityCustom": "Personnalisé - Utilise votre invite système",
+    "moreOptionsLabel": "Plus d'options",
+    "moreOptionsHints": {
+      "openclaw": "Recherche, voix, sessions",
+      "hermes": "Personnalité, mémoire, approbations",
+      "elizaos": "Base de données, images, voix",
+      "milady": "Base de données, confidentialité, préréglages"
+    },
+    "sessionScopeLabel": "Portée de session",
+    "sessionScopeHint": "Comment le contexte de conversation est partagé entre les utilisateurs",
+    "sessionScopePerUser": "Par utilisateur",
+    "sessionScopeGlobal": "Global",
+    "webSearchLabel": "Activer la recherche web",
+    "webSearchHint": "Permettre à l'agent de chercher des infos en temps réel",
+    "searchProviderLabel": "Fournisseur de recherche",
+    "searchProviderHint": "Quelle API de recherche utiliser",
+    "ttsLabel": "Activer la voix (TTS)",
+    "ttsHint": "Sortie texte-vers-parole pour les réponses vocales",
+    "ttsProviderLabel": "Fournisseur TTS",
+    "ttsProviderHint": "Moteur de synthèse vocale",
+    "hermesPersonalityLabel": "Personnalité",
+    "hermesPersonalityHint": "Ton et style de conversation",
+    "hermesPersonalityDefault": "Par défaut",
+    "hermesPersonalityHelpful": "Serviable",
+    "hermesPersonalityTechnical": "Technique",
+    "hermesPersonalityCreative": "Créatif",
+    "hermesPersonalityConcise": "Concis",
+    "memoryLabel": "Activer la mémoire",
+    "memoryHint": "Conserver le contexte entre les conversations",
+    "approvalModeLabel": "Mode d'approbation",
+    "approvalModeHint": "Comment les actions sont autorisées avant exécution",
+    "approvalModeAuto": "Automatique",
+    "approvalModeAsk": "Demander avant d'agir",
+    "approvalModeManual": "Manuel",
+    "databaseLabel": "Base de données",
+    "databaseHint": "Backend de stockage pour l'état et la mémoire de l'agent",
+    "databaseHintMilady": "Backend de stockage pour l'état de l'agent",
+    "imageGenLabel": "Activer la génération d'images",
+    "imageGenHint": "Permettre à l'agent de générer des images",
+    "voiceLabel": "Activer la voix",
+    "voiceHint": "Capacités parole-vers-texte et texte-vers-parole",
+    "localFirstLabel": "Mode local en priorité",
+    "localFirstHint": "Traiter les données localement avant synchronisation",
+    "miladyPersonalitySelectedHint": "Sélectionné ci-dessus — contrôle le ton de l'agent",
+    "step5Heading": "Prêt à lancer ?",
+    "step5Subheading": "Vérifiez votre configuration avant de lancer",
+    "summaryAgentType": "Type d'agent",
+    "summaryTemplate": "Modèle",
+    "summaryTemplateCustom": "Personnalisé",
+    "summaryAiModel": "Modèle IA",
+    "summaryDescription": "Description",
+    "summaryPlatforms": "Plateformes",
+    "summaryPersonality": "Personnalité",
+    "summaryPersonalityDefault": "Modèle par défaut",
+    "summaryPersonalityCustom": "Instructions personnalisées",
+    "summaryCost": "Coût",
+    "summaryCostFree": "$0.00 — gratuit",
+    "summaryCostByok": "$0.00 — clé personnelle",
+    "summaryFrameworkLabels": {
+      "openclaw": "Assistant multi-compétences",
+      "hermes": "Agent autonome",
+      "elizaos": "Framework multi-agents",
+      "milady": "Runtime confidentialité"
+    },
+    "testChatLabel": "Tester votre agent",
+    "testChatSubtext": "Aperçu des réponses de l'agent",
+    "testChatPreviewLabel": "Aperçu du chat",
+    "testChatSimulated": "Aperçu simulé. Déployez l'agent pour de vraies conversations.",
+    "testChatEmpty": "Envoyez un message pour prévisualiser l'agent",
+    "testChatEmptyHint": "Essayez \"Bonjour\" ou \"Que pouvez-vous faire ?\"",
+    "testChatPlaceholder": "Tapez un message...",
+    "launchedHeading": "Votre agent est en ligne !",
+    "launchedSubtext": "Redirection vers le tableau de bord de l'agent...",
+    "launchCtaLabel": "Lancer l'agent",
+    "launchCtaCreating": "Création de l'agent...",
+    "launchCtaCreated": "Agent créé avec succès",
+    "launchCta": "Lancer mon agent !",
+    "launching": "Éclosion...",
+    "launched": "Éclos !",
+    "frameworkFeatures": {
+      "openclaw": {
+        "desc": "Assistant IA polyvalent avec des milliers de compétences communautaires et messagerie multi-canal.",
+        "f1": "Des milliers de compétences",
+        "f2": "Navigation web",
+        "f3": "Tâches planifiées"
+      },
+      "hermes": {
+        "desc": "Agent IA intelligent qui mémorise le contexte entre les conversations et apprend au fil du temps.",
+        "f1": "Mémoire à long terme",
+        "f2": "40+ outils intégrés",
+        "f3": "Auto-amélioration"
+      },
+      "elizaos": {
+        "desc": "Framework multi-agents open-source par ai16z. 90+ plugins, mémoire persistante, Web3 natif.",
+        "f1": "90+ plugins",
+        "f2": "Mémoire vectorielle",
+        "f3": "Web3 natif"
+      },
+      "milady": {
+        "desc": "Runtime IA axé sur la confidentialité avec 20+ connecteurs, avatars VRM et intégration DeFi.",
+        "f1": "20+ connecteurs",
+        "f2": "Préréglages de personnalité",
+        "f3": "Confidentialité d'abord"
+      }
+    },
+    "skills": {
+      "webSearch": {
+        "name": "Recherche web",
+        "desc": "Chercher des infos en temps réel"
+      },
+      "calculator": {
+        "name": "Calculatrice",
+        "desc": "Calculs mathématiques"
+      },
+      "weather": {
+        "name": "Météo",
+        "desc": "Prévisions météo"
+      },
+      "codeInterpreter": {
+        "name": "Exécution code",
+        "desc": "Exécuter des extraits de code"
+      },
+      "fileManager": {
+        "name": "Gestionnaire fichiers",
+        "desc": "Lire et écrire des fichiers"
+      },
+      "imageGen": {
+        "name": "Génération d'images",
+        "desc": "Générer des images à partir de texte"
+      }
+    },
+    "tools": {
+      "webSearch": {
+        "name": "Recherche web",
+        "desc": "Rechercher des informations sur internet"
+      },
+      "calculator": {
+        "name": "Calculatrice",
+        "desc": "Calculs mathématiques"
+      },
+      "codeExecution": {
+        "name": "Exécution code",
+        "desc": "Exécuter des extraits de code"
+      },
+      "fileOperations": {
+        "name": "Opérations fichiers",
+        "desc": "Lire et écrire des fichiers"
+      },
+      "memory": {
+        "name": "Mémoire",
+        "desc": "Retenir conversations et faits"
+      },
+      "summarize": {
+        "name": "Résumeur",
+        "desc": "Résumer des textes longs"
+      },
+      "translate": {
+        "name": "Traducteur",
+        "desc": "Traduire entre langues"
+      },
+      "weather": {
+        "name": "Météo",
+        "desc": "Prévisions météo"
+      }
+    },
+    "plugins": {
+      "database": {
+        "name": "Base de données",
+        "desc": "Accès base de données SQL"
+      },
+      "imageGen": {
+        "name": "Génération d'images",
+        "desc": "Générer des images"
+      },
+      "video": {
+        "name": "Vidéo",
+        "desc": "Traitement vidéo"
+      },
+      "tts": {
+        "name": "Texte-vers-parole",
+        "desc": "Sortie vocale"
+      },
+      "nodeRuntime": {
+        "name": "Runtime Node",
+        "desc": "Opérations côté serveur"
+      },
+      "bootstrap": {
+        "name": "Bootstrap",
+        "desc": "Utilitaires essentiels"
+      }
+    },
+    "capabilities": {
+      "chat": {
+        "name": "Chat",
+        "desc": "Conversation principale"
+      },
+      "defi": {
+        "name": "DeFi",
+        "desc": "Interactions protocoles DeFi"
+      },
+      "social": {
+        "name": "Social",
+        "desc": "Intégration réseaux sociaux"
+      },
+      "analysis": {
+        "name": "Analyse",
+        "desc": "Analyse de données"
+      },
+      "privacy": {
+        "name": "Confidentialité",
+        "desc": "Outils de confidentialité"
+      },
+      "memes": {
+        "name": "Mèmes",
+        "desc": "Génération de mèmes"
+      }
+    },
+    "platforms": {
+      "telegram": {
+        "desc": "Déployer comme bot Telegram",
+        "helperField": "Telegram → @BotFather → /newbot → copier le token"
+      },
+      "discord": {
+        "desc": "Déployer comme bot Discord",
+        "helperField": "Portail développeurs Discord → Nouvelle app → Bot → Copier le token"
+      },
+      "whatsapp": {
+        "desc": "Connexion via QR code",
+        "note": "Couplage QR disponible après déploiement"
+      },
+      "slack": {
+        "desc": "Déployer dans l'espace Slack",
+        "helperField": "Slack API → Créer app → OAuth et permissions → Bot Token"
+      },
+      "twitter": {
+        "desc": "Publier, répondre et interagir sur X"
+      }
+    },
+    "llmFreeSummary": "Modèle IA gratuit (Groq)",
+    "llmByokSummary": "Votre clé : {provider}{model}",
+    "errorHeading": "Erreur de création",
+    "errorBody": "Une erreur s'est produite lors de la configuration de votre agent. Votre progression n'a pas été perdue.",
+    "errorIdLabel": "ID d'erreur :",
+    "tryAgain": "Réessayer",
+    "dashboard": "Tableau de bord"
   },
   "support": {
     "eyebrow": "Aide",

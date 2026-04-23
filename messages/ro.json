@@ -2004,41 +2004,352 @@
     "footerNote": "Scurtăturile sunt dezactivate când scrii în câmpuri text. Pe macOS, folosește Cmd în loc de Ctrl."
   },
   "create": {
-    "eyebrow": "Creează agent",
+    "eyebrow": "Crează agent",
     "heading": "Creează-ți agentul",
-    "subheading": "Lansează un agent AI gratuit în mai puțin de 2 minute.",
-    "stepsAriaLabel": "Pașii de creare",
+    "subheading": "Pornește un agent AI gratuit în mai puțin de 2 minute.",
+    "stepsAriaLabel": "Pași de creare",
     "stepLabels": {
       "style": "Stil",
       "category": "Categorie",
-      "template": "Template",
+      "template": "Șablon",
       "setUp": "Configurare",
-      "launch": "Lansare"
+      "launch": "Pornire"
     },
-    "authLoading": "Se autentifică...",
+    "authLoading": "Autentificare...",
     "authRequired": "Creează-ți agentul",
-    "authRequiredBody": "Autentifică-te în contul tău pentru a crea și deploya agenți AI.",
-    "signIn": "Autentificare",
-    "step1Heading": "Ce tip de agent vrei?",
-    "step1Subheading": "Fiecare framework are puncte forte diferite — alege-l pe cel potrivit.",
-    "continue": "Continuă",
+    "authRequiredBody": "Conectează-te la cont pentru a crea și implementa agenți AI.",
+    "signIn": "Conectare",
+    "back": "Înapoi",
+    "continue": "Următorul",
+    "step1Heading": "Ce tip de agent dorești?",
+    "step1Subheading": "Fiecare framework are avantaje diferite — alege-l pe cel potrivit.",
     "step2Heading": "Ce tip de agent?",
-    "step2Subheading": "Alege o categorie — îți vom arăta cele mai bune template-uri",
-    "searchTemplates": "Caută 200+ template-uri...",
+    "step2Subheading": "Alege o categorie — îți vom arăta cele mai bune șabloane",
+    "searchTemplates": "Caută printre 200+ șabloane...",
     "clearSearch": "Șterge căutarea",
-    "noTemplatesFound": "Niciun template găsit pentru \"{query}\"",
+    "noTemplatesFound": "Niciun șablon găsit pentru \"{query}\"",
     "clearSearchLink": "Șterge căutarea",
-    "step3Heading": "Alege un template",
-    "step3Subheading": "Alege un punct de pornire pentru agentul tău",
+    "categoryCount": "{count} șabloane",
+    "step3Heading": "Alege un șablon",
+    "step3Subheading": "Alege un șablon — poți personaliza totul la pasul următor",
+    "customAgent": "Agent personalizat",
+    "customAgentDesc": "Pornește de la zero cu propriul tău system prompt",
     "customOption": "Pornește de la zero",
-    "customOptionDesc": "Control total asupra fiecărei setări",
-    "step4Heading": "Configurează-ți agentul",
-    "step4Subheading": "Dă-i un nume, descrie-l, alege un model.",
-    "step5Heading": "Lansare!",
-    "step5Subheading": "Revizuiește configurația și deployează.",
-    "launchCta": "Lansează agentul",
-    "launching": "Se lansează...",
-    "launched": "Lansat!"
+    "customOptionDesc": "Control complet asupra fiecărei setări",
+    "step4Heading": "Personalizează-ți agentul",
+    "step4Subheading": "Dă-i un nume agentului și alege cum gândește",
+    "agentNameLabel": "Numele agentului",
+    "agentNamePlaceholder": "ex. AlphaResearcher, TweetLord...",
+    "agentNameHintCount": "{count}/50 de caractere",
+    "agentNameTooShort": "Numele trebuie să aibă cel puțin 3 caractere",
+    "agentNameInvalidChars": "Sunt permise doar litere, cifre, spații, cratime, două puncte, apostrofuri",
+    "descriptionLabel": "Descriere",
+    "descriptionPlaceholder": "Descriere scurtă a funcționalității agentului...",
+    "descriptionHint": "Scurt slogan pentru agentul tău",
+    "platformsHeading": "Unde să funcționeze agentul tău?",
+    "platformsSubheading": "Selectează platformele și adaugă cheile API. Poți adăuga mai multe oricând din Setări.",
+    "noPlatformsNote": "Nicio platformă selectată? Nu-i problemă — adaugă oricând din tab-ul Setări al agentului.",
+    "hideValue": "Ascunde valoarea",
+    "showValue": "Arată valoarea",
+    "llmModelLabel": "Model AI",
+    "llmModelAria": "Selecție model AI",
+    "llmFreeLabel": "Model AI gratuit",
+    "llmFreeTag": "GRATUIT",
+    "llmFreeSubtext": "Alimentat de Groq — nu necesită cheie API",
+    "llmByokLabel": "Folosește propria cheie AI",
+    "llmByokTag": "mereu gratuit",
+    "llmByokSubtext": "Conectează propria cheie API OpenAI, Anthropic sau altă platformă",
+    "byokProviderLabel": "Furnizor",
+    "byokModelLabel": "Model",
+    "byokModelPlaceholder": "identificator model...",
+    "byokBackToList": "Înapoi la lista de modele",
+    "byokSelectModel": "Selectează un model...",
+    "byokCustomModel": "Model personalizat...",
+    "byokApiKeyLabel": "Cheie API",
+    "byokApiKeyEncrypted": "criptată la stocare",
+    "byokBaseUrlLabel": "URL de bază",
+    "skillsHeading": "Abilități agent",
+    "skillsSubheading": "Alege ce poate face agentul tău",
+    "toolsHeading": "Instrumente agent",
+    "toolsSubheading": "Alege ce poate face agentul tău",
+    "pluginsHeading": "Plugin-uri",
+    "pluginsSubheading": "Alege ce poate face agentul tău",
+    "capabilitiesHeading": "Capacități",
+    "capabilitiesSubheading": "Alege ce poate face agentul tău",
+    "templateSkillsHeading": "Inclus în acest șablon",
+    "templateSkillsSubheading": "Aceste abilități ClawHub se instalează automat la prima pornire.",
+    "systemPromptLabel": "System Prompt",
+    "systemPromptCustomNote": "Instrucțiunile tale personalizate vor înlocui valoarea implicită a șablonului",
+    "systemPromptDefaultNote": "Personalitatea agentului este preconfigurată. Personalizează dacă dorești să o schimbi.",
+    "systemPromptCustomize": "Personalizează",
+    "systemPromptUseDefault": "Folosește șablonul implicit",
+    "systemPromptPlaceholder": "Scrie aici system prompt-ul personalizat. Înlocuiește complet valoarea implicită.",
+    "systemPromptHint": "Definește personalitatea, capacitățile și regulile agentului",
+    "systemPromptCount": "{count}/8000",
+    "systemPromptWarning": "Adaugă un system prompt pentru rezultate mai bune",
+    "elizaBioLabel": "Bio",
+    "elizaBioHint": "Definește personalitatea și contextul agentului. O afirmație per linie.",
+    "elizaBioPlaceholder": "Un asistent AI cu cunoștințe specializate în...",
+    "elizaLoreLabel": "Lore",
+    "elizaLoreHint": "Cunoștințe de bază și istoria agentului. Un fapt per linie.",
+    "elizaStyleLabel": "Instrucțiuni de stil",
+    "elizaStyleHint": "Cum trebuie să comunice agentul. O instrucțiune per linie.",
+    "elizaTopicsLabel": "Subiecte",
+    "elizaTopicsPlaceholder": "technology, AI, crypto, research",
+    "elizaTopicsHint": "Subiecte pe care le cunoaște agentul, separate prin virgulă",
+    "elizaAdjectivesLabel": "Adjective",
+    "elizaAdjectivesPlaceholder": "helpful, analytical, concise",
+    "elizaAdjectivesHint": "Trăsături de personalitate, separate prin virgulă",
+    "miladyPersonalityLabel": "Preset personalitate",
+    "miladyPersonalityHint": "Alege un stil de personalitate pentru agentul Milady.",
+    "miladyPersonalityHelpful": "Util - Prietenos și profesionist",
+    "miladyPersonalityTsundere": "Tsundere - Reticent dar grijuliu",
+    "miladyPersonalityUnhinged": "Haotic - Imprevizibil și spontan",
+    "miladyPersonalityCustom": "Personalizat - Folosește system prompt-ul tău",
+    "moreOptionsLabel": "Mai multe opțiuni",
+    "moreOptionsHints": {
+      "openclaw": "Căutare, voce, sesiuni",
+      "hermes": "Personalitate, memorie, aprobare",
+      "elizaos": "Bază de date, generare imagini, voce",
+      "milady": "Bază de date, confidențialitate, preset-uri"
+    },
+    "sessionScopeLabel": "Domeniu sesiune",
+    "sessionScopeHint": "Cum se partajează contextul conversației între utilizatori",
+    "sessionScopePerUser": "Per utilizator",
+    "sessionScopeGlobal": "Global",
+    "webSearchLabel": "Activează căutarea web",
+    "webSearchHint": "Permite agentului să caute informații în timp real",
+    "searchProviderLabel": "Furnizor căutare",
+    "searchProviderHint": "Ce API de căutare să folosești",
+    "ttsLabel": "Activează vocea (TTS)",
+    "ttsHint": "Ieșire text-în-voce pentru răspunsuri vocale",
+    "ttsProviderLabel": "Furnizor TTS",
+    "ttsProviderHint": "Motor de sinteză vocală",
+    "hermesPersonalityLabel": "Personalitate",
+    "hermesPersonalityHint": "Ton și stil de conversație",
+    "hermesPersonalityDefault": "Implicit",
+    "hermesPersonalityHelpful": "Util",
+    "hermesPersonalityTechnical": "Tehnic",
+    "hermesPersonalityCreative": "Creativ",
+    "hermesPersonalityConcise": "Concis",
+    "memoryLabel": "Activează memoria",
+    "memoryHint": "Păstrează contextul între conversații",
+    "approvalModeLabel": "Mod aprobare",
+    "approvalModeHint": "Cum sunt autorizate acțiunile înainte de execuție",
+    "approvalModeAuto": "Automat",
+    "approvalModeAsk": "Întreabă înainte de acțiuni",
+    "approvalModeManual": "Manual",
+    "databaseLabel": "Bază de date",
+    "databaseHint": "Backend stocare pentru starea și memoria agentului",
+    "databaseHintMilady": "Backend stocare pentru starea agentului",
+    "imageGenLabel": "Activează generarea de imagini",
+    "imageGenHint": "Permite agentului să genereze imagini",
+    "voiceLabel": "Activează vocea",
+    "voiceHint": "Capacități voce-în-text și text-în-voce",
+    "localFirstLabel": "Mod Local-First",
+    "localFirstHint": "Procesează datele local înainte de sincronizare",
+    "miladyPersonalitySelectedHint": "Selectat mai sus — controlează tonul agentului",
+    "step5Heading": "Gata de pornire?",
+    "step5Subheading": "Verifică configurația înainte de pornire",
+    "summaryAgentType": "Tip agent",
+    "summaryTemplate": "Șablon",
+    "summaryTemplateCustom": "Personalizat",
+    "summaryAiModel": "Model AI",
+    "summaryDescription": "Descriere",
+    "summaryPlatforms": "Platforme",
+    "summaryPersonality": "Personalitate",
+    "summaryPersonalityDefault": "Implicit șablon",
+    "summaryPersonalityCustom": "Instrucțiuni personalizate",
+    "summaryCost": "Cost",
+    "summaryCostFree": "$0.00 — gratuit",
+    "summaryCostByok": "$0.00 — cheie proprie",
+    "summaryFrameworkLabels": {
+      "openclaw": "Asistent multi-abilitate",
+      "hermes": "Agent autonom",
+      "elizaos": "Framework multi-agent",
+      "milady": "Runtime confidențialitate"
+    },
+    "testChatLabel": "Testează agentul",
+    "testChatSubtext": "Previzualizează cum va răspunde agentul",
+    "testChatPreviewLabel": "Previzualizare chat",
+    "testChatSimulated": "Previzualizare simulată. Implementează agentul pentru conversații reale.",
+    "testChatEmpty": "Trimite un mesaj pentru a previzualiza agentul",
+    "testChatEmptyHint": "Încearcă \"Salut\" sau \"Ce poți face?\"",
+    "testChatPlaceholder": "Scrie un mesaj...",
+    "launchedHeading": "Agentul tău este live!",
+    "launchedSubtext": "Redirecționare către dashboard-ul agentului...",
+    "launchCtaLabel": "Pornește agentul",
+    "launchCtaCreating": "Se creează agentul...",
+    "launchCtaCreated": "Agent creat cu succes",
+    "launchCta": "Pornește agentul meu!",
+    "launching": "Se eclozionează...",
+    "launched": "Eclozionat!",
+    "frameworkFeatures": {
+      "openclaw": {
+        "desc": "Asistent AI versatil cu mii de abilități din comunitate și mesagerie multi-canal.",
+        "f1": "Mii de abilități",
+        "f2": "Navigare web",
+        "f3": "Sarcini programate"
+      },
+      "hermes": {
+        "desc": "Agent AI inteligent care memorează contextul din conversații și învață în timp.",
+        "f1": "Memorie pe termen lung",
+        "f2": "40+ instrumente integrate",
+        "f3": "Auto-îmbunătățire"
+      },
+      "elizaos": {
+        "desc": "Framework multi-agent open-source de la ai16z. 90+ plugin-uri, memorie persistentă, Web3 nativ.",
+        "f1": "90+ plugin-uri",
+        "f2": "Memorie vectorială",
+        "f3": "Web3 nativ"
+      },
+      "milady": {
+        "desc": "Runtime AI axat pe confidențialitate cu 20+ conectori, avatare VRM și integrare DeFi.",
+        "f1": "20+ conectori",
+        "f2": "Preset-uri personalitate",
+        "f3": "Confidențialitate-first"
+      }
+    },
+    "skills": {
+      "webSearch": {
+        "name": "Căutare web",
+        "desc": "Caută informații în timp real"
+      },
+      "calculator": {
+        "name": "Calculator",
+        "desc": "Matematică și calcule"
+      },
+      "weather": {
+        "name": "Vreme",
+        "desc": "Prognoze meteo"
+      },
+      "codeInterpreter": {
+        "name": "Rulare cod",
+        "desc": "Execută fragmente de cod"
+      },
+      "fileManager": {
+        "name": "Manager fișiere",
+        "desc": "Citește și scrie fișiere"
+      },
+      "imageGen": {
+        "name": "Generare imagini",
+        "desc": "Generează imagini din text"
+      }
+    },
+    "tools": {
+      "webSearch": {
+        "name": "Căutare web",
+        "desc": "Caută informații pe internet"
+      },
+      "calculator": {
+        "name": "Calculator",
+        "desc": "Calcule matematice"
+      },
+      "codeExecution": {
+        "name": "Rulare cod",
+        "desc": "Execută fragmente de cod"
+      },
+      "fileOperations": {
+        "name": "Operațiuni fișiere",
+        "desc": "Citește și scrie fișiere"
+      },
+      "memory": {
+        "name": "Memorie",
+        "desc": "Ține minte conversații și fapte"
+      },
+      "summarize": {
+        "name": "Rezumat",
+        "desc": "Rezumă texte lungi"
+      },
+      "translate": {
+        "name": "Traducător",
+        "desc": "Traduce între limbi"
+      },
+      "weather": {
+        "name": "Vreme",
+        "desc": "Prognoze meteo"
+      }
+    },
+    "plugins": {
+      "database": {
+        "name": "Bază de date",
+        "desc": "Acces bază de date SQL"
+      },
+      "imageGen": {
+        "name": "Generare imagini",
+        "desc": "Generează imagini"
+      },
+      "video": {
+        "name": "Video",
+        "desc": "Procesare video"
+      },
+      "tts": {
+        "name": "Text-în-voce",
+        "desc": "Ieșire vocală"
+      },
+      "nodeRuntime": {
+        "name": "Runtime Node",
+        "desc": "Operațiuni pe server"
+      },
+      "bootstrap": {
+        "name": "Bootstrap",
+        "desc": "Utilități de bază"
+      }
+    },
+    "capabilities": {
+      "chat": {
+        "name": "Chat",
+        "desc": "Conversație principală"
+      },
+      "defi": {
+        "name": "DeFi",
+        "desc": "Interacțiuni protocoale DeFi"
+      },
+      "social": {
+        "name": "Social",
+        "desc": "Integrare rețele sociale"
+      },
+      "analysis": {
+        "name": "Analiză",
+        "desc": "Analiza datelor"
+      },
+      "privacy": {
+        "name": "Confidențialitate",
+        "desc": "Instrumente de confidențialitate"
+      },
+      "memes": {
+        "name": "Meme-uri",
+        "desc": "Generare meme-uri"
+      }
+    },
+    "platforms": {
+      "telegram": {
+        "desc": "Implementează ca bot Telegram",
+        "helperField": "Telegram → @BotFather → /newbot → copiază token-ul"
+      },
+      "discord": {
+        "desc": "Implementează ca bot Discord",
+        "helperField": "Portal dezvoltatori Discord → Aplicație nouă → Bot → Copiază token"
+      },
+      "whatsapp": {
+        "desc": "Conectare prin cod QR",
+        "note": "Asocierea QR va fi disponibilă după implementare"
+      },
+      "slack": {
+        "desc": "Implementează în spațiul Slack",
+        "helperField": "Slack API → Crează aplicație → OAuth și permisiuni → Bot Token"
+      },
+      "twitter": {
+        "desc": "Postează, răspunde și interacționează pe X"
+      }
+    },
+    "llmFreeSummary": "Model AI gratuit (Groq)",
+    "llmByokSummary": "Cheia ta: {provider}{model}",
+    "errorHeading": "Eroare la creare",
+    "errorBody": "A apărut o eroare la configurarea agentului. Progresul tău nu a fost pierdut.",
+    "errorIdLabel": "ID eroare:",
+    "tryAgain": "Încearcă din nou",
+    "dashboard": "Panou de control"
   },
   "support": {
     "eyebrow": "Ajutor",
