@@ -56,6 +56,9 @@ interface Props {
    *  character isn't spawned so we hide it to avoid a confusing dot at
    *  origin. */
   showCharacter: boolean;
+  /** Click-to-fast-travel handler — fires when the user clicks inside
+   *  a district square on the minimap. */
+  onTravel?: (category: Category) => void;
 }
 
 /**
@@ -66,12 +69,10 @@ interface Props {
  *
  * No click-to-teleport yet; walk mode fast-travel pads ship next.
  */
-export function Minimap({ state, agents, showCharacter }: Props) {
+export function Minimap({ state, agents, showCharacter, onTravel }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dprRef = useRef(typeof window !== 'undefined' ? window.devicePixelRatio : 1);
 
-  // Redraw every frame so the character position stays live in walk
-  // mode. rAF loop runs regardless of React render cadence.
   useEffect(() => {
     let raf = 0;
     const tick = () => {
@@ -81,6 +82,31 @@ export function Minimap({ state, agents, showCharacter }: Props) {
     tick();
     return () => cancelAnimationFrame(raf);
   }, [state, agents, showCharacter]);
+
+  const handleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!onTravel) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const mz = e.clientY - rect.top;
+    // Inverse of toMap — minimap px → world (x, z)
+    const wx = (mx / MAP_PX) * WORLD_HALF * 2 - WORLD_HALF;
+    const wz = (mz / MAP_PX) * WORLD_HALF * 2 - WORLD_HALF;
+    // Find the nearest district
+    const step = DISTRICT_SIZE + DISTRICT_GAP;
+    const totalRows = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
+    let best: { cat: Category; d2: number } | null = null;
+    CATEGORIES.forEach((cat, idx) => {
+      const col = idx % DISTRICT_COLS;
+      const row = Math.floor(idx / DISTRICT_COLS);
+      const cx = (col - (DISTRICT_COLS - 1) / 2) * step;
+      const cz = (row - (totalRows - 1) / 2) * step;
+      const d2 = (wx - cx) ** 2 + (wz - cz) ** 2;
+      if (!best || d2 < best.d2) best = { cat, d2 };
+    });
+    if (best && (best as { cat: Category; d2: number }).d2 < (DISTRICT_SIZE * 0.8) ** 2) {
+      onTravel((best as { cat: Category; d2: number }).cat);
+    }
+  };
 
   return (
     <div
@@ -93,14 +119,14 @@ export function Minimap({ state, agents, showCharacter }: Props) {
         border: '1px solid rgba(251,191,36,0.45)',
         borderRadius: 6,
         padding: 6,
-        pointerEvents: 'none',
       }}
     >
       <canvas
         ref={canvasRef}
         width={MAP_PX * dprRef.current}
         height={MAP_PX * dprRef.current}
-        style={{ width: MAP_PX, height: MAP_PX, display: 'block' }}
+        onClick={handleClick}
+        style={{ width: MAP_PX, height: MAP_PX, display: 'block', cursor: onTravel ? 'crosshair' : 'default' }}
       />
       <div
         style={{
@@ -112,7 +138,7 @@ export function Minimap({ state, agents, showCharacter }: Props) {
           textAlign: 'center',
         }}
       >
-        CITY MAP
+        CITY MAP — CLICK TO TRAVEL
       </div>
     </div>
   );

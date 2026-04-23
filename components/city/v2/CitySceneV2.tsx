@@ -13,6 +13,7 @@ import { SceneErrorBoundary } from './world/SceneErrorBoundary';
 import { Streets } from './world/Streets';
 import { DistrictPads } from './world/DistrictPads';
 import { Landmarks } from './world/Landmarks';
+import { TravelPads } from './world/TravelPads';
 import { Traffic } from './world/Traffic';
 import { NPCs } from './world/NPCs';
 import { Buildings } from './world/Buildings';
@@ -25,6 +26,7 @@ import {
 import { FollowCamera } from './character/FollowCamera';
 import { WalkSurveyToggle, type CityMode } from './hud/WalkSurveyToggle';
 import { Minimap } from './hud/Minimap';
+import { CATEGORIES } from '@/components/city/types';
 
 interface Props {
   agents?: CityAgent[];
@@ -60,6 +62,27 @@ export function CitySceneV2({ agents = [] }: Props) {
     return () => window.removeEventListener('keydown', onKey);
   }, [mode]);
 
+  // Minimap click handler — teleport character + enter walk mode so
+  // the click immediately puts you somewhere you can explore.
+  const handleTravel = (cat: (typeof CATEGORIES)[number]) => {
+    const DISTRICT_COLS = 5;
+    const DISTRICT_SIZE = 52;
+    const DISTRICT_GAP = 14;
+    const step = DISTRICT_SIZE + DISTRICT_GAP;
+    const totalRows = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
+    const idx = CATEGORIES.indexOf(cat);
+    if (idx < 0) return;
+    const col = idx % DISTRICT_COLS;
+    const row = Math.floor(idx / DISTRICT_COLS);
+    const cx = (col - (DISTRICT_COLS - 1) / 2) * step;
+    const cz = (row - (totalRows - 1) / 2) * step;
+    // Drop character at the district's travel pad corner so they're
+    // never inside a building after teleport.
+    charState.current.position.set(cx + 16, 0, cz + 16);
+    charState.current.heading = 0;
+    setMode('walk');
+  };
+
   return (
     <QualityProvider>
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -70,6 +93,7 @@ export function CitySceneV2({ agents = [] }: Props) {
           state={charState.current}
           agents={agents}
           showCharacter={mode === 'walk'}
+          onTravel={handleTravel}
         />
       </div>
     </QualityProvider>
@@ -126,6 +150,9 @@ function CanvasInner({
         </SceneErrorBoundary>
         <SceneErrorBoundary label="Landmarks">
           <Landmarks />
+        </SceneErrorBoundary>
+        <SceneErrorBoundary label="TravelPads">
+          <TravelPads />
         </SceneErrorBoundary>
         <SceneErrorBoundary label="Traffic">
           <Traffic />
