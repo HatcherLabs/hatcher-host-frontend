@@ -1,11 +1,8 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { useEffect, useRef, useState, useTransition } from 'react';
-import {
-  usePathname as useRawPathname,
-  useRouter as useRawRouter,
-} from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import { usePathname as useRawPathname } from 'next/navigation';
 import { ChevronDown } from 'lucide-react';
 import {
   locales,
@@ -50,11 +47,10 @@ function buildLocaleUrl(cleanPath: string, targetLocale: Locale): string {
 
 export function LocaleSwitcher() {
   const locale = useLocale() as Locale;
-  const router = useRawRouter();
   const rawPathname = useRawPathname();
   const t = useTranslations('localeSwitcher');
-  const [isPending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
+  const [pending, setPending] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -78,19 +74,18 @@ export function LocaleSwitcher() {
   function onPick(next: Locale) {
     setOpen(false);
     if (next === locale) return;
-    // Construct the exact target URL ourselves and navigate via the raw Next
-    // router. This avoids quirks in next-intl's router.replace where the
-    // locale homepage can yield "/ro/de" on switch.
     const cleanPath = isNonLocalePath(rawPathname)
       ? '/'
       : stripLocalePrefix(rawPathname, locale);
     const target = buildLocaleUrl(cleanPath, next);
-    // Also set the cookie immediately so middleware respects it on the next
-    // request in case next-intl doesn't catch up before navigation.
+    // Set cookie so the middleware picks up the preference on the new request.
     document.cookie = `HATCHER_LOCALE=${next}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax`;
-    startTransition(() => {
-      router.replace(target);
-    });
+    // Full page navigation — forces Next.js to re-render every layout with the
+    // new locale (including NextIntlClientProvider). SPA navigation via
+    // router.replace doesn't reliably re-run [locale]/layout.tsx, leaving the
+    // Header/Footer stuck on the previous language's strings.
+    setPending(true);
+    window.location.assign(target);
   }
 
   return (
@@ -98,7 +93,7 @@ export function LocaleSwitcher() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        disabled={isPending}
+        disabled={pending}
         aria-label={t('label')}
         aria-haspopup="listbox"
         aria-expanded={open}
