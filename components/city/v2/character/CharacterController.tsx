@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { WORLD_HALF } from '../world/grid';
+import type { SolidDisc } from '../world/colliders';
 
 export interface CharacterState {
   position: THREE.Vector3;
@@ -16,10 +17,15 @@ export interface CharacterState {
 interface Props {
   state: CharacterState;
   speed?: number;
-  /** External analog vector, usually the mobile virtual joystick.
-   *  Range (-1..1, -1..1). Keyboard and analog stack — whichever is
-   *  larger on each axis wins. */
+  /** External analog vector, usually the mobile virtual joystick. */
   analog?: { x: number; y: number };
+  /** Static circle colliders (buildings). If a step would end inside
+   *  a disc, the position is pushed radially back out so walking into
+   *  a skyscraper stops instead of passing through. */
+  solids?: SolidDisc[];
+  /** Character radius for the push-out check. Slightly larger than
+   *  the visual capsule so walking brushes feel solid. */
+  characterRadius?: number;
 }
 
 /**
@@ -35,7 +41,13 @@ interface Props {
  * NOT ( forward.z, 0, -forward.x ). A previous version had the sign
  * flipped, which made A/D feel swapped.
  */
-export function CharacterController({ state, speed = 12, analog }: Props) {
+export function CharacterController({
+  state,
+  speed = 12,
+  analog,
+  solids,
+  characterRadius = 0.6,
+}: Props) {
   const { camera } = useThree();
   const keys = useRef({
     forward: false,
@@ -136,8 +148,32 @@ export function CharacterController({ state, speed = 12, analog }: Props) {
 
     const stepDist = (sprint ? speed * 1.8 : speed) * dt;
     state.position.addScaledVector(move, stepDist);
-    // Clamp so the character can't walk off the map. Derived from the
-    // grid extent so it scales automatically with DISTRICT_SIZE tweaks.
+
+    // Building push-out — iterate every solid disc once and displace
+    // the character radially out of any we ended up inside. One pass
+    // is enough for non-overlapping solids; a second pass catches
+    // edge cases where the first correction shoves us into a
+    // neighbour. 700 solids × 2 passes = 1400 sqrts/frame, negligible.
+    if (solids && solids.length) {
+      for (let pass = 0; pass < 2; pass++) {
+        let moved = false;
+        for (const s of solids) {
+          const dx = state.position.x - s.x;
+          const dz = state.position.z - s.z;
+          const minDist = s.r + characterRadius;
+          const d2 = dx * dx + dz * dz;
+          if (d2 >= minDist * minDist || d2 === 0) continue;
+          const d = Math.sqrt(d2);
+          const push = (minDist - d) / d;
+          state.position.x += dx * push;
+          state.position.z += dz * push;
+          moved = true;
+        }
+        if (!moved) break;
+      }
+    }
+
+    // Clamp so the character can't walk off the map.
     const r = Math.sqrt(state.position.x ** 2 + state.position.z ** 2);
     if (r > WORLD_HALF) {
       state.position.x *= WORLD_HALF / r;

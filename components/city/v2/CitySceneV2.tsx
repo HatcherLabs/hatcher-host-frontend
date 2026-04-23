@@ -22,6 +22,7 @@ import { Buildings } from './world/Buildings';
 import { ActivityPulses } from './world/ActivityPulses';
 import { Atmosphere } from './world/Atmosphere';
 import { LiveBillboard } from './world/LiveBillboard';
+import { buildSolidDiscs } from './world/colliders';
 import {
   CharacterController,
   CharacterMesh,
@@ -37,6 +38,7 @@ import { MobileJoystick } from './character/MobileJoystick';
 import { AmbientAudio } from './hud/AmbientAudio';
 import { CATEGORIES } from '@/components/city/types';
 import { DISTRICT_SIZE, districtPosition as gridDistrictPosition } from './world/grid';
+import { useMemo as useMemoReact } from 'react';
 
 interface Props {
   agents?: CityAgent[];
@@ -153,6 +155,12 @@ function CanvasInner({
   analogRef: React.MutableRefObject<{ x: number; y: number }>;
 }) {
   const quality = useQuality();
+  // Only derive collider discs when in walk mode — in survey there's
+  // no character to push out, and the agent list can be huge.
+  const solids = useMemoReact(
+    () => (mode === 'walk' ? buildSolidDiscs(agents) : []),
+    [mode, agents],
+  );
   return (
     <Canvas
       key={quality}
@@ -236,7 +244,11 @@ function CanvasInner({
         />
       ) : (
         <>
-          <CharacterController state={charState} analog={analogRef.current} />
+          <CharacterController
+            state={charState}
+            analog={analogRef.current}
+            solids={solids}
+          />
           <MouseLook state={charState} />
           <FollowCamera state={charState} />
         </>
