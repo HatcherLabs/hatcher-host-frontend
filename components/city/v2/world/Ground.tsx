@@ -69,8 +69,12 @@ export function Ground() {
 
   return (
     <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-        <planeGeometry args={[GROUND_SIZE, GROUND_SIZE]} />
+      {/* Solid slab (6u thick) so the city reads as grounded instead of
+          a floating plane. If the player's camera ever ends up below
+          y=0 (edge-walking, panning, etc.) they hit opaque material on
+          the bottom face, not the void. */}
+      <mesh position={[0, -3, 0]} receiveShadow>
+        <boxGeometry args={[GROUND_SIZE, 6, GROUND_SIZE]} />
         <meshStandardMaterial
           map={diff}
           normalMap={norm}
@@ -80,6 +84,7 @@ export function Ground() {
           color={'#1a1a24'}
         />
       </mesh>
+      {/* Cyber grid overlay — hovers a hair above the slab. */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
         <planeGeometry args={[GROUND_SIZE, GROUND_SIZE]} />
         <meshBasicMaterial

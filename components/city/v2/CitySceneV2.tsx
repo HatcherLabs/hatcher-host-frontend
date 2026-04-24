@@ -9,6 +9,7 @@ import { QualityProvider, useQuality } from './quality/QualityContext';
 import { QualityToggle } from './quality/QualityToggle';
 import { Skybox } from './world/Skybox';
 import { Ground } from './world/Ground';
+import { HorizonRing } from './world/HorizonRing';
 import { SceneErrorBoundary } from './world/SceneErrorBoundary';
 import { Streets } from './world/Streets';
 import { DistrictPads } from './world/DistrictPads';
@@ -175,7 +176,12 @@ function CanvasInner({
           scene calm and keeps our 600u ground from competing with real
           photographed skyscrapers in the HDRI. */}
       <color attach="background" args={['#030111']} />
-      <fog attach="fog" args={['#050418', 140, 450]} />
+      {/* Fog is a light atmospheric touch — city stays clearly
+          readable out to ~380u, with a slow falloff past that. Avoids
+          the "everything is black in the distance" feel.
+          Walk mode clamps at ~255u of player movement, so the fog
+          far plane at 480 leaves plenty of headroom. */}
+      <fog attach="fog" args={['#050418', 200, 480]} />
       <ambientLight intensity={0.18} color={'#4866aa'} />
       <directionalLight
         position={[100, 140, 80]}
@@ -193,6 +199,7 @@ function CanvasInner({
           <Skybox timeOfDay="auto" />
         </SceneErrorBoundary>
         <Ground />
+        <HorizonRing />
         <SceneErrorBoundary label="DistrictPads">
           <DistrictPads />
         </SceneErrorBoundary>
@@ -238,9 +245,18 @@ function CanvasInner({
       {mode === 'survey' ? (
         <OrbitControls
           enableDamping
+          enablePan={false}
           target={[0, 0, 0]}
           minDistance={30}
-          maxDistance={400}
+          // Cap zoom-out inside the fog falloff so the city stays
+          // readable at max distance — no more black void.
+          maxDistance={300}
+          // Prevent orbiting below the horizon — otherwise the camera
+          // rotates under the ground slab and shows black void.
+          maxPolarAngle={Math.PI / 2 - 0.08}
+          // Keep a small ceiling on top-down so the view stays
+          // cityscape-angled, not flat map.
+          minPolarAngle={0.18}
         />
       ) : (
         <>
@@ -249,7 +265,11 @@ function CanvasInner({
             analog={analogRef.current}
             solids={solids}
           />
-          <MouseLook state={charState} />
+          {/* Walk mode needs enough pitch range to look at the street
+              in front of the character. -0.35 ≈ 20° below horizontal —
+              you see the road ahead but not past the ground slab.
+              Upper 0.95 keeps skyline look-ups unchanged. */}
+          <MouseLook state={charState} pitchMin={-0.35} pitchMax={0.95} />
           <FollowCamera state={charState} />
         </>
       )}
