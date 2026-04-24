@@ -58,8 +58,20 @@ export function CharacterController({
   });
 
   useEffect(() => {
+    // Ignore movement keys when the user is typing in a form field. Without
+    // this, W/A/S/D pressed in a chat input both inserts the letter AND
+    // walks the character away from the station.
+    const isTyping = () => {
+      const el = typeof document !== 'undefined' ? document.activeElement : null;
+      if (!el) return false;
+      const tag = el.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+      if ((el as HTMLElement).isContentEditable) return true;
+      return false;
+    };
     const down = (e: KeyboardEvent) => {
       if (e.repeat) return;
+      if (isTyping()) return;
       switch (e.code) {
         case 'KeyW':
         case 'ArrowUp':
@@ -84,6 +96,7 @@ export function CharacterController({
       }
     };
     const up = (e: KeyboardEvent) => {
+      if (isTyping()) return;
       switch (e.code) {
         case 'KeyW':
         case 'ArrowUp':
@@ -206,6 +219,12 @@ export function MouseLook({
     const down = (e: Event) => {
       const pe = e as PointerEvent;
       if (pe.button !== 0) return;
+      // Only start camera drag when the pointer pressed on the 3D canvas.
+      // Clicks on overlay panels / HUD buttons previously started a drag
+      // too, so moving the mouse inside a panel rotated the camera
+      // underneath it.
+      const target = pe.target as HTMLElement | null;
+      if (target && target.tagName !== 'CANVAS') return;
       dragging.current = true;
     };
     const up = () => {

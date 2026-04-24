@@ -46,19 +46,26 @@ export function LogWall({ station, framework, agentId, onClick, isNear }: Props)
 
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]} onClick={onClick}>
-      {/* Wall plane */}
-      <mesh position={[0, 2.2, 0]}>
-        <planeGeometry args={[3.6, 2.6]} />
-        <meshBasicMaterial color={0x000000} />
-      </mesh>
-      {/* Neon frame */}
-      <mesh position={[0, 2.2, -0.01]}>
-        <planeGeometry args={[3.7, 2.7]} />
+      {/* Neon frame — behind everything */}
+      <mesh position={[0, 2.2, -0.02]}>
+        <planeGeometry args={[3.1, 2.1]} />
         <meshBasicMaterial color={palette.primary} toneMapped={false} />
       </mesh>
-      <Html position={[0, 2.2, 0.02]} transform distanceFactor={4} zIndexRange={[10, 0]} style={{ width: 340, height: 240 }}>
+      {/* Wall plane — opaque black, in front of the frame */}
+      <mesh position={[0, 2.2, 0]}>
+        <planeGeometry args={[3.0, 2.0]} />
+        <meshBasicMaterial color={0x000000} />
+      </mesh>
+      <Html
+        position={[0, 2.2, 0.05]}
+        transform
+        occlude="blending"
+        distanceFactor={4}
+        zIndexRange={[10, 0]}
+        style={{ width: 280, height: 180, pointerEvents: 'none' }}
+      >
         <div
-          className="pointer-events-none h-full w-full overflow-hidden rounded bg-black p-2 font-mono text-[9px] leading-snug"
+          className="h-full w-full overflow-hidden bg-black p-2 font-mono text-[8px] leading-tight"
           style={{ color: palette.primary }}
         >
           {lines.length === 0 ? (
