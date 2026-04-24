@@ -3,6 +3,7 @@ import { Html } from '@react-three/drei';
 import type { Station } from '../world/layout';
 import { paletteFor } from '../colors';
 import { ProximityHalo } from './ProximityHalo';
+import { KenneyModel } from './KenneyModel';
 
 interface Props {
   station: Station;
@@ -17,33 +18,15 @@ export function PluginsCabinet({ station, framework, installedCount, onClick, is
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]} onClick={onClick}>
       <ProximityHalo color={palette.primary} active={!!isNear} />
-      {/* Cabinet body */}
-      <mesh position={[0, 1, 0]} castShadow receiveShadow>
-        <boxGeometry args={[1.2, 2, 0.6]} />
-        <meshStandardMaterial color={0x1d1d25} metalness={0.4} roughness={0.6} />
-      </mesh>
-      {/* 3 drawer fronts */}
-      {[0.4, 1.0, 1.6].map((y, i) => {
-        const on = i < Math.min(3, installedCount);
-        return (
-          <group key={y}>
-            <mesh position={[0, y, 0.31]}>
-              <boxGeometry args={[1.1, 0.5, 0.04]} />
-              <meshStandardMaterial
-                color={palette.accent}
-                emissive={palette.accent}
-                emissiveIntensity={on ? 0.7 : 0.2}
-                toneMapped={false}
-              />
-            </mesh>
-            {/* Handle */}
-            <mesh position={[0, y, 0.34]}>
-              <boxGeometry args={[0.18, 0.04, 0.03]} />
-              <meshStandardMaterial color={0x0b0b12} metalness={0.9} roughness={0.15} />
-            </mesh>
-          </group>
-        );
-      })}
+      {/* Drawer cabinet — Kenney Furniture Kit CC0.
+         Emissive ramps up with installed plugin count so a well-kitted
+         agent literally has glowing drawers. */}
+      <KenneyModel
+        url="cabinet_drawers.glb"
+        scale={2.2}
+        emissive={palette.accent}
+        emissiveIntensity={installedCount > 0 ? (isNear ? 0.55 : 0.25) : 0.08}
+      />
       <Html position={[0, 2.3, 0]} center distanceFactor={10} zIndexRange={[10, 0]}>
         <div
           className="whitespace-nowrap rounded-full border px-3 py-1 text-xs text-white backdrop-blur"

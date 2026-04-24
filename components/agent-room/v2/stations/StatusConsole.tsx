@@ -5,6 +5,7 @@ import type { Station } from '../world/layout';
 import { paletteFor } from '../colors';
 import { api } from '@/lib/api';
 import { ProximityHalo } from './ProximityHalo';
+import { KenneyModel } from './KenneyModel';
 
 function ledColor(status: string): string {
   if (status === 'active' || status === 'running') return '#22c55e';
@@ -55,25 +56,23 @@ export function StatusConsole({
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]}>
       <ProximityHalo color={palette.primary} active={!!isNear} />
-      {/* Console body — click opens full panel */}
-      <mesh position={[0, 0.6, 0]} castShadow receiveShadow onClick={onOpenPanel}>
-        <boxGeometry args={[2.4, 1.2, 1.0]} />
-        <meshStandardMaterial color={0x1d1d25} metalness={0.5} roughness={0.4} />
-      </mesh>
-      {/* Trim */}
-      <mesh position={[0, 1.22, 0]}>
-        <boxGeometry args={[2.45, 0.04, 1.05]} />
-        <meshBasicMaterial color={palette.primary} toneMapped={false} />
-      </mesh>
-      {/* Big LED ring — direct click toggles run state */}
-      <mesh position={[0, 1.4, 0.3]} onClick={toggleDirect}>
-        <torusGeometry args={[0.32, 0.07, 12, 48]} />
+      {/* Computer desk — Kenney Space Kit CC0 */}
+      <group onClick={onOpenPanel}>
+        <KenneyModel
+          url="desk_computer.glb"
+          scale={2.3}
+          emissive={palette.primary}
+          emissiveIntensity={isNear ? 0.25 : 0.1}
+        />
+      </group>
+      {/* Big status LED ring on top of the desk — direct click toggles */}
+      <mesh position={[0, 1.55, 0]} onClick={toggleDirect}>
+        <torusGeometry args={[0.3, 0.07, 12, 48]} />
         <meshBasicMaterial color={ledColor(status)} toneMapped={false} />
       </mesh>
-      {/* Fill the ring with a darker disc so it reads as a big button */}
-      <mesh position={[0, 1.4, 0.29]}>
-        <circleGeometry args={[0.27, 24]} />
-        <meshStandardMaterial color={0x0b0b12} emissive={ledColor(status)} emissiveIntensity={0.25} />
+      <mesh position={[0, 1.55, 0]}>
+        <circleGeometry args={[0.25, 24]} />
+        <meshStandardMaterial color={0x0b0b12} emissive={ledColor(status)} emissiveIntensity={0.4} />
       </mesh>
       <Html position={[0, 2.1, 0]} center distanceFactor={10} zIndexRange={[10, 0]}>
         <div

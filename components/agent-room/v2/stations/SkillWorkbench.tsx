@@ -3,6 +3,7 @@ import { Html } from '@react-three/drei';
 import type { Station } from '../world/layout';
 import { paletteFor } from '../colors';
 import { ProximityHalo } from './ProximityHalo';
+import { KenneyModel } from './KenneyModel';
 
 interface Props {
   station: Station;
@@ -17,20 +18,17 @@ export function SkillWorkbench({ station, framework, onClick, isNear }: Props) {
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]} onClick={onClick}>
       <ProximityHalo color={palette.primary} active={!!isNear} />
-      {/* Table body */}
-      <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
-        <boxGeometry args={[2.2, 1.0, 1.2]} />
-        <meshStandardMaterial color={0x2a2a34} metalness={0.6} roughness={0.3} />
-      </mesh>
-      {/* Glowing top edge */}
-      <mesh position={[0, 1.01, 0]}>
-        <boxGeometry args={[2.25, 0.05, 1.25]} />
-        <meshBasicMaterial color={palette.primary} toneMapped={false} />
-      </mesh>
-      {/* Tool rack */}
+      {/* Corner desk with monitor + keyboard — Kenney Space Kit CC0 */}
+      <KenneyModel
+        url="desk_computer_corner.glb"
+        scale={2.3}
+        emissive={palette.primary}
+        emissiveIntensity={isNear ? 0.3 : 0.1}
+      />
+      {/* Framework-tinted glow tools on the desk surface */}
       {[0, 1, 2].map(i => (
-        <mesh key={i} position={[-0.7 + i * 0.7, 1.4, -0.3]} castShadow>
-          <cylinderGeometry args={[0.08, 0.08, 0.6, 12]} />
+        <mesh key={i} position={[-0.6 + i * 0.6, 1.1, -0.3]} castShadow>
+          <cylinderGeometry args={[0.06, 0.06, 0.5, 12]} />
           <meshStandardMaterial
             color={palette.accent}
             emissive={palette.accent}
@@ -39,11 +37,6 @@ export function SkillWorkbench({ station, framework, onClick, isNear }: Props) {
           />
         </mesh>
       ))}
-      {/* Screen on the back */}
-      <mesh position={[0, 1.5, -0.55]} rotation={[-0.15, 0, 0]}>
-        <planeGeometry args={[1.0, 0.5]} />
-        <meshBasicMaterial color={palette.primary} toneMapped={false} opacity={0.6} transparent />
-      </mesh>
       <Html position={[0, 2.3, 0]} center distanceFactor={10} zIndexRange={[10, 0]}>
         <div
           className="whitespace-nowrap rounded-full border px-3 py-1 text-xs text-white backdrop-blur"
