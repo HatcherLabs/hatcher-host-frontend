@@ -38,7 +38,34 @@ interface AgentWithExtras {
   tier?: string;
   uptimeSec?: number;
   messageCountToday?: number;
-  integrations?: Array<{ platform?: string; channel?: string; status?: string; enabled?: boolean }>;
+  config?: Record<string, unknown>;
+}
+
+// Same extraction the legacy /room uses — integrations live inside config
+// under several shapes depending on framework. Returns a Set of lowercase
+// channel keys ('telegram', 'discord', 'twitter', etc.) that look wired up.
+function extractConnectedIntegrations(config: Record<string, unknown> | undefined): Set<string> {
+  const enabled = new Set<string>();
+  if (!config) return enabled;
+  for (const field of ['platforms', 'integrations'] as const) {
+    const v = config[field];
+    if (Array.isArray(v)) {
+      for (const item of v) if (typeof item === 'string') enabled.add(item.toLowerCase());
+    } else if (v && typeof v === 'object') {
+      for (const [k, cv] of Object.entries(v as Record<string, unknown>)) {
+        if (cv && typeof cv === 'object' && (cv as { enabled?: boolean }).enabled) enabled.add(k.toLowerCase());
+      }
+    }
+  }
+  const channelSettings = config.channelSettings;
+  if (channelSettings && typeof channelSettings === 'object') {
+    for (const k of Object.keys(channelSettings as Record<string, unknown>)) enabled.add(k.toLowerCase());
+  }
+  for (const k of Object.keys(config)) {
+    const m = k.match(/^([A-Z]+)_BOT_TOKEN$/);
+    if (m && config[k]) enabled.add(m[1]!.toLowerCase());
+  }
+  return enabled;
 }
 
 // Stations that need edit rights. AgentAvatar (chat), LogWall, StatsHologram stay
@@ -80,12 +107,23 @@ export function AgentRoomV2Client({ agentId }: Props) {
       // eslint-disable-next-line no-console
       console.log('[room-v2] agent loaded', {
         hasOwnerId: typeof data.ownerId === 'string',
-        ownerIdPreview: data.ownerId ? data.ownerId.slice(0, 8) : null,
         framework: data.framework,
-        status: data.status,
         keyList: Object.keys(data).sort().join(','),
-        hasAuthToken: typeof window !== 'undefined' && !!localStorage.getItem('hatcher_token'),
-        cookieHasJwt: typeof document !== 'undefined' && /hatcher_jwt|token=/.test(document.cookie),
+      });
+      // Cross-check: does /auth/me identify the same user from this page?
+      // If this returns success but getAgent shows hasOwnerId=false, then
+      // the user IS logged in but the agent request is somehow losing the
+      // auth signal.
+      api.getProfile().then((p) => {
+        // eslint-disable-next-line no-console
+        console.log('[room-v2] /auth/me from same context', {
+          success: p.success,
+          userId: p.success ? p.data.id.slice(0, 8) : null,
+          email: p.success ? p.data.email : null,
+        });
+      }).catch(() => {
+        // eslint-disable-next-line no-console
+        console.log('[room-v2] /auth/me threw');
       });
       setAgent(data);
       setFramework(data.framework ?? 'openclaw');
@@ -149,15 +187,10 @@ export function AgentRoomV2Client({ agentId }: Props) {
     return () => window.removeEventListener('keydown', onKey);
   }, [nearest, openPanel, handleStationClick]);
 
-  const connectedIntegrations = useMemo(() => {
-    const set = new Set<string>();
-    for (const i of agent?.integrations ?? []) {
-      const key = (i.platform ?? i.channel ?? '').toLowerCase();
-      const on = i.status === 'connected' || i.enabled === true;
-      if (on && key) set.add(key);
-    }
-    return set;
-  }, [agent]);
+  const connectedIntegrations = useMemo(
+    () => extractConnectedIntegrations(agent?.config),
+    [agent?.config],
+  );
 
   if (!framework || !layout) return <div className="h-screen w-screen bg-black" />;
 

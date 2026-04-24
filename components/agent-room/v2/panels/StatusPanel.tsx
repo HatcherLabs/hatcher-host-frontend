@@ -44,7 +44,9 @@ export function StatusPanel({
     }
   }, [agentId, onAction]);
 
-  const isRunning = status === 'running';
+  // Backend uses 'active' and sometimes 'running' / 'starting'; treat any
+  // of them as "up" so Stop is enabled and Start is disabled correctly.
+  const isRunning = status === 'active' || status === 'running' || status === 'starting';
   const minsUp = uptimeSec ? Math.floor(uptimeSec / 60) : 0;
 
   return (

@@ -6,8 +6,9 @@ import { paletteFor } from '../colors';
 import { api } from '@/lib/api';
 
 function ledColor(status: string): string {
-  if (status === 'running') return '#22c55e';
-  if (status === 'sleeping') return '#f59e0b';
+  if (status === 'active' || status === 'running') return '#22c55e';
+  if (status === 'starting') return '#3b82f6';
+  if (status === 'sleeping' || status === 'paused' || status === 'dormant') return '#f59e0b';
   if (status === 'error') return '#ef4444';
   return '#6b7280';
 }
@@ -39,7 +40,8 @@ export function StatusConsole({
     if (busy) return;
     setBusy(true);
     try {
-      if (status === 'running') await api.stopAgent(agentId);
+      const isUp = status === 'active' || status === 'running' || status === 'starting';
+      if (isUp) await api.stopAgent(agentId);
       else await api.startAgent(agentId);
       onStatusChange();
     } catch {
