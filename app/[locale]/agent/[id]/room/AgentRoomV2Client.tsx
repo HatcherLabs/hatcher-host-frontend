@@ -102,38 +102,13 @@ export function AgentRoomV2Client({ agentId }: Props) {
     try {
       const res = await api.getAgent(agentId);
       if (!res.success) {
-        // eslint-disable-next-line no-console
-        console.warn('[room-v2] getAgent failed', res);
         setFramework(prev => prev ?? 'openclaw');
         return;
       }
       const data = res.data as unknown as AgentWithExtras;
-      // eslint-disable-next-line no-console
-      console.log('[room-v2] agent loaded', {
-        hasOwnerId: typeof data.ownerId === 'string',
-        framework: data.framework,
-        keyList: Object.keys(data).sort().join(','),
-      });
-      // Cross-check: does /auth/me identify the same user from this page?
-      // If this returns success but getAgent shows hasOwnerId=false, then
-      // the user IS logged in but the agent request is somehow losing the
-      // auth signal.
-      api.getProfile().then((p) => {
-        // eslint-disable-next-line no-console
-        console.log('[room-v2] /auth/me from same context', {
-          success: p.success,
-          userId: p.success ? p.data.id.slice(0, 8) : null,
-          email: p.success ? p.data.email : null,
-        });
-      }).catch(() => {
-        // eslint-disable-next-line no-console
-        console.log('[room-v2] /auth/me threw');
-      });
       setAgent(data);
       setFramework(data.framework ?? 'openclaw');
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.warn('[room-v2] getAgent threw', e);
+    } catch {
       setFramework(prev => prev ?? 'openclaw');
     }
   }, [agentId]);
