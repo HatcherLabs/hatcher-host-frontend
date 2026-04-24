@@ -11,7 +11,7 @@ import { ProximityHint } from '@/components/agent-room/v2/hud/ProximityHint';
 import { getStationLayout, type StationId } from '@/components/agent-room/v2/world/layout';
 import { usePanelState } from '@/components/agent-room/v2/hooks/usePanelState';
 import { useStationProximity } from '@/components/agent-room/v2/hooks/useStationProximity';
-import { ChatPanel } from '@/components/agent-room/v2/panels/ChatPanel';
+import { ChatPanel, type ChatMessage } from '@/components/agent-room/v2/panels/ChatPanel';
 import { SkillsPanel } from '@/components/agent-room/v2/panels/SkillsPanel';
 import { IntegrationsPanel } from '@/components/agent-room/v2/panels/IntegrationsPanel';
 import { StatusPanel } from '@/components/agent-room/v2/panels/StatusPanel';
@@ -85,8 +85,10 @@ export function AgentRoomV2Client({ agentId }: Props) {
   const [framework, setFramework] = useState<string | null>(null);
   const [hasMemory, setHasMemory] = useState(false);
   const [pluginsInstalled, setPluginsInstalled] = useState(0);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [quality] = useState(() => detectDefaultQuality());
   const posRef = useRef(new THREE.Vector3());
+  const saveChatTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { openPanel, setOpenPanel, close } = usePanelState();
 
   // GET /agents/:id strips ownerId for non-owners (backend decides based on
@@ -164,6 +166,56 @@ export function AgentRoomV2Client({ agentId }: Props) {
       .catch(() => setPluginsInstalled(0));
   }, [agentId]);
 
+  // Load persisted chat history once per agent. State lives on the
+  // client (not inside ChatPanel) so closing / re-opening the panel
+  // keeps the conversation visible.
+  useEffect(() => {
+    api.getChatHistory(agentId)
+      .then((res) => {
+        if (!res.success) return;
+        const raw = res.data.messages ?? [];
+        const normalized: ChatMessage[] = raw
+          .filter((m) => m.role === 'user' || m.role === 'assistant')
+          .map((m) => ({
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+            ts: m.ts,
+          }));
+        setChatMessages(normalized);
+      })
+      .catch(() => {});
+  }, [agentId]);
+
+  const appendChatMessage = useCallback((msg: ChatMessage) => {
+    setChatMessages((prev) => [...prev, msg]);
+  }, []);
+
+  const updateLastChatMessage = useCallback((content: string) => {
+    setChatMessages((prev) => {
+      if (prev.length === 0) return prev;
+      const copy = [...prev];
+      copy[copy.length - 1] = { ...copy[copy.length - 1], content };
+      return copy;
+    });
+  }, []);
+
+  // Debounced save to backend so every streaming token doesn't hit the
+  // API. 800ms after the last message mutation settles, persist.
+  useEffect(() => {
+    if (chatMessages.length === 0) return;
+    if (saveChatTimerRef.current) clearTimeout(saveChatTimerRef.current);
+    saveChatTimerRef.current = setTimeout(() => {
+      const payload = chatMessages
+        .filter((m) => m.content.length > 0 && !m.content.startsWith('Error:'))
+        .map((m) => ({ role: m.role, content: m.content, ts: m.ts }));
+      if (payload.length === 0) return;
+      api.saveChatHistory(agentId, payload).catch(() => {});
+    }, 800);
+    return () => {
+      if (saveChatTimerRef.current) clearTimeout(saveChatTimerRef.current);
+    };
+  }, [chatMessages, agentId]);
+
   const layout = useMemo(
     () => (framework ? getStationLayout(framework) : null),
     [framework],
@@ -220,7 +272,14 @@ export function AgentRoomV2Client({ agentId }: Props) {
       <WalkOnboarding />
 
       {openPanel === 'agentAvatar' && (
-        <ChatPanel agentId={agentId} framework={framework} onClose={close} />
+        <ChatPanel
+          agentId={agentId}
+          framework={framework}
+          messages={chatMessages}
+          onAppend={appendChatMessage}
+          onUpdateLast={updateLastChatMessage}
+          onClose={close}
+        />
       )}
       {openPanel === 'skillWorkbench' && canEdit && (
         <SkillsPanel agentId={agentId} framework={framework} onClose={close} />

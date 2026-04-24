@@ -1,52 +1,51 @@
 'use client';
-import { useCallback, useRef, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { PanelShell } from './PanelShell';
 import { useWebSocketChat } from '@/hooks/useWebSocketChat';
 
-interface Message {
+export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  ts?: number;
 }
 
 interface Props {
   agentId: string;
   framework: string;
+  messages: ChatMessage[];
+  onAppend: (msg: ChatMessage) => void;
+  onUpdateLast: (content: string) => void;
   onClose: () => void;
 }
 
-export function ChatPanel({ agentId, framework, onClose }: Props) {
-  const [messages, setMessages] = useState<Message[]>([]);
+export function ChatPanel({
+  agentId,
+  framework,
+  messages,
+  onAppend,
+  onUpdateLast,
+  onClose,
+}: Props) {
   const [streaming, setStreaming] = useState(false);
   const [input, setInput] = useState('');
   const bufferRef = useRef('');
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const { send, isConnected } = useWebSocketChat({
     agentId,
     enabled: true,
     onToken: (tok) => {
       bufferRef.current += tok;
-      setMessages(prev => {
-        const copy = [...prev];
-        const last = copy[copy.length - 1];
-        if (last?.role === 'assistant') copy[copy.length - 1] = { ...last, content: bufferRef.current };
-        else copy.push({ role: 'assistant', content: bufferRef.current });
-        return copy;
-      });
+      onUpdateLast(bufferRef.current);
     },
     onDone: (content) => {
-      setMessages(prev => {
-        const copy = [...prev];
-        const last = copy[copy.length - 1];
-        const final = content || bufferRef.current;
-        if (last?.role === 'assistant') copy[copy.length - 1] = { ...last, content: final };
-        else copy.push({ role: 'assistant', content: final });
-        return copy;
-      });
+      const final = content || bufferRef.current;
+      onUpdateLast(final);
       bufferRef.current = '';
       setStreaming(false);
     },
     onError: (err) => {
-      setMessages(prev => [...prev, { role: 'assistant', content: `Error: ${err}` }]);
+      onUpdateLast(`Error: ${err}`);
       bufferRef.current = '';
       setStreaming(false);
     },
@@ -56,16 +55,24 @@ export function ChatPanel({ agentId, framework, onClose }: Props) {
     e.preventDefault();
     const text = input.trim();
     if (!text || streaming) return;
-    setMessages(prev => [...prev, { role: 'user', content: text }]);
+    onAppend({ role: 'user', content: text, ts: Date.now() });
+    onAppend({ role: 'assistant', content: '', ts: Date.now() });
     bufferRef.current = '';
     setStreaming(true);
     const ok = send(text);
     if (!ok) {
-      setMessages(prev => [...prev, { role: 'assistant', content: "Can't reach the agent right now." }]);
+      onUpdateLast("Can't reach the agent right now.");
       setStreaming(false);
     }
     setInput('');
-  }, [input, streaming, send]);
+  }, [input, streaming, send, onAppend, onUpdateLast]);
+
+  // Auto-scroll to bottom when messages change or stream.
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, streaming]);
 
   return (
     <PanelShell title="Chat" framework={framework} onClose={onClose}>
@@ -73,7 +80,10 @@ export function ChatPanel({ agentId, framework, onClose }: Props) {
         <span className={`inline-block h-2 w-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-neutral-600'}`} />
         {isConnected ? 'connected' : 'connecting…'}
       </div>
-      <div className="mb-3 h-[50vh] space-y-2 overflow-y-auto rounded-lg bg-neutral-950 p-3 text-sm">
+      <div
+        ref={scrollRef}
+        className="mb-3 h-[50vh] space-y-2 overflow-y-auto rounded-lg bg-neutral-950 p-3 text-sm"
+      >
         {messages.length === 0 && (
           <div className="text-center text-neutral-500">Say something to your agent.</div>
         )}
