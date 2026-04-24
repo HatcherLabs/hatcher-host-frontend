@@ -3,48 +3,89 @@ import { Html } from '@react-three/drei';
 import type { Station } from '../world/layout';
 import { paletteFor } from '../colors';
 import { ProximityHalo } from './ProximityHalo';
-import { KenneyModel } from './KenneyModel';
+import { MetalBox, NeonBar, Screen } from './CyberParts';
 
 interface Props {
   station: Station;
   framework: string;
   onClick: () => void;
   isNear?: boolean;
+  hideLabel?: boolean;
 }
 
-export function SkillWorkbench({ station, framework, onClick, isNear }: Props) {
+export function SkillWorkbench({ station, framework, onClick, isNear, hideLabel }: Props) {
   const palette = paletteFor(framework);
-  const emissiveIntensity = isNear ? 1.8 : 0.9;
+  const edgeColor = palette.primary;
+  const toolGlow = isNear ? 1.8 : 0.9;
+
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]} onClick={onClick}>
-      <ProximityHalo color={palette.primary} active={!!isNear} />
-      {/* Corner desk with monitor + keyboard — Kenney Space Kit CC0 */}
-      <KenneyModel
-        url="desk_computer_corner.glb"
-        targetHeight={1.2}
-        emissive={palette.primary}
-        emissiveIntensity={isNear ? 0.3 : 0.1}
+      <ProximityHalo color={edgeColor} active={!!isNear} />
+
+      {/* Two thin legs under the tabletop */}
+      <MetalBox size={[0.1, 0.85, 0.1]} position={[-1.05, 0.425, -0.45]} />
+      <MetalBox size={[0.1, 0.85, 0.1]} position={[1.05, 0.425, -0.45]} />
+      <MetalBox size={[0.1, 0.85, 0.1]} position={[-1.05, 0.425, 0.45]} />
+      <MetalBox size={[0.1, 0.85, 0.1]} position={[1.05, 0.425, 0.45]} />
+
+      {/* Tabletop */}
+      <MetalBox size={[2.3, 0.08, 1.1]} position={[0, 0.9, 0]} />
+
+      {/* Front edge — neon trim */}
+      <NeonBar
+        start={[-1.15, 0.86, 0.55]}
+        end={[1.15, 0.86, 0.55]}
+        color={edgeColor}
+        thickness={0.04}
       />
-      {/* Framework-tinted glow tools floating above the desk */}
-      {[0, 1, 2].map(i => (
-        <mesh key={i} position={[-0.4 + i * 0.4, 1.45, -0.15]} castShadow>
-          <cylinderGeometry args={[0.05, 0.05, 0.35, 12]} />
-          <meshStandardMaterial
-            color={palette.accent}
-            emissive={palette.accent}
-            emissiveIntensity={emissiveIntensity}
-            toneMapped={false}
-          />
-        </mesh>
+      {/* Back edge neon */}
+      <NeonBar
+        start={[-1.15, 0.86, -0.55]}
+        end={[1.15, 0.86, -0.55]}
+        color={edgeColor}
+      />
+
+      {/* Back panel with screen */}
+      <MetalBox size={[1.8, 0.95, 0.06]} position={[0, 1.45, -0.52]} />
+      <Screen
+        size={[1.5, 0.7]}
+        position={[0, 1.45, -0.49]}
+        rotation={[0, 0, 0]}
+        color={palette.primary}
+        intensity={isNear ? 1 : 0.75}
+      />
+
+      {/* 3 glowing "tools" — upright cylinders in a rack */}
+      {[-0.55, 0, 0.55].map((x, i) => (
+        <group key={i} position={[x, 1.05, 0.3]}>
+          {/* Mount */}
+          <mesh>
+            <cylinderGeometry args={[0.06, 0.08, 0.04, 12]} />
+            <meshStandardMaterial color={0x222228} metalness={0.9} roughness={0.3} />
+          </mesh>
+          {/* Glowing rod */}
+          <mesh position={[0, 0.2, 0]}>
+            <cylinderGeometry args={[0.035, 0.035, 0.4, 12]} />
+            <meshStandardMaterial
+              color={palette.accent}
+              emissive={palette.accent}
+              emissiveIntensity={toolGlow}
+              toneMapped={false}
+            />
+          </mesh>
+        </group>
       ))}
-      <Html position={[0, 2.3, 0]} center distanceFactor={10} zIndexRange={[10, 0]}>
-        <div
-          className="whitespace-nowrap rounded-full border px-3 py-1 text-xs text-white backdrop-blur"
-          style={{ borderColor: palette.primary, background: 'rgba(0,0,0,0.55)' }}
-        >
-          🛠 Skills
-        </div>
-      </Html>
+
+      {!hideLabel && (
+        <Html position={[0, 2.15, 0]} center distanceFactor={10} zIndexRange={[10, 0]}>
+          <div
+            className="whitespace-nowrap rounded-full border px-3 py-1 text-xs text-white backdrop-blur"
+            style={{ borderColor: edgeColor, background: 'rgba(0,0,0,0.55)' }}
+          >
+            🛠 Skills
+          </div>
+        </Html>
+      )}
     </group>
   );
 }
