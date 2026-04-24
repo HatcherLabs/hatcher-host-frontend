@@ -19,7 +19,14 @@
 // ============================================================
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Link } from '@/i18n/routing';
+
+// Routes that take over the full viewport and shouldn't show a
+// consent banner blocking the canvas. The pathname here still has
+// the locale prefix because next/navigation.usePathname does not
+// strip it (unlike the next-intl version used elsewhere).
+const IMMERSIVE_RE = /\/agent\/[^/]+\/room(?:-legacy)?(?:\/|$)/;
 import { Shield, BarChart3, Cookie as CookieIcon } from 'lucide-react';
 
 const CONSENT_KEY = 'hatcher-cookie-consent';
@@ -103,6 +110,8 @@ function optOutPostHog() {
 }
 
 export function CookieConsent() {
+  const pathname = usePathname();
+  const immersive = pathname ? IMMERSIVE_RE.test(pathname) : false;
   const [visible, setVisible] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [analyticsChoice, setAnalyticsChoice] = useState(false);
@@ -149,7 +158,7 @@ export function CookieConsent() {
     setVisible(false);
   }
 
-  if (!visible) return null;
+  if (!visible || immersive) return null;
 
   // Collapsed state: slim full-width bottom bar so we don't block the page
   // (hero CTAs, form fields, pricing tables). Expanded state: centered card

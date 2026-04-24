@@ -95,21 +95,18 @@ export function useWebSocketChat({
   const connect = useCallback(() => {
     if (!enabledRef.current) return;
 
-    const token = getToken();
-    if (!token) {
-      setConnectionState('error');
-      return;
-    }
-
     cleanup();
     setConnectionState('connecting');
 
+    const token = getToken();
     const url = getWsUrl(agentIdRef.current);
-    // Pass JWT via Sec-WebSocket-Protocol (browsers don't support custom headers on WS)
-    // The backend reads from the Authorization header which is set by the WS upgrade request.
-    // For browsers, we append the token as a query parameter since custom headers aren't
-    // supported for WebSocket connections.
-    const ws = new WebSocket(`${url}?token=${encodeURIComponent(token)}`);
+    // Append JWT via ?token= when we have one in localStorage (API-key or
+    // legacy header-auth flows). Cookie-only sessions have no accessible
+    // token — in that case connect without a query param and rely on the
+    // httpOnly hatcher_jwt cookie that the browser will send on the
+    // same-site WS upgrade; the backend reads it from request.cookies.
+    const wsUrl = token ? `${url}?token=${encodeURIComponent(token)}` : url;
+    const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
     ws.onopen = () => {
