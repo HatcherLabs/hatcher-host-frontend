@@ -70,17 +70,26 @@ export function AgentRoomV2Client({ agentId }: Props) {
   const loadAgent = useCallback(async () => {
     try {
       const res = await api.getAgent(agentId);
-      // api.req wraps responses in { success, data } | { success: false, error }.
-      // Previously we were reading fields straight off the wrapper, so ownerId
-      // was always undefined and canEdit was always false for everyone.
       if (!res.success) {
+        // eslint-disable-next-line no-console
+        console.warn('[room-v2] getAgent failed', res);
         setFramework(prev => prev ?? 'openclaw');
         return;
       }
       const data = res.data as unknown as AgentWithExtras;
+      // eslint-disable-next-line no-console
+      console.log('[room-v2] agent loaded', {
+        hasOwnerId: typeof data.ownerId === 'string',
+        ownerIdPreview: data.ownerId ? data.ownerId.slice(0, 8) : null,
+        framework: data.framework,
+        status: data.status,
+        keys: Object.keys(data).sort(),
+      });
       setAgent(data);
       setFramework(data.framework ?? 'openclaw');
-    } catch {
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn('[room-v2] getAgent threw', e);
       setFramework(prev => prev ?? 'openclaw');
     }
   }, [agentId]);

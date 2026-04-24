@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useGLTF, useAnimations } from '@react-three/drei';
 import * as THREE from 'three';
+import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
 import type { FrameworkPalette } from '@/components/agent-room/colors';
 
 const ROBOT_URL = 'https://threejs.org/examples/models/gltf/RobotExpressive/RobotExpressive.glb';
@@ -25,7 +26,12 @@ export function V2Robot({ palette }: Props) {
     scene: THREE.Group;
     animations: THREE.AnimationClip[];
   };
-  const clonedScene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
+  // Naive .clone(true) shares skeleton bones with the original scene,
+  // so bone transforms driven by useAnimations animate the ORIGINAL
+  // skeleton while our SkinnedMesh copies still reference frozen bones
+  // — arms and head appear to float in T-pose, disconnected from the
+  // body. SkeletonUtils.clone rebuilds the bone hierarchy per-instance.
+  const clonedScene = useMemo(() => SkeletonUtils.clone(gltf.scene) as THREE.Group, [gltf.scene]);
   const { actions } = useAnimations(gltf.animations, groupRef);
 
   useEffect(() => {
