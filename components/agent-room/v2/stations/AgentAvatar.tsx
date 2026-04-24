@@ -3,8 +3,8 @@ import { Suspense } from 'react';
 import { Html } from '@react-three/drei';
 import type { Station } from '../world/layout';
 import { paletteFor } from '../colors';
-import { GlbRobot } from '@/components/agent-room/GlbRobot';
 import { paletteFor as legacyPaletteFor } from '@/components/agent-room/colors';
+import { V2Robot } from './V2Robot';
 
 interface Props {
   station: Station;
@@ -20,15 +20,13 @@ export function AgentAvatar({ station, framework, onClick, isNear, hideLabel }: 
 
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]}>
-      {/* GlbRobot internally applies scale 0.55 (≈2.75m tall). At this
-          scale the robot towers over a 1.55m-eye player in first person
-          and looks disproportionate — wrap in an extra 0.75 so it reads
-          as a ~2m tall humanoid instead. */}
-      <group scale={0.75}>
-        <Suspense fallback={null}>
-          <GlbRobot palette={legacyPalette} framework={framework} />
-        </Suspense>
-      </group>
+      {/* V2Robot internally scales to 0.5 (≈2m tall) — smaller than the
+          legacy GlbRobot's 0.55 + dropped the framework accessories.
+          Accessories spin around the head and read as "extra floating
+          hands" in a first-person view. */}
+      <Suspense fallback={null}>
+        <V2Robot palette={legacyPalette} />
+      </Suspense>
       <mesh position={[0, 1.0, 0]} onClick={onClick}>
         <cylinderGeometry args={[0.9, 0.9, 2.1, 12]} />
         <meshBasicMaterial transparent opacity={0} />

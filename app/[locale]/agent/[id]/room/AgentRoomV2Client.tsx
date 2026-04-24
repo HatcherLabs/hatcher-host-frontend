@@ -3,7 +3,6 @@ import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { api } from '@/lib/api';
-import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/ui/ToastProvider';
 import { BackToCity } from '@/components/agent-room/v2/hud/BackToCity';
 import { WalkOnboarding } from '@/components/agent-room/v2/hud/WalkOnboarding';
@@ -54,7 +53,6 @@ const OWNER_ONLY: Set<StationId> = new Set([
 ]);
 
 export function AgentRoomV2Client({ agentId }: Props) {
-  const { user } = useAuth();
   const { toast } = useToast();
   const [agent, setAgent] = useState<AgentWithExtras | null>(null);
   const [framework, setFramework] = useState<string | null>(null);
@@ -64,7 +62,10 @@ export function AgentRoomV2Client({ agentId }: Props) {
   const posRef = useRef(new THREE.Vector3());
   const { openPanel, setOpenPanel, close } = usePanelState();
 
-  const canEdit = !!(user && agent?.ownerId && user.id === agent.ownerId);
+  // GET /agents/:id strips ownerId for non-owners (backend decides based on
+  // auth cookie/token). The mere presence of ownerId = you are the owner —
+  // no client-side comparison needed. Matches the legacy /room logic.
+  const canEdit = typeof agent?.ownerId === 'string' && agent.ownerId.length > 0;
 
   const loadAgent = useCallback(async () => {
     try {

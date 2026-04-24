@@ -1,0 +1,73 @@
+'use client';
+import { useEffect, useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { useGLTF, useAnimations } from '@react-three/drei';
+import * as THREE from 'three';
+import type { FrameworkPalette } from '@/components/agent-room/colors';
+
+const ROBOT_URL = 'https://threejs.org/examples/models/gltf/RobotExpressive/RobotExpressive.glb';
+
+interface Props {
+  palette: FrameworkPalette;
+}
+
+/**
+ * Slimmer robot avatar for /room — same base model as GlbRobot but
+ * without the framework accessories (halo / books / tentacles / crown).
+ * In first-person the accessories spin around the head and read as
+ * "extra disconnected hands" from up close, so we drop them for the
+ * cockpit experience. Also uses a gentler emissive tint so bloom can
+ * be cranked lower without losing framework identity.
+ */
+export function V2Robot({ palette }: Props) {
+  const groupRef = useRef<THREE.Group>(null);
+  const gltf = useGLTF(ROBOT_URL) as unknown as {
+    scene: THREE.Group;
+    animations: THREE.AnimationClip[];
+  };
+  const clonedScene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
+  const { actions } = useAnimations(gltf.animations, groupRef);
+
+  useEffect(() => {
+    const tint = new THREE.Color(palette.primary);
+    clonedScene.traverse((obj) => {
+      const mesh = obj as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      const base = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+      if (!base) return;
+      const cloned = (base as THREE.MeshStandardMaterial).clone();
+      if ('color' in cloned && (cloned as THREE.MeshStandardMaterial).color) {
+        const orig = (cloned as THREE.MeshStandardMaterial).color.clone();
+        // Gentler tint (50%) vs GlbRobot's 65% — keeps the robot's
+        // white/grey detail readable in dim first-person lighting.
+        (cloned as THREE.MeshStandardMaterial).color.lerpColors(orig, tint, 0.5);
+      }
+      if ('emissive' in cloned) {
+        (cloned as THREE.MeshStandardMaterial).emissive = new THREE.Color(palette.dim);
+        (cloned as THREE.MeshStandardMaterial).emissiveIntensity = 0.04;
+      }
+      mesh.material = cloned;
+    });
+  }, [clonedScene, palette]);
+
+  useEffect(() => {
+    const idle = actions['Idle'];
+    idle?.reset().fadeIn(0.3).play();
+    return () => { idle?.fadeOut(0.3); };
+  }, [actions]);
+
+  useFrame(({ clock }) => {
+    if (!groupRef.current) return;
+    const t = clock.getElapsedTime();
+    groupRef.current.position.y = Math.sin(t * 0.6) * 0.02;
+    groupRef.current.rotation.y = Math.sin(t * 0.15) * 0.08;
+  });
+
+  return (
+    <group ref={groupRef} position={[0, 0, 0]} scale={[0.5, 0.5, 0.5]}>
+      <primitive object={clonedScene} />
+    </group>
+  );
+}
+
+useGLTF.preload(ROBOT_URL);
