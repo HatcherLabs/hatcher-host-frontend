@@ -175,6 +175,15 @@ function PrimitiveInstance({
       args={[geometry, material, count]}
       castShadow
       receiveShadow
+      // InstancedMesh derives its bounding sphere from the TEMPLATE
+      // geometry, not from actual instance positions. With buildings
+      // scattered over a 500+u world from a template sitting at the
+      // origin, the camera's frustum test wrongly culls the whole
+      // mesh as soon as the viewer walks ~100u away from the template
+      // — the effect the user sees is "buildings disappear mid-walk".
+      // ~64 InstancedMesh × 700 instances is cheap enough to draw
+      // unconditionally; skip frustum culling.
+      frustumCulled={false}
       onClick={(e) => {
         if (!onBuildingClick) return;
         const id = e.instanceId;

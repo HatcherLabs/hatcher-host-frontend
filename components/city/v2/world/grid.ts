@@ -21,8 +21,10 @@ export const DISTRICT_COLS = 5;
 export const DISTRICT_ROWS = Math.ceil(CATEGORIES.length / DISTRICT_COLS);
 
 // One district is DISTRICT_SIZE × DISTRICT_SIZE units. Bumped from 52
-// (earlier phases) to 70 so 700 agents don't feel shoulder-to-shoulder.
-export const DISTRICT_SIZE = 70;
+// → 70 → 90 as the agent population grew. At 90u, ~28 agents per
+// district get ~290 sq u each — roughly 4× a typical Quaternius
+// footprint, enough air so buildings don't overlap at scale.
+export const DISTRICT_SIZE = 90;
 // Gap between two district pads = street lane width. Bumped to 16 so
 // two lanes of traffic + sidewalk breathe without a sea of asphalt.
 export const DISTRICT_GAP = 16;
