@@ -20,21 +20,21 @@ export function IntegrationsRack({ station, framework, connected, onClick, isNea
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]} onClick={onClick}>
       <ProximityHalo color={palette.primary} active={!!isNear} />
-      {/* Server rack / generator — Kenney Space Kit CC0 */}
+      {/* Industrial generator pillar — Kenney Space Kit CC0 */}
       <KenneyModel
         url="machine_generator.glb"
-        scale={1.8}
+        targetHeight={2.2}
         tint={palette.primary}
         tintAmount={0.15}
         emissive={palette.primary}
         emissiveIntensity={isNear ? 0.3 : 0.12}
       />
-      {/* 5 platform LEDs mounted on the front of the rack */}
+      {/* 5 platform LEDs floating in a vertical stack in front of the pillar */}
       {PLATFORMS.map((p, i) => {
         const on = connected.has(p);
         return (
-          <mesh key={p} position={[-0.35 + (i - 2) * 0.18, 1.55, 0.82]}>
-            <sphereGeometry args={[0.08, 12, 12]} />
+          <mesh key={p} position={[0, 2.0 - i * 0.28, 0.65]}>
+            <sphereGeometry args={[0.07, 12, 12]} />
             <meshBasicMaterial color={on ? '#22c55e' : '#525252'} toneMapped={false} />
           </mesh>
         );

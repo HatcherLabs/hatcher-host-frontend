@@ -23,7 +23,7 @@ export function PluginsCabinet({ station, framework, installedCount, onClick, is
          agent literally has glowing drawers. */}
       <KenneyModel
         url="cabinet_drawers.glb"
-        scale={2.2}
+        targetHeight={1.5}
         emissive={palette.accent}
         emissiveIntensity={installedCount > 0 ? (isNear ? 0.55 : 0.25) : 0.08}
       />

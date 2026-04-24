@@ -20,7 +20,7 @@ export function ConfigTerminal({ station, framework, onClick, isNear }: Props) {
       {/* Standalone computer screen — Kenney Space Kit CC0 */}
       <KenneyModel
         url="desk_computer_screen.glb"
-        scale={1.9}
+        targetHeight={1.0}
         emissive={palette.primary}
         emissiveIntensity={isNear ? 0.35 : 0.15}
       />

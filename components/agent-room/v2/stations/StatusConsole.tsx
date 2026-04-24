@@ -60,19 +60,19 @@ export function StatusConsole({
       <group onClick={onOpenPanel}>
         <KenneyModel
           url="desk_computer.glb"
-          scale={2.3}
+          targetHeight={1.2}
           emissive={palette.primary}
           emissiveIntensity={isNear ? 0.25 : 0.1}
         />
       </group>
-      {/* Big status LED ring on top of the desk — direct click toggles */}
-      <mesh position={[0, 1.55, 0]} onClick={toggleDirect}>
-        <torusGeometry args={[0.3, 0.07, 12, 48]} />
+      {/* Big status LED ring floating above the desk — direct click toggles */}
+      <mesh position={[0, 1.6, 0.3]} rotation={[-Math.PI / 6, 0, 0]} onClick={toggleDirect}>
+        <torusGeometry args={[0.28, 0.06, 12, 48]} />
         <meshBasicMaterial color={ledColor(status)} toneMapped={false} />
       </mesh>
-      <mesh position={[0, 1.55, 0]}>
-        <circleGeometry args={[0.25, 24]} />
-        <meshStandardMaterial color={0x0b0b12} emissive={ledColor(status)} emissiveIntensity={0.4} />
+      <mesh position={[0, 1.6, 0.3]} rotation={[-Math.PI / 6, 0, 0]}>
+        <circleGeometry args={[0.24, 24]} />
+        <meshStandardMaterial color={0x0b0b12} emissive={ledColor(status)} emissiveIntensity={0.5} />
       </mesh>
       <Html position={[0, 2.1, 0]} center distanceFactor={10} zIndexRange={[10, 0]}>
         <div

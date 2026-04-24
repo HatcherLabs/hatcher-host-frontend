@@ -21,14 +21,14 @@ export function SkillWorkbench({ station, framework, onClick, isNear }: Props) {
       {/* Corner desk with monitor + keyboard — Kenney Space Kit CC0 */}
       <KenneyModel
         url="desk_computer_corner.glb"
-        scale={2.3}
+        targetHeight={1.2}
         emissive={palette.primary}
         emissiveIntensity={isNear ? 0.3 : 0.1}
       />
-      {/* Framework-tinted glow tools on the desk surface */}
+      {/* Framework-tinted glow tools floating above the desk */}
       {[0, 1, 2].map(i => (
-        <mesh key={i} position={[-0.6 + i * 0.6, 1.1, -0.3]} castShadow>
-          <cylinderGeometry args={[0.06, 0.06, 0.5, 12]} />
+        <mesh key={i} position={[-0.4 + i * 0.4, 1.45, -0.15]} castShadow>
+          <cylinderGeometry args={[0.05, 0.05, 0.35, 12]} />
           <meshStandardMaterial
             color={palette.accent}
             emissive={palette.accent}

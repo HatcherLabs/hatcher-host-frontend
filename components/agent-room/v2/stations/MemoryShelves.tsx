@@ -21,7 +21,7 @@ export function MemoryShelves({ station, framework, hasMemory, onClick, isNear }
       {/* Bookcase full of lore — Kenney Furniture Kit CC0 */}
       <KenneyModel
         url="bookcase.glb"
-        scale={2.2}
+        targetHeight={2.2}
         emissive={palette.primary}
         emissiveIntensity={hasMemory ? (isNear ? 0.4 : 0.2) : 0.08}
       />
