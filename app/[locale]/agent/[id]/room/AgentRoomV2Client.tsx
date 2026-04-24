@@ -83,7 +83,9 @@ export function AgentRoomV2Client({ agentId }: Props) {
         ownerIdPreview: data.ownerId ? data.ownerId.slice(0, 8) : null,
         framework: data.framework,
         status: data.status,
-        keys: Object.keys(data).sort(),
+        keyList: Object.keys(data).sort().join(','),
+        hasAuthToken: typeof window !== 'undefined' && !!localStorage.getItem('hatcher_token'),
+        cookieHasJwt: typeof document !== 'undefined' && /hatcher_jwt|token=/.test(document.cookie),
       });
       setAgent(data);
       setFramework(data.framework ?? 'openclaw');
