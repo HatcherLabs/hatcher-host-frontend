@@ -208,10 +208,18 @@ export function MouseLook({
   state,
   domElement,
   sensitivity = 0.0035,
+  pitchMin = -0.45,
+  pitchMax = 0.95,
 }: {
   state: CharacterState;
   domElement?: HTMLElement | null;
   sensitivity?: number;
+  /** Minimum (downward) pitch in radians. Default -0.45 ≈ 26° down.
+   *  Cities tighten this to keep the player from looking under the
+   *  ground plane — the map looks grounded, not floating in a void. */
+  pitchMin?: number;
+  /** Maximum (upward) pitch. Default 0.95 ≈ 54° up. */
+  pitchMax?: number;
 }) {
   const dragging = useRef(false);
   useEffect(() => {
@@ -235,8 +243,8 @@ export function MouseLook({
       const pe = e as PointerEvent;
       state.cameraYaw -= pe.movementX * sensitivity;
       state.cameraPitch = Math.max(
-        -0.45,
-        Math.min(0.95, state.cameraPitch - pe.movementY * sensitivity),
+        pitchMin,
+        Math.min(pitchMax, state.cameraPitch - pe.movementY * sensitivity),
       );
     };
     el.addEventListener('pointerdown', down as EventListener);
