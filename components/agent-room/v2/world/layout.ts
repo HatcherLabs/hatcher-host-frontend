@@ -20,17 +20,27 @@ export interface Station {
 
 export type StationLayout = Record<StationId, Station>;
 
+/**
+ * 24x24 room — stations arranged so the player spawns near the south
+ * wall (positive z), faces the center where the avatar stands, and
+ * must walk towards the back to reach configure-only stations.
+ *
+ *   -z = "front of room" (log wall, avatar looks this way)
+ *   +z = "back of room" (where player spawns)
+ *   -x = left wall
+ *   +x = right wall
+ */
 export function getStationLayout(framework: string): StationLayout {
-  void framework; // per-framework offsets may override in future; base layout shared
+  void framework;
   return {
-    agentAvatar:      { id: 'agentAvatar',      position: [0, 0, 0],       rotationY: 0 },
-    skillWorkbench:   { id: 'skillWorkbench',   position: [-5, 0, -3],     rotationY: Math.PI / 4 },
-    integrationsRack: { id: 'integrationsRack', position: [5, 0, -3],      rotationY: -Math.PI / 4 },
-    statusConsole:    { id: 'statusConsole',    position: [0, 0, -6],      rotationY: 0 },
-    logWall:          { id: 'logWall',          position: [-6.8, 0, 0],    rotationY: Math.PI / 2 },
-    statsHologram:    { id: 'statsHologram',    position: [0, 0, 4.5],     rotationY: Math.PI },
-    memoryShelves:    { id: 'memoryShelves',    position: [6.8, 0, 2],     rotationY: -Math.PI / 2 },
-    configTerminal:   { id: 'configTerminal',   position: [3.5, 0, 3.5],   rotationY: -Math.PI * 3 / 4 },
-    pluginsCabinet:   { id: 'pluginsCabinet',   position: [-3.5, 0, 3.5],  rotationY: Math.PI * 3 / 4 },
+    agentAvatar:      { id: 'agentAvatar',      position: [0, 0, 0],      rotationY: Math.PI },
+    skillWorkbench:   { id: 'skillWorkbench',   position: [-8, 0, -5],    rotationY: Math.PI / 4 },
+    integrationsRack: { id: 'integrationsRack', position: [8, 0, -5],     rotationY: -Math.PI / 4 },
+    statusConsole:    { id: 'statusConsole',    position: [0, 0, -10],    rotationY: 0 },
+    logWall:          { id: 'logWall',          position: [-11.5, 0, 0],  rotationY: Math.PI / 2 },
+    statsHologram:    { id: 'statsHologram',    position: [0, 0, 8],      rotationY: Math.PI },
+    memoryShelves:    { id: 'memoryShelves',    position: [11.5, 0, 3],   rotationY: -Math.PI / 2 },
+    configTerminal:   { id: 'configTerminal',   position: [6, 0, 6],      rotationY: -Math.PI * 3 / 4 },
+    pluginsCabinet:   { id: 'pluginsCabinet',   position: [-6, 0, 6],     rotationY: Math.PI * 3 / 4 },
   };
 }

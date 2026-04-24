@@ -6,9 +6,8 @@ import * as THREE from 'three';
 import { paletteFor } from './colors';
 import {
   CharacterController,
-  CharacterMesh,
   MouseLook,
-  FollowCamera,
+  FirstPersonCamera,
   MobileJoystick,
   type CharacterState,
 } from './character';
@@ -81,10 +80,10 @@ export function AgentRoomSceneV2({
   const palette = paletteFor(framework);
 
   const charState = useMemo<CharacterState>(() => ({
-    position: new THREE.Vector3(0, 0, 6),
+    position: new THREE.Vector3(0, 0, 10),
     heading: Math.PI,
     cameraYaw: 0,
-    cameraPitch: 0.2,
+    cameraPitch: 0.0,
   }), []);
 
   const analogRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -99,7 +98,7 @@ export function AgentRoomSceneV2({
     <>
       <Canvas
         shadows={quality === 'high'}
-        camera={{ position: [0, 3, 10], fov: 60 }}
+        camera={{ position: [0, 1.55, 10], fov: 72 }}
         dpr={quality === 'low' ? [1, 1.5] : [1, 2]}
       >
         <color attach="background" args={[palette.background]} />
@@ -180,11 +179,10 @@ export function AgentRoomSceneV2({
             state={charState}
             analog={analogRef.current}
             solids={solids}
-            speed={8}
+            speed={6}
             characterRadius={0.6}
           />
-          <CharacterMesh state={charState} />
-          <FollowCamera state={charState} distance={10} />
+          <FirstPersonCamera state={charState} />
           <MouseLook state={charState} />
           <SyncPos state={charState} target={posRef} />
           {quality !== 'low' && (

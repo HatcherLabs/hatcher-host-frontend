@@ -56,7 +56,7 @@ export function LogWall({ station, framework, agentId, onClick, isNear }: Props)
         <planeGeometry args={[3.7, 2.7]} />
         <meshBasicMaterial color={palette.primary} toneMapped={false} />
       </mesh>
-      <Html position={[0, 2.2, 0.02]} transform distanceFactor={4} style={{ width: 340, height: 240 }}>
+      <Html position={[0, 2.2, 0.02]} transform distanceFactor={4} zIndexRange={[10, 0]} style={{ width: 340, height: 240 }}>
         <div
           className="pointer-events-none h-full w-full overflow-hidden rounded bg-black p-2 font-mono text-[9px] leading-snug"
           style={{ color: palette.primary }}
@@ -72,7 +72,7 @@ export function LogWall({ station, framework, agentId, onClick, isNear }: Props)
           )}
         </div>
       </Html>
-      <Html position={[0, 3.7, 0]} center distanceFactor={10}>
+      <Html position={[0, 3.7, 0]} center distanceFactor={10} zIndexRange={[10, 0]}>
         <div
           className="whitespace-nowrap rounded-full border px-3 py-1 text-xs text-white backdrop-blur"
           style={{

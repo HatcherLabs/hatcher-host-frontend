@@ -42,7 +42,7 @@ export function PluginsCabinet({ station, framework, installedCount, onClick, is
           </group>
         );
       })}
-      <Html position={[0, 2.3, 0]} center distanceFactor={10}>
+      <Html position={[0, 2.3, 0]} center distanceFactor={10} zIndexRange={[10, 0]}>
         <div
           className="whitespace-nowrap rounded-full border px-3 py-1 text-xs text-white backdrop-blur"
           style={{

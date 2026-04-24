@@ -42,7 +42,7 @@ export function SkillWorkbench({ station, framework, onClick, isNear }: Props) {
         <planeGeometry args={[1.0, 0.5]} />
         <meshBasicMaterial color={palette.primary} toneMapped={false} opacity={0.6} transparent />
       </mesh>
-      <Html position={[0, 2.3, 0]} center distanceFactor={10}>
+      <Html position={[0, 2.3, 0]} center distanceFactor={10} zIndexRange={[10, 0]}>
         <div
           className="whitespace-nowrap rounded-full border px-3 py-1 text-xs text-white backdrop-blur"
           style={{ borderColor: palette.primary, background: 'rgba(0,0,0,0.55)' }}

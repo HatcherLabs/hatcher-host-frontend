@@ -29,7 +29,7 @@ export function ConfigTerminal({ station, framework, onClick, isNear }: Props) {
         <planeGeometry args={[0.82, 0.5]} />
         <meshBasicMaterial color={palette.primary} toneMapped={false} opacity={0.7} transparent />
       </mesh>
-      <Html position={[0, 1.5, 0]} center distanceFactor={10}>
+      <Html position={[0, 1.5, 0]} center distanceFactor={10} zIndexRange={[10, 0]}>
         <div
           className="whitespace-nowrap rounded-full border px-3 py-1 text-xs text-white backdrop-blur"
           style={{

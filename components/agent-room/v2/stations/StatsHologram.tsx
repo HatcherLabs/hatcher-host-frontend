@@ -46,7 +46,7 @@ export function StatsHologram({
         <meshBasicMaterial color={palette.primary} toneMapped={false} transparent opacity={0.1} side={2} depthWrite={false} />
       </mesh>
       {/* Hologram HTML */}
-      <Html position={[0, 1.85, 0]} center distanceFactor={6}>
+      <Html position={[0, 1.85, 0]} center distanceFactor={6} zIndexRange={[10, 0]}>
         <div
           className="pointer-events-none w-60 rounded-lg border p-3 text-center font-mono text-[10px]"
           style={{

@@ -71,7 +71,7 @@ export function StatusConsole({
         <circleGeometry args={[0.27, 24]} />
         <meshStandardMaterial color={0x0b0b12} emissive={ledColor(status)} emissiveIntensity={0.25} />
       </mesh>
-      <Html position={[0, 2.1, 0]} center distanceFactor={10}>
+      <Html position={[0, 2.1, 0]} center distanceFactor={10} zIndexRange={[10, 0]}>
         <div
           className="whitespace-nowrap rounded-full border px-3 py-1 text-xs text-white backdrop-blur"
           style={{

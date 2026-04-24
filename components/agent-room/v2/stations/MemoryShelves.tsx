@@ -47,7 +47,7 @@ export function MemoryShelves({ station, framework, hasMemory, onClick, isNear }
           ))}
         </group>
       ))}
-      <Html position={[0, 2.8, 0]} center distanceFactor={10}>
+      <Html position={[0, 2.8, 0]} center distanceFactor={10} zIndexRange={[10, 0]}>
         <div
           className="whitespace-nowrap rounded-full border px-3 py-1 text-xs text-white backdrop-blur"
           style={{

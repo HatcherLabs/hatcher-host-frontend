@@ -11,9 +11,10 @@ interface Props {
   framework: string;
   onClick: () => void;
   isNear?: boolean;
+  hideLabel?: boolean;
 }
 
-export function AgentAvatar({ station, framework, onClick, isNear }: Props) {
+export function AgentAvatar({ station, framework, onClick, isNear, hideLabel }: Props) {
   const palette = paletteFor(framework);
   const legacyPalette = legacyPaletteFor(framework);
 
@@ -26,20 +27,22 @@ export function AgentAvatar({ station, framework, onClick, isNear }: Props) {
         <cylinderGeometry args={[1.2, 1.2, 2.8, 12]} />
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
-      <Html position={[0, 2.8, 0]} center distanceFactor={8} occlude="blending">
-        <button
-          onClick={(e) => { e.stopPropagation(); onClick(); }}
-          className="pointer-events-auto whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium backdrop-blur transition"
-          style={{
-            borderColor: palette.primary,
-            background: isNear ? palette.primary : 'rgba(0,0,0,0.55)',
-            color: isNear ? '#000' : '#fff',
-            boxShadow: isNear ? `0 0 18px ${palette.primary}` : 'none',
-          }}
-        >
-          💬 Talk
-        </button>
-      </Html>
+      {!hideLabel && (
+        <Html position={[0, 2.8, 0]} center distanceFactor={8} zIndexRange={[10, 0]}>
+          <button
+            onClick={(e) => { e.stopPropagation(); onClick(); }}
+            className="pointer-events-auto whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium backdrop-blur transition"
+            style={{
+              borderColor: palette.primary,
+              background: isNear ? palette.primary : 'rgba(0,0,0,0.55)',
+              color: isNear ? '#000' : '#fff',
+              boxShadow: isNear ? `0 0 18px ${palette.primary}` : 'none',
+            }}
+          >
+            💬 Talk
+          </button>
+        </Html>
+      )}
     </group>
   );
 }
