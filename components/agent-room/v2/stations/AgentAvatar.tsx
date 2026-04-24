@@ -20,11 +20,17 @@ export function AgentAvatar({ station, framework, onClick, isNear, hideLabel }: 
 
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]}>
-      <Suspense fallback={null}>
-        <GlbRobot palette={legacyPalette} framework={framework} />
-      </Suspense>
-      <mesh position={[0, 1.3, 0]} onClick={onClick}>
-        <cylinderGeometry args={[1.2, 1.2, 2.8, 12]} />
+      {/* GlbRobot internally applies scale 0.55 (≈2.75m tall). At this
+          scale the robot towers over a 1.55m-eye player in first person
+          and looks disproportionate — wrap in an extra 0.75 so it reads
+          as a ~2m tall humanoid instead. */}
+      <group scale={0.75}>
+        <Suspense fallback={null}>
+          <GlbRobot palette={legacyPalette} framework={framework} />
+        </Suspense>
+      </group>
+      <mesh position={[0, 1.0, 0]} onClick={onClick}>
+        <cylinderGeometry args={[0.9, 0.9, 2.1, 12]} />
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
       {!hideLabel && (

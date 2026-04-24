@@ -69,7 +69,14 @@ export function AgentRoomV2Client({ agentId }: Props) {
   const loadAgent = useCallback(async () => {
     try {
       const res = await api.getAgent(agentId);
-      const data = res as unknown as AgentWithExtras;
+      // api.req wraps responses in { success, data } | { success: false, error }.
+      // Previously we were reading fields straight off the wrapper, so ownerId
+      // was always undefined and canEdit was always false for everyone.
+      if (!res.success) {
+        setFramework(prev => prev ?? 'openclaw');
+        return;
+      }
+      const data = res.data as unknown as AgentWithExtras;
       setAgent(data);
       setFramework(data.framework ?? 'openclaw');
     } catch {
@@ -88,8 +95,8 @@ export function AgentRoomV2Client({ agentId }: Props) {
     if (!canEdit) return;
     api.getAgentMemory(agentId)
       .then((res) => {
-        const m = (res as { data?: { memoryMd?: string; dailyLogs?: unknown[] } }).data
-          ?? (res as { memoryMd?: string; dailyLogs?: unknown[] });
+        if (!res.success) { setHasMemory(false); return; }
+        const m = res.data as { memoryMd?: string; dailyLogs?: unknown[] };
         const anything = !!(m?.memoryMd && m.memoryMd.length > 20) || !!(m?.dailyLogs && m.dailyLogs.length);
         setHasMemory(anything);
       })
@@ -100,8 +107,8 @@ export function AgentRoomV2Client({ agentId }: Props) {
   useEffect(() => {
     api.getAgentPlugins(agentId)
       .then((res) => {
-        const data = (res as { data?: { installed?: unknown[] } }).data
-          ?? (res as unknown as { installed?: unknown[] });
+        if (!res.success) { setPluginsInstalled(0); return; }
+        const data = res.data as { installed?: unknown[] };
         setPluginsInstalled(data.installed?.length ?? 0);
       })
       .catch(() => setPluginsInstalled(0));

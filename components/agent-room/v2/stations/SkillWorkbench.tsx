@@ -12,7 +12,7 @@ interface Props {
 
 export function SkillWorkbench({ station, framework, onClick, isNear }: Props) {
   const palette = paletteFor(framework);
-  const emissiveIntensity = isNear ? 3.5 : 1.8;
+  const emissiveIntensity = isNear ? 1.8 : 0.9;
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]} onClick={onClick}>
       {/* Table body */}

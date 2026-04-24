@@ -188,9 +188,9 @@ export function AgentRoomSceneV2({
           {quality !== 'low' && (
             <EffectComposer multisampling={0} enableNormalPass={false}>
               <Bloom
-                intensity={quality === 'high' ? 0.9 : 0.7}
-                luminanceThreshold={0.85}
-                luminanceSmoothing={0.2}
+                intensity={quality === 'high' ? 0.45 : 0.35}
+                luminanceThreshold={0.95}
+                luminanceSmoothing={0.25}
                 mipmapBlur
               />
             </EffectComposer>
