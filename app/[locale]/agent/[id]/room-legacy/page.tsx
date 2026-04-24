@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { API_URL } from '@/lib/config';
-import { AgentRoomV2Client } from './AgentRoomV2Client';
+import { AgentRoomClient } from './AgentRoomClient';
 
 interface PublicAgent {
   id: string;
@@ -42,7 +42,7 @@ export async function generateMetadata({
   if (!agent) {
     return {
       title: 'Agent Room · Hatcher',
-      description: '3D GUI for your Hatcher agent — skills, integrations, chat, status in one immersive room.',
+      description: 'Gamified 3D interface for your Hatcher agent.',
       alternates: { canonical: `/agent/${id}/room` },
       robots: { index: false },
     };
@@ -50,7 +50,7 @@ export async function generateMetadata({
 
   const icon = FRAMEWORK_ICON[agent.framework] ?? '✨';
   const title = `${icon} ${agent.name} · Agent Room · Hatcher`;
-  const description = `Step inside ${agent.name}'s 3D room on Hatcher. Built on ${agent.framework}. Walk, chat, watch it run real tools, manage skills and integrations in one place.`;
+  const description = `Enter the live 3D room for ${agent.name} on Hatcher. Built on ${agent.framework}. Watch it think, chat, and run real tools.`;
 
   return {
     title,
@@ -70,11 +70,11 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({
+export default async function AgentRoomPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <AgentRoomV2Client agentId={id} />;
+  return <AgentRoomClient id={id} />;
 }

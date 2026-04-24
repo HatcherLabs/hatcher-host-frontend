@@ -9,11 +9,13 @@ import { ScrollToTop } from '@/components/ui/ScrollToTop';
 // cover their canvas. Extend this list as we add more immersive views.
 // Note: /city keeps the site chrome so the map feels part of hatcher.host
 // rather than a standalone app; the canvas sits inside the main content area.
-const IMMERSIVE_ROUTES: string[] = [];
+const IMMERSIVE_PATTERNS: RegExp[] = [
+  /^\/agent\/[^/]+\/room(?:-legacy)?(?:\/|$)/,
+];
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const immersive = IMMERSIVE_ROUTES.some(r => pathname === r || pathname.startsWith(`${r}/`));
+  const immersive = IMMERSIVE_PATTERNS.some(re => re.test(pathname));
 
   if (immersive) {
     // No skip-link, no header, no footer — the page owns the screen.

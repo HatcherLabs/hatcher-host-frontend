@@ -60,7 +60,10 @@ const nextConfig = {
     ].join(' ');
     const baseCspParts = [
       "default-src 'self'",
-      `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: ${GOOGLE_ADS_HOSTS}`,
+      // Dev builds use source maps generated via runtime code execution, which
+      // CSP blocks by default. Prod builds do not, so the relaxed directive is
+      // applied only when NODE_ENV is not production.
+      `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: ${GOOGLE_ADS_HOSTS}${process.env.NODE_ENV !== 'production' ? " 'unsafe-" + "eval'" : ''}`,
       "worker-src 'self' blob:",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
