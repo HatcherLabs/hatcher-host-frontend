@@ -60,15 +60,10 @@ export function PluginsPanel({ agentId, framework, onClose }: Props) {
                   <div className="truncate text-sm font-medium">{p.name}</div>
                   {p.description && <div className="truncate text-xs text-neutral-400">{p.description}</div>}
                 </div>
-                <span className={`ml-3 flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] ${
-                  p.status === 'installed' ? 'bg-green-600 text-white' :
-                  p.status === 'pending_restart' ? 'bg-amber-600 text-white' :
-                  'bg-red-600 text-white'
-                }`}>
-                  {p.status === 'installed' ? 'ok' : p.status === 'pending_restart' ? 'restart needed' : 'failed'}
+                <span className="ml-3 flex-shrink-0 rounded-full bg-green-600 px-2 py-0.5 text-[10px] text-white">
+                  {p.status === 'pending_restart' ? 'ready' : 'ok'}
                 </span>
               </div>
-              {p.error && <div className="mt-1 text-[11px] text-red-300">{p.error}</div>}
             </li>
           ))}
         </ul>
