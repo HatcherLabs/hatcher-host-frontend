@@ -2,6 +2,7 @@
 import { Html } from '@react-three/drei';
 import type { Station } from '../world/layout';
 import { paletteFor } from '../colors';
+import { ProximityHalo } from './ProximityHalo';
 
 interface Props {
   station: Station;
@@ -15,6 +16,7 @@ export function SkillWorkbench({ station, framework, onClick, isNear }: Props) {
   const emissiveIntensity = isNear ? 1.8 : 0.9;
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]} onClick={onClick}>
+      <ProximityHalo color={palette.primary} active={!!isNear} />
       {/* Table body */}
       <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
         <boxGeometry args={[2.2, 1.0, 1.2]} />

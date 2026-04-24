@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { Station } from '../world/layout';
 import { paletteFor } from '../colors';
 import { api } from '@/lib/api';
+import { ProximityHalo } from './ProximityHalo';
 
 function ledColor(status: string): string {
   if (status === 'active' || status === 'running') return '#22c55e';
@@ -53,6 +54,7 @@ export function StatusConsole({
 
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]}>
+      <ProximityHalo color={palette.primary} active={!!isNear} />
       {/* Console body — click opens full panel */}
       <mesh position={[0, 0.6, 0]} castShadow receiveShadow onClick={onOpenPanel}>
         <boxGeometry args={[2.4, 1.2, 1.0]} />

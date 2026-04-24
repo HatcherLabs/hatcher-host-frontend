@@ -10,6 +10,9 @@ const ROBOT_URL = 'https://threejs.org/examples/models/gltf/RobotExpressive/Robo
 
 interface Props {
   palette: FrameworkPalette;
+  /** When true, switch from Idle to a head-nod loop so the robot visibly
+   *  "talks" while the LLM streams its reply. Cross-fade is 0.3s. */
+  isStreaming?: boolean;
 }
 
 /**
@@ -20,7 +23,7 @@ interface Props {
  * cockpit experience. Also uses a gentler emissive tint so bloom can
  * be cranked lower without losing framework identity.
  */
-export function V2Robot({ palette }: Props) {
+export function V2Robot({ palette, isStreaming }: Props) {
   const groupRef = useRef<THREE.Group>(null);
   const gltf = useGLTF(ROBOT_URL) as unknown as {
     scene: THREE.Group;
@@ -61,6 +64,25 @@ export function V2Robot({ palette }: Props) {
     idle?.reset().fadeIn(0.3).play();
     return () => { idle?.fadeOut(0.3); };
   }, [actions]);
+
+  // Cross-fade to a "talking" clip while the LLM streams. RobotExpressive
+  // ships a few expressive clips; 'Yes' is a repeatable head-nod that
+  // reads as "active, responding" without being goofy like Wave/Dance.
+  useEffect(() => {
+    const idle = actions['Idle'];
+    const talk = actions['Yes'];
+    if (!idle || !talk) return;
+    if (isStreaming) {
+      talk.reset();
+      (talk as THREE.AnimationAction & { loop?: THREE.AnimationActionLoopStyles }).loop = THREE.LoopRepeat;
+      talk.clampWhenFinished = false;
+      idle.fadeOut(0.25);
+      talk.fadeIn(0.25).play();
+    } else {
+      talk.fadeOut(0.3);
+      idle.reset().fadeIn(0.3).play();
+    }
+  }, [isStreaming, actions]);
 
   useFrame(({ clock }) => {
     if (!groupRef.current) return;

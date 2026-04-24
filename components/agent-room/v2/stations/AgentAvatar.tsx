@@ -5,6 +5,7 @@ import type { Station } from '../world/layout';
 import { paletteFor } from '../colors';
 import { paletteFor as legacyPaletteFor } from '@/components/agent-room/colors';
 import { V2Robot } from './V2Robot';
+import { ProximityHalo } from './ProximityHalo';
 
 interface Props {
   station: Station;
@@ -12,21 +13,40 @@ interface Props {
   onClick: () => void;
   isNear?: boolean;
   hideLabel?: boolean;
+  agentName?: string;
+  isStreaming?: boolean;
 }
 
-export function AgentAvatar({ station, framework, onClick, isNear, hideLabel }: Props) {
+export function AgentAvatar({ station, framework, onClick, isNear, hideLabel, agentName, isStreaming }: Props) {
   const palette = paletteFor(framework);
   const legacyPalette = legacyPaletteFor(framework);
 
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]}>
+      <ProximityHalo color={palette.primary} active={!!isNear} radius={1.8} />
       {/* V2Robot internally scales to 0.5 (≈2m tall) — smaller than the
           legacy GlbRobot's 0.55 + dropped the framework accessories.
           Accessories spin around the head and read as "extra floating
           hands" in a first-person view. */}
       <Suspense fallback={null}>
-        <V2Robot palette={legacyPalette} />
+        <V2Robot palette={legacyPalette} isStreaming={!!isStreaming} />
       </Suspense>
+      {/* Floating name tag above the robot */}
+      {agentName && (
+        <Html position={[0, 3.4, 0]} center distanceFactor={9} zIndexRange={[10, 0]}>
+          <div
+            className="pointer-events-none whitespace-nowrap rounded-full border px-2.5 py-0.5 text-[11px] font-medium backdrop-blur"
+            style={{
+              borderColor: palette.primary,
+              background: 'rgba(0,0,0,0.5)',
+              color: palette.accent,
+              boxShadow: `0 0 14px ${palette.primary}66`,
+            }}
+          >
+            {agentName}
+          </div>
+        </Html>
+      )}
       <mesh position={[0, 1.0, 0]} onClick={onClick}>
         <cylinderGeometry args={[0.9, 0.9, 2.1, 12]} />
         <meshBasicMaterial transparent opacity={0} />

@@ -4,6 +4,7 @@ import { Html } from '@react-three/drei';
 import type { Station } from '../world/layout';
 import { paletteFor } from '../colors';
 import { api } from '@/lib/api';
+import { ProximityHalo } from './ProximityHalo';
 
 interface Props {
   station: Station;
@@ -46,6 +47,7 @@ export function LogWall({ station, framework, agentId, onClick, isNear }: Props)
 
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]} onClick={onClick}>
+      <ProximityHalo color={palette.primary} active={!!isNear} />
       {/* Neon frame — behind everything */}
       <mesh position={[0, 2.2, -0.02]}>
         <planeGeometry args={[3.1, 2.1]} />

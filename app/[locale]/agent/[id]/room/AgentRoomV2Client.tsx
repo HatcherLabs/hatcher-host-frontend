@@ -32,6 +32,7 @@ interface Props {
 
 interface AgentWithExtras {
   id?: string;
+  name?: string;
   ownerId?: string;
   framework?: string;
   status?: string;
@@ -86,6 +87,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
   const [hasMemory, setHasMemory] = useState(false);
   const [pluginsInstalled, setPluginsInstalled] = useState(0);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [isChatStreaming, setIsChatStreaming] = useState(false);
   const [quality] = useState(() => detectDefaultQuality());
   const posRef = useRef(new THREE.Vector3());
   const saveChatTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -262,6 +264,8 @@ export function AgentRoomV2Client({ agentId }: Props) {
         canEdit={canEdit}
         hasMemory={hasMemory}
         quality={quality}
+        agentName={agent?.name}
+        isChatStreaming={isChatStreaming}
         onStationClick={handleStationClick}
         onStatusChange={loadAgent}
       />
@@ -278,6 +282,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
           messages={chatMessages}
           onAppend={appendChatMessage}
           onUpdateLast={updateLastChatMessage}
+          onStreamingChange={setIsChatStreaming}
           onClose={close}
         />
       )}

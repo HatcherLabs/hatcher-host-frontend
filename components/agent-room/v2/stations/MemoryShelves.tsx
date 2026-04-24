@@ -2,6 +2,7 @@
 import { Html } from '@react-three/drei';
 import type { Station } from '../world/layout';
 import { paletteFor } from '../colors';
+import { ProximityHalo } from './ProximityHalo';
 
 interface Props {
   station: Station;
@@ -15,6 +16,7 @@ export function MemoryShelves({ station, framework, hasMemory, onClick, isNear }
   const palette = paletteFor(framework);
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]} onClick={onClick}>
+      <ProximityHalo color={palette.primary} active={!!isNear} />
       {/* Shelf frame */}
       <mesh position={[0, 1.25, 0]} castShadow>
         <boxGeometry args={[2.5, 2.5, 0.5]} />

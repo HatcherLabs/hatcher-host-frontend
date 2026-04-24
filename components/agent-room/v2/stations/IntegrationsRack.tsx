@@ -2,6 +2,7 @@
 import { Html } from '@react-three/drei';
 import type { Station } from '../world/layout';
 import { paletteFor } from '../colors';
+import { ProximityHalo } from './ProximityHalo';
 
 const PLATFORMS = ['discord', 'telegram', 'twitter', 'whatsapp', 'slack'] as const;
 
@@ -17,6 +18,7 @@ export function IntegrationsRack({ station, framework, connected, onClick, isNea
   const palette = paletteFor(framework);
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]} onClick={onClick}>
+      <ProximityHalo color={palette.primary} active={!!isNear} />
       {/* Rack body */}
       <mesh position={[0, 1, 0]} castShadow receiveShadow>
         <boxGeometry args={[1.4, 2, 0.7]} />

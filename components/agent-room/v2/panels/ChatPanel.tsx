@@ -15,6 +15,7 @@ interface Props {
   messages: ChatMessage[];
   onAppend: (msg: ChatMessage) => void;
   onUpdateLast: (content: string) => void;
+  onStreamingChange?: (streaming: boolean) => void;
   onClose: () => void;
 }
 
@@ -24,9 +25,14 @@ export function ChatPanel({
   messages,
   onAppend,
   onUpdateLast,
+  onStreamingChange,
   onClose,
 }: Props) {
-  const [streaming, setStreaming] = useState(false);
+  const [streaming, setStreamingLocal] = useState(false);
+  const setStreaming = useCallback((v: boolean) => {
+    setStreamingLocal(v);
+    onStreamingChange?.(v);
+  }, [onStreamingChange]);
   const [input, setInput] = useState('');
   const bufferRef = useRef('');
   const scrollRef = useRef<HTMLDivElement>(null);

@@ -43,6 +43,8 @@ interface Props {
   canEdit: boolean;
   hasMemory: boolean;
   quality: Quality;
+  agentName?: string;
+  isChatStreaming?: boolean;
   onStationClick: (id: StationId) => void;
   onStatusChange: () => void;
 }
@@ -74,6 +76,8 @@ export function AgentRoomSceneV2({
   canEdit,
   hasMemory,
   quality,
+  agentName,
+  isChatStreaming,
   onStationClick,
   onStatusChange,
 }: Props) {
@@ -114,6 +118,8 @@ export function AgentRoomSceneV2({
             framework={framework}
             onClick={() => onStationClick('agentAvatar')}
             isNear={nearest === 'agentAvatar'}
+            agentName={agentName}
+            isStreaming={isChatStreaming}
           />
           <SkillWorkbench
             station={layout.skillWorkbench}
