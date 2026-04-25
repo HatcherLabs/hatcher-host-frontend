@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { Html } from '@react-three/drei';
 import type { Station } from '../world/layout';
 import { paletteFor } from '../colors';
-import { paletteFor as legacyPaletteFor } from '@/components/agent-room/colors';
+import { paletteFor as legacyPaletteFor } from '../three-palette';
 import { V2Robot } from './V2Robot';
 import { ProximityHalo } from './ProximityHalo';
 

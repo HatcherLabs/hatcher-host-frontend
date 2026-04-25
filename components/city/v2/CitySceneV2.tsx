@@ -2,8 +2,9 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { useRouter } from '@/i18n/routing';
 import type { CityAgent } from '@/components/city/types';
 import { QualityProvider, useQuality } from './quality/QualityContext';
 import { QualityToggle } from './quality/QualityToggle';
@@ -34,7 +35,6 @@ import { FollowCamera } from './character/FollowCamera';
 import { WalkSurveyToggle, type CityMode } from './hud/WalkSurveyToggle';
 import { Minimap } from './hud/Minimap';
 import { WalkOnboarding } from './hud/WalkOnboarding';
-import { AgentPopup } from './hud/AgentPopup';
 import { MobileJoystick } from './character/MobileJoystick';
 import { AmbientAudio } from './hud/AmbientAudio';
 import { CATEGORIES } from '@/components/city/types';
@@ -61,8 +61,8 @@ interface Props {
 const EMPTY_PULSES: Map<string, number> = new Map();
 
 export function CitySceneV2({ agents = [], pulseAts = EMPTY_PULSES }: Props) {
+  const router = useRouter();
   const [mode, setMode] = useState<CityMode>('survey');
-  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const charState = useRef<CharacterState>({
     position: new THREE.Vector3(0, 0, 0),
     heading: 0,
@@ -72,8 +72,15 @@ export function CitySceneV2({ agents = [], pulseAts = EMPTY_PULSES }: Props) {
   // Analog vector from the mobile joystick; shared with CanvasInner
   // via ref so updating it doesn't cause re-renders.
   const analogRef = useRef({ x: 0, y: 0 });
-  const selectedAgent =
-    selectedAgentId ? agents.find((a) => a.id === selectedAgentId) ?? null : null;
+
+  // Building/NPC click → drop into the agent's V2 room. Replaces the
+  // old AgentPopup preview overlay — the room IS the detail view.
+  const openAgentRoom = useCallback(
+    (agentId: string) => {
+      router.push(`/agent/${agentId}/room`);
+    },
+    [router],
+  );
 
   // Esc exits walk mode from anywhere on the page
   useEffect(() => {
@@ -107,7 +114,7 @@ export function CitySceneV2({ agents = [], pulseAts = EMPTY_PULSES }: Props) {
           mode={mode}
           charState={charState.current}
           pulseAts={pulseAts}
-          onBuildingClick={setSelectedAgentId}
+          onBuildingClick={openAgentRoom}
           analogRef={analogRef}
         />
         <QualityToggle />
@@ -120,13 +127,6 @@ export function CitySceneV2({ agents = [], pulseAts = EMPTY_PULSES }: Props) {
         />
         <WalkOnboarding visible={mode === 'walk'} />
         <AmbientAudio />
-        <AgentPopup
-          agent={selectedAgent}
-          onClose={() => setSelectedAgentId(null)}
-          onOpen={(id) => {
-            window.location.href = `/agent/${id}`;
-          }}
-        />
         {mode === 'walk' && (
           <MobileJoystick
             onVector={(x, y) => {

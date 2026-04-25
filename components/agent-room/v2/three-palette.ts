@@ -1,5 +1,8 @@
 export type Framework = 'openclaw' | 'hermes' | 'elizaos' | 'milady';
 
+// THREE.Color-friendly palette: numeric channels for materials/emissive,
+// hex strings for HTML/CSS. Distinct from `./colors.ts` (which is the V2
+// stylistic palette: string + scene atmosphere numbers).
 export interface FrameworkPalette {
   primary: number;
   dim: number;
