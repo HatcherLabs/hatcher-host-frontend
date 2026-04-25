@@ -6,7 +6,6 @@ import {
   DISTRICT_COLS,
   DISTRICT_ROWS,
   DISTRICT_STEP,
-  DISTRICT_GAP,
 } from './grid';
 
 /**
@@ -20,10 +19,12 @@ export function Streetlights() {
 
   const positions = useMemo(() => {
     const out: Array<[number, number]> = [];
+    // Sit at street intersections — same gap-centre formula as
+    // Streets.tsx (no half-gap offset).
     for (let r = 0; r <= totalRows; r++) {
-      const z = (r - totalRows / 2) * step - DISTRICT_GAP / 2;
+      const z = (r - totalRows / 2) * step;
       for (let c = 0; c <= DISTRICT_COLS; c++) {
-        const x = (c - DISTRICT_COLS / 2) * step - DISTRICT_GAP / 2;
+        const x = (c - DISTRICT_COLS / 2) * step;
         out.push([x, z]);
       }
     }

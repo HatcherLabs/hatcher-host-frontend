@@ -7,7 +7,6 @@ import {
   DISTRICT_COLS,
   DISTRICT_ROWS,
   DISTRICT_STEP,
-  DISTRICT_GAP,
 } from './grid';
 
 const STREET_Y = 0.18;
@@ -145,14 +144,15 @@ function buildLanes(n: number): Lane[] {
   const totalRows = DISTRICT_ROWS;
   const longEdge = Math.max(DISTRICT_COLS, totalRows) * step + 20;
 
-  // Street centrelines — same math as Streets.tsx
+  // Street centrelines — same math as Streets.tsx (gap centres, no
+  // half-gap shift).
   const horizontalZs: number[] = [];
   for (let r = 0; r <= totalRows; r++) {
-    horizontalZs.push((r - totalRows / 2) * step - DISTRICT_GAP / 2);
+    horizontalZs.push((r - totalRows / 2) * step);
   }
   const verticalXs: number[] = [];
   for (let c = 0; c <= DISTRICT_COLS; c++) {
-    verticalXs.push((c - DISTRICT_COLS / 2) * step - DISTRICT_GAP / 2);
+    verticalXs.push((c - DISTRICT_COLS / 2) * step);
   }
 
   const out: Lane[] = [];

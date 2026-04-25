@@ -143,6 +143,30 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    // V1 city + agent-room routes were deleted on 2026-04-25 in favour
+    // of V2 (which is the only scene now). These 301s preserve any
+    // backlinks, search-engine equity, and embed iframes that landed
+    // in the wild between the V1 launch (2026-04-22) and the cleanup,
+    // turning a hard 404 into a click-through to the V2 agent room.
+    //
+    // Two entries per dead route — one for the EN default (no locale
+    // prefix) and one for the explicit non-default locales (zh/de/fr/ro).
+    // i18n uses `localePrefix: 'as-needed'` so EN URLs never carry a
+    // prefix and the bare path doesn't double-match.
+    const dead = ['agent/:id/room-legacy', 'agent/:id/city', 'embed/agent/:id'];
+    const target = '/agent/:id/room';
+    const out = [];
+    for (const path of dead) {
+      out.push({ source: `/${path}`, destination: target, permanent: true });
+      out.push({
+        source: `/:locale(zh|de|fr|ro)/${path}`,
+        destination: `/:locale${target}`,
+        permanent: true,
+      });
+    }
+    return out;
+  },
 };
 
 export default withSentryConfig(withNextIntl(nextConfig), {

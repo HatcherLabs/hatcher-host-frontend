@@ -53,10 +53,18 @@ export function Streets() {
     return { asphaltDiff: ad, asphaltNorm: an, asphaltRough: ar, concreteDiff: cd };
   }, [asphaltDiffBase, asphaltNormBase, asphaltRoughBase, concreteDiffBase, longEdge]);
 
+  // Street centrelines sit at gap-CENTRES between district pads (and
+  // at the perimeter, half a step outside the outermost rows/cols).
+  // With DISTRICT_COLS=5 and pad centres at (col-2)*step, the gaps
+  // sit at (col-1.5)*step → so for a street index r ∈ 0..ROWS, the
+  // formula is (r - ROWS/2) * step. The earlier `- DISTRICT_GAP/2`
+  // term was a thinko that shifted every street by half a gap, which
+  // made each pad appear offset by +8 in x and +8 in z (visible as a
+  // black band on the top + left of every district pad).
   const horizontal = useMemo(() => {
     const zs: number[] = [];
     for (let r = 0; r <= totalRows; r++) {
-      zs.push((r - totalRows / 2) * step - DISTRICT_GAP / 2);
+      zs.push((r - totalRows / 2) * step);
     }
     return zs;
   }, [totalRows, step]);
@@ -64,7 +72,7 @@ export function Streets() {
   const vertical = useMemo(() => {
     const xs: number[] = [];
     for (let c = 0; c <= DISTRICT_COLS; c++) {
-      xs.push((c - DISTRICT_COLS / 2) * step - DISTRICT_GAP / 2);
+      xs.push((c - DISTRICT_COLS / 2) * step);
     }
     return xs;
   }, [step]);

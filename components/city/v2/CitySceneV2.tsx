@@ -9,6 +9,7 @@ import type { CityAgent } from '@/components/city/types';
 import { QualityProvider, useQuality } from './quality/QualityContext';
 import { QualityToggle } from './quality/QualityToggle';
 import { Skybox } from './world/Skybox';
+import { CyberSky } from './world/CyberSky';
 import { Ground } from './world/Ground';
 import { HorizonRing } from './world/HorizonRing';
 import { SceneErrorBoundary } from './world/SceneErrorBoundary';
@@ -171,16 +172,18 @@ function CanvasInner({
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
     >
       {/* Cyber-cool lighting. Skybox HDRI supplies ambient/reflection
-          only (background={false}), so everything you see beyond the
-          city is the flat `<color>` below + fog falloff. Keeps the
-          scene calm and keeps our 600u ground from competing with real
-          photographed skyscrapers in the HDRI. */}
-      <color attach="background" args={['#030111']} />
+          only (background={false}); CyberSky paints a procedural
+          gradient + sparse star field so the dome above the city reads
+          as a real sky instead of a flat void. The clear color is a
+          near-match to the sky horizon as a fallback if the shader
+          ever fails to compile. */}
+      <color attach="background" args={['#050418']} />
       {/* Fog is a light atmospheric touch — city stays clearly
-          readable out to ~380u, with a slow falloff past that. Avoids
-          the "everything is black in the distance" feel.
-          Walk mode clamps at ~255u of player movement, so the fog
-          far plane at 480 leaves plenty of headroom. */}
+          readable out to ~380u, with a slow falloff past that. Walk
+          mode clamps at ~255u of player movement, so the fog far
+          plane at 480 leaves plenty of headroom. The fog colour
+          matches CyberSky's horizon band so the city blends into the
+          sky without a visible seam. */}
       <fog attach="fog" args={['#050418', 200, 480]} />
       <ambientLight intensity={0.18} color={'#4866aa'} />
       <directionalLight
@@ -197,6 +200,9 @@ function CanvasInner({
       <Suspense fallback={null}>
         <SceneErrorBoundary label="Skybox">
           <Skybox timeOfDay="auto" />
+        </SceneErrorBoundary>
+        <SceneErrorBoundary label="CyberSky">
+          <CyberSky />
         </SceneErrorBoundary>
         <Ground />
         <HorizonRing />

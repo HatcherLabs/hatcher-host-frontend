@@ -8,7 +8,6 @@ import {
   DISTRICT_COLS,
   DISTRICT_ROWS,
   DISTRICT_SIZE,
-  DISTRICT_GAP,
   DISTRICT_STEP,
   WORLD_HALF,
 } from '../world/grid';
@@ -176,14 +175,17 @@ function draw(
   const step = DISTRICT_STEP;
   const totalRows = DISTRICT_ROWS;
   ctx.beginPath();
+  // Street centrelines — same gap-centre formula as Streets.tsx (no
+  // half-gap offset). Keeps the minimap grid visually aligned with
+  // the actual road grid in the 3D scene.
   for (let r = 0; r <= totalRows; r++) {
-    const z = (r - totalRows / 2) * step - DISTRICT_GAP / 2;
+    const z = (r - totalRows / 2) * step;
     const { mz } = toMap(0, z);
     ctx.moveTo(0, mz);
     ctx.lineTo(MAP_PX, mz);
   }
   for (let c = 0; c <= DISTRICT_COLS; c++) {
-    const x = (c - DISTRICT_COLS / 2) * step - DISTRICT_GAP / 2;
+    const x = (c - DISTRICT_COLS / 2) * step;
     const { mx } = toMap(x, 0);
     ctx.moveTo(mx, 0);
     ctx.lineTo(mx, MAP_PX);
