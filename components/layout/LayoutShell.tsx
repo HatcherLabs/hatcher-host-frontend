@@ -11,6 +11,9 @@ import { ScrollToTop } from '@/components/ui/ScrollToTop';
 // rather than a standalone app; the canvas sits inside the main content area.
 const IMMERSIVE_PATTERNS: RegExp[] = [
   /^\/agent\/[^/]+\/room(?:-legacy)?(?:\/|$)/,
+  // Chat-to-hatch ships its own slim brand bar + back link; the legacy
+  // global chrome would push the chat / preview columns below the fold.
+  /^\/chat-to-hatch(?:\/|$)/,
 ];
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {
