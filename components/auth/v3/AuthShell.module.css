@@ -1,0 +1,70 @@
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-base);
+}
+
+.header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-line);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  padding: 32px;
+}
+
+.head { margin-bottom: 24px; text-align: center; }
+
+.title {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.foot {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-line);
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.foot :global(a) {
+  color: var(--accent);
+  text-decoration: none;
+}
+.foot :global(a):hover { text-decoration: underline; }

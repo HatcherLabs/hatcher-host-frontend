@@ -1,13 +1,24 @@
 import { withSentryConfig } from '@sentry/nextjs';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
 import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
+
+// Inject the app version from package.json into the client bundle so the
+// LandingV3 footer line ("$ hatcher --version  v<X.Y.Z>") shows real data.
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf8'));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   compress: true,
   poweredByHeader: false,
   transpilePackages: ['@hatcher/shared'],
+  env: {
+    NEXT_PUBLIC_APP_VERSION: pkg.version,
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '*.ipfs.nftstorage.link' },
