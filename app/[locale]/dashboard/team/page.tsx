@@ -367,7 +367,7 @@ export default function TeamPage() {
             <button
               onClick={handleCreateTeam}
               disabled={creating || !teamName.trim()}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors flex items-center gap-2"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-50 disabled:cursor-not-allowed text-[var(--bg-base)] text-sm font-medium transition-colors flex items-center gap-2"
             >
               {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
               {creating ? t('creating') : t('createBtn')}
@@ -530,7 +530,7 @@ export default function TeamPage() {
                   <button
                     onClick={handleInvite}
                     disabled={inviting || !inviteEmail.trim()}
-                    className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-50 disabled:cursor-not-allowed text-[var(--bg-base)] text-sm font-medium transition-colors flex items-center gap-1.5"
                   >
                     {inviting ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
                     {t('invite')}

@@ -159,7 +159,7 @@ export function PortAgentModal({ agent, isOpen, onClose }: PortAgentModalProps) 
             <button
               onClick={handlePort}
               disabled={loading}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-purple-500 text-white hover:bg-purple-600 transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-[var(--accent)] text-[var(--bg-base)] hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50"
             >
               {loading ? <Loader2 size={14} className="animate-spin" /> : <Copy size={14} />}
               {loading ? 'Cloning…' : 'Clone'}

@@ -333,7 +333,7 @@ export default function SupportPage() {
               {!isAuthenticated ? (
                 <div className="text-center py-8">
                   <p className="text-sm text-[var(--text-secondary)] mb-4">{t('signInPrompt')}</p>
-                  <Link href="/login" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-colors">
+                  <Link href="/login" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-[var(--bg-base)] text-sm font-medium transition-colors">
                     {t('signIn')}
                   </Link>
                 </div>
