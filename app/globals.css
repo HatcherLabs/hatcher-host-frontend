@@ -39,8 +39,13 @@
   /* Text — high-contrast white scale */
   --text-primary: #FFFFFF;
   --text-secondary: #A0A0A0;
-  --text-muted: #6B6B6B;
-  --text-dim: #4A4A4A;
+  /* Bumped from #6B6B6B (3.7:1 on bg-base) to #8A8A8A (5.7:1) to clear
+     WCAG AA color-contrast for muted text — caught by axe-core E8 audit. */
+  --text-muted: #8A8A8A;
+  /* Was #4A4A4A (~2.1:1, fails AA). #707070 hits 4.0:1 — still below AA but
+     intended for decorative-only / hover affordances. Use --text-muted for
+     anything that needs to be readable. */
+  --text-dim: #707070;
   --text-accent: #39FF88;
 
   /* Accent — phosphor green (the only chromatic colour in the system) */
@@ -675,6 +680,19 @@
 .typing-dot:nth-child(1) { animation: typing-dot 1.4s ease-in-out infinite; }
 .typing-dot:nth-child(2) { animation: typing-dot 1.4s ease-in-out 0.2s infinite; }
 .typing-dot:nth-child(3) { animation: typing-dot 1.4s ease-in-out 0.4s infinite; }
+
+/* ── A11y: distinguish inline links without relying on color ─────────────
+   Caught by axe-core E8 audit (link-in-text-block, WCAG 2 AA). Inline
+   links inside running text get a thin underline so colorblind / low-vision
+   users can spot them. Scoped to <p> + .prose-custom (legal pages with
+   lists too) — Footer/Nav columns use plain <ul><li> so they're not
+   covered, preserving their explicit per-link hover treatment. */
+p a,
+.prose-custom a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
 
 /* ── Config editor ───────────────────────────────────── */
 .config-input {

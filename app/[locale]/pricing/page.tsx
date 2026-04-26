@@ -454,7 +454,7 @@ export default function PricingPage() {
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('starter.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$6.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('priceUnit.perMonth')}</span></div>
                     </th>
-                    <th className="text-center px-2 py-3 sm:p-5 text-[#8b5cf6] font-semibold">
+                    <th className="text-center px-2 py-3 sm:p-5 text-[#a78bfa] font-semibold">
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('pro.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$19.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('priceUnit.perMonth')}</span></div>
                     </th>
@@ -462,7 +462,7 @@ export default function PricingPage() {
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('business.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$49.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('priceUnit.perMonth')}</span></div>
                     </th>
-                    <th className="text-center px-2 py-3 sm:p-5 text-[#e11d48] font-semibold">
+                    <th className="text-center px-2 py-3 sm:p-5 text-[#f43f5e] font-semibold">
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('founding_member.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('compareTable.onceSuffix')}</span></div>
                     </th>

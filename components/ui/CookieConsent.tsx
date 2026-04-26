@@ -20,7 +20,10 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Link } from '@/i18n/routing';
+// CookieConsent is rendered in app/layout.tsx OUTSIDE NextIntlClientProvider
+// so it must use plain next/link — the i18n Link's useLocale call would throw
+// "No intl context found" on bare routes (/privacy, /terms, /cookies, /impressum).
+import Link from 'next/link';
 
 // Routes that take over the full viewport and shouldn't show a
 // consent banner blocking the canvas. The pathname here still has
@@ -199,7 +202,7 @@ export function CookieConsent() {
               </button>
               <button
                 onClick={() => persist(true)}
-                className="px-3 py-1.5 rounded-md text-[12px] font-semibold bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white transition-colors"
+                className="px-3 py-1.5 rounded-md text-[12px] font-semibold bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--bg-base)] transition-colors"
               >
                 Accept all
               </button>
@@ -296,7 +299,7 @@ export function CookieConsent() {
               </button>
               <button
                 onClick={() => persist(analyticsChoice)}
-                className="px-4 py-2 rounded-lg text-[12px] font-semibold bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white transition-colors"
+                className="px-4 py-2 rounded-lg text-[12px] font-semibold bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[var(--bg-base)] transition-colors"
               >
                 Save preferences
               </button>

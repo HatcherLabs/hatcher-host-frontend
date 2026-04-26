@@ -65,6 +65,10 @@
 }
 .foot :global(a) {
   color: var(--accent);
-  text-decoration: none;
+  /* a11y: always underline so the link is distinguishable without color
+     (link-in-text-block, WCAG 2 AA). */
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
 }
-.foot :global(a):hover { text-decoration: underline; }
+.foot :global(a):hover { color: var(--accent-hover); }
