@@ -15,120 +15,79 @@
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* ── CSS Custom Properties ─────────────────────────── */
+/* v3 — terminal mono base + phosphor accent (dark-only).
+   Light theme support is removed in v3. Hardcoded color values in
+   component .btn-primary etc. classes are audited and replaced in
+   Phase E of the redesign — they remain as legacy artefacts here. */
 :root {
-  /* Backgrounds — layered depth system */
-  --bg-base: #0a0a0f;
-  --bg-surface: #141419;
-  --bg-sidebar: #0e0e14;
-  --bg-card: rgba(255, 255, 255, 0.03);
-  --bg-card-solid: #141419;
-  --bg-elevated: #1a1a22;
-  --bg-hover: #22222d;
-  --bg-active: #2a2a38;
+  /* Backgrounds — flat dark, no warm tint */
+  --bg-base: #0A0A0A;
+  --bg-surface: #131313;
+  --bg-sidebar: #0F0F0F;
+  --bg-card: #131313;
+  --bg-card-solid: #131313;
+  --bg-elevated: #1A1A1A;
+  --bg-hover: #1F1F1F;
+  --bg-active: #262626;
 
-  /* Brand — primary (purple) */
-  --primary-400: #a78bfa;
-  --primary-500: #8b5cf6;
-  --primary-600: #7c3aed;
-  --primary-700: #6d28d9;
-  --primary-glow: rgba(139, 92, 246, 0.15);
+  /* Borders — neutral grey lines, no purple tint */
+  --border-line: #1F1F1F;
+  --border-default: #2A2A2A;
+  --border-hover: rgba(57, 255, 136, 0.3);
+  --border-active: #39FF88;
 
-  /* CTA — accent (cyan) spectrum */
-  --accent-400: #22d3ee;
-  --accent-500: #06b6d4;
-  --accent-600: #0891b2;
-  --accent-700: #0e7490;
-  --accent-glow: rgba(6, 182, 212, 0.15);
+  /* Text — high-contrast white scale */
+  --text-primary: #FFFFFF;
+  --text-secondary: #A0A0A0;
+  --text-muted: #6B6B6B;
+  --text-dim: #4A4A4A;
+  --text-accent: #39FF88;
 
-  /* Accents */
-  --cyan-400: #22d3ee;
-  --cyan-500: #06b6d4;
-  --color-accent: #06b6d4;
-  --color-accent-hover: #0891b2;
-  --amber-400: #FBBF24;
-  /* Solana green — theme-aware. The official #14F195 is ~4.5:1 on dark
-     but only ~1.8:1 on white (fails WCAG). Light theme swaps to a
-     darker green that hits AA contrast while staying "Solana-green". */
-  --solana-green: #14F195;
+  /* Accent — phosphor green (the only chromatic colour in the system) */
+  --accent: #39FF88;
+  --accent-hover: #7CFFB0;
+  --accent-glow: rgba(57, 255, 136, 0.18);
+  --color-accent: #39FF88;
+  --color-accent-hover: #7CFFB0;
 
-  /* Text */
-  --text-primary: #fafafa;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
-  --text-dim: #3D375E;
-  --text-accent: #8b5cf6;
+  /* Legacy aliases kept so existing components don't 500.
+     Mapped to phosphor so they don't introduce competing chroma. */
+  --primary-400: #7CFFB0;
+  --primary-500: #39FF88;
+  --primary-600: #2EE077;
+  --primary-700: #25B55E;
+  --primary-glow: rgba(57, 255, 136, 0.15);
+  --accent-400: #7CFFB0;
+  --accent-500: #39FF88;
+  --accent-600: #2EE077;
+  --accent-700: #25B55E;
+  --cyan-400: #7CFFB0;
+  --cyan-500: #39FF88;
+  --amber-400: #A0A0A0; /* No amber in v3 — fall back to muted text */
+  --solana-green: #39FF88;
 
-  /* Borders */
-  --border-default: rgba(255, 255, 255, 0.06);
-  --border-hover: rgba(139, 92, 246, 0.3);
-  --border-active: #8b5cf6;
+  /* Gradients — dropped chromatic gradients, use mono only */
+  --gradient-card-border: linear-gradient(135deg, rgba(57,255,136,0.18), rgba(57,255,136,0.04));
+  --gradient-bg-subtle: radial-gradient(ellipse at top, rgba(57,255,136,0.04), transparent 70%);
 
-  /* Gradients */
-  --gradient-card-border: linear-gradient(135deg, rgba(139,92,246,0.3), rgba(6,182,212,0.1));
-  --gradient-bg-subtle: radial-gradient(ellipse at top, rgba(139,92,246,0.08), transparent 70%);
+  /* Fonts — fallback stacks. The actual JetBrains Mono / Inter are
+     injected via next/font in app/layout.tsx (variables --font-mono
+     and --font-inter on <html>). These :root values act as fallback
+     before the loaded fonts arrive. */
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   /* Misc */
-  --radius: 0.625rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
+  --radius: 0.5rem;
+  --radius-lg: 0.625rem;
+  --radius-xl: 0.875rem;
+
+  color-scheme: dark;
 }
 
-/* ── Light Theme Overrides ────────────────────────── */
-/* Design: Clean Swiss-inspired SaaS light theme.
-   Contrast: WCAG AA minimum (4.5:1 for text).
-   Strategy: White surfaces, soft gray layering, stronger borders for separation. */
-.light {
-  /* Backgrounds — white-forward with warm gray layering */
-  --bg-base: #fafbff;          /* Page background — near-white with subtle blue tint */
-  --bg-surface: #ffffff;       /* Clean white surface */
-  --bg-sidebar: #f1f3f9;      /* Sidebar — slightly cooler gray */
-  --bg-card: rgba(0, 0, 0, 0.03); /* Card overlay — visible separation */
-  --bg-card-solid: #ffffff;    /* Solid card — pure white */
-  --bg-elevated: #f4f5fa;     /* Elevated surfaces — light gray-blue */
-  --bg-hover: #ecedf5;        /* Hover — noticeable but gentle */
-  --bg-active: #e2e4ef;       /* Active/pressed — stronger */
-
-  /* Brand — slightly deeper purples for light bg contrast */
-  --primary-400: #8b5cf6;
-  --primary-500: #7c3aed;
-  --primary-600: #6d28d9;
-  --primary-700: #5b21b6;
-  --primary-glow: rgba(124, 58, 237, 0.08);
-
-  /* CTA — deeper cyan for light bg readability */
-  --accent-400: #0891b2;
-  --accent-500: #0e7490;
-  --accent-600: #155e75;
-  --accent-700: #164e63;
-  --accent-glow: rgba(14, 116, 144, 0.06);
-
-  /* Accents — darker for contrast */
-  --cyan-400: #0891b2;
-  --cyan-500: #0e7490;
-  --color-accent: #0e7490;
-  --color-accent-hover: #155e75;
-  --amber-400: #b45309;
-  /* Solana green darkened for AA contrast on white */
-  --solana-green: #047857;
-
-  /* Text — strong contrast hierarchy (WCAG AA+) */
-  --text-primary: #0f172a;     /* Slate-900 — 15.4:1 ratio on white */
-  --text-secondary: #475569;   /* Slate-600 — 6.4:1 ratio */
-  --text-muted: #64748b;       /* Slate-500 — 4.6:1 ratio (AA pass) */
-  --text-dim: #94a3b8;         /* Slate-400 — decorative only */
-  --text-accent: #7c3aed;      /* Purple-600 — 5.2:1 on white */
-
-  /* Borders — visible separation on light backgrounds */
-  --border-default: rgba(0, 0, 0, 0.10); /* Stronger than dark theme equivalent */
-  --border-hover: rgba(124, 58, 237, 0.30);
-  --border-active: #7c3aed;
-
-  /* Gradients — softer for light mode */
-  --gradient-card-border: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(14,116,144,0.06));
-  --gradient-bg-subtle: radial-gradient(ellipse at top, rgba(124,58,237,0.04), transparent 70%);
-
-  color-scheme: light;
-}
+/* Light theme support removed in v3.
+   The .light class is a no-op — any historical consumer renders dark.
+   Component-level .light overrides at the bottom of this file are
+   left in place but inert (the .light class isn't applied anywhere). */
 
 /* ── Keyframe Animations ───────────────────────────── */
 @keyframes fadeIn {
@@ -1103,4 +1062,28 @@ button, a, [role="tab"] {
     opacity: 0.38;
     filter: saturate(0.75) contrast(0.95);
   }
+}
+
+/* ── v3 — terminal idioms ─────────────────────────────
+   Subtle scanline overlay for hero sections. Tiny opacity (~1%) so it
+   feels like a shader, not a TV CRT. Disabled on prefers-reduced-motion. */
+.v3-scanline {
+  position: relative;
+}
+.v3-scanline::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 2px,
+    rgba(255, 255, 255, 0.012) 2px,
+    rgba(255, 255, 255, 0.012) 4px
+  );
+  z-index: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .v3-scanline::after { display: none; }
 }
