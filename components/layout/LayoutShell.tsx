@@ -17,6 +17,12 @@ const IMMERSIVE_PATTERNS: RegExp[] = [
   // LandingV3 owns its own Nav + Footer (marketing v3 chrome). Skipping
   // the legacy global chrome here prevents double-stacking.
   /^\/$/,
+  // Marketing pages wrapped in MarketingShell v3 (own Nav + Footer).
+  /^\/(?:pricing|frameworks|token|roadmap|blog|changelog|help|support|affiliate)(?:\/|$)/,
+  // Auth pages wrapped in AuthShell v3 (own slim brand bar).
+  /^\/(?:login|register|forgot-password|reset-password|verify-email)(?:\/|$)/,
+  // Bare legal pages wrapped in MarketingShell v3.
+  /^\/(?:privacy|terms|cookies|impressum)(?:\/|$)/,
 ];
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {

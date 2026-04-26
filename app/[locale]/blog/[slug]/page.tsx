@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import type { Metadata } from 'next';
 import { BLOG_POSTS, getBlogPost, getRelatedPosts } from '@/lib/blog';
+import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -67,7 +68,7 @@ export default async function BlogArticlePage({ params }: Props) {
   };
 
   return (
-    <div className="min-h-screen">
+    <MarketingShell>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
@@ -151,6 +152,6 @@ export default async function BlogArticlePage({ params }: Props) {
           </section>
         )}
       </article>
-    </div>
+    </MarketingShell>
   );
 }

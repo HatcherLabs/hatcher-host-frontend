@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/i18n/routing';
+import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import {
   BookOpen,
   MessageCircle,
@@ -214,12 +215,13 @@ export default function HelpPage() {
   }, [filteredItems, isSearching]);
 
   return (
-    <motion.div
-      className="min-h-screen p-4 sm:p-6 lg:p-10"
-      variants={pageVariants}
-      initial="hidden"
-      animate="visible"
-    >
+    <MarketingShell>
+      <motion.div
+        className="p-4 sm:p-6 lg:p-10"
+        variants={pageVariants}
+        initial="hidden"
+        animate="visible"
+      >
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <motion.div variants={cardVariants} className="relative">
@@ -471,7 +473,8 @@ export default function HelpPage() {
           </Link>
         </motion.div>
       </div>
-    </motion.div>
+      </motion.div>
+    </MarketingShell>
   );
 }
 

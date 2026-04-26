@@ -14,6 +14,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { buildLanguagesMap } from '@/lib/seo';
+import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import {
   ArrowRight,
   Wallet,
@@ -145,7 +146,7 @@ export default async function AffiliatePage() {
   const t = await getTranslations('affiliate');
 
   return (
-    <div className="relative">
+    <MarketingShell>
       <div className="mx-auto max-w-7xl px-4 pt-12 sm:pt-16 pb-20">
         {/* ── HERO ────────────────────────────────────────────── */}
         <section className="mb-16">
@@ -376,6 +377,6 @@ export default async function AffiliatePage() {
           </div>
         </section>
       </div>
-    </div>
+    </MarketingShell>
   );
 }

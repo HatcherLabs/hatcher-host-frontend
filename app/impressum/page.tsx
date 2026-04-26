@@ -4,6 +4,7 @@ import {
   Building2, Receipt, FileText, MapPin, Mail, Twitter, User,
   Server, ShieldAlert, AlertTriangle, Scale,
 } from 'lucide-react';
+import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 
 export const metadata: Metadata = {
   title: 'Impressum | Hatcher',
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
 // scan for fixed anchors (company info, contact, responsible person).
 export default function ImpressumPage() {
   return (
-    <main className="min-h-screen bg-[var(--bg-base)]">
+    <MarketingShell>
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         {/* Header */}
         <div className="mb-12">
@@ -216,6 +217,6 @@ export default function ImpressumPage() {
           </section>
         </div>
       </div>
-    </main>
+    </MarketingShell>
   );
 }

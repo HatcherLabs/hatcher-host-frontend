@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { motion, AnimatePresence } from 'framer-motion';
+import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import {
   LifeBuoy,
   Send,
@@ -211,7 +212,8 @@ export default function SupportPage() {
   }
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 lg:p-10">
+    <MarketingShell>
+      <div className="p-4 sm:p-6 lg:p-10">
       <motion.div
         className="max-w-3xl mx-auto space-y-8"
         variants={containerVariants}
@@ -649,6 +651,7 @@ export default function SupportPage() {
           </div>
         </motion.div>
       </motion.div>
-    </div>
+      </div>
+    </MarketingShell>
   );
 }

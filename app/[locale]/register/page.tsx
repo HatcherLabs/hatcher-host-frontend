@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { track } from '@/lib/analytics';
 import { Check, X, Gift, Loader2 } from 'lucide-react';
+import { AuthShell } from '@/components/auth/v3/AuthShell';
 
 type FieldStatus =
   | { state: 'idle' }
@@ -56,15 +57,8 @@ export default function RegisterPage() {
   const [localError, setLocalError] = useState<string | null>(null);
   const [emailStatus, setEmailStatus] = useState<FieldStatus>({ state: 'idle' });
   const [usernameStatus, setUsernameStatus] = useState<FieldStatus>({ state: 'idle' });
-  const [stats, setStats] = useState<{ totalUsers: number; totalAgents: number; activeAgents: number } | null>(null);
   const didSubmit = useRef(false);
   const strength = useMemo(() => getPasswordStrength(password, t), [password, t]);
-
-  useEffect(() => {
-    api.getPlatformStats().then((res) => {
-      if (res.success) setStats({ totalUsers: res.data.totalUsers, totalAgents: res.data.totalAgents, activeAgents: res.data.activeAgents });
-    }).catch(() => { /* silent */ });
-  }, []);
 
   // Debounced live availability check. Ignore stale responses by comparing
   // the value at request time vs current state when the response arrives.
@@ -172,57 +166,20 @@ export default function RegisterPage() {
   const displayError = localError || error;
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] flex items-stretch">
-      {/* Left panel — editorial proof (hidden on mobile). Punchline + live
-          platform stats; replaces the 3-icon-card panel pattern. */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between px-16 py-16 bg-[var(--bg-card)] border-r border-[var(--border-default)]">
-        <div>
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">{t('panelTagline')}</p>
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.05] text-[var(--text-primary)] max-w-md" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
-            {t('panelHeadlinePrefix')}{' '}<span className="text-[var(--color-accent)]">{t('panelHeadlineAccent')}</span>
-          </h2>
-          <p className="mt-5 text-[15px] text-[var(--text-secondary)] leading-relaxed max-w-md">
-            {t('panelBody')}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-3 gap-8 pt-8 border-t border-[var(--border-default)] max-w-md">
-          <div>
-            <p className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] tabular-nums">
-              {stats ? stats.totalUsers.toLocaleString() : '—'}
-            </p>
-            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">{t('statsUsers')}</p>
-          </div>
-          <div>
-            <p className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] tabular-nums">
-              {stats ? stats.totalAgents.toLocaleString() : '—'}
-            </p>
-            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">{t('statsAgents')}</p>
-          </div>
-          <div>
-            <p className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] tabular-nums flex items-baseline gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse self-center" />
-              {stats ? stats.activeAgents.toLocaleString() : '—'}
-            </p>
-            <p className="text-[11px] uppercase tracking-[0.15em] text-[var(--text-muted)] mt-1">{t('statsOnline')}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Right panel — register form */}
-      <div className="flex-1 flex items-center justify-center px-4">
-        <div
-          className="w-full max-w-sm rounded-2xl p-8 bg-[var(--bg-card)] border border-[var(--border-default)] backdrop-blur-xl shadow-lg"
-        >
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-[var(--text-primary)]">
-              {t('heading')}
-            </h1>
-            <p className="text-sm text-[var(--text-secondary)] mt-2">{t('subheading')}</p>
-          </div>
-
-          {/* Referral badge */}
-          {referrerUsername && (
+    <AuthShell
+      title={t('heading')}
+      subtitle={t('subheading')}
+      foot={
+        <>
+          {t('loginPrompt')}{' '}
+          <Link href="/login" className="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors">
+            {t('loginLink')}
+          </Link>
+        </>
+      }
+    >
+      {/* Referral badge */}
+      {referrerUsername && (
             <div className="flex items-center gap-2 px-3 py-2 mb-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
               <Gift size={14} className="text-emerald-400 flex-shrink-0" />
               <p className="text-xs text-emerald-300">
@@ -410,11 +367,11 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={submitBlocked}
-              className="w-full h-10 rounded-lg text-sm font-medium text-white bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              className="w-full h-10 rounded-lg text-sm font-medium text-[var(--bg-base)] bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <>
-                  <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="w-3.5 h-3.5 border-2 border-[var(--bg-base)]/30 border-t-[var(--bg-base)] rounded-full animate-spin" />
                   {t('submitLoading')}
                 </>
               ) : (
@@ -422,15 +379,6 @@ export default function RegisterPage() {
               )}
             </button>
           </form>
-
-          <p className="text-center text-xs text-[var(--text-secondary)] mt-6">
-            {t('loginPrompt')}{' '}
-            <Link href="/login" className="text-cyan-400 hover:text-cyan-300 transition-colors">
-              {t('loginLink')}
-            </Link>
-          </p>
-        </div>
-      </div>
-    </div>
+    </AuthShell>
   );
 }

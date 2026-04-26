@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Cookie, ShieldCheck, BarChart3, Wrench } from 'lucide-react';
+import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 
 export const metadata: Metadata = {
   title: 'Cookie Policy | Hatcher',
@@ -16,7 +17,7 @@ const LAST_UPDATED = 'April 16, 2026';
 // user gives analytics consent — see the hooks in app/layout.tsx.
 export default function CookiePolicyPage() {
   return (
-    <main className="min-h-screen bg-[var(--bg-base)]">
+    <MarketingShell>
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         {/* Header */}
         <div className="mb-12">
@@ -254,6 +255,6 @@ export default function CookiePolicyPage() {
           </section>
         </div>
       </div>
-    </main>
+    </MarketingShell>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { ChangelogAutoRefresh } from './ChangelogAutoRefresh';
 import { buildLanguagesMap } from '@/lib/seo';
+import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 
 export const metadata: Metadata = {
   title: 'Changelog — Hatcher',
@@ -76,7 +77,7 @@ export default async function ChangelogPage() {
   const groups = groupByDay(commits);
 
   return (
-    <main className="min-h-screen">
+    <MarketingShell>
       <ChangelogAutoRefresh />
       <div className="mx-auto max-w-2xl px-4 sm:px-6 py-16 sm:py-20">
 
@@ -146,6 +147,6 @@ export default async function ChangelogPage() {
           </div>
         )}
       </div>
-    </main>
+    </MarketingShell>
   );
 }

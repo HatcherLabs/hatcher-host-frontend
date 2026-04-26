@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import NextImage from 'next/image';
 import { motion } from 'framer-motion';
+import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import {
   ArrowRight,
   Sparkles,
@@ -55,7 +56,8 @@ const PLANNED_USE_CASES: UseCase[] = [
 export default function TokenPage() {
   const t = useTranslations('token');
   return (
-    <div className="relative overflow-hidden min-h-screen">
+    <MarketingShell>
+      <div className="relative overflow-hidden">
       {/* ── HERO ───────────────────────────────────────────── */}
       <section className="relative py-28 md:py-36 px-4 text-center">
         {/* Single subtle background glow — toned down from 3-layer
@@ -324,6 +326,7 @@ export default function TokenPage() {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </MarketingShell>
   );
 }
