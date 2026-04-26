@@ -14,6 +14,9 @@ const IMMERSIVE_PATTERNS: RegExp[] = [
   // Chat-to-hatch ships its own slim brand bar + back link; the legacy
   // global chrome would push the chat / preview columns below the fold.
   /^\/chat-to-hatch(?:\/|$)/,
+  // LandingV3 owns its own Nav + Footer (marketing v3 chrome). Skipping
+  // the legacy global chrome here prevents double-stacking.
+  /^\/$/,
 ];
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {

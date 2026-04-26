@@ -1,0 +1,49 @@
+.section { background: var(--bg-base); }
+.inner { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+.layout { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+@media (max-width: 880px) { .layout { grid-template-columns: 1fr; gap: 48px; } }
+
+.col { display: flex; flex-direction: column; gap: 20px; }
+
+.fwGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+.fwCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fwTop { display: inline-flex; align-items: center; gap: 8px; }
+.fwDot { width: 8px; height: 8px; border-radius: 50%; }
+.fwLabel { font-family: var(--font-mono); font-weight: 600; font-size: 14px; color: var(--text-primary); }
+.fwTag { font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.4; }
+
+.pricing {
+  width: 100%;
+  margin-top: 8px;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+.pricing td { padding: 12px 0; border-bottom: 1px solid var(--border-line); }
+.tier { color: var(--text-primary); font-weight: 600; }
+.amount { color: var(--accent); white-space: nowrap; padding: 12px 16px !important; }
+.limits { color: var(--text-muted); text-align: right; font-size: 11px; }
+
+.more {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  align-self: flex-start;
+  margin-top: 8px;
+}
+.more:hover { color: var(--accent); }

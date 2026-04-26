@@ -1,0 +1,13 @@
+.page {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+.page :global(section) { padding: 80px 0; }
+.page :global(section:first-of-type) { padding-top: 32px; }
+
+@media (max-width: 768px) {
+  .page :global(section) { padding: 56px 0; }
+}
