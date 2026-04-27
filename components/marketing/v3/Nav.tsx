@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl';
 import styles from './Nav.module.css';
 import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA } from './links';
 import { NavDrawer } from './NavDrawer';
+import { LocaleSwitcher } from '@/components/layout/LocaleSwitcher';
 import { useAuth } from '@/lib/auth-context';
 
 export function Nav() {
@@ -20,6 +21,7 @@ export function Nav() {
   const { isAuthenticated, isLoading: authLoading, user, logout } = useAuth();
   const router = useRouter();
   const tNav = useTranslations('nav');
+  const tGroups = useTranslations('nav.groups');
   const tMenu = useTranslations('nav.userMenu');
 
   const USER_MENU = useMemo(() => ([
@@ -87,7 +89,7 @@ export function Nav() {
                   aria-haspopup="true"
                   onClick={() => setOpenGroup(openGroup === g.key ? null : g.key)}
                 >
-                  {g.label}
+                  {tGroups(g.labelKey)}
                   <svg className={styles.caret} viewBox="0 0 8 8" aria-hidden>
                     <path d="M1 3l3 3 3-3" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -104,8 +106,8 @@ export function Nav() {
                       >
                         <span className={styles.glyph} aria-hidden>{it.glyph}</span>
                         <span className={styles.itemBody}>
-                          <span className={styles.itemLabel}>{it.label}</span>
-                          <span className={styles.itemSub}>{it.sub}</span>
+                          <span className={styles.itemLabel}>{tGroups(it.labelKey)}</span>
+                          <span className={styles.itemSub}>{tGroups(it.subKey)}</span>
                         </span>
                       </Link>
                     ))}
@@ -118,6 +120,9 @@ export function Nav() {
           <div className={styles.spacer} />
 
           <div className={styles.actions}>
+            <span className={styles.localeSlot}>
+              <LocaleSwitcher />
+            </span>
             {authLoading ? (
               <span className={styles.userPillSkeleton} aria-hidden />
             ) : isAuthenticated && user ? (
@@ -218,12 +223,12 @@ export function Nav() {
               </div>
             ) : (
               <Link href={SECONDARY_CTA.href} className={styles.signIn}>
-                {SECONDARY_CTA.label}
+                {tNav(SECONDARY_CTA.labelKey)}
               </Link>
             )}
             <Link href={PRIMARY_CTA.href} className={styles.cta}>
               <span className={styles.cursor} aria-hidden>▎</span>
-              {PRIMARY_CTA.label}
+              {tNav(PRIMARY_CTA.labelKey)}
             </Link>
             <button
               className={`${styles.hamburger} ${drawerOpen ? styles.open : ''}`}

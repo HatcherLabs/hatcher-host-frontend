@@ -102,6 +102,19 @@
 
 .actions { display: inline-flex; align-items: center; gap: 12px; }
 
+/* Wrap the legacy LocaleSwitcher so its hover/focus colors land on
+   v3's phosphor accent without touching the component itself
+   (it's still used by the old Header on internal pages). */
+.localeSlot button {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.localeSlot button:hover {
+  color: var(--accent) !important;
+  background: rgba(74, 222, 128, 0.06) !important;
+}
+@media (max-width: 600px) { .localeSlot { display: none; } }
+
 .signIn {
   font-family: var(--font-mono);
   font-size: 13px;

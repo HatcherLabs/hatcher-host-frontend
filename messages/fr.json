@@ -45,7 +45,33 @@
       "sub_admin": "Contrôles plateforme.",
       "sub_signOut": "Terminer la session sur cet appareil.",
       "tierSuffix": "forfait"
-    }
+    },
+    "groups": {
+      "build": "Construire",
+      "explore": "Explorer",
+      "resources": "Ressources",
+      "hatchAgentLabel": "Faire éclore (chat)",
+      "hatchAgentSub": "Décris ce que tu veux — en quelques secondes.",
+      "createTplLabel": "Depuis un modèle",
+      "createTplSub": "Framework + outils manuellement.",
+      "myAgentsLabel": "Mes agents",
+      "myAgentsSub": "Tableau de bord pour tes agents en cours.",
+      "cityLabel": "Hatcher City",
+      "citySub": "Marche dans un monde 3D d'agents en ligne.",
+      "frameworksLabel": "Frameworks",
+      "frameworksSub": "OpenClaw · Hermes · ElizaOS · Milady.",
+      "pricingLabel": "Tarifs",
+      "pricingSub": "Free · Starter · Pro · Business · Founding.",
+      "tokenLabel": "$HATCHER",
+      "tokenSub": "Token, trésorerie, burn.",
+      "blogLabel": "Blog",
+      "blogSub": "Notes, releases, deep dives.",
+      "roadmapLabel": "Roadmap",
+      "roadmapSub": "Ce qui arrive ensuite.",
+      "changelogLabel": "Changelog",
+      "changelogSub": "Ce qui a changé et quand."
+    },
+    "hatchAgent": "Faire éclore"
   },
   "notifications": {
     "heading": "Notifications",
@@ -82,7 +108,26 @@
     },
     "copyright": "© {year} HatcherLabs. Tous droits réservés.",
     "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România",
-    "legalNotice": "Les pages légales (Confidentialité, Conditions, Mentions légales, Cookies) sont disponibles uniquement en anglais."
+    "legalNotice": "Les pages légales (Confidentialité, Conditions, Mentions légales, Cookies) sont disponibles uniquement en anglais.",
+    "tag": "Hébergement managé d'agents IA · Roumanie",
+    "colBuild": "Construire",
+    "colExplore": "Explorer",
+    "colResources": "Ressources",
+    "colLegal": "Légal",
+    "itemHatchAgent": "Faire éclore",
+    "itemCreateTpl": "Depuis un modèle",
+    "itemMyAgents": "Mes agents",
+    "itemCity": "Hatcher City",
+    "itemFrameworks": "Frameworks",
+    "itemPricing": "Tarifs",
+    "itemToken": "$HATCHER",
+    "itemBlog": "Blog",
+    "itemRoadmap": "Roadmap",
+    "itemChangelog": "Changelog",
+    "itemPrivacy": "Confidentialité",
+    "itemTerms": "CGU",
+    "itemCookies": "Cookies",
+    "itemImpressum": "Mentions légales"
   },
   "landing": {
     "affiliateBanner": {
@@ -2563,5 +2608,74 @@
     "errNetwork": "Erreur réseau — l'API est-elle joignable ?",
     "errCreate": "Impossible de créer l'agent. Affine la description et réessaie.",
     "errCreateNetwork": "Erreur réseau lors de la création de l'agent."
+  },
+  "landingV3": {
+    "hero": {
+      "boxLabel": "Déploie",
+      "headline1": "Déploie des agents.",
+      "headline2": "Vois-les travailler.",
+      "sub": "Fais-en éclore un en quelques secondes. Entre dans sa salle 3D. Regarde-le penser.",
+      "ctaPrimary": "Faire éclore un agent",
+      "ctaGhost": "Explorer la ville"
+    },
+    "flow": {
+      "boxLabel": "Comment ça marche",
+      "title": "Trois étapes de l'idée à l'agent en ligne",
+      "tile1Title": "Décris ce que tu veux",
+      "tile1Body": "Français simple. Dis au chat ce que ton agent doit faire — pas de YAML, pas de flags.",
+      "tile1Example": "résumer les crypto-news quotidiennement",
+      "tile2Title": "Vérifie la config",
+      "tile2Body": "Framework, modèle, outils, intégrations — Hatcher propose ; tu confirmes ou ajustes.",
+      "tile3Title": "Agent en ligne",
+      "tile3Body": "L'agent tourne dans sa salle 3D. Intégrations branchées. Entre et regarde.",
+      "cta": "Fais éclore le tien",
+      "liveLabel": "agent en ligne"
+    },
+    "rooms": {
+      "boxLabel": "Salles d'agent",
+      "title": "Chaque agent a un cockpit 3D",
+      "body": "Entre dans la salle. Vois le statut, les compétences, la mémoire et les logs en direct de ton agent dans un cockpit 3D navigable. Une par agent.",
+      "stationAvatar": "Avatar",
+      "stationSkills": "Atelier de compétences",
+      "stationIntegrations": "Rack d'intégrations",
+      "stationStatus": "Console de statut",
+      "stationLogs": "Mur de logs",
+      "stationStats": "Hologramme de stats",
+      "stationMemory": "Étagères de mémoire",
+      "stationConfig": "Terminal de config"
+    },
+    "city": {
+      "boxLabel": "Hatcher City",
+      "title": "Le réseau d'agents, à pied",
+      "body": "Marche à travers 25 catégories d'agents. Chaque bâtiment est un agent en ligne — visite, regarde, suis.",
+      "cta": "Entrer dans Hatcher City",
+      "districts": "25 districts · grille 5×5"
+    },
+    "frameworks": {
+      "boxLabel": "Frameworks",
+      "seeAll": "Tout voir →",
+      "tagOpenclaw": "Assistant multi-compétences",
+      "tagHermes": "Agent autonome",
+      "tagElizaos": "Framework multi-agents",
+      "tagMilady": "Runtime privacy-first"
+    },
+    "pricing": {
+      "boxLabel": "Tarifs",
+      "seeFull": "Tarifs complets →",
+      "lifetime": "$99 à vie",
+      "free": "$0",
+      "perMonth": " /mois",
+      "agentSingular": "agent",
+      "agentPlural": "agents",
+      "msgsPerDay": "msg/jour"
+    },
+    "finalCta": {
+      "boxLabel": "Prêt",
+      "headline": "Déploie ton premier agent.",
+      "ctaPrimary": "Faire éclore un agent",
+      "ctaGhost": "Parcourir les modèles",
+      "metaFrameworks": "4 frameworks",
+      "metaNoCard": "pas de carte"
+    }
   }
 }

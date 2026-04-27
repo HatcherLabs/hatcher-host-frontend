@@ -1,11 +1,14 @@
 // components/marketing/v3/Footer.tsx
+'use client';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import styles from './Footer.module.css';
 import { FOOTER_COLUMNS, SOCIAL_LINKS } from './links';
 
 const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? 'dev';
 
 export function Footer() {
+  const t = useTranslations('footer');
   return (
     <footer className={styles.footer}>
       <div className={styles.inner}>
@@ -13,16 +16,16 @@ export function Footer() {
           <span className={styles.brand}>
             <BrandGlyph /> HATCHER
           </span>
-          <span className={styles.tag}>Managed AI agent hosting · Romania</span>
+          <span className={styles.tag}>{t('tag')}</span>
         </div>
 
         {FOOTER_COLUMNS.map((col) => (
-          <div key={col.head} className={styles.col}>
-            <h4 className={styles.head}>{col.head}</h4>
+          <div key={col.headKey} className={styles.col}>
+            <h4 className={styles.head}>{t(col.headKey)}</h4>
             <ul className={styles.list}>
               {col.items.map((it) => (
-                <li key={it.label}>
-                  <Link href={it.href} className={styles.link}>{it.label}</Link>
+                <li key={it.labelKey}>
+                  <Link href={it.href} className={styles.link}>{t(it.labelKey)}</Link>
                 </li>
               ))}
             </ul>

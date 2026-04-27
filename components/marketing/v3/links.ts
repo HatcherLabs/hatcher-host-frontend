@@ -4,6 +4,10 @@
 // and Footer all import from here. Adding/removing/renaming a link in
 // one place updates everywhere — prevents the dead-link drift that bit v2.
 //
+// All visible labels are i18n keys (resolved via useTranslations) instead
+// of literal strings, so the chrome translates across en/zh/de/fr/ro
+// without per-locale forks.
+//
 // Rule: every href listed here MUST be a real, reachable route. If a
 // route is proposed but doesn't exist yet, it does NOT belong in this file.
 
@@ -13,11 +17,14 @@ export type Href = InternalHref | ExternalHref;
 
 export interface NavGroup {
   key: 'build' | 'explore' | 'resources';
-  label: string;
+  /** Translation key under namespace `nav.groups` */
+  labelKey: string;
   items: ReadonlyArray<{
     key: string;
-    label: string;
-    sub: string;
+    /** Translation key under namespace `nav.groups` */
+    labelKey: string;
+    /** Translation key under namespace `nav.groups` */
+    subKey: string;
     href: Href;
     glyph: string;
   }>;
@@ -26,67 +33,69 @@ export interface NavGroup {
 export const NAV_GROUPS: ReadonlyArray<NavGroup> = [
   {
     key: 'build',
-    label: 'Build',
+    labelKey: 'build',
     items: [
-      { key: 'hatchAgent',  label: 'Hatch agent (chat)',     sub: 'Describe what you want — done in seconds.', href: '/chat-to-hatch', glyph: '✦' },
-      { key: 'createTpl',   label: 'Create from template',    sub: 'Pick a framework + tools manually.',         href: '/create',        glyph: '⊞' },
-      { key: 'myAgents',    label: 'My agents',               sub: 'Dashboard for your running agents.',         href: '/dashboard',     glyph: '◐' },
+      { key: 'hatchAgent',  labelKey: 'hatchAgentLabel',  subKey: 'hatchAgentSub',  href: '/chat-to-hatch', glyph: '✦' },
+      { key: 'createTpl',   labelKey: 'createTplLabel',   subKey: 'createTplSub',   href: '/create',        glyph: '⊞' },
+      { key: 'myAgents',    labelKey: 'myAgentsLabel',    subKey: 'myAgentsSub',    href: '/dashboard',     glyph: '◐' },
     ],
   },
   {
     key: 'explore',
-    label: 'Explore',
+    labelKey: 'explore',
     items: [
-      { key: 'city',        label: 'Hatcher City',            sub: 'Walk a 3D world of live agents.',            href: '/city',          glyph: '◇' },
-      { key: 'frameworks',  label: 'Frameworks',              sub: 'OpenClaw · Hermes · ElizaOS · Milady.',      href: '/frameworks',    glyph: '◆' },
+      { key: 'city',        labelKey: 'cityLabel',        subKey: 'citySub',        href: '/city',          glyph: '◇' },
+      { key: 'frameworks',  labelKey: 'frameworksLabel',  subKey: 'frameworksSub',  href: '/frameworks',    glyph: '◆' },
     ],
   },
   {
     key: 'resources',
-    label: 'Resources',
+    labelKey: 'resources',
     items: [
-      { key: 'pricing',     label: 'Pricing',                 sub: 'Free · Starter · Pro · Business · Founding.', href: '/pricing',     glyph: '★' },
-      { key: 'token',       label: '$HATCHER',                sub: 'Token, treasury, burn mechanics.',           href: '/token',         glyph: '◉' },
-      { key: 'blog',        label: 'Blog',                    sub: 'Notes, releases, deep dives.',               href: '/blog',          glyph: '✎' },
-      { key: 'roadmap',     label: 'Roadmap',                 sub: 'What we ship next.',                         href: '/roadmap',       glyph: '𝍌' },
-      { key: 'changelog',   label: 'Changelog',               sub: 'What changed and when.',                     href: '/changelog',     glyph: '⌖' },
+      { key: 'pricing',     labelKey: 'pricingLabel',     subKey: 'pricingSub',     href: '/pricing',       glyph: '★' },
+      { key: 'token',       labelKey: 'tokenLabel',       subKey: 'tokenSub',       href: '/token',         glyph: '◉' },
+      { key: 'blog',        labelKey: 'blogLabel',        subKey: 'blogSub',        href: '/blog',          glyph: '✎' },
+      { key: 'roadmap',     labelKey: 'roadmapLabel',     subKey: 'roadmapSub',     href: '/roadmap',       glyph: '𝍌' },
+      { key: 'changelog',   labelKey: 'changelogLabel',   subKey: 'changelogSub',   href: '/changelog',     glyph: '⌖' },
     ],
   },
 ] as const;
 
+/** Footer columns. `headKey` resolves under namespace `footer`; each
+ *  item's `labelKey` under the same namespace. */
 export const FOOTER_COLUMNS = [
   {
-    head: 'Build',
+    headKey: 'colBuild',
     items: [
-      { label: 'Hatch agent',          href: '/chat-to-hatch' as Href },
-      { label: 'Create from template', href: '/create' as Href },
-      { label: 'My agents',            href: '/dashboard' as Href },
+      { labelKey: 'itemHatchAgent', href: '/chat-to-hatch' as Href },
+      { labelKey: 'itemCreateTpl',  href: '/create' as Href },
+      { labelKey: 'itemMyAgents',   href: '/dashboard' as Href },
     ],
   },
   {
-    head: 'Explore',
+    headKey: 'colExplore',
     items: [
-      { label: 'Hatcher City', href: '/city' as Href },
-      { label: 'Frameworks',   href: '/frameworks' as Href },
+      { labelKey: 'itemCity',       href: '/city' as Href },
+      { labelKey: 'itemFrameworks', href: '/frameworks' as Href },
     ],
   },
   {
-    head: 'Resources',
+    headKey: 'colResources',
     items: [
-      { label: 'Pricing',   href: '/pricing' as Href },
-      { label: '$HATCHER',  href: '/token' as Href },
-      { label: 'Blog',      href: '/blog' as Href },
-      { label: 'Roadmap',   href: '/roadmap' as Href },
-      { label: 'Changelog', href: '/changelog' as Href },
+      { labelKey: 'itemPricing',   href: '/pricing' as Href },
+      { labelKey: 'itemToken',     href: '/token' as Href },
+      { labelKey: 'itemBlog',      href: '/blog' as Href },
+      { labelKey: 'itemRoadmap',   href: '/roadmap' as Href },
+      { labelKey: 'itemChangelog', href: '/changelog' as Href },
     ],
   },
   {
-    head: 'Legal',
+    headKey: 'colLegal',
     items: [
-      { label: 'Privacy',   href: '/privacy' as Href },
-      { label: 'Terms',     href: '/terms' as Href },
-      { label: 'Cookies',   href: '/cookies' as Href },
-      { label: 'Impressum', href: '/impressum' as Href },
+      { labelKey: 'itemPrivacy',   href: '/privacy' as Href },
+      { labelKey: 'itemTerms',     href: '/terms' as Href },
+      { labelKey: 'itemCookies',   href: '/cookies' as Href },
+      { labelKey: 'itemImpressum', href: '/impressum' as Href },
     ],
   },
 ] as const;
@@ -99,10 +108,15 @@ export const SOCIAL_LINKS = {
 
 export const PRIMARY_CTA = {
   href: '/chat-to-hatch' as Href,
-  label: 'Hatch agent',
+  /** Translation key under namespace `nav`. Brand-distinct verb that
+   *  matches the footer's `itemHatchAgent` copy — the previous reuse
+   *  of `nav.create` rendered as "Create" / "创建" etc., which links
+   *  to /create (template picker), not /chat-to-hatch. */
+  labelKey: 'hatchAgent',
 } as const;
 
 export const SECONDARY_CTA = {
   href: '/login' as Href,
-  label: 'Sign in',
+  /** Translation key under namespace `nav`. */
+  labelKey: 'signIn',
 } as const;
