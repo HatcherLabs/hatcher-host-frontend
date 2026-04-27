@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from '@/i18n/routing';
 import Link from 'next/link';
 import { req } from '@/lib/api';
@@ -13,8 +13,13 @@ interface ParsedConfig {
   framework: Framework;
   name: string;
   description: string;
-  personality?: string;
+  personality: string;
+  systemPrompt: string;
   suggestedSkills: string[];
+  suggestedPlugins: string[];
+  model: string;
+  greeting: string;
+  avatarHint: string;
 }
 
 interface ParseResponse {
@@ -36,6 +41,17 @@ const FW_VISUAL: Record<Framework, { color: string; glyph: string; label: string
   milady:   { color: '#FF5AC8', glyph: '🎨', label: 'Milady' },
 };
 
+const NAME_REGEX = /^[a-zA-Z0-9 \-:'.()&]+$/;
+
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 50);
+}
+
 export function ChatToHatch() {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
@@ -43,7 +59,15 @@ export function ChatToHatch() {
   const [input, setInput] = useState('');
   const [thinking, setThinking] = useState(false);
   const [hatching, setHatching] = useState(false);
-  const [config, setConfig] = useState<ParsedConfig | null>(null);
+  /** What the LLM most recently returned. Acts as the "reset to suggested"
+   *  baseline — we never mutate this; user edits live on `draft`. */
+  const [original, setOriginal] = useState<ParsedConfig | null>(null);
+  /** The user's working copy, edited inline; becomes the POST body on Hatch. */
+  const [draft, setDraft] = useState<ParsedConfig | null>(null);
+  const [showSystemPrompt, setShowSystemPrompt] = useState(false);
+  const [showPersonality, setShowPersonality] = useState(false);
+  const [skillInput, setSkillInput] = useState('');
+  const [pluginInput, setPluginInput] = useState('');
   const logRef = useRef<HTMLDivElement | null>(null);
 
   // Auth gate — push to /login with a return URL so the user lands
@@ -88,7 +112,8 @@ export function ChatToHatch() {
           ...m,
           { id: crypto.randomUUID(), who: 'assistant', text: res.data.reply },
         ]);
-        setConfig(res.data.config);
+        setOriginal(res.data.config);
+        setDraft(res.data.config);
       }
     } catch {
       setMessages((m) => [
@@ -96,7 +121,7 @@ export function ChatToHatch() {
         {
           id: crypto.randomUUID(),
           who: 'assistant',
-          text: "Network error — is the API reachable?",
+          text: 'Network error — is the API reachable?',
           isError: true,
         },
       ]);
@@ -105,20 +130,44 @@ export function ChatToHatch() {
     }
   }
 
+  /** Validate the draft has everything POST /agents needs. Returns the
+   *  first blocking issue or null if it's ready to ship. */
+  const draftError = useMemo<string | null>(() => {
+    if (!draft) return null;
+    if (draft.name.trim().length < 3) return 'Name needs at least 3 characters.';
+    if (draft.name.trim().length > 50) return 'Name is too long (50 max).';
+    if (!NAME_REGEX.test(draft.name.trim())) {
+      return 'Name can use letters, numbers, spaces, and - : \' . ( ) & only.';
+    }
+    if (draft.description.length > 140) return 'Description is too long (140 max).';
+    return null;
+  }, [draft]);
+
   async function handleHatch() {
-    if (!config || hatching) return;
+    if (!draft || hatching || draftError) return;
     setHatching(true);
     try {
+      // Build the config payload the API expects. CreateAgentBody is
+      // .passthrough() so suggestedSkills/Plugins/greeting/model land
+      // unchanged for the framework adapter to consume on container
+      // start. personality + systemPrompt are first-class fields.
+      const configBody: Record<string, unknown> = {};
+      if (draft.personality.trim()) configBody.personality = draft.personality.trim();
+      if (draft.systemPrompt.trim()) configBody.systemPrompt = draft.systemPrompt.trim();
+      if (draft.suggestedSkills.length) configBody.suggestedSkills = draft.suggestedSkills;
+      if (draft.suggestedPlugins.length) configBody.suggestedPlugins = draft.suggestedPlugins;
+      if (draft.model) configBody.model = draft.model;
+      if (draft.greeting.trim()) configBody.greeting = draft.greeting.trim();
+      if (draft.avatarHint.trim()) configBody.avatarHint = draft.avatarHint.trim();
+
       const created = await req<{ id: string; slug?: string | null }>('/agents', {
         method: 'POST',
         body: JSON.stringify({
-          name: config.name,
-          description: config.description,
-          framework: config.framework,
+          name: draft.name.trim(),
+          description: draft.description.trim() || undefined,
+          framework: draft.framework,
           template: 'custom',
-          config: config.personality
-            ? { personality: config.personality }
-            : undefined,
+          config: Object.keys(configBody).length ? configBody : undefined,
         }),
       });
       if (created.success) {
@@ -149,6 +198,43 @@ export function ChatToHatch() {
     }
   }
 
+  function patchDraft(patch: Partial<ParsedConfig>) {
+    setDraft((d) => (d ? { ...d, ...patch } : d));
+  }
+
+  function addSkill() {
+    const s = skillInput.trim();
+    if (!s || !draft) return;
+    if (draft.suggestedSkills.includes(s)) return;
+    if (draft.suggestedSkills.length >= 10) return;
+    patchDraft({ suggestedSkills: [...draft.suggestedSkills, s] });
+    setSkillInput('');
+  }
+
+  function removeSkill(s: string) {
+    if (!draft) return;
+    patchDraft({ suggestedSkills: draft.suggestedSkills.filter((x) => x !== s) });
+  }
+
+  function addPlugin() {
+    const s = pluginInput.trim();
+    if (!s || !draft) return;
+    if (draft.suggestedPlugins.includes(s)) return;
+    if (draft.suggestedPlugins.length >= 10) return;
+    patchDraft({ suggestedPlugins: [...draft.suggestedPlugins, s] });
+    setPluginInput('');
+  }
+
+  function removePlugin(s: string) {
+    if (!draft) return;
+    patchDraft({ suggestedPlugins: draft.suggestedPlugins.filter((x) => x !== s) });
+  }
+
+  function applySuggested() {
+    if (!original) return;
+    setDraft(original);
+  }
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     // Enter sends, Shift+Enter inserts a newline (chat conventions).
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -169,7 +255,8 @@ export function ChatToHatch() {
     );
   }
 
-  const fwVisual = config ? FW_VISUAL[config.framework] : null;
+  const fwVisual = draft ? FW_VISUAL[draft.framework] : null;
+  const slug = draft ? slugify(draft.name) : '';
 
   return (
     <div className={styles.page}>
@@ -215,8 +302,9 @@ export function ChatToHatch() {
                   <span className={styles.msgWho}>Hatcher</span>
                   <div className={styles.msgBody}>
                     Describe the agent you want — what it does, where it runs,
-                    what tone of voice. I&rsquo;ll pick the framework, name it,
-                    and queue it for hatching. One or two sentences is enough.
+                    what tone of voice. I&rsquo;ll pick a framework, generate a
+                    name + identity + skills, and queue it for hatching. One or
+                    two sentences is enough; you can edit every field after.
                   </div>
                 </div>
               )}
@@ -267,46 +355,218 @@ export function ChatToHatch() {
             </div>
           </div>
 
-          {/* ─── Preview ─── */}
+          {/* ─── Preview (editable) ─── */}
           <div className={styles.col}>
             <div className={styles.previewHead}>
               <h2 className={styles.previewTitle}>Agent preview</h2>
               <span className={styles.previewTag}>
-                {config ? 'Ready to hatch' : 'Empty'}
+                {draft ? (draftError ? 'Needs fixing' : 'Ready to hatch') : 'Empty'}
               </span>
             </div>
 
-            {!config && (
+            {!draft && (
               <div className={styles.empty}>
                 [ describe an agent on the left to start ]
               </div>
             )}
 
-            {config && fwVisual && (
+            {draft && fwVisual && (
               <div className={styles.previewBody}>
-                <span
-                  className={styles.fwBadge}
-                  style={{ '--fw': fwVisual.color } as React.CSSProperties}
-                >
-                  <span className={styles.fwGlyph} aria-hidden>{fwVisual.glyph}</span>
-                  {fwVisual.label}
-                </span>
-                <h3 className={styles.agentName}>{config.name}</h3>
-                <p className={styles.agentDesc}>{config.description}</p>
+                <div className={styles.previewTopRow}>
+                  <span
+                    className={styles.fwBadge}
+                    style={{ '--fw': fwVisual.color } as React.CSSProperties}
+                  >
+                    <span className={styles.fwGlyph} aria-hidden>{fwVisual.glyph}</span>
+                    {fwVisual.label}
+                  </span>
+                  {original && (
+                    <button
+                      type="button"
+                      className={styles.resetBtn}
+                      onClick={applySuggested}
+                      title="Revert all fields to the assistant's suggested values"
+                    >
+                      ↺ Reset to suggested
+                    </button>
+                  )}
+                </div>
 
-                {config.personality && (
-                  <div className={styles.personalityBox}>{config.personality}</div>
+                {/* Name */}
+                <label className={styles.fieldLabel}>
+                  Name
+                  <input
+                    type="text"
+                    className={styles.fieldInput}
+                    value={draft.name}
+                    onChange={(e) => patchDraft({ name: e.target.value })}
+                    maxLength={50}
+                    placeholder="Agent name"
+                  />
+                </label>
+                {slug && (
+                  <p className={styles.slugHint}>
+                    URL: <code>/agent/{slug}/room</code>
+                  </p>
                 )}
 
-                {config.suggestedSkills.length > 0 && (
-                  <>
-                    <div className={styles.skillsLabel}>Suggested skills</div>
-                    <div className={styles.skillsList}>
-                      {config.suggestedSkills.map((s, i) => (
-                        <span key={i} className={styles.skill}>{s}</span>
-                      ))}
+                {/* Description */}
+                <label className={styles.fieldLabel}>
+                  Description <span className={styles.fieldHint}>{draft.description.length}/140</span>
+                  <textarea
+                    className={styles.fieldTextarea}
+                    value={draft.description}
+                    onChange={(e) => patchDraft({ description: e.target.value })}
+                    maxLength={140}
+                    rows={2}
+                    placeholder="One short sentence describing what this agent does."
+                  />
+                </label>
+
+                {/* Personality (collapsible) */}
+                <details
+                  className={styles.collapsible}
+                  open={showPersonality || !!draft.personality}
+                  onToggle={(e) => setShowPersonality((e.target as HTMLDetailsElement).open)}
+                >
+                  <summary className={styles.collapsibleHead}>
+                    Personality
+                    <span className={styles.fieldHint}>{draft.personality.length}/2000</span>
+                  </summary>
+                  <textarea
+                    className={styles.fieldTextarea}
+                    value={draft.personality}
+                    onChange={(e) => patchDraft({ personality: e.target.value })}
+                    maxLength={2000}
+                    rows={3}
+                    placeholder="Short tonal direction — e.g. concise, technical, no apologies."
+                  />
+                </details>
+
+                {/* SOUL.md / system prompt (collapsible, big) */}
+                <details
+                  className={styles.collapsible}
+                  open={showSystemPrompt || !!draft.systemPrompt}
+                  onToggle={(e) => setShowSystemPrompt((e.target as HTMLDetailsElement).open)}
+                >
+                  <summary className={styles.collapsibleHead}>
+                    SOUL.md / system prompt
+                    <span className={styles.fieldHint}>{draft.systemPrompt.length}/4000</span>
+                  </summary>
+                  <textarea
+                    className={`${styles.fieldTextarea} ${styles.fieldMono}`}
+                    value={draft.systemPrompt}
+                    onChange={(e) => patchDraft({ systemPrompt: e.target.value })}
+                    maxLength={4000}
+                    rows={10}
+                    placeholder="Multi-paragraph system prompt — role, behavior, voice, tools."
+                  />
+                </details>
+
+                {/* Skills */}
+                <div className={styles.chipsBlock}>
+                  <div className={styles.chipsHead}>
+                    Suggested skills
+                    <span className={styles.fieldHint}>{draft.suggestedSkills.length}/10</span>
+                  </div>
+                  <div className={styles.skillsList}>
+                    {draft.suggestedSkills.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        className={`${styles.skill} ${styles.skillRemovable}`}
+                        onClick={() => removeSkill(s)}
+                        title="Remove"
+                      >
+                        {s} <span className={styles.chipX} aria-hidden>×</span>
+                      </button>
+                    ))}
+                    {draft.suggestedSkills.length < 10 && (
+                      <span className={styles.chipInputWrap}>
+                        <input
+                          type="text"
+                          className={styles.chipInput}
+                          placeholder="add skill"
+                          value={skillInput}
+                          maxLength={80}
+                          onChange={(e) => setSkillInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') { e.preventDefault(); addSkill(); }
+                          }}
+                        />
+                        {skillInput && (
+                          <button type="button" className={styles.chipAddBtn} onClick={addSkill}>+</button>
+                        )}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Plugins (only if framework supports plugins separately) */}
+                {(draft.framework === 'openclaw' || draft.framework === 'elizaos') && (
+                  <div className={styles.chipsBlock}>
+                    <div className={styles.chipsHead}>
+                      Suggested plugins
+                      <span className={styles.fieldHint}>{draft.suggestedPlugins.length}/10</span>
                     </div>
-                  </>
+                    <div className={styles.skillsList}>
+                      {draft.suggestedPlugins.map((p) => (
+                        <button
+                          key={p}
+                          type="button"
+                          className={`${styles.skill} ${styles.skillRemovable}`}
+                          onClick={() => removePlugin(p)}
+                          title="Remove"
+                        >
+                          {p} <span className={styles.chipX} aria-hidden>×</span>
+                        </button>
+                      ))}
+                      {draft.suggestedPlugins.length < 10 && (
+                        <span className={styles.chipInputWrap}>
+                          <input
+                            type="text"
+                            className={styles.chipInput}
+                            placeholder="add plugin"
+                            value={pluginInput}
+                            maxLength={80}
+                            onChange={(e) => setPluginInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') { e.preventDefault(); addPlugin(); }
+                            }}
+                          />
+                          {pluginInput && (
+                            <button type="button" className={styles.chipAddBtn} onClick={addPlugin}>+</button>
+                          )}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Greeting (read-only display) */}
+                {draft.greeting && (
+                  <div className={styles.greetingBox}>
+                    <span className={styles.greetingLabel}>Sample greeting</span>
+                    <p className={styles.greetingText}>“{draft.greeting}”</p>
+                  </div>
+                )}
+
+                {/* Model + avatar hint inline */}
+                <div className={styles.metaRow}>
+                  <span className={styles.metaItem}>
+                    <span className={styles.metaLabel}>Model</span>
+                    <code className={styles.metaValue}>{draft.model.split('/').pop()}</code>
+                  </span>
+                  {draft.avatarHint && (
+                    <span className={styles.metaItem}>
+                      <span className={styles.metaLabel}>Avatar idea</span>
+                      <span className={styles.metaValue}>{draft.avatarHint}</span>
+                    </span>
+                  )}
+                </div>
+
+                {draftError && (
+                  <p className={styles.errorLine}>✕ {draftError}</p>
                 )}
 
                 <div className={styles.foot}>
@@ -314,12 +574,13 @@ export function ChatToHatch() {
                     type="button"
                     className={styles.hatchBtn}
                     onClick={handleHatch}
-                    disabled={hatching}
+                    disabled={hatching || !!draftError}
                   >
                     {hatching ? '▸ Hatching…' : '▸ Hatch this agent'}
                   </button>
                   <p className={styles.footHint}>
-                    You can refine personality + add plugins on the agent page after.
+                    Every field is editable. After hatching you can refine config,
+                    install skills, and tweak SOUL.md on the agent page.
                   </p>
                 </div>
               </div>

@@ -67,11 +67,22 @@
   color: var(--text-muted);
 }
 .bottomLeft { letter-spacing: 0.04em; }
-.socials { display: inline-flex; gap: 16px; }
+.socials { display: inline-flex; gap: 14px; }
 .socials a {
-  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid var(--border-default);
   color: var(--text-secondary);
   text-decoration: none;
-  transition: color 150ms ease;
+  transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
 }
-.socials a:hover { color: var(--accent); }
+.socials a:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(74, 222, 128, 0.06);
+}
+.socials svg { display: block; }

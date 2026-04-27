@@ -468,3 +468,260 @@
   color: var(--mute);
   text-align: center;
 }
+
+/* ── Editable preview (chat-to-hatch v2) ───────────────────── */
+.previewTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.resetBtn {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--line-bright);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.resetBtn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.fieldLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mute);
+  position: relative;
+}
+.fieldHint {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--mute);
+  font-weight: 400;
+  margin-left: 8px;
+}
+.fieldInput,
+.fieldTextarea {
+  appearance: none;
+  width: 100%;
+  background: var(--bg-2);
+  border: 1px solid var(--line-bright);
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  letter-spacing: 0;
+  text-transform: none;
+  resize: vertical;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.fieldInput {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+.fieldInput:focus,
+.fieldTextarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(57, 255, 136, 0.18);
+}
+.fieldMono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.slugHint {
+  margin: -4px 0 -2px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--mute);
+}
+.slugHint code {
+  color: var(--ink-soft);
+  background: transparent;
+  padding: 0;
+}
+
+.collapsible {
+  border: 1px solid var(--line-bright);
+  border-radius: 6px;
+  background: var(--bg-2);
+}
+.collapsible[open] { background: var(--bg-3); }
+.collapsibleHead {
+  cursor: pointer;
+  list-style: none;
+  padding: 9px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.collapsibleHead::-webkit-details-marker { display: none; }
+.collapsibleHead::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 8px;
+  color: var(--accent);
+  transition: transform 0.15s;
+}
+.collapsible[open] .collapsibleHead::before { transform: rotate(90deg); }
+.collapsible textarea {
+  margin: 0 12px 12px;
+  width: calc(100% - 24px);
+}
+
+.chipsBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.chipsHead {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mute);
+  display: flex;
+  align-items: center;
+}
+.skillRemovable {
+  cursor: pointer;
+  appearance: none;
+  font: inherit;
+  letter-spacing: 0;
+  transition: border-color 0.15s, color 0.15s;
+}
+.skillRemovable:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+.chipX {
+  margin-left: 6px;
+  color: var(--mute);
+  font-size: 13px;
+  line-height: 1;
+}
+.skillRemovable:hover .chipX { color: var(--red); }
+
+.chipInputWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px dashed var(--line-bright);
+  border-radius: 6px;
+}
+.chipInput {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ink);
+  width: 100px;
+}
+.chipInput::placeholder { color: var(--mute); }
+.chipAddBtn {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.greetingBox {
+  background: var(--bg-2);
+  border-left: 2px solid var(--accent);
+  padding: 10px 14px;
+  border-radius: 0 6px 6px 0;
+}
+.greetingLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mute);
+  display: block;
+  margin-bottom: 4px;
+}
+.greetingText {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 10px 0;
+  border-top: 1px dashed var(--line);
+}
+.metaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.metaLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.metaValue {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-soft);
+  background: transparent;
+  padding: 0;
+}
+
+.errorLine {
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--red);
+  background: rgba(255, 107, 138, 0.08);
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--red);
+}

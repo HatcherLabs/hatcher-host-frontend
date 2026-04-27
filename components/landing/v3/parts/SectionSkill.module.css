@@ -1,0 +1,167 @@
+/* SectionSkill — "let your coding agent deploy Hatcher agents" */
+
+.section {
+  background: var(--bg-base);
+  padding: 96px 0;
+  border-top: 1px solid var(--border-default);
+}
+.inner { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+.head {
+  margin-bottom: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 720px;
+}
+.title {
+  font-family: var(--font-mono);
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.body {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 56px;
+  align-items: stretch;
+}
+@media (max-width: 960px) {
+  .layout { grid-template-columns: 1fr; gap: 36px; }
+}
+
+/* ── Terminal-style prompt card ── */
+.terminal {
+  display: flex;
+  flex-direction: column;
+  background: #050505;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.terminalHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #0F0F0F;
+  border-bottom: 1px solid var(--border-default);
+}
+.terminalLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.copyBtn {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--border-default);
+  border-radius: 3px;
+  padding: 5px 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+}
+.copyBtn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(74, 222, 128, 0.06);
+}
+
+.prompt {
+  margin: 0;
+  padding: 22px 18px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  flex: 1;
+}
+.promptCursor {
+  color: var(--accent);
+  font-weight: 700;
+}
+.promptUrl {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px dashed currentColor;
+}
+.promptUrl:hover { color: var(--accent-hover, var(--accent)); }
+
+.terminalFoot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 12px 18px;
+  border-top: 1px dashed var(--border-default);
+  background: rgba(0, 0, 0, 0.3);
+}
+.footLink {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+.footLink:hover { color: var(--accent-hover, var(--accent)); }
+
+/* ── Right column: numbered steps ── */
+.steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  transition: border-color 150ms ease;
+}
+.step:hover { border-color: var(--accent); }
+
+.stepNum {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  min-width: 32px;
+}
+.stepText {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
