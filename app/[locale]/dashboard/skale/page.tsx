@@ -20,9 +20,13 @@ import {
   ExternalLink,
   ArrowLeft,
   AlertTriangle,
+  CreditCard,
+  CheckCircle2,
+  Loader2,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { api, type Agent } from '@/lib/api';
+import { payWithSkaleX402, type SettleResult } from '@/lib/skale-x402-client';
 
 interface SkaleWalletRow {
   agent: Agent;
@@ -70,6 +74,10 @@ export default function SkaleDashboardPage() {
   const [evmAccount, setEvmAccount] = useState<string | null>(null);
   const [evmConnecting, setEvmConnecting] = useState(false);
   const [evmError, setEvmError] = useState<string | null>(null);
+  const [demoPaying, setDemoPaying] = useState(false);
+  const [demoResult, setDemoResult] = useState<SettleResult | null>(null);
+  const [demoError, setDemoError] = useState<string | null>(null);
+  const [demoTier, setDemoTier] = useState<'starter' | 'pro' | 'business'>('starter');
 
   const loadAgents = useCallback(async () => {
     setLoading(true);
@@ -186,6 +194,20 @@ export default function SkaleDashboardPage() {
       setCopyMsg(`${label} copied`);
       setTimeout(() => setCopyMsg(null), 1600);
     }).catch(() => {});
+  };
+
+  const tryDemoPay = async () => {
+    setDemoPaying(true);
+    setDemoError(null);
+    setDemoResult(null);
+    try {
+      const result = await payWithSkaleX402({ kind: 'tier', key: demoTier, billingPeriod: 'monthly' });
+      setDemoResult(result);
+    } catch (e) {
+      setDemoError(e instanceof Error ? e.message : 'Payment failed');
+    } finally {
+      setDemoPaying(false);
+    }
   };
 
   const connectEvm = async () => {
@@ -311,6 +333,75 @@ export default function SkaleDashboardPage() {
         {evmError && (
           <div className="mt-3 inline-flex items-center gap-2 px-3 py-2 border border-amber-500/30 bg-amber-500/5 text-[11px] text-amber-400">
             <AlertTriangle size={12} /> {evmError}
+          </div>
+        )}
+      </motion.div>
+
+      {/* Phase 4 — Pay tier with USDC via x402 */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0, transition: { delay: 0.25 } }}
+        className="border border-[var(--phosphor)]/40 p-5 mb-8 bg-[var(--phosphor)]/5"
+      >
+        <div className="flex items-center justify-between flex-wrap gap-3 mb-3">
+          <div className="flex items-center gap-3">
+            <CreditCard size={16} className="text-[var(--phosphor)]" />
+            <div>
+              <div className="text-xs uppercase tracking-[0.18em] text-[var(--phosphor)] mb-1">Phase 4 · x402</div>
+              <h2 className="text-base font-semibold text-[var(--text-primary)]">Pay a tier with USDC on SKALE</h2>
+            </div>
+          </div>
+          <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 border border-amber-500/30 text-amber-400">Testnet · USDC required</span>
+        </div>
+        <div className="text-xs text-[var(--text-muted)] leading-relaxed mb-4">
+          End-to-end demo of the new x402 rail. Connect EVM wallet → pick tier → sign EIP-3009 transferWithAuthorization
+          via your wallet → server forwards to PayAI facilitator → tier upgrade applied. Settles in ~1 second on chain
+          324705682. You'll need testnet USDC at the connected address (see SKALE Bridge / faucet).
+        </div>
+        <div className="flex items-center gap-3 flex-wrap">
+          <select
+            value={demoTier}
+            onChange={(e) => setDemoTier(e.target.value as 'starter' | 'pro' | 'business')}
+            disabled={demoPaying}
+            className="px-3 py-2 text-xs uppercase tracking-wider bg-[var(--bg-base)] border border-[var(--border-subtle)] text-[var(--text-primary)] focus:outline-none focus:border-[var(--phosphor)] disabled:opacity-50"
+          >
+            <option value="starter">Starter — $6.99 / mo</option>
+            <option value="pro">Pro — $19.99 / mo</option>
+            <option value="business">Business — $49.99 / mo</option>
+          </select>
+          <button
+            onClick={() => void tryDemoPay()}
+            disabled={demoPaying}
+            className="inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-wider border border-[var(--phosphor)] bg-[var(--phosphor)]/10 text-[var(--phosphor)] hover:bg-[var(--phosphor)]/20 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          >
+            {demoPaying ? <Loader2 size={12} className="animate-spin" /> : <CreditCard size={12} />}
+            {demoPaying ? 'Signing & settling…' : 'Pay with USDC'}
+          </button>
+        </div>
+        {demoResult && (
+          <div className="mt-4 p-3 border border-[var(--phosphor)]/40 bg-[var(--phosphor)]/5">
+            <div className="flex items-center gap-2 text-xs text-[var(--phosphor)] mb-2">
+              <CheckCircle2 size={14} />
+              <span className="uppercase tracking-wider">Payment confirmed</span>
+              {demoResult.duplicate && <span className="text-amber-400 text-[10px]">(duplicate — not re-applied)</span>}
+            </div>
+            <div className="space-y-1 text-[11px] font-mono text-[var(--text-muted)]">
+              <div>tier: <span className="text-[var(--text-primary)]">{demoResult.description}</span></div>
+              <div>amount: <span className="text-[var(--text-primary)]">${demoResult.usd.toFixed(2)}</span></div>
+              <div>payer: <span className="text-[var(--text-primary)]">{shortAddr(demoResult.payer)}</span></div>
+              <div>tx: <a
+                href={`https://base-sepolia-testnet.skalenodes.com/tx/${demoResult.txSignature}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--phosphor)] hover:underline"
+              >{shortAddr(demoResult.txSignature)} <ExternalLink size={9} className="inline" /></a></div>
+            </div>
+          </div>
+        )}
+        {demoError && (
+          <div className="mt-4 inline-flex items-start gap-2 px-3 py-2 border border-amber-500/30 bg-amber-500/5 text-[11px] text-amber-400">
+            <AlertTriangle size={12} className="flex-shrink-0 mt-0.5" />
+            <span>{demoError}</span>
           </div>
         )}
       </motion.div>
