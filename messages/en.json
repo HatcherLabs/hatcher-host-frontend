@@ -70,7 +70,8 @@
       "roadmapSub": "What we ship next.",
       "changelogLabel": "Changelog",
       "changelogSub": "What changed and when."
-    }
+    },
+    "hatchAgent": "Hatch agent"
   },
   "notifications": {
     "heading": "Notifications",

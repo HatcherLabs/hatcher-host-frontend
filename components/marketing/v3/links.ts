@@ -108,8 +108,11 @@ export const SOCIAL_LINKS = {
 
 export const PRIMARY_CTA = {
   href: '/chat-to-hatch' as Href,
-  /** Translation key under namespace `nav` (re-uses an existing key). */
-  labelKey: 'create',
+  /** Translation key under namespace `nav`. Brand-distinct verb that
+   *  matches the footer's `itemHatchAgent` copy — the previous reuse
+   *  of `nav.create` rendered as "Create" / "创建" etc., which links
+   *  to /create (template picker), not /chat-to-hatch. */
+  labelKey: 'hatchAgent',
 } as const;
 
 export const SECONDARY_CTA = {

@@ -70,7 +70,8 @@
       "roadmapSub": "接下来要发布什么。",
       "changelogLabel": "更新日志",
       "changelogSub": "什么变了，何时变的。"
-    }
+    },
+    "hatchAgent": "孵化代理"
   },
   "notifications": {
     "heading": "通知",

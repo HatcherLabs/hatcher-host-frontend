@@ -70,7 +70,8 @@
       "roadmapSub": "Ce lansăm în continuare.",
       "changelogLabel": "Changelog",
       "changelogSub": "Ce s-a schimbat și când."
-    }
+    },
+    "hatchAgent": "Eclozează agent"
   },
   "notifications": {
     "heading": "Notificări",

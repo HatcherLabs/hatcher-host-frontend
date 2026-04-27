@@ -70,7 +70,8 @@
       "roadmapSub": "Ce qui arrive ensuite.",
       "changelogLabel": "Changelog",
       "changelogSub": "Ce qui a changé et quand."
-    }
+    },
+    "hatchAgent": "Faire éclore"
   },
   "notifications": {
     "heading": "Notifications",
