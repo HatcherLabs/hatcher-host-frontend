@@ -35,7 +35,17 @@
     "affiliateDashboard": "推广控制台",
     "affiliatePending": "申请审核中",
     "affiliateRejected": "重新申请推广",
-    "affiliateBecome": "成为推广合作伙伴"
+    "affiliateBecome": "成为推广合作伙伴",
+    "userMenu": {
+      "sub_myAgents": "浏览、编辑、部署。",
+      "sub_create": "手动选择模板。",
+      "sub_billing": "套餐、附加项、积分。",
+      "sub_settings": "个人资料、API 密钥、偏好设置。",
+      "sub_support": "帮助、文档、联系方式。",
+      "sub_admin": "平台控制。",
+      "sub_signOut": "在此设备上结束会话。",
+      "tierSuffix": "套餐"
+    }
   },
   "notifications": {
     "heading": "通知",
@@ -847,7 +857,17 @@
       "tourSearchTitle": "搜索与探索",
       "tourSearchDescription": "搜索智能体或浏览200+模板，快速开始。",
       "tourPlanTitle": "您的套餐",
-      "tourPlanDescription": "免费开始，包含1个智能体和每日20条消息。随时升级。"
+      "tourPlanDescription": "免费开始，包含1个智能体和每日20条消息。随时升级。",
+      "statTotal": "总计",
+      "statActive": "活跃",
+      "statSleeping": "休眠",
+      "msgsShort": "条消息",
+      "cardOpen": "3D 房间",
+      "cardOpenTooltip": "进入 3D 房间",
+      "actionStop": "停止",
+      "actionStart": "启动",
+      "actionRestart": "重启",
+      "noResultsAction": "清除筛选"
     },
     "newAgent": {
       "eyebrow": "新建智能体",
@@ -1553,6 +1573,11 @@
         "status": "状态",
         "active": "活跃",
         "inactive": "非活跃"
+      },
+      "sidebar": {
+        "enter3DRoom": "进入 3D 房间",
+        "enter3DRoomSubtitle": "步行 + 互动配置",
+        "enter3DRoomTooltip": "走进你的代理 3D 驾驶舱"
       }
     }
   },
@@ -2481,5 +2506,12 @@
   },
   "localeSwitcher": {
     "label": "切换语言"
+  },
+  "agentRoom": {
+    "back": {
+      "toCity": "返回城市",
+      "toDashboard": "返回仪表板",
+      "toAgents": "返回代理列表"
+    }
   }
 }

@@ -3,6 +3,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import styles from './NavDrawer.module.css';
 import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA } from './links';
 import { useAuth } from '@/lib/auth-context';
@@ -14,6 +15,7 @@ interface Props {
 
 export function NavDrawer({ open, onClose }: Props) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const tNav = useTranslations('nav');
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -53,7 +55,7 @@ export function NavDrawer({ open, onClose }: Props) {
         <div className={styles.bottom}>
           {authLoading ? null : isAuthenticated ? (
             <Link href="/dashboard" className={styles.signIn} onClick={onClose}>
-              Dashboard
+              {tNav('dashboard')}
             </Link>
           ) : (
             <Link href={SECONDARY_CTA.href} className={styles.signIn} onClick={onClose}>

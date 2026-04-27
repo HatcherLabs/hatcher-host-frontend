@@ -1,22 +1,15 @@
 // components/marketing/v3/Nav.tsx
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import styles from './Nav.module.css';
 import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA } from './links';
 import { NavDrawer } from './NavDrawer';
 import { useAuth } from '@/lib/auth-context';
-
-const USER_MENU = [
-  { key: 'agents',    label: 'My agents',     sub: 'Browse, edit, deploy.',     href: '/dashboard/agents',   glyph: '◐' },
-  { key: 'create',    label: 'Create agent',  sub: 'Pick a template manually.', href: '/create',             glyph: '⊞' },
-  { key: 'billing',   label: 'Billing',       sub: 'Tier, addons, credits.',    href: '/dashboard/billing',  glyph: '◇' },
-  { key: 'settings',  label: 'Settings',      sub: 'Profile, API keys, prefs.', href: '/dashboard/settings', glyph: '◆' },
-  { key: 'support',   label: 'Support',       sub: 'Help, docs, contact.',      href: '/support',            glyph: '✎' },
-] as const;
 
 export function Nav() {
   const [openGroup, setOpenGroup] = useState<string | null>(null);
@@ -26,6 +19,16 @@ export function Nav() {
   const userMenuRef = useRef<HTMLDivElement | null>(null);
   const { isAuthenticated, isLoading: authLoading, user, logout } = useAuth();
   const router = useRouter();
+  const tNav = useTranslations('nav');
+  const tMenu = useTranslations('nav.userMenu');
+
+  const USER_MENU = useMemo(() => ([
+    { key: 'agents',   label: tNav('myAgents'),  sub: tMenu('sub_myAgents'), href: '/dashboard/agents',   glyph: '◐' },
+    { key: 'create',   label: tNav('create'),    sub: tMenu('sub_create'),   href: '/create',             glyph: '⊞' },
+    { key: 'billing',  label: tNav('billing'),   sub: tMenu('sub_billing'),  href: '/dashboard/billing',  glyph: '◇' },
+    { key: 'settings', label: tNav('settings'),  sub: tMenu('sub_settings'), href: '/dashboard/settings', glyph: '◆' },
+    { key: 'support',  label: tNav('support'),   sub: tMenu('sub_support'),  href: '/support',            glyph: '✎' },
+  ] as const), [tNav, tMenu]);
 
   useEffect(() => {
     if (!openGroup) return;
@@ -124,6 +127,7 @@ export function Nav() {
                   type="button"
                   aria-expanded={userMenuOpen}
                   aria-haspopup="menu"
+                  aria-label={`${user.username} — ${tNav('settings')}`}
                   onClick={() => setUserMenuOpen((v) => !v)}
                 >
                   {user.avatarUrl ? (
@@ -166,7 +170,7 @@ export function Nav() {
                           <span className={styles.userMetaEmail}>{user.email}</span>
                         </div>
                       </div>
-                      <span className={styles.userMetaTier}>{user.tier} tier</span>
+                      <span className={styles.userMetaTier}>{user.tier} {tMenu('tierSuffix')}</span>
                     </div>
                     {USER_MENU.map((it) => (
                       <Link
@@ -192,8 +196,8 @@ export function Nav() {
                       >
                         <span className={styles.glyph} aria-hidden>★</span>
                         <span className={styles.itemBody}>
-                          <span className={styles.itemLabel}>Admin</span>
-                          <span className={styles.itemSub}>Platform controls.</span>
+                          <span className={styles.itemLabel}>{tNav('admin')}</span>
+                          <span className={styles.itemSub}>{tMenu('sub_admin')}</span>
                         </span>
                       </Link>
                     )}
@@ -205,8 +209,8 @@ export function Nav() {
                     >
                       <span className={styles.glyph} aria-hidden>⎋</span>
                       <span className={styles.itemBody}>
-                        <span className={styles.itemLabel}>Sign out</span>
-                        <span className={styles.itemSub}>End session on this device.</span>
+                        <span className={styles.itemLabel}>{tNav('logout')}</span>
+                        <span className={styles.itemSub}>{tMenu('sub_signOut')}</span>
                       </span>
                     </button>
                   </div>

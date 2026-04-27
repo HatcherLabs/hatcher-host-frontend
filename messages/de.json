@@ -35,7 +35,17 @@
     "affiliateDashboard": "Affiliate Dashboard",
     "affiliatePending": "Bewerbung wird geprüft",
     "affiliateRejected": "Erneut als Affiliate bewerben",
-    "affiliateBecome": "Affiliate werden"
+    "affiliateBecome": "Affiliate werden",
+    "userMenu": {
+      "sub_myAgents": "Durchsuchen, bearbeiten, bereitstellen.",
+      "sub_create": "Vorlage manuell auswählen.",
+      "sub_billing": "Tarif, Add-ons, Guthaben.",
+      "sub_settings": "Profil, API-Schlüssel, Einstellungen.",
+      "sub_support": "Hilfe, Docs, Kontakt.",
+      "sub_admin": "Plattform-Steuerung.",
+      "sub_signOut": "Sitzung auf diesem Gerät beenden.",
+      "tierSuffix": "Tarif"
+    }
   },
   "notifications": {
     "heading": "Benachrichtigungen",
@@ -847,7 +857,17 @@
       "tourSearchTitle": "Suchen & Entdecken",
       "tourSearchDescription": "Agenten suchen oder 200+ Vorlagen durchsuchen, um schnell zu starten.",
       "tourPlanTitle": "Ihr Plan",
-      "tourPlanDescription": "Kostenlos starten mit 1 Agenten und 20 Nachrichten/Tag. Jederzeit upgraden."
+      "tourPlanDescription": "Kostenlos starten mit 1 Agenten und 20 Nachrichten/Tag. Jederzeit upgraden.",
+      "statTotal": "Gesamt",
+      "statActive": "Aktiv",
+      "statSleeping": "Schlafend",
+      "msgsShort": "Nachr.",
+      "cardOpen": "3D-Raum",
+      "cardOpenTooltip": "3D-Raum betreten",
+      "actionStop": "Stoppen",
+      "actionStart": "Starten",
+      "actionRestart": "Neustarten",
+      "noResultsAction": "Filter zurücksetzen"
     },
     "newAgent": {
       "eyebrow": "Neuer Agent",
@@ -1553,6 +1573,11 @@
         "status": "Status",
         "active": "Aktiv",
         "inactive": "Inaktiv"
+      },
+      "sidebar": {
+        "enter3DRoom": "3D-Raum betreten",
+        "enter3DRoomSubtitle": "Begehen + interaktiv konfigurieren",
+        "enter3DRoomTooltip": "3D-Cockpit deines Agenten betreten"
       }
     }
   },
@@ -2481,5 +2506,12 @@
   },
   "localeSwitcher": {
     "label": "Sprache ändern"
+  },
+  "agentRoom": {
+    "back": {
+      "toCity": "Zurück zur Stadt",
+      "toDashboard": "Zurück zum Dashboard",
+      "toAgents": "Zurück zu Agenten"
+    }
   }
 }

@@ -35,7 +35,17 @@
     "affiliateDashboard": "Affiliate Dashboard",
     "affiliatePending": "Application under review",
     "affiliateRejected": "Reapply as affiliate",
-    "affiliateBecome": "Become an affiliate"
+    "affiliateBecome": "Become an affiliate",
+    "userMenu": {
+      "sub_myAgents": "Browse, edit, deploy.",
+      "sub_create": "Pick a template manually.",
+      "sub_billing": "Tier, addons, credits.",
+      "sub_settings": "Profile, API keys, prefs.",
+      "sub_support": "Help, docs, contact.",
+      "sub_admin": "Platform controls.",
+      "sub_signOut": "End session on this device.",
+      "tierSuffix": "tier"
+    }
   },
   "notifications": {
     "heading": "Notifications",
@@ -847,7 +857,17 @@
       "tourSearchTitle": "Search & Explore",
       "tourSearchDescription": "Search agents or browse 200+ templates to get started quickly.",
       "tourPlanTitle": "Your Plan",
-      "tourPlanDescription": "Start free with 1 agent and 20 messages/day. Upgrade anytime."
+      "tourPlanDescription": "Start free with 1 agent and 20 messages/day. Upgrade anytime.",
+      "statTotal": "Total",
+      "statActive": "Active",
+      "statSleeping": "Sleeping",
+      "msgsShort": "msgs",
+      "cardOpen": "3D Room",
+      "cardOpenTooltip": "Enter 3D Room",
+      "actionStop": "Stop",
+      "actionStart": "Start",
+      "actionRestart": "Restart",
+      "noResultsAction": "Clear filters"
     },
     "newAgent": {
       "eyebrow": "New agent",
@@ -1553,6 +1573,11 @@
         "status": "Status",
         "active": "Active",
         "inactive": "Inactive"
+      },
+      "sidebar": {
+        "enter3DRoom": "Enter 3D Room",
+        "enter3DRoomSubtitle": "Walk + configure interactively",
+        "enter3DRoomTooltip": "Walk into your agent's 3D cockpit"
       }
     }
   },
@@ -2481,5 +2506,12 @@
   },
   "localeSwitcher": {
     "label": "Change language"
+  },
+  "agentRoom": {
+    "back": {
+      "toCity": "Back to City",
+      "toDashboard": "Back to Dashboard",
+      "toAgents": "Back to Agents"
+    }
   }
 }

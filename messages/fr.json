@@ -35,7 +35,17 @@
     "affiliateDashboard": "Tableau de bord affilié",
     "affiliatePending": "Candidature en cours d'examen",
     "affiliateRejected": "Recandidater en tant qu'affilié",
-    "affiliateBecome": "Devenir affilié"
+    "affiliateBecome": "Devenir affilié",
+    "userMenu": {
+      "sub_myAgents": "Parcourir, modifier, déployer.",
+      "sub_create": "Choisir un modèle manuellement.",
+      "sub_billing": "Forfait, modules, crédits.",
+      "sub_settings": "Profil, clés API, préférences.",
+      "sub_support": "Aide, docs, contact.",
+      "sub_admin": "Contrôles plateforme.",
+      "sub_signOut": "Terminer la session sur cet appareil.",
+      "tierSuffix": "forfait"
+    }
   },
   "notifications": {
     "heading": "Notifications",
@@ -847,7 +857,17 @@
       "tourSearchTitle": "Rechercher & explorer",
       "tourSearchDescription": "Recherchez des agents ou parcourez 200+ modèles pour démarrer rapidement.",
       "tourPlanTitle": "Votre forfait",
-      "tourPlanDescription": "Commencez gratuitement avec 1 agent et 20 messages/jour. Évoluez à tout moment."
+      "tourPlanDescription": "Commencez gratuitement avec 1 agent et 20 messages/jour. Évoluez à tout moment.",
+      "statTotal": "Total",
+      "statActive": "Actifs",
+      "statSleeping": "En veille",
+      "msgsShort": "msgs",
+      "cardOpen": "Salle 3D",
+      "cardOpenTooltip": "Entrer dans la salle 3D",
+      "actionStop": "Arrêter",
+      "actionStart": "Démarrer",
+      "actionRestart": "Redémarrer",
+      "noResultsAction": "Effacer les filtres"
     },
     "newAgent": {
       "eyebrow": "Nouvel agent",
@@ -1553,6 +1573,11 @@
         "status": "Statut",
         "active": "Actif",
         "inactive": "Inactif"
+      },
+      "sidebar": {
+        "enter3DRoom": "Entrer dans la salle 3D",
+        "enter3DRoomSubtitle": "Marcher + configurer en direct",
+        "enter3DRoomTooltip": "Entrer dans le cockpit 3D de votre agent"
       }
     }
   },
@@ -2481,5 +2506,12 @@
   },
   "localeSwitcher": {
     "label": "Changer de langue"
+  },
+  "agentRoom": {
+    "back": {
+      "toCity": "Retour à la Ville",
+      "toDashboard": "Retour au tableau de bord",
+      "toAgents": "Retour aux agents"
+    }
   }
 }

@@ -199,15 +199,15 @@ export default function MyAgentsPage() {
         {total > 0 && (
           <div className={styles.stats}>
             <div className={styles.statBox}>
-              <span className={styles.statLabel}>Total</span>
+              <span className={styles.statLabel}>{t('statTotal')}</span>
               <span className={styles.statValue}>{total}</span>
             </div>
             <div className={styles.statBox}>
-              <span className={styles.statLabel}>Active</span>
+              <span className={styles.statLabel}>{t('statActive')}</span>
               <span className={`${styles.statValue} ${styles.accent}`}>{activeCount}</span>
             </div>
             <div className={styles.statBox}>
-              <span className={styles.statLabel}>Sleeping</span>
+              <span className={styles.statLabel}>{t('statSleeping')}</span>
               <span className={styles.statValue}>{sleepingCount}</span>
             </div>
           </div>
@@ -350,7 +350,7 @@ export default function MyAgentsPage() {
                       {FRAMEWORK_LABEL[agent.framework] ?? agent.framework}
                     </span>
                     <span className={styles.dot}>·</span>
-                    <span>{(agent.messageCount ?? 0).toLocaleString()} msgs</span>
+                    <span>{(agent.messageCount ?? 0).toLocaleString()} {t('msgsShort')}</span>
                     <span className={styles.dot}>·</span>
                     <span>{timeAgo(new Date(agent.updatedAt ?? agent.createdAt))}</span>
                   </div>
@@ -364,39 +364,39 @@ export default function MyAgentsPage() {
                       href={`/agent/${slugOrId}/room?from=agents`}
                       className={`${styles.actionBtn} ${styles.primary}`}
                       onClick={(e) => e.stopPropagation()}
-                      title="Enter 3D Room"
+                      title={t('cardOpenTooltip')}
                     >
-                      ▎ 3D Room
+                      ▎ {t('cardOpen')}
                     </Link>
                     {isRunning ? (
                       <button
                         type="button"
                         className={styles.actionBtn}
                         disabled={busy}
-                        onClick={() => runAction(agent, api.stopAgent, `Stopped "${agent.name}"`)}
-                        title="Stop"
+                        onClick={() => runAction(agent, api.stopAgent, `${t('actionStop')} — ${agent.name}`)}
+                        title={t('actionStop')}
                       >
-                        <Square size={11} /> Stop
+                        <Square size={11} /> {t('actionStop')}
                       </button>
                     ) : (
                       <button
                         type="button"
                         className={styles.actionBtn}
                         disabled={busy}
-                        onClick={() => runAction(agent, api.startAgent, `Started "${agent.name}"`)}
-                        title="Start"
+                        onClick={() => runAction(agent, api.startAgent, `${t('actionStart')} — ${agent.name}`)}
+                        title={t('actionStart')}
                       >
-                        <Play size={11} /> Start
+                        <Play size={11} /> {t('actionStart')}
                       </button>
                     )}
                     <button
                       type="button"
                       className={styles.actionBtn}
                       disabled={busy}
-                      onClick={() => runAction(agent, api.restartAgent, `Restarted "${agent.name}"`)}
-                      title="Restart"
+                      onClick={() => runAction(agent, api.restartAgent, `${t('actionRestart')} — ${agent.name}`)}
+                      title={t('actionRestart')}
                     >
-                      <RotateCcw size={11} /> Restart
+                      <RotateCcw size={11} /> {t('actionRestart')}
                     </button>
                     <button
                       type="button"

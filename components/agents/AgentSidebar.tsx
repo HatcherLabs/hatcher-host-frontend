@@ -83,6 +83,7 @@ export const AgentSidebar = memo(function AgentSidebar({ agent, activeTab, onTab
   const tTabs = useTranslations('dashboard.agentDetail.tabs');
   const tSidebarGroups = useTranslations('dashboard.agentDetail.sidebarGroups');
   const tNav = useTranslations('dashboard.agentDetail.nav');
+  const tSidebar = useTranslations('dashboard.agentDetail.sidebar');
   const allTabs = getTabs(agent.framework, tTabs);
   const tabs = viewMode === 'easy' ? allTabs.filter(t => EASY_TABS.includes(t.id)) : allTabs;
   const statusInfo = STATUS_STYLES[agent.status] ?? STATUS_STYLES.paused;
@@ -178,15 +179,15 @@ export const AgentSidebar = memo(function AgentSidebar({ agent, activeTab, onTab
             borderColor: frameworkColor + '50',
             background: frameworkColor + '0d',
           }}
-          title="Walk into your agent's 3D cockpit"
+          title={tSidebar('enter3DRoomTooltip')}
         >
           <span className="text-base leading-none" aria-hidden>▎</span>
           <span className="flex flex-col gap-0.5 min-w-0">
             <span className="text-[11px] font-bold uppercase tracking-[0.08em]">
-              Enter 3D Room
+              {tSidebar('enter3DRoom')}
             </span>
             <span className="text-[10px] text-[var(--text-muted)] truncate">
-              Walk + configure interactively
+              {tSidebar('enter3DRoomSubtitle')}
             </span>
           </span>
           <span
