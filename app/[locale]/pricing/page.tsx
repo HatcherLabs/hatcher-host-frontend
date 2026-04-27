@@ -7,6 +7,7 @@ import { Link } from '@/i18n/routing';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
+import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import {
   ArrowRight,
   Building2,
@@ -133,7 +134,7 @@ export default function PricingPage() {
   }, []);
 
   return (
-    <div className="relative">
+    <MarketingShell>
       <div className="mx-auto max-w-7xl px-4 pt-12 sm:pt-16 pb-16 relative">
         {/* HERO */}
         <div className="mb-14">
@@ -342,7 +343,7 @@ export default function PricingPage() {
               transition={{ duration: 0.3 }}
               className="text-2xl font-bold mb-3 flex items-center justify-center gap-3"
             >
-              <Plus className="w-6 h-6 text-[#8b5cf6]" />
+              <Plus className="w-6 h-6 text-[var(--accent)]" />
               <span className="text-[var(--text-primary)]">{t('addons.heading')}</span>
             </motion.h2>
             <p className="text-[var(--text-muted)] text-sm max-w-lg mx-auto">
@@ -433,7 +434,7 @@ export default function PricingPage() {
               transition={{ duration: 0.3 }}
               className="text-2xl font-bold mb-3 flex items-center justify-center gap-3"
             >
-              <Shield className="w-6 h-6 text-[#8b5cf6]" />
+              <Shield className="w-6 h-6 text-[var(--accent)]" />
               <span className="text-[var(--text-primary)]">{t('compareTable.heading')}</span>
             </motion.h2>
             <p className="text-[var(--text-muted)] text-sm">{t('compareTable.subheading')}</p>
@@ -453,7 +454,7 @@ export default function PricingPage() {
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('starter.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$6.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('priceUnit.perMonth')}</span></div>
                     </th>
-                    <th className="text-center px-2 py-3 sm:p-5 text-[#8b5cf6] font-semibold">
+                    <th className="text-center px-2 py-3 sm:p-5 text-[#a78bfa] font-semibold">
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('pro.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$19.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('priceUnit.perMonth')}</span></div>
                     </th>
@@ -461,7 +462,7 @@ export default function PricingPage() {
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('business.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$49.99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('priceUnit.perMonth')}</span></div>
                     </th>
-                    <th className="text-center px-2 py-3 sm:p-5 text-[#e11d48] font-semibold">
+                    <th className="text-center px-2 py-3 sm:p-5 text-[#f43f5e] font-semibold">
                       <div className="text-[10px] sm:text-xs uppercase tracking-wider mb-1">{tTiers('founding_member.name')}</div>
                       <div className="text-sm sm:text-lg font-extrabold text-[var(--text-primary)]">$99<span className="text-[10px] sm:text-xs text-[var(--text-muted)] font-normal">{t('compareTable.onceSuffix')}</span></div>
                     </th>
@@ -518,7 +519,7 @@ export default function PricingPage() {
               transition={{ duration: 0.3 }}
               className="text-2xl font-bold flex items-center justify-center gap-3"
             >
-              <HelpCircle className="w-6 h-6 text-[#8b5cf6]" />
+              <HelpCircle className="w-6 h-6 text-[var(--accent)]" />
               <span className="text-[var(--text-primary)]">{t('faq.heading')}</span>
             </motion.h2>
           </div>
@@ -533,15 +534,15 @@ export default function PricingPage() {
         <div className="text-center mb-20">
           <p className="text-[var(--text-muted)] text-sm">
             {t('help.text')}{' '}
-            <a href="mailto:support@hatcher.host" className="text-[#8b5cf6] hover:underline font-medium">
+            <a href="mailto:support@hatcher.host" className="text-[var(--accent)] hover:underline font-medium">
               {t('help.emailLabel')}
             </a>
             {' '}{/* "or" — intentionally kept as a simple connector, not extracted */}or{' '}
-            <a href="https://discord.gg/7tY3HjKjMc" target="_blank" rel="noopener noreferrer" className="text-[#8b5cf6] hover:underline font-medium">
+            <a href="https://discord.gg/7tY3HjKjMc" target="_blank" rel="noopener noreferrer" className="text-[var(--accent)] hover:underline font-medium">
               {t('help.discordLabel')}
             </a>
             {' '}or{' '}
-            <a href="https://t.me/HatcherLabs" target="_blank" rel="noopener noreferrer" className="text-[#8b5cf6] hover:underline font-medium">
+            <a href="https://t.me/HatcherLabs" target="_blank" rel="noopener noreferrer" className="text-[var(--accent)] hover:underline font-medium">
               {t('help.telegramLabel')}
             </a>
           </p>
@@ -549,7 +550,7 @@ export default function PricingPage() {
 
         {/* CTA BANNER */}
         <div className="card glass-noise p-10 sm:p-14 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.1),transparent_60%)] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--accent-glow),transparent_60%)] pointer-events-none" />
           <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 relative text-[var(--text-primary)]">
             {t('cta.heading')}
           </h2>
@@ -576,7 +577,7 @@ export default function PricingPage() {
           {t('footerNote')}
         </p>
       </div>
-    </div>
+    </MarketingShell>
   );
 }
 
@@ -631,21 +632,21 @@ function FAQItem({ q, a }: { q: string; a: string }) {
     <div
       className={cn(
         'card glass-noise overflow-hidden transition-all duration-200',
-        open && 'border-[rgba(139,92,246,0.3)] shadow-[0_0_20px_rgba(139,92,246,0.06)]'
+        open && 'border-[var(--border-hover)] shadow-[0_0_20px_var(--accent-glow)]'
       )}
     >
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between p-5 text-left group"
       >
-        <span className="text-sm font-medium text-[var(--text-primary)] pr-4 group-hover:text-[#8b5cf6] transition-colors">{q}</span>
+        <span className="text-sm font-medium text-[var(--text-primary)] pr-4 group-hover:text-[var(--accent)] transition-colors">{q}</span>
         <div
           className={cn(
             'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors',
-            open ? 'bg-[#8b5cf6]/15' : 'bg-[var(--bg-card)]'
+            open ? 'bg-[var(--accent)]/15' : 'bg-[var(--bg-card)]'
           )}
         >
-          <ChevronDown className={cn('w-4 h-4 transition-all duration-200', open ? 'text-[#8b5cf6] rotate-180' : 'text-[var(--text-muted)]')} />
+          <ChevronDown className={cn('w-4 h-4 transition-all duration-200', open ? 'text-[var(--accent)] rotate-180' : 'text-[var(--text-muted)]')} />
         </div>
       </button>
       <AnimatePresence>
@@ -658,7 +659,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
             className="overflow-hidden"
           >
             <div className="px-5 pb-5 pt-0">
-              <div className="w-full h-px bg-gradient-to-r from-transparent via-[rgba(139,92,246,0.2)] to-transparent mb-4" />
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-[var(--border-hover)] to-transparent mb-4" />
               <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{a}</p>
             </div>
           </motion.div>

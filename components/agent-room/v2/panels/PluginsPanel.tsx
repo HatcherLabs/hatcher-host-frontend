@@ -48,7 +48,7 @@ export function PluginsPanel({ agentId, framework, onClose }: Props) {
       {!loading && !error && installed.length === 0 && (
         <div className="mb-4 text-sm text-neutral-400">
           No plugins installed yet. Browse and install from the{' '}
-          <a href={`/agent/${agentId}#plugins`} className="underline">dashboard</a>.
+          <a href={`/dashboard/agent/${agentId}?tab=plugins`} className="underline">dashboard</a>.
         </div>
       )}
       {installed.length > 0 && (
@@ -69,7 +69,7 @@ export function PluginsPanel({ agentId, framework, onClose }: Props) {
         </ul>
       )}
       <a
-        href={`/agent/${agentId}#plugins`}
+        href={`/dashboard/agent/${agentId}?tab=plugins`}
         className="inline-block w-full rounded-lg bg-white py-2 text-center text-sm font-medium text-black hover:bg-neutral-200"
       >
         Open full editor →

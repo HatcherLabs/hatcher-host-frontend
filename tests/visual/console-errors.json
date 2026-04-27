@@ -1,0 +1,98 @@
+{
+  "mobile-home": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "mobile-pricing": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "mobile-frameworks": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "mobile-blog": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "mobile-login": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "mobile-register": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "mobile-forgot": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "mobile-privacy": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "mobile-help": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "mobile-affiliate": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "tablet-home": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "tablet-pricing": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "tablet-frameworks": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "tablet-blog": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "tablet-login": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "tablet-register": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "tablet-forgot": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "tablet-privacy": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "tablet-help": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "tablet-affiliate": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "desktop-home": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "desktop-pricing": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED",
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "desktop-frameworks": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "desktop-blog": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "desktop-login": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "desktop-register": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "desktop-forgot": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "desktop-privacy": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "desktop-help": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ],
+  "desktop-affiliate": [
+    "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+  ]
+}

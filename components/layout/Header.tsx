@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
-import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { LocaleSwitcher } from './LocaleSwitcher';
 
 function isActive(pathname: string, href: string) {
@@ -334,7 +333,7 @@ export function Header() {
           <div className="flex items-center gap-2">
             <div className="hidden lg:flex items-center gap-2">
               <LocaleSwitcher />
-              <ThemeToggle />
+              {/* ThemeToggle removed in v3 — dark only */}
               {authLoading ? (
                 <div className="h-9 w-24 rounded-lg bg-[var(--bg-card)] animate-pulse" />
               ) : isAuthenticated && user ? (
@@ -466,7 +465,7 @@ export function Header() {
             {/* Mobile theme toggle + locale switcher + notification bell */}
             <div className="lg:hidden flex items-center gap-1">
               <LocaleSwitcher />
-              <ThemeToggle />
+              {/* ThemeToggle removed in v3 — dark only */}
             </div>
             {isAuthenticated && user && (
               <div className="lg:hidden">

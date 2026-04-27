@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { buildLanguagesMap } from '@/lib/seo';
+import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -140,7 +141,7 @@ export default async function RoadmapPage() {
   const t = await getTranslations('roadmap');
 
   return (
-    <main className="min-h-screen">
+    <MarketingShell>
       <div className="mx-auto max-w-2xl px-4 sm:px-6 py-16 sm:py-20">
 
         {/* Header — editorial eyebrow matches the rest of the site */}
@@ -245,6 +246,6 @@ export default async function RoadmapPage() {
         </div>
 
       </div>
-    </main>
+    </MarketingShell>
   );
 }

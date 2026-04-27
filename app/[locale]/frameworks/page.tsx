@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
+import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
@@ -291,8 +292,8 @@ export default function FrameworksPage() {
   const activeFramework = FRAMEWORKS.find((f) => f.key === activeCode)!;
 
   return (
-    <div className="min-h-screen px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl space-y-20">
+    <MarketingShell>
+      <div className="mx-auto max-w-6xl space-y-20 px-4 py-12 sm:px-6 lg:px-8">
 
         {/* ── Hero — editorial, left-aligned ───────────────────── */}
         <motion.div initial="hidden" animate="visible" variants={fadeUp}>
@@ -724,6 +725,6 @@ export default function FrameworksPage() {
         </section>
 
       </div>
-    </div>
+    </MarketingShell>
   );
 }

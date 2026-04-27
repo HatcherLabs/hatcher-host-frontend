@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { BLOG_POSTS, BLOG_CATEGORIES, searchPosts } from '@/lib/blog';
 import { motion, AnimatePresence } from 'framer-motion';
+import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 
 export default function BlogPage() {
   const t = useTranslations('blog');
@@ -25,7 +26,7 @@ export default function BlogPage() {
   const gridPosts = showFeatured ? filtered.slice(1) : filtered;
 
   return (
-    <div className="min-h-screen">
+    <MarketingShell>
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         {/* Header */}
         <div className="mb-14 max-w-2xl">
@@ -228,13 +229,13 @@ export default function BlogPage() {
                 setSearchQuery('');
                 setActiveCategory(null);
               }}
-              className="text-sm text-purple-400 hover:text-purple-300 transition-colors duration-200"
+              className="text-sm text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors duration-200"
             >
               {t('clearFilters')}
             </button>
           </div>
         )}
       </div>
-    </div>
+    </MarketingShell>
   );
 }

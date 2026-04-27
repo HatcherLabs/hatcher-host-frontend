@@ -62,7 +62,7 @@ export function SkillsPanel({ agentId, framework, onClose }: Props) {
       {!loading && skills.length === 0 && !error && (
         <div className="text-sm text-neutral-400">
           No skills installed yet. Open{' '}
-          <a href={`/agent/${agentId}#skills`} className="underline">the dashboard</a>{' '}
+          <a href={`/dashboard/agent/${agentId}?tab=skills`} className="underline">the dashboard</a>{' '}
           to browse and install skills.
         </div>
       )}
@@ -88,7 +88,7 @@ export function SkillsPanel({ agentId, framework, onClose }: Props) {
       {skills.length > 0 && (
         <div className="mt-4 text-xs text-neutral-500">
           Install new skills from the{' '}
-          <a href={`/agent/${agentId}#skills`} className="underline">dashboard</a>.
+          <a href={`/dashboard/agent/${agentId}?tab=skills`} className="underline">dashboard</a>.
         </div>
       )}
     </PanelShell>

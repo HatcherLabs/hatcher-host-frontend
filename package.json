@@ -61,6 +61,7 @@
     "@types/three": "^0.184.0",
     "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.4.20",
+    "axe-core": "^4.11.3",
     "eslint": "^9.39.4",
     "eslint-config-next": "^15.5.14",
     "gltf-pipeline": "^4.3.1",

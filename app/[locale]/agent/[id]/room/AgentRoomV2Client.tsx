@@ -98,6 +98,11 @@ export function AgentRoomV2Client({ agentId }: Props) {
   // no client-side comparison needed. Matches the legacy /room logic.
   const canEdit = typeof agent?.ownerId === 'string' && agent.ownerId.length > 0;
 
+  // URL param may be slug OR id; downstream API calls (memory, plugins, chat
+  // history) use only id-keyed lookups, so resolve to canonical id once the
+  // agent is loaded. Fall back to URL param while loading.
+  const apiId = agent?.id ?? agentId;
+
   const loadAgent = useCallback(async () => {
     try {
       const res = await api.getAgent(agentId);
@@ -122,7 +127,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
   // One-shot memory probe on mount to decide if the shelves glow brighter.
   useEffect(() => {
     if (!canEdit) return;
-    api.getAgentMemory(agentId)
+    api.getAgentMemory(apiId)
       .then((res) => {
         if (!res.success) { setHasMemory(false); return; }
         const m = res.data as { memoryMd?: string; dailyLogs?: unknown[] };
@@ -130,24 +135,25 @@ export function AgentRoomV2Client({ agentId }: Props) {
         setHasMemory(anything);
       })
       .catch(() => setHasMemory(false));
-  }, [agentId, canEdit]);
+  }, [apiId, canEdit]);
 
   // Plugin count for the cabinet's label ("Plugins · 3").
   useEffect(() => {
-    api.getAgentPlugins(agentId)
+    api.getAgentPlugins(apiId)
       .then((res) => {
         if (!res.success) { setPluginsInstalled(0); return; }
         const data = res.data as { installed?: unknown[] };
         setPluginsInstalled(data.installed?.length ?? 0);
       })
       .catch(() => setPluginsInstalled(0));
-  }, [agentId]);
+  }, [apiId]);
 
   // Load persisted chat history once per agent. State lives on the
   // client (not inside ChatPanel) so closing / re-opening the panel
   // keeps the conversation visible.
   useEffect(() => {
-    api.getChatHistory(agentId)
+    if (!apiId) return;
+    api.getChatHistory(apiId)
       .then((res) => {
         if (!res.success) return;
         const raw = res.data.messages ?? [];
@@ -161,7 +167,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
         setChatMessages(normalized);
       })
       .catch(() => {});
-  }, [agentId]);
+  }, [apiId]);
 
   const appendChatMessage = useCallback((msg: ChatMessage) => {
     setChatMessages((prev) => [...prev, msg]);
@@ -186,12 +192,12 @@ export function AgentRoomV2Client({ agentId }: Props) {
         .filter((m) => m.content.length > 0 && !m.content.startsWith('Error:'))
         .map((m) => ({ role: m.role, content: m.content, ts: m.ts }));
       if (payload.length === 0) return;
-      api.saveChatHistory(agentId, payload).catch(() => {});
+      api.saveChatHistory(apiId, payload).catch(() => {});
     }, 800);
     return () => {
       if (saveChatTimerRef.current) clearTimeout(saveChatTimerRef.current);
     };
-  }, [chatMessages, agentId]);
+  }, [chatMessages, apiId]);
 
   const layout = useMemo(
     () => (framework ? getStationLayout(framework) : null),
@@ -226,7 +232,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
   return (
     <div className="fixed inset-0 overflow-hidden bg-black">
       <AgentRoomSceneV2
-        agentId={agentId}
+        agentId={apiId}
         framework={framework}
         posRef={posRef}
         status={agent?.status ?? 'unknown'}
@@ -245,14 +251,14 @@ export function AgentRoomV2Client({ agentId }: Props) {
         onStatusChange={loadAgent}
       />
 
-      <BackToCity />
+      <BackToCity agentId={apiId} />
       <RoomMinimap layout={layout} playerPos={posRef} framework={framework} />
       <ProximityHint nearest={openPanel ? null : nearest} />
       <WalkOnboarding />
 
       {openPanel === 'agentAvatar' && (
         <ChatPanel
-          agentId={agentId}
+          agentId={apiId}
           framework={framework}
           messages={chatMessages}
           onAppend={appendChatMessage}
@@ -262,11 +268,11 @@ export function AgentRoomV2Client({ agentId }: Props) {
         />
       )}
       {openPanel === 'skillWorkbench' && canEdit && (
-        <SkillsPanel agentId={agentId} framework={framework} onClose={close} />
+        <SkillsPanel agentId={apiId} framework={framework} onClose={close} />
       )}
       {openPanel === 'integrationsRack' && canEdit && (
         <IntegrationsPanel
-          agentId={agentId}
+          agentId={apiId}
           framework={framework}
           connected={connectedIntegrations}
           onClose={close}
@@ -274,7 +280,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
       )}
       {openPanel === 'statusConsole' && canEdit && (
         <StatusPanel
-          agentId={agentId}
+          agentId={apiId}
           framework={framework}
           status={agent?.status ?? 'unknown'}
           uptimeSec={agent?.uptimeSec}
@@ -285,16 +291,16 @@ export function AgentRoomV2Client({ agentId }: Props) {
         />
       )}
       {openPanel === 'logWall' && (
-        <LogsPanel agentId={agentId} framework={framework} onClose={close} />
+        <LogsPanel agentId={apiId} framework={framework} onClose={close} />
       )}
       {openPanel === 'memoryShelves' && canEdit && (
-        <MemoryPanel agentId={agentId} framework={framework} onClose={close} />
+        <MemoryPanel agentId={apiId} framework={framework} onClose={close} />
       )}
       {openPanel === 'configTerminal' && canEdit && (
-        <ConfigPanel agentId={agentId} framework={framework} onClose={close} />
+        <ConfigPanel agentId={apiId} framework={framework} onClose={close} />
       )}
       {openPanel === 'pluginsCabinet' && canEdit && (
-        <PluginsPanel agentId={agentId} framework={framework} onClose={close} />
+        <PluginsPanel agentId={apiId} framework={framework} onClose={close} />
       )}
     </div>
   );

@@ -1,0 +1,11 @@
+.line {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  display: flex;
+  gap: 0.5em;
+  align-items: baseline;
+}
+.prompt { color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
+.cmd    { color: var(--text-secondary); }

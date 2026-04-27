@@ -35,7 +35,17 @@
     "affiliateDashboard": "Panou Afiliat",
     "affiliatePending": "Aplicație în curs de revizuire",
     "affiliateRejected": "Reaplică ca afiliat",
-    "affiliateBecome": "Devino afiliat"
+    "affiliateBecome": "Devino afiliat",
+    "userMenu": {
+      "sub_myAgents": "Răsfoiește, editează, lansează.",
+      "sub_create": "Alege un șablon manual.",
+      "sub_billing": "Tier, adăugiri, credite.",
+      "sub_settings": "Profil, chei API, preferințe.",
+      "sub_support": "Ajutor, documentație, contact.",
+      "sub_admin": "Control platformă.",
+      "sub_signOut": "Termină sesiunea pe acest dispozitiv.",
+      "tierSuffix": "tier"
+    }
   },
   "notifications": {
     "heading": "Notificări",
@@ -847,7 +857,17 @@
       "tourSearchTitle": "Caută & Explorează",
       "tourSearchDescription": "Caută agenți sau răsfoiește 200+ template-uri pentru a începe rapid.",
       "tourPlanTitle": "Planul Tău",
-      "tourPlanDescription": "Începe gratuit cu 1 agent și 20 mesaje/zi. Extinde oricând."
+      "tourPlanDescription": "Începe gratuit cu 1 agent și 20 mesaje/zi. Extinde oricând.",
+      "statTotal": "Total",
+      "statActive": "Active",
+      "statSleeping": "În pauză",
+      "msgsShort": "mesaje",
+      "cardOpen": "Camera 3D",
+      "cardOpenTooltip": "Intră în camera 3D",
+      "actionStop": "Oprește",
+      "actionStart": "Pornește",
+      "actionRestart": "Repornește",
+      "noResultsAction": "Șterge filtrele"
     },
     "newAgent": {
       "eyebrow": "Agent nou",
@@ -1553,6 +1573,11 @@
         "status": "Stare",
         "active": "Activ",
         "inactive": "Inactiv"
+      },
+      "sidebar": {
+        "enter3DRoom": "Intră în camera 3D",
+        "enter3DRoomSubtitle": "Pășește + configurează interactiv",
+        "enter3DRoomTooltip": "Intră în cockpit-ul 3D al agentului"
       }
     }
   },
@@ -2481,5 +2506,12 @@
   },
   "localeSwitcher": {
     "label": "Schimbă limba"
+  },
+  "agentRoom": {
+    "back": {
+      "toCity": "Înapoi la Oraș",
+      "toDashboard": "Înapoi la Dashboard",
+      "toAgents": "Înapoi la Agenți"
+    }
   }
 }
