@@ -993,11 +993,14 @@ export default function AgentManagePage() {
         <AgentSidebar agent={agent} activeTab={tab} onTabChange={setTab} />
 
         {/* ─── Main Content ─────────────────────────────────── */}
-        <div className="flex-1 min-w-0 flex flex-col">
-          {/* Top action bar */}
-          <div className="px-4 sm:px-6 py-3 border-b border-[var(--border-default)] flex items-center gap-3 flex-wrap">
-            {/* Status badge */}
-            <span className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full border flex-shrink-0 ${statusInfo.classes}`}>
+        <div className="flex-1 min-w-0 flex flex-col bg-[var(--bg-base)]">
+          {/* Top action bar — v3 mono */}
+          <div
+            className="px-4 sm:px-6 py-3 border-b border-[var(--border-default)] flex items-center gap-3 flex-wrap bg-[var(--bg-base)]"
+            style={{ fontFamily: 'var(--font-mono)' }}
+          >
+            {/* Status pill — v3 */}
+            <span className={`inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.06em] font-bold px-2 py-0.5 rounded-[3px] border flex-shrink-0 ${statusInfo.classes}`}>
               {statusInfo.pulse && (
                 <span className="relative flex h-1.5 w-1.5">
                   <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${statusInfo.dotColor} opacity-75`} />
@@ -1010,46 +1013,46 @@ export default function AgentManagePage() {
             {/* Spacer */}
             <div className="flex-1" />
 
-            {/* Easy / Advanced mode toggle */}
-            <div className="flex items-center rounded-lg border border-[var(--border-default)] overflow-hidden text-xs flex-shrink-0">
+            {/* Easy / Advanced mode toggle — v3 */}
+            <div className="flex items-center rounded-[3px] border border-[var(--border-default)] overflow-hidden text-[11px] flex-shrink-0 bg-[var(--bg-elevated)]">
               <button
                 onClick={() => setViewMode('easy')}
-                className={`px-2.5 py-1.5 transition-colors ${viewMode === 'easy' ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'}`}
+                className={`px-3 py-1.5 uppercase tracking-[0.06em] font-bold transition-colors ${viewMode === 'easy' ? 'bg-[rgba(74,222,128,0.08)] text-[var(--accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
               >
                 {tHeader('easy')}
               </button>
               <div className="w-px h-4 bg-[var(--border-default)]" aria-hidden="true" />
               <button
                 onClick={() => setViewMode('advanced')}
-                className={`px-2.5 py-1.5 transition-colors ${viewMode === 'advanced' ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'}`}
+                className={`px-3 py-1.5 uppercase tracking-[0.06em] font-bold transition-colors ${viewMode === 'advanced' ? 'bg-[rgba(74,222,128,0.08)] text-[var(--accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
               >
                 {tHeader('advanced')}
               </button>
             </div>
 
-            {/* Action buttons */}
-            <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Action buttons — v3 */}
+            <div className="flex items-center gap-1.5 flex-shrink-0">
               {isActive && (
                 <>
                   <button
                     onClick={() => actions.handleAction('restart')}
                     disabled={actions.actionLoading === 'restart'}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-accent)]/10 transition-all disabled:opacity-40"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.06em] font-bold rounded-[3px] border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] transition-all disabled:opacity-40"
                     title="Restart agent"
                   >
-                    <RotateCcw size={13} className={actions.actionLoading === 'restart' ? 'animate-spin' : ''} />
+                    <RotateCcw size={12} className={actions.actionLoading === 'restart' ? 'animate-spin' : ''} />
                     <span className="hidden sm:inline">{actions.actionLoading === 'restart' ? tHeader('restarting') : tHeader('restart')}</span>
                   </button>
                   <button
                     onClick={() => actions.handleAction('stop')}
                     disabled={actions.actionLoading === 'stop'}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 transition-all disabled:opacity-40"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.06em] font-bold rounded-[3px] border border-[rgba(251,191,36,0.3)] text-[#fbbf24] hover:bg-[rgba(251,191,36,0.08)] transition-all disabled:opacity-40"
                     title="Stop agent"
                   >
                     {actions.actionLoading === 'stop' ? (
                       <div className="w-3 h-3 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
                     ) : (
-                      <Square size={13} />
+                      <Square size={12} />
                     )}
                     <span className="hidden sm:inline">{actions.actionLoading === 'stop' ? tHeader('stopping') : tHeader('stop')}</span>
                   </button>
@@ -1059,13 +1062,13 @@ export default function AgentManagePage() {
                 <button
                   onClick={() => actions.handleAction('start')}
                   disabled={actions.actionLoading === 'start'}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-all disabled:opacity-40"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.06em] font-bold rounded-[3px] border border-[rgba(74,222,128,0.4)] text-[var(--accent)] hover:bg-[rgba(74,222,128,0.08)] transition-all disabled:opacity-40"
                   title="Start agent"
                 >
                   {actions.actionLoading === 'start' ? (
                     <div className="w-3 h-3 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
                   ) : (
-                    <Play size={13} />
+                    <Play size={12} />
                   )}
                   <span className="hidden sm:inline">{actions.actionLoading === 'start' ? tHeader('starting') : tHeader('start')}</span>
                 </button>
@@ -1083,70 +1086,59 @@ export default function AgentManagePage() {
                     window.open(tweetUrl, '_blank', 'width=550,height=420');
                   }
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--color-accent)]/40 hover:bg-[var(--color-accent)]/10 transition-all"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.06em] font-bold rounded-[3px] border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] transition-all"
                 title="Share agent"
               >
-                <Share2 size={13} />
+                <Share2 size={12} />
                 <span className="hidden sm:inline">{tHeader('share')}</span>
               </button>
               {(() => {
                 const fw = agent?.framework;
                 if (!fw || !['openclaw', 'hermes', 'elizaos', 'milady'].includes(fw)) return null;
-                const META: Record<string, { icon: string; cls: string }> = {
-                  openclaw: {
-                    icon: '🦞',
-                    cls: 'border-yellow-500/30 text-yellow-400 hover:border-yellow-500/60 hover:bg-yellow-500/10',
-                  },
-                  hermes: {
-                    icon: '🪶',
-                    cls: 'border-purple-500/30 text-purple-300 hover:border-purple-500/60 hover:bg-purple-500/10',
-                  },
-                  elizaos: {
-                    icon: '🐙',
-                    cls: 'border-blue-500/30 text-blue-300 hover:border-blue-500/60 hover:bg-blue-500/10',
-                  },
-                  milady: {
-                    icon: '🎨',
-                    cls: 'border-pink-500/30 text-pink-300 hover:border-pink-500/60 hover:bg-pink-500/10',
-                  },
+                const COLOR: Record<string, string> = {
+                  openclaw: '#f59e0b',
+                  hermes: '#a855f7',
+                  elizaos: '#38bdf8',
+                  milady: '#f43f5e',
                 };
-                const m = META[fw]!;
+                const c = COLOR[fw]!;
                 return (
                   <Link
-                    href={`/agent/${id}/room`}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border transition-all ${m.cls}`}
+                    href={`/agent/${id}/room?from=dashboard`}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.06em] font-bold rounded-[3px] border transition-all"
+                    style={{ color: c, borderColor: c + '50', background: c + '0d' }}
                     title="Enter 3D Agent Room"
                   >
-                    <span>{m.icon}</span>
+                    <span aria-hidden>▎</span>
                     <span className="hidden sm:inline">{tHeader('room')}</span>
                   </Link>
                 );
               })()}
               <button
                 onClick={() => setPortModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-purple-500/40 hover:bg-purple-500/10 hover:text-purple-300 transition-all"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.06em] font-bold rounded-[3px] border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] transition-all"
                 title="Clone to another framework"
               >
-                <Copy size={13} />
+                <Copy size={12} />
                 <span className="hidden sm:inline">{tHeader('clone')}</span>
               </button>
               <button
                 onClick={actions.handleDelete}
                 disabled={actions.deleting}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border transition-all disabled:opacity-40 ${
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] uppercase tracking-[0.06em] font-bold rounded-[3px] border transition-all disabled:opacity-40 ${
                   actions.deleteConfirm
-                    ? 'bg-red-500 text-white border-red-500 hover:bg-red-600'
-                    : 'border-red-500/30 text-red-400 hover:bg-red-500/10'
+                    ? 'bg-[#ff6b6b] text-white border-[#ff6b6b]'
+                    : 'border-[rgba(255,107,107,0.3)] text-[#ff8a8a] hover:bg-[rgba(255,107,107,0.08)]'
                 }`}
                 title="Delete agent"
               >
-                <Trash2 size={13} />
+                <Trash2 size={12} />
                 <span className="hidden sm:inline">{actions.deleting ? tHeader('deleting') : actions.deleteConfirm ? tHeader('confirm') : tHeader('delete')}</span>
               </button>
               {actions.deleteConfirm && !actions.deleting && (
                 <button
                   onClick={() => { actions.setDeleteConfirm(false); actions.setDeleteError(null); }}
-                  className="text-xs px-2 py-1 transition-colors text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
+                  className="text-[11px] uppercase tracking-[0.06em] font-bold px-2 py-1 transition-colors text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                 >
                   {tHeader('cancel')}
                 </button>
@@ -1155,14 +1147,20 @@ export default function AgentManagePage() {
           </div>
 
           {actions.deleteError && (
-            <p className="text-xs text-red-400 px-6 py-2 border-b border-[rgba(46,43,74,0.2)]">{actions.deleteError}</p>
+            <p
+              className="text-xs px-6 py-2 border-b border-[rgba(255,107,107,0.2)] text-[#ff8a8a] bg-[rgba(255,107,107,0.06)]"
+              style={{ fontFamily: 'var(--font-mono)' }}
+            >
+              ✕ {actions.deleteError}
+            </p>
           )}
 
           {/* M4: "Restart required" banner for Milady agents with pendingRestart=true */}
           {agent?.framework === 'milady' && agent?.status === 'active' && <MiladyRestartBanner />}
 
           {/* ─── Tab Content ──────────────────────────────────── */}
-          <div className={`flex-1 px-4 sm:px-6 py-6 min-w-0`}>
+          <div className="flex-1 min-w-0 bg-[var(--bg-base)]">
+            <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-6">
             <AnimatePresence mode="wait">
               {tab === 'overview' && <OverviewTab />}
               {tab === 'config' && (
@@ -1202,6 +1200,7 @@ export default function AgentManagePage() {
               {tab === 'schedules' && <SchedulesTab />}
               {tab === 'workflows' && <WorkflowsTab />}
             </AnimatePresence>
+            </div>
           </div>
         </div>
       </motion.div>

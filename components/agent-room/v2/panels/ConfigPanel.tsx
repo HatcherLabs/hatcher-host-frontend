@@ -20,7 +20,7 @@ export function ConfigPanel({ agentId, framework, onClose }: Props) {
         <li>• Advanced: streaming, reasoning, compression</li>
       </ul>
       <a
-        href={`/agent/${agentId}#settings`}
+        href={`/dashboard/agent/${agentId}?tab=config`}
         className="inline-block w-full rounded-lg bg-white py-2 text-center text-sm font-medium text-black hover:bg-neutral-200"
       >
         Open full editor →

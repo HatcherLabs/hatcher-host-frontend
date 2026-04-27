@@ -114,6 +114,149 @@
 .signIn:hover { color: var(--text-primary); }
 @media (max-width: 600px) { .signIn { display: none; } }
 
+.userAnchor { position: relative; }
+
+.userPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+.userPill:hover { border-color: var(--accent); background: var(--bg-card); }
+.userPill[aria-expanded='true'] { border-color: var(--accent); }
+
+.userDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+.userAvatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.userName {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.userPillSkeleton {
+  display: inline-block;
+  width: 100px;
+  height: 32px;
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  opacity: 0.6;
+}
+
+.userDropdown {
+  right: 0;
+  left: auto;
+  min-width: 280px;
+}
+
+.userMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid var(--border-default);
+  margin-bottom: 6px;
+}
+.userMetaTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.userMetaAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border-default);
+}
+.userMetaInitial {
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.userMetaText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.userMetaName {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.userMetaEmail {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.userMetaTier {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  align-self: flex-start;
+  padding: 3px 6px;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 3px;
+  background: rgba(74, 222, 128, 0.06);
+}
+
+.signOut {
+  background: transparent;
+  border: 0;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  margin-top: 6px;
+  border-top: 1px solid var(--border-default);
+  padding-top: 14px;
+}
+.signOut .itemLabel { color: var(--danger, #ff6b6b); }
+
 .cta {
   display: inline-flex;
   align-items: center;

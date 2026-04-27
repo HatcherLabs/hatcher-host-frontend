@@ -78,7 +78,7 @@ export function CitySceneV2({ agents = [], pulseAts = EMPTY_PULSES }: Props) {
   // old AgentPopup preview overlay — the room IS the detail view.
   const openAgentRoom = useCallback(
     (agentId: string) => {
-      router.push(`/agent/${agentId}/room`);
+      router.push(`/agent/${agentId}/room?from=city`);
     },
     [router],
   );

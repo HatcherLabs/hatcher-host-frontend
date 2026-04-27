@@ -122,7 +122,7 @@ export function ChatToHatch() {
         }),
       });
       if (created.success) {
-        router.push(`/agent/${created.data.slug ?? created.data.id}/room`);
+        router.push(`/agent/${created.data.slug ?? created.data.id}/room?from=hatch`);
         return;
       }
       setMessages((m) => [

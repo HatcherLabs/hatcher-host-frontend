@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import styles from './NavDrawer.module.css';
 import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA } from './links';
+import { useAuth } from '@/lib/auth-context';
 
 interface Props {
   open: boolean;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export function NavDrawer({ open, onClose }: Props) {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -49,9 +51,15 @@ export function NavDrawer({ open, onClose }: Props) {
         ))}
 
         <div className={styles.bottom}>
-          <Link href={SECONDARY_CTA.href} className={styles.signIn} onClick={onClose}>
-            {SECONDARY_CTA.label}
-          </Link>
+          {authLoading ? null : isAuthenticated ? (
+            <Link href="/dashboard" className={styles.signIn} onClick={onClose}>
+              Dashboard
+            </Link>
+          ) : (
+            <Link href={SECONDARY_CTA.href} className={styles.signIn} onClick={onClose}>
+              {SECONDARY_CTA.label}
+            </Link>
+          )}
           <Link href={PRIMARY_CTA.href} className={styles.cta} onClick={onClose}>
             <span aria-hidden>▎</span> {PRIMARY_CTA.label}
           </Link>

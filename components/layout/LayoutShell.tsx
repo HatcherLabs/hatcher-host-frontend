@@ -1,21 +1,19 @@
 'use client';
 
 import { usePathname } from '@/i18n/routing';
-import { Header } from './Header';
-import { Footer } from './Footer';
+import { Nav } from '@/components/marketing/v3/Nav';
+import { Footer as FooterV3 } from '@/components/marketing/v3/Footer';
 import { ScrollToTop } from '@/components/ui/ScrollToTop';
 
-// Routes that own the full viewport — the Header/Footer chrome would
+// Routes that own the full viewport — the Nav/Footer chrome would
 // cover their canvas. Extend this list as we add more immersive views.
-// Note: /city keeps the site chrome so the map feels part of hatcher.host
-// rather than a standalone app; the canvas sits inside the main content area.
 const IMMERSIVE_PATTERNS: RegExp[] = [
   /^\/agent\/[^/]+\/room(?:-legacy)?(?:\/|$)/,
-  // Chat-to-hatch ships its own slim brand bar + back link; the legacy
-  // global chrome would push the chat / preview columns below the fold.
+  // Chat-to-hatch ships its own slim brand bar + back link; the global
+  // chrome would push the chat / preview columns below the fold.
   /^\/chat-to-hatch(?:\/|$)/,
   // LandingV3 owns its own Nav + Footer (marketing v3 chrome). Skipping
-  // the legacy global chrome here prevents double-stacking.
+  // the global chrome here prevents double-stacking.
   /^\/$/,
   // Marketing pages wrapped in MarketingShell v3 (own Nav + Footer).
   /^\/(?:pricing|frameworks|token|roadmap|blog|changelog|help|support|affiliate)(?:\/|$)/,
@@ -44,7 +42,7 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
       >
         Skip to content
       </a>
-      <Header />
+      <Nav />
       <main
         id="main-content"
         role="main"
@@ -53,7 +51,7 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
       >
         {children}
       </main>
-      <Footer />
+      <FooterV3 />
       <ScrollToTop />
     </div>
   );

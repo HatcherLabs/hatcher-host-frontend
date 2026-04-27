@@ -220,98 +220,74 @@
 }
 
 @layer components {
-  /* ── Cards ───────────────────────────────────────── */
+  /* ── Cards (v3 mono) ─────────────────────────────── */
   .card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 16px;
-    box-shadow:
-      0 4px 24px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: 4px;
+    transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
   }
 
   .card:hover {
-    border-color: rgba(139, 92, 246, 0.3);
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow:
-      0 8px 40px rgba(139, 92, 246, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06),
-      0 0 20px var(--primary-glow);
+    border-color: var(--accent);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     transform: translateY(-1px);
   }
 
   .card-highlighted {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(139, 92, 246, 0.3);
-    border-radius: 16px;
-    box-shadow:
-      0 4px 24px rgba(0, 0, 0, 0.2),
-      0 0 24px var(--primary-glow),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    background: var(--bg-card);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px var(--accent-glow), 0 8px 24px rgba(0, 0, 0, 0.4);
+    transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
   }
 
   .card-highlighted:hover {
-    border-color: rgba(139, 92, 246, 0.45);
-    box-shadow:
-      0 8px 40px rgba(139, 92, 246, 0.12),
-      0 0 32px var(--primary-glow),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 0 2px var(--accent-glow), 0 8px 28px rgba(0, 0, 0, 0.5);
     transform: translateY(-1px);
   }
 
-  /* ── Glassmorphism ───────────────────────────────── */
+  /* ── Glass (alias to flat card v3) ───────────────── */
   .glass {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(40px) saturate(150%);
-    -webkit-backdrop-filter: blur(40px) saturate(150%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: var(--radius-lg);
-    box-shadow:
-      0 2px 16px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: 4px;
   }
 
   .glass-hover:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(139, 92, 246, 0.3);
+    border-color: var(--accent);
   }
 
-  /* ── Stat Cards ──────────────────────────────────── */
+  /* ── Stat Cards (v3 mono) ────────────────────────── */
   .stat-card {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(40px) saturate(150%);
-    -webkit-backdrop-filter: blur(40px) saturate(150%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 16px;
-    padding: 1.25rem 1.5rem;
-    box-shadow:
-      0 4px 24px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    transition: border-color 150ms ease, transform 150ms ease;
   }
 
   .stat-card:hover {
-    border-color: rgba(139, 92, 246, 0.3);
-    box-shadow:
-      0 8px 40px rgba(139, 92, 246, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06),
-      0 0 20px var(--primary-glow);
+    border-color: var(--accent);
     transform: translateY(-1px);
   }
 
   .stat-card .stat-value {
-    font-size: 1.75rem;
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--text-primary);
-    line-height: 1.2;
+    line-height: 1.1;
   }
 
   .stat-card .stat-label {
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    margin-top: 0.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--text-muted);
+    margin-top: 0.375rem;
   }
 
   /* ── Status dot ──────────────────────────────────── */
@@ -326,240 +302,261 @@
   .status-dot-paused  { background-color: #fbbf24; color: #fbbf24; animation: none; opacity: 0.8; }
   .status-dot-killed  { background-color: #f87171; color: #f87171; animation: none; opacity: 0.5; }
 
-  /* ── Buttons ─────────────────────────────────────── */
+  /* ── Buttons (v3 mono/phosphor) ──────────────────── */
   .btn-primary {
     @apply relative inline-flex items-center justify-center gap-2
-           font-semibold px-5 py-2.5 rounded-xl
-           transition-all duration-200 active:scale-95
+           px-5 py-2.5 rounded
+           transition-shadow duration-150 active:scale-[0.98]
            disabled:opacity-40 disabled:cursor-not-allowed;
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-    color: #ffffff;
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.25), 0 4px 12px rgba(0, 0, 0, 0.2);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    background: var(--accent);
+    color: var(--bg-base);
   }
 
   .btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, #a78bfa, #8b5cf6);
-    box-shadow: 0 0 32px rgba(139, 92, 246, 0.45), 0 8px 24px rgba(0, 0, 0, 0.3);
+    background: var(--accent-hover);
+    box-shadow: 0 0 20px var(--accent-glow);
   }
 
   .btn-primary:focus-visible {
-    box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px #8b5cf6, 0 0 20px rgba(139, 92, 246, 0.25);
+    outline: none;
+    box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--accent);
   }
 
   .btn-cta {
     @apply relative inline-flex items-center justify-center gap-2
-           font-semibold px-5 py-2.5 rounded-xl
-           transition-all duration-200 active:scale-95
+           px-5 py-2.5
+           transition-shadow duration-150 active:scale-[0.98]
            disabled:opacity-40 disabled:cursor-not-allowed;
-    background: linear-gradient(135deg, var(--color-accent), #0891b2);
-    color: #ffffff;
-    box-shadow: 0 0 20px rgba(6, 182, 212, 0.25), 0 4px 12px rgba(0, 0, 0, 0.2);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    background: var(--accent);
+    color: var(--bg-base);
   }
 
   .btn-cta:hover:not(:disabled) {
-    background: linear-gradient(135deg, #22d3ee, var(--color-accent));
-    box-shadow: 0 0 32px rgba(6, 182, 212, 0.45), 0 8px 24px rgba(0, 0, 0, 0.3);
+    background: var(--accent-hover);
+    box-shadow: 0 0 24px var(--accent-glow);
   }
 
   .btn-cta:focus-visible {
-    box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--color-accent), 0 0 20px rgba(6, 182, 212, 0.25);
+    outline: none;
+    box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--accent);
   }
 
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2
-           font-medium px-5 py-2.5 rounded-xl
-           transition-all duration-200 active:scale-95;
+           px-5 py-2.5
+           transition-colors duration-150 active:scale-[0.98];
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 4px;
     background: transparent;
-    color: var(--text-secondary);
+    color: var(--text-primary);
     border: 1px solid var(--border-default);
   }
 
   .btn-secondary:hover {
-    color: var(--text-primary);
-    border-color: var(--border-hover);
-    background: var(--bg-hover);
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(74, 222, 128, 0.06);
   }
 
   .btn-secondary:focus-visible {
-    box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px #8b5cf6;
+    outline: none;
+    box-shadow: 0 0 0 2px var(--bg-base), 0 0 0 4px var(--accent);
   }
 
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2
-           font-medium px-4 py-2.5 rounded-xl
-           transition-all duration-200;
+           px-4 py-2.5
+           transition-colors duration-150;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border-radius: 4px;
     color: var(--text-muted);
   }
 
   .btn-ghost:hover {
-    color: var(--text-primary);
-    background: var(--bg-hover);
+    color: var(--accent);
+    background: rgba(74, 222, 128, 0.06);
   }
 
   .btn-danger {
     @apply inline-flex items-center justify-center gap-2
-           font-medium px-4 py-2 rounded-xl
-           transition-all duration-200;
-    border: 1px solid rgba(239, 68, 68, 0.4);
-    color: #f87171;
+           px-4 py-2
+           transition-colors duration-150;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    color: #ff8a8a;
   }
 
   .btn-danger:hover {
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(255, 107, 107, 0.08);
+    border-color: rgba(255, 107, 107, 0.5);
   }
 
-  /* ── Inputs ──────────────────────────────────────── */
+  /* ── Inputs (v3 mono) ────────────────────────────── */
   .input {
-    @apply rounded-xl px-4 py-2.5 text-sm
-           placeholder-[#71717a]
-           focus:outline-none focus:ring-2
-           transition-all duration-200 w-full;
+    @apply px-3 py-2.5 text-sm
+           focus:outline-none
+           transition-colors duration-150 w-full;
+    font-family: var(--font-mono);
+    border-radius: 4px;
     background: var(--bg-elevated);
     border: 1px solid var(--border-default);
     color: var(--text-primary);
   }
 
-  .input:focus {
-    border-color: var(--primary-500);
-    --tw-ring-color: rgba(139, 92, 246, 0.2);
-  }
+  .input::placeholder { color: var(--text-muted); }
 
+  .input:focus,
   .input:focus-visible {
-    border-color: var(--primary-500);
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent-glow);
   }
 
-  /* ── Badges ──────────────────────────────────────── */
+  /* ── Badges (v3 square pills) ────────────────────── */
   .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center gap-1.5;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 3px;
+    border: 1px solid;
   }
 
   .badge-active {
     @apply badge;
-    background: rgba(34, 197, 94, 0.1);
-    color: #4ade80;
-    border: 1px solid rgba(34, 197, 94, 0.3);
-    animation: status-pulse 2s ease-in-out infinite;
+    background: rgba(74, 222, 128, 0.08);
+    color: var(--accent);
+    border-color: rgba(74, 222, 128, 0.4);
   }
 
   .badge-paused {
     @apply badge;
-    background: rgba(251, 191, 36, 0.1);
-    color: var(--amber-400);
-    border: 1px solid rgba(251, 191, 36, 0.25);
+    background: rgba(251, 191, 36, 0.08);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.3);
   }
 
   .badge-sleeping {
     @apply badge;
-    background: rgba(96, 165, 250, 0.1);
-    color: #60a5fa;
-    border: 1px solid rgba(96, 165, 250, 0.25);
+    background: transparent;
+    color: var(--text-muted);
+    border-color: var(--border-default);
   }
 
   .badge-error {
     @apply badge;
-    background: rgba(239, 68, 68, 0.1);
-    color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.25);
+    background: rgba(255, 107, 107, 0.08);
+    color: #ff8a8a;
+    border-color: rgba(255, 107, 107, 0.3);
   }
 
   .badge-feature {
     @apply badge;
-    background: var(--accent-glow);
-    color: var(--accent-400);
-    border: 1px solid rgba(6, 182, 212, 0.3);
+    background: rgba(74, 222, 128, 0.08);
+    color: var(--accent);
+    border-color: rgba(74, 222, 128, 0.3);
   }
 
-  /* ── Gradient text ───────────────────────────────── */
-  .text-gradient {
-    @apply text-transparent bg-clip-text;
-    background-image: linear-gradient(135deg, #a78bfa, #8b5cf6, #7c3aed);
-  }
-
-  .text-gradient-purple {
-    @apply text-transparent bg-clip-text;
-    background-image: linear-gradient(135deg, #a78bfa, #8b5cf6, #7c3aed);
-  }
-
+  /* ── Gradient text (v3 — flat phosphor) ──────────── */
+  .text-gradient,
+  .text-gradient-purple,
   .text-gradient-cyan {
-    @apply text-transparent bg-clip-text;
-    background-image: linear-gradient(135deg, #22d3ee, var(--color-accent), #0891b2);
+    color: var(--accent);
+    background: none;
+    -webkit-text-fill-color: currentColor;
   }
 
-  /* ── Text glow utility ──────────────────────────── */
-  .text-glow {
-    text-shadow: 0 0 20px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.2);
-  }
-
-  .text-glow-purple {
-    text-shadow: 0 0 20px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.2);
-  }
-
+  /* ── Text glow utility (v3 — phosphor glow) ──────── */
+  .text-glow,
+  .text-glow-purple,
   .text-glow-cyan {
-    text-shadow: 0 0 20px rgba(6, 182, 212, 0.4), 0 0 40px rgba(6, 182, 212, 0.2);
+    text-shadow: 0 0 16px var(--accent-glow);
   }
 
-  /* ── Section label ───────────────────────────────── */
+  /* ── Section label (v3 mono) ─────────────────────── */
   .section-label {
+    font-family: var(--font-mono);
     font-size: 0.6875rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.18em;
   }
 
-  /* ── Framework tag ───────────────────────────────── */
+  /* ── Framework tag (v3 square) ───────────────────── */
   .fw-tag {
-    @apply text-xs px-2 py-0.5 rounded-full;
-    background: var(--accent-glow);
-    color: var(--accent-400);
-    border: 1px solid rgba(6, 182, 212, 0.25);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: rgba(74, 222, 128, 0.08);
+    color: var(--accent);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    display: inline-flex;
+    align-items: center;
   }
 
-  /* ── Toast ───────────────────────────────────────── */
+  /* ── Toast (v3 mono) ─────────────────────────────── */
   .toast {
-    background: var(--bg-card-solid);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    background: var(--bg-card);
     border: 1px solid var(--border-default);
-    border-radius: var(--radius-lg);
-    padding: 0.875rem 1.25rem;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
     color: var(--text-primary);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
     animation: slide-in-right 0.3s ease-out;
   }
 
-  .toast-success {
-    border-left: 3px solid #22c55e;
-  }
+  .toast-success { border-left: 3px solid var(--accent); }
+  .toast-error { border-left: 3px solid #ff6b6b; }
+  .toast-info { border-left: 3px solid var(--accent); }
 
-  .toast-error {
-    border-left: 3px solid #ef4444;
-  }
-
-  .toast-info {
-    border-left: 3px solid var(--accent-500);
-  }
-
-  /* ── Glass noise (class kept, texture overlay removed) */
+  /* ── Glass noise (no-op, kept for DOM compatibility) */
   .glass-noise {
     position: relative;
   }
 
-  /* ── Solid card — opaque background, no glassmorphism.
-     For surfaces where the translucent `.card` hurts readability
-     (dense financial data, long prose, tables). Uses the themed
-     solid-card background so contrast stays strong on both themes. */
+  /* ── Solid card (v3 mono) ────────────────────────── */
   .card-solid {
-    background: var(--bg-card-solid);
+    background: var(--bg-card);
     border: 1px solid var(--border-default);
-    border-radius: 16px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    border-radius: 4px;
+    transition: border-color 150ms ease;
   }
 
   .card-solid:hover {
-    border-color: var(--border-hover, rgba(139, 92, 246, 0.3));
+    border-color: var(--accent);
   }
 
   /* ── Shimmer loading effect ──────────────────────── */

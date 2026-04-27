@@ -41,7 +41,7 @@ export function IntegrationsPanel({ agentId, framework, connected, onClose }: Pr
         })}
       </ul>
       <a
-        href={`/agent/${agentId}#integrations`}
+        href={`/dashboard/agent/${agentId}?tab=integrations`}
         className="inline-block w-full rounded-lg bg-white py-2 text-center text-sm font-medium text-black hover:bg-neutral-200"
       >
         Open full editor →
