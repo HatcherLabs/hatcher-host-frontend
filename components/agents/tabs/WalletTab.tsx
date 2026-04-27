@@ -13,7 +13,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Wallet as WalletIcon, Copy, RefreshCw, ExternalLink, ShieldCheck, Zap } from 'lucide-react';
+import { Wallet as WalletIcon, Copy, RefreshCw, ExternalLink, ShieldCheck, Zap, Key, AlertTriangle } from 'lucide-react';
 import { useAgentContext, GlassCard } from '../AgentContext';
 import { api } from '@/lib/api';
 
@@ -43,13 +43,17 @@ function shortAddr(addr: string): string {
 }
 
 export function WalletTab() {
-  const { agent } = useAgentContext();
+  const { agent, loadAgent } = useAgentContext();
   const [wallet, setWallet] = useState<WalletState | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copyMsg, setCopyMsg] = useState<string | null>(null);
   const [registering, setRegistering] = useState(false);
   const [registerMsg, setRegisterMsg] = useState<string | null>(null);
+  const [signingToggling, setSigningToggling] = useState(false);
+
+  const advanced = (agent.config?.advanced as Record<string, unknown> | undefined) ?? {};
+  const signingEnabled = advanced['agent_wallet_signer'] === true;
 
   const loadWallet = useCallback(async () => {
     setLoading(true);
@@ -77,6 +81,29 @@ export function WalletTab() {
       setCopyMsg('Copy failed');
       setTimeout(() => setCopyMsg(null), 1600);
     });
+  };
+
+  const toggleSigning = async () => {
+    const next = !signingEnabled;
+    if (next && !confirm(
+      'Enable runtime signing?\n\n' +
+      'This injects the agent\'s SKALE private key into the container env (SKALE_PRIVATE_KEY) on next start. ' +
+      'The agent will be able to sign + submit transactions on its own.\n\n' +
+      'You can revoke at any time. The wallet stays receive-only until then.\n\n' +
+      'Restart the agent after toggling for the change to take effect.',
+    )) return;
+
+    setSigningToggling(true);
+    try {
+      await api.updateAgent(agent.id, {
+        config: { advanced: { agent_wallet_signer: next } },
+      } as never);
+      await loadAgent();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Failed to toggle signing');
+    } finally {
+      setSigningToggling(false);
+    }
   };
 
   const registerOnChain = async () => {
@@ -301,6 +328,57 @@ export function WalletTab() {
             )}
           </div>
         )}
+      </GlassCard>
+
+      {/* Phase 3 — Runtime signing opt-in */}
+      <GlassCard className="p-5">
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div className="flex items-center gap-3">
+            <Key size={16} className={signingEnabled ? 'text-amber-400' : 'text-[var(--phosphor)]'} />
+            <h3 className="text-sm font-semibold text-[var(--text-primary)]">Agent Runtime Signing</h3>
+          </div>
+          <span className={`px-2 py-0.5 border text-[10px] uppercase tracking-wider ${
+            signingEnabled
+              ? 'border-amber-500/40 text-amber-400'
+              : 'border-[var(--border-subtle)] text-[var(--text-muted)]'
+          }`}>
+            {signingEnabled ? 'Signing ON' : 'Receive-only'}
+          </span>
+        </div>
+        <div className="text-xs text-[var(--text-muted)] leading-relaxed mb-3">
+          Off (default): the agent process can read balances and build unsigned transactions but cannot
+          submit them. Wallet is receive-only.
+          <br /><br />
+          On: the SKALE private key is injected into the container env at start time. The agent can use
+          the bundled <code className="text-[var(--phosphor)] font-mono">skale</code> CLI or
+          <code className="text-[var(--phosphor)] font-mono"> ethers</code> directly to sign + submit
+          on-chain transactions, including x402 / MPP payments and ERC-8004 reputation calls.
+        </div>
+        {signingEnabled && (
+          <div className="flex items-start gap-2 p-3 mb-3 border border-amber-500/30 bg-amber-500/5 text-[11px] text-amber-400">
+            <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
+            <span>
+              Active. The agent runtime now controls funds in this wallet. Restart the container after
+              the toggle for the change to take effect. Only enable for trusted skill sets.
+            </span>
+          </div>
+        )}
+        <button
+          onClick={() => void toggleSigning()}
+          disabled={signingToggling}
+          className={`inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-wider border transition disabled:opacity-50 disabled:cursor-not-allowed ${
+            signingEnabled
+              ? 'border-amber-500/40 text-amber-400 hover:bg-amber-500/10'
+              : 'border-[var(--phosphor)]/40 text-[var(--phosphor)] hover:bg-[var(--phosphor)]/10'
+          }`}
+        >
+          <Key size={12} />
+          {signingToggling
+            ? 'Updating…'
+            : signingEnabled
+              ? 'Disable signing'
+              : 'Enable agent signing'}
+        </button>
       </GlassCard>
 
       {/* Network footer */}
