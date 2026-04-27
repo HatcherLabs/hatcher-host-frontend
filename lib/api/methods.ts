@@ -221,6 +221,23 @@ export const api = {
   /** Get a single agent */
   getAgent: (id: string) => req<Agent>(`/agents/${id}`),
 
+  /** Get the agent's SKALE wallet info — address + native gas + USDC balance.
+   *  Owner/team only. Returns Phase 2 ERC-8004 fields (null until registered). */
+  getAgentSkaleWallet: (id: string) =>
+    req<{
+      address: string;
+      chainId: number;
+      rpcUrl: string;
+      ethWei: string;
+      ethFormatted: string;
+      usdcRaw: string;
+      usdcFormatted: string;
+      usdcContract: string;
+      erc8004AgentId: string | null;
+      erc8004RegisteredAt: string | null;
+      erc8004IdentityContract: string;
+    }>(`/agents/${id}/skale-wallet`),
+
   /** Get usage analytics for an agent */
   getAgentUsage: (id: string) =>
     req<{

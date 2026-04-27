@@ -200,6 +200,11 @@ const AddonsTab = dynamic(
   { loading: () => <TabSkeleton /> },
 );
 
+const WalletTab = dynamic(
+  () => import('@/components/agents/tabs/WalletTab').then(mod => ({ default: mod.WalletTab })),
+  { loading: () => <TabSkeleton /> },
+);
+
 // ─── Main Component ─────────────────────────────────────────
 
 export default function AgentManagePage() {
@@ -1196,6 +1201,7 @@ export default function AgentManagePage() {
               {tab === 'chat' && <ChatTab />}
               {tab === 'knowledge' && <KnowledgeTab />}
               {tab === 'addons' && <AddonsTab />}
+              {tab === 'wallet' && <WalletTab />}
               {tab === 'stats' && <StatsTab />}
               {tab === 'schedules' && <SchedulesTab />}
               {tab === 'workflows' && <WorkflowsTab />}
