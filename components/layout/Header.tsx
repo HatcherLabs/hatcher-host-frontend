@@ -173,6 +173,7 @@ export function Header() {
   // ── User dropdown links ──
   const USER_EXTRA_LINKS = [
     { href: '/dashboard/analytics', label: t('analytics'), icon: Activity },
+    { href: '/dashboard/skale',     label: t('skale'),     icon: Wallet },
     { href: '/dashboard/team',      label: t('team'),      icon: Users },
     { href: '/support',             label: t('support'),   icon: MessageSquare },
     { href: '/dashboard/settings',  label: t('settings'),  icon: Settings },
