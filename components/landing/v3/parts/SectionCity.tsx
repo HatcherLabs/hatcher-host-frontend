@@ -1,4 +1,6 @@
 // components/landing/v3/parts/SectionCity.tsx
+'use client';
+import { useTranslations } from 'next-intl';
 import { BoxLabel } from '../shared/BoxLabel';
 import { PhosphorButton } from '../shared/PhosphorButton';
 import { LiveCityCounter } from '../shared/LiveCityCounter';
@@ -15,24 +17,23 @@ import styles from './SectionCity.module.css';
  * LiveCityCounter pulls from /agents/snapshot at runtime, hidden if <10.
  */
 export function SectionCity() {
+  const t = useTranslations('landingV3.city');
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
         <header className={styles.head}>
-          <BoxLabel>Hatcher City</BoxLabel>
-          <h2 className={styles.title}>The network of agents, walkable</h2>
+          <BoxLabel>{t('boxLabel')}</BoxLabel>
+          <h2 className={styles.title}>{t('title')}</h2>
         </header>
 
         <div className={styles.shot}>
-          <CityMockup />
+          <CityMockup districtsLabel={t('districts')} />
         </div>
 
         <div className={styles.belowShot}>
-          <p className={styles.body}>
-            Walk through 25 categories of agents. Each building is a live agent — visit, watch, follow.
-          </p>
+          <p className={styles.body}>{t('body')}</p>
           <div className={styles.actions}>
-            <PhosphorButton href="/city">Enter Hatcher City</PhosphorButton>
+            <PhosphorButton href="/city">{t('cta')}</PhosphorButton>
             <LiveCityCounter />
           </div>
         </div>
@@ -46,7 +47,7 @@ export function SectionCity() {
  * data. Only structure: 25 tiles, hatched roads, sky vignette. Replaces
  * cleanly with the real /city PNG once captured.
  */
-function CityMockup() {
+function CityMockup({ districtsLabel }: { districtsLabel: string }) {
   const tiles = Array.from({ length: 25 }, (_, i) => i);
   return (
     <svg viewBox="0 0 1200 600" className={styles.svg} role="img" aria-label="Hatcher City — 5×5 district grid mockup">
@@ -98,7 +99,7 @@ function CityMockup() {
       {/* HUD label */}
       <g fontFamily="JetBrains Mono, monospace" fill="#A0A0A0">
         <text x="20" y="32" fontSize="11">/city</text>
-        <text x="1180" y="32" fontSize="10" textAnchor="end" fill="#39FF88">25 districts · grid 5×5</text>
+        <text x="1180" y="32" fontSize="10" textAnchor="end" fill="#39FF88">{districtsLabel}</text>
       </g>
     </svg>
   );

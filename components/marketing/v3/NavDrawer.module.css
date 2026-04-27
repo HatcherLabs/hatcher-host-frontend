@@ -35,6 +35,13 @@
 .itemLabel { display: block; font-family: var(--font-mono); font-size: 14px; font-weight: 500; color: var(--text-primary); }
 .itemSub { display: block; font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
+.localeRow {
+  padding: 16px 20px 8px;
+  border-top: 1px solid var(--border-line);
+  display: flex;
+  align-items: center;
+}
+
 .bottom {
   position: fixed;
   bottom: 0;

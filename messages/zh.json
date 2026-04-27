@@ -45,6 +45,31 @@
       "sub_admin": "平台控制。",
       "sub_signOut": "在此设备上结束会话。",
       "tierSuffix": "套餐"
+    },
+    "groups": {
+      "build": "构建",
+      "explore": "探索",
+      "resources": "资源",
+      "hatchAgentLabel": "孵化代理（聊天）",
+      "hatchAgentSub": "描述你想要的 — 几秒内完成。",
+      "createTplLabel": "从模板创建",
+      "createTplSub": "手动选择框架 + 工具。",
+      "myAgentsLabel": "我的代理",
+      "myAgentsSub": "运行中代理的仪表板。",
+      "cityLabel": "Hatcher 城市",
+      "citySub": "步行 3D 上线代理世界。",
+      "frameworksLabel": "框架",
+      "frameworksSub": "OpenClaw · Hermes · ElizaOS · Milady。",
+      "pricingLabel": "定价",
+      "pricingSub": "Free · Starter · Pro · Business · Founding。",
+      "tokenLabel": "$HATCHER",
+      "tokenSub": "代币、金库、销毁机制。",
+      "blogLabel": "博客",
+      "blogSub": "笔记、发布、深度文章。",
+      "roadmapLabel": "路线图",
+      "roadmapSub": "接下来要发布什么。",
+      "changelogLabel": "更新日志",
+      "changelogSub": "什么变了，何时变的。"
     }
   },
   "notifications": {
@@ -82,7 +107,26 @@
     },
     "copyright": "© {year} HatcherLabs. 保留所有权利。",
     "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România",
-    "legalNotice": "法律页面（隐私政策、服务条款、法律声明、Cookie 政策）仅提供英文版本。"
+    "legalNotice": "法律页面（隐私政策、服务条款、法律声明、Cookie 政策）仅提供英文版本。",
+    "tag": "托管式 AI 代理托管 · 罗马尼亚",
+    "colBuild": "构建",
+    "colExplore": "探索",
+    "colResources": "资源",
+    "colLegal": "法律",
+    "itemHatchAgent": "孵化代理",
+    "itemCreateTpl": "从模板创建",
+    "itemMyAgents": "我的代理",
+    "itemCity": "Hatcher 城市",
+    "itemFrameworks": "框架",
+    "itemPricing": "定价",
+    "itemToken": "$HATCHER",
+    "itemBlog": "博客",
+    "itemRoadmap": "路线图",
+    "itemChangelog": "更新日志",
+    "itemPrivacy": "隐私",
+    "itemTerms": "条款",
+    "itemCookies": "Cookies",
+    "itemImpressum": "版权信息"
   },
   "landing": {
     "affiliateBanner": {
@@ -2563,5 +2607,74 @@
     "errNetwork": "网络错误 — API 可达吗？",
     "errCreate": "无法创建代理。优化描述并重试。",
     "errCreateNetwork": "创建代理时出现网络错误。"
+  },
+  "landingV3": {
+    "hero": {
+      "boxLabel": "部署",
+      "headline1": "部署代理。",
+      "headline2": "看它们工作。",
+      "sub": "几秒内孵化一个。走进它的 3D 房间。看它思考。",
+      "ctaPrimary": "孵化代理",
+      "ctaGhost": "探索城市"
+    },
+    "flow": {
+      "boxLabel": "工作原理",
+      "title": "从想法到上线代理只需三步",
+      "tile1Title": "描述你想要的",
+      "tile1Body": "普通中文/英文。告诉聊天框你的代理该做什么 — 不需要 YAML，不需要参数。",
+      "tile1Example": "每日总结加密新闻",
+      "tile2Title": "审核配置",
+      "tile2Body": "框架、模型、工具、集成 — Hatcher 提议，你确认或调整。",
+      "tile3Title": "上线代理",
+      "tile3Body": "代理在它的 3D 房间运行。集成已连接。走进来看看。",
+      "cta": "孵化你的",
+      "liveLabel": "代理在线"
+    },
+    "rooms": {
+      "boxLabel": "代理房间",
+      "title": "每个代理都有一个 3D 驾驶舱",
+      "body": "走进房间。在可导航的 3D 驾驶舱中查看代理的状态、技能、记忆和实时日志。每个代理一个。",
+      "stationAvatar": "头像",
+      "stationSkills": "技能工作台",
+      "stationIntegrations": "集成机架",
+      "stationStatus": "状态控制台",
+      "stationLogs": "日志墙",
+      "stationStats": "数据全息",
+      "stationMemory": "记忆架",
+      "stationConfig": "配置终端"
+    },
+    "city": {
+      "boxLabel": "Hatcher 城市",
+      "title": "可步行的代理网络",
+      "body": "穿越 25 个代理类别。每栋建筑都是一个上线代理 — 访问、观看、关注。",
+      "cta": "进入 Hatcher 城市",
+      "districts": "25 个区域 · 5×5 网格"
+    },
+    "frameworks": {
+      "boxLabel": "框架",
+      "seeAll": "查看全部 →",
+      "tagOpenclaw": "多技能助手",
+      "tagHermes": "自主代理",
+      "tagElizaos": "多代理框架",
+      "tagMilady": "隐私优先运行时"
+    },
+    "pricing": {
+      "boxLabel": "定价",
+      "seeFull": "查看完整定价 →",
+      "lifetime": "终身 $99",
+      "free": "$0",
+      "perMonth": "/月",
+      "agentSingular": "代理",
+      "agentPlural": "代理",
+      "msgsPerDay": "条消息/天"
+    },
+    "finalCta": {
+      "boxLabel": "就绪",
+      "headline": "部署你的第一个代理。",
+      "ctaPrimary": "孵化代理",
+      "ctaGhost": "浏览模板",
+      "metaFrameworks": "4 个框架",
+      "metaNoCard": "无需信用卡"
+    }
   }
 }

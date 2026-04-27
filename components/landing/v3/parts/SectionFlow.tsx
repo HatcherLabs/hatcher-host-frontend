@@ -1,4 +1,6 @@
 // components/landing/v3/parts/SectionFlow.tsx
+'use client';
+import { useTranslations } from 'next-intl';
 import { BoxLabel } from '../shared/BoxLabel';
 import { PhosphorButton } from '../shared/PhosphorButton';
 import styles from './SectionFlow.module.css';
@@ -9,12 +11,13 @@ import styles from './SectionFlow.module.css';
  * captured in Phase F follow-up replace these without any other change).
  */
 export function SectionFlow() {
+  const t = useTranslations('landingV3.flow');
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
         <header className={styles.head}>
-          <BoxLabel>How it works</BoxLabel>
-          <h2 className={styles.title}>Three steps from idea to live agent</h2>
+          <BoxLabel>{t('boxLabel')}</BoxLabel>
+          <h2 className={styles.title}>{t('title')}</h2>
         </header>
 
         <ol className={styles.tiles}>
@@ -23,14 +26,12 @@ export function SectionFlow() {
             <div className={styles.tileVisual}>
               <div className={styles.typed}>
                 <span className={styles.typedPrompt}>&gt;</span>
-                <span className={styles.typedText}>summarize crypto news daily</span>
+                <span className={styles.typedText}>{t('tile1Example')}</span>
                 <span className={styles.typedCursor} aria-hidden>▎</span>
               </div>
             </div>
-            <h3 className={styles.tileTitle}>Type what you want</h3>
-            <p className={styles.tileBody}>
-              Plain English. Tell the chat what your agent should do — no YAML, no flags.
-            </p>
+            <h3 className={styles.tileTitle}>{t('tile1Title')}</h3>
+            <p className={styles.tileBody}>{t('tile1Body')}</p>
           </li>
 
           <li className={styles.tile}>
@@ -38,28 +39,24 @@ export function SectionFlow() {
             <div className={styles.tileVisual}>
               <ConfigMockup />
             </div>
-            <h3 className={styles.tileTitle}>Review the config</h3>
-            <p className={styles.tileBody}>
-              Framework, model, tools, integrations — Hatcher proposes; you confirm or tweak.
-            </p>
+            <h3 className={styles.tileTitle}>{t('tile2Title')}</h3>
+            <p className={styles.tileBody}>{t('tile2Body')}</p>
           </li>
 
           <li className={styles.tile}>
             <span className={styles.step}>03</span>
             <div className={styles.tileVisual}>
-              <LiveMockup />
+              <LiveMockup liveLabel={t('liveLabel')} />
             </div>
             <h3 className={styles.tileTitle}>
-              Live agent <span className={styles.check}>✓</span>
+              {t('tile3Title')} <span className={styles.check}>✓</span>
             </h3>
-            <p className={styles.tileBody}>
-              Agent runs in its 3D room. Integrations wired. Walk in and watch.
-            </p>
+            <p className={styles.tileBody}>{t('tile3Body')}</p>
           </li>
         </ol>
 
         <div className={styles.ctaRow}>
-          <PhosphorButton href="/chat-to-hatch">Hatch yours</PhosphorButton>
+          <PhosphorButton href="/chat-to-hatch">{t('cta')}</PhosphorButton>
         </div>
       </div>
     </section>
@@ -77,12 +74,12 @@ function ConfigMockup() {
   );
 }
 
-function LiveMockup() {
+function LiveMockup({ liveLabel }: { liveLabel: string }) {
   return (
     <div className={styles.mockup}>
       <div className={styles.liveRow}>
         <span className={styles.livePip} aria-hidden />
-        <span className={styles.liveText}>agent live</span>
+        <span className={styles.liveText}>{liveLabel}</span>
       </div>
       <div className={styles.mockRow}><span className={styles.mockKey}>room</span><span className={styles.mockVal}>3d cockpit ready</span></div>
       <div className={styles.mockRow}><span className={styles.mockKey}>integrations</span><span className={styles.mockVal}>connected</span></div>

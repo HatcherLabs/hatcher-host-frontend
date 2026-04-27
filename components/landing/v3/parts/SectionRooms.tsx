@@ -1,7 +1,11 @@
 // components/landing/v3/parts/SectionRooms.tsx
+'use client';
+import { useTranslations } from 'next-intl';
 import { BoxLabel } from '../shared/BoxLabel';
 import styles from './SectionRooms.module.css';
 
+// Framework labels stay literal — they are brand names, not strings to
+// translate. Colors mirror the framework_color_scheme memory.
 const FRAMEWORKS = [
   { key: 'openclaw', label: 'OpenClaw', color: '#FFCC00' },
   { key: 'hermes',   label: 'Hermes',   color: '#A855F7' },
@@ -10,12 +14,13 @@ const FRAMEWORKS = [
 ] as const;
 
 export function SectionRooms() {
+  const t = useTranslations('landingV3.rooms');
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
         <header className={styles.head}>
-          <BoxLabel>Agent Rooms</BoxLabel>
-          <h2 className={styles.title}>Every agent has a 3D cockpit</h2>
+          <BoxLabel>{t('boxLabel')}</BoxLabel>
+          <h2 className={styles.title}>{t('title')}</h2>
         </header>
 
         <div className={styles.layout}>
@@ -23,19 +28,16 @@ export function SectionRooms() {
             <RoomMockup />
           </div>
           <div className={styles.copy}>
-            <p className={styles.body}>
-              Walk into the room. See your agent&apos;s status, skills, memory, and live
-              logs in a navigable 3D cockpit. One per agent.
-            </p>
+            <p className={styles.body}>{t('body')}</p>
             <ul className={styles.stations}>
-              <li>Avatar</li>
-              <li>Skill Workbench</li>
-              <li>Integrations Rack</li>
-              <li>Status Console</li>
-              <li>Log Wall</li>
-              <li>Stats Hologram</li>
-              <li>Memory Shelves</li>
-              <li>Config Terminal</li>
+              <li>{t('stationAvatar')}</li>
+              <li>{t('stationSkills')}</li>
+              <li>{t('stationIntegrations')}</li>
+              <li>{t('stationStatus')}</li>
+              <li>{t('stationLogs')}</li>
+              <li>{t('stationStats')}</li>
+              <li>{t('stationMemory')}</li>
+              <li>{t('stationConfig')}</li>
             </ul>
             <div className={styles.chips}>
               {FRAMEWORKS.map((f) => (

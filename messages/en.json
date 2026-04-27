@@ -45,6 +45,31 @@
       "sub_admin": "Platform controls.",
       "sub_signOut": "End session on this device.",
       "tierSuffix": "tier"
+    },
+    "groups": {
+      "build": "Build",
+      "explore": "Explore",
+      "resources": "Resources",
+      "hatchAgentLabel": "Hatch agent (chat)",
+      "hatchAgentSub": "Describe what you want — done in seconds.",
+      "createTplLabel": "Create from template",
+      "createTplSub": "Pick a framework + tools manually.",
+      "myAgentsLabel": "My agents",
+      "myAgentsSub": "Dashboard for your running agents.",
+      "cityLabel": "Hatcher City",
+      "citySub": "Walk a 3D world of live agents.",
+      "frameworksLabel": "Frameworks",
+      "frameworksSub": "OpenClaw · Hermes · ElizaOS · Milady.",
+      "pricingLabel": "Pricing",
+      "pricingSub": "Free · Starter · Pro · Business · Founding.",
+      "tokenLabel": "$HATCHER",
+      "tokenSub": "Token, treasury, burn mechanics.",
+      "blogLabel": "Blog",
+      "blogSub": "Notes, releases, deep dives.",
+      "roadmapLabel": "Roadmap",
+      "roadmapSub": "What we ship next.",
+      "changelogLabel": "Changelog",
+      "changelogSub": "What changed and when."
     }
   },
   "notifications": {
@@ -82,7 +107,26 @@
     },
     "copyright": "© {year} HatcherLabs. All rights reserved.",
     "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România",
-    "legalNotice": "Legal pages (Privacy, Terms, Impressum, Cookies) are available in English only."
+    "legalNotice": "Legal pages (Privacy, Terms, Impressum, Cookies) are available in English only.",
+    "tag": "Managed AI agent hosting · Romania",
+    "colBuild": "Build",
+    "colExplore": "Explore",
+    "colResources": "Resources",
+    "colLegal": "Legal",
+    "itemHatchAgent": "Hatch agent",
+    "itemCreateTpl": "Create from template",
+    "itemMyAgents": "My agents",
+    "itemCity": "Hatcher City",
+    "itemFrameworks": "Frameworks",
+    "itemPricing": "Pricing",
+    "itemToken": "$HATCHER",
+    "itemBlog": "Blog",
+    "itemRoadmap": "Roadmap",
+    "itemChangelog": "Changelog",
+    "itemPrivacy": "Privacy",
+    "itemTerms": "Terms",
+    "itemCookies": "Cookies",
+    "itemImpressum": "Impressum"
   },
   "landing": {
     "affiliateBanner": {
@@ -2563,5 +2607,74 @@
     "errNetwork": "Network error — is the API reachable?",
     "errCreate": "Could not create the agent. Refine the description and try again.",
     "errCreateNetwork": "Network error while creating the agent."
+  },
+  "landingV3": {
+    "hero": {
+      "boxLabel": "Deploy",
+      "headline1": "Deploy agents.",
+      "headline2": "See them work.",
+      "sub": "Hatch one in seconds. Walk into its 3D room. Watch it think.",
+      "ctaPrimary": "Hatch agent",
+      "ctaGhost": "Explore the city"
+    },
+    "flow": {
+      "boxLabel": "How it works",
+      "title": "Three steps from idea to live agent",
+      "tile1Title": "Type what you want",
+      "tile1Body": "Plain English. Tell the chat what your agent should do — no YAML, no flags.",
+      "tile1Example": "summarize crypto news daily",
+      "tile2Title": "Review the config",
+      "tile2Body": "Framework, model, tools, integrations — Hatcher proposes; you confirm or tweak.",
+      "tile3Title": "Live agent",
+      "tile3Body": "Agent runs in its 3D room. Integrations wired. Walk in and watch.",
+      "cta": "Hatch yours",
+      "liveLabel": "agent live"
+    },
+    "rooms": {
+      "boxLabel": "Agent Rooms",
+      "title": "Every agent has a 3D cockpit",
+      "body": "Walk into the room. See your agent's status, skills, memory, and live logs in a navigable 3D cockpit. One per agent.",
+      "stationAvatar": "Avatar",
+      "stationSkills": "Skill Workbench",
+      "stationIntegrations": "Integrations Rack",
+      "stationStatus": "Status Console",
+      "stationLogs": "Log Wall",
+      "stationStats": "Stats Hologram",
+      "stationMemory": "Memory Shelves",
+      "stationConfig": "Config Terminal"
+    },
+    "city": {
+      "boxLabel": "Hatcher City",
+      "title": "The network of agents, walkable",
+      "body": "Walk through 25 categories of agents. Each building is a live agent — visit, watch, follow.",
+      "cta": "Enter Hatcher City",
+      "districts": "25 districts · grid 5×5"
+    },
+    "frameworks": {
+      "boxLabel": "Frameworks",
+      "seeAll": "See all →",
+      "tagOpenclaw": "Multi-skill assistant",
+      "tagHermes": "Autonomous agent",
+      "tagElizaos": "Multi-agent framework",
+      "tagMilady": "Privacy-first runtime"
+    },
+    "pricing": {
+      "boxLabel": "Pricing",
+      "seeFull": "See full pricing →",
+      "lifetime": "$99 lifetime",
+      "free": "$0",
+      "perMonth": "/mo",
+      "agentSingular": "agent",
+      "agentPlural": "agents",
+      "msgsPerDay": "msg/day"
+    },
+    "finalCta": {
+      "boxLabel": "Ready",
+      "headline": "Deploy your first agent.",
+      "ctaPrimary": "Hatch agent",
+      "ctaGhost": "Browse templates",
+      "metaFrameworks": "4 frameworks",
+      "metaNoCard": "no credit card"
+    }
   }
 }

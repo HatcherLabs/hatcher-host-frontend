@@ -45,6 +45,31 @@
       "sub_admin": "Control platformă.",
       "sub_signOut": "Termină sesiunea pe acest dispozitiv.",
       "tierSuffix": "tier"
+    },
+    "groups": {
+      "build": "Construiește",
+      "explore": "Explorează",
+      "resources": "Resurse",
+      "hatchAgentLabel": "Eclozează agent (chat)",
+      "hatchAgentSub": "Descrie ce vrei — gata în câteva secunde.",
+      "createTplLabel": "Din template",
+      "createTplSub": "Alege manual framework + tool-uri.",
+      "myAgentsLabel": "Agenții mei",
+      "myAgentsSub": "Dashboard pentru agenții care rulează.",
+      "cityLabel": "Hatcher City",
+      "citySub": "Plimbă-te într-o lume 3D de agenți live.",
+      "frameworksLabel": "Framework-uri",
+      "frameworksSub": "OpenClaw · Hermes · ElizaOS · Milady.",
+      "pricingLabel": "Prețuri",
+      "pricingSub": "Free · Starter · Pro · Business · Founding.",
+      "tokenLabel": "$HATCHER",
+      "tokenSub": "Token, treasury, mecanică de burn.",
+      "blogLabel": "Blog",
+      "blogSub": "Notițe, lansări, deep dives.",
+      "roadmapLabel": "Roadmap",
+      "roadmapSub": "Ce lansăm în continuare.",
+      "changelogLabel": "Changelog",
+      "changelogSub": "Ce s-a schimbat și când."
     }
   },
   "notifications": {
@@ -82,7 +107,26 @@
     },
     "copyright": "© {year} HatcherLabs. Toate drepturile rezervate.",
     "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România",
-    "legalNotice": "Paginile legale (Confidențialitate, Termeni, Impressum, Cookies) sunt disponibile doar în limba engleză."
+    "legalNotice": "Paginile legale (Confidențialitate, Termeni, Impressum, Cookies) sunt disponibile doar în limba engleză.",
+    "tag": "Găzduire managed pentru agenți AI · România",
+    "colBuild": "Construiește",
+    "colExplore": "Explorează",
+    "colResources": "Resurse",
+    "colLegal": "Legal",
+    "itemHatchAgent": "Eclozează agent",
+    "itemCreateTpl": "Din template",
+    "itemMyAgents": "Agenții mei",
+    "itemCity": "Hatcher City",
+    "itemFrameworks": "Framework-uri",
+    "itemPricing": "Prețuri",
+    "itemToken": "$HATCHER",
+    "itemBlog": "Blog",
+    "itemRoadmap": "Roadmap",
+    "itemChangelog": "Changelog",
+    "itemPrivacy": "Confidențialitate",
+    "itemTerms": "Termeni",
+    "itemCookies": "Cookies",
+    "itemImpressum": "Impressum"
   },
   "landing": {
     "affiliateBanner": {
@@ -2563,5 +2607,74 @@
     "errNetwork": "Eroare de rețea — e API-ul accesibil?",
     "errCreate": "Nu am putut crea agentul. Rafinează descrierea și reîncearcă.",
     "errCreateNetwork": "Eroare de rețea la crearea agentului."
+  },
+  "landingV3": {
+    "hero": {
+      "boxLabel": "Deploy",
+      "headline1": "Lansează agenți.",
+      "headline2": "Vezi-i la treabă.",
+      "sub": "Eclozează unul în câteva secunde. Intră în camera lui 3D. Vezi-l cum gândește.",
+      "ctaPrimary": "Eclozează agent",
+      "ctaGhost": "Explorează orașul"
+    },
+    "flow": {
+      "boxLabel": "Cum funcționează",
+      "title": "Trei pași de la idee la agent live",
+      "tile1Title": "Scrie ce vrei",
+      "tile1Body": "Limbaj natural. Spune-i chat-ului ce să facă agentul — fără YAML, fără flags.",
+      "tile1Example": "rezumă știri crypto zilnic",
+      "tile2Title": "Verifică configul",
+      "tile2Body": "Framework, model, tool-uri, integrări — Hatcher propune; tu confirmi sau ajustezi.",
+      "tile3Title": "Agent live",
+      "tile3Body": "Agentul rulează în camera lui 3D. Integrările conectate. Intră și privește.",
+      "cta": "Eclozează al tău",
+      "liveLabel": "agent live"
+    },
+    "rooms": {
+      "boxLabel": "Camerele agenților",
+      "title": "Fiecare agent are un cockpit 3D",
+      "body": "Intră în cameră. Vezi statusul, skill-urile, memoria și log-urile live ale agentului tău într-un cockpit 3D navigabil. Una pentru fiecare agent.",
+      "stationAvatar": "Avatar",
+      "stationSkills": "Atelier skill-uri",
+      "stationIntegrations": "Rack integrări",
+      "stationStatus": "Consolă status",
+      "stationLogs": "Perete log-uri",
+      "stationStats": "Hologramă stats",
+      "stationMemory": "Rafturi memorie",
+      "stationConfig": "Terminal config"
+    },
+    "city": {
+      "boxLabel": "Hatcher City",
+      "title": "Rețeaua de agenți, parcurgibilă",
+      "body": "Mergi prin 25 de categorii de agenți. Fiecare clădire e un agent live — vizitează, urmărește, abonează-te.",
+      "cta": "Intră în Hatcher City",
+      "districts": "25 cartiere · grilă 5×5"
+    },
+    "frameworks": {
+      "boxLabel": "Framework-uri",
+      "seeAll": "Vezi toate →",
+      "tagOpenclaw": "Asistent multi-skill",
+      "tagHermes": "Agent autonom",
+      "tagElizaos": "Framework multi-agent",
+      "tagMilady": "Runtime privacy-first"
+    },
+    "pricing": {
+      "boxLabel": "Prețuri",
+      "seeFull": "Vezi toate prețurile →",
+      "lifetime": "$99 pe viață",
+      "free": "$0",
+      "perMonth": " /lună",
+      "agentSingular": "agent",
+      "agentPlural": "agenți",
+      "msgsPerDay": "mesaje/zi"
+    },
+    "finalCta": {
+      "boxLabel": "Gata",
+      "headline": "Lansează primul tău agent.",
+      "ctaPrimary": "Eclozează agent",
+      "ctaGhost": "Răsfoiește template-uri",
+      "metaFrameworks": "4 framework-uri",
+      "metaNoCard": "fără card"
+    }
   }
 }

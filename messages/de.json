@@ -45,6 +45,31 @@
       "sub_admin": "Plattform-Steuerung.",
       "sub_signOut": "Sitzung auf diesem Gerät beenden.",
       "tierSuffix": "Tarif"
+    },
+    "groups": {
+      "build": "Bauen",
+      "explore": "Erkunden",
+      "resources": "Ressourcen",
+      "hatchAgentLabel": "Agent ausbrüten (Chat)",
+      "hatchAgentSub": "Beschreib was du willst — in Sekunden.",
+      "createTplLabel": "Aus Vorlage erstellen",
+      "createTplSub": "Framework + Tools manuell wählen.",
+      "myAgentsLabel": "Meine Agenten",
+      "myAgentsSub": "Dashboard für laufende Agenten.",
+      "cityLabel": "Hatcher City",
+      "citySub": "Eine 3D-Welt aus Live-Agenten begehen.",
+      "frameworksLabel": "Frameworks",
+      "frameworksSub": "OpenClaw · Hermes · ElizaOS · Milady.",
+      "pricingLabel": "Preise",
+      "pricingSub": "Free · Starter · Pro · Business · Founding.",
+      "tokenLabel": "$HATCHER",
+      "tokenSub": "Token, Treasury, Burn-Mechanik.",
+      "blogLabel": "Blog",
+      "blogSub": "Notizen, Releases, Deep Dives.",
+      "roadmapLabel": "Roadmap",
+      "roadmapSub": "Was wir als Nächstes shippen.",
+      "changelogLabel": "Changelog",
+      "changelogSub": "Was sich wann geändert hat."
     }
   },
   "notifications": {
@@ -82,7 +107,26 @@
     },
     "copyright": "© {year} HatcherLabs. Alle Rechte vorbehalten.",
     "companyInfo": "HHX TECHNOLOGY SRL · CUI 45318471 · Timișoara, România",
-    "legalNotice": "Rechtliche Seiten (Datenschutz, Nutzungsbedingungen, Impressum, Cookies) sind nur in englischer Sprache verfügbar."
+    "legalNotice": "Rechtliche Seiten (Datenschutz, Nutzungsbedingungen, Impressum, Cookies) sind nur in englischer Sprache verfügbar.",
+    "tag": "Managed AI Agent Hosting · Rumänien",
+    "colBuild": "Bauen",
+    "colExplore": "Erkunden",
+    "colResources": "Ressourcen",
+    "colLegal": "Rechtliches",
+    "itemHatchAgent": "Agent ausbrüten",
+    "itemCreateTpl": "Aus Vorlage",
+    "itemMyAgents": "Meine Agenten",
+    "itemCity": "Hatcher City",
+    "itemFrameworks": "Frameworks",
+    "itemPricing": "Preise",
+    "itemToken": "$HATCHER",
+    "itemBlog": "Blog",
+    "itemRoadmap": "Roadmap",
+    "itemChangelog": "Changelog",
+    "itemPrivacy": "Datenschutz",
+    "itemTerms": "AGB",
+    "itemCookies": "Cookies",
+    "itemImpressum": "Impressum"
   },
   "landing": {
     "affiliateBanner": {
@@ -2563,5 +2607,74 @@
     "errNetwork": "Netzwerkfehler — ist die API erreichbar?",
     "errCreate": "Agent konnte nicht erstellt werden. Beschreibung verfeinern und erneut versuchen.",
     "errCreateNetwork": "Netzwerkfehler beim Erstellen des Agenten."
+  },
+  "landingV3": {
+    "hero": {
+      "boxLabel": "Deploy",
+      "headline1": "Agenten deployen.",
+      "headline2": "Sie arbeiten sehen.",
+      "sub": "Innerhalb von Sekunden ausbrüten. In den 3D-Raum gehen. Beim Denken zusehen.",
+      "ctaPrimary": "Agent ausbrüten",
+      "ctaGhost": "Stadt erkunden"
+    },
+    "flow": {
+      "boxLabel": "So funktioniert es",
+      "title": "Drei Schritte von Idee zu Live-Agent",
+      "tile1Title": "Beschreib was du willst",
+      "tile1Body": "Klares Deutsch. Sag dem Chat, was dein Agent tun soll — kein YAML, keine Flags.",
+      "tile1Example": "krypto-news täglich zusammenfassen",
+      "tile2Title": "Konfiguration prüfen",
+      "tile2Body": "Framework, Modell, Tools, Integrationen — Hatcher schlägt vor; du bestätigst oder änderst.",
+      "tile3Title": "Live-Agent",
+      "tile3Body": "Agent läuft in seinem 3D-Raum. Integrationen verbunden. Reingehen und zusehen.",
+      "cta": "Deinen ausbrüten",
+      "liveLabel": "agent live"
+    },
+    "rooms": {
+      "boxLabel": "Agent-Räume",
+      "title": "Jeder Agent hat ein 3D-Cockpit",
+      "body": "Geh in den Raum. Sieh Status, Skills, Speicher und Live-Logs deines Agenten in einem begehbaren 3D-Cockpit. Einer pro Agent.",
+      "stationAvatar": "Avatar",
+      "stationSkills": "Skill-Werkstatt",
+      "stationIntegrations": "Integrations-Rack",
+      "stationStatus": "Status-Konsole",
+      "stationLogs": "Log-Wand",
+      "stationStats": "Stats-Hologramm",
+      "stationMemory": "Speicher-Regale",
+      "stationConfig": "Konfig-Terminal"
+    },
+    "city": {
+      "boxLabel": "Hatcher City",
+      "title": "Das Netzwerk der Agenten, begehbar",
+      "body": "Geh durch 25 Agenten-Kategorien. Jedes Gebäude ist ein Live-Agent — besuchen, zusehen, folgen.",
+      "cta": "Hatcher City betreten",
+      "districts": "25 Bezirke · 5×5-Raster"
+    },
+    "frameworks": {
+      "boxLabel": "Frameworks",
+      "seeAll": "Alle ansehen →",
+      "tagOpenclaw": "Multi-Skill-Assistent",
+      "tagHermes": "Autonomer Agent",
+      "tagElizaos": "Multi-Agent-Framework",
+      "tagMilady": "Privacy-first Runtime"
+    },
+    "pricing": {
+      "boxLabel": "Preise",
+      "seeFull": "Alle Preise →",
+      "lifetime": "$99 lebenslang",
+      "free": "$0",
+      "perMonth": " /Mo.",
+      "agentSingular": "Agent",
+      "agentPlural": "Agenten",
+      "msgsPerDay": "Nachr./Tag"
+    },
+    "finalCta": {
+      "boxLabel": "Bereit",
+      "headline": "Deploy deinen ersten Agenten.",
+      "ctaPrimary": "Agent ausbrüten",
+      "ctaGhost": "Vorlagen ansehen",
+      "metaFrameworks": "4 Frameworks",
+      "metaNoCard": "keine Kreditkarte"
+    }
   }
 }
