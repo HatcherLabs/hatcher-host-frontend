@@ -27,6 +27,7 @@ interface WalletState {
   erc8004AgentId: string | null;
   erc8004RegisteredAt: string | null;
   erc8004IdentityContract: string;
+  hubAddress: string | null;
 }
 
 function explorerAddrUrl(address: string, chainId: number): string {
@@ -47,6 +48,8 @@ export function WalletTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copyMsg, setCopyMsg] = useState<string | null>(null);
+  const [registering, setRegistering] = useState(false);
+  const [registerMsg, setRegisterMsg] = useState<string | null>(null);
 
   const loadWallet = useCallback(async () => {
     setLoading(true);
@@ -74,6 +77,25 @@ export function WalletTab() {
       setCopyMsg('Copy failed');
       setTimeout(() => setCopyMsg(null), 1600);
     });
+  };
+
+  const registerOnChain = async () => {
+    setRegistering(true);
+    setRegisterMsg(null);
+    try {
+      const res = await api.registerAgentSkale(agent.id);
+      if (res.success) {
+        setRegisterMsg(res.data.txHash ? `Registered. tx=${res.data.txHash.slice(0, 10)}…` : 'Synced from on-chain');
+        await loadWallet();
+      } else {
+        setRegisterMsg(res.error ?? 'Registration failed');
+      }
+    } catch (e) {
+      setRegisterMsg(e instanceof Error ? e.message : 'Registration failed');
+    } finally {
+      setRegistering(false);
+      setTimeout(() => setRegisterMsg(null), 6000);
+    }
   };
 
   if (loading && !wallet) {
@@ -219,11 +241,18 @@ export function WalletTab() {
         </GlassCard>
       </div>
 
-      {/* ERC-8004 status (Phase 2 placeholder) */}
+      {/* ERC-8004 status (Phase 2) */}
       <GlassCard className="p-5">
-        <div className="flex items-center gap-3 mb-3">
-          <ShieldCheck size={16} className="text-[var(--phosphor)]" />
-          <h3 className="text-sm font-semibold text-[var(--text-primary)]">ERC-8004 On-Chain Identity</h3>
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div className="flex items-center gap-3">
+            <ShieldCheck size={16} className="text-[var(--phosphor)]" />
+            <h3 className="text-sm font-semibold text-[var(--text-primary)]">ERC-8004 On-Chain Identity</h3>
+          </div>
+          {wallet.erc8004AgentId && (
+            <span className="px-2 py-0.5 border border-[var(--phosphor)]/40 text-[var(--phosphor)] text-[10px] uppercase tracking-wider">
+              Verified
+            </span>
+          )}
         </div>
         {wallet.erc8004AgentId ? (
           <div className="space-y-2 text-xs">
@@ -236,11 +265,40 @@ export function WalletTab() {
             <div className="font-mono text-[var(--text-muted)] break-all">
               Agent ID: <span className="text-[var(--phosphor)]">{wallet.erc8004AgentId}</span>
             </div>
+            <div className="font-mono text-[var(--text-muted)] break-all">
+              Registry: <a
+                href={explorerAddrUrl(wallet.erc8004IdentityContract, wallet.chainId)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--phosphor)] hover:underline"
+              >{shortAddr(wallet.erc8004IdentityContract)}</a>
+            </div>
           </div>
         ) : (
-          <div className="text-xs text-[var(--text-muted)]">
-            Phase 2 — ERC-8004 registration ships next. Once landed, your agent gets a globally unique
-            on-chain ID and reputation that carries across services that speak the standard.
+          <div className="space-y-3">
+            <div className="text-xs text-[var(--text-muted)]">
+              Not yet registered. Hit the button below to claim a globally unique on-chain ID + reputation
+              surface in the SKALE-deployed ERC-8004 registry. Gas is paid by the Hatcher master wallet.
+              {wallet.hubAddress && (
+                <div className="mt-1 font-mono text-[10px]">
+                  Hub: <span className="text-[var(--text-primary)]">{shortAddr(wallet.hubAddress)}</span>
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => void registerOnChain()}
+              disabled={registering || !wallet.hubAddress}
+              className="inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-wider border border-[var(--phosphor)]/40 text-[var(--phosphor)] hover:bg-[var(--phosphor)]/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              title={!wallet.hubAddress ? 'Master Hub wallet not configured' : 'Register agent on-chain'}
+            >
+              <ShieldCheck size={12} />
+              {registering ? 'Registering on-chain…' : 'Verify on SKALE'}
+            </button>
+            {registerMsg && (
+              <div className={`text-[10px] ${registerMsg.includes('failed') || registerMsg.includes('Failed') ? 'text-red-400' : 'text-[var(--phosphor)]'}`}>
+                {registerMsg}
+              </div>
+            )}
           </div>
         )}
       </GlassCard>

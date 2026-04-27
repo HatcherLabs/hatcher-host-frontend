@@ -236,7 +236,19 @@ export const api = {
       erc8004AgentId: string | null;
       erc8004RegisteredAt: string | null;
       erc8004IdentityContract: string;
+      hubAddress: string | null;
     }>(`/agents/${id}/skale-wallet`),
+
+  /** Manually retry the ERC-8004 on-chain registration (Phase 2).
+   *  Used by the Wallet tab when the background fire-and-forget at
+   *  agent-create time failed (RPC down, master wallet unfunded). */
+  registerAgentSkale: (id: string) =>
+    req<{
+      agentId: string;
+      metadataUri: string;
+      txHash: string;
+      registeredAt: string;
+    }>(`/agents/${id}/skale-register`, { method: 'POST' }),
 
   /** Get usage analytics for an agent */
   getAgentUsage: (id: string) =>
