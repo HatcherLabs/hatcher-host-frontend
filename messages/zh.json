@@ -128,7 +128,8 @@
     "itemPrivacy": "隐私",
     "itemTerms": "条款",
     "itemCookies": "Cookies",
-    "itemImpressum": "版权信息"
+    "itemImpressum": "版权信息",
+    "poweredBy": "技术支持"
   },
   "landing": {
     "affiliateBanner": {
@@ -2670,6 +2671,13 @@
       "agentSingular": "代理",
       "agentPlural": "代理",
       "msgsPerDay": "条消息/天"
+    },
+    "ecosystem": {
+      "boxLabel": "生态系统",
+      "title": "构建于开放生态",
+      "sub": "四个智能体框架，两条链。Solana 驱动 $HATCHER 和支付。SKALE 提供免 Gas 的链上身份与信誉。",
+      "frameworksLabel": "框架",
+      "chainsLabel": "区块链"
     },
     "finalCta": {
       "boxLabel": "就绪",

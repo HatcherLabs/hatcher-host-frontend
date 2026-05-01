@@ -128,7 +128,8 @@
     "itemPrivacy": "Datenschutz",
     "itemTerms": "AGB",
     "itemCookies": "Cookies",
-    "itemImpressum": "Impressum"
+    "itemImpressum": "Impressum",
+    "poweredBy": "Unterstützt von"
   },
   "landing": {
     "affiliateBanner": {
@@ -2670,6 +2671,13 @@
       "agentSingular": "Agent",
       "agentPlural": "Agenten",
       "msgsPerDay": "Nachr./Tag"
+    },
+    "ecosystem": {
+      "boxLabel": "Ökosystem",
+      "title": "Auf dem offenen Stack gebaut",
+      "sub": "Vier Agenten-Frameworks, zwei Chains. Solana für $HATCHER und Zahlungen. SKALE für gasfreie On-Chain-Identität und Reputation.",
+      "frameworksLabel": "Frameworks",
+      "chainsLabel": "Chains"
     },
     "finalCta": {
       "boxLabel": "Bereit",

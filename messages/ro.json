@@ -128,7 +128,8 @@
     "itemPrivacy": "Confidențialitate",
     "itemTerms": "Termeni",
     "itemCookies": "Cookies",
-    "itemImpressum": "Impressum"
+    "itemImpressum": "Impressum",
+    "poweredBy": "Construit pe"
   },
   "landing": {
     "affiliateBanner": {
@@ -2670,6 +2671,13 @@
       "agentSingular": "agent",
       "agentPlural": "agenți",
       "msgsPerDay": "mesaje/zi"
+    },
+    "ecosystem": {
+      "boxLabel": "Ecosistem",
+      "title": "Construit pe stack-ul deschis",
+      "sub": "Patru framework-uri de agenți, două chain-uri. Solana susține $HATCHER și plățile. SKALE oferă identitate și reputație on-chain fără gas.",
+      "frameworksLabel": "Framework-uri",
+      "chainsLabel": "Chain-uri"
     },
     "finalCta": {
       "boxLabel": "Gata",
