@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { PanelShell } from './PanelShell';
 import { api } from '@/lib/api';
 
@@ -28,6 +28,24 @@ export function StatusPanel({
 }: Props) {
   const [busy, setBusy] = useState<Action | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [reputation, setReputation] = useState<{
+    scorePct: number | null;
+    total: number;
+    onChainCount: number;
+  } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void api.getAgentReputation(agentId).then((r) => {
+      if (cancelled || !r.success) return;
+      setReputation({
+        scorePct: r.data.scorePct,
+        total: r.data.total,
+        onChainCount: r.data.onChain.attestationCount,
+      });
+    }).catch(() => { /* best-effort */ });
+    return () => { cancelled = true; };
+  }, [agentId]);
 
   const run = useCallback(async (action: Action) => {
     setBusy(action);
@@ -57,6 +75,18 @@ export function StatusPanel({
         <Stat label="Uptime" value={uptimeSec ? `${minsUp}m` : '—'} />
         <Stat label="Msgs today" value={messagesToday ?? '—'} />
       </div>
+      {reputation && (reputation.total > 0 || reputation.onChainCount > 0) && (
+        <div className="mb-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-2">
+          <Stat
+            label="★ Reputation"
+            value={reputation.scorePct !== null ? `${reputation.scorePct}% (${reputation.total})` : '—'}
+          />
+          <Stat
+            label="On-chain"
+            value={reputation.onChainCount > 0 ? `${reputation.onChainCount} attestation${reputation.onChainCount === 1 ? '' : 's'}` : '—'}
+          />
+        </div>
+      )}
       {error && <div className="mb-3 rounded-lg bg-red-900/40 p-2 text-sm text-red-200">{error}</div>}
       <div className="flex gap-2">
         <button

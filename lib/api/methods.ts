@@ -221,6 +221,35 @@ export const api = {
   /** Get a single agent */
   getAgent: (id: string) => req<Agent>(`/agents/${id}`),
 
+  /** Get the agent's SKALE wallet info — address + native gas + USDC balance.
+   *  Owner/team only. Returns Phase 2 ERC-8004 fields (null until registered). */
+  getAgentSkaleWallet: (id: string) =>
+    req<{
+      address: string;
+      chainId: number;
+      rpcUrl: string;
+      ethWei: string;
+      ethFormatted: string;
+      usdcRaw: string;
+      usdcFormatted: string;
+      usdcContract: string;
+      erc8004AgentId: string | null;
+      erc8004RegisteredAt: string | null;
+      erc8004IdentityContract: string;
+      hubAddress: string | null;
+    }>(`/agents/${id}/skale-wallet`),
+
+  /** Manually retry the ERC-8004 on-chain registration (Phase 2).
+   *  Used by the Wallet tab when the background fire-and-forget at
+   *  agent-create time failed (RPC down, master wallet unfunded). */
+  registerAgentSkale: (id: string) =>
+    req<{
+      agentId: string;
+      metadataUri: string;
+      txHash: string;
+      registeredAt: string;
+    }>(`/agents/${id}/skale-register`, { method: 'POST' }),
+
   /** Get usage analytics for an agent */
   getAgentUsage: (id: string) =>
     req<{
@@ -1973,6 +2002,26 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ messageId, rating }),
     }),
+
+  /** Public agent reputation — DB thumbs aggregate + ERC-8004 on-chain mirror. */
+  getAgentReputation: (agentId: string) =>
+    req<{
+      upCount: number;
+      downCount: number;
+      total: number;
+      scorePct: number | null;
+      onChain: {
+        agentId: string | null;
+        registeredAt: string | null;
+        attestationCount: number;
+        activityMilestone: number;
+        lastTxHash: string | null;
+        lastTxAt: string | null;
+        contract: string;
+        identityContract: string;
+        chainId: number;
+      };
+    }>(`/agents/${agentId}/reputation`),
 
   // Knowledge base (ElizaOS / Milady RAG documents)
   getKnowledge: (agentId: string) =>

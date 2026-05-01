@@ -19,6 +19,7 @@
     "create": "Create",
     "city": "City",
     "analytics": "Analytics",
+    "skale": "SKALE Wallets",
     "team": "Team",
     "billing": "Billing",
     "settings": "Settings",
@@ -127,7 +128,8 @@
     "itemPrivacy": "Privacy",
     "itemTerms": "Terms",
     "itemCookies": "Cookies",
-    "itemImpressum": "Impressum"
+    "itemImpressum": "Impressum",
+    "poweredBy": "Powered by"
   },
   "landing": {
     "affiliateBanner": {
@@ -1301,6 +1303,7 @@
         "sessions": "Sessions",
         "knowledge": "Knowledge",
         "addons": "Add-ons",
+        "wallet": "Wallet",
         "files": "Files",
         "workspace": "Workspace",
         "schedules": "Schedules",
@@ -2668,6 +2671,13 @@
       "agentSingular": "agent",
       "agentPlural": "agents",
       "msgsPerDay": "msg/day"
+    },
+    "ecosystem": {
+      "boxLabel": "Ecosystem",
+      "title": "Built on the open stack",
+      "sub": "Four agent frameworks, two chains. Solana powers $HATCHER and payments. SKALE provides gas-free on-chain identity and reputation.",
+      "frameworksLabel": "Frameworks",
+      "chainsLabel": "Chains"
     },
     "finalCta": {
       "boxLabel": "Ready",

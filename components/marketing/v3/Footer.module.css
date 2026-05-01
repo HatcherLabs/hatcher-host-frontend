@@ -52,9 +52,50 @@
 }
 .link:hover { color: var(--accent); }
 
-.bottom {
+.partners {
   max-width: 1280px;
   margin: 64px auto 0;
+  padding: 24px 20px 0;
+  border-top: 1px solid var(--border-line);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-family: var(--font-mono);
+}
+.partnersHead {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-right: 8px;
+}
+.partner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+}
+.partner:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(74, 222, 128, 0.06);
+}
+.partner svg { display: block; }
+
+.bottom {
+  max-width: 1280px;
+  margin: 24px auto 0;
   padding: 24px 20px 0;
   border-top: 1px solid var(--border-line);
   display: flex;

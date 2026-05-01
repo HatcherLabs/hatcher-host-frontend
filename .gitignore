@@ -54,3 +54,4 @@ e2e-*.png
 assets-raw/*
 !assets-raw/.gitkeep
 !assets-raw/README.md
+.env.local.bak.lan

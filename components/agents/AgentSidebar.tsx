@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   TerminalSquare,
   ShoppingCart,
+  Wallet,
 } from 'lucide-react';
 import type { Tab } from './AgentContext';
 import { STATUS_STYLES, useAgentContext } from './AgentContext';
@@ -49,6 +50,7 @@ function getTabs(framework: string | undefined, tTabs: ReturnType<typeof useTran
       : []),
     { id: 'knowledge' as const, label: tTabs('knowledge'), icon: <BookOpen size={16} />, group: 'data' as const },
     { id: 'addons' as const, label: tTabs('addons'), icon: <ShoppingCart size={16} />, group: 'data' as const },
+    { id: 'wallet' as const, label: tTabs('wallet'), icon: <Wallet size={16} />, group: 'data' as const },
     { id: 'files', label: tTabs('files'), icon: <FolderOpen size={16} />, group: 'data' },
     ...(framework === 'openclaw' || framework === 'hermes' ? [{ id: 'workspace' as const, label: tTabs('workspace'), icon: <FolderTree size={16} />, group: 'data' as const }] : []),
     { id: 'schedules', label: tTabs('schedules'), icon: <Clock size={16} />, group: 'advanced' },

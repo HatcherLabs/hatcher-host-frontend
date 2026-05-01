@@ -4,10 +4,21 @@ import { type RefObject } from 'react';
 import { motion } from 'framer-motion';
 import { Bot } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { DEFAULT_PROMPTS } from '../../AgentContext';
+import { DEFAULT_PROMPTS, useAgentContext } from '../../AgentContext';
 import ChatMessage from './ChatMessage';
 import { MESSAGES_WINDOW } from './constants';
 import type { ChatMsg } from './types';
+
+function toolGlyph(name: string): string {
+  if (name === '*') return '🔧';
+  if (name.startsWith('exec') || name === 'shell' || name === 'bash') return '⚡';
+  if (name.includes('web_search') || name === 'search') return '🔎';
+  if (name.includes('web_fetch') || name === 'fetch' || name === 'curl') return '🌐';
+  if (name.includes('write') || name.includes('mkdir') || name.includes('create')) return '✏️';
+  if (name.includes('read') || name.includes('cat') || name.includes('ls')) return '📂';
+  if (name.includes('memory')) return '🧠';
+  return '🔧';
+}
 
 interface MessageListProps {
   messages: ChatMsg[];
@@ -47,6 +58,10 @@ export function MessageList({
   bottomRef,
 }: MessageListProps) {
   const t = useTranslations('dashboard.agentDetail.chat');
+  const { inflightTools, completedTools } = useAgentContext();
+  const showToolStrip = (inflightTools.length > 0 || completedTools.length > 0)
+    && messages.length > 0
+    && messages[messages.length - 1]?.streaming;
   return (
     <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overscroll-contain space-y-4 mb-4 pr-1" style={{ overflowAnchor: 'none' as const }}>
       {messages.length === 0 && (
@@ -106,6 +121,32 @@ export function MessageList({
           framework={framework}
         />
       ))}
+
+      {showToolStrip && (
+        <div className="ml-1 space-y-1 pl-2 border-l border-[var(--border-subtle)]">
+          {completedTools.map((t) => (
+            <div key={`done-${t.callId}`} className="flex items-center gap-2 text-[11px] text-[var(--text-muted)]">
+              <span>{toolGlyph(t.name)}</span>
+              <span className="font-mono">{t.name}</span>
+              <span className="text-[var(--text-muted)] opacity-60">· done</span>
+            </div>
+          ))}
+          {inflightTools.map((tool) => (
+            <div key={`live-${tool.callId}`} className="flex items-center gap-2 text-[11px] text-[var(--color-accent)]">
+              <span className="animate-pulse">{toolGlyph(tool.name)}</span>
+              <span className="font-mono">{tool.name}</span>
+              {tool.argsPreview && (
+                <span
+                  className="truncate font-mono text-[var(--text-muted)] max-w-[40ch]"
+                  title={tool.argsPreview}
+                >
+                  {tool.argsPreview.length > 60 ? tool.argsPreview.slice(0, 57) + '…' : tool.argsPreview}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       <div ref={bottomRef} />
     </div>

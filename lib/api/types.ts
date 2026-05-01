@@ -70,6 +70,13 @@ export interface Agent {
   config?: Record<string, unknown>;
   features?: Array<{ featureKey: string }>;
   isPublic?: boolean;
+  // SKALE Phase 1+ — public wallet address for the agent (always non-null
+  // for agents created after the schema migration). erc8004 fields appear
+  // once Phase 2 registration ships. The encrypted private key is server-
+  // only and never reaches this type.
+  skaleWalletAddress?: string | null;
+  skaleAgentId?: string | null;
+  skaleRegisteredAt?: string | null;
   createdAt: string;
   updatedAt?: string;
 }

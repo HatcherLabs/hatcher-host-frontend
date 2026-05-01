@@ -15,6 +15,18 @@ function getWsUrl(agentId: string): string {
 
 type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
 
+/** Structured tool-call event surfaced from the agent container while
+ *  it runs its agentic loop. UI consumers render an inline indicator
+ *  ("🔧 calling exec…") so users see what the agent is doing instead
+ *  of staring at silence between thinking and final answer. */
+export interface ChatToolEvent {
+  callId: string;
+  name: string;
+  phase: 'start' | 'done';
+  argsPreview?: string;
+  agentId?: string;
+}
+
 interface UseWebSocketChatOptions {
   agentId: string;
   /** Whether the hook should attempt to connect (e.g. only when authenticated) */
@@ -22,6 +34,9 @@ interface UseWebSocketChatOptions {
   onToken: (token: string) => void;
   onDone: (content: string, model: string) => void;
   onError: (error: string) => void;
+  /** Called when the agent invokes a tool mid-stream. Optional — chats
+   *  that don't render tool indicators can omit. */
+  onToolEvent?: (evt: ChatToolEvent) => void;
   /** Called when connection status changes */
   onStatusChange?: (agentId: string, status: string) => void;
   onRateLimit?: (error: string, limit: number, used: number) => void;
@@ -49,6 +64,7 @@ export function useWebSocketChat({
   onToken,
   onDone,
   onError,
+  onToolEvent,
   onStatusChange,
   onRateLimit,
 }: UseWebSocketChatOptions): UseWebSocketChatReturn {
@@ -67,11 +83,13 @@ export function useWebSocketChat({
   const onTokenRef = useRef(onToken);
   const onDoneRef = useRef(onDone);
   const onErrorRef = useRef(onError);
+  const onToolEventRef = useRef(onToolEvent);
   const onStatusChangeRef = useRef(onStatusChange);
   const onRateLimitRef = useRef(onRateLimit);
   onTokenRef.current = onToken;
   onDoneRef.current = onDone;
   onErrorRef.current = onError;
+  onToolEventRef.current = onToolEvent;
   onStatusChangeRef.current = onStatusChange;
   onRateLimitRef.current = onRateLimit;
 
@@ -143,6 +161,17 @@ export function useWebSocketChat({
           break;
         case 'chat_error':
           onErrorRef.current(msg.payload.error as string);
+          break;
+        case 'chat_tool_event':
+          if (onToolEventRef.current) {
+            onToolEventRef.current({
+              callId: msg.payload.callId as string,
+              name: msg.payload.name as string,
+              phase: msg.payload.phase as 'start' | 'done',
+              argsPreview: msg.payload.argsPreview as string | undefined,
+              agentId: msg.payload.agentId as string | undefined,
+            });
+          }
           break;
         case 'rate_limit':
           if (onRateLimitRef.current) {

@@ -33,6 +33,28 @@ export function Footer() {
         ))}
       </div>
 
+      <div className={styles.partners}>
+        <span className={styles.partnersHead}>{t('poweredBy')}</span>
+        <a
+          href="https://skale.space"
+          aria-label="SKALE Network"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.partner}
+        >
+          <SkaleLogo /> <span>SKALE</span>
+        </a>
+        <a
+          href="https://solana.com"
+          aria-label="Solana"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.partner}
+        >
+          <SolanaLogo /> <span>Solana</span>
+        </a>
+      </div>
+
       <div className={styles.bottom}>
         <div className={styles.bottomLeft}>
           © HHX Technology SRL · v{APP_VERSION}
@@ -50,6 +72,28 @@ export function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+function SkaleLogo() {
+  // Octagonal mark + "SKALE" wordmark, mono-style. Uses currentColor so it
+  // inherits the partner pill's text color (and shifts to accent on hover).
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden>
+      <polygon points="8,2 16,2 22,8 22,16 16,22 8,22 2,16 2,8" />
+      <polygon points="8,7 16,7 17,12 16,17 8,17 7,12" fill="currentColor" stroke="none" opacity="0.85" />
+    </svg>
+  );
+}
+
+function SolanaLogo() {
+  // Three-bar Solana wordmark glyph, simplified for mono treatment.
+  return (
+    <svg width="22" height="18" viewBox="0 0 24 18" fill="currentColor" aria-hidden>
+      <path d="M4 3 L20 3 L17 0 L1 0 Z" />
+      <path d="M1 10 L17 10 L20 7 L4 7 Z" />
+      <path d="M4 17 L20 17 L17 14 L1 14 Z" />
+    </svg>
   );
 }
 
