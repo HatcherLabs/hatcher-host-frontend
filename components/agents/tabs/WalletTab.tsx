@@ -81,6 +81,8 @@ export function WalletTab() {
   const [registering, setRegistering] = useState(false);
   const [registerMsg, setRegisterMsg] = useState<string | null>(null);
   const [signingToggling, setSigningToggling] = useState(false);
+  const [signingPendingConfirm, setSigningPendingConfirm] = useState(false);
+  const [signingError, setSigningError] = useState<string | null>(null);
 
   const advanced = (agent.config?.advanced as Record<string, unknown> | undefined) ?? {};
   const signingEnabled = advanced['agent_wallet_signer'] === true;
@@ -121,16 +123,22 @@ export function WalletTab() {
     });
   };
 
-  const toggleSigning = async () => {
-    const next = !signingEnabled;
-    if (next && !confirm(
-      'Enable runtime signing?\n\n' +
-      'This injects the agent\'s SKALE private key into the container env (SKALE_PRIVATE_KEY) on next start. ' +
-      'The agent will be able to sign + submit transactions on its own.\n\n' +
-      'You can revoke at any time. The wallet stays receive-only until then.\n\n' +
-      'Restart the agent after toggling for the change to take effect.',
-    )) return;
+  // Two-step inline confirm — native confirm() is blocked in iOS WKWebView
+  // (the Android app embeds the dashboard in a WebView), and an inline
+  // pattern is consistent with how the rest of the dashboard gates
+  // destructive toggles (e.g. delete-agent on the management page).
+  const requestEnableSigning = () => {
+    setSigningError(null);
+    setSigningPendingConfirm(true);
+  };
 
+  const cancelEnableSigning = () => {
+    setSigningPendingConfirm(false);
+  };
+
+  const applySigningChange = async (next: boolean) => {
+    setSigningPendingConfirm(false);
+    setSigningError(null);
     setSigningToggling(true);
     try {
       await api.updateAgent(agent.id, {
@@ -138,7 +146,7 @@ export function WalletTab() {
       } as never);
       await loadAgent();
     } catch (e) {
-      alert(e instanceof Error ? e.message : 'Failed to toggle signing');
+      setSigningError(e instanceof Error ? e.message : 'Failed to toggle signing');
     } finally {
       setSigningToggling(false);
     }
@@ -477,22 +485,59 @@ export function WalletTab() {
             </span>
           </div>
         )}
-        <button
-          onClick={() => void toggleSigning()}
-          disabled={signingToggling}
-          className={`inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-wider border transition disabled:opacity-50 disabled:cursor-not-allowed ${
-            signingEnabled
-              ? 'border-amber-500/40 text-amber-400 hover:bg-amber-500/10'
-              : 'border-[var(--phosphor)]/40 text-[var(--phosphor)] hover:bg-[var(--phosphor)]/10'
-          }`}
-        >
-          <Key size={12} />
-          {signingToggling
-            ? 'Updating…'
-            : signingEnabled
-              ? 'Disable signing'
-              : 'Enable agent signing'}
-        </button>
+        {signingPendingConfirm ? (
+          <div className="border border-amber-500/40 bg-amber-500/5 p-3 space-y-3">
+            <div className="flex items-start gap-2 text-[11px] text-amber-400">
+              <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
+              <span>
+                Enabling injects the agent&apos;s SKALE private key into the container env
+                (<code className="font-mono">SKALE_PRIVATE_KEY</code>) on next start. The agent
+                will be able to sign + submit transactions on its own. You can revoke at any
+                time. Restart the container after toggling for the change to take effect.
+              </span>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => void applySigningChange(true)}
+                disabled={signingToggling}
+                className="inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-wider border border-amber-500/60 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition disabled:opacity-50"
+              >
+                <Key size={12} />
+                {signingToggling ? 'Enabling…' : 'Confirm enable'}
+              </button>
+              <button
+                onClick={cancelEnableSigning}
+                disabled={signingToggling}
+                className="inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-wider border border-[var(--border-subtle)] text-[var(--text-muted)] hover:bg-white/5 transition disabled:opacity-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => signingEnabled ? void applySigningChange(false) : requestEnableSigning()}
+            disabled={signingToggling}
+            className={`inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-wider border transition disabled:opacity-50 disabled:cursor-not-allowed ${
+              signingEnabled
+                ? 'border-amber-500/40 text-amber-400 hover:bg-amber-500/10'
+                : 'border-[var(--phosphor)]/40 text-[var(--phosphor)] hover:bg-[var(--phosphor)]/10'
+            }`}
+          >
+            <Key size={12} />
+            {signingToggling
+              ? 'Updating…'
+              : signingEnabled
+                ? 'Disable signing'
+                : 'Enable agent signing'}
+          </button>
+        )}
+        {signingError && (
+          <div className="mt-3 flex items-start gap-2 p-3 border border-red-500/30 bg-red-500/5 text-[11px] text-red-400">
+            <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
+            <span>{signingError}</span>
+          </div>
+        )}
       </GlassCard>
 
       {/* Network footer */}
