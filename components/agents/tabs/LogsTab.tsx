@@ -32,7 +32,10 @@ import { api } from '@/lib/api';
  *  that don't include it. The tail is live-updated but scrollback is
  *  capped so free/starter/pro only see recent activity unless they
  *  unlock the full history. */
-const FREE_LOG_LINE_CAP = 20;
+// Mirrors FREE_TAIL on the API side (routes/agents/crud.ts). Bumped from
+// 20 → 100 (2026-04-29) so free-tier users can actually see what their
+// agent is doing — 20 lines covered ~one prompt + reply with nothing else.
+const FREE_LOG_LINE_CAP = 100;
 
 /* ── Framework log format descriptions ── */
 const FRAMEWORK_LOG_INFO: Record<string, { label: string; description: string; accent: string; border: string; bg: string }> = {

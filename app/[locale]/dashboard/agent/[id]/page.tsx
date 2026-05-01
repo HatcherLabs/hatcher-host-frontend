@@ -16,7 +16,7 @@ interface AgentDetail extends Agent {
   isByok?: boolean;
 }
 import { useAuth } from '@/lib/auth-context';
-import { useWebSocketChat } from '@/hooks/useWebSocketChat';
+import { useWebSocketChat, type ChatToolEvent } from '@/hooks/useWebSocketChat';
 import { FRAMEWORKS, TIERS, getBYOKProvider } from '@hatcher/shared';
 import type { UserTierKey } from '@hatcher/shared';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -289,6 +289,10 @@ export default function AgentManagePage() {
   const wsLogsReconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wsLogsRetryCountRef = useRef(0);
   const wsStreamingMsgRef = useRef(false);
+  // Tool-call indicators surfaced from the agent container during streaming.
+  // Cleared on each new message; populated by ws-chat tool events.
+  const [inflightTools, setInflightTools] = useState<Array<{ callId: string; name: string; argsPreview?: string }>>([]);
+  const [completedTools, setCompletedTools] = useState<Array<{ callId: string; name: string }>>([]);
 
   // ─── Custom hooks ─────────────────────────────────────────
 
@@ -664,8 +668,28 @@ export default function AgentManagePage() {
         return updated;
       });
     },
+    onToolEvent: (evt: ChatToolEvent) => {
+      if (evt.phase === 'start') {
+        setInflightTools((prev) => prev.some((t) => t.callId === evt.callId)
+          ? prev
+          : [...prev, { callId: evt.callId, name: evt.name, argsPreview: evt.argsPreview }]);
+      } else if (evt.callId === 'all' && evt.name === '*') {
+        setInflightTools((prev) => {
+          setCompletedTools((c) => [...c, ...prev.map((t) => ({ callId: t.callId, name: t.name }))].slice(-6));
+          return [];
+        });
+      } else {
+        setInflightTools((prev) => {
+          const matched = prev.find((t) => t.callId === evt.callId);
+          if (matched) setCompletedTools((c) => [...c, { callId: matched.callId, name: matched.name }].slice(-6));
+          return prev.filter((t) => t.callId !== evt.callId);
+        });
+      }
+    },
     onDone: (_content, _model) => {
       wsStreamingMsgRef.current = false;
+      setInflightTools([]);
+      setCompletedTools([]);
       setMessages((prev) => {
         const updated = [...prev];
         const last = updated[updated.length - 1];
@@ -882,6 +906,7 @@ export default function AgentManagePage() {
       msgCount, hasUnlimitedChat, isByok, msgLimit, remaining, isLimitReached,
       bottomRef, inputRef, sendMessage, handleKeyDown, sendCooldown,
       wsConnected: wsChat.isConnected,
+      inflightTools, completedTools,
       configName: config.configName, setConfigName: config.setConfigName,
       configDesc: config.configDesc, setConfigDesc: config.setConfigDesc,
       configBio: config.configBio, setConfigBio: config.setConfigBio,
@@ -927,6 +952,7 @@ export default function AgentManagePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, agent, stats, tab, logs.logs, logs.logsLoading, logs.logFilter, logs.logSearch, logs.autoScroll, logs.filteredLogs, wsLogsConnected,
     messages, input, sending, sendCooldown, chatError, chatErrorType, msgCount, msgLimit, remaining, isLimitReached,
+    inflightTools, completedTools,
     config.configName, config.configDesc, config.configBio, config.configLore, config.configTopics,
     config.configStyle, config.configAdjectives, config.configSystemPrompt, config.configSkills,
     config.configModel, config.configProvider, config.customModelInput, config.useCustomModel,

@@ -1,7 +1,25 @@
 'use client';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { PanelShell } from './PanelShell';
-import { useWebSocketChat } from '@/hooks/useWebSocketChat';
+import { useWebSocketChat, type ChatToolEvent } from '@/hooks/useWebSocketChat';
+
+interface InflightTool {
+  callId: string;
+  name: string;
+  argsPreview?: string;
+  startedAt: number;
+}
+
+function toolGlyph(name: string): string {
+  if (name === '*') return '🔧';
+  if (name.startsWith('exec') || name === 'shell' || name === 'bash') return '⚡';
+  if (name.includes('web_search') || name === 'search') return '🔎';
+  if (name.includes('web_fetch') || name === 'fetch' || name === 'curl') return '🌐';
+  if (name.includes('write') || name.includes('mkdir') || name.includes('create')) return '✏️';
+  if (name.includes('read') || name.includes('cat') || name.includes('ls')) return '📂';
+  if (name.includes('memory')) return '🧠';
+  return '🔧';
+}
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
@@ -34,8 +52,39 @@ export function ChatPanel({
     onStreamingChange?.(v);
   }, [onStreamingChange]);
   const [input, setInput] = useState('');
+  const [inflightTools, setInflightTools] = useState<InflightTool[]>([]);
+  const [completedTools, setCompletedTools] = useState<InflightTool[]>([]);
   const bufferRef = useRef('');
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleToolEvent = useCallback((evt: ChatToolEvent) => {
+    if (evt.phase === 'start') {
+      setInflightTools((prev) => {
+        if (prev.some((t) => t.callId === evt.callId)) return prev;
+        return [...prev, {
+          callId: evt.callId,
+          name: evt.name,
+          argsPreview: evt.argsPreview,
+          startedAt: Date.now(),
+        }];
+      });
+    } else {
+      // OpenAI-compat returns {callId:'all', name:'*'} to close the
+      // whole tool-call round; treat it as "all current inflight done".
+      if (evt.callId === 'all' && evt.name === '*') {
+        setInflightTools((prev) => {
+          setCompletedTools((c) => [...c, ...prev].slice(-5));
+          return [];
+        });
+      } else {
+        setInflightTools((prev) => {
+          const matched = prev.find((t) => t.callId === evt.callId);
+          if (matched) setCompletedTools((c) => [...c, matched].slice(-5));
+          return prev.filter((t) => t.callId !== evt.callId);
+        });
+      }
+    }
+  }, []);
 
   const { send, isConnected } = useWebSocketChat({
     agentId,
@@ -44,15 +93,18 @@ export function ChatPanel({
       bufferRef.current += tok;
       onUpdateLast(bufferRef.current);
     },
+    onToolEvent: handleToolEvent,
     onDone: (content) => {
       const final = content || bufferRef.current;
       onUpdateLast(final);
       bufferRef.current = '';
+      setInflightTools([]);
       setStreaming(false);
     },
     onError: (err) => {
       onUpdateLast(`Error: ${err}`);
       bufferRef.current = '';
+      setInflightTools([]);
       setStreaming(false);
     },
   });
@@ -64,6 +116,8 @@ export function ChatPanel({
     onAppend({ role: 'user', content: text, ts: Date.now() });
     onAppend({ role: 'assistant', content: '', ts: Date.now() });
     bufferRef.current = '';
+    setInflightTools([]);
+    setCompletedTools([]);
     setStreaming(true);
     const ok = send(text);
     if (!ok) {
@@ -104,6 +158,28 @@ export function ChatPanel({
             </span>
           </div>
         ))}
+        {streaming && (inflightTools.length > 0 || completedTools.length > 0) && (
+          <div className="space-y-1 pt-1">
+            {completedTools.map((t) => (
+              <div key={`done-${t.callId}`} className="flex items-center gap-2 text-[11px] text-neutral-500">
+                <span>{toolGlyph(t.name)}</span>
+                <span className="font-mono">{t.name}</span>
+                <span className="text-neutral-600">· done</span>
+              </div>
+            ))}
+            {inflightTools.map((t) => (
+              <div key={`live-${t.callId}`} className="flex items-center gap-2 text-[11px] text-[var(--phosphor,#39ff88)]">
+                <span className="animate-pulse">{toolGlyph(t.name)}</span>
+                <span className="font-mono">{t.name}</span>
+                {t.argsPreview && (
+                  <span className="truncate font-mono text-neutral-400" title={t.argsPreview}>
+                    {t.argsPreview.length > 60 ? t.argsPreview.slice(0, 57) + '…' : t.argsPreview}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       <form onSubmit={submit} className="flex gap-2">
         <input
