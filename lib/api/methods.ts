@@ -2003,6 +2003,26 @@ export const api = {
       body: JSON.stringify({ messageId, rating }),
     }),
 
+  /** Public agent reputation — DB thumbs aggregate + ERC-8004 on-chain mirror. */
+  getAgentReputation: (agentId: string) =>
+    req<{
+      upCount: number;
+      downCount: number;
+      total: number;
+      scorePct: number | null;
+      onChain: {
+        agentId: string | null;
+        registeredAt: string | null;
+        attestationCount: number;
+        activityMilestone: number;
+        lastTxHash: string | null;
+        lastTxAt: string | null;
+        contract: string;
+        identityContract: string;
+        chainId: number;
+      };
+    }>(`/agents/${agentId}/reputation`),
+
   // Knowledge base (ElizaOS / Milady RAG documents)
   getKnowledge: (agentId: string) =>
     req<{ files: Array<{ name: string; size: number; createdAt: string }>; totalFiles: number }>(`/agents/${agentId}/knowledge`),

@@ -59,9 +59,19 @@ function shortAddr(addr: string): string {
   return addr.length > 14 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr;
 }
 
+function explorerBase(chainId: number): string {
+  // Verified via SKALE docs / chainlist: testnet 324705682 → blockscout at
+  // base-sepolia-testnet-explorer; mainnet uses skale-base-explorer.
+  if (chainId === 324705682) return 'https://base-sepolia-testnet-explorer.skalenodes.com';
+  return 'https://skale-base-explorer.skalenodes.com';
+}
+
 function explorerAddrUrl(address: string, chainId: number): string {
-  if (chainId === 324705682) return `https://base-sepolia-testnet.skalenodes.com/address/${address}`;
-  return `https://base.skalenodes.com/address/${address}`;
+  return `${explorerBase(chainId)}/address/${address}`;
+}
+
+function explorerTxUrl(txHash: string, chainId: number): string {
+  return `${explorerBase(chainId)}/tx/${txHash}`;
 }
 
 export default function SkaleDashboardPage() {
@@ -290,7 +300,7 @@ export default function SkaleDashboardPage() {
           <div className="text-[10px] text-[var(--text-muted)] mt-1">on-chain identity</div>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0, transition: { delay: 0.1 } }} className="border border-[var(--border-subtle)] p-4">
-          <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)] mb-1">Total sFUEL</div>
+          <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)] mb-1">Total CREDIT</div>
           <div className="text-2xl font-mono text-[var(--text-primary)]">{totals.totalEth.toFixed(4)}</div>
           <div className="text-[10px] text-[var(--text-muted)] mt-1">native gas</div>
         </motion.div>
@@ -327,7 +337,7 @@ export default function SkaleDashboardPage() {
           )}
         </div>
         <div className="text-xs text-[var(--text-muted)]">
-          Connect MetaMask, Rabby, or any EIP-1193 wallet to send sFUEL or USDC to one of your agents — just copy the
+          Connect MetaMask, Rabby, or any EIP-1193 wallet to send CREDIT or USDC to one of your agents — just copy the
           deposit address from the table below. Required for Phase 4 x402 payments once the WalletConnect modal lands.
         </div>
         {evmError && (
@@ -390,7 +400,7 @@ export default function SkaleDashboardPage() {
               <div>amount: <span className="text-[var(--text-primary)]">${demoResult.usd.toFixed(2)}</span></div>
               <div>payer: <span className="text-[var(--text-primary)]">{shortAddr(demoResult.payer)}</span></div>
               <div>tx: <a
-                href={`https://base-sepolia-testnet.skalenodes.com/tx/${demoResult.txSignature}`}
+                href={explorerTxUrl(demoResult.txSignature, 324705682)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[var(--phosphor)] hover:underline"
@@ -422,7 +432,7 @@ export default function SkaleDashboardPage() {
               <tr className="border-b border-[var(--border-subtle)] text-left text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">
                 <th className="px-4 py-3">Agent</th>
                 <th className="px-4 py-3">Address</th>
-                <th className="px-4 py-3 text-right">sFUEL</th>
+                <th className="px-4 py-3 text-right">CREDIT</th>
                 <th className="px-4 py-3 text-right">USDC</th>
                 <th className="px-4 py-3">ERC-8004</th>
                 <th className="px-4 py-3"></th>

@@ -111,6 +111,12 @@ export interface AgentContextValue {
   handleKeyDown: (e: React.KeyboardEvent) => void;
   sendCooldown: boolean;
   wsConnected: boolean;
+  /** Tool calls currently in flight on the agent container, surfaced live
+   *  via the WS chat stream. Cleared between messages. */
+  inflightTools: Array<{ callId: string; name: string; argsPreview?: string }>;
+  /** Tool calls that finished during the current streaming response —
+   *  used to render the trailing "✓ done" line under the live indicator. */
+  completedTools: Array<{ callId: string; name: string }>;
 
   // Config
   configName: string;

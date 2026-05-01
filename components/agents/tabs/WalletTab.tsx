@@ -1,19 +1,25 @@
 'use client';
 
 // ============================================================
-// WalletTab — SKALE Phase 1
+// WalletTab — SKALE wallet, identity, reputation, signing
 //
-// Shows the agent's SKALE wallet address, native gas + USDC
-// balances, and a QR code for the deposit address. Read-only
-// for now — Phase 2 adds an "Verify on SKALE" badge once the
-// agent is registered against ERC-8004, Phase 3 adds the
-// "Enable agent signing" toggle, Phase 4 adds the spend / earn
-// view via MPP.
+// Renders four cards stacked top-to-bottom:
+//   1. Wallet — public address, CREDIT + USDC balances, deposit QR.
+//   2. ERC-8004 Identity — on-chain agentId, registry contract,
+//      registered-at timestamp; "Verify on SKALE" button when not
+//      yet registered.
+//   3. On-Chain Reputation — DB thumbs aggregate (up/down/score%)
+//      paired with the on-chain attestation count cached from the
+//      ReputationRegistry, plus a link to the latest tx.
+//   4. Runtime Signing — opt-in toggle that injects the encrypted
+//      private key into the container env so the agent process can
+//      sign + submit transactions itself. Off by default; receive-only
+//      until the user explicitly enables it.
 // ============================================================
 
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Wallet as WalletIcon, Copy, RefreshCw, ExternalLink, ShieldCheck, Zap, Key, AlertTriangle } from 'lucide-react';
+import { Wallet as WalletIcon, Copy, RefreshCw, ExternalLink, ShieldCheck, Zap, Key, AlertTriangle, Star, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useAgentContext, GlassCard } from '../AgentContext';
 import { api } from '@/lib/api';
 
@@ -30,12 +36,35 @@ interface WalletState {
   hubAddress: string | null;
 }
 
+interface ReputationState {
+  upCount: number;
+  downCount: number;
+  total: number;
+  scorePct: number | null;
+  onChain: {
+    agentId: string | null;
+    attestationCount: number;
+    activityMilestone: number;
+    lastTxHash: string | null;
+    lastTxAt: string | null;
+    contract: string;
+    chainId: number;
+  };
+}
+
+function explorerBase(chainId: number): string {
+  // Verified via SKALE docs / chainlist: testnet 324705682 → blockscout at
+  // base-sepolia-testnet-explorer; mainnet uses skale-base-explorer.
+  if (chainId === 324705682) return 'https://base-sepolia-testnet-explorer.skalenodes.com';
+  return 'https://skale-base-explorer.skalenodes.com';
+}
+
 function explorerAddrUrl(address: string, chainId: number): string {
-  // SKALE Base Sepolia (testnet) explorer; switch when mainnet (1564830818).
-  if (chainId === 324705682) {
-    return `https://base-sepolia-testnet.skalenodes.com/address/${address}`;
-  }
-  return `https://base.skalenodes.com/address/${address}`;
+  return `${explorerBase(chainId)}/address/${address}`;
+}
+
+function explorerTxUrl(txHash: string, chainId: number): string {
+  return `${explorerBase(chainId)}/tx/${txHash}`;
 }
 
 function shortAddr(addr: string): string {
@@ -45,6 +74,7 @@ function shortAddr(addr: string): string {
 export function WalletTab() {
   const { agent, loadAgent } = useAgentContext();
   const [wallet, setWallet] = useState<WalletState | null>(null);
+  const [reputation, setReputation] = useState<ReputationState | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copyMsg, setCopyMsg] = useState<string | null>(null);
@@ -66,6 +96,14 @@ export function WalletTab() {
       setError(e instanceof Error ? e.message : 'Could not load wallet');
     } finally {
       setLoading(false);
+    }
+    // Reputation is best-effort — failure shouldn't break the rest of the
+    // wallet view (it's a public endpoint that can be down independently).
+    try {
+      const rep = await api.getAgentReputation(agent.id);
+      if (rep.success) setReputation(rep.data);
+    } catch {
+      /* swallow — keep card hidden */
     }
   }, [agent.id]);
 
@@ -219,17 +257,18 @@ export function WalletTab() {
               {copyMsg && <div className="text-[10px] text-[var(--phosphor)] mt-1">{copyMsg}</div>}
             </div>
             <div className="text-xs text-[var(--text-muted)] leading-relaxed">
-              Anyone can send native gas (sFUEL) or USDC to this address. Funds belong to the agent — they
-              power Phase 4 x402/MPP payments and Phase 3 on-chain skill calls.
+              Anyone can send native gas (CREDIT) or USDC to this address. Funds belong to the agent —
+              they cover its on-chain activity (gas for ERC-8004 registration, reputation attestations,
+              future agent-to-agent payments).
               {isTestnet && (
                 <>
-                  {' '}On testnet, grab free sFUEL from{' '}
+                  {' '}On testnet, grab free CREDITs from the{' '}
                   <a
-                    href="https://www.sfuelstation.com/"
+                    href="https://base-sepolia-faucet.skale.space"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[var(--phosphor)] hover:underline"
-                  >sfuelstation.com</a>.
+                  >SKALE Base Sepolia faucet</a>.
                 </>
               )}
             </div>
@@ -244,7 +283,7 @@ export function WalletTab() {
             <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
               <Zap size={12} /> Native Gas
             </div>
-            <span className="text-[10px] text-[var(--text-muted)]">sFUEL</span>
+            <span className="text-[10px] text-[var(--text-muted)]">CREDIT</span>
           </div>
           <div className="text-2xl font-mono text-[var(--text-primary)]">{wallet.ethFormatted}</div>
         </GlassCard>
@@ -268,7 +307,7 @@ export function WalletTab() {
         </GlassCard>
       </div>
 
-      {/* ERC-8004 status (Phase 2) */}
+      {/* ERC-8004 identity — on-chain agent registration */}
       <GlassCard className="p-5">
         <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <div className="flex items-center gap-3">
@@ -330,7 +369,82 @@ export function WalletTab() {
         )}
       </GlassCard>
 
-      {/* Phase 3 — Runtime signing opt-in */}
+      {/* ERC-8004 Reputation — DB thumbs aggregate + on-chain attestations */}
+      {wallet.erc8004AgentId && reputation && (
+        <GlassCard className="p-5">
+          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <div className="flex items-center gap-3">
+              <Star size={16} className="text-[var(--phosphor)]" />
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">On-Chain Reputation</h3>
+            </div>
+            {reputation.scorePct !== null && (
+              <span className="px-2 py-0.5 border border-[var(--phosphor)]/40 text-[var(--phosphor)] text-[10px] uppercase tracking-wider">
+                {reputation.scorePct}% positive
+              </span>
+            )}
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+            <ReputationStat
+              label="Thumbs up"
+              value={reputation.upCount}
+              icon={<ThumbsUp size={11} />}
+              tone="phosphor"
+            />
+            <ReputationStat
+              label="Thumbs down"
+              value={reputation.downCount}
+              icon={<ThumbsDown size={11} />}
+              tone="muted"
+            />
+            <ReputationStat
+              label="On-chain"
+              value={reputation.onChain.attestationCount}
+              icon={<ShieldCheck size={11} />}
+              tone="phosphor"
+            />
+            <ReputationStat
+              label="Activity"
+              value={reputation.onChain.activityMilestone}
+              icon={<Zap size={11} />}
+              tone="muted"
+            />
+          </div>
+          <div className="space-y-1.5 text-xs text-[var(--text-muted)]">
+            <div className="font-mono break-all">
+              Registry:{' '}
+              <a
+                href={explorerAddrUrl(reputation.onChain.contract, reputation.onChain.chainId)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--phosphor)] hover:underline"
+              >{shortAddr(reputation.onChain.contract)}</a>
+            </div>
+            {reputation.onChain.lastTxHash && (
+              <div className="font-mono break-all">
+                Last attestation:{' '}
+                <a
+                  href={explorerTxUrl(reputation.onChain.lastTxHash, reputation.onChain.chainId)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[var(--phosphor)] hover:underline"
+                >{shortAddr(reputation.onChain.lastTxHash)}</a>
+                {reputation.onChain.lastTxAt && (
+                  <span className="ml-2 text-[var(--text-muted)]">
+                    {new Date(reputation.onChain.lastTxAt).toLocaleString()}
+                  </span>
+                )}
+              </div>
+            )}
+            {reputation.onChain.attestationCount === 0 && reputation.total === 0 && (
+              <div className="text-[10px] italic">
+                No feedback yet. User thumbs go on-chain automatically; activity milestones every 100 messages.
+              </div>
+            )}
+          </div>
+        </GlassCard>
+      )}
+
+      {/* Runtime signing — opt-in private-key injection */}
       <GlassCard className="p-5">
         <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <div className="flex items-center gap-3">
@@ -386,5 +500,29 @@ export function WalletTab() {
         Network: SKALE Base {isTestnet ? 'Sepolia' : 'Mainnet'} · Chain ID {wallet.chainId}
       </div>
     </motion.div>
+  );
+}
+
+function ReputationStat({
+  label, value, icon, tone,
+}: {
+  label: string;
+  value: number;
+  icon: React.ReactNode;
+  tone: 'phosphor' | 'muted';
+}) {
+  const valueClass = tone === 'phosphor'
+    ? 'text-[var(--phosphor)]'
+    : 'text-[var(--text-primary)]';
+  return (
+    <div className="border border-[var(--border-subtle)] bg-black/20 px-3 py-2">
+      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+        {icon}
+        {label}
+      </div>
+      <div className={`mt-1 text-lg font-mono font-semibold ${valueClass}`}>
+        {value.toLocaleString()}
+      </div>
+    </div>
   );
 }
