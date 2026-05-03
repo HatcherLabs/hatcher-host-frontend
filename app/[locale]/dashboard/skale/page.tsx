@@ -59,10 +59,7 @@ function shortAddr(addr: string): string {
   return addr.length > 14 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr;
 }
 
-function explorerBase(chainId: number): string {
-  // Verified via SKALE docs / chainlist: testnet 324705682 → blockscout at
-  // base-sepolia-testnet-explorer; mainnet uses skale-base-explorer.
-  if (chainId === 324705682) return 'https://base-sepolia-testnet-explorer.skalenodes.com';
+function explorerBase(_chainId: number): string {
   return 'https://skale-base-explorer.skalenodes.com';
 }
 
@@ -361,12 +358,12 @@ export default function SkaleDashboardPage() {
               <h2 className="text-base font-semibold text-[var(--text-primary)]">Pay a tier with USDC on SKALE</h2>
             </div>
           </div>
-          <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 border border-amber-500/30 text-amber-400">Testnet · USDC required</span>
+          <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 border border-[var(--phosphor)]/30 text-[var(--phosphor)]">Mainnet · USDC required</span>
         </div>
         <div className="text-xs text-[var(--text-muted)] leading-relaxed mb-4">
           End-to-end demo of the new x402 rail. Connect EVM wallet → pick tier → sign EIP-3009 transferWithAuthorization
-          via your wallet → server forwards to PayAI facilitator → tier upgrade applied. Settles in ~1 second on chain
-          324705682. You'll need testnet USDC at the connected address (see SKALE Bridge / faucet).
+          via your wallet → server forwards to PayAI facilitator → tier upgrade applied. Settles in ~1 second on
+          SKALE Base Mainnet. You'll need USDC at the connected address (bridge via SKALE Bridge).
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           <select

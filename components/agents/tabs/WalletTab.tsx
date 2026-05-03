@@ -52,10 +52,7 @@ interface ReputationState {
   };
 }
 
-function explorerBase(chainId: number): string {
-  // Verified via SKALE docs / chainlist: testnet 324705682 → blockscout at
-  // base-sepolia-testnet-explorer; mainnet uses skale-base-explorer.
-  if (chainId === 324705682) return 'https://base-sepolia-testnet-explorer.skalenodes.com';
+function explorerBase(_chainId: number): string {
   return 'https://skale-base-explorer.skalenodes.com';
 }
 
@@ -200,7 +197,6 @@ export function WalletTab() {
     );
   }
 
-  const isTestnet = wallet.chainId === 324705682;
   const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(wallet.address)}&bgcolor=0a0a0a&color=39ff88&margin=8`;
 
   return (
@@ -215,7 +211,6 @@ export function WalletTab() {
             <h2 className="text-lg font-semibold text-[var(--text-primary)]">SKALE Wallet</h2>
             <p className="text-xs text-[var(--text-muted)]">
               On-chain identity for <span className="font-mono text-[var(--phosphor)]">{agent.name}</span>
-              {isTestnet && <span className="ml-2 px-1.5 py-0.5 border border-amber-500/30 text-amber-400 text-[10px] uppercase tracking-wider">Testnet</span>}
             </p>
           </div>
         </div>
@@ -265,20 +260,9 @@ export function WalletTab() {
               {copyMsg && <div className="text-[10px] text-[var(--phosphor)] mt-1">{copyMsg}</div>}
             </div>
             <div className="text-xs text-[var(--text-muted)] leading-relaxed">
-              Anyone can send native gas (CREDIT) or USDC to this address. Funds belong to the agent —
+              Anyone can send native gas (sFUEL) or USDC to this address. Funds belong to the agent —
               they cover its on-chain activity (gas for ERC-8004 registration, reputation attestations,
               future agent-to-agent payments).
-              {isTestnet && (
-                <>
-                  {' '}On testnet, grab free CREDITs from the{' '}
-                  <a
-                    href="https://base-sepolia-faucet.skale.space"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[var(--phosphor)] hover:underline"
-                  >SKALE Base Sepolia faucet</a>.
-                </>
-              )}
             </div>
           </div>
         </div>
@@ -542,7 +526,7 @@ export function WalletTab() {
 
       {/* Network footer */}
       <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)] text-center">
-        Network: SKALE Base {isTestnet ? 'Sepolia' : 'Mainnet'} · Chain ID {wallet.chainId}
+        Network: SKALE Base Mainnet · Chain ID {wallet.chainId}
       </div>
     </motion.div>
   );

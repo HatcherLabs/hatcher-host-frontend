@@ -70,13 +70,13 @@ function getProvider(): Eip1193Provider | null {
   return (window as unknown as { ethereum?: Eip1193Provider }).ethereum ?? null;
 }
 
-const SKALE_BASE_SEPOLIA_HEX = '0x135b762a'; // 324705682
-const SKALE_BASE_SEPOLIA = {
-  chainId: SKALE_BASE_SEPOLIA_HEX,
-  chainName: 'SKALE Base Sepolia Testnet',
+const SKALE_BASE_MAINNET_HEX = '0x46cea59d'; // 1187947933
+const SKALE_BASE_MAINNET = {
+  chainId: SKALE_BASE_MAINNET_HEX,
+  chainName: 'SKALE Base Mainnet',
   nativeCurrency: { name: 'sFUEL', symbol: 'sFUEL', decimals: 18 },
-  rpcUrls: ['https://base-sepolia-testnet.skalenodes.com/v1/base-testnet'],
-  blockExplorerUrls: ['https://base-sepolia-testnet.skalenodes.com'],
+  rpcUrls: ['https://skale-base.skalenodes.com/v1/base'],
+  blockExplorerUrls: ['https://skale-base-explorer.skalenodes.com'],
 };
 
 export class WalletNotInstalledError extends Error {
@@ -95,7 +95,7 @@ export async function connectEvmWallet(): Promise<string> {
   return accounts[0]!;
 }
 
-/** Switch the user's wallet to SKALE Base Sepolia. Adds the chain
+/** Switch the user's wallet to SKALE Base Mainnet. Adds the chain
  *  if the wallet doesn't know about it yet (error code 4902). */
 export async function ensureSkaleChain(): Promise<void> {
   const eth = getProvider();
@@ -103,14 +103,14 @@ export async function ensureSkaleChain(): Promise<void> {
   try {
     await eth.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: SKALE_BASE_SEPOLIA_HEX }],
+      params: [{ chainId: SKALE_BASE_MAINNET_HEX }],
     });
   } catch (e) {
     const code = (e as { code?: number }).code;
     if (code === 4902 || code === -32603) {
       await eth.request({
         method: 'wallet_addEthereumChain',
-        params: [SKALE_BASE_SEPOLIA],
+        params: [SKALE_BASE_MAINNET],
       });
       return;
     }
