@@ -43,6 +43,7 @@
       "sub_billing": "Forfait, modules, crédits.",
       "sub_settings": "Profil, clés API, préférences.",
       "sub_support": "Aide, docs, contact.",
+      "sub_affiliate": "Gagnez des crédits en partageant.",
       "sub_admin": "Contrôles plateforme.",
       "sub_signOut": "Terminer la session sur cet appareil.",
       "tierSuffix": "forfait"

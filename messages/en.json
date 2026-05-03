@@ -43,6 +43,7 @@
       "sub_billing": "Tier, addons, credits.",
       "sub_settings": "Profile, API keys, prefs.",
       "sub_support": "Help, docs, contact.",
+      "sub_affiliate": "Earn credits sharing Hatcher.",
       "sub_admin": "Platform controls.",
       "sub_signOut": "End session on this device.",
       "tierSuffix": "tier"

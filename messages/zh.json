@@ -43,6 +43,7 @@
       "sub_billing": "套餐、附加项、积分。",
       "sub_settings": "个人资料、API 密钥、偏好设置。",
       "sub_support": "帮助、文档、联系方式。",
+      "sub_affiliate": "推荐 Hatcher 赚取积分。",
       "sub_admin": "平台控制。",
       "sub_signOut": "在此设备上结束会话。",
       "tierSuffix": "套餐"
