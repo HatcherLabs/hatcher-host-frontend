@@ -176,6 +176,22 @@ const nextConfig = {
         permanent: true,
       });
     }
+
+    // Affiliate short-links — `hatcher.host/r/<code>` is the user-facing share
+    // URL, but the cookie-dropping handler lives on the API (it must set
+    // `hx_ref` on the api.hatcher.host origin so the registration POST sends
+    // it back). Without this redirect, next-intl rewrites `/r/<code>` to
+    // `/en/r/<code>` and the request 404s — see referrals attribution bug
+    // 2026-05-03. Use 302 (not permanent) so we can change the destination
+    // later without poisoning browser caches.
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    out.push({ source: '/r/:code', destination: `${API_URL}/r/:code`, permanent: false });
+    out.push({
+      source: '/:locale(zh|de|fr|ro)/r/:code',
+      destination: `${API_URL}/r/:code`,
+      permanent: false,
+    });
+
     return out;
   },
 };
