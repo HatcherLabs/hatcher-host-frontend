@@ -1,4 +1,5 @@
 'use client';
+import { useTexture } from '@react-three/drei';
 import { useMemo } from 'react';
 import * as THREE from 'three';
 import { ROOM_SIZE, ROOM_HEIGHT, ROOM_HALF } from './grid';
@@ -6,38 +7,154 @@ import { paletteFor } from '../colors';
 
 interface Props { framework: string; }
 
+function makeTechPanelTexture(primary: string, accent: string, variant: 'floor' | 'wall') {
+  const size = 1024;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  const bg = variant === 'floor' ? '#0b0d12' : '#080a10';
+  const panel = variant === 'floor' ? '#121620' : '#10131b';
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, size, size);
+
+  const cell = variant === 'floor' ? 256 : 192;
+  for (let y = 0; y < size; y += cell) {
+    for (let x = 0; x < size; x += cell) {
+      const inset = 12 + ((x + y) / cell) % 3 * 4;
+      ctx.fillStyle = panel;
+      ctx.fillRect(x + inset, y + inset, cell - inset * 2, cell - inset * 2);
+      ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x + inset, y + inset, cell - inset * 2, cell - inset * 2);
+      ctx.strokeStyle = 'rgba(0,0,0,0.42)';
+      ctx.lineWidth = 8;
+      ctx.strokeRect(x + 4, y + 4, cell - 8, cell - 8);
+    }
+  }
+
+  const glowColors = [primary, accent, '#39ff88', '#38bdf8', '#facc15'];
+  glowColors.forEach((color, i) => {
+    ctx.strokeStyle = color;
+    ctx.globalAlpha = variant === 'floor' ? 0.42 : 0.24;
+    ctx.lineWidth = i % 2 ? 3 : 2;
+    const offset = 54 + i * 76;
+    ctx.beginPath();
+    ctx.moveTo(offset, 0);
+    ctx.lineTo(offset + 180, 180);
+    ctx.lineTo(size, 180 + offset * 0.38);
+    ctx.stroke();
+  });
+  ctx.globalAlpha = 1;
+
+  for (let i = 0; i < 70; i++) {
+    const x = (i * 137) % size;
+    const y = (i * 283) % size;
+    ctx.fillStyle = i % 3 === 0 ? accent : primary;
+    ctx.globalAlpha = i % 4 === 0 ? 0.62 : 0.28;
+    ctx.fillRect(x, y, 18 + (i % 5) * 8, 3);
+  }
+  ctx.globalAlpha = 1;
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  texture.needsUpdate = true;
+  return texture;
+}
+
 export function RoomShell({ framework }: Props) {
   const palette = paletteFor(framework);
+  const [metalColorBase, metalNormalBase, metalRoughnessBase, metalnessBase, concreteDiffBase] =
+    useTexture([
+      '/assets/3d/textures/agent-room/metal-walkway-color.jpg',
+      '/assets/3d/textures/agent-room/metal-walkway-normal.jpg',
+      '/assets/3d/textures/agent-room/metal-walkway-roughness.jpg',
+      '/assets/3d/textures/agent-room/metal-walkway-metalness.jpg',
+      '/assets/3d/textures/concrete_diff.jpg',
+    ]);
+
+  const textures = useMemo(() => {
+    const metalColor = metalColorBase.clone();
+    const metalNormal = metalNormalBase.clone();
+    const metalRoughness = metalRoughnessBase.clone();
+    const metalness = metalnessBase.clone();
+    const concreteDiff = concreteDiffBase.clone();
+    for (const texture of [metalColor, metalNormal, metalRoughness, metalness]) {
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      texture.repeat.set(5.5, 5.5);
+      texture.needsUpdate = true;
+    }
+    concreteDiff.wrapS = concreteDiff.wrapT = THREE.RepeatWrapping;
+    concreteDiff.repeat.set(4, 1.4);
+    concreteDiff.colorSpace = THREE.SRGBColorSpace;
+    concreteDiff.needsUpdate = true;
+    metalColor.colorSpace = THREE.SRGBColorSpace;
+
+    const floorPanel = makeTechPanelTexture(palette.primary, palette.accent, 'floor');
+    floorPanel.repeat.set(3.5, 3.5);
+    const wallPanel = makeTechPanelTexture(palette.primary, palette.accent, 'wall');
+    wallPanel.repeat.set(4.5, 1.15);
+    return { metalColor, metalNormal, metalRoughness, metalness, concreteDiff, floorPanel, wallPanel };
+  }, [metalColorBase, metalNormalBase, metalRoughnessBase, metalnessBase, concreteDiffBase, palette.accent, palette.primary]);
 
   const floorMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: 0x0a0a12,
-    metalness: 0.6,
-    roughness: 0.3,
+    color: 0x0d1118,
+    map: textures.metalColor,
+    normalMap: textures.metalNormal,
+    normalScale: new THREE.Vector2(0.62, 0.62),
+    roughnessMap: textures.metalRoughness,
+    metalnessMap: textures.metalness,
+    metalness: 0.08,
+    roughness: 0.92,
+    envMapIntensity: 0.03,
     emissive: new THREE.Color(palette.primary),
-    emissiveIntensity: 0.03,
-  }), [palette.primary]);
+    emissiveIntensity: 0.018,
+  }), [palette.primary, textures.metalColor, textures.metalNormal, textures.metalRoughness, textures.metalness]);
 
   const wallMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: 0x15151c,
-    metalness: 0.5,
-    roughness: 0.7,
-  }), []);
+    color: 0x10131b,
+    map: textures.wallPanel,
+    roughnessMap: textures.concreteDiff,
+    metalness: 0.18,
+    roughness: 0.82,
+    envMapIntensity: 0.08,
+    emissive: new THREE.Color(palette.primary),
+    emissiveIntensity: 0.015,
+  }), [palette.primary, textures.concreteDiff, textures.wallPanel]);
 
   const trimMat = useMemo(() => new THREE.MeshBasicMaterial({
     color: palette.primary,
+    transparent: true,
+    opacity: 0.38,
     toneMapped: false,
   }), [palette.primary]);
 
   const panelMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: 0x0f1017,
-    metalness: 0.45,
-    roughness: 0.62,
-  }), []);
+    color: 0x121722,
+    map: textures.wallPanel,
+    metalness: 0.35,
+    roughness: 0.65,
+    envMapIntensity: 0.12,
+    emissive: new THREE.Color(palette.primary),
+    emissiveIntensity: 0.025,
+  }), [palette.primary, textures.wallPanel]);
 
   return (
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow material={floorMat}>
         <planeGeometry args={[ROOM_SIZE, ROOM_SIZE]} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.062, 0]}>
+        <planeGeometry args={[ROOM_SIZE, ROOM_SIZE]} />
+        <meshBasicMaterial
+          map={textures.floorPanel}
+          transparent
+          opacity={0.12}
+          toneMapped={false}
+          depthWrite={false}
+        />
       </mesh>
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, ROOM_HEIGHT, 0]} material={wallMat}>
         <planeGeometry args={[ROOM_SIZE, ROOM_SIZE]} />

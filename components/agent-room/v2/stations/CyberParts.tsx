@@ -30,11 +30,13 @@ export function NeonBar({
   end,
   color,
   thickness = 0.035,
+  opacity = 0.72,
 }: {
   start: [number, number, number];
   end: [number, number, number];
   color: string;
   thickness?: number;
+  opacity?: number;
 }) {
   const { position, rotation, length } = useMemo(() => {
     const a = new THREE.Vector3(...start);
@@ -58,7 +60,7 @@ export function NeonBar({
   return (
     <mesh position={position} rotation={rotation}>
       <boxGeometry args={[thickness, length, thickness]} />
-      <meshBasicMaterial color={color} toneMapped={false} />
+      <meshBasicMaterial color={color} toneMapped={false} transparent opacity={opacity} />
     </mesh>
   );
 }
@@ -91,7 +93,7 @@ export function Screen({
           color={color}
           toneMapped={false}
           transparent
-          opacity={0.75 * intensity}
+          opacity={0.42 * intensity}
         />
       </mesh>
       {/* Scanline overlay — very thin horizontal bars for a CRT feel */}

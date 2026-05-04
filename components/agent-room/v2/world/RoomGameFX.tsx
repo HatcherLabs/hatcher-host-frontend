@@ -20,16 +20,30 @@ export function RoomGameFX({ framework, layout, nearest, quality }: Props) {
     () => STATION_IDS.filter((id) => id !== 'agentAvatar').map((id) => layout[id]),
     [layout],
   );
+  const stationColors = useMemo(() => {
+    const cockpit = [palette.primary, '#39ff88', '#38bdf8', '#facc15', palette.accent];
+    return new Map(STATION_IDS.map((id, index) => [id, cockpit[index % cockpit.length]!] as const));
+  }, [palette.accent, palette.primary]);
   const focus = nearest ? layout[nearest] : null;
 
   return (
     <group>
+      <CockpitDeck color={palette.primary} accent={palette.accent} />
+      {STATION_IDS.map((id) => (
+        <StationPlatform
+          key={`platform-${id}`}
+          station={layout[id]}
+          color={stationColors.get(id) ?? palette.primary}
+          central={id === 'agentAvatar'}
+          active={id === nearest}
+        />
+      ))}
       {stations.map((station, i) => (
         <FloorConduit
           key={station.id}
           from={layout.agentAvatar}
           to={station}
-          color={palette.primary}
+          color={stationColors.get(station.id) ?? palette.primary}
           phase={i / Math.max(1, stations.length)}
           moving={quality !== 'low'}
         />
@@ -44,6 +58,101 @@ export function RoomGameFX({ framework, layout, nearest, quality }: Props) {
       ))}
       {focus && <StationFocus station={focus} color={palette.accent} />}
       {quality === 'high' && <AmbientRoomSweep color={palette.primary} />}
+    </group>
+  );
+}
+
+function CockpitDeck({ color, accent }: { color: string; accent: string }) {
+  const ring = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    if (!ring.current) return;
+    ring.current.rotation.z = clock.getElapsedTime() * 0.08;
+  });
+
+  return (
+    <group>
+      <mesh position={[0, 0.075, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[3.2, 8]} />
+        <meshStandardMaterial
+          color={0x10141c}
+          metalness={0.86}
+          roughness={0.28}
+          emissive={color}
+          emissiveIntensity={0.055}
+        />
+      </mesh>
+      <mesh ref={ring} position={[0, 0.12, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[2.38, 2.5, 72]} />
+        <meshBasicMaterial color={accent} toneMapped={false} transparent opacity={0.5} depthWrite={false} />
+      </mesh>
+      {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => {
+        const a = (i / 8) * Math.PI * 2;
+        return (
+          <mesh
+            key={i}
+            position={[Math.cos(a) * 2.85, 0.145, Math.sin(a) * 2.85]}
+            rotation={[0, -a, 0]}
+          >
+            <boxGeometry args={[0.52, 0.045, 0.055]} />
+            <meshBasicMaterial color={i % 2 ? accent : color} toneMapped={false} transparent opacity={0.7} />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
+function StationPlatform({
+  station,
+  color,
+  central,
+  active,
+}: {
+  station: Station;
+  color: string;
+  central: boolean;
+  active: boolean;
+}) {
+  const ring = useRef<THREE.Mesh>(null);
+  const pulse = useRef<THREE.MeshBasicMaterial>(null);
+  const radius = central ? 2.1 : 1.45;
+  const height = central ? 0.22 : 0.18;
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    if (ring.current) ring.current.rotation.z = t * (active ? 0.5 : 0.12);
+    if (pulse.current) pulse.current.opacity = active ? 0.62 + Math.sin(t * 4.8) * 0.18 : 0.28;
+  });
+
+  return (
+    <group position={[station.position[0], 0, station.position[2]]}>
+      <mesh position={[0, height * 0.5, 0]} receiveShadow castShadow>
+        <cylinderGeometry args={[radius, radius * 1.08, height, 8]} />
+        <meshStandardMaterial
+          color={0x111620}
+          metalness={0.88}
+          roughness={0.3}
+          emissive={color}
+          emissiveIntensity={active ? 0.12 : 0.045}
+        />
+      </mesh>
+      <mesh ref={ring} position={[0, height + 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[radius * 0.78, radius * 0.92, 8]} />
+        <meshBasicMaterial
+          ref={pulse}
+          color={color}
+          toneMapped={false}
+          transparent
+          opacity={active ? 0.6 : 0.28}
+          depthWrite={false}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+      <mesh position={[0, height + 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[radius * 1.02, radius * 1.08, 8]} />
+        <meshBasicMaterial color={color} toneMapped={false} transparent opacity={0.44} depthWrite={false} />
+      </mesh>
     </group>
   );
 }
@@ -94,17 +203,33 @@ function FloorConduit({
 
   return (
     <group>
+      <mesh position={[meta.mid[0], 0.072, meta.mid[1]]} rotation={[0, meta.rotationY, 0]}>
+        <boxGeometry args={[0.42, 0.055, meta.length]} />
+        <meshStandardMaterial
+          color={0x0b1017}
+          metalness={0.82}
+          roughness={0.34}
+          emissive={color}
+          emissiveIntensity={0.028}
+        />
+      </mesh>
       <mesh position={[meta.mid[0], 0.055, meta.mid[1]]} rotation={[0, meta.rotationY, 0]}>
-        <boxGeometry args={[0.055, 0.018, meta.length]} />
+        <boxGeometry args={[0.07, 0.018, meta.length]} />
         <meshBasicMaterial
           ref={matRef}
           color={color}
           transparent
-          opacity={0.12}
+          opacity={0.16}
           toneMapped={false}
           depthWrite={false}
         />
       </mesh>
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[meta.mid[0] + side * Math.cos(meta.rotationY) * 0.19, 0.108, meta.mid[1] - side * Math.sin(meta.rotationY) * 0.19]} rotation={[0, meta.rotationY, 0]}>
+          <boxGeometry args={[0.035, 0.025, meta.length * 0.92]} />
+          <meshBasicMaterial color={color} transparent opacity={0.18} toneMapped={false} depthWrite={false} />
+        </mesh>
+      ))}
       {moving && (
         <mesh ref={packetRef} position={[meta.ax, 0.18, meta.az]}>
           <sphereGeometry args={[0.09, 10, 10]} />
