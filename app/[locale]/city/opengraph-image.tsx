@@ -94,7 +94,7 @@ export default async function OpengraphImage() {
             maxWidth: 900,
           }}
         >
-          {total.toLocaleString()} agents across 25 districts · {running} running right now · built on four frameworks.
+          {total.toLocaleString()} agents across 25 districts · {running} running right now · OpenClaw + Hermes.
         </div>
 
         <div
@@ -117,8 +117,6 @@ export default async function OpengraphImage() {
           <span style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
             <Dot color="#10b981" label="OpenClaw" />
             <Dot color="#38bdf8" label="Hermes" />
-            <Dot color="#a855f7" label="ElizaOS" />
-            <Dot color="#ec4899" label="Milady" />
           </span>
         </div>
       </div>

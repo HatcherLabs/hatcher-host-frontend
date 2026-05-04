@@ -3,18 +3,15 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from '@/i18n/routing';
-import { X, ArrowRight, ArrowLeft, Check, MessageSquare, Plug, BarChart3, Key, Cpu, Brain, Bot, Sparkles } from 'lucide-react';
+import { X, ArrowRight, ArrowLeft, Check, MessageSquare, Plug, BarChart3, Key, Cpu, Brain } from 'lucide-react';
 
 // Editorial onboarding wizard — replaces the prior gradient-heavy
 // 4-color layout. One accent (cyan), typography-led, consistent with
-// the rest of the site. Still 4 steps: welcome → framework → features
-// → ready. Still routes to /create with the chosen framework param.
+// the rest of the site. Routes to /create with the chosen framework param.
 
 const FRAMEWORKS = [
-  { id: 'openclaw', name: 'OpenClaw', icon: Cpu,     desc: 'Full-featured with tools, memory, and web search. Best for most use cases.', tag: 'recommended' },
-  { id: 'hermes',   name: 'Hermes',   icon: Brain,   desc: 'Ultra-fast responses with function calling. Great for real-time chat bots.',  tag: 'fast' },
-  { id: 'elizaos',  name: 'ElizaOS',  icon: Bot,     desc: 'Multi-agent system with advanced personality. Best for complex interactions.', tag: 'advanced' },
-  { id: 'milady',   name: 'Milady',   icon: Sparkles, desc: 'Personality-driven with unique character traits. Best for social media.',     tag: 'creative' },
+  { id: 'openclaw', name: 'OpenClaw', icon: Cpu,   desc: 'Skill-heavy automation with integrations, files, cron, and workspace tools.', tag: 'recommended' },
+  { id: 'hermes',   name: 'Hermes',   icon: Brain, desc: 'Adaptive long-running agents with memory, research tools, and live config.',  tag: 'memory' },
 ];
 
 const DASHBOARD_FEATURES = [

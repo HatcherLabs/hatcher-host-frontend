@@ -59,19 +59,19 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'How do I create my first agent?',
-        a: 'Click "Create Agent" from the dashboard or the navigation bar. Choose a framework (OpenClaw, Hermes, ElizaOS, or Milady), pick a template or start from scratch, configure the agent personality and system prompt, then click Deploy. Your agent will be live in about 60 seconds. You can start chatting with it immediately from the dashboard.',
+        a: 'Click "Create Agent" from the dashboard or the navigation bar. Start with Chat-to-Hatch or choose a template, pick OpenClaw or Hermes, configure the agent personality and system prompt, then click Deploy. Your agent will be live in about 60 seconds.',
       },
       {
         q: 'What frameworks are available?',
-        a: 'Hatcher supports four frameworks: OpenClaw (general-purpose conversational AI, 13,700+ skills), Hermes (task-oriented autonomous agent, 40+ tools), ElizaOS (multi-agent, 350+ plugins, blockchain-native), and Milady (privacy-first, 29 connectors). Each framework comes with multiple templates optimized for different use cases. Pick the one that best fits your needs when creating an agent.',
+        a: 'Hatcher currently focuses on OpenClaw and Hermes. OpenClaw is best for skill-heavy automation, integrations, cron, files, and workspace tasks. Hermes is best for adaptive long-running agents with memory, research workflows, and live configuration.',
       },
       {
         q: 'How does the free tier work?',
-        a: 'Every account starts with a free tier that includes 1 agent. Free agents get 20 messages per day using Llama 4 Scout on Groq, with a 24-hour rolling reset. You get access to all integrations (Telegram, Discord, Twitter, WhatsApp, Slack). Free agents run on shared resources (0.5 CPU, 1GB RAM) and auto-sleep after 1 hour of inactivity. All tiers use Llama 4 Scout on Groq. If you bring your own API key (BYOK), messages are always unlimited and free.',
+        a: 'Every account starts with a free tier that includes 1 agent. Free agents get 20 hosted messages per day through OpenRouter with DeepSeek V4 Flash by default, with a 24-hour rolling reset. You get access to all integrations (Telegram, Discord, Twitter, WhatsApp, Slack). If you bring your own API key (BYOK), messages are always unlimited and free on Hatcher.',
       },
       {
         q: 'What is BYOK (Bring Your Own Key)?',
-        a: 'BYOK stands for "Bring Your Own Key." Instead of using Hatcher\'s hosted LLM key (which has daily message limits), you can provide your own API key from any supported provider (OpenAI, Anthropic, Google, Groq, etc.). With BYOK, you pay the provider directly and get unlimited messages on Hatcher at no extra cost. Configure your key in the agent\'s Config tab under the model settings.',
+        a: 'BYOK stands for "Bring Your Own Key." Instead of using Hatcher\'s hosted OpenRouter model with daily message limits, you can provide your own API key from any supported provider (OpenAI, Anthropic, Google, OpenRouter, Groq, etc.). With BYOK, you pay the provider directly and get unlimited messages on Hatcher at no extra cost.',
       },
       {
         q: 'How do I connect Telegram or Discord?',
@@ -101,7 +101,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'How do I change the AI model?',
-        a: 'Open your agent\'s Config tab and look for the model settings section. If you\'re using Hatcher\'s hosted key, all tiers use Llama 4 Scout on Groq. If you have BYOK configured, you can select from any model supported by your provider (e.g., GPT-4o, Claude 3.5, Gemini Pro). Change the model identifier, save, and restart.',
+        a: 'Open your agent\'s Config tab and look for the model settings section. If you\'re using Hatcher\'s hosted model, requests route through OpenRouter with DeepSeek V4 Flash by default. If you have BYOK configured, you can select from any model supported by your provider (e.g., GPT-4o, Claude, Gemini, or another OpenRouter model). Change the model identifier, save, and restart.',
       },
       {
         q: 'How do I start, stop, or restart my agent?',
@@ -115,7 +115,7 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'What plans are available?',
-        a: 'Hatcher offers four tiers plus a lifetime option. Free: 1 agent, 20 messages/day, 3 searches/day, shared resources, auto-sleep after 1 hour. Starter ($6.99/mo): 1 agent, 50 messages/day, 10 searches/day, 1 CPU/1.5GB RAM, auto-sleep after 4 hours. Pro ($19.99/mo): 3 agents, 100 messages/day per agent, 50 searches/day, dedicated resources (1.5 CPU, 2GB RAM), auto-sleep after 12 hours. Business ($49.99/mo): 10 agents, 300 messages/day per agent, 200 searches/day, always-on, priority support. Founding Member ($99 one-time, 10 spots): everything in Business with 4GB RAM and 2GB workspace, forever. All tiers use Llama 4 Scout on Groq. BYOK is always unlimited.',
+        a: 'Hatcher offers four tiers plus a lifetime option. Free: 1 agent, 20 messages/day, 3 searches/day, shared resources, auto-sleep after 1 hour. Starter ($6.99/mo): 1 agent, 50 messages/day, 10 searches/day, 1 CPU/1.5GB RAM, auto-sleep after 4 hours. Pro ($19.99/mo): 3 agents, 100 messages/day, 50 searches/day, dedicated resources (1.5 CPU, 2GB RAM), auto-sleep after 12 hours. Business ($49.99/mo): 10 agents, 300 messages/day, 200 searches/day, always-on, priority support. Founding Member ($99 one-time, 20 spots): everything in Business with 4GB RAM and 2GB workspace, forever. Hosted messages use OpenRouter by default. BYOK is always unlimited.',
       },
       {
         q: 'How do add-ons work?',

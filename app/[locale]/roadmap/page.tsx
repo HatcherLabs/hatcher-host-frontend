@@ -43,7 +43,7 @@ const PHASES: Phase[] = [
     status: 'done',
     label: 'DONE',
     items: [
-      { text: '4 agent frameworks — OpenClaw, Hermes, ElizaOS, Milady' },
+      { text: '2 focus agent frameworks — OpenClaw and Hermes' },
       { text: '5 integrations — Telegram, Discord, Twitter/X, WhatsApp, Slack' },
       { text: 'BYOK — bring your own LLM key (OpenAI, Anthropic, Google, Groq), unlimited on any tier' },
       { text: '$HATCHER token on Solana (Token-2022)', note: 'CA: Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump' },
@@ -51,7 +51,7 @@ const PHASES: Phase[] = [
       { text: 'SDK, CLI, Zapier app, Make module, GitHub Action' },
       { text: 'Teams collaboration, agent versioning with diff + restore, visual workflow builder' },
       { text: 'Referral program — earn credits for every signup you bring' },
-      { text: 'Skills + plugins ecosystem — ClawHub, Hermes 77 bundled, ElizaOS registry, npm support' },
+      { text: 'Skills + plugins ecosystem — ClawHub, Hermes tools, OpenRouter routing, npm support' },
       { text: 'Knowledge base, voice mode, secure terminal, managed mode (OpenClaw + Hermes)' },
       { text: 'Full docs (35+ pages), live changelog, support tickets, admin panel' },
     ],

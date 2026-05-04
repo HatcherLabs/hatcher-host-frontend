@@ -177,7 +177,7 @@ const softwareApplicationJsonLd = {
       name: 'Founding Member',
       price: '99',
       priceCurrency: 'USD',
-      description: '10 agents, 300 messages/day, 200 searches/day, lifetime access, always-on, 10 spots only.',
+      description: '10 agents, 300 messages/day, 200 searches/day, lifetime access, always-on, 20 spots only.',
     },
   ],
   creator: {
@@ -196,7 +196,7 @@ const faqJsonLd = {
       name: 'Is it really free?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. The free plan gives you 1 agent, 10 messages per day, and access to all platforms. No credit card required.',
+        text: 'Yes. The free plan gives you 1 agent, 20 messages per day, and access to all platforms. No credit card required.',
       },
     },
     {
@@ -212,7 +212,7 @@ const faqJsonLd = {
       name: 'What is "Bring Your Own Key"?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Connect your own OpenAI, Anthropic, Google, or Groq key for unlimited messages. You only pay your AI provider directly.',
+        text: 'Connect your own OpenAI, Anthropic, Google, OpenRouter, Groq, or other supported LLM key for unlimited messages. You only pay your AI provider directly.',
       },
     },
     {

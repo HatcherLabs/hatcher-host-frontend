@@ -66,13 +66,11 @@ export default function TermsOfServicePage() {
             <p>
               Hatcher is a managed hosting platform for open-source AI agent frameworks. You can deploy agents based
               on <strong className="text-[var(--text-primary)]">OpenClaw</strong>,{' '}
-              <strong className="text-[var(--text-primary)]">Hermes</strong>,{' '}
-              <strong className="text-[var(--text-primary)]">ElizaOS</strong>, or{' '}
-              <strong className="text-[var(--text-primary)]">Milady</strong>, connect them to platforms (Telegram,
+              or <strong className="text-[var(--text-primary)]">Hermes</strong>, connect them to platforms (Telegram,
               Discord, X/Twitter, WhatsApp, Slack), and optionally provide your own API keys (BYOK) for LLM providers.
             </p>
             <p className="mt-3">
-              We provide compute, container orchestration, storage, and optional LLM access via our hosted Groq key.
+              We provide compute, container orchestration, storage, and optional LLM access via our hosted OpenRouter configuration.
               You provide configuration, prompts, and any third-party tokens your agent needs.
             </p>
           </section>
@@ -146,8 +144,7 @@ export default function TermsOfServicePage() {
               resell, or mirror the platform.
             </p>
             <p className="mt-3">
-              The open-source frameworks we host (OpenClaw, Hermes, ElizaOS, Milady) remain under their respective
-              licenses.
+              The open-source frameworks we host, including OpenClaw and Hermes, remain under their respective licenses.
             </p>
           </section>
 

@@ -7,8 +7,6 @@ import { X, Bot, MessageSquare, Settings, Sparkles } from 'lucide-react';
 const FRAMEWORKS = [
   { name: 'OpenClaw' },
   { name: 'Hermes' },
-  { name: 'ElizaOS' },
-  { name: 'Milady' },
 ];
 
 const TYPING_NAME = 'my-trading-bot';

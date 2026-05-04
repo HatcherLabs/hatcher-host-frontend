@@ -127,10 +127,8 @@ export default function ImpressumPage() {
             <p>
               <span className="text-[var(--text-primary)] font-semibold">Hatcher.host</span> is a managed hosting platform
               for open-source AI agent frameworks. Users deploy agents based on frameworks such as{' '}
-              <span className="text-[var(--text-primary)]">OpenClaw</span>,{' '}
-              <span className="text-[var(--text-primary)]">Hermes</span>,{' '}
-              <span className="text-[var(--text-primary)]">ElizaOS</span>, and{' '}
-              <span className="text-[var(--text-primary)]">Milady</span>. Each agent runs in an isolated Docker container
+              <span className="text-[var(--text-primary)]">OpenClaw</span>{' '}
+              and <span className="text-[var(--text-primary)]">Hermes</span>. Each agent runs in an isolated Docker container
               with tier-based resource limits.
             </p>
           </section>
@@ -177,7 +175,7 @@ export default function ImpressumPage() {
             <ul className="space-y-2 text-sm list-disc pl-5">
               <li>Direct, indirect, incidental, or consequential damages arising from platform use.</li>
               <li>
-                Losses caused by the underlying open-source frameworks (OpenClaw, Hermes, ElizaOS, Milady) or their
+                Losses caused by the underlying open-source frameworks (including OpenClaw and Hermes) or their
                 third-party dependencies.
               </li>
               <li>Loss of funds, data, account access, or third-party platform integrations.</li>
