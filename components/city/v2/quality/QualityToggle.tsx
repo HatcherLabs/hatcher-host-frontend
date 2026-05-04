@@ -17,13 +17,15 @@ export function QualityToggle() {
         background: 'rgba(5,8,20,0.75)',
         border: '1px solid rgba(251,191,36,0.4)',
         borderRadius: 6,
-        padding: '6px 10px',
+        padding: '5px 7px',
         fontFamily: '"Press Start 2P", monospace',
-        fontSize: 10,
+        fontSize: 'clamp(7px, 0.75vw, 10px)',
         color: '#fbbf24',
         display: 'flex',
-        gap: 8,
+        gap: 5,
         alignItems: 'center',
+        maxWidth: 'calc(100vw - 176px)',
+        overflow: 'hidden',
         zIndex: 10,
       }}
     >
@@ -37,10 +39,10 @@ export function QualityToggle() {
             color: override === q ? '#000' : '#fbbf24',
             border: '1px solid #fbbf24',
             borderRadius: 3,
-            padding: '2px 6px',
+            padding: '3px 5px',
             cursor: 'pointer',
             fontFamily: 'inherit',
-            fontSize: 9,
+            fontSize: 'inherit',
           }}
         >
           {q.toUpperCase()}

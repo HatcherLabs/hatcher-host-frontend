@@ -72,7 +72,7 @@ export function Streetlights() {
 
   return (
     <group>
-      <instancedMesh ref={postRef} args={[undefined, undefined, positions.length]} castShadow>
+      <instancedMesh ref={postRef} args={[undefined, undefined, positions.length]}>
         <cylinderGeometry args={[0.12, 0.15, 5, 8]} />
         <primitive attach="material" object={postMat} />
       </instancedMesh>

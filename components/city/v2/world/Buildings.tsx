@@ -173,7 +173,6 @@ function PrimitiveInstance({
     <instancedMesh
       ref={ref}
       args={[geometry, material, count]}
-      castShadow
       receiveShadow
       // InstancedMesh derives its bounding sphere from the TEMPLATE
       // geometry, not from actual instance positions. With buildings

@@ -76,27 +76,68 @@ function DistrictLabel({
     canvas.width = 768;
     canvas.height = 160;
     const ctx = canvas.getContext('2d')!;
-    ctx.fillStyle = 'rgba(5,8,20,0.82)';
-    roundRect(ctx, 4, 4, 760, 152, 22);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const panel = ctx.createLinearGradient(4, 4, 760, 156);
+    panel.addColorStop(0, 'rgba(4, 12, 24, 0.9)');
+    panel.addColorStop(0.5, 'rgba(6, 18, 31, 0.78)');
+    panel.addColorStop(1, 'rgba(10, 8, 27, 0.88)');
+    ctx.fillStyle = panel;
+    chamferRect(ctx, 4, 4, 760, 152, 28);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(124, 216, 255, 0.65)';
+
+    ctx.shadowColor = 'rgba(98, 244, 255, 0.75)';
+    ctx.shadowBlur = 18;
+    ctx.strokeStyle = 'rgba(124, 216, 255, 0.82)';
     ctx.lineWidth = 2;
-    roundRect(ctx, 4, 4, 760, 152, 22);
+    chamferRect(ctx, 4, 4, 760, 152, 28);
     ctx.stroke();
-    // Icon
-    ctx.font = '82px sans-serif';
+    ctx.shadowBlur = 0;
+
+    ctx.strokeStyle = 'rgba(140, 255, 218, 0.48)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(24, 28);
+    ctx.lineTo(86, 28);
+    ctx.moveTo(682, 132);
+    ctx.lineTo(744, 132);
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(124, 216, 255, 0.1)';
+    chamferRect(ctx, 32, 24, 112, 112, 24);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(140, 255, 218, 0.62)';
+    ctx.lineWidth = 2;
+    chamferRect(ctx, 32, 24, 112, 112, 24);
+    ctx.stroke();
+
+    ctx.font = '72px sans-serif';
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-    ctx.fillText(icon, 90, 82);
-    // Label
-    ctx.font = 'bold 44px "Press Start 2P", monospace';
+    ctx.fillText(icon, 88, 82);
+
+    const title = label.toUpperCase();
+    ctx.font = `bold ${fitFont(ctx, title, 42, 30, 486)}px "Press Start 2P", monospace`;
     ctx.fillStyle = '#7ad8ff';
+    ctx.shadowColor = 'rgba(122, 216, 255, 0.65)';
+    ctx.shadowBlur = 10;
     ctx.textAlign = 'left';
-    ctx.fillText(label.toUpperCase(), 170, 70);
-    // Count subline
+    ctx.fillText(title, 172, 64);
+
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+    ctx.fillRect(172, 84, 512, 2);
+    ctx.fillStyle = 'rgba(140, 255, 218, 0.6)';
+    ctx.fillRect(172, 84, Math.min(80 + count * 7, 360), 2);
+
     ctx.font = '24px "Press Start 2P", monospace';
     ctx.fillStyle = '#fbbf24';
     ctx.fillText(`${count} ${count === 1 ? 'AGENT' : 'AGENTS'}`, 170, 118);
+
+    ctx.fillStyle = 'rgba(124, 216, 255, 0.28)';
+    for (let i = 0; i < 5; i++) {
+      ctx.fillRect(664 + i * 14, 42, 7, 52 - i * 5);
+    }
     const tex = new THREE.CanvasTexture(canvas);
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.needsUpdate = true;
@@ -112,19 +153,38 @@ function DistrictLabel({
   );
 }
 
-function roundRect(
+function chamferRect(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
   w: number,
   h: number,
-  r: number,
+  cut: number,
 ) {
   ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
+  ctx.moveTo(x + cut, y);
+  ctx.lineTo(x + w - cut, y);
+  ctx.lineTo(x + w, y + cut);
+  ctx.lineTo(x + w, y + h - cut);
+  ctx.lineTo(x + w - cut, y + h);
+  ctx.lineTo(x + cut, y + h);
+  ctx.lineTo(x, y + h - cut);
+  ctx.lineTo(x, y + cut);
   ctx.closePath();
+}
+
+function fitFont(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  start: number,
+  min: number,
+  maxWidth: number,
+) {
+  let size = start;
+  while (size > min) {
+    ctx.font = `bold ${size}px "Press Start 2P", monospace`;
+    if (ctx.measureText(text).width <= maxWidth) break;
+    size -= 2;
+  }
+  return size;
 }

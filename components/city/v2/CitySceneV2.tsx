@@ -20,6 +20,7 @@ import { TravelPads } from './world/TravelPads';
 import { Traffic } from './world/Traffic';
 import { NPCs } from './world/NPCs';
 import { Buildings } from './world/Buildings';
+import { CitySetDressing } from './world/CitySetDressing';
 import { ActivityPulses } from './world/ActivityPulses';
 import { Atmosphere } from './world/Atmosphere';
 import { LiveBillboard } from './world/LiveBillboard';
@@ -203,7 +204,6 @@ function CanvasInner({
         position={[100, 140, 80]}
         intensity={0.6}
         color={'#7ac8ff'}
-        castShadow
       />
       <directionalLight
         position={[-120, 60, -80]}
@@ -245,6 +245,11 @@ function CanvasInner({
       <SceneErrorBoundary label="NPCs">
         <NPCs agents={agents} onNpcClick={onBuildingClick} />
       </SceneErrorBoundary>
+      <Suspense fallback={null}>
+        <SceneErrorBoundary label="CitySetDressing">
+          <CitySetDressing />
+        </SceneErrorBoundary>
+      </Suspense>
       <Suspense fallback={null}>
         <SceneErrorBoundary label="Buildings">
           <Buildings agents={agents} onBuildingClick={onBuildingClick} />

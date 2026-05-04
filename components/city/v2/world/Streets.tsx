@@ -31,6 +31,17 @@ export function Streets() {
   const step = DISTRICT_STEP;
   const totalRows = DISTRICT_ROWS;
   const longEdge = Math.max(DISTRICT_COLS, totalRows) * step + 20;
+  const neonMat = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: 0x5df7ff,
+        transparent: true,
+        opacity: 0.5,
+        depthWrite: false,
+        toneMapped: false,
+      }),
+    [],
+  );
 
   // Clone shared textures before mutating repeat/wrap — Ground uses
   // the same asphalt cache with a different repeat, and mutating the
@@ -122,6 +133,34 @@ export function Streets() {
           <planeGeometry args={[longEdge, 1.5]} />
           <meshStandardMaterial map={concreteDiff} roughness={0.95} />
         </mesh>
+      ))}
+      {horizontal.map((z, i) => (
+        <group key={`hneon-${i}`}>
+          {[-1, 1].map((side) => (
+            <mesh
+              key={side}
+              rotation={[-Math.PI / 2, 0, 0]}
+              position={[0, STREET_Y + 0.11, z + side * 2.95]}
+              material={neonMat}
+            >
+              <planeGeometry args={[longEdge, 0.1]} />
+            </mesh>
+          ))}
+        </group>
+      ))}
+      {vertical.map((x, i) => (
+        <group key={`vneon-${i}`}>
+          {[-1, 1].map((side) => (
+            <mesh
+              key={side}
+              rotation={[-Math.PI / 2, 0, 0]}
+              position={[x + side * 2.95, STREET_Y + 0.12, 0]}
+              material={neonMat}
+            >
+              <planeGeometry args={[0.1, longEdge]} />
+            </mesh>
+          ))}
+        </group>
       ))}
     </group>
   );

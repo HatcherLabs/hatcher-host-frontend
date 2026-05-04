@@ -13,43 +13,68 @@ const STREET_Y = 0.18;
 const LANE_HALF = 2.5;
 
 /**
- * Ambient vehicle traffic moving along street centrelines. 40
- * vehicles HIGH / 12 LOW, distributed across the street grid:
- *   - horizontal streets (z = constant) carry cars going ±x
- *   - vertical streets (x = constant) carry cars going ±z
- *
- * Each vehicle is a short box with emissive head + tail lights. Three
- * InstancedMesh draws (body, head, tail) amortise the 40-vehicle
- * render over ~3 draw calls. Matrices are rewritten imperatively in a
- * single useFrame — no React reconciliation on movement.
+ * Ambient hover traffic moving along street centrelines. Vehicles are
+ * built from a handful of instanced parts so the scene reads as
+ * futuristic traffic without paying per-car React reconciliation cost.
  */
 export function Traffic() {
   const quality = useQuality();
   const count = quality === 'high' ? 40 : 12;
 
-  const { bodyMat, headMat, tailMat } = useMemo(() => {
+  const { bodyMat, canopyMat, wingMat, underMat, headMat, tailMat, trailMat } = useMemo(() => {
     return {
-      // Dark body — single colour per vehicle type would require
-      // instanceColor attribute; keep it uniform for now so the
-      // moving lights are what pop visually.
       bodyMat: new THREE.MeshStandardMaterial({
-        color: 0x1a2030,
-        roughness: 0.55,
-        metalness: 0.5,
+        color: 0x111826,
+        emissive: 0x08243a,
+        emissiveIntensity: 0.45,
+        roughness: 0.34,
+        metalness: 0.78,
+        envMapIntensity: 0.18,
+      }),
+      canopyMat: new THREE.MeshPhysicalMaterial({
+        color: 0x9cf5ff,
+        emissive: 0x39cfff,
+        emissiveIntensity: 0.45,
+        transparent: true,
+        opacity: 0.58,
+        roughness: 0.08,
+        metalness: 0.08,
+        transmission: 0.2,
+      }),
+      wingMat: new THREE.MeshStandardMaterial({
+        color: 0x172033,
+        emissive: 0x0e3c5f,
+        emissiveIntensity: 0.42,
+        roughness: 0.38,
+        metalness: 0.7,
+      }),
+      underMat: new THREE.MeshBasicMaterial({
+        color: 0x51f0ff,
+        transparent: true,
+        opacity: 0.42,
+        depthWrite: false,
+        toneMapped: false,
       }),
       headMat: new THREE.MeshStandardMaterial({
-        color: 0xfff5dc,
-        emissive: 0xfff5dc,
-        emissiveIntensity: 3,
+        color: 0xcff8ff,
+        emissive: 0x8ef7ff,
+        emissiveIntensity: 4.5,
         roughness: 0.2,
         metalness: 0.1,
       }),
       tailMat: new THREE.MeshStandardMaterial({
-        color: 0xff2a4b,
-        emissive: 0xff2a4b,
-        emissiveIntensity: 3.2,
+        color: 0xff4f8b,
+        emissive: 0xff1f6a,
+        emissiveIntensity: 4,
         roughness: 0.3,
         metalness: 0.1,
+      }),
+      trailMat: new THREE.MeshBasicMaterial({
+        color: 0x5df7ff,
+        transparent: true,
+        opacity: 0.22,
+        depthWrite: false,
+        toneMapped: false,
       }),
     };
   }, []);
@@ -60,13 +85,42 @@ export function Traffic() {
   const lanes = useMemo(() => buildLanes(count), [count]);
 
   const bodyRef = useRef<THREE.InstancedMesh>(null);
+  const canopyRef = useRef<THREE.InstancedMesh>(null);
+  const wingRef = useRef<THREE.InstancedMesh>(null);
+  const underRef = useRef<THREE.InstancedMesh>(null);
   const headRef = useRef<THREE.InstancedMesh>(null);
   const tailRef = useRef<THREE.InstancedMesh>(null);
+  const trailRef = useRef<THREE.InstancedMesh>(null);
 
   useFrame(({ clock }) => {
-    if (!bodyRef.current || !headRef.current || !tailRef.current) return;
+    if (
+      !bodyRef.current ||
+      !canopyRef.current ||
+      !wingRef.current ||
+      !underRef.current ||
+      !headRef.current ||
+      !tailRef.current ||
+      !trailRef.current
+    ) return;
     const t = clock.getElapsedTime();
     const obj = new THREE.Object3D();
+    const base = new THREE.Vector3();
+    const offset = new THREE.Vector3();
+    const quat = new THREE.Quaternion();
+    const setPart = (
+      mesh: THREE.InstancedMesh,
+      index: number,
+      localOffset: [number, number, number],
+      scale: [number, number, number],
+    ) => {
+      offset.set(localOffset[0], localOffset[1], localOffset[2]).applyQuaternion(quat);
+      obj.position.copy(base).add(offset);
+      obj.quaternion.copy(quat);
+      obj.scale.set(scale[0], scale[1], scale[2]);
+      obj.updateMatrix();
+      mesh.setMatrixAt(index, obj.matrix);
+    };
+
     lanes.forEach((l, i) => {
       const progress = (l.phase + t * l.speed) % l.length;
       const travel = progress - l.length / 2; // -half..+half so we cover the whole street
@@ -85,46 +139,56 @@ export function Traffic() {
         rotY = l.dir > 0 ? Math.PI / 2 : -Math.PI / 2;
       }
 
-      obj.position.set(x, STREET_Y + 0.3, z);
-      obj.rotation.set(0, rotY, 0);
-      obj.scale.set(1, 1, 1);
-      obj.updateMatrix();
-      bodyRef.current!.setMatrixAt(i, obj.matrix);
+      const float = Math.sin(t * 2.4 + l.phase * 0.07) * 0.08;
+      base.set(x, STREET_Y + 0.56 + float, z);
+      quat.setFromEuler(new THREE.Euler(0, rotY, 0));
 
-      // Headlights — shift forward along local +x before rotation so
-      // they always end up at the vehicle's nose.
-      const nose = new THREE.Object3D();
-      nose.position.set(x + Math.cos(rotY) * 1.1, STREET_Y + 0.55, z + Math.sin(rotY) * 1.1);
-      nose.rotation.set(0, rotY, 0);
-      nose.scale.set(1, 1, 1);
-      nose.updateMatrix();
-      headRef.current!.setMatrixAt(i, nose.matrix);
-
-      const tail = new THREE.Object3D();
-      tail.position.set(x - Math.cos(rotY) * 1.1, STREET_Y + 0.55, z - Math.sin(rotY) * 1.1);
-      tail.rotation.set(0, rotY, 0);
-      tail.scale.set(1, 1, 1);
-      tail.updateMatrix();
-      tailRef.current!.setMatrixAt(i, tail.matrix);
+      setPart(bodyRef.current!, i, [0, 0, 0], [2.6, 0.5, 1.06]);
+      setPart(canopyRef.current!, i, [0.28, 0.34, 0], [0.96, 0.36, 0.62]);
+      setPart(wingRef.current!, i, [-0.1, -0.02, 0], [1.72, 0.1, 1.7]);
+      setPart(underRef.current!, i, [0, -0.32, 0], [2.18, 0.035, 1.08]);
+      setPart(headRef.current!, i, [1.35, 0.05, 0], [0.18, 0.12, 0.72]);
+      setPart(tailRef.current!, i, [-1.34, 0.03, 0], [0.2, 0.12, 0.68]);
+      setPart(trailRef.current!, i, [-1.82, -0.02, 0], [1.0, 0.055, 0.92]);
     });
     bodyRef.current.instanceMatrix.needsUpdate = true;
+    canopyRef.current.instanceMatrix.needsUpdate = true;
+    wingRef.current.instanceMatrix.needsUpdate = true;
+    underRef.current.instanceMatrix.needsUpdate = true;
     headRef.current.instanceMatrix.needsUpdate = true;
     tailRef.current.instanceMatrix.needsUpdate = true;
+    trailRef.current.instanceMatrix.needsUpdate = true;
   });
 
   return (
     <group>
-      <instancedMesh ref={bodyRef} args={[undefined, undefined, count]} castShadow>
-        <boxGeometry args={[2.2, 0.7, 1.0]} />
+      <instancedMesh ref={bodyRef} args={[undefined, undefined, count]}>
+        <boxGeometry args={[1, 1, 1]} />
         <primitive attach="material" object={bodyMat} />
       </instancedMesh>
+      <instancedMesh ref={canopyRef} args={[undefined, undefined, count]}>
+        <sphereGeometry args={[0.5, 16, 10]} />
+        <primitive attach="material" object={canopyMat} />
+      </instancedMesh>
+      <instancedMesh ref={wingRef} args={[undefined, undefined, count]}>
+        <boxGeometry args={[1, 1, 1]} />
+        <primitive attach="material" object={wingMat} />
+      </instancedMesh>
+      <instancedMesh ref={underRef} args={[undefined, undefined, count]}>
+        <boxGeometry args={[1, 1, 1]} />
+        <primitive attach="material" object={underMat} />
+      </instancedMesh>
       <instancedMesh ref={headRef} args={[undefined, undefined, count]}>
-        <boxGeometry args={[0.3, 0.2, 0.8]} />
+        <boxGeometry args={[1, 1, 1]} />
         <primitive attach="material" object={headMat} />
       </instancedMesh>
       <instancedMesh ref={tailRef} args={[undefined, undefined, count]}>
-        <boxGeometry args={[0.2, 0.2, 0.7]} />
+        <boxGeometry args={[1, 1, 1]} />
         <primitive attach="material" object={tailMat} />
+      </instancedMesh>
+      <instancedMesh ref={trailRef} args={[undefined, undefined, count]}>
+        <boxGeometry args={[1, 1, 1]} />
+        <primitive attach="material" object={trailMat} />
       </instancedMesh>
     </group>
   );

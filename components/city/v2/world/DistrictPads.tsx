@@ -63,23 +63,89 @@ function DistrictPad({
   x: number;
   z: number;
 }) {
-  const mat = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: CATEGORY_PAD_COLOR[category],
-        roughness: 0.85,
-        metalness: 0.05,
+  const { mat, edgeMat } = useMemo(() => {
+    const accent = new THREE.Color(CATEGORY_PAD_COLOR[category]);
+    const base = accent.clone().multiplyScalar(0.44).lerp(new THREE.Color(0x071018), 0.34);
+    return {
+      mat: new THREE.MeshStandardMaterial({
+        map: makePadTexture(accent),
+        color: base,
+        emissive: accent,
+        emissiveIntensity: 0.13,
+        roughness: 0.62,
+        metalness: 0.28,
+        envMapIntensity: 0.08,
       }),
-    [category],
-  );
+      edgeMat: new THREE.MeshBasicMaterial({
+        color: accent,
+        transparent: true,
+        opacity: 0.48,
+        depthWrite: false,
+        toneMapped: false,
+      }),
+    };
+  }, [category]);
+
+  const half = DISTRICT_SIZE / 2;
   return (
-    <mesh
-      rotation={[-Math.PI / 2, 0, 0]}
-      position={[x, PAD_Y, z]}
-      receiveShadow
-      material={mat}
-    >
-      <planeGeometry args={[DISTRICT_SIZE, DISTRICT_SIZE]} />
-    </mesh>
+    <group position={[x, 0, z]}>
+      <mesh
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[0, PAD_Y, 0]}
+        receiveShadow
+        material={mat}
+      >
+        <planeGeometry args={[DISTRICT_SIZE, DISTRICT_SIZE]} />
+      </mesh>
+      {[
+        { key: 'north', position: [0, PAD_Y + 0.035, -half] as const, size: [DISTRICT_SIZE, 0.05, 0.18] as const },
+        { key: 'south', position: [0, PAD_Y + 0.035, half] as const, size: [DISTRICT_SIZE, 0.05, 0.18] as const },
+        { key: 'west', position: [-half, PAD_Y + 0.035, 0] as const, size: [0.18, 0.05, DISTRICT_SIZE] as const },
+        { key: 'east', position: [half, PAD_Y + 0.035, 0] as const, size: [0.18, 0.05, DISTRICT_SIZE] as const },
+      ].map((edge) => (
+        <mesh key={edge.key} position={edge.position} material={edgeMat}>
+          <boxGeometry args={edge.size} />
+        </mesh>
+      ))}
+    </group>
   );
+}
+
+function makePadTexture(accent: THREE.Color) {
+  const size = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  ctx.fillStyle = '#0a111b';
+  ctx.fillRect(0, 0, size, size);
+
+  const color = `rgb(${Math.round(accent.r * 255)}, ${Math.round(accent.g * 255)}, ${Math.round(accent.b * 255)})`;
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = 0.2;
+  ctx.lineWidth = 1;
+  for (let i = -size; i < size * 2; i += 20) {
+    ctx.beginPath();
+    ctx.moveTo(i, 0);
+    ctx.lineTo(i + size, size);
+    ctx.stroke();
+  }
+
+  ctx.globalAlpha = 0.28;
+  ctx.strokeRect(18, 18, size - 36, size - 36);
+  ctx.globalAlpha = 0.38;
+  for (let i = 0; i < 4; i++) {
+    const p = 34 + i * 42;
+    ctx.fillStyle = color;
+    ctx.fillRect(p, 34, 18, 3);
+    ctx.fillRect(size - 52, p, 3, 18);
+  }
+  ctx.globalAlpha = 1;
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(2, 2);
+  tex.needsUpdate = true;
+  return tex;
 }

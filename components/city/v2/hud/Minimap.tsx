@@ -87,8 +87,8 @@ export function Minimap({ state, agents, showCharacter, onTravel }: Props) {
     const mx = e.clientX - rect.left;
     const mz = e.clientY - rect.top;
     // Inverse of toMap — minimap px → world (x, z)
-    const wx = (mx / MAP_PX) * WORLD_HALF * 2 - WORLD_HALF;
-    const wz = (mz / MAP_PX) * WORLD_HALF * 2 - WORLD_HALF;
+    const wx = (mx / rect.width) * WORLD_HALF * 2 - WORLD_HALF;
+    const wz = (mz / rect.height) * WORLD_HALF * 2 - WORLD_HALF;
     // Find the nearest district
     const step = DISTRICT_STEP;
     const totalRows = DISTRICT_ROWS;
@@ -117,6 +117,7 @@ export function Minimap({ state, agents, showCharacter, onTravel }: Props) {
         border: '1px solid rgba(251,191,36,0.45)',
         borderRadius: 6,
         padding: 6,
+        width: 'fit-content',
       }}
     >
       <canvas
@@ -124,19 +125,24 @@ export function Minimap({ state, agents, showCharacter, onTravel }: Props) {
         width={MAP_PX * dprRef.current}
         height={MAP_PX * dprRef.current}
         onClick={handleClick}
-        style={{ width: MAP_PX, height: MAP_PX, display: 'block', cursor: onTravel ? 'crosshair' : 'default' }}
+        style={{
+          width: 'clamp(132px, 34vw, 200px)',
+          height: 'clamp(132px, 34vw, 200px)',
+          display: 'block',
+          cursor: onTravel ? 'crosshair' : 'default',
+        }}
       />
       <div
         style={{
           fontFamily: '"Press Start 2P", monospace',
-          fontSize: 8,
+          fontSize: 'clamp(6px, 1.45vw, 8px)',
           color: '#fbbf24',
-          letterSpacing: 1,
           marginTop: 4,
           textAlign: 'center',
+          lineHeight: 1.6,
         }}
       >
-        CITY MAP — CLICK TO TRAVEL
+        CITY MAP - CLICK TO TRAVEL
       </div>
     </div>
   );
