@@ -1,6 +1,6 @@
 'use client';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import { EffectComposer, Bloom, N8AO, Noise, Vignette } from '@react-three/postprocessing';
 import { Suspense, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { paletteFor } from './colors';
@@ -16,6 +16,7 @@ import { Skybox } from './world/Skybox';
 import { Lighting } from './world/Lighting';
 import { Atmosphere } from './world/Atmosphere';
 import { FrameworkDecor } from './world/FrameworkDecor';
+import { RoomGameFX } from './world/RoomGameFX';
 import { getStationLayout, type StationId, type StationLayout } from './world/layout';
 import { collidersFromLayout, wallColliders } from './world/colliders';
 import { AgentAvatar } from './stations/AgentAvatar';
@@ -112,6 +113,7 @@ export function AgentRoomSceneV2({
           {quality !== 'low' && <Atmosphere framework={framework} count={quality === 'high' ? 180 : 120} />}
           <RoomShell framework={framework} />
           <FrameworkDecor framework={framework} />
+          <RoomGameFX framework={framework} layout={layout} nearest={nearest} quality={quality} />
 
           <AgentAvatar
             station={layout.agentAvatar}
@@ -195,16 +197,41 @@ export function AgentRoomSceneV2({
           <FirstPersonCamera state={charState} />
           <MouseLook state={charState} />
           <SyncPos state={charState} target={posRef} />
-          {quality !== 'low' && (
+          {quality === 'high' ? (
             <EffectComposer multisampling={0} enableNormalPass={false}>
+              <N8AO
+                aoRadius={2.2}
+                distanceFalloff={1.8}
+                intensity={1.15}
+                quality="medium"
+              />
               <Bloom
-                intensity={quality === 'high' ? 0.45 : 0.35}
+                intensity={0.45}
                 luminanceThreshold={0.95}
                 luminanceSmoothing={0.25}
                 mipmapBlur
               />
+              <Vignette offset={0.18} darkness={0.45} opacity={0.55} />
+              <Noise opacity={0.025} />
             </EffectComposer>
-          )}
+          ) : quality === 'medium' ? (
+            <EffectComposer multisampling={0} enableNormalPass={false}>
+              <N8AO
+                aoRadius={2.2}
+                distanceFalloff={1.8}
+                intensity={0.75}
+                quality="performance"
+                halfRes
+              />
+              <Bloom
+                intensity={0.35}
+                luminanceThreshold={0.95}
+                luminanceSmoothing={0.25}
+                mipmapBlur
+              />
+              <Vignette offset={0.18} darkness={0.45} opacity={0.55} />
+            </EffectComposer>
+          ) : null}
         </Suspense>
       </Canvas>
       <MobileJoystick

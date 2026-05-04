@@ -23,6 +23,8 @@ export function FollowCamera({ state, distance = 12, lerp = 0.15 }: Props) {
   const { camera } = useThree();
   const target = useRef(new THREE.Vector3());
   const pos = useRef(new THREE.Vector3());
+  const lastPosition = useRef(new THREE.Vector3());
+  const bobPhase = useRef(0);
 
   // Snap on mount so the first frame isn't a jarring lerp-in
   useEffect(() => {
@@ -30,19 +32,32 @@ export function FollowCamera({ state, distance = 12, lerp = 0.15 }: Props) {
     computeDesired(state, distance, pos.current);
     camera.position.copy(pos.current);
     camera.lookAt(target.current);
+    lastPosition.current.copy(state.position);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useFrame(() => {
+  useFrame(({ clock }, dt) => {
+    const movement = state.position.distanceTo(lastPosition.current);
+    const speed = dt > 0 ? movement / dt : 0;
+    const walk = THREE.MathUtils.clamp(speed / 16, 0, 1);
+    bobPhase.current += dt * (walk > 0.02 ? THREE.MathUtils.lerp(5.5, 9, walk) : 1.2);
+    lastPosition.current.copy(state.position);
+
+    const forward = new THREE.Vector3(Math.sin(state.heading), 0, Math.cos(state.heading));
+    const lookAhead = walk * 1.2;
+    const bob = Math.sin(bobPhase.current * 2) * 0.16 * walk;
+    const breathe = Math.sin(clock.getElapsedTime() * 0.9) * 0.025;
+
     const wantTarget = new THREE.Vector3(
-      state.position.x,
-      1.2,
-      state.position.z,
+      state.position.x + forward.x * lookAhead,
+      1.25 + bob * 0.35 + breathe,
+      state.position.z + forward.z * lookAhead,
     );
     target.current.lerp(wantTarget, lerp);
 
     const wantPos = new THREE.Vector3();
     computeDesired(state, distance, wantPos);
+    wantPos.y += bob + breathe;
     pos.current.lerp(wantPos, lerp);
 
     camera.position.copy(pos.current);

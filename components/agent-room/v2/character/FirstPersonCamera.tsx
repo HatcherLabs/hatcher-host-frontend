@@ -25,17 +25,35 @@ export function FirstPersonCamera({ state, lerp = 1 }: Props) {
   const { camera } = useThree();
   const eye = useRef(new THREE.Vector3());
   const target = useRef(new THREE.Vector3());
+  const lastPosition = useRef(new THREE.Vector3());
+  const bobPhase = useRef(0);
 
   useEffect(() => {
     eye.current.set(state.position.x, EYE_HEIGHT, state.position.z);
     camera.position.copy(eye.current);
+    lastPosition.current.copy(state.position);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useFrame(() => {
+  useFrame(({ clock }, dt) => {
+    const movement = state.position.distanceTo(lastPosition.current);
+    const speed = dt > 0 ? movement / dt : 0;
+    const walk = THREE.MathUtils.clamp(speed / 5.5, 0, 1);
+    if (walk > 0.02) {
+      bobPhase.current += dt * THREE.MathUtils.lerp(6.5, 11, walk);
+    } else {
+      bobPhase.current += dt * 1.6;
+    }
+    lastPosition.current.copy(state.position);
+
+    const bob = Math.sin(bobPhase.current * 2) * 0.035 * walk;
+    const breathe = Math.sin(clock.getElapsedTime() * 1.1) * 0.008;
+    const strafeSway = Math.sin(bobPhase.current) * 0.018 * walk;
+    const roll = Math.sin(bobPhase.current) * 0.012 * walk;
+
     const wantEye = new THREE.Vector3(
-      state.position.x,
-      EYE_HEIGHT,
+      state.position.x + strafeSway,
+      EYE_HEIGHT + bob + breathe,
       state.position.z,
     );
     if (lerp >= 1) {
@@ -59,6 +77,7 @@ export function FirstPersonCamera({ state, lerp = 1 }: Props) {
 
     camera.position.copy(eye.current);
     camera.lookAt(target.current);
+    camera.rotation.z += roll;
   });
 
   return null;

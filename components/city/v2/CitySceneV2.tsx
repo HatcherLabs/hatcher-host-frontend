@@ -1,7 +1,5 @@
 'use client';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
-import { Bloom, EffectComposer } from '@react-three/postprocessing';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useRouter } from '@/i18n/routing';
@@ -25,6 +23,7 @@ import { Buildings } from './world/Buildings';
 import { ActivityPulses } from './world/ActivityPulses';
 import { Atmosphere } from './world/Atmosphere';
 import { LiveBillboard } from './world/LiveBillboard';
+import { CityGameFX } from './world/CityGameFX';
 import { buildSolidDiscs } from './world/colliders';
 import {
   CharacterController,
@@ -39,7 +38,15 @@ import { WalkOnboarding } from './hud/WalkOnboarding';
 import { MobileJoystick } from './character/MobileJoystick';
 import { AmbientAudio } from './hud/AmbientAudio';
 import { CATEGORIES } from '@/components/city/types';
-import { DISTRICT_SIZE, districtPosition as gridDistrictPosition } from './world/grid';
+import {
+  DISTRICT_COLS,
+  DISTRICT_GAP,
+  DISTRICT_ROWS,
+  DISTRICT_SIZE,
+  DISTRICT_STEP,
+  GROUND_SIZE,
+  districtPosition as gridDistrictPosition,
+} from './world/grid';
 import { useMemo as useMemoReact } from 'react';
 
 interface Props {
@@ -166,7 +173,13 @@ function CanvasInner({
   return (
     <Canvas
       key={quality}
-      camera={{ position: [60, 80, 120], fov: 45, near: 0.5, far: 1000 }}
+      camera={{
+        position: [0, 260, 0.1],
+        rotation: [-Math.PI / 2, 0, 0],
+        fov: 45,
+        near: 0.5,
+        far: 1000,
+      }}
       dpr={quality === 'high' ? [1, 2] : 1}
       gl={{ antialias: quality === 'high', powerPreference: 'high-performance' }}
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
@@ -201,69 +214,64 @@ function CanvasInner({
         <SceneErrorBoundary label="Skybox">
           <Skybox timeOfDay="auto" />
         </SceneErrorBoundary>
-        <SceneErrorBoundary label="CyberSky">
-          <CyberSky />
-        </SceneErrorBoundary>
+      </Suspense>
+      <SceneErrorBoundary label="CyberSky">
+        <CyberSky />
+      </SceneErrorBoundary>
+      <Suspense fallback={<FallbackGround />}>
         <Ground />
-        <HorizonRing />
-        <SceneErrorBoundary label="DistrictPads">
-          <DistrictPads />
-        </SceneErrorBoundary>
-        <SceneErrorBoundary label="Streets">
+      </Suspense>
+      <HorizonRing />
+      <SceneErrorBoundary label="DistrictPads">
+        <DistrictPads />
+      </SceneErrorBoundary>
+      <SceneErrorBoundary label="Streets">
+        <Suspense fallback={<FallbackStreets />}>
           <Streets />
-        </SceneErrorBoundary>
-        <SceneErrorBoundary label="Landmarks">
-          <Landmarks />
-        </SceneErrorBoundary>
-        <SceneErrorBoundary label="Streetlights">
-          <Streetlights />
-        </SceneErrorBoundary>
-        <SceneErrorBoundary label="TravelPads">
-          <TravelPads />
-        </SceneErrorBoundary>
-        <SceneErrorBoundary label="Traffic">
-          <Traffic />
-        </SceneErrorBoundary>
-        <SceneErrorBoundary label="NPCs">
-          <NPCs agents={agents} onNpcClick={onBuildingClick} />
-        </SceneErrorBoundary>
+        </Suspense>
+      </SceneErrorBoundary>
+      <SceneErrorBoundary label="Landmarks">
+        <Landmarks />
+      </SceneErrorBoundary>
+      <SceneErrorBoundary label="Streetlights">
+        <Streetlights />
+      </SceneErrorBoundary>
+      <SceneErrorBoundary label="TravelPads">
+        <TravelPads />
+      </SceneErrorBoundary>
+      <SceneErrorBoundary label="Traffic">
+        <Traffic />
+      </SceneErrorBoundary>
+      <SceneErrorBoundary label="NPCs">
+        <NPCs agents={agents} onNpcClick={onBuildingClick} />
+      </SceneErrorBoundary>
+      <Suspense fallback={null}>
         <SceneErrorBoundary label="Buildings">
           <Buildings agents={agents} onBuildingClick={onBuildingClick} />
         </SceneErrorBoundary>
-        <SceneErrorBoundary label="ActivityPulses">
-          <ActivityPulses agents={agents} pulseAts={pulseAts} />
-        </SceneErrorBoundary>
-        <SceneErrorBoundary label="Atmosphere">
-          <Atmosphere />
-        </SceneErrorBoundary>
-        <SceneErrorBoundary label="LiveBillboard">
-          <LiveBillboard agents={agents} />
-        </SceneErrorBoundary>
-        <SceneErrorBoundary label="DistrictLabels">
-          <DistrictLabels agents={agents} />
-        </SceneErrorBoundary>
-        {mode === 'walk' && (
-          <SceneErrorBoundary label="Character">
-            <CharacterMesh state={charState} />
-          </SceneErrorBoundary>
-        )}
       </Suspense>
+      <SceneErrorBoundary label="ActivityPulses">
+        <ActivityPulses agents={agents} pulseAts={pulseAts} />
+      </SceneErrorBoundary>
+      <SceneErrorBoundary label="Atmosphere">
+        <Atmosphere />
+      </SceneErrorBoundary>
+      <SceneErrorBoundary label="CityGameFX">
+        <CityGameFX agents={agents} />
+      </SceneErrorBoundary>
+      <SceneErrorBoundary label="LiveBillboard">
+        <LiveBillboard agents={agents} />
+      </SceneErrorBoundary>
+      <SceneErrorBoundary label="DistrictLabels">
+        <DistrictLabels agents={agents} />
+      </SceneErrorBoundary>
+      {mode === 'walk' && (
+        <SceneErrorBoundary label="Character">
+          <CharacterMesh state={charState} />
+        </SceneErrorBoundary>
+      )}
       {mode === 'survey' ? (
-        <OrbitControls
-          enableDamping
-          enablePan={false}
-          target={[0, 0, 0]}
-          minDistance={30}
-          // Cap zoom-out inside the fog falloff so the city stays
-          // readable at max distance — no more black void.
-          maxDistance={300}
-          // Prevent orbiting below the horizon — otherwise the camera
-          // rotates under the ground slab and shows black void.
-          maxPolarAngle={Math.PI / 2 - 0.08}
-          // Keep a small ceiling on top-down so the view stays
-          // cityscape-angled, not flat map.
-          minPolarAngle={0.18}
-        />
+        <SurveyCamera />
       ) : (
         <>
           <CharacterController
@@ -279,19 +287,70 @@ function CanvasInner({
           <FollowCamera state={charState} />
         </>
       )}
-      {/* Bloom picks up the emissive building tint + district pad edges
-          and the HDRI neon highlights. HIGH gets a punchier pass; LOW
-          keeps it cheap. */}
-      <EffectComposer multisampling={quality === 'high' ? 4 : 0} enableNormalPass={false}>
-        <Bloom
-          intensity={quality === 'high' ? 0.55 : 0.3}
-          luminanceThreshold={0.55}
-          luminanceSmoothing={0.2}
-          mipmapBlur
-          radius={quality === 'high' ? 0.6 : 0.45}
-        />
-      </EffectComposer>
     </Canvas>
+  );
+}
+
+function SurveyCamera() {
+  const { camera } = useThree();
+
+  useEffect(() => {
+    camera.position.set(0, 210, 255);
+    camera.lookAt(0, 0, 0);
+  }, [camera]);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime() * 0.035;
+    const radius = 255;
+    camera.position.set(Math.sin(t) * radius, 210, Math.cos(t) * radius);
+    camera.lookAt(0, 0, 0);
+  });
+
+  return null;
+}
+
+function FallbackGround() {
+  return (
+    <group>
+      <mesh position={[0, -3, 0]} receiveShadow>
+        <boxGeometry args={[GROUND_SIZE, 6, GROUND_SIZE]} />
+        <meshStandardMaterial color={'#151720'} roughness={0.95} metalness={0.03} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.006, 0]}>
+        <planeGeometry args={[GROUND_SIZE, GROUND_SIZE]} />
+        <meshBasicMaterial color={'#0b1224'} transparent opacity={0.72} />
+      </mesh>
+    </group>
+  );
+}
+
+function FallbackStreets() {
+  const longEdge = Math.max(DISTRICT_COLS, DISTRICT_ROWS) * DISTRICT_STEP + 20;
+  const laneWidth = DISTRICT_GAP - 2;
+  const horizontal = [];
+  for (let r = 0; r <= DISTRICT_ROWS; r++) {
+    horizontal.push((r - DISTRICT_ROWS / 2) * DISTRICT_STEP);
+  }
+  const vertical = [];
+  for (let c = 0; c <= DISTRICT_COLS; c++) {
+    vertical.push((c - DISTRICT_COLS / 2) * DISTRICT_STEP);
+  }
+
+  return (
+    <group>
+      {horizontal.map((z, i) => (
+        <mesh key={`fallback-h-${i}`} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.026, z]}>
+          <planeGeometry args={[longEdge, laneWidth]} />
+          <meshStandardMaterial color={'#252832'} roughness={0.88} />
+        </mesh>
+      ))}
+      {vertical.map((x, i) => (
+        <mesh key={`fallback-v-${i}`} rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.027, 0]}>
+          <planeGeometry args={[laneWidth, longEdge]} />
+          <meshStandardMaterial color={'#252832'} roughness={0.88} />
+        </mesh>
+      ))}
+    </group>
   );
 }
 

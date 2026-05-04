@@ -38,6 +38,109 @@ function pulseFor(status?: string): number {
   return 0.72;
 }
 
+function statusColor(status: string | undefined, palette: FrameworkPalette): number {
+  if (status === 'error' || status === 'crashed') return 0xff3b5c;
+  if (status === 'starting') return 0xf59e0b;
+  if (status === 'paused' || status === 'sleeping') return 0x94a3b8;
+  return palette.primary;
+}
+
+function AgentStatusAura({
+  palette,
+  isStreaming,
+  status,
+}: Pick<Props, 'palette' | 'isStreaming' | 'status'>) {
+  const floor = useRef<THREE.Group>(null);
+  const orbit = useRef<THREE.Group>(null);
+  const bars = useRef<(THREE.Mesh | null)[]>([]);
+  const color = statusColor(status, palette);
+  const pulse = pulseFor(status);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    if (floor.current) {
+      floor.current.rotation.z = t * 0.36;
+      const s = 1 + Math.sin(t * 2.6) * 0.025 * pulse;
+      floor.current.scale.set(s, s, 1);
+    }
+    if (orbit.current) {
+      orbit.current.rotation.y = t * (isStreaming ? 0.72 : 0.28);
+      orbit.current.rotation.z = Math.sin(t * 0.5) * 0.08;
+    }
+    bars.current.forEach((bar, i) => {
+      if (!bar) return;
+      const active = isStreaming ? 1 : 0.28;
+      const h = 0.18 + active * (0.28 + Math.sin(t * 7 + i * 0.75) * 0.18);
+      bar.scale.y = Math.max(0.08, h);
+      const mat = bar.material as THREE.MeshBasicMaterial;
+      mat.opacity += ((isStreaming ? 0.82 : 0.22) - mat.opacity) * 0.14;
+    });
+  });
+
+  return (
+    <group>
+      <group ref={floor} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.08, 0]}>
+        <mesh>
+          <ringGeometry args={[1.14, 1.2, 80]} />
+          <meshBasicMaterial
+            color={color}
+            toneMapped={false}
+            transparent
+            opacity={0.42}
+            depthWrite={false}
+          />
+        </mesh>
+        <mesh rotation={[0, 0, Math.PI / 4]}>
+          <ringGeometry args={[1.44, 1.48, 80]} />
+          <meshBasicMaterial
+            color={palette.bright}
+            toneMapped={false}
+            transparent
+            opacity={isStreaming ? 0.42 : 0.18}
+            depthWrite={false}
+          />
+        </mesh>
+      </group>
+
+      <group ref={orbit} position={[0, 1.55, 0]}>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[1.18, 0.012, 8, 96]} />
+          <meshBasicMaterial color={color} toneMapped={false} transparent opacity={0.36} />
+        </mesh>
+        <mesh rotation={[0, Math.PI / 2, 0]}>
+          <torusGeometry args={[1.32, 0.01, 8, 96]} />
+          <meshBasicMaterial
+            color={palette.bright}
+            toneMapped={false}
+            transparent
+            opacity={isStreaming ? 0.46 : 0.2}
+          />
+        </mesh>
+      </group>
+
+      <group position={[0, 2.72, 0.28]}>
+        {Array.from({ length: 5 }, (_, i) => (
+          <mesh
+            key={i}
+            ref={(m) => {
+              bars.current[i] = m;
+            }}
+            position={[(i - 2) * 0.16, 0, 0]}
+          >
+            <boxGeometry args={[0.07, 0.7, 0.045]} />
+            <meshBasicMaterial
+              color={i % 2 ? palette.bright : color}
+              toneMapped={false}
+              transparent
+              opacity={0.2}
+            />
+          </mesh>
+        ))}
+      </group>
+    </group>
+  );
+}
+
 function OpenClawMech({ palette, isStreaming, status }: Omit<Props, 'framework' | 'agentId'>) {
   const root = useRef<THREE.Group>(null);
   const leftArm = useRef<THREE.Group>(null);
@@ -293,17 +396,25 @@ function HermesScribe({ palette, isStreaming, status }: Omit<Props, 'framework' 
 
 export function AgentBody({ framework, agentId, palette, isStreaming, status }: Props) {
   const variant = useMemo(() => pickVariant(framework, agentId), [framework, agentId]);
+  const body = (() => {
+    switch (variant) {
+      case 'openclaw-mech':
+        return <OpenClawMech palette={palette} isStreaming={isStreaming} status={status} />;
+      case 'openclaw-drone':
+        return <OpenClawDrone palette={palette} isStreaming={isStreaming} status={status} />;
+      case 'hermes-oracle':
+        return <HermesOracle palette={palette} isStreaming={isStreaming} status={status} />;
+      case 'hermes-scribe':
+        return <HermesScribe palette={palette} isStreaming={isStreaming} status={status} />;
+      default:
+        return <V2Robot palette={palette} isStreaming={isStreaming} />;
+    }
+  })();
 
-  switch (variant) {
-    case 'openclaw-mech':
-      return <OpenClawMech palette={palette} isStreaming={isStreaming} status={status} />;
-    case 'openclaw-drone':
-      return <OpenClawDrone palette={palette} isStreaming={isStreaming} status={status} />;
-    case 'hermes-oracle':
-      return <HermesOracle palette={palette} isStreaming={isStreaming} status={status} />;
-    case 'hermes-scribe':
-      return <HermesScribe palette={palette} isStreaming={isStreaming} status={status} />;
-    default:
-      return <V2Robot palette={palette} isStreaming={isStreaming} />;
-  }
+  return (
+    <group>
+      <AgentStatusAura palette={palette} isStreaming={isStreaming} status={status} />
+      {body}
+    </group>
+  );
 }
