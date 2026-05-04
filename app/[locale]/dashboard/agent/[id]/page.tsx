@@ -263,6 +263,7 @@ export default function AgentManagePage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
+  const sendingRef = useRef(false);
   const [sendCooldown, setSendCooldown] = useState(false);
   const sendCooldownRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [chatError, setChatError] = useState<string | null>(null);
@@ -272,6 +273,7 @@ export default function AgentManagePage() {
 
   const historyLoadedRef = useRef(false);
   const lastSavedCountRef = useRef(0);
+  const lastHistorySignatureRef = useRef('');
 
   // Features / integrations
   const [activeFeatures, setActiveFeatures] = useState<AgentFeature[]>([]);
@@ -301,6 +303,29 @@ export default function AgentManagePage() {
   const logs = useAgentLogs(id);
 
   // ─── Data loaders ────────────────────────────────────────
+
+  const normalizeHistoryMessages = useCallback((raw: { role: string; content: string; ts: number }[]) => {
+    const deduped: typeof raw = [];
+    for (const m of raw) {
+      const prev = deduped[deduped.length - 1];
+      if (prev && prev.role === m.role && prev.content === m.content) continue;
+      deduped.push(m);
+    }
+
+    return deduped.map((m, i) => ({
+      id: `hist-${m.ts ?? i}-${i}`,
+      role: m.role as 'user' | 'assistant',
+      content: m.content,
+      timestamp: m.ts ? new Date(m.ts) : new Date(),
+    }));
+  }, []);
+
+  const historySignature = useCallback((items: Message[]) => (
+    items
+      .filter((m) => !m.streaming && m.content)
+      .map((m) => `${m.role}:${m.timestamp?.getTime() ?? 0}:${m.content}`)
+      .join('\n')
+  ), []);
 
   const loadAgent = useCallback(async () => {
     const res = await api.getAgent(id);
@@ -370,6 +395,7 @@ export default function AgentManagePage() {
       setLoading(true);
       historyLoadedRef.current = false;
       lastSavedCountRef.current = 0;
+      lastHistorySignatureRef.current = '';
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -388,6 +414,8 @@ export default function AgentManagePage() {
   // ─── Initial load ─────────────────────────────────────────
 
   useEffect(() => { loadAgent(); loadUsage(); }, [loadAgent, loadUsage]);
+
+  useEffect(() => { sendingRef.current = sending; }, [sending]);
 
   // ─── Poll agent status ────────────────────────────────────
 
@@ -585,34 +613,63 @@ export default function AgentManagePage() {
     if ((tab === 'integrations' || tab === 'config') && agentStatus) loadFeatures();
   }, [tab, agentStatus, loadFeatures]);
 
-  // ─── Load chat history from server on mount ───────────────
+  // ─── Load and poll chat history from server ───────────────
+
+  const loadChatHistory = useCallback(async (mode: 'initial' | 'poll' = 'poll') => {
+    if (!id) return;
+    if (mode === 'poll' && (sendingRef.current || wsStreamingMsgRef.current)) return;
+
+    if (mode === 'initial') historyLoadedRef.current = false;
+
+    try {
+      const res = await api.getChatHistory(id);
+      if (res.success) {
+        const loaded = normalizeHistoryMessages(res.data.messages);
+        const signature = historySignature(loaded);
+
+        if (mode === 'initial') {
+          setMessages(loaded);
+          lastSavedCountRef.current = loaded.length;
+          lastHistorySignatureRef.current = signature;
+        } else if (signature && signature !== lastHistorySignatureRef.current) {
+          setMessages((prev) => {
+            const completeLocal = prev.filter((m) => !m.streaming && m.content);
+            const hasLocalTail = completeLocal.length > 0;
+            const localTail = completeLocal[completeLocal.length - 1];
+            const loadedHasTail = localTail
+              ? loaded.some((m) => m.role === localTail.role && m.content === localTail.content)
+              : true;
+
+            // Avoid replacing a just-sent local message before the save debounce
+            // has persisted it. Scheduled assistant messages arrive on the next
+            // poll once the local tail is present server-side.
+            if (hasLocalTail && completeLocal.length > loaded.length && !loadedHasTail) {
+              return prev;
+            }
+
+            lastSavedCountRef.current = loaded.length;
+            lastHistorySignatureRef.current = signature;
+            return loaded;
+          });
+        }
+      }
+    } finally {
+      if (mode === 'initial') historyLoadedRef.current = true;
+    }
+  }, [historySignature, id, normalizeHistoryMessages]);
 
   useEffect(() => {
-    if (!id) return;
-    historyLoadedRef.current = false;
-    api.getChatHistory(id).then(res => {
-      if (res.success && res.data.messages.length > 0) {
-        const raw = res.data.messages as { role: string; content: string; ts: number }[];
-        const deduped: typeof raw = [];
-        for (const m of raw) {
-          const prev = deduped[deduped.length - 1];
-          if (prev && prev.role === m.role && prev.content === m.content) continue;
-          deduped.push(m);
-        }
-        const loaded = deduped.map((m, i) => ({
-          id: `hist-${i}`,
-          role: m.role as 'user' | 'assistant',
-          content: m.content,
-          timestamp: m.ts ? new Date(m.ts) : new Date(),
-        }));
-        setMessages(loaded);
-        lastSavedCountRef.current = loaded.length;
-      }
-      historyLoadedRef.current = true;
-    }).catch(() => {
-      historyLoadedRef.current = true;
-    });
-  }, [id]);
+    lastHistorySignatureRef.current = '';
+    void loadChatHistory('initial');
+  }, [loadChatHistory]);
+
+  useEffect(() => {
+    if (tab !== 'chat' || !id) return;
+    const timer = setInterval(() => {
+      void loadChatHistory('poll');
+    }, 10_000);
+    return () => clearInterval(timer);
+  }, [id, loadChatHistory, tab]);
 
   // ─── Save chat history to server (debounced) ──────────────
 

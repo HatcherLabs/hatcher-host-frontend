@@ -451,8 +451,10 @@ function PairingPanel({ integration }: { integration: IntegrationDef }) {
             ? t('pairing.restartAfterChange')
             : t('pairing.setBeforePairing')}
         </p>
-        {(integrationSaveMsg as unknown as string) === sk && (
-          <p className="text-[10px] text-emerald-400 mt-1">Saved! Restart agent to apply.</p>
+        {integrationSaveMsg[sk] && (
+          <p className={`text-[10px] mt-1 ${integrationSaveMsg[sk]?.startsWith('Error') ? 'text-red-400' : 'text-emerald-400'}`}>
+            {integrationSaveMsg[sk]}
+          </p>
         )}
       </div>
 

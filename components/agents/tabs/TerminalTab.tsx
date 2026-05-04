@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAgentContext } from '../AgentContext';
-import { getToken } from '@/lib/api';
+import { api, getToken } from '@/lib/api';
 import { API_URL } from '@/lib/config';
 import { RotateCcw, Circle, Send } from 'lucide-react';
 
@@ -28,6 +28,7 @@ async function loadXterm() {
 }
 
 type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
+type HistoryMessage = { role: string; content: string; ts: number };
 
 function getWsUrl(agentId: string, token: string | null): string {
   const base = API_URL.replace(/^http/, 'ws');
@@ -50,11 +51,62 @@ export function TerminalTab() {
   const [messageInput, setMessageInput] = useState('');
   const [sending, setSending] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const historyMarkerRef = useRef<string | null>(null);
 
   const isActive = agent?.status === 'active';
 
   // Keep ref in sync with state for use inside closures
   useEffect(() => { stateRef.current = state; }, [state]);
+
+  const historyMarker = useCallback((m: HistoryMessage) => `${m.role}:${m.ts}:${m.content}`, []);
+
+  const formatTerminalContent = useCallback((content: string) => (
+    content
+      .replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '')
+      .replace(/\r?\n/g, '\r\n')
+  ), []);
+
+  const pollProactiveMessages = useCallback(async () => {
+    if (!agent?.id || !termInstance.current) return;
+
+    try {
+      const res = await api.getChatHistory(agent.id);
+      if (!res.success) return;
+
+      const history = res.data.messages as HistoryMessage[];
+      if (history.length === 0) {
+        historyMarkerRef.current = null;
+        return;
+      }
+
+      const latestMarker = historyMarker(history[history.length - 1]!);
+      const previousMarker = historyMarkerRef.current;
+      if (!previousMarker) {
+        historyMarkerRef.current = latestMarker;
+        return;
+      }
+
+      const previousIndex = history.findIndex((m) => historyMarker(m) === previousMarker);
+      historyMarkerRef.current = latestMarker;
+      if (previousIndex === -1 || previousIndex === history.length - 1) return;
+
+      const nextMessages = history.slice(previousIndex + 1);
+      // Terminal-initiated chat is saved as a user+assistant pair. The
+      // terminal already printed that response live, so only display
+      // assistant-only additions produced by cron/workflow/webhook triggers.
+      if (nextMessages.some((m) => m.role === 'user')) return;
+
+      const assistantMessages = nextMessages.filter((m) => m.role === 'assistant' && m.content.trim());
+      if (assistantMessages.length === 0) return;
+
+      const term = termInstance.current;
+      for (const msg of assistantMessages) {
+        term.write(`\r\n\x1b[35m[agent]\x1b[0m ${formatTerminalContent(msg.content)}\r\n`);
+      }
+    } catch {
+      // Non-fatal: terminal log streaming should keep working even if polling fails.
+    }
+  }, [agent?.id, formatTerminalContent, historyMarker]);
 
   // ── Initialize xterm + connect WebSocket ──
   const connect = useCallback(async () => {
@@ -242,6 +294,20 @@ export function TerminalTab() {
     ws.addEventListener('message', handler);
     return () => ws.removeEventListener('message', handler);
   }, [state]);
+
+  useEffect(() => {
+    if (state !== 'connected') {
+      historyMarkerRef.current = null;
+      return;
+    }
+
+    void pollProactiveMessages();
+    const timer = setInterval(() => {
+      void pollProactiveMessages();
+    }, 10_000);
+
+    return () => clearInterval(timer);
+  }, [pollProactiveMessages, state]);
 
   // ── Disconnect ──
   const disconnect = useCallback(() => {

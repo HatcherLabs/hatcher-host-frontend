@@ -70,6 +70,8 @@ const FRAMEWORK_SCHEDULE_SUPPORT: Record<string, { native: boolean; method: stri
 // ─── Cron Presets ────────────────────────────────────────────
 
 const CRON_PRESETS = [
+  { label: 'Every 5 minutes', value: '*/5 * * * *' },
+  { label: 'Every 15 minutes', value: '*/15 * * * *' },
   { label: 'Every hour', value: '0 * * * *' },
   { label: 'Every 3 hours', value: '0 */3 * * *' },
   { label: 'Every 6 hours', value: '0 */6 * * *' },
@@ -358,7 +360,10 @@ export function SchedulesTab() {
       if (res.success) {
         setJobs(prev => prev.filter(j => j.id !== jobId));
       }
-    } catch { /* ignore */ }
+      else setError(res.error ?? 'Failed to delete schedule');
+    } catch {
+      setError('Failed to delete schedule');
+    }
     setActionLoading(null);
   };
 
@@ -370,7 +375,10 @@ export function SchedulesTab() {
       if (res.success) {
         setJobs(prev => prev.map(j => j.id === jobId ? { ...j, status: 'paused' } : j));
       }
-    } catch { /* ignore */ }
+      else setError(res.error ?? 'Failed to pause schedule');
+    } catch {
+      setError('Failed to pause schedule');
+    }
     setActionLoading(null);
   };
 
@@ -382,7 +390,10 @@ export function SchedulesTab() {
       if (res.success) {
         setJobs(prev => prev.map(j => j.id === jobId ? { ...j, status: 'active' } : j));
       }
-    } catch { /* ignore */ }
+      else setError(res.error ?? 'Failed to resume schedule');
+    } catch {
+      setError('Failed to resume schedule');
+    }
     setActionLoading(null);
   };
 
