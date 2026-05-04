@@ -44,8 +44,8 @@ test('register → login → create agent → agent appears in dashboard', async
   await expect(page).toHaveURL(/\/dashboard/);
 
   // ── 3. Navigate to "Create Agent" ───────────────────────────
-  await page.goto('/dashboard/agents/new');
-  await expect(page).toHaveURL(/\/dashboard\/agents\/new/);
+  await page.goto('/create/template');
+  await expect(page).toHaveURL(/\/create\/template/);
 
   // Template selection page — pick the first available template
   const firstTemplate = page.locator('[data-testid="template-card"], .template-card, [class*="TemplateCard"]').first();

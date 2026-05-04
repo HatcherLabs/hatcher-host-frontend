@@ -43,12 +43,12 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers = {}) {
         case 'n':
           e.preventDefault();
           if (handlers.onNewAgent) handlers.onNewAgent();
-          else router.push('/dashboard/agents/new');
+          else router.push('/create');
           break;
         case 't':
           e.preventDefault();
           if (handlers.onTemplates) handlers.onTemplates();
-          else router.push('/create');
+          else router.push('/create/template');
           break;
         case '/':
           e.preventDefault();

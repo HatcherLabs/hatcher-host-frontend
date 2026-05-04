@@ -15,7 +15,7 @@ export function SectionFinalCta() {
         <BoxLabel>{t('boxLabel')}</BoxLabel>
         <h2 className={styles.headline}>{t('headline')}</h2>
         <div className={styles.ctaRow}>
-          <PhosphorButton href="/chat-to-hatch">{t('ctaPrimary')}</PhosphorButton>
+          <PhosphorButton href="/create">{t('ctaPrimary')}</PhosphorButton>
           <PhosphorButton href="/create" variant="ghost">{t('ctaGhost')}</PhosphorButton>
         </div>
         <div className={styles.meta}>

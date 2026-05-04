@@ -19,7 +19,7 @@ export function SectionHero() {
           </h1>
           <p className={styles.sub}>{t('sub')}</p>
           <div className={styles.ctaRow}>
-            <PhosphorButton href="/chat-to-hatch">{t('ctaPrimary')}</PhosphorButton>
+            <PhosphorButton href="/create">{t('ctaPrimary')}</PhosphorButton>
             <PhosphorButton href="/city" variant="ghost">{t('ctaGhost')}</PhosphorButton>
           </div>
         </div>

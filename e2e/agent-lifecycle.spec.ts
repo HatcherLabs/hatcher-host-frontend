@@ -28,8 +28,8 @@ test.describe('Agent Lifecycle', () => {
     await loginAs(page, email, password);
 
     // Navigate to agent creation
-    await page.goto('/dashboard/agents/new');
-    await expect(page).toHaveURL(/\/dashboard\/agents\/new/);
+    await page.goto('/create');
+    await expect(page).toHaveURL(/\/create/);
 
     // The page should show framework or template selection
     await page.waitForLoadState('networkidle', { timeout: 10_000 });
@@ -46,7 +46,7 @@ test.describe('Agent Lifecycle', () => {
   test('user can create an agent via the wizard', async ({ page }) => {
     await loginAs(page, email, password);
 
-    await page.goto('/dashboard/agents/new');
+    await page.goto('/create/template');
     await page.waitForLoadState('networkidle', { timeout: 10_000 });
 
     // Pick the first available template/card

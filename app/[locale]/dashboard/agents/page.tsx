@@ -190,7 +190,7 @@ export default function MyAgentsPage() {
                     : t('agentsCountPlural').replace('{count}', String(total)).replace('{active}', String(activeCount)))}
             </p>
           </div>
-          <Link href="/chat-to-hatch" className={styles.cta}>
+          <Link href="/create" className={styles.cta}>
             <span aria-hidden>▎</span> {t('createCta')}
           </Link>
         </header>
@@ -298,7 +298,7 @@ export default function MyAgentsPage() {
               <span className={styles.emptyGlyph}>◐</span>
               <h2 className={styles.emptyTitle}>{t('emptyTitle')}</h2>
               <p className={styles.emptyDesc}>{t('emptyDescription')}</p>
-              <Link href="/chat-to-hatch" className={styles.cta}>
+              <Link href="/create" className={styles.cta}>
                 <span aria-hidden>▎</span> {t('emptyActionLabel')}
               </Link>
             </div>

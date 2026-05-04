@@ -142,7 +142,7 @@ export default function TokenPage() {
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10">
               <Link
-                href="/chat-to-hatch"
+                href="/create"
                 className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-[3px] bg-[var(--accent)] text-[var(--bg-base)] text-[13px] font-bold uppercase tracking-[0.06em] transition-shadow hover:shadow-[0_0_20px_var(--accent-glow)]"
                 style={{ fontFamily: 'var(--font-mono)' }}
               >
@@ -288,7 +288,7 @@ export default function TokenPage() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Link
-                    href="/chat-to-hatch"
+                    href="/create"
                     className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-[3px] bg-[var(--accent)] text-[var(--bg-base)] text-[13px] font-bold uppercase tracking-[0.06em] transition-shadow hover:shadow-[0_0_20px_var(--accent-glow)]"
                     style={{ fontFamily: 'var(--font-mono)' }}
                   >

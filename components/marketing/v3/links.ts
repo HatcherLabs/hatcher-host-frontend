@@ -35,8 +35,8 @@ export const NAV_GROUPS: ReadonlyArray<NavGroup> = [
     key: 'build',
     labelKey: 'build',
     items: [
-      { key: 'hatchAgent',  labelKey: 'hatchAgentLabel',  subKey: 'hatchAgentSub',  href: '/chat-to-hatch', glyph: '✦' },
-      { key: 'createTpl',   labelKey: 'createTplLabel',   subKey: 'createTplSub',   href: '/create',        glyph: '⊞' },
+      { key: 'hatchAgent',  labelKey: 'hatchAgentLabel',  subKey: 'hatchAgentSub',  href: '/create',          glyph: '✦' },
+      { key: 'createTpl',   labelKey: 'createTplLabel',   subKey: 'createTplSub',   href: '/create/template', glyph: '⊞' },
       { key: 'myAgents',    labelKey: 'myAgentsLabel',    subKey: 'myAgentsSub',    href: '/dashboard',     glyph: '◐' },
     ],
   },
@@ -67,8 +67,8 @@ export const FOOTER_COLUMNS = [
   {
     headKey: 'colBuild',
     items: [
-      { labelKey: 'itemHatchAgent', href: '/chat-to-hatch' as Href },
-      { labelKey: 'itemCreateTpl',  href: '/create' as Href },
+      { labelKey: 'itemHatchAgent', href: '/create' as Href },
+      { labelKey: 'itemCreateTpl',  href: '/create/template' as Href },
       { labelKey: 'itemMyAgents',   href: '/dashboard' as Href },
     ],
   },
@@ -107,11 +107,10 @@ export const SOCIAL_LINKS = {
 } as const;
 
 export const PRIMARY_CTA = {
-  href: '/chat-to-hatch' as Href,
+  href: '/create' as Href,
   /** Translation key under namespace `nav`. Brand-distinct verb that
-   *  matches the footer's `itemHatchAgent` copy — the previous reuse
-   *  of `nav.create` rendered as "Create" / "创建" etc., which links
-   *  to /create (template picker), not /chat-to-hatch. */
+   *  now lands on the create hub so users can choose Chat-to-Hatch or
+   *  template-based creation. */
   labelKey: 'hatchAgent',
 } as const;
 

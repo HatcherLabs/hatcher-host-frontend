@@ -8,7 +8,7 @@ import { req } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import styles from './ChatToHatch.module.css';
 
-type Framework = 'openclaw' | 'hermes' | 'elizaos' | 'milady';
+type Framework = 'openclaw' | 'hermes';
 
 interface ParsedConfig {
   framework: Framework;
@@ -38,8 +38,6 @@ interface Msg {
 const FW_VISUAL: Record<Framework, { color: string; glyph: string; label: string }> = {
   openclaw: { color: '#FFD23F', glyph: '🦞', label: 'OpenClaw' },
   hermes:   { color: '#9B5BFF', glyph: '🪶', label: 'Hermes' },
-  elizaos:  { color: '#6BE3FF', glyph: '🐙', label: 'ElizaOS' },
-  milady:   { color: '#FF5AC8', glyph: '🎨', label: 'Milady' },
 };
 
 const NAME_REGEX = /^[a-zA-Z0-9 \-:'.()&]+$/;
@@ -165,10 +163,9 @@ export function ChatToHatch() {
     if (!draft || hatching || draftError) return;
     setHatching(true);
     try {
-      // Build the config payload the API expects. CreateAgentBody is
-      // .passthrough() so suggestedSkills/Plugins/greeting/model land
-      // unchanged for the framework adapter to consume on container
-      // start. personality + systemPrompt are first-class fields.
+      // Build the config payload the API expects. The backend normalizes
+      // suggestedSkills/Plugins into installable pending skills and writes
+      // persona files during first container init.
       const configBody: Record<string, unknown> = {};
       if (draft.personality.trim()) configBody.personality = draft.personality.trim();
       if (draft.systemPrompt.trim()) configBody.systemPrompt = draft.systemPrompt.trim();
@@ -516,7 +513,7 @@ export function ChatToHatch() {
                 </div>
 
                 {/* Plugins (only if framework supports plugins separately) */}
-                {(draft.framework === 'openclaw' || draft.framework === 'elizaos') && (
+                {draft.framework === 'openclaw' && (
                   <div className={styles.chipsBlock}>
                     <div className={styles.chipsHead}>
                       {t('labelPlugins')}
