@@ -139,6 +139,7 @@ export function AgentRoomSceneV2({
             framework={framework}
             agentId={agentId}
             status={status}
+            canEdit={canEdit}
             onStatusChange={onStatusChange}
             onOpenPanel={() => onStationClick('statusConsole')}
             isNear={nearest === 'statusConsole'}
@@ -147,6 +148,7 @@ export function AgentRoomSceneV2({
             station={layout.logWall}
             framework={framework}
             agentId={agentId}
+            canViewLogs={canEdit}
             onClick={() => onStationClick('logWall')}
             isNear={nearest === 'logWall'}
           />

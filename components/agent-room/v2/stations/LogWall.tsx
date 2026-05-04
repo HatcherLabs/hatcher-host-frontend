@@ -10,21 +10,27 @@ interface Props {
   station: Station;
   framework: string;
   agentId: string;
+  canViewLogs: boolean;
   onClick: () => void;
   isNear?: boolean;
 }
 
-export function LogWall({ station, framework, agentId, onClick, isNear }: Props) {
+export function LogWall({ station, framework, agentId, canViewLogs, onClick, isNear }: Props) {
   const palette = paletteFor(framework);
   const [lines, setLines] = useState<string[]>([]);
 
   useEffect(() => {
+    if (!canViewLogs) {
+      setLines([]);
+      return;
+    }
     let alive = true;
     let t: ReturnType<typeof setTimeout>;
     const tick = async () => {
       try {
         const res = await api.getAgentLogs(agentId);
-        const raw = (res as { data?: { logs?: unknown } }).data?.logs ?? (res as { logs?: unknown }).logs;
+        if (!res.success) return;
+        const raw = res.data.logs as unknown;
         let arr: string[] = [];
         if (Array.isArray(raw)) {
           arr = raw.map(l => (typeof l === 'string' ? l : JSON.stringify(l)));
@@ -43,7 +49,7 @@ export function LogWall({ station, framework, agentId, onClick, isNear }: Props)
       alive = false;
       clearTimeout(t);
     };
-  }, [agentId]);
+  }, [agentId, canViewLogs]);
 
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]} onClick={onClick}>

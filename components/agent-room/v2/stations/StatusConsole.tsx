@@ -20,6 +20,7 @@ interface Props {
   framework: string;
   agentId: string;
   status: string;
+  canEdit: boolean;
   onStatusChange: () => void;
   onOpenPanel: () => void;
   isNear?: boolean;
@@ -31,6 +32,7 @@ export function StatusConsole({
   framework,
   agentId,
   status,
+  canEdit,
   onStatusChange,
   onOpenPanel,
   isNear,
@@ -44,6 +46,10 @@ export function StatusConsole({
   const toggleDirect = async (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
     if (busy) return;
+    if (!canEdit) {
+      onOpenPanel();
+      return;
+    }
     setBusy(true);
     try {
       const isUp = status === 'active' || status === 'running' || status === 'starting';
