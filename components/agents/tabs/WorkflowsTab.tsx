@@ -86,6 +86,17 @@ interface WorkflowData {
   updatedAt: string;
 }
 
+interface WorkflowExecutionLog {
+  timestamp: string;
+  trigger: string;
+  workflowId: string;
+  workflowName: string;
+  nodesExecuted: string[];
+  output: string | null;
+  error: string | null;
+  durationMs: number;
+}
+
 interface NodeConfig {
   label: string;
   subtype: string;
@@ -819,6 +830,98 @@ function WorkflowEditor({
   );
 }
 
+function WorkflowLogsPanel({
+  logs,
+  loading,
+  error,
+  onRefresh,
+}: {
+  logs: WorkflowExecutionLog[];
+  loading: boolean;
+  error: string | null;
+  onRefresh: () => void;
+}) {
+  return (
+    <GlassCard className="!p-0 overflow-hidden border-[var(--border-default)]/80">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)] bg-[var(--bg-card)]">
+        <div className="flex items-center gap-2">
+          <FileText size={14} className="text-[var(--color-accent)]" />
+          <span className="text-sm font-medium text-[var(--text-primary)]">Execution logs</span>
+          <span className="text-[10px] text-[var(--text-muted)]">{logs.length} recent</span>
+        </div>
+        <button
+          type="button"
+          onClick={onRefresh}
+          disabled={loading}
+          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[var(--border-default)] text-xs text-[var(--text-secondary)] hover:border-[var(--color-accent)]/40 disabled:opacity-50 transition-colors"
+        >
+          {loading ? <Loader2 size={12} className="animate-spin" /> : <Play size={12} />}
+          Refresh
+        </button>
+      </div>
+
+      {loading && (
+        <div className="flex items-center justify-center py-6">
+          <Loader2 size={18} className="animate-spin text-[var(--text-muted)]" />
+        </div>
+      )}
+
+      {!loading && error && (
+        <div className="flex items-start gap-2 px-4 py-3 text-xs text-red-300 bg-red-500/5">
+          <AlertTriangle size={14} className="mt-0.5 shrink-0 text-red-400" />
+          {error}
+        </div>
+      )}
+
+      {!loading && !error && logs.length === 0 && (
+        <div className="px-4 py-6 text-center text-xs text-[var(--text-muted)]">
+          No runs yet. Enable a workflow and trigger it from chat, a schedule, or an inbound webhook.
+        </div>
+      )}
+
+      {!loading && !error && logs.length > 0 && (
+        <div className="divide-y divide-[var(--border-default)]">
+          {logs.map((log, index) => (
+            <div key={`${log.timestamp}-${index}`} className="px-4 py-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full border ${
+                      log.error
+                        ? 'border-red-500/25 bg-red-500/10 text-red-400'
+                        : 'border-emerald-500/25 bg-emerald-500/10 text-emerald-400'
+                    }`}>
+                      {log.error ? 'Failed' : 'Success'}
+                    </span>
+                    <span className="text-xs text-[var(--text-secondary)]">{log.trigger}</span>
+                    <span className="text-[10px] text-[var(--text-muted)]">
+                      {new Date(log.timestamp).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="mt-1 flex items-center gap-3 text-[10px] text-[var(--text-muted)]">
+                    <span>{log.nodesExecuted.length} node{log.nodesExecuted.length !== 1 ? 's' : ''}</span>
+                    <span>{log.durationMs}ms</span>
+                  </div>
+                </div>
+              </div>
+              {log.output && (
+                <pre className="mt-2 max-h-24 overflow-y-auto whitespace-pre-wrap break-words rounded-lg border border-[var(--border-default)] bg-black/20 p-2 text-[11px] leading-relaxed text-[var(--text-secondary)]">
+                  {log.output}
+                </pre>
+              )}
+              {log.error && (
+                <p className="mt-2 rounded-lg border border-red-500/15 bg-red-500/5 p-2 text-[11px] text-red-300">
+                  {log.error}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </GlassCard>
+  );
+}
+
 // ─── Main WorkflowsTab ─────────────────────────────────────
 
 export function WorkflowsTab() {
@@ -831,6 +934,10 @@ export function WorkflowsTab() {
   const [editingWorkflow, setEditingWorkflow] = useState<WorkflowData | null | 'new'>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [viewingLogsId, setViewingLogsId] = useState<string | null>(null);
+  const [workflowLogs, setWorkflowLogs] = useState<Record<string, WorkflowExecutionLog[]>>({});
+  const [logsLoadingId, setLogsLoadingId] = useState<string | null>(null);
+  const [logsError, setLogsError] = useState<Record<string, string | null>>({});
 
   const loadWorkflows = useCallback(async () => {
     setLoading(true);
@@ -897,6 +1004,26 @@ export function WorkflowsTab() {
     } else {
       setError('Failed to delete workflow');
     }
+  };
+
+  const loadWorkflowLogs = useCallback(async (workflowId: string) => {
+    setLogsLoadingId(workflowId);
+    setLogsError((prev) => ({ ...prev, [workflowId]: null }));
+    const res = await api.getAgentWorkflowLogs(agentId, workflowId);
+    setLogsLoadingId(null);
+    if (res.success) {
+      setWorkflowLogs((prev) => ({ ...prev, [workflowId]: res.data.logs }));
+    } else {
+      setLogsError((prev) => ({ ...prev, [workflowId]: res.error || 'Failed to load workflow logs' }));
+    }
+  }, [agentId]);
+
+  const toggleWorkflowLogs = (workflowId: string) => {
+    setViewingLogsId((current) => {
+      if (current === workflowId) return null;
+      void loadWorkflowLogs(workflowId);
+      return workflowId;
+    });
   };
 
   // ─── Editor View ──
@@ -1188,6 +1315,19 @@ export function WorkflowsTab() {
 
                     {/* Edit */}
                     <button
+                      onClick={() => toggleWorkflowLogs(wf.id)}
+                      className={`p-1.5 rounded-lg border transition-all ${
+                        viewingLogsId === wf.id
+                          ? 'border-[var(--color-accent)]/40 text-[var(--color-accent)] bg-[var(--color-accent)]/10'
+                          : 'border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)]'
+                      }`}
+                      title="View execution logs"
+                    >
+                      <FileText size={14} />
+                    </button>
+
+                    {/* Edit */}
+                    <button
                       onClick={() => setEditingWorkflow(wf)}
                       className="p-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)] transition-all"
                       title="Edit workflow"
@@ -1211,6 +1351,24 @@ export function WorkflowsTab() {
                   </div>
                 </div>
               </GlassCard>
+              <AnimatePresence>
+                {viewingLogsId === wf.id && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="mt-2 overflow-hidden"
+                  >
+                    <WorkflowLogsPanel
+                      logs={workflowLogs[wf.id] ?? []}
+                      loading={logsLoadingId === wf.id}
+                      error={logsError[wf.id] ?? null}
+                      onRefresh={() => loadWorkflowLogs(wf.id)}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           );
         })}

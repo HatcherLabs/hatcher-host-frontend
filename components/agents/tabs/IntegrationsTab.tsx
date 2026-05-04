@@ -17,6 +17,9 @@ import {
   Webhook,
   Copy,
   Check,
+  Send,
+  Trash2,
+  RotateCcw,
   Star,
   Zap,
   Clock,
@@ -721,6 +724,363 @@ function WebhookSection() {
   );
 }
 
+const OUTBOUND_WEBHOOK_EVENTS = ['message', 'started', 'stopped', 'crashed', 'error'] as const;
+
+interface WebhookDelivery {
+  id: string;
+  event: string;
+  url: string;
+  status: string;
+  statusCode: number | null;
+  attempts: number;
+  errorMessage: string | null;
+  deliveredAt: string | null;
+  createdAt: string;
+}
+
+function OutboundWebhookSection() {
+  const { agent } = useAgentContext();
+  const [expanded, setExpanded] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [clearing, setClearing] = useState(false);
+  const [url, setUrl] = useState('');
+  const [enabled, setEnabled] = useState(false);
+  const [events, setEvents] = useState<string[]>(['message', 'started', 'stopped', 'error']);
+  const [secret, setSecret] = useState<string | null>(null);
+  const [secretVisible, setSecretVisible] = useState(false);
+  const [deliveries, setDeliveries] = useState<WebhookDelivery[]>([]);
+  const [statusMsg, setStatusMsg] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadConfig = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [configRes, deliveriesRes] = await Promise.all([
+        api.getAgentWebhookConfig(agent.id),
+        api.getAgentWebhookDeliveries(agent.id),
+      ]);
+
+      if (configRes.success) {
+        setUrl(configRes.data.webhookUrl ?? '');
+        setEnabled(configRes.data.enabled);
+        setEvents(configRes.data.events?.length ? configRes.data.events : ['message', 'started', 'stopped', 'error']);
+        setSecret(configRes.data.webhookSecret);
+      } else {
+        setError(configRes.error ?? 'Failed to load outbound webhook');
+      }
+
+      if (deliveriesRes.success) {
+        setDeliveries(deliveriesRes.data.deliveries);
+      }
+    } catch (e) {
+      setError((e as Error).message || 'Failed to load outbound webhook');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadConfig();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [agent.id]);
+
+  const toggleEvent = (event: string) => {
+    setEvents((prev) => {
+      if (prev.includes(event)) {
+        const next = prev.filter((e) => e !== event);
+        return next.length > 0 ? next : prev;
+      }
+      return [...prev, event];
+    });
+  };
+
+  const handleSave = async () => {
+    const trimmedUrl = url.trim();
+    if (!trimmedUrl) {
+      setError('Webhook URL is required.');
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+    setStatusMsg(null);
+    try {
+      const res = await api.updateAgentWebhookConfig(agent.id, {
+        webhookUrl: trimmedUrl,
+        events,
+        enabled,
+      });
+      if (res.success) {
+        setUrl(res.data.webhookUrl ?? '');
+        setEnabled(res.data.enabled);
+        setEvents(res.data.events);
+        setSecret(res.data.webhookSecret);
+        setStatusMsg(res.data._note ?? 'Outbound webhook saved.');
+      } else {
+        setError(res.error ?? 'Failed to save outbound webhook');
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleTest = async () => {
+    setTesting(true);
+    setError(null);
+    setStatusMsg(null);
+    try {
+      const res = await api.testAgentWebhookConfig(agent.id);
+      if (res.success) {
+        setStatusMsg('Test delivery queued.');
+        setTimeout(() => {
+          api.getAgentWebhookDeliveries(agent.id).then((deliveriesRes) => {
+            if (deliveriesRes.success) setDeliveries(deliveriesRes.data.deliveries);
+          }).catch(() => {});
+        }, 1200);
+      } else {
+        setError(res.error ?? 'Failed to queue test webhook');
+      }
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  const handleClear = async () => {
+    setClearing(true);
+    setError(null);
+    setStatusMsg(null);
+    try {
+      const res = await api.clearAgentWebhookConfig(agent.id);
+      if (res.success) {
+        setUrl('');
+        setEnabled(false);
+        setSecret(null);
+        setStatusMsg('Outbound webhook cleared.');
+      } else {
+        setError(res.error ?? 'Failed to clear outbound webhook');
+      }
+    } finally {
+      setClearing(false);
+    }
+  };
+
+  const latestDelivery = deliveries[0];
+
+  return (
+    <div>
+      <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 text-[var(--text-muted)]">
+        Outbound Webhooks
+        <span className="ml-2 text-cyan-400 normal-case tracking-normal font-normal">agent events to your app</span>
+      </h3>
+      <GlassCard className="!p-0">
+        <button
+          type="button"
+          onClick={() => setExpanded(!expanded)}
+          className="w-full flex items-center gap-3 p-4 text-left hover:bg-[var(--bg-card)] transition-colors cursor-pointer"
+        >
+          <div className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-cyan-500/10 border border-cyan-500/20">
+            <Send size={14} className="text-cyan-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-[var(--text-primary)]">Event delivery</span>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${
+                enabled && url
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
+              }`}>
+                {enabled && url ? 'Enabled' : 'Disabled'}
+              </span>
+              {latestDelivery && (
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${
+                  latestDelivery.status === 'success'
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                    : latestDelivery.status === 'failed'
+                      ? 'bg-red-500/10 text-red-400 border-red-500/20'
+                      : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                }`}>
+                  Last {latestDelivery.status}
+                </span>
+              )}
+            </div>
+            <p className="text-xs mt-0.5 truncate text-[var(--text-muted)]">
+              Send signed event payloads for messages, starts, stops, crashes, and errors.
+            </p>
+          </div>
+          {expanded
+            ? <ChevronUp size={16} className="text-[var(--text-muted)]" />
+            : <ChevronDown size={16} className="text-[var(--text-muted)]" />
+          }
+        </button>
+
+        {expanded && (
+          <div className="border-t border-[var(--border-default)] p-5 space-y-4 bg-[var(--bg-card)]">
+            {loading ? (
+              <div className="flex items-center justify-center py-6">
+                <Loader2 size={16} className="animate-spin text-[var(--text-muted)]" />
+              </div>
+            ) : (
+              <>
+                <div>
+                  <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Destination URL</label>
+                  <input
+                    type="url"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="https://api.example.com/hatcher/events"
+                    className="w-full h-9 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:border-cyan-500/50 focus:outline-none placeholder:text-[var(--text-muted)] font-mono"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg border border-[var(--border-default)] bg-black/15 px-3 py-2">
+                  <div>
+                    <p className="text-xs font-medium text-[var(--text-secondary)]">Enabled</p>
+                    <p className="text-[10px] text-[var(--text-muted)]">Deliver events to the destination URL.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setEnabled((v) => !v)}
+                    className={`relative h-6 w-11 rounded-full transition-colors ${enabled ? 'bg-cyan-500' : 'bg-zinc-700'}`}
+                    aria-label={enabled ? 'Disable outbound webhook' : 'Enable outbound webhook'}
+                  >
+                    <span className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-transform ${enabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                  </button>
+                </div>
+
+                <div>
+                  <p className="text-xs font-medium text-[var(--text-secondary)] mb-2">Events</p>
+                  <div className="flex flex-wrap gap-2">
+                    {OUTBOUND_WEBHOOK_EVENTS.map((event) => (
+                      <button
+                        key={event}
+                        type="button"
+                        onClick={() => toggleEvent(event)}
+                        className={`px-2.5 py-1.5 rounded-lg border text-xs transition-colors ${
+                          events.includes(event)
+                            ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-300'
+                            : 'border-[var(--border-default)] text-[var(--text-muted)] hover:text-white'
+                        }`}
+                      >
+                        {event}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {secret && (
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">Signing secret</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type={secretVisible ? 'text' : 'password'}
+                        readOnly
+                        value={secret}
+                        className="flex-1 h-9 px-3 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-default)] focus:outline-none font-mono"
+                      />
+                      <button
+                        onClick={() => setSecretVisible(!secretVisible)}
+                        className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-[var(--bg-hover)] transition-colors"
+                        title={secretVisible ? 'Hide secret' : 'Reveal secret'}
+                      >
+                        {secretVisible ? <EyeOff size={14} className="text-[var(--text-muted)]" /> : <Eye size={14} className="text-[var(--text-muted)]" />}
+                      </button>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(secret)}
+                        className="h-9 w-9 flex items-center justify-center rounded-lg border border-[var(--border-default)] hover:bg-[var(--bg-hover)] transition-colors"
+                        title="Copy secret"
+                      >
+                        <Copy size={14} className="text-[var(--text-muted)]" />
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-[var(--text-muted)] mt-1">
+                      Hatcher signs deliveries with this secret. It is only shown in full when newly generated.
+                    </p>
+                  </div>
+                )}
+
+                {statusMsg && <p className="text-xs text-emerald-400">{statusMsg}</p>}
+                {error && <p className="text-xs text-red-400">{error}</p>}
+
+                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[var(--border-default)]">
+                  <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium text-white bg-cyan-600 hover:bg-cyan-500 transition-colors disabled:opacity-50"
+                  >
+                    {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                    Save
+                  </button>
+                  <button
+                    onClick={handleTest}
+                    disabled={testing || !url.trim()}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-cyan-500/40 hover:text-cyan-300 transition-colors disabled:opacity-50"
+                  >
+                    {testing ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+                    Test
+                  </button>
+                  <button
+                    onClick={loadConfig}
+                    disabled={loading}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] transition-colors disabled:opacity-50"
+                  >
+                    <RotateCcw size={14} />
+                    Refresh
+                  </button>
+                  <button
+                    onClick={handleClear}
+                    disabled={clearing || (!url && !secret)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border border-red-500/25 text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                  >
+                    {clearing ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                    Clear
+                  </button>
+                </div>
+
+                <div className="pt-2 border-t border-[var(--border-default)]">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-medium text-[var(--text-secondary)]">Recent deliveries</p>
+                    <span className="text-[10px] text-[var(--text-muted)]">{deliveries.length} shown</span>
+                  </div>
+                  {deliveries.length === 0 ? (
+                    <p className="text-[11px] text-[var(--text-muted)]">No delivery attempts yet.</p>
+                  ) : (
+                    <div className="space-y-2 max-h-56 overflow-y-auto">
+                      {deliveries.slice(0, 8).map((delivery) => (
+                        <div key={delivery.id} className="rounded-lg border border-[var(--border-default)] bg-black/15 px-3 py-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className={`h-1.5 w-1.5 rounded-full ${
+                                delivery.status === 'success' ? 'bg-emerald-400' : delivery.status === 'failed' ? 'bg-red-400' : 'bg-amber-400'
+                              }`} />
+                              <span className="text-xs text-[var(--text-secondary)]">{delivery.event}</span>
+                              <span className="text-[10px] text-[var(--text-muted)] truncate">
+                                {delivery.statusCode ? `HTTP ${delivery.statusCode}` : delivery.status}
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-[var(--text-muted)]">
+                              {new Date(delivery.createdAt).toLocaleString()}
+                            </span>
+                          </div>
+                          {delivery.errorMessage && (
+                            <p className="text-[10px] text-red-300 mt-1 truncate">{delivery.errorMessage}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </GlassCard>
+    </div>
+  );
+}
+
 // ─── Integration Card ────────────────────────────────────────
 // Shared card component with enhanced visual hierarchy
 
@@ -930,6 +1290,7 @@ export function IntegrationsTab() {
 
           {/* Webhook section — always shown at top */}
           <WebhookSection />
+          <OutboundWebhookSection />
 
           {/* Main integrations — all free on every tier */}
           <div>

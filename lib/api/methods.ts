@@ -1580,6 +1580,52 @@ export const api = {
   getWebhookUrl: (agentId: string) =>
     req<{ url: string; token: string }>(`/agents/${agentId}/webhook-url`),
 
+  /** Get outbound webhook configuration for an agent */
+  getAgentWebhookConfig: (agentId: string) =>
+    req<{
+      webhookUrl: string | null;
+      webhookSecret: string | null;
+      events: string[];
+      enabled: boolean;
+    }>(`/agents/${agentId}/webhook-config`),
+
+  /** Update outbound webhook configuration */
+  updateAgentWebhookConfig: (agentId: string, data: { webhookUrl?: string; events?: string[]; enabled?: boolean }) =>
+    req<{
+      webhookUrl: string | null;
+      webhookSecret: string | null;
+      events: string[];
+      enabled: boolean;
+      _note?: string;
+    }>(`/agents/${agentId}/webhook-config`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  /** Clear outbound webhook configuration */
+  clearAgentWebhookConfig: (agentId: string) =>
+    req<{ cleared: boolean }>(`/agents/${agentId}/webhook-config`, { method: 'DELETE' }),
+
+  /** Queue a test outbound webhook delivery */
+  testAgentWebhookConfig: (agentId: string) =>
+    req<{ queued: boolean; url: string }>(`/agents/${agentId}/webhook-config/test`, { method: 'POST' }),
+
+  /** List recent outbound webhook deliveries */
+  getAgentWebhookDeliveries: (agentId: string) =>
+    req<{
+      deliveries: Array<{
+        id: string;
+        event: string;
+        url: string;
+        status: string;
+        statusCode: number | null;
+        attempts: number;
+        errorMessage: string | null;
+        deliveredAt: string | null;
+        createdAt: string;
+      }>;
+    }>(`/agents/${agentId}/webhook/deliveries`),
+
   // ─── Config Snapshots ──────────────────────────────────────
 
   /** List config snapshots for an agent */
@@ -1976,6 +2022,21 @@ export const api = {
     req<{ id: string; enabled: boolean }>(`/agents/${agentId}/workflows/${workflowId}/toggle`, {
       method: 'POST',
     }),
+
+  /** Get recent workflow execution logs */
+  getAgentWorkflowLogs: (agentId: string, workflowId: string) =>
+    req<{
+      logs: Array<{
+        timestamp: string;
+        trigger: string;
+        workflowId: string;
+        workflowName: string;
+        nodesExecuted: string[];
+        output: string | null;
+        error: string | null;
+        durationMs: number;
+      }>;
+    }>(`/agents/${agentId}/workflows/${workflowId}/logs`),
 
   // ─── Credits ──────────────────────────────────────────────────
 
