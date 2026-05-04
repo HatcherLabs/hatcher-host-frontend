@@ -25,6 +25,8 @@ export function StatsHologram({
   xpMax = 100,
 }: Props) {
   const palette = paletteFor(framework);
+  const primary = framework === 'openclaw' ? '#39ff88' : palette.primary;
+  const accent = framework === 'openclaw' ? '#38bdf8' : palette.accent;
   const xpPct = Math.min(1, xp / Math.max(1, xpMax));
   const mins = uptimeSec ? Math.floor(uptimeSec / 60) : 0;
 
@@ -38,31 +40,31 @@ export function StatsHologram({
       {/* Glowing ring */}
       <mesh position={[0, 0.52, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.55, 0.62, 32]} />
-        <meshBasicMaterial color={palette.primary} toneMapped={false} side={2} />
+        <meshBasicMaterial color={primary} toneMapped={false} side={2} />
       </mesh>
       {/* Beam to hologram */}
       <mesh position={[0, 1.3, 0]}>
         <cylinderGeometry args={[0.35, 0.2, 1.4, 16, 1, true]} />
-        <meshBasicMaterial color={palette.primary} toneMapped={false} transparent opacity={0.1} side={2} depthWrite={false} />
+        <meshBasicMaterial color={primary} toneMapped={false} transparent opacity={0.08} side={2} depthWrite={false} />
       </mesh>
       {/* Hologram HTML */}
-      <Html position={[0, 1.72, 0]} center distanceFactor={2.5} zIndexRange={[10, 0]}>
+      <Html position={[0, 1.72, 0]} center distanceFactor={1.9} zIndexRange={[10, 0]}>
         <div
-          className="pointer-events-none w-44 rounded-md border p-2 text-center font-mono text-[8px] leading-tight"
+          className="pointer-events-none w-36 rounded-md border p-1.5 text-center font-mono text-[7px] leading-tight"
           style={{
-            borderColor: palette.primary,
-            background: `linear-gradient(180deg, ${palette.primary}22 0%, transparent 100%)`,
-            color: palette.accent,
-            boxShadow: `0 0 20px ${palette.primary}66`,
+            borderColor: primary,
+            background: `linear-gradient(180deg, ${primary}1c 0%, transparent 100%)`,
+            color: accent,
+            boxShadow: `0 0 16px ${primary}55`,
           }}
         >
-          <div className="mb-1 text-[7px] uppercase tracking-widest" style={{ color: palette.primary }}>Agent Stats</div>
+          <div className="mb-1 text-[6px] uppercase tracking-widest" style={{ color: primary }}>Agent Stats</div>
           <div className="mt-1 flex justify-between gap-2"><span>Status</span><span className="truncate">{status ?? '—'}</span></div>
           <div className="mt-0.5 flex justify-between"><span>Tier</span><span>{tier ?? '—'}</span></div>
           <div className="mt-0.5 flex justify-between"><span>Msgs today</span><span>{messagesToday ?? '—'}</span></div>
           <div className="mt-0.5 flex justify-between"><span>Uptime</span><span>{uptimeSec ? `${mins}m` : '—'}</span></div>
           <div className="mt-1.5 h-1 w-full overflow-hidden rounded bg-black/40">
-            <div className="h-full" style={{ width: `${xpPct * 100}%`, background: palette.primary }} />
+            <div className="h-full" style={{ width: `${xpPct * 100}%`, background: primary }} />
           </div>
           <div className="mt-0.5 text-[7px] opacity-70">XP {xp} / {xpMax}</div>
         </div>

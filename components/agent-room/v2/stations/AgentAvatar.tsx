@@ -31,11 +31,24 @@ export function AgentAvatar({
   status,
 }: Props) {
   const palette = paletteFor(framework);
-  const legacyPalette = legacyPaletteFor(framework);
+  const roomPrimary = framework === 'openclaw' ? '#39ff88' : palette.primary;
+  const roomAccent = framework === 'openclaw' ? '#facc15' : palette.accent;
+  const legacyBase = legacyPaletteFor(framework);
+  const legacyPalette = framework === 'openclaw'
+    ? {
+      ...legacyBase,
+      primary: 0x39ff88,
+      dim: 0x16a34a,
+      bright: 0xb9ffd4,
+      primaryHex: '#39ff88',
+      dimHex: '#16a34a',
+      brightHex: '#b9ffd4',
+    }
+    : legacyBase;
 
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]}>
-      <ProximityHalo color={palette.primary} active={!!isNear} radius={1.8} />
+      <ProximityHalo color={roomPrimary} active={!!isNear} radius={1.8} />
       <Suspense fallback={null}>
         <AgentBody
           framework={framework}
@@ -51,10 +64,10 @@ export function AgentAvatar({
           <div
             className="pointer-events-none whitespace-nowrap rounded-full border px-2.5 py-0.5 text-[11px] font-medium backdrop-blur"
             style={{
-              borderColor: palette.primary,
+              borderColor: roomPrimary,
               background: 'rgba(0,0,0,0.5)',
-              color: palette.accent,
-              boxShadow: `0 0 14px ${palette.primary}66`,
+              color: roomAccent,
+              boxShadow: `0 0 14px ${roomPrimary}66`,
             }}
           >
             {agentName}
@@ -71,10 +84,10 @@ export function AgentAvatar({
             onClick={(e) => { e.stopPropagation(); onClick(); }}
             className="pointer-events-auto whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium backdrop-blur transition"
             style={{
-              borderColor: palette.primary,
-              background: isNear ? palette.primary : 'rgba(0,0,0,0.55)',
+              borderColor: roomPrimary,
+              background: isNear ? roomPrimary : 'rgba(0,0,0,0.55)',
               color: isNear ? '#000' : '#fff',
-              boxShadow: isNear ? `0 0 18px ${palette.primary}` : 'none',
+              boxShadow: isNear ? `0 0 18px ${roomPrimary}` : 'none',
             }}
           >
             💬 Talk

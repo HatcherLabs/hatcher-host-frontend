@@ -17,6 +17,7 @@ import { Lighting } from './world/Lighting';
 import { Atmosphere } from './world/Atmosphere';
 import { FrameworkDecor } from './world/FrameworkDecor';
 import { RoomGameFX } from './world/RoomGameFX';
+import { RoomSetDressing } from './world/RoomSetDressing';
 import { getStationLayout, type StationId, type StationLayout } from './world/layout';
 import { collidersFromLayout, wallColliders } from './world/colliders';
 import { AgentAvatar } from './stations/AgentAvatar';
@@ -112,6 +113,7 @@ export function AgentRoomSceneV2({
           <Lighting framework={framework} />
           {quality !== 'low' && <Atmosphere framework={framework} count={quality === 'high' ? 180 : 120} />}
           <RoomShell framework={framework} />
+          <RoomSetDressing framework={framework} quality={quality} />
           <FrameworkDecor framework={framework} />
           <RoomGameFX framework={framework} layout={layout} nearest={nearest} quality={quality} />
 

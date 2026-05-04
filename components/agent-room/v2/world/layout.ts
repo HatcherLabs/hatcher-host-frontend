@@ -38,7 +38,7 @@ export function getStationLayout(framework: string): StationLayout {
     integrationsRack: { id: 'integrationsRack', position: [8, 0, -5],     rotationY: -Math.PI / 4 },
     statusConsole:    { id: 'statusConsole',    position: [0, 0, -10],    rotationY: 0 },
     logWall:          { id: 'logWall',          position: [-11.5, 0, 0],  rotationY: Math.PI / 2 },
-    statsHologram:    { id: 'statsHologram',    position: [0, 0, 8],      rotationY: Math.PI },
+    statsHologram:    { id: 'statsHologram',    position: [0, 0, -7.2],   rotationY: 0 },
     memoryShelves:    { id: 'memoryShelves',    position: [11.5, 0, 3],   rotationY: -Math.PI / 2 },
     configTerminal:   { id: 'configTerminal',   position: [6, 0, 6],      rotationY: -Math.PI * 3 / 4 },
     pluginsCabinet:   { id: 'pluginsCabinet',   position: [-6, 0, 6],     rotationY: Math.PI * 3 / 4 },

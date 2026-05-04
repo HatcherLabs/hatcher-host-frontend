@@ -137,7 +137,7 @@ function HermesArchive({ primary, accent }: { primary: string; accent: string })
         </group>
       ))}
 
-      <group ref={orrery} position={[0, ROOM_HEIGHT - 1.15, 0]}>
+      <group ref={orrery} position={[0, ROOM_HEIGHT - 0.5, 0]} scale={0.55}>
         {[0, Math.PI / 2, Math.PI / 4].map((r, i) => (
           <mesh key={i} rotation={[r, i === 2 ? Math.PI / 3 : 0, 0]}>
             <torusGeometry args={[1.25 + i * 0.22, 0.018, 8, 72]} />
@@ -169,13 +169,15 @@ function HermesArchive({ primary, accent }: { primary: string; accent: string })
  */
 export function FrameworkDecor({ framework }: Props) {
   const palette = paletteFor(framework);
+  const primary = framework === 'openclaw' ? '#39ff88' : palette.primary;
+  const accent = framework === 'openclaw' ? '#38bdf8' : palette.accent;
 
   switch (framework) {
     case 'openclaw':
       // Industrial workshop — pipes running along the upper walls.
       return (
         <group>
-          <OpenClawGantry primary={palette.primary} accent={palette.accent} />
+          <OpenClawGantry primary={primary} accent={accent} />
           {[-1, 1].map(sx => (
             <mesh key={sx} position={[sx * ROOM_HALF * 0.95, ROOM_HEIGHT - 0.6, 0]} rotation={[0, 0, Math.PI / 2]}>
               <cylinderGeometry args={[0.09, 0.09, ROOM_HALF * 1.8, 12]} />
@@ -186,7 +188,7 @@ export function FrameworkDecor({ framework }: Props) {
           {[-2.5, 0, 2.5].map(z => (
             <mesh key={z} position={[0, 0.04, z]} rotation={[-Math.PI / 2, 0, 0]}>
               <planeGeometry args={[ROOM_HALF * 1.95, 0.04]} />
-              <meshBasicMaterial color={palette.primary} toneMapped={false} opacity={0.35} transparent />
+              <meshBasicMaterial color={primary} toneMapped={false} opacity={0.35} transparent />
             </mesh>
           ))}
         </group>

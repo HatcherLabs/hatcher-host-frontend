@@ -66,12 +66,28 @@ function makeTechPanelTexture(primary: string, accent: string, variant: 'floor' 
 
 export function RoomShell({ framework }: Props) {
   const palette = paletteFor(framework);
-  const [metalColorBase, metalNormalBase, metalRoughnessBase, metalnessBase, concreteDiffBase] =
+  const roomPrimary = framework === 'openclaw' ? '#39ff88' : palette.primary;
+  const roomAccent = framework === 'openclaw' ? '#38bdf8' : palette.accent;
+  const [
+    metalColorBase,
+    metalNormalBase,
+    metalRoughnessBase,
+    metalnessBase,
+    wallColorBase,
+    wallNormalBase,
+    wallRoughnessBase,
+    wallMetalnessBase,
+    concreteDiffBase,
+  ] =
     useTexture([
       '/assets/3d/textures/agent-room/metal-walkway-color.jpg',
       '/assets/3d/textures/agent-room/metal-walkway-normal.jpg',
       '/assets/3d/textures/agent-room/metal-walkway-roughness.jpg',
       '/assets/3d/textures/agent-room/metal-walkway-metalness.jpg',
+      '/assets/3d/textures/agent-room/wall-panels-color.jpg',
+      '/assets/3d/textures/agent-room/wall-panels-normal.jpg',
+      '/assets/3d/textures/agent-room/wall-panels-roughness.jpg',
+      '/assets/3d/textures/agent-room/wall-panels-metalness.jpg',
       '/assets/3d/textures/concrete_diff.jpg',
     ]);
 
@@ -80,10 +96,19 @@ export function RoomShell({ framework }: Props) {
     const metalNormal = metalNormalBase.clone();
     const metalRoughness = metalRoughnessBase.clone();
     const metalness = metalnessBase.clone();
+    const wallColor = wallColorBase.clone();
+    const wallNormal = wallNormalBase.clone();
+    const wallRoughness = wallRoughnessBase.clone();
+    const wallMetalness = wallMetalnessBase.clone();
     const concreteDiff = concreteDiffBase.clone();
     for (const texture of [metalColor, metalNormal, metalRoughness, metalness]) {
       texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
       texture.repeat.set(5.5, 5.5);
+      texture.needsUpdate = true;
+    }
+    for (const texture of [wallColor, wallNormal, wallRoughness, wallMetalness]) {
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      texture.repeat.set(2.8, 1.25);
       texture.needsUpdate = true;
     }
     concreteDiff.wrapS = concreteDiff.wrapT = THREE.RepeatWrapping;
@@ -91,13 +116,38 @@ export function RoomShell({ framework }: Props) {
     concreteDiff.colorSpace = THREE.SRGBColorSpace;
     concreteDiff.needsUpdate = true;
     metalColor.colorSpace = THREE.SRGBColorSpace;
+    wallColor.colorSpace = THREE.SRGBColorSpace;
 
-    const floorPanel = makeTechPanelTexture(palette.primary, palette.accent, 'floor');
+    const floorPanel = makeTechPanelTexture(roomPrimary, roomAccent, 'floor');
     floorPanel.repeat.set(3.5, 3.5);
-    const wallPanel = makeTechPanelTexture(palette.primary, palette.accent, 'wall');
+    const wallPanel = makeTechPanelTexture(roomPrimary, roomAccent, 'wall');
     wallPanel.repeat.set(4.5, 1.15);
-    return { metalColor, metalNormal, metalRoughness, metalness, concreteDiff, floorPanel, wallPanel };
-  }, [metalColorBase, metalNormalBase, metalRoughnessBase, metalnessBase, concreteDiffBase, palette.accent, palette.primary]);
+    return {
+      metalColor,
+      metalNormal,
+      metalRoughness,
+      metalness,
+      wallColor,
+      wallNormal,
+      wallRoughness,
+      wallMetalness,
+      concreteDiff,
+      floorPanel,
+      wallPanel,
+    };
+  }, [
+    metalColorBase,
+    metalNormalBase,
+    metalRoughnessBase,
+    metalnessBase,
+    wallColorBase,
+    wallNormalBase,
+    wallRoughnessBase,
+    wallMetalnessBase,
+    concreteDiffBase,
+    roomAccent,
+    roomPrimary,
+  ]);
 
   const floorMat = useMemo(() => new THREE.MeshStandardMaterial({
     color: 0x0d1118,
@@ -109,42 +159,58 @@ export function RoomShell({ framework }: Props) {
     metalness: 0.08,
     roughness: 0.92,
     envMapIntensity: 0.03,
-    emissive: new THREE.Color(palette.primary),
+    emissive: new THREE.Color(roomPrimary),
     emissiveIntensity: 0.018,
-  }), [palette.primary, textures.metalColor, textures.metalNormal, textures.metalRoughness, textures.metalness]);
+  }), [roomPrimary, textures.metalColor, textures.metalNormal, textures.metalRoughness, textures.metalness]);
 
   const wallMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: 0x10131b,
-    map: textures.wallPanel,
-    roughnessMap: textures.concreteDiff,
-    metalness: 0.18,
-    roughness: 0.82,
-    envMapIntensity: 0.08,
-    emissive: new THREE.Color(palette.primary),
-    emissiveIntensity: 0.015,
-  }), [palette.primary, textures.concreteDiff, textures.wallPanel]);
+    color: 0x171b22,
+    map: textures.wallColor,
+    normalMap: textures.wallNormal,
+    normalScale: new THREE.Vector2(0.72, 0.72),
+    roughnessMap: textures.wallRoughness,
+    metalnessMap: textures.wallMetalness,
+    metalness: 0.34,
+    roughness: 0.76,
+    envMapIntensity: 0.16,
+    emissive: new THREE.Color(roomPrimary),
+    emissiveIntensity: 0.018,
+  }), [roomPrimary, textures.wallColor, textures.wallMetalness, textures.wallNormal, textures.wallRoughness]);
 
   const trimMat = useMemo(() => new THREE.MeshBasicMaterial({
-    color: palette.primary,
+    color: roomPrimary,
     transparent: true,
     opacity: 0.38,
     toneMapped: false,
-  }), [palette.primary]);
+  }), [roomPrimary]);
 
   const panelMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: 0x121722,
-    map: textures.wallPanel,
-    metalness: 0.35,
-    roughness: 0.65,
-    envMapIntensity: 0.12,
-    emissive: new THREE.Color(palette.primary),
+    color: 0x181d26,
+    map: textures.wallColor,
+    normalMap: textures.wallNormal,
+    normalScale: new THREE.Vector2(0.45, 0.45),
+    roughnessMap: textures.wallRoughness,
+    metalnessMap: textures.wallMetalness,
+    metalness: 0.42,
+    roughness: 0.58,
+    envMapIntensity: 0.18,
+    emissive: new THREE.Color(roomPrimary),
     emissiveIntensity: 0.025,
-  }), [palette.primary, textures.wallPanel]);
+  }), [roomPrimary, textures.wallColor, textures.wallMetalness, textures.wallNormal, textures.wallRoughness]);
 
   return (
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow material={floorMat}>
         <planeGeometry args={[ROOM_SIZE, ROOM_SIZE]} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.061, 0]} renderOrder={1}>
+        <planeGeometry args={[ROOM_SIZE, ROOM_SIZE]} />
+        <meshBasicMaterial
+          color={0x02040a}
+          transparent
+          opacity={0.42}
+          depthWrite={false}
+        />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.062, 0]}>
         <planeGeometry args={[ROOM_SIZE, ROOM_SIZE]} />
