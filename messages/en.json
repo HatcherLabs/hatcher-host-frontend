@@ -61,7 +61,7 @@
       "cityLabel": "Hatcher City",
       "citySub": "Walk a 3D world of live agents.",
       "frameworksLabel": "Frameworks",
-      "frameworksSub": "OpenClaw · Hermes · ElizaOS · Milady.",
+      "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Pricing",
       "pricingSub": "Free · Starter · Pro · Business · Founding.",
       "tokenLabel": "$HATCHER",
@@ -154,7 +154,7 @@
         "Travel Planner",
         "Personal Assistant"
       ],
-      "body": "Pick a framework. Configure. Launch in 60 seconds. No code required, no infrastructure to manage. 4 frameworks, 20+ platforms, free tier with BYOK.",
+      "body": "Pick OpenClaw or Hermes. Configure. Launch in 60 seconds. No code required, no infrastructure to manage. 20+ platforms, hosted OpenRouter model, and BYOK.",
       "ctaPrimary": "Get started free",
       "ctaSecondary": "Read docs",
       "agentPreviewOnline": "CryptoHelper — Online"
@@ -187,7 +187,7 @@
         {
           "num": "01",
           "title": "Pick a framework",
-          "desc": "OpenClaw, Hermes, ElizaOS, or Milady. Each has unique strengths — browser control, memory, multi-agent, on-chain."
+          "desc": "Choose OpenClaw for skill-heavy automation or Hermes for adaptive long-running agents with memory."
         },
         {
           "num": "02",
@@ -416,7 +416,7 @@
         },
         {
           "q": "What is \"Bring Your Own Key\"?",
-          "a": "Connect your own OpenAI, Anthropic, Google, or Groq key for unlimited messages. You only pay your AI provider directly."
+          "a": "Connect your own OpenAI, Anthropic, Google, OpenRouter, or other supported LLM key for unlimited messages. You only pay your AI provider directly."
         },
         {
           "q": "Where does my agent run?",
@@ -590,7 +590,7 @@
         "storage": "50 MB workspace",
         "sleep": "Auto-sleep after 1h idle",
         "features": [
-          "Llama 4 Scout on Groq",
+          "DeepSeek V4 Flash on OpenRouter",
           "BYOK = unlimited messages",
           "3 web searches/day",
           "All integrations (Telegram, Discord, Twitter, etc)"
@@ -792,13 +792,13 @@
         "plugins": "Plugins + Skills",
         "integrations": "All integrations",
         "byokKey": "BYOK (own LLM key)",
-        "defaultLlm": "Default LLM (Groq)"
+        "defaultLlm": "Default LLM (OpenRouter)"
       },
       "values": {
         "unlimited": "Unlimited",
         "alwaysOn": "Always-on",
         "addon": "Add-on",
-        "llama4Scout": "Llama 4 Scout"
+        "llama4Scout": "DeepSeek V4 Flash"
       }
     },
     "faq": {
@@ -830,7 +830,7 @@
         },
         {
           "q": "What LLM do I get with the free tier?",
-          "a": "Free and Starter tiers use GPT-OSS 20B on Groq. Pro, Business, and Founding Member tiers get Llama 3.3 70B on Groq — a more capable model. Message limits are account-wide: Free 20/day, Starter 50/day, Pro 100/day, Business 300/day, Founding 300/day. BYOK (bring your own LLM key) bypasses all limits on any tier."
+          "a": "Hosted messages use DeepSeek V4 Flash through OpenRouter by default. Message limits are account-wide: Free 20/day, Starter 50/day, Pro 100/day, Business 300/day, Founding 300/day. BYOK (bring your own LLM key) bypasses all limits on any tier."
         },
         {
           "q": "What is the Founding Member tier?",
@@ -899,9 +899,9 @@
       "agentsCountPlural": "{count} agents total · {active} active",
       "details": "Details",
       "tourCreateTitle": "Create Your First Agent",
-      "tourCreateDescription": "Click here to hatch your first AI agent. Choose from 4 frameworks.",
+      "tourCreateDescription": "Click here to hatch your first AI agent with OpenClaw or Hermes.",
       "tourFilterTitle": "Filter by Framework",
-      "tourFilterDescription": "OpenClaw, Hermes, ElizaOS, or Milady — each has unique strengths.",
+      "tourFilterDescription": "OpenClaw is best for automation; Hermes is best for adaptive memory workflows.",
       "tourSearchTitle": "Search & Explore",
       "tourSearchDescription": "Search agents or browse 200+ templates to get started quickly.",
       "tourPlanTitle": "Your Plan",
@@ -1726,7 +1726,7 @@
   "frameworks": {
     "eyebrow": "Frameworks",
     "heading": "Pick the right framework",
-    "subheading": "Hatcher supports 4 battle-tested agent frameworks. Each has unique strengths — here's how to choose.",
+    "subheading": "Hatcher is focused on two production agent frameworks: OpenClaw for skill-heavy automation and Hermes for adaptive long-running agents.",
     "deployCta": "Deploy an agent",
     "docsLink": "Full docs",
     "atAGlance": "At a glance",
@@ -1740,13 +1740,13 @@
     "memoryUsage": "Baseline memory usage",
     "lowerFaster": "Lower is faster",
     "lowerLeaner": "Lower is leaner",
-    "benchmarkCallout": "🌸 Milady is the fastest and lightest — ideal for free-tier deployments. 🦞 OpenClaw packs the most tools but needs more resources.",
+    "benchmarkCallout": "OpenClaw is best when you need the widest skill surface and automations. Hermes is leaner for adaptive agents with memory-heavy research workflows.",
     "configExamples": "Configuration examples",
     "configSubheading": "Each framework has its own config format. Here's what a typical setup looks like.",
     "configRef": "Full configuration reference →",
     "docsSuffix": "docs",
     "llmSupport": "LLM support",
-    "llmSubheading": "All frameworks support BYOK (Bring Your Own Key) for unlimited messages. On the hosted LLM, every tier runs Llama 4 Scout (17B) on Groq — tool-call reliability and latency are the same across Free, Starter, Pro, Business, and Founding Member. Only the daily message quota changes per tier.",
+    "llmSubheading": "Both frameworks support BYOK (Bring Your Own Key) for unlimited messages. On the hosted LLM, Hatcher routes through OpenRouter with DeepSeek V4 Flash by default; daily message quotas still depend on your tier.",
     "byokNote": "* BYOK always free — unlimited messages on any framework.",
     "byokSetupLink": "View BYOK setup guide →",
     "decisionGuide": "Quick decision guide",
@@ -1764,20 +1764,20 @@
         "pick": "Hermes"
       },
       {
-        "condition": "I want a social media or community bot",
-        "pick": "ElizaOS"
+        "condition": "I need multi-channel messaging and triggers",
+        "pick": "OpenClaw"
       },
       {
-        "condition": "I'm just getting started and want simple",
-        "pick": "Milady"
+        "condition": "I need a memory-heavy research assistant",
+        "pick": "Hermes"
       },
       {
         "condition": "I need multi-channel messaging (Telegram + Discord + WhatsApp)",
         "pick": "OpenClaw or Hermes"
       },
       {
-        "condition": "I want a character-driven persona bot",
-        "pick": "ElizaOS or Milady"
+        "condition": "I want a workspace agent with files, logs, and skills",
+        "pick": "OpenClaw"
       }
     ]
   },
@@ -1956,7 +1956,7 @@
     "llmModelAria": "AI Model selection",
     "llmFreeLabel": "Free AI Model",
     "llmFreeTag": "FREE",
-    "llmFreeSubtext": "Powered by Groq — no API key needed",
+    "llmFreeSubtext": "Powered by OpenRouter and DeepSeek V4 Flash — no API key needed",
     "llmByokLabel": "Use Your Own AI Key",
     "llmByokTag": "always free",
     "llmByokSubtext": "Connect your own OpenAI, Anthropic, or other API key",
@@ -2244,7 +2244,7 @@
         "desc": "Post, reply and engage on X"
       }
     },
-    "llmFreeSummary": "Free AI Model (Groq)",
+    "llmFreeSummary": "Hosted AI Model (OpenRouter)",
     "llmByokSummary": "Your key: {provider}{model}",
     "errorHeading": "Creation Error",
     "errorBody": "Something went wrong while setting up your agent. Your progress has not been lost.",
@@ -2570,7 +2570,7 @@
     "h1Accent": "Hatch it.",
     "authChecking": "Checking session…",
     "assistantTitle": "Hatcher Assistant",
-    "assistantSub": "Powered by Llama 4 Scout · parses intent into a full agent config",
+    "assistantSub": "Powered by DeepSeek V4 Flash · parses intent into a full agent config",
     "live": "Live",
     "assistantWho": "Hatcher",
     "intro": "Describe the agent you want — what it does, where it runs, what tone of voice. I'll pick a framework, generate a name + identity + skills, and queue it for hatching. One or two sentences is enough; you can edit every field after.",

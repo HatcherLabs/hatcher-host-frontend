@@ -19,6 +19,8 @@
 @media (max-width: 960px) { .layout { grid-template-columns: 1fr; gap: 40px; } }
 
 .mockupWrap {
+  position: relative;
+  aspect-ratio: 16 / 9.5;
   background: #050505;
   border: 1px solid rgba(57, 255, 136, 0.18);
   border-radius: 8px;
@@ -27,7 +29,54 @@
     0 26px 86px rgba(0, 0, 0, 0.42),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
-.svg { display: block; width: 100%; height: auto; }
+.mockupWrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.62)),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.26), transparent 48%, rgba(0, 0, 0, 0.18));
+}
+
+.roomImage {
+  object-fit: cover;
+  filter: saturate(1.08) contrast(1.08) brightness(0.86);
+  transform: scale(1.015);
+}
+
+.roomHud {
+  position: absolute;
+  z-index: 1;
+  left: 14px;
+  right: 14px;
+  top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.roomHud strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.roomHud strong::after {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px rgba(57, 255, 136, 0.75);
+}
 
 .copy { display: flex; flex-direction: column; gap: 24px; }
 .body { font-size: 17px; line-height: 1.6; color: var(--text-secondary); margin: 0; }

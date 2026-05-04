@@ -61,7 +61,7 @@
       "cityLabel": "Hatcher City",
       "citySub": "Plimbă-te într-o lume 3D de agenți live.",
       "frameworksLabel": "Framework-uri",
-      "frameworksSub": "OpenClaw · Hermes · ElizaOS · Milady.",
+      "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Prețuri",
       "pricingSub": "Free · Starter · Pro · Business · Founding.",
       "tokenLabel": "$HATCHER",
@@ -154,7 +154,7 @@
         "Planificatorul de Călătorii",
         "Asistentul Personal"
       ],
-      "body": "Alege un framework. Configurează. Lansează în 60 de secunde. Fără cod, fără infrastructură de gestionat. 4 frameworks, 20+ platforme, plan gratuit cu BYOK.",
+      "body": "Alege OpenClaw sau Hermes. Configurează. Lansează în 60 de secunde. Fără cod, fără infrastructură de gestionat. 20+ platforme, model găzduit pe OpenRouter și BYOK.",
       "ctaPrimary": "Începe gratuit",
       "ctaSecondary": "Citește documentația",
       "agentPreviewOnline": "CryptoHelper — Online"
@@ -187,7 +187,7 @@
         {
           "num": "01",
           "title": "Alege un framework",
-          "desc": "OpenClaw, Hermes, ElizaOS sau Milady. Fiecare are puncte forte unice — control browser, memorie, multi-agent, on-chain."
+          "desc": "Alege OpenClaw pentru automatizări cu multe skill-uri sau Hermes pentru agenți adaptivi long-running cu memorie."
         },
         {
           "num": "02",
@@ -416,7 +416,7 @@
         },
         {
           "q": "Ce înseamnă \"Bring Your Own Key\"?",
-          "a": "Conectează-ți propria cheie OpenAI, Anthropic, Google sau Groq pentru mesaje nelimitate. Plătești direct furnizorul AI."
+          "a": "Conectează propria cheie OpenAI, Anthropic, Google, OpenRouter sau alt furnizor LLM suportat pentru mesaje nelimitate. Plătești direct furnizorul AI."
         },
         {
           "q": "Unde rulează agentul meu?",
@@ -590,7 +590,7 @@
         "storage": "50 MB spațiu de lucru",
         "sleep": "Adormit automat după 1h inactiv",
         "features": [
-          "Llama 4 Scout pe Groq",
+          "DeepSeek V4 Flash pe OpenRouter",
           "BYOK = mesaje nelimitate",
           "3 căutări web/zi",
           "Toate integrările (Telegram, Discord, Twitter, etc)"
@@ -792,13 +792,13 @@
         "plugins": "Plugins + Abilități",
         "integrations": "Toate integrările",
         "byokKey": "BYOK (cheie LLM proprie)",
-        "defaultLlm": "LLM implicit (Groq)"
+        "defaultLlm": "LLM implicit (OpenRouter)"
       },
       "values": {
         "unlimited": "Nelimitat",
         "alwaysOn": "Mereu activ",
         "addon": "Add-on",
-        "llama4Scout": "Llama 4 Scout"
+        "llama4Scout": "DeepSeek V4 Flash"
       }
     },
     "faq": {
@@ -830,7 +830,7 @@
         },
         {
           "q": "Ce LLM primesc pe planul gratuit?",
-          "a": "Planurile Gratuit și Starter folosesc GPT-OSS 20B pe Groq. Planurile Pro, Business și Founding Member beneficiază de Llama 3.3 70B pe Groq — un model mai capabil. Limitele de mesaje sunt la nivel de cont: Gratuit 20/zi, Starter 50/zi, Pro 100/zi, Business 300/zi, Founding 300/zi. BYOK (aduce-ți propria cheie LLM) depășește toate limitele pe orice plan."
+          "a": "Mesajele găzduite folosesc implicit DeepSeek V4 Flash prin OpenRouter. Limitele de mesaje sunt la nivel de cont: Gratuit 20/zi, Starter 50/zi, Pro 100/zi, Business 300/zi, Founding 300/zi. BYOK (aduce-ți propria cheie LLM) depășește toate limitele pe orice plan."
         },
         {
           "q": "Ce este planul Founding Member?",
@@ -899,9 +899,9 @@
       "agentsCountPlural": "{count} agenți total · {active} activi",
       "details": "Detalii",
       "tourCreateTitle": "Creează Primul Tău Agent",
-      "tourCreateDescription": "Dă click aici pentru a lansa primul tău agent AI. Alege din 4 frameworks.",
+      "tourCreateDescription": "Dă click aici pentru a lansa primul tău agent AI cu OpenClaw sau Hermes.",
       "tourFilterTitle": "Filtrează după Framework",
-      "tourFilterDescription": "OpenClaw, Hermes, ElizaOS sau Milady — fiecare are puncte forte unice.",
+      "tourFilterDescription": "OpenClaw este bun pentru automatizări; Hermes este bun pentru workflow-uri adaptive cu memorie.",
       "tourSearchTitle": "Caută & Explorează",
       "tourSearchDescription": "Caută agenți sau răsfoiește 200+ template-uri pentru a începe rapid.",
       "tourPlanTitle": "Planul Tău",
@@ -1726,7 +1726,7 @@
   "frameworks": {
     "eyebrow": "Frameworks",
     "heading": "Alege frameworkul potrivit",
-    "subheading": "Hatcher suportă 4 frameworks testate în producție. Fiecare are puncte forte unice — iată cum să alegi.",
+    "subheading": "Hatcher se concentrează pe două framework-uri de producție: OpenClaw pentru automatizări cu multe skill-uri și Hermes pentru agenți adaptivi long-running.",
     "deployCta": "Deployează un agent",
     "docsLink": "Documentație completă",
     "atAGlance": "La prima vedere",
@@ -1740,13 +1740,13 @@
     "memoryUsage": "Consum de memorie de bază",
     "lowerFaster": "Mai mic = mai rapid",
     "lowerLeaner": "Mai mic = mai eficient",
-    "benchmarkCallout": "🌸 Milady este cel mai rapid și mai ușor — ideal pentru deployuri pe planul gratuit. 🦞 OpenClaw are cele mai multe unelte, dar necesită mai multe resurse.",
+    "benchmarkCallout": "OpenClaw este alegerea bună când ai nevoie de cel mai larg set de skill-uri și automatizări. Hermes este mai potrivit pentru agenți adaptivi cu memorie și workflow-uri de research.",
     "configExamples": "Exemple de configurare",
     "configSubheading": "Fiecare framework are propriul format de configurare. Iată cum arată o configurare tipică.",
     "configRef": "Referință configurare completă →",
     "docsSuffix": "docs",
     "llmSupport": "Suport LLM",
-    "llmSubheading": "Toate frameworks-urile suportă BYOK (Bring Your Own Key) pentru mesaje nelimitate. Pe LLM-ul găzduit, fiecare plan rulează Llama 4 Scout (17B) pe Groq — fiabilitatea apelurilor de unelte și latența sunt identice pe Gratuit, Starter, Pro, Business și Founding Member. Doar cota zilnică de mesaje diferă per plan.",
+    "llmSubheading": "Ambele framework-uri suportă BYOK (Bring Your Own Key) pentru mesaje nelimitate. Pe LLM-ul găzduit, Hatcher rutează prin OpenRouter cu DeepSeek V4 Flash implicit; cotele zilnice depind în continuare de plan.",
     "byokNote": "* BYOK mereu gratuit — mesaje nelimitate pe orice framework.",
     "byokSetupLink": "Vezi ghidul de configurare BYOK →",
     "decisionGuide": "Ghid rapid de decizie",
@@ -1764,20 +1764,20 @@
         "pick": "Hermes"
       },
       {
-        "condition": "Vreau un bot pentru social media sau comunitate",
-        "pick": "ElizaOS"
+        "condition": "Am nevoie de mesagerie multi-canal și triggere",
+        "pick": "OpenClaw"
       },
       {
-        "condition": "Abia am început și vreau ceva simplu",
-        "pick": "Milady"
+        "condition": "Am nevoie de un asistent de research cu multă memorie",
+        "pick": "Hermes"
       },
       {
         "condition": "Am nevoie de mesagerie multi-canal (Telegram + Discord + WhatsApp)",
         "pick": "OpenClaw sau Hermes"
       },
       {
-        "condition": "Vreau un bot cu personalitate de personaj",
-        "pick": "ElizaOS sau Milady"
+        "condition": "Vreau un agent de workspace cu fișiere, logs și skill-uri",
+        "pick": "OpenClaw"
       }
     ]
   },
@@ -1956,7 +1956,7 @@
     "llmModelAria": "Selecție model AI",
     "llmFreeLabel": "Model AI gratuit",
     "llmFreeTag": "GRATUIT",
-    "llmFreeSubtext": "Alimentat de Groq — nu necesită cheie API",
+    "llmFreeSubtext": "Alimentat de OpenRouter și DeepSeek V4 Flash — nu necesită cheie API",
     "llmByokLabel": "Folosește propria cheie AI",
     "llmByokTag": "mereu gratuit",
     "llmByokSubtext": "Conectează propria cheie API OpenAI, Anthropic sau altă platformă",
@@ -2244,7 +2244,7 @@
         "desc": "Postează, răspunde și interacționează pe X"
       }
     },
-    "llmFreeSummary": "Model AI gratuit (Groq)",
+    "llmFreeSummary": "Model AI găzduit (OpenRouter)",
     "llmByokSummary": "Cheia ta: {provider}{model}",
     "errorHeading": "Eroare la creare",
     "errorBody": "A apărut o eroare la configurarea agentului. Progresul tău nu a fost pierdut.",
@@ -2570,7 +2570,7 @@
     "h1Accent": "Fă-l să eclozeze.",
     "authChecking": "Se verifică sesiunea…",
     "assistantTitle": "Asistent Hatcher",
-    "assistantSub": "Powered by Llama 4 Scout · transformă intenția într-o configurație completă de agent",
+    "assistantSub": "Powered by DeepSeek V4 Flash · transformă intenția într-o configurație completă de agent",
     "live": "Live",
     "assistantWho": "Hatcher",
     "intro": "Descrie agentul pe care îl vrei — ce face, unde rulează, ce ton. Aleg un framework, generez nume + identitate + skill-uri și îl pregătesc pentru eclozare. Una-două propoziții sunt destule; orice câmp e editabil după.",

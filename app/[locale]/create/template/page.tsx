@@ -41,7 +41,7 @@ import {
 
 type Step = 1 | 2 | 3 | 4 | 5;
 
-type LLMChoice = 'free_groq' | 'byok';
+type LLMChoice = 'hosted_openrouter' | 'byok';
 
 // BYOK_PROVIDERS imported from @hatcher/shared
 
@@ -199,13 +199,13 @@ export default function CreatePage() {
   const [launched, setLaunched] = useState(false);
 
   // ── LLM selection state ──
-  const [llmChoice, setLlmChoice] = useState<LLMChoice>('free_groq');
+  const [llmChoice, setLlmChoice] = useState<LLMChoice>('hosted_openrouter');
   const [byokProvider, setByokProvider] = useState<BYOKProvider>('openai');
   const [byokModel, setByokModel] = useState('');
   const [byokCustomModel, setByokCustomModel] = useState(false);
   const [byokApiKey, setByokApiKey] = useState('');
   const [byokBaseUrl, setByokBaseUrl] = useState('');
-  // Credits model removed — using Groq free or BYOK only
+  // Credits model removed: use the hosted OpenRouter model or BYOK.
 
   // ── Templates (fetched from API) ──
   const [templates, setTemplates] = useState<ApiTemplate[]>([]);
@@ -361,8 +361,8 @@ export default function CreatePage() {
 
   // Build LLM config for payload
   function getLLMConfig() {
-    if (llmChoice === 'free_groq') {
-      return { modelProvider: 'groq', model: 'meta-llama/llama-4-scout-17b-16e-instruct' };
+    if (llmChoice === 'hosted_openrouter') {
+      return { modelProvider: 'openrouter', model: 'deepseek/deepseek-v4-flash' };
     }
     if (llmChoice === 'byok') {
       return {
@@ -376,12 +376,11 @@ export default function CreatePage() {
         },
       };
     }
-    // Fallback: use free groq
-    return { modelProvider: 'groq', model: 'meta-llama/llama-4-scout-17b-16e-instruct' };
+    return { modelProvider: 'openrouter', model: 'deepseek/deepseek-v4-flash' };
   }
 
   function getLLMSummary(): string {
-    if (llmChoice === 'free_groq') return t('llmFreeSummary');
+    if (llmChoice === 'hosted_openrouter') return t('llmFreeSummary');
     const prov = getBYOKProvider(byokProvider);
     return t('llmByokSummary', { provider: prov?.name ?? byokProvider, model: byokModel ? ` / ${byokModel}` : '' });
   }
@@ -450,7 +449,7 @@ export default function CreatePage() {
         framework: selectedFramework,
         template: selectedTemplate,
         config: {
-          model: llm.model ?? 'meta-llama/llama-4-scout-17b-16e-instruct',
+          model: llm.model ?? 'deepseek/deepseek-v4-flash',
           provider: llm.modelProvider,
           ...(selectedFramework === 'openclaw' ? { skills: openclawSkills } : {}),
           ...(selectedFramework === 'hermes' ? { tools: hermesTools } : {}),
@@ -1168,14 +1167,14 @@ export default function CreatePage() {
                     {t('llmModelLabel')}
                   </legend>
                   <div className="space-y-3" role="radiogroup" aria-label={t('llmModelAria')}>
-                    {/* Free Groq */}
+                    {/* Hosted OpenRouter */}
                     <motion.button
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
-                      onClick={() => setLlmChoice('free_groq')}
+                      onClick={() => setLlmChoice('hosted_openrouter')}
                       className={cn(
                         'w-full p-4 rounded-xl border text-left transition-all duration-200',
-                        llmChoice === 'free_groq'
+                        llmChoice === 'hosted_openrouter'
                           ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-[0_0_16px_rgba(6,182,212,0.1)]'
                           : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)]'
                       )}
@@ -1356,7 +1355,7 @@ export default function CreatePage() {
                       </AnimatePresence>
                     </div>
 
-                    {/* Hatcher Credits option removed — use Groq free or BYOK */}
+                    {/* Hatcher Credits option removed: use hosted OpenRouter or BYOK. */}
                   </div>
                 </fieldset>
 
@@ -2031,7 +2030,7 @@ export default function CreatePage() {
                     <SummaryRow
                       label={t('summaryCost')}
                       value={
-                        llmChoice === 'free_groq' ? t('summaryCostFree') :
+                        llmChoice === 'hosted_openrouter' ? t('summaryCostFree') :
                         llmChoice === 'byok' ? t('summaryCostByok') :
                         t('summaryCostFree')
                       }

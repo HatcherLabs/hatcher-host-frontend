@@ -26,8 +26,8 @@ const FRAMEWORKS = [
   {
     key: 'openclaw',
     name: 'OpenClaw',
-    tagline: 'Autonomous powerhouse',
-    emoji: '🦞',
+    tagline: 'Skill-heavy autonomous worker',
+    emoji: 'OC',
     color: '#f59e0b',
     glow: 'rgba(245,158,11,0.15)',
     border: 'border-[#f59e0b]/30',
@@ -35,7 +35,7 @@ const FRAMEWORKS = [
     text: 'text-[#f59e0b]',
     complexity: 'Advanced',
     complexityColor: 'text-red-400 bg-red-400/10 border-red-400/20',
-    bestFor: 'Power users who need maximum capability — autonomous task execution, persistent workspace, and full multi-channel gateway.',
+    bestFor: 'Power users who need maximum capability: autonomous task execution, persistent workspace, skills, cron, and multi-channel integrations.',
     useCases: ['Enterprise automation', 'Multi-step research', 'Code generation pipelines', 'Cron-driven back-office agents', 'Full multi-platform bots'],
     features: [
       { name: '2,500+ ClawHub skills', supported: true },
@@ -49,13 +49,13 @@ const FRAMEWORKS = [
       { name: 'Lightweight deploy', supported: false },
     ],
     integrations: ['Telegram', 'Discord', 'Slack', 'WhatsApp', 'X (Twitter)'],
-    llmSupport: ['Groq', 'OpenAI', 'Anthropic', 'Google', 'xAI', 'OpenRouter'],
+    llmSupport: ['OpenRouter', 'OpenAI', 'Anthropic', 'Google', 'xAI', 'BYOK'],
     startupMs: 3200,
     memoryMb: 400,
     docsUrl: 'https://docs.openclaw.ai',
     configExample: `# openclaw/config.yaml
-model: meta-llama/llama-4-scout-17b-16e-instruct
-provider: groq
+model: deepseek/deepseek-v4-flash
+provider: openrouter
 
 skills:
   - web_search
@@ -77,7 +77,7 @@ memory:
     key: 'hermes',
     name: 'Hermes',
     tagline: 'Learning agent',
-    emoji: '🪽',
+    emoji: 'HM',
     color: '#a855f7',
     glow: 'rgba(168,85,247,0.15)',
     border: 'border-[#a855f7]/30',
@@ -85,7 +85,7 @@ memory:
     text: 'text-[#a855f7]',
     complexity: 'Intermediate',
     complexityColor: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-    bestFor: 'Agents that learn and adapt — 78 bundled skills, long-running memory, live config editing, multi-provider routing.',
+    bestFor: 'Agents that learn and adapt: long-running memory, live config editing, tool routing, and persistent research workflows.',
     useCases: ['Research assistants', 'Knowledge base bots', 'DevOps copilots', 'Security/red-team helpers', 'Long-running memory workflows'],
     features: [
       { name: '2,500+ ClawHub skills', supported: true },
@@ -99,14 +99,14 @@ memory:
       { name: 'Lightweight deploy', supported: false },
     ],
     integrations: ['Telegram', 'Discord', 'Slack', 'WhatsApp'],
-    llmSupport: ['Groq', 'OpenAI', 'Anthropic', 'Google', 'xAI', 'OpenRouter'],
+    llmSupport: ['OpenRouter', 'OpenAI', 'Anthropic', 'Google', 'xAI', 'BYOK'],
     startupMs: 2800,
     memoryMb: 350,
     docsUrl: 'https://hermes-agent.nousresearch.com',
     configExample: `# hermes/config.toml
 [model]
-provider = "groq"
-model = "meta-llama/llama-4-scout-17b-16e-instruct"
+provider = "openrouter"
+model = "deepseek/deepseek-v4-flash"
 
 [memory]
 backend = "chromadb"
@@ -124,103 +124,6 @@ enabled = [
 
 [platforms]
 telegram = { token = "\${TELEGRAM_BOT_TOKEN}" }`,
-  },
-  {
-    key: 'elizaos',
-    name: 'ElizaOS',
-    tagline: 'Character-driven',
-    emoji: '🎭',
-    color: 'var(--color-accent)',
-    glow: 'rgba(6,182,212,0.15)',
-    border: 'border-[var(--color-accent)]/30',
-    bg: 'bg-[var(--color-accent)]/10',
-    text: 'text-[var(--color-accent)]',
-    complexity: 'Intermediate',
-    complexityColor: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-    bestFor: 'Social media bots and community agents — deep character customization, PGLite-backed memory, 650+ plugin registry.',
-    useCases: ['Social media bots', 'Community moderators', 'Brand personas', 'NFT project agents', 'Session-based chat apps'],
-    features: [
-      { name: '2,500+ ClawHub skills', supported: false },
-      { name: 'Browser automation', supported: false },
-      { name: 'Cron jobs & triggers', supported: false },
-      { name: 'Multi-channel gateway', supported: true },
-      { name: 'Persistent memory', supported: true },
-      { name: 'Character personas', supported: true },
-      { name: 'Plugin ecosystem', supported: true },
-      { name: 'Social media native', supported: true },
-      { name: 'Lightweight deploy', supported: false },
-    ],
-    integrations: ['Telegram', 'Discord', 'Slack', 'X (Twitter)'],
-    llmSupport: ['Groq', 'OpenAI', 'Anthropic', 'Ollama'],
-    startupMs: 2400,
-    memoryMb: 300,
-    docsUrl: 'https://elizaos.github.io/eliza/',
-    configExample: `// elizaos/character.json
-{
-  "name": "Aria",
-  "bio": [
-    "Aria is a crypto-native community manager.",
-    "She's been in DeFi since 2020 and loves memes."
-  ],
-  "style": {
-    "all": ["casual", "knowledgeable", "friendly"],
-    "twitter": ["concise", "sharp", "playful"]
-  },
-  "plugins": [
-    "@elizaos/plugin-twitter",
-    "@elizaos/plugin-telegram",
-    "@elizaos/plugin-web3"
-  ],
-  "modelProvider": "groq",
-  "model": "meta-llama/llama-4-scout-17b-16e-instruct"
-}`,
-  },
-  {
-    key: 'milady',
-    name: 'Milady',
-    tagline: 'Featherweight',
-    emoji: '🌸',
-    color: '#f43f5e',
-    glow: 'rgba(244,63,94,0.15)',
-    border: 'border-[#f43f5e]/30',
-    bg: 'bg-[#f43f5e]/10',
-    text: 'text-[#f43f5e]',
-    complexity: 'Easy',
-    complexityColor: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
-    bestFor: 'Opinionated ElizaOS fork with 78 bundled skills and 109 plugins on tap — personality-first with batteries included.',
-    useCases: ['Personality chatbots', 'Community bots', 'Personal productivity agents', 'Home automation hubs', 'Fan engagement'],
-    features: [
-      { name: '2,500+ ClawHub skills', supported: false },
-      { name: 'Browser automation', supported: false },
-      { name: 'Cron jobs & triggers', supported: true },
-      { name: 'Multi-channel gateway', supported: true },
-      { name: 'Persistent memory', supported: true },
-      { name: 'Character personas', supported: true },
-      { name: 'Plugin ecosystem', supported: true },
-      { name: 'Social media native', supported: true },
-      { name: 'Lightweight deploy', supported: false },
-    ],
-    integrations: ['Telegram', 'Discord', 'Slack', 'WhatsApp', 'X (Twitter)'],
-    llmSupport: ['Groq', 'OpenAI', 'Anthropic', 'Google', 'OpenRouter', 'Ollama'],
-    startupMs: 800,
-    memoryMb: 120,
-    docsUrl: 'https://docs.milady.gg',
-    configExample: `# milady/persona.yaml
-name: "Sakura"
-personality: |
-  Sakura is a vibrant, culturally-aware AI with a love for
-  anime, memes, and wholesome community building. She speaks
-  casually, uses emojis naturally, and never breaks character.
-
-model:
-  provider: groq
-  id: meta-llama/llama-4-scout-17b-16e-instruct
-
-platforms:
-  telegram:
-    token: "\${TELEGRAM_BOT_TOKEN}"
-  discord:
-    token: "\${DISCORD_BOT_TOKEN}"`,
   },
 ];
 
@@ -335,7 +238,7 @@ export default function FrameworksPage() {
           >
             {t('atAGlance')}
           </motion.p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             {FRAMEWORKS.map((fw) => (
               <motion.div
                 key={fw.key}
@@ -639,7 +542,7 @@ export default function FrameworksPage() {
           <p className="mb-6 text-sm text-[var(--text-secondary)]">
             {t('llmSubheading')}
           </p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             {FRAMEWORKS.map((fw) => (
               <div
                 key={fw.key}
@@ -673,13 +576,11 @@ export default function FrameworksPage() {
             <h2 className="mb-6 text-xl font-bold text-[var(--text-primary)]">{t('decisionGuide')}</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               {([
-                { condition: t('decisions.0.condition'), pick: t('decisions.0.pick'), emoji: '🦞', color: 'text-[var(--color-accent)]' },
-                { condition: t('decisions.1.condition'), pick: t('decisions.1.pick'), emoji: '🪽', color: 'text-[#a78bfa]' },
-                { condition: t('decisions.2.condition'), pick: t('decisions.2.pick'), emoji: '🎭', color: 'text-[#4ade80]' },
-                { condition: t('decisions.3.condition'), pick: t('decisions.3.pick'), emoji: '🌸', color: 'text-[#f472b6]' },
-                { condition: t('decisions.4.condition'), pick: t('decisions.4.pick'), emoji: '🦞🪽', color: 'text-[var(--color-accent)]' },
-                { condition: t('decisions.5.condition'), pick: t('decisions.5.pick'), emoji: '🎭🌸', color: 'text-[#4ade80]' },
-              ] as Array<{ condition: string; pick: string; emoji: string; color: string }>).map((item) => (
+                { condition: t('decisions.0.condition'), pick: t('decisions.0.pick'), label: 'OC', color: 'text-[var(--color-accent)]' },
+                { condition: t('decisions.1.condition'), pick: t('decisions.1.pick'), label: 'HM', color: 'text-[#a78bfa]' },
+                { condition: t('decisions.2.condition'), pick: t('decisions.2.pick'), label: 'OC', color: 'text-[var(--color-accent)]' },
+                { condition: t('decisions.3.condition'), pick: t('decisions.3.pick'), label: 'HM', color: 'text-[#a78bfa]' },
+              ] as Array<{ condition: string; pick: string; label: string; color: string }>).map((item) => (
                 <div
                   key={item.condition}
                   className="flex items-start gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-4"
@@ -688,7 +589,7 @@ export default function FrameworksPage() {
                   <div>
                     <p className="text-sm text-[var(--text-secondary)]">{item.condition}</p>
                     <p className={cn('mt-1 text-sm font-bold', item.color)}>
-                      {item.emoji} {item.pick}
+                      {item.label} · {item.pick}
                     </p>
                   </div>
                 </div>
