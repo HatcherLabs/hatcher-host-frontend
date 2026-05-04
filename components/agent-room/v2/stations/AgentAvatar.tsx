@@ -4,7 +4,7 @@ import { Html } from '@react-three/drei';
 import type { Station } from '../world/layout';
 import { paletteFor } from '../colors';
 import { paletteFor as legacyPaletteFor } from '../three-palette';
-import { V2Robot } from './V2Robot';
+import { AgentBody } from './AgentBody';
 import { ProximityHalo } from './ProximityHalo';
 
 interface Props {
@@ -15,21 +15,35 @@ interface Props {
   hideLabel?: boolean;
   agentName?: string;
   isStreaming?: boolean;
+  agentId?: string;
+  status?: string;
 }
 
-export function AgentAvatar({ station, framework, onClick, isNear, hideLabel, agentName, isStreaming }: Props) {
+export function AgentAvatar({
+  station,
+  framework,
+  onClick,
+  isNear,
+  hideLabel,
+  agentName,
+  isStreaming,
+  agentId,
+  status,
+}: Props) {
   const palette = paletteFor(framework);
   const legacyPalette = legacyPaletteFor(framework);
 
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]}>
       <ProximityHalo color={palette.primary} active={!!isNear} radius={1.8} />
-      {/* V2Robot internally scales to 0.5 (≈2m tall) — smaller than the
-          legacy GlbRobot's 0.55 + dropped the framework accessories.
-          Accessories spin around the head and read as "extra floating
-          hands" in a first-person view. */}
       <Suspense fallback={null}>
-        <V2Robot palette={legacyPalette} isStreaming={!!isStreaming} />
+        <AgentBody
+          framework={framework}
+          agentId={agentId}
+          palette={legacyPalette}
+          isStreaming={!!isStreaming}
+          status={status}
+        />
       </Suspense>
       {/* Floating name tag above the robot */}
       {agentName && (
@@ -51,7 +65,7 @@ export function AgentAvatar({ station, framework, onClick, isNear, hideLabel, ag
         <cylinderGeometry args={[0.9, 0.9, 2.1, 12]} />
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
-      {!hideLabel && (
+      {!hideLabel && isNear && (
         <Html position={[0, 2.8, 0]} center distanceFactor={8} zIndexRange={[10, 0]}>
           <button
             onClick={(e) => { e.stopPropagation(); onClick(); }}

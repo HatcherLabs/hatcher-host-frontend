@@ -116,6 +116,8 @@ export function AgentRoomSceneV2({
           <AgentAvatar
             station={layout.agentAvatar}
             framework={framework}
+            agentId={agentId}
+            status={status}
             onClick={() => onStationClick('agentAvatar')}
             isNear={nearest === 'agentAvatar'}
             agentName={agentName}
