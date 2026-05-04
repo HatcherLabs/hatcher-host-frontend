@@ -20,20 +20,30 @@
 
 .media {
   position: absolute;
-  top: -28px;
-  right: -28px;
-  bottom: 64px;
-  left: -28px;
+  top: -12%;
+  right: -10%;
+  bottom: -10%;
+  left: -10%;
   z-index: -2;
   background-color: #020302;
   background-image: url('/landing-v3/robot-hatch-hero.png');
-  background-position: calc(50% + 150px) 12px;
+  background-position: center right;
   background-repeat: no-repeat;
-  background-size: min(1360px, 118vw) auto;
+  background-size: cover;
   opacity: 0.9;
   filter: saturate(1.18) contrast(1.08) brightness(0.96);
   transform-origin: 60% 50%;
   animation: hatchDrift 24s ease-in-out infinite alternate;
+}
+
+.media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, #020302 0%, rgba(2, 3, 2, 0.82) 9%, rgba(2, 3, 2, 0) 21%, rgba(2, 3, 2, 0) 82%, rgba(2, 3, 2, 0.84) 93%, #020302 100%),
+    linear-gradient(180deg, #020302 0%, rgba(2, 3, 2, 0.72) 10%, rgba(2, 3, 2, 0) 24%, rgba(2, 3, 2, 0) 72%, rgba(2, 3, 2, 0.86) 88%, #020302 100%);
 }
 
 .scrim {
@@ -157,6 +167,9 @@
     background-position: 58% top;
     background-size: cover;
     opacity: 0.68;
+  }
+  .media::after {
+    display: none;
   }
   .scrim {
     background:
