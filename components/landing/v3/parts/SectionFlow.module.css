@@ -1,4 +1,8 @@
-.section { background: var(--bg-base); }
+.section {
+  background:
+    linear-gradient(180deg, rgba(5, 8, 5, 0.94), var(--bg-base) 48%),
+    var(--bg-base);
+}
 .inner { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
 
 .head { display: flex; flex-direction: column; gap: 12px; margin-bottom: 48px; }
@@ -24,11 +28,23 @@
 .tile {
   display: flex;
   flex-direction: column;
-  background: var(--bg-card);
-  border: 1px solid var(--border-default);
+  background:
+    linear-gradient(180deg, rgba(57, 255, 136, 0.045), rgba(255, 255, 255, 0.015)),
+    var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   padding: 24px;
   position: relative;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.tile::before {
+  content: '';
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(57, 255, 136, 0.7), transparent);
 }
 .step {
   position: absolute;
@@ -41,8 +57,10 @@
 }
 
 .tileVisual {
-  background: #050505;
-  border: 1px solid var(--border-line);
+  background:
+    linear-gradient(135deg, rgba(57, 255, 136, 0.08), transparent 42%),
+    #050505;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 4px;
   aspect-ratio: 16 / 9;
   margin-bottom: 16px;
@@ -51,6 +69,7 @@
   justify-content: flex-start;
   padding: 16px;
   overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
 }
 
 .typed {

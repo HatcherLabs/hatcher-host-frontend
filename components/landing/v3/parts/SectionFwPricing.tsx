@@ -7,14 +7,9 @@ import type { UserTierKey } from '@hatcher/shared';
 import { BoxLabel } from '../shared/BoxLabel';
 import styles from './SectionFwPricing.module.css';
 
-// Framework brand names stay literal — they aren't strings to translate.
-// Tag copy lives in i18n keys keyed by framework so each locale picks
-// its own one-liner. Colours mirror the framework_color_scheme memory.
 const FRAMEWORKS = [
-  { key: 'openclaw', label: 'OpenClaw', color: '#FFCC00', tagKey: 'tagOpenclaw' },
-  { key: 'hermes',   label: 'Hermes',   color: '#A855F7', tagKey: 'tagHermes' },
-  { key: 'elizaos',  label: 'ElizaOS',  color: '#3B82F6', tagKey: 'tagElizaos' },
-  { key: 'milady',   label: 'Milady',   color: '#EC4899', tagKey: 'tagMilady' },
+  { key: 'openclaw', label: 'OpenClaw', color: '#FACC15', tagKey: 'tagOpenclaw' },
+  { key: 'hermes', label: 'Hermes', color: '#38BDF8', tagKey: 'tagHermes' },
 ] as const;
 
 const TIER_ORDER: ReadonlyArray<UserTierKey> = ['free', 'starter', 'pro', 'business', 'founding_member'];

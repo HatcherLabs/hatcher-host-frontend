@@ -1,12 +1,16 @@
 .term {
-  background: #050505;
-  border: 1px solid var(--border-default);
+  background:
+    linear-gradient(180deg, rgba(12, 18, 13, 0.96), rgba(3, 5, 4, 0.96)),
+    #050505;
+  border: 1px solid rgba(57, 255, 136, 0.2);
   border-radius: 8px;
   overflow: hidden;
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.7;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.58),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .head {
@@ -14,13 +18,21 @@
   align-items: center;
   gap: 6px;
   padding: 10px 14px;
-  background: #0F0F0F;
-  border-bottom: 1px solid var(--border-default);
+  background: rgba(15, 15, 15, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
 }
 .dot { width: 10px; height: 10px; border-radius: 50%; background: #2A2A2A; }
+.dot:nth-child(1) { background: #ef4444; }
+.dot:nth-child(2) { background: #facc15; }
+.dot:nth-child(3) { background: #39FF88; }
 .title { margin-left: 12px; font-size: 11px; color: var(--text-muted); letter-spacing: 0.04em; }
 
-.body { padding: 18px 16px; }
+.body {
+  padding: 18px 16px;
+  background-image:
+    linear-gradient(rgba(57, 255, 136, 0.035) 1px, transparent 1px);
+  background-size: 100% 28px;
+}
 
 .line { color: var(--text-secondary); }
 .prompt { color: var(--text-muted); margin-right: 0.5em; }

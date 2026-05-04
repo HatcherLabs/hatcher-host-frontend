@@ -50,13 +50,12 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: 'Hatcher — Hatch Your AI Agent in 60 Seconds', template: '%s | Hatcher' },
   description:
-    'Deploy AI agents instantly. Pick from 4 frameworks, configure with no code, launch on Telegram, Discord, WhatsApp. Free tier available.',
+    'Deploy OpenClaw and Hermes AI agents instantly. Configure with no code, launch on Telegram, Discord, WhatsApp, and manage agents in 3D rooms.',
   keywords: [
     'AI agents',
     'agent hosting',
     'OpenClaw',
     'Hermes',
-    'ElizaOS',
     'deploy AI',
     'Telegram bot',
     'Discord bot',
@@ -75,8 +74,8 @@ export const metadata: Metadata = {
     siteName: 'Hatcher',
     title: 'Hatcher — Hatch Your AI Agent in 60 Seconds',
     description:
-      'Deploy AI agents instantly. Pick from 4 frameworks, configure with no code, launch on Telegram, Discord, WhatsApp. Free tier available.',
-    images: [{ url: `${SITE_URL}/og?title=Hatcher&subtitle=Deploy+AI+agents+instantly.+Pick+from+4+frameworks%2C+configure+with+no+code%2C+launch+on+Telegram%2C+Discord%2C+WhatsApp.&tag=AI+Agent+Hosting`, width: 1200, height: 630, alt: 'Hatcher — Hatch Your AI Agent in 60 Seconds' }],
+      'Deploy OpenClaw and Hermes agents instantly. Configure with no code, launch on Telegram, Discord, WhatsApp, and manage agents in 3D rooms.',
+    images: [{ url: `${SITE_URL}/og?title=Hatcher&subtitle=Deploy+OpenClaw+and+Hermes+agents+instantly.+Configure+with+no+code%2C+launch+on+Telegram%2C+Discord%2C+WhatsApp.&tag=AI+Agent+Hosting`, width: 1200, height: 630, alt: 'Hatcher — Hatch Your AI Agent in 60 Seconds' }],
     locale: 'en_US',
   },
   twitter: {
@@ -85,8 +84,8 @@ export const metadata: Metadata = {
     creator: '@HatcherLabs',
     title: 'Hatcher — Hatch Your AI Agent in 60 Seconds',
     description:
-      'Deploy AI agents instantly. Pick from 4 frameworks, configure with no code, launch on Telegram, Discord, WhatsApp. Free tier available.',
-    images: [`${SITE_URL}/og?title=Hatcher&subtitle=Deploy+AI+agents+instantly.+Pick+from+4+frameworks%2C+configure+with+no+code%2C+launch+on+Telegram%2C+Discord%2C+WhatsApp.&tag=AI+Agent+Hosting`],
+      'Deploy OpenClaw and Hermes agents instantly. Configure with no code, launch on Telegram, Discord, WhatsApp, and manage agents in 3D rooms.',
+    images: [`${SITE_URL}/og?title=Hatcher&subtitle=Deploy+OpenClaw+and+Hermes+agents+instantly.+Configure+with+no+code%2C+launch+on+Telegram%2C+Discord%2C+WhatsApp.&tag=AI+Agent+Hosting`],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   alternates: { canonical: SITE_URL },
@@ -115,7 +114,7 @@ const organizationJsonLd = {
   name: 'Hatcher',
   url: 'https://hatcher.host',
   logo: `${SITE_URL}/icon.svg`,
-  description: 'Deploy AI agents instantly. Pick from 4 frameworks, configure with no code, launch on Telegram, Discord, WhatsApp. Free tier available.',
+  description: 'Deploy OpenClaw and Hermes agents instantly. Configure with no code, launch on Telegram, Discord, WhatsApp, and manage agents in 3D rooms.',
   sameAs: ['https://twitter.com/HatcherLabs'],
 };
 
@@ -140,7 +139,7 @@ const softwareApplicationJsonLd = {
   applicationCategory: 'DeveloperApplication',
   operatingSystem: 'Web',
   description:
-    'Managed AI agent hosting platform. Deploy autonomous AI agents across 20+ platforms in 60 seconds. OpenClaw, Hermes, ElizaOS, Milady frameworks. BYOK any LLM.',
+    'Managed AI agent hosting platform. Deploy OpenClaw and Hermes agents across 20+ platforms in 60 seconds. 3D rooms, Hatcher City, OpenRouter routing, and BYOK support.',
   offers: [
     {
       '@type': 'Offer',

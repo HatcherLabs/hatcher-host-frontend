@@ -5,10 +5,8 @@ import { BoxLabel } from '../shared/BoxLabel';
 import styles from './SectionEcosystem.module.css';
 
 const FRAMEWORKS = [
-  { key: 'openclaw', label: 'OpenClaw', color: '#FFCC00', kind: 'framework' as const },
-  { key: 'hermes',   label: 'Hermes',   color: '#A855F7', kind: 'framework' as const },
-  { key: 'elizaos',  label: 'ElizaOS',  color: '#3B82F6', kind: 'framework' as const },
-  { key: 'milady',   label: 'Milady',   color: '#EC4899', kind: 'framework' as const },
+  { key: 'openclaw', label: 'OpenClaw', color: '#FACC15', kind: 'framework' as const },
+  { key: 'hermes', label: 'Hermes', color: '#38BDF8', kind: 'framework' as const },
 ];
 
 const CHAINS = [

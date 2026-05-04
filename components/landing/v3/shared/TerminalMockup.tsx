@@ -26,8 +26,9 @@ export function TerminalMockup() {
         <div className={styles.spacer} />
         <div className={styles.lineMuted}>parsing intent...</div>
         <div className={styles.lineMuted}>framework: <span className={styles.value}>hermes</span></div>
-        <div className={styles.lineMuted}>model: <span className={styles.value}>llama-4-scout</span></div>
-        <div className={styles.lineMuted}>tools: <span className={styles.value}>brave_search</span></div>
+        <div className={styles.lineMuted}>provider: <span className={styles.value}>openrouter</span></div>
+        <div className={styles.lineMuted}>model: <span className={styles.value}>deepseek-v4-flash</span></div>
+        <div className={styles.lineMuted}>tools: <span className={styles.value}>web_search, memory</span></div>
         <div className={styles.spacer} />
         <div className={styles.lineSuccess}>
           <span className={styles.check}>✓</span> agent live

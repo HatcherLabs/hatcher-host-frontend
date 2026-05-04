@@ -1,11 +1,15 @@
 .page {
-  background: var(--bg-base);
+  background:
+    linear-gradient(90deg, rgba(57, 255, 136, 0.025) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(57, 255, 136, 0.02) 1px, transparent 1px),
+    var(--bg-base);
+  background-size: 88px 88px, 88px 88px, auto;
   color: var(--text-primary);
   font-family: var(--font-body);
   min-height: 100vh;
 }
 
-.page :global(section) { padding: 80px 0; }
+.page :global(section) { padding: 88px 0; }
 .page :global(section:first-of-type) { padding-top: 32px; }
 
 @media (max-width: 768px) {

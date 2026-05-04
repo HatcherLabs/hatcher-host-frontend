@@ -2676,7 +2676,7 @@
     "ecosystem": {
       "boxLabel": "Ecosistem",
       "title": "Construit pe stack-ul deschis",
-      "sub": "Patru framework-uri de agenți, două chain-uri. Solana susține $HATCHER și plățile. SKALE oferă identitate și reputație on-chain fără gas.",
+      "sub": "Agenți OpenClaw și Hermes, două chain-uri. Solana susține $HATCHER și plățile. SKALE oferă identitate și reputație on-chain fără gas.",
       "frameworksLabel": "Framework-uri",
       "chainsLabel": "Chain-uri"
     },
@@ -2685,7 +2685,7 @@
       "headline": "Lansează primul tău agent.",
       "ctaPrimary": "Eclozează agent",
       "ctaGhost": "Răsfoiește template-uri",
-      "metaFrameworks": "4 framework-uri",
+      "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "fără card"
     }
   }

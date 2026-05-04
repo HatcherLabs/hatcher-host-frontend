@@ -2676,7 +2676,7 @@
     "ecosystem": {
       "boxLabel": "生态系统",
       "title": "构建于开放生态",
-      "sub": "四个智能体框架，两条链。Solana 驱动 $HATCHER 和支付。SKALE 提供免 Gas 的链上身份与信誉。",
+      "sub": "OpenClaw 与 Hermes 智能体，两条链。Solana 驱动 $HATCHER 和支付。SKALE 提供免 Gas 的链上身份与信誉。",
       "frameworksLabel": "框架",
       "chainsLabel": "区块链"
     },
@@ -2685,7 +2685,7 @@
       "headline": "部署你的第一个代理。",
       "ctaPrimary": "孵化代理",
       "ctaGhost": "浏览模板",
-      "metaFrameworks": "4 个框架",
+      "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "无需信用卡"
     }
   }

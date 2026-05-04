@@ -1,19 +1,77 @@
-.hero { position: relative; overflow: hidden; }
+.hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  min-height: min(720px, calc(100svh - 112px));
+  padding: 0 !important;
+  background: #020302;
+}
+
+.bottomFade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  height: 132px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(2, 3, 2, 0), #020302 82%);
+}
+
+.media {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 96px;
+  left: 0;
+  z-index: -2;
+  background: #020302 url('/city-preview.png') center top / cover no-repeat;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  opacity: 0.5;
+  filter: saturate(1.18) contrast(1.12) brightness(0.72);
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(2, 3, 2, 0.96) 0%, rgba(2, 3, 2, 0.82) 42%, rgba(2, 3, 2, 0.42) 100%),
+    linear-gradient(0deg, rgba(2, 3, 2, 0.96) 0%, rgba(2, 3, 2, 0.12) 38%, rgba(2, 3, 2, 0.86) 100%);
+}
 
 .inner {
+  position: relative;
+  z-index: 1;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 64px 20px;
+  min-height: inherit;
+  padding: clamp(56px, 7vw, 84px) 20px clamp(48px, 6vw, 72px);
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 64px;
+  grid-template-columns: minmax(0, 0.98fr) minmax(360px, 0.72fr);
+  gap: clamp(32px, 6vw, 72px);
   align-items: center;
 }
 @media (max-width: 960px) {
-  .inner { grid-template-columns: 1fr; gap: 40px; padding: 48px 20px; }
+  .inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 44px 20px 40px;
+  }
 }
 
-.copy { display: flex; flex-direction: column; gap: 24px; }
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 720px;
+}
 
 .headline {
   font-family: var(--font-mono);
@@ -22,8 +80,13 @@
   font-weight: 700;
   margin: 0;
   color: var(--text-primary);
+  text-wrap: balance;
+  text-shadow: 0 0 26px rgba(0, 0, 0, 0.82);
 }
-.accent { color: var(--accent); }
+.accent {
+  color: var(--accent);
+  text-shadow: 0 0 22px rgba(57, 255, 136, 0.18);
+}
 
 .sub {
   font-size: 18px;
@@ -34,4 +97,185 @@
 }
 
 .ctaRow { display: inline-flex; gap: 16px; flex-wrap: wrap; }
-.visual { display: flex; justify-content: center; }
+
+.signals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 700px;
+}
+
+.signal {
+  min-height: 74px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 6px;
+  background: rgba(5, 8, 5, 0.62);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.signalLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.3;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.signalValue {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--text-primary);
+}
+
+.green { border-color: rgba(57, 255, 136, 0.28); }
+.cyan { border-color: rgba(56, 189, 248, 0.34); }
+.amber { border-color: rgba(250, 204, 21, 0.36); }
+
+.visualDeck {
+  position: relative;
+  min-height: 480px;
+  display: grid;
+  align-items: center;
+}
+
+.terminalLift {
+  width: min(100%, 520px);
+  justify-self: end;
+  transform: translateY(-18px);
+}
+
+.telemetry {
+  position: absolute;
+  right: 26px;
+  bottom: 24px;
+  width: min(360px, 72%);
+  border: 1px solid rgba(57, 255, 136, 0.24);
+  border-radius: 6px;
+  background: rgba(3, 5, 3, 0.82);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.46);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 14px;
+}
+
+.telemetryHead {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.liveDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px rgba(57, 255, 136, 0.75);
+  animation: pulse 1.8s ease-in-out infinite;
+}
+
+.feed {
+  display: grid;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.feedRow {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 10px;
+  color: var(--text-muted);
+}
+
+.feedRow strong {
+  color: var(--text-primary);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.routeMap {
+  position: absolute;
+  left: 12px;
+  top: 68px;
+  display: grid;
+  gap: 12px;
+}
+
+.routeMap span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(57, 255, 136, 0.72);
+  box-shadow: 0 0 18px rgba(57, 255, 136, 0.32);
+}
+
+.routeMap span:nth-child(2) {
+  border-color: rgba(56, 189, 248, 0.72);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.28);
+}
+
+.routeMap span:nth-child(3) {
+  border-color: rgba(250, 204, 21, 0.72);
+  box-shadow: 0 0 18px rgba(250, 204, 21, 0.22);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.72); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .video { display: none; }
+  .liveDot { animation: none; }
+}
+
+@media (max-width: 960px) {
+  .hero { min-height: auto; }
+  .scrim {
+    background:
+      linear-gradient(90deg, rgba(2, 3, 2, 0.94), rgba(2, 3, 2, 0.72)),
+      linear-gradient(0deg, rgba(2, 3, 2, 0.96), rgba(2, 3, 2, 0.34));
+  }
+  .visualDeck {
+    min-height: 320px;
+    align-items: start;
+  }
+  .terminalLift {
+    width: min(100%, 560px);
+    justify-self: start;
+    transform: none;
+  }
+  .telemetry {
+    right: 14px;
+    bottom: 6px;
+    width: min(330px, 78%);
+  }
+}
+
+@media (max-width: 720px) {
+  .signals { grid-template-columns: 1fr; }
+  .signal {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 132px minmax(0, 1fr);
+    align-items: center;
+  }
+  .visualDeck { display: none; }
+  .sub { font-size: 16px; }
+}

@@ -67,7 +67,7 @@ function ConfigMockup() {
   return (
     <div className={styles.mockup}>
       <div className={styles.mockRow}><span className={styles.mockKey}>framework</span><span className={styles.mockVal}>hermes</span></div>
-      <div className={styles.mockRow}><span className={styles.mockKey}>model</span><span className={styles.mockVal}>llama-4-scout</span></div>
+      <div className={styles.mockRow}><span className={styles.mockKey}>model</span><span className={styles.mockVal}>deepseek-v4-flash</span></div>
       <div className={styles.mockRow}><span className={styles.mockKey}>tools</span><span className={styles.mockVal}>brave_search, telegram</span></div>
       <div className={styles.mockRow}><span className={styles.mockKey}>schedule</span><span className={styles.mockVal}>0 9 * * *</span></div>
     </div>

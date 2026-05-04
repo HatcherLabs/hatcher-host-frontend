@@ -2676,7 +2676,7 @@
     "ecosystem": {
       "boxLabel": "Ökosystem",
       "title": "Auf dem offenen Stack gebaut",
-      "sub": "Vier Agenten-Frameworks, zwei Chains. Solana für $HATCHER und Zahlungen. SKALE für gasfreie On-Chain-Identität und Reputation.",
+      "sub": "OpenClaw- und Hermes-Agenten, zwei Chains. Solana für $HATCHER und Zahlungen. SKALE für gasfreie On-Chain-Identität und Reputation.",
       "frameworksLabel": "Frameworks",
       "chainsLabel": "Chains"
     },
@@ -2685,7 +2685,7 @@
       "headline": "Deploy deinen ersten Agenten.",
       "ctaPrimary": "Agent ausbrüten",
       "ctaGhost": "Vorlagen ansehen",
-      "metaFrameworks": "4 Frameworks",
+      "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "keine Kreditkarte"
     }
   }

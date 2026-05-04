@@ -2676,7 +2676,7 @@
     "ecosystem": {
       "boxLabel": "Écosystème",
       "title": "Construit sur la pile ouverte",
-      "sub": "Quatre frameworks d'agents, deux chaînes. Solana propulse $HATCHER et les paiements. SKALE offre identité et réputation on-chain sans frais de gas.",
+      "sub": "Agents OpenClaw et Hermes, deux chaînes. Solana propulse $HATCHER et les paiements. SKALE offre identité et réputation on-chain sans frais de gas.",
       "frameworksLabel": "Frameworks",
       "chainsLabel": "Blockchains"
     },
@@ -2685,7 +2685,7 @@
       "headline": "Déploie ton premier agent.",
       "ctaPrimary": "Faire éclore un agent",
       "ctaGhost": "Parcourir les modèles",
-      "metaFrameworks": "4 frameworks",
+      "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "pas de carte"
     }
   }
