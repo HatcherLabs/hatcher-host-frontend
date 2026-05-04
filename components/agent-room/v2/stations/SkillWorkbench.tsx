@@ -16,7 +16,7 @@ interface Props {
 export function SkillWorkbench({ station, framework, onClick, isNear, hideLabel }: Props) {
   const palette = paletteFor(framework);
   const edgeColor = palette.primary;
-  const toolGlow = isNear ? 1.8 : 0.9;
+  const toolGlow = isNear ? 0.9 : 0.35;
 
   return (
     <group position={station.position} rotation={[0, station.rotationY, 0]} onClick={onClick}>
@@ -52,7 +52,7 @@ export function SkillWorkbench({ station, framework, onClick, isNear, hideLabel 
         position={[0, 1.45, -0.49]}
         rotation={[0, 0, 0]}
         color={palette.primary}
-        intensity={isNear ? 1 : 0.75}
+        intensity={isNear ? 0.75 : 0.45}
       />
 
       {/* 3 glowing "tools" — upright cylinders in a rack */}
