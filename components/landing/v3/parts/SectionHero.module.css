@@ -20,21 +20,20 @@
 
 .media {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 96px;
-  left: 0;
+  top: -28px;
+  right: -28px;
+  bottom: 64px;
+  left: -28px;
   z-index: -2;
-  background: #020302 url('/city-preview.png') center top / cover no-repeat;
-}
-
-.video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
-  opacity: 0.5;
-  filter: saturate(1.18) contrast(1.12) brightness(0.72);
+  background-color: #020302;
+  background-image: url('/landing-v3/robot-hatch-hero.png');
+  background-position: calc(50% - 150px) 18px;
+  background-repeat: no-repeat;
+  background-size: min(1280px, 112vw) auto;
+  opacity: 0.84;
+  filter: saturate(1.16) contrast(1.08) brightness(0.9);
+  transform-origin: 60% 50%;
+  animation: hatchDrift 24s ease-in-out infinite alternate;
 }
 
 .scrim {
@@ -42,8 +41,8 @@
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(90deg, rgba(2, 3, 2, 0.96) 0%, rgba(2, 3, 2, 0.82) 42%, rgba(2, 3, 2, 0.42) 100%),
-    linear-gradient(0deg, rgba(2, 3, 2, 0.96) 0%, rgba(2, 3, 2, 0.12) 38%, rgba(2, 3, 2, 0.86) 100%);
+    linear-gradient(90deg, rgba(2, 3, 2, 0.98) 0%, rgba(2, 3, 2, 0.86) 36%, rgba(2, 3, 2, 0.38) 68%, rgba(2, 3, 2, 0.74) 100%),
+    linear-gradient(0deg, rgba(2, 3, 2, 0.96) 0%, rgba(2, 3, 2, 0.16) 42%, rgba(2, 3, 2, 0.82) 100%);
 }
 
 .inner {
@@ -150,11 +149,11 @@
 }
 
 .terminalLift {
-  width: min(100%, 520px);
+  width: min(100%, 500px);
 }
 
 .telemetry {
-  width: min(100%, 420px);
+  width: min(100%, 400px);
   border: 1px solid rgba(57, 255, 136, 0.24);
   border-radius: 6px;
   background: rgba(3, 5, 3, 0.82);
@@ -207,44 +206,32 @@
   white-space: nowrap;
 }
 
-.routeMap {
-  position: absolute;
-  left: 12px;
-  top: 68px;
-  display: grid;
-  gap: 12px;
-}
-
-.routeMap span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 1px solid rgba(57, 255, 136, 0.72);
-  box-shadow: 0 0 18px rgba(57, 255, 136, 0.32);
-}
-
-.routeMap span:nth-child(2) {
-  border-color: rgba(56, 189, 248, 0.72);
-  box-shadow: 0 0 18px rgba(56, 189, 248, 0.28);
-}
-
-.routeMap span:nth-child(3) {
-  border-color: rgba(250, 204, 21, 0.72);
-  box-shadow: 0 0 18px rgba(250, 204, 21, 0.22);
-}
-
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.45; transform: scale(0.72); }
 }
 
+@keyframes hatchDrift {
+  0% { transform: scale(1) translate3d(0, 0, 0); }
+  100% { transform: scale(1.035) translate3d(-10px, 8px, 0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .video { display: none; }
+  .media { animation: none; }
   .liveDot { animation: none; }
 }
 
 @media (max-width: 960px) {
   .hero { min-height: auto; }
+  .media {
+    top: 0;
+    right: -80px;
+    bottom: 0;
+    left: 0;
+    background-position: 58% top;
+    background-size: cover;
+    opacity: 0.68;
+  }
   .scrim {
     background:
       linear-gradient(90deg, rgba(2, 3, 2, 0.94), rgba(2, 3, 2, 0.72)),

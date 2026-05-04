@@ -1,7 +1,6 @@
 // components/landing/v3/parts/SectionHero.tsx
 'use client';
 import { useTranslations } from 'next-intl';
-import { BoxLabel } from '../shared/BoxLabel';
 import { PhosphorButton } from '../shared/PhosphorButton';
 import { TerminalMockup } from '../shared/TerminalMockup';
 import styles from './SectionHero.module.css';
@@ -22,25 +21,12 @@ export function SectionHero() {
   const t = useTranslations('landingV3.hero');
   return (
     <section className={`${styles.hero} v3-scanline`}>
-      <div className={styles.media} aria-hidden>
-        <video
-          className={styles.video}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          poster="/city-preview.png"
-        >
-          <source src="/city-hero.mp4" type="video/mp4" />
-        </video>
-      </div>
+      <div className={styles.media} aria-hidden />
       <div className={styles.scrim} aria-hidden />
       <div className={styles.bottomFade} aria-hidden />
 
       <div className={styles.inner}>
         <div className={styles.copy}>
-          <BoxLabel>{t('boxLabel')}</BoxLabel>
           <h1 className={styles.headline}>
             {t('headline1')}<br />
             <span className={styles.accent}>{t('headline2')}</span>
@@ -77,11 +63,6 @@ export function SectionHero() {
                 </div>
               ))}
             </div>
-          </div>
-          <div className={styles.routeMap} aria-hidden>
-            <span />
-            <span />
-            <span />
           </div>
         </div>
       </div>
