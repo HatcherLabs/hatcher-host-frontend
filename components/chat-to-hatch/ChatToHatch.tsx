@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { req } from '@/lib/api';
+import { api, req } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import styles from './ChatToHatch.module.css';
 
@@ -186,6 +186,20 @@ export function ChatToHatch() {
         }),
       });
       if (created.success) {
+        const started = await api.startAgent(created.data.id);
+        if (!started.success) {
+          setMessages((m) => [
+            ...m,
+            {
+              id: crypto.randomUUID(),
+              who: 'assistant',
+              text: started.error || 'Agent created, but automatic start failed. Open the agent and start it manually.',
+              isError: true,
+            },
+          ]);
+          setHatching(false);
+          return;
+        }
         router.push(`/agent/${created.data.slug ?? created.data.id}/room?from=hatch`);
         return;
       }

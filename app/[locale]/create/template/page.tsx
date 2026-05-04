@@ -506,11 +506,19 @@ export default function CreatePage() {
         return;
       }
 
-      // Auto-deploy — best-effort, don't block on failure
+      // Auto-deploy before sending the user into the room.
       try {
-        await api.startAgent(res.data.id);
+        const started = await api.startAgent(res.data.id);
+        if (!started.success) {
+          toast('error', started.error ?? 'Agent created, but automatic start failed');
+          setLaunching(false);
+          return;
+        }
       } catch (deployErr) {
-        console.warn('Auto-deploy failed; user can deploy manually from dashboard:', deployErr);
+        console.warn('Auto-deploy failed:', deployErr);
+        toast('error', 'Agent created, but automatic start failed');
+        setLaunching(false);
+        return;
       }
 
       // Success -- confetti!
@@ -525,7 +533,7 @@ export default function CreatePage() {
       });
 
       setTimeout(() => {
-        router.push(`/dashboard/agent/${res.data.id}?new=1`);
+        router.push(`/agent/${res.data.slug ?? res.data.id}/room?from=hatch`);
       }, 2000);
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Unknown error';
