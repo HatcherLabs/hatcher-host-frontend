@@ -141,22 +141,20 @@
 
 .visualDeck {
   position: relative;
-  min-height: 480px;
-  display: grid;
-  align-items: center;
+  display: flex;
+  min-height: 500px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 16px;
 }
 
 .terminalLift {
   width: min(100%, 520px);
-  justify-self: end;
-  transform: translateY(-18px);
 }
 
 .telemetry {
-  position: absolute;
-  right: 26px;
-  bottom: 24px;
-  width: min(360px, 72%);
+  width: min(100%, 420px);
   border: 1px solid rgba(57, 255, 136, 0.24);
   border-radius: 6px;
   background: rgba(3, 5, 3, 0.82);
@@ -253,18 +251,14 @@
       linear-gradient(0deg, rgba(2, 3, 2, 0.96), rgba(2, 3, 2, 0.34));
   }
   .visualDeck {
-    min-height: 320px;
-    align-items: start;
+    min-height: auto;
+    align-items: flex-start;
   }
   .terminalLift {
     width: min(100%, 560px);
-    justify-self: start;
-    transform: none;
   }
   .telemetry {
-    right: 14px;
-    bottom: 6px;
-    width: min(330px, 78%);
+    width: min(100%, 420px);
   }
 }
 
