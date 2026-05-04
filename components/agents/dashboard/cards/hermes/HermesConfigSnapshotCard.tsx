@@ -1,9 +1,17 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { AlertTriangle, Power, Sliders } from 'lucide-react';
+import { AlertTriangle, Sliders } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAgentContext, GlassCard, Skeleton } from '../../../AgentContext';
+import { timeAgo } from '@/lib/utils';
+
+interface HermesConfigSnapshot {
+  source: 'live' | 'snapshot' | 'none';
+  config: Record<string, unknown> | null;
+  snapshotAt: string | null;
+  liveReadError?: string;
+}
 
 /**
  * Walk a dot-path into a record, returning undefined if any segment
@@ -42,31 +50,27 @@ const CONFIG_KEYS: Array<{ path: string; label: string; color: string }> = [
 ];
 
 /**
- * Hermes live config snapshot card — read-only view of the 7 keys
- * the Hatcher config UI can PATCH. If a user needs to change one,
- * they click "Edit" to jump to the Config tab. Reading is free;
- * writing requires going through the allowlist-enforced PATCH route.
- *
- * Only rendered for managed-mode Hermes agents. Legacy agents hit
- * AgentNotRunningError (409) on this endpoint and the card surfaces
- * a friendly "not available" notice.
+ * Hermes config snapshot card — read-only view of the 7 keys the
+ * Hatcher config UI can PATCH. The API returns live config when the
+ * container is running, otherwise the last DB snapshot when available.
  */
 export function HermesConfigSnapshotCard() {
   const { agent, setTab } = useAgentContext();
-  const isActive = agent.status === 'active';
-  const [config, setConfig] = useState<Record<string, unknown> | null>(null);
+  const [data, setData] = useState<HermesConfigSnapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchConfig = useCallback(async () => {
-    if (!isActive) {
-      setLoading(false);
-      return;
-    }
+    setLoading(true);
     try {
       const res = await api.getHermesConfig(agent.id);
       if (res.success) {
-        setConfig(res.data.config);
+        setData({
+          source: res.data.source,
+          config: res.data.config,
+          snapshotAt: res.data.snapshotAt ?? null,
+          liveReadError: res.data.liveReadError,
+        });
         setError(null);
       } else {
         setError('error' in res ? res.error : 'Failed to load config');
@@ -76,28 +80,13 @@ export function HermesConfigSnapshotCard() {
     } finally {
       setLoading(false);
     }
-  }, [agent.id, isActive]);
+  }, [agent.id]);
 
   useEffect(() => {
     fetchConfig();
   }, [fetchConfig]);
 
-  if (!isActive) {
-    return (
-      <GlassCard>
-        <div className="flex items-center gap-2 mb-3">
-          <Sliders size={14} className="text-purple-400" />
-          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Live Config</h3>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-          <Power size={12} />
-          Start the agent to read its live config.
-        </div>
-      </GlassCard>
-    );
-  }
-
-  if (loading && !config) {
+  if (loading && !data) {
     return (
       <GlassCard>
         <div className="space-y-3">
@@ -112,7 +101,7 @@ export function HermesConfigSnapshotCard() {
     );
   }
 
-  if (error || !config) {
+  if (error || !data) {
     return (
       <GlassCard>
         <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
@@ -123,15 +112,50 @@ export function HermesConfigSnapshotCard() {
     );
   }
 
+  const snapshotRelative =
+    data.source === 'snapshot' && data.snapshotAt
+      ? timeAgo(data.snapshotAt, { switchToDateAfterDays: 7, dateFormat: 'short-month' })
+      : null;
+
+  if (!data.config) {
+    return (
+      <GlassCard>
+        <div className="flex items-center gap-2 mb-3">
+          <Sliders size={14} className="text-purple-400" />
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Config</h3>
+          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--bg-card)] text-[var(--text-muted)] border border-[var(--border-default)]">
+            {data.source === 'live' ? 'live' : data.source === 'snapshot' ? 'snapshot' : 'n/a'}
+          </span>
+        </div>
+        <div className="flex items-start gap-2 text-xs text-[var(--text-muted)]">
+          <AlertTriangle size={12} className="text-amber-400 flex-shrink-0 mt-0.5" />
+          <span>
+            {data.liveReadError
+              ? `Live config unavailable: ${data.liveReadError}`
+              : 'No config snapshot available yet. Start the agent once to capture config.yaml.'}
+          </span>
+        </div>
+      </GlassCard>
+    );
+  }
+
   return (
     <GlassCard>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Sliders size={14} className="text-purple-400" />
-          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Live Config</h3>
+          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Config</h3>
           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
             read-only
           </span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--bg-card)] text-[var(--text-muted)] border border-[var(--border-default)]">
+            {data.source === 'live' ? 'live' : data.source === 'snapshot' ? 'snapshot' : 'n/a'}
+          </span>
+          {snapshotRelative && (
+            <span className="text-[10px] text-[var(--text-muted)]" title={data.snapshotAt ?? undefined}>
+              · {snapshotRelative}
+            </span>
+          )}
         </div>
         <button
           onClick={() => setTab('config')}
@@ -143,7 +167,7 @@ export function HermesConfigSnapshotCard() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {CONFIG_KEYS.map(({ path, label, color }) => {
-          const value = getPath(config, path);
+          const value = getPath(data.config, path);
           return (
             <div
               key={path}

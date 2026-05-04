@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { useAgentContext, tabContentVariants } from '../AgentContext';
-import { GenericDashboard } from './GenericDashboard';
 import { HealthPerformanceCard } from './cards/HealthPerformanceCard';
 import { LiveLogsPreviewCard } from './cards/LiveLogsPreviewCard';
 import { QuickActionsCard } from './cards/QuickActionsCard';
@@ -15,11 +14,8 @@ import { OpenClawRecentErrorsCard } from './cards/openclaw/OpenClawRecentErrorsC
 /**
  * Framework-native dashboard for OpenClaw agents.
  *
- * Managed-mode only — legacy OpenClaw (the ~450 pre-rollout agents)
- * falls back to GenericDashboard because the gateway config snapshot,
- * workspace viewer, and schedules endpoints all short-circuit for
- * non-managed agents. Showing a wall of "not available" cards would
- * be worse UX than the generic fallback.
+ * The framework-specific cards gracefully fall back to cached snapshots
+ * or friendly empty states when the container is paused.
  *
  * Layout (managed):
  *   1. OpenClawGatewayCard      — bind + model + endpoints snapshot

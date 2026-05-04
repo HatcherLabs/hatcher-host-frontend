@@ -10,7 +10,7 @@ interface Props {
   uptimeSec?: number;
   messagesToday?: number;
   tier?: string;
-  onAction: () => void;
+  onAction: () => void | Promise<void>;
   onClose: () => void;
 }
 
@@ -51,10 +51,14 @@ export function StatusPanel({
     setBusy(action);
     setError(null);
     try {
-      if (action === 'start') await api.startAgent(agentId);
-      else if (action === 'stop') await api.stopAgent(agentId);
-      else await api.restartAgent(agentId);
-      onAction();
+      const res =
+        action === 'start'
+          ? await api.startAgent(agentId)
+          : action === 'stop'
+            ? await api.stopAgent(agentId)
+            : await api.restartAgent(agentId);
+      if (!res.success) throw new Error(res.error || 'Action failed.');
+      await onAction();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Action failed.');
     } finally {

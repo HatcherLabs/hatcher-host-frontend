@@ -28,9 +28,8 @@ export function PluginsPanel({ agentId, framework, onClose }: Props) {
     setLoading(true);
     try {
       const res = await api.getAgentPlugins(agentId);
-      const data = (res as { data?: { installed?: InstalledPlugin[] } }).data
-        ?? (res as unknown as { installed?: InstalledPlugin[] });
-      setInstalled(data.installed ?? []);
+      if (!res.success) throw new Error(res.error || 'Failed to load plugins.');
+      setInstalled(res.data.installed ?? []);
       setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load plugins.');

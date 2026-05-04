@@ -6,7 +6,6 @@ import { HealthPerformanceCard } from './cards/HealthPerformanceCard';
 import { LiveLogsPreviewCard } from './cards/LiveLogsPreviewCard';
 import { QuickActionsCard } from './cards/QuickActionsCard';
 import { CostCard } from './cards/CostCard';
-import { GenericDashboard } from './GenericDashboard';
 import { HermesConfigSnapshotCard } from './cards/hermes/HermesConfigSnapshotCard';
 import { HermesSkillsCard } from './cards/hermes/HermesSkillsCard';
 import { HermesCronCard } from './cards/hermes/HermesCronCard';
@@ -16,10 +15,9 @@ import { HermesStatsCard } from './cards/hermes/HermesStatsCard';
 /**
  * Framework-native dashboard for Hermes agents.
  *
- * Note: managed-mode only. The live `config.yaml` and `skills/`
- * Every hermes agent is managed post-launch, so the dashboard always
- * renders the full card set below (the legacy fall-through to the
- * generic dashboard was retired with the legacy flow itself).
+ * Every Hermes agent is managed post-launch, so the dashboard always
+ * renders the full card set below. Config and catalog cards use live
+ * reads when running and cached snapshots where supported.
  *
  * Layout:
  *   1. HermesConfigSnapshotCard  — 7 allowlisted live config keys

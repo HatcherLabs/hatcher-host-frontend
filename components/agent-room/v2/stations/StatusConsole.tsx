@@ -47,9 +47,8 @@ export function StatusConsole({
     setBusy(true);
     try {
       const isUp = status === 'active' || status === 'running' || status === 'starting';
-      if (isUp) await api.stopAgent(agentId);
-      else await api.startAgent(agentId);
-      onStatusChange();
+      const res = isUp ? await api.stopAgent(agentId) : await api.startAgent(agentId);
+      if (res.success) onStatusChange();
     } catch {
       // swallow
     } finally {

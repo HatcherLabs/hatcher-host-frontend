@@ -23,7 +23,8 @@ export function MemoryPanel({ agentId, framework, onClose }: Props) {
     setLoading(true);
     try {
       const res = await api.getAgentMemory(agentId);
-      const payload = (res as { data?: MemoryData }).data ?? (res as unknown as MemoryData);
+      if (!res.success) throw new Error(res.error || 'Failed to load memory.');
+      const payload = res.data;
       setData({
         memoryMd: payload.memoryMd ?? '',
         dailyLogs: payload.dailyLogs ?? [],

@@ -32,7 +32,7 @@ export function SkillsPanel({ agentId, framework, onClose }: Props) {
         setSkills(raw);
         setError(null);
       } else {
-        setError('Failed to load skills.');
+        setError(res.error || 'Failed to load skills.');
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load skills.');
@@ -45,8 +45,10 @@ export function SkillsPanel({ agentId, framework, onClose }: Props) {
 
   const toggle = useCallback(async (skillId: string, enabled: boolean) => {
     setBusy(skillId);
+    setError(null);
     try {
-      await api.toggleAgentSkill(agentId, skillId, enabled);
+      const res = await api.toggleAgentSkill(agentId, skillId, enabled);
+      if (!res.success) throw new Error(res.error || 'Toggle failed.');
       setSkills(prev => prev.map(s => (s.id === skillId ? { ...s, enabled } : s)));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Toggle failed.');

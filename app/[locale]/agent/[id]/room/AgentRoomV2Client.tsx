@@ -69,12 +69,14 @@ function extractConnectedIntegrations(config: Record<string, unknown> | undefine
   return enabled;
 }
 
-// Stations that need edit rights. AgentAvatar (chat), LogWall, StatsHologram stay
-// public — reading the agent's state is fine for anyone allowed on the page.
+// Stations that need edit rights. StatsHologram stays public because it only
+// exposes the public agent state already visible on the page.
 const OWNER_ONLY: Set<StationId> = new Set([
+  'agentAvatar',
   'skillWorkbench',
   'integrationsRack',
   'statusConsole',
+  'logWall',
   'memoryShelves',
   'configTerminal',
   'pluginsCabinet',
@@ -139,6 +141,10 @@ export function AgentRoomV2Client({ agentId }: Props) {
 
   // Plugin count for the cabinet's label ("Plugins · 3").
   useEffect(() => {
+    if (!canEdit) {
+      setPluginsInstalled(0);
+      return;
+    }
     api.getAgentPlugins(apiId)
       .then((res) => {
         if (!res.success) { setPluginsInstalled(0); return; }
@@ -146,13 +152,13 @@ export function AgentRoomV2Client({ agentId }: Props) {
         setPluginsInstalled(data.installed?.length ?? 0);
       })
       .catch(() => setPluginsInstalled(0));
-  }, [apiId]);
+  }, [apiId, canEdit]);
 
   // Load persisted chat history once per agent. State lives on the
   // client (not inside ChatPanel) so closing / re-opening the panel
   // keeps the conversation visible.
   useEffect(() => {
-    if (!apiId) return;
+    if (!apiId || !canEdit) return;
     api.getChatHistory(apiId)
       .then((res) => {
         if (!res.success) return;
@@ -167,7 +173,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
         setChatMessages(normalized);
       })
       .catch(() => {});
-  }, [apiId]);
+  }, [apiId, canEdit]);
 
   const appendChatMessage = useCallback((msg: ChatMessage) => {
     setChatMessages((prev) => [...prev, msg]);
@@ -185,7 +191,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
   // Debounced save to backend so every streaming token doesn't hit the
   // API. 800ms after the last message mutation settles, persist.
   useEffect(() => {
-    if (chatMessages.length === 0) return;
+    if (!canEdit || chatMessages.length === 0) return;
     if (saveChatTimerRef.current) clearTimeout(saveChatTimerRef.current);
     saveChatTimerRef.current = setTimeout(() => {
       const payload = chatMessages
@@ -197,7 +203,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
     return () => {
       if (saveChatTimerRef.current) clearTimeout(saveChatTimerRef.current);
     };
-  }, [chatMessages, apiId]);
+  }, [chatMessages, apiId, canEdit]);
 
   const layout = useMemo(
     () => (framework ? getStationLayout(framework) : null),
@@ -208,7 +214,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
 
   const handleStationClick = useCallback((id: StationId) => {
     if (OWNER_ONLY.has(id) && !canEdit) {
-      toast.info('Owner-only — only the agent owner can use this station.');
+      toast.info('Owner-only — sign in as the owner or a team member to use this station.');
       return;
     }
     setOpenPanel(id);
@@ -256,7 +262,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
       <ProximityHint nearest={openPanel ? null : nearest} />
       <WalkOnboarding />
 
-      {openPanel === 'agentAvatar' && (
+      {openPanel === 'agentAvatar' && canEdit && (
         <ChatPanel
           agentId={apiId}
           framework={framework}
@@ -290,7 +296,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
           onClose={close}
         />
       )}
-      {openPanel === 'logWall' && (
+      {openPanel === 'logWall' && canEdit && (
         <LogsPanel agentId={apiId} framework={framework} onClose={close} />
       )}
       {openPanel === 'memoryShelves' && canEdit && (

@@ -18,7 +18,8 @@ export function LogsPanel({ agentId, framework, onClose }: Props) {
     setLoading(true);
     try {
       const res = await api.getAgentLogs(agentId);
-      const raw = (res as { data?: { logs?: unknown } }).data?.logs ?? (res as { logs?: unknown }).logs;
+      if (!res.success) throw new Error(res.error || 'Failed to load logs.');
+      const raw = res.data.logs as unknown;
       let arr: string[] = [];
       if (Array.isArray(raw)) arr = raw.map(l => (typeof l === 'string' ? l : JSON.stringify(l)));
       else if (typeof raw === 'string') arr = raw.split('\n');
