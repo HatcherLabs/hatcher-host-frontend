@@ -3,25 +3,28 @@
 // ============================================================
 // WalletTab — SKALE wallet, identity, reputation, signing
 //
-// Renders four cards stacked top-to-bottom:
-//   1. Wallet — public address, CREDIT + USDC balances, deposit QR.
-//   2. ERC-8004 Identity — on-chain agentId, registry contract,
+// Renders five cards stacked top-to-bottom:
+//   1. Agent Passport — multichain identity, x402 rails, MCP links.
+//   2. Wallet — public address, CREDIT + USDC balances, deposit QR.
+//   3. ERC-8004 Identity — on-chain agentId, registry contract,
 //      registered-at timestamp; "Verify on SKALE" button when not
 //      yet registered.
-//   3. On-Chain Reputation — DB thumbs aggregate (up/down/score%)
+//   4. On-Chain Reputation — DB thumbs aggregate (up/down/score%)
 //      paired with the on-chain attestation count cached from the
 //      ReputationRegistry, plus a link to the latest tx.
-//   4. Runtime Signing — opt-in toggle that injects the encrypted
+//   5. Runtime Signing — opt-in toggle that injects the encrypted
 //      private key into the container env so the agent process can
 //      sign + submit transactions itself. Off by default; receive-only
 //      until the user explicitly enables it.
 // ============================================================
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Wallet as WalletIcon, Copy, RefreshCw, ExternalLink, ShieldCheck, Zap, Key, AlertTriangle, Star, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Wallet as WalletIcon, Copy, RefreshCw, ExternalLink, ShieldCheck, Zap, Key, AlertTriangle, Star, ThumbsUp, ThumbsDown, Fingerprint, Server, CreditCard, Link2, Network } from 'lucide-react';
 import { useAgentContext, GlassCard } from '../AgentContext';
 import { api } from '@/lib/api';
+import type { AgentPassport, AgentPassportNetwork, AgentPassportNetworkId, AgentPassportPaymentRail, AgentPassportStatus } from '@/lib/api';
+import { buildFallbackPassport, networkStatusLabel, networkStatusTone, shortAddress } from '@/lib/agent-passport';
 
 interface WalletState {
   address: string;
@@ -71,6 +74,7 @@ function shortAddr(addr: string): string {
 export function WalletTab() {
   const { agent, loadAgent } = useAgentContext();
   const [wallet, setWallet] = useState<WalletState | null>(null);
+  const [passport, setPassport] = useState<AgentPassport | null>(null);
   const [reputation, setReputation] = useState<ReputationState | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,9 +84,16 @@ export function WalletTab() {
   const [signingToggling, setSigningToggling] = useState(false);
   const [signingPendingConfirm, setSigningPendingConfirm] = useState(false);
   const [signingError, setSigningError] = useState<string | null>(null);
+  const [provisioningChains, setProvisioningChains] = useState(false);
+  const [runtimeRestartNeeded, setRuntimeRestartNeeded] = useState(false);
+  const [restartingRuntime, setRestartingRuntime] = useState(false);
 
   const advanced = (agent.config?.advanced as Record<string, unknown> | undefined) ?? {};
   const signingEnabled = advanced['agent_wallet_signer'] === true;
+  const activePassport = useMemo(
+    () => passport ?? buildFallbackPassport(agent, agent.id),
+    [agent, passport],
+  );
 
   const loadWallet = useCallback(async () => {
     setLoading(true);
@@ -104,13 +115,23 @@ export function WalletTab() {
     } catch {
       /* swallow — keep card hidden */
     }
+    // Passport powers the dashboard multichain card. It is best-effort here:
+    // the SKALE wallet view remains usable even if the public manifest route
+    // is temporarily unavailable during local development.
+    try {
+      const pass = await api.getAgentPassport(agent.id);
+      if (pass.success) setPassport(pass.data);
+    } catch {
+      /* fallback derived from the already-loaded agent stays visible */
+    }
   }, [agent.id]);
 
   useEffect(() => {
     void loadWallet();
   }, [loadWallet]);
 
-  const copy = (value: string, label: string) => {
+  const copy = (value: string | null | undefined, label: string) => {
+    if (!value) return;
     navigator.clipboard.writeText(value).then(() => {
       setCopyMsg(`${label} copied`);
       setTimeout(() => setCopyMsg(null), 1600);
@@ -168,6 +189,45 @@ export function WalletTab() {
     }
   };
 
+  const provisionChainAccounts = async () => {
+    setProvisioningChains(true);
+    try {
+      const res = await api.provisionAgentChainAccounts(agent.id);
+      if (!res.success) throw new Error(res.error || 'Provisioning failed');
+      const pass = await api.getAgentPassport(agent.id);
+      if (pass.success) setPassport(pass.data);
+      setRuntimeRestartNeeded(res.data.needsRestart);
+      setCopyMsg(res.data.needsRestart
+        ? 'Provisioned. Restart agent to refresh runtime env'
+        : res.data.provisioned
+          ? 'Multichain accounts provisioned'
+          : 'Multichain accounts already provisioned');
+      setTimeout(() => setCopyMsg(null), res.data.needsRestart ? 3200 : 1800);
+    } catch (e) {
+      setCopyMsg(e instanceof Error ? e.message : 'Provisioning failed');
+      setTimeout(() => setCopyMsg(null), 2400);
+    } finally {
+      setProvisioningChains(false);
+    }
+  };
+
+  const restartRuntime = async () => {
+    setRestartingRuntime(true);
+    try {
+      const res = await api.restartAgent(agent.id);
+      if (!res.success) throw new Error(res.error || 'Restart failed');
+      setRuntimeRestartNeeded(false);
+      setCopyMsg('Agent runtime restarting');
+      await loadAgent();
+      setTimeout(() => setCopyMsg(null), 2200);
+    } catch (e) {
+      setCopyMsg(e instanceof Error ? e.message : 'Restart failed');
+      setTimeout(() => setCopyMsg(null), 2600);
+    } finally {
+      setRestartingRuntime(false);
+    }
+  };
+
   if (loading && !wallet) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 p-6">
@@ -222,6 +282,16 @@ export function WalletTab() {
           <RefreshCw size={12} className={loading ? 'animate-spin' : ''} /> Refresh
         </button>
       </div>
+
+      <AgentPassportDashboardCard
+        passport={activePassport}
+        onCopy={copy}
+        onProvision={() => void provisionChainAccounts()}
+        provisioning={provisioningChains}
+        onRestartRuntime={() => void restartRuntime()}
+        runtimeRestartNeeded={runtimeRestartNeeded}
+        restartingRuntime={restartingRuntime}
+      />
 
       {/* Address + QR card */}
       <GlassCard className="p-6">
@@ -529,6 +599,251 @@ export function WalletTab() {
         Network: SKALE Base Mainnet · Chain ID {wallet.chainId}
       </div>
     </motion.div>
+  );
+}
+
+const PASSPORT_NETWORK_ORDER: AgentPassportNetworkId[] = ['skale', 'base', 'solana'];
+
+function dashboardNetworkIcon(id: AgentPassportNetworkId) {
+  if (id === 'solana') return <Network size={14} />;
+  if (id === 'base') return <Link2 size={14} />;
+  return <ShieldCheck size={14} />;
+}
+
+function statusPill(status: AgentPassportStatus) {
+  return (
+    <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-wider ${networkStatusTone(status)}`}>
+      {networkStatusLabel(status)}
+    </span>
+  );
+}
+
+function AgentPassportDashboardCard({
+  passport,
+  onCopy,
+  onProvision,
+  provisioning,
+  onRestartRuntime,
+  runtimeRestartNeeded,
+  restartingRuntime,
+}: {
+  passport: AgentPassport;
+  onCopy: (value: string | null | undefined, label: string) => void;
+  onProvision: () => void;
+  provisioning: boolean;
+  onRestartRuntime: () => void;
+  runtimeRestartNeeded: boolean;
+  restartingRuntime: boolean;
+}) {
+  const networks = PASSPORT_NETWORK_ORDER
+    .map((id) => passport.identity.networks.find((network) => network.id === id))
+    .filter((network): network is AgentPassportNetwork => !!network);
+  const hasSolanaWallet = networks.some((network) => network.id === 'solana' && network.walletAddress);
+
+  return (
+    <GlassCard className="p-5">
+      <div className="flex items-start justify-between gap-3 flex-wrap mb-4">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 border border-[var(--phosphor)]/40 flex items-center justify-center">
+            <Fingerprint size={18} className="text-[var(--phosphor)]" />
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold text-[var(--text-primary)]">Agent Passport</h3>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">
+              Identity, wallet, x402 and MCP surface shared by dashboard and 3D room.
+            </p>
+            <button
+              type="button"
+              onClick={() => onCopy(passport.identity.handle, 'Passport handle')}
+              className="mt-2 block max-w-full truncate font-mono text-[11px] text-[var(--phosphor)] hover:underline"
+              title={passport.identity.handle}
+            >
+              {passport.identity.handle}
+            </button>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {!hasSolanaWallet && (
+            <button
+              type="button"
+              onClick={onProvision}
+              disabled={provisioning}
+              className="inline-flex items-center gap-1 px-2 py-1 text-[10px] uppercase tracking-wider border border-[var(--phosphor)]/40 text-[var(--phosphor)] hover:bg-[var(--phosphor)]/10 transition disabled:opacity-50"
+            >
+              <RefreshCw size={10} className={provisioning ? 'animate-spin' : ''} />
+              {provisioning ? 'Provisioning' : 'Provision chains'}
+            </button>
+          )}
+          {runtimeRestartNeeded && (
+            <button
+              type="button"
+              onClick={onRestartRuntime}
+              disabled={restartingRuntime}
+              className="inline-flex items-center gap-1 px-2 py-1 text-[10px] uppercase tracking-wider border border-amber-400/40 text-amber-200 hover:bg-amber-400/10 transition disabled:opacity-50"
+            >
+              <RefreshCw size={10} className={restartingRuntime ? 'animate-spin' : ''} />
+              {restartingRuntime ? 'Restarting' : 'Restart runtime'}
+            </button>
+          )}
+          <DashboardLinkButton href={passport.links.room} label="3D room" />
+          <DashboardLinkButton href={passport.links.passport} label="passport.json" />
+          <DashboardLinkButton href={passport.mcp.manifestUrl} label="MCP manifest" />
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-3">
+        {networks.map((network) => (
+          <DashboardNetworkCard key={network.id} network={network} onCopy={onCopy} />
+        ))}
+      </div>
+
+      <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-3 mt-3">
+        <div className="border border-[var(--border-subtle)] bg-black/20 p-3">
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
+              <WalletIcon size={12} /> Wallets
+            </div>
+            {statusPill(passport.wallets[0]?.status ?? 'planned')}
+          </div>
+          <div className="grid sm:grid-cols-2 gap-2">
+            {passport.wallets.map((wallet) => (
+              <button
+                key={wallet.id}
+                type="button"
+                onClick={() => onCopy(wallet.address, `${wallet.chainType.toUpperCase()} wallet`)}
+                disabled={!wallet.address}
+                className="min-w-0 text-left border border-[var(--border-subtle)] bg-[var(--bg-base)]/40 px-3 py-2 disabled:cursor-default"
+              >
+                <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+                  {wallet.chainType} · {wallet.networks.join(', ')}
+                </div>
+                <div className="mt-1 truncate font-mono text-xs text-[var(--text-primary)]">
+                  {shortAddress(wallet.address)}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="border border-[var(--border-subtle)] bg-black/20 p-3">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)] mb-3">
+            <CreditCard size={12} /> x402 Payments
+          </div>
+          <div className="space-y-2">
+            {passport.payments.map((rail) => (
+              <DashboardPaymentRail key={rail.id} rail={rail} onCopy={onCopy} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 border border-violet-400/25 bg-violet-500/5 p-3">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-violet-200">
+            <Server size={12} /> MCP
+          </div>
+          {statusPill(passport.mcp.status)}
+        </div>
+        <button
+          type="button"
+          onClick={() => onCopy(passport.mcp.manifestUrl, 'MCP manifest URL')}
+          className="mt-2 max-w-full truncate font-mono text-[11px] text-violet-200/80 hover:text-violet-100"
+          title={passport.mcp.manifestUrl}
+        >
+          {passport.mcp.manifestUrl}
+        </button>
+      </div>
+    </GlassCard>
+  );
+}
+
+function DashboardNetworkCard({
+  network,
+  onCopy,
+}: {
+  network: AgentPassportNetwork;
+  onCopy: (value: string | null | undefined, label: string) => void;
+}) {
+  return (
+    <div className="min-w-0 border border-[var(--border-subtle)] bg-black/20 p-3">
+      <div className="flex items-center gap-2">
+        <div className="w-8 h-8 border border-[var(--border-subtle)] flex items-center justify-center text-[var(--phosphor)]">
+          {dashboardNetworkIcon(network.id)}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-sm font-semibold text-[var(--text-primary)]">{network.label}</div>
+          <div className="truncate font-mono text-[10px] text-[var(--text-muted)]">{network.caip2}</div>
+        </div>
+      </div>
+      <div className="mt-3">{statusPill(network.status)}</div>
+      <button
+        type="button"
+        onClick={() => onCopy(network.walletAddress, `${network.label} wallet`)}
+        disabled={!network.walletAddress}
+        className="mt-3 flex w-full items-center justify-between gap-2 border border-[var(--border-subtle)] bg-[var(--bg-base)]/40 px-2 py-1.5 disabled:cursor-default"
+      >
+        <span className="truncate font-mono text-[11px] text-[var(--text-primary)]">
+          {shortAddress(network.walletAddress)}
+        </span>
+        {network.walletAddress && <Copy size={12} className="flex-shrink-0 text-[var(--text-muted)]" />}
+      </button>
+      <div className="mt-2 truncate text-[11px] text-[var(--text-muted)]">
+        {network.agentId ? `agentId ${network.agentId}` : network.registry ?? 'registry pending'}
+      </div>
+      {network.explorerUrl && (
+        <a
+          href={network.explorerUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-flex items-center gap-1 text-[11px] text-[var(--phosphor)] hover:underline"
+        >
+          Explorer <ExternalLink size={10} />
+        </a>
+      )}
+    </div>
+  );
+}
+
+function DashboardPaymentRail({
+  rail,
+  onCopy,
+}: {
+  rail: AgentPassportPaymentRail;
+  onCopy: (value: string | null | undefined, label: string) => void;
+}) {
+  return (
+    <div className="border border-[var(--border-subtle)] bg-[var(--bg-base)]/40 px-3 py-2">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">{rail.network}</span>
+        {statusPill(rail.status)}
+      </div>
+      <button
+        type="button"
+        onClick={() => onCopy(rail.receivingAddress, `${rail.network} payTo`)}
+        disabled={!rail.receivingAddress}
+        className="mt-1 block w-full min-w-0 text-left disabled:cursor-default"
+      >
+        <span className="block truncate font-mono text-[11px] text-[var(--text-primary)]">
+          payTo {shortAddress(rail.receivingAddress)}
+        </span>
+        <span className="block truncate font-mono text-[10px] text-[var(--text-muted)]">
+          asset {rail.asset ? shortAddress(rail.asset) : rail.caip2}
+        </span>
+      </button>
+    </div>
+  );
+}
+
+function DashboardLinkButton({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1 px-2 py-1 text-[10px] uppercase tracking-wider border border-[var(--border-subtle)] text-[var(--text-muted)] hover:border-[var(--phosphor)] hover:text-[var(--phosphor)] transition"
+    >
+      {label} <ExternalLink size={10} />
+    </a>
   );
 }
 

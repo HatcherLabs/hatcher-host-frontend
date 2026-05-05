@@ -8,6 +8,7 @@ import { BackToCity } from '@/components/agent-room/v2/hud/BackToCity';
 import { WalkOnboarding } from '@/components/agent-room/v2/hud/WalkOnboarding';
 import { RoomMinimap } from '@/components/agent-room/v2/hud/RoomMinimap';
 import { ProximityHint } from '@/components/agent-room/v2/hud/ProximityHint';
+import { PassportHud } from '@/components/agent-room/v2/hud/PassportHud';
 import { getStationLayout, type StationId } from '@/components/agent-room/v2/world/layout';
 import { usePanelState } from '@/components/agent-room/v2/hooks/usePanelState';
 import { useStationProximity } from '@/components/agent-room/v2/hooks/useStationProximity';
@@ -19,7 +20,10 @@ import { LogsPanel } from '@/components/agent-room/v2/panels/LogsPanel';
 import { MemoryPanel } from '@/components/agent-room/v2/panels/MemoryPanel';
 import { ConfigPanel } from '@/components/agent-room/v2/panels/ConfigPanel';
 import { PluginsPanel } from '@/components/agent-room/v2/panels/PluginsPanel';
+import { AgentPassportPanel } from '@/components/agent-room/v2/panels/AgentPassportPanel';
 import { detectDefaultQuality } from '@/components/agent-room/v2/quality';
+import type { AgentPassport } from '@/lib/api';
+import { buildFallbackPassport, primaryPassportStatus } from '@/lib/agent-passport';
 
 const AgentRoomSceneV2 = dynamic(
   () => import('@/components/agent-room/v2/AgentRoomSceneV2').then(m => m.AgentRoomSceneV2),
@@ -32,7 +36,10 @@ interface Props {
 
 interface AgentWithExtras {
   id?: string;
+  slug?: string | null;
   name?: string;
+  description?: string | null;
+  avatarUrl?: string | null;
   ownerId?: string;
   framework?: string;
   status?: string;
@@ -40,6 +47,11 @@ interface AgentWithExtras {
   uptimeSec?: number;
   messageCountToday?: number;
   config?: Record<string, unknown>;
+  skaleWalletAddress?: string | null;
+  skaleAgentId?: string | null;
+  skaleRegisteredAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Same extraction the legacy /room uses — integrations live inside config
@@ -90,6 +102,8 @@ export function AgentRoomV2Client({ agentId }: Props) {
   const [pluginsInstalled, setPluginsInstalled] = useState(0);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [isChatStreaming, setIsChatStreaming] = useState(false);
+  const [passport, setPassport] = useState<AgentPassport | null>(null);
+  const [passportOpen, setPassportOpen] = useState(false);
   const [quality] = useState(() => detectDefaultQuality());
   const posRef = useRef(new THREE.Vector3());
   const saveChatTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -104,6 +118,11 @@ export function AgentRoomV2Client({ agentId }: Props) {
   // history) use only id-keyed lookups, so resolve to canonical id once the
   // agent is loaded. Fall back to URL param while loading.
   const apiId = agent?.id ?? agentId;
+  const fallbackPassport = useMemo(
+    () => buildFallbackPassport(agent, apiId),
+    [agent, apiId],
+  );
+  const activePassport = passport ?? fallbackPassport;
 
   const loadAgent = useCallback(async () => {
     try {
@@ -125,6 +144,18 @@ export function AgentRoomV2Client({ agentId }: Props) {
     const t = setInterval(loadAgent, 10_000);
     return () => clearInterval(t);
   }, [loadAgent]);
+
+  useEffect(() => {
+    let cancelled = false;
+    api.getAgentPassport(apiId)
+      .then((res) => {
+        if (!cancelled && res.success) setPassport(res.data);
+      })
+      .catch(() => {
+        if (!cancelled) setPassport(null);
+      });
+    return () => { cancelled = true; };
+  }, [apiId]);
 
   // One-shot memory probe on mount to decide if the shelves glow brighter.
   useEffect(() => {
@@ -220,6 +251,16 @@ export function AgentRoomV2Client({ agentId }: Props) {
     setOpenPanel(id);
   }, [canEdit, setOpenPanel, toast]);
 
+  const handlePassportOpen = useCallback(() => {
+    close();
+    setPassportOpen(true);
+  }, [close]);
+
+  const handleOpenChatFromPassport = useCallback(() => {
+    setPassportOpen(false);
+    if (canEdit) setOpenPanel('agentAvatar');
+  }, [canEdit, setOpenPanel]);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'e' && nearest && !openPanel) handleStationClick(nearest);
@@ -253,11 +294,14 @@ export function AgentRoomV2Client({ agentId }: Props) {
         quality={quality}
         agentName={agent?.name}
         isChatStreaming={isChatStreaming}
+        passportStatus={primaryPassportStatus(activePassport)}
         onStationClick={handleStationClick}
+        onPassportClick={handlePassportOpen}
         onStatusChange={loadAgent}
       />
 
       <BackToCity agentId={apiId} />
+      <PassportHud passport={activePassport} onOpen={handlePassportOpen} />
       <RoomMinimap layout={layout} playerPos={posRef} framework={framework} />
       <ProximityHint nearest={openPanel ? null : nearest} />
       <WalkOnboarding />
@@ -271,6 +315,15 @@ export function AgentRoomV2Client({ agentId }: Props) {
           onUpdateLast={updateLastChatMessage}
           onStreamingChange={setIsChatStreaming}
           onClose={close}
+        />
+      )}
+      {passportOpen && (
+        <AgentPassportPanel
+          framework={framework}
+          passport={activePassport}
+          canChat={canEdit}
+          onOpenChat={handleOpenChatFromPassport}
+          onClose={() => setPassportOpen(false)}
         />
       )}
       {openPanel === 'skillWorkbench' && canEdit && (

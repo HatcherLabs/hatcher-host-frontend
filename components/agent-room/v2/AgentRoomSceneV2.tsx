@@ -47,7 +47,9 @@ interface Props {
   quality: Quality;
   agentName?: string;
   isChatStreaming?: boolean;
+  passportStatus?: 'registered' | 'wallet-ready' | 'planned' | 'unavailable' | 'server-unconfigured';
   onStationClick: (id: StationId) => void;
+  onPassportClick: () => void;
   onStatusChange: () => void;
 }
 
@@ -80,7 +82,9 @@ export function AgentRoomSceneV2({
   quality,
   agentName,
   isChatStreaming,
+  passportStatus,
   onStationClick,
+  onPassportClick,
   onStatusChange,
 }: Props) {
   const palette = paletteFor(framework);
@@ -126,6 +130,8 @@ export function AgentRoomSceneV2({
             isNear={nearest === 'agentAvatar'}
             agentName={agentName}
             isStreaming={isChatStreaming}
+            passportStatus={passportStatus}
+            onPassportClick={onPassportClick}
           />
           <SkillWorkbench
             station={layout.skillWorkbench}

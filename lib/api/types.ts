@@ -81,6 +81,92 @@ export interface Agent {
   updatedAt?: string;
 }
 
+export type AgentPassportNetworkId = 'skale' | 'base' | 'solana';
+export type AgentPassportChainType = 'evm' | 'solana';
+export type AgentPassportStatus =
+  | 'registered'
+  | 'wallet-ready'
+  | 'planned'
+  | 'unavailable'
+  | 'server-unconfigured';
+
+export interface AgentPassportNetwork {
+  id: AgentPassportNetworkId;
+  label: string;
+  chainType: AgentPassportChainType;
+  status: AgentPassportStatus;
+  caip2: string;
+  chainId?: number;
+  walletAddress: string | null;
+  agentId: string | null;
+  registry: string | null;
+  registryStatus: AgentPassportStatus;
+  registeredAt: string | null;
+  explorerUrl: string | null;
+  contracts?: Record<string, string | null>;
+  sharedWalletWith?: AgentPassportNetworkId;
+  notes?: string[];
+}
+
+export interface AgentPassportPaymentRail {
+  id: string;
+  protocol: 'x402';
+  network: AgentPassportNetworkId;
+  status: AgentPassportStatus;
+  caip2: string;
+  asset: string | null;
+  receivingAddress: string | null;
+  facilitatorUrl: string | null;
+}
+
+export interface AgentPassport {
+  schemaVersion: 1;
+  generatedAt: string;
+  agent: {
+    id: string;
+    slug: string | null;
+    name: string;
+    description: string | null;
+    framework: string;
+    status: string;
+    profileUrl: string;
+    roomUrl: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  avatar: {
+    kind: 'hatcher-room-v2';
+    stationId: 'agentAvatar';
+    imageUrl: string | null;
+    roomUrl: string;
+  };
+  identity: {
+    handle: string;
+    primaryNetwork: AgentPassportNetworkId;
+    networks: AgentPassportNetwork[];
+  };
+  wallets: Array<{
+    id: string;
+    chainType: AgentPassportChainType;
+    status: AgentPassportStatus;
+    address: string | null;
+    networks: AgentPassportNetworkId[];
+    signerMode: 'receive-only' | 'planned';
+  }>;
+  payments: AgentPassportPaymentRail[];
+  mcp: {
+    status: AgentPassportStatus;
+    manifestUrl: string;
+    notes: string[];
+  };
+  links: {
+    profile: string;
+    room: string;
+    passport: string;
+    skaleMetadata: string;
+  };
+}
+
 /**
  * Payment row as returned by the admin /payments endpoint.
  * Richer than the user-facing Payment shape — includes user + agent joins,

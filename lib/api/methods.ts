@@ -4,7 +4,7 @@
 
 import { API_URL } from '@/lib/config';
 import { getToken, req } from './core';
-import type { Agent, Payment, AgentFeature, ChatMessage, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse } from './types';
+import type { Agent, AgentPassport, Payment, AgentFeature, ChatMessage, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse } from './types';
 import type { TierConfig, AdminOverviewExtras } from '@hatcher/shared';
 
 const API_BASE = API_URL;
@@ -220,6 +220,13 @@ export const api = {
 
   /** Get a single agent */
   getAgent: (id: string) => req<Agent>(`/agents/${id}`),
+
+  /** Get the agent's public/owner-safe on-chain passport. */
+  getAgentPassport: (id: string) => req<AgentPassport>(`/agents/${id}/passport`),
+
+  /** Provision missing multichain account rows for existing agents. */
+  provisionAgentChainAccounts: (id: string) =>
+    req<{ provisioned: boolean; provisionedCount: number; needsRestart: boolean }>(`/agents/${id}/chain-accounts/provision`, { method: 'POST' }),
 
   /** Get the agent's SKALE wallet info — address + native gas + USDC balance.
    *  Owner/team only. Returns Phase 2 ERC-8004 fields (null until registered). */
