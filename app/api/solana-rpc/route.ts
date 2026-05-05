@@ -4,10 +4,10 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function upstreamRpc(): string {
-  if (process.env.SOLANA_RPC_URL) return process.env.SOLANA_RPC_URL;
   if (process.env.HELIUS_API_KEY) {
     return `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
   }
+  if (process.env.SOLANA_RPC_URL) return process.env.SOLANA_RPC_URL;
   return process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com';
 }
 

@@ -5,6 +5,10 @@ export const DOCS_URL = process.env.NEXT_PUBLIC_DOCS_URL || 'http://localhost:30
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
+const PUBLIC_SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://hatcher.host');
+
 // Solana mainnet RPC for read-only wallet UX. Public mainnet-beta is
 // rate-limited but adequate — the backend proxies anything that needs a
 // premium provider (Helius).
@@ -20,10 +24,14 @@ export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001
 export const SOLANA_RPC =
   process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com';
 
-// Browser payment flows go through our same-origin proxy because Solana's
-// public mainnet endpoint rejects hatcher.host browser requests with 403.
+// Browser payment flows go through our same-origin proxy because public Solana
+// RPC endpoints can reject hatcher.host browser requests with 403. The wallet
+// adapter requires an absolute URL even during SSR.
 export const SOLANA_RPC_BROWSER_ENDPOINT =
-  process.env.NEXT_PUBLIC_SOLANA_RPC_BROWSER_ENDPOINT || '/api/solana-rpc';
+  new URL(
+    process.env.NEXT_PUBLIC_SOLANA_RPC_BROWSER_ENDPOINT || '/api/solana-rpc',
+    PUBLIC_SITE_URL,
+  ).toString();
 
 // Treasury wallet — all on-chain payments go here. Backend verifies
 // tx.destination matches this exact pubkey before activating features.
