@@ -2683,7 +2683,6 @@
     "team": {
       "boxLabel": "Team",
       "title": "The people building Hatcher",
-      "sub": "A small product and engineering team shipping the agent hosting layer from prototype to production.",
       "cristianName": "Cristian",
       "cristianRole": "Developer / CEO",
       "ioanaName": "Ioana",

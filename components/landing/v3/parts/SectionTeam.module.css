@@ -27,14 +27,6 @@
   letter-spacing: 0;
 }
 
-.sub {
-  font-size: 14px;
-  color: var(--text-muted);
-  line-height: 1.5;
-  max-width: 620px;
-  margin: 0;
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -98,6 +90,12 @@
   object-fit: cover;
   background: #050705;
   box-shadow: 0 0 22px color-mix(in srgb, var(--team-accent) 18%, transparent);
+}
+
+.socialActions {
+  display: inline-flex;
+  gap: 8px;
+  flex: 0 0 auto;
 }
 
 .socialLink {

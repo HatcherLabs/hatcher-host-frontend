@@ -15,6 +15,7 @@ const MEMBERS = [
     avatar: 'C',
     imageSrc: '/landing-v3/team-cristian.jpg',
     socialHref: 'https://x.com/CristianG1296',
+    linkedInHref: 'https://www.linkedin.com/in/cristian-ghiorma-706933187',
     accent: '#39FF88',
   },
   {
@@ -61,7 +62,6 @@ export function SectionTeam() {
         <header className={styles.head}>
           <BoxLabel>{t('boxLabel')}</BoxLabel>
           <h2 className={styles.title}>{t('title')}</h2>
-          <p className={styles.sub}>{t('sub')}</p>
         </header>
 
         <div className={styles.grid}>
@@ -86,16 +86,31 @@ export function SectionTeam() {
                     </span>
                   )}
                 </div>
-                {'socialHref' in member && (
-                  <a
-                    href={member.socialHref}
-                    className={styles.socialLink}
-                    aria-label={`X profile: ${t(member.nameKey)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <XIcon />
-                  </a>
+                {('socialHref' in member || 'linkedInHref' in member) && (
+                  <div className={styles.socialActions}>
+                    {'socialHref' in member && (
+                      <a
+                        href={member.socialHref}
+                        className={styles.socialLink}
+                        aria-label={`X profile: ${t(member.nameKey)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <XIcon />
+                      </a>
+                    )}
+                    {'linkedInHref' in member && (
+                      <a
+                        href={member.linkedInHref as string}
+                        className={styles.socialLink}
+                        aria-label={`LinkedIn profile: ${t(member.nameKey)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <LinkedInIcon />
+                      </a>
+                    )}
+                  </div>
                 )}
               </div>
               <div className={styles.copy}>
@@ -115,6 +130,14 @@ function XIcon() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+}
+
+function LinkedInIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5ZM.32 8.08h4.34V23H.32V8.08Zm7.26 0h4.16v2.04h.06c.58-1.1 2-2.26 4.12-2.26 4.4 0 5.22 2.9 5.22 6.68V23h-4.34v-7.5c0-1.78-.03-4.08-2.48-4.08-2.49 0-2.87 1.94-2.87 3.95V23H7.58V8.08Z" />
     </svg>
   );
 }
