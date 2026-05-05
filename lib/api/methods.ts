@@ -3,7 +3,7 @@
 // ============================================================
 
 import { API_URL } from '@/lib/config';
-import { getToken, setToken, clearToken, req } from './core';
+import { getToken, req } from './core';
 import type { Agent, Payment, AgentFeature, ChatMessage, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse } from './types';
 import type { TierConfig, AdminOverviewExtras } from '@hatcher/shared';
 
@@ -415,7 +415,7 @@ export const api = {
 
   /** Subscribe to a tier. Returns prorated credit refunded for the
    *  unused portion of the previous tier on an upgrade (zero otherwise).
-   *  `billingPeriod='annual'` → 12 months at 20% off (server enforces). */
+   *  `billingPeriod='annual'` → 12 months at 15% off (server enforces). */
   subscribe: (tier: string, txSignature: string, paymentToken: 'sol' | 'hatch' | 'usdc' = 'sol', billingPeriod: 'monthly' | 'annual' = 'monthly') =>
     req<{ tier: string; expiresAt: string | null; paymentId: string; proratedCredit: number }>('/features/subscribe', {
       method: 'POST',
@@ -423,7 +423,7 @@ export const api = {
     }),
 
   /** Purchase an add-on (optionally per-agent). Subscription-type addons
-   *  honor `billingPeriod='annual'` (20% off, 12 months); one-time addons
+   *  honor `billingPeriod='annual'` (15% off, 12 months); one-time addons
    *  always charge the flat price regardless. */
   purchaseAddon: (addonKey: string, txSignature: string, agentId?: string, paymentToken: 'sol' | 'hatch' | 'usdc' = 'sol', billingPeriod: 'monthly' | 'annual' = 'monthly') =>
     req<{ addonKey: string }>('/features/addon', {

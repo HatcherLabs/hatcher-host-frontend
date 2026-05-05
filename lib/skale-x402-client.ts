@@ -60,6 +60,7 @@ export interface SettleResult {
   usd: number;
   description: string;
   duplicate: boolean;
+  proratedCredit?: number;
 }
 
 interface Eip1193Provider {
@@ -227,7 +228,6 @@ export async function payWithSkaleX402(target: PaymentTarget): Promise<SettleRes
     credentials: 'include',
     headers: {
       'content-type': 'application/json',
-      ...(localStorage.getItem('hatcher_token') ? { authorization: `Bearer ${localStorage.getItem('hatcher_token')}` } : {}),
     },
     body: JSON.stringify(target),
   });
@@ -253,7 +253,6 @@ export async function payWithSkaleX402(target: PaymentTarget): Promise<SettleRes
     headers: {
       'content-type': 'application/json',
       'x-payment': xPayment,
-      ...(localStorage.getItem('hatcher_token') ? { authorization: `Bearer ${localStorage.getItem('hatcher_token')}` } : {}),
     },
     body: JSON.stringify(target),
   });
@@ -263,4 +262,3 @@ export async function payWithSkaleX402(target: PaymentTarget): Promise<SettleRes
   }
   return settleBody.data;
 }
-

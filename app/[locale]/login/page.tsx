@@ -2,25 +2,31 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Link, useRouter } from '@/i18n/routing';
+import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/auth-context';
 import { track } from '@/lib/analytics';
 import { AuthShell } from '@/components/auth/v3/AuthShell';
+import { sanitizeLocalReturnPath } from '@/lib/safe-redirect';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const t = useTranslations('auth.login');
   const { login, isAuthenticated, isLoading, error, clearError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const didSubmit = useRef(false);
+  const returnPath = sanitizeLocalReturnPath(
+    searchParams.get('return') || searchParams.get('next'),
+  );
 
   useEffect(() => {
     if (isAuthenticated) {
       if (didSubmit.current) track.login();
-      router.push('/dashboard');
+      router.push(returnPath);
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, returnPath, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +45,7 @@ export default function LoginPage() {
       foot={
         <>
           {t('registerPrompt')}{' '}
-          <Link href="/register" className="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors">
+          <Link href={`/register?return=${encodeURIComponent(returnPath)}`} className="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors">
             {t('registerLink')}
           </Link>
         </>

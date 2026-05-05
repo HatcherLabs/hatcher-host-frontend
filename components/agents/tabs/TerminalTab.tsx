@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAgentContext } from '../AgentContext';
-import { api, getToken } from '@/lib/api';
+import { api } from '@/lib/api';
 import { API_URL } from '@/lib/config';
 import { RotateCcw, Circle, Send } from 'lucide-react';
 
@@ -30,12 +30,9 @@ async function loadXterm() {
 type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
 type HistoryMessage = { role: string; content: string; ts: number };
 
-function getWsUrl(agentId: string, token: string | null): string {
+function getWsUrl(agentId: string): string {
   const base = API_URL.replace(/^http/, 'ws');
-  // Token in query is optional — backend also honours the httpOnly
-  // `hatcher_jwt` cookie that the browser auto-sends on WS upgrade.
-  const qs = token ? `?token=${encodeURIComponent(token)}` : '';
-  return `${base}/agents/${agentId}/terminal/ws${qs}`;
+  return `${base}/agents/${agentId}/terminal/ws`;
 }
 
 export function TerminalTab() {
@@ -178,17 +175,8 @@ export function TerminalTab() {
       term.clear();
       term.writeln('\x1b[36m[hatcher]\x1b[0m Connecting to agent terminal...');
 
-      // Pass the localStorage JWT via query when we have one. If the user
-      // is on a cookie-only session (localStorage cleared, or first login
-      // on this device), we still let the WebSocket upgrade happen — the
-      // backend will read the httpOnly `hatcher_jwt` cookie the browser
-      // sends automatically. The old "Not authenticated" early-throw path
-      // was firing even for users who had a valid cookie session, blocking
-      // the terminal entirely.
-      const token = getToken();
-
       // Connect WebSocket
-      const ws = new WebSocket(getWsUrl(agent.id, token));
+      const ws = new WebSocket(getWsUrl(agent.id));
       wsRef.current = ws;
 
       ws.onopen = () => {

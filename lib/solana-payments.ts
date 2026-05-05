@@ -24,10 +24,16 @@ import {
   PublicKey,
   SystemProgram,
   Transaction,
+  TransactionInstruction,
   LAMPORTS_PER_SOL,
 } from '@solana/web3.js';
+import { Buffer } from 'buffer';
 import type { WalletContextState } from '@solana/wallet-adapter-react';
 import { TREASURY_WALLET, HATCH_TOKEN_MINT, USDC_TOKEN_MINT } from './config';
+
+const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
+const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
+const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EP6xJp5LGCWVztFuy5Gwj');
 
 export interface SolQuote {
   usdAmount: number;
@@ -55,6 +61,86 @@ export function quoteSolForUsd(usdAmount: number, solUsdPrice: number): SolQuote
     lamports,
     quotedAt: Date.now(),
   };
+}
+
+function getAssociatedTokenAddress(
+  mint: PublicKey,
+  owner: PublicKey,
+  tokenProgramId: PublicKey,
+): PublicKey {
+  const [address] = PublicKey.findProgramAddressSync(
+    [owner.toBuffer(), tokenProgramId.toBuffer(), mint.toBuffer()],
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+  );
+  return address;
+}
+
+function encodeTokenAmountInstruction(instruction: number, amount: bigint): Buffer {
+  if (amount < 0n || amount > 0xffff_ffff_ffff_ffffn) {
+    throw new Error('Token amount is outside the u64 range');
+  }
+
+  const data = Buffer.alloc(9);
+  data[0] = instruction;
+  data.writeBigUInt64LE(amount, 1);
+  return data;
+}
+
+function createAssociatedTokenAccountInstruction(
+  payer: PublicKey,
+  associatedToken: PublicKey,
+  owner: PublicKey,
+  mint: PublicKey,
+  tokenProgramId: PublicKey,
+): TransactionInstruction {
+  return new TransactionInstruction({
+    programId: ASSOCIATED_TOKEN_PROGRAM_ID,
+    keys: [
+      { pubkey: payer, isSigner: true, isWritable: true },
+      { pubkey: associatedToken, isSigner: false, isWritable: true },
+      { pubkey: owner, isSigner: false, isWritable: false },
+      { pubkey: mint, isSigner: false, isWritable: false },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+      { pubkey: tokenProgramId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.alloc(0),
+  });
+}
+
+function createTransferInstruction(
+  source: PublicKey,
+  destination: PublicKey,
+  owner: PublicKey,
+  amount: bigint,
+  tokenProgramId: PublicKey,
+): TransactionInstruction {
+  return new TransactionInstruction({
+    programId: tokenProgramId,
+    keys: [
+      { pubkey: source, isSigner: false, isWritable: true },
+      { pubkey: destination, isSigner: false, isWritable: true },
+      { pubkey: owner, isSigner: true, isWritable: false },
+    ],
+    data: encodeTokenAmountInstruction(3, amount),
+  });
+}
+
+function createBurnInstruction(
+  account: PublicKey,
+  mint: PublicKey,
+  owner: PublicKey,
+  amount: bigint,
+  tokenProgramId: PublicKey,
+): TransactionInstruction {
+  return new TransactionInstruction({
+    programId: tokenProgramId,
+    keys: [
+      { pubkey: account, isSigner: false, isWritable: true },
+      { pubkey: mint, isSigner: false, isWritable: true },
+      { pubkey: owner, isSigner: true, isWritable: false },
+    ],
+    data: encodeTokenAmountInstruction(8, amount),
+  });
 }
 
 /**
@@ -132,7 +218,7 @@ export async function payWithSol(params: {
  * Build + sign + broadcast an SPL token transfer (USDC or $HATCHER) to
  * the treasury's Associated Token Account for that mint. Creates the
  * treasury's ATA on the fly if it doesn't exist yet — the payer eats
- * the ~0.00203928 SOL rent for that idempotent one-time cost.
+ * the ~0.00203928 SOL rent for that one-time cost.
  */
 export async function payWithSplToken(params: {
   wallet: WalletContextState;
@@ -144,10 +230,6 @@ export async function payWithSplToken(params: {
   const { publicKey, sendTransaction } = wallet;
   if (!publicKey || !sendTransaction) throw new Error('Connect a Solana wallet first');
 
-  // Lazy-load SPL-token so we don't ship the whole SDK in the initial bundle.
-  const { TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, createTransferInstruction, createBurnInstruction } =
-    await import('@solana/spl-token');
-
   // $HATCHER is a Token-2022 token (pump.fun launched it on the 2022 program
   // for metadata pointer support). USDC is a classic SPL Token. The ATA
   // derivation and transfer instruction must be issued to the right program
@@ -157,8 +239,8 @@ export async function payWithSplToken(params: {
   const mintPubkey = new PublicKey(mint === 'usdc' ? USDC_TOKEN_MINT : HATCH_TOKEN_MINT);
   const treasury = new PublicKey(TREASURY_WALLET);
 
-  const fromAta = await getAssociatedTokenAddress(mintPubkey, publicKey, false, tokenProgramId);
-  const toAta = await getAssociatedTokenAddress(mintPubkey, treasury, false, tokenProgramId);
+  const fromAta = getAssociatedTokenAddress(mintPubkey, publicKey, tokenProgramId);
+  const toAta = getAssociatedTokenAddress(mintPubkey, treasury, tokenProgramId);
 
   const decimals = mint === 'usdc' ? 6 : 6; // both USDC + $HATCHER use 6 decimals
   const totalBaseUnits = BigInt(Math.floor(amountHuman * 10 ** decimals));
@@ -173,7 +255,7 @@ export async function payWithSplToken(params: {
 
   const tx = new Transaction();
 
-  // Create treasury's ATA if missing — idempotent, payer eats the rent
+  // Create treasury's ATA if missing — payer eats the rent.
   const toAtaInfo = await connection.getAccountInfo(toAta);
   if (!toAtaInfo) {
     tx.add(
@@ -193,7 +275,6 @@ export async function payWithSplToken(params: {
       toAta,
       publicKey,
       transferBaseUnits,
-      [],
       tokenProgramId,
     ),
   );
@@ -205,7 +286,6 @@ export async function payWithSplToken(params: {
         mintPubkey,
         publicKey,       // authority
         burnBaseUnits,
-        [],
         tokenProgramId,
       ),
     );

@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import { track } from '@/lib/analytics';
+import { sanitizeLocalReturnPath } from '@/lib/safe-redirect';
 import { Check, X, Gift, Loader2 } from 'lucide-react';
 import { AuthShell } from '@/components/auth/v3/AuthShell';
 
@@ -59,6 +60,9 @@ export default function RegisterPage() {
   const [usernameStatus, setUsernameStatus] = useState<FieldStatus>({ state: 'idle' });
   const didSubmit = useRef(false);
   const strength = useMemo(() => getPasswordStrength(password, t), [password, t]);
+  const returnPath = sanitizeLocalReturnPath(
+    searchParams.get('return') || searchParams.get('next'),
+  );
 
   // Debounced live availability check. Ignore stale responses by comparing
   // the value at request time vs current state when the response arrives.
@@ -112,9 +116,9 @@ export default function RegisterPage() {
   useEffect(() => {
     // Only auto-redirect if user was already logged in (not fresh registration)
     if (isAuthenticated && !didSubmit.current) {
-      router.push('/dashboard');
+      router.push(returnPath);
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, returnPath, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -172,7 +176,7 @@ export default function RegisterPage() {
       foot={
         <>
           {t('loginPrompt')}{' '}
-          <Link href="/login" className="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors">
+          <Link href={`/login?return=${encodeURIComponent(returnPath)}`} className="text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors">
             {t('loginLink')}
           </Link>
         </>
@@ -224,7 +228,7 @@ export default function RegisterPage() {
               {emailStatus.state === 'taken' && (
                 <p className="text-[10px] text-red-400 mt-1">
                   {t('emailTaken')}{' '}
-                  <Link href="/login" className="underline hover:text-red-300">{t('emailTakenLink')}</Link>?
+                  <Link href={`/login?return=${encodeURIComponent(returnPath)}`} className="underline hover:text-red-300">{t('emailTakenLink')}</Link>?
                 </p>
               )}
               {emailStatus.state === 'invalid' && email.length > 3 && (

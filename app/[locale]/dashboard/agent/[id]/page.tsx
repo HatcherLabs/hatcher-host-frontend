@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useRouter } from '@/i18n/routing';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
-import { api, getToken } from '@/lib/api';
+import { api } from '@/lib/api';
 import { API_URL } from '@/lib/config';
 import type { Agent, AgentFeature } from '@/lib/api';
 
@@ -518,10 +518,9 @@ export default function AgentManagePage() {
 
       function connectWsLogs() {
         if (cancelled) return;
-        const token = getToken();
         const apiBase = API_URL;
         const wsBase = apiBase.replace(/^http/, 'ws');
-        const url = `${wsBase}/agents/${id}/logs/ws${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+        const url = `${wsBase}/agents/${id}/logs/ws`;
         // Don't flash the loading skeleton on every reconnect. Only the
         // very first attempt sets loading; subsequent retries keep the
         // existing log buffer on screen so the user doesn't see the

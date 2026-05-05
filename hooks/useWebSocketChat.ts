@@ -5,7 +5,6 @@
 
 import { useRef, useCallback, useEffect, useState } from 'react';
 import { API_URL } from '@/lib/config';
-import { getToken } from '@/lib/api';
 
 /** Derive ws:// or wss:// URL from the API base URL */
 function getWsUrl(agentId: string): string {
@@ -116,15 +115,8 @@ export function useWebSocketChat({
     cleanup();
     setConnectionState('connecting');
 
-    const token = getToken();
     const url = getWsUrl(agentIdRef.current);
-    // Append JWT via ?token= when we have one in localStorage (API-key or
-    // legacy header-auth flows). Cookie-only sessions have no accessible
-    // token — in that case connect without a query param and rely on the
-    // httpOnly hatcher_jwt cookie that the browser will send on the
-    // same-site WS upgrade; the backend reads it from request.cookies.
-    const wsUrl = token ? `${url}?token=${encodeURIComponent(token)}` : url;
-    const ws = new WebSocket(wsUrl);
+    const ws = new WebSocket(url);
     wsRef.current = ws;
 
     ws.onopen = () => {

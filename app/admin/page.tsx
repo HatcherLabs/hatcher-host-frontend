@@ -1330,11 +1330,9 @@ export default function AdminPage() {
     setSelectedUserId(userId);
     setUserDetailLoading(true);
     const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
-    const token = typeof window !== 'undefined' ? localStorage.getItem('hatcher_token') : null;
     try {
       const res = await fetch(`${API_BASE}/admin/users/${userId}`, {
         credentials: 'include',
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const json = await res.json();
       if (json.success) setUserDetail(json.data);

@@ -2,10 +2,9 @@
 // API Core — token management and request wrapper
 // ============================================================
 // 
-// Auth strategy (cookie + localStorage hybrid):
-// - New logins: backend sets httpOnly cookie, frontend sends credentials: 'include'
-// - Existing sessions: localStorage token used as fallback via Authorization header
-// - API keys (hk_*): always sent via Authorization header (not affected)
+// Auth strategy:
+// - Browser sessions rely on httpOnly cookies and credentials: 'include'
+// - API keys (hk_*) may still be sent via Authorization for explicit tooling flows
 // ============================================================
 
 import { API_URL } from '@/lib/config';
@@ -13,19 +12,24 @@ import { API_URL } from '@/lib/config';
 const API_BASE = API_URL;
 const TOKEN_KEY = 'hatcher_token';
 
-// ─── Token helpers (localStorage — kept as fallback for existing sessions) ───
+// ─── Token helpers ───────────────────────────────────────────
 export function getToken(): string | null {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem(TOKEN_KEY);
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token) return null;
+  if (token.startsWith('hk_')) return token;
+  localStorage.removeItem(TOKEN_KEY);
+  return null;
 }
 
 /**
- * Store token in localStorage.
- * During transition: still called so existing code doesn't break,
- * but new logins rely on the httpOnly cookie instead.
+ * Store only explicit API keys in localStorage. JWT browser sessions are
+ * cookie-only; if a login/refresh response passes a JWT here, clear the
+ * legacy fallback instead of persisting it.
  */
 export function setToken(token: string) {
-  localStorage.setItem(TOKEN_KEY, token);
+  if (token.startsWith('hk_')) localStorage.setItem(TOKEN_KEY, token);
+  else localStorage.removeItem(TOKEN_KEY);
 }
 
 /**
@@ -44,20 +48,15 @@ export function isAuthenticated(): boolean {
 
 // ─── Token refresh (internal — never retries on 401 to avoid loops) ─
 async function attemptRefresh(): Promise<boolean> {
-  const token = getToken();
   try {
     const res = await fetch(`${API_BASE}/auth/refresh`, {
       method: 'POST',
       credentials: 'include', // Send cookie
-      headers: {
-        // No Content-Type — Fastify rejects empty body with JSON content-type
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      // No Content-Type — Fastify rejects empty body with JSON content-type
     });
     if (!res.ok) return false;
     const json = (await res.json()) as { success: boolean; data?: { token: string } };
     if (json.success && json.data?.token) {
-      // Still store in localStorage for backwards compat during transition
       setToken(json.data.token);
       return true;
     }
@@ -82,7 +81,7 @@ export async function req<T>(
   if (options.body) {
     headers['Content-Type'] = 'application/json';
   }
-  // Send localStorage token as Authorization header (fallback for existing sessions + API keys)
+  // Send only explicit API keys as Authorization. Browser JWTs are cookie-only.
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   try {

@@ -8,6 +8,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
+import { useAuth } from '@/lib/auth-context';
+import { loginHrefForReturn } from '@/lib/safe-redirect';
 import {
   ArrowRight,
   Building2,
@@ -113,6 +115,7 @@ const ADDON_PRICES: Record<AddonGroupKey, { price: string; isSubscription: boole
 export default function PricingPage() {
   const t = useTranslations('pricing');
   const tTiers = useTranslations('shared.tiers');
+  const { isAuthenticated } = useAuth();
   const [isAnnual, setIsAnnual] = useState(false);
   // Founding Member availability — fetched from /features (public).
   // null = still loading; a number = actual remaining slots.
@@ -318,7 +321,13 @@ export default function PricingPage() {
 
                 {/* CTA */}
                 <Link
-                  href={tier.key === 'free' ? '/register' : `/dashboard/billing?upgrade=${tier.key}`}
+                  href={
+                    tier.key === 'free'
+                      ? isAuthenticated ? '/dashboard/agents' : '/register'
+                      : isAuthenticated
+                        ? `/dashboard/billing?upgrade=${tier.key}`
+                        : loginHrefForReturn(`/dashboard/billing?upgrade=${tier.key}`)
+                  }
                   className={cn(
                     'block text-center font-semibold px-5 py-2.5 rounded-md text-sm transition-opacity',
                     tier.highlighted || isLifetime
