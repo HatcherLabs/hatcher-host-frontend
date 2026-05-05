@@ -33,11 +33,9 @@ import {
   HardDrive,
   Server,
   Download,
-  Play,
   BarChart3,
   TrendingUp,
   PieChart,
-  Calendar,
   Sunrise,
   Eye,
   Globe,
@@ -49,7 +47,6 @@ import {
   ScrollText,
   CreditCard,
   Network,
-  Archive,
 } from 'lucide-react';
 import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip as ReTooltip, BarChart, Bar, XAxis, YAxis } from 'recharts';
 import type { AdminOverviewExtras } from '@hatcher/shared';
@@ -201,7 +198,6 @@ type StripeDisputeRow = {
   chargeId: string | null;
   createdAt: string;
 };
-type BackupRow = { filename: string; size: string; date: string };
 type LiveStatsShape = {
   onlineUsers: number;
   pageViewsToday: number;
@@ -247,13 +243,12 @@ function AnalyticsTab() {
   const [cohorts, setCohorts] = useState<RetentionCohortRow[] | null>(null);
   const [integrationHealth, setIntegrationHealth] = useState<IntegrationHealthRow[] | null>(null);
   const [disputes, setDisputes] = useState<{ rows: StripeDisputeRow[]; error?: string } | null>(null);
-  const [backups, setBackups] = useState<BackupRow[] | null>(null);
   const [landingStats, setLandingStats] = useState<LiveStatsShape | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
-      const [f, c, r, h, e, w, l, coh, ih, dis, bks, live] = await Promise.all([
+      const [f, c, r, h, e, w, l, coh, ih, dis, live] = await Promise.all([
         api.adminGetFunnel().catch(() => null),
         api.adminGetChurnRadar().catch(() => null),
         api.adminGetReferrals().catch(() => null),
@@ -264,7 +259,6 @@ function AnalyticsTab() {
         api.adminGetRetentionCohort().catch(() => null),
         api.adminGetIntegrationHealth().catch(() => null),
         api.adminGetStripeDisputes().catch(() => null),
-        api.adminGetBackups().catch(() => null),
         api.adminGetLiveStats().catch(() => null),
       ]);
       if (cancelled) return;
@@ -278,7 +272,6 @@ function AnalyticsTab() {
       if (coh?.success) setCohorts(coh.data.cohorts);
       if (ih?.success) setIntegrationHealth(ih.data.health);
       if (dis?.success) setDisputes({ rows: dis.data.disputes, error: dis.data.error });
-      if (bks?.success) setBackups(bks.data.backups);
       if (live?.success) setLandingStats(live.data);
     }
     load();
@@ -465,66 +458,34 @@ function AnalyticsTab() {
 
       {/* ─── Phase C cards ──────────────────────────────────── */}
 
-      {/* Landing Traffic + Recent Backups side by side */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {landingStats ? (
-          <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
-            <div className="flex items-center gap-2 mb-3">
-              <Globe size={14} className="text-violet-400" />
-              <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Landing Traffic (today, UTC)</span>
+      {/* Landing Traffic */}
+      {landingStats ? (
+        <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+          <div className="flex items-center gap-2 mb-3">
+            <Globe size={14} className="text-violet-400" />
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Landing Traffic (today, UTC)</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="p-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
+              <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Online</div>
+              <div className="text-2xl font-bold text-emerald-400">{landingStats.onlineUsers.toLocaleString()}</div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
-                <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Pageviews</div>
-                <div className="text-2xl font-bold text-[var(--text-primary)]">{landingStats.pageViewsToday.toLocaleString()}</div>
-              </div>
-              <div className="p-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
-                <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Unique Visitors</div>
-                <div className="text-2xl font-bold text-[var(--text-primary)]">{landingStats.uniqueVisitors.toLocaleString()}</div>
-              </div>
+            <div className="p-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
+              <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Pageviews</div>
+              <div className="text-2xl font-bold text-[var(--text-primary)]">{landingStats.pageViewsToday.toLocaleString()}</div>
             </div>
-            <div className="text-[10px] text-[var(--text-muted)] mt-2">
-              Beacon: <code className="font-mono">/analytics/pageview</code> · HLL-hashed IPs, zero PII
+            <div className="p-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
+              <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Unique Visitors</div>
+              <div className="text-2xl font-bold text-[var(--text-primary)]">{landingStats.uniqueVisitors.toLocaleString()}</div>
             </div>
           </div>
-        ) : (
-          <AnalyticsCardSkeleton label="Landing Traffic (today, UTC)" />
-        )}
-
-        {backups ? (
-          <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
-            <div className="flex items-center gap-2 mb-3">
-              <Archive size={14} className="text-[var(--color-accent)]" />
-              <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Recent Backups (last 10)</span>
-            </div>
-            {backups.length === 0 ? (
-              <div className="text-xs text-[var(--text-muted)]">No backups yet. Use the Health tab to trigger one.</div>
-            ) : (
-              <div className="space-y-1 max-h-64 overflow-y-auto">
-                {backups.slice(0, 10).map((b) => (
-                  <div key={b.filename} className="flex items-center justify-between gap-2 text-xs border-b border-[var(--border-primary)]/40 py-1.5">
-                    <div className="flex-1 min-w-0">
-                      <div className="font-mono text-[var(--text-primary)] truncate">{b.filename}</div>
-                      <div className="text-[10px] text-[var(--text-muted)]">{b.date} · {b.size}</div>
-                    </div>
-                    <a
-                      href={api.adminBackupDownloadUrl(b.filename)}
-                      download={b.filename}
-                      className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium bg-[var(--color-accent)]/15 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/25 transition-colors"
-                      title="Download backup"
-                    >
-                      <Download size={10} />
-                      Download
-                    </a>
-                  </div>
-                ))}
-              </div>
-            )}
+          <div className="text-[10px] text-[var(--text-muted)] mt-2">
+            Beacon: <code className="font-mono">/analytics/pageview</code> · HLL-hashed IPs, zero PII
           </div>
-        ) : (
-          <AnalyticsCardSkeleton label="Recent Backups (last 10)" />
-        )}
-      </div>
+        </div>
+      ) : (
+        <AnalyticsCardSkeleton label="Landing Traffic (today, UTC)" />
+      )}
 
       {/* Retention Cohort grid */}
       {cohorts ? (
@@ -695,10 +656,6 @@ function AnalyticsTab() {
 }
 
 // ── Audit Log Tab ─────────────────────────────────────────────
-// Renders the Redis-backed admin audit log with basic filter + expand.
-// Server-side filter: hits `/admin/audit-log?action=` on Apply (not debounced).
-// Details cell collapses JSON to 1 line until clicked — prevents the table
-// from ballooning when most rows have large payloads.
 type AuditEntry = {
   ts: string;
   adminId: string;
@@ -707,8 +664,41 @@ type AuditEntry = {
   details: Record<string, unknown>;
 };
 
+const COMMON_AUDIT_FILTERS = ['agent:', 'user:', 'ticket:', 'affiliate.', 'agent:kill', 'agent:pause'] as const;
+
+function auditGroup(action: string): string {
+  if (action.includes(':')) return `${action.split(':')[0]}:`;
+  if (action.includes('.')) return `${action.split('.')[0]}.`;
+  return action;
+}
+
+function auditActionLabel(action: string): string {
+  return action.replace(/[:._-]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function auditActionTone(action: string): string {
+  if (action.includes('kill') || action.includes('ban') || action.includes('reject') || action.includes('freeze')) {
+    return 'border-red-500/25 bg-red-500/10 text-red-300';
+  }
+  if (action.includes('pause') || action.includes('status') || action.includes('toggle')) {
+    return 'border-amber-500/25 bg-amber-500/10 text-amber-300';
+  }
+  if (action.includes('approve') || action.includes('unban') || action.includes('unfreeze') || action.includes('payout')) {
+    return 'border-emerald-500/25 bg-emerald-500/10 text-emerald-300';
+  }
+  return 'border-[var(--color-accent)]/25 bg-[var(--color-accent)]/10 text-[var(--color-accent)]';
+}
+
+function formatAuditValue(value: unknown): string {
+  if (value == null) return 'null';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  return JSON.stringify(value);
+}
+
 function AuditLogTab() {
   const [entries, setEntries] = useState<AuditEntry[] | null>(null);
+  const [meta, setMeta] = useState<{ total: number; limit: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [actionFilter, setActionFilter] = useState('');
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
@@ -721,25 +711,60 @@ function AuditLogTab() {
     setLoading(false);
     if (res.success) {
       setEntries(res.data.entries);
+      setMeta({ total: res.data.total, limit: res.data.limit });
     } else {
       setError(res.error);
       setEntries([]);
+      setMeta(null);
     }
   };
 
   useEffect(() => {
     load();
-    // Manual refresh only — audit data is compliance-sensitive and we'd
-    // rather admins see exactly what they requested than have it update
-    // under them mid-investigation.
   }, []);
+
+  const summary = useMemo(() => {
+    const rows = entries ?? [];
+    const uniqueAdmins = new Set(rows.map((e) => e.adminEmail ?? e.adminId)).size;
+    const uniqueActions = new Set(rows.map((e) => e.action)).size;
+    const newest = rows[0]?.ts ? new Date(rows[0].ts) : null;
+    const oldest = rows.at(-1)?.ts ? new Date(rows.at(-1)!.ts) : null;
+    const windowLabel = newest && oldest
+      ? `${oldest.toLocaleDateString()} - ${newest.toLocaleDateString()}`
+      : 'No window';
+    return { uniqueAdmins, uniqueActions, windowLabel };
+  }, [entries]);
+
+  const quickFilters = useMemo(() => {
+    const fromEntries = entries ? entries.map((e) => auditGroup(e.action)) : [];
+    return Array.from(new Set([...COMMON_AUDIT_FILTERS, ...fromEntries])).slice(0, 8);
+  }, [entries]);
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-3">
+          <p className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Shown</p>
+          <p className="mt-1 text-xl font-bold text-[var(--text-primary)]">{entries?.length ?? '—'}</p>
+        </div>
+        <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-3">
+          <p className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Actions</p>
+          <p className="mt-1 text-xl font-bold text-[var(--text-primary)]">{entries ? summary.uniqueActions : '—'}</p>
+        </div>
+        <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-3">
+          <p className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Admins</p>
+          <p className="mt-1 text-xl font-bold text-[var(--text-primary)]">{entries ? summary.uniqueAdmins : '—'}</p>
+        </div>
+        <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-3 col-span-2 lg:col-span-1">
+          <p className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Window</p>
+          <p className="mt-1 text-sm font-semibold text-[var(--text-primary)] truncate">{summary.windowLabel}</p>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
         <form
           onSubmit={(e) => { e.preventDefault(); load(actionFilter); }}
-          className="flex-1 flex items-center gap-2"
+          className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2"
         >
           <div className="relative flex-1">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
@@ -747,17 +772,41 @@ function AuditLogTab() {
               type="text"
               value={actionFilter}
               onChange={(e) => setActionFilter(e.target.value)}
-              onBlur={() => load(actionFilter)}
-              placeholder="Filter by action (e.g. user:ban, system:backup_download)"
+              placeholder="Filter by action (e.g. user:ban, agent:kill, affiliate.)"
               className="w-full pl-9 pr-3 py-2 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-primary)] text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/50"
             />
           </div>
-          <button type="submit" className="btn-secondary text-xs px-3 py-2">Apply</button>
+          <div className="flex gap-2">
+            <button type="submit" className="btn-secondary text-xs px-3 py-2 flex-1 sm:flex-none">Apply</button>
+            <button
+              type="button"
+              onClick={() => { setActionFilter(''); load(); }}
+              className="btn-secondary text-xs px-3 py-2 flex-1 sm:flex-none"
+            >
+              Clear
+            </button>
+            <button onClick={() => load(actionFilter)} disabled={loading} type="button" className="btn-secondary text-xs px-3 py-2 flex-1 sm:flex-none whitespace-nowrap">
+              <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
+              Refresh
+            </button>
+          </div>
         </form>
-        <button onClick={() => load(actionFilter)} disabled={loading} className="btn-secondary text-xs px-3 py-2 whitespace-nowrap">
-          <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
-          Refresh
-        </button>
+
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {quickFilters.map((filter) => (
+            <button
+              key={filter}
+              onClick={() => { setActionFilter(filter); load(filter); }}
+              className={`px-3 py-1.5 rounded-lg border text-[11px] font-mono whitespace-nowrap transition-colors ${
+                actionFilter === filter
+                  ? 'border-[var(--color-accent)]/40 bg-[var(--color-accent)]/15 text-[var(--color-accent)]'
+                  : 'border-[var(--border-primary)] bg-[var(--bg-secondary)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
       </div>
 
       {error && (
@@ -777,63 +826,78 @@ function AuditLogTab() {
         ) : entries.length === 0 ? (
           <div className="p-6 text-xs text-[var(--text-muted)] text-center">No audit entries match this filter.</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-primary)]/40 bg-[var(--bg-tertiary)]/30">
-                  <th className="text-left font-semibold py-2.5 px-3">Time</th>
-                  <th className="text-left font-semibold py-2.5 px-3">Admin</th>
-                  <th className="text-left font-semibold py-2.5 px-3">Action</th>
-                  <th className="text-left font-semibold py-2.5 px-3">Details</th>
-                </tr>
-              </thead>
-              <tbody>
-                {entries.map((e, i) => {
-                  const isExpanded = expandedIdx === i;
-                  const detailsStr = JSON.stringify(e.details);
-                  const hasDetails = detailsStr !== '{}';
-                  return (
-                    <tr key={`${e.ts}-${i}`} className="border-b border-[var(--border-primary)]/20 hover:bg-[var(--bg-card)]/40">
-                      <td className="py-2 px-3 align-top whitespace-nowrap text-[var(--text-muted)] font-mono text-[11px]">
-                        {new Date(e.ts).toLocaleString()}
-                      </td>
-                      <td className="py-2 px-3 align-top text-[var(--text-primary)]">
-                        {e.adminEmail ?? <span className="text-[var(--text-muted)] font-mono">{e.adminId.slice(0, 8)}…</span>}
-                      </td>
-                      <td className="py-2 px-3 align-top">
-                        <code className="font-mono text-[var(--color-accent)] text-[11px]">{e.action}</code>
-                      </td>
-                      <td className="py-2 px-3 align-top">
-                        {!hasDetails ? (
-                          <span className="text-[var(--text-muted)]">—</span>
-                        ) : (
-                          <button
-                            onClick={() => setExpandedIdx(isExpanded ? null : i)}
-                            className="flex items-start gap-1 text-left w-full group"
-                          >
-                            {isExpanded ? (
-                              <ChevronDown size={12} className="mt-0.5 flex-shrink-0 text-[var(--text-muted)]" />
-                            ) : (
-                              <ChevronRight size={12} className="mt-0.5 flex-shrink-0 text-[var(--text-muted)]" />
-                            )}
-                            <code className={`font-mono text-[11px] text-[var(--text-muted)] group-hover:text-[var(--text-primary)] transition-colors ${isExpanded ? 'whitespace-pre-wrap break-all' : 'truncate block max-w-md'}`}>
-                              {isExpanded ? JSON.stringify(e.details, null, 2) : detailsStr}
-                            </code>
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div className="divide-y divide-[var(--border-primary)]/40">
+            {entries.map((entry, i) => {
+              const isExpanded = expandedIdx === i;
+              const detailPairs = Object.entries(entry.details ?? {});
+              const visibleDetails = isExpanded ? detailPairs : detailPairs.slice(0, 4);
+              const hasDetails = detailPairs.length > 0;
+              return (
+                <article key={`${entry.ts}-${i}`} className="p-3 sm:p-4 hover:bg-[var(--bg-card)]/30 transition-colors">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-lg border text-[11px] font-semibold ${auditActionTone(entry.action)}`}>
+                          {auditActionLabel(entry.action)}
+                        </span>
+                        <code className="text-[10px] font-mono text-[var(--text-muted)]">{entry.action}</code>
+                      </div>
+                      <div className="mt-2 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-[11px] text-[var(--text-muted)]">
+                        <span className="font-mono">{new Date(entry.ts).toLocaleString()}</span>
+                        <span className="truncate">
+                          Admin: {entry.adminEmail ?? <code className="font-mono">{entry.adminId.slice(0, 8)}...</code>}
+                        </span>
+                      </div>
+                    </div>
+
+                    {hasDetails && (
+                      <button
+                        onClick={() => setExpandedIdx(isExpanded ? null : i)}
+                        className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-secondary)] px-2.5 py-1.5 text-[11px] text-[var(--text-muted)] hover:text-[var(--text-primary)] sm:self-start"
+                      >
+                        {isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+                        {isExpanded ? 'Collapse' : 'Details'}
+                      </button>
+                    )}
+                  </div>
+
+                  {hasDetails ? (
+                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {visibleDetails.map(([key, value]) => (
+                        <div key={key} className="rounded-lg border border-[var(--border-primary)]/60 bg-[var(--bg-card)]/60 px-3 py-2 min-w-0">
+                          <p className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)] truncate">{key}</p>
+                          <p className="mt-1 text-xs text-[var(--text-primary)] font-mono break-words">{formatAuditValue(value)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-3 text-xs text-[var(--text-muted)]">No details recorded.</p>
+                  )}
+
+                  {hasDetails && detailPairs.length > visibleDetails.length && !isExpanded && (
+                    <button
+                      onClick={() => setExpandedIdx(i)}
+                      className="mt-2 text-[11px] text-[var(--color-accent)] hover:text-[var(--text-primary)]"
+                    >
+                      Show {detailPairs.length - visibleDetails.length} more detail{detailPairs.length - visibleDetails.length === 1 ? '' : 's'}
+                    </button>
+                  )}
+
+                  {isExpanded && hasDetails && (
+                    <pre className="mt-3 max-h-72 overflow-auto rounded-lg border border-[var(--border-primary)] bg-[var(--bg-tertiary)]/40 p-3 text-[11px] text-[var(--text-secondary)]">
+                      {JSON.stringify(entry.details, null, 2)}
+                    </pre>
+                  )}
+                </article>
+              );
+            })}
           </div>
         )}
       </div>
 
       {entries && entries.length > 0 && (
         <div className="text-[10px] text-[var(--text-muted)] text-center">
-          Showing {entries.length} entries · filter: {actionFilter || 'none'} · Redis list <code className="font-mono">admin:audit:log</code>
+          Showing {entries.length}{meta ? ` of ${meta.total}` : ''} entries · filter: {actionFilter || 'none'} · Redis list <code className="font-mono">admin:audit:log</code>
         </div>
       )}
     </div>
@@ -931,11 +995,8 @@ export default function AdminPage() {
     disk: { used: string; total: string; percent: number };
     ram: { total: string; used: string; available: string; percent: number };
     cpu: { cores: number; model: string; load1m: string; load5m: string; load15m: string; percent: number };
-    backup: { lastBackup: string | null; lastSize: string | null };
   } | null>(null);
   const [healthLoading, setHealthLoading] = useState(false);
-  const [backupRunning, setBackupRunning] = useState(false);
-  const [backups, setBackups] = useState<Array<{ filename: string; size: string; date: string }>>([]);
 
   // ── User detail slide-over ─────────────────────────────────
   type UserDetail = {
@@ -1023,9 +1084,8 @@ export default function AdminPage() {
 
     async function fetchHealth() {
       setHealthLoading(true);
-      const [healthRes, backupsRes] = await Promise.all([api.adminGetHealth(), api.adminGetBackups()]);
+      const healthRes = await api.adminGetHealth();
       if (healthRes.success) setHealth(healthRes.data);
-      if (backupsRes.success) setBackups(backupsRes.data.backups);
       setHealthLoading(false);
     }
 
@@ -1052,23 +1112,6 @@ export default function AdminPage() {
     load();
     return () => { cancelled = true; };
   }, [isAuthenticated, isAdmin, activeTab, paymentStatusFilter]);
-
-  // ── Backup handler ──────────────────────────────────────────
-  async function handleRunBackup() {
-    if (!confirm('Run a database backup now?')) return;
-    setBackupRunning(true);
-    const res = await api.adminRunBackup();
-    setBackupRunning(false);
-    if (res.success) {
-      alert('Backup completed successfully!');
-      // Refresh health + backups
-      const [healthRes, backupsRes] = await Promise.all([api.adminGetHealth(), api.adminGetBackups()]);
-      if (healthRes.success) setHealth(healthRes.data);
-      if (backupsRes.success) setBackups(backupsRes.data.backups);
-    } else {
-      alert(`Backup failed: ${res.error ?? 'Unknown error'}`);
-    }
-  }
 
   // ── Load more agents ───────────────────────────────────────
   async function handleLoadMoreAgents() {
@@ -1427,200 +1470,197 @@ export default function AdminPage() {
           </button>
         </motion.div>
 
-        {/* ── Live Activity (real-time, refreshes every 30s) ──── */}
-        {liveStats && (
-          <div className="grid grid-cols-3 gap-3">
-            <motion.div className="card glass-noise p-4 sm:p-5 border-emerald-500/20" variants={cardVariants}>
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)] flex items-center gap-1.5">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
-                    </span>
-                    Online Now
-                  </span>
-                  <span className="text-2xl sm:text-3xl font-bold text-emerald-400 block mt-1">{liveStats.onlineUsers}</span>
+        {activeTab === 'overview' && (
+          <>
+            {/* ── Live Activity (real-time, refreshes every 30s) ──── */}
+            {liveStats && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <motion.div className="card glass-noise p-4 sm:p-5 border-emerald-500/20" variants={cardVariants}>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)] flex items-center gap-1.5">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                        </span>
+                        Online Now
+                      </span>
+                      <span className="text-2xl sm:text-3xl font-bold text-emerald-400 block mt-1">{liveStats.onlineUsers}</span>
+                    </div>
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+                      <Radio className="w-5 h-5 text-emerald-400" />
+                    </div>
+                  </div>
+                </motion.div>
+                <motion.div className="card glass-noise p-4 sm:p-5" variants={cardVariants}>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Page Views Today</span>
+                      <span className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] block mt-1">{liveStats.pageViewsToday.toLocaleString()}</span>
+                    </div>
+                    <div className="w-10 h-10 rounded-xl bg-cyan-500/15 flex items-center justify-center">
+                      <Eye className="w-5 h-5 text-cyan-400" />
+                    </div>
+                  </div>
+                </motion.div>
+                <motion.div className="card glass-noise p-4 sm:p-5" variants={cardVariants}>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Unique Visitors</span>
+                      <span className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] block mt-1">{liveStats.uniqueVisitors.toLocaleString()}</span>
+                    </div>
+                    <div className="w-10 h-10 rounded-xl bg-violet-500/15 flex items-center justify-center">
+                      <Globe className="w-5 h-5 text-violet-400" />
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+
+            {/* ── Overview Extras Cards ───────────────────────────── */}
+            {extras && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mt-4"
+              >
+                <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <PieChart size={14} className="text-[#FBBF24]" />
+                    <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Revenue by Rail</span>
+                  </div>
+                  <ResponsiveContainer width="100%" height={120}>
+                    <RePieChart>
+                      <Pie
+                        data={Object.entries(extras.revenueByRail)
+                          .filter(([, v]) => v.usd > 0)
+                          .map(([name, v]) => ({ name, value: v.usd, txs: v.txs }))}
+                        dataKey="value"
+                        nameKey="name"
+                        innerRadius={28}
+                        outerRadius={50}
+                      >
+                        {['#9945FF', '#2775CA', '#FBBF24', '#635BFF', '#4ADE80'].map((c, i) => (
+                          <Cell key={i} fill={c} />
+                        ))}
+                      </Pie>
+                      <ReTooltip
+                        formatter={((v: unknown, _n: unknown, p: { payload: { name: string; txs: number } }) =>
+                          [`$${(v as number).toFixed(2)} (${p.payload.txs} txs)`, p.payload.name]) as (v: unknown, n: unknown, p: object) => [string, string]}
+                      />
+                    </RePieChart>
+                  </ResponsiveContainer>
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center">
-                  <Radio className="w-5 h-5 text-emerald-400" />
+
+                <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Flame size={14} className="text-[#A78BFA]" />
+                    <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Founding Slots</span>
+                  </div>
+                  <div className="text-2xl font-bold text-[var(--text-primary)]">
+                    {extras.foundingSlots.remaining} <span className="text-base text-[var(--text-muted)]">/ {extras.foundingSlots.max}</span>
+                  </div>
+                  <div className="text-[11px] text-[var(--text-muted)] mt-1">{extras.foundingSlots.taken} taken</div>
+                  <div className="mt-2 h-1.5 rounded-full bg-[var(--bg-tertiary)] overflow-hidden">
+                    <div
+                      className="h-full bg-[#A78BFA]"
+                      style={{ width: `${(extras.foundingSlots.taken / extras.foundingSlots.max) * 100}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-            <motion.div className="card glass-noise p-4 sm:p-5" variants={cardVariants}>
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Page Views Today</span>
-                  <span className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] block mt-1">{liveStats.pageViewsToday.toLocaleString()}</span>
+
+                <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <PiggyBank size={14} className="text-[#34D399]" />
+                    <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Active Paying Users</span>
+                  </div>
+                  <div className="text-2xl font-bold text-[var(--text-primary)]">{extras.activePayingUsers.toLocaleString()}</div>
+                  <div className="text-[11px] text-[var(--text-muted)] mt-1">active features</div>
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-cyan-500/15 flex items-center justify-center">
-                  <Eye className="w-5 h-5 text-cyan-400" />
+
+                <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp size={14} className="text-[#FBBF24]" />
+                    <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Revenue 30d</span>
+                  </div>
+                  <div className="text-base font-bold text-[var(--text-primary)]">
+                    <span className="text-[#34D399]">${extras.revenueNewVsRenewal30d.newUsd.toFixed(0)}</span>
+                    <span className="text-[var(--text-muted)] text-xs"> new</span>
+                  </div>
+                  <div className="text-base font-bold text-[var(--text-primary)]">
+                    <span className="text-[#60A5FA]">${extras.revenueNewVsRenewal30d.renewalUsd.toFixed(0)}</span>
+                    <span className="text-[var(--text-muted)] text-xs"> renewal</span>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-            <motion.div className="card glass-noise p-4 sm:p-5" variants={cardVariants}>
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Unique Visitors</span>
-                  <span className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] block mt-1">{liveStats.uniqueVisitors.toLocaleString()}</span>
+
+                <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Clock size={14} className="text-[#F472B6]" />
+                    <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Expiring 7d</span>
+                  </div>
+                  <div className="text-2xl font-bold text-[var(--text-primary)]">{extras.expiringSoon.length}</div>
+                  <div className="text-[11px] text-[var(--text-muted)] mt-1">
+                    {extras.expiringSoon.length > 0
+                      ? `next: ${new Date(extras.expiringSoon[0].expiresAt).toLocaleDateString()}`
+                      : 'no upcoming expirations'}
+                  </div>
                 </div>
-                <div className="w-10 h-10 rounded-xl bg-violet-500/15 flex items-center justify-center">
-                  <Globe className="w-5 h-5 text-violet-400" />
+              </motion.div>
+            )}
+
+            {extras && extras.containerTopN.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]"
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <Server size={14} className="text-[var(--color-accent)]" />
+                  <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Container Resource Top 10</span>
                 </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-left text-[10px] uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-primary)]">
+                        <th className="py-2 pr-4">Agent</th>
+                        <th className="py-2 pr-4">Framework</th>
+                        <th className="py-2 pr-4 text-right">CPU %</th>
+                        <th className="py-2 pr-0 text-right">Memory</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {extras.containerTopN.map((c) => (
+                        <tr key={c.agentId} className="border-b border-[var(--border-primary)]/40 hover:bg-[var(--bg-tertiary)]/50">
+                          <td className="py-2 pr-4">
+                            <Link href={`/dashboard/agent/${c.agentId}`} className="text-[var(--color-accent)] hover:underline">
+                              {c.agentName}
+                            </Link>
+                          </td>
+                          <td className="py-2 pr-4 text-[var(--text-muted)]">{c.framework}</td>
+                          <td className="py-2 pr-4 text-right font-mono tabular-nums">{c.cpuPercent.toFixed(1)}%</td>
+                          <td className="py-2 pr-0 text-right font-mono tabular-nums">
+                            {c.memoryUsageMb.toFixed(0)} / {c.memoryLimitMb.toFixed(0)} MB
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </motion.div>
+            )}
 
-        {/* ── Overview Extras Cards ───────────────────────────── */}
-        {extras && (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mt-4"
-          >
-            {/* Revenue by rail — pie */}
-            <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
-              <div className="flex items-center gap-2 mb-2">
-                <PieChart size={14} className="text-[#FBBF24]" />
-                <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Revenue by Rail</span>
+            {stats && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3">
+                <StatCard label="Users" value={stats.totalUsers} icon={Users} iconColor="var(--color-accent)" />
+                <StatCard label="Agents" value={stats.totalAgents} icon={Bot} iconColor="#60A5FA" />
+                <StatCard label="Active" value={stats.activeAgents} icon={Activity} iconColor="#4ADE80" />
+                <StatCard label="Revenue" value={`$${stats.totalRevenueUsd.toFixed(2)}`} icon={DollarSign} iconColor="#FBBF24" />
+                <StatCard label="Messages" value={stats.totalMessages} icon={MessageSquare} iconColor="#60A5FA" />
+                <StatCard label="Today" value={`+${stats.newUsersToday ?? 0}u / +${stats.newAgentsToday ?? 0}a`} icon={Sunrise} iconColor="#34D399" />
+                <StatCard label="Rev 7d" value={`$${(stats.revenueWeek ?? 0).toFixed(2)}`} icon={TrendingUp} iconColor="#FBBF24" />
               </div>
-              <ResponsiveContainer width="100%" height={120}>
-                <RePieChart>
-                  <Pie
-                    data={Object.entries(extras.revenueByRail)
-                      .filter(([, v]) => v.usd > 0)
-                      .map(([name, v]) => ({ name, value: v.usd, txs: v.txs }))}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={28}
-                    outerRadius={50}
-                  >
-                    {['#9945FF', '#2775CA', '#FBBF24', '#635BFF', '#4ADE80'].map((c, i) => (
-                      <Cell key={i} fill={c} />
-                    ))}
-                  </Pie>
-                  <ReTooltip
-                    formatter={((v: unknown, _n: unknown, p: { payload: { name: string; txs: number } }) =>
-                      [`$${(v as number).toFixed(2)} (${p.payload.txs} txs)`, p.payload.name]) as (v: unknown, n: unknown, p: object) => [string, string]}
-                  />
-                </RePieChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Founding Member slots */}
-            <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
-              <div className="flex items-center gap-2 mb-2">
-                <Flame size={14} className="text-[#A78BFA]" />
-                <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Founding Slots</span>
-              </div>
-              <div className="text-2xl font-bold text-[var(--text-primary)]">
-                {extras.foundingSlots.remaining} <span className="text-base text-[var(--text-muted)]">/ {extras.foundingSlots.max}</span>
-              </div>
-              <div className="text-[11px] text-[var(--text-muted)] mt-1">{extras.foundingSlots.taken} taken</div>
-              <div className="mt-2 h-1.5 rounded-full bg-[var(--bg-tertiary)] overflow-hidden">
-                <div
-                  className="h-full bg-[#A78BFA]"
-                  style={{ width: `${(extras.foundingSlots.taken / extras.foundingSlots.max) * 100}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Active paying users */}
-            <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
-              <div className="flex items-center gap-2 mb-2">
-                <PiggyBank size={14} className="text-[#34D399]" />
-                <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Active Paying Users</span>
-              </div>
-              <div className="text-2xl font-bold text-[var(--text-primary)]">{extras.activePayingUsers.toLocaleString()}</div>
-              <div className="text-[11px] text-[var(--text-muted)] mt-1">active features</div>
-            </div>
-
-            {/* New vs renewal 30d */}
-            <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp size={14} className="text-[#FBBF24]" />
-                <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Revenue 30d</span>
-              </div>
-              <div className="text-base font-bold text-[var(--text-primary)]">
-                <span className="text-[#34D399]">${extras.revenueNewVsRenewal30d.newUsd.toFixed(0)}</span>
-                <span className="text-[var(--text-muted)] text-xs"> new</span>
-              </div>
-              <div className="text-base font-bold text-[var(--text-primary)]">
-                <span className="text-[#60A5FA]">${extras.revenueNewVsRenewal30d.renewalUsd.toFixed(0)}</span>
-                <span className="text-[var(--text-muted)] text-xs"> renewal</span>
-              </div>
-            </div>
-
-            {/* Expiring 7d */}
-            <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock size={14} className="text-[#F472B6]" />
-                <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Expiring 7d</span>
-              </div>
-              <div className="text-2xl font-bold text-[var(--text-primary)]">{extras.expiringSoon.length}</div>
-              <div className="text-[11px] text-[var(--text-muted)] mt-1">
-                {extras.expiringSoon.length > 0
-                  ? `next: ${new Date(extras.expiringSoon[0].expiresAt).toLocaleDateString()}`
-                  : 'no upcoming expirations'}
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* ── Container Resource Top 10 ────────────────────────── */}
-        {extras && extras.containerTopN.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4 p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]"
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <Server size={14} className="text-[var(--color-accent)]" />
-              <span className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)]">Container Resource Top 10</span>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-[10px] uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-primary)]">
-                    <th className="py-2 pr-4">Agent</th>
-                    <th className="py-2 pr-4">Framework</th>
-                    <th className="py-2 pr-4 text-right">CPU %</th>
-                    <th className="py-2 pr-0 text-right">Memory</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {extras.containerTopN.map((c) => (
-                    <tr key={c.agentId} className="border-b border-[var(--border-primary)]/40 hover:bg-[var(--bg-tertiary)]/50">
-                      <td className="py-2 pr-4">
-                        <Link href={`/dashboard/agent/${c.agentId}`} className="text-[var(--color-accent)] hover:underline">
-                          {c.agentName}
-                        </Link>
-                      </td>
-                      <td className="py-2 pr-4 text-[var(--text-muted)]">{c.framework}</td>
-                      <td className="py-2 pr-4 text-right font-mono tabular-nums">{c.cpuPercent.toFixed(1)}%</td>
-                      <td className="py-2 pr-0 text-right font-mono tabular-nums">
-                        {c.memoryUsageMb.toFixed(0)} / {c.memoryLimitMb.toFixed(0)} MB
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </motion.div>
-        )}
-
-        {/* ── Quick Stats Row (always visible) ────────────────── */}
-        {stats && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3">
-            <StatCard label="Users" value={stats.totalUsers} icon={Users} iconColor="var(--color-accent)" />
-            <StatCard label="Agents" value={stats.totalAgents} icon={Bot} iconColor="#60A5FA" />
-            <StatCard label="Active" value={stats.activeAgents} icon={Activity} iconColor="#4ADE80" />
-            <StatCard label="Revenue" value={`$${stats.totalRevenueUsd.toFixed(2)}`} icon={DollarSign} iconColor="#FBBF24" />
-            <StatCard label="Messages" value={stats.totalMessages} icon={MessageSquare} iconColor="#60A5FA" />
-            <StatCard label="Today" value={`+${stats.newUsersToday ?? 0}u / +${stats.newAgentsToday ?? 0}a`} icon={Sunrise} iconColor="#34D399" />
-            <StatCard label="Rev 7d" value={`$${(stats.revenueWeek ?? 0).toFixed(2)}`} icon={TrendingUp} iconColor="#FBBF24" />
-          </div>
+            )}
+          </>
         )}
 
         {/* ── Tab Switcher + Table Area ─────────────────────── */}
@@ -1662,14 +1702,6 @@ export default function AdminPage() {
           {/* ── Overview Tab ─────────────────────────────────── */}
           {activeTab === 'overview' && stats && (
             <div className="space-y-5">
-              {/* Daily stats row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard label="Users Today" value={stats.newUsersToday ?? 0} icon={Sunrise} iconColor="#34D399" />
-                <StatCard label="Agents Today" value={stats.newAgentsToday ?? 0} icon={Calendar} iconColor="#818CF8" />
-                <StatCard label="Revenue Today" value={`$${(stats.revenueToday ?? 0).toFixed(2)}`} icon={DollarSign} iconColor="#34D399" />
-                <StatCard label="New Users 7d" value={stats.newUsersLast7d} icon={UserPlus} iconColor="var(--color-accent)" />
-              </div>
-
               {/* Framework + Tier Distribution */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Framework Distribution */}
@@ -2696,70 +2728,6 @@ export default function AdminPage() {
                               </td>
                               <td className="py-2.5 pr-4">
                                 <span className={`text-xs font-mono ${svc.restarts > 0 ? 'text-amber-400' : 'text-[var(--text-muted)]'}`}>{svc.restarts}</span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-
-                {/* Backup Section */}
-                <div className="rounded-xl border border-[var(--border-default)] p-4 bg-[var(--bg-elevated)]">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-semibold text-[var(--text-primary)] flex items-center gap-2">
-                      <Database size={16} className="text-[var(--text-muted)]" />
-                      Database Backups
-                    </h3>
-                    <button
-                      onClick={handleRunBackup}
-                      disabled={backupRunning}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20 hover:bg-[var(--color-accent)]/20 transition-colors disabled:opacity-40"
-                    >
-                      {backupRunning ? <RefreshCw size={12} className="animate-spin" /> : <Play size={12} />}
-                      {backupRunning ? 'Running...' : 'Run Backup Now'}
-                    </button>
-                  </div>
-
-                  {health.backup.lastBackup && (
-                    <div className="flex items-center gap-4 mb-3 text-xs text-[var(--text-secondary)]">
-                      <span className="flex items-center gap-1.5">
-                        <Clock size={12} className="text-[var(--text-muted)]" />
-                        Last: {health.backup.lastBackup}
-                      </span>
-                      {health.backup.lastSize && (
-                        <span className="flex items-center gap-1.5">
-                          <HardDrive size={12} className="text-[var(--text-muted)]" />
-                          Size: {health.backup.lastSize}
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {backups.length === 0 ? (
-                    <p className="text-xs text-[var(--text-muted)]">No backups found. Run your first backup above.</p>
-                  ) : (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left">
-                        <thead>
-                          <tr className="border-b border-[var(--border-default)]">
-                            {['Filename', 'Size', 'Date'].map(h => (
-                              <th key={h} className="pb-2 pr-4 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">{h}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {backups.map((b) => (
-                            <tr key={b.filename} className="border-b border-[var(--border-default)] last:border-b-0">
-                              <td className="py-2 pr-4">
-                                <span className="text-xs font-mono text-[var(--text-primary)]">{b.filename}</span>
-                              </td>
-                              <td className="py-2 pr-4">
-                                <span className="text-xs text-[var(--text-secondary)]">{b.size}</span>
-                              </td>
-                              <td className="py-2 pr-4">
-                                <span className="text-xs text-[var(--text-muted)]">{b.date}</span>
                               </td>
                             </tr>
                           ))}

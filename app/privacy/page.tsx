@@ -166,7 +166,6 @@ export default function PrivacyPolicyPage() {
               <li>Agent containers run as non-root, with CPU/memory limits and network isolation</li>
               <li>Database access restricted to the application server over localhost</li>
               <li>Firewall (iptables) limits Docker egress to our LLM proxy + API only</li>
-              <li>Off-site encrypted backups rotated daily</li>
             </ul>
             <p className="mt-3">
               No method of electronic storage or transmission is 100% secure. We cannot guarantee absolute security,
@@ -233,7 +232,6 @@ export default function PrivacyPolicyPage() {
               <li><strong className="text-[var(--text-primary)]">Chat history &amp; agent configs</strong> — until you delete them or the agent is removed.</li>
               <li><strong className="text-[var(--text-primary)]">Payment records &amp; invoices</strong> — 7 years minimum (Romanian Fiscal Code &amp; EU accounting directive).</li>
               <li><strong className="text-[var(--text-primary)]">Server &amp; access logs</strong> — 90 days then purged.</li>
-              <li><strong className="text-[var(--text-primary)]">Backups</strong> — rotated on a 30-day cycle.</li>
               <li><strong className="text-[var(--text-primary)]">Anonymized analytics</strong> — retained indefinitely for aggregate trend analysis.</li>
             </ul>
           </section>

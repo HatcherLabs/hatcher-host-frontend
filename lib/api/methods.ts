@@ -1279,32 +1279,7 @@ export const api = {
       disk: { used: string; total: string; percent: number };
       ram: { total: string; used: string; available: string; percent: number };
       cpu: { cores: number; model: string; load1m: string; load5m: string; load15m: string; percent: number };
-      backup: { lastBackup: string | null; lastSize: string | null };
     }>('/admin/health'),
-
-  /** Admin: trigger backup now */
-  adminRunBackup: () =>
-    req<{ message: string }>('/admin/backup', { method: 'POST' }),
-
-  /** Admin: list backup files */
-  adminGetBackups: () =>
-    req<{ backups: Array<{ filename: string; size: string; date: string }> }>('/admin/backups'),
-
-  /**
-   * Admin: download a backup file (C18).
-   *
-   * Returns a browser URL that — when opened in a new tab or used as an
-   * `<a href={url} download>` target — streams the gzipped backup with the
-   * right Content-Disposition. Auth is carried via the httpOnly cookie, so
-   * this works for browser-initiated downloads even though `req()` isn't
-   * involved. Falls back to a Bearer query param only if we're running in a
-   * context without cookies (not expected on the admin panel).
-   *
-   * If you need to fetch the bytes programmatically, prefer the URL-only
-   * helper and wrap it with fetch(..., { credentials: 'include' }).
-   */
-  adminBackupDownloadUrl: (filename: string) =>
-    `${API_BASE}/admin/backups/${encodeURIComponent(filename)}`,
 
   /**
    * Admin: 10 most recent Stripe disputes (C17).
