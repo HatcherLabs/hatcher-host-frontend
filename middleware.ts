@@ -20,7 +20,7 @@ import createMiddleware from 'next-intl/middleware';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { routing } from './i18n/routing';
-import { locales } from './i18n/config';
+import { defaultLocale, locales } from './i18n/config';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const PUBLIC_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://hatcher.host';
@@ -94,6 +94,11 @@ export default function middleware(req: NextRequest): NextResponse {
     return NextResponse.next();
   }
 
+  const defaultLocaleRedirect = redirectDefaultLocalePath(req);
+  if (defaultLocaleRedirect) {
+    return defaultLocaleRedirect;
+  }
+
   // Step 1: Run next-intl first so it can handle locale detection/rewrites/redirects
   // and set the HATCHER_LOCALE cookie.
   const response = intlMiddleware(req);
@@ -128,6 +133,22 @@ export default function middleware(req: NextRequest): NextResponse {
     });
   }
 
+  return response;
+}
+
+function redirectDefaultLocalePath(req: NextRequest): NextResponse | null {
+  const { pathname, search } = req.nextUrl;
+  const prefix = `/${defaultLocale}`;
+  if (pathname !== prefix && !pathname.startsWith(`${prefix}/`)) return null;
+
+  const target = new URL(`${stripLocalePrefix(pathname)}${search}`, PUBLIC_SITE_URL);
+  const response = NextResponse.redirect(target);
+  response.cookies.set('HATCHER_LOCALE', defaultLocale, {
+    path: '/',
+    maxAge: 60 * 60 * 24 * 365,
+    secure: true,
+    sameSite: 'lax',
+  });
   return response;
 }
 
