@@ -21,9 +21,10 @@ interface Props {
 
 /**
  * One `InstancedMesh` per (base, primitive) pair. Quaternius buildings
- * ship with 6-9 primitives per base (one material each), so an 8-base
- * inventory yields ~72 InstancedMeshes — still ~100× cheaper than
- * rendering each agent as its own mesh group.
+ * ship as a small number of meshes, sometimes with material groups.
+ * Keep multi-material meshes intact so we do not redraw the whole
+ * geometry once per material and accidentally create opaque dark
+ * duplicate shells around the city.
  *
  * Per instance:
  *   - matrix4 (position, rotation, scale) driven by `Buildings.layout`
@@ -107,7 +108,7 @@ function PrimitiveInstance({
   onBuildingClick,
 }: {
   geometry: THREE.BufferGeometry;
-  material: THREE.Material;
+  material: THREE.Material | THREE.Material[];
   layouts: BuildingLayout[];
   nativeHeight: number;
   nativeMinY: number;
@@ -123,28 +124,37 @@ function PrimitiveInstance({
   // geometry. Only runs once per material; per-instance colour
   // multiplier still comes from instanceColor below.
   useMemo(() => {
-    const std = material as THREE.MeshStandardMaterial & {
-      emissive?: THREE.Color;
-      emissiveIntensity?: number;
-      name?: string;
-    };
-    if ('emissive' in std && std.emissive instanceof THREE.Color) {
-      const n = (std.name ?? '').toLowerCase();
-      // Tight regex: Quaternius buildings ship with a "Light" material
-      // that is beige structural paint, NOT lit windows. Including
-      // `light` in the window heuristic lit up three-quarters of the
-      // city (see review B1 on commit ff5142a). Windows are
-      // consistently named `Windows` or `Glass`.
-      const looksLikeWindow = /window|glass|neon|emissive/.test(n);
-      if (looksLikeWindow) {
-        std.emissive.set(0xfff4c8);
-        std.emissiveIntensity = 1.6;
-      } else {
-        std.emissive.set(0x223355);
-        std.emissiveIntensity = 0.25;
+    const materials = Array.isArray(material) ? material : [material];
+    materials.forEach((mat) => {
+      if ('vertexColors' in mat) {
+        (mat as THREE.Material & { vertexColors: boolean }).vertexColors = true;
+        mat.needsUpdate = true;
       }
-      std.needsUpdate = true;
-    }
+    });
+    materials.forEach((mat) => {
+      const std = mat as THREE.MeshStandardMaterial & {
+        emissive?: THREE.Color;
+        emissiveIntensity?: number;
+        name?: string;
+      };
+      if ('emissive' in std && std.emissive instanceof THREE.Color) {
+        const n = (std.name ?? '').toLowerCase();
+        // Tight regex: Quaternius buildings ship with a "Light" material
+        // that is beige structural paint, NOT lit windows. Including
+        // `light` in the window heuristic lit up three-quarters of the
+        // city (see review B1 on commit ff5142a). Windows are
+        // consistently named `Windows` or `Glass`.
+        const looksLikeWindow = /window|glass|neon|emissive/.test(n);
+        if (looksLikeWindow) {
+          std.emissive.set(0xfff4c8);
+          std.emissiveIntensity = 1.6;
+        } else {
+          std.emissive.set(0x223355);
+          std.emissiveIntensity = 0.25;
+        }
+        std.needsUpdate = true;
+      }
+    });
   }, [material]);
 
   useEffect(() => {

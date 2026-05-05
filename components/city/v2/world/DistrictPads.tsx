@@ -65,21 +65,21 @@ function DistrictPad({
 }) {
   const { mat, edgeMat } = useMemo(() => {
     const accent = new THREE.Color(CATEGORY_PAD_COLOR[category]);
-    const base = accent.clone().multiplyScalar(0.44).lerp(new THREE.Color(0x071018), 0.34);
+    const base = accent.clone().multiplyScalar(0.58).lerp(new THREE.Color(0x08121c), 0.24);
     return {
       mat: new THREE.MeshStandardMaterial({
         map: makePadTexture(accent),
         color: base,
         emissive: accent,
-        emissiveIntensity: 0.13,
-        roughness: 0.62,
-        metalness: 0.28,
-        envMapIntensity: 0.08,
+        emissiveIntensity: 0.22,
+        roughness: 0.56,
+        metalness: 0.34,
+        envMapIntensity: 0.16,
       }),
       edgeMat: new THREE.MeshBasicMaterial({
         color: accent,
         transparent: true,
-        opacity: 0.48,
+        opacity: 0.62,
         depthWrite: false,
         toneMapped: false,
       }),
@@ -122,7 +122,7 @@ function makePadTexture(accent: THREE.Color) {
 
   const color = `rgb(${Math.round(accent.r * 255)}, ${Math.round(accent.g * 255)}, ${Math.round(accent.b * 255)})`;
   ctx.strokeStyle = color;
-  ctx.globalAlpha = 0.2;
+  ctx.globalAlpha = 0.28;
   ctx.lineWidth = 1;
   for (let i = -size; i < size * 2; i += 20) {
     ctx.beginPath();
@@ -131,9 +131,9 @@ function makePadTexture(accent: THREE.Color) {
     ctx.stroke();
   }
 
-  ctx.globalAlpha = 0.28;
+  ctx.globalAlpha = 0.36;
   ctx.strokeRect(18, 18, size - 36, size - 36);
-  ctx.globalAlpha = 0.38;
+  ctx.globalAlpha = 0.46;
   for (let i = 0; i < 4; i++) {
     const p = 34 + i * 42;
     ctx.fillStyle = color;

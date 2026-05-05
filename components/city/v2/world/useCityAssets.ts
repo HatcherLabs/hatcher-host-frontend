@@ -12,14 +12,13 @@ useGLTF.setDecoderPath('/draco/');
 
 export interface BuildingPrimitive {
   geometry: THREE.BufferGeometry;
-  material: THREE.Material;
+  material: THREE.Material | THREE.Material[];
 }
 
 export interface BuildingAsset {
-  /** Every Mesh.primitives[] entry becomes one InstancedMesh at render
-   *  time. Quaternius FBX exports ship one material per structural
-   *  element (Bricks / Glass / Wood / Dark / ...), so each building
-   *  lands in 6-9 primitives. */
+  /** Every mesh becomes one InstancedMesh at render time. Multi-material
+   *  meshes stay multi-material so grouped GLB geometry renders once
+   *  instead of once per material group. */
   primitives: BuildingPrimitive[];
   /** Native height of the source mesh (max Y - min Y), computed once
    *  so Buildings.tsx can scale Y to target height without hardcoding
@@ -36,9 +35,7 @@ function collectPrimitives(root: THREE.Object3D): BuildingPrimitive[] {
     const m = obj as THREE.Mesh;
     if (!m.isMesh) return;
     if (Array.isArray(m.material)) {
-      m.material.forEach((mat) => {
-        out.push({ geometry: m.geometry, material: mat.clone() });
-      });
+      out.push({ geometry: m.geometry, material: m.material.map((mat) => mat.clone()) });
     } else if (m.material) {
       out.push({ geometry: m.geometry, material: (m.material as THREE.Material).clone() });
     }

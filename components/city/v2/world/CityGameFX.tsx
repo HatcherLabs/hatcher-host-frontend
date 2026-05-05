@@ -1,10 +1,11 @@
 'use client';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { CityAgent } from '@/components/city/types';
 import { CATEGORIES, FRAMEWORK_COLORS } from '@/components/city/types';
 import { useQuality } from '../quality/QualityContext';
+import { layoutBuildingsV2 } from './Buildings.layout';
 import { WORLD_HALF, districtPosition } from './grid';
 
 interface Props {
@@ -14,6 +15,10 @@ interface Props {
 export function CityGameFX({ agents }: Props) {
   const quality = useQuality();
   const districts = useMemo(() => buildDistricts(agents), [agents]);
+  const routes = useMemo(
+    () => buildAgentRoutes(agents, quality === 'high' ? 32 : 14),
+    [agents, quality],
+  );
   const skyLaneCount = quality === 'high' ? 18 : 0;
 
   return (
@@ -21,6 +26,7 @@ export function CityGameFX({ agents }: Props) {
       {districts.map((district) => (
         <DistrictBeacon key={district.category} {...district} />
       ))}
+      <AgentTransitRoutes routes={routes} />
       {skyLaneCount > 0 && <SkyLanes count={skyLaneCount} />}
       {quality === 'high' && <CityScan color={0x7dd3fc} />}
     </group>
@@ -62,6 +68,117 @@ function buildDistricts(agents: CityAgent[]) {
   });
 }
 
+interface AgentRoute {
+  key: string;
+  curve: THREE.CatmullRomCurve3;
+  color: number;
+  phase: number;
+  speed: number;
+}
+
+function buildAgentRoutes(agents: CityAgent[], limit: number): AgentRoute[] {
+  if (!agents.length || limit <= 0) return [];
+  const layouts = layoutBuildingsV2(agents);
+  const byId = new Map(layouts.map((layout) => [layout.agentId, layout]));
+  const dataIdx = CATEGORIES.indexOf('data');
+  const fallbackHub = districtPosition(dataIdx >= 0 ? dataIdx : Math.floor(CATEGORIES.length / 2));
+
+  return [...agents]
+    .filter((agent) => byId.has(agent.id))
+    .sort((a, b) => {
+      const statusA = a.status === 'running' ? 100_000 : 0;
+      const statusB = b.status === 'running' ? 100_000 : 0;
+      const scoreA = statusA + a.messageCount + a.tier * 500;
+      const scoreB = statusB + b.messageCount + b.tier * 500;
+      return scoreB - scoreA;
+    })
+    .slice(0, limit)
+    .map((agent, index) => {
+      const layout = byId.get(agent.id)!;
+      const source = new THREE.Vector3(layout.x, 3 + Math.min(layout.height, 18), layout.z);
+      const sourceDistrictIdx = CATEGORIES.indexOf(agent.category);
+      const sourceDistrict = districtPosition(sourceDistrictIdx >= 0 ? sourceDistrictIdx : dataIdx);
+      const hubBias = index % 3 === 0 ? sourceDistrict : fallbackHub;
+      const target = new THREE.Vector3(hubBias.x, 18 + (index % 4) * 2.5, hubBias.z);
+      const midLift = 36 + (index % 5) * 4 + Math.min(10, agent.tier * 2.2);
+      const sideways = Math.sin(index * 2.399) * 18;
+      const midpoint = new THREE.Vector3(
+        (source.x + target.x) / 2 + sideways,
+        midLift,
+        (source.z + target.z) / 2 + Math.cos(index * 1.713) * 18,
+      );
+
+      return {
+        key: `${agent.id}-${index}`,
+        curve: new THREE.CatmullRomCurve3([source, midpoint, target]),
+        color: FRAMEWORK_COLORS[agent.framework],
+        phase: ((index * 37) % 100) / 100,
+        speed: 0.055 + (index % 7) * 0.008,
+      };
+    });
+}
+
+function AgentTransitRoutes({ routes }: { routes: AgentRoute[] }) {
+  if (routes.length === 0) return null;
+  return (
+    <group>
+      {routes.map((route) => (
+        <AgentTransitRoute key={route.key} route={route} />
+      ))}
+    </group>
+  );
+}
+
+function AgentTransitRoute({ route }: { route: AgentRoute }) {
+  const material = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: route.color,
+        transparent: true,
+        opacity: 0.18,
+        depthWrite: false,
+        toneMapped: false,
+      }),
+    [route.color],
+  );
+  const geometry = useMemo(
+    () => new THREE.TubeGeometry(route.curve, 36, 0.035, 6, false),
+    [route.curve],
+  );
+  const packet = useRef<THREE.Mesh>(null);
+
+  useEffect(() => {
+    return () => {
+      geometry.dispose();
+      material.dispose();
+    };
+  }, [geometry, material]);
+
+  useFrame(({ clock }) => {
+    if (!packet.current) return;
+    const t = (route.phase + clock.getElapsedTime() * route.speed) % 1;
+    const point = route.curve.getPointAt(t);
+    const tangent = route.curve.getTangentAt(t);
+    packet.current.position.copy(point);
+    packet.current.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tangent.normalize());
+  });
+
+  return (
+    <group>
+      <mesh geometry={geometry} material={material} />
+      <mesh ref={packet}>
+        <boxGeometry args={[0.24, 1.9, 0.24]} />
+        <meshBasicMaterial
+          color={route.color}
+          toneMapped={false}
+          transparent
+          opacity={0.86}
+        />
+      </mesh>
+    </group>
+  );
+}
+
 function DistrictBeacon({
   x,
   z,
@@ -101,7 +218,16 @@ function DistrictBeacon({
   return (
     <group position={[x, 0, z]}>
       <mesh position={[0, 7 + intensity * 5, 0]}>
-        <cylinderGeometry args={[1.2 + intensity * 1.8, 2.8 + intensity * 2.4, 14 + intensity * 10, 32, 1, true]} />
+        <cylinderGeometry
+          args={[
+            1.2 + intensity * 1.8,
+            2.8 + intensity * 2.4,
+            14 + intensity * 10,
+            32,
+            1,
+            true,
+          ]}
+        />
         <meshBasicMaterial
           ref={beam}
           color={color}
@@ -114,7 +240,13 @@ function DistrictBeacon({
       </mesh>
       <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.32, 0]}>
         <ringGeometry args={[8.4, 8.8, 96]} />
-        <meshBasicMaterial color={color} transparent opacity={0.28} toneMapped={false} depthWrite={false} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={0.28}
+          toneMapped={false}
+          depthWrite={false}
+        />
       </mesh>
       <mesh ref={orb} position={[0, 11, 0]}>
         <sphereGeometry args={[0.55 + intensity * 0.5, 16, 16]} />

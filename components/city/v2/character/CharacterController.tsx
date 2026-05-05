@@ -255,7 +255,7 @@ export function MouseLook({
       window.removeEventListener('pointerup', up);
       window.removeEventListener('pointermove', move as EventListener);
     };
-  }, [state, domElement, sensitivity]);
+  }, [state, domElement, sensitivity, pitchMin, pitchMax]);
   return null;
 }
 

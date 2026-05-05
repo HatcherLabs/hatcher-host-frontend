@@ -19,7 +19,7 @@ export function WalkSurveyToggle({ mode, onChange }: Props) {
     <div
       style={{
         position: 'absolute',
-        top: 52,
+        top: 68,
         right: 12,
         zIndex: 10,
       }}
@@ -33,7 +33,7 @@ export function WalkSurveyToggle({ mode, onChange }: Props) {
           borderRadius: 6,
           padding: '6px 14px',
           fontFamily: '"Press Start 2P", monospace',
-          fontSize: 11,
+          fontSize: 'clamp(9px, 2.4vw, 11px)',
           cursor: 'pointer',
           letterSpacing: 1,
         }}

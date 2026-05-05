@@ -81,7 +81,7 @@ export function Ground() {
           roughnessMap={rough}
           roughness={0.95}
           metalness={0.02}
-          color={'#1a1a24'}
+          color={'#222331'}
         />
       </mesh>
       {/* Cyber grid overlay — hovers a hair above the slab. */}

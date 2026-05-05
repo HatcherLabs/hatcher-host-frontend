@@ -1,9 +1,17 @@
 'use client';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { MapControls } from '@react-three/drei';
+import { Canvas, useThree } from '@react-three/fiber';
+import {
+  EffectComposer,
+  Bloom,
+  N8AO,
+  Noise,
+  Vignette,
+} from '@react-three/postprocessing';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useRouter } from '@/i18n/routing';
-import type { CityAgent } from '@/components/city/types';
+import { CATEGORIES, type Category, type CityAgent } from '@/components/city/types';
 import { QualityProvider, useQuality } from './quality/QualityContext';
 import { QualityToggle } from './quality/QualityToggle';
 import { Skybox } from './world/Skybox';
@@ -38,7 +46,6 @@ import { Minimap } from './hud/Minimap';
 import { WalkOnboarding } from './hud/WalkOnboarding';
 import { MobileJoystick } from './character/MobileJoystick';
 import { AmbientAudio } from './hud/AmbientAudio';
-import { CATEGORIES } from '@/components/city/types';
 import {
   DISTRICT_COLS,
   DISTRICT_GAP,
@@ -48,7 +55,6 @@ import {
   GROUND_SIZE,
   districtPosition as gridDistrictPosition,
 } from './world/grid';
-import { useMemo as useMemoReact } from 'react';
 
 interface Props {
   agents?: CityAgent[];
@@ -68,15 +74,35 @@ interface Props {
  * and first-person Walk (WASD + FollowCamera).
  */
 const EMPTY_PULSES: Map<string, number> = new Map();
+const DEFAULT_WALK_DISTRICT: Category = 'data';
+
+function walkSpawnFor(category: Category) {
+  const idx = CATEGORIES.indexOf(category);
+  const { x: cx, z: cz } = gridDistrictPosition(idx >= 0 ? idx : 0);
+  const padOffset = DISTRICT_SIZE * 0.3;
+  const x = cx + padOffset;
+  const z = cz + padOffset;
+  const yaw = Math.atan2(cx - x, cz - z);
+  return { x, z, yaw };
+}
+
+function placeCharacterOnTravelPad(state: CharacterState, category: Category) {
+  const spawn = walkSpawnFor(category);
+  state.position.set(spawn.x, 0, spawn.z);
+  state.heading = spawn.yaw;
+  state.cameraYaw = spawn.yaw;
+  state.cameraPitch = 0.18;
+}
 
 export function CitySceneV2({ agents = [], pulseAts = EMPTY_PULSES }: Props) {
   const router = useRouter();
   const [mode, setMode] = useState<CityMode>('survey');
+  const initialSpawn = walkSpawnFor(DEFAULT_WALK_DISTRICT);
   const charState = useRef<CharacterState>({
-    position: new THREE.Vector3(0, 0, 0),
-    heading: 0,
-    cameraYaw: 0,
-    cameraPitch: 0.35,
+    position: new THREE.Vector3(initialSpawn.x, 0, initialSpawn.z),
+    heading: initialSpawn.yaw,
+    cameraYaw: initialSpawn.yaw,
+    cameraPitch: 0.18,
   });
   // Analog vector from the mobile joystick; shared with CanvasInner
   // via ref so updating it doesn't cause re-renders.
@@ -89,6 +115,16 @@ export function CitySceneV2({ agents = [], pulseAts = EMPTY_PULSES }: Props) {
       router.push(`/agent/${agentId}/room?from=city`);
     },
     [router],
+  );
+
+  const handleModeChange = useCallback(
+    (next: CityMode) => {
+      if (next === 'walk' && mode !== 'walk' && charState.current.position.lengthSq() < 4) {
+        placeCharacterOnTravelPad(charState.current, DEFAULT_WALK_DISTRICT);
+      }
+      setMode(next);
+    },
+    [mode],
   );
 
   // Esc exits walk mode from anywhere on the page
@@ -107,11 +143,12 @@ export function CitySceneV2({ agents = [], pulseAts = EMPTY_PULSES }: Props) {
     const idx = CATEGORIES.indexOf(cat);
     if (idx < 0) return;
     const { x: cx, z: cz } = gridDistrictPosition(idx);
-    // Drop the character at the SE travel-pad corner so they never
-    // appear inside the district's landmark sculpt.
-    const padOffset = DISTRICT_SIZE * 0.3;
-    charState.current.position.set(cx + padOffset, 0, cz + padOffset);
-    charState.current.heading = 0;
+    const category = CATEGORIES[idx]!;
+    placeCharacterOnTravelPad(charState.current, category);
+    charState.current.heading = Math.atan2(
+      cx - charState.current.position.x,
+      cz - charState.current.position.z,
+    );
     setMode('walk');
   };
 
@@ -127,7 +164,7 @@ export function CitySceneV2({ agents = [], pulseAts = EMPTY_PULSES }: Props) {
           analogRef={analogRef}
         />
         <QualityToggle />
-        <WalkSurveyToggle mode={mode} onChange={setMode} />
+        <WalkSurveyToggle mode={mode} onChange={handleModeChange} />
         <Minimap
           state={charState.current}
           agents={agents}
@@ -167,7 +204,7 @@ function CanvasInner({
   const quality = useQuality();
   // Only derive collider discs when in walk mode — in survey there's
   // no character to push out, and the agent list can be huge.
-  const solids = useMemoReact(
+  const solids = useMemo(
     () => (mode === 'walk' ? buildSolidDiscs(agents) : []),
     [mode, agents],
   );
@@ -183,6 +220,11 @@ function CanvasInner({
       }}
       dpr={quality === 'high' ? [1, 2] : 1}
       gl={{ antialias: quality === 'high', powerPreference: 'high-performance' }}
+      shadows={quality === 'high'}
+      onCreated={({ gl }) => {
+        gl.toneMapping = THREE.ACESFilmicToneMapping;
+        gl.toneMappingExposure = quality === 'high' ? 1.08 : 1.0;
+      }}
       style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
     >
       {/* Cyber-cool lighting. Skybox HDRI supplies ambient/reflection
@@ -191,23 +233,25 @@ function CanvasInner({
           as a real sky instead of a flat void. The clear color is a
           near-match to the sky horizon as a fallback if the shader
           ever fails to compile. */}
-      <color attach="background" args={['#050418']} />
+      <color attach="background" args={['#070a18']} />
       {/* Fog is a light atmospheric touch — city stays clearly
           readable out to ~380u, with a slow falloff past that. Walk
           mode clamps at ~255u of player movement, so the fog far
           plane at 480 leaves plenty of headroom. The fog colour
           matches CyberSky's horizon band so the city blends into the
           sky without a visible seam. */}
-      <fog attach="fog" args={['#050418', 200, 480]} />
-      <ambientLight intensity={0.18} color={'#4866aa'} />
+      <fog attach="fog" args={['#070a18', 260, 620]} />
+      <ambientLight intensity={0.28} color={'#5f7fca'} />
+      <hemisphereLight color={'#9fc9ff'} groundColor={'#050814'} intensity={0.16} />
       <directionalLight
         position={[100, 140, 80]}
-        intensity={0.6}
+        intensity={0.9}
         color={'#7ac8ff'}
+        castShadow={quality === 'high'}
       />
       <directionalLight
         position={[-120, 60, -80]}
-        intensity={0.3}
+        intensity={0.45}
         color={'#d855ff'}
       />
       <Suspense fallback={null}>
@@ -292,6 +336,7 @@ function CanvasInner({
           <FollowCamera state={charState} />
         </>
       )}
+      <CityPostProcessing />
     </Canvas>
   );
 }
@@ -300,18 +345,59 @@ function SurveyCamera() {
   const { camera } = useThree();
 
   useEffect(() => {
-    camera.position.set(0, 210, 255);
+    camera.position.set(150, 170, 235);
     camera.lookAt(0, 0, 0);
   }, [camera]);
 
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime() * 0.035;
-    const radius = 255;
-    camera.position.set(Math.sin(t) * radius, 210, Math.cos(t) * radius);
-    camera.lookAt(0, 0, 0);
-  });
+  return (
+    <MapControls
+      makeDefault
+      enableDamping
+      dampingFactor={0.08}
+      enableZoom
+      enablePan
+      enableRotate
+      minDistance={85}
+      maxDistance={430}
+      minPolarAngle={0.38}
+      maxPolarAngle={1.23}
+      zoomSpeed={0.9}
+      panSpeed={0.72}
+      rotateSpeed={0.42}
+      target={[0, 0, 0]}
+    />
+  );
+}
 
-  return null;
+function CityPostProcessing() {
+  const quality = useQuality();
+  if (quality === 'low') {
+    return (
+      <EffectComposer multisampling={0} enableNormalPass={false}>
+        <Bloom
+          intensity={0.28}
+          luminanceThreshold={0.72}
+          luminanceSmoothing={0.22}
+          mipmapBlur
+        />
+        <Vignette offset={0.22} darkness={0.35} opacity={0.38} />
+      </EffectComposer>
+    );
+  }
+  return (
+    <EffectComposer multisampling={0} enableNormalPass={false}>
+      <N8AO
+        aoRadius={5.5}
+        distanceFalloff={1.8}
+        intensity={0.72}
+        quality="performance"
+        halfRes
+      />
+      <Bloom intensity={0.58} luminanceThreshold={0.68} luminanceSmoothing={0.22} mipmapBlur />
+      <Vignette offset={0.18} darkness={0.42} opacity={0.5} />
+      <Noise opacity={0.018} />
+    </EffectComposer>
+  );
 }
 
 function FallbackGround() {

@@ -5,7 +5,7 @@ import type { CityAgent, Category } from '@/components/city/types';
 import { CATEGORIES, CATEGORY_LABELS, CATEGORY_ICON } from '@/components/city/types';
 import { districtPosition } from './grid';
 
-const LABEL_Y = 22;
+const LABEL_Y = 25;
 
 interface Props {
   agents: CityAgent[];
@@ -141,7 +141,12 @@ function DistrictLabel({
     const tex = new THREE.CanvasTexture(canvas);
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.needsUpdate = true;
-    const mat = new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true });
+    const mat = new THREE.SpriteMaterial({
+      map: tex,
+      depthTest: false,
+      transparent: true,
+      opacity: count === 0 ? 0.58 : 0.96,
+    });
     prevRef.current?.mat.dispose();
     prevRef.current?.tex.dispose();
     prevRef.current = { mat, tex };
@@ -149,7 +154,7 @@ function DistrictLabel({
   }, [label, icon, count]);
 
   return (
-    <sprite position={[x, LABEL_Y, z]} scale={[16, 3.3, 1]} material={material} />
+    <sprite position={[x, LABEL_Y, z]} scale={[20, 4.25, 1]} material={material} />
   );
 }
 

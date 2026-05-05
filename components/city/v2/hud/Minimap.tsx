@@ -14,7 +14,7 @@ import {
 
 // Minimap canvas size in CSS px. Doubled internally via DPR for
 // crisp strokes on HiDPI displays.
-const MAP_PX = 200;
+const MAP_PX = 180;
 
 // Same colors as DistrictPads.tsx — duplicated here because importing
 // that file would pull in a bunch of three.js deps the minimap doesn't
@@ -113,11 +113,13 @@ export function Minimap({ state, agents, showCharacter, onTravel }: Props) {
         top: 12,
         left: 12,
         zIndex: 10,
-        background: 'rgba(5,8,20,0.75)',
-        border: '1px solid rgba(251,191,36,0.45)',
+        background: 'linear-gradient(135deg, rgba(5,8,20,0.82), rgba(10,14,34,0.68))',
+        border: '1px solid rgba(122,216,255,0.38)',
         borderRadius: 6,
         padding: 6,
         width: 'fit-content',
+        boxShadow: '0 18px 55px rgba(0,0,0,0.42), inset 0 0 0 1px rgba(255,255,255,0.04)',
+        backdropFilter: 'blur(12px)',
       }}
     >
       <canvas
@@ -126,8 +128,8 @@ export function Minimap({ state, agents, showCharacter, onTravel }: Props) {
         height={MAP_PX * dprRef.current}
         onClick={handleClick}
         style={{
-          width: 'clamp(132px, 34vw, 200px)',
-          height: 'clamp(132px, 34vw, 200px)',
+          width: 'clamp(112px, 18vw, 176px)',
+          height: 'clamp(112px, 18vw, 176px)',
           display: 'block',
           cursor: onTravel ? 'crosshair' : 'default',
         }}
@@ -136,7 +138,7 @@ export function Minimap({ state, agents, showCharacter, onTravel }: Props) {
         style={{
           fontFamily: '"Press Start 2P", monospace',
           fontSize: 'clamp(6px, 1.45vw, 8px)',
-          color: '#fbbf24',
+          color: '#7ad8ff',
           marginTop: 4,
           textAlign: 'center',
           lineHeight: 1.6,

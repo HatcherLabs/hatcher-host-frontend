@@ -114,7 +114,7 @@ export function AmbientAudio() {
       aria-label={on ? 'Mute ambient audio' : 'Play ambient audio'}
       style={{
         position: 'absolute',
-        top: 92,
+        top: 114,
         right: 12,
         zIndex: 10,
         background: 'rgba(5,8,20,0.75)',
@@ -123,7 +123,7 @@ export function AmbientAudio() {
         borderRadius: 6,
         padding: '6px 12px',
         fontFamily: '"Press Start 2P", monospace',
-        fontSize: 11,
+        fontSize: 'clamp(9px, 2.4vw, 11px)',
         cursor: 'pointer',
         letterSpacing: 1,
       }}
