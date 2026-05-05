@@ -505,7 +505,7 @@ export default function CreatePage() {
         return;
       }
 
-      // Auto-deploy before sending the user into the room.
+      // Auto-deploy, then send the user to the management dashboard.
       try {
         const started = await api.startAgent(res.data.id);
         if (!started.success) {
@@ -532,7 +532,7 @@ export default function CreatePage() {
       });
 
       setTimeout(() => {
-        router.push(`/agent/${res.data.slug ?? res.data.id}/room?from=hatch`);
+        router.push(`/dashboard/agent/${res.data.id}?from=hatch`);
       }, 2000);
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Unknown error';

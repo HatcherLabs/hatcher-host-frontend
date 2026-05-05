@@ -2680,6 +2680,25 @@
       "frameworksLabel": "Frameworks",
       "chainsLabel": "Chains"
     },
+    "team": {
+      "boxLabel": "Team",
+      "title": "Die Menschen hinter Hatcher",
+      "sub": "Ein kleines Produkt- und Engineering-Team, das den Agent-Hosting-Layer vom Prototyp in die Produktion bringt.",
+      "cristianName": "Cristian",
+      "cristianRole": "Developer / CEO",
+      "ioanaName": "Ioana",
+      "ioanaRole": "CMO / Marketing",
+      "johnName": "John",
+      "johnRole": "Developer",
+      "anonymousOneName": "Anonymous Dev",
+      "anonymousOneRole": "Developer",
+      "anonymousTwoName": "Anonymous Dev",
+      "anonymousTwoRole": "Developer",
+      "founderTag": "founder",
+      "growthTag": "growth",
+      "builderTag": "builder",
+      "anonymousTag": "private"
+    },
     "finalCta": {
       "boxLabel": "Bereit",
       "headline": "Deploy deinen ersten Agenten.",

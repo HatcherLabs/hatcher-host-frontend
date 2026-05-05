@@ -102,6 +102,7 @@ export const FOOTER_COLUMNS = [
 
 export const SOCIAL_LINKS = {
   x:       'https://x.com/HatcherLabs',
+  telegram:'https://t.me/HatcherLabs',
   discord: 'https://discord.gg/7tY3HjKjMc',
   github:  'https://github.com/HatcherLabs',
 } as const;

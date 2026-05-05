@@ -200,7 +200,7 @@ export function ChatToHatch() {
           setHatching(false);
           return;
         }
-        router.push(`/agent/${created.data.slug ?? created.data.id}/room?from=hatch`);
+        router.push(`/dashboard/agent/${created.data.id}?from=hatch`);
         return;
       }
       setMessages((m) => [

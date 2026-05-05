@@ -63,6 +63,9 @@ export function Footer() {
           <a href={SOCIAL_LINKS.x} aria-label="X / Twitter" target="_blank" rel="noopener noreferrer">
             <XIcon />
           </a>
+          <a href={SOCIAL_LINKS.telegram} aria-label="Telegram" target="_blank" rel="noopener noreferrer">
+            <TelegramIcon />
+          </a>
           <a href={SOCIAL_LINKS.discord} aria-label="Discord" target="_blank" rel="noopener noreferrer">
             <DiscordIcon />
           </a>
@@ -110,6 +113,14 @@ function XIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+}
+
+function TelegramIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M9.78 15.66 9.4 20.9c.54 0 .78-.23 1.06-.5l2.54-2.43 5.27 3.86c.97.53 1.65.25 1.91-.9l3.47-16.25c.31-1.43-.52-1.99-1.46-1.64L1.83 10.88c-1.39.54-1.37 1.31-.24 1.66l5.21 1.62L18.9 6.59c.57-.38 1.09-.17.66.21z" />
     </svg>
   );
 }

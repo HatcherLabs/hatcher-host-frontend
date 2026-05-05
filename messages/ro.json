@@ -2680,6 +2680,25 @@
       "frameworksLabel": "Framework-uri",
       "chainsLabel": "Chain-uri"
     },
+    "team": {
+      "boxLabel": "Echipă",
+      "title": "Oamenii care construiesc Hatcher",
+      "sub": "O echipă mică de produs și engineering care duce layer-ul de hosting pentru agenți din prototip în producție.",
+      "cristianName": "Cristian",
+      "cristianRole": "Developer / CEO",
+      "ioanaName": "Ioana",
+      "ioanaRole": "CMO / Marketing",
+      "johnName": "John",
+      "johnRole": "Developer",
+      "anonymousOneName": "Anonymous Dev",
+      "anonymousOneRole": "Developer",
+      "anonymousTwoName": "Anonymous Dev",
+      "anonymousTwoRole": "Developer",
+      "founderTag": "founder",
+      "growthTag": "growth",
+      "builderTag": "builder",
+      "anonymousTag": "privat"
+    },
     "finalCta": {
       "boxLabel": "Gata",
       "headline": "Lansează primul tău agent.",

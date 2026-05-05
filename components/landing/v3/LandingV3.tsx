@@ -8,6 +8,7 @@ import { SectionCity } from './parts/SectionCity';
 import { SectionSkill } from './parts/SectionSkill';
 import { SectionFwPricing } from './parts/SectionFwPricing';
 import { SectionEcosystem } from './parts/SectionEcosystem';
+import { SectionTeam } from './parts/SectionTeam';
 import { SectionFinalCta } from './parts/SectionFinalCta';
 import styles from './landing-v3.module.css';
 
@@ -23,6 +24,7 @@ export function LandingV3() {
         <SectionSkill />
         <SectionFwPricing />
         <SectionEcosystem />
+        <SectionTeam />
         <SectionFinalCta />
       </main>
       <Footer />

@@ -2680,6 +2680,25 @@
       "frameworksLabel": "框架",
       "chainsLabel": "区块链"
     },
+    "team": {
+      "boxLabel": "团队",
+      "title": "构建 Hatcher 的团队",
+      "sub": "一个小型产品与工程团队，把代理托管层从原型推进到生产环境。",
+      "cristianName": "Cristian",
+      "cristianRole": "Developer / CEO",
+      "ioanaName": "Ioana",
+      "ioanaRole": "CMO / Marketing",
+      "johnName": "John",
+      "johnRole": "Developer",
+      "anonymousOneName": "Anonymous Dev",
+      "anonymousOneRole": "Developer",
+      "anonymousTwoName": "Anonymous Dev",
+      "anonymousTwoRole": "Developer",
+      "founderTag": "founder",
+      "growthTag": "growth",
+      "builderTag": "builder",
+      "anonymousTag": "private"
+    },
     "finalCta": {
       "boxLabel": "就绪",
       "headline": "部署你的第一个代理。",
