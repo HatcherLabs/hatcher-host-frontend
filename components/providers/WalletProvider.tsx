@@ -5,7 +5,7 @@ import { ConnectionProvider, WalletProvider as SolanaWalletProvider } from '@sol
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
 import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
-import { SOLANA_RPC } from '@/lib/config';
+import { SOLANA_RPC_BROWSER_ENDPOINT } from '@/lib/config';
 
 import '@solana/wallet-adapter-react-ui/styles.css';
 
@@ -17,7 +17,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <ConnectionProvider endpoint={SOLANA_RPC}>
+    <ConnectionProvider endpoint={SOLANA_RPC_BROWSER_ENDPOINT}>
       <SolanaWalletProvider wallets={wallets} autoConnect={true}>
         <WalletModalProvider>
           {children}

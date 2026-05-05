@@ -20,6 +20,11 @@ export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001
 export const SOLANA_RPC =
   process.env.NEXT_PUBLIC_SOLANA_RPC || 'https://api.mainnet-beta.solana.com';
 
+// Browser payment flows go through our same-origin proxy because Solana's
+// public mainnet endpoint rejects hatcher.host browser requests with 403.
+export const SOLANA_RPC_BROWSER_ENDPOINT =
+  process.env.NEXT_PUBLIC_SOLANA_RPC_BROWSER_ENDPOINT || '/api/solana-rpc';
+
 // Treasury wallet — all on-chain payments go here. Backend verifies
 // tx.destination matches this exact pubkey before activating features.
 export const TREASURY_WALLET =
@@ -38,4 +43,3 @@ export const SOCIAL_LINKS = {
   github: 'https://github.com/HatcherLabs',
   telegram: 'https://t.me/HatcherLabs',
 } as const;
-
