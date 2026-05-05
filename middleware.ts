@@ -23,6 +23,7 @@ import { routing } from './i18n/routing';
 import { locales } from './i18n/config';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const PUBLIC_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://hatcher.host';
 
 // next-intl middleware instance — runs first to handle locale detection/rewrites.
 const intlMiddleware = createMiddleware(routing);
@@ -96,6 +97,7 @@ export default function middleware(req: NextRequest): NextResponse {
   // Step 1: Run next-intl first so it can handle locale detection/rewrites/redirects
   // and set the HATCHER_LOCALE cookie.
   const response = intlMiddleware(req);
+  normalizeInternalRedirect(response);
 
   // Step 2: Beacon logic — operate on the locale-stripped pathname so
   // /zh/pricing, /de/pricing, etc. all match just like /pricing does.
@@ -127,6 +129,21 @@ export default function middleware(req: NextRequest): NextResponse {
   }
 
   return response;
+}
+
+function normalizeInternalRedirect(response: NextResponse): void {
+  if (process.env.NODE_ENV !== 'production') return;
+
+  const location = response.headers.get('location');
+  if (!location) return;
+
+  const target = new URL(location, PUBLIC_SITE_URL);
+  if (target.port !== '3000') return;
+
+  const publicUrl = new URL(PUBLIC_SITE_URL);
+  target.protocol = publicUrl.protocol;
+  target.host = publicUrl.host;
+  response.headers.set('location', target.toString());
 }
 
 // Route matcher — Next.js runs this middleware ONLY for paths that match.
