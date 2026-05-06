@@ -44,15 +44,11 @@ interface SkaleWalletRow {
 const FRAMEWORK_GLYPH: Record<string, string> = {
   openclaw: '⊞',
   hermes: '◇',
-  elizaos: '◯',
-  milady: '★',
 };
 
 const FRAMEWORK_COLOR: Record<string, string> = {
   openclaw: '#f59e0b',
   hermes: '#a855f7',
-  elizaos: '#38bdf8',
-  milady: '#f43f5e',
 };
 
 function shortAddr(addr: string): string {

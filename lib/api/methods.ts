@@ -4,7 +4,7 @@
 
 import { API_URL } from '@/lib/config';
 import { getToken, req } from './core';
-import type { Agent, AgentPassport, Payment, AgentFeature, ChatMessage, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse } from './types';
+import type { Agent, AgentPassport, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse } from './types';
 import type { TierConfig, AdminOverviewExtras } from '@hatcher/shared';
 
 const API_BASE = API_URL;
@@ -324,7 +324,7 @@ export const api = {
   createAgent: (data: {
     name: string;
     description?: string;
-    framework: 'openclaw' | 'hermes' | 'elizaos' | 'milady';
+    framework: 'openclaw' | 'hermes';
     template?: string;
     config: {
       model?: string;
@@ -351,7 +351,6 @@ export const api = {
       dbBackend?: string;
       enableImageGen?: boolean;
       enableVoice?: boolean;
-      miladyPersonality?: string;
       localFirst?: boolean;
       [key: string]: unknown;
     };
@@ -374,7 +373,7 @@ export const api = {
     }),
 
   /** Clone an agent to a different framework (lite port). */
-  portAgent: (id: string, targetFramework: 'openclaw' | 'hermes' | 'elizaos' | 'milady') =>
+  portAgent: (id: string, targetFramework: 'openclaw' | 'hermes') =>
     req<Agent & { portedFrom?: { id: string; framework: string } }>(`/agents/${id}/port`, {
       method: 'POST',
       body: JSON.stringify({ targetFramework }),
@@ -547,192 +546,6 @@ export const api = {
     }>(`/agents/${id}/workspace/file?path=${encodeURIComponent(filePath)}`),
 
   /**
-   * ElizaOS memory viewer (E3). Reads the live memories table from
-   * the running container via /api/agents/:uuid/memories. Returns
-   * 503 if the container is stopped.
-   *
-   * Optional `roomId` filters to just that room's memories — used by
-   * the sessions tab to drill from a room row into its history.
-   */
-  getElizaosMemories: (id: string, roomId?: string) =>
-    req<{
-      total: number;
-      returned: number;
-      roomId: string | null;
-      memories: Array<{
-        id: string;
-        type: string;
-        createdAt: number;
-        text: string;
-        source?: string;
-        roomId?: string;
-      }>;
-    }>(
-      roomId
-        ? `/agents/${id}/elizaos/memories?roomId=${encodeURIComponent(roomId)}`
-        : `/agents/${id}/elizaos/memories`,
-    ),
-
-  /**
-   * ElizaOS sessions/rooms viewer (E3).
-   */
-  getElizaosRooms: (id: string) =>
-    req<{
-      total: number;
-      rooms: Array<{
-        id: string;
-        name: string;
-        channelId?: string;
-        worldId?: string;
-      }>;
-    }>(`/agents/${id}/elizaos/rooms`),
-
-  /**
-   * ElizaOS live agent detail (plugins, settings, style, system prompt).
-   * Secrets in settings.secrets are redacted server-side.
-   */
-  getElizaosAgent: (id: string) =>
-    req<{
-      id: string;
-      name: string;
-      system: string;
-      bio: string[];
-      topics: string[];
-      adjectives: string[];
-      plugins: string[];
-      style: Record<string, unknown>;
-      settings: Record<string, unknown>;
-      enabled: boolean;
-      status: string;
-    }>(`/agents/${id}/elizaos/agent`),
-
-  /**
-   * Hot-reload: PATCH the running elizaos container with the current
-   * agent.configJson. Call this after saving config to apply without
-   * a stop/start cycle.
-   */
-  hotReloadElizaosAgent: (id: string) =>
-    req<{ applied: boolean; name: string; pluginsCount: number }>(
-      `/agents/${id}/elizaos/hot-reload`,
-      { method: 'POST' },
-    ),
-
-  /**
-   * Update the list of enabled plugins for an elizaos agent.
-   * Core plugins (plugin-sql, plugin-bootstrap) are always included
-   * server-side regardless of what's sent.
-   */
-  setElizaosPlugins: (id: string, enabled: string[]) =>
-    req<{ plugins: string[]; core: string[]; liveApplied: boolean }>(
-      `/agents/${id}/elizaos/plugins`,
-      { method: 'PATCH', body: JSON.stringify({ enabled }) },
-    ),
-
-  /**
-   * Fetch the community plugin registry (elizaos-plugins/registry),
-   * filtered to v1-compatible plugins and annotated with:
-   *   - `installed`   — already enabled on THIS agent
-   *   - `installable` — baked into the image and safe to enable
-   *
-   * Non-installable entries show up in the browser for discovery but
-   * require an image rebuild before they can actually run. The
-   * response also includes the flat `bundled` + `core` sets so the UI
-   * can render them as chips without re-filtering.
-   *
-   * Works for both running and stopped agents (reads plugin list from
-   * the persisted configJson, not from the live container).
-   */
-  getElizaosRegistry: (id: string) =>
-    req<{
-      total: number;
-      fetchedAt: number;
-      source: 'memory' | 'redis' | 'upstream' | 'stale';
-      entries: Array<{
-        name: string;
-        gitRepo: string | null;
-        description: string | null;
-        homepage: string | null;
-        topics: string[];
-        stars: number;
-        language: string | null;
-        hasNpm: boolean;
-        installed: boolean;
-        installable: boolean;
-      }>;
-      bundled: string[];
-      core: string[];
-    }>(`/agents/${id}/elizaos-registry`),
-
-  /**
-   * Milady live config — returns the full character JSON parsed from
-   * the running container's `GET /api/config`, with secrets redacted.
-   * 503 MILADY_API_UNAVAILABLE when the container is stopped.
-   */
-  getMiladyConfig: (id: string) =>
-    req<{ config: Record<string, unknown> | null }>(`/agents/${id}/milady/config`),
-
-  /**
-   * Milady character patch — edit name/system/bio/topics/adjectives/
-   * style/model. Saves to configJson + hot-reloads via Milady's native
-   * PUT /api/config (no container restart). Returns applied-fields
-   * list + a pendingRestart flag for fields that DO require a full
-   * restart to fully take effect (model change in particular).
-   */
-  patchMiladyConfig: (
-    id: string,
-    patch: {
-      systemPrompt?: string;
-      personality?: string;
-      bio?: string[];
-      topics?: string[];
-      adjectives?: string[];
-      styleAll?: string[];
-      styleChat?: string[];
-      model?: string;
-    },
-  ) =>
-    req<{
-      applied: string[];
-      pendingRestart: boolean;
-      pendingRestartReasons: string[];
-    }>(`/agents/${id}/milady/config`, {
-      method: 'PATCH',
-      body: JSON.stringify(patch),
-    }),
-
-  /** Milady skills catalog (78 bundled skills). Read-only. */
-  getMiladySkills: (id: string) =>
-    req<{
-      total: number;
-      enabled: number;
-      skills: Array<{
-        id: string;
-        name: string;
-        description: string;
-        enabled: boolean;
-      }>;
-    }>(`/agents/${id}/milady/skills`),
-
-  /** Milady plugins catalog (109 plugins across 6 categories). */
-  getMiladyPlugins: (id: string) =>
-    req<{
-      total: number;
-      enabled: number;
-      configured: number;
-      categories: Record<string, number>;
-      plugins: Array<{
-        id: string;
-        name: string;
-        description: string;
-        tags: string[];
-        enabled: boolean;
-        configured: boolean;
-        envKey: string | null;
-        category: string;
-      }>;
-    }>(`/agents/${id}/milady/plugins`),
-
-  /**
    * Hermes config — returns parsed `config.yaml` from whichever source
    * is currently authoritative, with secrets redacted (`***`). Only
    * available for managed-mode Hermes agents; legacy agents regenerate
@@ -812,38 +625,6 @@ export const api = {
       totalScanned: number;
       sourceFile: string | null;
     }>(`/agents/${id}/hermes/errors`),
-
-  /**
-   * Recent ERROR/WARN lines from ElizaOS container stdout logs,
-   * filtered and normalized for the dashboard errors card.
-   */
-  getElizaOSErrors: (id: string) =>
-    req<{
-      entries: Array<{
-        ts: string;
-        level: 'WARN' | 'ERROR' | 'FATAL' | 'UNKNOWN';
-        message: string;
-        source: string | null;
-      }>;
-      totalScanned: number;
-      sourceFile: string | null;
-    }>(`/agents/${id}/elizaos/errors`),
-
-  /**
-   * Recent ERROR/WARN lines from Milady container stdout logs,
-   * filtered and normalized for the dashboard errors card.
-   */
-  getMiladyErrors: (id: string) =>
-    req<{
-      entries: Array<{
-        ts: string;
-        level: 'WARN' | 'ERROR' | 'FATAL' | 'UNKNOWN';
-        message: string;
-        source: string | null;
-      }>;
-      totalScanned: number;
-      sourceFile: string | null;
-    }>(`/agents/${id}/milady/errors`),
 
   /**
    * Hermes native cron jobs — reads `/home/hermes/.hermes/cron/jobs.json`
@@ -962,38 +743,6 @@ export const api = {
       lastActiveAt: string;
       containerOffline: boolean;
     }>(`/agents/${id}/hermes/stats`),
-
-  /** Milady runtime status with pendingRestart flag. */
-  getMiladyStatus: (id: string) =>
-    req<{
-      state: string;
-      agentName: string;
-      model: string;
-      uptime: number;
-      startup: { phase: string; attempt: number };
-      pendingRestart: boolean;
-      pendingRestartReasons: string[];
-    }>(`/agents/${id}/milady/status`),
-
-  /**
-   * Hot-reload milady config from agent.configJson. Pushes the
-   * rebuilt config via PUT /api/config on the live container.
-   * Returns `pendingRestart: true` if the agent needs a restart
-   * to apply changes.
-   */
-  hotReloadMilady: (id: string) =>
-    req<{
-      applied: boolean;
-      pendingRestart: boolean;
-      pendingRestartReasons: string[];
-    }>(`/agents/${id}/milady/hot-reload`, { method: 'POST' }),
-
-  /** Graceful restart via Milady's native POST /api/restart. */
-  restartMilady: (id: string) =>
-    req<{ restarting: boolean; message?: string }>(
-      `/agents/${id}/milady/restart`,
-      { method: 'POST' },
-    ),
 
   /**
    * Managed OpenClaw live config (Etapa 2).
@@ -1557,9 +1306,28 @@ export const api = {
       body: JSON.stringify({ channel }),
     }),
 
+  /** Load chat sessions */
+  getChatSessions: (agentId: string) =>
+    req<{ sessions: ChatSessionSummary[] }>(`/agents/${agentId}/chat/sessions`),
+
+  /** Start a new chat session */
+  createChatSession: (agentId: string, title?: string) =>
+    req<{ session: ChatSessionSummary }>(`/agents/${agentId}/chat/sessions`, {
+      method: 'POST',
+      body: JSON.stringify(title ? { title } : {}),
+    }),
+
+  /** Delete a chat session */
+  deleteChatSession: (agentId: string, sessionId: string) =>
+    req<{ deleted: number }>(`/agents/${agentId}/chat/sessions/${encodeURIComponent(sessionId)}`, {
+      method: 'DELETE',
+    }),
+
   /** Load chat history */
-  getChatHistory: (agentId: string) =>
-    req<{ messages: Array<{ role: string; content: string; ts: number }> }>(`/agents/${agentId}/chat/history`),
+  getChatHistory: (agentId: string, sessionId?: string) =>
+    req<{ messages: Array<{ role: string; content: string; ts: number }>; nextCursor?: string | null }>(
+      `/agents/${agentId}/chat/history${sessionId ? `?sessionId=${encodeURIComponent(sessionId)}` : ''}`,
+    ),
 
   /** Save chat messages to history */
   saveChatHistory: (agentId: string, messages: Array<{ role: string; content: string; ts?: number }>) =>
@@ -1873,7 +1641,7 @@ export const api = {
         type: 'skill' | 'plugin';
         source: string;
         description: string | null;
-        status: 'installed' | 'pending_restart' | 'failed';
+        status: 'installed' | 'pending' | 'pending_restart' | 'failed';
         error?: string;
         requiresRestart?: boolean;
       }>;
@@ -1903,7 +1671,8 @@ export const api = {
       name: string;
       installed: boolean;
       requiresRestart: boolean;
-      note: string;
+      message?: string;
+      note?: string;
     }>(`/agents/${agentId}/plugins/install`, {
       method: 'POST',
       body: JSON.stringify({ pluginName, type, source }),
@@ -1914,7 +1683,8 @@ export const api = {
     req<{
       name: string;
       uninstalled: boolean;
-      note: string;
+      message?: string;
+      note?: string;
     }>(`/agents/${agentId}/plugins/${encodeURIComponent(pluginName)}`, {
       method: 'DELETE',
     }),
@@ -2087,7 +1857,7 @@ export const api = {
       };
     }>(`/agents/${agentId}/reputation`),
 
-  // Knowledge base (ElizaOS / Milady RAG documents)
+  // Knowledge base documents
   getKnowledge: (agentId: string) =>
     req<{ files: Array<{ name: string; size: number; createdAt: string }>; totalFiles: number }>(`/agents/${agentId}/knowledge`),
 

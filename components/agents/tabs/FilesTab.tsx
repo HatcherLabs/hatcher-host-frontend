@@ -56,8 +56,6 @@ function formatBytes(bytes: number): string {
 const FRAMEWORK_ACCENT: Record<string, { color: string; border: string; bg: string; text: string }> = {
   openclaw: { color: '#f59e0b', border: 'border-amber-500/30', bg: 'bg-amber-500/10', text: 'text-amber-400' },
   hermes:   { color: '#a855f7', border: 'border-purple-500/30', bg: 'bg-purple-500/10', text: 'text-purple-400' },
-  elizaos:  { color: 'var(--color-accent)', border: 'border-cyan-500/20', bg: 'bg-cyan-500/10', text: 'text-cyan-400' },
-  milady:   { color: '#f43f5e', border: 'border-rose-500/20', bg: 'bg-rose-500/10', text: 'text-rose-400' },
 };
 
 const FRAMEWORK_FS_INFO: Record<string, { label: string; description: string }> = {
@@ -68,14 +66,6 @@ const FRAMEWORK_FS_INFO: Record<string, { label: string; description: string }> 
   hermes: {
     label: 'Hermes Workspace',
     description: 'Agent files are stored in /home/hermes/.hermes. Modify character.json and plugin configs here.',
-  },
-  elizaos: {
-    label: 'ElizaOS Data Directory',
-    description: 'ElizaOS stores agent data in /data. Character files, memories, and plugin state live here.',
-  },
-  milady: {
-    label: 'Milady Workspace',
-    description: 'Milady agent files in /data/.milady. Character config, connectors, and runtime state are managed here.',
   },
 };
 

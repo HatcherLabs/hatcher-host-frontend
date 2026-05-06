@@ -30,17 +30,6 @@ const FRAMEWORK_COMMANDS: Record<string, Array<{ cmd: string; desc: string }>> =
     { cmd: '/reset', desc: 'Reset conversation' },
     { cmd: '/status', desc: 'Agent status' },
   ],
-  elizaos: [
-    { cmd: '/help', desc: 'Show available commands' },
-    { cmd: '/reset', desc: 'Reset conversation' },
-    { cmd: '/status', desc: 'Agent status' },
-  ],
-  milady: [
-    { cmd: '/help', desc: 'Show available commands' },
-    { cmd: '/reset', desc: 'Reset conversation' },
-    { cmd: '/status', desc: 'Agent status' },
-    { cmd: '/plugins', desc: 'List installed plugins' },
-  ],
 };
 
 interface ChatInputProps {

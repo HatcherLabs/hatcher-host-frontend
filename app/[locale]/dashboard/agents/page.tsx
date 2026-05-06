@@ -12,25 +12,21 @@ import { Search, X, Play, Square, RotateCcw, Trash2 } from 'lucide-react';
 import styles from './agents.module.css';
 
 type StatusFilter = 'all' | 'active' | 'sleeping' | 'paused' | 'error' | 'restarting';
-type FrameworkFilter = 'all' | 'openclaw' | 'hermes' | 'elizaos' | 'milady';
+type FrameworkFilter = 'all' | 'openclaw' | 'hermes';
 type SortOption = 'newest' | 'az' | 'messages' | 'active';
 
 const STATUS_FILTERS: StatusFilter[] = ['all', 'active', 'sleeping', 'paused', 'error', 'restarting'];
-const FRAMEWORKS: FrameworkFilter[] = ['all', 'openclaw', 'hermes', 'elizaos', 'milady'];
+const FRAMEWORKS: FrameworkFilter[] = ['all', 'openclaw', 'hermes'];
 const SORTS: SortOption[] = ['newest', 'az', 'messages', 'active'];
 
 const FRAMEWORK_GLYPH: Record<string, string> = {
   openclaw: '⊞',
   hermes: '◇',
-  elizaos: '◯',
-  milady: '★',
 };
 
 const FRAMEWORK_LABEL: Record<string, string> = {
   openclaw: 'OpenClaw',
   hermes: 'Hermes',
-  elizaos: 'ElizaOS',
-  milady: 'Milady',
 };
 
 function statusClass(status: string): string {

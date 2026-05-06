@@ -32,9 +32,8 @@ interface HermesCategory {
 /**
  * Hermes bundled-skills browser. Walks the `skills/` directory in the
  * managed-mode volume via `GET /agents/:id/hermes-skills` and shows
- * categories, per-skill metadata, and search. This mirrors what
- * MiladySkillsTab does for Milady, but the data shape is different —
- * Hermes groups skills by category folder with a DESCRIPTION.md per
+ * categories, per-skill metadata, and search. Hermes groups skills by
+ * category folder with a DESCRIPTION.md per
  * category and a SKILL.md per individual skill.
  *
  * Only useful for managed-mode Hermes agents; the backend route returns

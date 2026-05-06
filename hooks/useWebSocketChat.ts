@@ -121,7 +121,6 @@ export function useWebSocketChat({
 
     ws.onopen = () => {
       reconnectAttemptsRef.current = 0;
-      setConnectionState('connected');
     };
 
     ws.onmessage = (event) => {
@@ -177,6 +176,7 @@ export function useWebSocketChat({
           }
           break;
         case 'agent_status':
+          setConnectionState('connected');
           if (onStatusChangeRef.current) {
             onStatusChangeRef.current(
               msg.payload.agentId as string,

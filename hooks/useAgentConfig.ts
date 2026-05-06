@@ -99,15 +99,6 @@ export function useAgentConfig(
       skills: configSkills.split(',').map((s) => s.trim()).filter(Boolean),
       model: (useCustomModel ? customModelInput.trim() : configModel) || undefined,
       provider: configProvider || undefined,
-      ...(agent.framework === 'elizaos' ? {
-        bio: configBio.trim() || undefined,
-        lore: configLore.trim() || undefined,
-        topics: configTopics.split(',').map(s => s.trim()).filter(Boolean),
-        adjectives: configAdjectives.split(',').map(s => s.trim()).filter(Boolean),
-        style: configStyle.trim() ? {
-          all: configStyle.split('\n').map(s => s.trim()).filter(Boolean),
-        } : undefined,
-      } : {}),
       ...(byokKeyInput.trim() ? {
         byok: {
           provider: configProvider as 'openai' | 'anthropic' | 'google' | 'groq' | 'xai' | 'openrouter',

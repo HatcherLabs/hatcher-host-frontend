@@ -195,21 +195,6 @@ export function ConfigTab() {
   const [hmSttProvider, setHmSttProvider] = useState('whisper');
   const [hmTtsProvider, setHmTtsProvider] = useState('elevenlabs');
 
-  // ElizaOS advanced
-  const [ezDatabase, setEzDatabase] = useState('pglite');
-  const [ezImageGen, setEzImageGen] = useState(false);
-  const [ezVoice, setEzVoice] = useState(false);
-  const [ezBlockchain, setEzBlockchain] = useState(false);
-  const [ezAutoPlugins, setEzAutoPlugins] = useState(true);
-  const [ezStyleChat, setEzStyleChat] = useState('');
-  const [ezStylePost, setEzStylePost] = useState('');
-
-  // Milady advanced
-  const [mlLocalFirst, setMlLocalFirst] = useState(true);
-  const [mlEmbedding, setMlEmbedding] = useState('nomic');
-  const [mlPersonality, setMlPersonality] = useState('helpful');
-  const [mlDatabase, setMlDatabase] = useState('pglite');
-
   // Load advanced settings from existing agent config
   useEffect(() => {
     if (!agent?.config) return;
@@ -232,19 +217,6 @@ export function ConfigTab() {
       if (typeof adv.voice === 'boolean') setHmVoice(adv.voice);
       if (adv.sttProvider) setHmSttProvider(adv.sttProvider as string);
       if (adv.ttsProvider) setHmTtsProvider(adv.ttsProvider as string);
-    } else if (agent.framework === 'elizaos') {
-      if (adv.database) setEzDatabase(adv.database as string);
-      if (typeof adv.imageGen === 'boolean') setEzImageGen(adv.imageGen);
-      if (typeof adv.voice === 'boolean') setEzVoice(adv.voice);
-      if (typeof adv.blockchain === 'boolean') setEzBlockchain(adv.blockchain);
-      if (typeof adv.autoPlugins === 'boolean') setEzAutoPlugins(adv.autoPlugins);
-      if (adv.styleChat) setEzStyleChat(typeof adv.styleChat === 'string' ? adv.styleChat : Array.isArray(adv.styleChat) ? (adv.styleChat as string[]).join('\n') : '');
-      if (adv.stylePost) setEzStylePost(typeof adv.stylePost === 'string' ? adv.stylePost : Array.isArray(adv.stylePost) ? (adv.stylePost as string[]).join('\n') : '');
-    } else if (agent.framework === 'milady') {
-      if (typeof adv.localFirst === 'boolean') setMlLocalFirst(adv.localFirst);
-      if (adv.embedding) setMlEmbedding(adv.embedding as string);
-      if (adv.personality) setMlPersonality(adv.personality as string);
-      if (adv.database) setMlDatabase(adv.database as string);
     }
   }, [agent?.config, agent?.framework]);
 
@@ -273,32 +245,11 @@ export function ConfigTab() {
         ttsProvider: hmTtsProvider,
       };
     }
-    if (fw === 'elizaos') {
-      return {
-        database: ezDatabase,
-        imageGen: ezImageGen,
-        voice: ezVoice,
-        blockchain: ezBlockchain,
-        autoPlugins: ezAutoPlugins,
-        styleChat: ezStyleChat.trim() || undefined,
-        stylePost: ezStylePost.trim() || undefined,
-      };
-    }
-    if (fw === 'milady') {
-      return {
-        localFirst: mlLocalFirst,
-        embedding: mlEmbedding,
-        personality: mlPersonality,
-        database: mlDatabase,
-      };
-    }
     return {};
   }, [
     agent?.framework,
     ocSessionScope, ocCompaction, ocWebSearch, ocSearchProvider, ocTts, ocTtsProvider, ocMaxConversations, ocMaxSubagents,
     hmPersonality, hmPersistentMemory, hmApprovalMode, hmVoice, hmSttProvider, hmTtsProvider,
-    ezDatabase, ezImageGen, ezVoice, ezBlockchain, ezAutoPlugins, ezStyleChat, ezStylePost,
-    mlLocalFirst, mlEmbedding, mlPersonality, mlDatabase,
   ]);
 
   /** Wrapper that merges advanced settings into the config before saving */
@@ -313,13 +264,6 @@ export function ConfigTab() {
     } as Parameters<typeof api.updateAgent>[1]).catch(() => {
       // Silent fail — main config was already saved
     });
-    // Note: for elizaos and milady we DO NOT call the hot-reload endpoints
-    // from here. crud.ts PATCH /agents/:id already triggers an async full
-    // container restart whenever `config` changes (see crud.ts:626). The
-    // hot-reload endpoints exist as building blocks for future "Apply live"
-    // buttons but auto-calling them from save races with crud.ts's restart
-    // and writes to a container that's about to go down. The crud.ts
-    // restart picks up all config changes from the DB on the next start.
   }, [agent, buildAdvancedConfig, saveConfig]);
 
   return (
@@ -405,8 +349,8 @@ export function ConfigTab() {
       {/* Framework Config */}
       <GlassCard>
         <div className="flex items-center gap-2 mb-4">
-          <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${agent?.framework === 'hermes' ? 'bg-purple-500/10' : agent?.framework === 'elizaos' ? 'bg-cyan-500/10' : agent?.framework === 'milady' ? 'bg-rose-500/10' : 'bg-amber-500/10'}`}>
-            <Cpu size={14} className={agent?.framework === 'hermes' ? 'text-purple-400' : agent?.framework === 'elizaos' ? 'text-cyan-400' : agent?.framework === 'milady' ? 'text-rose-400' : 'text-amber-400'} />
+          <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${agent?.framework === 'hermes' ? 'bg-purple-500/10' : 'bg-amber-500/10'}`}>
+            <Cpu size={14} className={agent?.framework === 'hermes' ? 'text-purple-400' : 'text-amber-400'} />
           </div>
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">{FRAMEWORKS[(agent?.framework ?? 'openclaw') as AgentFramework]?.name ?? 'Agent'} Config</h3>
         </div>
@@ -536,56 +480,6 @@ export function ConfigTab() {
               Tell your agent how to behave, what tone to use, and what it should know. You can write multiple lines.
             </p>
           </div>
-          {/* ElizaOS character fields — full editor is in Advanced Settings below */}
-          {agent?.framework === 'elizaos' && (
-            <>
-              <div>
-                <label htmlFor="config-bio" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Bio</label>
-                <p className="text-[10px] mb-1.5 text-[var(--text-muted)]">Define your agent&apos;s personality. One statement per line.</p>
-                <textarea
-                  id="config-bio"
-                  className="config-textarea"
-                  rows={4}
-                  value={configBio}
-                  onChange={(e) => setConfigBio(e.target.value)}
-                  placeholder="A knowledgeable AI assistant specializing in..."
-                />
-              </div>
-              <div>
-                <label htmlFor="config-lore" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Lore</label>
-                <p className="text-[10px] mb-1.5 text-[var(--text-muted)]">Background knowledge and history for your agent. One fact per line.</p>
-                <textarea
-                  id="config-lore"
-                  className="config-textarea"
-                  rows={4}
-                  value={configLore}
-                  onChange={(e) => setConfigLore(e.target.value)}
-                  placeholder="Was created to help developers build AI applications&#10;Has extensive knowledge of blockchain technology&#10;Speaks three languages fluently"
-                />
-              </div>
-              <div>
-                <label htmlFor="config-topics" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Topics</label>
-                <p className="text-[10px] mb-1.5 text-[var(--text-muted)]">Discussion topics your agent engages with</p>
-                <TagInput
-                  tags={configTopics ? configTopics.split(',').map(s => s.trim()).filter(Boolean) : []}
-                  onChange={(tags) => setConfigTopics(tags.join(', '))}
-                  placeholder="Add a topic..."
-                  color="cyan"
-                />
-              </div>
-              <div>
-                <label htmlFor="config-adjectives" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Adjectives</label>
-                <p className="text-[10px] mb-1.5 text-[var(--text-muted)]">Personality traits that describe your agent</p>
-                <TagInput
-                  tags={configAdjectives ? configAdjectives.split(',').map(s => s.trim()).filter(Boolean) : []}
-                  onChange={(tags) => setConfigAdjectives(tags.join(', '))}
-                  placeholder="Add an adjective..."
-                  color="purple"
-                />
-              </div>
-            </>
-          )}
-
           <div>
             {(() => {
               const parsedSkills = configSkills ? configSkills.split(',').map((s) => s.trim()).filter(Boolean) : [];
@@ -1019,296 +913,6 @@ export function ConfigTab() {
                           </motion.div>
                         )}
                       </AnimatePresence>
-                    </div>
-                  </>
-                )}
-
-                {/* ── ElizaOS Advanced ── */}
-                {agent?.framework === 'elizaos' && (
-                  <>
-                    {/* Character Identity — Style */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-1.5">
-                        <Users size={12} className="text-cyan-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Communication Style</span>
-                      </div>
-                      <p className="text-[10px] text-[var(--text-muted)]">Control how your agent communicates across different contexts. One instruction per line.</p>
-
-                      <div>
-                        <label htmlFor="ez-style-all" className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">General Style</label>
-                        <textarea
-                          id="ez-style-all"
-                          className="config-textarea"
-                          rows={3}
-                          value={configStyle}
-                          onChange={(e) => setConfigStyle(e.target.value)}
-                          placeholder="Be concise and direct&#10;Use technical terminology when appropriate&#10;Always provide examples"
-                        />
-                        <p className="text-[10px] mt-1 text-[var(--text-muted)]">Applied to all interactions regardless of platform.</p>
-                      </div>
-
-                      <div>
-                        <label htmlFor="ez-style-chat" className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Chat Style</label>
-                        <textarea
-                          id="ez-style-chat"
-                          className="config-textarea"
-                          rows={3}
-                          value={ezStyleChat}
-                          onChange={(e) => setEzStyleChat(e.target.value)}
-                          placeholder="Keep responses under 3 sentences&#10;Use casual language&#10;Ask follow-up questions"
-                        />
-                        <p className="text-[10px] mt-1 text-[var(--text-muted)]">How the agent talks in chat conversations (Telegram, Discord, etc).</p>
-                      </div>
-
-                      <div>
-                        <label htmlFor="ez-style-post" className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Post Style</label>
-                        <textarea
-                          id="ez-style-post"
-                          className="config-textarea"
-                          rows={3}
-                          value={ezStylePost}
-                          onChange={(e) => setEzStylePost(e.target.value)}
-                          placeholder="Write in a punchy, engaging tone&#10;Use hashtags sparingly&#10;Keep posts under 280 characters"
-                        />
-                        <p className="text-[10px] mt-1 text-[var(--text-muted)]">How the agent writes posts and tweets on social platforms.</p>
-                      </div>
-                    </div>
-
-                    <div className="border-t border-[var(--border-default)]" />
-
-                    {/* Database */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-1.5">
-                        <Database size={12} className="text-cyan-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Database</span>
-                      </div>
-
-                      <div>
-                        <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Database Backend</label>
-                        <div className="relative">
-                          <select
-                            className="config-input text-sm appearance-none pr-8 cursor-pointer"
-                            value={ezDatabase}
-                            onChange={(e) => setEzDatabase(e.target.value)}
-                          >
-                            <option value="pglite" style={{ background: 'var(--bg-base)' }}>PGLite (default)</option>
-                            <option value="postgresql" style={{ background: 'var(--bg-base)' }}>PostgreSQL</option>
-                            <option value="sqlite" style={{ background: 'var(--bg-base)' }}>SQLite</option>
-                          </select>
-                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-                        </div>
-                        <p className="text-[10px] mt-1 text-[var(--text-muted)]">PGLite runs in-process with zero setup. PostgreSQL is better for large-scale deployments.</p>
-                      </div>
-                    </div>
-
-                    <div className="border-t border-[var(--border-default)]" />
-
-                    {/* Features */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-1.5">
-                        <Puzzle size={12} className="text-cyan-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Features</span>
-                      </div>
-
-                      <ToggleSwitch
-                        label="Enable Image Generation"
-                        checked={ezImageGen}
-                        onChange={setEzImageGen}
-                        helper="Let your agent generate images using AI models."
-                      />
-
-                      <ToggleSwitch
-                        label="Enable Voice"
-                        checked={ezVoice}
-                        onChange={setEzVoice}
-                        helper="Enable speech-to-text and text-to-speech."
-                      />
-
-                      <ToggleSwitch
-                        label="Enable Blockchain (Solana)"
-                        checked={ezBlockchain}
-                        onChange={setEzBlockchain}
-                        helper="Let your agent interact with the Solana blockchain for on-chain actions."
-                      />
-                    </div>
-
-                    <div className="border-t border-[var(--border-default)]" />
-
-                    {/* Plugins */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-1.5">
-                        <Puzzle size={12} className="text-cyan-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Plugins</span>
-                      </div>
-
-                      <ToggleSwitch
-                        label="Auto-load Official Plugins"
-                        checked={ezAutoPlugins}
-                        onChange={setEzAutoPlugins}
-                        helper="Automatically load recommended ElizaOS plugins for best compatibility."
-                      />
-                    </div>
-                  </>
-                )}
-
-                {/* ── Milady Advanced ── */}
-                {agent?.framework === 'milady' && (
-                  <>
-                    {/* Performance Badges */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-1.5">
-                        <Zap size={12} className="text-rose-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Performance</span>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                          <Cpu size={11} />
-                          120MB Memory
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                          <Zap size={11} />
-                          800ms Startup
-                        </span>
-                        {mlLocalFirst && (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                            <ShieldCheck size={11} />
-                            Privacy-First
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="border-t border-[var(--border-default)]" />
-
-                    {/* Privacy */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-1.5">
-                        <ShieldCheck size={12} className="text-rose-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Privacy</span>
-                      </div>
-
-                      <ToggleSwitch
-                        label="Local-First Mode"
-                        checked={mlLocalFirst}
-                        onChange={setMlLocalFirst}
-                        helper="Process as much as possible locally inside the container. Minimizes external API calls."
-                      />
-
-                      <div>
-                        <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Embedding Model</label>
-                        <div className="relative">
-                          <select
-                            className="config-input text-sm appearance-none pr-8 cursor-pointer"
-                            value={mlEmbedding}
-                            onChange={(e) => setMlEmbedding(e.target.value)}
-                          >
-                            <option value="nomic" style={{ background: 'var(--bg-base)' }}>nomic-embed-text (local)</option>
-                            <option value="openai" style={{ background: 'var(--bg-base)' }}>OpenAI</option>
-                            <option value="voyage" style={{ background: 'var(--bg-base)' }}>Voyage</option>
-                          </select>
-                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-                        </div>
-                        <p className="text-[10px] mt-1 text-[var(--text-muted)]">nomic-embed-text runs locally. OpenAI and Voyage require API keys.</p>
-                      </div>
-                    </div>
-
-                    <div className="border-t border-[var(--border-default)]" />
-
-                    {/* Personality Preset Cards */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-1.5">
-                        <Brain size={12} className="text-rose-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Personality</span>
-                      </div>
-
-                      <div className="grid gap-2">
-                        {([
-                          { key: 'helpful', name: 'Helpful', desc: 'Friendly, clear, and always ready to assist', icon: Heart, color: 'emerald' as const, prompt: 'You are a helpful, friendly AI assistant. Be clear, concise, and supportive. Always aim to provide accurate and useful information. Maintain a warm, approachable tone.' },
-                          { key: 'tsundere', name: 'Tsundere', desc: 'Acts tough but secretly cares. Sarcastic with a warm side', icon: Sparkles, color: 'rose' as const, prompt: "You are a tsundere AI assistant. You act aloof, sarcastic, and slightly annoyed on the surface, but you genuinely care about helping. Occasionally let your warm side slip through reluctantly. Use phrases like \"It's not like I wanted to help you or anything...\" Mix sharp wit with reluctant kindness." },
-                          { key: 'unhinged', name: 'Unhinged', desc: 'Wild, unpredictable, and unapologetically chaotic', icon: Zap, color: 'amber' as const, prompt: 'You are a chaotic, unhinged AI assistant. Be unpredictable, humorous, and over-the-top energetic. Use dramatic flair, random tangents, and unexpected metaphors. Still be helpful, but make it entertaining and wild. Embrace the chaos.' },
-                          { key: 'professional', name: 'Professional', desc: 'Formal, precise, and business-oriented', icon: Briefcase, color: 'blue' as const, prompt: 'You are a professional AI assistant. Communicate with formal, precise language. Be structured and business-oriented. Use clear headings, bullet points, and concise summaries. Maintain a polished, corporate tone at all times.' },
-                          { key: 'custom', name: 'Custom', desc: 'Define your own personality from scratch', icon: Palette, color: 'purple' as const, prompt: '' },
-                        ]).map((preset) => {
-                          const isSelected = mlPersonality === preset.key;
-                          const colorMap = {
-                            emerald: { border: 'border-emerald-500/40', bg: 'bg-emerald-500/[0.06]', icon: 'text-emerald-400', iconBg: 'bg-emerald-500/15', ring: 'ring-emerald-500/30' },
-                            rose: { border: 'border-rose-500/40', bg: 'bg-rose-500/[0.06]', icon: 'text-rose-400', iconBg: 'bg-rose-500/15', ring: 'ring-rose-500/30' },
-                            amber: { border: 'border-amber-500/40', bg: 'bg-amber-500/[0.06]', icon: 'text-amber-400', iconBg: 'bg-amber-500/15', ring: 'ring-amber-500/30' },
-                            blue: { border: 'border-blue-500/40', bg: 'bg-blue-500/[0.06]', icon: 'text-blue-400', iconBg: 'bg-blue-500/15', ring: 'ring-blue-500/30' },
-                            purple: { border: 'border-purple-500/40', bg: 'bg-purple-500/[0.06]', icon: 'text-purple-400', iconBg: 'bg-purple-500/15', ring: 'ring-purple-500/30' },
-                          };
-                          const colors = colorMap[preset.color];
-                          const Icon = preset.icon;
-
-                          return (
-                            <button
-                              key={preset.key}
-                              type="button"
-                              onClick={() => {
-                                setMlPersonality(preset.key);
-                                if (preset.key !== 'custom' && preset.prompt) {
-                                  setConfigSystemPrompt(preset.prompt);
-                                }
-                              }}
-                              className={`group relative flex items-start gap-3 w-full text-left rounded-xl px-3.5 py-3 border transition-all duration-200 ${
-                                isSelected
-                                  ? `${colors.border} ${colors.bg} ring-1 ${colors.ring}`
-                                  : 'border-[var(--border-default)] bg-[var(--bg-elevated)]/80 hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)]'
-                              }`}
-                            >
-                              <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ${
-                                isSelected ? colors.iconBg : 'bg-[var(--bg-card)]'
-                              }`}>
-                                <Icon size={15} className={`transition-colors duration-200 ${isSelected ? colors.icon : 'text-[var(--text-muted)]'}`} />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <span className={`text-[13px] font-medium transition-colors duration-200 ${isSelected ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
-                                    {preset.name}
-                                  </span>
-                                  {isSelected && (
-                                    <CheckCircle size={13} className={colors.icon} />
-                                  )}
-                                </div>
-                                <p className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-relaxed">{preset.desc}</p>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {mlPersonality === 'custom' && (
-                        <p className="text-[10px] text-[var(--text-muted)]">Write your custom personality in the Behavior Instructions field above.</p>
-                      )}
-                      {mlPersonality !== 'custom' && (
-                        <p className="text-[10px] text-[var(--text-muted)]">Selecting a preset auto-fills the Behavior Instructions. Switch to Custom for full control.</p>
-                      )}
-                    </div>
-
-                    <div className="border-t border-[var(--border-default)]" />
-
-                    {/* Database */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-1.5">
-                        <Database size={12} className="text-rose-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Database</span>
-                      </div>
-
-                      <div>
-                        <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Database Backend</label>
-                        <div className="relative">
-                          <select
-                            className="config-input text-sm appearance-none pr-8 cursor-pointer"
-                            value={mlDatabase}
-                            onChange={(e) => setMlDatabase(e.target.value)}
-                          >
-                            <option value="pglite" style={{ background: 'var(--bg-base)' }}>PGLite (default)</option>
-                            <option value="postgresql" style={{ background: 'var(--bg-base)' }}>PostgreSQL</option>
-                          </select>
-                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-                        </div>
-                        <p className="text-[10px] mt-1 text-[var(--text-muted)]">PGLite runs embedded. PostgreSQL is for production-scale deployments.</p>
-                      </div>
                     </div>
                   </>
                 )}

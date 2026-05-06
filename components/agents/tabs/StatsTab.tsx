@@ -121,24 +121,18 @@ interface MonitoringData {
 const FRAMEWORK_THEME: Record<string, { primary: string; primaryDim: string; primaryBg: string; gradient: string; gradientDim: string; label: string }> = {
   openclaw: { primary: '#f59e0b', primaryDim: 'rgba(245,158,11,0.4)', primaryBg: 'rgba(245,158,11,0.1)', gradient: 'linear-gradient(90deg, #f59e0b, #d97706)', gradientDim: 'linear-gradient(90deg, #d97706, #b45309)', label: 'OpenClaw' },
   hermes: { primary: '#a855f7', primaryDim: 'rgba(168,85,247,0.4)', primaryBg: 'rgba(168,85,247,0.1)', gradient: 'linear-gradient(90deg, #8b5cf6, #a855f7)', gradientDim: 'linear-gradient(90deg, #7c3aed, #6d28d9)', label: 'Hermes' },
-  elizaos: { primary: 'var(--color-accent)', primaryDim: 'rgba(6,182,212,0.4)', primaryBg: 'rgba(6,182,212,0.1)', gradient: 'linear-gradient(90deg, var(--color-accent), #0891b2)', gradientDim: 'linear-gradient(90deg, #0891b2, #0e7490)', label: 'ElizaOS' },
-  milady: { primary: '#f43f5e', primaryDim: 'rgba(244,63,94,0.4)', primaryBg: 'rgba(244,63,94,0.1)', gradient: 'linear-gradient(90deg, #f43f5e, #e11d48)', gradientDim: 'linear-gradient(90deg, #e11d48, #be123c)', label: 'Milady' },
 };
 
-const DEFAULT_THEME = FRAMEWORK_THEME.elizaos;
+const DEFAULT_THEME = FRAMEWORK_THEME.openclaw;
 
 const FRAMEWORK_TIPS: Record<string, string> = {
   openclaw: 'OpenClaw agents benefit from tracking tool usage patterns. Watch token output — high output suggests verbose tool responses you can optimize.',
   hermes: 'Hermes agents are conversation-heavy. Monitor messages/day and token costs closely, especially if using paid LLM providers.',
-  elizaos: 'ElizaOS agents run multi-platform. Compare activity across time ranges to identify peak engagement windows.',
-  milady: 'Milady agents are personality-driven. High message counts with low token usage indicate efficient, character-consistent responses.',
 };
 
 const FRAMEWORK_CONTEXT: Record<string, { text: string; accent: string; accentBg: string; accentBorder: string }> = {
   openclaw: { text: 'Each message sent to the agent counts toward your daily limit, regardless of channel. BYOK users have unlimited messages.', accent: 'text-amber-400', accentBg: 'bg-amber-500/[0.06]', accentBorder: 'border-amber-500/20' },
   hermes: { text: 'Each message sent to the agent counts toward your daily limit, regardless of channel. BYOK users have unlimited messages.', accent: 'text-purple-400', accentBg: 'bg-purple-500/[0.06]', accentBorder: 'border-purple-500/20' },
-  elizaos: { text: 'Each message sent to the agent counts toward your daily limit, regardless of channel. BYOK users have unlimited messages.', accent: 'text-cyan-400', accentBg: 'bg-cyan-500/[0.06]', accentBorder: 'border-cyan-500/20' },
-  milady: { text: 'Each message sent to the agent counts toward your daily limit, regardless of channel. BYOK users have unlimited messages.', accent: 'text-rose-400', accentBg: 'bg-rose-500/[0.06]', accentBorder: 'border-rose-500/20' },
 };
 
 const TIER_BADGE: Record<string, { label: string; className: string }> = {
@@ -158,8 +152,6 @@ const HEALTH_STYLES: Record<string, { bg: string; text: string; dot: string; rin
 const FRAMEWORK_COLORS: Record<string, { hex: string; hexLight: string; border: string; text: string }> = {
   openclaw: { hex: '#f59e0b', hexLight: '#fbbf24', border: 'border-amber-500/20', text: 'text-amber-400' },
   hermes: { hex: '#a855f7', hexLight: '#c084fc', border: 'border-purple-500/20', text: 'text-purple-400' },
-  elizaos: { hex: 'var(--color-accent)', hexLight: '#22d3ee', border: 'border-cyan-500/20', text: 'text-cyan-400' },
-  milady: { hex: '#f43f5e', hexLight: '#fb7185', border: 'border-rose-500/20', text: 'text-rose-400' },
 };
 
 const RANGES: { value: Range; label: string }[] = [
@@ -440,8 +432,8 @@ export function StatsTab() {
   const fwCtx = FRAMEWORK_CONTEXT[framework] ?? FRAMEWORK_CONTEXT.openclaw;
   const fwBadge = FRAMEWORK_BADGE[framework] ?? 'bg-slate-500/15 text-slate-400 border-slate-500/30';
   const tierBadge = TIER_BADGE[tier] ?? TIER_BADGE.free;
-  const fwColors = FRAMEWORK_COLORS[framework] ?? FRAMEWORK_COLORS.elizaos;
-  const tip = FRAMEWORK_TIPS[framework] ?? FRAMEWORK_TIPS.elizaos;
+  const fwColors = FRAMEWORK_COLORS[framework] ?? FRAMEWORK_COLORS.openclaw;
+  const tip = FRAMEWORK_TIPS[framework] ?? FRAMEWORK_TIPS.openclaw;
 
   // ── Section 1: Messages (Usage) ──────────────────────────────
   const [usageData, setUsageData] = useState<UsageData | null>(null);

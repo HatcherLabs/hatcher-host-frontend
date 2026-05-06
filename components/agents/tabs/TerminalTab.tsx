@@ -3,9 +3,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAgentContext } from '../AgentContext';
-import { api } from '@/lib/api';
 import { API_URL } from '@/lib/config';
-import { RotateCcw, Circle, Send } from 'lucide-react';
+import { RotateCcw, Circle, ShieldCheck } from 'lucide-react';
 
 // xterm.js CSS — imported once when component loads
 import '@xterm/xterm/css/xterm.css';
@@ -28,7 +27,6 @@ async function loadXterm() {
 }
 
 type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
-type HistoryMessage = { role: string; content: string; ts: number };
 
 function getWsUrl(agentId: string): string {
   const base = API_URL.replace(/^http/, 'ws');
@@ -37,77 +35,27 @@ function getWsUrl(agentId: string): string {
 
 export function TerminalTab() {
   const tTerminal = useTranslations('dashboard.agentDetail.terminal');
-  const { agent } = useAgentContext();
+  const { agent, stats } = useAgentContext();
   const termRef = useRef<HTMLDivElement>(null);
   const termInstance = useRef<InstanceType<typeof import('@xterm/xterm').Terminal> | null>(null);
   const fitAddonRef = useRef<InstanceType<typeof import('@xterm/addon-fit').FitAddon> | null>(null);
+  const terminalInputRef = useRef<{ dispose: () => void } | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const stateRef = useRef<ConnectionState>('disconnected');
+  const connectionSeqRef = useRef(0);
   const [state, setState] = useState<ConnectionState>('disconnected');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [messageInput, setMessageInput] = useState('');
-  const [sending, setSending] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const historyMarkerRef = useRef<string | null>(null);
 
   const isActive = agent?.status === 'active';
+  const shortContainerId = stats?.containerId ? stats.containerId.slice(0, 12) : null;
 
   // Keep ref in sync with state for use inside closures
   useEffect(() => { stateRef.current = state; }, [state]);
 
-  const historyMarker = useCallback((m: HistoryMessage) => `${m.role}:${m.ts}:${m.content}`, []);
-
-  const formatTerminalContent = useCallback((content: string) => (
-    content
-      .replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '')
-      .replace(/\r?\n/g, '\r\n')
-  ), []);
-
-  const pollProactiveMessages = useCallback(async () => {
-    if (!agent?.id || !termInstance.current) return;
-
-    try {
-      const res = await api.getChatHistory(agent.id);
-      if (!res.success) return;
-
-      const history = res.data.messages as HistoryMessage[];
-      if (history.length === 0) {
-        historyMarkerRef.current = null;
-        return;
-      }
-
-      const latestMarker = historyMarker(history[history.length - 1]!);
-      const previousMarker = historyMarkerRef.current;
-      if (!previousMarker) {
-        historyMarkerRef.current = latestMarker;
-        return;
-      }
-
-      const previousIndex = history.findIndex((m) => historyMarker(m) === previousMarker);
-      historyMarkerRef.current = latestMarker;
-      if (previousIndex === -1 || previousIndex === history.length - 1) return;
-
-      const nextMessages = history.slice(previousIndex + 1);
-      // Terminal-initiated chat is saved as a user+assistant pair. The
-      // terminal already printed that response live, so only display
-      // assistant-only additions produced by cron/workflow/webhook triggers.
-      if (nextMessages.some((m) => m.role === 'user')) return;
-
-      const assistantMessages = nextMessages.filter((m) => m.role === 'assistant' && m.content.trim());
-      if (assistantMessages.length === 0) return;
-
-      const term = termInstance.current;
-      for (const msg of assistantMessages) {
-        term.write(`\r\n\x1b[35m[agent]\x1b[0m ${formatTerminalContent(msg.content)}\r\n`);
-      }
-    } catch {
-      // Non-fatal: terminal log streaming should keep working even if polling fails.
-    }
-  }, [agent?.id, formatTerminalContent, historyMarker]);
-
   // ── Initialize xterm + connect WebSocket ──
   const connect = useCallback(async () => {
     if (!agent?.id || !isActive) return;
+    const connectionSeq = ++connectionSeqRef.current;
 
     // Close existing connection first to avoid race conditions
     if (wsRef.current) {
@@ -120,6 +68,7 @@ export function TerminalTab() {
 
     try {
       await loadXterm();
+      if (connectionSeqRef.current !== connectionSeq) return;
       if (!Terminal || !FitAddon || !WebLinksAddon) throw new Error('Failed to load terminal library');
 
       // Create terminal instance if not exists
@@ -154,7 +103,7 @@ export function TerminalTab() {
           allowTransparency: true,
           scrollback: 5000,
           convertEol: true,
-          disableStdin: true, // No raw keyboard input — messages only
+          disableStdin: false,
         });
 
         const fit = new FitAddon();
@@ -169,6 +118,7 @@ export function TerminalTab() {
       }
 
       const term = termInstance.current;
+      if (connectionSeqRef.current !== connectionSeq) return;
       if (!term) throw new Error('Terminal not initialized');
 
       // Clear and show connecting message
@@ -179,22 +129,35 @@ export function TerminalTab() {
       const ws = new WebSocket(getWsUrl(agent.id));
       wsRef.current = ws;
 
+      terminalInputRef.current?.dispose();
+      terminalInputRef.current = term.onData((data: string) => {
+        const current = wsRef.current;
+        if (connectionSeqRef.current !== connectionSeq) return;
+        if (!current || current.readyState !== WebSocket.OPEN) return;
+        current.send(JSON.stringify({ type: 'input', data }));
+      });
+
       ws.onopen = () => {
         // Connected — wait for server confirmation
       };
 
       ws.onmessage = (event) => {
+        if (connectionSeqRef.current !== connectionSeq || wsRef.current !== ws) return;
         try {
           const msg = JSON.parse(event.data);
 
           switch (msg.type) {
             case 'connected':
               setState('connected');
+              fitAddonRef.current?.fit();
+              if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'resize', cols: term.cols, rows: term.rows }));
+              }
               term.writeln(`\x1b[32m[hatcher]\x1b[0m Connected to \x1b[1m${msg.agentName || agent.name}\x1b[0m (${msg.framework || agent.framework})`);
               term.writeln('\x1b[90m─────────────────────────────────────────\x1b[0m');
-              term.writeln('\x1b[90mType a message below to talk to the agent.\x1b[0m');
+              term.writeln('\x1b[90mInteractive shell attached inside the agent container.\x1b[0m');
               term.writeln('');
-              inputRef.current?.focus();
+              term.focus();
               break;
 
             case 'output':
@@ -222,12 +185,14 @@ export function TerminalTab() {
       };
 
       ws.onerror = () => {
+        if (connectionSeqRef.current !== connectionSeq || wsRef.current !== ws) return;
         setState('error');
         setErrorMsg('Connection error');
         term.writeln('\x1b[31m[error]\x1b[0m WebSocket connection failed');
       };
 
       ws.onclose = (e) => {
+        if (connectionSeqRef.current !== connectionSeq || wsRef.current !== ws) return;
         if (stateRef.current !== 'error') setState('disconnected');
         if (e.code !== 1000) {
           term.writeln(`\x1b[33m[hatcher]\x1b[0m Connection closed (${e.reason || `code ${e.code}`})`);
@@ -241,64 +206,11 @@ export function TerminalTab() {
     }
   }, [agent?.id, agent?.name, agent?.framework, isActive]);
 
-  // ── Send message to agent ──
-  const sendMessage = useCallback(() => {
-    const text = messageInput.trim();
-    if (!text || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN || sending) return;
-
-    setSending(true);
-    wsRef.current.send(JSON.stringify({ type: 'input', data: text }));
-    setMessageInput('');
-    // Re-enable after response (or timeout)
-    setTimeout(() => setSending(false), 30000);
-  }, [messageInput, sending]);
-
-  // Listen for output messages to detect when response is complete.
-  //
-  // Deps are `[state]` not empty: a ref change is not reactive, so we
-  // key the effect on the connection state transition. `state` flips to
-  // 'connected' after connect() finishes setting wsRef.current, at which
-  // point we attach the message handler once; when state leaves
-  // 'connected' the cleanup removes it and the next 'connected' run
-  // re-attaches against the new socket. Previously the effect had no
-  // dep array at all and re-ran on every component render, attaching
-  // and removing the listener on every keystroke in the command input.
-  useEffect(() => {
-    if (state !== 'connected' || !wsRef.current) return;
-    const ws = wsRef.current;
-    const handler = (event: MessageEvent) => {
-      try {
-        const msg = JSON.parse(event.data);
-        // When we get output that's a green response (from proxyChat), the request is done
-        if (msg.type === 'output' && typeof msg.data === 'string' && msg.data.includes('\x1b[32m')) {
-          setSending(false);
-        }
-        // Error responses also unblock
-        if (msg.type === 'output' && typeof msg.data === 'string' && msg.data.includes('\x1b[31m')) {
-          setSending(false);
-        }
-      } catch { /* ignore */ }
-    };
-    ws.addEventListener('message', handler);
-    return () => ws.removeEventListener('message', handler);
-  }, [state]);
-
-  useEffect(() => {
-    if (state !== 'connected') {
-      historyMarkerRef.current = null;
-      return;
-    }
-
-    void pollProactiveMessages();
-    const timer = setInterval(() => {
-      void pollProactiveMessages();
-    }, 10_000);
-
-    return () => clearInterval(timer);
-  }, [pollProactiveMessages, state]);
-
   // ── Disconnect ──
   const disconnect = useCallback(() => {
+    terminalInputRef.current?.dispose();
+    terminalInputRef.current = null;
+    connectionSeqRef.current += 1;
     if (wsRef.current) {
       wsRef.current.close(1000, 'User disconnect');
       wsRef.current = null;
@@ -322,6 +234,11 @@ export function TerminalTab() {
     const handleResize = () => {
       if (fitAddonRef.current) {
         fitAddonRef.current.fit();
+        const term = termInstance.current;
+        const ws = wsRef.current;
+        if (term && ws?.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: 'resize', cols: term.cols, rows: term.rows }));
+        }
       }
     };
     window.addEventListener('resize', handleResize);
@@ -365,7 +282,7 @@ export function TerminalTab() {
     <div className="flex flex-col h-full">
       {/* Terminal header */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--border-default)] bg-[var(--bg-elevated)]">
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-3">
           <div className="flex items-center gap-1.5">
             <Circle
               size={8}
@@ -377,9 +294,18 @@ export function TerminalTab() {
             </span>
           </div>
           <span className="text-xs text-[var(--border-default)]">|</span>
-          <span className="text-xs font-mono text-[var(--text-muted)]">
+          <span className="min-w-0 truncate text-xs font-mono text-[var(--text-muted)]">
             {agent.name} ({agent.framework})
           </span>
+          <span className="hidden xl:inline-flex items-center gap-1.5 rounded-md border border-emerald-500/20 bg-emerald-500/5 px-2 py-0.5 text-[10px] font-mono text-emerald-300">
+            <ShieldCheck size={11} />
+            Container shell
+          </span>
+          {shortContainerId && (
+            <span className="hidden 2xl:inline text-[10px] font-mono text-[var(--text-muted)]">
+              {shortContainerId}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -408,33 +334,10 @@ export function TerminalTab() {
         <div ref={termRef} className="h-full w-full" />
       </div>
 
-      {/* Message input */}
-      {state === 'connected' && (
-        <div className="flex items-center gap-2 px-3 py-2 border-t border-[var(--border-default)] bg-[var(--bg-elevated)]">
-          <input
-            ref={inputRef}
-            type="text"
-            value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-            placeholder={sending ? tTerminal('sending') : tTerminal('sendMessage')}
-            disabled={sending}
-            className="flex-1 bg-[var(--bg-card)] border border-[var(--border-default)] rounded-lg px-3 py-1.5 text-sm font-mono text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--border-hover)] disabled:opacity-50"
-          />
-          <button
-            onClick={sendMessage}
-            disabled={!messageInput.trim() || sending}
-            className="p-1.5 rounded-lg bg-[var(--bg-card)] hover:bg-[var(--bg-hover)] text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border-default)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-          >
-            <Send size={14} />
-          </button>
-        </div>
-      )}
-
       {/* Info banner */}
       <div className="px-4 py-1.5 border-t border-[var(--border-default)] bg-[var(--bg-elevated)]">
         <p className="text-[10px] text-[var(--text-muted)] font-mono">
-          Streaming agent logs. Send messages via the input field above.
+          Shell runs inside the isolated agent container, not on the host. Terminal open/close and entered commands are audited with secret redaction.
           {errorMsg && <span className="text-red-400 ml-2">Error: {errorMsg}</span>}
         </p>
       </div>

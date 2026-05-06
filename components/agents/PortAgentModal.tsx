@@ -5,7 +5,6 @@ import { useRouter } from '@/i18n/routing';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Loader2, AlertTriangle, ArrowRight, Check } from 'lucide-react';
 import { FRAMEWORKS } from '@hatcher/shared';
-import type { AgentFramework } from '@hatcher/shared';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
 
@@ -15,27 +14,29 @@ interface PortAgentModalProps {
   onClose: () => void;
 }
 
-const PORTABLE_TARGETS: AgentFramework[] = ['openclaw', 'hermes', 'elizaos', 'milady'];
-const CHARACTER_LIKE = new Set<AgentFramework>(['elizaos', 'milady']);
+type PortableFramework = 'openclaw' | 'hermes';
 
-function describeLosses(source: AgentFramework, target: AgentFramework): string[] {
+const PORTABLE_TARGETS: PortableFramework[] = ['openclaw', 'hermes'];
+
+function isPortableFramework(framework: string): framework is PortableFramework {
+  return framework === 'openclaw' || framework === 'hermes';
+}
+
+function describeLosses(source: PortableFramework, target: PortableFramework): string[] {
   const losses: string[] = [
     'Memories, chat history, and session state',
     'Installed skills and plugins (different ecosystems)',
   ];
   if (source === 'openclaw') losses.push('Workflows, triggers, and cron jobs');
   if (source === 'hermes') losses.push('Native Hermes cron jobs and custom skill files');
-  if (CHARACTER_LIKE.has(source) && !CHARACTER_LIKE.has(target)) {
-    losses.push('Character profile (bio, lore, topics, adjectives, style, messageExamples)');
-  }
   return losses;
 }
 
 export function PortAgentModal({ agent, isOpen, onClose }: PortAgentModalProps) {
   const router = useRouter();
-  const sourceFramework = agent.framework as AgentFramework;
+  const sourceFramework = isPortableFramework(agent.framework) ? agent.framework : 'openclaw';
   const defaultTarget = PORTABLE_TARGETS.find((f) => f !== sourceFramework) ?? 'hermes';
-  const [target, setTarget] = useState<AgentFramework>(defaultTarget);
+  const [target, setTarget] = useState<PortableFramework>(defaultTarget);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,7 +49,7 @@ export function PortAgentModal({ agent, isOpen, onClose }: PortAgentModalProps) 
     setLoading(true);
     setError(null);
     try {
-      const res = await api.portAgent(agent.id, target as Exclude<AgentFramework, 'custom'>);
+      const res = await api.portAgent(agent.id, target);
       if (!res.success) {
         throw new Error(res.error ?? 'Failed to clone agent');
       }
@@ -97,7 +98,7 @@ export function PortAgentModal({ agent, isOpen, onClose }: PortAgentModalProps) 
               <ArrowRight size={14} className="text-[var(--text-muted)]" />
               <select
                 value={target}
-                onChange={(e) => setTarget(e.target.value as AgentFramework)}
+                onChange={(e) => setTarget(e.target.value as PortableFramework)}
                 disabled={loading}
                 className="flex-1 bg-[var(--bg-card)] border border-[var(--border-default)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--color-accent)] disabled:opacity-40"
               >
@@ -119,9 +120,6 @@ export function PortAgentModal({ agent, isOpen, onClose }: PortAgentModalProps) 
                 <li>BYOK config (provider, model, API key)</li>
                 <li>Integration credentials (Telegram, Discord, Twitter, etc.)</li>
                 <li>Environment variables and channel settings</li>
-                {CHARACTER_LIKE.has(sourceFramework) && CHARACTER_LIKE.has(target) && (
-                  <li>Character profile (bio, topics, style, etc.)</li>
-                )}
               </ul>
             </div>
 

@@ -8,8 +8,6 @@
 const FRAMEWORK_COLORS: Record<string, { fill: string; bg: string }> = {
   openclaw: { fill: '#f59e0b', bg: '#1a1508' },
   hermes: { fill: '#a855f7', bg: '#140a1e' },
-  elizaos: { fill: '#06b6d4', bg: '#061214' },
-  milady: { fill: '#f43f5e', bg: '#1a0a10' },
 };
 
 const DEFAULT_COLORS = { fill: '#06b6d4', bg: '#0d0b1a' };

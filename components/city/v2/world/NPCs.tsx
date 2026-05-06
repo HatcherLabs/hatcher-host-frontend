@@ -86,8 +86,6 @@ export function NPCs({ agents, onNpcClick }: Props) {
     const m: Record<Framework, NpcState[]> = {
       openclaw: [],
       hermes: [],
-      elizaos: [],
-      milady: [],
     };
     for (const s of states) m[s.framework].push(s);
     return m;

@@ -29,7 +29,7 @@ export function RecordingDot() {
 
 /* ── Typing indicator with framework-colored bouncing dots ──── */
 export function TypingIndicator({ framework }: { framework: string }) {
-  const dotColor = ({ openclaw: 'bg-amber-400', hermes: 'bg-purple-400', elizaos: 'bg-cyan-400', milady: 'bg-rose-400' } as Record<string, string>)[framework] ?? 'bg-cyan-400';
+  const dotColor = ({ openclaw: 'bg-amber-400', hermes: 'bg-purple-400' } as Record<string, string>)[framework] ?? 'bg-cyan-400';
   return (
     <div className="flex gap-1.5 items-center h-5 px-1">
       {[0, 1, 2].map((i) => (

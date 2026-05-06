@@ -22,7 +22,7 @@ export interface TemplateCardData {
   integrations?: string[];
   sampleConversation?: Array<{ role: 'user' | 'assistant'; content: string }>;
   badge?: string; // e.g. "Popular", "New"
-  framework?: 'openclaw' | 'hermes' | 'elizaos' | 'milady';
+  framework?: 'openclaw' | 'hermes';
 }
 
 interface TemplateCardProps {

@@ -20,6 +20,16 @@ export type { TicketStatus, TicketCategory, TicketPriority };
 /** Re-export WsChatMessage as ChatMessage for frontend use */
 export type ChatMessage = WsChatMessage;
 
+export interface ChatSessionSummary {
+  id: string;
+  title: string;
+  preview: string | null;
+  messageCount: number;
+  startedAt: number;
+  updatedAt: number;
+  current: boolean;
+}
+
 /**
  * Payment as returned by the API (serialized dates, optional agent join).
  * Differs from shared Payment which has userId and Date fields.

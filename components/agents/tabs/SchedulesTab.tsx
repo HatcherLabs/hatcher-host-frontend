@@ -54,17 +54,13 @@ interface LogEntry {
 const FRAMEWORK_COLORS: Record<string, { accent: string; glow: string; label: string }> = {
   openclaw: { accent: '#f59e0b', glow: 'rgba(245,158,11,0.15)', label: 'OpenClaw' },
   hermes:   { accent: '#a855f7', glow: 'rgba(168,85,247,0.15)', label: 'Hermes' },
-  elizaos:  { accent: 'var(--color-accent)', glow: 'rgba(6,182,212,0.15)',  label: 'ElizaOS' },
-  milady:   { accent: '#f43f5e', glow: 'rgba(244,63,94,0.15)',  label: 'Milady' },
 };
 
 // ─── Framework Compatibility ─────────────────────────────────
 
 const FRAMEWORK_SCHEDULE_SUPPORT: Record<string, { native: boolean; method: string; note: string }> = {
-  openclaw: { native: true,  method: 'Built-in cron scheduler', note: 'Full native cron support — schedules run inside the container with direct access to agent memory and tools.' },
-  hermes:   { native: true,  method: 'Built-in task scheduler', note: 'Native scheduled tasks via Hermes task system — supports recurring prompts with full context.' },
-  elizaos:  { native: false, method: 'External cron trigger',   note: 'Schedules are triggered externally via the Hatcher orchestrator. The agent receives the prompt as a new message at each interval.' },
-  milady:   { native: false, method: 'External cron trigger',   note: 'Schedules are triggered externally via the Hatcher orchestrator. The agent receives the prompt as a new message at each interval.' },
+  openclaw: { native: false, method: 'Hatcher scheduler',       note: 'Schedules are managed by the Hatcher platform. The agent receives the prompt as a new message at each interval.' },
+  hermes:   { native: false, method: 'Hatcher scheduler',       note: 'Schedules are managed by the Hatcher platform. The agent receives the prompt as a new message at each interval.' },
 };
 
 // ─── Cron Presets ────────────────────────────────────────────
@@ -462,7 +458,7 @@ export function SchedulesTab() {
                   color: fwSupport.native ? '#4ade80' : '#fbbf24',
                 }}
               >
-                {fwSupport.native ? 'Native Support' : 'External Cron'}
+                {fwSupport.native ? 'Native Support' : fwSupport.method}
               </span>
             </div>
             <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">{fwSupport.note}</p>
@@ -471,7 +467,7 @@ export function SchedulesTab() {
               <span className="text-[10px] text-[var(--text-muted)]">
                 {fwSupport.native
                   ? 'Schedules persist across container restarts.'
-                  : 'Schedules are managed by the Hatcher platform and trigger the agent externally.'}
+                  : 'Schedules persist in Hatcher and continue independently of container restarts.'}
               </span>
             </div>
           </div>

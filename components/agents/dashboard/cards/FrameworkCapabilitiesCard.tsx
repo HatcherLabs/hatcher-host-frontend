@@ -8,8 +8,7 @@ import { GlassCard, FRAMEWORK_BADGE } from '../../AgentContext';
 // ─── Framework capability constants ──────────────────────────
 // Static decorative chips + stats per framework. Kept here so
 // GenericDashboard can surface them for every framework, while
-// per-framework dashboards (MiladyDashboard, HermesDashboard, etc.)
-// are free to replace this card with something richer.
+// per-framework dashboards are free to replace this card with something richer.
 const FRAMEWORK_CAPABILITIES: Record<string, string[]> = {
   openclaw: [
     'Web Search',
@@ -30,35 +29,16 @@ const FRAMEWORK_CAPABILITIES: Record<string, string[]> = {
     'Learning Agent',
     'Research Mode',
   ],
-  elizaos: [
-    'Character Personas',
-    'Plugin System',
-    'Social Media Native',
-    'Image Gen',
-    'Blockchain',
-    'Multi-Client',
-  ],
-  milady: [
-    'Personality Presets',
-    'Lightweight (120MB)',
-    'Fast Start (800ms)',
-    'Privacy-First',
-    'Cultural Awareness',
-  ],
 };
 
 const FRAMEWORK_CAP_STYLE: Record<string, string> = {
   openclaw: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
   hermes: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-  elizaos: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
-  milady: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
 };
 
 const FRAMEWORK_STAT_COLOR: Record<string, string> = {
   openclaw: 'text-amber-400',
   hermes: 'text-purple-400',
-  elizaos: 'text-cyan-400',
-  milady: 'text-rose-400',
 };
 
 const FRAMEWORK_STATS: Record<string, { label: string; value: string }[]> = {
@@ -71,16 +51,6 @@ const FRAMEWORK_STATS: Record<string, { label: string; value: string }[]> = {
     { label: 'Startup Time', value: '~3s' },
     { label: 'Memory', value: '~290MB' },
     { label: 'Platforms', value: '8' },
-  ],
-  elizaos: [
-    { label: 'Startup Time', value: '~2s' },
-    { label: 'Memory', value: '~250MB' },
-    { label: 'Platforms', value: '10+' },
-  ],
-  milady: [
-    { label: 'Startup Time', value: '~800ms' },
-    { label: 'Memory', value: '~120MB' },
-    { label: 'Platforms', value: '7' },
   ],
 };
 

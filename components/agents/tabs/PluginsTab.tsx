@@ -109,32 +109,6 @@ const RECOMMENDED: Record<string, Array<{ name: string; displayName?: string; ty
     // Plugin
     { name: '42-evey/hermes-plugins', type: 'plugin', source: 'github', description: '23 plugins: autonomy, telemetry, safety, memory' },
   ],
-  elizaos: [
-    { name: '@elizaos/plugin-image', displayName: 'Image Generation', type: 'plugin', source: 'elizaos-registry', description: 'Generate images with DALL-E, Stable Diffusion, and more' },
-    { name: '@elizaos/plugin-video', displayName: 'Video', type: 'plugin', source: 'elizaos-registry', description: 'Video generation and processing' },
-    { name: '@elizaos/plugin-tts', displayName: 'Text to Speech', type: 'plugin', source: 'elizaos-registry', description: 'Convert text to natural speech' },
-    { name: '@elizaos/plugin-solana', displayName: 'Solana', type: 'plugin', source: 'elizaos-registry', description: 'Solana blockchain interactions, token transfers, DeFi' },
-    { name: '@elizaos/plugin-evm', displayName: 'EVM Chains', type: 'plugin', source: 'elizaos-registry', description: 'Ethereum, Polygon, Arbitrum, Base interactions' },
-    { name: '@elizaos/plugin-farcaster', displayName: 'Farcaster', type: 'plugin', source: 'elizaos-registry', description: 'Farcaster social protocol integration' },
-    { name: '@elizaos/plugin-github', displayName: 'GitHub', type: 'plugin', source: 'elizaos-registry', description: 'GitHub repo management and automation' },
-    { name: '@elizaos/plugin-pdf', displayName: 'PDF Reader', type: 'plugin', source: 'elizaos-registry', description: 'Read and extract content from PDF files' },
-    { name: '@elizaos/plugin-coinbase', displayName: 'Coinbase', type: 'plugin', source: 'elizaos-registry', description: 'Coinbase trading and wallet integration' },
-    { name: '@elizaos/plugin-web-search', displayName: 'Web Search', type: 'plugin', source: 'elizaos-registry', description: 'Search the web for real-time information' },
-  ],
-  milady: [
-    // Skills (from milady-ai/skills GitHub repo)
-    { name: 'milady-development', displayName: 'Development', type: 'skill', source: 'milady-skills', description: 'Agent self-modification and development skill' },
-    { name: 'binance-algo', displayName: 'Binance Algo', type: 'skill', source: 'milady-skills', description: 'Algorithmic trading strategies for Binance' },
-    { name: 'bags', displayName: 'Bags', type: 'skill', source: 'milady-skills', description: 'Portfolio and token bag management' },
-    // Plugins (from ElizaOS registry)
-    { name: '@elizaos/plugin-image', displayName: 'Image Generation', type: 'plugin', source: 'elizaos-registry', description: 'Generate images with AI models' },
-    { name: '@elizaos/plugin-solana', displayName: 'Solana', type: 'plugin', source: 'elizaos-registry', description: 'Solana blockchain interactions, token transfers' },
-    { name: '@elizaos/plugin-evm', displayName: 'EVM Chains', type: 'plugin', source: 'elizaos-registry', description: 'Ethereum, Polygon, Arbitrum, Base interactions' },
-    { name: '@elizaos/plugin-tts', displayName: 'Text to Speech', type: 'plugin', source: 'elizaos-registry', description: 'Convert text to natural speech' },
-    { name: '@elizaos/plugin-farcaster', displayName: 'Farcaster', type: 'plugin', source: 'elizaos-registry', description: 'Farcaster social protocol integration' },
-    { name: '@elizaos/plugin-github', displayName: 'GitHub', type: 'plugin', source: 'elizaos-registry', description: 'GitHub repo management and automation' },
-    { name: '@elizaos/plugin-coinbase', displayName: 'Coinbase', type: 'plugin', source: 'elizaos-registry', description: 'Coinbase trading and wallet integration' },
-  ],
 };
 
 // ─── Helpers ─────────────────────────────────────────────────
@@ -144,8 +118,6 @@ const SOURCE_COLORS: Record<string, { bg: string; text: string }> = {
   'clawhub-plugin': { bg: 'bg-amber-500/10', text: 'text-amber-400' },
   github:           { bg: 'bg-slate-500/10', text: 'text-slate-300' },
   npm:              { bg: 'bg-red-500/10', text: 'text-red-400' },
-  'elizaos-registry': { bg: 'bg-cyan-500/10', text: 'text-cyan-400' },
-  'milady-skills':  { bg: 'bg-rose-500/10', text: 'text-rose-400' },
   bundled:          { bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
 };
 
@@ -262,9 +234,7 @@ export function PluginsTab() {
   const [bundledExpanded, setBundledExpanded] = useState(true);
   const [toggling, setToggling] = useState<string | null>(null);
 
-  // ElizaOS has no skills concept in v1.7.x
-  const hasSkills = agent?.framework !== 'elizaos';
-  const [subTab, setSubTab] = useState<SubTab>(hasSkills ? 'skills' : 'plugins');
+  const [subTab, setSubTab] = useState<SubTab>('skills');
 
   // ─── Load plugins data ─────────────────────────────────────
 
@@ -313,8 +283,8 @@ export function PluginsTab() {
 
   // Reset sub-tab when framework changes
   useEffect(() => {
-    setSubTab(hasSkills ? 'skills' : 'plugins');
-  }, [hasSkills]);
+    setSubTab('skills');
+  }, [agent?.framework]);
 
   // ─── Toggle bundled skill ──────────────────────────────────
 
@@ -359,7 +329,7 @@ export function PluginsTab() {
       if (res.success) {
         toast(
           res.data.requiresRestart ? 'warning' : 'success',
-          res.data.note || `${name} installed successfully`,
+          res.data.message || res.data.note || `${name} installed successfully`,
         );
         await load();
       } else {
@@ -381,7 +351,7 @@ export function PluginsTab() {
     try {
       const res = await api.uninstallAgentPlugin(agent.id, name);
       if (res.success) {
-        toast.success(res.data.note || `${name} has been removed.`);
+        toast.success(res.data.message || res.data.note || `${name} has been removed.`);
         await load();
       } else {
         toast.error(res.error || `Failed to uninstall ${name}`);
@@ -405,9 +375,6 @@ export function PluginsTab() {
     if (type === 'plugin') {
       if (fw === 'openclaw') source = 'npm';
       else if (fw === 'hermes') source = 'github';
-      else source = 'elizaos-registry';
-    } else if (fw === 'milady') {
-      source = 'milady-skills';
     }
     setManualName('');
     await handleInstall(name, type, source);
@@ -541,37 +508,35 @@ export function PluginsTab() {
         </GlassCard>
       )}
 
-      {/* Sub-tabs (hide skills tab for ElizaOS) */}
-      {hasSkills && (
-        <div className="flex gap-1 p-1 rounded-lg bg-white/[0.03] border border-white/5 w-fit">
-          <button
-            onClick={() => setSubTab('skills')}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
-              subTab === 'skills'
-                ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] shadow-sm'
-                : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
-            }`}
-          >
-            <span className="inline-flex items-center gap-1.5">
-              <Sparkles size={14} />
-              Skills
-            </span>
-          </button>
-          <button
-            onClick={() => setSubTab('plugins')}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
-              subTab === 'plugins'
-                ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] shadow-sm'
-                : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
-            }`}
-          >
-            <span className="inline-flex items-center gap-1.5">
-              <Puzzle size={14} />
-              Plugins
-            </span>
-          </button>
-        </div>
-      )}
+      {/* Sub-tabs */}
+      <div className="flex gap-1 p-1 rounded-lg bg-white/[0.03] border border-white/5 w-fit">
+        <button
+          onClick={() => setSubTab('skills')}
+          className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+            subTab === 'skills'
+              ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] shadow-sm'
+              : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
+          }`}
+        >
+          <span className="inline-flex items-center gap-1.5">
+            <Sparkles size={14} />
+            Skills
+          </span>
+        </button>
+        <button
+          onClick={() => setSubTab('plugins')}
+          className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+            subTab === 'plugins'
+              ? 'bg-[var(--color-accent)]/15 text-[var(--color-accent)] shadow-sm'
+              : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
+          }`}
+        >
+          <span className="inline-flex items-center gap-1.5">
+            <Puzzle size={14} />
+            Plugins
+          </span>
+        </button>
+      </div>
 
       {/* ─── 1. Bundled Skills Section (only on Skills sub-tab) ──── */}
       {bundledSkills.length > 0 && subTab === 'skills' && (
@@ -736,9 +701,7 @@ export function PluginsTab() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={`Search ${
-                agent?.framework === 'elizaos' ? 'ElizaOS'
-                : agent?.framework === 'milady' ? (subTab === 'skills' ? 'Milady' : 'ElizaOS')
-                : 'ClawHub'
+                agent?.framework === 'hermes' && subTab === 'plugins' ? 'GitHub' : 'ClawHub'
               } ${subTab}...`}
               className="w-full pl-9 pr-3 py-1.5 text-sm rounded-lg bg-white/[0.04] border border-white/10 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/40"
             />
@@ -856,9 +819,7 @@ export function PluginsTab() {
                   ? 'e.g. hello-world'
                   : agent?.framework === 'hermes'
                     ? 'e.g. 42-evey/hermes-plugins'
-                    : agent?.framework === 'openclaw'
-                      ? 'e.g. @openclaw/openviking'
-                      : 'e.g. @elizaos/plugin-image'
+                    : 'e.g. @openclaw/openviking'
               }
               className="flex-1 px-3 py-1.5 text-sm rounded-lg bg-white/[0.04] border border-white/10 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--color-accent)]/40"
             />

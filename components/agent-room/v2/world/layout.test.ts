@@ -12,7 +12,7 @@ describe('getStationLayout', () => {
     expect(agentAvatar.position).toEqual([0, 0, 0]);
   });
   it('keeps all stations inside the room bounds', () => {
-    const layout = getStationLayout('milady');
+    const layout = getStationLayout('openclaw');
     // Leave ~0.5m of headroom so station meshes themselves don't poke
     // through the walls even though their centers are inside.
     for (const s of Object.values(layout)) {
@@ -21,7 +21,7 @@ describe('getStationLayout', () => {
     }
   });
   it('never overlaps two stations within 2m', () => {
-    const layout = getStationLayout('elizaos');
+    const layout = getStationLayout('hermes');
     const entries = Object.values(layout);
     for (let i = 0; i < entries.length; i++) {
       for (let j = i + 1; j < entries.length; j++) {

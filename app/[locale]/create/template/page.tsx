@@ -42,6 +42,7 @@ import {
 type Step = 1 | 2 | 3 | 4 | 5;
 
 type LLMChoice = 'hosted_openrouter' | 'byok';
+type FrameworkChoice = 'openclaw' | 'hermes';
 
 // BYOK_PROVIDERS imported from @hatcher/shared
 
@@ -59,8 +60,6 @@ interface ApiTemplate {
   recommendedSkills?: {
     openclaw: string[];
     hermes: string[];
-    elizaos: string[];
-    milady: string[];
   };
 }
 
@@ -77,8 +76,6 @@ function formatSkillName(name: string): string {
     'email-assistant': 'Email Assistant', 'pdf-reader': 'PDF Reader',
     'notion-tools': 'Notion', 'google-sheets': 'Google Sheets',
     'todoist-task-manager': 'Todoist', 'calendar-assistant': 'Calendar',
-    '@elizaos/plugin-github': 'GitHub', '@elizaos/plugin-bootstrap': 'Bootstrap',
-    '@elizaos/plugin-node': 'Node Runtime', '@elizaos/plugin-sql': 'Database',
   };
   if (overrides[name]) return overrides[name];
   return name
@@ -98,7 +95,7 @@ const PLATFORMS = [
     name: 'Telegram',
     icon: '\u2708\uFE0F',
     description: 'Deploy as a Telegram bot',
-    frameworks: ['openclaw', 'hermes', 'elizaos', 'milady'],
+    frameworks: ['openclaw', 'hermes'],
     fields: [
       { key: 'TELEGRAM_BOT_TOKEN', label: 'Bot Token', placeholder: 'Token from @BotFather', helper: 'Message @BotFather on Telegram \u2192 /newbot \u2192 copy the token', required: true },
     ],
@@ -108,7 +105,7 @@ const PLATFORMS = [
     name: 'Discord',
     icon: '\uD83C\uDFAE',
     description: 'Deploy as a Discord bot',
-    frameworks: ['openclaw', 'hermes', 'elizaos', 'milady'],
+    frameworks: ['openclaw', 'hermes'],
     fields: [
       { key: 'DISCORD_API_TOKEN', label: 'Bot Token', placeholder: 'Discord bot token', helper: 'Discord Developer Portal \u2192 New Application \u2192 Bot \u2192 Copy Token', required: true },
     ],
@@ -119,7 +116,7 @@ const PLATFORMS = [
     icon: '\uD83D\uDCAC',
     description: 'Connect via QR code',
     // Only OpenClaw supports non-interactive QR pairing from the dashboard.
-    // Hermes needs a TTY; Milady uses Meta Cloud API tokens instead.
+    // Hermes needs a TTY.
     frameworks: ['openclaw'],
     fields: [],
     note: 'QR pairing will be available after deployment',
@@ -129,7 +126,7 @@ const PLATFORMS = [
     name: 'Slack',
     icon: '\uD83D\uDCBC',
     description: 'Deploy in Slack workspace',
-    frameworks: ['openclaw', 'hermes', 'elizaos', 'milady'],
+    frameworks: ['openclaw', 'hermes'],
     fields: [
       { key: 'SLACK_BOT_TOKEN', label: 'Bot Token', placeholder: 'xoxb-...', helper: 'Slack API \u2192 Create App \u2192 OAuth & Permissions \u2192 Bot Token', required: true },
     ],
@@ -139,7 +136,7 @@ const PLATFORMS = [
     name: 'X (Twitter)',
     icon: '\uD835\uDD4F',
     description: 'Post, reply and engage on X',
-    frameworks: ['openclaw', 'elizaos', 'milady'],
+    frameworks: ['openclaw'],
     fields: [
       { key: 'XURL_CLIENT_ID', label: 'OAuth2 Client ID', placeholder: 'Client ID from X Developer Portal', required: true },
       { key: 'XURL_CLIENT_SECRET', label: 'OAuth2 Client Secret', placeholder: 'Client Secret', required: true },
@@ -236,7 +233,7 @@ export default function CreatePage() {
   const preselectedTemplate = searchParams.get('template') ?? 'custom';
   const validPreselect = preselectedTemplate; // will be validated dynamically
   const [selectedTemplate, setSelectedTemplate] = useState(validPreselect);
-  const [selectedFramework, setSelectedFramework] = useState<'openclaw' | 'hermes' | 'elizaos' | 'milady'>('openclaw');
+  const [selectedFramework, setSelectedFramework] = useState<FrameworkChoice>('openclaw');
 
   // ── OpenClaw form state ──
   const [openclawForm, setOpenclawForm] = useState({
@@ -247,18 +244,6 @@ export default function CreatePage() {
   const [showCustomPrompt, setShowCustomPrompt] = useState(false);
   const [openclawSkills, setOpenclawSkills] = useState<string[]>(['web_search', 'calculator']);
   const [hermesTools, setHermesTools] = useState<string[]>(['web_search', 'memory', 'calculator']);
-  const [elizaPlugins, setElizaPlugins] = useState<string[]>(['@elizaos/plugin-bootstrap', '@elizaos/plugin-node', '@elizaos/plugin-sql']);
-  const [miladyCapabilities, setMiladyCapabilities] = useState<string[]>(['chat', 'defi', 'social']);
-
-  // ── ElizaOS-specific form state ──
-  const [elizaBio, setElizaBio] = useState('');
-  const [elizaLore, setElizaLore] = useState('');
-  const [elizaStyle, setElizaStyle] = useState('');
-  const [elizaTopics, setElizaTopics] = useState('');
-  const [elizaAdjectives, setElizaAdjectives] = useState('');
-
-  // ── Milady-specific form state ──
-  const [miladyPersonality, setMiladyPersonality] = useState<'helpful' | 'tsundere' | 'unhinged' | 'custom'>('helpful');
 
   // ── Advanced create options ──
   const [enableWebSearch, setEnableWebSearch] = useState(false);
@@ -267,13 +252,9 @@ export default function CreatePage() {
   const [ttsProvider, setTtsProvider] = useState('elevenlabs');
   const [sessionScope, setSessionScope] = useState('per-peer');
   const [enableMemory, setEnableMemory] = useState(true);
-  const [dbBackend, setDbBackend] = useState('pglite');
   const [hermesPersonality, setHermesPersonality] = useState('default');
   const [approvalMode, setApprovalMode] = useState('auto');
   const [showMoreOptions, setShowMoreOptions] = useState(false);
-  const [enableImageGen, setEnableImageGen] = useState(false);
-  const [enableVoice, setEnableVoice] = useState(false);
-  const [localFirst, setLocalFirst] = useState(true);
 
   // ── Platform selection state ──
   const [platformsEnabled, setPlatformsEnabled] = useState<Record<string, boolean>>({});
@@ -344,18 +325,6 @@ export default function CreatePage() {
   function toggleHermesTool(tool: string) {
     setHermesTools((prev) =>
       prev.includes(tool) ? prev.filter((t) => t !== tool) : [...prev, tool]
-    );
-  }
-
-  function toggleElizaPlugin(plugin: string) {
-    setElizaPlugins((prev) =>
-      prev.includes(plugin) ? prev.filter((p) => p !== plugin) : [...prev, plugin]
-    );
-  }
-
-  function toggleMiladyCapability(cap: string) {
-    setMiladyCapabilities((prev) =>
-      prev.includes(cap) ? prev.filter((c) => c !== cap) : [...prev, cap]
     );
   }
 
@@ -453,20 +422,6 @@ export default function CreatePage() {
           provider: llm.modelProvider,
           ...(selectedFramework === 'openclaw' ? { skills: openclawSkills } : {}),
           ...(selectedFramework === 'hermes' ? { tools: hermesTools } : {}),
-          ...(selectedFramework === 'elizaos' ? { plugins: elizaPlugins } : {}),
-          ...(selectedFramework === 'milady' ? { capabilities: miladyCapabilities } : {}),
-          ...(selectedFramework === 'elizaos' ? {
-            bio: elizaBio.trim() || undefined,
-            lore: elizaLore.trim() || undefined,
-            topics: elizaTopics.split(',').map(s => s.trim()).filter(Boolean),
-            adjectives: elizaAdjectives.split(',').map(s => s.trim()).filter(Boolean),
-            style: elizaStyle.trim() ? {
-              all: elizaStyle.split('\n').map(s => s.trim()).filter(Boolean),
-            } : undefined,
-          } : {}),
-          ...(selectedFramework === 'milady' ? {
-            miladyPersonality,
-          } : {}),
           systemPrompt: openclawForm.systemPrompt.trim() || '',
           // Note: template system prompt is fetched server-side from AgentTemplate.soulMd
           // BYOK config -- backend reads agentConfig['byok']
@@ -484,15 +439,6 @@ export default function CreatePage() {
             personality: hermesPersonality,
             enableMemory,
             approvalMode,
-          }),
-          ...(selectedFramework === 'elizaos' && {
-            dbBackend,
-            enableImageGen,
-            enableVoice,
-          }),
-          ...(selectedFramework === 'milady' && {
-            dbBackend,
-            localFirst,
           }),
         },
       };
@@ -1461,106 +1407,6 @@ export default function CreatePage() {
                   </fieldset>
                 )}
 
-                {/* Plugins — ElizaOS only */}
-                {selectedFramework === 'elizaos' && (
-                  <fieldset>
-                    <legend className="block text-sm font-medium text-[var(--text-primary)] mb-1">
-                      {t('pluginsHeading')}
-                    </legend>
-                    <p className="text-xs text-[var(--text-muted)] mb-4">{t('pluginsSubheading')}</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {([
-                        { id: '@elizaos/plugin-sql', emoji: '\uD83D\uDDC3\uFE0F', nameKey: 'plugins.database.name', descKey: 'plugins.database.desc' },
-                        { id: '@elizaos/plugin-image', emoji: '\uD83C\uDFA8', nameKey: 'plugins.imageGen.name', descKey: 'plugins.imageGen.desc' },
-                        { id: '@elizaos/plugin-video', emoji: '\uD83C\uDFAC', nameKey: 'plugins.video.name', descKey: 'plugins.video.desc' },
-                        { id: '@elizaos/plugin-tts', emoji: '\uD83D\uDD0A', nameKey: 'plugins.tts.name', descKey: 'plugins.tts.desc' },
-                        { id: '@elizaos/plugin-node', emoji: '\u2699\uFE0F', nameKey: 'plugins.nodeRuntime.name', descKey: 'plugins.nodeRuntime.desc' },
-                        { id: '@elizaos/plugin-bootstrap', emoji: '\uD83D\uDE80', nameKey: 'plugins.bootstrap.name', descKey: 'plugins.bootstrap.desc' },
-                      ] as const).map((plugin) => {
-                        const selected = elizaPlugins.includes(plugin.id);
-                        return (
-                          <motion.button
-                            key={plugin.id}
-                            type="button"
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                            onClick={() => toggleElizaPlugin(plugin.id)}
-                            className={cn(
-                              'relative p-4 rounded-xl border text-left transition-all duration-200',
-                              selected
-                                ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-[0_0_16px_rgba(6,182,212,0.12)]'
-                                : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)]'
-                            )}
-                          >
-                            {selected && (
-                              <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center"
-                              >
-                                <Check className="w-3 h-3 text-white" />
-                              </motion.div>
-                            )}
-                            <span className="text-xl mb-2 block">{plugin.emoji}</span>
-                            <div className="text-sm font-medium text-[var(--text-primary)]">{t(plugin.nameKey)}</div>
-                            <div className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-snug">{t(plugin.descKey)}</div>
-                          </motion.button>
-                        );
-                      })}
-                    </div>
-                  </fieldset>
-                )}
-
-                {/* Capabilities — Milady only */}
-                {selectedFramework === 'milady' && (
-                  <fieldset>
-                    <legend className="block text-sm font-medium text-[var(--text-primary)] mb-1">
-                      {t('capabilitiesHeading')}
-                    </legend>
-                    <p className="text-xs text-[var(--text-muted)] mb-4">{t('capabilitiesSubheading')}</p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {([
-                        { id: 'chat', emoji: '\uD83D\uDCAC', nameKey: 'capabilities.chat.name', descKey: 'capabilities.chat.desc' },
-                        { id: 'defi', emoji: '\uD83D\uDCB0', nameKey: 'capabilities.defi.name', descKey: 'capabilities.defi.desc' },
-                        { id: 'social', emoji: '\uD83D\uDCF1', nameKey: 'capabilities.social.name', descKey: 'capabilities.social.desc' },
-                        { id: 'analysis', emoji: '\uD83D\uDCCA', nameKey: 'capabilities.analysis.name', descKey: 'capabilities.analysis.desc' },
-                        { id: 'privacy', emoji: '\uD83D\uDD12', nameKey: 'capabilities.privacy.name', descKey: 'capabilities.privacy.desc' },
-                        { id: 'memes', emoji: '\uD83C\uDFAD', nameKey: 'capabilities.memes.name', descKey: 'capabilities.memes.desc' },
-                      ] as const).map((cap) => {
-                        const selected = miladyCapabilities.includes(cap.id);
-                        return (
-                          <motion.button
-                            key={cap.id}
-                            type="button"
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                            onClick={() => toggleMiladyCapability(cap.id)}
-                            className={cn(
-                              'relative p-4 rounded-xl border text-left transition-all duration-200',
-                              selected
-                                ? 'bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-[0_0_16px_rgba(6,182,212,0.12)]'
-                                : 'bg-[var(--bg-elevated)] border-[var(--border-default)] hover:border-[rgba(6,182,212,0.3)]'
-                            )}
-                          >
-                            {selected && (
-                              <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[var(--accent-600)] flex items-center justify-center"
-                              >
-                                <Check className="w-3 h-3 text-white" />
-                              </motion.div>
-                            )}
-                            <span className="text-xl mb-2 block">{cap.emoji}</span>
-                            <div className="text-sm font-medium text-[var(--text-primary)]">{t(cap.nameKey)}</div>
-                            <div className="text-[11px] text-[var(--text-muted)] mt-0.5 leading-snug">{t(cap.descKey)}</div>
-                          </motion.button>
-                        );
-                      })}
-                    </div>
-                  </fieldset>
-                )}
-
                 {/* Recommended ClawHub skills from template */}
                 {selectedTemplate !== 'custom' && (() => {
                   const tpl = templates.find(t => t.id === selectedTemplate);
@@ -1600,108 +1446,6 @@ export default function CreatePage() {
                   setShowCustomPrompt={setShowCustomPrompt}
                 />
 
-                {/* ElizaOS-specific fields */}
-                {selectedFramework === 'elizaos' && (
-                  <>
-                    <div>
-                      <label htmlFor="eliza-bio" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                        {t('elizaBioLabel')}
-                      </label>
-                      <p className="text-xs text-[var(--text-muted)] mb-2">{t('elizaBioHint')}</p>
-                      <textarea
-                        id="eliza-bio"
-                        className="input resize-none"
-                        rows={4}
-                        placeholder={t('elizaBioPlaceholder')}
-                        value={elizaBio}
-                        onChange={(e) => setElizaBio(e.target.value)}
-                        maxLength={2000}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="eliza-lore" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                        {t('elizaLoreLabel')}
-                      </label>
-                      <p className="text-xs text-[var(--text-muted)] mb-2">{t('elizaLoreHint')}</p>
-                      <textarea
-                        id="eliza-lore"
-                        className="input resize-none"
-                        rows={3}
-                        placeholder={"Was created to help developers build AI applications\nHas extensive knowledge of blockchain technology\nSpeaks three languages fluently"}
-                        value={elizaLore}
-                        onChange={(e) => setElizaLore(e.target.value)}
-                        maxLength={2000}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="eliza-style" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                        {t('elizaStyleLabel')}
-                      </label>
-                      <p className="text-xs text-[var(--text-muted)] mb-2">{t('elizaStyleHint')}</p>
-                      <textarea
-                        id="eliza-style"
-                        className="input resize-none"
-                        rows={3}
-                        placeholder={"Be concise and direct\nUse technical terminology when appropriate\nAlways provide examples"}
-                        value={elizaStyle}
-                        onChange={(e) => setElizaStyle(e.target.value)}
-                        maxLength={1000}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="eliza-topics" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                        {t('elizaTopicsLabel')}
-                      </label>
-                      <input
-                        id="eliza-topics"
-                        type="text"
-                        className="input"
-                        placeholder={t('elizaTopicsPlaceholder')}
-                        value={elizaTopics}
-                        onChange={(e) => setElizaTopics(e.target.value)}
-                        maxLength={500}
-                      />
-                      <p className="text-xs text-[var(--text-muted)] mt-1">{t('elizaTopicsHint')}</p>
-                    </div>
-                    <div>
-                      <label htmlFor="eliza-adjectives" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                        {t('elizaAdjectivesLabel')}
-                      </label>
-                      <input
-                        id="eliza-adjectives"
-                        type="text"
-                        className="input"
-                        placeholder={t('elizaAdjectivesPlaceholder')}
-                        value={elizaAdjectives}
-                        onChange={(e) => setElizaAdjectives(e.target.value)}
-                        maxLength={500}
-                      />
-                      <p className="text-xs text-[var(--text-muted)] mt-1">{t('elizaAdjectivesHint')}</p>
-                    </div>
-                  </>
-                )}
-
-                {/* Milady-specific fields */}
-                {selectedFramework === 'milady' && (
-                  <div>
-                    <label htmlFor="milady-personality" className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                      {t('miladyPersonalityLabel')}
-                    </label>
-                    <p className="text-xs text-[var(--text-muted)] mb-2">{t('miladyPersonalityHint')}</p>
-                    <select
-                      id="milady-personality"
-                      className="input"
-                      value={miladyPersonality}
-                      onChange={(e) => setMiladyPersonality(e.target.value as typeof miladyPersonality)}
-                    >
-                      <option value="helpful">{t('miladyPersonalityHelpful')}</option>
-                      <option value="tsundere">{t('miladyPersonalityTsundere')}</option>
-                      <option value="unhinged">{t('miladyPersonalityUnhinged')}</option>
-                      <option value="custom">{t('miladyPersonalityCustom')}</option>
-                    </select>
-                  </div>
-                )}
-
                 {/* ── More Options (collapsible, framework-specific) ── */}
                 <div className="border border-[var(--border-default)] bg-[var(--bg-card)] rounded-xl overflow-hidden">
                   <button
@@ -1714,9 +1458,7 @@ export default function CreatePage() {
                       <span className="text-sm font-medium text-[var(--text-primary)]">{t('moreOptionsLabel')}</span>
                       <span className="text-xs text-[var(--text-muted)]">
                         {selectedFramework === 'openclaw' ? t('moreOptionsHints.openclaw') :
-                         selectedFramework === 'hermes' ? t('moreOptionsHints.hermes') :
-                         selectedFramework === 'elizaos' ? t('moreOptionsHints.elizaos') :
-                         t('moreOptionsHints.milady')}
+                         t('moreOptionsHints.hermes')}
                       </span>
                     </div>
                     {showMoreOptions
@@ -1855,88 +1597,6 @@ export default function CreatePage() {
                             </>
                           )}
 
-                          {/* ── ElizaOS options ── */}
-                          {selectedFramework === 'elizaos' && (
-                            <>
-                              {/* Database */}
-                              <OptionRow
-                                label={t('databaseLabel')}
-                                hint={t('databaseHint')}
-                              >
-                                <OptionSelect
-                                  value={dbBackend}
-                                  onChange={setDbBackend}
-                                  options={[
-                                    { value: 'pglite', label: 'PGLite (default)' },
-                                    { value: 'postgresql', label: 'PostgreSQL' },
-                                    { value: 'sqlite', label: 'SQLite' },
-                                  ]}
-                                />
-                              </OptionRow>
-
-                              {/* Image Generation */}
-                              <OptionRow
-                                label={t('imageGenLabel')}
-                                hint={t('imageGenHint')}
-                              >
-                                <ToggleSwitch checked={enableImageGen} onChange={setEnableImageGen} />
-                              </OptionRow>
-
-                              {/* Voice */}
-                              <OptionRow
-                                label={t('voiceLabel')}
-                                hint={t('voiceHint')}
-                              >
-                                <ToggleSwitch checked={enableVoice} onChange={setEnableVoice} />
-                              </OptionRow>
-                            </>
-                          )}
-
-                          {/* ── Milady options ── */}
-                          {selectedFramework === 'milady' && (
-                            <>
-                              {/* Personality (already selected above, show summary) */}
-                              <OptionRow
-                                label={t('miladyPersonalityLabel')}
-                                hint={t('miladyPersonalitySelectedHint')}
-                              >
-                                <OptionSelect
-                                  value={miladyPersonality}
-                                  onChange={(v) => setMiladyPersonality(v as typeof miladyPersonality)}
-                                  options={[
-                                    { value: 'helpful', label: t('hermesPersonalityHelpful') },
-                                    { value: 'tsundere', label: 'Tsundere' },
-                                    { value: 'unhinged', label: 'Unhinged' },
-                                    { value: 'custom', label: t('hermesPersonalityTechnical') },
-                                  ]}
-                                />
-                              </OptionRow>
-
-                              {/* Database */}
-                              <OptionRow
-                                label={t('databaseLabel')}
-                                hint={t('databaseHintMilady')}
-                              >
-                                <OptionSelect
-                                  value={dbBackend}
-                                  onChange={setDbBackend}
-                                  options={[
-                                    { value: 'pglite', label: 'PGLite (default)' },
-                                    { value: 'postgresql', label: 'PostgreSQL' },
-                                  ]}
-                                />
-                              </OptionRow>
-
-                              {/* Local-First Mode */}
-                              <OptionRow
-                                label={t('localFirstLabel')}
-                                hint={t('localFirstHint')}
-                              >
-                                <ToggleSwitch checked={localFirst} onChange={setLocalFirst} />
-                              </OptionRow>
-                            </>
-                          )}
-
                         </div>
                       </motion.div>
                     )}
@@ -1996,7 +1656,7 @@ export default function CreatePage() {
                   <div>
                     <div className="text-lg font-bold text-[var(--text-primary)]">{agentName}</div>
                     <div className="text-sm text-[var(--text-muted)]">
-                      {selectedFramework === 'openclaw' ? 'OpenClaw' : selectedFramework === 'hermes' ? 'Hermes' : selectedFramework === 'milady' ? 'Milady' : 'ElizaOS'} agent
+                      {selectedFramework === 'openclaw' ? 'OpenClaw' : 'Hermes'} agent
                       <span className="ml-1.5 text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-hover)] text-[var(--text-secondary)] border border-[var(--border-default)] align-middle">
                         {t(`summaryFrameworkLabels.${selectedFramework}`)}
                       </span>
@@ -2006,7 +1666,7 @@ export default function CreatePage() {
 
                 {/* Summary details */}
                 <div className="space-y-3 text-sm">
-                  <SummaryRow label={t('summaryAgentType')} value={selectedFramework === 'openclaw' ? 'OpenClaw' : selectedFramework === 'hermes' ? 'Hermes' : selectedFramework === 'milady' ? 'Milady' : 'ElizaOS'} />
+                  <SummaryRow label={t('summaryAgentType')} value={selectedFramework === 'openclaw' ? 'OpenClaw' : 'Hermes'} />
                   <SummaryRow label={t('summaryTemplate')} value={templates.find(tpl => tpl.id === selectedTemplate)?.name ?? t('summaryTemplateCustom')} />
                   <SummaryRow label={t('summaryAiModel')} value={getLLMSummary()} />
 
@@ -2021,7 +1681,6 @@ export default function CreatePage() {
 
                   <PersonalitySummary
                     framework={selectedFramework}
-                    miladyPersonality={miladyPersonality}
                     hermesPersonality={hermesPersonality}
                     systemPrompt={openclawForm.systemPrompt}
                   />
@@ -2348,21 +2007,18 @@ function SystemPromptSection({
 
 // ── Personality Summary ───────────────────────────────────────
 
-function PersonalitySummary({ framework, miladyPersonality, hermesPersonality, systemPrompt }: {
+function PersonalitySummary({ framework, hermesPersonality, systemPrompt }: {
   framework: string;
-  miladyPersonality: string;
   hermesPersonality: string;
   systemPrompt: string;
 }) {
   const t = useTranslations('create');
-  const isMiladyCustom = framework === 'milady' && miladyPersonality !== 'helpful';
   const isHermesCustom = framework === 'hermes' && hermesPersonality !== 'default';
   const hasCustomPrompt = systemPrompt.trim();
   let label = t('summaryPersonalityDefault');
-  if (isMiladyCustom) label = miladyPersonality.charAt(0).toUpperCase() + miladyPersonality.slice(1);
-  else if (isHermesCustom) label = hermesPersonality.charAt(0).toUpperCase() + hermesPersonality.slice(1);
+  if (isHermesCustom) label = hermesPersonality.charAt(0).toUpperCase() + hermesPersonality.slice(1);
   else if (hasCustomPrompt) label = t('summaryPersonalityCustom');
-  return <SummaryRow label={t('summaryPersonality')} value={label} highlight={!!hasCustomPrompt || isMiladyCustom || isHermesCustom} />;
+  return <SummaryRow label={t('summaryPersonality')} value={label} highlight={!!hasCustomPrompt || isHermesCustom} />;
 }
 
 // ── Summary Row ─────────────────────────────────────────────

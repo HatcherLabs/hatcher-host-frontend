@@ -86,7 +86,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
 
                 <ul className="space-y-3 mb-8">
                   {[
-                    '4 AI frameworks to choose from',
+                    '2 AI frameworks to choose from',
                     'Deploy to Telegram, Discord, Twitter, WhatsApp & Slack',
                     'Free tier with BYOK — no credit card required',
                   ].map((item, i) => (

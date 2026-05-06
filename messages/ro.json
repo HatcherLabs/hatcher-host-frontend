@@ -262,18 +262,6 @@
           "tag": "raționament",
           "desc": "Design axat pe inteligență, memorie bogată și raționament.",
           "features": "77 abilități incluse · Memorie profundă · Multi-model"
-        },
-        {
-          "name": "ElizaOS",
-          "tag": "multi-agent",
-          "desc": "Coordonare multi-agent cu 90+ plugins.",
-          "features": "90+ plugins · Multi-agent · Bază de cunoștințe"
-        },
-        {
-          "name": "Milady",
-          "tag": "crypto-nativ",
-          "desc": "Conștientizare on-chain, unelte DeFi, urmărire tokenuri.",
-          "features": "Unelte DeFi · Date on-chain · Urmărire tokenuri"
         }
       ]
     },
@@ -1479,6 +1467,7 @@
           "inboundHttp": "HTTP de intrare",
           "triggerFrom": "Declanșează agentul din servicii externe (Zapier, GitHub, etc.)",
           "webhookUrl": "URL Webhook",
+          "alwaysActive": "Mereu activ",
           "bearerToken": "Bearer Token",
           "exampleRequest": "Exemplu de cerere",
           "revealToken": "Arată token-ul",
@@ -1994,31 +1983,10 @@
     "systemPromptHint": "Definește personalitatea, capacitățile și regulile agentului",
     "systemPromptCount": "{count}/8000",
     "systemPromptWarning": "Adaugă un system prompt pentru rezultate mai bune",
-    "elizaBioLabel": "Bio",
-    "elizaBioHint": "Definește personalitatea și contextul agentului. O afirmație per linie.",
-    "elizaBioPlaceholder": "Un asistent AI cu cunoștințe specializate în...",
-    "elizaLoreLabel": "Lore",
-    "elizaLoreHint": "Cunoștințe de bază și istoria agentului. Un fapt per linie.",
-    "elizaStyleLabel": "Instrucțiuni de stil",
-    "elizaStyleHint": "Cum trebuie să comunice agentul. O instrucțiune per linie.",
-    "elizaTopicsLabel": "Subiecte",
-    "elizaTopicsPlaceholder": "technology, AI, crypto, research",
-    "elizaTopicsHint": "Subiecte pe care le cunoaște agentul, separate prin virgulă",
-    "elizaAdjectivesLabel": "Adjective",
-    "elizaAdjectivesPlaceholder": "helpful, analytical, concise",
-    "elizaAdjectivesHint": "Trăsături de personalitate, separate prin virgulă",
-    "miladyPersonalityLabel": "Preset personalitate",
-    "miladyPersonalityHint": "Alege un stil de personalitate pentru agentul Milady.",
-    "miladyPersonalityHelpful": "Util - Prietenos și profesionist",
-    "miladyPersonalityTsundere": "Tsundere - Reticent dar grijuliu",
-    "miladyPersonalityUnhinged": "Haotic - Imprevizibil și spontan",
-    "miladyPersonalityCustom": "Personalizat - Folosește system prompt-ul tău",
     "moreOptionsLabel": "Mai multe opțiuni",
     "moreOptionsHints": {
       "openclaw": "Căutare, voce, sesiuni",
-      "hermes": "Personalitate, memorie, aprobare",
-      "elizaos": "Bază de date, generare imagini, voce",
-      "milady": "Bază de date, confidențialitate, preset-uri"
+      "hermes": "Personalitate, memorie, aprobare"
     },
     "sessionScopeLabel": "Domeniu sesiune",
     "sessionScopeHint": "Cum se partajează contextul conversației între utilizatori",
@@ -2048,14 +2016,12 @@
     "approvalModeManual": "Manual",
     "databaseLabel": "Bază de date",
     "databaseHint": "Backend stocare pentru starea și memoria agentului",
-    "databaseHintMilady": "Backend stocare pentru starea agentului",
     "imageGenLabel": "Activează generarea de imagini",
     "imageGenHint": "Permite agentului să genereze imagini",
     "voiceLabel": "Activează vocea",
     "voiceHint": "Capacități voce-în-text și text-în-voce",
     "localFirstLabel": "Mod Local-First",
     "localFirstHint": "Procesează datele local înainte de sincronizare",
-    "miladyPersonalitySelectedHint": "Selectat mai sus — controlează tonul agentului",
     "step5Heading": "Gata de pornire?",
     "step5Subheading": "Verifică configurația înainte de pornire",
     "summaryAgentType": "Tip agent",
@@ -2072,9 +2038,7 @@
     "summaryCostByok": "$0.00 — cheie proprie",
     "summaryFrameworkLabels": {
       "openclaw": "Asistent multi-abilitate",
-      "hermes": "Agent autonom",
-      "elizaos": "Framework multi-agent",
-      "milady": "Runtime confidențialitate"
+      "hermes": "Agent autonom"
     },
     "testChatLabel": "Testează agentul",
     "testChatSubtext": "Previzualizează cum va răspunde agentul",
@@ -2103,18 +2067,6 @@
         "f1": "Memorie pe termen lung",
         "f2": "40+ instrumente integrate",
         "f3": "Auto-îmbunătățire"
-      },
-      "elizaos": {
-        "desc": "Framework multi-agent open-source de la ai16z. 90+ plugin-uri, memorie persistentă, Web3 nativ.",
-        "f1": "90+ plugin-uri",
-        "f2": "Memorie vectorială",
-        "f3": "Web3 nativ"
-      },
-      "milady": {
-        "desc": "Runtime AI axat pe confidențialitate cu 20+ conectori, avatare VRM și integrare DeFi.",
-        "f1": "20+ conectori",
-        "f2": "Preset-uri personalitate",
-        "f3": "Confidențialitate-first"
       }
     },
     "skills": {
@@ -2539,14 +2491,6 @@
       "hermes": {
         "name": "Hermes Agent",
         "description": "Agent AI autonom de la Nous Research cu memorie persistentă, 40+ unelte, sistem de abilități și gateway de mesagerie multi-platformă."
-      },
-      "elizaos": {
-        "name": "ElizaOS",
-        "description": "Framework open-source pentru agenți AI cu personalități bazate pe personaje, ecosistem de plugin-uri și suport multi-client pentru platforme sociale și de mesagerie."
-      },
-      "milady": {
-        "name": "Milady",
-        "description": "Framework ușor pentru agenți AI axat pe personalitate, conceput pentru agenți conversaționali expresivi, culturalmente conștienți, cu capabilități modulare."
       }
     },
     "agentStatus": {
@@ -2666,9 +2610,7 @@
       "boxLabel": "Framework-uri",
       "seeAll": "Vezi toate →",
       "tagOpenclaw": "Asistent multi-skill",
-      "tagHermes": "Agent autonom",
-      "tagElizaos": "Framework multi-agent",
-      "tagMilady": "Runtime privacy-first"
+      "tagHermes": "Agent autonom"
     },
     "pricing": {
       "boxLabel": "Prețuri",

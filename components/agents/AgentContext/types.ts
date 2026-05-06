@@ -1,4 +1,4 @@
-import type { Agent, AgentFeature } from '@/lib/api';
+import type { Agent, AgentFeature, ChatSessionSummary } from '@/lib/api';
 import type { AgentFramework } from '@hatcher/shared';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -111,6 +111,11 @@ export interface AgentContextValue {
   handleKeyDown: (e: React.KeyboardEvent) => void;
   sendCooldown: boolean;
   wsConnected: boolean;
+  chatSessions: ChatSessionSummary[];
+  activeChatSessionId: string | null;
+  setActiveChatSessionId: (sessionId: string) => void;
+  startNewChatSession: () => Promise<void>;
+  refreshChatSessions: () => Promise<void>;
   /** Tool calls currently in flight on the agent container, surfaced live
    *  via the WS chat stream. Cleared between messages. */
   inflightTools: Array<{ callId: string; name: string; argsPreview?: string }>;

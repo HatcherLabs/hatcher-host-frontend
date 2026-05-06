@@ -290,8 +290,7 @@ export function WorkspaceTab() {
 
   // Framework gate — backend only exposes the workspace viewer for
   // OpenClaw (any mode) and managed Hermes. Legacy Hermes regenerates
-  // its config dir on every start so there's nothing useful to browse,
-  // and ElizaOS/Milady don't have a "workspace" in this sense at all.
+  // its config dir on every start so there's nothing useful to browse.
   // Keep this in sync with getWorkspaceConfig() in
   // apps/api/src/routes/agents/workspace.ts.
   const isOpenClaw = agent?.framework === 'openclaw';

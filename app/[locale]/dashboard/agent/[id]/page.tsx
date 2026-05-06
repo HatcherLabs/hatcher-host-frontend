@@ -7,7 +7,7 @@ import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import { API_URL } from '@/lib/config';
-import type { Agent, AgentFeature } from '@/lib/api';
+import type { Agent, AgentFeature, ChatSessionSummary } from '@/lib/api';
 
 /** Extra fields the GET /agents/:id response includes beyond the base Agent type */
 interface AgentDetail extends Agent {
@@ -95,26 +95,6 @@ const MemoryTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
-const ElizaosMemoryTab = dynamic(
-  () => import('@/components/agents/tabs/ElizaosMemoryTab').then(mod => ({ default: mod.ElizaosMemoryTab })),
-  { loading: () => <TabSkeleton /> }
-);
-
-const ElizaosSessionsTab = dynamic(
-  () => import('@/components/agents/tabs/ElizaosSessionsTab').then(mod => ({ default: mod.ElizaosSessionsTab })),
-  { loading: () => <TabSkeleton /> }
-);
-
-const ElizaosPluginsTab = dynamic(
-  () => import('@/components/agents/tabs/ElizaosPluginsTab').then(mod => ({ default: mod.ElizaosPluginsTab })),
-  { loading: () => <TabSkeleton /> }
-);
-
-const MiladySkillsTab = dynamic(
-  () => import('@/components/agents/tabs/MiladySkillsTab').then(mod => ({ default: mod.MiladySkillsTab })),
-  { loading: () => <TabSkeleton /> }
-);
-
 const HermesSkillsTab = dynamic(
   () => import('@/components/agents/tabs/HermesSkillsTab').then(mod => ({ default: mod.HermesSkillsTab })),
   { loading: () => <TabSkeleton /> }
@@ -138,21 +118,6 @@ const HermesConfigTab = dynamic(
 const OpenClawConfigTab = dynamic(
   () => import('@/components/agents/tabs/OpenClawConfigTab').then(mod => ({ default: mod.OpenClawConfigTab })),
   { loading: () => <TabSkeleton /> }
-);
-
-const MiladyConfigTab = dynamic(
-  () => import('@/components/agents/tabs/MiladyConfigTab').then(mod => ({ default: mod.MiladyConfigTab })),
-  { loading: () => <TabSkeleton /> }
-);
-
-const MiladyPluginsTab = dynamic(
-  () => import('@/components/agents/tabs/MiladyPluginsTab').then(mod => ({ default: mod.MiladyPluginsTab })),
-  { loading: () => <TabSkeleton /> }
-);
-
-const MiladyRestartBanner = dynamic(
-  () => import('@/components/agents/MiladyRestartBanner').then(mod => ({ default: mod.MiladyRestartBanner })),
-  { ssr: false }
 );
 
 const StatsTab = dynamic(
@@ -259,8 +224,9 @@ export default function AgentManagePage() {
   const [stats, setStats] = useState<AgentStats | null>(null);
 
   // Chat state
-  const chatKey = `hatcher-chat-${id}`;
   const [messages, setMessages] = useState<Message[]>([]);
+  const [chatSessions, setChatSessions] = useState<ChatSessionSummary[]>([]);
+  const [activeChatSessionId, setActiveChatSessionIdState] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const sendingRef = useRef(false);
@@ -274,6 +240,7 @@ export default function AgentManagePage() {
   const historyLoadedRef = useRef(false);
   const lastSavedCountRef = useRef(0);
   const lastHistorySignatureRef = useRef('');
+  const activeChatSessionIdRef = useRef<string | null>(null);
 
   // Features / integrations
   const [activeFeatures, setActiveFeatures] = useState<AgentFeature[]>([]);
@@ -301,6 +268,11 @@ export default function AgentManagePage() {
   const config = useAgentConfig(agent, id, setAgent);
   const integrations = useAgentIntegrations(agent, id, setAgent);
   const logs = useAgentLogs(id);
+
+  const setActiveChatSessionId = useCallback((sessionId: string) => {
+    setActiveChatSessionIdState(sessionId);
+    activeChatSessionIdRef.current = sessionId;
+  }, []);
 
   // ─── Data loaders ────────────────────────────────────────
 
@@ -389,6 +361,9 @@ export default function AgentManagePage() {
       const params = new URLSearchParams(window.location.search);
       setTab(normalizeTab(params.get('tab') as Tab));
       setMessages([]);
+      setChatSessions([]);
+      setActiveChatSessionIdState(null);
+      activeChatSessionIdRef.current = null;
       logs.setLogs([]);
       setStats(null);
       setAgent(null);
@@ -614,6 +589,19 @@ export default function AgentManagePage() {
 
   // ─── Load and poll chat history from server ───────────────
 
+  const loadChatSessions = useCallback(async () => {
+    if (!id) return;
+    const res = await api.getChatSessions(id);
+    if (!res.success) return;
+
+    setChatSessions(res.data.sessions);
+    const current = res.data.sessions.find((session) => session.current) ?? res.data.sessions[0];
+    if (!activeChatSessionIdRef.current && current) {
+      activeChatSessionIdRef.current = current.id;
+      setActiveChatSessionIdState(current.id);
+    }
+  }, [id]);
+
   const loadChatHistory = useCallback(async (mode: 'initial' | 'poll' = 'poll') => {
     if (!id) return;
     if (mode === 'poll' && (sendingRef.current || wsStreamingMsgRef.current)) return;
@@ -621,7 +609,7 @@ export default function AgentManagePage() {
     if (mode === 'initial') historyLoadedRef.current = false;
 
     try {
-      const res = await api.getChatHistory(id);
+      const res = await api.getChatHistory(id, activeChatSessionIdRef.current ?? undefined);
       if (res.success) {
         const loaded = normalizeHistoryMessages(res.data.messages);
         const signature = historySignature(loaded);
@@ -659,8 +647,9 @@ export default function AgentManagePage() {
 
   useEffect(() => {
     lastHistorySignatureRef.current = '';
+    void loadChatSessions();
     void loadChatHistory('initial');
-  }, [loadChatHistory]);
+  }, [loadChatHistory, loadChatSessions, activeChatSessionId]);
 
   useEffect(() => {
     if (tab !== 'chat' || !id) return;
@@ -669,6 +658,24 @@ export default function AgentManagePage() {
     }, 10_000);
     return () => clearInterval(timer);
   }, [id, loadChatHistory, tab]);
+
+  const startNewChatSession = useCallback(async () => {
+    if (!id) return;
+    const res = await api.createChatSession(id);
+    if (!res.success) {
+      toast.error(res.error ?? 'Failed to start a new chat session');
+      return;
+    }
+    setActiveChatSessionId(res.data.session.id);
+    setChatSessions((prev) => [
+      { ...res.data.session, current: true },
+      ...prev.map((session) => ({ ...session, current: false })),
+    ]);
+    setMessages([]);
+    lastSavedCountRef.current = 0;
+    lastHistorySignatureRef.current = '';
+    historyLoadedRef.current = true;
+  }, [id, setActiveChatSessionId, toast]);
 
   // ─── Save chat history to server (debounced) ──────────────
 
@@ -762,6 +769,7 @@ export default function AgentManagePage() {
         setChatError('Agent returned an empty response. Try again or check if the agent is running.');
       }
       setSending(false);
+      window.setTimeout(() => void loadChatSessions(), 500);
     },
     onError: (errMsg) => {
       wsStreamingMsgRef.current = false;
@@ -809,6 +817,31 @@ export default function AgentManagePage() {
     setChatError(null);
     setChatErrorType(null);
 
+    const currentSession = chatSessions.find((session) => session.current) ?? chatSessions[0];
+    const selectedSession = chatSessions.find((session) => session.id === activeChatSessionIdRef.current);
+    const selectedHistory = messages
+      .filter((m) => !m.streaming)
+      .slice(-40)
+      .map((m) => ({ role: m.role, content: m.content }));
+
+    // If the user is viewing an older session and sends a message, start a
+    // fresh current session and use the selected session only as context.
+    // Without this, the response would be appended after the latest marker in
+    // storage but the UI would still be filtering the old session.
+    if (currentSession && selectedSession && selectedSession.id !== currentSession.id) {
+      const res = await api.createChatSession(id, `Continued: ${selectedSession.title}`);
+      if (res.success) {
+        setActiveChatSessionId(res.data.session.id);
+        setChatSessions((prev) => [
+          { ...res.data.session, current: true },
+          ...prev.map((session) => ({ ...session, current: false })),
+        ]);
+        setMessages([]);
+        lastSavedCountRef.current = 0;
+        lastHistorySignatureRef.current = '';
+      }
+    }
+
     setSendCooldown(true);
     if (sendCooldownRef.current) clearTimeout(sendCooldownRef.current);
     sendCooldownRef.current = setTimeout(() => setSendCooldown(false), 2000);
@@ -816,10 +849,7 @@ export default function AgentManagePage() {
     setMessages((prev) => [...prev, userMsg]);
     setSending(true);
     setMsgCount((c) => c + 1);
-    const history = messages
-      .filter((m) => !m.streaming)
-      .slice(-40)
-      .map((m) => ({ role: m.role, content: m.content }));
+    const history = selectedHistory;
     setMessages((prev) => [...prev, { id: genId(), role: 'assistant', content: '', streaming: true, timestamp: new Date() }]);
 
     if (wsChat.isConnected) {
@@ -859,6 +889,7 @@ export default function AgentManagePage() {
             return updated;
           });
           setSending(false);
+          window.setTimeout(() => void loadChatSessions(), 500);
         },
         (errMsg) => {
           const lower = errMsg.toLowerCase();
@@ -962,6 +993,11 @@ export default function AgentManagePage() {
       msgCount, hasUnlimitedChat, isByok, msgLimit, remaining, isLimitReached,
       bottomRef, inputRef, sendMessage, handleKeyDown, sendCooldown,
       wsConnected: wsChat.isConnected,
+      chatSessions,
+      activeChatSessionId,
+      setActiveChatSessionId,
+      startNewChatSession,
+      refreshChatSessions: loadChatSessions,
       inflightTools, completedTools,
       configName: config.configName, setConfigName: config.setConfigName,
       configDesc: config.configDesc, setConfigDesc: config.setConfigDesc,
@@ -1008,6 +1044,7 @@ export default function AgentManagePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, agent, stats, tab, logs.logs, logs.logsLoading, logs.logFilter, logs.logSearch, logs.autoScroll, logs.filteredLogs, wsLogsConnected,
     messages, input, sending, sendCooldown, chatError, chatErrorType, msgCount, msgLimit, remaining, isLimitReached,
+    chatSessions, activeChatSessionId, setActiveChatSessionId, startNewChatSession, loadChatSessions,
     inflightTools, completedTools,
     config.configName, config.configDesc, config.configBio, config.configLore, config.configTopics,
     config.configStyle, config.configAdjectives, config.configSystemPrompt, config.configSkills,
@@ -1181,12 +1218,10 @@ export default function AgentManagePage() {
               </button>
               {(() => {
                 const fw = agent?.framework;
-                if (!fw || !['openclaw', 'hermes', 'elizaos', 'milady'].includes(fw)) return null;
+                if (!fw || !['openclaw', 'hermes'].includes(fw)) return null;
                 const COLOR: Record<string, string> = {
                   openclaw: '#f59e0b',
                   hermes: '#a855f7',
-                  elizaos: '#38bdf8',
-                  milady: '#f43f5e',
                 };
                 const c = COLOR[fw]!;
                 return (
@@ -1242,17 +1277,13 @@ export default function AgentManagePage() {
             </p>
           )}
 
-          {/* M4: "Restart required" banner for Milady agents with pendingRestart=true */}
-          {agent?.framework === 'milady' && agent?.status === 'active' && <MiladyRestartBanner />}
-
           {/* ─── Tab Content ──────────────────────────────────── */}
           <div className="flex-1 min-w-0 bg-[var(--bg-base)]">
-            <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-6">
+            <div className={`${tab === 'chat' ? 'w-full max-w-none px-4 sm:px-6 lg:px-8 2xl:px-10' : 'max-w-[1280px] mx-auto px-4 sm:px-6'} py-6`}>
             <AnimatePresence mode="wait">
               {tab === 'overview' && <OverviewTab />}
               {tab === 'config' && (
                 agent?.framework === 'hermes' ? <HermesConfigTab /> :
-                agent?.framework === 'milady' ? <MiladyConfigTab /> :
                 (agent?.framework === 'openclaw' && true) ? (
                   // Managed OpenClaw: stack the live PATCH editor on top of
                   // the legacy DB-backed form. Live editor handles runtime
@@ -1271,12 +1302,10 @@ export default function AgentManagePage() {
               {tab === 'logs' && <LogsTab />}
               {tab === 'terminal' && <TerminalTab />}
               {tab === 'memory' && (
-                agent?.framework === 'elizaos' ? <ElizaosMemoryTab /> :
                 agent?.framework === 'hermes' ? <HermesMemoryTab /> :
                 <MemoryTab />
               )}
               {tab === 'sessions' && (
-                agent?.framework === 'elizaos' ? <ElizaosSessionsTab /> :
                 agent?.framework === 'openclaw' ? <OpenClawSessionsTab /> :
                 null
               )}
