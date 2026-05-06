@@ -19,30 +19,6 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_APP_VERSION: pkg.version,
   },
-  async redirects() {
-    return [
-      {
-        source: '/blog/openclaw-vs-hermes-vs-elizaos',
-        destination: '/blog/state-of-ai-agent-hosting-2026',
-        permanent: true,
-      },
-      {
-        source: '/blog/openclaw-vs-hermes-elizaos-milady',
-        destination: '/blog/state-of-ai-agent-hosting-2026',
-        permanent: true,
-      },
-      {
-        source: '/:locale(en|ro|de|fr|zh)/blog/openclaw-vs-hermes-vs-elizaos',
-        destination: '/:locale/blog/state-of-ai-agent-hosting-2026',
-        permanent: true,
-      },
-      {
-        source: '/:locale(en|ro|de|fr|zh)/blog/openclaw-vs-hermes-elizaos-milady',
-        destination: '/:locale/blog/state-of-ai-agent-hosting-2026',
-        permanent: true,
-      },
-    ];
-  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '*.ipfs.nftstorage.link' },
@@ -192,6 +168,23 @@ const nextConfig = {
     const dead = ['agent/:id/room-legacy', 'agent/:id/city', 'embed/agent/:id'];
     const target = '/agent/:id/room';
     const out = [];
+
+    for (const slug of [
+      'openclaw-vs-hermes-vs-elizaos',
+      'openclaw-vs-hermes-elizaos-milady',
+    ]) {
+      out.push({
+        source: `/blog/${slug}`,
+        destination: '/blog/state-of-ai-agent-hosting-2026',
+        permanent: true,
+      });
+      out.push({
+        source: `/:locale(zh|de|fr|ro)/blog/${slug}`,
+        destination: '/:locale/blog/state-of-ai-agent-hosting-2026',
+        permanent: true,
+      });
+    }
+
     for (const path of dead) {
       out.push({ source: `/${path}`, destination: target, permanent: true });
       out.push({
