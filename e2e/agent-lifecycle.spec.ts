@@ -5,11 +5,47 @@
  * Runs in an unauthenticated browser so we control the full flow.
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { registerUser, loginAs, TEST_PASSWORD } from './helpers';
 
 // No saved auth — start from scratch
 test.use({ storageState: { cookies: [], origins: [] } });
+
+const API_BASE_URL = process.env.E2E_API_URL ?? 'http://localhost:3001';
+
+async function createPausedAgent(page: Page, name: string): Promise<string> {
+  const response = await page.request.post(`${API_BASE_URL}/agents`, {
+    data: {
+      name,
+      description: 'Created by the agent lifecycle E2E test',
+      framework: 'openclaw',
+      template: 'custom',
+      config: {
+        model: 'deepseek/deepseek-v4-flash',
+        provider: 'openrouter',
+        skills: ['web_search', 'calculator'],
+        systemPrompt: 'You are a concise test agent.',
+      },
+    },
+  });
+
+  expect(response.status()).toBe(201);
+  const body = (await response.json()) as {
+    success: boolean;
+    data?: { id?: string };
+    error?: string;
+  };
+  expect(body, body.error).toMatchObject({ success: true });
+  expect(body.data?.id).toBeTruthy();
+  return body.data!.id!;
+}
+
+async function deleteAgent(page: Page, agentId: string): Promise<void> {
+  const response = await page.request.delete(`${API_BASE_URL}/agents/${agentId}`);
+  expect(response.ok()).toBe(true);
+  const body = (await response.json()) as { success: boolean; error?: string };
+  expect(body, body.error).toMatchObject({ success: true });
+}
 
 test.describe('Agent Lifecycle', () => {
   let email: string;
@@ -43,44 +79,47 @@ test.describe('Agent Lifecycle', () => {
     expect(hasCreationUI).toBe(true);
   });
 
-  test('user can create an agent via the wizard', async ({ page }) => {
+  test('user can complete the current template wizard to launch review', async ({ page }) => {
     await loginAs(page, email, password);
 
     await page.goto('/create/template');
     await page.waitForLoadState('networkidle', { timeout: 10_000 });
 
-    // Pick the first available template/card
-    const firstTemplate = page.locator(
-      '[data-testid="template-card"], .template-card, [class*="TemplateCard"], [class*="template"]'
-    ).first();
+    await expect(page.getByRole('heading', { name: /what kind of agent/i })).toBeVisible();
+    await page.getByRole('button', { name: /continue/i }).click();
 
-    const hasTemplate = await firstTemplate.isVisible({ timeout: 5_000 }).catch(() => false);
-    if (!hasTemplate) {
-      test.skip(true, 'No template cards visible — UI may use a different creation flow');
-      return;
+    await expect(page.getByRole('heading', { name: /what type of agent/i })).toBeVisible();
+    await page.getByRole('button', { name: /custom agent/i }).click();
+
+    await expect(page.getByRole('heading', { name: /personalize your agent/i })).toBeVisible();
+    const agentName = `E2E Wizard ${Date.now()}`;
+    await page.locator('#agent-name').fill(agentName);
+    await page.locator('#agent-description').fill('Current wizard smoke test');
+    await page.getByRole('button', { name: /continue/i }).click();
+
+    await expect(page.getByRole('heading', { name: /ready to launch/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /launch your agent/i })).toBeVisible();
+    await expect(page.getByText(agentName)).toBeVisible();
+  });
+
+  test('user can create and delete a custom agent through the backend', async ({ page }) => {
+    await loginAs(page, email, password);
+
+    const agentName = `E2E API Agent ${Date.now()}`;
+    let agentId: string | null = null;
+
+    try {
+      agentId = await createPausedAgent(page, agentName);
+
+      await page.goto('/dashboard/agents');
+      await expect(page).toHaveURL(/\/dashboard\/agents/);
+      await expect(page.getByText(agentName)).toBeVisible({ timeout: 10_000 });
+      await expect(page.getByText(/paused/i).first()).toBeVisible();
+    } finally {
+      if (agentId) {
+        await deleteAgent(page, agentId);
+      }
     }
-
-    await firstTemplate.click();
-
-    // Fill in agent name if a name field appears
-    const nameInput = page.locator('input[name="name"], input[placeholder*="name" i]').first();
-    if (await nameInput.isVisible({ timeout: 3_000 }).catch(() => false)) {
-      await nameInput.fill(`E2E Agent ${Date.now()}`);
-    }
-
-    // Click deploy/create/launch button
-    const deployBtn = page
-      .locator('button:has-text("Deploy"), button:has-text("Create"), button:has-text("Launch"), button:has-text("Continue")')
-      .first();
-
-    if (await deployBtn.isVisible({ timeout: 3_000 }).catch(() => false)) {
-      await deployBtn.click();
-      // Wait for redirect to agent page or dashboard
-      await page.waitForURL(/\/dashboard\/(agent|agents)/, { timeout: 20_000 });
-    }
-
-    // Verify we end up on a dashboard page
-    await expect(page).toHaveURL(/\/dashboard/);
   });
 
   test('agents list page loads', async ({ page }) => {
