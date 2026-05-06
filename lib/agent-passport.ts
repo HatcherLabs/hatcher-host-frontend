@@ -148,7 +148,7 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
           caip2: `solana:${SOLANA_NETWORK}`,
           walletAddress: null,
           agentId: null,
-          registry: 'Solana Agent Registry / 8004-Solana',
+          registry: 'Hatcher Solana Memo Registry',
           registryStatus: 'planned',
           registeredAt: null,
           explorerUrl: null,
@@ -232,6 +232,7 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
       room: roomUrl,
       passport: `${apiBase}/agents/${publicId}/passport.json`,
       skaleMetadata: `${apiBase}/agents/${id}/skale-metadata.json`,
+      solanaMetadata: `${apiBase}/agents/${id}/solana-metadata.json`,
     },
   };
 }

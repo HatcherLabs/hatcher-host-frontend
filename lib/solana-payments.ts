@@ -216,8 +216,8 @@ export async function payWithSol(params: {
 
 /**
  * Build + sign + broadcast an SPL token transfer (USDC or $HATCHER) to
- * the treasury's Associated Token Account for that mint. Creates the
- * treasury's ATA on the fly if it doesn't exist yet — the payer eats
+ * the recipient's Associated Token Account for that mint. Creates the
+ * recipient's ATA on the fly if it doesn't exist yet — the payer eats
  * the ~0.00203928 SOL rent for that one-time cost.
  */
 export async function payWithSplToken(params: {
@@ -225,8 +225,9 @@ export async function payWithSplToken(params: {
   connection: Connection;
   mint: 'usdc' | 'hatch';
   amountHuman: number; // e.g. 4.99 USDC or 100000 HATCH
+  recipientWallet?: string;
 }): Promise<{ signature: string }> {
-  const { wallet, connection, mint, amountHuman } = params;
+  const { wallet, connection, mint, amountHuman, recipientWallet } = params;
   const { publicKey, sendTransaction } = wallet;
   if (!publicKey || !sendTransaction) throw new Error('Connect a Solana wallet first');
 
@@ -237,7 +238,7 @@ export async function payWithSplToken(params: {
   const tokenProgramId = mint === 'hatch' ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID;
 
   const mintPubkey = new PublicKey(mint === 'usdc' ? USDC_TOKEN_MINT : HATCH_TOKEN_MINT);
-  const treasury = new PublicKey(TREASURY_WALLET);
+  const treasury = new PublicKey(recipientWallet ?? TREASURY_WALLET);
 
   const fromAta = getAssociatedTokenAddress(mintPubkey, publicKey, tokenProgramId);
   const toAta = getAssociatedTokenAddress(mintPubkey, treasury, tokenProgramId);

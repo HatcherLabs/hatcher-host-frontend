@@ -181,6 +181,7 @@ export interface AgentPassport {
     room: string;
     passport: string;
     skaleMetadata: string;
+    solanaMetadata: string;
   };
 }
 

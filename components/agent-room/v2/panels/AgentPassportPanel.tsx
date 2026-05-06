@@ -175,6 +175,7 @@ export function AgentPassportPanel({
           <div className="grid gap-2 sm:grid-cols-2">
             <LinkButton href={passport.links.passport} label="Passport JSON" />
             <LinkButton href={passport.links.skaleMetadata} label="SKALE metadata" />
+            <LinkButton href={passport.links.solanaMetadata} label="Solana metadata" />
             <LinkButton href={passport.agent.profileUrl} label="Public profile" />
             <LinkButton href={passport.agent.roomUrl} label="3D room" />
           </div>

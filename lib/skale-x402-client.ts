@@ -34,7 +34,7 @@ export interface PaymentRequirementsRow {
   mimeType: string;
   resource: string;
   maxTimeoutSeconds: number;
-  extra: { name: string; version: string };
+  extra: { name: string; version: string; decimals?: number };
 }
 
 export interface CheckoutResponse {
@@ -292,4 +292,68 @@ export async function payWithSkaleX402(target: PaymentTarget): Promise<SettleRes
 
 export async function payWithBaseX402(target: PaymentTarget): Promise<SettleResult> {
   return payWithEvmX402(target, 'base');
+}
+
+export type SolanaUsdcSender = (
+  usdAmount: number,
+  label: string,
+  recipientWallet?: string,
+) => Promise<string>;
+
+function rawUsdcToHuman(raw: string, decimals = 6): number {
+  const value = BigInt(raw);
+  const base = 10n ** BigInt(decimals);
+  const whole = value / base;
+  const fraction = value % base;
+  return Number(whole) + Number(fraction) / Number(base);
+}
+
+export async function payWithSolanaX402(
+  target: PaymentTarget,
+  sendUsdc: SolanaUsdcSender,
+): Promise<SettleResult> {
+  const checkoutRes = await fetch(`${API_URL}/payments/solana-x402/checkout`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(target),
+  });
+  if (checkoutRes.status !== 402) {
+    const errBody = await checkoutRes.json().catch(() => null);
+    throw new Error(errBody?.error ?? `checkout failed (${checkoutRes.status})`);
+  }
+
+  const checkoutBody = (await checkoutRes.json()) as { data: CheckoutResponse };
+  const requirements = checkoutBody.data?.accepts?.[0];
+  if (!requirements) throw new Error('Server returned no payment requirements');
+
+  const amount = rawUsdcToHuman(requirements.maxAmountRequired, requirements.extra.decimals ?? 6);
+  const txSignature = await sendUsdc(amount, requirements.description, requirements.payTo);
+  const xPayment = base64Encode(JSON.stringify({
+    x402Version: 1,
+    scheme: requirements.scheme,
+    network: requirements.network,
+    payload: {
+      txSignature,
+      signature: txSignature,
+      transaction: txSignature,
+    },
+  }));
+
+  const settleRes = await fetch(`${API_URL}/payments/solana-x402/settle`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'content-type': 'application/json',
+      'x-payment': xPayment,
+    },
+    body: JSON.stringify({ ...target, txSignature }),
+  });
+  const settleBody = (await settleRes.json()) as { success: boolean; data?: SettleResult; error?: string };
+  if (!settleBody.success || !settleBody.data) {
+    throw new Error(settleBody.error ?? `settle failed (${settleRes.status})`);
+  }
+  return settleBody.data;
 }

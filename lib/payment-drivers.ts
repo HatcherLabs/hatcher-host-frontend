@@ -38,8 +38,8 @@ export interface UsePaymentDrivers {
   closeConfirm: (approved: boolean) => void;
   /** SOL → treasury. Live Jupiter quote, 1% buffer for slippage. */
   driveSol: (usdAmount: number, label: string) => Promise<string>;
-  /** USDC (1:1 pegged) → treasury SPL ATA. */
-  driveUsdc: (usdAmount: number, label: string) => Promise<string>;
+  /** USDC (1:1 pegged) → treasury SPL ATA, or an explicit x402 recipient. */
+  driveUsdc: (usdAmount: number, label: string, recipientWallet?: string) => Promise<string>;
   /**
    * $HATCHER → 90% to treasury + 10% burn in the same signed tx. Live
    * Jupiter quote with 1% buffer. On-chain proof of burn visible to the
@@ -177,7 +177,7 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     }
   }, [connection, ensureConnected, askConfirm, forceReconnect]);
 
-  const driveUsdc = useCallback(async (usdAmount: number, label: string): Promise<string> => {
+  const driveUsdc = useCallback(async (usdAmount: number, label: string, recipientWallet?: string): Promise<string> => {
     await ensureConnected();
     const approved = await askConfirm({
       token: 'usdc', label, usdAmount,
@@ -186,7 +186,7 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     if (!approved) throw new Error('Cancelled');
     try {
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'usdc', amountHuman: usdAmount,
+        wallet: walletRef.current, connection, mint: 'usdc', amountHuman: usdAmount, recipientWallet,
       });
       return signature;
     } catch (e) {
@@ -194,7 +194,7 @@ export function usePaymentDrivers(): UsePaymentDrivers {
       if (!isTrustRevokedError(e)) throw e;
       await forceReconnect();
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'usdc', amountHuman: usdAmount,
+        wallet: walletRef.current, connection, mint: 'usdc', amountHuman: usdAmount, recipientWallet,
       });
       return signature;
     }

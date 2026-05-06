@@ -14,7 +14,7 @@ import type { UserTierKey, AddonKey } from '@hatcher/shared';
 import { usePaymentDrivers } from '@/lib/payment-drivers';
 import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
 import { formatFeatureKey } from '@/lib/feature-labels';
-import { payWithBaseX402, payWithSkaleX402 } from '@/lib/skale-x402-client';
+import { payWithBaseX402, payWithSkaleX402, payWithSolanaX402 } from '@/lib/skale-x402-client';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -570,24 +570,22 @@ export default function BillingPage() {
     if (!tierKey) return;
     const tierConfig = TIERS[tierKey];
     const period = subscribePeriod(tierKey);
-    const price = subscribePrice(tierKey);
     setPaymentLoading(true);
     setSubscribing(tierKey);
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
-      const txSignature = await driveUsdc(price, `Subscribe to ${tierConfig.name}${period === 'annual' ? ' (annual)' : ''}`);
-      const res = await api.subscribe(tierKey, txSignature, 'usdc', period);
-      if (res.success) {
-        await loadAccountData();
-        showSuccess(
-          (res.data?.proratedCredit ?? 0) > 0
-            ? `Subscribed to ${tierConfig.name} with USDC! $${(res.data!.proratedCredit).toFixed(2)} credit added for your unused days.`
-            : `Subscribed to ${tierConfig.name} with USDC!`,
-        );
-      } else {
-        setError(res.error ?? 'Subscription failed');
-      }
+      const result = await payWithSolanaX402(
+        { kind: 'tier', key: tierKey, billingPeriod: period },
+        driveUsdc,
+      );
+      await loadAccountData();
+      const credit = result.proratedCredit ?? 0;
+      showSuccess(
+        credit > 0
+          ? `Subscribed to ${tierConfig.name} with USDC on Solana! $${credit.toFixed(2)} credit added for your unused days.`
+          : `Subscribed to ${tierConfig.name} with USDC on Solana!`,
+      );
     } catch (err) {
       reportCatch(err, 'Subscription failed');
     } finally {
@@ -756,20 +754,19 @@ export default function BillingPage() {
     if (!addonConfig) return;
     if (addonConfig.perAgent && !selectedAgentId) return;
     const period = addonPeriod(addonConfig);
-    const price = addonPrice(addonConfig);
     setPaymentLoading(true);
     setPurchasingAddon(addonKey);
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
-      const txSignature = await driveUsdc(price, `${addonConfig.name}${period === 'annual' ? ' (annual)' : ''}`);
-      const res = await api.purchaseAddon(addonKey, txSignature, selectedAgentId ?? undefined, 'usdc', period);
-      if (res.success) {
-        await loadAccountData();
-        showSuccess(`${addonConfig.name} purchased with USDC!`);
-      } else {
-        setError(res.error ?? 'Purchase failed');
-      }
+      await payWithSolanaX402({
+        kind: 'addon',
+        key: addonKey,
+        billingPeriod: period,
+        ...(selectedAgentId ? { agentId: selectedAgentId } : {}),
+      }, driveUsdc);
+      await loadAccountData();
+      showSuccess(`${addonConfig.name} purchased with USDC on Solana!`);
     } catch (err) {
       reportCatch(err, 'Purchase failed');
     } finally {
