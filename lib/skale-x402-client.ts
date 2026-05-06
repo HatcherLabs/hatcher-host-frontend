@@ -79,6 +79,15 @@ const SKALE_BASE_MAINNET = {
   rpcUrls: ['https://skale-base.skalenodes.com/v1/base'],
   blockExplorerUrls: ['https://skale-base-explorer.skalenodes.com'],
 };
+const BASE_MAINNET_HEX = '0x2105'; // 8453
+const BASE_MAINNET = {
+  chainId: BASE_MAINNET_HEX,
+  chainName: 'Base',
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: ['https://mainnet.base.org'],
+  blockExplorerUrls: ['https://basescan.org'],
+};
+export type EvmX402Network = 'skale' | 'base';
 
 export class WalletNotInstalledError extends Error {
   constructor() {
@@ -99,19 +108,29 @@ export async function connectEvmWallet(): Promise<string> {
 /** Switch the user's wallet to SKALE Base Mainnet. Adds the chain
  *  if the wallet doesn't know about it yet (error code 4902). */
 export async function ensureSkaleChain(): Promise<void> {
+  return ensureEvmX402Chain('skale');
+}
+
+export async function ensureBaseChain(): Promise<void> {
+  return ensureEvmX402Chain('base');
+}
+
+async function ensureEvmX402Chain(network: EvmX402Network): Promise<void> {
   const eth = getProvider();
   if (!eth) throw new WalletNotInstalledError();
+  const chainId = network === 'base' ? BASE_MAINNET_HEX : SKALE_BASE_MAINNET_HEX;
+  const chainConfig = network === 'base' ? BASE_MAINNET : SKALE_BASE_MAINNET;
   try {
     await eth.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: SKALE_BASE_MAINNET_HEX }],
+      params: [{ chainId }],
     });
   } catch (e) {
     const code = (e as { code?: number }).code;
     if (code === 4902 || code === -32603) {
       await eth.request({
         method: 'wallet_addEthereumChain',
-        params: [SKALE_BASE_MAINNET],
+        params: [chainConfig],
       });
       return;
     }
@@ -218,12 +237,16 @@ async function buildXPaymentHeader(
 /** Drive the full pay-with-USDC flow end-to-end. Throws on any
  *  step that fails (wallet rejected, chain switch failed, server
  *  /verify or /settle returned an error). */
-export async function payWithSkaleX402(target: PaymentTarget): Promise<SettleResult> {
+export async function payWithEvmX402(
+  target: PaymentTarget,
+  network: EvmX402Network = 'skale',
+): Promise<SettleResult> {
   const account = await connectEvmWallet();
-  await ensureSkaleChain();
+  await ensureEvmX402Chain(network);
+  const routePrefix = network === 'base' ? 'base-x402' : 'skale-x402';
 
   // Step 1 — fetch the 402 requirements blob from the server.
-  const checkoutRes = await fetch(`${API_URL}/payments/skale-x402/checkout`, {
+  const checkoutRes = await fetch(`${API_URL}/payments/${routePrefix}/checkout`, {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -247,7 +270,7 @@ export async function payWithSkaleX402(target: PaymentTarget): Promise<SettleRes
   const xPayment = await buildXPaymentHeader(account, requirements);
 
   // Step 3 — submit the signed header to /settle.
-  const settleRes = await fetch(`${API_URL}/payments/skale-x402/settle`, {
+  const settleRes = await fetch(`${API_URL}/payments/${routePrefix}/settle`, {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -261,4 +284,12 @@ export async function payWithSkaleX402(target: PaymentTarget): Promise<SettleRes
     throw new Error(settleBody.error ?? `settle failed (${settleRes.status})`);
   }
   return settleBody.data;
+}
+
+export async function payWithSkaleX402(target: PaymentTarget): Promise<SettleResult> {
+  return payWithEvmX402(target, 'skale');
+}
+
+export async function payWithBaseX402(target: PaymentTarget): Promise<SettleResult> {
+  return payWithEvmX402(target, 'base');
 }

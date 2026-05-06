@@ -14,7 +14,7 @@ import type { UserTierKey, AddonKey } from '@hatcher/shared';
 import { usePaymentDrivers } from '@/lib/payment-drivers';
 import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
 import { formatFeatureKey } from '@/lib/feature-labels';
-import { payWithSkaleX402 } from '@/lib/skale-x402-client';
+import { payWithBaseX402, payWithSkaleX402 } from '@/lib/skale-x402-client';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -78,6 +78,7 @@ interface PaymentModalProps {
   onPayWithHATCHER: () => void;
   onPayWithUSDC: () => void;
   onPayWithSkaleUSDC: () => void;
+  onPayWithBaseUSDC: () => void;
   onPayWithCard: () => void;
   onPayWithCredits?: () => void;
   creditBalance: number;
@@ -88,7 +89,7 @@ interface PaymentModalProps {
   onSelectAgent?: (agentId: string) => void;
 }
 
-function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithHATCHER, onPayWithUSDC, onPayWithSkaleUSDC, onPayWithCard, onPayWithCredits, creditBalance, loading, requiresAgent, agents, selectedAgentId, onSelectAgent }: PaymentModalProps) {
+function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithHATCHER, onPayWithUSDC, onPayWithSkaleUSDC, onPayWithBaseUSDC, onPayWithCard, onPayWithCredits, creditBalance, loading, requiresAgent, agents, selectedAgentId, onSelectAgent }: PaymentModalProps) {
   const t = useTranslations('dashboard.billing');
   const tc = useTranslations('dashboard.common');
   if (!isOpen) return null;
@@ -108,7 +109,7 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
           transition={{ duration: 0.2 }}
-          className="card-solid w-full max-w-md mx-4 overflow-hidden"
+          className="card-solid w-full max-w-md mx-4 max-h-[calc(100vh-2rem)] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
@@ -222,6 +223,22 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
               <div className="text-left">
                 <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithSkaleUsdc')}</p>
                 <p className="text-[11px] text-[var(--text-muted)]">{t('skaleUsdcDesc')}</p>
+              </div>
+              {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
+            </button>
+
+            {/* Pay with Base USDC */}
+            <button
+              onClick={onPayWithBaseUSDC}
+              disabled={loading || needsAgentSelection}
+              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#0052FF]/40 hover:bg-[#0052FF]/[0.05] transition-all disabled:opacity-40"
+            >
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#0052FF] to-[#2775CA] flex items-center justify-center flex-shrink-0">
+                <span className="text-white font-bold text-[10px]">USDC</span>
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithBaseUsdc')}</p>
+                <p className="text-[11px] text-[var(--text-muted)]">{t('baseUsdcDesc')}</p>
               </div>
               {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
             </button>
@@ -606,6 +623,33 @@ export default function BillingPage() {
     }
   };
 
+  /* ── Subscribe to a tier (Base x402 USDC payment) ──────── */
+  const handleSubscribeBaseUSDC = async () => {
+    const tierKey = paymentModal.tierKey;
+    if (!tierKey) return;
+    const tierConfig = TIERS[tierKey];
+    const period = subscribePeriod(tierKey);
+    setPaymentLoading(true);
+    setSubscribing(tierKey);
+    setError(null);
+    setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    try {
+      const result = await payWithBaseX402({ kind: 'tier', key: tierKey, billingPeriod: period });
+      await loadAccountData();
+      const credit = result.proratedCredit ?? 0;
+      showSuccess(
+        credit > 0
+          ? `Subscribed to ${tierConfig.name} with USDC on Base! $${credit.toFixed(2)} credit added for your unused days.`
+          : `Subscribed to ${tierConfig.name} with USDC on Base!`,
+      );
+    } catch (err) {
+      reportCatch(err, 'Base USDC payment failed');
+    } finally {
+      setSubscribing(null);
+      setPaymentLoading(false);
+    }
+  };
+
   /* ── Subscribe via Stripe Card checkout ─────────────────
      Opens a Stripe-hosted checkout session. User pays by card and the
      /stripe/webhook handler grants the tier on payment_intent.succeeded.
@@ -757,6 +801,35 @@ export default function BillingPage() {
       showSuccess(`${addonConfig.name} purchased with USDC on SKALE!`);
     } catch (err) {
       reportCatch(err, 'SKALE USDC payment failed');
+    } finally {
+      setPurchasingAddon(null);
+      setPaymentLoading(false);
+    }
+  };
+
+  /* ── Purchase add-on (Base x402 USDC payment) ──────────── */
+  const handlePurchaseAddonBaseUSDC = async () => {
+    const addonKey = paymentModal.addonKey;
+    if (!addonKey) return;
+    const addonConfig = ADDONS.find(a => a.key === addonKey);
+    if (!addonConfig) return;
+    if (addonConfig.perAgent && !selectedAgentId) return;
+    const period = addonPeriod(addonConfig);
+    setPaymentLoading(true);
+    setPurchasingAddon(addonKey);
+    setError(null);
+    setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    try {
+      await payWithBaseX402({
+        kind: 'addon',
+        key: addonKey,
+        billingPeriod: period,
+        ...(selectedAgentId ? { agentId: selectedAgentId } : {}),
+      });
+      await loadAccountData();
+      showSuccess(`${addonConfig.name} purchased with USDC on Base!`);
+    } catch (err) {
+      reportCatch(err, 'Base USDC payment failed');
     } finally {
       setPurchasingAddon(null);
       setPaymentLoading(false);
@@ -1728,6 +1801,7 @@ export default function BillingPage() {
         onPayWithHATCHER={paymentModal.type === 'subscription' ? handleSubscribeHATCHER : handlePurchaseAddonHATCHER}
         onPayWithUSDC={paymentModal.type === 'subscription' ? handleSubscribeUSDC : handlePurchaseAddonUSDC}
         onPayWithSkaleUSDC={paymentModal.type === 'subscription' ? handleSubscribeSkaleUSDC : handlePurchaseAddonSkaleUSDC}
+        onPayWithBaseUSDC={paymentModal.type === 'subscription' ? handleSubscribeBaseUSDC : handlePurchaseAddonBaseUSDC}
         onPayWithCard={paymentModal.type === 'subscription' ? handleSubscribeStripe : handlePurchaseAddonStripe}
         onPayWithCredits={paymentModal.type === 'subscription' ? handleSubscribeCredits : handlePurchaseAddonCredits}
         creditBalance={creditBalance}

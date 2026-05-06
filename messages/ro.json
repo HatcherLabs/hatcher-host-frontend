@@ -1004,6 +1004,8 @@
       "hatcherDesc": "Token HATCHER pe Solana",
       "payWithSkaleUsdc": "Plătește cu USDC pe SKALE",
       "skaleUsdcDesc": "Decontare rapidă x402 prin portofel EVM",
+      "payWithBaseUsdc": "Plătește cu USDC pe Base",
+      "baseUsdcDesc": "USDC nativ prin portofel EVM",
       "payWithUsdcSolana": "Plătește cu USDC pe Solana",
       "usdcSolanaDesc": "SPL USDC prin portofel Solana",
       "payWithUsdc": "Plătește cu USDC",

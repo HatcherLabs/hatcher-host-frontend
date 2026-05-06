@@ -1004,6 +1004,8 @@
       "hatcherDesc": "Solana 上的 HATCHER 代币",
       "payWithSkaleUsdc": "用 SKALE 上的 USDC 付款",
       "skaleUsdcDesc": "通过 EVM 钱包快速 x402 结算",
+      "payWithBaseUsdc": "用 Base 上的 USDC 付款",
+      "baseUsdcDesc": "通过 EVM 钱包支付原生 USDC",
       "payWithUsdcSolana": "用 Solana 上的 USDC 付款",
       "usdcSolanaDesc": "通过 Solana 钱包支付 SPL USDC",
       "payWithUsdc": "用 USDC 付款",

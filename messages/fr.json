@@ -1004,6 +1004,8 @@
       "hatcherDesc": "Token HATCHER sur Solana",
       "payWithSkaleUsdc": "Payer avec USDC sur SKALE",
       "skaleUsdcDesc": "Règlement x402 rapide via portefeuille EVM",
+      "payWithBaseUsdc": "Payer avec USDC sur Base",
+      "baseUsdcDesc": "USDC natif via portefeuille EVM",
       "payWithUsdcSolana": "Payer avec USDC sur Solana",
       "usdcSolanaDesc": "SPL USDC via portefeuille Solana",
       "payWithUsdc": "Payer avec USDC",
