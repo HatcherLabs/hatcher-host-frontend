@@ -257,6 +257,27 @@ export const api = {
       registeredAt: string;
     }>(`/agents/${id}/skale-register`, { method: 'POST' }),
 
+  /** Manually retry Base ERC-8004 registration. */
+  registerAgentBase: (id: string) =>
+    req<{
+      agentId: string;
+      metadataUri: string;
+      txHash: string;
+      registeredAt: string;
+      identityContract: string;
+      hubAddress: string | null;
+    }>(`/agents/${id}/base-register`, { method: 'POST' }),
+
+  /** Manually retry Solana identity memo anchoring. */
+  registerAgentSolana: (id: string) =>
+    req<{
+      agentId: string;
+      metadataUri: string;
+      txHash: string;
+      registeredAt: string;
+      registryProgram: string;
+    }>(`/agents/${id}/solana-register`, { method: 'POST' }),
+
   /** Get usage analytics for an agent */
   getAgentUsage: (id: string) =>
     req<{
