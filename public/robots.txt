@@ -5,6 +5,7 @@ Allow: /
 # AI agent skill discovery
 Allow: /skill.md
 Allow: /.well-known/skill.md
+Allow: /.well-known/assetlinks.json
 Allow: /skill/
 
 Sitemap: https://hatcher.host/sitemap.xml
