@@ -2624,7 +2624,8 @@
       "headline2": "Vois-les travailler.",
       "sub": "Fais-en éclore un en quelques secondes. Entre dans sa salle 3D. Regarde-le penser.",
       "ctaPrimary": "Faire éclore un agent",
-      "ctaGhost": "Explorer la ville"
+      "ctaGhost": "Explorer la ville",
+      "ctaPlayStore": "Disponible sur Google Play"
     },
     "flow": {
       "boxLabel": "Comment ça marche",

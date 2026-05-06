@@ -2624,7 +2624,8 @@
       "headline2": "看它们工作。",
       "sub": "几秒内孵化一个。走进它的 3D 房间。看它思考。",
       "ctaPrimary": "孵化代理",
-      "ctaGhost": "探索城市"
+      "ctaGhost": "探索城市",
+      "ctaPlayStore": "在 Google Play 获取"
     },
     "flow": {
       "boxLabel": "工作原理",

@@ -1,8 +1,11 @@
 // components/landing/v3/parts/SectionHero.tsx
 'use client';
 import { useTranslations } from 'next-intl';
+import { Download } from 'lucide-react';
 import { PhosphorButton } from '../shared/PhosphorButton';
 import styles from './SectionHero.module.css';
+
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=host.hatcher.app';
 
 const SIGNALS = [
   { label: 'Hosted LLM', value: 'OpenRouter', tone: 'green' },
@@ -28,6 +31,18 @@ export function SectionHero() {
           <div className={styles.ctaRow}>
             <PhosphorButton href="/create">{t('ctaPrimary')}</PhosphorButton>
             <PhosphorButton href="/city" variant="ghost">{t('ctaGhost')}</PhosphorButton>
+            <PhosphorButton
+              href={PLAY_STORE_URL}
+              variant="ghost"
+              target="_blank"
+              rel="noopener noreferrer"
+              event="landing_google_play_click"
+            >
+              <span className={styles.playStoreLabel}>
+                <Download className={styles.playStoreIcon} aria-hidden />
+                {t('ctaPlayStore')}
+              </span>
+            </PhosphorButton>
           </div>
           <div className={styles.signals} aria-label="Hatcher platform highlights">
             {SIGNALS.map((signal) => (

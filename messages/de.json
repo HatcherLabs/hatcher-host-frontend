@@ -2624,7 +2624,8 @@
       "headline2": "Sie arbeiten sehen.",
       "sub": "Innerhalb von Sekunden ausbrüten. In den 3D-Raum gehen. Beim Denken zusehen.",
       "ctaPrimary": "Agent ausbrüten",
-      "ctaGhost": "Stadt erkunden"
+      "ctaGhost": "Stadt erkunden",
+      "ctaPlayStore": "Bei Google Play laden"
     },
     "flow": {
       "boxLabel": "So funktioniert es",

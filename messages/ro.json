@@ -2624,7 +2624,8 @@
       "headline2": "Vezi-i la treabă.",
       "sub": "Eclozează unul în câteva secunde. Intră în camera lui 3D. Vezi-l cum gândește.",
       "ctaPrimary": "Eclozează agent",
-      "ctaGhost": "Explorează orașul"
+      "ctaGhost": "Explorează orașul",
+      "ctaPlayStore": "Descarcă din Google Play"
     },
     "flow": {
       "boxLabel": "Cum funcționează",
