@@ -15,9 +15,9 @@ test.describe('i18n', () => {
   test('root path serves English landing', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
-    // Landing has "Hatch" in the English hero headline
+    // Landing V3 headline.
     const headline = page.locator('h1').first();
-    await expect(headline).toContainText(/Hatch/i);
+    await expect(headline).toContainText(/Deploy agents/i);
   });
 
   test('/zh serves Chinese locale', async ({ page }) => {
@@ -38,8 +38,8 @@ test.describe('i18n', () => {
   test('language switcher in header exists and is accessible', async ({ page }) => {
     await page.goto('/pricing');
     await page.waitForLoadState('networkidle', { timeout: 15_000 });
-    // LocaleSwitcher renders a <select aria-label="Change language">
-    const switcher = page.locator('select[aria-label*="language" i]').first();
+    // LocaleSwitcher renders a button/listbox control.
+    const switcher = page.getByRole('button', { name: /change language/i }).first();
     await expect(switcher).toBeVisible();
   });
 
@@ -47,8 +47,9 @@ test.describe('i18n', () => {
     await page.goto('/pricing');
     await page.waitForLoadState('networkidle', { timeout: 15_000 });
 
-    const switcher = page.locator('select[aria-label*="language" i]').first();
-    await switcher.selectOption('de');
+    const switcher = page.getByRole('button', { name: /change language/i }).first();
+    await switcher.click();
+    await page.getByRole('option', { name: /Deutsch/ }).click();
     await page.waitForURL(/\/de\/pricing/, { timeout: 10_000 });
 
     const cookies = await context.cookies();
