@@ -307,7 +307,7 @@ function CreateCronModal({ agentId, onClose, onCreated, onError }: CreateCronMod
     } finally {
       setSubmitting(false);
     }
-  }, [agentId, name, schedule, prompt, onClose, onCreated, onError]);
+  }, [agentId, name, schedule, prompt, onCreated, onError]);
 
   return (
     <div

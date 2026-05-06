@@ -24,7 +24,6 @@ export class SceneErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(err: Error): void {
-    // eslint-disable-next-line no-console
     console.warn(`[SceneErrorBoundary${this.props.label ? `:${this.props.label}` : ''}]`, err.message);
   }
 

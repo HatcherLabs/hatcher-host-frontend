@@ -149,7 +149,7 @@ export default function TeamPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (isAuthenticated) fetchData();

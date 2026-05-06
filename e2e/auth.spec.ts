@@ -6,7 +6,7 @@
  */
 
 import { test, expect } from '@playwright/test';
-import { registerUser, loginAs, uniqueEmail, uniqueUsername, TEST_PASSWORD } from './helpers';
+import { registerUser, loginAs } from './helpers';
 
 // No saved auth — start from scratch
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -35,6 +35,7 @@ test.describe('Authentication', () => {
       localStorage.clear();
       sessionStorage.clear();
     });
+    await page.context().clearCookies();
 
     // Now log in with those credentials
     await loginAs(page, creds.email, creds.password);
@@ -56,10 +57,7 @@ test.describe('Authentication', () => {
     await page.waitForTimeout(2_000);
     expect(page.url()).toMatch(/\/login/);
 
-    // An error message should appear (toast, inline error, etc.)
-    const errorVisible =
-      (await page.locator('[role="alert"], .error, .toast, [class*="error"], [class*="Error"], text=/invalid|incorrect|wrong|not found/i').count()) > 0;
-    expect(errorVisible).toBe(true);
+    await expect(page.getByText(/invalid|incorrect|wrong|not found/i).first()).toBeVisible();
   });
 
   test('register page has required form fields', async ({ page }) => {
@@ -68,7 +66,7 @@ test.describe('Authentication', () => {
 
     // Email, username, and password fields should be present
     await expect(page.locator('input[type="email"]')).toBeVisible();
-    await expect(page.locator('input[placeholder*="username" i], input[name="username"]')).toBeVisible();
+    await expect(page.locator('input#username, input[name="username"], input[autocomplete="username"]')).toBeVisible();
     await expect(page.locator('input[type="password"]').first()).toBeVisible();
     await expect(page.locator('button[type="submit"]')).toBeVisible();
   });

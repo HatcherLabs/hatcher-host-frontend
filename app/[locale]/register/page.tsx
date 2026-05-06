@@ -69,7 +69,6 @@ export default function RegisterPage() {
   useEffect(() => {
     const trimmed = email.trim().toLowerCase();
     if (trimmed.length === 0) { setEmailStatus({ state: 'idle' }); return; }
-    // eslint-disable-next-line no-useless-escape
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) { setEmailStatus({ state: 'invalid' }); return; }
     setEmailStatus({ state: 'checking' });
     const timer = setTimeout(() => {

@@ -125,7 +125,7 @@ export function ChatPanel({
       setStreaming(false);
     }
     setInput('');
-  }, [input, streaming, send, onAppend, onUpdateLast]);
+  }, [input, streaming, send, onAppend, onUpdateLast, setStreaming]);
 
   // Auto-scroll to bottom when messages change or stream.
   useEffect(() => {

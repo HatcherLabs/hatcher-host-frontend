@@ -11,14 +11,16 @@ test('pricing page renders all tiers', async ({ page }) => {
   await page.goto('/pricing');
   await page.waitForLoadState('networkidle', { timeout: 10_000 });
 
-  // All three tier cards should be visible
+  // Core monthly tier cards should be visible
   await expect(page.locator('text=Free').first()).toBeVisible();
-  await expect(page.locator('text=Basic').first()).toBeVisible();
+  await expect(page.locator('text=Starter').first()).toBeVisible();
   await expect(page.locator('text=Pro').first()).toBeVisible();
+  await expect(page.locator('text=Business').first()).toBeVisible();
 
   // Price values present
-  await expect(page.locator('text=$9.99').first()).toBeVisible();
+  await expect(page.locator('text=$6.99').first()).toBeVisible();
   await expect(page.locator('text=$19.99').first()).toBeVisible();
+  await expect(page.locator('text=$49.99').first()).toBeVisible();
 });
 
 test('pricing page: clicking upgrade tier triggers checkout redirect', async ({ page }) => {
@@ -34,9 +36,9 @@ test('pricing page: clicking upgrade tier triggers checkout redirect', async ({ 
     { timeout: 15_000 }
   );
 
-  // Click the Basic tier upgrade/subscribe button
+  // Click the Starter tier upgrade/subscribe link
   const upgradeBtn = page
-    .locator('button:has-text("Get Basic"), button:has-text("Upgrade"), button:has-text("Subscribe"), a:has-text("Get Basic")')
+    .locator('button:has-text("Choose Starter"), button:has-text("Upgrade"), button:has-text("Subscribe"), a:has-text("Choose Starter")')
     .first();
   await expect(upgradeBtn).toBeVisible({ timeout: 8_000 });
   await upgradeBtn.click();

@@ -379,7 +379,7 @@ export default function BillingPage() {
       setError(t('canceledPayment'));
       window.history.replaceState({}, '', '/dashboard/billing');
     }
-  }, [searchParams]);
+  }, [searchParams, t]);
 
   // Full reload after any payment — mirrors the initial-load fetches so
   // the page never shows stale data (credit balance, payment history,
