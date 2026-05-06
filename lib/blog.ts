@@ -83,9 +83,8 @@ export const BLOG_POSTS: BlogPost[] = [
 <ul>
 <li><strong>OpenClaw</strong> — The integration powerhouse with 13,700+ community skills, 20+ platform connectors, and a plugin ecosystem. Best for community bots, social media agents, and multi-platform deployments.</li>
 <li><strong>Hermes</strong> — NousResearch's lightweight framework with persistent memory, 40+ built-in tools, and SOUL.md identity files. Best for research assistants, coding agents, and autonomous task runners.</li>
-<li><strong>ElizaOS</strong> — Multi-agent runtime with 350+ plugins, blockchain-native features, and support for running multiple agents in a single container. Best for crypto projects and DeFi workflows.</li>
 </ul>
-<p>Not sure which to pick? Start with <strong>OpenClaw</strong> if you want maximum integrations, or <strong>Hermes</strong> if you want autonomous task execution. Read our <a href="/blog/openclaw-vs-hermes-vs-elizaos">full comparison guide</a> for details.</p>
+<p>Not sure which to pick? Start with <strong>OpenClaw</strong> if you want maximum integrations, or <strong>Hermes</strong> if you want autonomous task execution.</p>
 
 <h2>Step 3: Choose a Template</h2>
 <p>Hatcher offers 23 pre-built templates to get you started fast. Templates include pre-configured system prompts, tool selections, and platform settings. Popular templates include:</p>
@@ -165,96 +164,6 @@ export const BLOG_POSTS: BlogPost[] = [
     coverImageDescription: 'A rocket launching from a laptop screen, trailing purple light, with a dashboard interface visible in the background',
   },
   {
-    slug: 'openclaw-vs-hermes-vs-elizaos',
-    title: 'OpenClaw vs Hermes vs ElizaOS: Which AI Agent Framework Is Right for You?',
-    excerpt:
-      'A detailed comparison of the three major agent frameworks on Hatcher — features, strengths, and the best use case for each.',
-    content: `<p>Hatcher supports three powerful AI agent frameworks: <strong>OpenClaw</strong>, <strong>Hermes</strong>, and <strong>ElizaOS</strong>. Each brings distinct strengths to the table. This guide breaks down what makes each framework unique and helps you choose the right one for your project.</p>
-
-<h2>OpenClaw: The Integration Powerhouse</h2>
-<p>OpenClaw is a community-driven agent framework built for maximum connectivity and extensibility. If your agent needs to operate across multiple platforms and leverage a wide ecosystem of skills, OpenClaw is your best bet.</p>
-<h3>Key Strengths</h3>
-<ul>
-<li><strong>13,700+ Community Skills</strong> — The ClawHub marketplace offers a massive library of community-built skills covering everything from web scraping to blockchain interactions, image generation, and data analysis. Installing a new skill takes one click.</li>
-<li><strong>20+ Platform Integrations</strong> — Native support for Telegram, Discord, Twitter/X, WhatsApp, Slack, IRC, Matrix, Line, WeChat, and more. Connect your agent to any platform your users are on.</li>
-<li><strong>Plugin Ecosystem</strong> — Beyond skills, OpenClaw supports plugins that extend core functionality: custom memory backends, tool integrations, authentication flows, and API endpoints.</li>
-<li><strong>Rich Character System</strong> — Define your agent's personality with voice, tone, behavioral rules, and response templates. Characters can be shared and imported across agents.</li>
-<li><strong>Built-in Knowledge Base</strong> — Upload documents (PDF, TXT, CSV) that your agent can reference during conversations via RAG (Retrieval Augmented Generation).</li>
-</ul>
-<p><strong>Best for:</strong> Community bots, social media managers, customer support agents, multi-platform deployments, and projects that need a wide range of integrations.</p>
-
-<h2>Hermes: The Lightweight Autonomous Agent</h2>
-<p>Hermes, developed by NousResearch, is a focused framework designed for autonomous task execution. It trades breadth of integrations for depth of reasoning and persistent state management.</p>
-<h3>Key Strengths</h3>
-<ul>
-<li><strong>Persistent Memory</strong> — Unlike session-based agents, Hermes maintains persistent memory across conversations. Your agent remembers past interactions, user preferences, and ongoing tasks without any additional setup.</li>
-<li><strong>40+ Built-in Tools</strong> — Web browsing, file management, code execution, shell commands, HTTP requests, database queries, and more. Every tool is available out of the box without plugins.</li>
-<li><strong>SOUL.md Identity System</strong> — Define your agent's core identity, values, and behavioral boundaries in a structured Markdown file. The SOUL.md system provides deeper personality control than simple system prompts.</li>
-<li><strong>Lightweight Runtime</strong> — Hermes uses fewer resources than other frameworks, making it ideal for the free tier (0.5 CPU, 1GB RAM). It starts faster and runs more efficiently.</li>
-<li><strong>Advanced Reasoning</strong> — Optimized for multi-step planning, chain-of-thought execution, and self-correction. Hermes agents handle complex, multi-step tasks reliably.</li>
-</ul>
-<p><strong>Best for:</strong> Research assistants, coding agents, personal assistants, data processing, and autonomous workflows where reasoning depth and persistent state matter most.</p>
-
-<h2>ElizaOS: The Blockchain-Native Multi-Agent Runtime</h2>
-<p>ElizaOS is an open-source framework designed specifically for blockchain and crypto use cases. It supports running multiple agents in a single container and has the largest plugin ecosystem in the crypto-AI space.</p>
-<h3>Key Strengths</h3>
-<ul>
-<li><strong>350+ Plugins</strong> — The largest plugin registry in the AI agent ecosystem, with deep coverage of blockchain protocols, DeFi platforms, NFT marketplaces, and on-chain data providers.</li>
-<li><strong>Multi-Agent Runtime</strong> — Run multiple agents in a single container, each with its own identity and configuration. Agents can communicate with each other and coordinate tasks.</li>
-<li><strong>Blockchain-Native</strong> — Built-in support for Solana, Ethereum, Base, Arbitrum, and other chains. Agents can read on-chain data, execute transactions, and interact with smart contracts natively.</li>
-<li><strong>Token-Gated Access</strong> — Gate agent access based on token holdings, NFT ownership, or on-chain credentials. Perfect for token communities and DAOs.</li>
-<li><strong>Extensible Actions</strong> — Define custom actions that your agent can take, from executing swaps to minting NFTs to posting governance proposals.</li>
-</ul>
-<p><strong>Best for:</strong> Crypto trading bots, DeFi agents, DAO tooling, NFT projects, token community management, and any use case that requires deep blockchain integration.</p>
-
-<h2>Side-by-Side Comparison</h2>
-<table>
-<thead><tr><th>Feature</th><th>OpenClaw</th><th>Hermes</th><th>ElizaOS</th></tr></thead>
-<tbody>
-<tr><td>Community skills/plugins</td><td>13,700+ skills</td><td>40+ built-in tools</td><td>350+ plugins</td></tr>
-<tr><td>Platform integrations</td><td>20+</td><td>Basic (API/CLI)</td><td>10+ (crypto-focused)</td></tr>
-<tr><td>Memory system</td><td>Long-term + short-term</td><td>Persistent across sessions</td><td>Configurable per plugin</td></tr>
-<tr><td>Identity system</td><td>Character files</td><td>SOUL.md</td><td>Character JSON</td></tr>
-<tr><td>Multi-agent support</td><td>No (one per container)</td><td>No (one per container)</td><td>Yes (multiple per container)</td></tr>
-<tr><td>Blockchain support</td><td>Via plugins</td><td>Via tools</td><td>Native (multi-chain)</td></tr>
-<tr><td>Autonomous reasoning</td><td>Basic</td><td>Advanced</td><td>Moderate</td></tr>
-<tr><td>Resource usage</td><td>Moderate</td><td>Low</td><td>Moderate-High</td></tr>
-<tr><td>Best LLM pairing</td><td>Any (Groq, OpenAI, Anthropic)</td><td>Hermes-tuned, OpenAI, Anthropic</td><td>Any (OpenAI, Anthropic, Groq)</td></tr>
-<tr><td>Setup complexity</td><td>Low (GUI config)</td><td>Low (GUI config)</td><td>Low (GUI config)</td></tr>
-<tr><td>Ideal tier</td><td>Any</td><td>Any (runs well on Free)</td><td>Starter or Pro</td></tr>
-</tbody>
-</table>
-
-<h2>Decision Framework</h2>
-<p>Ask yourself these questions to narrow down your choice:</p>
-
-<h3>Do you need multi-platform presence?</h3>
-<p>If your agent needs to operate simultaneously on Telegram, Discord, Twitter, and Slack, <strong>OpenClaw</strong> is the clear winner with 20+ native integrations.</p>
-
-<h3>Do you need autonomous task execution?</h3>
-<p>If your agent needs to plan, research, write code, or handle complex multi-step workflows without hand-holding, <strong>Hermes</strong> has the strongest reasoning capabilities.</p>
-
-<h3>Do you need blockchain integration?</h3>
-<p>If your agent needs to interact with smart contracts, execute trades, or manage token-gated communities, <strong>ElizaOS</strong> is purpose-built for this.</p>
-
-<h3>Are you resource-constrained?</h3>
-<p>On the free tier (0.5 CPU, 1GB RAM), <strong>Hermes</strong> runs most efficiently. OpenClaw and ElizaOS work but benefit from Starter or Pro tier resources.</p>
-
-<h2>Can I Switch Later?</h2>
-<p>Absolutely. You can create multiple agents on Hatcher, each with a different framework. Free accounts include one agent, but you can purchase add-on agent slots to run all three side by side. Your platform tokens and LLM keys are stored at the account level, so switching frameworks does not require reconfiguring integrations from scratch.</p>
-
-<h2>Our Recommendation</h2>
-<p><strong>Starting out?</strong> Go with OpenClaw. Its massive skill library and integration ecosystem mean you can add capabilities without writing code.</p>
-<p><strong>Need autonomy?</strong> Choose Hermes. Its persistent memory and advanced reasoning make it the best choice for agents that need to work independently.</p>
-<p><strong>Building in crypto?</strong> Pick ElizaOS. Its native blockchain support and multi-agent runtime are unmatched in the space.</p>
-<p>All three frameworks deploy in under 60 seconds on Hatcher. Try them all and see which fits your workflow.</p>`,
-    author: 'HatcherLabs Team',
-    date: '2026-03-23',
-    category: 'Comparison',
-    readTime: '8 min',
-    coverImageDescription: 'Three glowing framework icons arranged in a triangle formation, connected by data streams, against a deep purple-black gradient background',
-  },
-  {
     slug: '5-ai-agent-use-cases-save-time',
     title: '5 AI Agent Use Cases That Will Save You 10+ Hours Per Week',
     excerpt:
@@ -273,7 +182,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <li>Executes pre-defined trading strategies based on technical indicators</li>
 </ul>
 <h3>Recommended Setup</h3>
-<p>Use <strong>ElizaOS</strong> on Hatcher with blockchain plugins enabled. Connect to your preferred chains (Solana, Ethereum, Base) and configure price alert thresholds. Pair with a BYOK key from Groq for fast, low-latency responses. Start with the <strong>Trading Assistant</strong> template.</p>
+<p>Use <strong>OpenClaw</strong> on Hatcher with market-data and automation skills enabled. Connect the alert channels your community uses and configure price thresholds. Pair with a BYOK key for fast, low-latency responses. Start with the <strong>Trading Assistant</strong> template.</p>
 <blockquote>Tip: Start with monitoring and alerts only. Add automated execution after you have tested the agent's analysis quality for at least a week.</blockquote>
 
 <h2>2. Customer Support Automation</h2>
@@ -466,7 +375,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <ul>
 <li><strong>Docker containers per agent</strong> — full isolation, dedicated resources</li>
 <li><strong>20+ platform integrations</strong> — Telegram, Discord, Twitter, WhatsApp, Slack, and more, all wired up out of the box</li>
-<li><strong>4 frameworks</strong> — OpenClaw, Hermes, ElizaOS, and Milady, each with their own strengths and tooling</li>
+<li><strong>2 frameworks</strong> — OpenClaw and Hermes, each with focused strengths and tooling</li>
 <li><strong>Auto-sleep and auto-wake</strong> — idle agents sleep to save resources, wake instantly on incoming messages</li>
 <li><strong>LLM proxy with rate limiting</strong> — use our hosted Groq models or bring your own key for unlimited messages</li>
 </ul>
@@ -573,102 +482,6 @@ export const BLOG_POSTS: BlogPost[] = [
     coverImageDescription: 'A smartphone showing the Telegram app with an AI chat bubble, connected by a glowing line to a server rack with the Hatcher logo, dark blue and purple tones',
   },
   {
-    slug: 'openclaw-vs-hermes-elizaos-milady',
-    title: 'OpenClaw vs Hermes vs ElizaOS vs Milady: Which Framework?',
-    excerpt:
-      'A practical comparison of all four AI agent frameworks on Hatcher — when to use each, what they are good at, and how to choose.',
-    content: `<p>Hatcher supports four AI agent frameworks: <strong>OpenClaw</strong>, <strong>Hermes</strong>, <strong>ElizaOS</strong>, and <strong>Milady</strong>. They are all fully deployable on Hatcher, but they have very different strengths, philosophies, and use cases. This guide will help you pick the right one.</p>
-
-<h2>The Short Version</h2>
-<ul>
-<li><strong>OpenClaw</strong> — Maximum integrations. Best for community bots and multi-platform deployments.</li>
-<li><strong>Hermes</strong> — Autonomous task execution. Best for research, coding, and agentic workflows.</li>
-<li><strong>ElizaOS</strong> — Multi-agent runtime. Best for crypto projects and complex agent orchestration.</li>
-<li><strong>Milady</strong> — Lightweight and fast. Best for simple deployments and resource-constrained use cases.</li>
-</ul>
-
-<h2>OpenClaw</h2>
-<p>OpenClaw is the most integration-rich framework on Hatcher. It ships with 20+ platform connectors out of the box and a community plugin ecosystem with over 13,700 skills.</p>
-<h3>Strengths</h3>
-<ul>
-<li>20+ platform integrations (Telegram, Discord, Twitter, WhatsApp, Slack, and more)</li>
-<li>Plugin architecture — install community skills or write your own</li>
-<li>Multi-model support — swap LLMs without changing your configuration</li>
-<li>Mature project with extensive documentation</li>
-</ul>
-<h3>Best For</h3>
-<p>Community management bots, social media agents, customer support deployments, and any use case where you need the agent connected to multiple platforms simultaneously.</p>
-<h3>Not Ideal For</h3>
-<p>Pure agentic task execution (Hermes is better) or crypto-native projects (ElizaOS has better on-chain tooling).</p>
-
-<h2>Hermes</h2>
-<p>Hermes is NousResearch's agent framework, designed for autonomous task execution rather than reactive chatbot behavior. It ships with persistent memory, 40+ built-in tools, and a SOUL.md identity file system.</p>
-<h3>Strengths</h3>
-<ul>
-<li>40+ built-in tools — web search, file management, code execution, API calls</li>
-<li>Persistent memory across sessions</li>
-<li>SOUL.md identity files — define your agent's personality and knowledge in a markdown file</li>
-<li>Strong at multi-step, autonomous task completion</li>
-</ul>
-<h3>Best For</h3>
-<p>Research assistants, coding agents, autonomous workflow runners, and any scenario where the agent needs to take a sequence of actions without constant human guidance.</p>
-<h3>Not Ideal For</h3>
-<p>High-volume community chat moderation (OpenClaw handles that better) or running multiple coordinated agents (ElizaOS excels there).</p>
-
-<h2>ElizaOS</h2>
-<p>ElizaOS is a multi-agent runtime with 350+ plugins and deep blockchain-native tooling. Originally built for the ai16z ecosystem, it has grown into a general-purpose framework with strong crypto and DeFi integrations.</p>
-<h3>Strengths</h3>
-<ul>
-<li>350+ plugins covering DeFi, NFTs, on-chain analytics, and more</li>
-<li>Multi-agent support — run multiple coordinated agents in one container</li>
-<li>Native Solana and EVM integrations</li>
-<li>Active development with a large open-source community</li>
-</ul>
-<h3>Best For</h3>
-<p>Crypto projects, DeFi automation, NFT community management, and any use case that requires deep on-chain integration or running multiple agents in coordination.</p>
-<h3>Not Ideal For</h3>
-<p>Simple single-bot deployments (the complexity overhead is not worth it) or pure task execution (Hermes is lighter and more focused).</p>
-
-<h2>Milady</h2>
-<p>Milady is the newest addition to Hatcher's framework lineup. It is built for simplicity and speed — minimal dependencies, fast startup, and a clean configuration model that prioritizes developer experience over feature breadth.</p>
-<h3>Strengths</h3>
-<ul>
-<li>Extremely fast startup and low memory footprint</li>
-<li>Simple configuration — one YAML file defines everything</li>
-<li>Built-in support for Telegram, Discord, and REST API</li>
-<li>Easy to extend with custom handlers</li>
-</ul>
-<h3>Best For</h3>
-<p>Lightweight deployments, hobby projects, agents where startup speed matters, and teams that want minimal cognitive overhead when managing multiple agents.</p>
-<h3>Not Ideal For</h3>
-<p>Complex multi-platform deployments or crypto-native use cases (use OpenClaw or ElizaOS instead).</p>
-
-<h2>Feature Comparison</h2>
-<p>Here is a quick reference matrix:</p>
-<table>
-<thead><tr><th>Feature</th><th>OpenClaw</th><th>Hermes</th><th>ElizaOS</th><th>Milady</th></tr></thead>
-<tbody>
-<tr><td>Platform connectors</td><td>20+</td><td>5+</td><td>15+</td><td>3</td></tr>
-<tr><td>Built-in tools</td><td>Plugin-based</td><td>40+</td><td>350+ plugins</td><td>Custom handlers</td></tr>
-<tr><td>Multi-agent</td><td>No</td><td>No</td><td>Yes</td><td>No</td></tr>
-<tr><td>Persistent memory</td><td>Yes</td><td>Yes</td><td>Yes</td><td>No</td></tr>
-<tr><td>Crypto/DeFi tooling</td><td>Limited</td><td>Limited</td><td>Extensive</td><td>No</td></tr>
-<tr><td>Resource footprint</td><td>Medium</td><td>Medium</td><td>High</td><td>Low</td></tr>
-<tr><td>Learning curve</td><td>Medium</td><td>Medium</td><td>High</td><td>Low</td></tr>
-</tbody>
-</table>
-
-<h2>Which Should You Choose?</h2>
-<p>If you are not sure, start with <strong>OpenClaw</strong>. It has the broadest integration support, a large community, and sensible defaults for most use cases. You can always migrate to a different framework later — Hatcher makes it easy to redeploy with a different framework config.</p>
-<p>If you are building something crypto-native, go <strong>ElizaOS</strong>. If you need autonomous task execution without platform noise, go <strong>Hermes</strong>. If you want something simple and fast, go <strong>Milady</strong>.</p>
-<p>All frameworks are available on the free tier. <a href="https://hatcher.host/create">Try them at hatcher.host/create.</a></p>`,
-    author: 'Hatcher Labs',
-    date: '2026-03-26',
-    category: 'Comparison',
-    readTime: '7 min',
-    coverImageDescription: 'Four distinct robot characters side by side, each representing a different AI framework with unique visual styles, glowing purple and cyan on dark background',
-  },
-  {
     slug: 'state-of-ai-agent-hosting-2026',
     title: 'The State of AI Agent Hosting in 2026',
     excerpt:
@@ -691,7 +504,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>For a senior infrastructure engineer, this is manageable. For a developer who just wants to ship an agent, it is a full week of work before the first useful message gets sent.</p>
 
 <h2>The Framework Fragmentation Problem</h2>
-<p>The agent framework ecosystem has also fragmented. OpenClaw, Hermes, ElizaOS, Milady, AutoGPT, CrewAI, Langchain agents, Autogen, and others all have different configuration models, different deployment patterns, and different assumptions about what infrastructure they run on.</p>
+<p>The agent framework ecosystem has also fragmented. OpenClaw, Hermes, AutoGPT, CrewAI, Langchain agents, Autogen, and others all have different configuration models, different deployment patterns, and different assumptions about what infrastructure they run on.</p>
 <p>This fragmentation means that if you switch frameworks — which teams often do as their requirements evolve — you often have to rebuild your entire deployment pipeline from scratch.</p>
 
 <h2>The Emerging Solution: Managed Agent Hosting</h2>
@@ -895,7 +708,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <h3>Setup</h3>
 <ul>
 <li>Create account at hatcher.host (free, no credit card)</li>
-<li>Pick a framework: OpenClaw, Hermes, ElizaOS, or Milady</li>
+<li>Pick a framework: OpenClaw or Hermes</li>
 <li>Choose a template or start blank</li>
 <li>Add your platform tokens (Telegram, Discord, etc.)</li>
 <li>Hit Deploy</li>

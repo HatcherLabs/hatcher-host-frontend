@@ -61,7 +61,7 @@
       "cityLabel": "Hatcher 城市",
       "citySub": "步行 3D 上线代理世界。",
       "frameworksLabel": "框架",
-      "frameworksSub": "OpenClaw · Hermes · ElizaOS · Milady。",
+      "frameworksSub": "OpenClaw · Hermes.。",
       "pricingLabel": "定价",
       "pricingSub": "Free · Starter · Pro · Business · Founding。",
       "tokenLabel": "$HATCHER",
@@ -154,7 +154,7 @@
         "旅行规划师",
         "个人助理"
       ],
-      "body": "选择框架，配置，60秒内上线。无需编码，无需管理基础设施。4种框架，20+平台，免费套餐支持BYOK。",
+      "body": "选择框架，配置，60秒内上线。无需编码，无需管理基础设施。2种框架，20+平台，免费套餐支持BYOK。",
       "ctaPrimary": "免费开始",
       "ctaSecondary": "查阅文档",
       "agentPreviewOnline": "CryptoHelper — 在线"
@@ -187,7 +187,7 @@
         {
           "num": "01",
           "title": "选择框架",
-          "desc": "OpenClaw、Hermes、ElizaOS 或 Milady。各有独特优势——浏览器控制、记忆、多智能体、链上能力。"
+          "desc": "选择 OpenClaw 处理技能密集型自动化，或选择 Hermes 构建带记忆的自适应长期运行智能体。"
         },
         {
           "num": "02",
@@ -248,7 +248,7 @@
     },
     "frameworks": {
       "eyebrow": "框架",
-      "heading": "四大框架，一个平台。",
+      "heading": "两大框架，一个平台。",
       "subheading": "选择最适合您智能体的框架，随时切换。",
       "items": [
         {
@@ -262,18 +262,6 @@
           "tag": "推理型",
           "desc": "智能优先设计，支持丰富记忆与推理能力。",
           "features": "77 个内置技能 · 深度记忆 · 多模型支持"
-        },
-        {
-          "name": "ElizaOS",
-          "tag": "多智能体",
-          "desc": "多智能体协调，90+ 插件生态。",
-          "features": "90+ 插件 · 多智能体 · 知识库"
-        },
-        {
-          "name": "Milady",
-          "tag": "加密原生",
-          "desc": "链上感知、DeFi工具、代币追踪。",
-          "features": "DeFi 工具 · 链上数据 · 代币追踪"
         }
       ]
     },
@@ -899,9 +887,9 @@
       "agentsCountPlural": "共 {count} 个智能体 · {active} 个活跃",
       "details": "详情",
       "tourCreateTitle": "创建您的第一个智能体",
-      "tourCreateDescription": "点击此处孵化您的第一个AI智能体，从4种框架中选择。",
+      "tourCreateDescription": "点击此处孵化您的第一个AI智能体，从 OpenClaw 或 Hermes 中选择。",
       "tourFilterTitle": "按框架筛选",
-      "tourFilterDescription": "OpenClaw、Hermes、ElizaOS 或 Milady——各有独特优势。",
+      "tourFilterDescription": "OpenClaw 或 Hermes——各有独特优势。",
       "tourSearchTitle": "搜索与探索",
       "tourSearchDescription": "搜索智能体或浏览200+模板，快速开始。",
       "tourPlanTitle": "您的套餐",
@@ -1479,6 +1467,7 @@
           "inboundHttp": "入站 HTTP",
           "triggerFrom": "从外部服务（Zapier、GitHub 等）触发您的智能体",
           "webhookUrl": "Webhook URL",
+          "alwaysActive": "始终在线",
           "bearerToken": "Bearer Token",
           "exampleRequest": "示例请求",
           "revealToken": "显示令牌",
@@ -1746,7 +1735,7 @@
     "memoryUsage": "基准内存用量",
     "lowerFaster": "越低越快",
     "lowerLeaner": "越低越轻量",
-    "benchmarkCallout": "🌸 Milady 最快最轻量——最适合免费套餐部署。🦞 OpenClaw 工具最全面，但需要更多资源。",
+    "benchmarkCallout": "🌸 Hermes 最快最轻量——最适合免费套餐部署。🦞 OpenClaw 工具最全面，但需要更多资源。",
     "configExamples": "配置示例",
     "configSubheading": "每个框架都有自己的配置格式，以下是典型设置示例。",
     "configRef": "完整配置参考 →",
@@ -1770,20 +1759,8 @@
         "pick": "Hermes"
       },
       {
-        "condition": "我想要一个社交媒体或社区机器人",
-        "pick": "ElizaOS"
-      },
-      {
-        "condition": "我刚开始入门，想要简单易用的",
-        "pick": "Milady"
-      },
-      {
         "condition": "我需要多渠道消息（Telegram + Discord + WhatsApp）",
         "pick": "OpenClaw 或 Hermes"
-      },
-      {
-        "condition": "我想要一个角色驱动的人格机器人",
-        "pick": "ElizaOS 或 Milady"
       }
     ]
   },
@@ -1994,31 +1971,10 @@
     "systemPromptHint": "定义智能体的个性、能力和规则",
     "systemPromptCount": "{count}/8000",
     "systemPromptWarning": "建议添加系统提示以获得更好效果",
-    "elizaBioLabel": "简介",
-    "elizaBioHint": "定义智能体的个性和背景。每行一条陌述。",
-    "elizaBioPlaceholder": "专门从事...的知识型AI助手",
-    "elizaLoreLabel": "背景知识",
-    "elizaLoreHint": "智能体的背景知识和历史。每行一个事实。",
-    "elizaStyleLabel": "风格说明",
-    "elizaStyleHint": "智能体应如何沟通。每行一条指令。",
-    "elizaTopicsLabel": "主题",
-    "elizaTopicsPlaceholder": "technology, AI, crypto, research",
-    "elizaTopicsHint": "智能体了解的主题，逗号分隔",
-    "elizaAdjectivesLabel": "形容词",
-    "elizaAdjectivesPlaceholder": "helpful, analytical, concise",
-    "elizaAdjectivesHint": "个性特征，逗号分隔",
-    "miladyPersonalityLabel": "个性预设",
-    "miladyPersonalityHint": "为您的Milady智能体选择个性风格。",
-    "miladyPersonalityHelpful": "热心 - 友好且专业",
-    "miladyPersonalityTsundere": "傲娇 - 表面冷淡内心关心",
-    "miladyPersonalityUnhinged": "混乱 - 随机不可预测",
-    "miladyPersonalityCustom": "自定义 - 使用您的系统提示",
     "moreOptionsLabel": "更多选项",
     "moreOptionsHints": {
       "openclaw": "搜索、语音、会话",
-      "hermes": "个性、记忆、审批",
-      "elizaos": "数据库、图像生成、语音",
-      "milady": "数据库、隐私、预设"
+      "hermes": "个性、记忆、审批"
     },
     "sessionScopeLabel": "会话范围",
     "sessionScopeHint": "用户之间共享对话上下文的方式",
@@ -2048,14 +2004,12 @@
     "approvalModeManual": "手动",
     "databaseLabel": "数据库",
     "databaseHint": "智能体状态和记忆的存储后端",
-    "databaseHintMilady": "智能体状态的存储后端",
     "imageGenLabel": "启用图像生成",
     "imageGenHint": "允许智能体生成图像",
     "voiceLabel": "启用语音",
     "voiceHint": "语音转文字和文字转语音功能",
     "localFirstLabel": "本地优先模式",
     "localFirstHint": "在同步之前在本地处理数据",
-    "miladyPersonalitySelectedHint": "上方已选择——控制智能体语气",
     "step5Heading": "准备启动？",
     "step5Subheading": "启动前检查您的配置",
     "summaryAgentType": "智能体类型",
@@ -2072,9 +2026,7 @@
     "summaryCostByok": "$0.00 — 使用您自己的密鑰",
     "summaryFrameworkLabels": {
       "openclaw": "多技能助手",
-      "hermes": "自主智能体",
-      "elizaos": "多智能体框架",
-      "milady": "隐私优先运行时"
+      "hermes": "自主智能体"
     },
     "testChatLabel": "测试您的智能体",
     "testChatSubtext": "预览智能体的响应方式",
@@ -2103,18 +2055,6 @@
         "f1": "长期记忆",
         "f2": "40+内置工具",
         "f3": "自我提升"
-      },
-      "elizaos": {
-        "desc": "ai16z开源多智能体框架。90+插件、持久记忆、Web3原生。",
-        "f1": "90+插件",
-        "f2": "向量记忆",
-        "f3": "Web3原生"
-      },
-      "milady": {
-        "desc": "隐私优先AI运行时，拥有20+连接器、VRM虚拟形象和DeFi集成。",
-        "f1": "20+连接器",
-        "f2": "个性预设",
-        "f3": "隐私优先"
       }
     },
     "skills": {
@@ -2539,14 +2479,6 @@
       "hermes": {
         "name": "Hermes Agent",
         "description": "Nous Research出品的自主AI智能体，具备持久记忆、40+工具、技能系统和多平台消息网关。"
-      },
-      "elizaos": {
-        "name": "ElizaOS",
-        "description": "开源AI智能体框架，支持角色驱动人格、插件生态和多客户端社交及消息平台接入。"
-      },
-      "milady": {
-        "name": "Milady",
-        "description": "轻量级人格优先AI智能体框架，专为有表现力、具文化感知的对话智能体设计，支持模块化能力扩展。"
       }
     },
     "agentStatus": {
@@ -2666,9 +2598,7 @@
       "boxLabel": "框架",
       "seeAll": "查看全部 →",
       "tagOpenclaw": "多技能助手",
-      "tagHermes": "自主代理",
-      "tagElizaos": "多代理框架",
-      "tagMilady": "隐私优先运行时"
+      "tagHermes": "自主代理"
     },
     "pricing": {
       "boxLabel": "定价",

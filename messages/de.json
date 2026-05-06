@@ -61,7 +61,7 @@
       "cityLabel": "Hatcher City",
       "citySub": "Eine 3D-Welt aus Live-Agenten begehen.",
       "frameworksLabel": "Frameworks",
-      "frameworksSub": "OpenClaw · Hermes · ElizaOS · Milady.",
+      "frameworksSub": "OpenClaw · Hermes.",
       "pricingLabel": "Preise",
       "pricingSub": "Free · Starter · Pro · Business · Founding.",
       "tokenLabel": "$HATCHER",
@@ -154,7 +154,7 @@
         "Reiseplaner",
         "Persönlichen Assistenten"
       ],
-      "body": "Framework wählen. Konfigurieren. In 60 Sekunden live. Kein Code erforderlich, keine Infrastruktur zu verwalten. 4 Frameworks, 20+ Plattformen, kostenloser Tarif mit BYOK.",
+      "body": "Framework wählen. Konfigurieren. In 60 Sekunden live. Kein Code erforderlich, keine Infrastruktur zu verwalten. 2 Frameworks, 20+ Plattformen, kostenloser Tarif mit BYOK.",
       "ctaPrimary": "Kostenlos starten",
       "ctaSecondary": "Docs lesen",
       "agentPreviewOnline": "CryptoHelper — Online"
@@ -187,7 +187,7 @@
         {
           "num": "01",
           "title": "Framework wählen",
-          "desc": "OpenClaw, Hermes, ElizaOS oder Milady. Jedes hat einzigartige Stärken — Browser-Steuerung, Gedächtnis, Multi-Agent, On-Chain."
+          "desc": "Wählen Sie OpenClaw für skill-starke Automatisierung oder Hermes für adaptive, lang laufende Agenten mit Gedächtnis."
         },
         {
           "num": "02",
@@ -262,18 +262,6 @@
           "tag": "Reasoning",
           "desc": "Smart-first-Design für reichhaltiges Gedächtnis und Reasoning.",
           "features": "77 integrierte Fähigkeiten · Deep Memory · Multi-Modell"
-        },
-        {
-          "name": "ElizaOS",
-          "tag": "Multi-Agent",
-          "desc": "Multi-Agent-Koordination mit 90+ Plugins.",
-          "features": "90+ Plugins · Multi-Agent · Wissensdatenbank"
-        },
-        {
-          "name": "Milady",
-          "tag": "Crypto-nativ",
-          "desc": "On-Chain-Bewusstsein, DeFi-Tools, Token-Tracking.",
-          "features": "DeFi-Tools · On-Chain-Daten · Token-Tracking"
         }
       ]
     },
@@ -899,9 +887,9 @@
       "agentsCountPlural": "{count} Agenten gesamt · {active} aktiv",
       "details": "Details",
       "tourCreateTitle": "Ersten Agenten erstellen",
-      "tourCreateDescription": "Klicken Sie hier, um Ihren ersten KI-Agenten zu starten. Wählen aus 4 Frameworks.",
+      "tourCreateDescription": "Klicken Sie hier, um Ihren ersten KI-Agenten zu starten. Wählen Sie zwischen OpenClaw und Hermes.",
       "tourFilterTitle": "Nach Framework filtern",
-      "tourFilterDescription": "OpenClaw, Hermes, ElizaOS oder Milady — jedes hat einzigartige Stärken.",
+      "tourFilterDescription": "OpenClaw oder Hermes — jedes hat einzigartige Stärken.",
       "tourSearchTitle": "Suchen & Entdecken",
       "tourSearchDescription": "Agenten suchen oder 200+ Vorlagen durchsuchen, um schnell zu starten.",
       "tourPlanTitle": "Ihr Plan",
@@ -1479,6 +1467,7 @@
           "inboundHttp": "Eingehender HTTP",
           "triggerFrom": "Agenten von externen Diensten aus auslösen (Zapier, GitHub, etc.)",
           "webhookUrl": "Webhook URL",
+          "alwaysActive": "Immer aktiv",
           "bearerToken": "Bearer Token",
           "exampleRequest": "Beispielanfrage",
           "revealToken": "Token anzeigen",
@@ -1746,7 +1735,7 @@
     "memoryUsage": "Basis-Speichernutzung",
     "lowerFaster": "Niedriger ist schneller",
     "lowerLeaner": "Niedriger ist schlanker",
-    "benchmarkCallout": "🌸 Milady ist das schnellste und leichteste — ideal für kostenlose Tarif-Deployments. 🦞 OpenClaw bietet die meisten Tools, benötigt aber mehr Ressourcen.",
+    "benchmarkCallout": "🌸 Hermes ist das schnellste und leichteste — ideal für kostenlose Tarif-Deployments. 🦞 OpenClaw bietet die meisten Tools, benötigt aber mehr Ressourcen.",
     "configExamples": "Konfigurationsbeispiele",
     "configSubheading": "Jedes Framework hat sein eigenes Konfigurationsformat. So sieht ein typisches Setup aus.",
     "configRef": "Vollständige Konfigurationsreferenz →",
@@ -1770,20 +1759,8 @@
         "pick": "Hermes"
       },
       {
-        "condition": "Ich möchte einen Social-Media- oder Community-Bot",
-        "pick": "ElizaOS"
-      },
-      {
-        "condition": "Ich fange gerade erst an und möchte etwas Einfaches",
-        "pick": "Milady"
-      },
-      {
         "condition": "Ich benötige Multi-Channel-Messaging (Telegram + Discord + WhatsApp)",
         "pick": "OpenClaw oder Hermes"
-      },
-      {
-        "condition": "Ich möchte einen charaktergesteuerten Persona-Bot",
-        "pick": "ElizaOS oder Milady"
       }
     ]
   },
@@ -1994,31 +1971,10 @@
     "systemPromptHint": "Definiert Persönlichkeit, Fähigkeiten und Regeln des Agents",
     "systemPromptCount": "{count}/8000",
     "systemPromptWarning": "System-Prompt empfohlen für bessere Ergebnisse",
-    "elizaBioLabel": "Biografie",
-    "elizaBioHint": "Persönlichkeit und Hintergrund des Agents. Ein Satz pro Zeile.",
-    "elizaBioPlaceholder": "Ein kenntnisreicher KI-Assistent spezialisiert auf...",
-    "elizaLoreLabel": "Hintergrundwissen",
-    "elizaLoreHint": "Hintergrundwissen und Geschichte des Agents. Ein Fakt pro Zeile.",
-    "elizaStyleLabel": "Stil-Anweisungen",
-    "elizaStyleHint": "Wie Ihr Agent kommunizieren soll. Eine Anweisung pro Zeile.",
-    "elizaTopicsLabel": "Themen",
-    "elizaTopicsPlaceholder": "technology, AI, crypto, research",
-    "elizaTopicsHint": "Kommagetrennte Themen, über die der Agent Bescheid weiß",
-    "elizaAdjectivesLabel": "Adjektive",
-    "elizaAdjectivesPlaceholder": "helpful, analytical, concise",
-    "elizaAdjectivesHint": "Persönlichkeitsmerkmale, kommagetrennt",
-    "miladyPersonalityLabel": "Persönlichkeits-Preset",
-    "miladyPersonalityHint": "Persönlichkeitsstil für Ihren Milady-Agent wählen.",
-    "miladyPersonalityHelpful": "Hilfsbereit - Freundlich und professionell",
-    "miladyPersonalityTsundere": "Tsundere - Widerwillig aber fürsorglich",
-    "miladyPersonalityUnhinged": "Chaotisch - Unberechenbar und spontan",
-    "miladyPersonalityCustom": "Eigene - Verwendet Ihren System-Prompt",
     "moreOptionsLabel": "Weitere Optionen",
     "moreOptionsHints": {
       "openclaw": "Suche, Sprache, Sitzungen",
-      "hermes": "Persönlichkeit, Gedächtnis, Freigaben",
-      "elizaos": "Datenbank, Bildgenerierung, Sprache",
-      "milady": "Datenbank, Datenschutz, Presets"
+      "hermes": "Persönlichkeit, Gedächtnis, Freigaben"
     },
     "sessionScopeLabel": "Sitzungsumfang",
     "sessionScopeHint": "Wie Konversationskontext zwischen Nutzern geteilt wird",
@@ -2048,14 +2004,12 @@
     "approvalModeManual": "Manuell",
     "databaseLabel": "Datenbank",
     "databaseHint": "Speicher-Backend für Agent-Zustand und Gedächtnis",
-    "databaseHintMilady": "Speicher-Backend für Agent-Zustand",
     "imageGenLabel": "Bildgenerierung aktivieren",
     "imageGenHint": "Agent darf Bilder generieren",
     "voiceLabel": "Sprache aktivieren",
     "voiceHint": "Sprache-zu-Text und Text-zu-Sprache",
     "localFirstLabel": "Local-First-Modus",
     "localFirstHint": "Daten lokal verarbeiten vor der Synchronisierung",
-    "miladyPersonalitySelectedHint": "Oben ausgewählt — steuert den Agent-Ton",
     "step5Heading": "Bereit zum Starten?",
     "step5Subheading": "Konfiguration vor dem Start prüfen",
     "summaryAgentType": "Agent-Typ",
@@ -2072,9 +2026,7 @@
     "summaryCostByok": "$0.00 — Eigener Schlüssel",
     "summaryFrameworkLabels": {
       "openclaw": "Multi-Skill-Assistent",
-      "hermes": "Autonomer Agent",
-      "elizaos": "Multi-Agent-Framework",
-      "milady": "Datenschutz-Runtime"
+      "hermes": "Autonomer Agent"
     },
     "testChatLabel": "Agent testen",
     "testChatSubtext": "Vorschau der Agent-Antworten",
@@ -2103,18 +2055,6 @@
         "f1": "Langzeitgedächtnis",
         "f2": "40+ integrierte Tools",
         "f3": "Selbstverbesserung"
-      },
-      "elizaos": {
-        "desc": "Open-Source Multi-Agent-Framework von ai16z. 90+ Plugins, persistentes Gedächtnis, Web3-nativ.",
-        "f1": "90+ Plugins",
-        "f2": "Vektorspeicher",
-        "f3": "Web3-nativ"
-      },
-      "milady": {
-        "desc": "Datenschutzorientierte KI-Runtime mit 20+ Konnektoren, VRM-Avataren und DeFi-Integration.",
-        "f1": "20+ Konnektoren",
-        "f2": "Persönlichkeits-Presets",
-        "f3": "Datenschutz-First"
       }
     },
     "skills": {
@@ -2539,14 +2479,6 @@
       "hermes": {
         "name": "Hermes Agent",
         "description": "Autonomer KI-Agent von Nous Research mit dauerhaftem Gedächtnis, 40+ Tools, Fähigkeitensystem und Multi-Plattform-Messaging-Gateway."
-      },
-      "elizaos": {
-        "name": "ElizaOS",
-        "description": "Open-Source-KI-Agent-Framework mit charaktergesteuerten Personas, Plugin-Ökosystem und Multi-Client-Unterstützung für Social- und Messaging-Plattformen."
-      },
-      "milady": {
-        "name": "Milady",
-        "description": "Leichtgewichtiges, persönlichkeitsorientiertes KI-Agent-Framework, das für ausdrucksstarke, kulturell bewusste Konversationsagenten mit modularen Fähigkeiten entwickelt wurde."
       }
     },
     "agentStatus": {
@@ -2666,9 +2598,7 @@
       "boxLabel": "Frameworks",
       "seeAll": "Alle ansehen →",
       "tagOpenclaw": "Multi-Skill-Assistent",
-      "tagHermes": "Autonomer Agent",
-      "tagElizaos": "Multi-Agent-Framework",
-      "tagMilady": "Privacy-first Runtime"
+      "tagHermes": "Autonomer Agent"
     },
     "pricing": {
       "boxLabel": "Preise",

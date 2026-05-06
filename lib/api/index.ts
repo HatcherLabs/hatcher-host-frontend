@@ -15,6 +15,7 @@ export type {
   AgentPassportPaymentRail,
   AgentPassportStatus,
   ChatMessage,
+  ChatSessionSummary,
   TicketStatus,
   TicketCategory,
   TicketPriority,

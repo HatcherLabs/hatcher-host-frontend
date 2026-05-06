@@ -18,7 +18,6 @@ import {
   Trash2,
   Package,
   Store,
-  Puzzle,
 } from 'lucide-react';
 import {
   useAgentContext,
@@ -90,7 +89,6 @@ const SKILL_CATEGORIES: SkillCategory[] = [
       { id: 'calculator', name: 'Calculator', description: 'Perform mathematical calculations', popular: true },
       { id: 'spreadsheet', name: 'Spreadsheet', description: 'Create and manipulate spreadsheets' },
       { id: 'charts', name: 'Charts', description: 'Generate data visualizations' },
-      { id: '@elizaos/plugin-sql', name: 'Database', description: 'SQL database operations' },
       { id: 'data-science', name: 'Data Science', description: 'Data analysis, visualization, and statistical modeling', popular: true },
       { id: 'diagramming', name: 'Diagramming', description: 'Create diagrams, flowcharts, and architectural drawings' },
     ],
@@ -100,10 +98,7 @@ const SKILL_CATEGORIES: SkillCategory[] = [
     icon: '\u{1F3A8}',
     skills: [
       { id: 'image_gen', name: 'Image Generation', description: 'Generate images with AI models' },
-      { id: '@elizaos/plugin-image', name: 'Image Gen', description: 'Generate images with AI' },
       { id: 'writing', name: 'Writing Assistant', description: 'Help with creative and technical writing' },
-      { id: '@elizaos/plugin-video', name: 'Video', description: 'Video generation and processing' },
-      { id: '@elizaos/plugin-tts', name: 'Text to Speech', description: 'Voice synthesis and text-to-speech' },
       { id: 'creative', name: 'Creative', description: 'Creative writing, brainstorming, and content generation', popular: true },
       { id: 'music-creation', name: 'Music Creation', description: 'Create and edit music compositions' },
       { id: 'gifs', name: 'GIFs', description: 'Search and create GIFs for conversations' },
@@ -141,9 +136,6 @@ const SKILL_CATEGORIES: SkillCategory[] = [
     icon: '\u{1F517}',
     skills: [
       { id: 'api_caller', name: 'API Caller', description: 'Make HTTP requests to external APIs' },
-      { id: '@elizaos/plugin-twitter', name: 'Twitter', description: 'X/Twitter integration and posting' },
-      { id: '@elizaos/plugin-discord', name: 'Discord', description: 'Discord bot integration' },
-      { id: '@elizaos/plugin-telegram', name: 'Telegram', description: 'Telegram bot integration' },
       { id: 'twitter', name: 'Twitter', description: 'X/Twitter integration and posting' },
       { id: 'discord', name: 'Discord', description: 'Discord bot integration' },
       { id: 'telegram', name: 'Telegram', description: 'Telegram bot integration' },
@@ -181,7 +173,7 @@ const SKILL_CATEGORIES: SkillCategory[] = [
 function normalizeSkillId(id: string): string {
   return id
     .toLowerCase()
-    .replace(/@[a-z0-9-]+\//g, '') // strip npm scope like @elizaos/
+    .replace(/@[a-z0-9-]+\//g, '') // strip npm scope
     .replace(/^plugin-/, '')        // strip "plugin-" prefix
     .replace(/[-_\s.]+/g, '');      // strip separators
 }
@@ -229,14 +221,10 @@ const SKILL_ALIASES: Record<string, string> = {
   'image-gen': 'image_gen',
   'imagegeneration': 'image_gen',
   'image-generation': 'image_gen',
-  'image': '@elizaos/plugin-image',
-  'sql': '@elizaos/plugin-sql',
-  'database': '@elizaos/plugin-sql',
-  'db': '@elizaos/plugin-sql',
-  'video': '@elizaos/plugin-video',
-  'tts': '@elizaos/plugin-tts',
-  'texttospeech': '@elizaos/plugin-tts',
-  'text-to-speech': '@elizaos/plugin-tts',
+  'image': 'image_gen',
+  'sql': 'spreadsheet',
+  'database': 'spreadsheet',
+  'db': 'spreadsheet',
   'twitter': 'twitter',
   'discord': 'discord',
   'telegram': 'telegram',
@@ -375,23 +363,6 @@ interface MarketplaceItem {
   category: string;
 }
 
-const ELIZAOS_MARKETPLACE: MarketplaceItem[] = [
-  { id: '@elizaos/plugin-image', name: 'Image Generation', description: 'Generate images with DALL-E, Stable Diffusion, etc.', category: 'Creative' },
-  { id: '@elizaos/plugin-video', name: 'Video Generation', description: 'Generate and process videos', category: 'Creative' },
-  { id: '@elizaos/plugin-tts', name: 'Text to Speech', description: 'Convert text to natural speech', category: 'Voice' },
-  { id: '@elizaos/plugin-twitter', name: 'Twitter/X', description: 'Post, reply, and engage on X/Twitter', category: 'Social' },
-  { id: '@elizaos/plugin-discord', name: 'Discord', description: 'Discord bot integration', category: 'Social' },
-  { id: '@elizaos/plugin-telegram', name: 'Telegram', description: 'Telegram bot integration', category: 'Social' },
-  { id: '@elizaos/plugin-solana', name: 'Solana', description: 'Solana blockchain interactions, token transfers', category: 'Crypto' },
-  { id: '@elizaos/plugin-evm', name: 'EVM Chains', description: 'Ethereum, Polygon, Arbitrum, Base interactions', category: 'Crypto' },
-  { id: '@elizaos/plugin-coinbase', name: 'Coinbase', description: 'Coinbase trading and wallet integration', category: 'Crypto' },
-  { id: '@elizaos/plugin-farcaster', name: 'Farcaster', description: 'Farcaster social protocol integration', category: 'Social' },
-  { id: '@elizaos/plugin-slack', name: 'Slack', description: 'Slack workspace integration', category: 'Social' },
-  { id: '@elizaos/plugin-github', name: 'GitHub', description: 'GitHub repo management and automation', category: 'Dev' },
-  { id: '@elizaos/plugin-pdf', name: 'PDF Reader', description: 'Read and extract content from PDF files', category: 'Files' },
-  { id: '@elizaos/plugin-whatsapp', name: 'WhatsApp', description: 'WhatsApp messaging integration', category: 'Social' },
-];
-
 const OPENCLAW_MARKETPLACE: MarketplaceItem[] = [
   { id: 'web-search', name: 'Web Search', description: 'Search the internet with Brave, Google, or DuckDuckGo', category: 'Web' },
   { id: 'github-pr', name: 'GitHub PR Assistant', description: 'Review PRs, manage issues, and automate workflows', category: 'Dev' },
@@ -406,13 +377,11 @@ const OPENCLAW_MARKETPLACE: MarketplaceItem[] = [
 ];
 
 function getMarketplaceItems(framework: string): MarketplaceItem[] {
-  if (framework === 'elizaos' || framework === 'milady') return ELIZAOS_MARKETPLACE;
   if (framework === 'openclaw') return OPENCLAW_MARKETPLACE;
   return [];
 }
 
-function getInstallSource(framework: string): 'npm' | 'clawhub' {
-  if (framework === 'elizaos' || framework === 'milady') return 'npm';
+function getInstallSource(_framework: string): 'clawhub' {
   return 'clawhub';
 }
 
@@ -890,10 +859,7 @@ function MarketplaceSection({
               <div className="flex items-center gap-1.5 text-[10px] text-[var(--text-muted)]">
                 <ShoppingBag size={10} />
                 <span>
-                  {framework === 'elizaos' || framework === 'milady'
-                    ? 'Packages installed via npm from the ElizaOS registry'
-                    : 'Skills installed from ClawHub marketplace'
-                  }
+                  Skills installed from ClawHub marketplace
                 </span>
               </div>
             </div>
@@ -921,20 +887,6 @@ const FRAMEWORK_SKILL_INFO: Record<string, { description: string; icon: typeof S
     accentBg: 'bg-purple-500/[0.06]',
     accentText: 'text-purple-400',
   },
-  elizaos: {
-    description: 'ElizaOS uses a plugin architecture. Plugins add capabilities like Discord integration, image generation, blockchain access, and more.',
-    icon: Puzzle,
-    accentBorder: 'border-cyan-500/20',
-    accentBg: 'bg-cyan-500/[0.06]',
-    accentText: 'text-cyan-400',
-  },
-  milady: {
-    description: 'Milady includes core capabilities like web search, memory, file management, and shell access. Lightweight by design.',
-    icon: Sparkles,
-    accentBorder: 'border-rose-500/20',
-    accentBg: 'bg-rose-500/[0.06]',
-    accentText: 'text-rose-400',
-  },
 };
 
 function FrameworkInfoBanner({ framework }: { framework: string }) {
@@ -943,7 +895,7 @@ function FrameworkInfoBanner({ framework }: { framework: string }) {
 
   const Icon = info.icon;
   const badgeClass = FRAMEWORK_BADGE[framework] ?? 'bg-white/10 text-[var(--text-secondary)] border-white/10';
-  const frameworkLabel = framework === 'elizaos' ? 'ElizaOS' : framework.charAt(0).toUpperCase() + framework.slice(1);
+  const frameworkLabel = framework.charAt(0).toUpperCase() + framework.slice(1);
 
   return (
     <div className={`flex items-start gap-3 px-4 py-3.5 rounded-xl border ${info.accentBorder} ${info.accentBg} transition-all`}>
@@ -1011,9 +963,8 @@ export function SkillsTab() {
   const [installError, setInstallError] = useState<string | null>(null);
   const [installSuccess, setInstallSuccess] = useState<string | null>(null);
 
-  const isEliza = agent?.framework === 'elizaos';
-  const label = isEliza ? 'Plugins' : 'Skills';
-  const labelLower = isEliza ? 'plugins' : 'skills';
+  const label = 'Skills';
+  const labelLower = 'skills';
 
   const loadSkills = useCallback(async () => {
     if (!agent) return;
@@ -1281,7 +1232,7 @@ export function SkillsTab() {
         <div>
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             <Sparkles size={18} className="text-[var(--color-accent)]" />
-            {isEliza ? 'Plugins' : 'Skills Browser'}
+            Skills Browser
             {enabledCount > 0 && (
               <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
                 {enabledCount} active

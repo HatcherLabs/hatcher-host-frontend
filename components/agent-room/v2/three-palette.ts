@@ -1,4 +1,4 @@
-export type Framework = 'openclaw' | 'hermes' | 'elizaos' | 'milady';
+export type Framework = 'openclaw' | 'hermes';
 
 // THREE.Color-friendly palette: numeric channels for materials/emissive,
 // hex strings for HTML/CSS. Distinct from `./colors.ts` (which is the V2
@@ -28,22 +28,6 @@ export const FRAMEWORK_PALETTES: Record<Framework, FrameworkPalette> = {
     primaryHex: '#A855F7',
     dimHex: '#7E22CE',
     brightHex: '#E9D5FF',
-  },
-  elizaos: {
-    primary: 0x3b82f6,
-    dim: 0x1d4ed8,
-    bright: 0xbfdbfe,
-    primaryHex: '#3B82F6',
-    dimHex: '#1D4ED8',
-    brightHex: '#BFDBFE',
-  },
-  milady: {
-    primary: 0xec4899,
-    dim: 0xbe185d,
-    bright: 0xfbcfe8,
-    primaryHex: '#EC4899',
-    dimHex: '#BE185D',
-    brightHex: '#FBCFE8',
   },
 };
 

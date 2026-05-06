@@ -1,4 +1,4 @@
-export type Framework = 'openclaw' | 'hermes' | 'elizaos' | 'milady';
+export type Framework = 'openclaw' | 'hermes';
 // Aligned 1:1 with AgentTemplate.category on prod (25 buckets). Keep
 // in sync with routes/city.ts on the backend.
 export type Category =
@@ -76,15 +76,11 @@ export const CATEGORY_LABELS: Record<Category, string> = {
 export const FRAMEWORK_COLORS: Record<Framework, number> = {
   openclaw: 0x10b981,
   hermes: 0x38bdf8,
-  elizaos: 0xa855f7,
-  milady: 0xec4899,
 };
 
 export const FRAMEWORK_EMISSIVE: Record<Framework, number> = {
   openclaw: 0x34d399,
   hermes: 0x7dd3fc,
-  elizaos: 0xc084fc,
-  milady: 0xf9a8d4,
 };
 
 // Building heights by tier index (0..4).

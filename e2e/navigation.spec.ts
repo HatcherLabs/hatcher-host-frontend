@@ -101,9 +101,7 @@ test.describe('Public Page Navigation', () => {
     // Should mention at least one framework
     const hasFramework =
       (await page.locator('text=/openclaw/i').count()) > 0 ||
-      (await page.locator('text=/hermes/i').count()) > 0 ||
-      (await page.locator('text=/elizaos/i').count()) > 0 ||
-      (await page.locator('text=/milady/i').count()) > 0;
+      (await page.locator('text=/hermes/i').count()) > 0;
     expect(hasFramework).toBe(true);
   });
 

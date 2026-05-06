@@ -32,7 +32,7 @@ export type MessageSegment =
  *   - `<reasoning>...</reasoning>` — some openclaw models
  *   - `[tool_call: NAME]` — openclaw tool invocation notice (inline)
  *   - `[WEB_SEARCH]` / `[MEMORY]` / etc — action names from the
- *     elizaos/milady bootstrap plugin
+ *     framework bootstrap plugin
  *
  * INVARIANT (append-only during streaming): as `raw` grows
  * character-by-character, earlier segments MUST stay stable. A

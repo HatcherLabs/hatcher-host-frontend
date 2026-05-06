@@ -17,6 +17,7 @@ import { RateLimitIndicator } from './RateLimitIndicator';
 import { ChatInput } from './ChatInput';
 import { VoiceCallOverlay } from './VoiceCallOverlay';
 import { ChatStyles } from './ChatStyles';
+import { ChatSessionsRail } from './ChatSessionsRail';
 
 export function ChatTab() {
   const ctx = useAgentContext();
@@ -322,7 +323,7 @@ export function ChatTab() {
   }
 
   return (
-    <motion.div key="tab-chat" className="flex flex-col" style={{ height: 'calc(100dvh - 280px)', minHeight: '300px' }} variants={tabContentVariants} initial="enter" animate="center" exit="exit">
+    <motion.div key="tab-chat" className="flex w-full min-w-0 flex-col" style={{ height: 'calc(100dvh - 280px)', minHeight: '300px' }} variants={tabContentVariants} initial="enter" animate="center" exit="exit">
       <ChatHeader
         agent={agent}
         wsConnected={wsConnected}
@@ -335,89 +336,95 @@ export function ChatTab() {
         onStartVoiceCall={startVoiceCall}
       />
 
-      <MessageList
-        messages={messages}
-        visibleMessages={visibleMessages}
-        hasMore={hasMore}
-        windowStart={windowStart}
-        onLoadMore={() => setExtraLoaded((n) => n + MESSAGES_WINDOW)}
-        agentName={agent.name}
-        agentId={agent.id}
-        framework={agent.framework}
-        isAuthenticated={isAuthenticated}
-        ttsSupported={voice.ttsSupported}
-        isSpeaking={voice.isSpeaking}
-        speakingMsgId={speakingMsgIdRef.current}
-        onSpeak={handleSpeakMessage}
-        onSendMessage={sendMessage}
-        messagesContainerRef={messagesContainerRef}
-        bottomRef={bottomRef}
-      />
+      <div className="flex flex-1 min-h-0 gap-3 lg:gap-4">
+        <ChatSessionsRail />
 
-      <VoiceControlBar
-        isListening={voice.isListening}
-        isSpeaking={voice.isSpeaking}
-        onStop={() => {
-          if (voice.isListening) voice.stopListening();
-          if (voice.isSpeaking) voice.stopSpeaking();
-        }}
-      />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <MessageList
+            messages={messages}
+            visibleMessages={visibleMessages}
+            hasMore={hasMore}
+            windowStart={windowStart}
+            onLoadMore={() => setExtraLoaded((n) => n + MESSAGES_WINDOW)}
+            agentName={agent.name}
+            agentId={agent.id}
+            framework={agent.framework}
+            isAuthenticated={isAuthenticated}
+            ttsSupported={voice.ttsSupported}
+            isSpeaking={voice.isSpeaking}
+            speakingMsgId={speakingMsgIdRef.current}
+            onSpeak={handleSpeakMessage}
+            onSendMessage={sendMessage}
+            messagesContainerRef={messagesContainerRef}
+            bottomRef={bottomRef}
+          />
 
-      <ChatErrorBar
-        chatError={chatError}
-        chatErrorType={chatErrorType}
-        setChatError={setChatError}
-        setChatErrorType={setChatErrorType}
-        messages={messages}
-        setMessages={setMessages}
-        sendMessage={sendMessage}
-      />
+          <VoiceControlBar
+            isListening={voice.isListening}
+            isSpeaking={voice.isSpeaking}
+            onStop={() => {
+              if (voice.isListening) voice.stopListening();
+              if (voice.isSpeaking) voice.stopSpeaking();
+            }}
+          />
 
-      <RateLimitIndicator
-        isAuthenticated={!!isAuthenticated}
-        isLimitReached={isLimitReached}
-        hasUnlimitedChat={hasUnlimitedChat}
-        isByok={isByok}
-        msgCount={msgCount}
-        msgLimit={msgLimit}
-        remaining={remaining}
-      />
+          <ChatErrorBar
+            chatError={chatError}
+            chatErrorType={chatErrorType}
+            setChatError={setChatError}
+            setChatErrorType={setChatErrorType}
+            messages={messages}
+            setMessages={setMessages}
+            sendMessage={sendMessage}
+          />
 
-      <ChatInput
-        agent={agent}
-        isAuthenticated={isAuthenticated}
-        isLimitReached={isLimitReached}
-        agentStarting={agent.status === 'starting'}
-        input={input}
-        setInput={setInput}
-        sending={sending}
-        sendCooldown={sendCooldown}
-        sttSupported={voice.sttSupported}
-        isListening={voice.isListening}
-        onMicToggle={handleMicToggle}
-        onSendMessage={() => sendWithAttachments()}
-        onKeyDown={(e) => {
-          // Ctrl/Cmd+Enter (or plain Enter per existing handler) sends —
-          // intercept here so attachments merge into the sent text.
-          if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendWithAttachments();
-            return;
-          }
-          handleKeyDown(e);
-        }}
-        inputRef={inputRef}
-        llmProvider={llmProvider}
-        hasUnlimitedChat={hasUnlimitedChat}
-        msgCount={msgCount}
-        msgLimit={msgLimit}
-        remaining={remaining}
-        attachments={attachments}
-        attachmentError={attachmentError}
-        uploadingAttachments={uploadingAttachments}
-        onAttachFiles={handleAttachFiles}
-        onRemoveAttachment={handleRemoveAttachment}
-      />
+          <RateLimitIndicator
+            isAuthenticated={!!isAuthenticated}
+            isLimitReached={isLimitReached}
+            hasUnlimitedChat={hasUnlimitedChat}
+            isByok={isByok}
+            msgCount={msgCount}
+            msgLimit={msgLimit}
+            remaining={remaining}
+          />
+
+          <ChatInput
+            agent={agent}
+            isAuthenticated={isAuthenticated}
+            isLimitReached={isLimitReached}
+            agentStarting={agent.status === 'starting'}
+            input={input}
+            setInput={setInput}
+            sending={sending}
+            sendCooldown={sendCooldown}
+            sttSupported={voice.sttSupported}
+            isListening={voice.isListening}
+            onMicToggle={handleMicToggle}
+            onSendMessage={() => sendWithAttachments()}
+            onKeyDown={(e) => {
+              // Ctrl/Cmd+Enter (or plain Enter per existing handler) sends —
+              // intercept here so attachments merge into the sent text.
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendWithAttachments();
+                return;
+              }
+              handleKeyDown(e);
+            }}
+            inputRef={inputRef}
+            llmProvider={llmProvider}
+            hasUnlimitedChat={hasUnlimitedChat}
+            msgCount={msgCount}
+            msgLimit={msgLimit}
+            remaining={remaining}
+            attachments={attachments}
+            attachmentError={attachmentError}
+            uploadingAttachments={uploadingAttachments}
+            onAttachFiles={handleAttachFiles}
+            onRemoveAttachment={handleRemoveAttachment}
+          />
+        </div>
+      </div>
 
       <ChatStyles />
     </motion.div>

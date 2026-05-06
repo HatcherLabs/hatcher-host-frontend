@@ -135,8 +135,6 @@ function StatusBadge({ status }: { status: string }) {
 const FRAMEWORK_META: Record<string, { label: string; color: string; style: string }> = {
   openclaw: { label: 'OpenClaw', color: '#f59e0b', style: 'bg-amber-500/10 text-amber-400 border-amber-500/25' },
   hermes: { label: 'Hermes', color: '#a855f7', style: 'bg-purple-500/10 text-purple-400 border-purple-500/25' },
-  elizaos: { label: 'ElizaOS', color: 'var(--color-accent)', style: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/25' },
-  milady: { label: 'Milady', color: '#f43f5e', style: 'bg-rose-500/10 text-rose-400 border-rose-500/25' },
 };
 
 function FrameworkTag({ framework = 'openclaw' }: { framework?: string }) {

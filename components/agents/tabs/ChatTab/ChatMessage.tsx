@@ -3,12 +3,12 @@
 import { memo, useState, useCallback, useMemo, Fragment } from 'react';
 import { motion } from 'framer-motion';
 import { Bot, Volume2, ThumbsUp, ThumbsDown } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
 import { api } from '@/lib/api';
 import { SoundWaveBars, TypingIndicator } from './SoundWaveBars';
 import { FRAMEWORK_BUBBLE } from './constants';
 import type { ChatMessageProps } from './types';
 import { parseMessageSegments, ThinkingBlock, ToolCallChip } from './ThinkingBlock';
+import { RichMarkdown } from './ArtifactRenderer';
 
 const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupported, onSpeak, agentId, isAuthenticated, framework }: ChatMessageProps) {
   const [vote, setVote] = useState<'up' | 'down' | null>(null);
@@ -127,7 +127,7 @@ const AssistantBody = memo(function AssistantBody({
   if (segments.length === 1 && segments[0]?.kind === 'text') {
     return (
       <div className="markdown-body">
-        <ReactMarkdown>{segments[0].content}</ReactMarkdown>
+        <RichMarkdown content={segments[0].content} />
         {streaming && (
           <span className="inline-block w-[2px] h-4 ml-0.5 align-text-bottom bg-[var(--color-accent)] animate-pulse rounded-full" />
         )}
@@ -151,7 +151,7 @@ const AssistantBody = memo(function AssistantBody({
         // text segment
         return (
           <Fragment key={i}>
-            <ReactMarkdown>{seg.content}</ReactMarkdown>
+            <RichMarkdown content={seg.content} />
           </Fragment>
         );
       })}

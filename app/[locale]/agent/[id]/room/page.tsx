@@ -27,8 +27,6 @@ async function fetchPublicAgent(id: string): Promise<PublicAgent | null> {
 const FRAMEWORK_ICON: Record<string, string> = {
   openclaw: '🦞',
   hermes: '🪶',
-  elizaos: '🐙',
-  milady: '🎨',
 };
 
 export async function generateMetadata({

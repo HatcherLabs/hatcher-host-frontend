@@ -44,8 +44,8 @@ function getTabs(framework: string | undefined, tTabs: ReturnType<typeof useTran
     { id: 'plugins', label: tTabs('plugins'), icon: <Puzzle size={16} />, group: 'configure' },
     { id: 'logs', label: tTabs('logs'), icon: <ScrollText size={16} />, group: 'data' },
     { id: 'stats', label: tTabs('stats'), icon: <BarChart3 size={16} />, group: 'data' },
-    ...(framework !== 'milady' ? [{ id: 'memory' as const, label: tTabs('memory'), icon: <Brain size={16} />, group: 'data' as const }] : []),
-    ...(framework === 'elizaos' || framework === 'openclaw'
+    { id: 'memory' as const, label: tTabs('memory'), icon: <Brain size={16} />, group: 'data' as const },
+    ...(framework === 'openclaw'
       ? [{ id: 'sessions' as const, label: tTabs('sessions'), icon: <MessageSquare size={16} />, group: 'data' as const }]
       : []),
     { id: 'knowledge' as const, label: tTabs('knowledge'), icon: <BookOpen size={16} />, group: 'data' as const },
@@ -61,15 +61,11 @@ function getTabs(framework: string | undefined, tTabs: ReturnType<typeof useTran
 const FRAMEWORK_GLYPH: Record<string, string> = {
   openclaw: '⊞',
   hermes: '◇',
-  elizaos: '◯',
-  milady: '★',
 };
 
 const FRAMEWORK_COLOR: Record<string, string> = {
   openclaw: '#f59e0b',
   hermes: '#a855f7',
-  elizaos: '#38bdf8',
-  milady: '#f43f5e',
 };
 
 interface AgentSidebarProps {

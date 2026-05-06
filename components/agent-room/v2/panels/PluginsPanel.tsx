@@ -8,7 +8,7 @@ interface InstalledPlugin {
   type: 'skill' | 'plugin';
   source: string;
   description: string | null;
-  status: 'installed' | 'pending_restart' | 'failed';
+  status: 'installed' | 'pending' | 'pending_restart' | 'failed';
   error?: string;
   requiresRestart?: boolean;
 }
@@ -60,7 +60,7 @@ export function PluginsPanel({ agentId, framework, onClose }: Props) {
                   {p.description && <div className="truncate text-xs text-neutral-400">{p.description}</div>}
                 </div>
                 <span className="ml-3 flex-shrink-0 rounded-full bg-green-600 px-2 py-0.5 text-[10px] text-white">
-                  {p.status === 'pending_restart' ? 'ready' : 'ok'}
+                  {p.status === 'pending' ? 'pending' : p.status === 'pending_restart' ? 'ready' : 'ok'}
                 </span>
               </div>
             </li>

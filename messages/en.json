@@ -248,7 +248,7 @@
     },
     "frameworks": {
       "eyebrow": "Frameworks",
-      "heading": "Four frameworks. One platform.",
+      "heading": "Two frameworks. One platform.",
       "subheading": "Pick the one that fits your agent. Switch whenever you want.",
       "items": [
         {
@@ -262,18 +262,6 @@
           "tag": "reasoning",
           "desc": "Smart-first design for rich memory and reasoning.",
           "features": "77 bundled skills · Deep memory · Multi-model"
-        },
-        {
-          "name": "ElizaOS",
-          "tag": "multi-agent",
-          "desc": "Multi-agent coordination with 90+ plugins.",
-          "features": "90+ plugins · Multi-agent · Knowledge base"
-        },
-        {
-          "name": "Milady",
-          "tag": "crypto-native",
-          "desc": "On-chain awareness, DeFi tools, token tracking.",
-          "features": "DeFi tools · On-chain data · Token tracking"
         }
       ]
     },
@@ -1479,6 +1467,7 @@
           "inboundHttp": "Inbound HTTP",
           "triggerFrom": "Trigger your agent from external services (Zapier, GitHub, etc.)",
           "webhookUrl": "Webhook URL",
+          "alwaysActive": "Always Active",
           "bearerToken": "Bearer Token",
           "exampleRequest": "Example Request",
           "revealToken": "Reveal token",
@@ -1994,31 +1983,10 @@
     "systemPromptHint": "Defines your agent's personality, capabilities, and rules",
     "systemPromptCount": "{count}/8000",
     "systemPromptWarning": "Consider adding a system prompt for better results",
-    "elizaBioLabel": "Bio",
-    "elizaBioHint": "Define your agent's personality and background. One statement per line.",
-    "elizaBioPlaceholder": "A knowledgeable AI assistant specializing in...",
-    "elizaLoreLabel": "Lore",
-    "elizaLoreHint": "Background knowledge and history for your agent. One fact per line.",
-    "elizaStyleLabel": "Style Instructions",
-    "elizaStyleHint": "How your agent should communicate. One instruction per line.",
-    "elizaTopicsLabel": "Topics",
-    "elizaTopicsPlaceholder": "technology, AI, crypto, research",
-    "elizaTopicsHint": "Comma-separated topics your agent knows about",
-    "elizaAdjectivesLabel": "Adjectives",
-    "elizaAdjectivesPlaceholder": "helpful, analytical, concise",
-    "elizaAdjectivesHint": "Personality traits, comma-separated",
-    "miladyPersonalityLabel": "Personality Preset",
-    "miladyPersonalityHint": "Choose a personality vibe for your Milady agent.",
-    "miladyPersonalityHelpful": "Helpful - Friendly and professional",
-    "miladyPersonalityTsundere": "Tsundere - Reluctant but secretly caring",
-    "miladyPersonalityUnhinged": "Unhinged - Chaotic and unpredictable",
-    "miladyPersonalityCustom": "Custom - Uses your system prompt",
     "moreOptionsLabel": "More Options",
     "moreOptionsHints": {
       "openclaw": "Search, voice, sessions",
-      "hermes": "Personality, memory, approvals",
-      "elizaos": "Database, image gen, voice",
-      "milady": "Database, privacy, presets"
+      "hermes": "Personality, memory, approvals"
     },
     "sessionScopeLabel": "Session Scope",
     "sessionScopeHint": "How conversation context is shared between users",
@@ -2048,14 +2016,12 @@
     "approvalModeManual": "Manual",
     "databaseLabel": "Database",
     "databaseHint": "Storage backend for agent state and memory",
-    "databaseHintMilady": "Storage backend for agent state",
     "imageGenLabel": "Enable Image Generation",
     "imageGenHint": "Allow the agent to generate images",
     "voiceLabel": "Enable Voice",
     "voiceHint": "Speech-to-text and text-to-speech capabilities",
     "localFirstLabel": "Local-First Mode",
     "localFirstHint": "Process data locally before syncing",
-    "miladyPersonalitySelectedHint": "Selected above — controls agent tone",
     "step5Heading": "Ready to launch?",
     "step5Subheading": "Review your configuration before launching",
     "summaryAgentType": "Agent Type",
@@ -2072,9 +2038,7 @@
     "summaryCostByok": "$0.00 — using your own key",
     "summaryFrameworkLabels": {
       "openclaw": "Multi-skill assistant",
-      "hermes": "Autonomous agent",
-      "elizaos": "Multi-agent framework",
-      "milady": "Privacy-first runtime"
+      "hermes": "Autonomous agent"
     },
     "testChatLabel": "Test Your Agent",
     "testChatSubtext": "Preview how your agent will respond",
@@ -2103,18 +2067,6 @@
         "f1": "Long-term memory",
         "f2": "40+ built-in tools",
         "f3": "Self-improving"
-      },
-      "elizaos": {
-        "desc": "Open-source multi-agent framework by ai16z. 90+ plugins, persistent memory, Web3 native.",
-        "f1": "90+ plugins",
-        "f2": "Vector memory",
-        "f3": "Web3 native"
-      },
-      "milady": {
-        "desc": "Privacy-first AI runtime with 20+ connectors, VRM avatars, and DeFi integration.",
-        "f1": "20+ connectors",
-        "f2": "Personality presets",
-        "f3": "Privacy-first"
       }
     },
     "skills": {
@@ -2539,14 +2491,6 @@
       "hermes": {
         "name": "Hermes Agent",
         "description": "Autonomous AI agent by Nous Research with persistent memory, 40+ tools, skills system, and multi-platform messaging gateway."
-      },
-      "elizaos": {
-        "name": "ElizaOS",
-        "description": "Open-source AI agent framework with character-driven personas, plugin ecosystem, and multi-client support for social and messaging platforms."
-      },
-      "milady": {
-        "name": "Milady",
-        "description": "Lightweight, personality-first AI agent framework designed for expressive, culturally-aware conversational agents with modular capabilities."
       }
     },
     "agentStatus": {
@@ -2666,9 +2610,7 @@
       "boxLabel": "Frameworks",
       "seeAll": "See all →",
       "tagOpenclaw": "Multi-skill assistant",
-      "tagHermes": "Autonomous agent",
-      "tagElizaos": "Multi-agent framework",
-      "tagMilady": "Privacy-first runtime"
+      "tagHermes": "Autonomous agent"
     },
     "pricing": {
       "boxLabel": "Pricing",

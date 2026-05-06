@@ -15,8 +15,7 @@ import { QuickActionsCard } from './cards/QuickActionsCard';
  * cards in the same order and with the same content as the legacy
  * OverviewTab, so the user-visible behavior is unchanged by Etapa 1.
  *
- * Per-framework dashboards (MiladyDashboard, HermesDashboard,
- * ElizaOSDashboard, OpenClawDashboard) will land in later etapes and
+ * Per-framework dashboards (HermesDashboard, OpenClawDashboard) will
  * replace this for their respective frameworks — see the research doc
  * at docs/superpowers/plans/2026-04-10-dashboards-research.md.
  */

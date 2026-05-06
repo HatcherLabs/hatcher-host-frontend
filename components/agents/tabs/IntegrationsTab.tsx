@@ -73,34 +73,12 @@ const FRAMEWORK_COMPAT: Record<string, Record<string, CompatLevel>> = {
     'openclaw.platform.slack': 'native',
     'openclaw.feature.webhooks': 'native',
   },
-  elizaos: {
-    'openclaw.platform.telegram': 'native',
-    'openclaw.platform.discord': 'native',
-    'elizaos.twitter': 'native',
-    'openclaw.platform.slack': 'community',
-  },
-  milady: {
-    'openclaw.platform.telegram': 'native',
-    'openclaw.platform.discord': 'native',
-    'openclaw.platform.whatsapp': 'native',
-    'elizaos.twitter': 'native',
-    'openclaw.platform.slack': 'native',
-    'extra.twitch': 'community',
-    'extra.mattermost': 'community',
-    'extra.line': 'community',
-    'extra.matrix': 'community',
-    'extra.nostr': 'community',
-    'extra.feishu': 'community',
-    'extra.bluebubbles': 'community',
-  },
 };
 
 // Recommended integrations per framework (best-supported, highlighted)
 const FRAMEWORK_RECOMMENDED: Record<string, string[]> = {
   openclaw: ['openclaw.platform.telegram', 'openclaw.platform.discord', 'openclaw.platform.twitter'],
   hermes: ['openclaw.platform.telegram', 'openclaw.platform.discord'],
-  elizaos: ['openclaw.platform.telegram', 'openclaw.platform.discord', 'elizaos.twitter'],
-  milady: ['openclaw.platform.telegram', 'openclaw.platform.discord', 'elizaos.twitter'],
 };
 
 // Quick Setup = only needs API token(s), no OAuth flow, no pairing, no complex setup
@@ -162,7 +140,7 @@ function IntegrationFieldsForm({
   } = ctx;
 
   // Channel settings (DM policy, group policy, streaming) are only read
-  // by the OpenClaw adapter via build-spec.ts. Hermes/ElizaOS/Milady
+  // by the OpenClaw adapter via build-spec.ts. Hermes
   // have no code path that honors these fields, so rendering them for
   // those frameworks just gives users controls that silently do nothing.
   const showChannelSettings =
@@ -1239,7 +1217,7 @@ export function IntegrationsTab() {
   const mainIntegrations = getIntegrationsForFramework(fw);
   const extraIntegrations = getExtraIntegrationsForFramework(fw);
   const fwBadge = FRAMEWORK_BADGE[fw] ?? 'bg-slate-500/15 text-slate-400 border-slate-500/30';
-  const fwLabel = fw === 'elizaos' ? 'ElizaOS' : fw.charAt(0).toUpperCase() + fw.slice(1);
+  const fwLabel = fw.charAt(0).toUpperCase() + fw.slice(1);
 
   // Count configured
   const configuredCount = [...mainIntegrations, ...extraIntegrations].filter(

@@ -53,20 +53,6 @@ const FRAMEWORK_LOG_INFO: Record<string, { label: string; description: string; a
     border: 'border-purple-500/20',
     bg: 'bg-purple-500/[0.06]',
   },
-  elizaos: {
-    label: 'ElizaOS',
-    description: 'Structured logs with plugin namespaces. Actions, evaluators, and providers emit tagged entries.',
-    accent: 'text-cyan-400',
-    border: 'border-cyan-500/20',
-    bg: 'bg-cyan-500/[0.06]',
-  },
-  milady: {
-    label: 'Milady',
-    description: 'Hybrid log format with JSON metadata. Personality and response generation events are tracked.',
-    accent: 'text-rose-400',
-    border: 'border-rose-500/20',
-    bg: 'bg-rose-500/[0.06]',
-  },
 };
 
 /* ── Level badge config ── */

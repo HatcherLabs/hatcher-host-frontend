@@ -44,15 +44,11 @@ const CATEGORY_TAGLINE: Record<Category, string> = {
 const FW_LABEL: Record<Framework, string> = {
   openclaw: 'OpenClaw',
   hermes: 'Hermes',
-  elizaos: 'ElizaOS',
-  milady: 'Milady',
 };
 
 const FW_DOT: Record<Framework, string> = {
   openclaw: '#10b981',
   hermes: '#38bdf8',
-  elizaos: '#a855f7',
-  milady: '#ec4899',
 };
 
 function isCategory(s: string): s is Category {

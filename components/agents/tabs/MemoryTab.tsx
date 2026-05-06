@@ -32,20 +32,6 @@ const FRAMEWORK_MEMORY_INFO: Record<string, { description: string; color: string
     bgColor: 'bg-purple-500/[0.06]',
     iconColor: 'text-purple-400/70',
   },
-  elizaos: {
-    description: 'ElizaOS stores memories in its internal database (PGLite). Memories persist across sessions and are managed automatically by the framework.',
-    color: 'text-cyan-400',
-    borderColor: 'border-cyan-500/20',
-    bgColor: 'bg-cyan-500/[0.06]',
-    iconColor: 'text-cyan-400/70',
-  },
-  milady: {
-    description: 'Milady stores memories in its internal database (PGLite). Memories persist across sessions and are managed automatically by the framework.',
-    color: 'text-rose-400',
-    borderColor: 'border-rose-500/20',
-    bgColor: 'bg-rose-500/[0.06]',
-    iconColor: 'text-rose-400/70',
-  },
 };
 
 export function MemoryTab() {

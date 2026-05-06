@@ -64,10 +64,8 @@ import { useTranslations } from 'next-intl';
 // ─── Framework Workflow Compatibility ─────────────────────────
 
 const FRAMEWORK_WORKFLOW_SUPPORT: Record<string, { level: 'full' | 'partial' | 'planned'; note: string; color: string }> = {
-  openclaw: { level: 'full', note: 'Full workflow support — triggers, conditions, and all action nodes', color: 'amber' },
-  hermes: { level: 'full', note: 'Full workflow support with native tool-chain integration', color: 'purple' },
-  elizaos: { level: 'partial', note: 'Partial support — trigger and response nodes only, conditions coming soon', color: 'cyan' },
-  milady: { level: 'planned', note: 'Workflow support planned — manual config required for now', color: 'rose' },
+  openclaw: { level: 'partial', note: 'Hatcher workflows support triggers, conditions, and message/API actions. Direct native skill execution is limited.', color: 'amber' },
+  hermes: { level: 'partial', note: 'Hatcher workflows support triggers, conditions, and message/API actions. Direct native skill execution is limited.', color: 'purple' },
 };
 
 // ─── Types ───────────────────────────────────────────────────

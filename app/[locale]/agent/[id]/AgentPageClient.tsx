@@ -73,14 +73,11 @@ import {
   Clock,
   BarChart3,
   Rocket,
-  Sparkles,
 } from 'lucide-react';
 
 const FRAMEWORK_AVATAR: Record<string, { gradient: string; icon: React.ComponentType<{ className?: string }> }> = {
   openclaw: { gradient: 'from-amber-600 to-amber-400', icon: Cpu },
   hermes:   { gradient: 'from-purple-600 to-purple-400', icon: Brain },
-  elizaos:  { gradient: 'from-cyan-600 to-cyan-400', icon: Bot },
-  milady:   { gradient: 'from-rose-600 to-rose-400', icon: Sparkles },
 };
 
 

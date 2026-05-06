@@ -27,16 +27,12 @@ export const pageEntranceVariants = {
 export const FRAMEWORK_BADGE: Record<string, string> = {
   openclaw: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
   hermes: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
-  elizaos: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
-  milady: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
 };
 
 /** Root filesystem path inside each framework's container */
 export const FRAMEWORK_ROOT_PATH: Record<string, string> = {
   openclaw: '/home/node/.openclaw',
   hermes: '/home/hermes/.hermes',
-  elizaos: '/data',
-  milady: '/data',
 };
 
 export const STATUS_STYLES: Record<string, { classes: string; label: string; pulse: boolean; dotColor: string }> = {
@@ -73,7 +69,7 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     secretPrefix: 'TELEGRAM',
     docsUrl: 'https://docs.hatcher.host/integrations/telegram',
     hasChannelSettings: true,
-    frameworks: ['openclaw', 'hermes', 'elizaos', 'milady'],
+    frameworks: ['openclaw', 'hermes'],
     fields: [
       { key: 'TELEGRAM_BOT_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'Bot token from @BotFather', helper: 'Message @BotFather on Telegram to create a bot and get the token', required: true },
     ],
@@ -85,11 +81,10 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     secretPrefix: 'DISCORD',
     docsUrl: 'https://docs.hatcher.host/integrations/discord',
     hasChannelSettings: true,
-    frameworks: ['openclaw', 'hermes', 'elizaos', 'milady'],
+    frameworks: ['openclaw', 'hermes'],
     fields: [
-      // Canonical env var key after Phase 6 rename. ElizaOS plugin-discord
-      // reads `DISCORD_API_TOKEN` natively; OpenClaw + Milady adapters
-      // accept both names with legacy `DISCORD_BOT_TOKEN` as fallback.
+      // Canonical env var key after Phase 6 rename. Keep legacy fallback
+      // support in the adapters for existing configs.
       { key: 'DISCORD_API_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'Discord bot token', helper: 'From Discord Developer Portal > Bot > Token', required: true },
       { key: 'DISCORD_APPLICATION_ID', label: 'Application ID', type: 'text', placeholder: 'e.g. 123456789012345678', helper: 'From Discord Developer Portal > General Information', required: true },
     ],
@@ -103,7 +98,7 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     hasChannelSettings: false,
     // Hermes WhatsApp pairing requires a TTY-capable flow we don't have in
     // the dashboard yet — Hermes users can still pair via the agent terminal
-    // (`hermes whatsapp`). Milady uses Meta Cloud API tokens, not pairing.
+    // (`hermes whatsapp`).
     frameworks: ['openclaw'],
     pairingRequired: true,
     pairingFields: [
@@ -111,37 +106,6 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     ],
     pairingChannel: 'whatsapp',
     fields: [],
-  },
-  {
-    featureKey: 'elizaos.platform.whatsapp',
-    stateKey: 'elizaos.whatsapp',
-    name: 'WhatsApp (Cloud API)',
-    description: 'Deploy via Meta WhatsApp Business Cloud API — token + phone number ID instead of QR pairing.',
-    secretPrefix: 'WHATSAPP',
-    docsUrl: 'https://docs.hatcher.host/integrations/whatsapp',
-    hasChannelSettings: false,
-    frameworks: ['elizaos'],
-    fields: [
-      { key: 'WHATSAPP_TOKEN', label: 'Access Token', type: 'password', placeholder: 'Permanent access token', helper: 'From Meta Developer Portal > WhatsApp > API Setup > System User token', required: true },
-      { key: 'WHATSAPP_PHONE_NUMBER_ID', label: 'Phone Number ID', type: 'text', placeholder: '1098xxxxxxxxxxx', helper: 'From Meta Developer Portal > WhatsApp > API Setup', required: true },
-      { key: 'WHATSAPP_VERIFY_TOKEN', label: 'Webhook Verify Token', type: 'password', placeholder: 'Random string you choose', helper: 'Any string — you\'ll paste the same value into the Meta Webhook config' },
-      { key: 'WHATSAPP_APP_SECRET', label: 'App Secret', type: 'password', placeholder: 'Meta app secret', helper: 'From Meta Developer Portal > App > Settings > Basic > App Secret' },
-    ],
-  },
-  {
-    featureKey: 'elizaos.platform.farcaster',
-    stateKey: 'elizaos.farcaster',
-    name: 'Farcaster',
-    description: 'Post casts, reply, and engage on Farcaster via the Neynar API.',
-    secretPrefix: 'FARCASTER',
-    docsUrl: 'https://docs.hatcher.host/integrations/farcaster',
-    hasChannelSettings: false,
-    frameworks: ['elizaos'],
-    fields: [
-      { key: 'FARCASTER_NEYNAR_API_KEY', label: 'Neynar API Key', type: 'password', placeholder: 'neynar_xxxxx', helper: 'From neynar.com > Dashboard > API keys', required: true },
-      { key: 'FARCASTER_NEYNAR_SIGNER_UUID', label: 'Signer UUID', type: 'password', placeholder: 'UUID from Neynar', helper: 'Neynar-managed signer for the bot account', required: true },
-      { key: 'FARCASTER_FID', label: 'FID', type: 'text', placeholder: 'Numeric FID', helper: 'The Farcaster ID of the bot account' },
-    ],
   },
   {
     featureKey: 'openclaw.platform.twitter',
@@ -157,32 +121,13 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     ],
   },
   {
-    featureKey: 'openclaw.platform.twitter',
-    stateKey: 'elizaos.twitter',
-    name: 'X (Twitter)',
-    description: 'Post tweets, reply, and engage on X via the Twitter plugin.',
-    frameworks: ['elizaos', 'milady'],
-    secretPrefix: 'TWITTER',
-    docsUrl: 'https://docs.hatcher.host/integrations/twitter',
-    hasChannelSettings: false,
-    fields: [
-      { key: 'TWITTER_USERNAME', label: 'Username', type: 'text', placeholder: '@youragent', helper: 'Your X/Twitter account username (without @)', required: true },
-      { key: 'TWITTER_PASSWORD', label: 'Password', type: 'password', placeholder: 'Account password', helper: 'Password for the Twitter account (cookie-based auth)', required: true },
-      { key: 'TWITTER_EMAIL', label: 'Email', type: 'text', placeholder: 'email@example.com', helper: 'Email associated with the Twitter account (needed for login verification)' },
-      { key: 'TWITTER_API_KEY', label: 'API Key (optional)', type: 'password', placeholder: 'API Key from X Developer Portal', helper: 'Alternative to cookie auth — use X API v1 keys instead of username/password' },
-      { key: 'TWITTER_API_SECRET', label: 'API Secret (optional)', type: 'password', placeholder: 'API Secret', helper: 'API Secret Key from X Developer Portal' },
-      { key: 'TWITTER_ACCESS_TOKEN', label: 'Access Token (optional)', type: 'password', placeholder: 'Access Token', helper: 'OAuth 1.0a Access Token from X Developer Portal' },
-      { key: 'TWITTER_ACCESS_TOKEN_SECRET', label: 'Access Token Secret (optional)', type: 'password', placeholder: 'Access Token Secret', helper: 'OAuth 1.0a Access Token Secret' },
-    ],
-  },
-  {
     featureKey: 'openclaw.platform.slack',
     name: 'Slack',
     description: 'Deploy your agent in Slack workspaces.',
     secretPrefix: 'SLACK',
     docsUrl: 'https://docs.hatcher.host/integrations/slack',
     hasChannelSettings: true,
-    frameworks: ['openclaw', 'hermes', 'elizaos', 'milady'],
+    frameworks: ['openclaw', 'hermes'],
     fields: [
       { key: 'SLACK_BOT_TOKEN', label: 'Bot Token', type: 'password', placeholder: 'xoxb-...', helper: 'Bot User OAuth Token from Slack API', required: true },
       { key: 'SLACK_APP_TOKEN', label: 'App Token', type: 'password', placeholder: 'xapp-...', helper: 'App-Level Token for Socket Mode (from Slack API > Basic Information)' },
