@@ -83,6 +83,8 @@ export interface Agent {
 
 export type AgentPassportNetworkId = 'skale' | 'base' | 'solana';
 export type AgentPassportChainType = 'evm' | 'solana';
+export type AgentPassportSignerMode = 'receive-only' | 'runtime-signing' | 'planned';
+export type AgentPassportTradingStatus = 'enabled' | 'disabled';
 export type AgentPassportStatus =
   | 'registered'
   | 'wallet-ready'
@@ -151,8 +153,23 @@ export interface AgentPassport {
     status: AgentPassportStatus;
     address: string | null;
     networks: AgentPassportNetworkId[];
-    signerMode: 'receive-only' | 'planned';
+    signerMode: AgentPassportSignerMode;
   }>;
+  runtime: {
+    signerMode: AgentPassportSignerMode;
+    trading: {
+      status: AgentPassportTradingStatus;
+      networks: AgentPassportNetworkId[];
+      requiresExplicitUserIntent: boolean;
+      quoteProviders: Array<{
+        id: 'jupiter';
+        network: 'solana';
+        status: AgentPassportTradingStatus;
+        baseUrl: string;
+      }>;
+      notes: string[];
+    };
+  };
   payments: AgentPassportPaymentRail[];
   mcp: {
     status: AgentPassportStatus;

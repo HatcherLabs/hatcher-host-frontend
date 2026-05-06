@@ -163,6 +163,8 @@ export function WalletTab() {
         config: { advanced: { agent_wallet_signer: next } },
       } as never);
       await loadAgent();
+      await loadWallet();
+      setRuntimeRestartNeeded(true);
     } catch (e) {
       setSigningError(e instanceof Error ? e.message : 'Failed to toggle signing');
     } finally {
@@ -525,10 +527,10 @@ export function WalletTab() {
           Off (default): the agent process can read balances and build unsigned transactions but cannot
           submit them. Wallet is receive-only.
           <br /><br />
-          On: the SKALE private key is injected into the container env at start time. The agent can use
-          the bundled <code className="text-[var(--phosphor)] font-mono">skale</code> CLI or
-          <code className="text-[var(--phosphor)] font-mono"> ethers</code> directly to sign + submit
-          on-chain transactions, including x402 / MPP payments and ERC-8004 reputation calls.
+          On: the SKALE/Base EVM key and Solana key are injected into the container env at start time.
+          The agent can use the bundled wallet skills, <code className="text-[var(--phosphor)] font-mono">skale</code>{' '}
+          CLI, <code className="text-[var(--phosphor)] font-mono">ethers</code>, or Solana tooling to
+          sign + submit transactions, including x402 payments, ERC-8004 reputation calls, and Solana trades.
         </div>
         {signingEnabled && (
           <div className="flex items-start gap-2 p-3 mb-3 border border-amber-500/30 bg-amber-500/5 text-[11px] text-amber-400">
@@ -544,10 +546,12 @@ export function WalletTab() {
             <div className="flex items-start gap-2 text-[11px] text-amber-400">
               <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
               <span>
-                Enabling injects the agent&apos;s SKALE private key into the container env
-                (<code className="font-mono">SKALE_PRIVATE_KEY</code>) on next start. The agent
-                will be able to sign + submit transactions on its own. You can revoke at any
-                time. Restart the container after toggling for the change to take effect.
+                Enabling injects the agent&apos;s EVM and Solana private keys into the container env
+                (<code className="font-mono">SKALE_PRIVATE_KEY</code>,
+                <code className="font-mono"> BASE_PRIVATE_KEY</code>,
+                <code className="font-mono"> SOLANA_PRIVATE_KEY</code>) on next start. The agent
+                will be able to sign + submit transactions on its own. You can revoke at any time.
+                Restart the container after toggling for the change to take effect.
               </span>
             </div>
             <div className="flex gap-2">
@@ -618,6 +622,18 @@ function statusPill(status: AgentPassportStatus) {
   );
 }
 
+function signerModeLabel(mode: AgentPassport['runtime']['signerMode']): string {
+  if (mode === 'runtime-signing') return 'Runtime signing';
+  if (mode === 'planned') return 'Planned';
+  return 'Receive-only';
+}
+
+function signerModeTone(mode: AgentPassport['runtime']['signerMode']): string {
+  if (mode === 'runtime-signing') return 'border-amber-400/40 bg-amber-500/10 text-amber-200';
+  if (mode === 'planned') return 'border-violet-400/35 bg-violet-500/10 text-violet-200';
+  return 'border-[var(--border-subtle)] bg-black/20 text-[var(--text-muted)]';
+}
+
 function AgentPassportDashboardCard({
   passport,
   onCopy,
@@ -639,6 +655,9 @@ function AgentPassportDashboardCard({
     .map((id) => passport.identity.networks.find((network) => network.id === id))
     .filter((network): network is AgentPassportNetwork => !!network);
   const hasSolanaWallet = networks.some((network) => network.id === 'solana' && network.walletAddress);
+  const trading = passport.runtime.trading;
+  const tradingEnabled = trading.status === 'enabled';
+  const tradingProvider = trading.quoteProviders[0];
 
   return (
     <GlassCard className="p-5">
@@ -720,6 +739,9 @@ function AgentPassportDashboardCard({
                 <div className="mt-1 truncate font-mono text-xs text-[var(--text-primary)]">
                   {shortAddress(wallet.address)}
                 </div>
+                <div className={`mt-2 inline-flex rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-wider ${signerModeTone(wallet.signerMode)}`}>
+                  {signerModeLabel(wallet.signerMode)}
+                </div>
               </button>
             ))}
           </div>
@@ -752,6 +774,41 @@ function AgentPassportDashboardCard({
         >
           {passport.mcp.manifestUrl}
         </button>
+      </div>
+
+      <div className={`mt-3 border p-3 ${
+        tradingEnabled
+          ? 'border-emerald-400/30 bg-emerald-500/5'
+          : 'border-[var(--border-subtle)] bg-black/20'
+      }`}>
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className={`flex items-center gap-2 text-xs uppercase tracking-[0.18em] ${
+            tradingEnabled ? 'text-emerald-200' : 'text-[var(--text-muted)]'
+          }`}>
+            <Zap size={12} /> Trading
+          </div>
+          <span className={`inline-flex rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-wider ${
+            tradingEnabled
+              ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200'
+              : 'border-[var(--border-subtle)] bg-black/20 text-[var(--text-muted)]'
+          }`}>
+            {tradingEnabled ? 'Enabled' : signerModeLabel(passport.runtime.signerMode)}
+          </span>
+        </div>
+        <div className="mt-2 grid sm:grid-cols-2 gap-2 text-[11px] text-[var(--text-muted)]">
+          <div className="min-w-0">
+            Networks:{' '}
+            <span className="text-[var(--text-primary)]">
+              {trading.networks.length > 0 ? trading.networks.join(', ') : 'solana pending'}
+            </span>
+          </div>
+          <div className="min-w-0 truncate">
+            Provider:{' '}
+            <span className="font-mono text-[var(--text-primary)]">
+              {tradingProvider ? tradingProvider.baseUrl.replace(/^https?:\/\//, '') : '-'}
+            </span>
+          </div>
+        </div>
       </div>
     </GlassCard>
   );

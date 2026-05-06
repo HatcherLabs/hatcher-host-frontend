@@ -173,6 +173,23 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
         signerMode: 'planned',
       },
     ],
+    runtime: {
+      signerMode: 'receive-only',
+      trading: {
+        status: 'disabled',
+        networks: [],
+        requiresExplicitUserIntent: true,
+        quoteProviders: [
+          {
+            id: 'jupiter',
+            network: 'solana',
+            status: 'disabled',
+            baseUrl: 'https://api.jup.ag',
+          },
+        ],
+        notes: ['Runtime signing is disabled; wallets are receive-only from inside the agent process.'],
+      },
+    },
     payments: [
       {
         id: 'x402-skale-usdc',
