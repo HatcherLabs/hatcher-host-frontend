@@ -105,7 +105,8 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
             brightWhite: '#ffffff',
           },
           allowTransparency: true,
-          scrollback: 20000,
+          scrollback: 50000,
+          scrollOnUserInput: true,
           convertEol: true,
           disableStdin: false,
         });
@@ -279,7 +280,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   if (!isActive) {
     const isStarting = agent?.status === 'starting';
     return (
-      <div className="flex flex-col items-center justify-center h-full min-h-[400px] gap-4 text-zinc-400">
+      <div className="flex h-[calc(100dvh-190px)] min-h-[520px] flex-col items-center justify-center gap-4 text-zinc-400 lg:min-h-[620px] 2xl:min-h-[720px]">
         {isStarting ? (
           <>
             <div className="w-10 h-10 rounded-full border-2 border-[var(--color-accent)]/40 border-t-[var(--color-accent)] animate-spin" />
@@ -298,7 +299,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-[calc(100dvh-190px)] min-h-[520px] flex-col overflow-hidden border border-[var(--border-default)] bg-[#0a0a0a] lg:min-h-[620px] 2xl:h-[calc(100dvh-170px)] 2xl:min-h-[720px]">
       {/* Terminal header */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--border-default)] bg-[var(--bg-elevated)]">
         <div className="flex min-w-0 items-center gap-3">
@@ -349,8 +350,8 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
       </div>
 
       {/* Terminal container */}
-      <div className="flex-1 bg-[#0a0a0a] p-1 min-h-[400px]">
-        <div ref={termRef} className="h-full w-full" />
+      <div className="min-h-0 flex-1 overflow-hidden bg-[#0a0a0a] p-1">
+        <div ref={termRef} className="h-full w-full overflow-hidden [&_.xterm-viewport]:overflow-y-auto" />
       </div>
 
       {/* Info banner */}
