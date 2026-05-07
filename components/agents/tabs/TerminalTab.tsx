@@ -28,12 +28,16 @@ async function loadXterm() {
 
 type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
 
+interface TerminalTabProps {
+  isVisible?: boolean;
+}
+
 function getWsUrl(agentId: string): string {
   const base = API_URL.replace(/^http/, 'ws');
   return `${base}/agents/${agentId}/terminal/ws?mode=gateway`;
 }
 
-export function TerminalTab() {
+export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   const tTerminal = useTranslations('dashboard.agentDetail.terminal');
   const { agent, stats } = useAgentContext();
   const termRef = useRef<HTMLDivElement>(null);
@@ -101,7 +105,7 @@ export function TerminalTab() {
             brightWhite: '#ffffff',
           },
           allowTransparency: true,
-          scrollback: 5000,
+          scrollback: 20000,
           convertEol: true,
           disableStdin: false,
         });
@@ -229,6 +233,20 @@ export function TerminalTab() {
       disconnect();
     };
   }, [isActive, connect, disconnect]);
+
+  useEffect(() => {
+    if (!isVisible) return;
+    const frame = requestAnimationFrame(() => {
+      fitAddonRef.current?.fit();
+      const term = termInstance.current;
+      const ws = wsRef.current;
+      if (term && ws?.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'resize', cols: term.cols, rows: term.rows }));
+        term.focus();
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isVisible]);
 
   // ── Handle resize ──
   useEffect(() => {

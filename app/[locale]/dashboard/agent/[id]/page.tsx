@@ -43,6 +43,7 @@ import {
 } from '@/components/agents/AgentContext';
 import { AgentSidebar } from '@/components/agents/AgentSidebar';
 import { PortAgentModal } from '@/components/agents/PortAgentModal';
+import { shouldMountTerminalTab } from '@/components/agents/terminalPersistence';
 import { useAgentConfig } from '@/hooks/useAgentConfig';
 import { useAgentIntegrations } from '@/hooks/useAgentIntegrations';
 import { useAgentActions } from '@/hooks/useAgentActions';
@@ -213,12 +214,16 @@ export default function AgentManagePage() {
   };
   const initialTab = normalizeTab(rawTab);
   const [tab, setTabRaw] = useState<Tab>(initialTab);
+  const [terminalMounted, setTerminalMounted] = useState(() => shouldMountTerminalTab(initialTab, false));
   const setTab = useCallback((t: Tab) => {
     setTabRaw(t);
     const url = new URL(window.location.href);
     url.searchParams.set('tab', t);
     window.history.replaceState({}, '', url.pathname + url.search);
   }, []);
+  useEffect(() => {
+    setTerminalMounted((mounted) => shouldMountTerminalTab(tab, mounted));
+  }, [tab]);
 
   // Stats
   const [stats, setStats] = useState<AgentStats | null>(null);
@@ -1300,7 +1305,6 @@ export default function AgentManagePage() {
               {tab === 'files' && <FilesTab />}
               {tab === 'workspace' && <WorkspaceTab />}
               {tab === 'logs' && <LogsTab />}
-              {tab === 'terminal' && <TerminalTab />}
               {tab === 'memory' && (
                 agent?.framework === 'hermes' ? <HermesMemoryTab /> :
                 <MemoryTab />
@@ -1317,6 +1321,11 @@ export default function AgentManagePage() {
               {tab === 'schedules' && <SchedulesTab />}
               {tab === 'workflows' && <WorkflowsTab />}
             </AnimatePresence>
+            {terminalMounted && (
+              <div className={tab === 'terminal' ? 'block' : 'hidden'} aria-hidden={tab !== 'terminal'}>
+                <TerminalTab isVisible={tab === 'terminal'} />
+              </div>
+            )}
             </div>
           </div>
         </div>
