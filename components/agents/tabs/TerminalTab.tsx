@@ -124,7 +124,7 @@ export function TerminalTab() {
 
       // Clear and show connecting message
       term.clear();
-      term.writeln('\x1b[36m[hatcher]\x1b[0m Connecting to agent gateway...');
+      term.writeln('\x1b[36m[hatcher]\x1b[0m Connecting to agent CLI...');
 
       // Connect WebSocket
       const ws = new WebSocket(getWsUrl(agent.id));
@@ -156,8 +156,8 @@ export function TerminalTab() {
               }
               term.writeln(`\x1b[32m[hatcher]\x1b[0m Connected to \x1b[1m${msg.agentName || agent.name}\x1b[0m (${msg.framework || agent.framework})`);
               term.writeln('\x1b[90m─────────────────────────────────────────\x1b[0m');
-              term.writeln('\x1b[90mAttached to the live gateway CLI inside the agent container.\x1b[0m');
-              term.writeln('\x1b[90mInput/output are relayed through the running agent process.\x1b[0m');
+              term.writeln('\x1b[90mAttached to the framework CLI inside the agent container.\x1b[0m');
+              term.writeln('\x1b[90mThe gateway keeps running separately for chat and integrations.\x1b[0m');
               term.writeln('');
               term.focus();
               break;
@@ -338,7 +338,7 @@ export function TerminalTab() {
       {/* Info banner */}
       <div className="px-4 py-1.5 border-t border-[var(--border-default)] bg-[var(--bg-elevated)]">
         <p className="text-[10px] text-[var(--text-muted)] font-mono">
-          Attached to the live gateway CLI inside the isolated agent container. Input/output are relayed through the running agent process. Terminal open/close and entered commands are audited with secret redaction.
+          Attached to the framework CLI inside the isolated agent container. The gateway keeps running separately for chat and integrations. Terminal open/close and entered commands are audited with secret redaction.
           {errorMsg && <span className="text-red-400 ml-2">Error: {errorMsg}</span>}
         </p>
       </div>
