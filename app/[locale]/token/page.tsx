@@ -71,8 +71,8 @@ export default function TokenPage() {
               <div className="relative z-10 w-full h-full rounded-[6px] p-[2px] bg-[var(--accent)] shadow-[0_0_24px_var(--accent-glow)]">
                 <div className="w-full h-full rounded-[4px] overflow-hidden bg-[var(--bg-base)]">
                   <NextImage
-                    src="/hatcher-logo.png"
-                    alt="$HATCHER token logo"
+                    src="/img/hatcher_logo.png"
+                    alt="Hatcher logo"
                     width={160}
                     height={160}
                     priority
