@@ -30,7 +30,7 @@ type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
 
 function getWsUrl(agentId: string): string {
   const base = API_URL.replace(/^http/, 'ws');
-  return `${base}/agents/${agentId}/terminal/ws`;
+  return `${base}/agents/${agentId}/terminal/ws?mode=gateway`;
 }
 
 export function TerminalTab() {
@@ -120,10 +120,11 @@ export function TerminalTab() {
       const term = termInstance.current;
       if (connectionSeqRef.current !== connectionSeq) return;
       if (!term) throw new Error('Terminal not initialized');
+      term.options.disableStdin = false;
 
       // Clear and show connecting message
       term.clear();
-      term.writeln('\x1b[36m[hatcher]\x1b[0m Connecting to agent terminal...');
+      term.writeln('\x1b[36m[hatcher]\x1b[0m Connecting to agent gateway...');
 
       // Connect WebSocket
       const ws = new WebSocket(getWsUrl(agent.id));
@@ -155,7 +156,8 @@ export function TerminalTab() {
               }
               term.writeln(`\x1b[32m[hatcher]\x1b[0m Connected to \x1b[1m${msg.agentName || agent.name}\x1b[0m (${msg.framework || agent.framework})`);
               term.writeln('\x1b[90m─────────────────────────────────────────\x1b[0m');
-              term.writeln('\x1b[90mInteractive shell attached inside the agent container.\x1b[0m');
+              term.writeln('\x1b[90mAttached to the live gateway CLI inside the agent container.\x1b[0m');
+              term.writeln('\x1b[90mInput/output are relayed through the running agent process.\x1b[0m');
               term.writeln('');
               term.focus();
               break;
@@ -220,13 +222,12 @@ export function TerminalTab() {
 
   // ── Auto-connect when tab opens and agent is active ──
   useEffect(() => {
-    if (isActive && state === 'disconnected') {
+    if (isActive) {
       connect();
     }
     return () => {
       disconnect();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive, connect, disconnect]);
 
   // ── Handle resize ──
@@ -299,7 +300,7 @@ export function TerminalTab() {
           </span>
           <span className="hidden xl:inline-flex items-center gap-1.5 rounded-md border border-emerald-500/20 bg-emerald-500/5 px-2 py-0.5 text-[10px] font-mono text-emerald-300">
             <ShieldCheck size={11} />
-            Container shell
+            Isolated container
           </span>
           {shortContainerId && (
             <span className="hidden 2xl:inline text-[10px] font-mono text-[var(--text-muted)]">
@@ -337,7 +338,7 @@ export function TerminalTab() {
       {/* Info banner */}
       <div className="px-4 py-1.5 border-t border-[var(--border-default)] bg-[var(--bg-elevated)]">
         <p className="text-[10px] text-[var(--text-muted)] font-mono">
-          Shell runs inside the isolated agent container, not on the host. Terminal open/close and entered commands are audited with secret redaction.
+          Attached to the live gateway CLI inside the isolated agent container. Input/output are relayed through the running agent process. Terminal open/close and entered commands are audited with secret redaction.
           {errorMsg && <span className="text-red-400 ml-2">Error: {errorMsg}</span>}
         </p>
       </div>
