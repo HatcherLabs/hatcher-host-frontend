@@ -32,6 +32,9 @@ interface TerminalTabProps {
   isVisible?: boolean;
 }
 
+const TERMINAL_KEEPALIVE_MS = 25_000;
+const TERMINAL_RECONNECT_DELAY_MS = 1_500;
+
 function getWsUrl(agentId: string): string {
   const base = API_URL.replace(/^http/, 'ws');
   return `${base}/agents/${agentId}/terminal/ws?mode=gateway`;
@@ -45,6 +48,9 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   const fitAddonRef = useRef<InstanceType<typeof import('@xterm/addon-fit').FitAddon> | null>(null);
   const terminalInputRef = useRef<{ dispose: () => void } | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
+  const keepAliveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const manualDisconnectRef = useRef(false);
   const stateRef = useRef<ConnectionState>('disconnected');
   const connectionSeqRef = useRef(0);
   const [state, setState] = useState<ConnectionState>('disconnected');
@@ -56,9 +62,25 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   // Keep ref in sync with state for use inside closures
   useEffect(() => { stateRef.current = state; }, [state]);
 
+  const stopKeepAlive = useCallback(() => {
+    if (keepAliveTimerRef.current) {
+      clearInterval(keepAliveTimerRef.current);
+      keepAliveTimerRef.current = null;
+    }
+  }, []);
+
+  const stopReconnect = useCallback(() => {
+    if (reconnectTimerRef.current) {
+      clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
+    }
+  }, []);
+
   // ── Initialize xterm + connect WebSocket ──
   const connect = useCallback(async () => {
     if (!agent?.id || !isActive) return;
+    manualDisconnectRef.current = false;
+    stopReconnect();
     const connectionSeq = ++connectionSeqRef.current;
 
     // Close existing connection first to avoid race conditions
@@ -66,6 +88,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
       wsRef.current.close(1000, 'Reconnecting');
       wsRef.current = null;
     }
+    stopKeepAlive();
 
     setState('connecting');
     setErrorMsg(null);
@@ -134,6 +157,11 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
       // Connect WebSocket
       const ws = new WebSocket(getWsUrl(agent.id));
       wsRef.current = ws;
+      keepAliveTimerRef.current = setInterval(() => {
+        if (connectionSeqRef.current !== connectionSeq) return;
+        if (wsRef.current !== ws || ws.readyState !== WebSocket.OPEN) return;
+        ws.send(JSON.stringify({ type: 'ping', at: Date.now() }));
+      }, TERMINAL_KEEPALIVE_MS);
 
       terminalInputRef.current?.dispose();
       terminalInputRef.current = term.onData((data: string) => {
@@ -184,6 +212,9 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
               setErrorMsg(msg.message);
               term.writeln(`\x1b[31m[error]\x1b[0m ${msg.message}`);
               break;
+
+            case 'pong':
+              break;
           }
         } catch {
           // Non-JSON message — write raw
@@ -200,21 +231,32 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
 
       ws.onclose = (e) => {
         if (connectionSeqRef.current !== connectionSeq || wsRef.current !== ws) return;
+        stopKeepAlive();
         if (stateRef.current !== 'error') setState('disconnected');
         if (e.code !== 1000) {
           term.writeln(`\x1b[33m[hatcher]\x1b[0m Connection closed (${e.reason || `code ${e.code}`})`);
         }
         wsRef.current = null;
+        if (!manualDisconnectRef.current && e.code !== 1000) {
+          term.writeln('\x1b[90m[hatcher] Reconnecting terminal session...\x1b[0m');
+          reconnectTimerRef.current = setTimeout(() => {
+            reconnectTimerRef.current = null;
+            void connect();
+          }, TERMINAL_RECONNECT_DELAY_MS);
+        }
       };
 
     } catch (e) {
       setState('error');
       setErrorMsg((e as Error).message);
     }
-  }, [agent?.id, agent?.name, agent?.framework, isActive]);
+  }, [agent?.id, agent?.name, agent?.framework, isActive, stopKeepAlive, stopReconnect]);
 
   // ── Disconnect ──
   const disconnect = useCallback(() => {
+    manualDisconnectRef.current = true;
+    stopReconnect();
+    stopKeepAlive();
     terminalInputRef.current?.dispose();
     terminalInputRef.current = null;
     connectionSeqRef.current += 1;
@@ -223,7 +265,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
       wsRef.current = null;
     }
     setState('disconnected');
-  }, []);
+  }, [stopKeepAlive, stopReconnect]);
 
   // ── Auto-connect when tab opens and agent is active ──
   useEffect(() => {
@@ -299,7 +341,7 @@ export function TerminalTab({ isVisible = true }: TerminalTabProps) {
   }
 
   return (
-    <div className="flex h-[calc(100dvh-190px)] min-h-[520px] flex-col overflow-hidden border border-[var(--border-default)] bg-[#0a0a0a] lg:min-h-[620px] 2xl:h-[calc(100dvh-170px)] 2xl:min-h-[720px]">
+    <div className="hatcher-terminal-frame flex h-[calc(100dvh-190px)] min-h-[520px] flex-col overflow-hidden border border-[var(--border-default)] bg-[#0a0a0a] lg:min-h-[620px] 2xl:h-[calc(100dvh-170px)] 2xl:min-h-[720px]">
       {/* Terminal header */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--border-default)] bg-[var(--bg-elevated)]">
         <div className="flex min-w-0 items-center gap-3">

@@ -1102,3 +1102,27 @@ button, a, [role="tab"] {
 @media (prefers-reduced-motion: reduce) {
   .v3-scanline::after { display: none; }
 }
+
+.hatcher-terminal-frame .xterm-viewport {
+  overflow-y: scroll !important;
+  scrollbar-color: rgba(0, 255, 65, 0.55) #050505;
+  scrollbar-width: thin;
+}
+
+.hatcher-terminal-frame .xterm-viewport::-webkit-scrollbar {
+  width: 10px;
+}
+
+.hatcher-terminal-frame .xterm-viewport::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+.hatcher-terminal-frame .xterm-viewport::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 65, 0.45);
+  border: 2px solid #050505;
+  border-radius: 999px;
+}
+
+.hatcher-terminal-frame .xterm-viewport::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 65, 0.7);
+}
