@@ -2,7 +2,14 @@
 import { MapControls } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import { Building2, UserRound, Users, X, Zap } from 'lucide-react';
-import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import type { ReactNode } from 'react';
 import * as THREE from 'three';
 import { useRouter } from '@/i18n/routing';
@@ -14,7 +21,11 @@ import {
 import { QualityToggle } from '@/components/city/v2/quality/QualityToggle';
 import { SceneErrorBoundary } from '@/components/city/v2/world/SceneErrorBoundary';
 import { cityAgentPassportPath, cityBuildingTitle } from './cityNavigation';
-import { layoutLiveCity, type LiveBuildingLayout } from './liveLayout';
+import {
+  layoutLiveCity,
+  type LiveAgentMarkerLayout,
+  type LiveBuildingLayout,
+} from './liveLayout';
 import { LiveAgentMarkers } from './LiveAgentMarkers';
 import { LiveActivityPulses } from './LiveActivityPulses';
 import { LiveBuildings } from './LiveBuildings';
@@ -99,7 +110,7 @@ function LiveCitySceneBody({
     <div className="relative h-full w-full bg-[#8fd3ea]">
       <Canvas
         key={quality}
-        camera={{ position: [112, 82, 138], fov: 43, near: 0.5, far: 760 }}
+        camera={{ position: [178, 128, 216], fov: 42, near: 0.5, far: 900 }}
         dpr={quality === 'high' ? [1, 2] : 1}
         gl={{
           antialias: quality === 'high',
@@ -112,7 +123,7 @@ function LiveCitySceneBody({
         }}
       >
         <color attach="background" args={['#8fd3ea']} />
-        <fog attach="fog" args={['#bdebf0', 150, 560]} />
+        <fog attach="fog" args={['#bdebf0', 210, 680]} />
         <ambientLight intensity={0.68} color="#d8f8ff" />
         <hemisphereLight
           color="#e1fbff"
@@ -159,6 +170,12 @@ function LiveCitySceneBody({
             pulseAts={pulseAts}
           />
         </SceneErrorBoundary>
+        <LiveCityPointerTargets
+          buildings={layout.buildings}
+          markers={layout.markers}
+          onBuildingClick={(building) => setSelectedOwnerKey(building.ownerKey)}
+          onAgentClick={onAgentClick}
+        />
         <SurveyCamera />
       </Canvas>
       <QualityToggle />
@@ -257,8 +274,8 @@ function BuildingStat({
 function SurveyCamera() {
   const { camera } = useThree();
   useEffect(() => {
-    camera.position.set(112, 82, 138);
-    camera.lookAt(0, 8, 6);
+    camera.position.set(178, 128, 216);
+    camera.lookAt(0, 9, 8);
   }, [camera]);
 
   return (
@@ -270,10 +287,136 @@ function SurveyCamera() {
       enablePan
       enableRotate
       minDistance={56}
-      maxDistance={260}
+      maxDistance={360}
       minPolarAngle={0.5}
       maxPolarAngle={1.26}
-      target={[0, 8, 6]}
+      target={[0, 9, 8]}
     />
   );
+}
+
+function LiveCityPointerTargets({
+  buildings,
+  markers,
+  onBuildingClick,
+  onAgentClick,
+}: {
+  buildings: LiveBuildingLayout[];
+  markers: LiveAgentMarkerLayout[];
+  onBuildingClick: (building: LiveBuildingLayout) => void;
+  onAgentClick: (agentId: string) => void;
+}) {
+  const { camera, gl } = useThree();
+  const pointerDown = useRef<{ x: number; y: number } | null>(null);
+  const buildingTargets = useMemo(
+    () =>
+      buildings.map((building) => {
+        const footprint =
+          5.6 +
+          Math.min(4.2, building.tier * 0.86) +
+          Math.min(3.1, Math.log2(building.agentCount + 1) * 0.46);
+        return {
+          building,
+          box: new THREE.Box3().setFromCenterAndSize(
+            new THREE.Vector3(
+              building.x,
+              Math.max(1.8, building.height / 2),
+              building.z,
+            ),
+            new THREE.Vector3(footprint, Math.max(4.2, building.height), footprint),
+          ),
+        };
+      }),
+    [buildings],
+  );
+  const markerTargets = useMemo(
+    () =>
+      markers.map((marker) => {
+        const footprint = 3.2 + marker.width * 2.2 + marker.tier * 0.24;
+        return {
+          marker,
+          box: new THREE.Box3().setFromCenterAndSize(
+            new THREE.Vector3(marker.x, marker.height / 2 + 0.4, marker.z),
+            new THREE.Vector3(footprint, Math.max(4.6, marker.height), footprint),
+          ),
+        };
+      }),
+    [markers],
+  );
+
+  useEffect(() => {
+    const element = gl.domElement;
+    const raycaster = new THREE.Raycaster();
+    const ndc = new THREE.Vector2();
+    const hit = new THREE.Vector3();
+
+    const updateRay = (event: PointerEvent) => {
+      const rect = element.getBoundingClientRect();
+      ndc.set(
+        ((event.clientX - rect.left) / rect.width) * 2 - 1,
+        -((event.clientY - rect.top) / rect.height) * 2 + 1,
+      );
+      raycaster.setFromCamera(ndc, camera);
+    };
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.button !== 0) return;
+      pointerDown.current = { x: event.clientX, y: event.clientY };
+    };
+
+    const onPointerUp = (event: PointerEvent) => {
+      const start = pointerDown.current;
+      pointerDown.current = null;
+      if (!start || event.button !== 0) return;
+      if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8) {
+        return;
+      }
+
+      updateRay(event);
+
+      let bestAgent:
+        | { marker: LiveAgentMarkerLayout; distance: number }
+        | null = null;
+      for (const target of markerTargets) {
+        const point = raycaster.ray.intersectBox(target.box, hit);
+        if (!point) continue;
+        const distance = raycaster.ray.origin.distanceTo(point);
+        if (!bestAgent || distance < bestAgent.distance) {
+          bestAgent = { marker: target.marker, distance };
+        }
+      }
+
+      if (bestAgent) {
+        event.preventDefault();
+        onAgentClick(bestAgent.marker.agentId);
+        return;
+      }
+
+      let bestBuilding:
+        | { building: LiveBuildingLayout; distance: number }
+        | null = null;
+      for (const target of buildingTargets) {
+        const point = raycaster.ray.intersectBox(target.box, hit);
+        if (!point) continue;
+        const distance = raycaster.ray.origin.distanceTo(point);
+        if (!bestBuilding || distance < bestBuilding.distance) {
+          bestBuilding = { building: target.building, distance };
+        }
+      }
+
+      if (bestBuilding) {
+        event.preventDefault();
+        onBuildingClick(bestBuilding.building);
+      }
+    };
+
+    element.addEventListener('pointerdown', onPointerDown);
+    element.addEventListener('pointerup', onPointerUp);
+    return () => {
+      element.removeEventListener('pointerdown', onPointerDown);
+      element.removeEventListener('pointerup', onPointerUp);
+    };
+  }, [buildingTargets, camera, gl, markerTargets, onAgentClick, onBuildingClick]);
+
+  return null;
 }

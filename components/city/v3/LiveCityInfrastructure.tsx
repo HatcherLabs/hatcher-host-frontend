@@ -1,6 +1,11 @@
 'use client';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
+import {
+  LIVE_CITY_BLOCKS,
+  LIVE_CITY_BOUNDS,
+  LIVE_CITY_ROADS,
+} from './liveLayout';
 
 export function LiveCityInfrastructure() {
   return (
@@ -8,37 +13,42 @@ export function LiveCityInfrastructure() {
       <SkyDome />
       <GreenHorizon />
 
-      <mesh position={[0, -0.55, 8]} receiveShadow>
-        <boxGeometry args={[620, 0.5, 520]} />
+      <mesh position={[0, -0.58, LIVE_CITY_BOUNDS.centerZ]} receiveShadow>
+        <boxGeometry args={[760, 0.5, 560]} />
         <meshStandardMaterial
-          color="#2f6c4c"
+          color="#28724d"
           roughness={0.94}
           metalness={0.02}
         />
       </mesh>
 
-      <mesh position={[0, -0.2, 8]} receiveShadow>
-        <boxGeometry args={[214, 0.42, 184]} />
-        <meshStandardMaterial
-          color="#111923"
-          roughness={0.76}
-          metalness={0.18}
-          emissive="#020506"
-          emissiveIntensity={0.04}
+      <mesh position={[0, -0.2, LIVE_CITY_BOUNDS.centerZ]} receiveShadow>
+        <boxGeometry
+          args={[LIVE_CITY_BOUNDS.width + 18, 0.42, LIVE_CITY_BOUNDS.depth + 16]}
         />
-      </mesh>
-
-      <mesh position={[0, 0.025, 8]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[205, 175]} />
         <meshStandardMaterial
-          color="#172333"
+          color="#172126"
           roughness={0.86}
-          metalness={0.14}
+          metalness={0.08}
         />
       </mesh>
 
-      <CoreHub />
-      <OuterBeacons />
+      <mesh
+        position={[0, 0.018, LIVE_CITY_BOUNDS.centerZ]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
+        <planeGeometry args={[LIVE_CITY_BOUNDS.width, LIVE_CITY_BOUNDS.depth]} />
+        <meshStandardMaterial
+          color="#273135"
+          roughness={0.9}
+          metalness={0.04}
+        />
+      </mesh>
+
+      <CityBlocks />
+      <StreetGrid />
+      <CityFurniture />
       <TreeLine />
     </group>
   );
@@ -56,16 +66,16 @@ function SkyDome() {
 function GreenHorizon() {
   const hills = useMemo(
     () =>
-      Array.from({ length: 18 }, (_, index) => {
+      Array.from({ length: 24 }, (_, index) => {
         const side = index % 2 === 0 ? -1 : 1;
         const row = Math.floor(index / 2);
         return {
           key: `hill-${index}`,
-          x: side * (115 + row * 15),
-          z: -96 + row * 22,
-          width: 48 + (index % 5) * 9,
-          height: 10 + (index % 4) * 3,
-          depth: 18 + (index % 3) * 8,
+          x: side * (165 + row * 18),
+          z: -138 + row * 23,
+          width: 58 + (index % 5) * 11,
+          height: 8 + (index % 4) * 2.5,
+          depth: 20 + (index % 3) * 8,
         };
       }),
     [],
@@ -73,9 +83,9 @@ function GreenHorizon() {
 
   return (
     <group>
-      <mesh position={[0, -0.62, -118]} receiveShadow>
-        <boxGeometry args={[340, 0.7, 44]} />
-        <meshStandardMaterial color="#366f4f" roughness={0.96} />
+      <mesh position={[0, -0.62, -158]} receiveShadow>
+        <boxGeometry args={[520, 0.7, 54]} />
+        <meshStandardMaterial color="#3c845f" roughness={0.96} />
       </mesh>
       {hills.map((hill) => (
         <mesh
@@ -91,71 +101,173 @@ function GreenHorizon() {
   );
 }
 
-function CoreHub() {
+function CityBlocks() {
   return (
-    <group position={[0, 0, -2]}>
-      <mesh position={[0, 0.36, 0]} receiveShadow>
-        <cylinderGeometry args={[8.4, 10.8, 0.72, 8]} />
-        <meshStandardMaterial
-          color="#182636"
-          roughness={0.52}
-          metalness={0.3}
-        />
-      </mesh>
-      <mesh position={[0, 7.2, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[1.2, 2.25, 14.4, 8]} />
-        <meshStandardMaterial
-          color="#23394d"
-          roughness={0.48}
-          metalness={0.34}
-          emissive="#0a2733"
-          emissiveIntensity={0.16}
-        />
-      </mesh>
-      <mesh position={[0, 16.3, 0]}>
-        <octahedronGeometry args={[2.25, 0]} />
-        <meshStandardMaterial
-          color="#47d7c6"
-          roughness={0.34}
-          metalness={0.2}
-          emissive="#102b2a"
-          emissiveIntensity={0.28}
-        />
-      </mesh>
+    <group>
+      {LIVE_CITY_BLOCKS.map((block) => (
+        <group key={block.id} position={[block.x, 0.062, block.z]}>
+          <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+            <planeGeometry args={[block.padWidth, block.padDepth]} />
+            <meshStandardMaterial
+              color={
+                block.accent === 'core'
+                  ? '#303c40'
+                  : block.accent === 'inner'
+                    ? '#2b3639'
+                    : '#263033'
+              }
+              roughness={0.92}
+              metalness={0.03}
+            />
+          </mesh>
+          <mesh position={[0, 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[block.padWidth + 1.1, block.padDepth + 1.1]} />
+            <meshBasicMaterial color="#3b4547" transparent opacity={0.32} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+function StreetGrid() {
+  return (
+    <group>
+      {LIVE_CITY_ROADS.map((road) => (
+        <mesh
+          key={road.key}
+          position={[road.x, 0.082, road.z]}
+          rotation={[-Math.PI / 2, 0, 0]}
+          receiveShadow
+        >
+          <planeGeometry args={[road.width, road.depth]} />
+          <meshStandardMaterial
+            color="#10181c"
+            roughness={0.88}
+            metalness={0.03}
+          />
+        </mesh>
+      ))}
+      <LaneMarks />
+    </group>
+  );
+}
+
+function LaneMarks() {
+  const marks = useMemo(() => {
+    const out: Array<{
+      key: string;
+      x: number;
+      z: number;
+      width: number;
+      depth: number;
+    }> = [];
+
+    for (const road of LIVE_CITY_ROADS) {
+      const count = road.kind === 'vertical' ? 24 : 28;
+      for (let i = 0; i < count; i++) {
+        const t = (i + 0.5) / count - 0.5;
+        if (road.kind === 'vertical') {
+          out.push({
+            key: `${road.key}-mark-${i}`,
+            x: road.x,
+            z: road.z + t * (road.depth - 18),
+            width: 0.34,
+            depth: 3.6,
+          });
+        } else {
+          out.push({
+            key: `${road.key}-mark-${i}`,
+            x: road.x + t * (road.width - 18),
+            z: road.z,
+            width: 3.6,
+            depth: 0.34,
+          });
+        }
+      }
+    }
+
+    return out;
+  }, []);
+
+  return (
+    <group>
+      {marks.map((mark) => (
+        <mesh
+          key={mark.key}
+          position={[mark.x, 0.091, mark.z]}
+          rotation={[-Math.PI / 2, 0, 0]}
+        >
+          <planeGeometry args={[mark.width, mark.depth]} />
+          <meshBasicMaterial color="#c8d1c9" transparent opacity={0.34} />
+        </mesh>
+      ))}
     </group>
   );
 }
 
 function OuterBeacons() {
   const beacons = [
-    [-78, 8, -54],
-    [78, 8, -50],
-    [-70, 7, 64],
-    [70, 7, 68],
+    [-166, 6.5, -132],
+    [166, 6.5, -132],
+    [-166, 6.5, 148],
+    [166, 6.5, 148],
   ] as const;
 
   return (
     <group>
-      {beacons.map(([x, y, z], index) => (
+      {beacons.map(([x, y, z]) => (
         <group key={`${x}-${z}`} position={[x, 0, z]}>
           <mesh position={[0, y / 2, 0]} castShadow receiveShadow>
-            <boxGeometry args={[1.2, y, 1.2]} />
+            <boxGeometry args={[1.1, y, 1.1]} />
             <meshStandardMaterial
-              color="#213242"
-              roughness={0.58}
-              metalness={0.24}
+              color="#202b2d"
+              roughness={0.72}
+              metalness={0.12}
             />
           </mesh>
-          <mesh position={[0, y + 1.8, 0]}>
-            <sphereGeometry args={[1.08, 12, 8]} />
+          <mesh position={[0, y + 0.9, 0]} castShadow receiveShadow>
+            <sphereGeometry args={[0.82, 12, 8]} />
             <meshStandardMaterial
-              color={index % 2 ? '#21b991' : '#43b6d9'}
-              roughness={0.42}
-              metalness={0.16}
+              color="#7d938d"
+              roughness={0.62}
+              metalness={0.1}
             />
           </mesh>
         </group>
       ))}
+    </group>
+  );
+}
+
+function CityGateways() {
+  return (
+    <group>
+      <mesh position={[0, 0.24, -142]} receiveShadow>
+        <boxGeometry args={[54, 0.48, 5.5]} />
+        <meshStandardMaterial
+          color="#202b2d"
+          roughness={0.84}
+          metalness={0.08}
+        />
+      </mesh>
+      <mesh position={[0, 0.24, 158]} receiveShadow>
+        <boxGeometry args={[54, 0.48, 5.5]} />
+        <meshStandardMaterial
+          color="#202b2d"
+          roughness={0.84}
+          metalness={0.08}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+function CityFurniture() {
+  return (
+    <group>
+      <OuterBeacons />
+      <CityGateways />
     </group>
   );
 }
@@ -165,32 +277,32 @@ function TreeLine() {
   const crownRef = useRef<THREE.InstancedMesh>(null);
   const trees = useMemo(() => {
     const positions: Array<{ x: number; z: number; height: number }> = [];
-    for (let i = 0; i < 96; i++) {
+    for (let i = 0; i < 140; i++) {
       const side = i % 4;
-      const t = i / 95;
-      const jitter = Math.sin(i * 12.9898) * 3.4;
+      const t = i / 139;
+      const jitter = Math.sin(i * 12.9898) * 4.8;
       if (side === 0)
         positions.push({
-          x: -126,
-          z: -84 + t * 176 + jitter,
+          x: -206,
+          z: -142 + t * 306 + jitter,
           height: 4 + (i % 5) * 0.5,
         });
       if (side === 1)
         positions.push({
-          x: 126,
-          z: -84 + t * 176 - jitter,
+          x: 206,
+          z: -142 + t * 306 - jitter,
           height: 4.4 + (i % 4) * 0.55,
         });
       if (side === 2)
         positions.push({
-          x: -112 + t * 224 + jitter,
-          z: -102,
+          x: -178 + t * 356 + jitter,
+          z: -170,
           height: 4.2 + (i % 6) * 0.45,
         });
       if (side === 3)
         positions.push({
-          x: -112 + t * 224 - jitter,
-          z: 104,
+          x: -178 + t * 356 - jitter,
+          z: 184,
           height: 3.9 + (i % 5) * 0.48,
         });
     }

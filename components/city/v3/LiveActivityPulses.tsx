@@ -47,10 +47,10 @@ function LiveActivityPulse({
   useFrame(() => {
     if (!ref.current) return;
     const age = Math.min(1, (performance.now() - bornAt) / 1800);
-    const scale = 1 + age * 8;
+    const scale = 1 + age * 5.5;
     ref.current.scale.set(scale, scale, scale);
     const mat = ref.current.material as THREE.MeshBasicMaterial;
-    mat.opacity = Math.max(0, 0.74 * (1 - age));
+    mat.opacity = Math.max(0, 0.28 * (1 - age));
   });
 
   return (
@@ -59,7 +59,7 @@ function LiveActivityPulse({
       <meshBasicMaterial
         color={color}
         transparent
-        opacity={0.74}
+        opacity={0.28}
         depthWrite={false}
         toneMapped={false}
       />

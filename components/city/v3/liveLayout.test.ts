@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { CityAgent } from '@/components/city/types';
 import {
+  LIVE_CITY_BOUNDS,
   layoutLiveCity,
   rankAgentForCity,
   selectRouteAgents,
@@ -244,6 +245,58 @@ describe('layoutLiveCity', () => {
     expect(right).toBe(true);
     expect(front).toBe(true);
     expect(back).toBe(true);
+  });
+
+  it('keeps hundreds of owner buildings inside the expanded city footprint', () => {
+    const agents = Array.from({ length: 520 }, (_, i) =>
+      mkAgent(`agent-${i}`, {
+        ownerKey: `owner-${i}`,
+        status: i % 11 === 0 ? 'running' : 'sleeping',
+        tier: i % 5,
+        messageCount: 20 + i,
+      }),
+    );
+
+    const layout = layoutLiveCity(agents, {
+      maxBuildings: 800,
+      routeLimit: 12,
+    });
+    const halfWidth = LIVE_CITY_BOUNDS.width / 2;
+    const minZ = LIVE_CITY_BOUNDS.centerZ - LIVE_CITY_BOUNDS.depth / 2;
+    const maxZ = LIVE_CITY_BOUNDS.centerZ + LIVE_CITY_BOUNDS.depth / 2;
+
+    expect(layout.buildings).toHaveLength(520);
+    expect(
+      layout.buildings.every(
+        (building) =>
+          Math.abs(building.x) < halfWidth - 8 &&
+          building.z > minZ + 8 &&
+          building.z < maxZ - 8,
+      ),
+    ).toBe(true);
+  });
+
+  it('uses tier to choose larger building families instead of color coding', () => {
+    const layout = layoutLiveCity(
+      [
+        mkAgent('free-owner', { ownerKey: 'free-owner', tier: 0 }),
+        mkAgent('basic-owner', { ownerKey: 'basic-owner', tier: 2 }),
+        mkAgent('pro-owner', { ownerKey: 'pro-owner', tier: 4 }),
+      ],
+      { maxBuildings: 10, routeLimit: 0 },
+    );
+
+    const byOwner = new Map(
+      layout.buildings.map((building) => [building.ownerKey, building]),
+    );
+
+    expect(byOwner.get('free-owner')?.base.startsWith('small-building-')).toBe(
+      true,
+    );
+    expect(byOwner.get('basic-owner')?.base.startsWith('medium-building-')).toBe(
+      true,
+    );
+    expect(byOwner.get('pro-owner')?.base.startsWith('skyscraper-')).toBe(true);
   });
 
   it('does not render sleeping overflow agents as loose markers', () => {

@@ -37,7 +37,7 @@ function LiveNetworkRoute({ route }: { route: LiveRouteLayout }) {
       new THREE.MeshBasicMaterial({
         color,
         transparent: true,
-        opacity: route.mine ? 0.3 : 0.12,
+        opacity: route.mine ? 0.16 : 0.055,
         depthWrite: false,
         toneMapped: false,
       }),
@@ -72,7 +72,7 @@ function LiveNetworkRoute({ route }: { route: LiveRouteLayout }) {
         <meshBasicMaterial
           color={color}
           transparent
-          opacity={0.84}
+          opacity={0.48}
           toneMapped={false}
         />
       </mesh>

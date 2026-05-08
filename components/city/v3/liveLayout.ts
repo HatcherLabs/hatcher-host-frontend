@@ -2,7 +2,6 @@ import type { CityAgent, CityStatus } from '@/components/city/types';
 import { TIER_HEIGHT } from '@/components/city/types';
 import {
   BUILDING_BASES,
-  pickBase,
   type BuildingBase,
 } from '@/components/city/v2/world/Buildings.layout';
 
@@ -75,6 +74,13 @@ export interface LiveCityLayoutOptions {
 const DEFAULT_MAX_BUILDINGS = 72;
 const DEFAULT_ROUTE_LIMIT = 18;
 const OWNER_WEIGHT = 200_000;
+const CITY_CENTER_Z = 8;
+
+export const LIVE_CITY_BOUNDS = {
+  width: 372,
+  depth: 316,
+  centerZ: CITY_CENTER_Z,
+} as const;
 
 export interface LiveCityBlock {
   id: string;
@@ -96,168 +102,65 @@ export interface LiveCityRoad {
   z: number;
   width: number;
   depth: number;
-  color: 'cyan' | 'emerald' | 'amber';
+  kind: 'vertical' | 'horizontal';
 }
 
-export const LIVE_CITY_BLOCKS: readonly LiveCityBlock[] = [
-  {
-    id: 'core-west',
-    x: -18,
-    z: -14,
-    cols: 4,
-    rows: 3,
-    spacingX: 8,
-    spacingZ: 8,
-    padWidth: 42,
-    padDepth: 34,
-    heightScale: 1.24,
-    accent: 'core',
-  },
-  {
-    id: 'core-east',
-    x: 18,
-    z: -10,
-    cols: 4,
-    rows: 3,
-    spacingX: 8,
-    spacingZ: 8,
-    padWidth: 42,
-    padDepth: 34,
-    heightScale: 1.18,
-    accent: 'core',
-  },
-  {
-    id: 'core-south',
-    x: 0,
-    z: 20,
-    cols: 5,
-    rows: 3,
-    spacingX: 7,
-    spacingZ: 8,
-    padWidth: 48,
-    padDepth: 32,
-    heightScale: 1.08,
-    accent: 'core',
-  },
-  {
-    id: 'west-market',
-    x: -48,
-    z: 18,
-    cols: 3,
-    rows: 4,
-    spacingX: 8,
-    spacingZ: 8,
-    padWidth: 34,
-    padDepth: 44,
-    heightScale: 0.92,
-    accent: 'inner',
-  },
-  {
-    id: 'east-stack',
-    x: 48,
-    z: 16,
-    cols: 3,
-    rows: 4,
-    spacingX: 8,
-    spacingZ: 8,
-    padWidth: 34,
-    padDepth: 44,
-    heightScale: 1.02,
-    accent: 'inner',
-  },
-  {
-    id: 'north-port',
-    x: -44,
-    z: -42,
-    cols: 3,
-    rows: 3,
-    spacingX: 9,
-    spacingZ: 8,
-    padWidth: 36,
-    padDepth: 34,
-    heightScale: 0.86,
-    accent: 'inner',
-  },
-  {
-    id: 'north-array',
-    x: 44,
-    z: -40,
-    cols: 3,
-    rows: 3,
-    spacingX: 9,
-    spacingZ: 8,
-    padWidth: 36,
-    padDepth: 34,
-    heightScale: 0.9,
-    accent: 'inner',
-  },
-  {
-    id: 'south-left',
-    x: -38,
-    z: 54,
-    cols: 4,
-    rows: 2,
-    spacingX: 8,
-    spacingZ: 8,
-    padWidth: 42,
-    padDepth: 26,
-    heightScale: 0.8,
-    accent: 'outer',
-  },
-  {
-    id: 'south-right',
-    x: 38,
-    z: 56,
-    cols: 4,
-    rows: 2,
-    spacingX: 8,
-    spacingZ: 8,
-    padWidth: 42,
-    padDepth: 26,
-    heightScale: 0.82,
-    accent: 'outer',
-  },
-  {
-    id: 'far-west',
-    x: -72,
-    z: -18,
-    cols: 2,
-    rows: 4,
-    spacingX: 9,
-    spacingZ: 8,
-    padWidth: 28,
-    padDepth: 42,
-    heightScale: 0.72,
-    accent: 'outer',
-  },
-  {
-    id: 'far-east',
-    x: 72,
-    z: -14,
-    cols: 2,
-    rows: 4,
-    spacingX: 9,
-    spacingZ: 8,
-    padWidth: 28,
-    padDepth: 42,
-    heightScale: 0.74,
-    accent: 'outer',
-  },
-];
+const ROAD_XS = [-160, -96, -32, 32, 96, 160] as const;
+const ROAD_ZS = [-132, -76, -20, 36, 92, 148] as const;
+const BLOCK_XS = [-128, -64, 0, 64, 128] as const;
+const BLOCK_ZS = [-104, -48, 8, 64, 120] as const;
+
+function blockAccent(x: number, z: number): LiveCityBlock['accent'] {
+  const distance = Math.hypot(x / 128, (z - CITY_CENTER_Z) / 124);
+  if (distance < 0.55) return 'core';
+  if (distance < 1.08) return 'inner';
+  return 'outer';
+}
+
+export const LIVE_CITY_BLOCKS: readonly LiveCityBlock[] = BLOCK_ZS.flatMap(
+  (z, row) =>
+    BLOCK_XS.map((x, col) => {
+      const accent = blockAccent(x, z);
+      const capacityBoost = accent === 'core' ? 1 : 0;
+      return {
+        id: `block-${row}-${col}`,
+        x,
+        z,
+        cols: 6 + capacityBoost,
+        rows: 6,
+        spacingX: accent === 'core' ? 7.4 : 7,
+        spacingZ: accent === 'core' ? 7.2 : 6.8,
+        padWidth: 56,
+        padDepth: 50,
+        heightScale: accent === 'core' ? 1.16 : accent === 'inner' ? 0.98 : 0.82,
+        accent,
+      } satisfies LiveCityBlock;
+    }),
+).sort((a, b) => {
+  const distanceA = Math.hypot(a.x / 128, (a.z - CITY_CENTER_Z) / 124);
+  const distanceB = Math.hypot(b.x / 128, (b.z - CITY_CENTER_Z) / 124);
+  return distanceA - distanceB;
+});
 
 export const LIVE_CITY_ROADS: readonly LiveCityRoad[] = [
-  { key: 'central-spine', x: 0, z: 4, width: 9, depth: 136, color: 'cyan' },
-  { key: 'cross-core', x: 0, z: -11, width: 130, depth: 8, color: 'emerald' },
-  { key: 'south-cross', x: 0, z: 36, width: 110, depth: 7, color: 'cyan' },
-  { key: 'north-cross', x: 0, z: -42, width: 108, depth: 7, color: 'cyan' },
-  { key: 'west-lane', x: -56, z: 4, width: 7, depth: 88, color: 'emerald' },
-  { key: 'east-lane', x: 56, z: 6, width: 7, depth: 88, color: 'emerald' },
-  { key: 'owner-avenue', x: 0, z: 18, width: 72, depth: 5, color: 'amber' },
+  ...ROAD_XS.map((x) => ({
+    key: `avenue-${x}`,
+    x,
+    z: CITY_CENTER_Z,
+    width: Math.abs(x) === 32 ? 10 : 8,
+    depth: 288,
+    kind: 'vertical' as const,
+  })),
+  ...ROAD_ZS.map((z) => ({
+    key: `street-${z}`,
+    x: 0,
+    z,
+    width: 344,
+    depth: Math.abs(z - CITY_CENTER_Z) === 28 ? 10 : 8,
+    kind: 'horizontal' as const,
+  })),
 ];
 
-const CORE_BLOCK_IDS = [0, 1, 2] as const;
-const INNER_BLOCK_IDS = [3, 4, 5, 6] as const;
-const OUTER_BLOCK_IDS = [7, 8, 9, 10] as const;
 const LIVE_CITY_HUBS = [
   { x: 0, y: 18, z: -2 },
   { x: -28, y: 14, z: 12 },
@@ -453,31 +356,38 @@ export function selectRouteAgents(
     .slice(0, limit);
 }
 
-function chooseBlock(index: number, count: number, agentId: string) {
-  const coreCount = Math.min(count, 27);
-  const innerCount = Math.min(Math.max(count - coreCount, 0), 40);
+function blockCapacity(block: LiveCityBlock): number {
+  return block.cols * block.rows;
+}
 
-  let ids: readonly number[];
-  let localIndex: number;
-  if (index < coreCount) {
-    ids = CORE_BLOCK_IDS;
-    localIndex = index;
-  } else if (index < coreCount + innerCount) {
-    ids = INNER_BLOCK_IDS;
-    localIndex = index - coreCount;
-  } else {
-    ids = OUTER_BLOCK_IDS;
-    localIndex = index - coreCount - innerCount;
+function chooseBlock(index: number, count: number) {
+  const activeBlockCount = Math.min(
+    LIVE_CITY_BLOCKS.length,
+    Math.max(8, Math.ceil(count / 24)),
+  );
+  const activeBlocks = LIVE_CITY_BLOCKS.slice(0, activeBlockCount);
+  const block = activeBlocks[index % activeBlocks.length] ?? activeBlocks[0]!;
+  const slot = Math.floor(index / activeBlocks.length);
+
+  if (slot < blockCapacity(block)) return { block, slot };
+
+  let remaining = index;
+  for (const overflowBlock of LIVE_CITY_BLOCKS) {
+    const capacity = blockCapacity(overflowBlock);
+    if (remaining < capacity) return { block: overflowBlock, slot: remaining };
+    remaining -= capacity;
   }
 
-  const offset = Math.floor(hashStr(`${agentId}:block`) * ids.length);
-  const blockIndex = ids[(localIndex + offset) % ids.length] ?? ids[0]!;
-  const slot = Math.floor(localIndex / ids.length);
-  return { block: LIVE_CITY_BLOCKS[blockIndex]!, slot };
+  const fallbackBlock =
+    LIVE_CITY_BLOCKS[index % LIVE_CITY_BLOCKS.length] ?? LIVE_CITY_BLOCKS[0]!;
+  return {
+    block: fallbackBlock,
+    slot: index % blockCapacity(fallbackBlock),
+  };
 }
 
 function blockPosition(index: number, count: number, agentId: string) {
-  const { block, slot } = chooseBlock(index, count, agentId);
+  const { block, slot } = chooseBlock(index, count);
   const col = slot % block.cols;
   const row = Math.floor(slot / block.cols);
   const width = Math.max(1, block.cols - 1) * block.spacingX;
@@ -486,27 +396,46 @@ function blockPosition(index: number, count: number, agentId: string) {
     block.x +
     col * block.spacingX -
     width / 2 +
-    (hashStr(`${agentId}:x`) - 0.5) * 2.1;
+    (hashStr(`${agentId}:x`) - 0.5) * 1.35;
   const z =
     block.z +
     row * block.spacingZ -
     depth / 2 +
-    (hashStr(`${agentId}:z`) - 0.5) * 2.1;
+    (hashStr(`${agentId}:z`) - 0.5) * 1.25;
   return { block, x, z };
+}
+
+function pickLiveBase(ownerKey: string, tier: number): BuildingBase {
+  const r = hashStr(`${ownerKey}:live-base`);
+  const small = BUILDING_BASES.filter((b) => b.startsWith('small-building-'));
+  const medium = BUILDING_BASES.filter((b) => b.startsWith('medium-building-'));
+  const skyscrapers = BUILDING_BASES.filter((b) => b.startsWith('skyscraper-'));
+
+  if (tier <= 0) return small[Math.floor(r * small.length)]!;
+  if (tier === 1) {
+    const options = [...small, ...medium];
+    return options[Math.floor(r * options.length)]!;
+  }
+  if (tier === 2) return medium[Math.floor(r * medium.length)]!;
+  if (tier === 3) {
+    const options = [...medium, ...skyscrapers];
+    return options[Math.floor(r * options.length)]!;
+  }
+  return skyscrapers[Math.floor(r * skyscrapers.length)]!;
 }
 
 function buildingHeight(cluster: LiveUserCluster, block: LiveCityBlock) {
   const base = TIER_HEIGHT[cluster.tier] ?? TIER_HEIGHT[0] ?? 3;
-  const activityBoost = Math.min(7, Math.log10(cluster.messageCount + 1) * 1.7);
-  const fleetBoost = Math.min(5, Math.log2(cluster.agents.length + 1) * 1.1);
+  const activityBoost = Math.min(4.4, Math.log10(cluster.messageCount + 1) * 1.1);
+  const fleetBoost = Math.min(4.2, Math.log2(cluster.agents.length + 1) * 0.85);
   const statusBoost =
     cluster.status === 'running'
-      ? 1.8
+      ? 1.2
       : cluster.status === 'crashed'
-        ? -1.4
+        ? -1.1
         : 0;
   return Math.max(
-    2.5,
+    3,
     (base * (cluster.mine ? 1.18 : 1) +
       activityBoost +
       fleetBoost +
@@ -580,11 +509,14 @@ export function layoutLiveCity(
       activeAgentIds: cluster.activeAgents.map((agent) => agent.id),
       agentCount: cluster.agents.length,
       blockId: pos.block.id,
-      base: pickBase(cluster.ownerKey, cluster.tier),
+      base: pickLiveBase(cluster.ownerKey, cluster.tier),
       x: pos.x,
       z: pos.z,
       height: buildingHeight(cluster, pos.block),
-      rotation: hashStr(`${cluster.ownerKey}:rotation`) * Math.PI * 2,
+      rotation:
+        Math.round(hashStr(`${cluster.ownerKey}:rotation`) * 3) *
+          (Math.PI / 2) +
+        (hashStr(`${cluster.ownerKey}:rotation-jitter`) - 0.5) * 0.1,
       framework: cluster.framework,
       status: cluster.status,
       tier: cluster.tier,
