@@ -337,7 +337,7 @@ export function MailTab() {
                     className={`relative h-6 w-11 rounded-full border transition-colors disabled:opacity-50 ${autoSendEnabled ? 'border-[rgba(74,222,128,0.45)] bg-[rgba(74,222,128,0.22)]' : 'border-[var(--border-default)] bg-[var(--bg-elevated)]'}`}
                   >
                     <span
-                      className={`absolute top-0.5 h-5 w-5 rounded-full bg-current transition-transform ${autoSendEnabled ? 'translate-x-5 text-[var(--accent)]' : 'translate-x-0.5 text-[var(--text-muted)]'}`}
+                      className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-current transition-transform ${autoSendEnabled ? 'translate-x-5 text-[var(--accent)]' : 'translate-x-0 text-[var(--text-muted)]'}`}
                     />
                   </button>
                 </div>
