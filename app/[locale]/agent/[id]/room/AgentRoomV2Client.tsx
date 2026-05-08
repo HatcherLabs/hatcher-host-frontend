@@ -102,6 +102,7 @@ const OWNER_ONLY: Set<StationId> = new Set([
   'logWall',
   'memoryShelves',
   'configTerminal',
+  'mailInbox',
   'pluginsCabinet',
 ]);
 
@@ -297,10 +298,16 @@ export function AgentRoomV2Client({ agentId }: Props) {
       toast.info('Owner-only — sign in as the owner or a team member to use this station.');
       return;
     }
+    if (id === 'mailInbox') {
+      close();
+      setPassportOpen(false);
+      setMailOpen(true);
+      return;
+    }
     setPassportOpen(false);
     setMailOpen(false);
     setOpenPanel(id);
-  }, [canEdit, setOpenPanel, toast]);
+  }, [canEdit, close, setOpenPanel, toast]);
 
   const handlePassportOpen = useCallback(() => {
     close();
@@ -394,7 +401,6 @@ export function AgentRoomV2Client({ agentId }: Props) {
         passportStatus={primaryPassportStatus(activePassport)}
         onStationClick={handleStationClick}
         onPassportClick={handlePassportOpen}
-        onStatusChange={loadAgent}
       />
 
       <BackToCity agentId={apiId} />

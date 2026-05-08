@@ -2564,7 +2564,8 @@
     "back": {
       "toCity": "Zurück zur Stadt",
       "toDashboard": "Zurück zum Dashboard",
-      "toAgents": "Zurück zu Agenten"
+      "toAgents": "Zurück zu Agenten",
+      "toHouse": "Zurück zu House"
     }
   },
   "chatToHatch": {

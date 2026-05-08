@@ -2576,7 +2576,8 @@
     "back": {
       "toCity": "Înapoi la Oraș",
       "toDashboard": "Înapoi la Dashboard",
-      "toAgents": "Înapoi la Agenți"
+      "toAgents": "Înapoi la Agenți",
+      "toHouse": "Înapoi la House"
     }
   },
   "chatToHatch": {

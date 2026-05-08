@@ -10,6 +10,7 @@ const LABELS: Record<StationId, string> = {
   statsHologram: 'view stats',
   memoryShelves: 'browse memory',
   configTerminal: 'open config',
+  mailInbox: 'open mail',
   pluginsCabinet: 'manage plugins',
 };
 

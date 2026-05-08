@@ -16,6 +16,7 @@ const INTERACTABLE: ReadonlySet<StationId> = new Set<StationId>([
   'logWall',
   'memoryShelves',
   'configTerminal',
+  'mailInbox',
   'pluginsCabinet',
 ]);
 

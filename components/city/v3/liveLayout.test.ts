@@ -284,7 +284,8 @@ describe('layoutLiveCity', () => {
       [
         mkAgent('free-owner', { ownerKey: 'free-owner', tier: 0 }),
         mkAgent('basic-owner', { ownerKey: 'basic-owner', tier: 2 }),
-        mkAgent('pro-owner', { ownerKey: 'pro-owner', tier: 4 }),
+        mkAgent('business-owner', { ownerKey: 'business-owner', tier: 3 }),
+        mkAgent('founding-owner', { ownerKey: 'founding-owner', tier: 4 }),
       ],
       { maxBuildings: 10, routeLimit: 0 },
     );
@@ -295,8 +296,12 @@ describe('layoutLiveCity', () => {
 
     expect(byOwner.get('free-owner')?.tierKey).toBe('free');
     expect(byOwner.get('basic-owner')?.tierKey).toBe('pro');
-    expect(byOwner.get('pro-owner')?.tierKey).toBe('enterprise');
-    expect(byOwner.get('pro-owner')!.height).toBeGreaterThan(
+    expect(byOwner.get('business-owner')?.tierKey).toBe('business');
+    expect(byOwner.get('founding-owner')?.tierKey).toBe('founding');
+    expect(byOwner.get('founding-owner')!.height).toBeGreaterThan(
+      byOwner.get('business-owner')!.height,
+    );
+    expect(byOwner.get('business-owner')!.height).toBeGreaterThan(
       byOwner.get('basic-owner')!.height,
     );
     expect(byOwner.get('basic-owner')!.height).toBeGreaterThan(
@@ -323,20 +328,65 @@ describe('layoutLiveCity', () => {
     ];
 
     const layout = layoutLiveCity(agents, { maxBuildings: 100, routeLimit: 0 });
-    const enterpriseDistances = layout.buildings
-      .filter((building) => building.tierKey === 'enterprise')
+    const foundingDistances = layout.buildings
+      .filter((building) => building.tierKey === 'founding')
       .map((building) => Math.hypot(building.x, building.z));
     const freeDistances = layout.buildings
       .filter((building) => building.tierKey === 'free')
       .map((building) => Math.hypot(building.x, building.z));
-    const enterpriseAverage =
-      enterpriseDistances.reduce((sum, distance) => sum + distance, 0) /
-      enterpriseDistances.length;
+    const foundingAverage =
+      foundingDistances.reduce((sum, distance) => sum + distance, 0) /
+      foundingDistances.length;
     const freeAverage =
       freeDistances.reduce((sum, distance) => sum + distance, 0) /
       freeDistances.length;
 
-    expect(enterpriseAverage).toBeLessThan(freeAverage);
+    expect(foundingAverage).toBeLessThan(freeAverage);
+  });
+
+  it('creates one building for every user, even users without agents', () => {
+    const layout = layoutLiveCity(
+      [
+        mkAgent('owner-a-active', {
+          ownerKey: 'owner-a',
+          status: 'running',
+          tier: 1,
+        }),
+      ],
+      {
+        routeLimit: 0,
+        users: [
+          {
+            ownerKey: 'owner-a',
+            ownerUsername: 'cristian',
+            tier: 4,
+            agentCount: 3,
+            activeAgentCount: 1,
+            mine: true,
+          },
+          {
+            ownerKey: 'owner-b',
+            ownerUsername: 'maria',
+            tier: 0,
+            agentCount: 0,
+            activeAgentCount: 0,
+            mine: false,
+          },
+        ],
+      },
+    );
+
+    const byOwner = new Map(
+      layout.buildings.map((building) => [building.ownerKey, building]),
+    );
+
+    expect(layout.buildings).toHaveLength(2);
+    expect(byOwner.get('owner-a')?.agentCount).toBe(3);
+    expect(byOwner.get('owner-a')?.activeAgentCount).toBe(1);
+    expect(byOwner.get('owner-a')?.mine).toBe(true);
+    expect(byOwner.get('owner-a')?.tierKey).toBe('founding');
+    expect(byOwner.get('owner-b')?.agentCount).toBe(0);
+    expect(byOwner.get('owner-b')?.tierKey).toBe('free');
   });
 
   it('does not render sleeping overflow agents as loose markers', () => {

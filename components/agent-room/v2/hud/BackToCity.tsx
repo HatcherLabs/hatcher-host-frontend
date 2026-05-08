@@ -58,6 +58,9 @@ function resolve(
   if (from === 'agents') {
     return { href: '/dashboard/agents', label: t('toAgents') };
   }
+  if (from === 'house') {
+    return { href: '/city/house', label: t('toHouse') };
+  }
   if (from === 'city') {
     return { href: '/city', label: t('toCity') };
   }
