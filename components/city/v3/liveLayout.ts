@@ -28,6 +28,20 @@ export interface LiveBuildingLayout {
   rank: number;
 }
 
+export interface LiveAgentMarkerLayout {
+  agentId: string;
+  blockId: string;
+  x: number;
+  z: number;
+  height: number;
+  width: number;
+  framework: CityAgent['framework'];
+  status: CityAgent['status'];
+  tier: number;
+  mine: boolean;
+  rank: number;
+}
+
 export interface LiveRouteLayout {
   key: string;
   agentId: string;
@@ -42,6 +56,7 @@ export interface LiveRouteLayout {
 
 export interface LiveCityLayout {
   buildings: LiveBuildingLayout[];
+  markers: LiveAgentMarkerLayout[];
   routes: LiveRouteLayout[];
   ownedAgents: CityAgent[];
   visibleAgentIds: Set<string>;
@@ -55,6 +70,7 @@ export interface LiveCityLayoutOptions {
 const DEFAULT_MAX_BUILDINGS = 72;
 const DEFAULT_ROUTE_LIMIT = 18;
 const OWNER_WEIGHT = 200_000;
+const MARKER_BLOCK_STRIDE = 7;
 
 export interface LiveCityBlock {
   id: string;
@@ -366,6 +382,110 @@ function buildingHeight(agent: CityAgent, block: LiveCityBlock) {
   );
 }
 
+function markerHeight(agent: CityAgent) {
+  const activityBoost = Math.min(
+    0.9,
+    Math.log10(agent.messageCount + 1) * 0.22,
+  );
+  const statusBoost =
+    agent.status === 'running'
+      ? 0.7
+      : agent.status === 'paused'
+        ? 0.35
+        : agent.status === 'crashed'
+          ? 0.15
+          : 0;
+
+  return Math.min(3.2, 0.72 + agent.tier * 0.24 + activityBoost + statusBoost);
+}
+
+function markerWidth(agent: CityAgent) {
+  if (agent.mine) return 1.12;
+  if (agent.status === 'running') return 0.82;
+  if (agent.status === 'paused') return 0.72;
+  return 0.62;
+}
+
+function chooseMarkerBlock(index: number, agentId: string) {
+  const offset = Math.floor(
+    hashStr(`${agentId}:marker-block`) * LIVE_CITY_BLOCKS.length,
+  );
+  const blockIndex =
+    (index * MARKER_BLOCK_STRIDE + offset) % LIVE_CITY_BLOCKS.length;
+  return LIVE_CITY_BLOCKS[blockIndex] ?? LIVE_CITY_BLOCKS[0]!;
+}
+
+function markerPositionInBlock(
+  agentId: string,
+  localIndex: number,
+  localCount: number,
+  block: LiveCityBlock,
+) {
+  const usableWidth = block.padWidth - 5.5;
+  const usableDepth = block.padDepth - 5.5;
+  const cols = Math.max(3, Math.floor(usableWidth / 3.3));
+  const rows = Math.max(1, Math.ceil(localCount / cols));
+  const col = localIndex % cols;
+  const row = Math.floor(localIndex / cols);
+  const xStep = cols === 1 ? 0 : usableWidth / (cols - 1);
+  const zStep = rows === 1 ? 0 : usableDepth / (rows - 1);
+  const jitterX = (hashStr(`${agentId}:marker-x`) - 0.5) * 0.55;
+  const jitterZ = (hashStr(`${agentId}:marker-z`) - 0.5) * 0.55;
+
+  return {
+    x: block.x - usableWidth / 2 + col * xStep + jitterX,
+    z: block.z - usableDepth / 2 + row * zStep + jitterZ,
+  };
+}
+
+function layoutAgentMarkers(
+  agents: CityAgent[],
+  buildingIds: Set<string>,
+): LiveAgentMarkerLayout[] {
+  const markerAgents = agents
+    .filter((agent) => !buildingIds.has(agent.id))
+    .sort((a, b) => {
+      const rankDiff = rankAgentForCity(b) - rankAgentForCity(a);
+      if (rankDiff !== 0) return rankDiff;
+      return a.id.localeCompare(b.id);
+    });
+
+  const byBlock = new Map<
+    string,
+    { block: LiveCityBlock; agents: CityAgent[] }
+  >();
+  markerAgents.forEach((agent, index) => {
+    const block = chooseMarkerBlock(index, agent.id);
+    const bucket = byBlock.get(block.id) ?? { block, agents: [] };
+    bucket.agents.push(agent);
+    byBlock.set(block.id, bucket);
+  });
+
+  return [...byBlock.values()].flatMap(({ block, agents: bucket }) =>
+    bucket.map((agent, localIndex) => {
+      const position = markerPositionInBlock(
+        agent.id,
+        localIndex,
+        bucket.length,
+        block,
+      );
+      return {
+        agentId: agent.id,
+        blockId: block.id,
+        x: position.x,
+        z: position.z,
+        height: markerHeight(agent),
+        width: markerWidth(agent),
+        framework: agent.framework,
+        status: agent.status,
+        tier: agent.tier,
+        mine: agent.mine,
+        rank: rankAgentForCity(agent),
+      };
+    }),
+  );
+}
+
 export function layoutLiveCity(
   agents: CityAgent[],
   options: LiveCityLayoutOptions = {},
@@ -394,6 +514,8 @@ export function layoutLiveCity(
   const byId = new Map(
     buildings.map((building) => [building.agentId, building]),
   );
+  const buildingIds = new Set(buildings.map((building) => building.agentId));
+  const markers = layoutAgentMarkers(agents, buildingIds);
   const routeAgents = selectRouteAgents(renderedAgents, routeLimit);
   const routes = routeAgents.flatMap((agent, index) => {
     const source = byId.get(agent.id);
@@ -428,9 +550,13 @@ export function layoutLiveCity(
 
   return {
     buildings,
+    markers,
     routes,
     ownedAgents: agents.filter((agent) => agent.mine),
-    visibleAgentIds: new Set(buildings.map((building) => building.agentId)),
+    visibleAgentIds: new Set([
+      ...buildings.map((building) => building.agentId),
+      ...markers.map((marker) => marker.agentId),
+    ]),
   };
 }
 

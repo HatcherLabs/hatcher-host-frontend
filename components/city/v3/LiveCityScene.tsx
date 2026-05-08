@@ -11,10 +11,12 @@ import {
 } from '@/components/city/v2/quality/QualityContext';
 import { QualityToggle } from '@/components/city/v2/quality/QualityToggle';
 import { CyberSky } from '@/components/city/v2/world/CyberSky';
+import { HorizonRing } from '@/components/city/v2/world/HorizonRing';
 import { SceneErrorBoundary } from '@/components/city/v2/world/SceneErrorBoundary';
 import { Skybox } from '@/components/city/v2/world/Skybox';
 import { Atmosphere } from '@/components/city/v2/world/Atmosphere';
 import { layoutLiveCity } from './liveLayout';
+import { LiveAgentMarkers } from './LiveAgentMarkers';
 import { LiveActivityPulses } from './LiveActivityPulses';
 import { LiveBuildings } from './LiveBuildings';
 import { LiveCityHud } from './LiveCityHud';
@@ -74,8 +76,8 @@ function LiveCitySceneBody({
   const layout = useMemo(
     () =>
       layoutLiveCity(agents, {
-        maxBuildings: quality === 'high' ? 92 : 52,
-        routeLimit: quality === 'high' ? 12 : 7,
+        maxBuildings: quality === 'high' ? 180 : 110,
+        routeLimit: quality === 'high' ? 14 : 8,
       }),
     [agents, quality],
   );
@@ -84,7 +86,7 @@ function LiveCitySceneBody({
     <div className="relative h-full w-full bg-[#030506]">
       <Canvas
         key={quality}
-        camera={{ position: [94, 78, 122], fov: 42, near: 0.5, far: 720 }}
+        camera={{ position: [98, 62, 118], fov: 43, near: 0.5, far: 760 }}
         dpr={quality === 'high' ? [1, 2] : 1}
         gl={{
           antialias: quality === 'high',
@@ -97,7 +99,7 @@ function LiveCitySceneBody({
         }}
       >
         <color attach="background" args={['#050814']} />
-        <fog attach="fog" args={['#050814', 130, 360]} />
+        <fog attach="fog" args={['#050814', 170, 540]} />
         <ambientLight intensity={0.2} color="#6aa6ff" />
         <hemisphereLight
           color="#9fc9ff"
@@ -124,6 +126,9 @@ function LiveCitySceneBody({
         <SceneErrorBoundary label="CyberSky">
           <CyberSky />
         </SceneErrorBoundary>
+        <SceneErrorBoundary label="HorizonRing">
+          <HorizonRing />
+        </SceneErrorBoundary>
         <SceneErrorBoundary label="LiveCityInfrastructure">
           <LiveCityInfrastructure />
         </SceneErrorBoundary>
@@ -134,6 +139,12 @@ function LiveCitySceneBody({
               onBuildingClick={onBuildingClick}
             />
           </Suspense>
+        </SceneErrorBoundary>
+        <SceneErrorBoundary label="LiveAgentMarkers">
+          <LiveAgentMarkers
+            markers={layout.markers}
+            onMarkerClick={onBuildingClick}
+          />
         </SceneErrorBoundary>
         <SceneErrorBoundary label="LiveNetworkRoutes">
           <LiveNetworkRoutes routes={layout.routes} />
@@ -162,8 +173,8 @@ function LiveCitySceneBody({
 function SurveyCamera() {
   const { camera } = useThree();
   useEffect(() => {
-    camera.position.set(94, 78, 122);
-    camera.lookAt(0, 10, 8);
+    camera.position.set(98, 62, 118);
+    camera.lookAt(0, 9, 6);
   }, [camera]);
 
   return (
@@ -178,7 +189,7 @@ function SurveyCamera() {
       maxDistance={260}
       minPolarAngle={0.5}
       maxPolarAngle={1.26}
-      target={[0, 10, 8]}
+      target={[0, 9, 6]}
     />
   );
 }

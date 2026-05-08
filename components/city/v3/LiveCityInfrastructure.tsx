@@ -14,8 +14,8 @@ const ROAD_COLOR = {
 } as const;
 
 export function LiveCityInfrastructure() {
-  const gridLines = useMemo(() => {
-    const lines: Array<{
+  const { cityGridLines, terrainGridLines } = useMemo(() => {
+    const cityLines: Array<{
       key: string;
       x: number;
       z: number;
@@ -23,8 +23,14 @@ export function LiveCityInfrastructure() {
       depth: number;
     }> = [];
     for (let i = -8; i <= 8; i++) {
-      lines.push({ key: `x-${i}`, x: i * 12, z: 8, width: 0.08, depth: 158 });
-      lines.push({
+      cityLines.push({
+        key: `x-${i}`,
+        x: i * 12,
+        z: 8,
+        width: 0.08,
+        depth: 158,
+      });
+      cityLines.push({
         key: `z-${i}`,
         x: 0,
         z: i * 12 + 8,
@@ -32,11 +38,56 @@ export function LiveCityInfrastructure() {
         depth: 0.08,
       });
     }
-    return lines;
+    const terrainLines: typeof cityLines = [];
+    for (let i = -10; i <= 10; i++) {
+      terrainLines.push({
+        key: `terrain-x-${i}`,
+        x: i * 24,
+        z: 8,
+        width: 0.1,
+        depth: 420,
+      });
+      terrainLines.push({
+        key: `terrain-z-${i}`,
+        x: 0,
+        z: i * 24 + 8,
+        width: 520,
+        depth: 0.1,
+      });
+    }
+    return { cityGridLines: cityLines, terrainGridLines: terrainLines };
   }, []);
 
   return (
     <group>
+      <mesh position={[0, -3.45, 8]} receiveShadow>
+        <boxGeometry args={[520, 2.1, 430]} />
+        <meshStandardMaterial
+          color="#030609"
+          roughness={0.9}
+          metalness={0.08}
+          emissive="#020810"
+          emissiveIntensity={0.22}
+        />
+      </mesh>
+
+      {terrainGridLines.map((line) => (
+        <mesh
+          key={line.key}
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[line.x, -2.34, line.z]}
+        >
+          <planeGeometry args={[line.width, line.depth]} />
+          <meshBasicMaterial
+            color="#0a6f8a"
+            transparent
+            opacity={0.13}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+      ))}
+
       <mesh position={[0, -1.2, 8]} receiveShadow>
         <boxGeometry args={[205, 2.4, 176]} />
         <meshStandardMaterial
@@ -48,7 +99,7 @@ export function LiveCityInfrastructure() {
         />
       </mesh>
 
-      {gridLines.map((line) => (
+      {cityGridLines.map((line) => (
         <mesh
           key={line.key}
           rotation={[-Math.PI / 2, 0, 0]}
@@ -75,6 +126,7 @@ export function LiveCityInfrastructure() {
 
       <CoreHub />
       <OuterBeacons />
+      <FoundationPiers />
     </group>
   );
 }
@@ -293,6 +345,54 @@ function OuterBeacons() {
               color={index % 2 ? '#10f0a8' : '#2fd3ff'}
               transparent
               opacity={0.8}
+              toneMapped={false}
+            />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+function FoundationPiers() {
+  const piers = [
+    [-96, -75],
+    [-48, -75],
+    [0, -75],
+    [48, -75],
+    [96, -75],
+    [-96, 91],
+    [-48, 91],
+    [0, 91],
+    [48, 91],
+    [96, 91],
+    [-96, -32],
+    [-96, 32],
+    [96, -32],
+    [96, 32],
+  ] as const;
+
+  return (
+    <group>
+      {piers.map(([x, z], index) => (
+        <group key={`${x}-${z}`} position={[x, -4.6, z]}>
+          <mesh>
+            <boxGeometry args={[2.4, 4.2, 2.4]} />
+            <meshStandardMaterial
+              color="#09111b"
+              roughness={0.58}
+              metalness={0.36}
+              emissive={index % 2 ? '#063a3e' : '#052948'}
+              emissiveIntensity={0.42}
+            />
+          </mesh>
+          <mesh position={[0, 2.25, 0]}>
+            <boxGeometry args={[3.1, 0.18, 3.1]} />
+            <meshBasicMaterial
+              color={index % 2 ? '#10f0a8' : '#19d6ff'}
+              transparent
+              opacity={0.42}
+              depthWrite={false}
               toneMapped={false}
             />
           </mesh>

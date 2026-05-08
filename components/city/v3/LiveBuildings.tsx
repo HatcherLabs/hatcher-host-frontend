@@ -1,12 +1,12 @@
 'use client';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { FRAMEWORK_COLORS } from '@/components/city/types';
 import {
   useCityBuildings,
   type BuildingAsset,
 } from '@/components/city/v2/world/useCityAssets';
 import type { BuildingBase } from '@/components/city/v2/world/Buildings.layout';
+import { liveAgentColor, liveAgentGlowColor } from './LiveCityColors';
 import { allKnownBuildingBases, type LiveBuildingLayout } from './liveLayout';
 
 interface Props {
@@ -45,6 +45,7 @@ export function LiveBuildings({ buildings, onBuildingClick }: Props) {
           />
         );
       })}
+      <LiveBuildingColorShells buildings={buildings} />
       <LiveBuildingBeacons buildings={buildings} />
     </group>
   );
@@ -92,21 +93,26 @@ function LivePrimitiveInstances({
   onBuildingClick?: (agentId: string) => void;
 }) {
   const ref = useRef<THREE.InstancedMesh>(null);
+  const instanceGeometry = useMemo(() => {
+    const cloned = geometry.clone();
+    cloned.deleteAttribute('color');
+    return cloned;
+  }, [geometry]);
 
   const clonedMaterial = useMemo(() => {
-    const cloneOne = (mat: THREE.Material) => {
-      const cloned = mat.clone() as THREE.MeshStandardMaterial;
-      if ('vertexColors' in cloned) cloned.vertexColors = true;
-      if (cloned.emissive instanceof THREE.Color) {
-        cloned.emissive.set(0x102033);
-        cloned.emissiveIntensity = 0.55;
-      }
+    const cloneOne = () => {
+      const cloned = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: 0.5,
+        metalness: 0.3,
+        emissive: 0x08182a,
+        emissiveIntensity: 0.95,
+        vertexColors: true,
+      });
       cloned.needsUpdate = true;
       return cloned;
     };
-    return Array.isArray(material)
-      ? material.map(cloneOne)
-      : cloneOne(material);
+    return Array.isArray(material) ? material.map(cloneOne) : cloneOne();
   }, [material]);
 
   useEffect(() => {
@@ -120,12 +126,12 @@ function LivePrimitiveInstances({
       obj.scale.set(layout.mine ? 1.08 : 1, scaleY, layout.mine ? 1.08 : 1);
       obj.updateMatrix();
       ref.current!.setMatrixAt(index, obj.matrix);
-      color.setHex(layout.mine ? 0xffd24a : FRAMEWORK_COLORS[layout.framework]);
-      if (layout.status === 'crashed') color.setHex(0xfb7185);
+      color.setHex(liveAgentColor(layout));
       ref.current!.setColorAt(index, color);
     });
     ref.current.instanceMatrix.needsUpdate = true;
     if (ref.current.instanceColor) ref.current.instanceColor.needsUpdate = true;
+    markMaterialsForInstanceColors(ref.current.material);
   }, [layouts, nativeHeight, nativeMinY]);
 
   useEffect(() => {
@@ -137,10 +143,16 @@ function LivePrimitiveInstances({
     };
   }, [clonedMaterial]);
 
+  useEffect(() => {
+    return () => {
+      instanceGeometry.dispose();
+    };
+  }, [instanceGeometry]);
+
   return (
     <instancedMesh
       ref={ref}
-      args={[geometry, clonedMaterial, layouts.length]}
+      args={[instanceGeometry, clonedMaterial, layouts.length]}
       receiveShadow
       castShadow
       frustumCulled={false}
@@ -152,6 +164,55 @@ function LivePrimitiveInstances({
         onBuildingClick(layout.agentId);
       }}
     />
+  );
+}
+
+function markMaterialsForInstanceColors(
+  material: THREE.Material | THREE.Material[],
+) {
+  const materials = Array.isArray(material) ? material : [material];
+  for (const mat of materials) mat.needsUpdate = true;
+}
+
+function LiveBuildingColorShells({
+  buildings,
+}: {
+  buildings: LiveBuildingLayout[];
+}) {
+  return (
+    <group>
+      {buildings.map((building) => {
+        const shellWidth =
+          building.tier >= 4 ? 5.2 : building.tier >= 2 ? 4.2 : 3.2;
+        const color = liveAgentColor(building);
+        const opacity =
+          building.mine || building.status === 'running'
+            ? 0.32
+            : building.status === 'sleeping'
+              ? 0.2
+              : 0.28;
+
+        return (
+          <mesh
+            key={`${building.agentId}-color-shell`}
+            position={[building.x, building.height / 2 + 0.1, building.z]}
+            rotation={[0, building.rotation, 0]}
+          >
+            <boxGeometry
+              args={[shellWidth, building.height + 0.2, shellWidth]}
+            />
+            <meshBasicMaterial
+              color={color}
+              transparent
+              opacity={opacity}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+              toneMapped={false}
+            />
+          </mesh>
+        );
+      })}
+    </group>
   );
 }
 
@@ -169,8 +230,8 @@ function LiveBuildingBeacons({
       {buildings.map((building) => {
         if (building.status !== 'running' && !building.mine) return null;
         const color = building.mine
-          ? 0xffd24a
-          : FRAMEWORK_COLORS[building.framework];
+          ? liveAgentGlowColor(building)
+          : liveAgentColor(building);
         return (
           <mesh
             key={`${building.agentId}-beacon`}

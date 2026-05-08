@@ -93,6 +93,29 @@ describe('layoutLiveCity', () => {
     expect(layout.buildings.length).toBeLessThanOrEqual(24);
   });
 
+  it('represents every public agent with either a building or marker', () => {
+    const agents = Array.from({ length: 700 }, (_, i) =>
+      mkAgent(`agent-${i}`, {
+        framework: i % 2 === 0 ? 'openclaw' : 'hermes',
+        status: i % 9 === 0 ? 'running' : 'sleeping',
+        tier: i % 5,
+        messageCount: i * 3,
+      }),
+    );
+
+    const layout = layoutLiveCity(agents, {
+      maxBuildings: 180,
+      routeLimit: 14,
+    });
+
+    expect(layout.buildings).toHaveLength(180);
+    expect(layout.markers).toHaveLength(520);
+    expect(layout.visibleAgentIds.size).toBe(700);
+    expect(agents.every((agent) => layout.visibleAgentIds.has(agent.id))).toBe(
+      true,
+    );
+  });
+
   it('caps live routes by option', () => {
     const agents = Array.from({ length: 30 }, (_, i) =>
       mkAgent(`agent-${i}`, { status: 'running', messageCount: i * 10 }),
@@ -125,6 +148,25 @@ describe('layoutLiveCity', () => {
     expect(right).toBe(true);
     expect(front).toBe(true);
     expect(back).toBe(true);
+  });
+
+  it('packs overflow agent markers back into city blocks', () => {
+    const agents = Array.from({ length: 240 }, (_, i) =>
+      mkAgent(`agent-${i}`, {
+        status: i % 5 === 0 ? 'running' : 'sleeping',
+        tier: i % 5,
+        messageCount: i,
+      }),
+    );
+
+    const layout = layoutLiveCity(agents, { maxBuildings: 80, routeLimit: 12 });
+    const markerBlockIds = new Set(
+      layout.markers.map((marker) => marker.blockId),
+    );
+
+    expect(layout.markers).toHaveLength(160);
+    expect(markerBlockIds.size).toBeGreaterThanOrEqual(8);
+    expect(layout.markers.every((marker) => marker.height > 0.6)).toBe(true);
   });
 
   it('keeps network routes close to the city skyline', () => {
