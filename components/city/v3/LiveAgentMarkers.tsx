@@ -62,11 +62,10 @@ function LiveAgentMarkerBucket({
 }) {
   const towerRef = useRef<THREE.InstancedMesh>(null);
   const capRef = useRef<THREE.InstancedMesh>(null);
-  const padRef = useRef<THREE.InstancedMesh>(null);
   const obj = useMemo(() => new THREE.Object3D(), []);
 
   useEffect(() => {
-    if (!towerRef.current || !capRef.current || !padRef.current) return;
+    if (!towerRef.current || !capRef.current) return;
 
     markers.forEach((marker, index) => {
       obj.rotation.set(0, marker.rank % Math.PI, 0);
@@ -84,21 +83,10 @@ function LiveAgentMarkerBucket({
       );
       obj.updateMatrix();
       capRef.current!.setMatrixAt(index, obj.matrix);
-
-      obj.rotation.set(-Math.PI / 2, 0, 0);
-      obj.position.set(marker.x, 0.13, marker.z);
-      obj.scale.set(
-        marker.width * 1.15,
-        marker.width * 1.15,
-        marker.width * 1.15,
-      );
-      obj.updateMatrix();
-      padRef.current!.setMatrixAt(index, obj.matrix);
     });
 
     towerRef.current.instanceMatrix.needsUpdate = true;
     capRef.current.instanceMatrix.needsUpdate = true;
-    padRef.current.instanceMatrix.needsUpdate = true;
   }, [markers, obj]);
 
   const click = (event: {
@@ -143,22 +131,6 @@ function LiveAgentMarkerBucket({
           color={glowColor}
           transparent
           opacity={0.86}
-          depthWrite={false}
-          toneMapped={false}
-        />
-      </instancedMesh>
-      <instancedMesh
-        key={`agent-marker-pads-${markers.length}`}
-        ref={padRef}
-        args={[undefined, undefined, markers.length]}
-        frustumCulled={false}
-        onClick={click}
-      >
-        <ringGeometry args={[0.82, 1, 18]} />
-        <meshBasicMaterial
-          color={glowColor}
-          transparent
-          opacity={0.28}
           depthWrite={false}
           toneMapped={false}
         />

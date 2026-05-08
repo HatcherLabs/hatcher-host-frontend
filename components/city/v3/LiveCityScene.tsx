@@ -76,8 +76,8 @@ function LiveCitySceneBody({
   const layout = useMemo(
     () =>
       layoutLiveCity(agents, {
-        maxBuildings: quality === 'high' ? 180 : 110,
-        routeLimit: quality === 'high' ? 14 : 8,
+        maxBuildings: quality === 'high' ? 800 : 420,
+        routeLimit: quality === 'high' ? 18 : 10,
       }),
     [agents, quality],
   );

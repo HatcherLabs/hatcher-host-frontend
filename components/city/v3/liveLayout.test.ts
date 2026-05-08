@@ -7,7 +7,9 @@ import {
   STATUS_WEIGHT,
 } from './liveLayout';
 
-function mkAgent(id: string, overrides: Partial<CityAgent> = {}): CityAgent {
+type AgentOverrides = Partial<CityAgent> & { ownerKey?: string };
+
+function mkAgent(id: string, overrides: AgentOverrides = {}): CityAgent {
   return {
     id,
     slug: id,
@@ -93,9 +95,89 @@ describe('layoutLiveCity', () => {
     expect(layout.buildings.length).toBeLessThanOrEqual(24);
   });
 
-  it('represents every public agent with either a building or marker', () => {
+  it('aggregates each owner fleet into one user building', () => {
+    const layout = layoutLiveCity(
+      [
+        mkAgent('owner-a-running', {
+          ownerKey: 'owner-a',
+          status: 'running',
+          tier: 2,
+          messageCount: 50,
+        }),
+        mkAgent('owner-a-sleeping', {
+          ownerKey: 'owner-a',
+          status: 'sleeping',
+          tier: 4,
+          messageCount: 200,
+        }),
+        mkAgent('owner-b-agent', {
+          ownerKey: 'owner-b',
+          status: 'sleeping',
+          tier: 1,
+          messageCount: 8,
+        }),
+      ],
+      { maxBuildings: 10, routeLimit: 4 },
+    );
+
+    expect(layout.buildings).toHaveLength(2);
+    expect(
+      layout.buildings.map((building) => building.ownerKey).sort(),
+    ).toEqual(['owner-a', 'owner-b']);
+    expect(
+      layout.buildings.find((building) => building.ownerKey === 'owner-a')
+        ?.agentCount,
+    ).toBe(2);
+    expect(
+      layout.buildings.find((building) => building.ownerKey === 'owner-a')
+        ?.tier,
+    ).toBe(4);
+  });
+
+  it('renders only active agents as city markers around user buildings', () => {
+    const layout = layoutLiveCity(
+      [
+        mkAgent('active-a', {
+          ownerKey: 'owner-a',
+          status: 'running',
+          tier: 3,
+          messageCount: 100,
+        }),
+        mkAgent('sleeping-a', {
+          ownerKey: 'owner-a',
+          status: 'sleeping',
+          tier: 2,
+          messageCount: 40,
+        }),
+        mkAgent('paused-b', {
+          ownerKey: 'owner-b',
+          status: 'paused',
+          tier: 1,
+          messageCount: 12,
+        }),
+        mkAgent('active-b', {
+          ownerKey: 'owner-b',
+          status: 'running',
+          tier: 1,
+          messageCount: 16,
+        }),
+      ],
+      { maxBuildings: 10, routeLimit: 4 },
+    );
+
+    expect(layout.markers.map((marker) => marker.agentId).sort()).toEqual([
+      'active-a',
+      'active-b',
+    ]);
+    expect(layout.markers.every((marker) => marker.status === 'running')).toBe(
+      true,
+    );
+  });
+
+  it('represents every public agent through an owner building or active marker', () => {
     const agents = Array.from({ length: 700 }, (_, i) =>
       mkAgent(`agent-${i}`, {
+        ownerKey: `owner-${i % 70}`,
         framework: i % 2 === 0 ? 'openclaw' : 'hermes',
         status: i % 9 === 0 ? 'running' : 'sleeping',
         tier: i % 5,
@@ -108,8 +190,8 @@ describe('layoutLiveCity', () => {
       routeLimit: 14,
     });
 
-    expect(layout.buildings).toHaveLength(180);
-    expect(layout.markers).toHaveLength(520);
+    expect(layout.buildings).toHaveLength(70);
+    expect(layout.markers).toHaveLength(78);
     expect(layout.visibleAgentIds.size).toBe(700);
     expect(agents.every((agent) => layout.visibleAgentIds.has(agent.id))).toBe(
       true,
@@ -150,9 +232,10 @@ describe('layoutLiveCity', () => {
     expect(back).toBe(true);
   });
 
-  it('packs overflow agent markers back into city blocks', () => {
+  it('does not render sleeping overflow agents as loose markers', () => {
     const agents = Array.from({ length: 240 }, (_, i) =>
       mkAgent(`agent-${i}`, {
+        ownerKey: `owner-${i % 40}`,
         status: i % 5 === 0 ? 'running' : 'sleeping',
         tier: i % 5,
         messageCount: i,
@@ -160,13 +243,12 @@ describe('layoutLiveCity', () => {
     );
 
     const layout = layoutLiveCity(agents, { maxBuildings: 80, routeLimit: 12 });
-    const markerBlockIds = new Set(
-      layout.markers.map((marker) => marker.blockId),
-    );
 
-    expect(layout.markers).toHaveLength(160);
-    expect(markerBlockIds.size).toBeGreaterThanOrEqual(8);
-    expect(layout.markers.every((marker) => marker.height > 0.6)).toBe(true);
+    expect(layout.buildings).toHaveLength(40);
+    expect(layout.markers).toHaveLength(48);
+    expect(layout.markers.every((marker) => marker.status === 'running')).toBe(
+      true,
+    );
   });
 
   it('keeps network routes close to the city skyline', () => {

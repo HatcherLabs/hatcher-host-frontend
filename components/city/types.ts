@@ -2,11 +2,31 @@ export type Framework = 'openclaw' | 'hermes';
 // Aligned 1:1 with AgentTemplate.category on prod (25 buckets). Keep
 // in sync with routes/city.ts on the backend.
 export type Category =
-  | 'automation' | 'business' | 'compliance' | 'creative' | 'customer-success'
-  | 'data' | 'development' | 'devops' | 'ecommerce' | 'education'
-  | 'finance' | 'freelance' | 'healthcare' | 'hr' | 'legal'
-  | 'marketing' | 'moltbook' | 'ollama' | 'personal' | 'productivity'
-  | 'real-estate' | 'saas' | 'security' | 'supply-chain' | 'voice';
+  | 'automation'
+  | 'business'
+  | 'compliance'
+  | 'creative'
+  | 'customer-success'
+  | 'data'
+  | 'development'
+  | 'devops'
+  | 'ecommerce'
+  | 'education'
+  | 'finance'
+  | 'freelance'
+  | 'healthcare'
+  | 'hr'
+  | 'legal'
+  | 'marketing'
+  | 'moltbook'
+  | 'ollama'
+  | 'personal'
+  | 'productivity'
+  | 'real-estate'
+  | 'saas'
+  | 'security'
+  | 'supply-chain'
+  | 'voice';
 export type CityStatus = 'running' | 'sleeping' | 'paused' | 'crashed';
 
 export interface CityAgent {
@@ -16,6 +36,7 @@ export interface CityAgent {
   avatarUrl: string | null;
   framework: Framework;
   category: Category;
+  ownerKey?: string | null;
   tier: number;
   status: CityStatus;
   messageCount: number;
@@ -38,11 +59,31 @@ export interface CityResponse {
 // Ordered for a 5×5 district grid. Heavy-volume districts are clustered
 // toward the centre so zoom-out presents the densest buildings first.
 export const CATEGORIES: Category[] = [
-  'personal', 'productivity', 'automation', 'voice', 'moltbook',
-  'marketing', 'business', 'customer-success', 'hr', 'freelance',
-  'creative', 'development', 'data', 'devops', 'ollama',
-  'finance', 'ecommerce', 'saas', 'security', 'compliance',
-  'education', 'healthcare', 'real-estate', 'supply-chain', 'legal',
+  'personal',
+  'productivity',
+  'automation',
+  'voice',
+  'moltbook',
+  'marketing',
+  'business',
+  'customer-success',
+  'hr',
+  'freelance',
+  'creative',
+  'development',
+  'data',
+  'devops',
+  'ollama',
+  'finance',
+  'ecommerce',
+  'saas',
+  'security',
+  'compliance',
+  'education',
+  'healthcare',
+  'real-estate',
+  'supply-chain',
+  'legal',
 ];
 
 export const CATEGORY_LABELS: Record<Category, string> = {

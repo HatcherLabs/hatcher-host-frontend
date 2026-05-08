@@ -1,11 +1,7 @@
 'use client';
 import { useMemo } from 'react';
 import * as THREE from 'three';
-import {
-  LIVE_CITY_BLOCKS,
-  LIVE_CITY_ROADS,
-  type LiveCityBlock,
-} from './liveLayout';
+import { LIVE_CITY_ROADS } from './liveLayout';
 
 const ROAD_COLOR = {
   cyan: '#19d6ff',
@@ -120,10 +116,6 @@ export function LiveCityInfrastructure() {
         <Road key={key} {...road} />
       ))}
 
-      {LIVE_CITY_BLOCKS.map((block) => (
-        <CityBlockPad key={block.id} block={block} />
-      ))}
-
       <CoreHub />
       <OuterBeacons />
       <FoundationPiers />
@@ -208,66 +200,6 @@ function NeonStrip({
         toneMapped={false}
       />
     </mesh>
-  );
-}
-
-function CityBlockPad({ block }: { block: LiveCityBlock }) {
-  const core = block.accent === 'core';
-  const color = core
-    ? '#0b1728'
-    : block.accent === 'inner'
-      ? '#08131f'
-      : '#070d16';
-  const neon = core
-    ? '#3de8ff'
-    : block.accent === 'inner'
-      ? '#11d6a8'
-      : '#5966ff';
-
-  return (
-    <group>
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[block.x, 0.075, block.z]}
-      >
-        <planeGeometry args={[block.padWidth, block.padDepth]} />
-        <meshStandardMaterial
-          color={color}
-          roughness={0.62}
-          metalness={0.24}
-          emissive={core ? '#092a3a' : '#061521'}
-          emissiveIntensity={core ? 0.5 : 0.28}
-        />
-      </mesh>
-      <NeonStrip
-        x={block.x}
-        z={block.z - block.padDepth / 2}
-        width={block.padWidth}
-        depth={0.16}
-        color={neon}
-      />
-      <NeonStrip
-        x={block.x}
-        z={block.z + block.padDepth / 2}
-        width={block.padWidth}
-        depth={0.16}
-        color={neon}
-      />
-      <NeonStrip
-        x={block.x - block.padWidth / 2}
-        z={block.z}
-        width={0.16}
-        depth={block.padDepth}
-        color={neon}
-      />
-      <NeonStrip
-        x={block.x + block.padWidth / 2}
-        z={block.z}
-        width={0.16}
-        depth={block.padDepth}
-        color={neon}
-      />
-    </group>
   );
 }
 

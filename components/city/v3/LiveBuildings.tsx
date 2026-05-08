@@ -6,7 +6,7 @@ import {
   type BuildingAsset,
 } from '@/components/city/v2/world/useCityAssets';
 import type { BuildingBase } from '@/components/city/v2/world/Buildings.layout';
-import { liveAgentColor, liveAgentGlowColor } from './LiveCityColors';
+import { liveAgentColor } from './LiveCityColors';
 import { allKnownBuildingBases, type LiveBuildingLayout } from './liveLayout';
 
 interface Props {
@@ -45,7 +45,7 @@ export function LiveBuildings({ buildings, onBuildingClick }: Props) {
           />
         );
       })}
-      <LiveBuildingColorShells buildings={buildings} />
+      <LiveBuildingColorBands buildings={buildings} />
       <LiveBuildingBeacons buildings={buildings} />
     </group>
   );
@@ -174,50 +174,94 @@ function markMaterialsForInstanceColors(
   for (const mat of materials) mat.needsUpdate = true;
 }
 
-function LiveBuildingColorShells({
+export function statusEmissiveFor(status: LiveBuildingLayout['status']) {
+  return STATUS_EMISSIVE[status];
+}
+
+function LiveBuildingColorBands({
   buildings,
 }: {
   buildings: LiveBuildingLayout[];
 }) {
+  const buckets = useMemo(() => {
+    const grouped = new Map<number, LiveBuildingLayout[]>();
+    for (const building of buildings) {
+      const color = liveAgentColor(building);
+      const bucket = grouped.get(color) ?? [];
+      bucket.push(building);
+      grouped.set(color, bucket);
+    }
+    return [...grouped.entries()];
+  }, [buildings]);
+
   return (
     <group>
-      {buildings.map((building) => {
-        const shellWidth =
-          building.tier >= 4 ? 5.2 : building.tier >= 2 ? 4.2 : 3.2;
-        const color = liveAgentColor(building);
-        const opacity =
-          building.mine || building.status === 'running'
-            ? 0.32
-            : building.status === 'sleeping'
-              ? 0.2
-              : 0.28;
-
-        return (
-          <mesh
-            key={`${building.agentId}-color-shell`}
-            position={[building.x, building.height / 2 + 0.1, building.z]}
-            rotation={[0, building.rotation, 0]}
-          >
-            <boxGeometry
-              args={[shellWidth, building.height + 0.2, shellWidth]}
-            />
-            <meshBasicMaterial
-              color={color}
-              transparent
-              opacity={opacity}
-              depthWrite={false}
-              blending={THREE.AdditiveBlending}
-              toneMapped={false}
-            />
-          </mesh>
-        );
-      })}
+      {buckets.map(([color, bucket]) => (
+        <LiveBuildingColorBandBucket
+          key={`building-color-band-${color}`}
+          color={color}
+          buildings={bucket}
+        />
+      ))}
     </group>
   );
 }
 
-export function statusEmissiveFor(status: LiveBuildingLayout['status']) {
-  return STATUS_EMISSIVE[status];
+function LiveBuildingColorBandBucket({
+  color,
+  buildings,
+}: {
+  color: number;
+  buildings: LiveBuildingLayout[];
+}) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const obj = useMemo(() => new THREE.Object3D(), []);
+
+  useEffect(() => {
+    if (!ref.current) return;
+
+    buildings.forEach((building, index) => {
+      const forwardX = Math.sin(building.rotation);
+      const forwardZ = Math.cos(building.rotation);
+      const outward =
+        building.tier >= 4 ? 1.72 : building.tier >= 2 ? 1.36 : 1.08;
+      const height = Math.min(18, Math.max(3.2, building.height * 0.6));
+      const width =
+        0.18 +
+        building.tier * 0.04 +
+        Math.min(0.34, Math.log2(building.agentCount + 1) * 0.05);
+
+      obj.position.set(
+        building.x + forwardX * outward,
+        height / 2 + 0.18,
+        building.z + forwardZ * outward,
+      );
+      obj.rotation.set(0, building.rotation, 0);
+      obj.scale.set(width, height, 0.22);
+      obj.updateMatrix();
+      ref.current!.setMatrixAt(index, obj.matrix);
+    });
+
+    ref.current.instanceMatrix.needsUpdate = true;
+  }, [buildings, obj]);
+
+  return (
+    <instancedMesh
+      ref={ref}
+      args={[undefined, undefined, buildings.length]}
+      frustumCulled={false}
+    >
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial
+        color={color}
+        emissive={color}
+        emissiveIntensity={0.42}
+        roughness={0.5}
+        metalness={0.22}
+        toneMapped={false}
+      />
+    </instancedMesh>
+  );
 }
 
 function LiveBuildingBeacons({
@@ -228,10 +272,7 @@ function LiveBuildingBeacons({
   return (
     <group>
       {buildings.map((building) => {
-        if (building.status !== 'running' && !building.mine) return null;
-        const color = building.mine
-          ? liveAgentGlowColor(building)
-          : liveAgentColor(building);
+        const color = liveAgentColor(building);
         return (
           <mesh
             key={`${building.agentId}-beacon`}
@@ -251,7 +292,9 @@ function LiveBuildingBeacons({
             <meshBasicMaterial
               color={color}
               transparent
-              opacity={building.mine ? 0.78 : 0.52}
+              opacity={
+                building.status === 'running' || building.mine ? 0.5 : 0.28
+              }
               depthWrite={false}
               toneMapped={false}
             />
