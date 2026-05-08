@@ -45,12 +45,12 @@ export default defineConfig({
       dependencies: ['setup'],
       testMatch: /.*\.spec\.ts/,
       // Exclude tests that manage their own auth or are fully public
-      testIgnore: /.*\/(landing|navigation|auth|agent-lifecycle|i18n|seo|city-v2)/,
+      testIgnore: /.*\/(landing|navigation|auth|agent-lifecycle|i18n|seo|city-v2|city-live-network)/,
     },
     {
       name: 'chromium-public',
       use: { ...devices['Desktop Chrome'] },
-      testMatch: /.*\/(landing|navigation|auth|agent-lifecycle|i18n|seo|city-v2).*\.spec\.ts/,
+      testMatch: /.*\/(landing|navigation|auth|agent-lifecycle|i18n|seo|city-v2|city-live-network).*\.spec\.ts/,
     },
   ],
 

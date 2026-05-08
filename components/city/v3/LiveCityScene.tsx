@@ -1,7 +1,6 @@
 'use client';
 import { MapControls } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
-import { Bloom, EffectComposer, N8AO, Vignette } from '@react-three/postprocessing';
 import { Suspense, useCallback, useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { useRouter } from '@/i18n/routing';
@@ -123,7 +122,6 @@ function LiveCitySceneBody({
           <Atmosphere />
         </SceneErrorBoundary>
         <SurveyCamera />
-        <LivePostProcessing />
       </Canvas>
       <QualityToggle />
       <LiveCityHud counts={counts} ownedAgents={layout.ownedAgents} generatedAt={generatedAt} />
@@ -152,30 +150,5 @@ function SurveyCamera() {
       maxPolarAngle={1.26}
       target={[0, 8, -4]}
     />
-  );
-}
-
-function LivePostProcessing() {
-  const quality = useQuality();
-  if (quality === 'low') {
-    return (
-      <EffectComposer multisampling={0} enableNormalPass={false}>
-        <Bloom intensity={0.26} luminanceThreshold={0.72} luminanceSmoothing={0.22} mipmapBlur />
-        <Vignette offset={0.22} darkness={0.36} opacity={0.4} />
-      </EffectComposer>
-    );
-  }
-  return (
-    <EffectComposer multisampling={0} enableNormalPass={false}>
-      <N8AO
-        aoRadius={4.8}
-        distanceFalloff={1.6}
-        intensity={0.62}
-        quality="performance"
-        halfRes
-      />
-      <Bloom intensity={0.52} luminanceThreshold={0.66} luminanceSmoothing={0.22} mipmapBlur />
-      <Vignette offset={0.18} darkness={0.42} opacity={0.5} />
-    </EffectComposer>
   );
 }
