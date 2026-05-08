@@ -1,9 +1,18 @@
 import type { CityAgent, CityStatus } from '@/components/city/types';
-import { TIER_HEIGHT } from '@/components/city/types';
 import {
-  BUILDING_BASES,
-  type BuildingBase,
-} from '@/components/city/v2/world/Buildings.layout';
+  cityGridFor,
+  deriveHandoffBuildingVisual,
+  hashInt,
+  LIVE_CITY_SUPER,
+  nodeAt,
+  plotPosition,
+  spiralOrder,
+  tierKeyForCity,
+  type HandoffBuildingVisual,
+  type LiveCityGrid,
+  type LiveCityNode,
+  type LiveCityTierKey,
+} from './liveCityHandoff';
 
 export const STATUS_WEIGHT: Record<CityStatus, number> = {
   running: 8_000,
@@ -20,7 +29,8 @@ export interface LiveBuildingLayout {
   activeAgentIds: string[];
   agentCount: number;
   blockId: string;
-  base: BuildingBase;
+  gridX: number;
+  gridZ: number;
   x: number;
   z: number;
   height: number;
@@ -28,6 +38,8 @@ export interface LiveBuildingLayout {
   framework: CityAgent['framework'];
   status: CityAgent['status'];
   tier: number;
+  tierKey: LiveCityTierKey;
+  visual: HandoffBuildingVisual;
   mine: boolean;
   rank: number;
 }
@@ -44,6 +56,9 @@ export interface LiveAgentMarkerLayout {
   tier: number;
   mine: boolean;
   rank: number;
+  pathNodes: LiveCityNode[];
+  speed: number;
+  phase: number;
 }
 
 export interface LiveRouteLayout {
@@ -59,6 +74,7 @@ export interface LiveRouteLayout {
 }
 
 export interface LiveCityLayout {
+  grid: LiveCityGrid;
   buildings: LiveBuildingLayout[];
   markers: LiveAgentMarkerLayout[];
   routes: LiveRouteLayout[];
@@ -71,104 +87,11 @@ export interface LiveCityLayoutOptions {
   routeLimit?: number;
 }
 
-const DEFAULT_MAX_BUILDINGS = 72;
+const DEFAULT_MAX_BUILDINGS = 900;
 const DEFAULT_ROUTE_LIMIT = 18;
 const OWNER_WEIGHT = 200_000;
-const CITY_CENTER_Z = 8;
 
-export const LIVE_CITY_BOUNDS = {
-  width: 220,
-  depth: 188,
-  centerZ: CITY_CENTER_Z,
-} as const;
-
-export interface LiveCityBlock {
-  id: string;
-  x: number;
-  z: number;
-  cols: number;
-  rows: number;
-  spacingX: number;
-  spacingZ: number;
-  padWidth: number;
-  padDepth: number;
-  heightScale: number;
-  accent: 'core' | 'inner' | 'outer';
-}
-
-export interface LiveCityRoad {
-  key: string;
-  x: number;
-  z: number;
-  width: number;
-  depth: number;
-  kind: 'vertical' | 'horizontal';
-}
-
-const ROAD_XS = [-88, -52, -16, 20, 56, 92] as const;
-const ROAD_ZS = [-76, -42, -8, 26, 60, 94] as const;
-const BLOCK_XS = [-70, -34, 2, 38, 74] as const;
-const BLOCK_ZS = [-58, -24, 10, 44, 78] as const;
-
-function blockAccent(x: number, z: number): LiveCityBlock['accent'] {
-  const distance = Math.hypot(x / 128, (z - CITY_CENTER_Z) / 124);
-  if (distance < 0.55) return 'core';
-  if (distance < 1.08) return 'inner';
-  return 'outer';
-}
-
-export const LIVE_CITY_BLOCKS: readonly LiveCityBlock[] = BLOCK_ZS.flatMap(
-  (z, row) =>
-    BLOCK_XS.map((x, col) => {
-      const accent = blockAccent(x, z);
-      const capacityBoost = accent === 'core' ? 1 : 0;
-      return {
-        id: `block-${row}-${col}`,
-        x,
-        z,
-        cols: 6 + capacityBoost,
-        rows: 6,
-        spacingX: accent === 'core' ? 5.9 : 5.55,
-        spacingZ: accent === 'core' ? 5.7 : 5.35,
-        padWidth: 31,
-        padDepth: 29,
-        heightScale: accent === 'core' ? 1.16 : accent === 'inner' ? 0.98 : 0.82,
-        accent,
-      } satisfies LiveCityBlock;
-    }),
-).sort((a, b) => {
-  const distanceA = Math.hypot(a.x / 128, (a.z - CITY_CENTER_Z) / 124);
-  const distanceB = Math.hypot(b.x / 128, (b.z - CITY_CENTER_Z) / 124);
-  return distanceA - distanceB;
-});
-
-export const LIVE_CITY_ROADS: readonly LiveCityRoad[] = [
-  ...ROAD_XS.map((x) => ({
-    key: `avenue-${x}`,
-    x,
-    z: CITY_CENTER_Z,
-    width: Math.abs(x - 20) <= 36 ? 7.2 : 6.4,
-    depth: 172,
-    kind: 'vertical' as const,
-  })),
-  ...ROAD_ZS.map((z) => ({
-    key: `street-${z}`,
-    x: 0,
-    z,
-    width: 204,
-    depth: Math.abs(z - CITY_CENTER_Z) === 18 ? 7.2 : 6.4,
-    kind: 'horizontal' as const,
-  })),
-];
-
-const LIVE_CITY_HUBS = [
-  { x: 0, y: 18, z: -2 },
-  { x: -28, y: 14, z: 12 },
-  { x: 28, y: 14, z: 10 },
-  { x: -18, y: 13, z: -36 },
-  { x: 18, y: 13, z: -34 },
-  { x: 0, y: 15, z: 34 },
-];
+export const LIVE_CITY_BOUNDS = cityGridFor(DEFAULT_MAX_BUILDINGS).bounds;
 
 interface LiveUserCluster {
   ownerKey: string;
@@ -185,12 +108,7 @@ interface LiveUserCluster {
 }
 
 function hashStr(s: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return (h >>> 0) / 0xffffffff;
+  return hashInt(s) / 0xffffffff;
 }
 
 export function rankAgentForCity(agent: CityAgent): number {
@@ -356,92 +274,27 @@ export function selectRouteAgents(
     .slice(0, limit);
 }
 
-function blockCapacity(block: LiveCityBlock): number {
-  return block.cols * block.rows;
+const TIER_PLACEMENT_RANK: Record<LiveCityTierKey, number> = {
+  enterprise: 0,
+  pro: 1,
+  starter: 2,
+  free: 3,
+};
+
+function placementScore(cluster: LiveUserCluster): number {
+  const tierScore = TIER_PLACEMENT_RANK[tierKeyForCity(cluster.tier)];
+  const jitter = hashStr(`${cluster.ownerKey}:handoff-placement`) * 0.6;
+  return tierScore + jitter;
 }
 
-function chooseBlock(index: number, count: number) {
-  const activeBlockCount = Math.min(
-    LIVE_CITY_BLOCKS.length,
-    Math.max(8, count > 240 ? LIVE_CITY_BLOCKS.length : Math.ceil(count / 22)),
-  );
-  const activeBlocks = LIVE_CITY_BLOCKS.slice(0, activeBlockCount);
-  const block = activeBlocks[index % activeBlocks.length] ?? activeBlocks[0]!;
-  const slot = Math.floor(index / activeBlocks.length);
-
-  if (slot < blockCapacity(block)) return { block, slot };
-
-  let remaining = index;
-  for (const overflowBlock of LIVE_CITY_BLOCKS) {
-    const capacity = blockCapacity(overflowBlock);
-    if (remaining < capacity) return { block: overflowBlock, slot: remaining };
-    remaining -= capacity;
-  }
-
-  const fallbackBlock =
-    LIVE_CITY_BLOCKS[index % LIVE_CITY_BLOCKS.length] ?? LIVE_CITY_BLOCKS[0]!;
-  return {
-    block: fallbackBlock,
-    slot: index % blockCapacity(fallbackBlock),
-  };
-}
-
-function blockPosition(index: number, count: number, agentId: string) {
-  const { block, slot } = chooseBlock(index, count);
-  const col = slot % block.cols;
-  const row = Math.floor(slot / block.cols);
-  const width = Math.max(1, block.cols - 1) * block.spacingX;
-  const depth = Math.max(1, block.rows - 1) * block.spacingZ;
-  const x =
-    block.x +
-    col * block.spacingX -
-    width / 2 +
-    (hashStr(`${agentId}:x`) - 0.5) * 1.35;
-  const z =
-    block.z +
-    row * block.spacingZ -
-    depth / 2 +
-    (hashStr(`${agentId}:z`) - 0.5) * 1.25;
-  return { block, x, z };
-}
-
-function pickLiveBase(ownerKey: string, tier: number): BuildingBase {
-  const r = hashStr(`${ownerKey}:live-base`);
-  const small = BUILDING_BASES.filter((b) => b.startsWith('small-building-'));
-  const medium = BUILDING_BASES.filter((b) => b.startsWith('medium-building-'));
-  const skyscrapers = BUILDING_BASES.filter((b) => b.startsWith('skyscraper-'));
-
-  if (tier <= 0) return small[Math.floor(r * small.length)]!;
-  if (tier === 1) {
-    const options = [...small, ...medium];
-    return options[Math.floor(r * options.length)]!;
-  }
-  if (tier === 2) return medium[Math.floor(r * medium.length)]!;
-  if (tier === 3) {
-    const options = [...medium, ...skyscrapers];
-    return options[Math.floor(r * options.length)]!;
-  }
-  return skyscrapers[Math.floor(r * skyscrapers.length)]!;
-}
-
-function buildingHeight(cluster: LiveUserCluster, block: LiveCityBlock) {
-  const base = TIER_HEIGHT[cluster.tier] ?? TIER_HEIGHT[0] ?? 3;
-  const activityBoost = Math.min(4.4, Math.log10(cluster.messageCount + 1) * 1.1);
-  const fleetBoost = Math.min(4.2, Math.log2(cluster.agents.length + 1) * 0.85);
-  const statusBoost =
-    cluster.status === 'running'
-      ? 1.2
-      : cluster.status === 'crashed'
-        ? -1.1
-        : 0;
-  return Math.max(
-    3,
-    (base * (cluster.mine ? 1.18 : 1) +
-      activityBoost +
-      fleetBoost +
-      statusBoost) *
-      block.heightScale,
-  );
+function sortForPlacement(clusters: LiveUserCluster[]): LiveUserCluster[] {
+  return [...clusters].sort((a, b) => {
+    const placementDiff = placementScore(a) - placementScore(b);
+    if (placementDiff !== 0) return placementDiff;
+    const rankDiff = b.rank - a.rank;
+    if (rankDiff !== 0) return rankDiff;
+    return a.ownerKey.localeCompare(b.ownerKey);
+  });
 }
 
 function markerHeight(agent: CityAgent) {
@@ -449,37 +302,73 @@ function markerHeight(agent: CityAgent) {
     1.25,
     Math.log10(agent.messageCount + 1) * 0.34,
   );
-  return Math.min(5.2, 1.8 + agent.tier * 0.38 + activityBoost);
+  return Math.min(3.1, 1.3 + agent.tier * 0.22 + activityBoost);
 }
 
 function markerWidth(agent: CityAgent) {
-  if (agent.mine) return 1.32;
-  if (agent.status === 'running') return 1.02;
+  if (agent.mine) return 1.2;
+  if (agent.status === 'running') return 1;
   if (agent.status === 'paused') return 0.72;
   return 0.62;
+}
+
+function clampNodeIndex(value: number, max: number): number {
+  return Math.max(0, Math.min(max, value));
+}
+
+function nearestNodeForPlot(
+  grid: LiveCityGrid,
+  gridX: number,
+  gridZ: number,
+): LiveCityNode {
+  const gx = clampNodeIndex(Math.round((gridX + 0.5) / LIVE_CITY_SUPER), grid.Nsb);
+  const gz = clampNodeIndex(Math.round((gridZ + 0.5) / LIVE_CITY_SUPER), grid.Nsb);
+  return nodeAt(grid, gx, gz) ?? grid.nodes[0]!;
+}
+
+function planAgentPath(
+  grid: LiveCityGrid,
+  building: LiveBuildingLayout,
+  agent: CityAgent,
+  localIndex: number,
+): LiveCityNode[] {
+  const start = nearestNodeForPlot(grid, building.gridX, building.gridZ);
+  const seed = hashInt(`${agent.id}:handoff-walk:${localIndex}`);
+  const endIndex = seed % grid.nodes.length;
+  let end = grid.nodes[endIndex] ?? start;
+  if (end.id === start.id && grid.nodes.length > 1) {
+    end = grid.nodes[(endIndex + Math.ceil(grid.Nsb / 2) + 1) % grid.nodes.length]!;
+  }
+
+  const goXFirst = (seed & 1) === 0;
+  const corner =
+    (goXFirst
+      ? nodeAt(grid, end.gx, start.gz)
+      : nodeAt(grid, start.gx, end.gz)) ?? null;
+
+  if (!corner || corner.id === start.id || corner.id === end.id) {
+    return [start, end];
+  }
+  return [start, corner, end];
 }
 
 function layoutAgentMarkers(
   clusters: LiveUserCluster[],
   buildingsByOwner: Map<string, LiveBuildingLayout>,
+  grid: LiveCityGrid,
 ): LiveAgentMarkerLayout[] {
   return clusters.flatMap((cluster) => {
     const building = buildingsByOwner.get(cluster.ownerKey);
     if (!building) return [];
 
     return cluster.activeAgents.map((agent, localIndex) => {
-      const angle =
-        (localIndex / Math.max(1, cluster.activeAgents.length)) * Math.PI * 2 +
-        hashStr(`${agent.id}:active-angle`) * 0.65;
-      const radius =
-        6.4 +
-        Math.min(5.2, cluster.agents.length * 0.24) +
-        hashStr(`${agent.id}:active-radius`) * 2.2;
+      const pathNodes = planAgentPath(grid, building, agent, localIndex);
+      const start = pathNodes[0] ?? nearestNodeForPlot(grid, building.gridX, building.gridZ);
       return {
         agentId: agent.id,
         blockId: building.blockId,
-        x: building.x + Math.cos(angle) * radius,
-        z: building.z + Math.sin(angle) * radius,
+        x: start.x,
+        z: start.z,
         height: markerHeight(agent),
         width: markerWidth(agent),
         framework: agent.framework,
@@ -487,6 +376,9 @@ function layoutAgentMarkers(
         tier: agent.tier,
         mine: agent.mine,
         rank: rankAgentForCity(agent),
+        pathNodes,
+        speed: 1.35 + hashStr(`${agent.id}:walk-speed`) * 0.95,
+        phase: hashStr(`${agent.id}:walk-phase`) * Math.PI * 2,
       };
     });
   });
@@ -499,8 +391,16 @@ export function layoutLiveCity(
   const maxBuildings = options.maxBuildings ?? DEFAULT_MAX_BUILDINGS;
   const routeLimit = options.routeLimit ?? DEFAULT_ROUTE_LIMIT;
   const renderedClusters = selectRenderedOwners(agents, maxBuildings);
-  const buildings = renderedClusters.map((cluster, index) => {
-    const pos = blockPosition(index, renderedClusters.length, cluster.ownerKey);
+  const placementClusters = sortForPlacement(renderedClusters);
+  const grid = cityGridFor(placementClusters.length);
+  const coords = spiralOrder(grid.N);
+  const buildings = placementClusters.map((cluster, index) => {
+    const [gridX, gridZ] = coords[index] ?? coords[coords.length - 1] ?? [0, 0];
+    const position = plotPosition(gridX, gridZ, grid.half);
+    const visual = deriveHandoffBuildingVisual(cluster.ownerKey, cluster.tier);
+    const superX = Math.floor(gridX / LIVE_CITY_SUPER);
+    const superZ = Math.floor(gridZ / LIVE_CITY_SUPER);
+
     return {
       agentId: cluster.representative.id,
       ownerKey: cluster.ownerKey,
@@ -508,27 +408,27 @@ export function layoutLiveCity(
       agentIds: cluster.agents.map((agent) => agent.id),
       activeAgentIds: cluster.activeAgents.map((agent) => agent.id),
       agentCount: cluster.agents.length,
-      blockId: pos.block.id,
-      base: pickLiveBase(cluster.ownerKey, cluster.tier),
-      x: pos.x,
-      z: pos.z,
-      height: buildingHeight(cluster, pos.block),
-      rotation:
-        Math.round(hashStr(`${cluster.ownerKey}:rotation`) * 3) *
-          (Math.PI / 2) +
-        (hashStr(`${cluster.ownerKey}:rotation-jitter`) - 0.5) * 0.1,
+      blockId: `super-${superX}-${superZ}`,
+      gridX,
+      gridZ,
+      x: position.x,
+      z: position.z,
+      height: visual.height,
+      rotation: 0,
       framework: cluster.framework,
       status: cluster.status,
       tier: cluster.tier,
+      tierKey: visual.tierKey,
+      visual,
       mine: cluster.mine,
       rank: cluster.rank,
-    };
+    } satisfies LiveBuildingLayout;
   });
 
   const byOwner = new Map(
     buildings.map((building) => [building.ownerKey, building]),
   );
-  const markers = layoutAgentMarkers(renderedClusters, byOwner);
+  const markers = layoutAgentMarkers(renderedClusters, byOwner, grid);
   const routeAgents = selectRouteAgents(
     renderedClusters.flatMap((cluster) =>
       cluster.activeAgents.length
@@ -539,12 +439,8 @@ export function layoutLiveCity(
   );
   const routes = routeAgents.flatMap((agent, index) => {
     const source = byOwner.get(ownerKeyFor(agent));
-    if (!source) return [];
-    const hub =
-      LIVE_CITY_HUBS[index % LIVE_CITY_HUBS.length] ?? LIVE_CITY_HUBS[0]!;
-    const targetX = agent.mine ? 0 : hub.x;
-    const targetY = agent.mine ? 18 : hub.y;
-    const targetZ = agent.mine ? -2 : hub.z;
+    const target = grid.nodes[(index * 7 + 3) % grid.nodes.length] ?? grid.nodes[0];
+    if (!source || !target) return [];
     return [
       {
         key: `${agent.id}-${index}`,
@@ -554,11 +450,11 @@ export function layoutLiveCity(
           number,
           number,
         ],
-        to: [targetX, targetY, targetZ] as [number, number, number],
+        to: [target.x, 1.8, target.z] as [number, number, number],
         mid: [
-          (source.x + targetX) / 2 + Math.sin(index * 2.31) * 5,
-          Math.min(30, Math.max(source.height + 5, targetY + 5)),
-          (source.z + targetZ) / 2 + Math.cos(index * 1.63) * 5,
+          (source.x + target.x) / 2 + Math.sin(index * 2.31) * 5,
+          Math.min(30, Math.max(source.height + 5, 6)),
+          (source.z + target.z) / 2 + Math.cos(index * 1.63) * 5,
         ] as [number, number, number],
         framework: agent.framework,
         mine: agent.mine,
@@ -569,6 +465,7 @@ export function layoutLiveCity(
   });
 
   return {
+    grid,
     buildings,
     markers,
     routes,
@@ -578,8 +475,4 @@ export function layoutLiveCity(
       ...markers.map((marker) => marker.agentId),
     ]),
   };
-}
-
-export function allKnownBuildingBases(): readonly BuildingBase[] {
-  return BUILDING_BASES;
 }

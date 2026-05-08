@@ -12,7 +12,12 @@ interface Props {
 
 export function LiveActivityPulses({ buildings, pulseAts }: Props) {
   const byId = useMemo(
-    () => new Map(buildings.map((building) => [building.agentId, building])),
+    () =>
+      new Map(
+        buildings.flatMap((building) =>
+          building.agentIds.map((agentId) => [agentId, building] as const),
+        ),
+      ),
     [buildings],
   );
   const pulses = useMemo(

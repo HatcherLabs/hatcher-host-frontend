@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CityAgent } from '@/components/city/types';
 import {
-  LIVE_CITY_BOUNDS,
   layoutLiveCity,
   rankAgentForCity,
   selectRouteAgents,
@@ -149,7 +148,7 @@ describe('layoutLiveCity', () => {
     ).toBe('maria');
   });
 
-  it('renders only active agents as city markers around user buildings', () => {
+  it('renders only active agents as walking city markers', () => {
     const layout = layoutLiveCity(
       [
         mkAgent('active-a', {
@@ -187,6 +186,9 @@ describe('layoutLiveCity', () => {
     expect(layout.markers.every((marker) => marker.status === 'running')).toBe(
       true,
     );
+    expect(layout.markers.every((marker) => marker.pathNodes.length > 1)).toBe(
+      true,
+    );
   });
 
   it('represents every public agent through an owner building or active marker', () => {
@@ -222,7 +224,7 @@ describe('layoutLiveCity', () => {
     expect(selectRouteAgents(agents, 0)).toHaveLength(0);
   });
 
-  it('spreads buildings across city blocks instead of linear rows', () => {
+  it('spreads buildings across dynamic city blocks instead of linear rows', () => {
     const agents = Array.from({ length: 72 }, (_, i) =>
       mkAgent(`agent-${i}`, {
         status: i % 4 === 0 ? 'running' : 'sleeping',
@@ -235,10 +237,11 @@ describe('layoutLiveCity', () => {
     const blockIds = new Set(
       layout.buildings.map((building) => building.blockId),
     );
-    const left = layout.buildings.some((building) => building.x < -35);
-    const right = layout.buildings.some((building) => building.x > 35);
-    const front = layout.buildings.some((building) => building.z > 35);
-    const back = layout.buildings.some((building) => building.z < -30);
+    const spread = layout.grid.bounds.width * 0.2;
+    const left = layout.buildings.some((building) => building.x < -spread);
+    const right = layout.buildings.some((building) => building.x > spread);
+    const front = layout.buildings.some((building) => building.z > spread);
+    const back = layout.buildings.some((building) => building.z < -spread);
 
     expect(blockIds.size).toBeGreaterThanOrEqual(8);
     expect(left).toBe(true);
@@ -247,7 +250,7 @@ describe('layoutLiveCity', () => {
     expect(back).toBe(true);
   });
 
-  it('keeps hundreds of owner buildings inside the expanded city footprint', () => {
+  it('keeps hundreds of owner buildings inside the dynamic city footprint', () => {
     const agents = Array.from({ length: 520 }, (_, i) =>
       mkAgent(`agent-${i}`, {
         ownerKey: `owner-${i}`,
@@ -261,22 +264,22 @@ describe('layoutLiveCity', () => {
       maxBuildings: 800,
       routeLimit: 12,
     });
-    const halfWidth = LIVE_CITY_BOUNDS.width / 2;
-    const minZ = LIVE_CITY_BOUNDS.centerZ - LIVE_CITY_BOUNDS.depth / 2;
-    const maxZ = LIVE_CITY_BOUNDS.centerZ + LIVE_CITY_BOUNDS.depth / 2;
+    const halfWidth = layout.grid.bounds.width / 2;
+    const minZ = layout.grid.bounds.centerZ - layout.grid.bounds.depth / 2;
+    const maxZ = layout.grid.bounds.centerZ + layout.grid.bounds.depth / 2;
 
     expect(layout.buildings).toHaveLength(520);
     expect(
       layout.buildings.every(
         (building) =>
-          Math.abs(building.x) < halfWidth - 8 &&
-          building.z > minZ + 8 &&
-          building.z < maxZ - 8,
+          Math.abs(building.x) < halfWidth - 3 &&
+          building.z > minZ + 3 &&
+          building.z < maxZ - 3,
       ),
     ).toBe(true);
   });
 
-  it('uses tier to choose larger building families instead of color coding', () => {
+  it('uses tier to choose larger procedural building archetypes', () => {
     const layout = layoutLiveCity(
       [
         mkAgent('free-owner', { ownerKey: 'free-owner', tier: 0 }),
@@ -290,13 +293,50 @@ describe('layoutLiveCity', () => {
       layout.buildings.map((building) => [building.ownerKey, building]),
     );
 
-    expect(byOwner.get('free-owner')?.base.startsWith('small-building-')).toBe(
-      true,
+    expect(byOwner.get('free-owner')?.tierKey).toBe('free');
+    expect(byOwner.get('basic-owner')?.tierKey).toBe('pro');
+    expect(byOwner.get('pro-owner')?.tierKey).toBe('enterprise');
+    expect(byOwner.get('pro-owner')!.height).toBeGreaterThan(
+      byOwner.get('basic-owner')!.height,
     );
-    expect(byOwner.get('basic-owner')?.base.startsWith('medium-building-')).toBe(
-      true,
+    expect(byOwner.get('basic-owner')!.height).toBeGreaterThan(
+      byOwner.get('free-owner')!.height,
     );
-    expect(byOwner.get('pro-owner')?.base.startsWith('skyscraper-')).toBe(true);
+  });
+
+  it('places higher tier user buildings closer to the city center', () => {
+    const agents = [
+      ...Array.from({ length: 8 }, (_, i) =>
+        mkAgent(`enterprise-${i}`, {
+          ownerKey: `enterprise-owner-${i}`,
+          tier: 4,
+          messageCount: 1000 + i,
+        }),
+      ),
+      ...Array.from({ length: 80 }, (_, i) =>
+        mkAgent(`free-${i}`, {
+          ownerKey: `free-owner-${i}`,
+          tier: 0,
+          messageCount: i,
+        }),
+      ),
+    ];
+
+    const layout = layoutLiveCity(agents, { maxBuildings: 100, routeLimit: 0 });
+    const enterpriseDistances = layout.buildings
+      .filter((building) => building.tierKey === 'enterprise')
+      .map((building) => Math.hypot(building.x, building.z));
+    const freeDistances = layout.buildings
+      .filter((building) => building.tierKey === 'free')
+      .map((building) => Math.hypot(building.x, building.z));
+    const enterpriseAverage =
+      enterpriseDistances.reduce((sum, distance) => sum + distance, 0) /
+      enterpriseDistances.length;
+    const freeAverage =
+      freeDistances.reduce((sum, distance) => sum + distance, 0) /
+      freeDistances.length;
+
+    expect(enterpriseAverage).toBeLessThan(freeAverage);
   });
 
   it('does not render sleeping overflow agents as loose markers', () => {

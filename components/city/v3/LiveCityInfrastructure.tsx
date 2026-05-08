@@ -1,20 +1,33 @@
 'use client';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
-import { LIVE_CITY_BOUNDS, LIVE_CITY_ROADS } from './liveLayout';
+import {
+  createSeededRng,
+  hashInt,
+  LIVE_CITY_GUTTER,
+  LIVE_CITY_SUPER_W,
+  LIVE_CITY_TILE,
+  type LiveCityGrid,
+} from './liveCityHandoff';
 
-const TERRAIN_SIZE = 820;
-const CITY_CENTER_Z = LIVE_CITY_BOUNDS.centerZ;
+interface Props {
+  grid: LiveCityGrid;
+}
 
-export function LiveCityInfrastructure() {
+const TERRAIN_SIZE = 1400;
+const TERRAIN_SEGMENTS = 80;
+const CITY_FLAT_RADIUS = 110;
+
+export function LiveCityInfrastructure({ grid }: Props) {
   return (
     <group>
       <SkyDome />
+      <Stars />
       <Terrain />
       <MountainRing />
-      <StreetGrid />
-      <StreetLights />
-      <TreeLine />
+      <StreetGrid grid={grid} />
+      <StreetLights grid={grid} />
+      <TreeRing />
     </group>
   );
 }
@@ -22,39 +35,40 @@ export function LiveCityInfrastructure() {
 function SkyDome() {
   const uniforms = useMemo(
     () => ({
-      topColor: { value: new THREE.Color('#bdeff4') },
-      horizonColor: { value: new THREE.Color('#78bfa5') },
-      bottomColor: { value: new THREE.Color('#dff5ec') },
+      uTop: { value: new THREE.Color(0x4a7ec2) },
+      uBottom: { value: new THREE.Color(0xd6e2ec) },
+      uOffset: { value: 0 },
+      uExp: { value: 0.7 },
     }),
     [],
   );
 
   return (
     <mesh>
-      <sphereGeometry args={[520, 36, 18]} />
+      <sphereGeometry args={[900, 32, 18]} />
       <shaderMaterial
         side={THREE.BackSide}
         depthWrite={false}
         uniforms={uniforms}
         vertexShader={`
-          varying vec3 vWorldPosition;
+          varying vec3 vWorld;
           void main() {
-            vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-            vWorldPosition = worldPosition.xyz;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            vec4 wp = modelMatrix * vec4(position, 1.0);
+            vWorld = wp.xyz;
+            gl_Position = projectionMatrix * viewMatrix * wp;
           }
         `}
         fragmentShader={`
-          uniform vec3 topColor;
-          uniform vec3 horizonColor;
-          uniform vec3 bottomColor;
-          varying vec3 vWorldPosition;
+          uniform vec3 uTop;
+          uniform vec3 uBottom;
+          uniform float uOffset;
+          uniform float uExp;
+          varying vec3 vWorld;
           void main() {
-            float h = normalize(vWorldPosition).y;
-            float sky = smoothstep(-0.18, 0.82, h);
-            vec3 low = mix(bottomColor, horizonColor, smoothstep(-0.34, 0.08, h));
-            vec3 color = mix(low, topColor, sky);
-            gl_FragColor = vec4(color, 1.0);
+            float h = normalize(vWorld).y;
+            float t = pow(max(h + uOffset, 0.0), uExp);
+            vec3 col = mix(uBottom, uTop, clamp(t, 0.0, 1.0));
+            gl_FragColor = vec4(col, 1.0);
           }
         `}
       />
@@ -62,77 +76,100 @@ function SkyDome() {
   );
 }
 
-function Terrain() {
+function Stars() {
   const geometry = useMemo(() => {
-    const plane = new THREE.PlaneGeometry(TERRAIN_SIZE, TERRAIN_SIZE, 86, 86);
-    const positions = plane.attributes.position as THREE.BufferAttribute;
-    const colors: number[] = [];
-    const color = new THREE.Color();
-
-    for (let i = 0; i < positions.count; i++) {
-      const x = positions.getX(i);
-      const z = positions.getY(i);
-      const cityDx = Math.max(0, Math.abs(x) - LIVE_CITY_BOUNDS.width * 0.48);
-      const cityDz = Math.max(
-        0,
-        Math.abs(z - CITY_CENTER_Z) - LIVE_CITY_BOUNDS.depth * 0.48,
-      );
-      const outsideCity = Math.min(1, Math.hypot(cityDx, cityDz) / 70);
-      const ripple =
-        Math.sin(x * 0.024 + z * 0.012) * 0.55 +
-        Math.sin(z * 0.034 - x * 0.015) * 0.42;
-      positions.setZ(i, outsideCity * ripple - 0.22);
-
-      const shade = 0.5 + outsideCity * 0.12 + ripple * 0.02;
-      color.setHSL(0.39, 0.42, shade);
-      colors.push(color.r, color.g, color.b);
+    const rng = createSeededRng(321_903);
+    const starCount = 600;
+    const positions = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount; i++) {
+      const u = rng();
+      const v = rng() * 0.85 + 0.05;
+      const theta = u * Math.PI * 2;
+      const phi = Math.acos(1 - v);
+      const radius = 800;
+      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = radius * Math.cos(phi);
+      positions[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
     }
-
-    plane.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    plane.computeVertexNormals();
-    return plane;
+    const points = new THREE.BufferGeometry();
+    points.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    return points;
   }, []);
 
   useEffect(() => () => geometry.dispose(), [geometry]);
 
   return (
-    <mesh
-      geometry={geometry}
-      rotation={[-Math.PI / 2, 0, 0]}
-      position={[0, -0.16, CITY_CENTER_Z]}
-      receiveShadow
-    >
-      <meshBasicMaterial vertexColors />
+    <points geometry={geometry}>
+      <pointsMaterial
+        color="#ffffff"
+        size={1.6}
+        sizeAttenuation={false}
+        transparent
+        opacity={0}
+      />
+    </points>
+  );
+}
+
+function Terrain() {
+  const geometry = useMemo(() => {
+    const terrain = new THREE.PlaneGeometry(
+      TERRAIN_SIZE,
+      TERRAIN_SIZE,
+      TERRAIN_SEGMENTS,
+      TERRAIN_SEGMENTS,
+    );
+    terrain.rotateX(-Math.PI / 2);
+    const positions = terrain.attributes.position as THREE.BufferAttribute;
+    const colors = new Float32Array(positions.count * 3);
+    const grass = new THREE.Color(0x4a6a3e);
+    const grass2 = new THREE.Color(0x5d7e4c);
+    const dirt = new THREE.Color(0x6b6347);
+    const rock = new THREE.Color(0x494a55);
+
+    for (let i = 0; i < positions.count; i++) {
+      const x = positions.getX(i);
+      const z = positions.getZ(i);
+      const dist = Math.hypot(x, z);
+      let height = 0;
+      if (dist > CITY_FLAT_RADIUS) {
+        const ramp = Math.min(1, (dist - CITY_FLAT_RADIUS) / 50);
+        height =
+          terrainNoise(x, z) * 6 * ramp +
+          Math.max(0, dist - 200) * 0.02;
+      }
+      positions.setY(i, height);
+
+      const color =
+        height < 0.4
+          ? grass
+              .clone()
+              .lerp(grass2, hashUnit(`terrain-grass-${i}`) * 0.5)
+          : height < 2.5
+            ? grass2.clone().lerp(dirt, Math.min(1, height / 3))
+            : dirt.clone().lerp(rock, Math.min(1, (height - 2) / 4));
+      colors[i * 3] = color.r;
+      colors[i * 3 + 1] = color.g;
+      colors[i * 3 + 2] = color.b;
+    }
+
+    terrain.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    terrain.computeVertexNormals();
+    return terrain;
+  }, []);
+
+  useEffect(() => () => geometry.dispose(), [geometry]);
+
+  return (
+    <mesh geometry={geometry} position={[0, -0.05, 0]} receiveShadow>
+      <meshLambertMaterial vertexColors flatShading />
     </mesh>
   );
 }
 
-function StreetGrid() {
-  return (
-    <group>
-      {LIVE_CITY_ROADS.map((road) => (
-        <mesh
-          key={road.key}
-          position={[road.x, 0.032, road.z]}
-          rotation={[-Math.PI / 2, 0, 0]}
-          receiveShadow
-        >
-          <planeGeometry args={[road.width, road.depth]} />
-          <meshStandardMaterial
-            color="#17202c"
-            roughness={0.86}
-            metalness={0.04}
-          />
-        </mesh>
-      ))}
-      <LaneMarks />
-    </group>
-  );
-}
-
-function LaneMarks() {
-  const marks = useMemo(() => {
-    const out: Array<{
+function StreetGrid({ grid }: Props) {
+  const stripeMarks = useMemo(() => {
+    const marks: Array<{
       key: string;
       x: number;
       z: number;
@@ -140,239 +177,204 @@ function LaneMarks() {
       depth: number;
     }> = [];
 
-    for (const road of LIVE_CITY_ROADS) {
-      const count = road.kind === 'vertical' ? 26 : 30;
-      for (let i = 0; i < count; i++) {
-        const t = (i + 0.5) / count - 0.5;
-        if (road.kind === 'vertical') {
-          out.push({
-            key: `${road.key}-mark-${i}`,
-            x: road.x,
-            z: road.z + t * (road.depth - 18),
-            width: 0.24,
-            depth: 3.2,
-          });
-        } else {
-          out.push({
-            key: `${road.key}-mark-${i}`,
-            x: road.x + t * (road.width - 18),
-            z: road.z,
-            width: 3.2,
-            depth: 0.24,
+    for (const z of grid.streetZs) {
+      for (let superBlock = 0; superBlock < grid.Nsb; superBlock++) {
+        for (let dash = 0; dash < 3; dash++) {
+          marks.push({
+            key: `h-${z}-${superBlock}-${dash}`,
+            x:
+              -grid.half +
+              LIVE_CITY_GUTTER +
+              superBlock * LIVE_CITY_TILE +
+              (dash + 0.5) * (LIVE_CITY_SUPER_W / 3) -
+              0.6,
+            z,
+            width: 1.2,
+            depth: 0.07,
           });
         }
       }
     }
 
-    return out;
-  }, []);
+    for (const x of grid.streetXs) {
+      for (let superBlock = 0; superBlock < grid.Nsb; superBlock++) {
+        for (let dash = 0; dash < 3; dash++) {
+          marks.push({
+            key: `v-${x}-${superBlock}-${dash}`,
+            x,
+            z:
+              -grid.half +
+              LIVE_CITY_GUTTER +
+              superBlock * LIVE_CITY_TILE +
+              (dash + 0.5) * (LIVE_CITY_SUPER_W / 3) -
+              0.6,
+            width: 0.07,
+            depth: 1.2,
+          });
+        }
+      }
+    }
+
+    return marks;
+  }, [grid]);
 
   return (
     <group>
-      {marks.map((mark) => (
+      {grid.roads.map((road) => (
         <mesh
-          key={mark.key}
-          position={[mark.x, 0.045, mark.z]}
-          rotation={[-Math.PI / 2, 0, 0]}
+          key={road.key}
+          position={[road.x, 0, road.z]}
+          receiveShadow
         >
-          <planeGeometry args={[mark.width, mark.depth]} />
-          <meshBasicMaterial color="#e6eedf" transparent opacity={0.42} />
+          <boxGeometry args={[road.width, 0.04, road.depth]} />
+          <meshLambertMaterial color={0x1a2130} />
+        </mesh>
+      ))}
+      {stripeMarks.map((mark) => (
+        <mesh key={mark.key} position={[mark.x, 0.001, mark.z]}>
+          <boxGeometry args={[mark.width, 0.045, mark.depth]} />
+          <meshBasicMaterial
+            color={0xcfd8ea}
+            transparent
+            opacity={0.7}
+          />
         </mesh>
       ))}
     </group>
   );
 }
 
-function StreetLights() {
-  const lampRef = useRef<THREE.InstancedMesh>(null);
-  const glowRef = useRef<THREE.InstancedMesh>(null);
-  const obj = useMemo(() => new THREE.Object3D(), []);
-  const lamps = useMemo(() => {
-    const xs = LIVE_CITY_ROADS
-      .filter((road) => road.kind === 'vertical')
-      .map((road) => road.x);
-    const zs = LIVE_CITY_ROADS
-      .filter((road) => road.kind === 'horizontal')
-      .map((road) => road.z);
-    const out: Array<{ x: number; z: number; height: number }> = [];
-
-    for (const x of xs) {
-      for (const z of zs) {
-        if ((Math.round((x + z) * 10) / 10) % 3 === 0) continue;
-        out.push({
-          x: x + (hashStr(`${x}:${z}:lamp-x`) - 0.5) * 1.2,
-          z: z + (hashStr(`${x}:${z}:lamp-z`) - 0.5) * 1.2,
-          height: 5.2 + hashStr(`${x}:${z}:lamp-h`) * 1.4,
-        });
-      }
-    }
-    return out;
-  }, []);
-
-  useEffect(() => {
-    if (!lampRef.current || !glowRef.current) return;
-    lamps.forEach((lamp, index) => {
-      obj.position.set(lamp.x, lamp.height / 2, lamp.z);
-      obj.scale.set(0.12, lamp.height, 0.12);
-      obj.updateMatrix();
-      lampRef.current!.setMatrixAt(index, obj.matrix);
-
-      obj.position.set(lamp.x, lamp.height + 0.2, lamp.z);
-      obj.scale.set(0.52, 0.52, 0.52);
-      obj.updateMatrix();
-      glowRef.current!.setMatrixAt(index, obj.matrix);
-    });
-    lampRef.current.instanceMatrix.needsUpdate = true;
-    glowRef.current.instanceMatrix.needsUpdate = true;
-  }, [lamps, obj]);
-
+function StreetLights({ grid }: Props) {
   return (
     <group>
-      <instancedMesh
-        ref={lampRef}
-        args={[undefined, undefined, lamps.length]}
-        castShadow
-        receiveShadow
-      >
-        <cylinderGeometry args={[1, 1, 1, 8]} />
-        <meshStandardMaterial color="#1c2731" roughness={0.72} metalness={0.12} />
-      </instancedMesh>
-      <instancedMesh ref={glowRef} args={[undefined, undefined, lamps.length]}>
-        <sphereGeometry args={[1, 10, 8]} />
-        <meshStandardMaterial
-          color="#f1d77a"
-          emissive="#ffe38d"
-          emissiveIntensity={0.46}
-          roughness={0.38}
-        />
-      </instancedMesh>
+      {grid.streetXs.flatMap((x) =>
+        grid.streetZs.map((z) => (
+          <group key={`lamp-${x}-${z}`} position={[x, 0, z]}>
+            <mesh position={[0, 0.8, 0]} castShadow receiveShadow>
+              <cylinderGeometry args={[0.05, 0.05, 1.6, 5]} />
+              <meshLambertMaterial color={0x2a2f3d} />
+            </mesh>
+            <mesh position={[0, 1.6, 0]}>
+              <sphereGeometry args={[0.11, 6, 5]} />
+              <meshBasicMaterial color={0x6a6a72} />
+            </mesh>
+          </group>
+        )),
+      )}
     </group>
   );
 }
 
-function TreeLine() {
-  const trunkRef = useRef<THREE.InstancedMesh>(null);
-  const crownRef = useRef<THREE.InstancedMesh>(null);
+function TreeRing() {
   const trees = useMemo(() => {
-    const positions: Array<{ x: number; z: number; height: number }> = [];
-    const cityHalfW = LIVE_CITY_BOUNDS.width / 2 + 28;
-    const cityHalfD = LIVE_CITY_BOUNDS.depth / 2 + 24;
-
-    for (let i = 0; i < 260; i++) {
-      const side = i % 4;
-      const t = hashStr(`tree-${i}:t`);
-      const jitter = (hashStr(`tree-${i}:j`) - 0.5) * 18;
-      let x = 0;
-      let z = CITY_CENTER_Z;
-
-      if (side === 0) {
-        x = -cityHalfW - 14 - hashStr(`tree-${i}:x`) * 140;
-        z += -cityHalfD + t * cityHalfD * 2 + jitter;
-      } else if (side === 1) {
-        x = cityHalfW + 14 + hashStr(`tree-${i}:x`) * 140;
-        z += -cityHalfD + t * cityHalfD * 2 + jitter;
-      } else if (side === 2) {
-        x = -cityHalfW + t * cityHalfW * 2 + jitter;
-        z += -cityHalfD - 16 - hashStr(`tree-${i}:z`) * 126;
-      } else {
-        x = -cityHalfW + t * cityHalfW * 2 - jitter;
-        z += cityHalfD + 16 + hashStr(`tree-${i}:z`) * 126;
-      }
-
-      positions.push({
+    const rng = createSeededRng(55_491);
+    return Array.from({ length: 380 }, (_, index) => {
+      const radius =
+        CITY_FLAT_RADIUS + 6 + Math.pow(rng(), 0.6) * 480;
+      const angle = rng() * Math.PI * 2;
+      const x = Math.cos(angle) * radius + (rng() - 0.5) * 8;
+      const z = Math.sin(angle) * radius + (rng() - 0.5) * 8;
+      const dist = Math.hypot(x, z);
+      const height =
+        terrainNoise(x, z) *
+          6 *
+          Math.min(1, (dist - CITY_FLAT_RADIUS) / 50) +
+        Math.max(0, dist - 200) * 0.02;
+      return {
+        key: `tree-${index}`,
         x,
         z,
-        height: 3.4 + hashStr(`tree-${i}:h`) * 3.1,
-      });
-    }
-
-    return positions;
-  }, []);
-  const obj = useMemo(() => new THREE.Object3D(), []);
-
-  useEffect(() => {
-    if (!trunkRef.current || !crownRef.current) return;
-
-    trees.forEach((tree, index) => {
-      obj.position.set(tree.x, tree.height * 0.22, tree.z);
-      obj.scale.set(0.34, tree.height * 0.44, 0.34);
-      obj.updateMatrix();
-      trunkRef.current!.setMatrixAt(index, obj.matrix);
-
-      obj.position.set(tree.x, tree.height * 0.76, tree.z);
-      obj.scale.set(tree.height * 0.28, tree.height * 0.5, tree.height * 0.28);
-      obj.updateMatrix();
-      crownRef.current!.setMatrixAt(index, obj.matrix);
+        height,
+        rotation: rng() * Math.PI,
+        scale: 0.7 + rng() * 0.9,
+        cone: rng() < 0.55,
+        materialIndex: Math.floor(rng() * 3),
+      };
     });
-
-    trunkRef.current.instanceMatrix.needsUpdate = true;
-    crownRef.current.instanceMatrix.needsUpdate = true;
-  }, [obj, trees]);
+  }, []);
 
   return (
     <group>
-      <instancedMesh
-        ref={trunkRef}
-        args={[undefined, undefined, trees.length]}
-        castShadow
-        receiveShadow
-      >
-        <cylinderGeometry args={[1, 1, 1, 6]} />
-        <meshStandardMaterial color="#5a412c" roughness={0.92} />
-      </instancedMesh>
-      <instancedMesh
-        ref={crownRef}
-        args={[undefined, undefined, trees.length]}
-        castShadow
-        receiveShadow
-      >
-        <coneGeometry args={[1, 1, 8]} />
-        <meshStandardMaterial color="#145b3a" roughness={0.9} />
-      </instancedMesh>
+      {trees.map((tree) => (
+        <group
+          key={tree.key}
+          position={[tree.x, tree.height, tree.z]}
+          rotation={[0, tree.rotation, 0]}
+          scale={[tree.scale, tree.scale, tree.scale]}
+        >
+          <mesh position={[0, 0.6, 0]} castShadow receiveShadow>
+            <cylinderGeometry args={[0.18, 0.22, 1.2, 5]} />
+            <meshLambertMaterial color={0x4a3624} />
+          </mesh>
+          <mesh
+            position={[0, tree.cone ? 1.9 : 1.6, 0]}
+            castShadow
+            receiveShadow
+          >
+            {tree.cone ? (
+              <coneGeometry args={[0.9, 2.2, 6]} />
+            ) : (
+              <icosahedronGeometry args={[1, 0]} />
+            )}
+            <meshLambertMaterial
+              color={foliageColor(tree.materialIndex)}
+              flatShading
+            />
+          </mesh>
+        </group>
+      ))}
     </group>
   );
 }
 
 function MountainRing() {
-  const mountains = useMemo(
-    () =>
-      Array.from({ length: 30 }, (_, index) => {
-        const angle = (index / 30) * Math.PI * 2;
-        const radius = 360 + hashStr(`mountain-${index}:r`) * 96;
-        return {
-          key: `mountain-${index}`,
-          x: Math.cos(angle) * radius,
-          z: CITY_CENTER_Z + Math.sin(angle) * radius,
-          radius: 18 + hashStr(`mountain-${index}:w`) * 26,
-          height: 14 + hashStr(`mountain-${index}:h`) * 22,
-          rotation: angle + Math.PI,
-        };
-      }),
-    [],
-  );
+  const mountains = useMemo(() => {
+    const rng = createSeededRng(91_204);
+    const ringRadius = 600;
+    const peakCount = 90;
+    return Array.from({ length: peakCount }, (_, index) => {
+      const angle = (index / peakCount) * Math.PI * 2 + rng() * 0.04;
+      const radius = ringRadius + rng() * 80;
+      return {
+        key: `mountain-${index}`,
+        x: Math.cos(angle) * radius,
+        z: Math.sin(angle) * radius,
+        height: 30 + rng() * 70,
+        width: 60 + rng() * 60,
+        rotation: rng() * Math.PI,
+      };
+    });
+  }, []);
 
   return (
     <group>
       {mountains.map((mountain) => (
         <mesh
           key={mountain.key}
-          position={[mountain.x, mountain.height / 2 - 2.5, mountain.z]}
+          position={[mountain.x, mountain.height / 2 - 5, mountain.z]}
           rotation={[0, mountain.rotation, 0]}
           receiveShadow
         >
-          <coneGeometry args={[mountain.radius, mountain.height, 5]} />
-          <meshLambertMaterial color="#2f664b" transparent opacity={0.3} />
+          <coneGeometry args={[mountain.width, mountain.height, 4]} />
+          <meshLambertMaterial color={0x6679a0} flatShading />
         </mesh>
       ))}
     </group>
   );
 }
 
-function hashStr(s: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return (h >>> 0) / 0xffffffff;
+function terrainNoise(x: number, z: number): number {
+  return (
+    Math.sin(x * 0.018) * Math.cos(z * 0.022) * 1 +
+    Math.sin(x * 0.043 + 1.7) * Math.cos(z * 0.037 + 0.5) * 0.55 +
+    Math.sin(x * 0.092 + 2.4) * Math.cos(z * 0.087 - 1.1) * 0.25
+  );
+}
+
+function hashUnit(value: string): number {
+  return hashInt(value) / 0xffffffff;
+}
+
+function foliageColor(index: number): number {
+  return [0x3f6c3a, 0x4d7d44, 0x6b8a3a][index] ?? 0x4d7d44;
 }

@@ -21,6 +21,7 @@ import {
 import { QualityToggle } from '@/components/city/v2/quality/QualityToggle';
 import { SceneErrorBoundary } from '@/components/city/v2/world/SceneErrorBoundary';
 import { cityAgentPassportPath, cityBuildingTitle } from './cityNavigation';
+import { LIVE_CITY_TIERS } from './liveCityHandoff';
 import {
   layoutLiveCity,
   type LiveAgentMarkerLayout,
@@ -86,10 +87,10 @@ function LiveCitySceneBody({
   const layout = useMemo(
     () =>
       layoutLiveCity(agents, {
-        maxBuildings: quality === 'high' ? 800 : 420,
+        maxBuildings: 900,
         routeLimit: 0,
       }),
-    [agents, quality],
+    [agents],
   );
   const selectedBuilding = useMemo(
     () =>
@@ -106,10 +107,10 @@ function LiveCitySceneBody({
   }, [selectedBuilding, selectedOwnerKey]);
 
   return (
-    <div className="relative h-full w-full bg-[#8fd3ea]">
+    <div className="relative h-full w-full bg-[#c9d8e6]">
       <Canvas
         key={quality}
-        camera={{ position: [72, 56, 88], fov: 46, near: 0.5, far: 900 }}
+        camera={{ position: [85, 75, 95], fov: 45, near: 0.5, far: 1000 }}
         dpr={quality === 'high' ? [1, 2] : 1}
         gl={{
           antialias: quality === 'high',
@@ -118,31 +119,26 @@ function LiveCitySceneBody({
         shadows={quality === 'high'}
         onCreated={({ gl }) => {
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = quality === 'high' ? 1.04 : 0.98;
+          gl.toneMappingExposure = quality === 'high' ? 1 : 0.96;
         }}
       >
-        <color attach="background" args={['#8fd3ea']} />
-        <fog attach="fog" args={['#bdebf0', 310, 820]} />
-        <ambientLight intensity={0.68} color="#d8f8ff" />
+        <color attach="background" args={['#c9d8e6']} />
+        <fog attach="fog" args={['#c9d8e6', 280, 900]} />
+        <ambientLight intensity={0.55} color="#ffffff" />
         <hemisphereLight
-          color="#e1fbff"
-          groundColor="#31593f"
-          intensity={0.86}
+          color="#ffffff"
+          groundColor="#556b45"
+          intensity={0.6}
         />
         <directionalLight
           position={[90, 120, 80]}
-          intensity={1.04}
-          color="#fff5d6"
+          intensity={1}
+          color="#fff5e0"
           castShadow={quality === 'high'}
-        />
-        <directionalLight
-          position={[-90, 58, -74]}
-          intensity={0.24}
-          color="#76c9ff"
         />
 
         <SceneErrorBoundary label="LiveCityInfrastructure">
-          <LiveCityInfrastructure />
+          <LiveCityInfrastructure grid={layout.grid} />
         </SceneErrorBoundary>
         <SceneErrorBoundary label="LiveBuildings">
           <Suspense fallback={null}>
@@ -190,8 +186,6 @@ function LiveCitySceneBody({
   );
 }
 
-const TIER_LABELS = ['Free', 'Starter', 'Pro', 'Business', 'Founding'];
-
 function LiveBuildingPanel({
   building,
   onClose,
@@ -199,7 +193,7 @@ function LiveBuildingPanel({
   building: LiveBuildingLayout;
   onClose: () => void;
 }) {
-  const tierLabel = TIER_LABELS[building.tier] ?? 'User';
+  const tierLabel = LIVE_CITY_TIERS[building.tierKey].label;
   const activeCount = building.activeAgentIds.length;
 
   return (
@@ -270,8 +264,8 @@ function BuildingStat({
 function SurveyCamera() {
   const { camera } = useThree();
   useEffect(() => {
-    camera.position.set(72, 56, 88);
-    camera.lookAt(0, 9, 8);
+    camera.position.set(85, 75, 95);
+    camera.lookAt(0, 0, 0);
   }, [camera]);
 
   return (
@@ -283,10 +277,10 @@ function SurveyCamera() {
       enablePan
       enableRotate
       minDistance={28}
-      maxDistance={240}
-      minPolarAngle={0.5}
-      maxPolarAngle={1.26}
-      target={[0, 9, 8]}
+      maxDistance={220}
+      minPolarAngle={0.24}
+      maxPolarAngle={Math.PI * 0.48}
+      target={[0, 0, 0]}
     />
   );
 }
@@ -308,9 +302,7 @@ function LiveCityPointerTargets({
     () =>
       buildings.map((building) => {
         const footprint =
-          5.6 +
-          Math.min(4.2, building.tier * 0.86) +
-          Math.min(3.1, Math.log2(building.agentCount + 1) * 0.46);
+          Math.max(building.visual.width, building.visual.depth) + 1.7;
         return {
           building,
           box: new THREE.Box3().setFromCenterAndSize(
@@ -328,7 +320,7 @@ function LiveCityPointerTargets({
   const markerTargets = useMemo(
     () =>
       markers.map((marker) => {
-        const footprint = 3.2 + marker.width * 2.2 + marker.tier * 0.24;
+        const footprint = 2.4 + marker.width * 1.8;
         return {
           marker,
           box: new THREE.Box3().setFromCenterAndSize(

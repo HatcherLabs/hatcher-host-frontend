@@ -1,6 +1,10 @@
 'use client';
 import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
+import {
+  createSeededRng,
+  type LiveCityTierKey,
+} from './liveCityHandoff';
 import type { LiveBuildingLayout } from './liveLayout';
 
 interface Props {
@@ -8,69 +12,37 @@ interface Props {
   onBuildingClick?: (building: LiveBuildingLayout) => void;
 }
 
-type BuildingTierVisual = 'free' | 'starter' | 'pro' | 'enterprise';
-
-interface TierVisualConfig {
-  key: BuildingTierVisual;
-  facade: string;
-  trim: string;
-  roof: string;
-  window: string;
-  emissive: string;
-  footprint: [number, number];
-}
-
-const TIER_VISUALS: TierVisualConfig[] = [
-  {
-    key: 'free',
-    facade: '#62728b',
-    trim: '#283246',
-    roof: '#273040',
-    window: '#ffd089',
-    emissive: '#ffd089',
-    footprint: [3.35, 3.25],
-  },
-  {
-    key: 'starter',
-    facade: '#6287aa',
-    trim: '#31496a',
-    roof: '#2d3949',
-    window: '#ffe4a8',
-    emissive: '#ffe4a8',
-    footprint: [4.25, 4.05],
-  },
-  {
-    key: 'pro',
-    facade: '#5a728b',
-    trim: '#314054',
-    roof: '#253244',
-    window: '#7fd9ff',
-    emissive: '#74d5ff',
-    footprint: [5.05, 5.75],
-  },
-  {
-    key: 'enterprise',
-    facade: '#4f5f79',
-    trim: '#252f45',
-    roof: '#1e2739',
-    window: '#a9d8ff',
-    emissive: '#92ceff',
-    footprint: [6.15, 6.15],
-  },
-];
-
 interface FacadeTextures {
-  colorMap: THREE.Texture | null;
+  map: THREE.Texture | null;
   emissiveMap: THREE.Texture | null;
 }
 
+interface StaticMaterialSet {
+  freeRoof: THREE.MeshLambertMaterial;
+  freeChimney: THREE.MeshLambertMaterial;
+  starterRoof: THREE.MeshLambertMaterial;
+  starterParapet: THREE.MeshLambertMaterial;
+  starterTank: THREE.MeshLambertMaterial;
+  proLobby: THREE.MeshLambertMaterial;
+  enterprisePodium: THREE.MeshLambertMaterial;
+  enterpriseLedge: THREE.MeshLambertMaterial;
+  antenna: THREE.MeshLambertMaterial;
+  beacon: THREE.MeshBasicMaterial;
+  plinth: THREE.MeshLambertMaterial;
+  equipment: THREE.MeshLambertMaterial;
+  duct: THREE.MeshLambertMaterial;
+  treeTrunk: THREE.MeshLambertMaterial;
+  treeFoliage: THREE.MeshLambertMaterial;
+}
+
 const facadeTextureCache = new Map<string, FacadeTextures>();
+let staticMaterials: StaticMaterialSet | null = null;
 
 export function LiveBuildings({ buildings, onBuildingClick }: Props) {
   return (
     <group>
       {buildings.map((building) => (
-        <LiveProceduralBuilding
+        <HandoffBuilding
           key={building.ownerKey}
           building={building}
           onBuildingClick={onBuildingClick}
@@ -84,78 +56,47 @@ export function LiveBuildings({ buildings, onBuildingClick }: Props) {
   );
 }
 
-function LiveProceduralBuilding({
+function HandoffBuilding({
   building,
   onBuildingClick,
 }: {
   building: LiveBuildingLayout;
   onBuildingClick?: (building: LiveBuildingLayout) => void;
 }) {
-  const visual = tierVisualFor(building.tier);
-  const variant = Math.floor(hashStr(`${building.ownerKey}:building-style`) * 4);
-  const baseHeight = Math.max(2.1, building.height);
-  const widthBoost =
-    1 + Math.min(0.16, Math.log2(building.agentCount + 1) * 0.034);
-  const footprint = {
-    w: visual.footprint[0] * widthBoost,
-    d: visual.footprint[1] * widthBoost,
-  };
-
-  const textures = useMemo(
-    () => getFacadeTextures(visual, variant),
-    [visual, variant],
-  );
-  const facadeMaterial = useMemo(
-    () =>
-      new THREE.MeshLambertMaterial({
-        color: '#ffffff',
-        map: textures.colorMap,
-        emissive: new THREE.Color(visual.emissive),
-        emissiveMap: textures.emissiveMap,
-        emissiveIntensity: building.status === 'running' ? 0.34 : 0.16,
-      }),
-    [building.status, textures, visual],
-  );
-  const trimMaterial = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: visual.trim,
-        roughness: 0.78,
-        metalness: 0.08,
-      }),
-    [visual],
-  );
-  const roofMaterial = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: visual.roof,
-        roughness: 0.82,
-        metalness: 0.05,
-      }),
-    [visual],
-  );
-  const glassMaterial = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: visual.window,
-        emissive: new THREE.Color(visual.window),
-        emissiveIntensity: building.status === 'running' ? 0.42 : 0.18,
-        roughness: 0.28,
-        metalness: 0.12,
-        transparent: true,
-        opacity: 0.72,
-      }),
-    [building.status, visual],
-  );
+  const materials = useMemo(() => getStaticMaterials(), []);
+  const facadeMaterial = useMemo(() => {
+    const textures = makeFacadeTextures(
+      building.visual.tierKey,
+      building.visual.variant,
+    );
+    const material = new THREE.MeshLambertMaterial({
+      map: textures.map,
+      emissive: 0xffffff,
+      emissiveMap: textures.emissiveMap,
+      emissiveIntensity: 0.05,
+    });
+    material.userData.isFacade = true;
+    return material;
+  }, [building.visual.tierKey, building.visual.variant]);
+  const glassMaterial = useMemo(() => {
+    if (building.visual.tierKey !== 'enterprise') return null;
+    const material = new THREE.MeshLambertMaterial({
+      color: 0x0c1a2a,
+      emissive: new THREE.Color('#a9d8ff'),
+      emissiveIntensity: 0.08,
+      transparent: true,
+      opacity: 0.95,
+    });
+    material.userData.isGlass = true;
+    return material;
+  }, [building.visual.tierKey]);
 
   useEffect(() => {
     return () => {
       facadeMaterial.dispose();
-      trimMaterial.dispose();
-      roofMaterial.dispose();
-      glassMaterial.dispose();
+      glassMaterial?.dispose();
     };
-  }, [facadeMaterial, glassMaterial, roofMaterial, trimMaterial]);
+  }, [facadeMaterial, glassMaterial]);
 
   const handlePointer = (event: { stopPropagation: () => void }) => {
     if (!onBuildingClick) return;
@@ -170,124 +111,61 @@ function LiveProceduralBuilding({
       onClick={handlePointer}
       onPointerDown={handlePointer}
     >
-      {visual.key === 'free' ? (
+      {building.visual.tierKey === 'free' ? (
         <FreeBuilding
           building={building}
-          height={Math.min(4.2, baseHeight)}
-          width={footprint.w}
-          depth={footprint.d}
           facadeMaterial={facadeMaterial}
-          trimMaterial={trimMaterial}
-          roofMaterial={roofMaterial}
+          materials={materials}
         />
-      ) : visual.key === 'starter' ? (
+      ) : building.visual.tierKey === 'starter' ? (
         <StarterBuilding
           building={building}
-          height={Math.min(6.2, Math.max(3.2, baseHeight))}
-          width={footprint.w}
-          depth={footprint.d}
           facadeMaterial={facadeMaterial}
-          trimMaterial={trimMaterial}
-          roofMaterial={roofMaterial}
-          glassMaterial={glassMaterial}
+          materials={materials}
         />
-      ) : visual.key === 'pro' ? (
+      ) : building.visual.tierKey === 'pro' ? (
         <ProBuilding
           building={building}
-          height={Math.min(13.2, Math.max(6.2, baseHeight))}
-          width={footprint.w}
-          depth={footprint.d}
           facadeMaterial={facadeMaterial}
-          trimMaterial={trimMaterial}
-          roofMaterial={roofMaterial}
-          glassMaterial={glassMaterial}
+          materials={materials}
         />
       ) : (
         <EnterpriseBuilding
           building={building}
-          height={Math.min(28, Math.max(13, baseHeight))}
-          width={footprint.w}
-          depth={footprint.d}
           facadeMaterial={facadeMaterial}
-          trimMaterial={trimMaterial}
-          roofMaterial={roofMaterial}
           glassMaterial={glassMaterial}
+          materials={materials}
         />
       )}
+      <Plinth building={building} material={materials.plinth} />
     </group>
   );
 }
 
 function FreeBuilding({
   building,
-  height,
-  width,
-  depth,
   facadeMaterial,
-  trimMaterial,
-  roofMaterial,
-}: BuildingPartProps) {
-  const wallHeight = height * 0.72;
-  const roofGeometry = useMemo(
-    () => makePitchedRoofGeometry(width * 1.14, depth * 1.16, height * 0.32),
-    [depth, height, width],
-  );
-
-  useEffect(() => () => roofGeometry.dispose(), [roofGeometry]);
-
-  return (
-    <group>
-      <mesh position={[0, wallHeight / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[width, wallHeight, depth]} />
-        <primitive object={facadeMaterial} attach="material" />
-      </mesh>
-      <mesh
-        geometry={roofGeometry}
-        material={roofMaterial}
-        position={[0, wallHeight, 0]}
-        rotation={[0, (building.rank % 2) * Math.PI * 0.5, 0]}
-        castShadow
-        receiveShadow
-      />
-      <mesh
-        position={[
-          width * 0.24,
-          wallHeight + height * 0.18,
-          -depth * 0.18,
-        ]}
-        castShadow
-      >
-        <boxGeometry args={[0.32, height * 0.28, 0.32]} />
-        <primitive object={trimMaterial} attach="material" />
-      </mesh>
-      <SmallAwning
-        width={width * 0.54}
-        depth={0.42}
-        y={wallHeight * 0.36}
-        z={depth / 2 + 0.04}
-        material={trimMaterial}
-      />
-    </group>
-  );
-}
-
-function StarterBuilding({
-  building,
-  height,
-  width,
-  depth,
-  facadeMaterial,
-  trimMaterial,
-  roofMaterial,
-  glassMaterial,
-}: BuildingPartProps) {
-  const hasPitchedRoof = hashStr(`${building.ownerKey}:roof`) > 0.42;
-  const roofGeometry = useMemo(
-    () => makePitchedRoofGeometry(width * 1.1, depth * 1.1, height * 0.22),
-    [depth, height, width],
-  );
-
-  useEffect(() => () => roofGeometry.dispose(), [roofGeometry]);
+  materials,
+}: {
+  building: LiveBuildingLayout;
+  facadeMaterial: THREE.Material;
+  materials: StaticMaterialSet;
+}) {
+  const { width, depth, height, seed } = building.visual;
+  const spec = useMemo(() => {
+    const rng = rngAfterVisual(seed);
+    const roofH = 0.7 + rng() * 0.4;
+    const hasChimney = rng() > 0.4;
+    const chimney = hasChimney
+      ? {
+          x: (rng() - 0.5) * width * 0.5,
+          y: height + 0.5 + roofH * 0.3,
+          z: (rng() - 0.5) * depth * 0.3,
+        }
+      : null;
+    const tree = makeTreeSpec(rng, width, depth);
+    return { roofH, chimney, tree };
+  }, [depth, height, seed, width]);
 
   return (
     <group>
@@ -295,207 +173,393 @@ function StarterBuilding({
         <boxGeometry args={[width, height, depth]} />
         <primitive object={facadeMaterial} attach="material" />
       </mesh>
-      <mesh position={[0, height + 0.08, 0]} castShadow receiveShadow>
-        <boxGeometry args={[width * 1.08, 0.18, depth * 1.08]} />
-        <primitive object={trimMaterial} attach="material" />
-      </mesh>
-      {hasPitchedRoof ? (
+      <PitchedRoof
+        width={width * 1.06}
+        depth={depth * 1.06}
+        height={spec.roofH}
+        y={height}
+        material={materials.freeRoof}
+      />
+      {spec.chimney && (
         <mesh
-          geometry={roofGeometry}
-          material={roofMaterial}
-          position={[0, height + 0.08, 0]}
-          rotation={[0, (building.rank % 2) * Math.PI * 0.5, 0]}
+          position={[spec.chimney.x, spec.chimney.y, spec.chimney.z]}
           castShadow
           receiveShadow
+        >
+          <boxGeometry args={[0.35, 1, 0.35]} />
+          <primitive object={materials.freeChimney} attach="material" />
+        </mesh>
+      )}
+      {spec.tree && <SmallTree spec={spec.tree} materials={materials} />}
+    </group>
+  );
+}
+
+function StarterBuilding({
+  building,
+  facadeMaterial,
+  materials,
+}: {
+  building: LiveBuildingLayout;
+  facadeMaterial: THREE.Material;
+  materials: StaticMaterialSet;
+}) {
+  const { width, depth, height, seed } = building.visual;
+  const spec = useMemo(() => {
+    const rng = rngAfterVisual(seed);
+    const pitched = rng() < 0.5;
+    const tank = pitched
+      ? null
+      : {
+          x: (rng() - 0.5) * width * 0.3,
+          z: (rng() - 0.5) * depth * 0.3,
+        };
+    const tree = makeTreeSpec(rng, width, depth);
+    return { pitched, tank, tree };
+  }, [depth, seed, width]);
+
+  return (
+    <group>
+      <mesh position={[0, height / 2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[width, height, depth]} />
+        <primitive object={facadeMaterial} attach="material" />
+      </mesh>
+      {spec.pitched ? (
+        <PitchedRoof
+          width={width * 1.05}
+          depth={depth * 1.05}
+          height={0.9}
+          y={height}
+          material={materials.starterRoof}
         />
       ) : (
-        <RooftopEquipment
-          height={height}
-          width={width}
-          depth={depth}
-          trimMaterial={trimMaterial}
-          roofMaterial={roofMaterial}
-        />
+        <>
+          <mesh position={[0, height + 0.1, 0]} castShadow receiveShadow>
+            <boxGeometry args={[width * 1.04, 0.25, depth * 1.04]} />
+            <primitive object={materials.starterParapet} attach="material" />
+          </mesh>
+          <mesh
+            position={[spec.tank?.x ?? 0, height + 0.6, spec.tank?.z ?? 0]}
+            castShadow
+            receiveShadow
+          >
+            <cylinderGeometry args={[0.4, 0.4, 0.7, 10]} />
+            <primitive object={materials.starterTank} attach="material" />
+          </mesh>
+        </>
       )}
-      <GlassLobby
-        width={width * 0.74}
-        height={Math.min(1.3, height * 0.25)}
-        z={depth / 2 + 0.035}
-        material={glassMaterial}
-      />
+      {spec.tree && <SmallTree spec={spec.tree} materials={materials} />}
     </group>
   );
 }
 
 function ProBuilding({
-  height,
-  width,
-  depth,
+  building,
   facadeMaterial,
-  trimMaterial,
-  roofMaterial,
-  glassMaterial,
-}: BuildingPartProps) {
-  const baseHeight = height * 0.54;
-  const topHeight = height * 0.42;
+  materials,
+}: {
+  building: LiveBuildingLayout;
+  facadeMaterial: THREE.Material;
+  materials: StaticMaterialSet;
+}) {
+  const { width: baseWidth, depth: baseDepth, height: totalHeight, seed } =
+    building.visual;
+  const spec = useMemo(() => {
+    const rng = rngAfterVisual(seed);
+    const width = baseWidth + 0.6;
+    const depth = baseDepth + 0.6;
+    const baseHeight = totalHeight * (0.55 + rng() * 0.15);
+    const topHeight = totalHeight - baseHeight;
+    return {
+      width,
+      depth,
+      baseHeight,
+      topHeight,
+      topWidth: width * 0.78,
+      topDepth: depth * 0.78,
+    };
+  }, [baseDepth, baseWidth, seed, totalHeight]);
 
   return (
     <group>
-      <mesh position={[0, baseHeight / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[width, baseHeight, depth]} />
+      <mesh position={[0, spec.baseHeight / 2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[spec.width, spec.baseHeight, spec.depth]} />
         <primitive object={facadeMaterial} attach="material" />
       </mesh>
       <mesh
-        position={[0, baseHeight + topHeight / 2, 0]}
+        position={[0, spec.baseHeight + spec.topHeight / 2, 0]}
         castShadow
         receiveShadow
       >
-        <boxGeometry args={[width * 0.78, topHeight, depth * 0.72]} />
+        <boxGeometry args={[spec.topWidth, spec.topHeight, spec.topDepth]} />
         <primitive object={facadeMaterial} attach="material" />
       </mesh>
-      <mesh position={[0, height * 0.18, depth / 2 + 0.04]}>
-        <boxGeometry args={[width * 0.9, 0.72, 0.08]} />
-        <primitive object={glassMaterial!} attach="material" />
-      </mesh>
-      <mesh position={[0, baseHeight + 0.08, 0]} castShadow receiveShadow>
-        <boxGeometry args={[width * 0.92, 0.22, depth * 0.86]} />
-        <primitive object={trimMaterial} attach="material" />
-      </mesh>
       <RooftopEquipment
-        height={height}
-        width={width * 0.78}
-        depth={depth * 0.72}
-        trimMaterial={trimMaterial}
-        roofMaterial={roofMaterial}
+        seed={seed}
+        skipAfterVisual={1}
+        width={spec.topWidth}
+        depth={spec.topDepth}
+        baseY={totalHeight}
+        dense={false}
+        materials={materials}
       />
+      <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
+        <boxGeometry args={[spec.width * 1.005, 1, spec.depth * 1.005]} />
+        <primitive object={materials.proLobby} attach="material" />
+      </mesh>
     </group>
   );
 }
 
 function EnterpriseBuilding({
-  height,
-  width,
-  depth,
+  building,
   facadeMaterial,
-  trimMaterial,
-  roofMaterial,
   glassMaterial,
-}: BuildingPartProps) {
-  const podium = Math.min(4.2, height * 0.22);
-  const segmentHeight = (height - podium) / 3;
+  materials,
+}: {
+  building: LiveBuildingLayout;
+  facadeMaterial: THREE.Material;
+  glassMaterial: THREE.Material | null;
+  materials: StaticMaterialSet;
+}) {
+  const { width: baseWidth, depth: baseDepth, height: totalHeight, seed } =
+    building.visual;
+  const spec = useMemo(() => {
+    const rng = rngAfterVisual(seed);
+    const podiumHeight = 2.8 + rng() * 1.2;
+    const podiumWidth = baseWidth + 1.2;
+    const podiumDepth = baseDepth + 1.2;
+    const remaining = Math.max(1, totalHeight - podiumHeight);
+    const segmentHeight = remaining / 3;
+    const segments = Array.from({ length: 3 }, (_, index) => {
+      const scale = 0.86 ** index;
+      return {
+        index,
+        width: baseWidth * 1.05 * scale,
+        depth: baseDepth * 1.05 * scale,
+        height: segmentHeight,
+        y: podiumHeight + segmentHeight * index + segmentHeight / 2,
+        topY: podiumHeight + segmentHeight * (index + 1),
+      };
+    });
+    const finalScale = 0.86 ** 3;
+    return {
+      podiumHeight,
+      podiumWidth,
+      podiumDepth,
+      segments,
+      crownWidth: baseWidth * 1.05 * finalScale * 0.7,
+      crownDepth: baseDepth * 1.05 * finalScale * 0.7,
+      topY: podiumHeight + remaining,
+    };
+  }, [baseDepth, baseWidth, seed, totalHeight]);
 
   return (
     <group>
-      <mesh position={[0, podium / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[width * 1.12, podium, depth * 1.12]} />
-        <primitive object={facadeMaterial} attach="material" />
+      <mesh
+        position={[0, spec.podiumHeight / 2, 0]}
+        castShadow
+        receiveShadow
+      >
+        <boxGeometry
+          args={[spec.podiumWidth, spec.podiumHeight, spec.podiumDepth]}
+        />
+        <primitive object={materials.enterprisePodium} attach="material" />
       </mesh>
-      {[0, 1, 2].map((segment) => {
-        const scale = 1 - segment * 0.12;
-        const y = podium + segmentHeight * segment + segmentHeight / 2;
-        return (
-          <group key={segment}>
-            <mesh position={[0, y, 0]} castShadow receiveShadow>
+      {glassMaterial && (
+        <mesh position={[0, spec.podiumHeight * 0.45, 0]}>
+          <boxGeometry
+            args={[
+              spec.podiumWidth * 1.005,
+              spec.podiumHeight * 0.6,
+              spec.podiumDepth * 1.005,
+            ]}
+          />
+          <primitive object={glassMaterial} attach="material" />
+        </mesh>
+      )}
+      {spec.segments.map((segment) => (
+        <group key={segment.index}>
+          <mesh position={[0, segment.y, 0]} castShadow receiveShadow>
+            <boxGeometry
+              args={[segment.width, segment.height, segment.depth]}
+            />
+            <primitive object={facadeMaterial} attach="material" />
+          </mesh>
+          {segment.index < spec.segments.length - 1 && (
+            <mesh position={[0, segment.topY, 0]} castShadow receiveShadow>
               <boxGeometry
-                args={[width * scale, segmentHeight * 0.96, depth * scale]}
+                args={[segment.width * 1.02, 0.2, segment.depth * 1.02]}
               />
-              <primitive object={facadeMaterial} attach="material" />
+              <primitive object={materials.enterpriseLedge} attach="material" />
             </mesh>
-            <mesh
-              position={[0, y + segmentHeight * 0.3, depth * scale * 0.5 + 0.045]}
-            >
-              <boxGeometry args={[width * scale * 0.72, 0.5, 0.08]} />
-              <primitive object={glassMaterial!} attach="material" />
-            </mesh>
-          </group>
-        );
-      })}
-      <mesh position={[0, height + 0.2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[width * 0.56, 0.42, depth * 0.56]} />
-        <primitive object={roofMaterial} attach="material" />
+          )}
+        </group>
+      ))}
+      <mesh position={[0, spec.topY + 0.7, 0]} castShadow receiveShadow>
+        <boxGeometry args={[spec.crownWidth, 1.4, spec.crownDepth]} />
+        <primitive object={materials.enterprisePodium} attach="material" />
       </mesh>
-      <mesh position={[0, height + 1.45, 0]} castShadow>
-        <boxGeometry args={[0.16, 2.55, 0.16]} />
-        <primitive object={trimMaterial} attach="material" />
+      <mesh position={[0, spec.topY + 1.4 + totalHeight * 0.09, 0]} castShadow>
+        <cylinderGeometry args={[0.06, 0.1, totalHeight * 0.18, 6]} />
+        <primitive object={materials.antenna} attach="material" />
       </mesh>
+      <mesh position={[0, spec.topY + 1.4 + totalHeight * 0.18 + 0.18, 0]}>
+        <sphereGeometry args={[0.22, 12, 8]} />
+        <primitive object={materials.beacon} attach="material" />
+      </mesh>
+      <RooftopEquipment
+        seed={seed}
+        skipAfterVisual={1}
+        width={spec.podiumWidth * 0.7}
+        depth={spec.podiumDepth * 0.7}
+        baseY={spec.podiumHeight}
+        dense
+        materials={materials}
+      />
     </group>
   );
 }
 
-interface BuildingPartProps {
-  building: LiveBuildingLayout;
-  height: number;
-  width: number;
-  depth: number;
-  facadeMaterial: THREE.Material;
-  trimMaterial: THREE.Material;
-  roofMaterial: THREE.Material;
-  glassMaterial?: THREE.Material;
-}
-
-function SmallAwning({
-  width,
-  depth,
-  y,
-  z,
+function Plinth({
+  building,
   material,
 }: {
-  width: number;
-  depth: number;
-  y: number;
-  z: number;
+  building: LiveBuildingLayout;
   material: THREE.Material;
 }) {
   return (
-    <mesh position={[0, y, z]} castShadow receiveShadow>
-      <boxGeometry args={[width, 0.12, depth]} />
+    <mesh position={[0, 0.06, 0]} receiveShadow>
+      <boxGeometry
+        args={[
+          building.visual.width + 0.5,
+          0.12,
+          building.visual.depth + 0.5,
+        ]}
+      />
       <primitive object={material} attach="material" />
     </mesh>
   );
 }
 
-function GlassLobby({
+function PitchedRoof({
   width,
+  depth,
   height,
-  z,
+  y,
   material,
 }: {
   width: number;
+  depth: number;
   height: number;
-  z: number;
-  material?: THREE.Material;
+  y: number;
+  material: THREE.Material;
 }) {
-  if (!material) return null;
+  const geometry = useMemo(
+    () => makePitchedRoofGeometry(width, depth, height),
+    [depth, height, width],
+  );
+
+  useEffect(() => () => geometry.dispose(), [geometry]);
+
   return (
-    <mesh position={[0, height * 0.6, z]}>
-      <boxGeometry args={[width, height, 0.08]} />
-      <primitive object={material} attach="material" />
-    </mesh>
+    <mesh
+      geometry={geometry}
+      material={material}
+      position={[0, y, 0]}
+      castShadow
+      receiveShadow
+    />
   );
 }
 
 function RooftopEquipment({
-  height,
+  seed,
+  skipAfterVisual,
   width,
   depth,
-  trimMaterial,
-  roofMaterial,
+  baseY,
+  dense,
+  materials,
 }: {
-  height: number;
+  seed: number;
+  skipAfterVisual: number;
   width: number;
   depth: number;
-  trimMaterial: THREE.Material;
-  roofMaterial: THREE.Material;
+  baseY: number;
+  dense: boolean;
+  materials: StaticMaterialSet;
 }) {
+  const spec = useMemo(() => {
+    const rng = rngAfterVisual(seed);
+    for (let i = 0; i < skipAfterVisual; i++) rng();
+    const count = dense ? 4 + Math.floor(rng() * 3) : 2 + Math.floor(rng() * 2);
+    const boxes = Array.from({ length: count }, () => {
+      const boxWidth = 0.4 + rng() * 0.6;
+      const boxHeight = 0.3 + rng() * 0.4;
+      const boxDepth = 0.4 + rng() * 0.6;
+      return {
+        width: boxWidth,
+        height: boxHeight,
+        depth: boxDepth,
+        x: (rng() - 0.5) * width * 0.7,
+        y: baseY + boxHeight / 2 + 0.05,
+        z: (rng() - 0.5) * depth * 0.7,
+      };
+    });
+    const vent =
+      rng() > 0.5
+        ? {
+            x: (rng() - 0.5) * width * 0.5,
+            z: (rng() - 0.5) * depth * 0.5,
+          }
+        : null;
+    return { boxes, vent };
+  }, [baseY, dense, depth, seed, skipAfterVisual, width]);
+
   return (
     <group>
-      <mesh position={[-width * 0.2, height + 0.32, depth * 0.12]} castShadow>
-        <boxGeometry args={[width * 0.26, 0.48, depth * 0.2]} />
-        <primitive object={trimMaterial} attach="material" />
+      {spec.boxes.map((box, index) => (
+        <mesh
+          key={`equipment-${index}`}
+          position={[box.x, box.y, box.z]}
+          castShadow
+          receiveShadow
+        >
+          <boxGeometry args={[box.width, box.height, box.depth]} />
+          <primitive object={materials.equipment} attach="material" />
+        </mesh>
+      ))}
+      {spec.vent && (
+        <mesh
+          position={[spec.vent.x, baseY + 0.4, spec.vent.z]}
+          castShadow
+          receiveShadow
+        >
+          <cylinderGeometry args={[0.08, 0.08, 0.7, 6]} />
+          <primitive object={materials.duct} attach="material" />
+        </mesh>
+      )}
+    </group>
+  );
+}
+
+function SmallTree({
+  spec,
+  materials,
+}: {
+  spec: { x: number; z: number };
+  materials: StaticMaterialSet;
+}) {
+  return (
+    <group position={[spec.x, 0.16, spec.z]}>
+      <mesh position={[0, 0.25, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.08, 0.1, 0.5, 5]} />
+        <primitive object={materials.treeTrunk} attach="material" />
       </mesh>
-      <mesh position={[width * 0.22, height + 0.26, -depth * 0.16]} castShadow>
-        <boxGeometry args={[width * 0.18, 0.36, depth * 0.22]} />
-        <primitive object={roofMaterial} attach="material" />
+      <mesh position={[0, 0.7, 0]} castShadow receiveShadow>
+        <icosahedronGeometry args={[0.42, 0]} />
+        <primitive object={materials.treeFoliage} attach="material" />
       </mesh>
     </group>
   );
@@ -526,20 +590,22 @@ function LiveBuildingClickTargets({
 
   useEffect(() => {
     buildings.forEach((building, index) => {
-      const visual = tierVisualFor(building.tier);
-      const footprint =
-        Math.max(visual.footprint[0], visual.footprint[1]) +
-        Math.min(2.2, Math.log2(building.agentCount + 1) * 0.32);
+      const footprint = Math.max(
+        building.visual.width + 1.4,
+        building.visual.depth + 1.4,
+        3.8,
+      );
       matrix.position.set(
         building.x,
         Math.max(1.7, building.height / 2),
         building.z,
       );
       matrix.rotation.set(0, building.rotation, 0);
-      matrix.scale.set(footprint, Math.max(4, building.height + 1.8), footprint);
+      matrix.scale.set(footprint, Math.max(3, building.height + 2.6), footprint);
       matrix.updateMatrix();
       mesh.setMatrixAt(index, matrix.matrix);
     });
+    mesh.count = buildings.length;
     mesh.instanceMatrix.needsUpdate = true;
   }, [buildings, matrix, mesh]);
 
@@ -572,177 +638,202 @@ function LiveBuildingClickTargets({
   );
 }
 
-function tierVisualFor(tier: number): TierVisualConfig {
-  if (tier <= 0) return TIER_VISUALS[0]!;
-  if (tier === 1) return TIER_VISUALS[1]!;
-  if (tier === 2) return TIER_VISUALS[2]!;
-  return TIER_VISUALS[3]!;
+function rngAfterVisual(seed: number): () => number {
+  const rng = createSeededRng(seed);
+  rng();
+  rng();
+  rng();
+  rng();
+  return rng;
 }
 
-function getFacadeTextures(
-  visual: TierVisualConfig,
-  variant: number,
-): FacadeTextures {
-  const key = `${visual.key}:${variant}`;
-  const cached = facadeTextureCache.get(key);
-  if (cached) return cached;
-
-  if (typeof document === 'undefined') {
-    const empty = { colorMap: null, emissiveMap: null };
-    facadeTextureCache.set(key, empty);
-    return empty;
-  }
-
-  const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
-  const ctx = canvas.getContext('2d')!;
-  ctx.fillStyle = visual.facade;
-  ctx.fillRect(0, 0, 256, 256);
-
-  const emissiveCanvas = document.createElement('canvas');
-  emissiveCanvas.width = 256;
-  emissiveCanvas.height = 256;
-  const emissiveCtx = emissiveCanvas.getContext('2d')!;
-  emissiveCtx.fillStyle = '#000000';
-  emissiveCtx.fillRect(0, 0, 256, 256);
-
-  const columns = visual.key === 'free' ? 3 : visual.key === 'starter' ? 4 : 6;
-  const rows =
-    visual.key === 'free' ? 3 : visual.key === 'starter' ? 5 : visual.key === 'pro' ? 9 : 14;
-  const padX = visual.key === 'free' ? 26 : 18;
-  const padY = visual.key === 'free' ? 26 : 16;
-  const gapX = (256 - padX * 2) / columns;
-  const gapY = (256 - padY * 2) / rows;
-  const litChance =
-    visual.key === 'free'
-      ? 0.26
-      : visual.key === 'starter'
-        ? 0.34
-        : visual.key === 'pro'
-          ? 0.46
-          : 0.54;
-
-  ctx.fillStyle = subtleShade(visual.facade, -0.13);
-  for (let y = 8; y < 256; y += 24) {
-    ctx.fillRect(0, y, 256, 1);
-  }
-
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < columns; col++) {
-      const r = hashStr(`${visual.key}:${variant}:${row}:${col}`);
-      const lit = r < litChance;
-      const w = Math.max(9, gapX * 0.44);
-      const h = Math.max(10, gapY * 0.34);
-      const x = padX + col * gapX + (gapX - w) / 2;
-      const y = padY + row * gapY + (gapY - h) / 2;
-      ctx.fillStyle = lit ? visual.window : subtleShade(visual.facade, 0.18);
-      ctx.globalAlpha = lit ? 0.92 : 0.58;
-      ctx.fillRect(x, y, w, h);
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = subtleShade(visual.facade, -0.24);
-      ctx.fillRect(x, y + h + 1, w, 1);
-
-      if (lit) {
-        emissiveCtx.fillStyle = visual.emissive;
-        emissiveCtx.globalAlpha = 0.86;
-        emissiveCtx.fillRect(x, y, w, h);
-        emissiveCtx.globalAlpha = 1;
-      }
-    }
-  }
-
-  const colorMap = new THREE.CanvasTexture(canvas);
-  colorMap.wrapS = THREE.RepeatWrapping;
-  colorMap.wrapT = THREE.RepeatWrapping;
-  colorMap.repeat.set(1, visual.key === 'enterprise' ? 2.4 : visual.key === 'pro' ? 1.7 : 1);
-  colorMap.colorSpace = THREE.SRGBColorSpace;
-  colorMap.needsUpdate = true;
-
-  const emissiveMap = new THREE.CanvasTexture(emissiveCanvas);
-  emissiveMap.wrapS = THREE.RepeatWrapping;
-  emissiveMap.wrapT = THREE.RepeatWrapping;
-  emissiveMap.repeat.copy(colorMap.repeat);
-  emissiveMap.colorSpace = THREE.SRGBColorSpace;
-  emissiveMap.needsUpdate = true;
-
-  const textures = { colorMap, emissiveMap };
-  facadeTextureCache.set(key, textures);
-  return textures;
+function makeTreeSpec(rng: () => number, width: number, depth: number) {
+  if (rng() <= 0.4) return null;
+  return {
+    x: (rng() - 0.5) * width * 1.3,
+    z: depth * 0.7 * (rng() < 0.5 ? 1 : -1),
+  };
 }
 
 function makePitchedRoofGeometry(
   width: number,
   depth: number,
   height: number,
-): THREE.BufferGeometry {
-  const hw = width / 2;
-  const hd = depth / 2;
-  const vertices = new Float32Array([
-    -hw,
-    0,
-    -hd,
-    hw,
-    0,
-    -hd,
-    0,
-    height,
-    -hd,
-    -hw,
-    0,
-    hd,
-    hw,
-    0,
-    hd,
-    0,
-    height,
-    hd,
-  ]);
-  const indices = [
-    0,
-    1,
-    2,
-    3,
-    5,
-    4,
-    0,
-    3,
-    4,
-    0,
-    4,
-    1,
-    1,
-    4,
-    5,
-    1,
-    5,
-    2,
-    2,
-    5,
-    3,
-    2,
-    3,
-    0,
-  ];
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-  geometry.setIndex(indices);
+): THREE.ExtrudeGeometry {
+  const shape = new THREE.Shape();
+  shape.moveTo(-width / 2, 0);
+  shape.lineTo(width / 2, 0);
+  shape.lineTo(0, height);
+  shape.lineTo(-width / 2, 0);
+  const geometry = new THREE.ExtrudeGeometry(shape, {
+    depth,
+    bevelEnabled: false,
+    steps: 1,
+  });
+  geometry.translate(0, 0, -depth / 2);
   geometry.computeVertexNormals();
   return geometry;
 }
 
-function subtleShade(hex: string, amount: number) {
-  const color = new THREE.Color(hex);
-  if (amount >= 0) color.lerp(new THREE.Color('#ffffff'), amount);
-  else color.lerp(new THREE.Color('#000000'), Math.abs(amount));
-  return `#${color.getHexString()}`;
+function makeFacadeTextures(
+  tier: LiveCityTierKey,
+  variant: number,
+): FacadeTextures {
+  const key = `${tier}:lowpoly:${variant}`;
+  const cached = facadeTextureCache.get(key);
+  if (cached) return cached;
+
+  if (typeof document === 'undefined') {
+    const empty = { map: null, emissiveMap: null };
+    facadeTextureCache.set(key, empty);
+    return empty;
+  }
+
+  const cfg = {
+    free: {
+      cols: 4,
+      rows: 4,
+      base: '#3d4a63',
+      trim: '#2a3346',
+      litColor: '#ffd089',
+    },
+    starter: {
+      cols: 5,
+      rows: 6,
+      base: '#4d6d92',
+      trim: '#33486a',
+      litColor: '#ffe4a8',
+    },
+    pro: {
+      cols: 7,
+      rows: 10,
+      base: '#475a72',
+      trim: '#2c3a4d',
+      litColor: '#7fd9ff',
+    },
+    enterprise: {
+      cols: 9,
+      rows: 16,
+      base: '#3d4863',
+      trim: '#222a3d',
+      litColor: '#a9d8ff',
+    },
+  }[tier];
+
+  const W = 256;
+  const H = 256;
+  const colorCanvas = document.createElement('canvas');
+  colorCanvas.width = W;
+  colorCanvas.height = H;
+  const cx = colorCanvas.getContext('2d')!;
+
+  cx.fillStyle = cfg.base;
+  cx.fillRect(0, 0, W, H);
+
+  cx.fillStyle = cfg.trim;
+  const colW = W / cfg.cols;
+  for (let i = 0; i <= cfg.cols; i++) {
+    cx.fillRect(Math.round(i * colW) - 1, 0, 2, H);
+  }
+  const rowH = H / cfg.rows;
+  for (let r = 0; r <= cfg.rows; r++) {
+    cx.fillRect(0, Math.round(r * rowH) - 1, W, 2);
+  }
+
+  const padX = colW * 0.18;
+  const padY = rowH * 0.22;
+  for (let row = 0; row < cfg.rows; row++) {
+    for (let col = 0; col < cfg.cols; col++) {
+      const x = col * colW + padX;
+      const y = row * rowH + padY;
+      const width = colW - padX * 2;
+      const height = rowH - padY * 2;
+      cx.fillStyle = '#0a1220';
+      cx.fillRect(x, y, width, height);
+      cx.fillStyle = cfg.trim;
+      cx.fillRect(x + width / 2 - 0.5, y, 1, height);
+    }
+  }
+
+  const gy = (cfg.rows - 1) * rowH;
+  cx.fillStyle = '#0e1726';
+  cx.fillRect(0, gy + rowH * 0.2, W, rowH * 0.7);
+  cx.fillStyle = '#1a232f';
+  cx.fillRect(W * 0.45, gy + rowH * 0.25, W * 0.1, rowH * 0.7);
+
+  const colorTexture = new THREE.CanvasTexture(colorCanvas);
+  colorTexture.wrapS = colorTexture.wrapT = THREE.RepeatWrapping;
+  colorTexture.anisotropy = 4;
+
+  const emissiveCanvas = document.createElement('canvas');
+  emissiveCanvas.width = W;
+  emissiveCanvas.height = H;
+  const ex = emissiveCanvas.getContext('2d')!;
+  ex.fillStyle = '#000000';
+  ex.fillRect(0, 0, W, H);
+  const litRng = createSeededRng(variant * 977 + tier.length * 131);
+  const litChance = {
+    free: 0.25,
+    starter: 0.32,
+    pro: 0.45,
+    enterprise: 0.55,
+  }[tier];
+  for (let row = 0; row < cfg.rows; row++) {
+    for (let col = 0; col < cfg.cols; col++) {
+      if (litRng() > litChance) continue;
+      const flicker = 0.75 + litRng() * 0.25;
+      const baseColor = new THREE.Color(cfg.litColor).multiplyScalar(flicker);
+      const x = col * colW + padX;
+      const y = row * rowH + padY;
+      const width = colW - padX * 2;
+      const height = rowH - padY * 2;
+      ex.fillStyle = `#${baseColor.getHexString()}`;
+      ex.fillRect(x, y, width, height);
+    }
+  }
+  if (litRng() > 0.4) {
+    ex.fillStyle = '#fff2c8';
+    ex.fillRect(0, gy + rowH * 0.2, W, rowH * 0.7);
+    ex.fillStyle = '#000000';
+    ex.fillRect(W * 0.45, gy + rowH * 0.25, W * 0.1, rowH * 0.7);
+  }
+
+  const emissiveTexture = new THREE.CanvasTexture(emissiveCanvas);
+  emissiveTexture.wrapS = emissiveTexture.wrapT = THREE.RepeatWrapping;
+  emissiveTexture.anisotropy = 4;
+
+  const result = { map: colorTexture, emissiveMap: emissiveTexture };
+  facadeTextureCache.set(key, result);
+  return result;
 }
 
-function hashStr(s: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return (h >>> 0) / 0xffffffff;
+function getStaticMaterials(): StaticMaterialSet {
+  if (staticMaterials) return staticMaterials;
+  staticMaterials = {
+    freeRoof: new THREE.MeshLambertMaterial({
+      color: 0x6b3c2e,
+      flatShading: true,
+    }),
+    freeChimney: new THREE.MeshLambertMaterial({ color: 0x4a3a30 }),
+    starterRoof: new THREE.MeshLambertMaterial({
+      color: 0x5a4030,
+      flatShading: true,
+    }),
+    starterParapet: new THREE.MeshLambertMaterial({ color: 0x2a3346 }),
+    starterTank: new THREE.MeshLambertMaterial({ color: 0x6b6e7a }),
+    proLobby: new THREE.MeshLambertMaterial({ color: 0x1a2030 }),
+    enterprisePodium: new THREE.MeshLambertMaterial({ color: 0x222a3d }),
+    enterpriseLedge: new THREE.MeshLambertMaterial({ color: 0x1a2030 }),
+    antenna: new THREE.MeshLambertMaterial({ color: 0x666e80 }),
+    beacon: new THREE.MeshBasicMaterial({ color: 0xff5050 }),
+    plinth: new THREE.MeshLambertMaterial({ color: 0x6b6f78 }),
+    equipment: new THREE.MeshLambertMaterial({ color: 0x4a525e }),
+    duct: new THREE.MeshLambertMaterial({ color: 0x2e3340 }),
+    treeTrunk: new THREE.MeshLambertMaterial({ color: 0x4a3624 }),
+    treeFoliage: new THREE.MeshLambertMaterial({
+      color: 0x4d7d44,
+      flatShading: true,
+    }),
+  };
+  return staticMaterials;
 }
