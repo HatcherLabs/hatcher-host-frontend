@@ -4,7 +4,7 @@
 
 import { API_URL } from '@/lib/config';
 import { getToken, req } from './core';
-import type { Agent, AgentPassport, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse } from './types';
+import type { Agent, AgentPassport, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection } from './types';
 import type { TierConfig, AdminOverviewExtras } from '@hatcher/shared';
 
 const API_BASE = API_URL;
@@ -223,6 +223,33 @@ export const api = {
 
   /** Get the agent's public/owner-safe on-chain passport. */
   getAgentPassport: (id: string) => req<AgentPassport>(`/agents/${id}/passport`),
+
+  /** Get the agent's platform-owned mailbox, runtime hints, and mail settings. */
+  getAgentMailbox: (id: string) =>
+    req<GetAgentMailboxResponse>(`/agents/${id}/mailbox`),
+
+  /** Get recent agent mail messages. Direction omitted returns inbound + outbound. */
+  getAgentMailMessages: (id: string, params: { limit?: number; direction?: AgentMailDirection } = {}) => {
+    const qs = new URLSearchParams();
+    if (params.limit) qs.set('limit', String(params.limit));
+    if (params.direction) qs.set('direction', params.direction);
+    const suffix = qs.toString() ? `?${qs.toString()}` : '';
+    return req<GetAgentMailMessagesResponse>(`/agents/${id}/mail/messages${suffix}`);
+  },
+
+  /** Send a manual outbound email from the agent mailbox. */
+  sendAgentMail: (id: string, body: SendAgentMailBody) =>
+    req<SendAgentMailResponse>(`/agents/${id}/mail/send`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  /** Update agent mail behavior. Does not restart the runtime by itself. */
+  updateAgentMailSettings: (id: string, body: UpdateAgentMailSettingsBody) =>
+    req<UpdateAgentMailSettingsResponse>(`/agents/${id}/mail/settings`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
 
   /** Provision missing multichain account rows for existing agents. */
   provisionAgentChainAccounts: (id: string) =>

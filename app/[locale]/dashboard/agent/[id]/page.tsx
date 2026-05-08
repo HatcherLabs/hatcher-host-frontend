@@ -91,6 +91,11 @@ const ChatTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
+const MailTab = dynamic(
+  () => import('@/components/agents/tabs/MailTab').then(mod => ({ default: mod.MailTab })),
+  { loading: () => <TabSkeleton /> }
+);
+
 const MemoryTab = dynamic(
   () => import('@/components/agents/tabs/MemoryTab').then(mod => ({ default: mod.MemoryTab })),
   { loading: () => <TabSkeleton /> }
@@ -204,7 +209,7 @@ export default function AgentManagePage() {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','workspace','logs','terminal','memory','sessions','knowledge','addons','schedules','workflows','chat','stats','wallet'];
+  const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','workspace','logs','terminal','memory','sessions','knowledge','addons','schedules','workflows','chat','mail','stats','wallet'];
   // 'skills' kept in validTabs for backwards compat (deep links), but redirects to plugins tab
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
   const rawTab = searchParams.get('tab') as Tab;
@@ -1284,7 +1289,7 @@ export default function AgentManagePage() {
 
           {/* ─── Tab Content ──────────────────────────────────── */}
           <div className="flex-1 min-w-0 bg-[var(--bg-base)]">
-            <div className={`${tab === 'chat' || tab === 'terminal' ? 'w-full max-w-none px-4 sm:px-6 lg:px-8 2xl:px-10' : 'max-w-[1280px] mx-auto px-4 sm:px-6'} py-6`}>
+            <div className={`${tab === 'chat' || tab === 'terminal' || tab === 'mail' ? 'w-full max-w-none px-4 sm:px-6 lg:px-8 2xl:px-10' : 'max-w-[1280px] mx-auto px-4 sm:px-6'} py-6`}>
             <AnimatePresence mode="wait">
               {tab === 'overview' && <OverviewTab />}
               {tab === 'config' && (
@@ -1314,6 +1319,7 @@ export default function AgentManagePage() {
                 null
               )}
               {tab === 'chat' && <ChatTab />}
+              {tab === 'mail' && <MailTab />}
               {tab === 'knowledge' && <KnowledgeTab />}
               {tab === 'addons' && <AddonsTab />}
               {tab === 'wallet' && <WalletTab />}

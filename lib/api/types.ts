@@ -91,6 +91,81 @@ export interface Agent {
   updatedAt?: string;
 }
 
+export interface AgentMailboxInfo {
+  id: string;
+  address: string;
+  status: string;
+}
+
+export interface AgentMailSettings {
+  autoSendEnabled: boolean;
+}
+
+export interface AgentMailRuntime {
+  address: string;
+  sendUrl: string;
+  messagesUrl: string;
+  mailboxUrl: string;
+}
+
+export type AgentMailDirection = 'inbound' | 'outbound';
+
+export interface AgentMailMessage {
+  id: string;
+  agentId?: string;
+  mailboxId?: string;
+  direction?: AgentMailDirection | string;
+  provider?: string;
+  status?: string;
+  providerMessageId?: string | null;
+  fromAddress?: string;
+  toAddresses?: string[] | unknown;
+  subject?: string | null;
+  textBody?: string | null;
+  htmlBody?: string | null;
+  headers?: Record<string, unknown> | unknown;
+  errorMessage?: string | null;
+  receivedAt?: string | null;
+  sentAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface GetAgentMailboxResponse {
+  mailbox: AgentMailboxInfo;
+  settings: AgentMailSettings;
+  runtime: AgentMailRuntime;
+  instructions: string;
+}
+
+export interface GetAgentMailMessagesResponse {
+  messages: AgentMailMessage[];
+}
+
+export interface SendAgentMailBody {
+  to: string | string[];
+  subject: string;
+  text?: string;
+  html?: string;
+}
+
+export interface SendAgentMailResponse {
+  messageId: string;
+  providerMessageId: string | null;
+  status: string;
+  mode: 'mock' | 'resend';
+  from: string;
+  to: string[];
+}
+
+export interface UpdateAgentMailSettingsBody {
+  autoSendEnabled: boolean;
+}
+
+export interface UpdateAgentMailSettingsResponse {
+  settings: AgentMailSettings;
+}
+
 export type AgentPassportNetworkId = 'skale' | 'base' | 'solana';
 export type AgentPassportChainType = 'evm' | 'solana';
 export type AgentPassportSignerMode = 'receive-only' | 'runtime-signing' | 'planned';

@@ -1288,6 +1288,7 @@
       "tabs": {
         "dashboard": "仪表板",
         "chat": "聊天",
+        "mail": "邮件",
         "terminal": "终端",
         "config": "配置",
         "integrations": "集成",
@@ -1383,6 +1384,68 @@
           "thinking": "正在思考...",
           "speaking": "正在说话...",
           "tapToSpeak": "点击麦克风说话"
+        }
+      },
+      "mail": {
+        "title": "智能体邮件",
+        "subtitle": "管理智能体邮箱、自动回复模式、消息历史和手动发信。",
+        "mailbox": "邮箱地址",
+        "copy": "复制",
+        "copied": "邮箱地址已复制",
+        "copyFailed": "复制失败",
+        "refresh": "刷新",
+        "refreshing": "刷新中...",
+        "autoSend": "自动发送回复",
+        "autoSendOn": "自动发送已开启",
+        "autoSendOff": "自动发送已关闭",
+        "runtimeActive": "自动回复仅在智能体已处于活跃状态时生效。",
+        "runtimeInactive": "自动回复仅在智能体已处于活跃状态时生效。请先启动智能体再依赖回复。",
+        "messageList": "消息",
+        "messageCount": "已加载 {count} 条消息",
+        "details": "消息详情",
+        "noSelection": "选择一条消息查看详情。",
+        "emptyTitle": "暂无邮件",
+        "emptySubtitle": "此邮箱使用后，收到和发出的消息会显示在这里。",
+        "untitled": "无主题",
+        "from": "发件人",
+        "to": "收件人",
+        "subject": "主题",
+        "created": "日期",
+        "body": "正文",
+        "noBody": "无正文内容",
+        "filters": {
+          "all": "全部",
+          "inbound": "收件",
+          "outbound": "发件"
+        },
+        "directions": {
+          "inbound": "收件",
+          "outbound": "发件"
+        },
+        "statusLabels": {
+          "queued": "排队中",
+          "sent": "已发送",
+          "delivered": "已送达",
+          "failed": "失败",
+          "received": "已收到",
+          "unknown": "未知"
+        },
+        "errors": {
+          "mailbox": "无法加载邮箱。",
+          "messages": "无法加载邮件消息。",
+          "settings": "无法更新邮件设置。"
+        },
+        "composer": {
+          "title": "手动发送",
+          "subtitle": "从智能体邮箱发送一封邮件。",
+          "toPlaceholder": "recipient@example.com",
+          "subjectPlaceholder": "主题",
+          "bodyPlaceholder": "编写邮件正文...",
+          "validation": "收件人、主题和正文为必填项。",
+          "failed": "无法发送邮件。",
+          "sent": "邮件已排队",
+          "send": "发送邮件",
+          "sending": "发送中..."
         }
       },
       "logs": {

@@ -1288,6 +1288,7 @@
       "tabs": {
         "dashboard": "Tableau de bord",
         "chat": "Discussion",
+        "mail": "Mail",
         "terminal": "Terminal",
         "config": "Configuration",
         "integrations": "Intégrations",
@@ -1383,6 +1384,68 @@
           "thinking": "Réflexion...",
           "speaking": "Parle...",
           "tapToSpeak": "Appuyez sur le micro pour parler"
+        }
+      },
+      "mail": {
+        "title": "Mail de l'agent",
+        "subtitle": "Gérez la boîte mail de l'agent, le mode réponse automatique, l'historique et les envois manuels.",
+        "mailbox": "Adresse de boîte mail",
+        "copy": "Copier",
+        "copied": "Adresse copiée",
+        "copyFailed": "Copie impossible",
+        "refresh": "Actualiser",
+        "refreshing": "Actualisation...",
+        "autoSend": "Réponses auto",
+        "autoSendOn": "L'envoi automatique est actif",
+        "autoSendOff": "L'envoi automatique est désactivé",
+        "runtimeActive": "La réponse automatique fonctionne seulement quand l'agent est déjà actif.",
+        "runtimeInactive": "La réponse automatique fonctionne seulement quand l'agent est déjà actif. Démarrez l'agent avant de compter sur ses réponses.",
+        "messageList": "Messages",
+        "messageCount": "{count} messages chargés",
+        "details": "Détail du message",
+        "noSelection": "Sélectionnez un message pour l'inspecter.",
+        "emptyTitle": "Aucun mail pour le moment",
+        "emptySubtitle": "Les messages reçus et envoyés apparaîtront ici après utilisation de cette boîte.",
+        "untitled": "Sans objet",
+        "from": "De",
+        "to": "À",
+        "subject": "Objet",
+        "created": "Date",
+        "body": "Corps",
+        "noBody": "Aucun contenu",
+        "filters": {
+          "all": "Tous",
+          "inbound": "Entrants",
+          "outbound": "Sortants"
+        },
+        "directions": {
+          "inbound": "Entrant",
+          "outbound": "Sortant"
+        },
+        "statusLabels": {
+          "queued": "En file",
+          "sent": "Envoyé",
+          "delivered": "Livré",
+          "failed": "Échec",
+          "received": "Reçu",
+          "unknown": "Inconnu"
+        },
+        "errors": {
+          "mailbox": "Impossible de charger la boîte mail.",
+          "messages": "Impossible de charger les messages mail.",
+          "settings": "Impossible de mettre à jour les paramètres mail."
+        },
+        "composer": {
+          "title": "Envoi manuel",
+          "subtitle": "Envoyez un email sortant depuis la boîte de l'agent.",
+          "toPlaceholder": "destinataire@example.com",
+          "subjectPlaceholder": "Objet",
+          "bodyPlaceholder": "Rédigez le corps de l'email...",
+          "validation": "Le destinataire, l'objet et le corps sont requis.",
+          "failed": "Impossible d'envoyer l'email.",
+          "sent": "Email mis en file",
+          "send": "Envoyer l'email",
+          "sending": "Envoi..."
         }
       },
       "logs": {

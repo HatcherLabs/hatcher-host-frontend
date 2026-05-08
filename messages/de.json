@@ -1288,6 +1288,7 @@
       "tabs": {
         "dashboard": "Dashboard",
         "chat": "Chat",
+        "mail": "Mail",
         "terminal": "Terminal",
         "config": "Konfiguration",
         "integrations": "Integrationen",
@@ -1383,6 +1384,68 @@
           "thinking": "Denkt nach...",
           "speaking": "Spricht...",
           "tapToSpeak": "Mikrofon tippen, um zu sprechen"
+        }
+      },
+      "mail": {
+        "title": "Agent Mail",
+        "subtitle": "Mailbox, Auto-Antworten, Nachrichtenverlauf und manuelle ausgehende E-Mails verwalten.",
+        "mailbox": "Mailbox-Adresse",
+        "copy": "Kopieren",
+        "copied": "Mailbox-Adresse kopiert",
+        "copyFailed": "Kopieren fehlgeschlagen",
+        "refresh": "Aktualisieren",
+        "refreshing": "Wird aktualisiert...",
+        "autoSend": "Antworten automatisch senden",
+        "autoSendOn": "Automatisches Senden ist aktiv",
+        "autoSendOff": "Automatisches Senden ist aus",
+        "runtimeActive": "Auto-Antworten funktionieren nur, wenn der Agent bereits aktiv ist.",
+        "runtimeInactive": "Auto-Antworten funktionieren nur, wenn der Agent bereits aktiv ist. Starten Sie den Agenten, bevor Sie sich auf Antworten verlassen.",
+        "messageList": "Nachrichten",
+        "messageCount": "{count} Nachrichten geladen",
+        "details": "Nachrichtendetails",
+        "noSelection": "Wählen Sie eine Nachricht zum Prüfen aus.",
+        "emptyTitle": "Noch keine Mail",
+        "emptySubtitle": "Eingehende und ausgehende Nachrichten erscheinen hier, nachdem diese Mailbox genutzt wurde.",
+        "untitled": "Kein Betreff",
+        "from": "Von",
+        "to": "An",
+        "subject": "Betreff",
+        "created": "Datum",
+        "body": "Inhalt",
+        "noBody": "Kein Inhalt",
+        "filters": {
+          "all": "Alle",
+          "inbound": "Eingehend",
+          "outbound": "Ausgehend"
+        },
+        "directions": {
+          "inbound": "Eingehend",
+          "outbound": "Ausgehend"
+        },
+        "statusLabels": {
+          "queued": "Wartend",
+          "sent": "Gesendet",
+          "delivered": "Zugestellt",
+          "failed": "Fehlgeschlagen",
+          "received": "Empfangen",
+          "unknown": "Unbekannt"
+        },
+        "errors": {
+          "mailbox": "Mailbox konnte nicht geladen werden.",
+          "messages": "Mail-Nachrichten konnten nicht geladen werden.",
+          "settings": "Mail-Einstellungen konnten nicht aktualisiert werden."
+        },
+        "composer": {
+          "title": "Manuell senden",
+          "subtitle": "Senden Sie eine ausgehende E-Mail aus der Agent-Mailbox.",
+          "toPlaceholder": "empfaenger@example.com",
+          "subjectPlaceholder": "Betreff",
+          "bodyPlaceholder": "E-Mail-Inhalt schreiben...",
+          "validation": "Empfänger, Betreff und Inhalt sind erforderlich.",
+          "failed": "E-Mail konnte nicht gesendet werden.",
+          "sent": "E-Mail eingereiht",
+          "send": "E-Mail senden",
+          "sending": "Wird gesendet..."
         }
       },
       "logs": {

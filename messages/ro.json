@@ -1288,6 +1288,7 @@
       "tabs": {
         "dashboard": "Panou de control",
         "chat": "Chat",
+        "mail": "Mail",
         "terminal": "Terminal",
         "config": "Configurare",
         "integrations": "Integrări",
@@ -1383,6 +1384,68 @@
           "thinking": "Gândește...",
           "speaking": "Vorbește...",
           "tapToSpeak": "Atinge microfonul pentru a vorbi"
+        }
+      },
+      "mail": {
+        "title": "Mail agent",
+        "subtitle": "Gestionează mailbox-ul agentului, răspunsurile automate, istoricul mesajelor și emailurile trimise manual.",
+        "mailbox": "Adresă mailbox",
+        "copy": "Copiază",
+        "copied": "Adresa mailbox-ului a fost copiată",
+        "copyFailed": "Copiere eșuată",
+        "refresh": "Reîmprospătează",
+        "refreshing": "Se reîmprospătează...",
+        "autoSend": "Trimite automat răspunsuri",
+        "autoSendOn": "Trimiterea automată este activă",
+        "autoSendOff": "Trimiterea automată este oprită",
+        "runtimeActive": "Răspunsul automat funcționează doar când agentul este deja activ.",
+        "runtimeInactive": "Răspunsul automat funcționează doar când agentul este deja activ. Pornește agentul înainte să te bazezi pe răspunsuri.",
+        "messageList": "Mesaje",
+        "messageCount": "{count} mesaje încărcate",
+        "details": "Detalii mesaj",
+        "noSelection": "Selectează un mesaj pentru inspectare.",
+        "emptyTitle": "Încă nu există mail",
+        "emptySubtitle": "Mesajele primite și trimise vor apărea aici după ce mailbox-ul este folosit.",
+        "untitled": "Fără subiect",
+        "from": "De la",
+        "to": "Către",
+        "subject": "Subiect",
+        "created": "Dată",
+        "body": "Conținut",
+        "noBody": "Fără conținut",
+        "filters": {
+          "all": "Toate",
+          "inbound": "Primite",
+          "outbound": "Trimise"
+        },
+        "directions": {
+          "inbound": "Primit",
+          "outbound": "Trimis"
+        },
+        "statusLabels": {
+          "queued": "În coadă",
+          "sent": "Trimis",
+          "delivered": "Livrat",
+          "failed": "Eșuat",
+          "received": "Primit",
+          "unknown": "Necunoscut"
+        },
+        "errors": {
+          "mailbox": "Mailbox-ul nu a putut fi încărcat.",
+          "messages": "Mesajele mail nu au putut fi încărcate.",
+          "settings": "Setările mail nu au putut fi actualizate."
+        },
+        "composer": {
+          "title": "Trimitere manuală",
+          "subtitle": "Trimite un email outbound din mailbox-ul agentului.",
+          "toPlaceholder": "destinatar@example.com",
+          "subjectPlaceholder": "Subiect",
+          "bodyPlaceholder": "Scrie conținutul emailului...",
+          "validation": "Destinatarul, subiectul și conținutul sunt obligatorii.",
+          "failed": "Emailul nu a putut fi trimis.",
+          "sent": "Email pus în coadă",
+          "send": "Trimite email",
+          "sending": "Se trimite..."
         }
       },
       "logs": {

@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, memo } from 'react';
 import {
+  Mail,
   MessageSquare,
   Settings,
   Puzzle,
@@ -38,6 +39,7 @@ function getTabs(framework: string | undefined, tTabs: ReturnType<typeof useTran
   return [
     { id: 'overview', label: tTabs('dashboard'), icon: <LayoutDashboard size={16} />, group: 'main' },
     { id: 'chat', label: tTabs('chat'), icon: <MessageSquare size={16} />, group: 'main' },
+    { id: 'mail', label: tTabs('mail'), icon: <Mail size={16} />, group: 'main' },
     { id: 'terminal', label: tTabs('terminal'), icon: <TerminalSquare size={16} />, group: 'main' },
     { id: 'config', label: tTabs('config'), icon: <Settings size={16} />, group: 'configure' },
     { id: 'integrations', label: tTabs('integrations'), icon: <Puzzle size={16} />, group: 'configure' },

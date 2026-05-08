@@ -1288,6 +1288,7 @@
       "tabs": {
         "dashboard": "Dashboard",
         "chat": "Chat",
+        "mail": "Mail",
         "terminal": "Terminal",
         "config": "Config",
         "integrations": "Integrations",
@@ -1383,6 +1384,68 @@
           "thinking": "Thinking...",
           "speaking": "Speaking...",
           "tapToSpeak": "Tap mic to speak"
+        }
+      },
+      "mail": {
+        "title": "Agent Mail",
+        "subtitle": "Manage the agent mailbox, auto-reply mode, message history, and manual outbound email.",
+        "mailbox": "Mailbox address",
+        "copy": "Copy",
+        "copied": "Mailbox address copied",
+        "copyFailed": "Copy failed",
+        "refresh": "Refresh",
+        "refreshing": "Refreshing...",
+        "autoSend": "Auto-send replies",
+        "autoSendOn": "Auto-send is on",
+        "autoSendOff": "Auto-send is off",
+        "runtimeActive": "Auto-reply only works while the agent is already active.",
+        "runtimeInactive": "Auto-reply only works while the agent is already active. Start the agent before relying on replies.",
+        "messageList": "Messages",
+        "messageCount": "{count} messages loaded",
+        "details": "Message detail",
+        "noSelection": "Select a message to inspect it.",
+        "emptyTitle": "No mail yet",
+        "emptySubtitle": "Inbound and outbound messages will appear here after this mailbox is used.",
+        "untitled": "No subject",
+        "from": "From",
+        "to": "To",
+        "subject": "Subject",
+        "created": "Date",
+        "body": "Body",
+        "noBody": "No body content",
+        "filters": {
+          "all": "All",
+          "inbound": "Inbound",
+          "outbound": "Outbound"
+        },
+        "directions": {
+          "inbound": "Inbound",
+          "outbound": "Outbound"
+        },
+        "statusLabels": {
+          "queued": "Queued",
+          "sent": "Sent",
+          "delivered": "Delivered",
+          "failed": "Failed",
+          "received": "Received",
+          "unknown": "Unknown"
+        },
+        "errors": {
+          "mailbox": "Could not load mailbox.",
+          "messages": "Could not load mail messages.",
+          "settings": "Could not update mail settings."
+        },
+        "composer": {
+          "title": "Manual send",
+          "subtitle": "Send one outbound email from the agent mailbox.",
+          "toPlaceholder": "recipient@example.com",
+          "subjectPlaceholder": "Subject",
+          "bodyPlaceholder": "Write the email body...",
+          "validation": "Recipient, subject, and body are required.",
+          "failed": "Could not send email.",
+          "sent": "Email queued",
+          "send": "Send email",
+          "sending": "Sending..."
         }
       },
       "logs": {
