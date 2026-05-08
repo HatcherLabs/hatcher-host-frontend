@@ -1,7 +1,6 @@
 import { MetadataRoute } from 'next';
 import { BLOG_POSTS } from '@/lib/blog';
 import { API_URL } from '@/lib/config';
-import { CATEGORIES } from '@/components/city/types';
 import { routing } from '@/i18n/routing';
 
 export const dynamic = 'force-static';
@@ -70,22 +69,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // City category pages — localized
-  const cityEntries: MetadataRoute.Sitemap = [];
-  for (const category of CATEGORIES) {
-    const path = `/city/${category}`;
-    const languages = buildLanguagesMap(path);
-    for (const locale of routing.locales) {
-      cityEntries.push({
-        url: absUrl(locale, path),
-        lastModified: now,
-        changeFrequency: 'daily',
-        priority: 0.6,
-        alternates: { languages },
-      });
-    }
-  }
-
   // Blog posts — English only (blog content not localized yet)
   const blogPostEntries: MetadataRoute.Sitemap = BLOG_POSTS.map((post) => ({
     url: `${SITE_URL}/blog/${post.slug}`,
@@ -123,7 +106,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...localizedEntries,
-    ...cityEntries,
     ...blogPostEntries,
     ...legalEntries,
     ...agentEntries,

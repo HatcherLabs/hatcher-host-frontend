@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { FRAMEWORK_COLORS } from '@/components/city/types';
@@ -52,13 +52,6 @@ function LiveActivityPulse({
     const mat = ref.current.material as THREE.MeshBasicMaterial;
     mat.opacity = Math.max(0, 0.74 * (1 - age));
   });
-
-  useEffect(() => {
-    return () => {
-      const mat = ref.current?.material;
-      if (mat && !Array.isArray(mat)) mat.dispose();
-    };
-  }, []);
 
   return (
     <mesh ref={ref} position={[building.x, 0.12, building.z]} rotation={[-Math.PI / 2, 0, 0]}>

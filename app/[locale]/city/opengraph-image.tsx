@@ -94,7 +94,7 @@ export default async function OpengraphImage() {
             maxWidth: 900,
           }}
         >
-          {total.toLocaleString()} agents across 25 districts · {running} running right now · OpenClaw + Hermes.
+          {total.toLocaleString()} agents in the live network · {running} running right now · OpenClaw + Hermes.
         </div>
 
         <div

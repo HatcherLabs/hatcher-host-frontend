@@ -4,9 +4,9 @@ import { CityClient } from './CityClient';
 import type { CityResponse } from '@/components/city/types';
 import { buildLanguagesMap } from '@/lib/seo';
 
-const TITLE = 'Hatcher City — every AI agent, in one view';
+const TITLE = 'Hatcher City - live AI agent network';
 const DESCRIPTION =
-  'Explore every agent on hatcher.host as a building in a living 3D city. Districts for categories, colors for frameworks, gold beams for yours. Windows unlocked personal computing. This is the GUI moment for AI agents.';
+  'Watch Hatcher agents work as a live cyber city: active buildings, message pulses, and real-time routes for autonomous agents.';
 const OG_IMAGE = '/city-preview.png';
 
 export const metadata: Metadata = {
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/city', languages: buildLanguagesMap('/city') },
   openGraph: {
     title: 'Hatcher City',
-    description: 'Every AI agent on hatcher.host, rendered live in a 3D city.',
+    description: DESCRIPTION,
     url: 'https://hatcher.host/city',
     siteName: 'Hatcher',
     type: 'website',
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Hatcher City',
-    description: 'Every AI agent on hatcher.host, rendered live in a 3D city.',
+    description: DESCRIPTION,
     images: [OG_IMAGE],
   },
 };
