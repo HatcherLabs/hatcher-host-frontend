@@ -16,6 +16,7 @@ export const STATUS_WEIGHT: Record<CityStatus, number> = {
 export interface LiveBuildingLayout {
   agentId: string;
   ownerKey: string;
+  ownerUsername: string | null;
   agentIds: string[];
   activeAgentIds: string[];
   agentCount: number;
@@ -268,6 +269,7 @@ const LIVE_CITY_HUBS = [
 
 interface LiveUserCluster {
   ownerKey: string;
+  ownerUsername: string | null;
   agents: CityAgent[];
   activeAgents: CityAgent[];
   representative: CityAgent;
@@ -330,6 +332,13 @@ function ownerKeyFor(agent: CityAgent): string {
   return agent.ownerKey || `agent:${agent.id}`;
 }
 
+function ownerUsernameFor(agents: CityAgent[]): string | null {
+  const username = agents.find((agent) =>
+    agent.ownerUsername?.trim(),
+  )?.ownerUsername;
+  return username?.trim() || null;
+}
+
 function dominantFramework(agents: CityAgent[]): CityAgent['framework'] {
   let openclaw = 0;
   let hermes = 0;
@@ -383,6 +392,7 @@ function clusterAgentsByOwner(agents: CityAgent[]): LiveUserCluster[] {
       const representative = sorted[0]!;
       const clusterBase = {
         ownerKey,
+        ownerUsername: ownerUsernameFor(sorted),
         agents: sorted,
         activeAgents,
         representative,
@@ -565,6 +575,7 @@ export function layoutLiveCity(
     return {
       agentId: cluster.representative.id,
       ownerKey: cluster.ownerKey,
+      ownerUsername: cluster.ownerUsername,
       agentIds: cluster.agents.map((agent) => agent.id),
       activeAgentIds: cluster.activeAgents.map((agent) => agent.id),
       agentCount: cluster.agents.length,

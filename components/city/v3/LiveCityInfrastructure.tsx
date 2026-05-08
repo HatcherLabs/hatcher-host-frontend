@@ -1,248 +1,125 @@
 'use client';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { LIVE_CITY_ROADS } from './liveLayout';
-
-const ROAD_COLOR = {
-  cyan: '#19d6ff',
-  emerald: '#10f0a8',
-  amber: '#ffd24a',
-} as const;
 
 export function LiveCityInfrastructure() {
-  const { cityGridLines, terrainGridLines } = useMemo(() => {
-    const cityLines: Array<{
-      key: string;
-      x: number;
-      z: number;
-      width: number;
-      depth: number;
-    }> = [];
-    for (let i = -8; i <= 8; i++) {
-      cityLines.push({
-        key: `x-${i}`,
-        x: i * 12,
-        z: 8,
-        width: 0.08,
-        depth: 158,
-      });
-      cityLines.push({
-        key: `z-${i}`,
-        x: 0,
-        z: i * 12 + 8,
-        width: 184,
-        depth: 0.08,
-      });
-    }
-    const terrainLines: typeof cityLines = [];
-    for (let i = -10; i <= 10; i++) {
-      terrainLines.push({
-        key: `terrain-x-${i}`,
-        x: i * 24,
-        z: 8,
-        width: 0.1,
-        depth: 420,
-      });
-      terrainLines.push({
-        key: `terrain-z-${i}`,
-        x: 0,
-        z: i * 24 + 8,
-        width: 520,
-        depth: 0.1,
-      });
-    }
-    return { cityGridLines: cityLines, terrainGridLines: terrainLines };
-  }, []);
-
   return (
     <group>
-      <mesh position={[0, -3.45, 8]} receiveShadow>
-        <boxGeometry args={[520, 2.1, 430]} />
+      <SkyDome />
+      <GreenHorizon />
+
+      <mesh position={[0, -0.55, 8]} receiveShadow>
+        <boxGeometry args={[620, 0.5, 520]} />
         <meshStandardMaterial
-          color="#030609"
-          roughness={0.9}
-          metalness={0.08}
-          emissive="#020810"
-          emissiveIntensity={0.22}
+          color="#2f6c4c"
+          roughness={0.94}
+          metalness={0.02}
         />
       </mesh>
 
-      {terrainGridLines.map((line) => (
-        <mesh
-          key={line.key}
-          rotation={[-Math.PI / 2, 0, 0]}
-          position={[line.x, -2.34, line.z]}
-        >
-          <planeGeometry args={[line.width, line.depth]} />
-          <meshBasicMaterial
-            color="#0a6f8a"
-            transparent
-            opacity={0.13}
-            depthWrite={false}
-            toneMapped={false}
-          />
-        </mesh>
-      ))}
-
-      <mesh position={[0, -1.2, 8]} receiveShadow>
-        <boxGeometry args={[205, 2.4, 176]} />
+      <mesh position={[0, -0.2, 8]} receiveShadow>
+        <boxGeometry args={[214, 0.42, 184]} />
         <meshStandardMaterial
-          color="#070a12"
-          roughness={0.82}
-          metalness={0.22}
-          emissive="#031220"
-          emissiveIntensity={0.28}
+          color="#111923"
+          roughness={0.76}
+          metalness={0.18}
+          emissive="#020506"
+          emissiveIntensity={0.04}
         />
       </mesh>
 
-      {cityGridLines.map((line) => (
-        <mesh
-          key={line.key}
-          rotation={[-Math.PI / 2, 0, 0]}
-          position={[line.x, 0.012, line.z]}
-        >
-          <planeGeometry args={[line.width, line.depth]} />
-          <meshBasicMaterial
-            color="#0b86a8"
-            transparent
-            opacity={0.26}
-            depthWrite={false}
-            toneMapped={false}
-          />
-        </mesh>
-      ))}
-
-      {LIVE_CITY_ROADS.map(({ key, ...road }) => (
-        <Road key={key} {...road} />
-      ))}
+      <mesh position={[0, 0.025, 8]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[205, 175]} />
+        <meshStandardMaterial
+          color="#172333"
+          roughness={0.86}
+          metalness={0.14}
+        />
+      </mesh>
 
       <CoreHub />
       <OuterBeacons />
-      <FoundationPiers />
+      <TreeLine />
     </group>
   );
 }
 
-function Road({
-  x,
-  z,
-  width,
-  depth,
-  color,
-}: {
-  x: number;
-  z: number;
-  width: number;
-  depth: number;
-  color: keyof typeof ROAD_COLOR;
-}) {
-  const neon = ROAD_COLOR[color];
-  const horizontal = width > depth;
+function SkyDome() {
+  return (
+    <mesh>
+      <sphereGeometry args={[430, 32, 16]} />
+      <meshBasicMaterial color="#8fd3ea" side={THREE.BackSide} />
+    </mesh>
+  );
+}
+
+function GreenHorizon() {
+  const hills = useMemo(
+    () =>
+      Array.from({ length: 18 }, (_, index) => {
+        const side = index % 2 === 0 ? -1 : 1;
+        const row = Math.floor(index / 2);
+        return {
+          key: `hill-${index}`,
+          x: side * (115 + row * 15),
+          z: -96 + row * 22,
+          width: 48 + (index % 5) * 9,
+          height: 10 + (index % 4) * 3,
+          depth: 18 + (index % 3) * 8,
+        };
+      }),
+    [],
+  );
 
   return (
     <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.03, z]}>
-        <planeGeometry args={[width, depth]} />
-        <meshStandardMaterial
-          color="#07131d"
-          roughness={0.72}
-          metalness={0.18}
-          emissive="#031f30"
-          emissiveIntensity={0.34}
-        />
+      <mesh position={[0, -0.62, -118]} receiveShadow>
+        <boxGeometry args={[340, 0.7, 44]} />
+        <meshStandardMaterial color="#366f4f" roughness={0.96} />
       </mesh>
-      <NeonStrip
-        x={x}
-        z={z + (horizontal ? depth / 2 - 0.35 : 0)}
-        width={horizontal ? width : 0.14}
-        depth={horizontal ? 0.14 : depth}
-        color={neon}
-      />
-      <NeonStrip
-        x={x + (horizontal ? 0 : width / 2 - 0.35)}
-        z={z}
-        width={horizontal ? width : 0.14}
-        depth={horizontal ? 0.14 : depth}
-        color={neon}
-      />
-      <NeonStrip
-        x={x - (horizontal ? 0 : width / 2 - 0.35)}
-        z={z - (horizontal ? depth / 2 - 0.35 : 0)}
-        width={horizontal ? width : 0.14}
-        depth={horizontal ? 0.14 : depth}
-        color={neon}
-      />
+      {hills.map((hill) => (
+        <mesh
+          key={hill.key}
+          position={[hill.x, hill.height / 2 - 0.58, hill.z]}
+          receiveShadow
+        >
+          <boxGeometry args={[hill.width, hill.height, hill.depth]} />
+          <meshStandardMaterial color="#244e3a" roughness={0.94} />
+        </mesh>
+      ))}
     </group>
-  );
-}
-
-function NeonStrip({
-  x,
-  z,
-  width,
-  depth,
-  color,
-}: {
-  x: number;
-  z: number;
-  width: number;
-  depth: number;
-  color: string;
-}) {
-  return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[x, 0.052, z]}>
-      <planeGeometry args={[width, depth]} />
-      <meshBasicMaterial
-        color={color}
-        transparent
-        opacity={0.62}
-        depthWrite={false}
-        toneMapped={false}
-      />
-    </mesh>
   );
 }
 
 function CoreHub() {
   return (
     <group position={[0, 0, -2]}>
-      <mesh position={[0, 0.4, 0]}>
-        <cylinderGeometry args={[9, 11.5, 0.8, 6]} />
+      <mesh position={[0, 0.36, 0]} receiveShadow>
+        <cylinderGeometry args={[8.4, 10.8, 0.72, 8]} />
         <meshStandardMaterial
-          color="#081526"
-          roughness={0.42}
-          metalness={0.5}
-          emissive="#08384d"
-          emissiveIntensity={0.7}
+          color="#182636"
+          roughness={0.52}
+          metalness={0.3}
         />
       </mesh>
-      <mesh position={[0, 8, 0]}>
-        <cylinderGeometry args={[1.2, 2.4, 16, 6]} />
+      <mesh position={[0, 7.2, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[1.2, 2.25, 14.4, 8]} />
         <meshStandardMaterial
-          color="#0e2235"
-          roughness={0.38}
-          metalness={0.48}
-          emissive="#12d6ff"
-          emissiveIntensity={0.65}
+          color="#23394d"
+          roughness={0.48}
+          metalness={0.34}
+          emissive="#0a2733"
+          emissiveIntensity={0.16}
         />
       </mesh>
-      <mesh position={[0, 18.5, 0]}>
-        <octahedronGeometry args={[2.8, 0]} />
-        <meshBasicMaterial
-          color="#2ff6ff"
-          transparent
-          opacity={0.86}
-          toneMapped={false}
-        />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.12, 0]}>
-        <ringGeometry args={[12, 12.45, 72]} />
-        <meshBasicMaterial
-          color="#2ff6ff"
-          transparent
-          opacity={0.56}
-          depthWrite={false}
-          toneMapped={false}
+      <mesh position={[0, 16.3, 0]}>
+        <octahedronGeometry args={[2.25, 0]} />
+        <meshStandardMaterial
+          color="#47d7c6"
+          roughness={0.34}
+          metalness={0.2}
+          emissive="#102b2a"
+          emissiveIntensity={0.28}
         />
       </mesh>
     </group>
@@ -261,23 +138,20 @@ function OuterBeacons() {
     <group>
       {beacons.map(([x, y, z], index) => (
         <group key={`${x}-${z}`} position={[x, 0, z]}>
-          <mesh position={[0, y / 2, 0]}>
+          <mesh position={[0, y / 2, 0]} castShadow receiveShadow>
             <boxGeometry args={[1.2, y, 1.2]} />
             <meshStandardMaterial
-              color="#0b1724"
-              roughness={0.52}
-              metalness={0.38}
-              emissive={index % 2 ? '#0bd9a5' : '#0aa6e8'}
-              emissiveIntensity={0.55}
+              color="#213242"
+              roughness={0.58}
+              metalness={0.24}
             />
           </mesh>
           <mesh position={[0, y + 1.8, 0]}>
-            <sphereGeometry args={[1.15, 12, 8]} />
-            <meshBasicMaterial
-              color={index % 2 ? '#10f0a8' : '#2fd3ff'}
-              transparent
-              opacity={0.8}
-              toneMapped={false}
+            <sphereGeometry args={[1.08, 12, 8]} />
+            <meshStandardMaterial
+              color={index % 2 ? '#21b991' : '#43b6d9'}
+              roughness={0.42}
+              metalness={0.16}
             />
           </mesh>
         </group>
@@ -286,50 +160,83 @@ function OuterBeacons() {
   );
 }
 
-function FoundationPiers() {
-  const piers = [
-    [-96, -75],
-    [-48, -75],
-    [0, -75],
-    [48, -75],
-    [96, -75],
-    [-96, 91],
-    [-48, 91],
-    [0, 91],
-    [48, 91],
-    [96, 91],
-    [-96, -32],
-    [-96, 32],
-    [96, -32],
-    [96, 32],
-  ] as const;
+function TreeLine() {
+  const trunkRef = useRef<THREE.InstancedMesh>(null);
+  const crownRef = useRef<THREE.InstancedMesh>(null);
+  const trees = useMemo(() => {
+    const positions: Array<{ x: number; z: number; height: number }> = [];
+    for (let i = 0; i < 96; i++) {
+      const side = i % 4;
+      const t = i / 95;
+      const jitter = Math.sin(i * 12.9898) * 3.4;
+      if (side === 0)
+        positions.push({
+          x: -126,
+          z: -84 + t * 176 + jitter,
+          height: 4 + (i % 5) * 0.5,
+        });
+      if (side === 1)
+        positions.push({
+          x: 126,
+          z: -84 + t * 176 - jitter,
+          height: 4.4 + (i % 4) * 0.55,
+        });
+      if (side === 2)
+        positions.push({
+          x: -112 + t * 224 + jitter,
+          z: -102,
+          height: 4.2 + (i % 6) * 0.45,
+        });
+      if (side === 3)
+        positions.push({
+          x: -112 + t * 224 - jitter,
+          z: 104,
+          height: 3.9 + (i % 5) * 0.48,
+        });
+    }
+    return positions;
+  }, []);
+  const obj = useMemo(() => new THREE.Object3D(), []);
+
+  useEffect(() => {
+    if (!trunkRef.current || !crownRef.current) return;
+
+    trees.forEach((tree, index) => {
+      obj.position.set(tree.x, tree.height * 0.24, tree.z);
+      obj.scale.set(0.42, tree.height * 0.48, 0.42);
+      obj.updateMatrix();
+      trunkRef.current!.setMatrixAt(index, obj.matrix);
+
+      obj.position.set(tree.x, tree.height * 0.82, tree.z);
+      obj.scale.set(tree.height * 0.32, tree.height * 0.52, tree.height * 0.32);
+      obj.updateMatrix();
+      crownRef.current!.setMatrixAt(index, obj.matrix);
+    });
+
+    trunkRef.current.instanceMatrix.needsUpdate = true;
+    crownRef.current.instanceMatrix.needsUpdate = true;
+  }, [obj, trees]);
 
   return (
     <group>
-      {piers.map(([x, z], index) => (
-        <group key={`${x}-${z}`} position={[x, -4.6, z]}>
-          <mesh>
-            <boxGeometry args={[2.4, 4.2, 2.4]} />
-            <meshStandardMaterial
-              color="#09111b"
-              roughness={0.58}
-              metalness={0.36}
-              emissive={index % 2 ? '#063a3e' : '#052948'}
-              emissiveIntensity={0.42}
-            />
-          </mesh>
-          <mesh position={[0, 2.25, 0]}>
-            <boxGeometry args={[3.1, 0.18, 3.1]} />
-            <meshBasicMaterial
-              color={index % 2 ? '#10f0a8' : '#19d6ff'}
-              transparent
-              opacity={0.42}
-              depthWrite={false}
-              toneMapped={false}
-            />
-          </mesh>
-        </group>
-      ))}
+      <instancedMesh
+        ref={trunkRef}
+        args={[undefined, undefined, trees.length]}
+        castShadow
+        receiveShadow
+      >
+        <cylinderGeometry args={[1, 1, 1, 6]} />
+        <meshStandardMaterial color="#5b4732" roughness={0.92} />
+      </instancedMesh>
+      <instancedMesh
+        ref={crownRef}
+        args={[undefined, undefined, trees.length]}
+        castShadow
+        receiveShadow
+      >
+        <coneGeometry args={[1, 1, 8]} />
+        <meshStandardMaterial color="#1f6b45" roughness={0.9} />
+      </instancedMesh>
     </group>
   );
 }

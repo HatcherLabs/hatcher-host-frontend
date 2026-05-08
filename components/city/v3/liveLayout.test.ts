@@ -7,7 +7,10 @@ import {
   STATUS_WEIGHT,
 } from './liveLayout';
 
-type AgentOverrides = Partial<CityAgent> & { ownerKey?: string };
+type AgentOverrides = Partial<CityAgent> & {
+  ownerKey?: string;
+  ownerUsername?: string;
+};
 
 function mkAgent(id: string, overrides: AgentOverrides = {}): CityAgent {
   return {
@@ -100,18 +103,21 @@ describe('layoutLiveCity', () => {
       [
         mkAgent('owner-a-running', {
           ownerKey: 'owner-a',
+          ownerUsername: 'cristian',
           status: 'running',
           tier: 2,
           messageCount: 50,
         }),
         mkAgent('owner-a-sleeping', {
           ownerKey: 'owner-a',
+          ownerUsername: 'cristian',
           status: 'sleeping',
           tier: 4,
           messageCount: 200,
         }),
         mkAgent('owner-b-agent', {
           ownerKey: 'owner-b',
+          ownerUsername: 'maria',
           status: 'sleeping',
           tier: 1,
           messageCount: 8,
@@ -132,6 +138,14 @@ describe('layoutLiveCity', () => {
       layout.buildings.find((building) => building.ownerKey === 'owner-a')
         ?.tier,
     ).toBe(4);
+    expect(
+      layout.buildings.find((building) => building.ownerKey === 'owner-a')
+        ?.ownerUsername,
+    ).toBe('cristian');
+    expect(
+      layout.buildings.find((building) => building.ownerKey === 'owner-b')
+        ?.ownerUsername,
+    ).toBe('maria');
   });
 
   it('renders only active agents as city markers around user buildings', () => {

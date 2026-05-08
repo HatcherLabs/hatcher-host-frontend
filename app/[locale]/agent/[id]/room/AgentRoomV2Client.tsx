@@ -1,5 +1,6 @@
 'use client';
 import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Mail } from 'lucide-react';
@@ -116,6 +117,7 @@ function isTypingTarget(target: EventTarget | null): boolean {
 
 export function AgentRoomV2Client({ agentId }: Props) {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
   const [agent, setAgent] = useState<AgentWithExtras | null>(null);
   const [framework, setFramework] = useState<string | null>(null);
   const [hasMemory, setHasMemory] = useState(false);
@@ -129,6 +131,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
   const [quality] = useState(() => detectDefaultQuality());
   const posRef = useRef(new THREE.Vector3());
   const saveChatTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const initialPassportRequestRef = useRef(false);
   const { openPanel, setOpenPanel, close } = usePanelState();
 
   // GET /agents/:id strips ownerId for non-owners (backend decides based on
@@ -304,6 +307,13 @@ export function AgentRoomV2Client({ agentId }: Props) {
     setMailOpen(false);
     setPassportOpen(true);
   }, [close]);
+
+  useEffect(() => {
+    if (initialPassportRequestRef.current) return;
+    if (searchParams.get('passport') !== '1') return;
+    initialPassportRequestRef.current = true;
+    handlePassportOpen();
+  }, [handlePassportOpen, searchParams]);
 
   const handleMailOpen = useCallback(() => {
     close();

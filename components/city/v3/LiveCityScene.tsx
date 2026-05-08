@@ -1,7 +1,9 @@
 'use client';
 import { MapControls } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
-import { Suspense, useCallback, useEffect, useMemo } from 'react';
+import { Building2, UserRound, Users, X, Zap } from 'lucide-react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
 import * as THREE from 'three';
 import { useRouter } from '@/i18n/routing';
 import type { CityAgent, CityResponse } from '@/components/city/types';
@@ -10,12 +12,9 @@ import {
   useQuality,
 } from '@/components/city/v2/quality/QualityContext';
 import { QualityToggle } from '@/components/city/v2/quality/QualityToggle';
-import { CyberSky } from '@/components/city/v2/world/CyberSky';
-import { HorizonRing } from '@/components/city/v2/world/HorizonRing';
 import { SceneErrorBoundary } from '@/components/city/v2/world/SceneErrorBoundary';
-import { Skybox } from '@/components/city/v2/world/Skybox';
-import { Atmosphere } from '@/components/city/v2/world/Atmosphere';
-import { layoutLiveCity } from './liveLayout';
+import { cityAgentPassportPath, cityBuildingTitle } from './cityNavigation';
+import { layoutLiveCity, type LiveBuildingLayout } from './liveLayout';
 import { LiveAgentMarkers } from './LiveAgentMarkers';
 import { LiveActivityPulses } from './LiveActivityPulses';
 import { LiveBuildings } from './LiveBuildings';
@@ -44,8 +43,8 @@ export function LiveCityScene({
   pulseAts,
 }: Props) {
   const router = useRouter();
-  const openAgentRoom = useCallback(
-    (agentId: string) => router.push(`/agent/${agentId}/room?from=city`),
+  const openAgentPassport = useCallback(
+    (agentId: string) => router.push(cityAgentPassportPath(agentId)),
     [router],
   );
 
@@ -56,7 +55,7 @@ export function LiveCityScene({
         counts={counts ?? EMPTY_COUNTS}
         generatedAt={generatedAt}
         pulseAts={pulseAts}
-        onBuildingClick={openAgentRoom}
+        onAgentClick={openAgentPassport}
       />
     </QualityProvider>
   );
@@ -67,12 +66,13 @@ function LiveCitySceneBody({
   counts,
   generatedAt,
   pulseAts,
-  onBuildingClick,
+  onAgentClick,
 }: Props & {
   counts: CityResponse['counts'];
-  onBuildingClick: (agentId: string) => void;
+  onAgentClick: (agentId: string) => void;
 }) {
   const quality = useQuality();
+  const [selectedOwnerKey, setSelectedOwnerKey] = useState<string | null>(null);
   const layout = useMemo(
     () =>
       layoutLiveCity(agents, {
@@ -81,12 +81,25 @@ function LiveCitySceneBody({
       }),
     [agents, quality],
   );
+  const selectedBuilding = useMemo(
+    () =>
+      selectedOwnerKey
+        ? (layout.buildings.find(
+            (building) => building.ownerKey === selectedOwnerKey,
+          ) ?? null)
+        : null,
+    [layout.buildings, selectedOwnerKey],
+  );
+
+  useEffect(() => {
+    if (selectedOwnerKey && !selectedBuilding) setSelectedOwnerKey(null);
+  }, [selectedBuilding, selectedOwnerKey]);
 
   return (
-    <div className="relative h-full w-full bg-[#030506]">
+    <div className="relative h-full w-full bg-[#8fd3ea]">
       <Canvas
         key={quality}
-        camera={{ position: [98, 62, 118], fov: 43, near: 0.5, far: 760 }}
+        camera={{ position: [112, 82, 138], fov: 43, near: 0.5, far: 760 }}
         dpr={quality === 'high' ? [1, 2] : 1}
         gl={{
           antialias: quality === 'high',
@@ -95,40 +108,29 @@ function LiveCitySceneBody({
         shadows={quality === 'high'}
         onCreated={({ gl }) => {
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = quality === 'high' ? 1.08 : 1.0;
+          gl.toneMappingExposure = quality === 'high' ? 1.04 : 0.98;
         }}
       >
-        <color attach="background" args={['#050814']} />
-        <fog attach="fog" args={['#050814', 170, 540]} />
-        <ambientLight intensity={0.2} color="#6aa6ff" />
+        <color attach="background" args={['#8fd3ea']} />
+        <fog attach="fog" args={['#bdebf0', 150, 560]} />
+        <ambientLight intensity={0.68} color="#d8f8ff" />
         <hemisphereLight
-          color="#9fc9ff"
-          groundColor="#030506"
-          intensity={0.15}
+          color="#e1fbff"
+          groundColor="#31593f"
+          intensity={0.86}
         />
         <directionalLight
           position={[90, 120, 80]}
-          intensity={0.86}
-          color="#7ac8ff"
+          intensity={1.04}
+          color="#fff5d6"
           castShadow={quality === 'high'}
         />
         <directionalLight
           position={[-90, 58, -74]}
-          intensity={0.58}
-          color="#d855ff"
+          intensity={0.24}
+          color="#76c9ff"
         />
 
-        <Suspense fallback={null}>
-          <SceneErrorBoundary label="Skybox">
-            <Skybox timeOfDay="auto" />
-          </SceneErrorBoundary>
-        </Suspense>
-        <SceneErrorBoundary label="CyberSky">
-          <CyberSky />
-        </SceneErrorBoundary>
-        <SceneErrorBoundary label="HorizonRing">
-          <HorizonRing />
-        </SceneErrorBoundary>
         <SceneErrorBoundary label="LiveCityInfrastructure">
           <LiveCityInfrastructure />
         </SceneErrorBoundary>
@@ -136,14 +138,16 @@ function LiveCitySceneBody({
           <Suspense fallback={null}>
             <LiveBuildings
               buildings={layout.buildings}
-              onBuildingClick={onBuildingClick}
+              onBuildingClick={(building) =>
+                setSelectedOwnerKey(building.ownerKey)
+              }
             />
           </Suspense>
         </SceneErrorBoundary>
         <SceneErrorBoundary label="LiveAgentMarkers">
           <LiveAgentMarkers
             markers={layout.markers}
-            onMarkerClick={onBuildingClick}
+            onMarkerClick={onAgentClick}
           />
         </SceneErrorBoundary>
         <SceneErrorBoundary label="LiveNetworkRoutes">
@@ -155,9 +159,6 @@ function LiveCitySceneBody({
             pulseAts={pulseAts}
           />
         </SceneErrorBoundary>
-        <SceneErrorBoundary label="Atmosphere">
-          <Atmosphere />
-        </SceneErrorBoundary>
         <SurveyCamera />
       </Canvas>
       <QualityToggle />
@@ -166,6 +167,89 @@ function LiveCitySceneBody({
         ownedAgents={layout.ownedAgents}
         generatedAt={generatedAt}
       />
+      {selectedBuilding && (
+        <LiveBuildingPanel
+          building={selectedBuilding}
+          onClose={() => setSelectedOwnerKey(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+const TIER_LABELS = ['Free', 'Starter', 'Pro', 'Business', 'Founding'];
+
+function LiveBuildingPanel({
+  building,
+  onClose,
+}: {
+  building: LiveBuildingLayout;
+  onClose: () => void;
+}) {
+  const tierLabel = TIER_LABELS[building.tier] ?? 'User';
+  const activeCount = building.activeAgentIds.length;
+
+  return (
+    <aside className="pointer-events-auto absolute bottom-5 right-5 z-20 w-[min(340px,calc(100vw-2.5rem))] rounded-[4px] border border-white/18 bg-[#08111a]/88 p-4 text-white shadow-2xl backdrop-blur-xl">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
+            <Building2 size={13} />
+            User building
+          </div>
+          <h2 className="mt-1 truncate text-lg font-semibold leading-tight">
+            {cityBuildingTitle(building.ownerUsername)}
+          </h2>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="grid h-8 w-8 shrink-0 place-items-center rounded-[3px] border border-white/12 bg-white/5 text-white/80 transition hover:border-white/30 hover:bg-white/10"
+          aria-label="Close building panel"
+        >
+          <X size={15} />
+        </button>
+      </div>
+
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        <BuildingStat
+          icon={<UserRound size={13} />}
+          label="Tier"
+          value={tierLabel}
+        />
+        <BuildingStat
+          icon={<Users size={13} />}
+          label="Agents"
+          value={building.agentCount.toLocaleString()}
+        />
+        <BuildingStat
+          icon={<Zap size={13} />}
+          label="Active"
+          value={activeCount.toLocaleString()}
+        />
+      </div>
+    </aside>
+  );
+}
+
+function BuildingStat({
+  icon,
+  label,
+  value,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-[3px] border border-white/10 bg-white/[0.055] px-2.5 py-2">
+      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.08em] text-white/52">
+        {icon}
+        {label}
+      </div>
+      <div className="mt-1 truncate text-sm font-semibold text-white">
+        {value}
+      </div>
     </div>
   );
 }
@@ -173,8 +257,8 @@ function LiveCitySceneBody({
 function SurveyCamera() {
   const { camera } = useThree();
   useEffect(() => {
-    camera.position.set(98, 62, 118);
-    camera.lookAt(0, 9, 6);
+    camera.position.set(112, 82, 138);
+    camera.lookAt(0, 8, 6);
   }, [camera]);
 
   return (
@@ -189,7 +273,7 @@ function SurveyCamera() {
       maxDistance={260}
       minPolarAngle={0.5}
       maxPolarAngle={1.26}
-      target={[0, 9, 6]}
+      target={[0, 8, 6]}
     />
   );
 }

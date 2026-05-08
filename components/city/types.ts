@@ -37,6 +37,7 @@ export interface CityAgent {
   framework: Framework;
   category: Category;
   ownerKey?: string | null;
+  ownerUsername?: string | null;
   tier: number;
   status: CityStatus;
   messageCount: number;
