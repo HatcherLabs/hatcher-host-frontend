@@ -18,6 +18,7 @@ import {
   Activity,
   X,
   Trash2,
+  Mail,
 } from 'lucide-react';
 
 interface Notification {
@@ -32,8 +33,17 @@ const ICON_MAP: Record<string, typeof Server> = {
   agent_started: Server,
   agent_stopped: Server,
   agent_created: Plus,
+  agent_deployed: Plus,
   agent_error: AlertTriangle,
+  agent_crashed: AlertTriangle,
+  agent_crash_loop: AlertTriangle,
+  agent_reply: MessageSquare,
   agent_restarted: Server,
+  agent_sleeping: Server,
+  agent_woke: Server,
+  agent_alert: Server,
+  agent_mail: Mail,
+  mail: Mail,
   workspace_quota: AlertTriangle,
   subscription: CreditCard,
   subscription_confirmed: CreditCard,
@@ -52,8 +62,17 @@ const ICON_COLOR_MAP: Record<string, string> = {
   agent_started: 'text-emerald-400 bg-emerald-500/15',
   agent_stopped: 'text-amber-400 bg-amber-500/15',
   agent_created: 'text-[var(--color-accent)] bg-[var(--color-accent)]/15',
+  agent_deployed: 'text-[var(--color-accent)] bg-[var(--color-accent)]/15',
   agent_error: 'text-red-400 bg-red-500/15',
+  agent_crashed: 'text-red-400 bg-red-500/15',
+  agent_crash_loop: 'text-red-400 bg-red-500/15',
+  agent_reply: 'text-emerald-400 bg-emerald-500/15',
   agent_restarted: 'text-blue-400 bg-blue-500/15',
+  agent_sleeping: 'text-blue-400 bg-blue-500/15',
+  agent_woke: 'text-emerald-400 bg-emerald-500/15',
+  agent_alert: 'text-amber-400 bg-amber-500/15',
+  agent_mail: 'text-[var(--color-accent)] bg-[var(--color-accent)]/15',
+  mail: 'text-[var(--color-accent)] bg-[var(--color-accent)]/15',
   workspace_quota: 'text-orange-400 bg-orange-500/15',
   agent: 'text-emerald-400 bg-emerald-500/15',
   subscription: 'text-purple-400 bg-purple-500/15',
@@ -138,6 +157,12 @@ export function NotificationCenter() {
   }, [fetchNotifications]);
 
   useEffect(() => {
+    const onFocus = () => { void fetchNotifications(); };
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [fetchNotifications]);
+
+  useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
@@ -191,7 +216,13 @@ export function NotificationCenter() {
   return (
     <div className="relative" ref={containerRef}>
       <button
-        onClick={() => setOpen((o) => { if (!o && unreadCount > 0) markAllRead(); return !o; })}
+        onClick={() => setOpen((o) => {
+          if (!o) {
+            void fetchNotifications();
+            if (unreadCount > 0) void markAllRead();
+          }
+          return !o;
+        })}
         className="relative h-9 w-9 flex items-center justify-center rounded-lg hover:bg-[var(--bg-card)] transition-colors"
         aria-label={unreadCount > 0 ? t('unreadAriaLabel', { count: unreadCount }) : t('allReadAriaLabel')}
         aria-expanded={open}

@@ -188,8 +188,8 @@ export default function AgentManagePage() {
   const tNotFound = useTranslations('dashboard.agentDetail.notFound');
   const tStatusPoll = useTranslations('dashboard.agentDetail.statusPoll');
 
-  // View mode (easy = Chat/Integrations/Logs/Stats only, advanced = everything)
-  const EASY_TABS: Tab[] = ['overview', 'chat', 'integrations', 'logs', 'stats'];
+  // View mode (easy = operational tabs only, advanced = everything)
+  const EASY_TABS: Tab[] = ['overview', 'chat', 'mail', 'integrations', 'logs', 'stats'];
   const [viewMode, setViewModeRaw] = useState<'easy' | 'advanced'>('easy');
   useEffect(() => {
     const saved = localStorage.getItem('hatcher-view-mode') as 'easy' | 'advanced' | null;

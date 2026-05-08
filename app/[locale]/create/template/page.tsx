@@ -1695,6 +1695,11 @@ export default function CreatePage() {
                       }
                       valueClass="text-green-400"
                     />
+                    <SummaryRow
+                      label={t('summaryLaunchIncludes')}
+                      value={t('summaryLaunchIncludesValue')}
+                      highlight
+                    />
                   </div>
                 </div>
               </motion.div>

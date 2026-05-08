@@ -76,7 +76,7 @@ interface AgentSidebarProps {
   onTabChange: (tab: Tab) => void;
 }
 
-const EASY_TABS: Tab[] = ['overview', 'chat', 'integrations', 'logs', 'stats'];
+const EASY_TABS: Tab[] = ['overview', 'chat', 'mail', 'integrations', 'logs', 'stats'];
 
 export const AgentSidebar = memo(function AgentSidebar({ agent, activeTab, onTabChange }: AgentSidebarProps) {
   const { viewMode } = useAgentContext();
@@ -91,7 +91,7 @@ export const AgentSidebar = memo(function AgentSidebar({ agent, activeTab, onTab
   const frameworkGlyph = FRAMEWORK_GLYPH[agent.framework] ?? '◇';
 
   const GROUP_LABELS: Record<string, string> = {
-    main: '',
+    main: tSidebarGroups('operate'),
     configure: tSidebarGroups('configure'),
     data: tSidebarGroups('monitor'),
     advanced: tSidebarGroups('advanced'),

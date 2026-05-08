@@ -25,6 +25,9 @@ export function WalkOnboarding() {
           <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">D</kbd> to walk, mouse to look.
           Walk up to any station and press{' '}
           <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">E</kbd> to interact.
+          Press <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">P</kbd> for passport,
+          <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">M</kbd> for mail, and{' '}
+          <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">Esc</kbd> to close panels.
         </p>
         <button
           onClick={dismiss}

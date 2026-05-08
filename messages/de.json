@@ -1306,6 +1306,7 @@
         "workflows": "Workflows"
       },
       "sidebarGroups": {
+        "operate": "Bedienen",
         "configure": "Konfigurieren",
         "monitor": "Überwachen",
         "advanced": "Erweitert"
@@ -2087,6 +2088,8 @@
     "summaryCost": "Kosten",
     "summaryCostFree": "$0.00 — Kostenlos",
     "summaryCostByok": "$0.00 — Eigener Schlüssel",
+    "summaryLaunchIncludes": "Nach dem Start",
+    "summaryLaunchIncludesValue": "Dashboard, Chat, Mail, Benachrichtigungen",
     "summaryFrameworkLabels": {
       "openclaw": "Multi-Skill-Assistent",
       "hermes": "Autonomer Agent"

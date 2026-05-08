@@ -1306,6 +1306,7 @@
         "workflows": "Workflows"
       },
       "sidebarGroups": {
+        "operate": "Piloter",
         "configure": "Configurer",
         "monitor": "Surveiller",
         "advanced": "Avancé"
@@ -2087,6 +2088,8 @@
     "summaryCost": "Coût",
     "summaryCostFree": "$0.00 — gratuit",
     "summaryCostByok": "$0.00 — clé personnelle",
+    "summaryLaunchIncludes": "Après le lancement",
+    "summaryLaunchIncludesValue": "Tableau de bord, chat, mail, notifications",
     "summaryFrameworkLabels": {
       "openclaw": "Assistant multi-compétences",
       "hermes": "Agent autonome"

@@ -1306,6 +1306,7 @@
         "workflows": "Workflow-uri"
       },
       "sidebarGroups": {
+        "operate": "Operare",
         "configure": "Configurare",
         "monitor": "Monitorizare",
         "advanced": "Avansat"
@@ -2099,6 +2100,8 @@
     "summaryCost": "Cost",
     "summaryCostFree": "$0.00 — gratuit",
     "summaryCostByok": "$0.00 — cheie proprie",
+    "summaryLaunchIncludes": "După lansare",
+    "summaryLaunchIncludesValue": "Dashboard, chat, mail, notificări",
     "summaryFrameworkLabels": {
       "openclaw": "Asistent multi-abilitate",
       "hermes": "Agent autonom"

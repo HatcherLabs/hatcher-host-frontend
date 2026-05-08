@@ -17,7 +17,7 @@ export function ProximityHint({ nearest }: { nearest: StationId | null }) {
   if (!nearest) return null;
   return (
     <div className="pointer-events-none fixed bottom-24 left-1/2 z-30 -translate-x-1/2 rounded-full border border-white/20 bg-black/70 px-4 py-2 text-sm text-white backdrop-blur">
-      Press <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">E</kbd> to {LABELS[nearest]}
+      <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">E</kbd> {LABELS[nearest]}
     </div>
   );
 }

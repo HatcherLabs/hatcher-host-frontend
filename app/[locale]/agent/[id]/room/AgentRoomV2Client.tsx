@@ -10,6 +10,7 @@ import { WalkOnboarding } from '@/components/agent-room/v2/hud/WalkOnboarding';
 import { RoomMinimap } from '@/components/agent-room/v2/hud/RoomMinimap';
 import { ProximityHint } from '@/components/agent-room/v2/hud/ProximityHint';
 import { PassportHud } from '@/components/agent-room/v2/hud/PassportHud';
+import { ShortcutHud } from '@/components/agent-room/v2/hud/ShortcutHud';
 import { getStationLayout, type StationId } from '@/components/agent-room/v2/world/layout';
 import { usePanelState } from '@/components/agent-room/v2/hooks/usePanelState';
 import { useStationProximity } from '@/components/agent-room/v2/hooks/useStationProximity';
@@ -29,7 +30,14 @@ import { buildFallbackPassport, primaryPassportStatus } from '@/lib/agent-passpo
 
 const AgentRoomSceneV2 = dynamic(
   () => import('@/components/agent-room/v2/AgentRoomSceneV2').then(m => m.AgentRoomSceneV2),
-  { ssr: false, loading: () => <div className="h-screen w-screen bg-black" /> }
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-screen w-screen items-center justify-center bg-black text-[11px] uppercase tracking-[0.16em] text-neutral-400">
+        Loading room
+      </div>
+    ),
+  }
 );
 
 interface Props {
@@ -95,6 +103,16 @@ const OWNER_ONLY: Set<StationId> = new Set([
   'configTerminal',
   'pluginsCabinet',
 ]);
+
+function isTypingTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  return (
+    target.isContentEditable ||
+    target.tagName === 'INPUT' ||
+    target.tagName === 'TEXTAREA' ||
+    target.tagName === 'SELECT'
+  );
+}
 
 export function AgentRoomV2Client({ agentId }: Props) {
   const { toast } = useToast();
@@ -300,18 +318,50 @@ export function AgentRoomV2Client({ agentId }: Props) {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === 'e' && nearest && !openPanel) handleStationClick(nearest);
+      if (isTypingTarget(e.target)) return;
+
+      if (e.key === 'Escape') {
+        close();
+        setPassportOpen(false);
+        setMailOpen(false);
+        return;
+      }
+
+      const key = e.key.toLowerCase();
+      if (key === 'e' && nearest && !openPanel && !passportOpen && !mailOpen) {
+        handleStationClick(nearest);
+      } else if (key === 'p') {
+        handlePassportOpen();
+      } else if (key === 'm' && canEdit) {
+        handleMailOpen();
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [nearest, openPanel, handleStationClick]);
+  }, [
+    canEdit,
+    close,
+    handleMailOpen,
+    handlePassportOpen,
+    handleStationClick,
+    mailOpen,
+    nearest,
+    openPanel,
+    passportOpen,
+  ]);
 
   const connectedIntegrations = useMemo(
     () => extractConnectedIntegrations(agent?.config),
     [agent?.config],
   );
 
-  if (!framework || !layout) return <div className="h-screen w-screen bg-black" />;
+  if (!framework || !layout) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-black text-[11px] uppercase tracking-[0.16em] text-neutral-400">
+        Loading room
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-black">
@@ -364,6 +414,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
       )}
       <RoomMinimap layout={layout} playerPos={posRef} framework={framework} />
       <ProximityHint nearest={openPanel ? null : nearest} />
+      <ShortcutHud canEdit={canEdit} />
       <WalkOnboarding />
 
       {openPanel === 'agentAvatar' && canEdit && (
