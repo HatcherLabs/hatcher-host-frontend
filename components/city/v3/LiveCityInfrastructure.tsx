@@ -63,6 +63,7 @@ function SkyDome({ timeMode }: { timeMode: LiveCityTimeMode }) {
       <sphereGeometry args={[900, 32, 18]} />
       <shaderMaterial
         side={THREE.BackSide}
+        fog={false}
         depthWrite={false}
         uniforms={uniforms}
         vertexShader={`
