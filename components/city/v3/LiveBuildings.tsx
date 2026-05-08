@@ -45,6 +45,7 @@ export function LiveBuildings({ buildings, onBuildingClick }: Props) {
           />
         );
       })}
+      <LiveBuildingBeacons buildings={buildings} />
     </group>
   );
 }
@@ -103,7 +104,9 @@ function LivePrimitiveInstances({
       cloned.needsUpdate = true;
       return cloned;
     };
-    return Array.isArray(material) ? material.map(cloneOne) : cloneOne(material);
+    return Array.isArray(material)
+      ? material.map(cloneOne)
+      : cloneOne(material);
   }, [material]);
 
   useEffect(() => {
@@ -127,7 +130,9 @@ function LivePrimitiveInstances({
 
   useEffect(() => {
     return () => {
-      const materials = Array.isArray(clonedMaterial) ? clonedMaterial : [clonedMaterial];
+      const materials = Array.isArray(clonedMaterial)
+        ? clonedMaterial
+        : [clonedMaterial];
       for (const mat of materials) mat.dispose();
     };
   }, [clonedMaterial]);
@@ -152,4 +157,46 @@ function LivePrimitiveInstances({
 
 export function statusEmissiveFor(status: LiveBuildingLayout['status']) {
   return STATUS_EMISSIVE[status];
+}
+
+function LiveBuildingBeacons({
+  buildings,
+}: {
+  buildings: LiveBuildingLayout[];
+}) {
+  return (
+    <group>
+      {buildings.map((building) => {
+        if (building.status !== 'running' && !building.mine) return null;
+        const color = building.mine
+          ? 0xffd24a
+          : FRAMEWORK_COLORS[building.framework];
+        return (
+          <mesh
+            key={`${building.agentId}-beacon`}
+            position={[
+              building.x,
+              Math.min(building.height + 0.55, 30),
+              building.z,
+            ]}
+          >
+            <boxGeometry
+              args={[
+                building.mine ? 2.1 : 1.45,
+                0.16,
+                building.mine ? 2.1 : 1.45,
+              ]}
+            />
+            <meshBasicMaterial
+              color={color}
+              transparent
+              opacity={building.mine ? 0.78 : 0.52}
+              depthWrite={false}
+              toneMapped={false}
+            />
+          </mesh>
+        );
+      })}
+    </group>
+  );
 }

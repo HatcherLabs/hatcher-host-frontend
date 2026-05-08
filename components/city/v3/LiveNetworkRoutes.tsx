@@ -28,7 +28,8 @@ function LiveNetworkRoute({ route }: { route: LiveRouteLayout }) {
     [route.from, route.mid, route.to],
   );
   const geometry = useMemo(
-    () => new THREE.TubeGeometry(curve, 32, route.mine ? 0.055 : 0.035, 6, false),
+    () =>
+      new THREE.TubeGeometry(curve, 28, route.mine ? 0.045 : 0.026, 6, false),
     [curve, route.mine],
   );
   const material = useMemo(
@@ -36,7 +37,7 @@ function LiveNetworkRoute({ route }: { route: LiveRouteLayout }) {
       new THREE.MeshBasicMaterial({
         color,
         transparent: true,
-        opacity: route.mine ? 0.34 : 0.18,
+        opacity: route.mine ? 0.3 : 0.12,
         depthWrite: false,
         toneMapped: false,
       }),
@@ -57,15 +58,23 @@ function LiveNetworkRoute({ route }: { route: LiveRouteLayout }) {
     const point = curve.getPointAt(t);
     const tangent = curve.getTangentAt(t).normalize();
     packet.current.position.copy(point);
-    packet.current.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tangent);
+    packet.current.quaternion.setFromUnitVectors(
+      new THREE.Vector3(0, 1, 0),
+      tangent,
+    );
   });
 
   return (
     <group>
       <mesh geometry={geometry} material={material} />
       <mesh ref={packet}>
-        <boxGeometry args={[0.24, route.mine ? 2.4 : 1.8, 0.24]} />
-        <meshBasicMaterial color={color} transparent opacity={0.92} toneMapped={false} />
+        <boxGeometry args={[0.18, route.mine ? 1.35 : 1.05, 0.18]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={0.84}
+          toneMapped={false}
+        />
       </mesh>
     </group>
   );

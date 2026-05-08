@@ -7,10 +7,7 @@ import {
   STATUS_WEIGHT,
 } from './liveLayout';
 
-function mkAgent(
-  id: string,
-  overrides: Partial<CityAgent> = {},
-): CityAgent {
+function mkAgent(id: string, overrides: Partial<CityAgent> = {}): CityAgent {
   return {
     id,
     slug: id,
@@ -28,10 +25,20 @@ function mkAgent(
 
 describe('rankAgentForCity', () => {
   it('prioritizes owned agents over public agents', () => {
-    const owned = mkAgent('owned', { mine: true, status: 'sleeping', messageCount: 0 });
-    const publicActive = mkAgent('public', { mine: false, status: 'running', messageCount: 500 });
+    const owned = mkAgent('owned', {
+      mine: true,
+      status: 'sleeping',
+      messageCount: 0,
+    });
+    const publicActive = mkAgent('public', {
+      mine: false,
+      status: 'running',
+      messageCount: 500,
+    });
 
-    expect(rankAgentForCity(owned)).toBeGreaterThan(rankAgentForCity(publicActive));
+    expect(rankAgentForCity(owned)).toBeGreaterThan(
+      rankAgentForCity(publicActive),
+    );
   });
 
   it('uses status, tier, and message count for public ranking', () => {
@@ -42,8 +49,12 @@ describe('rankAgentForCity', () => {
     const busy = mkAgent('busy', { messageCount: 200 });
     const quiet = mkAgent('quiet', { messageCount: 1 });
 
-    expect(rankAgentForCity(running)).toBeGreaterThan(rankAgentForCity(crashed));
-    expect(rankAgentForCity(highTier)).toBeGreaterThan(rankAgentForCity(lowTier));
+    expect(rankAgentForCity(running)).toBeGreaterThan(
+      rankAgentForCity(crashed),
+    );
+    expect(rankAgentForCity(highTier)).toBeGreaterThan(
+      rankAgentForCity(lowTier),
+    );
     expect(rankAgentForCity(busy)).toBeGreaterThan(rankAgentForCity(quiet));
     expect(STATUS_WEIGHT.running).toBeGreaterThan(STATUS_WEIGHT.sleeping);
   });
@@ -64,11 +75,18 @@ describe('layoutLiveCity', () => {
 
   it('keeps owned agents in the rendered hero set even when many public agents exist', () => {
     const publicAgents = Array.from({ length: 80 }, (_, i) =>
-      mkAgent(`public-${i}`, { status: 'running', messageCount: 1000 + i, tier: 4 }),
+      mkAgent(`public-${i}`, {
+        status: 'running',
+        messageCount: 1000 + i,
+        tier: 4,
+      }),
     );
     const owned = mkAgent('mine', { mine: true, status: 'sleeping', tier: 1 });
 
-    const layout = layoutLiveCity([...publicAgents, owned], { maxBuildings: 24, routeLimit: 8 });
+    const layout = layoutLiveCity([...publicAgents, owned], {
+      maxBuildings: 24,
+      routeLimit: 8,
+    });
 
     expect(layout.buildings.some((b) => b.agentId === 'mine')).toBe(true);
     expect(layout.ownedAgents.map((a) => a.id)).toContain('mine');
@@ -82,5 +100,46 @@ describe('layoutLiveCity', () => {
 
     expect(selectRouteAgents(agents, 10)).toHaveLength(10);
     expect(selectRouteAgents(agents, 0)).toHaveLength(0);
+  });
+
+  it('spreads buildings across city blocks instead of linear rows', () => {
+    const agents = Array.from({ length: 72 }, (_, i) =>
+      mkAgent(`agent-${i}`, {
+        status: i % 4 === 0 ? 'running' : 'sleeping',
+        tier: i % 5,
+        messageCount: 100 + i,
+      }),
+    );
+
+    const layout = layoutLiveCity(agents, { maxBuildings: 72, routeLimit: 12 });
+    const blockIds = new Set(
+      layout.buildings.map((building) => building.blockId),
+    );
+    const left = layout.buildings.some((building) => building.x < -35);
+    const right = layout.buildings.some((building) => building.x > 35);
+    const front = layout.buildings.some((building) => building.z > 35);
+    const back = layout.buildings.some((building) => building.z < -30);
+
+    expect(blockIds.size).toBeGreaterThanOrEqual(8);
+    expect(left).toBe(true);
+    expect(right).toBe(true);
+    expect(front).toBe(true);
+    expect(back).toBe(true);
+  });
+
+  it('keeps network routes close to the city skyline', () => {
+    const agents = Array.from({ length: 20 }, (_, i) =>
+      mkAgent(`agent-${i}`, {
+        status: 'running',
+        tier: 3,
+        messageCount: 50 + i,
+      }),
+    );
+
+    const layout = layoutLiveCity(agents, { routeLimit: 12 });
+
+    expect(layout.routes).toHaveLength(12);
+    expect(layout.routes.every((route) => route.to[1] <= 18)).toBe(true);
+    expect(layout.routes.every((route) => route.mid[1] <= 30)).toBe(true);
   });
 });
