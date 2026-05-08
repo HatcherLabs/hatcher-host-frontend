@@ -10,12 +10,11 @@ import {
   type LiveCityTimeMode,
 } from './liveCityHandoff';
 import {
-  CITY_FLAT_RADIUS,
   createTreeRingSpecs,
   hashUnit,
   TERRAIN_SEGMENTS,
   TERRAIN_SIZE,
-  terrainNoise,
+  terrainHeightAt,
 } from './liveCityEnvironment';
 
 interface InfrastructureProps {
@@ -35,11 +34,11 @@ export function LiveCityInfrastructure({
     <group>
       <SkyDome timeMode={timeMode} />
       <Stars timeMode={timeMode} />
-      <Terrain timeMode={timeMode} />
+      <Terrain grid={grid} timeMode={timeMode} />
       <MountainRing timeMode={timeMode} />
       <StreetGrid grid={grid} />
       <StreetLights grid={grid} timeMode={timeMode} />
-      <TreeRing timeMode={timeMode} />
+      <TreeRing grid={grid} timeMode={timeMode} />
     </group>
   );
 }
@@ -127,7 +126,7 @@ function Stars({ timeMode }: { timeMode: LiveCityTimeMode }) {
   );
 }
 
-function Terrain({ timeMode }: { timeMode: LiveCityTimeMode }) {
+function Terrain({ grid, timeMode }: InfrastructureProps) {
   const geometry = useMemo(() => {
     const terrain = new THREE.PlaneGeometry(
       TERRAIN_SIZE,
@@ -146,12 +145,7 @@ function Terrain({ timeMode }: { timeMode: LiveCityTimeMode }) {
     for (let i = 0; i < positions.count; i++) {
       const x = positions.getX(i);
       const z = positions.getZ(i);
-      const dist = Math.hypot(x, z);
-      let height = 0;
-      if (dist > CITY_FLAT_RADIUS) {
-        const ramp = Math.min(1, (dist - CITY_FLAT_RADIUS) / 50);
-        height = terrainNoise(x, z) * 6 * ramp + Math.max(0, dist - 200) * 0.02;
-      }
+      const height = terrainHeightAt(x, z, grid.half);
       positions.setY(i, height);
 
       const color =
@@ -168,7 +162,7 @@ function Terrain({ timeMode }: { timeMode: LiveCityTimeMode }) {
     terrain.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     terrain.computeVertexNormals();
     return terrain;
-  }, [timeMode]);
+  }, [grid.half, timeMode]);
 
   useEffect(() => () => geometry.dispose(), [geometry]);
 
@@ -271,8 +265,8 @@ function StreetLights({ grid, timeMode }: InfrastructureProps) {
   );
 }
 
-function TreeRing({ timeMode }: { timeMode: LiveCityTimeMode }) {
-  const trees = useMemo(() => createTreeRingSpecs(), []);
+function TreeRing({ grid, timeMode }: InfrastructureProps) {
+  const trees = useMemo(() => createTreeRingSpecs(grid.half), [grid.half]);
 
   return (
     <group>
