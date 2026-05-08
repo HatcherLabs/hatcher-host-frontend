@@ -13,13 +13,7 @@ import {
   X,
   Zap,
 } from 'lucide-react';
-import {
-  Suspense,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import * as THREE from 'three';
 import { useRouter } from '@/i18n/routing';
@@ -46,6 +40,16 @@ import { LiveActivityPulses } from './LiveActivityPulses';
 import { LiveBuildings } from './LiveBuildings';
 import { LiveCityHud } from './LiveCityHud';
 import { LiveCityInfrastructure } from './LiveCityInfrastructure';
+import { makeLiveAgentLoopPath, sampleLiveAgentPath } from './liveAgentMotion';
+import {
+  createAgentColliders,
+  createWalkCollisionMap,
+  resolveWalkPosition,
+  SURVEY_FOV,
+  WALK_EYE_HEIGHT,
+  WALK_FOV,
+  WALK_SPEED,
+} from './walkCollision';
 
 interface Props {
   agents: CityAgent[];
@@ -184,8 +188,9 @@ function LiveCitySceneBody({
   const selectedAgent = useMemo(
     () =>
       selectedAgentId
-        ? (layout.markers.find((marker) => marker.agentId === selectedAgentId) ??
-          null)
+        ? (layout.markers.find(
+            (marker) => marker.agentId === selectedAgentId,
+          ) ?? null)
         : null,
     [layout.markers, selectedAgentId],
   );
@@ -281,6 +286,8 @@ function LiveCitySceneBody({
         <WalkCameraController
           enabled={viewMode === 'walk'}
           grid={layout.grid}
+          buildings={layout.buildings}
+          markers={layout.markers}
         />
       </Canvas>
       <QualityToggle />
@@ -492,6 +499,11 @@ function labelAgentStatus(status: CityAgent['status']): string {
 function SurveyCamera() {
   const { camera } = useThree();
   useEffect(() => {
+    if (camera instanceof THREE.PerspectiveCamera) {
+      camera.fov = SURVEY_FOV;
+      camera.near = 0.2;
+      camera.updateProjectionMatrix();
+    }
     camera.position.set(85, 75, 95);
     camera.lookAt(0, 0, 0);
   }, [camera]);
@@ -516,29 +528,52 @@ function SurveyCamera() {
 function WalkCameraController({
   enabled,
   grid,
+  buildings,
+  markers,
 }: {
   enabled: boolean;
   grid: LiveCityGrid;
+  buildings: LiveBuildingLayout[];
+  markers: LiveAgentMarkerLayout[];
 }) {
   const { camera, gl } = useThree();
   const keysRef = useRef(new Set<string>());
   const draggingRef = useRef(false);
   const yawRef = useRef(0);
-  const pitchRef = useRef(-0.12);
+  const pitchRef = useRef(-0.04);
   const scratchForward = useMemo(() => new THREE.Vector3(), []);
   const scratchRight = useMemo(() => new THREE.Vector3(), []);
   const scratchMove = useMemo(() => new THREE.Vector3(), []);
   const scratchEuler = useMemo(() => new THREE.Euler(0, 0, 0, 'YXZ'), []);
+  const collisionMap = useMemo(
+    () => createWalkCollisionMap(grid, buildings),
+    [buildings, grid],
+  );
+  const markerPaths = useMemo(
+    () =>
+      new Map(
+        markers.map((marker) => [
+          marker.agentId,
+          makeLiveAgentLoopPath(marker.pathNodes, marker.x, marker.z),
+        ]),
+      ),
+    [markers],
+  );
 
   useEffect(() => {
     if (!enabled) return;
-    const startZ = grid.half + 10;
-    camera.position.set(0, 2.15, startZ);
+    const startZ = Math.min(grid.half + 10, collisionMap.bounds - 2);
+    camera.position.set(0, WALK_EYE_HEIGHT, startZ);
+    if (camera instanceof THREE.PerspectiveCamera) {
+      camera.fov = WALK_FOV;
+      camera.near = 0.05;
+      camera.updateProjectionMatrix();
+    }
     yawRef.current = 0;
-    pitchRef.current = -0.12;
+    pitchRef.current = -0.04;
     scratchEuler.set(pitchRef.current, yawRef.current, 0);
     camera.quaternion.setFromEuler(scratchEuler);
-  }, [camera, enabled, grid.half, scratchEuler]);
+  }, [camera, collisionMap.bounds, enabled, grid.half, scratchEuler]);
 
   useEffect(() => {
     if (!enabled) {
@@ -592,7 +627,7 @@ function WalkCameraController({
     };
   }, [enabled, gl]);
 
-  useFrame((_, delta) => {
+  useFrame(({ clock }, delta) => {
     if (!enabled) return;
     const keys = keysRef.current;
     const turnSpeed = 1.8 * delta;
@@ -610,18 +645,36 @@ function WalkCameraController({
     scratchRight.normalize();
     scratchMove.set(0, 0, 0);
 
-    if (keys.has('KeyW') || keys.has('ArrowUp')) scratchMove.add(scratchForward);
-    if (keys.has('KeyS') || keys.has('ArrowDown')) scratchMove.sub(scratchForward);
+    if (keys.has('KeyW') || keys.has('ArrowUp'))
+      scratchMove.add(scratchForward);
+    if (keys.has('KeyS') || keys.has('ArrowDown'))
+      scratchMove.sub(scratchForward);
     if (keys.has('KeyA')) scratchMove.sub(scratchRight);
     if (keys.has('KeyD')) scratchMove.add(scratchRight);
 
     if (scratchMove.lengthSq() > 0) {
-      scratchMove.normalize().multiplyScalar(18 * delta);
-      camera.position.add(scratchMove);
-      const limit = grid.half + 18;
-      camera.position.x = THREE.MathUtils.clamp(camera.position.x, -limit, limit);
-      camera.position.z = THREE.MathUtils.clamp(camera.position.z, -limit, limit);
-      camera.position.y = 2.15;
+      const elapsed = clock.elapsedTime;
+      scratchMove.normalize().multiplyScalar(WALK_SPEED * delta);
+      const previous = {
+        x: camera.position.x,
+        z: camera.position.z,
+      };
+      const dynamicColliders = createAgentColliders(markers, (marker) => {
+        const path =
+          markerPaths.get(marker.agentId) ??
+          makeLiveAgentLoopPath(marker.pathNodes, marker.x, marker.z);
+        return sampleLiveAgentPath(path, elapsed * marker.speed + marker.phase);
+      });
+      const next = resolveWalkPosition(
+        {
+          x: camera.position.x + scratchMove.x,
+          z: camera.position.z + scratchMove.z,
+        },
+        previous,
+        collisionMap,
+        dynamicColliders,
+      );
+      camera.position.set(next.x, WALK_EYE_HEIGHT, next.z);
     }
   });
 
@@ -669,7 +722,11 @@ function LiveCityPointerTargets({
               Math.max(1.8, building.height / 2),
               building.z,
             ),
-            new THREE.Vector3(footprint, Math.max(4.2, building.height), footprint),
+            new THREE.Vector3(
+              footprint,
+              Math.max(4.2, building.height),
+              footprint,
+            ),
           ),
         };
       }),
@@ -729,9 +786,10 @@ function LiveCityPointerTargets({
 
       updateRay(event);
 
-      let bestAgent:
-        | { marker: LiveAgentMarkerLayout; distance: number }
-        | null = null;
+      let bestAgent: {
+        marker: LiveAgentMarkerLayout;
+        distance: number;
+      } | null = null;
       for (const target of markerTargets) {
         const point = raycaster.ray.intersectBox(target.box, hit);
         if (!point) continue;
@@ -747,9 +805,10 @@ function LiveCityPointerTargets({
         return;
       }
 
-      let bestBuilding:
-        | { building: LiveBuildingLayout; distance: number }
-        | null = null;
+      let bestBuilding: {
+        building: LiveBuildingLayout;
+        distance: number;
+      } | null = null;
       for (const target of buildingTargets) {
         const point = raycaster.ray.intersectBox(target.box, hit);
         if (!point) continue;
@@ -771,7 +830,14 @@ function LiveCityPointerTargets({
       element.removeEventListener('pointerdown', onPointerDown);
       element.removeEventListener('pointerup', onPointerUp);
     };
-  }, [buildingTargets, camera, gl, markerTargets, onAgentClick, onBuildingClick]);
+  }, [
+    buildingTargets,
+    camera,
+    gl,
+    markerTargets,
+    onAgentClick,
+    onBuildingClick,
+  ]);
 
   return null;
 }
