@@ -64,6 +64,13 @@ interface Props {
   pulseAts: Map<string, number>;
 }
 
+interface SurveyFocusTarget {
+  key: string;
+  x: number;
+  z: number;
+  height: number;
+}
+
 const EMPTY_COUNTS: CityResponse['counts'] = {
   total: 0,
   running: 0,
@@ -181,6 +188,10 @@ function LiveCitySceneBody({
   const [viewMode, setViewMode] = useState<'survey' | 'walk'>('survey');
   const [selectedOwnerKey, setSelectedOwnerKey] = useState<string | null>(null);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
+  const [cameraFocus, setCameraFocus] = useState<{
+    ownerKey: string;
+    nonce: number;
+  } | null>(null);
   const layout = useMemo(
     () =>
       layoutLiveCity(agents, {
@@ -208,6 +219,24 @@ function LiveCitySceneBody({
         : null,
     [layout.markers, selectedAgentId],
   );
+  const myBuilding = useMemo(
+    () => layout.buildings.find((building) => building.mine) ?? null,
+    [layout.buildings],
+  );
+  const focusTarget = useMemo<SurveyFocusTarget | null>(() => {
+    if (!cameraFocus) return null;
+    const building =
+      layout.buildings.find(
+        (candidate) => candidate.ownerKey === cameraFocus.ownerKey,
+      ) ?? null;
+    if (!building) return null;
+    return {
+      key: `${building.ownerKey}:${cameraFocus.nonce}`,
+      x: building.x,
+      z: building.z,
+      height: building.height,
+    };
+  }, [cameraFocus, layout.buildings]);
 
   useEffect(() => {
     if (selectedOwnerKey && !selectedBuilding) setSelectedOwnerKey(null);
@@ -216,6 +245,14 @@ function LiveCitySceneBody({
   useEffect(() => {
     if (selectedAgentId && !selectedAgent) setSelectedAgentId(null);
   }, [selectedAgent, selectedAgentId]);
+
+  const focusMyBuilding = () => {
+    if (!myBuilding) return;
+    setViewMode('survey');
+    setSelectedAgentId(null);
+    setSelectedOwnerKey(myBuilding.ownerKey);
+    setCameraFocus({ ownerKey: myBuilding.ownerKey, nonce: Date.now() });
+  };
 
   return (
     <div
@@ -296,7 +333,9 @@ function LiveCitySceneBody({
             setSelectedAgentId(agentId);
           }}
         />
-        {viewMode === 'survey' ? <SurveyCamera grid={layout.grid} /> : null}
+        {viewMode === 'survey' ? (
+          <SurveyCamera grid={layout.grid} focusTarget={focusTarget} />
+        ) : null}
         <WalkCameraController
           enabled={viewMode === 'walk'}
           grid={layout.grid}
@@ -316,7 +355,8 @@ function LiveCitySceneBody({
         counts={counts}
         ownedAgents={layout.ownedAgents}
         generatedAt={generatedAt}
-        hasMyBuilding={layout.buildings.some((building) => building.mine)}
+        hasMyBuilding={myBuilding !== null}
+        onMyBuildingClick={focusMyBuilding}
       />
       {selectedBuilding && (
         <LiveBuildingPanel
@@ -395,7 +435,7 @@ function LiveBuildingPanel({
           className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[4px] border border-emerald-300/30 bg-emerald-300 px-3 py-2 text-xs font-semibold text-black transition hover:bg-emerald-200"
         >
           <DoorOpen size={14} />
-          Enter house
+          Enter building
         </button>
       )}
     </aside>
@@ -525,8 +565,26 @@ function labelAgentStatus(status: CityAgent['status']): string {
   }
 }
 
-function SurveyCamera({ grid }: { grid: LiveCityGrid }) {
+function SurveyCamera({
+  grid,
+  focusTarget,
+}: {
+  grid: LiveCityGrid;
+  focusTarget: SurveyFocusTarget | null;
+}) {
   const { camera } = useThree();
+  const mapTarget = useMemo<[number, number, number]>(
+    () =>
+      focusTarget
+        ? [
+            focusTarget.x,
+            Math.min(12, focusTarget.height * 0.36),
+            focusTarget.z,
+          ]
+        : [0, 0, 0],
+    [focusTarget],
+  );
+
   useEffect(() => {
     const span = Math.max(95, grid.bounds.width * 0.48);
     if (camera instanceof THREE.PerspectiveCamera) {
@@ -535,12 +593,27 @@ function SurveyCamera({ grid }: { grid: LiveCityGrid }) {
       camera.far = Math.max(1000, grid.bounds.width * 5);
       camera.updateProjectionMatrix();
     }
+    if (focusTarget) {
+      const distance = Math.max(
+        34,
+        Math.min(82, focusTarget.height * 2.4 + 24),
+      );
+      const y = Math.max(18, focusTarget.height + 12, distance * 0.64);
+      camera.position.set(
+        focusTarget.x + distance * 0.82,
+        y,
+        focusTarget.z + distance * 1.04,
+      );
+      camera.lookAt(mapTarget[0], mapTarget[1], mapTarget[2]);
+      return;
+    }
     camera.position.set(span, span * 0.82, span * 1.12);
-    camera.lookAt(0, 0, 0);
-  }, [camera, grid.bounds.width]);
+    camera.lookAt(mapTarget[0], mapTarget[1], mapTarget[2]);
+  }, [camera, focusTarget, grid.bounds.width, mapTarget]);
 
   return (
     <MapControls
+      key={focusTarget?.key ?? 'city-survey'}
       makeDefault
       enableDamping
       dampingFactor={0.08}
@@ -551,7 +624,7 @@ function SurveyCamera({ grid }: { grid: LiveCityGrid }) {
       maxDistance={Math.max(220, grid.bounds.width * 1.4)}
       minPolarAngle={0.24}
       maxPolarAngle={Math.PI * 0.48}
-      target={[0, 0, 0]}
+      target={mapTarget}
     />
   );
 }
