@@ -79,6 +79,8 @@ const EMPTY_COUNTS: CityResponse['counts'] = {
   byCategory: {} as CityResponse['counts']['byCategory'],
 };
 
+const CITY_CAMERA_FAR = 3_000;
+
 const CITY_LIGHTING: Record<
   LiveCityTimeMode,
   {
@@ -261,7 +263,12 @@ function LiveCitySceneBody({
     >
       <Canvas
         key={`${quality}-${timeMode}`}
-        camera={{ position: [85, 75, 95], fov: 45, near: 0.5, far: 1000 }}
+        camera={{
+          position: [85, 75, 95],
+          fov: 45,
+          near: 0.5,
+          far: CITY_CAMERA_FAR,
+        }}
         dpr={quality === 'high' ? [1, 2] : 1}
         gl={{
           antialias: quality === 'high',
@@ -590,7 +597,7 @@ function SurveyCamera({
     if (camera instanceof THREE.PerspectiveCamera) {
       camera.fov = SURVEY_FOV;
       camera.near = 0.2;
-      camera.far = Math.max(1000, grid.bounds.width * 5);
+      camera.far = Math.max(CITY_CAMERA_FAR, grid.bounds.width * 5);
       camera.updateProjectionMatrix();
     }
     if (focusTarget) {
