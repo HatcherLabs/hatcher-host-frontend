@@ -168,6 +168,15 @@ const nextConfig = {
     const dead = ['agent/:id/room-legacy', 'agent/:id/city', 'embed/agent/:id'];
     const target = '/agent/:id/room';
     const out = [];
+    const cityCategory =
+      ':category(automation|business|compliance|creative|customer-success|data|development|devops|ecommerce|education|finance|freelance|healthcare|hr|legal|marketing|moltbook|ollama|personal|productivity|real-estate|saas|security|supply-chain|voice)';
+
+    out.push({ source: `/city/${cityCategory}`, destination: '/city', permanent: true });
+    out.push({
+      source: `/:locale(zh|de|fr|ro)/city/${cityCategory}`,
+      destination: '/:locale/city',
+      permanent: true,
+    });
 
     for (const slug of [
       'openclaw-vs-hermes-vs-elizaos',

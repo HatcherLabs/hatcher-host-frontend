@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
 
 export async function generateStaticParams() {
   return [];
@@ -13,5 +15,5 @@ export const metadata: Metadata = {
 };
 
 export default function CityCategoryRedirect() {
-  redirect('/city');
+  permanentRedirect('/city');
 }

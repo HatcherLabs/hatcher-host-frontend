@@ -193,7 +193,11 @@ test.describe('Hatcher City live network', () => {
       .toBe(true);
   });
 
-  test('legacy category pages redirect back to the city', async ({ page }) => {
+  test('legacy category pages redirect back to the city', async ({ page, request }) => {
+    const response = await request.get('/city/development', { maxRedirects: 0 });
+    expect(response.status()).toBe(308);
+    expect(response.headers().location).toBe('/city');
+
     await page.goto('/city/development', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/city$/);
     await expect(page.getByRole('heading', { name: 'Live Agent Network' })).toBeVisible();
