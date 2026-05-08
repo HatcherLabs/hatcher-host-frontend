@@ -55,8 +55,17 @@ jobs:
             pm2 restart hatcher-web
 
             echo "==> Health check..."
-            sleep 3
-            if curl -sf http://localhost:3000 > /dev/null 2>&1; then
+            HEALTH_OK=0
+            for i in $(seq 1 20); do
+              if curl -fsS http://127.0.0.1:3000/ro/city > /dev/null 2>&1; then
+                HEALTH_OK=1
+                break
+              fi
+              echo "Health check waiting ($i/20)..."
+              sleep 2
+            done
+
+            if [ "$HEALTH_OK" = "1" ]; then
               echo "Frontend health check passed"
             else
               echo "WARNING: Frontend health check failed"
