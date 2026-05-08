@@ -50,6 +50,10 @@ export function LiveBuildings({ buildings, onBuildingClick }: Props) {
           />
         );
       })}
+      <LiveBuildingClickTargets
+        buildings={buildings}
+        onBuildingClick={onBuildingClick}
+      />
     </group>
   );
 }
@@ -169,5 +173,62 @@ function LivePrimitiveInstances({
       onClick={handleBuildingPointer}
       onPointerDown={handleBuildingPointer}
     />
+  );
+}
+
+function LiveBuildingClickTargets({
+  buildings,
+  onBuildingClick,
+}: {
+  buildings: LiveBuildingLayout[];
+  onBuildingClick?: (building: LiveBuildingLayout) => void;
+}) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const obj = useMemo(() => new THREE.Object3D(), []);
+
+  useEffect(() => {
+    if (!ref.current) return;
+
+    buildings.forEach((building, index) => {
+      const footprint =
+        2.9 +
+        Math.min(2.2, building.tier * 0.36) +
+        Math.min(1.8, Math.log2(building.agentCount + 1) * 0.3);
+      obj.position.set(
+        building.x,
+        Math.max(1.6, building.height / 2),
+        building.z,
+      );
+      obj.rotation.set(0, building.rotation, 0);
+      obj.scale.set(footprint, Math.max(3.2, building.height), footprint);
+      obj.updateMatrix();
+      ref.current!.setMatrixAt(index, obj.matrix);
+    });
+
+    ref.current.instanceMatrix.needsUpdate = true;
+  }, [buildings, obj]);
+
+  const handleBuildingPointer = (event: {
+    instanceId?: number;
+    stopPropagation: () => void;
+  }) => {
+    if (!onBuildingClick || event.instanceId == null) return;
+    const building = buildings[event.instanceId];
+    if (!building) return;
+    event.stopPropagation();
+    onBuildingClick(building);
+  };
+
+  return (
+    <instancedMesh
+      ref={ref}
+      args={[undefined, undefined, buildings.length]}
+      frustumCulled={false}
+      onClick={handleBuildingPointer}
+      onPointerDown={handleBuildingPointer}
+    >
+      <boxGeometry args={[1, 1, 1]} />
+      <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+    </instancedMesh>
   );
 }
