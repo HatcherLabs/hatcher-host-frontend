@@ -31,7 +31,6 @@ import { LiveActivityPulses } from './LiveActivityPulses';
 import { LiveBuildings } from './LiveBuildings';
 import { LiveCityHud } from './LiveCityHud';
 import { LiveCityInfrastructure } from './LiveCityInfrastructure';
-import { LiveNetworkRoutes } from './LiveNetworkRoutes';
 
 interface Props {
   agents: CityAgent[];
@@ -88,7 +87,7 @@ function LiveCitySceneBody({
     () =>
       layoutLiveCity(agents, {
         maxBuildings: quality === 'high' ? 800 : 420,
-        routeLimit: quality === 'high' ? 18 : 10,
+        routeLimit: 0,
       }),
     [agents, quality],
   );
@@ -110,7 +109,7 @@ function LiveCitySceneBody({
     <div className="relative h-full w-full bg-[#8fd3ea]">
       <Canvas
         key={quality}
-        camera={{ position: [178, 128, 216], fov: 42, near: 0.5, far: 900 }}
+        camera={{ position: [72, 56, 88], fov: 46, near: 0.5, far: 900 }}
         dpr={quality === 'high' ? [1, 2] : 1}
         gl={{
           antialias: quality === 'high',
@@ -123,7 +122,7 @@ function LiveCitySceneBody({
         }}
       >
         <color attach="background" args={['#8fd3ea']} />
-        <fog attach="fog" args={['#bdebf0', 210, 680]} />
+        <fog attach="fog" args={['#bdebf0', 310, 820]} />
         <ambientLight intensity={0.68} color="#d8f8ff" />
         <hemisphereLight
           color="#e1fbff"
@@ -160,9 +159,6 @@ function LiveCitySceneBody({
             markers={layout.markers}
             onMarkerClick={onAgentClick}
           />
-        </SceneErrorBoundary>
-        <SceneErrorBoundary label="LiveNetworkRoutes">
-          <LiveNetworkRoutes routes={layout.routes} />
         </SceneErrorBoundary>
         <SceneErrorBoundary label="LiveActivityPulses">
           <LiveActivityPulses
@@ -274,7 +270,7 @@ function BuildingStat({
 function SurveyCamera() {
   const { camera } = useThree();
   useEffect(() => {
-    camera.position.set(178, 128, 216);
+    camera.position.set(72, 56, 88);
     camera.lookAt(0, 9, 8);
   }, [camera]);
 
@@ -286,8 +282,8 @@ function SurveyCamera() {
       enableZoom
       enablePan
       enableRotate
-      minDistance={56}
-      maxDistance={360}
+      minDistance={28}
+      maxDistance={240}
       minPolarAngle={0.5}
       maxPolarAngle={1.26}
       target={[0, 9, 8]}

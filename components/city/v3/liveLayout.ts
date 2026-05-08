@@ -77,8 +77,8 @@ const OWNER_WEIGHT = 200_000;
 const CITY_CENTER_Z = 8;
 
 export const LIVE_CITY_BOUNDS = {
-  width: 372,
-  depth: 316,
+  width: 220,
+  depth: 188,
   centerZ: CITY_CENTER_Z,
 } as const;
 
@@ -105,10 +105,10 @@ export interface LiveCityRoad {
   kind: 'vertical' | 'horizontal';
 }
 
-const ROAD_XS = [-160, -96, -32, 32, 96, 160] as const;
-const ROAD_ZS = [-132, -76, -20, 36, 92, 148] as const;
-const BLOCK_XS = [-128, -64, 0, 64, 128] as const;
-const BLOCK_ZS = [-104, -48, 8, 64, 120] as const;
+const ROAD_XS = [-88, -52, -16, 20, 56, 92] as const;
+const ROAD_ZS = [-76, -42, -8, 26, 60, 94] as const;
+const BLOCK_XS = [-70, -34, 2, 38, 74] as const;
+const BLOCK_ZS = [-58, -24, 10, 44, 78] as const;
 
 function blockAccent(x: number, z: number): LiveCityBlock['accent'] {
   const distance = Math.hypot(x / 128, (z - CITY_CENTER_Z) / 124);
@@ -128,10 +128,10 @@ export const LIVE_CITY_BLOCKS: readonly LiveCityBlock[] = BLOCK_ZS.flatMap(
         z,
         cols: 6 + capacityBoost,
         rows: 6,
-        spacingX: accent === 'core' ? 7.4 : 7,
-        spacingZ: accent === 'core' ? 7.2 : 6.8,
-        padWidth: 56,
-        padDepth: 50,
+        spacingX: accent === 'core' ? 5.9 : 5.55,
+        spacingZ: accent === 'core' ? 5.7 : 5.35,
+        padWidth: 31,
+        padDepth: 29,
         heightScale: accent === 'core' ? 1.16 : accent === 'inner' ? 0.98 : 0.82,
         accent,
       } satisfies LiveCityBlock;
@@ -147,16 +147,16 @@ export const LIVE_CITY_ROADS: readonly LiveCityRoad[] = [
     key: `avenue-${x}`,
     x,
     z: CITY_CENTER_Z,
-    width: Math.abs(x) === 32 ? 10 : 8,
-    depth: 288,
+    width: Math.abs(x - 20) <= 36 ? 7.2 : 6.4,
+    depth: 172,
     kind: 'vertical' as const,
   })),
   ...ROAD_ZS.map((z) => ({
     key: `street-${z}`,
     x: 0,
     z,
-    width: 344,
-    depth: Math.abs(z - CITY_CENTER_Z) === 28 ? 10 : 8,
+    width: 204,
+    depth: Math.abs(z - CITY_CENTER_Z) === 18 ? 7.2 : 6.4,
     kind: 'horizontal' as const,
   })),
 ];
@@ -363,7 +363,7 @@ function blockCapacity(block: LiveCityBlock): number {
 function chooseBlock(index: number, count: number) {
   const activeBlockCount = Math.min(
     LIVE_CITY_BLOCKS.length,
-    Math.max(8, Math.ceil(count / 24)),
+    Math.max(8, count > 240 ? LIVE_CITY_BLOCKS.length : Math.ceil(count / 22)),
   );
   const activeBlocks = LIVE_CITY_BLOCKS.slice(0, activeBlockCount);
   const block = activeBlocks[index % activeBlocks.length] ?? activeBlocks[0]!;

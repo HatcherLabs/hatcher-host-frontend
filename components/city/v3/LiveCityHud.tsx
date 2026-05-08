@@ -82,7 +82,7 @@ export function LiveCityHud({ counts, ownedAgents, generatedAt }: Props) {
         </div>
       ) : (
         <div className="absolute bottom-4 left-4 rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-xs text-white/70 backdrop-blur-xl">
-          Live activity appears as routes and pulses. Your agents turn gold after login.
+          Active agents move through the city. Your agents turn gold after login.
         </div>
       )}
     </div>

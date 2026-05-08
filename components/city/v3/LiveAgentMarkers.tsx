@@ -1,8 +1,8 @@
 'use client';
 import { useFrame } from '@react-three/fiber';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { liveAgentColor, liveAgentGlowColor } from './LiveCityColors';
+import { liveAgentColor } from './LiveCityColors';
 import type { LiveAgentMarkerLayout } from './liveLayout';
 
 interface Props {
@@ -10,39 +10,18 @@ interface Props {
   onMarkerClick?: (agentId: string) => void;
 }
 
+const TRAIL_POINTS = 18;
+
 export function LiveAgentMarkers({ markers, onMarkerClick }: Props) {
-  const buckets = useMemo(() => {
-    const out = new Map<
-      string,
-      {
-        color: number;
-        glowColor: number;
-        markers: LiveAgentMarkerLayout[];
-      }
-    >();
-
-    for (const marker of markers) {
-      const color = liveAgentColor(marker);
-      const glowColor = liveAgentGlowColor(marker);
-      const key = `${color}:${glowColor}`;
-      const bucket = out.get(key) ?? { color, glowColor, markers: [] };
-      bucket.markers.push(marker);
-      out.set(key, bucket);
-    }
-
-    return [...out.entries()];
-  }, [markers]);
-
   if (markers.length === 0) return null;
 
   return (
     <group>
-      {buckets.map(([key, bucket]) => (
-        <LiveAgentMarkerBucket
-          key={key}
-          color={bucket.color}
-          glowColor={bucket.glowColor}
-          markers={bucket.markers}
+      {markers.map((marker, index) => (
+        <LiveRobotAgent
+          key={marker.agentId}
+          marker={marker}
+          index={index}
           onMarkerClick={onMarkerClick}
         />
       ))}
@@ -50,111 +29,200 @@ export function LiveAgentMarkers({ markers, onMarkerClick }: Props) {
   );
 }
 
-function LiveAgentMarkerBucket({
-  markers,
-  color,
-  glowColor,
+function LiveRobotAgent({
+  marker,
+  index,
   onMarkerClick,
 }: {
-  markers: LiveAgentMarkerLayout[];
-  color: number;
-  glowColor: number;
+  marker: LiveAgentMarkerLayout;
+  index: number;
   onMarkerClick?: (agentId: string) => void;
 }) {
-  const towerRef = useRef<THREE.InstancedMesh>(null);
-  const capRef = useRef<THREE.InstancedMesh>(null);
-  const obj = useMemo(() => new THREE.Object3D(), []);
-
-  const writeMatrices = useCallback(
-    (elapsed: number) => {
-      if (!towerRef.current || !capRef.current) return;
-
-      markers.forEach((marker, index) => {
-        const phase = (marker.rank % 10_000) * 0.001 + index * 0.53;
-        const speed = 0.2 + (marker.rank % 9) * 0.008;
-        const radius = 0.95 + marker.tier * 0.14 + marker.width * 0.42;
-        const walkX = marker.x + Math.cos(elapsed * speed + phase) * radius;
-        const walkZ =
-          marker.z + Math.sin(elapsed * speed * 0.82 + phase * 1.31) * radius;
-        const bob = Math.sin(elapsed * speed * 5 + phase) * 0.08;
-
-        obj.rotation.set(0, elapsed * speed + phase, 0);
-        obj.position.set(walkX, marker.height / 2 + 0.06 + bob, walkZ);
-        obj.scale.set(marker.width, marker.height, marker.width);
-        obj.updateMatrix();
-        towerRef.current!.setMatrixAt(index, obj.matrix);
-
-        obj.rotation.set(0, 0, 0);
-        obj.position.set(walkX, marker.height + 0.34 + bob, walkZ);
-        obj.scale.set(
-          marker.width * 0.42,
-          marker.width * 0.42,
-          marker.width * 0.42,
-        );
-        obj.updateMatrix();
-        capRef.current!.setMatrixAt(index, obj.matrix);
-      });
-
-      towerRef.current.instanceMatrix.needsUpdate = true;
-      capRef.current.instanceMatrix.needsUpdate = true;
-    },
-    [markers, obj],
-  );
+  const groupRef = useRef<THREE.Group>(null);
+  const headRef = useRef<THREE.Mesh>(null);
+  const leftArmRef = useRef<THREE.Mesh>(null);
+  const rightArmRef = useRef<THREE.Mesh>(null);
+  const leftLegRef = useRef<THREE.Mesh>(null);
+  const rightLegRef = useRef<THREE.Mesh>(null);
+  const color = liveAgentColor(marker);
+  const accent = useMemo(() => new THREE.Color(color), [color]);
+  const scale = 1.35 + Math.min(0.52, marker.tier * 0.1 + marker.width * 0.22);
+  const phase = (marker.rank % 10_000) * 0.001 + index * 0.61;
+  const walkRadius = 2.8 + marker.tier * 0.2 + marker.width * 0.9;
+  const speed = 0.18 + (marker.rank % 7) * 0.012;
+  const trail = useMemo(() => {
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute(
+      'position',
+      new THREE.BufferAttribute(new Float32Array(TRAIL_POINTS * 3), 3),
+    );
+    const material = new THREE.LineBasicMaterial({
+      color,
+      transparent: true,
+      opacity: marker.mine ? 0.4 : 0.28,
+      depthWrite: false,
+      toneMapped: false,
+    });
+    const line = new THREE.Line(geometry, material);
+    line.frustumCulled = false;
+    return line;
+  }, [color, marker.mine]);
 
   useEffect(() => {
-    writeMatrices(0);
-  }, [writeMatrices]);
+    return () => {
+      trail.geometry.dispose();
+      (trail.material as THREE.Material).dispose();
+    };
+  }, [trail]);
 
   useFrame(({ clock }) => {
-    writeMatrices(clock.elapsedTime);
+    const elapsed = clock.elapsedTime;
+    const t = elapsed * speed + phase;
+    const x =
+      marker.x +
+      Math.cos(t) * walkRadius +
+      Math.sin(t * 0.47 + phase) * 0.72;
+    const z =
+      marker.z +
+      Math.sin(t * 0.82) * walkRadius +
+      Math.cos(t * 0.39 + phase) * 0.64;
+    const dx = -Math.sin(t) * walkRadius;
+    const dz = Math.cos(t * 0.82) * walkRadius;
+    const bob = Math.sin(elapsed * 6.2 + phase) * 0.08;
+    const walk = Math.sin(elapsed * 7.4 + phase);
+
+    if (groupRef.current) {
+      groupRef.current.position.set(x, 0.24 + bob, z);
+      groupRef.current.rotation.y = Math.atan2(dx, dz);
+      groupRef.current.scale.setScalar(scale);
+    }
+    if (headRef.current) {
+      headRef.current.rotation.y = Math.sin(elapsed * 1.6 + phase) * 0.18;
+    }
+    if (leftArmRef.current) leftArmRef.current.rotation.x = walk * 0.48;
+    if (rightArmRef.current) rightArmRef.current.rotation.x = -walk * 0.48;
+    if (leftLegRef.current) leftLegRef.current.rotation.x = -walk * 0.42;
+    if (rightLegRef.current) rightLegRef.current.rotation.x = walk * 0.42;
+
+    const positions = trail.geometry.attributes.position as THREE.BufferAttribute;
+    for (let i = 0; i < TRAIL_POINTS; i++) {
+      const lag = i / (TRAIL_POINTS - 1);
+      const past = t - lag * 1.9;
+      const px =
+        marker.x +
+        Math.cos(past) * walkRadius +
+        Math.sin(past * 0.47 + phase) * 0.72;
+      const pz =
+        marker.z +
+        Math.sin(past * 0.82) * walkRadius +
+        Math.cos(past * 0.39 + phase) * 0.64;
+      positions.setXYZ(i, px, 0.18 + (1 - lag) * 0.18, pz);
+    }
+    positions.needsUpdate = true;
   });
 
-  const click = (event: {
-    instanceId?: number;
-    stopPropagation: () => void;
-  }) => {
-    if (!onMarkerClick || event.instanceId == null) return;
-    const marker = markers[event.instanceId];
-    if (!marker) return;
+  const handlePointer = (event: { stopPropagation: () => void }) => {
+    if (!onMarkerClick) return;
     event.stopPropagation();
     onMarkerClick(marker.agentId);
   };
 
   return (
     <group>
-      <instancedMesh
-        key={`agent-marker-towers-${markers.length}`}
-        ref={towerRef}
-        args={[undefined, undefined, markers.length]}
-        castShadow
-        receiveShadow
-        frustumCulled={false}
-        onClick={click}
+      <primitive object={trail} />
+      <group
+        ref={groupRef}
+        onClick={handlePointer}
+        onPointerDown={handlePointer}
       >
-        <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={0.9}
-          toneMapped={false}
-        />
-      </instancedMesh>
-      <instancedMesh
-        key={`agent-marker-caps-${markers.length}`}
-        ref={capRef}
-        args={[undefined, undefined, markers.length]}
-        frustumCulled={false}
-        onClick={click}
-      >
-        <sphereGeometry args={[1, 10, 8]} />
-        <meshBasicMaterial
-          color={glowColor}
-          transparent
-          opacity={0.86}
-          depthWrite={false}
-          toneMapped={false}
-        />
-      </instancedMesh>
+        <mesh position={[0, 0.82, 0]} castShadow receiveShadow>
+          <boxGeometry args={[0.54, 0.72, 0.36]} />
+          <meshStandardMaterial
+            color={marker.mine ? '#ffc857' : '#d6e3e1'}
+            roughness={0.48}
+            metalness={0.18}
+          />
+        </mesh>
+        <mesh ref={headRef} position={[0, 1.32, 0]} castShadow receiveShadow>
+          <boxGeometry args={[0.48, 0.38, 0.42]} />
+          <meshStandardMaterial
+            color="#f0f6f3"
+            roughness={0.38}
+            metalness={0.2}
+          />
+        </mesh>
+        <mesh position={[0, 1.34, 0.225]}>
+          <boxGeometry args={[0.34, 0.08, 0.035]} />
+          <meshStandardMaterial
+            color={accent}
+            emissive={accent}
+            emissiveIntensity={0.76}
+            roughness={0.26}
+            metalness={0.1}
+          />
+        </mesh>
+        <mesh position={[0, 0.88, 0.205]}>
+          <boxGeometry args={[0.28, 0.13, 0.035]} />
+          <meshStandardMaterial
+            color={accent}
+            emissive={accent}
+            emissiveIntensity={0.54}
+            roughness={0.32}
+          />
+        </mesh>
+        <mesh position={[0, 1.6, 0]} castShadow>
+          <cylinderGeometry args={[0.025, 0.025, 0.26, 6]} />
+          <meshStandardMaterial color="#1b2a31" roughness={0.6} />
+        </mesh>
+        <mesh position={[0, 1.77, 0]}>
+          <sphereGeometry args={[0.055, 8, 6]} />
+          <meshStandardMaterial
+            color={accent}
+            emissive={accent}
+            emissiveIntensity={0.74}
+          />
+        </mesh>
+        <mesh
+          ref={leftArmRef}
+          position={[-0.38, 0.88, 0]}
+          castShadow
+          receiveShadow
+        >
+          <boxGeometry args={[0.16, 0.56, 0.16]} />
+          <meshStandardMaterial color="#c2cfca" roughness={0.52} />
+        </mesh>
+        <mesh
+          ref={rightArmRef}
+          position={[0.38, 0.88, 0]}
+          castShadow
+          receiveShadow
+        >
+          <boxGeometry args={[0.16, 0.56, 0.16]} />
+          <meshStandardMaterial color="#c2cfca" roughness={0.52} />
+        </mesh>
+        <mesh
+          ref={leftLegRef}
+          position={[-0.16, 0.26, 0]}
+          castShadow
+          receiveShadow
+        >
+          <boxGeometry args={[0.16, 0.5, 0.18]} />
+          <meshStandardMaterial color="#879590" roughness={0.64} />
+        </mesh>
+        <mesh
+          ref={rightLegRef}
+          position={[0.16, 0.26, 0]}
+          castShadow
+          receiveShadow
+        >
+          <boxGeometry args={[0.16, 0.5, 0.18]} />
+          <meshStandardMaterial color="#879590" roughness={0.64} />
+        </mesh>
+        <mesh position={[0, 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[0.42, 20]} />
+          <meshBasicMaterial color="#000000" transparent opacity={0.22} />
+        </mesh>
+      </group>
     </group>
   );
 }

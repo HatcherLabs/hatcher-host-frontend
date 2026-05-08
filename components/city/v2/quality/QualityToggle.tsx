@@ -12,7 +12,7 @@ export function QualityToggle() {
     <div
       style={{
         position: 'absolute',
-        top: 12,
+        top: 58,
         right: 12,
         background: 'rgba(5,8,20,0.75)',
         border: '1px solid rgba(251,191,36,0.4)',
