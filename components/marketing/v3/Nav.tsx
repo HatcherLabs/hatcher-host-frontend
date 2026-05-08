@@ -10,6 +10,7 @@ import styles from './Nav.module.css';
 import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA } from './links';
 import { NavDrawer } from './NavDrawer';
 import { LocaleSwitcher } from '@/components/layout/LocaleSwitcher';
+import { NotificationCenter } from '@/components/ui/NotificationCenter';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 
@@ -169,113 +170,118 @@ export function Nav() {
             {authLoading ? (
               <span className={styles.userPillSkeleton} aria-hidden />
             ) : isAuthenticated && user ? (
-              <div className={styles.userAnchor} ref={userMenuRef}>
-                <button
-                  className={styles.userPill}
-                  type="button"
-                  aria-expanded={userMenuOpen}
-                  aria-haspopup="menu"
-                  aria-label={`${user.username} — ${tNav('settings')}`}
-                  onClick={() => setUserMenuOpen((v) => !v)}
-                >
-                  {user.avatarUrl ? (
-                    <Image
-                      src={user.avatarUrl}
-                      alt=""
-                      width={20}
-                      height={20}
-                      className={styles.userAvatar}
-                      unoptimized
-                    />
-                  ) : (
-                    <span className={styles.userDot} aria-hidden />
-                  )}
-                  <span className={styles.userName}>{user.username}</span>
-                  <svg className={styles.caret} viewBox="0 0 8 8" aria-hidden>
-                    <path d="M1 3l3 3 3-3" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-                {userMenuOpen && (
-                  <div className={`${styles.dropdown} ${styles.userDropdown}`} role="menu">
-                    <div className={styles.userMeta}>
-                      <div className={styles.userMetaTop}>
-                        {user.avatarUrl ? (
-                          <Image
-                            src={user.avatarUrl}
-                            alt=""
-                            width={36}
-                            height={36}
-                            className={styles.userMetaAvatar}
-                            unoptimized
-                          />
-                        ) : (
-                          <span className={styles.userMetaInitial} aria-hidden>
-                            {user.username.charAt(0).toUpperCase()}
-                          </span>
-                        )}
-                        <div className={styles.userMetaText}>
-                          <span className={styles.userMetaName}>{user.username}</span>
-                          <span className={styles.userMetaEmail}>{user.email}</span>
-                        </div>
-                      </div>
-                      <span className={styles.userMetaTier}>{user.tier} {tMenu('tierSuffix')}</span>
-                    </div>
-                    {USER_MENU.map((it) => (
-                      <Link
-                        key={it.key}
-                        href={it.href}
-                        className={styles.item}
-                        role="menuitem"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <span className={styles.glyph} aria-hidden>{it.glyph}</span>
-                        <span className={styles.itemBody}>
-                          <span className={styles.itemLabel}>{it.label}</span>
-                          <span className={styles.itemSub}>{it.sub}</span>
-                        </span>
-                      </Link>
-                    ))}
-                    <Link
-                      href={affiliateItem.href}
-                      className={styles.item}
-                      role="menuitem"
-                      onClick={() => setUserMenuOpen(false)}
-                    >
-                      <span className={styles.glyph} aria-hidden>✦</span>
-                      <span className={styles.itemBody}>
-                        <span className={styles.itemLabel}>{affiliateItem.label}</span>
-                        <span className={styles.itemSub}>{tMenu('sub_affiliate')}</span>
-                      </span>
-                    </Link>
-                    {user.isAdmin && (
-                      <Link
-                        href="/admin"
-                        className={styles.item}
-                        role="menuitem"
-                        onClick={() => setUserMenuOpen(false)}
-                      >
-                        <span className={styles.glyph} aria-hidden>★</span>
-                        <span className={styles.itemBody}>
-                          <span className={styles.itemLabel}>{tNav('admin')}</span>
-                          <span className={styles.itemSub}>{tMenu('sub_admin')}</span>
-                        </span>
-                      </Link>
+              <>
+                <span className={styles.notificationSlot}>
+                  <NotificationCenter />
+                </span>
+                <div className={styles.userAnchor} ref={userMenuRef}>
+                  <button
+                    className={styles.userPill}
+                    type="button"
+                    aria-expanded={userMenuOpen}
+                    aria-haspopup="menu"
+                    aria-label={`${user.username} — ${tNav('settings')}`}
+                    onClick={() => setUserMenuOpen((v) => !v)}
+                  >
+                    {user.avatarUrl ? (
+                      <Image
+                        src={user.avatarUrl}
+                        alt=""
+                        width={20}
+                        height={20}
+                        className={styles.userAvatar}
+                        unoptimized
+                      />
+                    ) : (
+                      <span className={styles.userDot} aria-hidden />
                     )}
-                    <button
-                      type="button"
-                      className={`${styles.item} ${styles.signOut}`}
-                      role="menuitem"
-                      onClick={handleLogout}
-                    >
-                      <span className={styles.glyph} aria-hidden>⎋</span>
-                      <span className={styles.itemBody}>
-                        <span className={styles.itemLabel}>{tNav('logout')}</span>
-                        <span className={styles.itemSub}>{tMenu('sub_signOut')}</span>
-                      </span>
-                    </button>
-                  </div>
-                )}
-              </div>
+                    <span className={styles.userName}>{user.username}</span>
+                    <svg className={styles.caret} viewBox="0 0 8 8" aria-hidden>
+                      <path d="M1 3l3 3 3-3" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                  {userMenuOpen && (
+                    <div className={`${styles.dropdown} ${styles.userDropdown}`} role="menu">
+                      <div className={styles.userMeta}>
+                        <div className={styles.userMetaTop}>
+                          {user.avatarUrl ? (
+                            <Image
+                              src={user.avatarUrl}
+                              alt=""
+                              width={36}
+                              height={36}
+                              className={styles.userMetaAvatar}
+                              unoptimized
+                            />
+                          ) : (
+                            <span className={styles.userMetaInitial} aria-hidden>
+                              {user.username.charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                          <div className={styles.userMetaText}>
+                            <span className={styles.userMetaName}>{user.username}</span>
+                            <span className={styles.userMetaEmail}>{user.email}</span>
+                          </div>
+                        </div>
+                        <span className={styles.userMetaTier}>{user.tier} {tMenu('tierSuffix')}</span>
+                      </div>
+                      {USER_MENU.map((it) => (
+                        <Link
+                          key={it.key}
+                          href={it.href}
+                          className={styles.item}
+                          role="menuitem"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          <span className={styles.glyph} aria-hidden>{it.glyph}</span>
+                          <span className={styles.itemBody}>
+                            <span className={styles.itemLabel}>{it.label}</span>
+                            <span className={styles.itemSub}>{it.sub}</span>
+                          </span>
+                        </Link>
+                      ))}
+                      <Link
+                        href={affiliateItem.href}
+                        className={styles.item}
+                        role="menuitem"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <span className={styles.glyph} aria-hidden>✦</span>
+                        <span className={styles.itemBody}>
+                          <span className={styles.itemLabel}>{affiliateItem.label}</span>
+                          <span className={styles.itemSub}>{tMenu('sub_affiliate')}</span>
+                        </span>
+                      </Link>
+                      {user.isAdmin && (
+                        <Link
+                          href="/admin"
+                          className={styles.item}
+                          role="menuitem"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          <span className={styles.glyph} aria-hidden>★</span>
+                          <span className={styles.itemBody}>
+                            <span className={styles.itemLabel}>{tNav('admin')}</span>
+                            <span className={styles.itemSub}>{tMenu('sub_admin')}</span>
+                          </span>
+                        </Link>
+                      )}
+                      <button
+                        type="button"
+                        className={`${styles.item} ${styles.signOut}`}
+                        role="menuitem"
+                        onClick={handleLogout}
+                      >
+                        <span className={styles.glyph} aria-hidden>⎋</span>
+                        <span className={styles.itemBody}>
+                          <span className={styles.itemLabel}>{tNav('logout')}</span>
+                          <span className={styles.itemSub}>{tMenu('sub_signOut')}</span>
+                        </span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
             ) : (
               <Link href={SECONDARY_CTA.href} className={styles.signIn}>
                 {tNav(SECONDARY_CTA.labelKey)}

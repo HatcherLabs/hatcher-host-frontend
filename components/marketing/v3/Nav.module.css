@@ -127,6 +127,12 @@
 .signIn:hover { color: var(--text-primary); }
 @media (max-width: 600px) { .signIn { display: none; } }
 
+.notificationSlot {
+  display: inline-flex;
+  align-items: center;
+}
+@media (max-width: 880px) { .notificationSlot { order: 1; } }
+
 .userAnchor { position: relative; }
 
 .userPill {
