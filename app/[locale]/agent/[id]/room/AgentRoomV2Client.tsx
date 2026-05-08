@@ -2,6 +2,7 @@
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { Mail } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useToast } from '@/components/ui/ToastProvider';
 import { BackToCity } from '@/components/agent-room/v2/hud/BackToCity';
@@ -21,6 +22,7 @@ import { MemoryPanel } from '@/components/agent-room/v2/panels/MemoryPanel';
 import { ConfigPanel } from '@/components/agent-room/v2/panels/ConfigPanel';
 import { PluginsPanel } from '@/components/agent-room/v2/panels/PluginsPanel';
 import { AgentPassportPanel } from '@/components/agent-room/v2/panels/AgentPassportPanel';
+import { MailPanel } from '@/components/agent-room/v2/panels/MailPanel';
 import { detectDefaultQuality } from '@/components/agent-room/v2/quality';
 import type { AgentPassport } from '@/lib/api';
 import { buildFallbackPassport, primaryPassportStatus } from '@/lib/agent-passport';
@@ -104,6 +106,8 @@ export function AgentRoomV2Client({ agentId }: Props) {
   const [isChatStreaming, setIsChatStreaming] = useState(false);
   const [passport, setPassport] = useState<AgentPassport | null>(null);
   const [passportOpen, setPassportOpen] = useState(false);
+  const [mailOpen, setMailOpen] = useState(false);
+  const [mailAttentionCount, setMailAttentionCount] = useState(0);
   const [quality] = useState(() => detectDefaultQuality());
   const posRef = useRef(new THREE.Vector3());
   const saveChatTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -156,6 +160,30 @@ export function AgentRoomV2Client({ agentId }: Props) {
       });
     return () => { cancelled = true; };
   }, [apiId]);
+
+  const refreshMailSummary = useCallback(() => {
+    if (!canEdit) {
+      setMailAttentionCount(0);
+      return;
+    }
+    api.getAgentMailMessages(apiId, { limit: 20 })
+      .then((res) => {
+        if (!res.success) {
+          setMailAttentionCount(0);
+          return;
+        }
+        const count = res.data.messages.filter((message) => (
+          message.direction === 'inbound' &&
+          (message.status === 'received' || message.status === 'failed' || message.status === 'skipped')
+        )).length;
+        setMailAttentionCount(count);
+      })
+      .catch(() => setMailAttentionCount(0));
+  }, [apiId, canEdit]);
+
+  useEffect(() => {
+    refreshMailSummary();
+  }, [refreshMailSummary]);
 
   // One-shot memory probe on mount to decide if the shelves glow brighter.
   useEffect(() => {
@@ -248,12 +276,21 @@ export function AgentRoomV2Client({ agentId }: Props) {
       toast.info('Owner-only — sign in as the owner or a team member to use this station.');
       return;
     }
+    setPassportOpen(false);
+    setMailOpen(false);
     setOpenPanel(id);
   }, [canEdit, setOpenPanel, toast]);
 
   const handlePassportOpen = useCallback(() => {
     close();
+    setMailOpen(false);
     setPassportOpen(true);
+  }, [close]);
+
+  const handleMailOpen = useCallback(() => {
+    close();
+    setPassportOpen(false);
+    setMailOpen(true);
   }, [close]);
 
   const handleOpenChatFromPassport = useCallback(() => {
@@ -302,6 +339,29 @@ export function AgentRoomV2Client({ agentId }: Props) {
 
       <BackToCity agentId={apiId} />
       <PassportHud passport={activePassport} onOpen={handlePassportOpen} />
+      {canEdit && (
+        <button
+          type="button"
+          onClick={handleMailOpen}
+          className="fixed right-4 top-[108px] z-30 max-w-[220px] rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-base)]/80 px-3 py-2 text-left text-[var(--text-primary)] backdrop-blur transition hover:border-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] sm:max-w-[280px]"
+          style={{ fontFamily: 'var(--font-mono)' }}
+        >
+          <div className="flex items-center gap-2">
+            <Mail size={14} className="text-[var(--accent)]" />
+            <span className="truncate text-[11px] font-bold uppercase tracking-[0.06em]">
+              Mail
+            </span>
+            {mailAttentionCount > 0 && (
+              <span className="ml-auto rounded-full border border-[rgba(74,222,128,0.35)] bg-[rgba(74,222,128,0.12)] px-1.5 py-0.5 text-[10px] text-[var(--accent)]">
+                {mailAttentionCount}
+              </span>
+            )}
+          </div>
+          <p className="mt-1 text-[10px] text-[var(--text-muted)]">
+            mailbox and recent replies
+          </p>
+        </button>
+      )}
       <RoomMinimap layout={layout} playerPos={posRef} framework={framework} />
       <ProximityHint nearest={openPanel ? null : nearest} />
       <WalkOnboarding />
@@ -324,6 +384,14 @@ export function AgentRoomV2Client({ agentId }: Props) {
           canChat={canEdit}
           onOpenChat={handleOpenChatFromPassport}
           onClose={() => setPassportOpen(false)}
+        />
+      )}
+      {mailOpen && canEdit && (
+        <MailPanel
+          agentId={apiId}
+          framework={framework}
+          onClose={() => setMailOpen(false)}
+          onRefreshSummary={refreshMailSummary}
         />
       )}
       {openPanel === 'skillWorkbench' && canEdit && (
