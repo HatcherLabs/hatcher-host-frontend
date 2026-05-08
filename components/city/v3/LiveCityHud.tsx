@@ -64,7 +64,7 @@ export function LiveCityHud({ counts, ownedAgents, generatedAt }: Props) {
             {topOwned.map((agent) => (
               <Link
                 key={agent.id}
-                href={`/agent/${agent.id}/room?from=city`}
+                href={`/dashboard/agent/${agent.id}`}
                 className="group rounded-md border border-white/8 bg-white/[0.035] px-2.5 py-2 transition hover:border-amber-300/35 hover:bg-amber-300/10"
               >
                 <div className="flex items-center justify-between gap-2">

@@ -46,6 +46,9 @@ export interface LiveBuildingLayout {
 
 export interface LiveAgentMarkerLayout {
   agentId: string;
+  agentName: string;
+  ownerKey: string;
+  ownerUsername: string | null;
   blockId: string;
   x: number;
   z: number;
@@ -366,6 +369,9 @@ function layoutAgentMarkers(
       const start = pathNodes[0] ?? nearestNodeForPlot(grid, building.gridX, building.gridZ);
       return {
         agentId: agent.id,
+        agentName: agent.name,
+        ownerKey: cluster.ownerKey,
+        ownerUsername: cluster.ownerUsername,
         blockId: building.blockId,
         x: start.x,
         z: start.z,

@@ -8,9 +8,15 @@ import {
   LIVE_CITY_SUPER_W,
   LIVE_CITY_TILE,
   type LiveCityGrid,
+  type LiveCityTimeMode,
 } from './liveCityHandoff';
 
-interface Props {
+interface InfrastructureProps {
+  grid: LiveCityGrid;
+  timeMode: LiveCityTimeMode;
+}
+
+interface GridProps {
   grid: LiveCityGrid;
 }
 
@@ -18,29 +24,33 @@ const TERRAIN_SIZE = 1400;
 const TERRAIN_SEGMENTS = 80;
 const CITY_FLAT_RADIUS = 110;
 
-export function LiveCityInfrastructure({ grid }: Props) {
+export function LiveCityInfrastructure({ grid, timeMode }: InfrastructureProps) {
   return (
     <group>
-      <SkyDome />
-      <Stars />
-      <Terrain />
-      <MountainRing />
+      <SkyDome timeMode={timeMode} />
+      <Stars timeMode={timeMode} />
+      <Terrain timeMode={timeMode} />
+      <MountainRing timeMode={timeMode} />
       <StreetGrid grid={grid} />
-      <StreetLights grid={grid} />
-      <TreeRing />
+      <StreetLights grid={grid} timeMode={timeMode} />
+      <TreeRing timeMode={timeMode} />
     </group>
   );
 }
 
-function SkyDome() {
+function SkyDome({ timeMode }: { timeMode: LiveCityTimeMode }) {
   const uniforms = useMemo(
     () => ({
-      uTop: { value: new THREE.Color(0x4a7ec2) },
-      uBottom: { value: new THREE.Color(0xd6e2ec) },
-      uOffset: { value: 0 },
-      uExp: { value: 0.7 },
+      uTop: {
+        value: new THREE.Color(timeMode === 'day' ? 0x78a9df : 0x070d20),
+      },
+      uBottom: {
+        value: new THREE.Color(timeMode === 'day' ? 0xe5edf4 : 0x1a2548),
+      },
+      uOffset: { value: timeMode === 'day' ? 0 : 0.05 },
+      uExp: { value: timeMode === 'day' ? 0.72 : 0.5 },
     }),
-    [],
+    [timeMode],
   );
 
   return (
@@ -76,7 +86,7 @@ function SkyDome() {
   );
 }
 
-function Stars() {
+function Stars({ timeMode }: { timeMode: LiveCityTimeMode }) {
   const geometry = useMemo(() => {
     const rng = createSeededRng(321_903);
     const starCount = 600;
@@ -105,13 +115,13 @@ function Stars() {
         size={1.6}
         sizeAttenuation={false}
         transparent
-        opacity={0}
+        opacity={timeMode === 'night' ? 0.85 : 0}
       />
     </points>
   );
 }
 
-function Terrain() {
+function Terrain({ timeMode }: { timeMode: LiveCityTimeMode }) {
   const geometry = useMemo(() => {
     const terrain = new THREE.PlaneGeometry(
       TERRAIN_SIZE,
@@ -122,10 +132,10 @@ function Terrain() {
     terrain.rotateX(-Math.PI / 2);
     const positions = terrain.attributes.position as THREE.BufferAttribute;
     const colors = new Float32Array(positions.count * 3);
-    const grass = new THREE.Color(0x4a6a3e);
-    const grass2 = new THREE.Color(0x5d7e4c);
-    const dirt = new THREE.Color(0x6b6347);
-    const rock = new THREE.Color(0x494a55);
+    const grass = new THREE.Color(timeMode === 'day' ? 0x7dbb72 : 0x314a31);
+    const grass2 = new THREE.Color(timeMode === 'day' ? 0x95ca86 : 0x3f5d3c);
+    const dirt = new THREE.Color(timeMode === 'day' ? 0x8b805c : 0x514b37);
+    const rock = new THREE.Color(timeMode === 'day' ? 0x6d7588 : 0x343847);
 
     for (let i = 0; i < positions.count; i++) {
       const x = positions.getX(i);
@@ -156,7 +166,7 @@ function Terrain() {
     terrain.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     terrain.computeVertexNormals();
     return terrain;
-  }, []);
+  }, [timeMode]);
 
   useEffect(() => () => geometry.dispose(), [geometry]);
 
@@ -167,7 +177,7 @@ function Terrain() {
   );
 }
 
-function StreetGrid({ grid }: Props) {
+function StreetGrid({ grid }: GridProps) {
   const stripeMarks = useMemo(() => {
     const marks: Array<{
       key: string;
@@ -244,7 +254,7 @@ function StreetGrid({ grid }: Props) {
   );
 }
 
-function StreetLights({ grid }: Props) {
+function StreetLights({ grid, timeMode }: InfrastructureProps) {
   return (
     <group>
       {grid.streetXs.flatMap((x) =>
@@ -256,7 +266,9 @@ function StreetLights({ grid }: Props) {
             </mesh>
             <mesh position={[0, 1.6, 0]}>
               <sphereGeometry args={[0.11, 6, 5]} />
-              <meshBasicMaterial color={0x6a6a72} />
+              <meshBasicMaterial
+                color={timeMode === 'night' ? 0xffe0a8 : 0x8b9096}
+              />
             </mesh>
           </group>
         )),
@@ -265,7 +277,7 @@ function StreetLights({ grid }: Props) {
   );
 }
 
-function TreeRing() {
+function TreeRing({ timeMode }: { timeMode: LiveCityTimeMode }) {
   const trees = useMemo(() => {
     const rng = createSeededRng(55_491);
     return Array.from({ length: 380 }, (_, index) => {
@@ -317,7 +329,7 @@ function TreeRing() {
               <icosahedronGeometry args={[1, 0]} />
             )}
             <meshLambertMaterial
-              color={foliageColor(tree.materialIndex)}
+              color={foliageColor(tree.materialIndex, timeMode)}
               flatShading
             />
           </mesh>
@@ -327,7 +339,7 @@ function TreeRing() {
   );
 }
 
-function MountainRing() {
+function MountainRing({ timeMode }: { timeMode: LiveCityTimeMode }) {
   const mountains = useMemo(() => {
     const rng = createSeededRng(91_204);
     const ringRadius = 600;
@@ -356,7 +368,10 @@ function MountainRing() {
           receiveShadow
         >
           <coneGeometry args={[mountain.width, mountain.height, 4]} />
-          <meshLambertMaterial color={0x6679a0} flatShading />
+          <meshLambertMaterial
+            color={timeMode === 'day' ? 0x8ea2c5 : 0x202840}
+            flatShading
+          />
         </mesh>
       ))}
     </group>
@@ -375,6 +390,8 @@ function hashUnit(value: string): number {
   return hashInt(value) / 0xffffffff;
 }
 
-function foliageColor(index: number): number {
-  return [0x3f6c3a, 0x4d7d44, 0x6b8a3a][index] ?? 0x4d7d44;
+function foliageColor(index: number, timeMode: LiveCityTimeMode): number {
+  const day = [0x4f8a46, 0x62a152, 0x88ad45];
+  const night = [0x2f5630, 0x3d6739, 0x566f32];
+  return (timeMode === 'day' ? day : night)[index] ?? 0x62a152;
 }

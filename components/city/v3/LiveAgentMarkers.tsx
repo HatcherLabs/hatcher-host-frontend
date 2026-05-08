@@ -146,6 +146,15 @@ function LiveRobotAgent({
         onClick={handlePointer}
         onPointerDown={handlePointer}
       >
+        <mesh position={[0, 0.62, 0]}>
+          <boxGeometry args={[1.45, 1.65, 1.45]} />
+          <meshBasicMaterial
+            transparent
+            opacity={0}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
         <mesh position={[0, 0.45, 0]} castShadow receiveShadow>
           <boxGeometry args={[0.32, 0.42, 0.26]} />
           <meshLambertMaterial color={0xc7cdd8} />

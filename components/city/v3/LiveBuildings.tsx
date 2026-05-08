@@ -3,12 +3,14 @@ import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import {
   createSeededRng,
+  type LiveCityTimeMode,
   type LiveCityTierKey,
 } from './liveCityHandoff';
 import type { LiveBuildingLayout } from './liveLayout';
 
 interface Props {
   buildings: LiveBuildingLayout[];
+  timeMode: LiveCityTimeMode;
   onBuildingClick?: (building: LiveBuildingLayout) => void;
 }
 
@@ -38,13 +40,14 @@ interface StaticMaterialSet {
 const facadeTextureCache = new Map<string, FacadeTextures>();
 let staticMaterials: StaticMaterialSet | null = null;
 
-export function LiveBuildings({ buildings, onBuildingClick }: Props) {
+export function LiveBuildings({ buildings, timeMode, onBuildingClick }: Props) {
   return (
     <group>
       {buildings.map((building) => (
         <HandoffBuilding
           key={building.ownerKey}
           building={building}
+          timeMode={timeMode}
           onBuildingClick={onBuildingClick}
         />
       ))}
@@ -58,9 +61,11 @@ export function LiveBuildings({ buildings, onBuildingClick }: Props) {
 
 function HandoffBuilding({
   building,
+  timeMode,
   onBuildingClick,
 }: {
   building: LiveBuildingLayout;
+  timeMode: LiveCityTimeMode;
   onBuildingClick?: (building: LiveBuildingLayout) => void;
 }) {
   const materials = useMemo(() => getStaticMaterials(), []);
@@ -73,23 +78,23 @@ function HandoffBuilding({
       map: textures.map,
       emissive: 0xffffff,
       emissiveMap: textures.emissiveMap,
-      emissiveIntensity: 0.05,
+      emissiveIntensity: timeMode === 'night' ? 0.85 : 0.05,
     });
     material.userData.isFacade = true;
     return material;
-  }, [building.visual.tierKey, building.visual.variant]);
+  }, [building.visual.tierKey, building.visual.variant, timeMode]);
   const glassMaterial = useMemo(() => {
     if (building.visual.tierKey !== 'enterprise') return null;
     const material = new THREE.MeshLambertMaterial({
       color: 0x0c1a2a,
       emissive: new THREE.Color('#a9d8ff'),
-      emissiveIntensity: 0.08,
+      emissiveIntensity: timeMode === 'night' ? 0.7 : 0.08,
       transparent: true,
       opacity: 0.95,
     });
     material.userData.isGlass = true;
     return material;
-  }, [building.visual.tierKey]);
+  }, [building.visual.tierKey, timeMode]);
 
   useEffect(() => {
     return () => {

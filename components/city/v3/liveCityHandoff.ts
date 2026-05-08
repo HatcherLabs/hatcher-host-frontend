@@ -1,6 +1,7 @@
 import type { CityAgent } from '@/components/city/types';
 
 export type LiveCityTierKey = 'free' | 'starter' | 'pro' | 'enterprise';
+export type LiveCityTimeMode = 'day' | 'night';
 
 export interface LiveCityTierConfig {
   label: string;
