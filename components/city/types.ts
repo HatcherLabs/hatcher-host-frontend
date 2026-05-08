@@ -42,13 +42,25 @@ export interface CityAgent {
   status: CityStatus;
   messageCount: number;
   mine: boolean;
+  visibility?: 'public' | 'private';
+}
+
+export interface CityUser {
+  ownerKey: string;
+  ownerUsername: string | null;
+  tier: number;
+  agentCount: number;
+  activeAgentCount: number;
+  mine: boolean;
 }
 
 export interface CityResponse {
   agents: CityAgent[];
+  users?: CityUser[];
   counts: {
     total: number;
     running: number;
+    users?: number;
     byFramework: Record<Framework, number>;
     byCategory: Record<Category, number>;
   };

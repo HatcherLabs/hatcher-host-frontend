@@ -1,4 +1,4 @@
-import type { CityAgent, CityStatus } from '@/components/city/types';
+import type { CityAgent, CityStatus, CityUser } from '@/components/city/types';
 import {
   cityGridFor,
   deriveHandoffBuildingVisual,
@@ -28,6 +28,7 @@ export interface LiveBuildingLayout {
   agentIds: string[];
   activeAgentIds: string[];
   agentCount: number;
+  activeAgentCount: number;
   blockId: string;
   gridX: number;
   gridZ: number;
@@ -58,6 +59,7 @@ export interface LiveAgentMarkerLayout {
   status: CityAgent['status'];
   tier: number;
   mine: boolean;
+  visibility?: CityAgent['visibility'];
   rank: number;
   pathNodes: LiveCityNode[];
   speed: number;
@@ -88,9 +90,10 @@ export interface LiveCityLayout {
 export interface LiveCityLayoutOptions {
   maxBuildings?: number;
   routeLimit?: number;
+  users?: CityUser[];
 }
 
-const DEFAULT_MAX_BUILDINGS = 900;
+const DEFAULT_MAX_BUILDINGS = 2_500;
 const DEFAULT_ROUTE_LIMIT = 18;
 const OWNER_WEIGHT = 200_000;
 
@@ -107,6 +110,8 @@ interface LiveUserCluster {
   tier: number;
   mine: boolean;
   messageCount: number;
+  agentCount: number;
+  activeAgentCount: number;
   rank: number;
 }
 
@@ -191,12 +196,34 @@ function clusterRank(cluster: Omit<LiveUserCluster, 'rank'>): number {
     STATUS_WEIGHT[cluster.status] +
     tierScore +
     activityScore +
-    cluster.activeAgents.length * 1_100 +
-    Math.min(2_500, cluster.agents.length * 180)
+    cluster.activeAgentCount * 1_100 +
+    Math.min(2_500, cluster.agentCount * 180)
   );
 }
 
-function clusterAgentsByOwner(agents: CityAgent[]): LiveUserCluster[] {
+function makeUserRepresentative(user: CityUser): CityAgent {
+  const ownerUsername = user.ownerUsername?.trim() || null;
+  return {
+    id: `user-building:${user.ownerKey}`,
+    slug: null,
+    name: `${ownerUsername || 'Builder'} building`,
+    avatarUrl: null,
+    framework: 'openclaw',
+    category: 'automation',
+    ownerKey: user.ownerKey,
+    ownerUsername,
+    tier: user.tier,
+    status: user.activeAgentCount > 0 ? 'running' : 'sleeping',
+    messageCount: 0,
+    mine: user.mine,
+    visibility: 'private',
+  };
+}
+
+function clusterAgentsByOwner(
+  agents: CityAgent[],
+  users: CityUser[] = [],
+): LiveUserCluster[] {
   const byOwner = new Map<string, CityAgent[]>();
   for (const agent of agents) {
     const key = ownerKeyFor(agent);
@@ -204,33 +231,51 @@ function clusterAgentsByOwner(agents: CityAgent[]): LiveUserCluster[] {
     bucket.push(agent);
     byOwner.set(key, bucket);
   }
+  const usersByOwner = new Map(users.map((user) => [user.ownerKey, user]));
+  const ownerKeys = new Set([...usersByOwner.keys(), ...byOwner.keys()]);
 
-  return [...byOwner.entries()]
-    .map(([ownerKey, ownerAgents]) => {
+  return [...ownerKeys]
+    .map((ownerKey) => {
+      const ownerAgents = byOwner.get(ownerKey) ?? [];
+      const user = usersByOwner.get(ownerKey);
       const sorted = [...ownerAgents].sort((a, b) => {
         const rankDiff = rankAgentForCity(b) - rankAgentForCity(a);
         if (rankDiff !== 0) return rankDiff;
         return a.id.localeCompare(b.id);
       });
       const activeAgents = sorted.filter((agent) => agent.status === 'running');
-      const representative = sorted[0]!;
+      const representative =
+        sorted[0] ?? (user ? makeUserRepresentative(user) : null);
+      if (!representative) return null;
+      const agentCount = user?.agentCount ?? sorted.length;
+      const activeAgentCount = user?.activeAgentCount ?? activeAgents.length;
       const clusterBase = {
         ownerKey,
-        ownerUsername: ownerUsernameFor(sorted),
+        ownerUsername: user?.ownerUsername ?? ownerUsernameFor(sorted),
         agents: sorted,
         activeAgents,
         representative,
-        framework: dominantFramework(sorted),
-        status: aggregateStatus(sorted),
-        tier: Math.max(...sorted.map((agent) => agent.tier)),
-        mine: sorted.some((agent) => agent.mine),
+        framework: sorted.length
+          ? dominantFramework(sorted)
+          : representative.framework,
+        status:
+          activeAgentCount > 0
+            ? 'running'
+            : sorted.length
+              ? aggregateStatus(sorted)
+              : 'sleeping',
+        tier: Math.max(user?.tier ?? 0, ...sorted.map((agent) => agent.tier)),
+        mine: user?.mine ?? sorted.some((agent) => agent.mine),
         messageCount: sorted.reduce(
           (sum, agent) => sum + agent.messageCount,
           0,
         ),
+        agentCount,
+        activeAgentCount,
       };
       return { ...clusterBase, rank: clusterRank(clusterBase) };
     })
+    .filter((cluster): cluster is LiveUserCluster => cluster !== null)
     .sort((a, b) => {
       const rankDiff = b.rank - a.rank;
       if (rankDiff !== 0) return rankDiff;
@@ -241,8 +286,9 @@ function clusterAgentsByOwner(agents: CityAgent[]): LiveUserCluster[] {
 function selectRenderedOwners(
   agents: CityAgent[],
   maxBuildings = DEFAULT_MAX_BUILDINGS,
+  users: CityUser[] = [],
 ): LiveUserCluster[] {
-  const clusters = clusterAgentsByOwner(agents);
+  const clusters = clusterAgentsByOwner(agents, users);
   if (clusters.length <= maxBuildings) return clusters;
 
   const owned = clusters.filter((cluster) => cluster.mine);
@@ -278,10 +324,11 @@ export function selectRouteAgents(
 }
 
 const TIER_PLACEMENT_RANK: Record<LiveCityTierKey, number> = {
-  enterprise: 0,
-  pro: 1,
-  starter: 2,
-  free: 3,
+  founding: 0,
+  business: 1,
+  pro: 2,
+  starter: 3,
+  free: 4,
 };
 
 function placementScore(cluster: LiveUserCluster): number {
@@ -324,8 +371,14 @@ function nearestNodeForPlot(
   gridX: number,
   gridZ: number,
 ): LiveCityNode {
-  const gx = clampNodeIndex(Math.round((gridX + 0.5) / LIVE_CITY_SUPER), grid.Nsb);
-  const gz = clampNodeIndex(Math.round((gridZ + 0.5) / LIVE_CITY_SUPER), grid.Nsb);
+  const gx = clampNodeIndex(
+    Math.round((gridX + 0.5) / LIVE_CITY_SUPER),
+    grid.Nsb,
+  );
+  const gz = clampNodeIndex(
+    Math.round((gridZ + 0.5) / LIVE_CITY_SUPER),
+    grid.Nsb,
+  );
   return nodeAt(grid, gx, gz) ?? grid.nodes[0]!;
 }
 
@@ -340,7 +393,8 @@ function planAgentPath(
   const endIndex = seed % grid.nodes.length;
   let end = grid.nodes[endIndex] ?? start;
   if (end.id === start.id && grid.nodes.length > 1) {
-    end = grid.nodes[(endIndex + Math.ceil(grid.Nsb / 2) + 1) % grid.nodes.length]!;
+    end =
+      grid.nodes[(endIndex + Math.ceil(grid.Nsb / 2) + 1) % grid.nodes.length]!;
   }
 
   const goXFirst = (seed & 1) === 0;
@@ -366,7 +420,9 @@ function layoutAgentMarkers(
 
     return cluster.activeAgents.map((agent, localIndex) => {
       const pathNodes = planAgentPath(grid, building, agent, localIndex);
-      const start = pathNodes[0] ?? nearestNodeForPlot(grid, building.gridX, building.gridZ);
+      const start =
+        pathNodes[0] ??
+        nearestNodeForPlot(grid, building.gridX, building.gridZ);
       return {
         agentId: agent.id,
         agentName: agent.name,
@@ -381,6 +437,7 @@ function layoutAgentMarkers(
         status: agent.status,
         tier: agent.tier,
         mine: agent.mine,
+        visibility: agent.visibility,
         rank: rankAgentForCity(agent),
         pathNodes,
         speed: 1.35 + hashStr(`${agent.id}:walk-speed`) * 0.95,
@@ -396,7 +453,11 @@ export function layoutLiveCity(
 ): LiveCityLayout {
   const maxBuildings = options.maxBuildings ?? DEFAULT_MAX_BUILDINGS;
   const routeLimit = options.routeLimit ?? DEFAULT_ROUTE_LIMIT;
-  const renderedClusters = selectRenderedOwners(agents, maxBuildings);
+  const renderedClusters = selectRenderedOwners(
+    agents,
+    maxBuildings,
+    options.users,
+  );
   const placementClusters = sortForPlacement(renderedClusters);
   const grid = cityGridFor(placementClusters.length);
   const coords = spiralOrder(grid.N);
@@ -413,7 +474,8 @@ export function layoutLiveCity(
       ownerUsername: cluster.ownerUsername,
       agentIds: cluster.agents.map((agent) => agent.id),
       activeAgentIds: cluster.activeAgents.map((agent) => agent.id),
-      agentCount: cluster.agents.length,
+      agentCount: cluster.agentCount,
+      activeAgentCount: cluster.activeAgentCount,
       blockId: `super-${superX}-${superZ}`,
       gridX,
       gridZ,
@@ -445,7 +507,8 @@ export function layoutLiveCity(
   );
   const routes = routeAgents.flatMap((agent, index) => {
     const source = byOwner.get(ownerKeyFor(agent));
-    const target = grid.nodes[(index * 7 + 3) % grid.nodes.length] ?? grid.nodes[0];
+    const target =
+      grid.nodes[(index * 7 + 3) % grid.nodes.length] ?? grid.nodes[0];
     if (!source || !target) return [];
     return [
       {

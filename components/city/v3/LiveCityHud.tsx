@@ -1,11 +1,13 @@
 'use client';
 import Link from 'next/link';
+import { DoorOpen } from 'lucide-react';
 import type { CityAgent, CityResponse } from '@/components/city/types';
 
 interface Props {
   counts: CityResponse['counts'] | null;
   ownedAgents: CityAgent[];
   generatedAt?: string | null;
+  hasMyBuilding?: boolean;
 }
 
 function labelStatus(status: CityAgent['status']) {
@@ -21,10 +23,17 @@ function labelStatus(status: CityAgent['status']) {
   }
 }
 
-export function LiveCityHud({ counts, ownedAgents, generatedAt }: Props) {
-  const topOwned = [...ownedAgents]
+export function LiveCityHud({
+  counts,
+  ownedAgents,
+  generatedAt,
+  hasMyBuilding = false,
+}: Props) {
+  const topOwned = ownedAgents
+    .filter((agent) => agent.visibility !== 'private')
     .sort((a, b) => {
-      const runningDiff = Number(b.status === 'running') - Number(a.status === 'running');
+      const runningDiff =
+        Number(b.status === 'running') - Number(a.status === 'running');
       if (runningDiff !== 0) return runningDiff;
       return b.messageCount - a.messageCount;
     })
@@ -37,26 +46,45 @@ export function LiveCityHud({ counts, ownedAgents, generatedAt }: Props) {
           <p className="text-[10px] uppercase tracking-[0.24em] text-emerald-300/80">
             Hatcher City
           </p>
-          <h1 className="text-xl font-semibold tracking-tight">Live Agent Network</h1>
+          <h1 className="text-xl font-semibold tracking-tight">
+            Live Agent Network
+          </h1>
           <div className="mt-2 flex flex-wrap gap-2 text-xs text-white/65">
+            <span>{counts?.users ?? counts?.total ?? 0} users</span>
             <span>{counts?.total ?? 0} agents</span>
             <span>{counts?.running ?? 0} active</span>
-            {generatedAt && <span>updated {new Date(generatedAt).toLocaleTimeString()}</span>}
+            {generatedAt && (
+              <span>updated {new Date(generatedAt).toLocaleTimeString()}</span>
+            )}
           </div>
         </div>
-        <Link
-          href="/create"
-          className="pointer-events-auto rounded-lg border border-emerald-300/25 bg-emerald-300 px-3 py-2 text-xs font-semibold text-black transition hover:bg-emerald-200"
-        >
-          Create agent
-        </Link>
+        <div className="pointer-events-auto flex items-center gap-2">
+          {hasMyBuilding && (
+            <Link
+              href="/city/house"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300/45 bg-black/58 px-3 py-2 text-xs font-semibold text-amber-200 backdrop-blur-xl transition hover:bg-amber-300 hover:text-black"
+            >
+              <DoorOpen size={14} />
+              My building
+            </Link>
+          )}
+          <Link
+            href="/create"
+            className="rounded-lg border border-emerald-300/25 bg-emerald-300 px-3 py-2 text-xs font-semibold text-black transition hover:bg-emerald-200"
+          >
+            Create agent
+          </Link>
+        </div>
       </div>
 
       {topOwned.length > 0 ? (
         <div className="pointer-events-auto absolute right-4 top-28 w-64 rounded-lg border border-amber-300/20 bg-black/58 p-3 text-white shadow-2xl backdrop-blur-xl">
           <div className="mb-2 flex items-center justify-between">
             <p className="text-xs font-semibold text-amber-200">My agents</p>
-            <Link href="/dashboard/agents" className="text-[11px] text-white/55 hover:text-white">
+            <Link
+              href="/dashboard/agents"
+              className="text-[11px] text-white/55 hover:text-white"
+            >
               dashboard
             </Link>
           </div>
@@ -68,7 +96,9 @@ export function LiveCityHud({ counts, ownedAgents, generatedAt }: Props) {
                 className="group rounded-md border border-white/8 bg-white/[0.035] px-2.5 py-2 transition hover:border-amber-300/35 hover:bg-amber-300/10"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="truncate text-xs font-medium text-white">{agent.name}</span>
+                  <span className="truncate text-xs font-medium text-white">
+                    {agent.name}
+                  </span>
                   <span className="shrink-0 text-[10px] text-white/50">
                     {labelStatus(agent.status)}
                   </span>
@@ -82,7 +112,8 @@ export function LiveCityHud({ counts, ownedAgents, generatedAt }: Props) {
         </div>
       ) : (
         <div className="absolute bottom-4 left-4 rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-xs text-white/70 backdrop-blur-xl">
-          Active agents move through the city. Your agents turn gold after login.
+          Active agents move through the city. Your agents turn gold after
+          login.
         </div>
       )}
     </div>

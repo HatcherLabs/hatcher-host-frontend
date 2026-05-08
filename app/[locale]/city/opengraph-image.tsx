@@ -23,6 +23,7 @@ async function fetchCounts(): Promise<CityResponse['counts'] | null> {
 export default async function OpengraphImage() {
   const counts = await fetchCounts();
   const total = counts?.total ?? 718;
+  const users = counts?.users ?? total;
   const running = counts?.running ?? 0;
 
   return new ImageResponse(
@@ -94,7 +95,7 @@ export default async function OpengraphImage() {
             maxWidth: 900,
           }}
         >
-          {total.toLocaleString()} agents in the live network · {running} running right now · OpenClaw + Hermes.
+          {users.toLocaleString()} user buildings · {total.toLocaleString()} agents · {running} running right now.
         </div>
 
         <div

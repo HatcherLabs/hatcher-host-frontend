@@ -2576,7 +2576,8 @@
     "back": {
       "toCity": "Back to City",
       "toDashboard": "Back to Dashboard",
-      "toAgents": "Back to Agents"
+      "toAgents": "Back to Agents",
+      "toHouse": "Back to House"
     }
   },
   "chatToHatch": {

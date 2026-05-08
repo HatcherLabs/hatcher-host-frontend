@@ -6,7 +6,8 @@ import { API_URL } from '@/lib/config';
 import type { CityAgent, CityResponse } from '@/components/city/types';
 
 const LiveCityScene = dynamic(
-  () => import('@/components/city/v3/LiveCityScene').then((m) => m.LiveCityScene),
+  () =>
+    import('@/components/city/v3/LiveCityScene').then((m) => m.LiveCityScene),
   { ssr: false },
 );
 
@@ -88,6 +89,7 @@ export function CityClient({ initial }: Props) {
     <div className="relative h-[calc(100vh-4rem)] min-h-[560px] overflow-hidden bg-[#030506]">
       <LiveCityScene
         agents={data?.agents ?? []}
+        users={data?.users ?? []}
         counts={data?.counts ?? null}
         generatedAt={data?.generatedAt ?? null}
         pulseAts={pulseAts}

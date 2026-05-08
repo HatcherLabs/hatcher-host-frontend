@@ -40,6 +40,10 @@ interface StaticMaterialSet {
 const facadeTextureCache = new Map<string, FacadeTextures>();
 let staticMaterials: StaticMaterialSet | null = null;
 
+function isTowerTier(tier: LiveCityTierKey): boolean {
+  return tier === 'business' || tier === 'founding';
+}
+
 export function LiveBuildings({ buildings, timeMode, onBuildingClick }: Props) {
   return (
     <group>
@@ -84,10 +88,12 @@ function HandoffBuilding({
     return material;
   }, [building.visual.tierKey, building.visual.variant, timeMode]);
   const glassMaterial = useMemo(() => {
-    if (building.visual.tierKey !== 'enterprise') return null;
+    if (!isTowerTier(building.visual.tierKey)) return null;
     const material = new THREE.MeshLambertMaterial({
       color: 0x0c1a2a,
-      emissive: new THREE.Color('#a9d8ff'),
+      emissive: new THREE.Color(
+        building.visual.tierKey === 'founding' ? '#ffd46b' : '#a9d8ff',
+      ),
       emissiveIntensity: timeMode === 'night' ? 0.7 : 0.08,
       transparent: true,
       opacity: 0.95,
@@ -143,6 +149,31 @@ function HandoffBuilding({
         />
       )}
       <Plinth building={building} material={materials.plinth} />
+      {building.mine && <MyBuildingMarker height={building.height} />}
+    </group>
+  );
+}
+
+function MyBuildingMarker({ height }: { height: number }) {
+  return (
+    <group position={[0, height + 1.2, 0]}>
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[1.0, 0.035, 8, 36]} />
+        <meshBasicMaterial color={0xffd24a} toneMapped={false} />
+      </mesh>
+      <mesh>
+        <sphereGeometry args={[0.22, 14, 10]} />
+        <meshBasicMaterial color={0xffd24a} toneMapped={false} />
+      </mesh>
+      <mesh position={[0, -0.65, 0]}>
+        <cylinderGeometry args={[0.025, 0.025, 1.35, 6]} />
+        <meshBasicMaterial
+          color={0xffd24a}
+          transparent
+          opacity={0.72}
+          toneMapped={false}
+        />
+      </mesh>
     </group>
   );
 }
@@ -267,8 +298,12 @@ function ProBuilding({
   facadeMaterial: THREE.Material;
   materials: StaticMaterialSet;
 }) {
-  const { width: baseWidth, depth: baseDepth, height: totalHeight, seed } =
-    building.visual;
+  const {
+    width: baseWidth,
+    depth: baseDepth,
+    height: totalHeight,
+    seed,
+  } = building.visual;
   const spec = useMemo(() => {
     const rng = rngAfterVisual(seed);
     const width = baseWidth + 0.6;
@@ -327,8 +362,12 @@ function EnterpriseBuilding({
   glassMaterial: THREE.Material | null;
   materials: StaticMaterialSet;
 }) {
-  const { width: baseWidth, depth: baseDepth, height: totalHeight, seed } =
-    building.visual;
+  const {
+    width: baseWidth,
+    depth: baseDepth,
+    height: totalHeight,
+    seed,
+  } = building.visual;
   const spec = useMemo(() => {
     const rng = rngAfterVisual(seed);
     const podiumHeight = 2.8 + rng() * 1.2;
@@ -361,11 +400,7 @@ function EnterpriseBuilding({
 
   return (
     <group>
-      <mesh
-        position={[0, spec.podiumHeight / 2, 0]}
-        castShadow
-        receiveShadow
-      >
+      <mesh position={[0, spec.podiumHeight / 2, 0]} castShadow receiveShadow>
         <boxGeometry
           args={[spec.podiumWidth, spec.podiumHeight, spec.podiumDepth]}
         />
@@ -436,11 +471,7 @@ function Plinth({
   return (
     <mesh position={[0, 0.06, 0]} receiveShadow>
       <boxGeometry
-        args={[
-          building.visual.width + 0.5,
-          0.12,
-          building.visual.depth + 0.5,
-        ]}
+        args={[building.visual.width + 0.5, 0.12, building.visual.depth + 0.5]}
       />
       <primitive object={material} attach="material" />
     </mesh>
@@ -606,7 +637,11 @@ function LiveBuildingClickTargets({
         building.z,
       );
       matrix.rotation.set(0, building.rotation, 0);
-      matrix.scale.set(footprint, Math.max(3, building.height + 2.6), footprint);
+      matrix.scale.set(
+        footprint,
+        Math.max(3, building.height + 2.6),
+        footprint,
+      );
       matrix.updateMatrix();
       mesh.setMatrixAt(index, matrix.matrix);
     });
@@ -716,12 +751,19 @@ function makeFacadeTextures(
       trim: '#2c3a4d',
       litColor: '#7fd9ff',
     },
-    enterprise: {
+    business: {
       cols: 9,
       rows: 16,
       base: '#3d4863',
       trim: '#222a3d',
       litColor: '#a9d8ff',
+    },
+    founding: {
+      cols: 10,
+      rows: 20,
+      base: '#3f4354',
+      trim: '#25283a',
+      litColor: '#ffd46b',
     },
   }[tier];
 
@@ -781,7 +823,8 @@ function makeFacadeTextures(
     free: 0.25,
     starter: 0.32,
     pro: 0.45,
-    enterprise: 0.55,
+    business: 0.55,
+    founding: 0.62,
   }[tier];
   for (let row = 0; row < cfg.rows; row++) {
     for (let col = 0; col < cfg.cols; col++) {

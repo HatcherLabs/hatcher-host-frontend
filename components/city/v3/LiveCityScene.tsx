@@ -4,6 +4,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   Bot,
   Building2,
+  DoorOpen,
   Footprints,
   LayoutDashboard,
   Map as MapIcon,
@@ -17,7 +18,11 @@ import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import * as THREE from 'three';
 import { useRouter } from '@/i18n/routing';
-import type { CityAgent, CityResponse } from '@/components/city/types';
+import type {
+  CityAgent,
+  CityResponse,
+  CityUser,
+} from '@/components/city/types';
 import {
   QualityProvider,
   useQuality,
@@ -53,6 +58,7 @@ import {
 
 interface Props {
   agents: CityAgent[];
+  users?: CityUser[];
   counts: CityResponse['counts'] | null;
   generatedAt?: string | null;
   pulseAts: Map<string, number>;
@@ -61,6 +67,7 @@ interface Props {
 const EMPTY_COUNTS: CityResponse['counts'] = {
   total: 0,
   running: 0,
+  users: 0,
   byFramework: { openclaw: 0, hermes: 0 },
   byCategory: {} as CityResponse['counts']['byCategory'],
 };
@@ -131,6 +138,7 @@ function useCityTimeMode(): LiveCityTimeMode {
 
 export function LiveCityScene({
   agents,
+  users = [],
   counts,
   generatedAt,
   pulseAts,
@@ -141,12 +149,14 @@ export function LiveCityScene({
     <QualityProvider>
       <LiveCitySceneBody
         agents={agents}
+        users={users}
         counts={counts ?? EMPTY_COUNTS}
         generatedAt={generatedAt}
         pulseAts={pulseAts}
         onDashboardClick={(agentId) =>
           router.push(`/dashboard/agent/${agentId}`)
         }
+        onHouseClick={() => router.push('/city/house')}
       />
     </QualityProvider>
   );
@@ -154,13 +164,16 @@ export function LiveCityScene({
 
 function LiveCitySceneBody({
   agents,
+  users = [],
   counts,
   generatedAt,
   pulseAts,
   onDashboardClick,
+  onHouseClick,
 }: Props & {
   counts: CityResponse['counts'];
   onDashboardClick: (agentId: string) => void;
+  onHouseClick: () => void;
 }) {
   const quality = useQuality();
   const timeMode = useCityTimeMode();
@@ -171,10 +184,11 @@ function LiveCitySceneBody({
   const layout = useMemo(
     () =>
       layoutLiveCity(agents, {
-        maxBuildings: 900,
+        maxBuildings: Math.max(2_500, users.length),
         routeLimit: 0,
+        users,
       }),
-    [agents],
+    [agents, users],
   );
   const selectedBuilding = useMemo(
     () =>
@@ -282,7 +296,7 @@ function LiveCitySceneBody({
             setSelectedAgentId(agentId);
           }}
         />
-        {viewMode === 'survey' ? <SurveyCamera /> : null}
+        {viewMode === 'survey' ? <SurveyCamera grid={layout.grid} /> : null}
         <WalkCameraController
           enabled={viewMode === 'walk'}
           grid={layout.grid}
@@ -302,11 +316,13 @@ function LiveCitySceneBody({
         counts={counts}
         ownedAgents={layout.ownedAgents}
         generatedAt={generatedAt}
+        hasMyBuilding={layout.buildings.some((building) => building.mine)}
       />
       {selectedBuilding && (
         <LiveBuildingPanel
           building={selectedBuilding}
           onClose={() => setSelectedOwnerKey(null)}
+          onHouseClick={onHouseClick}
         />
       )}
       {selectedAgent && (
@@ -323,12 +339,14 @@ function LiveCitySceneBody({
 function LiveBuildingPanel({
   building,
   onClose,
+  onHouseClick,
 }: {
   building: LiveBuildingLayout;
   onClose: () => void;
+  onHouseClick: () => void;
 }) {
   const tierLabel = LIVE_CITY_TIERS[building.tierKey].label;
-  const activeCount = building.activeAgentIds.length;
+  const activeCount = building.activeAgentCount;
 
   return (
     <aside className="pointer-events-auto absolute bottom-5 right-5 z-20 w-[min(340px,calc(100vw-2.5rem))] rounded-[4px] border border-white/18 bg-[#08111a]/88 p-4 text-white shadow-2xl backdrop-blur-xl">
@@ -369,6 +387,17 @@ function LiveBuildingPanel({
           value={activeCount.toLocaleString()}
         />
       </div>
+
+      {building.mine && (
+        <button
+          type="button"
+          onClick={onHouseClick}
+          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[4px] border border-emerald-300/30 bg-emerald-300 px-3 py-2 text-xs font-semibold text-black transition hover:bg-emerald-200"
+        >
+          <DoorOpen size={14} />
+          Enter house
+        </button>
+      )}
     </aside>
   );
 }
@@ -442,7 +471,7 @@ function LiveAgentPanel({
         />
       </div>
 
-      {marker.mine && (
+      {marker.mine && marker.visibility !== 'private' && (
         <button
           type="button"
           onClick={() => onDashboardClick(marker.agentId)}
@@ -496,17 +525,19 @@ function labelAgentStatus(status: CityAgent['status']): string {
   }
 }
 
-function SurveyCamera() {
+function SurveyCamera({ grid }: { grid: LiveCityGrid }) {
   const { camera } = useThree();
   useEffect(() => {
+    const span = Math.max(95, grid.bounds.width * 0.48);
     if (camera instanceof THREE.PerspectiveCamera) {
       camera.fov = SURVEY_FOV;
       camera.near = 0.2;
+      camera.far = Math.max(1000, grid.bounds.width * 5);
       camera.updateProjectionMatrix();
     }
-    camera.position.set(85, 75, 95);
+    camera.position.set(span, span * 0.82, span * 1.12);
     camera.lookAt(0, 0, 0);
-  }, [camera]);
+  }, [camera, grid.bounds.width]);
 
   return (
     <MapControls
@@ -517,7 +548,7 @@ function SurveyCamera() {
       enablePan
       enableRotate
       minDistance={28}
-      maxDistance={220}
+      maxDistance={Math.max(220, grid.bounds.width * 1.4)}
       minPolarAngle={0.24}
       maxPolarAngle={Math.PI * 0.48}
       target={[0, 0, 0]}

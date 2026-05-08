@@ -3,7 +3,7 @@ import { getStationLayout, STATION_IDS } from './layout';
 import { ROOM_HALF } from './grid';
 
 describe('getStationLayout', () => {
-  it('returns all 9 stations', () => {
+  it('returns all stations', () => {
     const layout = getStationLayout('openclaw');
     expect(Object.keys(layout)).toHaveLength(STATION_IDS.length);
   });

@@ -1,6 +1,11 @@
 import type { CityAgent } from '@/components/city/types';
 
-export type LiveCityTierKey = 'free' | 'starter' | 'pro' | 'enterprise';
+export type LiveCityTierKey =
+  | 'free'
+  | 'starter'
+  | 'pro'
+  | 'business'
+  | 'founding';
 export type LiveCityTimeMode = 'day' | 'night';
 
 export interface LiveCityTierConfig {
@@ -37,13 +42,21 @@ export const LIVE_CITY_TIERS: Record<LiveCityTierKey, LiveCityTierConfig> = {
     maxH: 9.0,
     footprint: [3, 4],
   },
-  enterprise: {
-    label: 'Enterprise',
+  business: {
+    label: 'Business',
     color: 0x3d4863,
     glow: 0xa9d8ff,
     minH: 12.0,
     maxH: 22.0,
     footprint: [4, 4],
+  },
+  founding: {
+    label: 'Founding',
+    color: 0x3f4354,
+    glow: 0xffd46b,
+    minH: 24.0,
+    maxH: 34.0,
+    footprint: [5, 5],
   },
 };
 
@@ -103,7 +116,8 @@ export function tierKeyForCity(tier: CityAgent['tier']): LiveCityTierKey {
   if (tier <= 0) return 'free';
   if (tier === 1) return 'starter';
   if (tier === 2) return 'pro';
-  return 'enterprise';
+  if (tier === 3) return 'business';
+  return 'founding';
 }
 
 export function createSeededRng(seed: number): () => number {

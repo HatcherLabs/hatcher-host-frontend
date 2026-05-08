@@ -1,9 +1,8 @@
 'use client';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { EffectComposer, Bloom, N8AO, Noise, Vignette } from '@react-three/postprocessing';
+import { EffectComposer, Bloom, N8AO } from '@react-three/postprocessing';
 import { Suspense, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { paletteFor } from './colors';
 import {
   CharacterController,
   MouseLook,
@@ -11,24 +10,10 @@ import {
   MobileJoystick,
   type CharacterState,
 } from './character';
-import { RoomShell } from './world/RoomShell';
-import { Skybox } from './world/Skybox';
-import { Lighting } from './world/Lighting';
-import { Atmosphere } from './world/Atmosphere';
-import { FrameworkDecor } from './world/FrameworkDecor';
-import { RoomGameFX } from './world/RoomGameFX';
-import { RoomSetDressing } from './world/RoomSetDressing';
 import { getStationLayout, type StationId, type StationLayout } from './world/layout';
 import { collidersFromLayout, wallColliders } from './world/colliders';
 import { AgentAvatar } from './stations/AgentAvatar';
-import { SkillWorkbench } from './stations/SkillWorkbench';
-import { IntegrationsRack } from './stations/IntegrationsRack';
-import { StatusConsole } from './stations/StatusConsole';
-import { LogWall } from './stations/LogWall';
-import { StatsHologram } from './stations/StatsHologram';
-import { MemoryShelves } from './stations/MemoryShelves';
-import { ConfigTerminal } from './stations/ConfigTerminal';
-import { PluginsCabinet } from './stations/PluginsCabinet';
+import { RoomOffice } from './world/RoomOffice';
 import type { Quality } from './quality';
 
 interface Props {
@@ -50,7 +35,6 @@ interface Props {
   passportStatus?: 'registered' | 'wallet-ready' | 'planned' | 'unavailable' | 'server-unconfigured';
   onStationClick: (id: StationId) => void;
   onPassportClick: () => void;
-  onStatusChange: () => void;
 }
 
 function SyncPos({
@@ -85,15 +69,12 @@ export function AgentRoomSceneV2({
   passportStatus,
   onStationClick,
   onPassportClick,
-  onStatusChange,
 }: Props) {
-  const palette = paletteFor(framework);
-
   const charState = useMemo<CharacterState>(() => ({
-    position: new THREE.Vector3(0, 0, 10),
+    position: new THREE.Vector3(0, 0, 6.15),
     heading: Math.PI,
     cameraYaw: 0,
-    cameraPitch: 0.0,
+    cameraPitch: -0.02,
   }), []);
 
   const analogRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -108,18 +89,34 @@ export function AgentRoomSceneV2({
     <>
       <Canvas
         shadows={quality === 'high'}
-        camera={{ position: [0, 1.55, 10], fov: 72 }}
+        camera={{ position: [0, 1.48, 6.15], fov: 72 }}
         dpr={quality === 'low' ? [1, 1.5] : [1, 2]}
       >
-        <color attach="background" args={[palette.background]} />
+        <color attach="background" args={['#121826']} />
         <Suspense fallback={null}>
-          <Skybox framework={framework} />
-          <Lighting framework={framework} />
-          {quality !== 'low' && <Atmosphere framework={framework} count={quality === 'high' ? 180 : 120} />}
-          <RoomShell framework={framework} />
-          <RoomSetDressing framework={framework} quality={quality} />
-          <FrameworkDecor framework={framework} />
-          <RoomGameFX framework={framework} layout={layout} nearest={nearest} quality={quality} />
+          <ambientLight intensity={0.64} color="#fff1dc" />
+          <hemisphereLight color="#dbeafe" groundColor="#2a1f18" intensity={0.78} />
+          <directionalLight
+            position={[-9, 10, 6]}
+            intensity={1.05}
+            color="#ffd9a0"
+            castShadow={quality === 'high'}
+          />
+          <RoomOffice
+            layout={layout}
+            framework={framework}
+            status={status}
+            tier={tier}
+            messagesToday={messagesToday}
+            uptimeSec={uptimeSec}
+            connectedIntegrations={connectedIntegrations}
+            pluginsInstalled={pluginsInstalled}
+            nearest={nearest}
+            canEdit={canEdit}
+            hasMemory={hasMemory}
+            agentName={agentName}
+            onStationClick={onStationClick}
+          />
 
           <AgentAvatar
             station={layout.agentAvatar}
@@ -133,68 +130,6 @@ export function AgentRoomSceneV2({
             passportStatus={passportStatus}
             onPassportClick={onPassportClick}
           />
-          <SkillWorkbench
-            station={layout.skillWorkbench}
-            framework={framework}
-            onClick={() => onStationClick('skillWorkbench')}
-            isNear={nearest === 'skillWorkbench'}
-          />
-          <IntegrationsRack
-            station={layout.integrationsRack}
-            framework={framework}
-            connected={connectedIntegrations}
-            onClick={() => onStationClick('integrationsRack')}
-            isNear={nearest === 'integrationsRack'}
-          />
-          <StatusConsole
-            station={layout.statusConsole}
-            framework={framework}
-            agentId={agentId}
-            status={status}
-            canEdit={canEdit}
-            onStatusChange={onStatusChange}
-            onOpenPanel={() => onStationClick('statusConsole')}
-            isNear={nearest === 'statusConsole'}
-          />
-          <LogWall
-            station={layout.logWall}
-            framework={framework}
-            agentId={agentId}
-            canViewLogs={canEdit}
-            onClick={() => onStationClick('logWall')}
-            isNear={nearest === 'logWall'}
-          />
-          <StatsHologram
-            station={layout.statsHologram}
-            framework={framework}
-            tier={tier}
-            messagesToday={messagesToday}
-            uptimeSec={uptimeSec}
-            status={status}
-          />
-          {canEdit && (
-            <MemoryShelves
-              station={layout.memoryShelves}
-              framework={framework}
-              hasMemory={hasMemory}
-              onClick={() => onStationClick('memoryShelves')}
-              isNear={nearest === 'memoryShelves'}
-            />
-          )}
-          <ConfigTerminal
-            station={layout.configTerminal}
-            framework={framework}
-            onClick={() => onStationClick('configTerminal')}
-            isNear={nearest === 'configTerminal'}
-          />
-          <PluginsCabinet
-            station={layout.pluginsCabinet}
-            framework={framework}
-            installedCount={pluginsInstalled}
-            onClick={() => onStationClick('pluginsCabinet')}
-            isNear={nearest === 'pluginsCabinet'}
-          />
-
           <CharacterController
             state={charState}
             analog={analogRef.current}
@@ -219,8 +154,6 @@ export function AgentRoomSceneV2({
                 luminanceSmoothing={0.25}
                 mipmapBlur
               />
-              <Vignette offset={0.18} darkness={0.45} opacity={0.55} />
-              <Noise opacity={0.025} />
             </EffectComposer>
           ) : quality === 'medium' ? (
             <EffectComposer multisampling={0} enableNormalPass={false}>
@@ -237,7 +170,6 @@ export function AgentRoomSceneV2({
                 luminanceSmoothing={0.25}
                 mipmapBlur
               />
-              <Vignette offset={0.18} darkness={0.45} opacity={0.55} />
             </EffectComposer>
           ) : null}
         </Suspense>
