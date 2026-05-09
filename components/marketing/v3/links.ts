@@ -120,3 +120,9 @@ export const SECONDARY_CTA = {
   /** Translation key under namespace `nav`. */
   labelKey: 'signIn',
 } as const;
+
+export const SIGN_UP_CTA = {
+  href: '/register' as Href,
+  /** Translation key under namespace `nav`. */
+  labelKey: 'signUp',
+} as const;

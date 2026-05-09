@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import styles from './NavDrawer.module.css';
-import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA } from './links';
+import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA, SIGN_UP_CTA } from './links';
 import { LocaleSwitcher } from '@/components/layout/LocaleSwitcher';
 import { useAuth } from '@/lib/auth-context';
 
@@ -64,13 +64,20 @@ export function NavDrawer({ open, onClose }: Props) {
               {tNav('dashboard')}
             </Link>
           ) : (
-            <Link href={SECONDARY_CTA.href} className={styles.signIn} onClick={onClose}>
-              {tNav(SECONDARY_CTA.labelKey)}
+            <>
+              <Link href={SECONDARY_CTA.href} className={styles.signIn} onClick={onClose}>
+                {tNav(SECONDARY_CTA.labelKey)}
+              </Link>
+              <Link href={SIGN_UP_CTA.href} className={styles.cta} onClick={onClose}>
+                <span aria-hidden>▎</span> {tNav(SIGN_UP_CTA.labelKey)}
+              </Link>
+            </>
+          )}
+          {(authLoading || isAuthenticated) && (
+            <Link href={PRIMARY_CTA.href} className={styles.cta} onClick={onClose}>
+              <span aria-hidden>▎</span> {tNav(PRIMARY_CTA.labelKey)}
             </Link>
           )}
-          <Link href={PRIMARY_CTA.href} className={styles.cta} onClick={onClose}>
-            <span aria-hidden>▎</span> {tNav(PRIMARY_CTA.labelKey)}
-          </Link>
         </div>
       </div>
     </div>
