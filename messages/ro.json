@@ -2636,7 +2636,7 @@
       "boxLabel": "Deploy",
       "headline1": "Lansează agenți.",
       "headline2": "Vezi-i la treabă.",
-      "sub": "Eclozează unul în câteva secunde. Intră în camera lui 3D. Vezi-l cum gândește.",
+      "sub": "Creează unul cu Chat-to-Hatch în câteva secunde. Primești propria clădire, intri în camerele agenților și îi vezi la treabă.",
       "ctaPrimary": "Eclozează agent",
       "ctaGhost": "Explorează orașul",
       "ctaPlayStore": "Descarcă din Google Play"
@@ -2654,10 +2654,49 @@
       "cta": "Eclozează al tău",
       "liveLabel": "agent live"
     },
+    "useCases": {
+      "boxLabel": "Ce pot face agenții",
+      "title": "Exemple ușor de înțeles",
+      "body": "Pornești de la o cerere în limbaj natural. Hatcher o transformă într-un agent hosted, cu framework, tool-uri, integrări, cameră și clădire.",
+      "items": {
+        "crypto": {
+          "eyebrow": "Piețe",
+          "title": "Crypto news scout",
+          "body": "Urmărește știri despre tokenuri, wallet activity, prețuri și rezumate zilnice prin chat, email sau Telegram."
+        },
+        "polymarket": {
+          "eyebrow": "Prediction markets",
+          "title": "Polymarket watcher",
+          "body": "Monitorizează piețe, schimbări de odds, spike-uri de volum și trimite alerte când o teză cere atenție."
+        },
+        "trader": {
+          "eyebrow": "Trading",
+          "title": "Trader copilot",
+          "body": "Ține watchlist-uri, note de risc, linkuri de research și alerte, iar deciziile rămân la tine."
+        },
+        "community": {
+          "eyebrow": "Comunități",
+          "title": "Operator Telegram sau Discord",
+          "body": "Răspunde la FAQ, moderează canale, rezumă thread-uri și îți trimite mesajele importante."
+        },
+        "research": {
+          "eyebrow": "Research",
+          "title": "Daily research loop",
+          "body": "Caută pe web, citește surse, compilează brief-uri și păstrează memorie live pentru ce contează."
+        },
+        "email": {
+          "eyebrow": "Operations",
+          "title": "Asistent email și task-uri",
+          "body": "Citește update-uri din inbox, propune răspunsuri, pregătește remindere și mută rutina mai departe."
+        }
+      },
+      "footer": "Fiecare primește loc în clădirea ta, o cameră în care poți intra și log-uri pe care le poți verifica.",
+      "cta": "Creează cu Chat-to-Hatch"
+    },
     "rooms": {
-      "boxLabel": "Camerele agenților",
-      "title": "Fiecare agent are un cockpit 3D",
-      "body": "Intră în cameră. Vezi statusul, skill-urile, memoria și log-urile live ale agentului tău într-un cockpit 3D navigabil. Una pentru fiecare agent.",
+      "boxLabel": "Building-ul tău",
+      "title": "O ușă pentru fiecare agent",
+      "body": "Intri din Hatcher City, alegi ușa unui agent, apoi îl gestionezi în camera lui cu status, skill-uri, memorie, config și log-uri.",
       "stationAvatar": "Avatar",
       "stationSkills": "Atelier skill-uri",
       "stationIntegrations": "Rack integrări",
@@ -2670,7 +2709,7 @@
     "city": {
       "boxLabel": "Hatcher City",
       "title": "Rețeaua de agenți, parcurgibilă",
-      "body": "Mergi prin 25 de categorii de agenți. Fiecare clădire e un agent live — vizitează, urmărește, abonează-te.",
+      "body": "Ia-ți propria clădire de agenți. Plimbă-te prin oraș, vezi agenții activi în mișcare, apoi intră în building ca să gestionezi fiecare cameră.",
       "cta": "Intră în Hatcher City",
       "districts": "25 cartiere · grilă 5×5"
     },

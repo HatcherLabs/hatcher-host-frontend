@@ -2624,7 +2624,7 @@
       "boxLabel": "Deploy",
       "headline1": "Agenten deployen.",
       "headline2": "Sie arbeiten sehen.",
-      "sub": "Innerhalb von Sekunden ausbrüten. In den 3D-Raum gehen. Beim Denken zusehen.",
+      "sub": "Mit Chat-to-Hatch in Sekunden erstellen. Hol dir dein eigenes Gebäude, öffne Agentenräume und sieh ihnen bei der Arbeit zu.",
       "ctaPrimary": "Agent ausbrüten",
       "ctaGhost": "Stadt erkunden",
       "ctaPlayStore": "Bei Google Play laden"
@@ -2642,10 +2642,49 @@
       "cta": "Deinen ausbrüten",
       "liveLabel": "agent live"
     },
+    "useCases": {
+      "boxLabel": "Was Agenten können",
+      "title": "Einfache Beispiele, die sofort verständlich sind",
+      "body": "Starte mit einer Anfrage in normaler Sprache. Hatcher macht daraus einen gehosteten Agenten mit passendem Framework, Tools, Integrationen, Raum und Gebäude.",
+      "items": {
+        "crypto": {
+          "eyebrow": "Märkte",
+          "title": "Crypto News Scout",
+          "body": "Verfolgt Token-News, Wallet-Aktivität, Preise und tägliche Zusammenfassungen per Chat, E-Mail oder Telegram."
+        },
+        "polymarket": {
+          "eyebrow": "Prediction Markets",
+          "title": "Polymarket Watcher",
+          "body": "Beobachtet Märkte, Odds-Bewegungen, Volumenspitzen und sendet Alerts, wenn eine These Aufmerksamkeit braucht."
+        },
+        "trader": {
+          "eyebrow": "Trading",
+          "title": "Trader Copilot",
+          "body": "Pflegt Watchlists, Risikonotizen, Research-Links und Alerts, während jede Entscheidung bei dir bleibt."
+        },
+        "community": {
+          "eyebrow": "Communities",
+          "title": "Telegram- oder Discord-Operator",
+          "body": "Beantwortet FAQs, moderiert Kanäle, fasst Threads zusammen und leitet wichtige Nachrichten weiter."
+        },
+        "research": {
+          "eyebrow": "Research",
+          "title": "Daily Research Loop",
+          "body": "Sucht im Web, liest Quellen, erstellt Briefings und hält Live-Memory für die wichtigen Punkte."
+        },
+        "email": {
+          "eyebrow": "Operations",
+          "title": "E-Mail- und Task-Assistent",
+          "body": "Liest Inbox-Updates, entwirft Antworten, bereitet Reminder vor und hält Routinearbeit in Bewegung."
+        }
+      },
+      "footer": "Jeder Agent bekommt einen Platz in deinem Gebäude, einen Raum zum Betreten und Logs zum Prüfen.",
+      "cta": "Mit Chat-to-Hatch erstellen"
+    },
     "rooms": {
-      "boxLabel": "Agent-Räume",
-      "title": "Jeder Agent hat ein 3D-Cockpit",
-      "body": "Geh in den Raum. Sieh Status, Skills, Speicher und Live-Logs deines Agenten in einem begehbaren 3D-Cockpit. Einer pro Agent.",
+      "boxLabel": "Dein Gebäude",
+      "title": "Eine Tür für jeden Agenten",
+      "body": "Betritt es aus Hatcher City, wähle eine Agententür und verwalte diesen Agenten in seinem eigenen Raum mit Status, Skills, Memory, Konfig und Logs.",
       "stationAvatar": "Avatar",
       "stationSkills": "Skill-Werkstatt",
       "stationIntegrations": "Integrations-Rack",
@@ -2658,7 +2697,7 @@
     "city": {
       "boxLabel": "Hatcher City",
       "title": "Das Netzwerk der Agenten, begehbar",
-      "body": "Geh durch 25 Agenten-Kategorien. Jedes Gebäude ist ein Live-Agent — besuchen, zusehen, folgen.",
+      "body": "Hol dir dein eigenes Gebäude voller Agenten. Geh durch die City, sieh aktive Agenten in Bewegung und betrete dein Gebäude, um jeden Raum zu verwalten.",
       "cta": "Hatcher City betreten",
       "districts": "25 Bezirke · 5×5-Raster"
     },

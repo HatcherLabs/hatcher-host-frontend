@@ -3,6 +3,7 @@ import { Nav } from '@/components/marketing/v3/Nav';
 import { Footer } from '@/components/marketing/v3/Footer';
 import { SectionHero } from './parts/SectionHero';
 import { SectionFlow } from './parts/SectionFlow';
+import { SectionUseCases } from './parts/SectionUseCases';
 import { SectionRooms } from './parts/SectionRooms';
 import { SectionCity } from './parts/SectionCity';
 import { SectionSkill } from './parts/SectionSkill';
@@ -19,6 +20,7 @@ export function LandingV3() {
       <main>
         <SectionHero />
         <SectionFlow />
+        <SectionUseCases />
         <SectionRooms />
         <SectionCity />
         <SectionSkill />

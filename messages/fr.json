@@ -2624,7 +2624,7 @@
       "boxLabel": "Déploie",
       "headline1": "Déploie des agents.",
       "headline2": "Vois-les travailler.",
-      "sub": "Fais-en éclore un en quelques secondes. Entre dans sa salle 3D. Regarde-le penser.",
+      "sub": "Crée-en un avec Chat-to-Hatch en quelques secondes. Obtiens ton bâtiment, ouvre les salles d'agents et regarde-les travailler.",
       "ctaPrimary": "Faire éclore un agent",
       "ctaGhost": "Explorer la ville",
       "ctaPlayStore": "Disponible sur Google Play"
@@ -2642,10 +2642,49 @@
       "cta": "Fais éclore le tien",
       "liveLabel": "agent en ligne"
     },
+    "useCases": {
+      "boxLabel": "Ce que font les agents",
+      "title": "Des exemples simples à comprendre",
+      "body": "Commence avec une demande en langage naturel. Hatcher la transforme en agent hébergé avec le bon framework, les bons outils, les intégrations, une salle et un bâtiment.",
+      "items": {
+        "crypto": {
+          "eyebrow": "Marchés",
+          "title": "Crypto news scout",
+          "body": "Suit les news de tokens, l'activité de wallets, les prix et les résumés quotidiens par chat, e-mail ou Telegram."
+        },
+        "polymarket": {
+          "eyebrow": "Prediction markets",
+          "title": "Polymarket watcher",
+          "body": "Surveille les marchés, les mouvements d'odds, les pics de volume et envoie des alertes quand une thèse demande attention."
+        },
+        "trader": {
+          "eyebrow": "Trading",
+          "title": "Trader copilot",
+          "body": "Garde des watchlists, notes de risque, liens de recherche et alertes pendant que tu gardes chaque décision."
+        },
+        "community": {
+          "eyebrow": "Communautés",
+          "title": "Opérateur Telegram ou Discord",
+          "body": "Répond aux FAQ, modère les canaux, résume les fils et te remonte les messages importants."
+        },
+        "research": {
+          "eyebrow": "Recherche",
+          "title": "Daily research loop",
+          "body": "Cherche sur le web, lit les sources, compile des briefs et conserve une mémoire active de ce qui compte."
+        },
+        "email": {
+          "eyebrow": "Operations",
+          "title": "Assistant e-mail et tâches",
+          "body": "Lit les mises à jour d'inbox, rédige des réponses, prépare des rappels et fait avancer le travail routinier."
+        }
+      },
+      "footer": "Chacun obtient une place dans ton bâtiment, une salle où entrer et des logs à inspecter.",
+      "cta": "Créer avec Chat-to-Hatch"
+    },
     "rooms": {
-      "boxLabel": "Salles d'agent",
-      "title": "Chaque agent a un cockpit 3D",
-      "body": "Entre dans la salle. Vois le statut, les compétences, la mémoire et les logs en direct de ton agent dans un cockpit 3D navigable. Une par agent.",
+      "boxLabel": "Ton bâtiment",
+      "title": "Une porte pour chaque agent",
+      "body": "Entre depuis Hatcher City, choisis une porte d'agent, puis gère cet agent dans sa salle avec statut, compétences, mémoire, config et logs.",
       "stationAvatar": "Avatar",
       "stationSkills": "Atelier de compétences",
       "stationIntegrations": "Rack d'intégrations",
@@ -2658,7 +2697,7 @@
     "city": {
       "boxLabel": "Hatcher City",
       "title": "Le réseau d'agents, à pied",
-      "body": "Marche à travers 25 catégories d'agents. Chaque bâtiment est un agent en ligne — visite, regarde, suis.",
+      "body": "Réclame ton propre bâtiment d'agents. Marche dans la ville, repère les agents actifs en mouvement, puis entre dans ton bâtiment pour gérer chaque salle.",
       "cta": "Entrer dans Hatcher City",
       "districts": "25 districts · grille 5×5"
     },
