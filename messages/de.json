@@ -1702,6 +1702,7 @@
       "active": "Aktiv",
       "sleeping": "Ruhezustand",
       "paused": "Pausiert",
+      "archived": "Archiviert",
       "error": "Fehler",
       "killed": "Beendet",
       "restarting": "Neustart"
@@ -2551,6 +2552,7 @@
       "active": "Aktiv",
       "sleeping": "Ruhezustand",
       "paused": "Pausiert",
+      "archived": "Archiviert",
       "error": "Fehler",
       "killed": "Beendet",
       "restarting": "Neustart",

@@ -126,6 +126,7 @@ export function ActivityFeedCard({
       active: 'started',
       paused: 'stopped',
       sleeping: 'stopped',
+      archived: 'stopped',
       error: 'error',
       restarting: 'restarted',
     };

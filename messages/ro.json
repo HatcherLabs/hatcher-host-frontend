@@ -1702,6 +1702,7 @@
       "active": "Activ",
       "sleeping": "Adormit",
       "paused": "Pauză",
+      "archived": "Arhivat",
       "error": "Eroare",
       "killed": "Oprit forțat",
       "restarting": "Se repornește"
@@ -2563,6 +2564,7 @@
       "active": "Activ",
       "sleeping": "Adormit",
       "paused": "Pauză",
+      "archived": "Arhivat",
       "error": "Eroare",
       "killed": "Oprit forțat",
       "restarting": "Se repornește",

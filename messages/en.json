@@ -1702,6 +1702,7 @@
       "active": "Active",
       "sleeping": "Sleeping",
       "paused": "Paused",
+      "archived": "Archived",
       "error": "Error",
       "killed": "Killed",
       "restarting": "Restarting"
@@ -2563,6 +2564,7 @@
       "active": "Active",
       "sleeping": "Sleeping",
       "paused": "Paused",
+      "archived": "Archived",
       "error": "Error",
       "killed": "Killed",
       "restarting": "Restarting",

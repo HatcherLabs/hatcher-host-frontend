@@ -1692,6 +1692,7 @@
       "active": "活跃",
       "sleeping": "休眠中",
       "paused": "已暂停",
+      "archived": "已归档",
       "error": "错误",
       "killed": "已停止",
       "restarting": "重启中"
@@ -2541,6 +2542,7 @@
       "active": "活跃",
       "sleeping": "休眠中",
       "paused": "已暂停",
+      "archived": "已归档",
       "error": "错误",
       "killed": "已停止",
       "restarting": "重启中",

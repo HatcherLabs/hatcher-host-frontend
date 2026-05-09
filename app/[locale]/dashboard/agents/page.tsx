@@ -11,11 +11,11 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { Search, X, Play, Square, RotateCcw, Trash2 } from 'lucide-react';
 import styles from './agents.module.css';
 
-type StatusFilter = 'all' | 'active' | 'sleeping' | 'paused' | 'error' | 'restarting';
+type StatusFilter = 'all' | 'active' | 'sleeping' | 'paused' | 'archived' | 'error' | 'restarting';
 type FrameworkFilter = 'all' | 'openclaw' | 'hermes';
 type SortOption = 'newest' | 'az' | 'messages' | 'active';
 
-const STATUS_FILTERS: StatusFilter[] = ['all', 'active', 'sleeping', 'paused', 'error', 'restarting'];
+const STATUS_FILTERS: StatusFilter[] = ['all', 'active', 'sleeping', 'paused', 'archived', 'error', 'restarting'];
 const FRAMEWORKS: FrameworkFilter[] = ['all', 'openclaw', 'hermes'];
 const SORTS: SortOption[] = ['newest', 'az', 'messages', 'active'];
 
@@ -33,6 +33,7 @@ function statusClass(status: string): string {
   if (status === 'active') return styles.active;
   if (status === 'sleeping') return styles.sleeping;
   if (status === 'paused') return styles.paused;
+  if (status === 'archived') return styles.paused;
   if (status === 'error' || status === 'killed') return styles.error;
   if (status === 'restarting') return styles.restarting;
   if (status === 'stopping') return styles.stopping;
@@ -226,7 +227,7 @@ export default function MyAgentsPage() {
                 >
                   {key === 'all'
                     ? t('filterAll')
-                    : tStatus(key as 'active' | 'sleeping' | 'paused' | 'error' | 'restarting')}
+                    : tStatus(key as 'active' | 'sleeping' | 'paused' | 'archived' | 'error' | 'restarting')}
                 </button>
               ))}
             </div>
@@ -337,7 +338,7 @@ export default function MyAgentsPage() {
                     <span className={styles.cardName}>{agent.name}</span>
                     <span className={`${styles.statusPill} ${statusClass(agent.status)}`}>
                       <span className={`${styles.statusDot} ${isRunning ? styles.pulse : ''}`} />
-                      {tStatus(agent.status as 'active' | 'sleeping' | 'paused' | 'error' | 'restarting' | 'stopping' | 'killed')}
+                      {tStatus(agent.status as 'active' | 'sleeping' | 'paused' | 'archived' | 'error' | 'restarting' | 'stopping' | 'killed')}
                     </span>
                   </div>
 
