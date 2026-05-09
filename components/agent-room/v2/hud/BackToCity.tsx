@@ -33,7 +33,7 @@ export function BackToCity({ agentId }: Props = {}) {
   return (
     <Link
       href={target.href}
-      className="fixed top-4 left-4 z-30 rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-base)]/80 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--text-primary)] backdrop-blur transition hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)]"
+      className="fixed left-4 top-4 z-30 hidden rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-base)]/80 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--text-primary)] backdrop-blur transition hover:border-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] hover:text-[var(--accent)] md:inline-flex"
       style={{ fontFamily: 'var(--font-mono)' }}
     >
       ← {target.label}

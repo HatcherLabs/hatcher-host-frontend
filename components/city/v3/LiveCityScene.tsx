@@ -17,11 +17,21 @@ import {
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import * as THREE from 'three';
+import { Link } from '@/i18n/routing';
 import { useRouter } from '@/i18n/routing';
 import type { CityAgent, CityResponse, CityUser } from '@/components/city/types';
-import { QualityProvider, useQuality } from '@/components/city/v2/quality/QualityContext';
+import { MobileJoystick } from '@/components/city/v2/character/MobileJoystick';
+import {
+  QualityProvider,
+  useQuality,
+  useQualityControl,
+} from '@/components/city/v2/quality/QualityContext';
 import { QualityToggle } from '@/components/city/v2/quality/QualityToggle';
 import { SceneErrorBoundary } from '@/components/city/v2/world/SceneErrorBoundary';
+import {
+  MobileSceneActionButton,
+  MobileSceneMenu,
+} from '@/components/mobile-scene/MobileSceneControls';
 import {
   buildingPanelEnterLabel,
   cityBuildingHref,
@@ -180,6 +190,7 @@ function LiveCitySceneBody({
   onBuildingEnterClick: () => void;
 }) {
   const quality = useQuality();
+  const qualityControl = useQualityControl();
   const timeMode = useCityTimeMode();
   const lighting = CITY_LIGHTING[timeMode];
   const [viewMode, setViewMode] = useState<'survey' | 'walk'>('survey');
@@ -189,6 +200,7 @@ function LiveCitySceneBody({
     ownerKey: string;
     nonce: number;
   } | null>(null);
+  const mobileWalkVector = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const layout = useMemo(
     () =>
       layoutLiveCity(agents, {
@@ -266,6 +278,18 @@ function LiveCitySceneBody({
     setSelectedOwnerKey(myBuilding.ownerKey);
     setCameraFocus({ ownerKey: myBuilding.ownerKey, nonce: Date.now() });
   };
+  const mobilePrimaryAction =
+    selectedBuilding && selectedBuildingIsMine && canEnterBuilding
+      ? {
+          label: 'Enter',
+          onClick: onBuildingEnterClick,
+        }
+      : selectedAgent && selectedAgent.mine && selectedAgent.visibility !== 'private'
+        ? {
+            label: 'Dashboard',
+            onClick: () => onDashboardClick(selectedAgent.agentId),
+          }
+        : null;
 
   return (
     <div className="relative h-full w-full" style={{ background: lighting.background }}>
@@ -350,14 +374,19 @@ function LiveCitySceneBody({
           grid={layout.grid}
           buildings={layout.buildings}
           markers={layout.markers}
+          mobileAnalog={mobileWalkVector.current}
         />
       </Canvas>
-      <QualityToggle />
-      <CityModeToggle
-        viewMode={viewMode}
-        timeMode={timeMode}
-        onToggle={() => setViewMode((mode) => (mode === 'walk' ? 'survey' : 'walk'))}
-      />
+      <div className="hidden md:block">
+        <QualityToggle />
+      </div>
+      <div className="hidden md:block">
+        <CityModeToggle
+          viewMode={viewMode}
+          timeMode={timeMode}
+          onToggle={() => setViewMode((mode) => (mode === 'walk' ? 'survey' : 'walk'))}
+        />
+      </div>
       <LiveCityHud
         counts={counts}
         ownedAgents={layout.ownedAgents}
@@ -382,7 +411,162 @@ function LiveCitySceneBody({
           onDashboardClick={onDashboardClick}
         />
       )}
+      <LiveCityMobileMenu
+        counts={counts}
+        ownedAgents={layout.ownedAgents}
+        generatedAt={generatedAt}
+        viewMode={viewMode}
+        timeMode={timeMode}
+        qualityOverride={qualityControl.override}
+        onQualityChange={qualityControl.setQuality}
+        hasMyBuilding={canEnterBuilding || myBuilding !== null}
+        onMyBuildingClick={onBuildingEnterClick}
+        onFindMyBuildingClick={myBuilding ? focusMyBuilding : undefined}
+        onToggleViewMode={() => setViewMode((mode) => (mode === 'walk' ? 'survey' : 'walk'))}
+      />
+      {viewMode === 'walk' && (
+        <MobileJoystick
+          onVector={(x, y) => {
+            mobileWalkVector.current.x = x;
+            mobileWalkVector.current.y = y;
+          }}
+        />
+      )}
+      {mobilePrimaryAction && (
+        <MobileSceneActionButton
+          label={mobilePrimaryAction.label}
+          onClick={mobilePrimaryAction.onClick}
+        />
+      )}
     </div>
+  );
+}
+
+function LiveCityMobileMenu({
+  counts,
+  ownedAgents,
+  generatedAt,
+  viewMode,
+  timeMode,
+  qualityOverride,
+  hasMyBuilding,
+  onMyBuildingClick,
+  onFindMyBuildingClick,
+  onToggleViewMode,
+  onQualityChange,
+}: {
+  counts: CityResponse['counts'];
+  ownedAgents: CityAgent[];
+  generatedAt?: string | null;
+  viewMode: 'survey' | 'walk';
+  timeMode: LiveCityTimeMode;
+  qualityOverride: 'auto' | 'high' | 'low';
+  hasMyBuilding: boolean;
+  onMyBuildingClick: () => void;
+  onFindMyBuildingClick?: () => void;
+  onToggleViewMode: () => void;
+  onQualityChange: (quality: 'auto' | 'high' | 'low') => void;
+}) {
+  const topOwned = ownedAgents
+    .filter((agent) => agent.visibility !== 'private')
+    .sort((a, b) => Number(b.status === 'running') - Number(a.status === 'running'))
+    .slice(0, 4);
+
+  return (
+    <MobileSceneMenu
+      title="Live Agent Network"
+      subtitle={`${counts?.users ?? counts?.total ?? 0} users · ${counts?.running ?? 0} active${
+        generatedAt ? ` · ${new Date(generatedAt).toLocaleTimeString()}` : ''
+      }`}
+      tone="cool"
+    >
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={onToggleViewMode}
+          className="rounded-[7px] border border-white/12 bg-white/[0.06] px-3 py-2 text-left text-sm font-semibold text-white"
+        >
+          {viewMode === 'walk' ? 'Map view' : 'Walk mode'}
+          <span className="mt-1 block text-[11px] font-normal text-white/55">{timeMode}</span>
+        </button>
+        <Link
+          href="/create"
+          className="rounded-[7px] border border-emerald-300/25 bg-emerald-300 px-3 py-2 text-sm font-semibold text-black"
+        >
+          Create agent
+        </Link>
+      </div>
+
+      <div className="grid gap-2">
+        {hasMyBuilding && (
+          <button
+            type="button"
+            onClick={onMyBuildingClick}
+            className="rounded-[7px] border border-amber-300/35 bg-amber-300 px-3 py-2 text-left text-sm font-semibold text-black"
+          >
+            Go to building
+          </button>
+        )}
+        {onFindMyBuildingClick && (
+          <button
+            type="button"
+            onClick={onFindMyBuildingClick}
+            className="rounded-[7px] border border-white/12 bg-white/[0.06] px-3 py-2 text-left text-sm font-semibold text-white"
+          >
+            Find my building
+          </button>
+        )}
+      </div>
+
+      <div>
+        <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/45">
+          Quality
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {(['auto', 'high', 'low'] as const).map((quality) => (
+            <button
+              key={quality}
+              type="button"
+              onClick={() => onQualityChange(quality)}
+              className={`rounded-[7px] border px-3 py-2 text-xs font-semibold uppercase ${
+                qualityOverride === quality
+                  ? 'border-amber-300 bg-amber-300 text-black'
+                  : 'border-white/12 bg-white/[0.05] text-white/72'
+              }`}
+            >
+              {quality}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {topOwned.length > 0 && (
+        <div>
+          <div className="mb-2 flex items-center justify-between">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/45">
+              My agents
+            </div>
+            <Link href="/dashboard/agents" className="text-xs text-cyan-200">
+              Dashboard
+            </Link>
+          </div>
+          <div className="grid gap-1.5">
+            {topOwned.map((agent) => (
+              <Link
+                key={agent.id}
+                href={`/dashboard/agent/${agent.id}`}
+                className="rounded-[7px] border border-white/10 bg-white/[0.045] px-3 py-2"
+              >
+                <span className="block truncate text-sm font-medium text-white">{agent.name}</span>
+                <span className="mt-0.5 block text-[11px] uppercase tracking-wide text-white/48">
+                  {agent.framework} · {labelAgentStatus(agent.status)}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </MobileSceneMenu>
   );
 }
 
@@ -407,7 +591,7 @@ function LiveBuildingPanel({
   });
 
   return (
-    <aside className="pointer-events-auto absolute bottom-5 right-5 z-20 w-[min(340px,calc(100vw-2.5rem))] rounded-[4px] border border-white/18 bg-[#08111a]/88 p-4 text-white shadow-2xl backdrop-blur-xl">
+    <aside className="pointer-events-auto absolute bottom-24 left-3 right-3 z-20 rounded-[4px] border border-white/18 bg-[#08111a]/88 p-4 text-white shadow-2xl backdrop-blur-xl md:bottom-5 md:left-auto md:right-5 md:w-[min(340px,calc(100vw-2.5rem))]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
@@ -480,7 +664,7 @@ function LiveAgentPanel({
   const owner = marker.ownerUsername?.trim() || 'Builder';
 
   return (
-    <aside className="pointer-events-auto absolute bottom-5 right-5 z-20 w-[min(320px,calc(100vw-2.5rem))] rounded-[4px] border border-white/18 bg-[#08111a]/88 p-4 text-white shadow-2xl backdrop-blur-xl">
+    <aside className="pointer-events-auto absolute bottom-24 left-3 right-3 z-20 rounded-[4px] border border-white/18 bg-[#08111a]/88 p-4 text-white shadow-2xl backdrop-blur-xl md:bottom-5 md:left-auto md:right-5 md:w-[min(320px,calc(100vw-2.5rem))]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-300">
@@ -621,11 +805,13 @@ function WalkCameraController({
   grid,
   buildings,
   markers,
+  mobileAnalog,
 }: {
   enabled: boolean;
   grid: LiveCityGrid;
   buildings: LiveBuildingLayout[];
   markers: LiveAgentMarkerLayout[];
+  mobileAnalog?: { x: number; y: number };
 }) {
   const { camera, gl } = useThree();
   const keysRef = useRef(new Set<string>());
@@ -737,6 +923,10 @@ function WalkCameraController({
     if (keys.has('KeyS') || keys.has('ArrowDown')) scratchMove.sub(scratchForward);
     if (keys.has('KeyA')) scratchMove.sub(scratchRight);
     if (keys.has('KeyD')) scratchMove.add(scratchRight);
+    if (mobileAnalog && (Math.abs(mobileAnalog.x) > 0.05 || Math.abs(mobileAnalog.y) > 0.05)) {
+      scratchMove.addScaledVector(scratchForward, -mobileAnalog.y);
+      scratchMove.addScaledVector(scratchRight, mobileAnalog.x);
+    }
 
     if (scratchMove.lengthSq() > 0) {
       const elapsed = clock.elapsedTime;

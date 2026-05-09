@@ -5,12 +5,18 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { api } from '@/lib/api';
 import { useToast } from '@/components/ui/ToastProvider';
-import { useRouter } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { BackToCity } from '@/components/agent-room/v2/hud/BackToCity';
 import { WalkOnboarding } from '@/components/agent-room/v2/hud/WalkOnboarding';
-import { ProximityHint } from '@/components/agent-room/v2/hud/ProximityHint';
+import {
+  ProximityHint,
+  stationActionLabel,
+} from '@/components/agent-room/v2/hud/ProximityHint';
 import { ShortcutHud } from '@/components/agent-room/v2/hud/ShortcutHud';
-import { AvatarEmoteHud } from '@/components/agent-room/v2/hud/AvatarEmoteHud';
+import {
+  AvatarEmoteControls,
+  AvatarEmoteHud,
+} from '@/components/agent-room/v2/hud/AvatarEmoteHud';
 import { getStationLayout, type StationId } from '@/components/agent-room/v2/world/layout';
 import { usePanelState } from '@/components/agent-room/v2/hooks/usePanelState';
 import { useStationProximity } from '@/components/agent-room/v2/hooks/useStationProximity';
@@ -33,6 +39,10 @@ import {
   type RoomEmoteId,
 } from '@/components/agent-room/v2/stations/AgentBody';
 import { cityBuildingHref } from '@/components/city/v3/cityNavigation';
+import {
+  MobileSceneActionButton,
+  MobileSceneMenu,
+} from '@/components/mobile-scene/MobileSceneControls';
 import type { AgentPassport } from '@/lib/api';
 import { buildFallbackPassport } from '@/lib/agent-passport';
 
@@ -363,6 +373,10 @@ export function AgentRoomV2Client({ agentId }: Props) {
 
   const nearest = useStationProximity(posRef, layout);
   const selectedAvatarVariant = normalizeAvatarVariant(agent?.config?.roomAvatarVariant);
+  const mobileBackTarget = useMemo(
+    () => resolveMobileBackTarget(searchParams.get('from'), apiId),
+    [apiId, searchParams],
+  );
 
   const openLaptop = useCallback(
     (tab: LaptopTab = 'status') => {
@@ -530,6 +544,28 @@ export function AgentRoomV2Client({ agentId }: Props) {
         />
       )}
       <WalkOnboarding />
+      <AgentRoomMobileMenu
+        agentName={agent?.name ?? 'Agent'}
+        framework={framework}
+        status={agent?.status ?? 'unknown'}
+        canEdit={canEdit}
+        mailAttentionCount={mailAttentionCount}
+        backTarget={mobileBackTarget}
+        selectedAvatarVariant={selectedAvatarVariant}
+        onAvatarChange={handleAvatarChange}
+        onEmote={handleEmote}
+        onOpenLaptop={openLaptop}
+        onOpenChat={() => {
+          setLaptopOpen(false);
+          setOpenPanel('agentAvatar');
+        }}
+      />
+      {nearest && !openPanel && !laptopOpen && (
+        <MobileSceneActionButton
+          label={mobileStationButtonLabel(nearest)}
+          onClick={() => handleStationClick(nearest)}
+        />
+      )}
 
       {openPanel === 'agentAvatar' && canEdit && (
         <ChatPanel
@@ -595,5 +631,125 @@ export function AgentRoomV2Client({ agentId }: Props) {
         <PluginsPanel agentId={apiId} framework={framework} onClose={close} />
       )}
     </div>
+  );
+}
+
+function resolveMobileBackTarget(from: string | null, agentId: string): { href: string; label: string } {
+  if ((from === 'dashboard' || from === 'hatch') && agentId) {
+    return { href: `/dashboard/agent/${agentId}`, label: 'Dashboard' };
+  }
+  if (from === 'agents') return { href: '/dashboard/agents', label: 'Agents' };
+  if (from === 'building' || from === 'house') {
+    return { href: cityBuildingHref(), label: 'Building' };
+  }
+  return { href: '/city', label: 'City' };
+}
+
+function mobileStationButtonLabel(station: StationId): string {
+  switch (station) {
+    case 'buildingExit':
+      return 'Back';
+    case 'agentAvatar':
+      return 'Talk';
+    case 'configTerminal':
+      return 'Laptop';
+    case 'mailInbox':
+      return 'Mail';
+    default:
+      return stationActionLabel(station).replace('manage ', '').replace('view ', 'Open ');
+  }
+}
+
+function AgentRoomMobileMenu({
+  agentName,
+  framework,
+  status,
+  canEdit,
+  mailAttentionCount,
+  backTarget,
+  selectedAvatarVariant,
+  onAvatarChange,
+  onEmote,
+  onOpenLaptop,
+  onOpenChat,
+}: {
+  agentName: string;
+  framework: string;
+  status: string;
+  canEdit: boolean;
+  mailAttentionCount: number;
+  backTarget: { href: string; label: string };
+  selectedAvatarVariant: AvatarVariant | null;
+  onAvatarChange: (variant: AvatarVariant) => void | Promise<void>;
+  onEmote: (emote: RoomEmoteId) => void;
+  onOpenLaptop: (tab?: LaptopTab) => void;
+  onOpenChat: () => void;
+}) {
+  return (
+    <MobileSceneMenu title={agentName} subtitle={`${framework} · ${status}`} tone="warm">
+      <div className="grid grid-cols-2 gap-2">
+        <Link
+          href={backTarget.href}
+          className="rounded-[7px] border border-[#d6b177]/25 bg-[#2b1d12] px-3 py-2 text-sm font-semibold text-[#f6ead8]"
+        >
+          {backTarget.label}
+        </Link>
+        <button
+          type="button"
+          onClick={() => onOpenLaptop('status')}
+          disabled={!canEdit}
+          className="rounded-[7px] border border-[#d6b177]/25 bg-[#d6b177] px-3 py-2 text-sm font-semibold text-[#20140b] disabled:border-white/10 disabled:bg-white/10 disabled:text-white/35"
+        >
+          Laptop
+        </button>
+      </div>
+
+      {canEdit && (
+        <>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => onOpenLaptop('config')}
+              className="rounded-[7px] border border-[#d6b177]/25 bg-[#2b1d12] px-3 py-2 text-sm font-semibold text-[#f6ead8]"
+            >
+              Config
+            </button>
+            <button
+              type="button"
+              onClick={() => onOpenLaptop('passport')}
+              className="rounded-[7px] border border-[#d6b177]/25 bg-[#2b1d12] px-3 py-2 text-sm font-semibold text-[#f6ead8]"
+            >
+              Passport
+            </button>
+            <button
+              type="button"
+              onClick={() => onOpenLaptop('mail')}
+              className="rounded-[7px] border border-[#d6b177]/25 bg-[#2b1d12] px-3 py-2 text-sm font-semibold text-[#f6ead8]"
+            >
+              Mail{mailAttentionCount > 0 ? ` · ${mailAttentionCount}` : ''}
+            </button>
+            <button
+              type="button"
+              onClick={onOpenChat}
+              className="rounded-[7px] border border-[#d6b177]/25 bg-[#2b1d12] px-3 py-2 text-sm font-semibold text-[#f6ead8]"
+            >
+              Chat
+            </button>
+          </div>
+
+          <div>
+            <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#d6b177]">
+              Avatar
+            </div>
+            <AvatarEmoteControls
+              selectedAvatarVariant={selectedAvatarVariant}
+              onAvatarChange={onAvatarChange}
+              onEmote={onEmote}
+              layout="menu"
+            />
+          </div>
+        </>
+      )}
+    </MobileSceneMenu>
   );
 }

@@ -88,7 +88,7 @@ export function CityClient({ initial }: Props) {
   }, [data]);
 
   return (
-    <div className="relative h-[calc(100vh-4rem)] min-h-[560px] overflow-hidden bg-[#030506]">
+    <div className="relative h-[100svh] min-h-[520px] overflow-hidden bg-[#030506]">
       <LiveCityScene
         agents={data?.agents ?? []}
         users={data?.users ?? []}

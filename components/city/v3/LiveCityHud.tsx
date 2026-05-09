@@ -44,7 +44,7 @@ export function LiveCityHud({
     .slice(0, 5);
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-10">
+    <div className="pointer-events-none absolute inset-0 z-10 hidden md:block">
       <div className="absolute left-4 right-4 top-4 flex flex-wrap items-start justify-between gap-3">
         <div className="rounded-lg border border-white/10 bg-black/55 px-4 py-3 text-white shadow-2xl backdrop-blur-xl">
           <p className="text-[10px] uppercase tracking-[0.24em] text-emerald-300/80">

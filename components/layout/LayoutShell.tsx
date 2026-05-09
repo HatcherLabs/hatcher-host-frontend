@@ -9,6 +9,7 @@ import { ScrollToTop } from '@/components/ui/ScrollToTop';
 // cover their canvas. Extend this list as we add more immersive views.
 const IMMERSIVE_PATTERNS: RegExp[] = [
   /^\/agent\/[^/]+\/room(?:-legacy)?(?:\/|$)/,
+  /^\/city(?:\/|$)/,
   // Chat-to-hatch ships its own slim brand bar + back link; the global
   // chrome would push the chat / preview columns below the fold.
   /^\/chat-to-hatch(?:\/|$)/,
