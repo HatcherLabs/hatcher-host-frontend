@@ -969,7 +969,7 @@ export default function AgentManagePage() {
   // spinners surface the transition); avoids both buttons disappearing during
   // a restart and leaving the header empty.
   const isActive = agent?.status === 'active' || agent?.status === 'restarting' || agent?.status === 'starting' || agent?.status === 'stopping';
-  const isNotActive = agent?.status === 'paused' || agent?.status === 'sleeping' || agent?.status === 'error' || agent?.status === 'stopped';
+  const isNotActive = agent?.status === 'paused' || agent?.status === 'sleeping' || agent?.status === 'error' || agent?.status === 'stopped' || agent?.status === 'archived';
 
   const activeFeatureKeys = new Set(activeFeatures.map((f) => f.featureKey));
 

@@ -1702,6 +1702,7 @@
       "active": "Actif",
       "sleeping": "En veille",
       "paused": "En pause",
+      "archived": "Archivé",
       "error": "Erreur",
       "killed": "Arrêté",
       "restarting": "Redémarrage"
@@ -2551,6 +2552,7 @@
       "active": "Actif",
       "sleeping": "En veille",
       "paused": "En pause",
+      "archived": "Archivé",
       "error": "Erreur",
       "killed": "Arrêté",
       "restarting": "Redémarrage",

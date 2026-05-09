@@ -39,6 +39,7 @@ export const STATUS_STYLES: Record<string, { classes: string; label: string; pul
   active: { classes: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30', label: 'Active', pulse: true, dotColor: 'bg-emerald-400' },
   sleeping: { classes: 'bg-blue-500/15 text-blue-400 border-blue-500/30', label: 'Sleeping', pulse: false, dotColor: 'bg-blue-400' },
   paused: { classes: 'bg-amber-500/15 text-amber-400 border-amber-500/30', label: 'Paused', pulse: false, dotColor: 'bg-amber-400' },
+  archived: { classes: 'bg-zinc-500/15 text-zinc-300 border-zinc-500/30', label: 'Archived', pulse: false, dotColor: 'bg-zinc-400' },
   error: { classes: 'bg-red-500/15 text-red-400 border-red-500/30', label: 'Error', pulse: false, dotColor: 'bg-red-400' },
   killed: { classes: 'bg-red-500/15 text-red-400 border-red-500/30', label: 'Killed', pulse: false, dotColor: 'bg-red-400' },
   restarting: { classes: 'bg-amber-500/15 text-amber-400 border-amber-500/30', label: 'Restarting', pulse: true, dotColor: 'bg-amber-400' },

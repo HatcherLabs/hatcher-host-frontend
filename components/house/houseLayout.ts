@@ -55,6 +55,8 @@ export function labelAgentStatus(status: string | undefined): string {
       return 'Restarting';
     case 'paused':
       return 'Paused';
+    case 'archived':
+      return 'Archived';
     case 'error':
     case 'killed':
     case 'crashed':
@@ -75,6 +77,8 @@ export function statusColor(status: string | undefined): string {
       return '#22d3ee';
     case 'paused':
       return '#facc15';
+    case 'archived':
+      return '#a1a1aa';
     case 'error':
     case 'killed':
     case 'crashed':
