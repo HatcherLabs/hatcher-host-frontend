@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 import { API_URL } from '@/lib/config';
+import { useAuth } from '@/lib/auth-context';
 import type { CityAgent, CityResponse } from '@/components/city/types';
 
 const LiveCityScene = dynamic(
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function CityClient({ initial }: Props) {
+  const { isAuthenticated } = useAuth();
   const [data, setData] = useState<CityResponse | null>(initial);
   // Track last-seen messageCount so we can spawn a ring pulse every
   // time an agent's tally ticks up between polls.
@@ -93,6 +95,7 @@ export function CityClient({ initial }: Props) {
         counts={data?.counts ?? null}
         generatedAt={data?.generatedAt ?? null}
         pulseAts={pulseAts}
+        canEnterBuilding={isAuthenticated}
       />
     </div>
   );

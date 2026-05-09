@@ -48,7 +48,7 @@ function statusDotClass(status: AgentPassportStatus): string {
     case 'wallet-ready':
       return 'bg-sky-300 shadow-[0_0_12px_rgba(125,211,252,0.55)]';
     case 'planned':
-      return 'bg-violet-300 shadow-[0_0_12px_rgba(196,181,253,0.45)]';
+      return 'bg-amber-200 shadow-[0_0_12px_rgba(252,211,77,0.45)]';
     case 'server-unconfigured':
       return 'bg-amber-300 shadow-[0_0_12px_rgba(252,211,77,0.5)]';
     case 'unavailable':
@@ -179,7 +179,7 @@ export function AgentPassportPanel({
             <LinkButton href={passport.agent.profileUrl} label="Public profile" />
             <LinkButton href={passport.agent.roomUrl} label="3D room" />
           </div>
-          <div className="mt-3 rounded-lg border border-violet-400/25 bg-violet-500/10 p-3 text-xs text-violet-100">
+          <div className="mt-3 rounded-lg border border-[#d6b177]/25 bg-[#3a281a]/55 p-3 text-xs text-[#f6ead8]">
             <div className="flex items-center gap-2 font-medium">
               <Server size={14} />
               MCP manifest
@@ -187,7 +187,7 @@ export function AgentPassportPanel({
                 {networkStatusLabel(passport.mcp.status)}
               </span>
             </div>
-            <div className="mt-2 truncate font-mono text-[11px] text-violet-200/80">
+            <div className="mt-2 truncate font-mono text-[11px] text-[#d8c3a3]">
               {passport.mcp.manifestUrl}
             </div>
           </div>

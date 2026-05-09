@@ -18,28 +18,13 @@ import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import * as THREE from 'three';
 import { useRouter } from '@/i18n/routing';
-import type {
-  CityAgent,
-  CityResponse,
-  CityUser,
-} from '@/components/city/types';
-import {
-  QualityProvider,
-  useQuality,
-} from '@/components/city/v2/quality/QualityContext';
+import type { CityAgent, CityResponse, CityUser } from '@/components/city/types';
+import { QualityProvider, useQuality } from '@/components/city/v2/quality/QualityContext';
 import { QualityToggle } from '@/components/city/v2/quality/QualityToggle';
 import { SceneErrorBoundary } from '@/components/city/v2/world/SceneErrorBoundary';
-import { cityBuildingTitle } from './cityNavigation';
-import {
-  LIVE_CITY_TIERS,
-  type LiveCityGrid,
-  type LiveCityTimeMode,
-} from './liveCityHandoff';
-import {
-  layoutLiveCity,
-  type LiveAgentMarkerLayout,
-  type LiveBuildingLayout,
-} from './liveLayout';
+import { cityBuildingHref, cityBuildingTitle } from './cityNavigation';
+import { LIVE_CITY_TIERS, type LiveCityGrid, type LiveCityTimeMode } from './liveCityHandoff';
+import { layoutLiveCity, type LiveAgentMarkerLayout, type LiveBuildingLayout } from './liveLayout';
 import { LiveAgentMarkers } from './LiveAgentMarkers';
 import { LiveActivityPulses } from './LiveActivityPulses';
 import { LiveBuildings } from './LiveBuildings';
@@ -62,6 +47,7 @@ interface Props {
   counts: CityResponse['counts'] | null;
   generatedAt?: string | null;
   pulseAts: Map<string, number>;
+  canEnterBuilding?: boolean;
 }
 
 interface SurveyFocusTarget {
@@ -131,9 +117,7 @@ function getCityTimeMode(date = new Date()): LiveCityTimeMode {
 }
 
 function useCityTimeMode(): LiveCityTimeMode {
-  const [timeMode, setTimeMode] = useState<LiveCityTimeMode>(() =>
-    getCityTimeMode(),
-  );
+  const [timeMode, setTimeMode] = useState<LiveCityTimeMode>(() => getCityTimeMode());
 
   useEffect(() => {
     const update = () => setTimeMode(getCityTimeMode());
@@ -151,8 +135,10 @@ export function LiveCityScene({
   counts,
   generatedAt,
   pulseAts,
+  canEnterBuilding = false,
 }: Props) {
   const router = useRouter();
+  const buildingHref = cityBuildingHref();
 
   return (
     <QualityProvider>
@@ -162,10 +148,9 @@ export function LiveCityScene({
         counts={counts ?? EMPTY_COUNTS}
         generatedAt={generatedAt}
         pulseAts={pulseAts}
-        onDashboardClick={(agentId) =>
-          router.push(`/dashboard/agent/${agentId}`)
-        }
-        onHouseClick={() => router.push('/city/house')}
+        onDashboardClick={(agentId) => router.push(`/dashboard/agent/${agentId}`)}
+        canEnterBuilding={canEnterBuilding}
+        onBuildingEnterClick={() => router.push(buildingHref)}
       />
     </QualityProvider>
   );
@@ -177,12 +162,13 @@ function LiveCitySceneBody({
   counts,
   generatedAt,
   pulseAts,
+  canEnterBuilding = false,
   onDashboardClick,
-  onHouseClick,
+  onBuildingEnterClick,
 }: Props & {
   counts: CityResponse['counts'];
   onDashboardClick: (agentId: string) => void;
-  onHouseClick: () => void;
+  onBuildingEnterClick: () => void;
 }) {
   const quality = useQuality();
   const timeMode = useCityTimeMode();
@@ -206,18 +192,14 @@ function LiveCitySceneBody({
   const selectedBuilding = useMemo(
     () =>
       selectedOwnerKey
-        ? (layout.buildings.find(
-            (building) => building.ownerKey === selectedOwnerKey,
-          ) ?? null)
+        ? (layout.buildings.find((building) => building.ownerKey === selectedOwnerKey) ?? null)
         : null,
     [layout.buildings, selectedOwnerKey],
   );
   const selectedAgent = useMemo(
     () =>
       selectedAgentId
-        ? (layout.markers.find(
-            (marker) => marker.agentId === selectedAgentId,
-          ) ?? null)
+        ? (layout.markers.find((marker) => marker.agentId === selectedAgentId) ?? null)
         : null,
     [layout.markers, selectedAgentId],
   );
@@ -228,9 +210,7 @@ function LiveCitySceneBody({
   const focusTarget = useMemo<SurveyFocusTarget | null>(() => {
     if (!cameraFocus) return null;
     const building =
-      layout.buildings.find(
-        (candidate) => candidate.ownerKey === cameraFocus.ownerKey,
-      ) ?? null;
+      layout.buildings.find((candidate) => candidate.ownerKey === cameraFocus.ownerKey) ?? null;
     if (!building) return null;
     return {
       key: `${building.ownerKey}:${cameraFocus.nonce}`,
@@ -257,10 +237,7 @@ function LiveCitySceneBody({
   };
 
   return (
-    <div
-      className="relative h-full w-full"
-      style={{ background: lighting.background }}
-    >
+    <div className="relative h-full w-full" style={{ background: lighting.background }}>
       <Canvas
         key={`${quality}-${timeMode}`}
         camera={{
@@ -281,10 +258,7 @@ function LiveCitySceneBody({
         }}
       >
         <color attach="background" args={[lighting.background]} />
-        <fog
-          attach="fog"
-          args={[lighting.fog, lighting.fogNear, lighting.fogFar]}
-        />
+        <fog attach="fog" args={[lighting.fog, lighting.fogNear, lighting.fogFar]} />
         <ambientLight intensity={lighting.ambient} color="#ffffff" />
         <hemisphereLight
           color={lighting.hemiSky}
@@ -323,10 +297,7 @@ function LiveCitySceneBody({
           />
         </SceneErrorBoundary>
         <SceneErrorBoundary label="LiveActivityPulses">
-          <LiveActivityPulses
-            buildings={layout.buildings}
-            pulseAts={pulseAts}
-          />
+          <LiveActivityPulses buildings={layout.buildings} pulseAts={pulseAts} />
         </SceneErrorBoundary>
         <LiveCityPointerTargets
           buildings={layout.buildings}
@@ -354,22 +325,21 @@ function LiveCitySceneBody({
       <CityModeToggle
         viewMode={viewMode}
         timeMode={timeMode}
-        onToggle={() =>
-          setViewMode((mode) => (mode === 'walk' ? 'survey' : 'walk'))
-        }
+        onToggle={() => setViewMode((mode) => (mode === 'walk' ? 'survey' : 'walk'))}
       />
       <LiveCityHud
         counts={counts}
         ownedAgents={layout.ownedAgents}
         generatedAt={generatedAt}
-        hasMyBuilding={myBuilding !== null}
-        onMyBuildingClick={focusMyBuilding}
+        hasMyBuilding={canEnterBuilding || myBuilding !== null}
+        onMyBuildingClick={onBuildingEnterClick}
+        onFindMyBuildingClick={myBuilding ? focusMyBuilding : undefined}
       />
       {selectedBuilding && (
         <LiveBuildingPanel
           building={selectedBuilding}
           onClose={() => setSelectedOwnerKey(null)}
-          onHouseClick={onHouseClick}
+          onBuildingEnterClick={onBuildingEnterClick}
         />
       )}
       {selectedAgent && (
@@ -386,11 +356,11 @@ function LiveCitySceneBody({
 function LiveBuildingPanel({
   building,
   onClose,
-  onHouseClick,
+  onBuildingEnterClick,
 }: {
   building: LiveBuildingLayout;
   onClose: () => void;
-  onHouseClick: () => void;
+  onBuildingEnterClick: () => void;
 }) {
   const tierLabel = LIVE_CITY_TIERS[building.tierKey].label;
   const activeCount = building.activeAgentCount;
@@ -418,11 +388,7 @@ function LiveBuildingPanel({
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <BuildingStat
-          icon={<UserRound size={13} />}
-          label="Tier"
-          value={tierLabel}
-        />
+        <BuildingStat icon={<UserRound size={13} />} label="Tier" value={tierLabel} />
         <BuildingStat
           icon={<Users size={13} />}
           label="Agents"
@@ -438,7 +404,7 @@ function LiveBuildingPanel({
       {building.mine && (
         <button
           type="button"
-          onClick={onHouseClick}
+          onClick={onBuildingEnterClick}
           className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[4px] border border-emerald-300/30 bg-emerald-300 px-3 py-2 text-xs font-semibold text-black transition hover:bg-emerald-200"
         >
           <DoorOpen size={14} />
@@ -449,24 +415,14 @@ function LiveBuildingPanel({
   );
 }
 
-function BuildingStat({
-  icon,
-  label,
-  value,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-}) {
+function BuildingStat({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
     <div className="rounded-[3px] border border-white/10 bg-white/[0.055] px-2.5 py-2">
       <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.08em] text-white/52">
         {icon}
         {label}
       </div>
-      <div className="mt-1 truncate text-sm font-semibold text-white">
-        {value}
-      </div>
+      <div className="mt-1 truncate text-sm font-semibold text-white">{value}</div>
     </div>
   );
 }
@@ -490,9 +446,7 @@ function LiveAgentPanel({
             <Bot size={13} />
             Active agent
           </div>
-          <h2 className="mt-1 truncate text-lg font-semibold leading-tight">
-            {marker.agentName}
-          </h2>
+          <h2 className="mt-1 truncate text-lg font-semibold leading-tight">{marker.agentName}</h2>
           <p className="mt-1 truncate text-xs text-white/58">{owner}</p>
         </div>
         <button
@@ -511,11 +465,7 @@ function LiveAgentPanel({
           label="Status"
           value={labelAgentStatus(marker.status)}
         />
-        <BuildingStat
-          icon={<Zap size={13} />}
-          label="Framework"
-          value={marker.framework}
-        />
+        <BuildingStat icon={<Zap size={13} />} label="Framework" value={marker.framework} />
       </div>
 
       {marker.mine && marker.visibility !== 'private' && (
@@ -583,11 +533,7 @@ function SurveyCamera({
   const mapTarget = useMemo<[number, number, number]>(
     () =>
       focusTarget
-        ? [
-            focusTarget.x,
-            Math.min(12, focusTarget.height * 0.36),
-            focusTarget.z,
-          ]
+        ? [focusTarget.x, Math.min(12, focusTarget.height * 0.36), focusTarget.z]
         : [0, 0, 0],
     [focusTarget],
   );
@@ -601,16 +547,9 @@ function SurveyCamera({
       camera.updateProjectionMatrix();
     }
     if (focusTarget) {
-      const distance = Math.max(
-        34,
-        Math.min(82, focusTarget.height * 2.4 + 24),
-      );
+      const distance = Math.max(34, Math.min(82, focusTarget.height * 2.4 + 24));
       const y = Math.max(18, focusTarget.height + 12, distance * 0.64);
-      camera.position.set(
-        focusTarget.x + distance * 0.82,
-        y,
-        focusTarget.z + distance * 1.04,
-      );
+      camera.position.set(focusTarget.x + distance * 0.82, y, focusTarget.z + distance * 1.04);
       camera.lookAt(mapTarget[0], mapTarget[1], mapTarget[2]);
       return;
     }
@@ -656,10 +595,7 @@ function WalkCameraController({
   const scratchRight = useMemo(() => new THREE.Vector3(), []);
   const scratchMove = useMemo(() => new THREE.Vector3(), []);
   const scratchEuler = useMemo(() => new THREE.Euler(0, 0, 0, 'YXZ'), []);
-  const collisionMap = useMemo(
-    () => createWalkCollisionMap(grid, buildings),
-    [buildings, grid],
-  );
+  const collisionMap = useMemo(() => createWalkCollisionMap(grid, buildings), [buildings, grid]);
   const markerPaths = useMemo(
     () =>
       new Map(
@@ -756,10 +692,8 @@ function WalkCameraController({
     scratchRight.normalize();
     scratchMove.set(0, 0, 0);
 
-    if (keys.has('KeyW') || keys.has('ArrowUp'))
-      scratchMove.add(scratchForward);
-    if (keys.has('KeyS') || keys.has('ArrowDown'))
-      scratchMove.sub(scratchForward);
+    if (keys.has('KeyW') || keys.has('ArrowUp')) scratchMove.add(scratchForward);
+    if (keys.has('KeyS') || keys.has('ArrowDown')) scratchMove.sub(scratchForward);
     if (keys.has('KeyA')) scratchMove.sub(scratchRight);
     if (keys.has('KeyD')) scratchMove.add(scratchRight);
 
@@ -823,21 +757,12 @@ function LiveCityPointerTargets({
   const buildingTargets = useMemo(
     () =>
       buildings.map((building) => {
-        const footprint =
-          Math.max(building.visual.width, building.visual.depth) + 1.7;
+        const footprint = Math.max(building.visual.width, building.visual.depth) + 1.7;
         return {
           building,
           box: new THREE.Box3().setFromCenterAndSize(
-            new THREE.Vector3(
-              building.x,
-              Math.max(1.8, building.height / 2),
-              building.z,
-            ),
-            new THREE.Vector3(
-              footprint,
-              Math.max(4.2, building.height),
-              footprint,
-            ),
+            new THREE.Vector3(building.x, Math.max(1.8, building.height / 2), building.z),
+            new THREE.Vector3(footprint, Math.max(4.2, building.height), footprint),
           ),
         };
       }),
@@ -941,14 +866,7 @@ function LiveCityPointerTargets({
       element.removeEventListener('pointerdown', onPointerDown);
       element.removeEventListener('pointerup', onPointerUp);
     };
-  }, [
-    buildingTargets,
-    camera,
-    gl,
-    markerTargets,
-    onAgentClick,
-    onBuildingClick,
-  ]);
+  }, [buildingTargets, camera, gl, markerTargets, onAgentClick, onBuildingClick]);
 
   return null;
 }

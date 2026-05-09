@@ -2577,6 +2577,7 @@
       "toCity": "Back to City",
       "toDashboard": "Back to Dashboard",
       "toAgents": "Back to Agents",
+      "toBuilding": "Back to Building",
       "toHouse": "Back to House"
     }
   },

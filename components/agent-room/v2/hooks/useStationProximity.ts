@@ -1,24 +1,10 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import type * as THREE from 'three';
-import type { StationLayout, StationId } from '../world/layout';
+import { ROOM_INTERACTION_STATION_IDS, type StationLayout, type StationId } from '../world/layout';
 import { INTERACT_RADIUS } from '../world/grid';
 
-// Stations you can actually interact with (open a panel / toggle state).
-// Stats Hologram is purely read-only ambient decor so we skip it here —
-// otherwise the "Press E" hint shows near it but pressing E does nothing,
-// which reads as a bug.
-const INTERACTABLE: ReadonlySet<StationId> = new Set<StationId>([
-  'agentAvatar',
-  'skillWorkbench',
-  'integrationsRack',
-  'statusConsole',
-  'logWall',
-  'memoryShelves',
-  'configTerminal',
-  'mailInbox',
-  'pluginsCabinet',
-]);
+const INTERACTABLE: ReadonlySet<StationId> = new Set<StationId>(ROOM_INTERACTION_STATION_IDS);
 
 export function useStationProximity(
   playerPos: React.MutableRefObject<THREE.Vector3>,
@@ -39,7 +25,7 @@ export function useStationProximity(
         if (d < INTERACT_RADIUS && (!best || d < best.d)) best = { id: s.id, d };
       }
       const nextId = best?.id ?? null;
-      setNearest(prev => (prev === nextId ? prev : nextId));
+      setNearest((prev) => (prev === nextId ? prev : nextId));
       raf.current = requestAnimationFrame(tick);
     };
     raf.current = requestAnimationFrame(tick);

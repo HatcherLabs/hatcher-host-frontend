@@ -9,6 +9,7 @@ interface Props {
   generatedAt?: string | null;
   hasMyBuilding?: boolean;
   onMyBuildingClick?: () => void;
+  onFindMyBuildingClick?: () => void;
 }
 
 function labelStatus(status: CityAgent['status']) {
@@ -30,6 +31,7 @@ export function LiveCityHud({
   generatedAt,
   hasMyBuilding = false,
   onMyBuildingClick,
+  onFindMyBuildingClick,
 }: Props) {
   const topOwned = ownedAgents
     .filter((agent) => agent.visibility !== 'private')
@@ -68,7 +70,16 @@ export function LiveCityHud({
               className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300/45 bg-black/58 px-3 py-2 text-xs font-semibold text-amber-200 backdrop-blur-xl transition hover:bg-amber-300 hover:text-black"
             >
               <DoorOpen size={14} />
-              My building
+              Go to building
+            </button>
+          )}
+          {onFindMyBuildingClick && (
+            <button
+              type="button"
+              onClick={onFindMyBuildingClick}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-xs font-semibold text-white/75 backdrop-blur-xl transition hover:border-cyan-300/45 hover:text-cyan-200"
+            >
+              Find mine
             </button>
           )}
           <Link

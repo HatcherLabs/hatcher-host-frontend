@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
+import { cityBuildingHref } from '@/components/city/v3/cityNavigation';
 
 interface Props {
   agentId?: string;
@@ -58,8 +59,8 @@ function resolve(
   if (from === 'agents') {
     return { href: '/dashboard/agents', label: t('toAgents') };
   }
-  if (from === 'house') {
-    return { href: '/city/house', label: t('toHouse') };
+  if (from === 'building' || from === 'house') {
+    return { href: cityBuildingHref(), label: t('toBuilding') };
   }
   if (from === 'city') {
     return { href: '/city', label: t('toCity') };

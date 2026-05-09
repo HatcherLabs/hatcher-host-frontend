@@ -6,19 +6,20 @@ const LABELS: Record<StationId, string> = {
   skillWorkbench: 'manage skills',
   integrationsRack: 'manage integrations',
   statusConsole: 'open status',
-  logWall: 'open logs',
+  logWall: 'view logs',
   statsHologram: 'view stats',
   memoryShelves: 'browse memory',
-  configTerminal: 'open config',
+  configTerminal: 'open laptop',
   mailInbox: 'open mail',
   pluginsCabinet: 'manage plugins',
+  buildingExit: 'back to building',
 };
 
 export function ProximityHint({ nearest }: { nearest: StationId | null }) {
   if (!nearest) return null;
   return (
-    <div className="pointer-events-none fixed bottom-24 left-1/2 z-30 -translate-x-1/2 rounded-full border border-white/20 bg-black/70 px-4 py-2 text-sm text-white backdrop-blur">
-      <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">E</kbd> {LABELS[nearest]}
+    <div className="pointer-events-none fixed bottom-28 left-1/2 z-30 -translate-x-1/2 rounded-full border border-[#d6b177]/35 bg-[#1c130c]/82 px-4 py-2 text-sm text-[#f6ead8] backdrop-blur">
+      <kbd className="rounded bg-[#3a281a] px-1.5 py-0.5 text-xs">E</kbd> {LABELS[nearest]}
     </div>
   );
 }

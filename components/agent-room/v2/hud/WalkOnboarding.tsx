@@ -15,18 +15,16 @@ export function WalkOnboarding() {
     setShow(false);
   };
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 backdrop-blur">
       <div className="max-w-sm rounded-xl border border-white/10 bg-neutral-900 p-6 text-center text-white">
         <h2 className="mb-2 text-xl font-semibold">Welcome to the Room</h2>
         <p className="mb-4 text-sm text-neutral-300">
           Use <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">W</kbd>{' '}
           <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">A</kbd>{' '}
           <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">S</kbd>{' '}
-          <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">D</kbd> to walk, mouse to look.
-          Walk up to any station and press{' '}
-          <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">E</kbd> to interact.
-          Press <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">P</kbd> for passport,
-          <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">M</kbd> for mail, and{' '}
+          <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">D</kbd> to walk, mouse to
+          look. Walk up to any station and press{' '}
+          <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">E</kbd> to interact, and{' '}
           <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">Esc</kbd> to close panels.
         </p>
         <button
