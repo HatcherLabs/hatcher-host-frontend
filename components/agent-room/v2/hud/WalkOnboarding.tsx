@@ -16,9 +16,9 @@ export function WalkOnboarding() {
   };
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 backdrop-blur">
-      <div className="max-w-sm rounded-xl border border-white/10 bg-neutral-900 p-6 text-center text-white">
+      <div className="mx-4 max-w-sm rounded-xl border border-white/10 bg-neutral-900 p-6 text-center text-white">
         <h2 className="mb-2 text-xl font-semibold">Welcome to the Room</h2>
-        <p className="mb-4 text-sm text-neutral-300">
+        <p className="mb-4 hidden text-sm text-neutral-300 md:block">
           Use <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">W</kbd>{' '}
           <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">A</kbd>{' '}
           <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">S</kbd>{' '}
@@ -26,6 +26,10 @@ export function WalkOnboarding() {
           look. Walk up to any station and press{' '}
           <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">E</kbd> to interact, and{' '}
           <kbd className="rounded bg-neutral-800 px-1.5 py-0.5 text-xs">Esc</kbd> to close panels.
+        </p>
+        <p className="mb-4 text-sm text-neutral-300 md:hidden">
+          Use the joystick to walk, drag the room to look around, and use the action button when
+          you are near an object.
         </p>
         <button
           onClick={dismiss}

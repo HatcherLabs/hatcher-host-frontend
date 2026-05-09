@@ -13,6 +13,10 @@ interface Props {
   onEmote: (emote: RoomEmoteId) => void;
 }
 
+interface ControlsProps extends Props {
+  layout?: 'bar' | 'menu';
+}
+
 const EMOTE_SHORT: Record<RoomEmoteId, string> = {
   wave: 'Wave',
   dance: 'Dance',
@@ -21,11 +25,23 @@ const EMOTE_SHORT: Record<RoomEmoteId, string> = {
   alert: 'Alert',
 };
 
-export function AvatarEmoteHud({ selectedAvatarVariant, onAvatarChange, onEmote }: Props) {
+export function AvatarEmoteControls({
+  selectedAvatarVariant,
+  onAvatarChange,
+  onEmote,
+  layout = 'bar',
+}: ControlsProps) {
+  const menu = layout === 'menu';
   return (
-    <div className="fixed bottom-4 left-1/2 z-40 flex w-[min(760px,calc(100vw-2rem))] -translate-x-1/2 items-center gap-2 rounded-xl border border-[#d6b177]/35 bg-[#1c130c]/86 p-2 text-[#f6ead8] shadow-[0_18px_55px_rgba(0,0,0,0.45)] backdrop-blur">
-      <label className="flex min-w-0 flex-1 items-center gap-2">
-        <span className="hidden text-[10px] font-semibold uppercase tracking-[0.16em] text-[#d6b177] sm:inline">
+    <div className={menu ? 'grid gap-2' : 'flex w-full items-center gap-2'}>
+      <label className={menu ? 'grid gap-1.5' : 'flex min-w-0 flex-1 items-center gap-2'}>
+        <span
+          className={
+            menu
+              ? 'text-[10px] font-semibold uppercase tracking-[0.16em] text-[#d6b177]'
+              : 'hidden text-[10px] font-semibold uppercase tracking-[0.16em] text-[#d6b177] sm:inline'
+          }
+        >
           Avatar
         </span>
         <select
@@ -44,9 +60,9 @@ export function AvatarEmoteHud({ selectedAvatarVariant, onAvatarChange, onEmote 
         </select>
       </label>
 
-      <div className="h-8 w-px bg-[#5a3a20]" />
+      {!menu && <div className="h-8 w-px bg-[#5a3a20]" />}
 
-      <div className="flex shrink-0 items-center gap-1">
+      <div className={menu ? 'grid grid-cols-3 gap-1.5' : 'flex shrink-0 items-center gap-1'}>
         {ROOM_EMOTES.map((emote) => (
           <button
             key={emote.id}
@@ -58,6 +74,14 @@ export function AvatarEmoteHud({ selectedAvatarVariant, onAvatarChange, onEmote 
           </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+export function AvatarEmoteHud(props: Props) {
+  return (
+    <div className="fixed bottom-4 left-1/2 z-40 hidden w-[min(760px,calc(100vw-2rem))] -translate-x-1/2 items-center gap-2 rounded-xl border border-[#d6b177]/35 bg-[#1c130c]/86 p-2 text-[#f6ead8] shadow-[0_18px_55px_rgba(0,0,0,0.45)] backdrop-blur md:flex">
+      <AvatarEmoteControls {...props} />
     </div>
   );
 }

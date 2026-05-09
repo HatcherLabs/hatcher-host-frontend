@@ -67,8 +67,8 @@ export function MobileJoystick({ onVector }: Props) {
       onTouchCancel={onEnd}
       style={{
         position: 'absolute',
-        bottom: 24,
-        left: 24,
+        bottom: 'max(24px, calc(env(safe-area-inset-bottom) + 16px))',
+        left: 'max(24px, calc(env(safe-area-inset-left) + 16px))',
         width: SIZE,
         height: SIZE,
         borderRadius: '50%',

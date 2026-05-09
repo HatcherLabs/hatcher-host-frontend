@@ -8,6 +8,10 @@ import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
 import type { Agent } from '@/lib/api';
 import {
+  MobileSceneActionButton,
+  MobileSceneMenu,
+} from '@/components/mobile-scene/MobileSceneControls';
+import {
   frameworkColor,
   labelAgentStatus,
   statusColor,
@@ -88,10 +92,18 @@ export function HouseClient() {
     },
     [router],
   );
+  const activateNearestDoor = useCallback(() => {
+    if (!nearestDoor) return;
+    if (nearestDoor === 'exit') {
+      router.push('/city');
+      return;
+    }
+    enterAgent(nearestDoor.agent);
+  }, [enterAgent, nearestDoor, router]);
 
   if (authLoading || loading) {
     return (
-      <div className="relative grid h-[calc(100vh-4rem)] min-h-[560px] place-items-center bg-[#070b12] text-white">
+      <div className="relative grid h-[100svh] min-h-[520px] place-items-center bg-[#070b12] text-white">
         <div className="flex items-center gap-3 text-xs uppercase tracking-[0.16em] text-white/55">
           <Loader2 size={16} className="animate-spin" />
           Loading building
@@ -102,7 +114,7 @@ export function HouseClient() {
 
   if (!isAuthenticated) {
     return (
-      <div className="relative grid h-[calc(100vh-4rem)] min-h-[560px] place-items-center bg-[#070b12] px-4 text-white">
+      <div className="relative grid h-[100svh] min-h-[520px] place-items-center bg-[#070b12] px-4 text-white">
         <div className="w-full max-w-md rounded-[6px] border border-white/12 bg-white/[0.06] p-6 text-center shadow-2xl backdrop-blur">
           <Home className="mx-auto text-emerald-300" size={28} />
           <h1 className="mt-4 text-2xl font-semibold">Sign in to enter your Building</h1>
@@ -121,7 +133,7 @@ export function HouseClient() {
   }
 
   return (
-    <div className="relative h-[calc(100vh-4rem)] min-h-[560px] overflow-hidden bg-[#070b12] text-white">
+    <div className="relative h-[100svh] min-h-[520px] overflow-hidden bg-[#070b12] text-white">
       <AgentHouseScene
         agents={agents}
         profile={profile}
@@ -131,7 +143,7 @@ export function HouseClient() {
         onExit={() => router.push('/city')}
       />
 
-      <div className="pointer-events-auto absolute left-4 top-4 z-30 flex flex-wrap items-start gap-3">
+      <div className="pointer-events-auto absolute left-4 top-4 z-30 hidden flex-wrap items-start gap-3 md:flex">
         <div className="rounded-[6px] border border-white/12 bg-[#07101b]/82 px-4 py-3 shadow-2xl backdrop-blur">
           <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
             <Home size={14} />
@@ -155,7 +167,7 @@ export function HouseClient() {
       </div>
 
       {panelOpen ? (
-        <aside className="pointer-events-auto absolute right-4 top-4 z-30 flex max-h-[calc(100%-2rem)] w-[min(330px,calc(100vw-2rem))] flex-col rounded-[7px] border border-white/12 bg-[#111722]/88 text-white shadow-2xl backdrop-blur-xl">
+        <aside className="pointer-events-auto absolute right-4 top-4 z-30 hidden max-h-[calc(100%-2rem)] w-[min(330px,calc(100vw-2rem))] flex-col rounded-[7px] border border-white/12 bg-[#111722]/88 text-white shadow-2xl backdrop-blur-xl md:flex">
           <div className="flex items-start justify-between gap-3 border-b border-white/10 px-4 py-3">
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50">
@@ -225,7 +237,7 @@ export function HouseClient() {
         <button
           type="button"
           onClick={() => setPanelOpen(true)}
-          className="pointer-events-auto absolute right-4 top-4 z-30 inline-flex items-center gap-2 rounded-[6px] border border-white/12 bg-[#111722]/88 px-3 py-2 text-xs font-semibold text-white/82 shadow-2xl backdrop-blur-xl transition hover:border-emerald-300/40 hover:text-emerald-200"
+          className="pointer-events-auto absolute right-4 top-4 z-30 hidden items-center gap-2 rounded-[6px] border border-white/12 bg-[#111722]/88 px-3 py-2 text-xs font-semibold text-white/82 shadow-2xl backdrop-blur-xl transition hover:border-emerald-300/40 hover:text-emerald-200 md:inline-flex"
         >
           <DoorOpen size={14} />
           Agents
@@ -233,12 +245,109 @@ export function HouseClient() {
       )}
 
       {nearestDoor && (
-        <div className="pointer-events-none absolute bottom-6 left-1/2 z-30 -translate-x-1/2 rounded-full border border-white/16 bg-black/65 px-4 py-2 text-sm text-white shadow-2xl backdrop-blur">
+        <div className="pointer-events-none absolute bottom-6 left-1/2 z-30 hidden -translate-x-1/2 rounded-full border border-white/16 bg-black/65 px-4 py-2 text-sm text-white shadow-2xl backdrop-blur md:block">
           <kbd className="rounded bg-white/10 px-1.5 py-0.5 text-xs">E</kbd>{' '}
           {nearestDoor === 'exit' ? 'exit to City' : `enter ${nearestDoor.agent.name}`}
         </div>
       )}
+
+      <HouseMobileMenu
+        agents={agents}
+        profile={profile}
+        activeCount={activeCount}
+        error={error}
+        onEnterAgent={enterAgent}
+      />
+      {nearestDoor && (
+        <MobileSceneActionButton
+          label={nearestDoor === 'exit' ? 'City' : 'Enter'}
+          onClick={activateNearestDoor}
+        />
+      )}
     </div>
+  );
+}
+
+function HouseMobileMenu({
+  agents,
+  profile,
+  activeCount,
+  error,
+  onEnterAgent,
+}: {
+  agents: Agent[];
+  profile: Profile | null;
+  activeCount: number;
+  error: string | null;
+  onEnterAgent: (agent: Agent) => void;
+}) {
+  return (
+    <MobileSceneMenu
+      title={`${profile?.username || 'Builder'} Building`}
+      subtitle={`${(profile?.tier || 'free').toUpperCase()} · ${agents.length} agents · ${activeCount} active`}
+      tone="cool"
+    >
+      <div className="grid grid-cols-2 gap-2">
+        <Link
+          href="/city"
+          className="rounded-[7px] border border-white/12 bg-white/[0.06] px-3 py-2 text-sm font-semibold text-white"
+        >
+          City
+        </Link>
+        <Link
+          href="/create"
+          className="rounded-[7px] border border-emerald-300/25 bg-emerald-300 px-3 py-2 text-sm font-semibold text-black"
+        >
+          Create agent
+        </Link>
+      </div>
+
+      <div>
+        <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/45">
+          Agents
+        </div>
+        {error ? (
+          <p className="rounded-[7px] border border-rose-300/20 bg-rose-500/10 px-3 py-2 text-sm text-rose-100">
+            {error}
+          </p>
+        ) : agents.length === 0 ? (
+          <p className="rounded-[7px] border border-white/10 bg-white/[0.05] px-3 py-2 text-sm text-white/62">
+            No agents yet.
+          </p>
+        ) : (
+          <div className="grid gap-1.5">
+            {agents.map((agent, index) => {
+              const sColor = statusColor(agent.status);
+              const fColor = frameworkColor(agent.framework);
+              return (
+                <button
+                  key={agent.id}
+                  type="button"
+                  onClick={() => onEnterAgent(agent)}
+                  className="grid grid-cols-[2rem_1fr_auto] items-center gap-2 rounded-[7px] border border-white/10 bg-white/[0.045] px-3 py-2 text-left"
+                >
+                  <span className="font-mono text-[11px] text-white/35">
+                    #{String(index + 1).padStart(2, '0')}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-medium text-white">
+                      {agent.name}
+                    </span>
+                    <span className="block truncate text-[11px]" style={{ color: fColor }}>
+                      {agent.framework}
+                    </span>
+                  </span>
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: sColor, boxShadow: `0 0 10px ${sColor}` }}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </MobileSceneMenu>
   );
 }
 
