@@ -847,7 +847,7 @@ function WindowTerrain({ timeMode }: { timeMode: WindowTimeMode }) {
   const geometry = useMemo(() => createWindowTerrainGeometry(timeMode), [timeMode]);
   useEffect(() => () => geometry.dispose(), [geometry]);
   return (
-    <mesh geometry={geometry} position={[-17, -0.16, 0]} receiveShadow>
+    <mesh geometry={geometry} position={[-36, -0.16, 0]} receiveShadow>
       <meshLambertMaterial vertexColors flatShading />
     </mesh>
   );
@@ -1414,10 +1414,6 @@ function ExitDoor({ stationId, layout, accent, isNear, onStationClick }: Station
         <mesh position={[0.4, 1.05, 0.05]} material={METAL}>
           <sphereGeometry args={[0.05, 12, 8]} />
         </mesh>
-        <mesh position={[0, 0.02, 0.22]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[1, 0.05]} />
-          <meshBasicMaterial color="#ffd089" transparent opacity={0.6} toneMapped={false} />
-        </mesh>
         <mesh position={[0, 2.42, -0.08]} material={WOOD_DARK}>
           <boxGeometry args={[0.86, 0.24, 0.035]} />
         </mesh>
@@ -1459,7 +1455,12 @@ function SmallShelfPlant({ position }: { position: [number, number, number] }) {
       {[0, 1, 2, 3, 4].map((i) => {
         const a = (i / 5) * Math.PI * 2;
         return (
-          <mesh key={i} position={[0, 0.46, 0]} scale={[0.7, 1.4, 0.46]} rotation={[0.28, a, 0.48]}>
+          <mesh
+            key={i}
+            position={[0, 0.46, 0]}
+            scale={[0.7, 1.4, 0.46]}
+            rotation={[0.28, a, 0.48]}
+          >
             <sphereGeometry args={[0.18, 8, 6]} />
             <meshLambertMaterial color={i % 2 ? '#2f7d4a' : '#1f6b41'} />
           </mesh>
@@ -1629,7 +1630,13 @@ function ClickHotspot({
       }}
     >
       <cylinderGeometry args={[radius, radius, height, 16]} />
-      <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      <meshBasicMaterial
+        transparent
+        opacity={0}
+        colorWrite={false}
+        depthWrite={false}
+        depthTest={false}
+      />
     </mesh>
   );
 }

@@ -63,7 +63,13 @@ export function AgentAvatar({
       </Suspense>
       <mesh position={[0, 1.0, 0]} onClick={onClick}>
         <cylinderGeometry args={[0.9, 0.9, 2.1, 12]} />
-        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        <meshBasicMaterial
+          transparent
+          opacity={0}
+          colorWrite={false}
+          depthWrite={false}
+          depthTest={false}
+        />
       </mesh>
     </group>
   );
