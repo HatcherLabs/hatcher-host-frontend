@@ -20,7 +20,7 @@ const AgentHouseScene = dynamic(
     ssr: false,
     loading: () => (
       <div className="grid h-full w-full place-items-center bg-[#070b12] text-[11px] uppercase tracking-[0.16em] text-white/50">
-        Loading house
+        Loading building
       </div>
     ),
   },
@@ -77,23 +77,24 @@ export function HouseClient() {
   }, [authLoading, isAuthenticated]);
 
   const activeCount = useMemo(
-    () => agents.filter((agent) => ['active', 'running', 'restarting'].includes(agent.status)).length,
+    () =>
+      agents.filter((agent) => ['active', 'running', 'restarting'].includes(agent.status)).length,
     [agents],
   );
 
   const enterAgent = useCallback(
     (agent: Agent) => {
-      router.push(`/agent/${agent.id}/room?from=house`);
+      router.push(`/agent/${agent.id}/room?from=building`);
     },
     [router],
   );
 
   if (authLoading || loading) {
     return (
-      <div className="fixed inset-0 z-0 grid place-items-center bg-[#070b12] text-white">
+      <div className="relative grid h-[calc(100vh-4rem)] min-h-[560px] place-items-center bg-[#070b12] text-white">
         <div className="flex items-center gap-3 text-xs uppercase tracking-[0.16em] text-white/55">
           <Loader2 size={16} className="animate-spin" />
-          Loading house
+          Loading building
         </div>
       </div>
     );
@@ -101,10 +102,10 @@ export function HouseClient() {
 
   if (!isAuthenticated) {
     return (
-      <div className="fixed inset-0 grid place-items-center bg-[#070b12] px-4 text-white">
+      <div className="relative grid h-[calc(100vh-4rem)] min-h-[560px] place-items-center bg-[#070b12] px-4 text-white">
         <div className="w-full max-w-md rounded-[6px] border border-white/12 bg-white/[0.06] p-6 text-center shadow-2xl backdrop-blur">
           <Home className="mx-auto text-emerald-300" size={28} />
-          <h1 className="mt-4 text-2xl font-semibold">Sign in to enter your House</h1>
+          <h1 className="mt-4 text-2xl font-semibold">Sign in to enter your Building</h1>
           <p className="mt-2 text-sm text-white/58">
             Your building hallway is private and is built from your agents.
           </p>
@@ -120,7 +121,7 @@ export function HouseClient() {
   }
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-[#070b12] text-white">
+    <div className="relative h-[calc(100vh-4rem)] min-h-[560px] overflow-hidden bg-[#070b12] text-white">
       <AgentHouseScene
         agents={agents}
         profile={profile}
@@ -130,17 +131,18 @@ export function HouseClient() {
         onExit={() => router.push('/city')}
       />
 
-      <div className="pointer-events-auto fixed left-4 top-4 z-30 flex flex-wrap items-start gap-3">
+      <div className="pointer-events-auto absolute left-4 top-4 z-30 flex flex-wrap items-start gap-3">
         <div className="rounded-[6px] border border-white/12 bg-[#07101b]/82 px-4 py-3 shadow-2xl backdrop-blur">
           <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">
             <Home size={14} />
-            Hatcher House
+            Hatcher Building
           </div>
           <h1 className="mt-1 text-lg font-semibold leading-tight">
             @{profile?.username || 'builder'}
           </h1>
           <p className="mt-1 text-xs text-white/56">
-            {(profile?.tier || 'free').toUpperCase()} · {agents.length} agents · {activeCount} active
+            {(profile?.tier || 'free').toUpperCase()} · {agents.length} agents · {activeCount}{' '}
+            active
           </p>
         </div>
         <Link
@@ -153,7 +155,7 @@ export function HouseClient() {
       </div>
 
       {panelOpen ? (
-        <aside className="pointer-events-auto fixed right-4 top-4 z-30 flex max-h-[calc(100vh-2rem)] w-[min(330px,calc(100vw-2rem))] flex-col rounded-[7px] border border-white/12 bg-[#111722]/88 text-white shadow-2xl backdrop-blur-xl">
+        <aside className="pointer-events-auto absolute right-4 top-4 z-30 flex max-h-[calc(100%-2rem)] w-[min(330px,calc(100vw-2rem))] flex-col rounded-[7px] border border-white/12 bg-[#111722]/88 text-white shadow-2xl backdrop-blur-xl">
           <div className="flex items-start justify-between gap-3 border-b border-white/10 px-4 py-3">
             <div>
               <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50">
@@ -223,7 +225,7 @@ export function HouseClient() {
         <button
           type="button"
           onClick={() => setPanelOpen(true)}
-          className="pointer-events-auto fixed right-4 top-4 z-30 inline-flex items-center gap-2 rounded-[6px] border border-white/12 bg-[#111722]/88 px-3 py-2 text-xs font-semibold text-white/82 shadow-2xl backdrop-blur-xl transition hover:border-emerald-300/40 hover:text-emerald-200"
+          className="pointer-events-auto absolute right-4 top-4 z-30 inline-flex items-center gap-2 rounded-[6px] border border-white/12 bg-[#111722]/88 px-3 py-2 text-xs font-semibold text-white/82 shadow-2xl backdrop-blur-xl transition hover:border-emerald-300/40 hover:text-emerald-200"
         >
           <DoorOpen size={14} />
           Agents
@@ -231,11 +233,9 @@ export function HouseClient() {
       )}
 
       {nearestDoor && (
-        <div className="pointer-events-none fixed bottom-6 left-1/2 z-30 -translate-x-1/2 rounded-full border border-white/16 bg-black/65 px-4 py-2 text-sm text-white shadow-2xl backdrop-blur">
+        <div className="pointer-events-none absolute bottom-6 left-1/2 z-30 -translate-x-1/2 rounded-full border border-white/16 bg-black/65 px-4 py-2 text-sm text-white shadow-2xl backdrop-blur">
           <kbd className="rounded bg-white/10 px-1.5 py-0.5 text-xs">E</kbd>{' '}
-          {nearestDoor === 'exit'
-            ? 'exit to City'
-            : `enter ${nearestDoor.agent.name}`}
+          {nearestDoor === 'exit' ? 'exit to City' : `enter ${nearestDoor.agent.name}`}
         </div>
       )}
     </div>

@@ -2565,6 +2565,7 @@
       "toCity": "Retour à la Ville",
       "toDashboard": "Retour au tableau de bord",
       "toAgents": "Retour aux agents",
+      "toBuilding": "Retour au Building",
       "toHouse": "Retour à House"
     }
   },

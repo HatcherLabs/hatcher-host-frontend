@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { HouseClient } from './HouseClient';
+import { HouseClient } from '../house/HouseClient';
 
 export const metadata: Metadata = {
   title: 'Hatcher Building · Hatcher',

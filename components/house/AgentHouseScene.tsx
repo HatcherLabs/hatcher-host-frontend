@@ -1,9 +1,7 @@
 'use client';
 
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
 import { Suspense, useEffect, useMemo, useRef } from 'react';
-import type { ReactNode } from 'react';
 import * as THREE from 'three';
 import type { Agent } from '@/lib/api';
 import type { SolidDisc } from '@/components/city/v2/world/colliders';
@@ -17,6 +15,7 @@ import {
 import {
   buildHouseLayout,
   frameworkColor,
+  HOUSE_DOOR_PITCH,
   HOUSE_EYE_HEIGHT,
   labelAgentStatus,
   statusColor,
@@ -38,21 +37,21 @@ interface Props {
   onExit: () => void;
 }
 
-const WALL = new THREE.MeshLambertMaterial({ color: 0xc8b693 });
-const WALL_PANEL = new THREE.MeshLambertMaterial({ color: 0xd7c6a6 });
+const WALL = new THREE.MeshLambertMaterial({ color: 0xd5c29c });
+const WALL_PANEL = new THREE.MeshLambertMaterial({ color: 0xe1cfad });
 const WALL_TRIM = new THREE.MeshLambertMaterial({ color: 0x6d583b });
 const FLOOR = new THREE.MeshLambertMaterial({ color: 0x6b472b });
-const FLOOR_DARK = new THREE.MeshLambertMaterial({ color: 0x3b2516 });
+const FLOOR_PLANK_A = new THREE.MeshLambertMaterial({ color: 0x744a2c });
+const FLOOR_PLANK_B = new THREE.MeshLambertMaterial({ color: 0x5f3c23 });
+const FLOOR_SEAM = new THREE.MeshLambertMaterial({ color: 0x3b2516 });
 const CARPET = new THREE.MeshLambertMaterial({ color: 0x6d1828 });
 const DOOR = new THREE.MeshLambertMaterial({ color: 0x805432 });
 const DOOR_DARK = new THREE.MeshLambertMaterial({ color: 0x442b18 });
-const CEILING = new THREE.MeshLambertMaterial({ color: 0x0d1420 });
+const CEILING = new THREE.MeshLambertMaterial({ color: 0x151d2d });
 const METAL = new THREE.MeshLambertMaterial({ color: 0x707786 });
-const SCREEN = new THREE.MeshLambertMaterial({
-  color: 0x09111f,
-  emissive: 0x10263d,
-  emissiveIntensity: 0.24,
-});
+
+const DOOR_W = 1.4;
+const DOOR_H = 2.4;
 
 export function AgentHouseScene({
   agents,
@@ -98,11 +97,11 @@ export function AgentHouseScene({
           gl.toneMappingExposure = 1.02;
         }}
       >
-        <color attach="background" args={['#070b12']} />
-        <fog attach="fog" args={['#0b1222', 16, Math.max(32, layout.length + 18)]} />
-        <ambientLight intensity={0.34} color="#ffe8c6" />
-        <hemisphereLight color="#fff1d6" groundColor="#24170f" intensity={0.54} />
-        <directionalLight position={[7, 9, 7]} intensity={0.58} />
+        <color attach="background" args={['#101827']} />
+        <fog attach="fog" args={['#141b29', 24, Math.max(44, layout.length + 24)]} />
+        <ambientLight intensity={0.62} color="#fff0d8" />
+        <hemisphereLight color="#fff7e6" groundColor="#4a321f" intensity={0.82} />
+        <directionalLight position={[7, 9, 7]} intensity={0.95} />
         <Suspense fallback={null}>
           <HouseHall layout={layout} profile={profile} />
           <HouseInteraction
@@ -134,13 +133,7 @@ export function AgentHouseScene({
   );
 }
 
-function HouseHall({
-  layout,
-  profile,
-}: {
-  layout: HouseLayout;
-  profile: ViewerProfile | null;
-}) {
+function HouseHall({ layout, profile }: { layout: HouseLayout; profile: ViewerProfile | null }) {
   const displayName = profile?.username?.trim() || 'Builder';
   const tier = profile?.tier?.trim() || 'free';
   const halfW = layout.width / 2;
@@ -151,9 +144,7 @@ function HouseHall({
       <mesh position={[0, -0.055, 0]} receiveShadow material={FLOOR}>
         <boxGeometry args={[layout.width, 0.11, layout.length]} />
       </mesh>
-      <mesh position={[0, -0.043, 0]} receiveShadow material={FLOOR_DARK}>
-        <boxGeometry args={[layout.width, 0.012, layout.length]} />
-      </mesh>
+      <HouseFloorPlanks layout={layout} />
       <mesh position={[0, 0.012, 0]} receiveShadow material={CARPET}>
         <boxGeometry args={[2.3, 0.025, layout.length - 0.72]} />
       </mesh>
@@ -180,7 +171,12 @@ function HouseHall({
 
       <Wainscot layout={layout} />
       <CeilingLights layout={layout} />
-      <ReceptionWall layout={layout} displayName={displayName} tier={tier} agentCount={layout.doors.length} />
+      <ReceptionWall
+        layout={layout}
+        displayName={displayName}
+        tier={tier}
+        agentCount={layout.doors.length}
+      />
       <ExitDoor layout={layout} />
       {layout.doors.map((door) => (
         <AgentDoor key={door.agent.id} door={door} />
@@ -191,12 +187,53 @@ function HouseHall({
   );
 }
 
+function HouseFloorPlanks({ layout }: { layout: HouseLayout }) {
+  const plankW = 0.88;
+  const rows = Math.max(10, Math.ceil(layout.length / 0.86));
+  const cols = Math.max(8, Math.ceil(layout.width / plankW));
+  const rowD = layout.length / rows;
+  return (
+    <group>
+      {Array.from({ length: rows }, (_, row) =>
+        Array.from({ length: cols }, (_, col) => {
+          const x = -layout.width / 2 + plankW / 2 + col * plankW + (row % 2 ? plankW / 2 : 0);
+          const z = -layout.length / 2 + rowD / 2 + row * rowD;
+          if (x > layout.width / 2 + plankW / 2) return null;
+          return (
+            <mesh
+              key={`${row}-${col}`}
+              position={[x, 0.003, z]}
+              receiveShadow
+              material={(row + col) % 2 === 0 ? FLOOR_PLANK_A : FLOOR_PLANK_B}
+            >
+              <boxGeometry args={[plankW - 0.025, 0.014, rowD - 0.025]} />
+            </mesh>
+          );
+        }),
+      )}
+      {Array.from({ length: rows + 1 }, (_, i) => (
+        <mesh
+          key={`hall-seam-${i}`}
+          position={[0, 0.014, -layout.length / 2 + i * rowD]}
+          receiveShadow
+          material={FLOOR_SEAM}
+        >
+          <boxGeometry args={[layout.width, 0.008, 0.012]} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 function Wainscot({ layout }: { layout: HouseLayout }) {
   const halfW = layout.width / 2;
   const halfL = layout.length / 2;
   return (
     <group>
-      {[halfL - 0.14, -halfL + 0.14].map((z) => (
+      {[
+        { z: halfL - 0.14, exitWall: true },
+        { z: -halfL + 0.14, exitWall: false },
+      ].map(({ z, exitWall }) => (
         <group key={z}>
           <mesh position={[0, 0.42, z]} material={WALL_PANEL}>
             <boxGeometry args={[layout.width, 0.84, 0.06]} />
@@ -204,17 +241,24 @@ function Wainscot({ layout }: { layout: HouseLayout }) {
           <mesh position={[0, 0.88, z]} material={WALL_TRIM}>
             <boxGeometry args={[layout.width, 0.06, 0.08]} />
           </mesh>
-          <mesh position={[0, 0.09, z]} material={DOOR_DARK}>
-            <boxGeometry args={[layout.width, 0.18, 0.08]} />
-          </mesh>
+          {exitWall ? (
+            <>
+              <mesh position={[-(halfW + 1.16) / 2, 0.09, z]} material={DOOR_DARK}>
+                <boxGeometry args={[halfW - 1.16, 0.18, 0.08]} />
+              </mesh>
+              <mesh position={[(halfW + 1.16) / 2, 0.09, z]} material={DOOR_DARK}>
+                <boxGeometry args={[halfW - 1.16, 0.18, 0.08]} />
+              </mesh>
+            </>
+          ) : (
+            <mesh position={[0, 0.09, z]} material={DOOR_DARK}>
+              <boxGeometry args={[layout.width, 0.18, 0.08]} />
+            </mesh>
+          )}
         </group>
       ))}
       {[-1, 1].map((side) => (
-        <mesh
-          key={side}
-          position={[side * (halfW - 0.12), 0.08, 0]}
-          material={DOOR_DARK}
-        >
+        <mesh key={side} position={[side * (halfW - 0.12), 0.08, 0]} material={DOOR_DARK}>
           <boxGeometry args={[0.05, 0.16, layout.length]} />
         </mesh>
       ))}
@@ -262,30 +306,16 @@ function ReceptionWall({
       <mesh position={[0, 1.06, z]} castShadow receiveShadow material={DOOR}>
         <boxGeometry args={[2.78, 0.08, 0.88]} />
       </mesh>
-      <mesh position={[0, 2.1, -layout.length / 2 + 0.12]}>
-        <boxGeometry args={[3.5, 0.92, 0.06]} />
-        <meshLambertMaterial color="#111827" emissive="#101b2f" emissiveIntensity={0.28} />
+      <mesh position={[0, 2.1, -layout.length / 2 + 0.105]}>
+        <boxGeometry args={[3.48, 1.02, 0.07]} />
+        <meshLambertMaterial color="#2b1d13" />
       </mesh>
-      <SceneLabel
-        position={[0, 2.23, -layout.length / 2 + 0.165]}
-        fontSize={0.18}
-        maxWidth={3.1}
-        color="#59f0d1"
-        anchorX="center"
-        anchorY="middle"
-      >
-        @{displayName}
-      </SceneLabel>
-      <SceneLabel
-        position={[0, 2.02, -layout.length / 2 + 0.165]}
-        fontSize={0.12}
-        maxWidth={3.1}
-        color="#e5eefb"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {`${tier.toUpperCase()} · ${agentCount} agent${agentCount === 1 ? '' : 's'}`}
-      </SceneLabel>
+      <ReceptionPlaque
+        position={[0, 2.1, -layout.length / 2 + 0.145]}
+        displayName={displayName}
+        tier={tier}
+        agentCount={agentCount}
+      />
       <HousePlant position={[-1.14, 1.1, z]} scale={0.52} />
       <mesh position={[1.1, 1.1, z]} castShadow>
         <cylinderGeometry args={[0.08, 0.1, 0.08, 14]} />
@@ -297,24 +327,43 @@ function ReceptionWall({
 }
 
 function ExitDoor({ layout }: { layout: HouseLayout }) {
-  const z = layout.length / 2 - 0.1;
+  const z = layout.length / 2 - 0.25;
   return (
     <group position={[0, 0, z]}>
-      <mesh position={[0, 1.24, -0.03]} material={DOOR_DARK}>
-        <boxGeometry args={[2.16, 2.55, 0.08]} />
+      <mesh position={[0, 1.3, 0.16]} rotation={[0, Math.PI, 0]}>
+        <planeGeometry args={[1.96, 2.56]} />
+        <meshLambertMaterial color="#0a0a10" />
       </mesh>
-      <mesh position={[0, 1.23, -0.08]} material={DOOR}>
-        <boxGeometry args={[1.84, 2.36, 0.07]} />
+      <mesh position={[0, 2.66, -0.04]} material={DOOR_DARK}>
+        <boxGeometry args={[2.2, 0.12, 0.1]} />
       </mesh>
-      <mesh position={[0, 2.62, -0.11]} material={WALL_TRIM}>
-        <boxGeometry args={[2.18, 0.12, 0.12]} />
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[side * 1.06, 1.3, -0.04]} material={DOOR_DARK}>
+          <boxGeometry args={[0.12, 2.6, 0.1]} />
+        </mesh>
+      ))}
+      <mesh position={[0, 1.25, -0.1]} material={DOOR}>
+        <boxGeometry args={[1.9, 2.5, 0.05]} />
       </mesh>
-      <SceneLabel position={[0, 2.88, -0.16]} fontSize={0.16} color="#65e7ff" anchorX="center">
-        CITY
-      </SceneLabel>
-      <mesh position={[0, 0.025, -0.36]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[1.5, 0.08]} />
-        <meshBasicMaterial color="#65e7ff" transparent opacity={0.68} toneMapped={false} />
+      <mesh position={[0, 1.76, -0.135]} rotation={[0, Math.PI, 0]}>
+        <planeGeometry args={[1.52, 0.82]} />
+        <meshLambertMaterial color="#6b3e22" />
+      </mesh>
+      <mesh position={[0, 0.68, -0.135]} rotation={[0, Math.PI, 0]}>
+        <planeGeometry args={[1.52, 0.58]} />
+        <meshLambertMaterial color="#6b3e22" />
+      </mesh>
+      <mesh position={[0.66, 1.05, -0.17]} material={METAL}>
+        <sphereGeometry args={[0.055, 12, 8]} />
+      </mesh>
+      <mesh position={[0, 2.95, -0.08]}>
+        <boxGeometry args={[2.18, 0.58, 0.05]} />
+        <meshLambertMaterial color="#2b1d13" />
+      </mesh>
+      <ExitSign position={[0, 2.95, -0.115]} />
+      <mesh position={[0, 0.006, -0.05]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[1.6, 0.06]} />
+        <meshBasicMaterial color="#ffd089" transparent opacity={0.58} toneMapped={false} />
       </mesh>
     </group>
   );
@@ -326,100 +375,104 @@ function AgentDoor({ door }: { door: HouseDoorLayout }) {
   const sColor = statusColor(door.agent.status);
   const label = labelAgentStatus(door.agent.status);
   const rotY = facing > 0 ? Math.PI / 2 : -Math.PI / 2;
+  const trimT = 0.06;
+  const trimW = 0.1;
+  const panelX = facing * 0.04;
 
   return (
     <group position={[door.x, 0, door.z]}>
-      <mesh position={[facing * 0.04, 1.22, 0]} rotation={[0, rotY, 0]} material={DOOR_DARK}>
-        <boxGeometry args={[0.08, 2.56, 1.62]} />
+      <mesh position={[facing * 0.001, DOOR_H / 2, 0]} rotation={[0, rotY, 0]}>
+        <planeGeometry args={[DOOR_W - 0.04, DOOR_H - 0.04]} />
+        <meshLambertMaterial color="#0a0a10" />
       </mesh>
-      <mesh position={[facing * 0.095, 1.2, 0]} rotation={[0, rotY, 0]} material={DOOR}>
-        <boxGeometry args={[0.07, 2.36, 1.34]} />
+      <mesh position={[facing * (trimT / 2), DOOR_H + trimW / 2, 0]} material={DOOR_DARK}>
+        <boxGeometry args={[trimT, trimW, DOOR_W + trimW * 2]} />
       </mesh>
-      <mesh position={[facing * 0.16, 1.02, -0.45]}>
+      {[-1, 1].map((side) => (
+        <mesh
+          key={side}
+          position={[facing * (trimT / 2), DOOR_H / 2, side * (DOOR_W / 2 + trimW / 2)]}
+          material={DOOR_DARK}
+        >
+          <boxGeometry args={[trimT, DOOR_H, trimW]} />
+        </mesh>
+      ))}
+      <mesh position={[panelX, DOOR_H / 2, 0]} material={DOOR}>
+        <boxGeometry args={[0.04, DOOR_H - 0.04, DOOR_W - 0.04]} />
+      </mesh>
+      <mesh position={[panelX + facing * 0.022, DOOR_H * 0.22, 0]} rotation={[0, rotY, 0]}>
+        <planeGeometry args={[DOOR_W - 0.32, DOOR_H * 0.3]} />
+        <meshLambertMaterial color="#6b3e22" />
+      </mesh>
+      <mesh position={[panelX + facing * 0.05, 1.05, DOOR_W / 2 - 0.18]}>
         <sphereGeometry args={[0.055, 12, 8]} />
         <primitive object={METAL} attach="material" />
       </mesh>
-      <mesh position={[facing * 0.17, 2.63, 0]} rotation={[0, rotY, 0]}>
-        <boxGeometry args={[0.08, 0.22, 0.62]} />
-        <meshLambertMaterial color="#0d1b2e" emissive={color} emissiveIntensity={0.18} />
+      <mesh
+        position={[panelX + facing * 0.025, 1.05, DOOR_W / 2 - 0.18]}
+        rotation={[0, 0, Math.PI / 2]}
+      >
+        <cylinderGeometry args={[0.025, 0.03, 0.04, 10]} />
+        <primitive object={METAL} attach="material" />
       </mesh>
-      <SceneLabel
-        position={[facing * 0.225, 2.63, 0]}
+      <DoorNumberPlate
+        position={[facing * (trimT + 0.012), DOOR_H + trimW + 0.18, 0]}
         rotation={[0, rotY, 0]}
-        fontSize={0.11}
-        color="#d8f7ff"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {String(door.index + 1).padStart(2, '0')}
-      </SceneLabel>
-      <mesh position={[facing * 0.2, 1.65, facing > 0 ? -0.96 : 0.96]} rotation={[0, rotY, 0]} material={SCREEN}>
-        <boxGeometry args={[0.06, 0.86, 1.34]} />
-      </mesh>
-      <SceneLabel
-        position={[facing * 0.245, 1.8, facing > 0 ? -0.96 : 0.96]}
-        rotation={[0, rotY, 0]}
-        fontSize={0.105}
-        maxWidth={1.12}
-        color="#f8fafc"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {door.agent.name}
-      </SceneLabel>
-      <SceneLabel
-        position={[facing * 0.247, 1.58, facing > 0 ? -0.96 : 0.96]}
-        rotation={[0, rotY, 0]}
-        fontSize={0.07}
-        maxWidth={1.04}
-        color={color}
-        anchorX="center"
-        anchorY="middle"
-      >
-        {door.agent.framework}
-      </SceneLabel>
-      <SceneLabel
-        position={[facing * 0.247, 1.37, facing > 0 ? -0.96 : 0.96]}
-        rotation={[0, rotY, 0]}
-        fontSize={0.065}
-        maxWidth={1.04}
-        color="#94a3b8"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {label}
-      </SceneLabel>
-      <mesh position={[facing * 0.22, 1.92, facing > 0 ? -0.36 : 0.36]}>
-        <sphereGeometry args={[0.09, 14, 10]} />
-        <meshBasicMaterial color={sColor} toneMapped={false} />
-      </mesh>
-      <pointLight
-        position={[facing * 0.25, 1.82, facing > 0 ? -0.36 : 0.36]}
-        color={sColor}
-        intensity={0.28}
-        distance={2.2}
+        number={door.index + 1}
       />
+      <AgentDoorPlaque
+        position={[panelX + facing * 0.028, 1.62, 0]}
+        rotation={[0, rotY, 0]}
+        agentName={door.agent.name}
+        framework={door.agent.framework}
+        statusLabel={label}
+        number={door.index + 1}
+        frameworkColor={color}
+        statusColor={sColor}
+      />
+      {['active', 'running', 'restarting'].includes(door.agent.status) && (
+        <mesh position={[facing * 0.5, 0.012, 0]} rotation={[-Math.PI / 2, 0, Math.PI / 2]}>
+          <planeGeometry args={[1.6, 0.05]} />
+          <meshBasicMaterial color={sColor} transparent opacity={0.28} toneMapped={false} />
+        </mesh>
+      )}
     </group>
   );
 }
 
 function Sconces({ layout }: { layout: HouseLayout }) {
   const perSide = Math.max(1, Math.ceil(layout.doors.length / 2));
-  const startZ = -((perSide - 1) * 2.8) / 2;
+  const startZ = -((perSide - 1) * HOUSE_DOOR_PITCH) / 2;
   return (
     <group>
-      {Array.from({ length: perSide + 1 }, (_, i) => startZ - 1.4 + i * 2.8).map((z) => (
+      {Array.from(
+        { length: perSide + 1 },
+        (_, i) => startZ - HOUSE_DOOR_PITCH / 2 + i * HOUSE_DOOR_PITCH,
+      ).map((z) => (
         <group key={z}>
           {[-1, 1].map((side) => (
             <group key={side} position={[side * (layout.width / 2 - 0.18), 1.78, z]}>
               <mesh material={DOOR_DARK}>
                 <boxGeometry args={[0.06, 0.32, 0.12]} />
               </mesh>
-              <mesh position={[-side * 0.15, 0, 0]} rotation={[0, 0, side > 0 ? -Math.PI / 2 : Math.PI / 2]}>
+              <mesh
+                position={[-side * 0.15, 0, 0]}
+                rotation={[0, 0, side > 0 ? -Math.PI / 2 : Math.PI / 2]}
+              >
                 <coneGeometry args={[0.14, 0.22, 12, 1, true]} />
-                <meshLambertMaterial color="#e8c98a" emissive="#ffd089" emissiveIntensity={0.55} side={THREE.DoubleSide} />
+                <meshLambertMaterial
+                  color="#e8c98a"
+                  emissive="#ffd089"
+                  emissiveIntensity={0.55}
+                  side={THREE.DoubleSide}
+                />
               </mesh>
-              <pointLight position={[-side * 0.16, 0, 0]} color="#ffd089" intensity={0.18} distance={2.8} />
+              <pointLight
+                position={[-side * 0.16, 0, 0]}
+                color="#ffd089"
+                intensity={0.18}
+                distance={2.8}
+              />
             </group>
           ))}
         </group>
@@ -469,50 +522,211 @@ function HousePlant({
   );
 }
 
-function SceneLabel({
+function ReceptionPlaque({
   position,
-  rotation = [0, 0, 0],
-  fontSize,
-  color,
-  maxWidth,
-  children,
+  displayName,
+  tier,
+  agentCount,
 }: {
   position: [number, number, number];
-  rotation?: [number, number, number];
-  fontSize: number;
-  color: string;
-  maxWidth?: number;
-  anchorX?: string;
-  anchorY?: string;
-  children: ReactNode;
+  displayName: string;
+  tier: string;
+  agentCount: number;
 }) {
-  return (
-    <Html
-      position={position}
-      rotation={rotation}
-      transform
-      distanceFactor={7.5}
-      zIndexRange={[8, 0]}
-    >
-      <div
-        style={{
-          color,
-          fontFamily: 'var(--font-mono), ui-monospace, SFMono-Regular, monospace',
-          fontSize: `${Math.max(8, fontSize * 82)}px`,
-          fontWeight: 700,
-          lineHeight: 1.05,
-          maxWidth: maxWidth ? `${maxWidth * 82}px` : undefined,
-          overflow: 'hidden',
-          textAlign: 'center',
-          textOverflow: 'ellipsis',
-          textShadow: '0 1px 8px rgba(0,0,0,0.75)',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {children}
-      </div>
-    </Html>
+  const texture = useMemo(
+    () =>
+      createCanvasTexture(1024, 256, (ctx) => {
+        ctx.fillStyle = '#101827';
+        ctx.fillRect(0, 0, 1024, 256);
+        ctx.fillStyle = '#20314a';
+        ctx.fillRect(0, 0, 1024, 8);
+        drawFittedText(ctx, `@${displayName}`, 44, 92, 936, 56, 34, '#7fd9ff', 'bold');
+        drawFittedText(
+          ctx,
+          `${tier.toUpperCase()} · ${agentCount} agent${agentCount === 1 ? '' : 's'}`,
+          44,
+          170,
+          936,
+          42,
+          26,
+          '#e8eef9',
+          '600',
+        );
+        ctx.fillStyle = '#7b879f';
+        ctx.font = '24px ui-sans-serif, system-ui, sans-serif';
+        ctx.fillText('HATCHER BUILDING', 44, 220);
+      }),
+    [agentCount, displayName, tier],
   );
+  useEffect(() => () => texture.dispose(), [texture]);
+
+  return (
+    <mesh position={position}>
+      <planeGeometry args={[3.2, 0.8]} />
+      <meshBasicMaterial map={texture} toneMapped={false} />
+    </mesh>
+  );
+}
+
+function ExitSign({ position }: { position: [number, number, number] }) {
+  const texture = useMemo(
+    () =>
+      createCanvasTexture(512, 128, (ctx) => {
+        ctx.fillStyle = '#101827';
+        ctx.fillRect(0, 0, 512, 128);
+        ctx.fillStyle = '#65e7ff';
+        ctx.font = 'bold 52px ui-sans-serif, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('← CITY', 256, 82);
+      }),
+    [],
+  );
+  useEffect(() => () => texture.dispose(), [texture]);
+
+  return (
+    <mesh position={position} rotation={[0, Math.PI, 0]}>
+      <planeGeometry args={[2, 0.5]} />
+      <meshBasicMaterial map={texture} toneMapped={false} />
+    </mesh>
+  );
+}
+
+function DoorNumberPlate({
+  position,
+  rotation,
+  number,
+}: {
+  position: [number, number, number];
+  rotation: [number, number, number];
+  number: number;
+}) {
+  const texture = useMemo(
+    () =>
+      createCanvasTexture(256, 128, (ctx) => {
+        ctx.fillStyle = '#101827';
+        ctx.fillRect(0, 0, 256, 128);
+        ctx.fillStyle = '#7fd9ff';
+        ctx.font = 'bold 72px ui-monospace, SFMono-Regular, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(String(number).padStart(2, '0'), 128, 88);
+      }),
+    [number],
+  );
+  useEffect(() => () => texture.dispose(), [texture]);
+
+  return (
+    <mesh position={position} rotation={rotation}>
+      <planeGeometry args={[0.42, 0.22]} />
+      <meshBasicMaterial map={texture} toneMapped={false} />
+    </mesh>
+  );
+}
+
+function AgentDoorPlaque({
+  position,
+  rotation,
+  agentName,
+  framework,
+  statusLabel,
+  number,
+  frameworkColor,
+  statusColor,
+}: {
+  position: [number, number, number];
+  rotation: [number, number, number];
+  agentName: string;
+  framework: string | undefined;
+  statusLabel: string;
+  number: number;
+  frameworkColor: string;
+  statusColor: string;
+}) {
+  const texture = useMemo(
+    () =>
+      createCanvasTexture(768, 384, (ctx) => {
+        ctx.fillStyle = '#0d1424';
+        ctx.fillRect(0, 0, 768, 384);
+        ctx.fillStyle = frameworkColor;
+        ctx.fillRect(0, 0, 768, 12);
+        ctx.fillStyle = statusColor;
+        ctx.beginPath();
+        ctx.arc(70, 110, 28, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = statusColor;
+        ctx.lineWidth = 3;
+        ctx.globalAlpha = 0.42;
+        ctx.beginPath();
+        ctx.arc(70, 110, 42, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        drawFittedText(ctx, agentName, 130, 138, 520, 80, 36, '#e8eef9', 'bold');
+        drawFittedText(ctx, framework || 'agent', 130, 200, 520, 42, 24, frameworkColor, '600');
+        ctx.fillStyle = '#8b97b3';
+        ctx.font = '32px ui-sans-serif, system-ui, sans-serif';
+        ctx.fillText('STATUS', 40, 280);
+        drawFittedText(ctx, statusLabel.toUpperCase(), 40, 326, 330, 38, 24, statusColor, 'bold');
+        ctx.fillStyle = '#5b6886';
+        ctx.font = 'bold 56px ui-monospace, SFMono-Regular, monospace';
+        ctx.textAlign = 'right';
+        ctx.fillText(`#${String(number).padStart(2, '0')}`, 728, 88);
+        ctx.textAlign = 'start';
+        ctx.strokeStyle = '#232c44';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(40, 244);
+        ctx.lineTo(728, 244);
+        ctx.stroke();
+      }),
+    [agentName, framework, frameworkColor, number, statusColor, statusLabel],
+  );
+  useEffect(() => () => texture.dispose(), [texture]);
+
+  return (
+    <mesh position={position} rotation={rotation}>
+      <planeGeometry args={[0.92, 0.46]} />
+      <meshBasicMaterial map={texture} toneMapped={false} />
+    </mesh>
+  );
+}
+
+function createCanvasTexture(
+  width: number,
+  height: number,
+  draw: (ctx: CanvasRenderingContext2D) => void,
+) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Could not create building label canvas.');
+  draw(ctx);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.generateMipmaps = false;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function drawFittedText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  maxSize: number,
+  minSize: number,
+  color: string,
+  weight: string,
+) {
+  let size = maxSize;
+  do {
+    ctx.font = `${weight} ${size}px ui-sans-serif, system-ui, sans-serif`;
+    if (ctx.measureText(text).width <= maxWidth) break;
+    size -= 2;
+  } while (size > minSize);
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
 }
 
 function HouseInteraction({
@@ -563,10 +777,7 @@ function nearestDoorForPosition(
   position: THREE.Vector3,
   layout: HouseLayout,
 ): HouseDoorLayout | 'exit' | null {
-  if (
-    Math.abs(position.z - (layout.length / 2 - 0.75)) < 1.05 &&
-    Math.abs(position.x) < 1.2
-  ) {
+  if (Math.abs(position.z - (layout.length / 2 - 0.75)) < 1.05 && Math.abs(position.x) < 1.2) {
     return 'exit';
   }
 

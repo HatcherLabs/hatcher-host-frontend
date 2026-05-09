@@ -1,9 +1,10 @@
 import type { Agent } from '@/lib/api';
 
-export const HOUSE_DOOR_PITCH = 2.8;
-export const HOUSE_WIDTH = 6.4;
+export const HOUSE_DOOR_PITCH = 3.25;
+export const HOUSE_WIDTH = 7.0;
 export const HOUSE_HEIGHT = 3.35;
 export const HOUSE_EYE_HEIGHT = 1.5;
+const HOUSE_END_CLEARANCE = 7.2;
 
 export interface HouseDoorLayout {
   agent: Agent;
@@ -23,7 +24,7 @@ export interface HouseLayout {
 
 export function buildHouseLayout(agents: Agent[]): HouseLayout {
   const perSide = Math.max(1, Math.ceil(agents.length / 2));
-  const length = Math.max(12, perSide * HOUSE_DOOR_PITCH + 5);
+  const length = Math.max(13, (perSide - 1) * HOUSE_DOOR_PITCH + HOUSE_END_CLEARANCE);
   const startZ = -((perSide - 1) * HOUSE_DOOR_PITCH) / 2;
 
   return {

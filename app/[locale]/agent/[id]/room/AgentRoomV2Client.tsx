@@ -3,15 +3,14 @@ import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { Mail } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useToast } from '@/components/ui/ToastProvider';
+import { useRouter } from '@/i18n/routing';
 import { BackToCity } from '@/components/agent-room/v2/hud/BackToCity';
 import { WalkOnboarding } from '@/components/agent-room/v2/hud/WalkOnboarding';
-import { RoomMinimap } from '@/components/agent-room/v2/hud/RoomMinimap';
 import { ProximityHint } from '@/components/agent-room/v2/hud/ProximityHint';
-import { PassportHud } from '@/components/agent-room/v2/hud/PassportHud';
 import { ShortcutHud } from '@/components/agent-room/v2/hud/ShortcutHud';
+import { AvatarEmoteHud } from '@/components/agent-room/v2/hud/AvatarEmoteHud';
 import { getStationLayout, type StationId } from '@/components/agent-room/v2/world/layout';
 import { usePanelState } from '@/components/agent-room/v2/hooks/usePanelState';
 import { useStationProximity } from '@/components/agent-room/v2/hooks/useStationProximity';
@@ -19,18 +18,26 @@ import { ChatPanel, type ChatMessage } from '@/components/agent-room/v2/panels/C
 import { SkillsPanel } from '@/components/agent-room/v2/panels/SkillsPanel';
 import { IntegrationsPanel } from '@/components/agent-room/v2/panels/IntegrationsPanel';
 import { StatusPanel } from '@/components/agent-room/v2/panels/StatusPanel';
-import { LogsPanel } from '@/components/agent-room/v2/panels/LogsPanel';
 import { MemoryPanel } from '@/components/agent-room/v2/panels/MemoryPanel';
 import { ConfigPanel } from '@/components/agent-room/v2/panels/ConfigPanel';
 import { PluginsPanel } from '@/components/agent-room/v2/panels/PluginsPanel';
-import { AgentPassportPanel } from '@/components/agent-room/v2/panels/AgentPassportPanel';
-import { MailPanel } from '@/components/agent-room/v2/panels/MailPanel';
+import {
+  LaptopPanel,
+  type LaptopConfigPatch,
+  type LaptopTab,
+} from '@/components/agent-room/v2/panels/LaptopPanel';
 import { detectDefaultQuality } from '@/components/agent-room/v2/quality';
+import {
+  normalizeAvatarVariant,
+  type AvatarVariant,
+  type RoomEmoteId,
+} from '@/components/agent-room/v2/stations/AgentBody';
+import { cityBuildingHref } from '@/components/city/v3/cityNavigation';
 import type { AgentPassport } from '@/lib/api';
-import { buildFallbackPassport, primaryPassportStatus } from '@/lib/agent-passport';
+import { buildFallbackPassport } from '@/lib/agent-passport';
 
 const AgentRoomSceneV2 = dynamic(
-  () => import('@/components/agent-room/v2/AgentRoomSceneV2').then(m => m.AgentRoomSceneV2),
+  () => import('@/components/agent-room/v2/AgentRoomSceneV2').then((m) => m.AgentRoomSceneV2),
   {
     ssr: false,
     loading: () => (
@@ -38,7 +45,7 @@ const AgentRoomSceneV2 = dynamic(
         Loading room
       </div>
     ),
-  }
+  },
 );
 
 interface Props {
@@ -77,19 +84,43 @@ function extractConnectedIntegrations(config: Record<string, unknown> | undefine
       for (const item of v) if (typeof item === 'string') enabled.add(item.toLowerCase());
     } else if (v && typeof v === 'object') {
       for (const [k, cv] of Object.entries(v as Record<string, unknown>)) {
-        if (cv && typeof cv === 'object' && (cv as { enabled?: boolean }).enabled) enabled.add(k.toLowerCase());
+        if (cv && typeof cv === 'object' && (cv as { enabled?: boolean }).enabled)
+          enabled.add(k.toLowerCase());
       }
     }
   }
   const channelSettings = config.channelSettings;
   if (channelSettings && typeof channelSettings === 'object') {
-    for (const k of Object.keys(channelSettings as Record<string, unknown>)) enabled.add(k.toLowerCase());
+    for (const k of Object.keys(channelSettings as Record<string, unknown>))
+      enabled.add(k.toLowerCase());
   }
   for (const k of Object.keys(config)) {
     const m = k.match(/^([A-Z]+)_BOT_TOKEN$/);
     if (m && config[k]) enabled.add(m[1]!.toLowerCase());
   }
   return enabled;
+}
+
+function normalizeLogLine(entry: unknown): string | null {
+  if (typeof entry === 'string') return entry;
+  if (!entry || typeof entry !== 'object') return null;
+  const record = entry as Record<string, unknown>;
+  const timestamp = typeof record.timestamp === 'string' ? record.timestamp : '';
+  const level = typeof record.level === 'string' ? record.level.toUpperCase() : 'INFO';
+  const message = typeof record.message === 'string' ? record.message : '';
+  if (!message) return null;
+  const time = timestamp ? new Date(timestamp) : null;
+  const stamp =
+    time && !Number.isNaN(time.getTime())
+      ? time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      : '';
+  return `${stamp ? `${stamp} ` : ''}${level} ${message}`;
+}
+
+function normalizeLogLines(payload: unknown): string[] {
+  const logs = (payload as { logs?: unknown })?.logs;
+  if (!Array.isArray(logs)) return [];
+  return logs.map(normalizeLogLine).filter((line): line is string => !!line).slice(-80);
 }
 
 // Stations that need edit rights. StatsHologram stays public because it only
@@ -99,7 +130,6 @@ const OWNER_ONLY: Set<StationId> = new Set([
   'skillWorkbench',
   'integrationsRack',
   'statusConsole',
-  'logWall',
   'memoryShelves',
   'configTerminal',
   'mailInbox',
@@ -118,6 +148,7 @@ function isTypingTarget(target: EventTarget | null): boolean {
 
 export function AgentRoomV2Client({ agentId }: Props) {
   const { toast } = useToast();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [agent, setAgent] = useState<AgentWithExtras | null>(null);
   const [framework, setFramework] = useState<string | null>(null);
@@ -126,9 +157,12 @@ export function AgentRoomV2Client({ agentId }: Props) {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [isChatStreaming, setIsChatStreaming] = useState(false);
   const [passport, setPassport] = useState<AgentPassport | null>(null);
-  const [passportOpen, setPassportOpen] = useState(false);
-  const [mailOpen, setMailOpen] = useState(false);
+  const [laptopOpen, setLaptopOpen] = useState(false);
+  const [laptopInitialTab, setLaptopInitialTab] = useState<LaptopTab>('status');
+  const [activeEmote, setActiveEmote] = useState<RoomEmoteId | null>(null);
+  const [emoteNonce, setEmoteNonce] = useState(0);
   const [mailAttentionCount, setMailAttentionCount] = useState(0);
+  const [tvLogLines, setTvLogLines] = useState<string[]>([]);
   const [quality] = useState(() => detectDefaultQuality());
   const posRef = useRef(new THREE.Vector3());
   const saveChatTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -144,24 +178,21 @@ export function AgentRoomV2Client({ agentId }: Props) {
   // history) use only id-keyed lookups, so resolve to canonical id once the
   // agent is loaded. Fall back to URL param while loading.
   const apiId = agent?.id ?? agentId;
-  const fallbackPassport = useMemo(
-    () => buildFallbackPassport(agent, apiId),
-    [agent, apiId],
-  );
+  const fallbackPassport = useMemo(() => buildFallbackPassport(agent, apiId), [agent, apiId]);
   const activePassport = passport ?? fallbackPassport;
 
   const loadAgent = useCallback(async () => {
     try {
       const res = await api.getAgent(agentId);
       if (!res.success) {
-        setFramework(prev => prev ?? 'openclaw');
+        setFramework((prev) => prev ?? 'openclaw');
         return;
       }
       const data = res.data as unknown as AgentWithExtras;
       setAgent(data);
       setFramework(data.framework ?? 'openclaw');
     } catch {
-      setFramework(prev => prev ?? 'openclaw');
+      setFramework((prev) => prev ?? 'openclaw');
     }
   }, [agentId]);
 
@@ -172,15 +203,43 @@ export function AgentRoomV2Client({ agentId }: Props) {
   }, [loadAgent]);
 
   useEffect(() => {
+    if (!apiId || !canEdit) {
+      setTvLogLines([]);
+      return;
+    }
     let cancelled = false;
-    api.getAgentPassport(apiId)
+    const loadLogs = () => {
+      api
+        .getAgentLogs(apiId)
+        .then((res) => {
+          if (cancelled || !res.success) return;
+          setTvLogLines(normalizeLogLines(res.data));
+        })
+        .catch(() => {
+          if (!cancelled) setTvLogLines([]);
+        });
+    };
+    loadLogs();
+    const timer = setInterval(loadLogs, 5_000);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [apiId, canEdit]);
+
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .getAgentPassport(apiId)
       .then((res) => {
         if (!cancelled && res.success) setPassport(res.data);
       })
       .catch(() => {
         if (!cancelled) setPassport(null);
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [apiId]);
 
   const refreshMailSummary = useCallback(() => {
@@ -188,16 +247,20 @@ export function AgentRoomV2Client({ agentId }: Props) {
       setMailAttentionCount(0);
       return;
     }
-    api.getAgentMailMessages(apiId, { limit: 20 })
+    api
+      .getAgentMailMessages(apiId, { limit: 20 })
       .then((res) => {
         if (!res.success) {
           setMailAttentionCount(0);
           return;
         }
-        const count = res.data.messages.filter((message) => (
-          message.direction === 'inbound' &&
-          (message.status === 'received' || message.status === 'failed' || message.status === 'skipped')
-        )).length;
+        const count = res.data.messages.filter(
+          (message) =>
+            message.direction === 'inbound' &&
+            (message.status === 'received' ||
+              message.status === 'failed' ||
+              message.status === 'skipped'),
+        ).length;
         setMailAttentionCount(count);
       })
       .catch(() => setMailAttentionCount(0));
@@ -210,11 +273,16 @@ export function AgentRoomV2Client({ agentId }: Props) {
   // One-shot memory probe on mount to decide if the shelves glow brighter.
   useEffect(() => {
     if (!canEdit) return;
-    api.getAgentMemory(apiId)
+    api
+      .getAgentMemory(apiId)
       .then((res) => {
-        if (!res.success) { setHasMemory(false); return; }
+        if (!res.success) {
+          setHasMemory(false);
+          return;
+        }
         const m = res.data as { memoryMd?: string; dailyLogs?: unknown[] };
-        const anything = !!(m?.memoryMd && m.memoryMd.length > 20) || !!(m?.dailyLogs && m.dailyLogs.length);
+        const anything =
+          !!(m?.memoryMd && m.memoryMd.length > 20) || !!(m?.dailyLogs && m.dailyLogs.length);
         setHasMemory(anything);
       })
       .catch(() => setHasMemory(false));
@@ -226,9 +294,13 @@ export function AgentRoomV2Client({ agentId }: Props) {
       setPluginsInstalled(0);
       return;
     }
-    api.getAgentPlugins(apiId)
+    api
+      .getAgentPlugins(apiId)
       .then((res) => {
-        if (!res.success) { setPluginsInstalled(0); return; }
+        if (!res.success) {
+          setPluginsInstalled(0);
+          return;
+        }
         const data = res.data as { installed?: unknown[] };
         setPluginsInstalled(data.installed?.length ?? 0);
       })
@@ -240,7 +312,8 @@ export function AgentRoomV2Client({ agentId }: Props) {
   // keeps the conversation visible.
   useEffect(() => {
     if (!apiId || !canEdit) return;
-    api.getChatHistory(apiId)
+    api
+      .getChatHistory(apiId)
       .then((res) => {
         if (!res.success) return;
         const raw = res.data.messages ?? [];
@@ -286,34 +359,47 @@ export function AgentRoomV2Client({ agentId }: Props) {
     };
   }, [chatMessages, apiId, canEdit]);
 
-  const layout = useMemo(
-    () => (framework ? getStationLayout(framework) : null),
-    [framework],
-  );
+  const layout = useMemo(() => (framework ? getStationLayout(framework) : null), [framework]);
 
   const nearest = useStationProximity(posRef, layout);
+  const selectedAvatarVariant = normalizeAvatarVariant(agent?.config?.roomAvatarVariant);
 
-  const handleStationClick = useCallback((id: StationId) => {
-    if (OWNER_ONLY.has(id) && !canEdit) {
-      toast.info('Owner-only — sign in as the owner or a team member to use this station.');
-      return;
-    }
-    if (id === 'mailInbox') {
+  const openLaptop = useCallback(
+    (tab: LaptopTab = 'status') => {
       close();
-      setPassportOpen(false);
-      setMailOpen(true);
-      return;
-    }
-    setPassportOpen(false);
-    setMailOpen(false);
-    setOpenPanel(id);
-  }, [canEdit, close, setOpenPanel, toast]);
+      setLaptopInitialTab(tab);
+      setLaptopOpen(true);
+    },
+    [close],
+  );
+
+  const handleStationClick = useCallback(
+    (id: StationId) => {
+      if (id === 'buildingExit') {
+        router.push(cityBuildingHref());
+        return;
+      }
+      if (OWNER_ONLY.has(id) && !canEdit) {
+        toast.info('Owner-only — sign in as the owner or a team member to use this station.');
+        return;
+      }
+      if (id === 'mailInbox') {
+        openLaptop('mail');
+        return;
+      }
+      if (id === 'configTerminal') {
+        openLaptop('config');
+        return;
+      }
+      setLaptopOpen(false);
+      setOpenPanel(id);
+    },
+    [canEdit, openLaptop, router, setOpenPanel, toast],
+  );
 
   const handlePassportOpen = useCallback(() => {
-    close();
-    setMailOpen(false);
-    setPassportOpen(true);
-  }, [close]);
+    openLaptop('passport');
+  }, [openLaptop]);
 
   useEffect(() => {
     if (initialPassportRequestRef.current) return;
@@ -322,16 +408,61 @@ export function AgentRoomV2Client({ agentId }: Props) {
     handlePassportOpen();
   }, [handlePassportOpen, searchParams]);
 
-  const handleMailOpen = useCallback(() => {
-    close();
-    setPassportOpen(false);
-    setMailOpen(true);
-  }, [close]);
-
   const handleOpenChatFromPassport = useCallback(() => {
-    setPassportOpen(false);
+    setLaptopOpen(false);
     if (canEdit) setOpenPanel('agentAvatar');
   }, [canEdit, setOpenPanel]);
+
+  const handleLaptopConfigSave = useCallback(
+    async (patch: LaptopConfigPatch) => {
+      if (!canEdit) throw new Error('Owner-only config.');
+      const previous = agent;
+      setAgent((prev) =>
+        prev
+          ? {
+              ...prev,
+              name: patch.name,
+              description: patch.description || null,
+              config: patch.config,
+            }
+          : prev,
+      );
+      const res = await api.updateAgent(apiId, {
+        name: patch.name,
+        description: patch.description,
+        config: patch.config,
+      });
+      if (!res.success) {
+        if (previous) setAgent(previous);
+        throw new Error(res.error || 'Could not save config.');
+      }
+      setAgent(res.data as unknown as AgentWithExtras);
+      toast.success('Config saved');
+    },
+    [agent, apiId, canEdit, toast],
+  );
+
+  const handleAvatarChange = useCallback(
+    async (variant: AvatarVariant) => {
+      if (!canEdit) return;
+      const nextConfig = { ...(agent?.config ?? {}), roomAvatarVariant: variant };
+      setAgent((prev) => (prev ? { ...prev, config: nextConfig } : prev));
+      try {
+        const res = await api.updateAgent(apiId, { config: nextConfig });
+        if (!res.success) throw new Error(res.error || 'Could not save avatar.');
+        toast.success('Avatar updated');
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Could not save avatar.');
+        void loadAgent();
+      }
+    },
+    [agent?.config, apiId, canEdit, loadAgent, toast],
+  );
+
+  const handleEmote = useCallback((emote: RoomEmoteId) => {
+    setActiveEmote(emote);
+    setEmoteNonce((value) => value + 1);
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -339,33 +470,18 @@ export function AgentRoomV2Client({ agentId }: Props) {
 
       if (e.key === 'Escape') {
         close();
-        setPassportOpen(false);
-        setMailOpen(false);
+        setLaptopOpen(false);
         return;
       }
 
       const key = e.key.toLowerCase();
-      if (key === 'e' && nearest && !openPanel && !passportOpen && !mailOpen) {
+      if (key === 'e' && nearest && !openPanel && !laptopOpen) {
         handleStationClick(nearest);
-      } else if (key === 'p') {
-        handlePassportOpen();
-      } else if (key === 'm' && canEdit) {
-        handleMailOpen();
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [
-    canEdit,
-    close,
-    handleMailOpen,
-    handlePassportOpen,
-    handleStationClick,
-    mailOpen,
-    nearest,
-    openPanel,
-    passportOpen,
-  ]);
+  }, [canEdit, close, handleStationClick, laptopOpen, nearest, openPanel]);
 
   const connectedIntegrations = useMemo(
     () => extractConnectedIntegrations(agent?.config),
@@ -390,47 +506,29 @@ export function AgentRoomV2Client({ agentId }: Props) {
         tier={agent?.tier}
         messagesToday={agent?.messageCountToday}
         uptimeSec={agent?.uptimeSec}
+        logLines={tvLogLines}
         connectedIntegrations={connectedIntegrations}
-        pluginsInstalled={pluginsInstalled}
         nearest={nearest}
         canEdit={canEdit}
         hasMemory={hasMemory}
         quality={quality}
-        agentName={agent?.name}
         isChatStreaming={isChatStreaming}
-        passportStatus={primaryPassportStatus(activePassport)}
+        avatarVariant={selectedAvatarVariant}
+        activeEmote={activeEmote}
+        emoteNonce={emoteNonce}
         onStationClick={handleStationClick}
-        onPassportClick={handlePassportOpen}
       />
 
       <BackToCity agentId={apiId} />
-      <PassportHud passport={activePassport} onOpen={handlePassportOpen} />
-      {canEdit && (
-        <button
-          type="button"
-          onClick={handleMailOpen}
-          className="fixed right-4 top-[108px] z-30 max-w-[220px] rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-base)]/80 px-3 py-2 text-left text-[var(--text-primary)] backdrop-blur transition hover:border-[var(--accent)] hover:bg-[rgba(74,222,128,0.06)] sm:max-w-[280px]"
-          style={{ fontFamily: 'var(--font-mono)' }}
-        >
-          <div className="flex items-center gap-2">
-            <Mail size={14} className="text-[var(--accent)]" />
-            <span className="truncate text-[11px] font-bold uppercase tracking-[0.06em]">
-              Mail
-            </span>
-            {mailAttentionCount > 0 && (
-              <span className="ml-auto rounded-full border border-[rgba(74,222,128,0.35)] bg-[rgba(74,222,128,0.12)] px-1.5 py-0.5 text-[10px] text-[var(--accent)]">
-                {mailAttentionCount}
-              </span>
-            )}
-          </div>
-          <p className="mt-1 text-[10px] text-[var(--text-muted)]">
-            mailbox and recent replies
-          </p>
-        </button>
-      )}
-      <RoomMinimap layout={layout} playerPos={posRef} framework={framework} />
       <ProximityHint nearest={openPanel ? null : nearest} />
       <ShortcutHud canEdit={canEdit} />
+      {canEdit && (
+        <AvatarEmoteHud
+          selectedAvatarVariant={selectedAvatarVariant}
+          onAvatarChange={handleAvatarChange}
+          onEmote={handleEmote}
+        />
+      )}
       <WalkOnboarding />
 
       {openPanel === 'agentAvatar' && canEdit && (
@@ -444,21 +542,24 @@ export function AgentRoomV2Client({ agentId }: Props) {
           onClose={close}
         />
       )}
-      {passportOpen && (
-        <AgentPassportPanel
-          framework={framework}
-          passport={activePassport}
-          canChat={canEdit}
-          onOpenChat={handleOpenChatFromPassport}
-          onClose={() => setPassportOpen(false)}
-        />
-      )}
-      {mailOpen && canEdit && (
-        <MailPanel
+      {laptopOpen && canEdit && (
+        <LaptopPanel
           agentId={apiId}
+          agentName={agent?.name}
+          agentDescription={agent?.description}
+          agentConfig={agent?.config}
           framework={framework}
-          onClose={() => setMailOpen(false)}
-          onRefreshSummary={refreshMailSummary}
+          status={agent?.status ?? 'unknown'}
+          tier={agent?.tier}
+          messagesToday={agent?.messageCountToday}
+          uptimeSec={agent?.uptimeSec}
+          initialTab={laptopInitialTab}
+          mailAttentionCount={mailAttentionCount}
+          passport={activePassport}
+          onSaveConfig={handleLaptopConfigSave}
+          onClose={() => setLaptopOpen(false)}
+          onOpenStation={setOpenPanel}
+          onOpenChat={handleOpenChatFromPassport}
         />
       )}
       {openPanel === 'skillWorkbench' && canEdit && (
@@ -483,9 +584,6 @@ export function AgentRoomV2Client({ agentId }: Props) {
           onAction={loadAgent}
           onClose={close}
         />
-      )}
-      {openPanel === 'logWall' && canEdit && (
-        <LogsPanel agentId={apiId} framework={framework} onClose={close} />
       )}
       {openPanel === 'memoryShelves' && canEdit && (
         <MemoryPanel agentId={apiId} framework={framework} onClose={close} />
