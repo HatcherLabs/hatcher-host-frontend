@@ -22,7 +22,7 @@ import type { CityAgent, CityResponse, CityUser } from '@/components/city/types'
 import { QualityProvider, useQuality } from '@/components/city/v2/quality/QualityContext';
 import { QualityToggle } from '@/components/city/v2/quality/QualityToggle';
 import { SceneErrorBoundary } from '@/components/city/v2/world/SceneErrorBoundary';
-import { cityBuildingHref, cityBuildingTitle } from './cityNavigation';
+import { buildingPanelEnterLabel, cityBuildingHref, cityBuildingTitle } from './cityNavigation';
 import { LIVE_CITY_TIERS, type LiveCityGrid, type LiveCityTimeMode } from './liveCityHandoff';
 import { layoutLiveCity, type LiveAgentMarkerLayout, type LiveBuildingLayout } from './liveLayout';
 import { LiveAgentMarkers } from './LiveAgentMarkers';
@@ -338,6 +338,7 @@ function LiveCitySceneBody({
       {selectedBuilding && (
         <LiveBuildingPanel
           building={selectedBuilding}
+          canEnterBuilding={canEnterBuilding}
           onClose={() => setSelectedOwnerKey(null)}
           onBuildingEnterClick={onBuildingEnterClick}
         />
@@ -355,15 +356,21 @@ function LiveCitySceneBody({
 
 function LiveBuildingPanel({
   building,
+  canEnterBuilding,
   onClose,
   onBuildingEnterClick,
 }: {
   building: LiveBuildingLayout;
+  canEnterBuilding: boolean;
   onClose: () => void;
   onBuildingEnterClick: () => void;
 }) {
   const tierLabel = LIVE_CITY_TIERS[building.tierKey].label;
   const activeCount = building.activeAgentCount;
+  const enterLabel = buildingPanelEnterLabel({
+    canEnterBuilding,
+    isMyBuilding: building.mine,
+  });
 
   return (
     <aside className="pointer-events-auto absolute bottom-5 right-5 z-20 w-[min(340px,calc(100vw-2.5rem))] rounded-[4px] border border-white/18 bg-[#08111a]/88 p-4 text-white shadow-2xl backdrop-blur-xl">
@@ -401,14 +408,14 @@ function LiveBuildingPanel({
         />
       </div>
 
-      {building.mine && (
+      {enterLabel && (
         <button
           type="button"
           onClick={onBuildingEnterClick}
           className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[4px] border border-emerald-300/30 bg-emerald-300 px-3 py-2 text-xs font-semibold text-black transition hover:bg-emerald-200"
         >
           <DoorOpen size={14} />
-          Enter building
+          {enterLabel}
         </button>
       )}
     </aside>

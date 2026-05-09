@@ -1597,22 +1597,10 @@ function StationNearGlow({
   color: string;
   active: boolean;
 }) {
-  if (!active) return null;
-  return (
-    <group position={position}>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.09, 0]}>
-        <ringGeometry args={[0.62, 0.66, 40]} />
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={0.22}
-          toneMapped={false}
-          depthWrite={false}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-    </group>
-  );
+  void position;
+  void color;
+  void active;
+  return null;
 }
 
 function ClickHotspot({
