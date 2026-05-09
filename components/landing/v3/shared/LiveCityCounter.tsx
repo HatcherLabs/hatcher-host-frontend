@@ -11,6 +11,18 @@ interface SnapshotResponse {
   agents?: number;
   count?: number;
   total?: number;
+  running?: number;
+  counts?: {
+    running?: number;
+    total?: number;
+  };
+  success?: boolean;
+  data?: {
+    counts?: {
+      running?: number;
+      total?: number;
+    };
+  };
 }
 
 /**
@@ -18,10 +30,9 @@ interface SnapshotResponse {
  * Hidden entirely if count is below MIN_THRESHOLD (avoids showing "1 agent
  * online" which reads as empty).
  *
- * Endpoint adapted from the api-repo `/agents/snapshot` route registered
- * under apps/api/src/routes/agents/index.ts. If the schema changes, the
- * SnapshotResponse fallback chain (online → agents → count → total) keeps
- * this component silent rather than crashing.
+ * Endpoint adapted from the public city payload. If the schema changes, the
+ * SnapshotResponse fallback chain keeps this component silent rather than
+ * crashing.
  */
 export function LiveCityCounter() {
   const [count, setCount] = useState<number | null>(null);
@@ -29,11 +40,21 @@ export function LiveCityCounter() {
   useEffect(() => {
     let cancelled = false;
     const apiBase = process.env.NEXT_PUBLIC_API_URL ?? '';
-    fetch(`${apiBase}/agents/snapshot`)
+    fetch(`${apiBase}/public/city`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data: SnapshotResponse | null) => {
         if (cancelled || !data) return;
-        const n = data.online ?? data.agents ?? data.count ?? data.total ?? 0;
+        const n =
+          data.data?.counts?.running ??
+          data.counts?.running ??
+          data.running ??
+          data.online ??
+          data.agents ??
+          data.count ??
+          data.data?.counts?.total ??
+          data.counts?.total ??
+          data.total ??
+          0;
         setCount(typeof n === 'number' ? n : 0);
       })
       .catch(() => {});
