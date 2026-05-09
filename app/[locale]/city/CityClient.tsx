@@ -17,7 +17,7 @@ interface Props {
 }
 
 export function CityClient({ initial }: Props) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [data, setData] = useState<CityResponse | null>(initial);
   // Track last-seen messageCount so we can spawn a ring pulse every
   // time an agent's tally ticks up between polls.
@@ -96,6 +96,7 @@ export function CityClient({ initial }: Props) {
         generatedAt={data?.generatedAt ?? null}
         pulseAts={pulseAts}
         canEnterBuilding={isAuthenticated}
+        viewerUsername={user?.username ?? null}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import {
   buildingPanelEnterLabel,
   cityBuildingHref,
   cityBuildingTitle,
+  isViewerBuilding,
 } from './cityNavigation';
 
 describe('city navigation helpers', () => {
@@ -25,8 +26,36 @@ describe('city navigation helpers', () => {
     expect(buildingPanelEnterLabel({ canEnterBuilding: true, isMyBuilding: true })).toBe(
       'Enter building',
     );
-    expect(buildingPanelEnterLabel({ canEnterBuilding: true, isMyBuilding: false })).toBe(
-      'Go to your building',
-    );
+    expect(buildingPanelEnterLabel({ canEnterBuilding: true, isMyBuilding: false })).toBeNull();
+  });
+
+  it('recognizes the viewer building beyond the backend mine flag', () => {
+    expect(
+      isViewerBuilding({
+        buildingMine: false,
+        buildingOwnerKey: 'owner-1',
+        buildingOwnerUsername: 'canes100x',
+        viewerOwnerKey: 'owner-1',
+        viewerUsername: null,
+      }),
+    ).toBe(true);
+    expect(
+      isViewerBuilding({
+        buildingMine: false,
+        buildingOwnerKey: 'owner-2',
+        buildingOwnerUsername: ' Canes100x ',
+        viewerOwnerKey: null,
+        viewerUsername: 'canes100x',
+      }),
+    ).toBe(true);
+    expect(
+      isViewerBuilding({
+        buildingMine: false,
+        buildingOwnerKey: 'owner-2',
+        buildingOwnerUsername: 'other',
+        viewerOwnerKey: 'owner-1',
+        viewerUsername: 'canes100x',
+      }),
+    ).toBe(false);
   });
 });

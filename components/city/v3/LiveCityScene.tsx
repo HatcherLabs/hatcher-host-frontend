@@ -22,7 +22,12 @@ import type { CityAgent, CityResponse, CityUser } from '@/components/city/types'
 import { QualityProvider, useQuality } from '@/components/city/v2/quality/QualityContext';
 import { QualityToggle } from '@/components/city/v2/quality/QualityToggle';
 import { SceneErrorBoundary } from '@/components/city/v2/world/SceneErrorBoundary';
-import { buildingPanelEnterLabel, cityBuildingHref, cityBuildingTitle } from './cityNavigation';
+import {
+  buildingPanelEnterLabel,
+  cityBuildingHref,
+  cityBuildingTitle,
+  isViewerBuilding,
+} from './cityNavigation';
 import { LIVE_CITY_TIERS, type LiveCityGrid, type LiveCityTimeMode } from './liveCityHandoff';
 import { layoutLiveCity, type LiveAgentMarkerLayout, type LiveBuildingLayout } from './liveLayout';
 import { LiveAgentMarkers } from './LiveAgentMarkers';
@@ -48,6 +53,7 @@ interface Props {
   generatedAt?: string | null;
   pulseAts: Map<string, number>;
   canEnterBuilding?: boolean;
+  viewerUsername?: string | null;
 }
 
 interface SurveyFocusTarget {
@@ -136,6 +142,7 @@ export function LiveCityScene({
   generatedAt,
   pulseAts,
   canEnterBuilding = false,
+  viewerUsername = null,
 }: Props) {
   const router = useRouter();
   const buildingHref = cityBuildingHref();
@@ -150,6 +157,7 @@ export function LiveCityScene({
         pulseAts={pulseAts}
         onDashboardClick={(agentId) => router.push(`/dashboard/agent/${agentId}`)}
         canEnterBuilding={canEnterBuilding}
+        viewerUsername={viewerUsername}
         onBuildingEnterClick={() => router.push(buildingHref)}
       />
     </QualityProvider>
@@ -163,6 +171,7 @@ function LiveCitySceneBody({
   generatedAt,
   pulseAts,
   canEnterBuilding = false,
+  viewerUsername = null,
   onDashboardClick,
   onBuildingEnterClick,
 }: Props & {
@@ -203,10 +212,32 @@ function LiveCitySceneBody({
         : null,
     [layout.markers, selectedAgentId],
   );
-  const myBuilding = useMemo(
-    () => layout.buildings.find((building) => building.mine) ?? null,
-    [layout.buildings],
+  const viewerOwnerKey = useMemo(
+    () => users.find((user) => user.mine)?.ownerKey ?? agents.find((agent) => agent.mine)?.ownerKey,
+    [agents, users],
   );
+  const myBuilding = useMemo(
+    () =>
+      layout.buildings.find((building) =>
+        isViewerBuilding({
+          buildingMine: building.mine,
+          buildingOwnerKey: building.ownerKey,
+          buildingOwnerUsername: building.ownerUsername,
+          viewerOwnerKey,
+          viewerUsername,
+        }),
+      ) ?? null,
+    [layout.buildings, viewerOwnerKey, viewerUsername],
+  );
+  const selectedBuildingIsMine = selectedBuilding
+    ? isViewerBuilding({
+        buildingMine: selectedBuilding.mine,
+        buildingOwnerKey: selectedBuilding.ownerKey,
+        buildingOwnerUsername: selectedBuilding.ownerUsername,
+        viewerOwnerKey,
+        viewerUsername,
+      })
+    : false;
   const focusTarget = useMemo<SurveyFocusTarget | null>(() => {
     if (!cameraFocus) return null;
     const building =
@@ -339,6 +370,7 @@ function LiveCitySceneBody({
         <LiveBuildingPanel
           building={selectedBuilding}
           canEnterBuilding={canEnterBuilding}
+          isViewerBuilding={selectedBuildingIsMine}
           onClose={() => setSelectedOwnerKey(null)}
           onBuildingEnterClick={onBuildingEnterClick}
         />
@@ -357,11 +389,13 @@ function LiveCitySceneBody({
 function LiveBuildingPanel({
   building,
   canEnterBuilding,
+  isViewerBuilding: isViewerBuildingOwner,
   onClose,
   onBuildingEnterClick,
 }: {
   building: LiveBuildingLayout;
   canEnterBuilding: boolean;
+  isViewerBuilding: boolean;
   onClose: () => void;
   onBuildingEnterClick: () => void;
 }) {
@@ -369,7 +403,7 @@ function LiveBuildingPanel({
   const activeCount = building.activeAgentCount;
   const enterLabel = buildingPanelEnterLabel({
     canEnterBuilding,
-    isMyBuilding: building.mine,
+    isMyBuilding: isViewerBuildingOwner,
   });
 
   return (
