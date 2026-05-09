@@ -11,7 +11,7 @@ import styles from './SectionCity.module.css';
  * Hatcher City section. Uses the real public city preview asset instead of a
  * schematic mockup so the landing page shows the product's game-like surface.
  * Real data: "25 categories" comes from world/grid.ts (5x5 grid).
- * LiveCityCounter pulls from /agents/snapshot at runtime, hidden if <10.
+ * LiveCityCounter pulls from /public/city at runtime, hidden if <10.
  */
 export function SectionCity() {
   const t = useTranslations('landingV3.city');
