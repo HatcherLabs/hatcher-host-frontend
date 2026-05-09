@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   top: 60px;
-  z-index: 49;
+  z-index: 999;
   background: var(--bg-base);
   display: none;
   overflow: hidden;

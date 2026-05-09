@@ -1,7 +1,7 @@
 .nav {
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 1000;
   background: rgba(10, 10, 10, 0.85);
   backdrop-filter: saturate(140%) blur(8px);
   -webkit-backdrop-filter: saturate(140%) blur(8px);
@@ -27,6 +27,13 @@
   letter-spacing: 0.18em;
   color: var(--text-primary);
   text-decoration: none;
+}
+@media (max-width: 360px) {
+  .brand {
+    gap: 0;
+    font-size: 0;
+    letter-spacing: 0;
+  }
 }
 
 .groups { display: flex; gap: 4px; }
@@ -101,6 +108,7 @@
 .spacer { flex: 1; }
 
 .actions { display: inline-flex; align-items: center; gap: 12px; }
+@media (max-width: 600px) { .actions { gap: 8px; } }
 
 /* Wrap the legacy LocaleSwitcher so its hover/focus colors land on
    v3's phosphor accent without touching the component itself
@@ -126,6 +134,39 @@
 }
 .signIn:hover { color: var(--text-primary); }
 @media (max-width: 600px) { .signIn { display: none; } }
+
+.mobileGuestAuth { display: none; }
+@media (max-width: 600px) {
+  .mobileGuestAuth {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.mobileSignIn,
+.mobileSignUp {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  border-radius: 4px;
+}
+
+.mobileSignIn {
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  padding: 9px 8px;
+}
+
+.mobileSignUp {
+  color: var(--bg-base);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 9px 8px;
+}
 
 .notificationSlot {
   display: inline-flex;
@@ -294,6 +335,7 @@
 }
 .cta:hover { background: var(--accent-hover); box-shadow: 0 0 16px var(--accent-glow); }
 .cursor { font-weight: 400; font-size: 14px; line-height: 1; }
+@media (max-width: 600px) { .guestCta { display: none; } }
 
 .hamburger {
   display: none;
