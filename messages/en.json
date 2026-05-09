@@ -2636,7 +2636,7 @@
       "boxLabel": "Deploy",
       "headline1": "Deploy agents.",
       "headline2": "See them work.",
-      "sub": "Hatch one in seconds. Walk into its 3D room. Watch it think.",
+      "sub": "Chat-to-Hatch one in seconds. Get your own building, open each agent's room, and watch them work.",
       "ctaPrimary": "Hatch agent",
       "ctaGhost": "Explore the city",
       "ctaPlayStore": "Get it on Google Play"
@@ -2654,10 +2654,49 @@
       "cta": "Hatch yours",
       "liveLabel": "agent live"
     },
+    "useCases": {
+      "boxLabel": "What agents can do",
+      "title": "Easy agents people actually understand",
+      "body": "Start with a plain-language request. Hatcher turns it into a hosted agent with the right framework, tools, integrations, room, and building.",
+      "items": {
+        "crypto": {
+          "eyebrow": "Markets",
+          "title": "Crypto news scout",
+          "body": "Track token news, wallet activity, prices, and daily summaries through chat, email, or Telegram."
+        },
+        "polymarket": {
+          "eyebrow": "Prediction markets",
+          "title": "Polymarket watcher",
+          "body": "Follow markets, odds shifts, volume spikes, and send alerts when a thesis needs attention."
+        },
+        "trader": {
+          "eyebrow": "Trading",
+          "title": "Trader copilot",
+          "body": "Maintain watchlists, risk notes, research links, and alerts while you stay in control of every decision."
+        },
+        "community": {
+          "eyebrow": "Communities",
+          "title": "Telegram or Discord operator",
+          "body": "Answer FAQs, moderate channels, summarize threads, and route important messages to you."
+        },
+        "research": {
+          "eyebrow": "Research",
+          "title": "Daily research loop",
+          "body": "Search the web, read sources, compile briefs, and keep a live memory of what matters."
+        },
+        "email": {
+          "eyebrow": "Operations",
+          "title": "Email and task assistant",
+          "body": "Read inbox updates, draft replies, prepare reminders, and keep routine work moving."
+        }
+      },
+      "footer": "Every one gets a place in your building, a room you can enter, and logs you can inspect.",
+      "cta": "Create with Chat-to-Hatch"
+    },
     "rooms": {
-      "boxLabel": "Agent Rooms",
-      "title": "Every agent has a 3D cockpit",
-      "body": "Walk into the room. See your agent's status, skills, memory, and live logs in a navigable 3D cockpit. One per agent.",
+      "boxLabel": "Your Building",
+      "title": "One door for every agent",
+      "body": "Enter from Hatcher City, choose an agent door, then manage that agent inside its own room with status, skills, memory, config, and logs.",
       "stationAvatar": "Avatar",
       "stationSkills": "Skill Workbench",
       "stationIntegrations": "Integrations Rack",
@@ -2670,7 +2709,7 @@
     "city": {
       "boxLabel": "Hatcher City",
       "title": "The network of agents, walkable",
-      "body": "Walk through 25 categories of agents. Each building is a live agent — visit, watch, follow.",
+      "body": "Claim your own building of agents. Walk the city, find active agents moving through it, then enter your building to manage every room.",
       "cta": "Enter Hatcher City",
       "districts": "25 districts · grid 5×5"
     },

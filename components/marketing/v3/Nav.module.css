@@ -36,10 +36,19 @@
   }
 }
 
-.groups { display: flex; gap: 4px; }
-@media (max-width: 880px) { .groups { display: none; } }
+.groups {
+  display: flex;
+  gap: 4px;
+}
+@media (max-width: 880px) {
+  .groups {
+    display: none;
+  }
+}
 
-.groupAnchor { position: relative; }
+.groupAnchor {
+  position: relative;
+}
 
 .groupBtn {
   display: inline-flex;
@@ -54,12 +63,23 @@
   border: 0;
   cursor: pointer;
   border-radius: 4px;
-  transition: color 150ms ease, background 150ms ease;
+  transition:
+    color 150ms ease,
+    background 150ms ease;
 }
-.groupBtn:hover { color: var(--text-primary); background: var(--bg-elevated); }
-.groupBtn[aria-expanded='true'] { color: var(--accent); }
+.groupBtn:hover {
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+}
+.groupBtn[aria-expanded='true'] {
+  color: var(--accent);
+}
 
-.caret { width: 8px; height: 8px; opacity: 0.6; }
+.caret {
+  width: 8px;
+  height: 8px;
+  opacity: 0.6;
+}
 
 .dropdown {
   position: absolute;
@@ -85,7 +105,9 @@
   text-decoration: none;
   transition: background 150ms ease;
 }
-.item:hover { background: var(--bg-elevated); }
+.item:hover {
+  background: var(--bg-elevated);
+}
 
 .glyph {
   font-family: var(--font-mono);
@@ -96,19 +118,42 @@
   text-align: center;
 }
 
-.itemBody { display: flex; flex-direction: column; gap: 2px; }
+.itemBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 .itemLabel {
   font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
 }
-.itemSub { font-family: var(--font-body); font-size: 12px; color: var(--text-muted); }
+.itemSub {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-muted);
+}
 
-.spacer { flex: 1; }
+.spacer {
+  flex: 1;
+}
 
-.actions { display: inline-flex; align-items: center; gap: 12px; }
-@media (max-width: 600px) { .actions { gap: 8px; } }
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+@media (max-width: 600px) {
+  .inner {
+    gap: 10px;
+    padding: 8px 12px;
+  }
+  .actions {
+    gap: 6px;
+    min-width: 0;
+  }
+}
 
 /* Wrap the legacy LocaleSwitcher so its hover/focus colors land on
    v3's phosphor accent without touching the component itself
@@ -121,7 +166,11 @@
   color: var(--accent) !important;
   background: rgba(74, 222, 128, 0.06) !important;
 }
-@media (max-width: 600px) { .localeSlot { display: none; } }
+@media (max-width: 600px) {
+  .localeSlot {
+    display: none;
+  }
+}
 
 .signIn {
   font-family: var(--font-mono);
@@ -132,10 +181,18 @@
   border-radius: 4px;
   transition: color 150ms ease;
 }
-.signIn:hover { color: var(--text-primary); }
-@media (max-width: 600px) { .signIn { display: none; } }
+.signIn:hover {
+  color: var(--text-primary);
+}
+@media (max-width: 600px) {
+  .signIn {
+    display: none;
+  }
+}
 
-.mobileGuestAuth { display: none; }
+.mobileGuestAuth {
+  display: none;
+}
 @media (max-width: 600px) {
   .mobileGuestAuth {
     display: inline-flex;
@@ -172,9 +229,15 @@
   display: inline-flex;
   align-items: center;
 }
-@media (max-width: 880px) { .notificationSlot { order: 1; } }
+@media (max-width: 880px) {
+  .notificationSlot {
+    order: 1;
+  }
+}
 
-.userAnchor { position: relative; }
+.userAnchor {
+  position: relative;
+}
 
 .userPill {
   display: inline-flex;
@@ -189,10 +252,17 @@
   border: 1px solid var(--border-default);
   border-radius: 4px;
   cursor: pointer;
-  transition: border-color 150ms ease, background 150ms ease;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease;
 }
-.userPill:hover { border-color: var(--accent); background: var(--bg-card); }
-.userPill[aria-expanded='true'] { border-color: var(--accent); }
+.userPill:hover {
+  border-color: var(--accent);
+  background: var(--bg-card);
+}
+.userPill[aria-expanded='true'] {
+  border-color: var(--accent);
+}
 
 .userDot {
   width: 6px;
@@ -224,6 +294,11 @@
   border-radius: 4px;
   background: var(--bg-elevated);
   opacity: 0.6;
+}
+@media (max-width: 600px) {
+  .userPillSkeleton {
+    display: none;
+  }
 }
 
 .userDropdown {
@@ -315,7 +390,9 @@
   border-top: 1px solid var(--border-default);
   padding-top: 14px;
 }
-.signOut .itemLabel { color: var(--danger, #ff6b6b); }
+.signOut .itemLabel {
+  color: var(--danger, #ff6b6b);
+}
 
 .cta {
   display: inline-flex;
@@ -331,11 +408,38 @@
   color: var(--bg-base);
   border-radius: 4px;
   text-decoration: none;
-  transition: background 150ms ease, box-shadow 150ms ease;
+  transition:
+    background 150ms ease,
+    box-shadow 150ms ease;
 }
-.cta:hover { background: var(--accent-hover); box-shadow: 0 0 16px var(--accent-glow); }
-.cursor { font-weight: 400; font-size: 14px; line-height: 1; }
-@media (max-width: 600px) { .guestCta { display: none; } }
+.cta:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+.cursor {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1;
+}
+@media (max-width: 600px) {
+  .guestCta {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .cta {
+    max-width: 116px;
+    padding: 9px 10px;
+    font-size: 10px;
+    line-height: 1.15;
+    white-space: normal;
+  }
+
+  .cursor {
+    flex: 0 0 auto;
+  }
+}
 
 .hamburger {
   display: none;
@@ -356,12 +460,32 @@
   right: 8px;
   height: 1.5px;
   background: var(--text-primary);
-  transition: transform 150ms ease, opacity 150ms ease;
+  transition:
+    transform 150ms ease,
+    opacity 150ms ease;
 }
-.hamburger::before { top: 11px; }
-.hamburger span    { top: 17px; }
-.hamburger::after  { top: 23px; }
-.hamburger.open::before { top: 17px; transform: rotate(45deg); }
-.hamburger.open span    { opacity: 0; }
-.hamburger.open::after  { top: 17px; transform: rotate(-45deg); }
-@media (max-width: 880px) { .hamburger { display: block; } }
+.hamburger::before {
+  top: 11px;
+}
+.hamburger span {
+  top: 17px;
+}
+.hamburger::after {
+  top: 23px;
+}
+.hamburger.open::before {
+  top: 17px;
+  transform: rotate(45deg);
+}
+.hamburger.open span {
+  opacity: 0;
+}
+.hamburger.open::after {
+  top: 17px;
+  transform: rotate(-45deg);
+}
+@media (max-width: 880px) {
+  .hamburger {
+    display: block;
+  }
+}
