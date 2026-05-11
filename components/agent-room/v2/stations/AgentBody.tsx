@@ -96,6 +96,7 @@ interface Props {
   avatarVariant?: string | null;
   activeEmote?: RoomEmoteId | null;
   emoteNonce?: number;
+  showStatusAura?: boolean;
 }
 
 const AVATAR_VARIANT_IDS = new Set<string>(AVATAR_VARIANTS.map((variant) => variant.id));
@@ -1538,6 +1539,7 @@ export function AgentBody({
   avatarVariant,
   activeEmote,
   emoteNonce,
+  showStatusAura = true,
 }: Props) {
   const variant = useMemo(
     () => pickVariant(framework, agentId, avatarVariant),
@@ -1546,7 +1548,7 @@ export function AgentBody({
 
   return (
     <>
-      {isStreaming && (
+      {showStatusAura && isStreaming && (
         <AgentStatusAura palette={palette} isStreaming={isStreaming} status={status} />
       )}
       {isGlbAvatarVariant(variant) ? (

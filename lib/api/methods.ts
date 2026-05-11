@@ -1216,7 +1216,8 @@ export const api = {
     history: Array<{ role: 'user' | 'assistant'; content: string }>,
     onToken: (token: string) => void,
     onDone: (model: string) => void,
-    onError: (err: string) => void
+    onError: (err: string) => void,
+    onMessage?: (content: string) => void
   ) => {
     const token = getToken();
 
@@ -1245,10 +1246,20 @@ export const api = {
           body: JSON.stringify({ message, history }),
         });
         if (!fallback.ok) { onError(`HTTP ${fallback.status}`); return; }
-        const data = await fallback.json() as { data?: { content: string; model: string } };
-        if (data.data?.content) {
-          onToken(data.data.content);
-          onDone(data.data.model ?? 'groq');
+        const data = await fallback.json() as {
+          data?: {
+            content?: string;
+            model?: string;
+            messages?: Array<{ content?: string }>;
+          };
+        };
+        const payload = data.data;
+        const messages = payload?.messages?.map((item) => item.content).filter((item): item is string => Boolean(item?.trim())) ?? [];
+        const firstContent = messages[0] ?? payload?.content;
+        if (firstContent) {
+          onToken(firstContent);
+          onDone(payload?.model ?? 'unknown');
+          for (const extra of messages.slice(1)) onMessage?.(extra);
         } else {
           onError('Empty response');
         }
@@ -1260,6 +1271,32 @@ export const api = {
 
     if (!res.ok || !res.body) {
       onError(`HTTP ${res.status}`);
+      return;
+    }
+
+    const contentType = res.headers.get('content-type') ?? '';
+    if (contentType.includes('application/json')) {
+      try {
+        const data = await res.json() as {
+          data?: {
+            content?: string;
+            model?: string;
+            messages?: Array<{ content?: string }>;
+          };
+        };
+        const payload = data.data;
+        const messages = payload?.messages?.map((item) => item.content).filter((item): item is string => Boolean(item?.trim())) ?? [];
+        const firstContent = messages[0] ?? payload?.content;
+        if (!firstContent) {
+          onError('Empty response');
+          return;
+        }
+        onToken(firstContent);
+        onDone(payload?.model ?? 'unknown');
+        for (const extra of messages.slice(1)) onMessage?.(extra);
+      } catch (err) {
+        onError(err instanceof Error ? err.message : 'Invalid JSON response');
+      }
       return;
     }
 

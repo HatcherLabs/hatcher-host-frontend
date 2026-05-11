@@ -36,7 +36,12 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
           </div>
         </div>
       )}
-      <div className={`flex flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start'}`} style={{ maxWidth: '75%' }}>
+      <div
+        className={`flex min-w-0 flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
+        style={{
+          maxWidth: msg.role === 'assistant' ? 'min(100%, 980px)' : 'min(84%, 760px)',
+        }}
+      >
         {/* User bubble: subtle gradient; Assistant bubble: framework accent color */}
         <div
           className={`chat-bubble text-[var(--text-primary)] ${

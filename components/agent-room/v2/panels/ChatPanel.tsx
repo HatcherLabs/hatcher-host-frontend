@@ -2,6 +2,8 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { PanelShell } from './PanelShell';
 import { useWebSocketChat, type ChatToolEvent } from '@/hooks/useWebSocketChat';
+import { RichMarkdown } from '@/components/agents/tabs/ChatTab/ArtifactRenderer';
+import { ChatStyles } from '@/components/agents/tabs/ChatTab/ChatStyles';
 
 interface InflightTool {
   callId: string;
@@ -22,6 +24,7 @@ function toolGlyph(name: string): string {
 }
 
 export interface ChatMessage {
+  id?: string;
   role: 'user' | 'assistant';
   content: string;
   ts?: number;
@@ -55,6 +58,7 @@ export function ChatPanel({
   const [inflightTools, setInflightTools] = useState<InflightTool[]>([]);
   const [completedTools, setCompletedTools] = useState<InflightTool[]>([]);
   const bufferRef = useRef('');
+  const seenLiveMessageIdsRef = useRef(new Set<string>());
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleToolEvent = useCallback((evt: ChatToolEvent) => {
@@ -94,6 +98,12 @@ export function ChatPanel({
       onUpdateLast(bufferRef.current);
     },
     onToolEvent: handleToolEvent,
+    onMessage: (message) => {
+      if (message.role !== 'assistant' || !message.content.trim()) return;
+      if (seenLiveMessageIdsRef.current.has(message.id)) return;
+      seenLiveMessageIdsRef.current.add(message.id);
+      onAppend({ id: message.id, role: 'assistant', content: message.content, ts: message.ts });
+    },
     onDone: (content) => {
       const final = content || bufferRef.current;
       onUpdateLast(final);
@@ -136,6 +146,7 @@ export function ChatPanel({
 
   return (
     <PanelShell title="Chat" framework={framework} onClose={onClose}>
+      <ChatStyles />
       <div className="mb-3 flex items-center gap-2 text-xs text-neutral-400">
         <span className={`inline-block h-2 w-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-neutral-600'}`} />
         {isConnected ? 'connected' : 'connecting…'}
@@ -148,14 +159,22 @@ export function ChatPanel({
           <div className="text-center text-neutral-500">Say something to your agent.</div>
         )}
         {messages.map((m, i) => (
-          <div key={i} className={m.role === 'user' ? 'text-right' : 'text-left'}>
-            <span
+          <div key={m.id ?? i} className={m.role === 'user' ? 'text-right' : 'text-left'}>
+            <div
               className={`inline-block max-w-[85%] whitespace-pre-wrap rounded-lg px-3 py-1.5 ${
                 m.role === 'user' ? 'bg-white text-black' : 'bg-neutral-800 text-neutral-100'
               }`}
             >
-              {m.content || (streaming && i === messages.length - 1 ? '…' : '')}
-            </span>
+              {m.content ? (
+                m.role === 'assistant' ? (
+                  <span className="markdown-body block whitespace-normal text-left">
+                    <RichMarkdown content={m.content} />
+                  </span>
+                ) : (
+                  m.content
+                )
+              ) : (streaming && i === messages.length - 1 ? '…' : '')}
+            </div>
           </div>
         ))}
         {streaming && (inflightTools.length > 0 || completedTools.length > 0) && (
