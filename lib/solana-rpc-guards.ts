@@ -1,0 +1,66 @@
+const MAX_BATCH_SIZE = 20;
+
+const ALLOWED_METHODS = new Set([
+  'getAccountInfo',
+  'getBalance',
+  'getBlockHeight',
+  'getFeeForMessage',
+  'getHealth',
+  'getLatestBlockhash',
+  'getMinimumBalanceForRentExemption',
+  'getSignatureStatuses',
+  'getTokenAccountBalance',
+  'getTokenAccountsByOwner',
+  'sendTransaction',
+  'simulateTransaction',
+]);
+
+export function isAllowedSolanaRpcPayload(payload: unknown): boolean {
+  if (Array.isArray(payload)) {
+    return (
+      payload.length > 0
+      && payload.length <= MAX_BATCH_SIZE
+      && payload.every(isAllowedRpcObject)
+    );
+  }
+  return isAllowedRpcObject(payload);
+}
+
+export function solanaRpcMethods(payload: unknown): string[] {
+  if (Array.isArray(payload)) {
+    return payload
+      .filter((item): item is { method: string } => isAllowedRpcObject(item))
+      .map((item) => item.method);
+  }
+  return isAllowedRpcObject(payload) ? [payload.method] : [];
+}
+
+export function isTrustedSolanaRpcSource(
+  origin: string | null,
+  referer: string | null,
+  requestOrigin: string,
+  nodeEnv = process.env.NODE_ENV,
+): boolean {
+  if (nodeEnv !== 'production') return true;
+  const candidates = [origin, referer].filter((value): value is string => Boolean(value));
+  if (candidates.length === 0) return false;
+  return candidates.some((value) => {
+    try {
+      return new URL(value).host === new URL(requestOrigin).host;
+    } catch {
+      return false;
+    }
+  });
+}
+
+function isAllowedRpcObject(payload: unknown): payload is { method: string; id?: unknown } {
+  return (
+    isRpcObject(payload)
+    && typeof payload.method === 'string'
+    && ALLOWED_METHODS.has(payload.method)
+  );
+}
+
+function isRpcObject(payload: unknown): payload is { method?: unknown; id?: unknown } {
+  return typeof payload === 'object' && payload !== null && !Array.isArray(payload);
+}
