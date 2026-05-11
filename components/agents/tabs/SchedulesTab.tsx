@@ -59,8 +59,8 @@ const FRAMEWORK_COLORS: Record<string, { accent: string; glow: string; label: st
 // ─── Framework Compatibility ─────────────────────────────────
 
 const FRAMEWORK_SCHEDULE_SUPPORT: Record<string, { native: boolean; method: string; note: string }> = {
-  openclaw: { native: false, method: 'Hatcher scheduler',       note: 'Schedules are managed by the Hatcher platform. The agent receives the prompt as a new message at each interval.' },
-  hermes:   { native: false, method: 'Hatcher scheduler',       note: 'Schedules are managed by the Hatcher platform. The agent receives the prompt as a new message at each interval.' },
+  openclaw: { native: true, method: 'OpenClaw Gateway cron', note: 'Schedules are created inside OpenClaw Gateway cron. Finished runs post their summary back into webchat through the framework webhook delivery.' },
+  hermes:   { native: true, method: 'Hermes Jobs API',       note: 'Schedules are created inside Hermes cron through its native Jobs API and run in isolated Hermes sessions.' },
 };
 
 // ─── Cron Presets ────────────────────────────────────────────
@@ -421,7 +421,7 @@ export function SchedulesTab() {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-white">Scheduled Tasks</h3>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">Set your agent to run tasks automatically on a schedule</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">Set your agent to run tasks automatically in its native scheduler</p>
           </div>
           {!showForm && (
             <button

@@ -26,6 +26,17 @@ export interface ChatToolEvent {
   agentId?: string;
 }
 
+export interface LiveChatMessage {
+  id: string;
+  agentId: string;
+  userId: string;
+  role: 'user' | 'assistant';
+  content: string;
+  source: 'cron' | 'workflow' | 'agent' | 'system';
+  ts: number;
+  metadata?: Record<string, unknown>;
+}
+
 interface UseWebSocketChatOptions {
   agentId: string;
   /** Whether the hook should attempt to connect (e.g. only when authenticated) */
@@ -36,6 +47,9 @@ interface UseWebSocketChatOptions {
   /** Called when the agent invokes a tool mid-stream. Optional — chats
    *  that don't render tool indicators can omit. */
   onToolEvent?: (evt: ChatToolEvent) => void;
+  /** Called when the server pushes a complete message that was not
+   *  initiated by the current input request, e.g. cron/workflow output. */
+  onMessage?: (message: LiveChatMessage) => void;
   /** Called when connection status changes */
   onStatusChange?: (agentId: string, status: string) => void;
   onRateLimit?: (error: string, limit: number, used: number) => void;
@@ -64,6 +78,7 @@ export function useWebSocketChat({
   onDone,
   onError,
   onToolEvent,
+  onMessage,
   onStatusChange,
   onRateLimit,
 }: UseWebSocketChatOptions): UseWebSocketChatReturn {
@@ -83,12 +98,14 @@ export function useWebSocketChat({
   const onDoneRef = useRef(onDone);
   const onErrorRef = useRef(onError);
   const onToolEventRef = useRef(onToolEvent);
+  const onMessageRef = useRef(onMessage);
   const onStatusChangeRef = useRef(onStatusChange);
   const onRateLimitRef = useRef(onRateLimit);
   onTokenRef.current = onToken;
   onDoneRef.current = onDone;
   onErrorRef.current = onError;
   onToolEventRef.current = onToolEvent;
+  onMessageRef.current = onMessage;
   onStatusChangeRef.current = onStatusChange;
   onRateLimitRef.current = onRateLimit;
 
@@ -162,6 +179,11 @@ export function useWebSocketChat({
               argsPreview: msg.payload.argsPreview as string | undefined,
               agentId: msg.payload.agentId as string | undefined,
             });
+          }
+          break;
+        case 'chat_message':
+          if (onMessageRef.current) {
+            onMessageRef.current(msg.payload as unknown as LiveChatMessage);
           }
           break;
         case 'rate_limit':

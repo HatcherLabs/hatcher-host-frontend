@@ -606,7 +606,7 @@ export default function AgentManagePage() {
 
     setChatSessions(res.data.sessions);
     const current = res.data.sessions.find((session) => session.current) ?? res.data.sessions[0];
-    if (!activeChatSessionIdRef.current && current) {
+    if (current && activeChatSessionIdRef.current !== current.id) {
       activeChatSessionIdRef.current = current.id;
       setActiveChatSessionIdState(current.id);
     }
@@ -758,6 +758,24 @@ export default function AgentManagePage() {
           return prev.filter((t) => t.callId !== evt.callId);
         });
       }
+    },
+    onMessage: (message) => {
+      if (message.role !== 'assistant' || !message.content.trim()) return;
+      setChatError(null);
+      setChatErrorType(null);
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === message.id)) return prev;
+        return [
+          ...prev,
+          {
+            id: message.id,
+            role: 'assistant',
+            content: message.content,
+            timestamp: new Date(message.ts),
+          },
+        ];
+      });
+      window.setTimeout(() => void loadChatSessions(), 500);
     },
     onDone: (_content, _model) => {
       wsStreamingMsgRef.current = false;
@@ -922,7 +940,13 @@ export default function AgentManagePage() {
           }
           setMessages((prev) => prev.filter((m) => !(m.streaming && m.content === '')));
           setSending(false);
-        }
+        },
+        (content) => {
+          setMessages((prev) => [
+            ...prev,
+            { id: genId(), role: 'assistant', content, timestamp: new Date() },
+          ]);
+        },
       );
     } catch (err) {
       const errMessage = err instanceof Error ? err.message : 'Connection error';

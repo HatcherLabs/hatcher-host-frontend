@@ -76,12 +76,13 @@ const nextConfig = {
       // Dev builds use source maps generated via runtime code execution, which
       // CSP blocks by default. Prod builds do not, so the relaxed directive is
       // applied only when NODE_ENV is not production.
-      `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: ${GOOGLE_ADS_HOSTS}${process.env.NODE_ENV !== 'production' ? " 'unsafe-" + "eval'" : ''}`,
+      `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: https://s3.tradingview.com ${GOOGLE_ADS_HOSTS}${process.env.NODE_ENV !== 'production' ? " 'unsafe-" + "eval'" : ''}`,
       "worker-src 'self' blob:",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
-      `img-src 'self' data: blob: https://*.ipfs.nftstorage.link https://arweave.net https://raw.githubusercontent.com https://api.qrserver.com ${GOOGLE_ADS_HOSTS}`,
+      `img-src 'self' data: blob: https: ${GOOGLE_ADS_HOSTS}`,
       `connect-src 'self' blob: https://api.hatcher.host wss://api.hatcher.host https://*.solana.com wss://*.solana.com https://*.helius-rpc.com wss://*.helius-rpc.com https://api.dexscreener.com https://threejs.org ${GOOGLE_ADS_HOSTS}${process.env.NODE_ENV !== 'production' ? ' http://localhost:3001 ws://localhost:3001 http://localhost:8080 http://127.0.0.1:3001 ws://127.0.0.1:3001 http://127.0.0.1:8080' : ''}`,
+      "frame-src 'self' https://www.tradingview.com https://s.tradingview.com https://tradingview.com https://www.tradingview-widget.com https://www.geckoterminal.com https://geckoterminal.com https://dexscreener.com https://www.dexscreener.com",
       "base-uri 'self'",
       "form-action 'self'",
     ];

@@ -17,7 +17,7 @@ import { RateLimitIndicator } from './RateLimitIndicator';
 import { ChatInput } from './ChatInput';
 import { VoiceCallOverlay } from './VoiceCallOverlay';
 import { ChatStyles } from './ChatStyles';
-import { ChatSessionsRail } from './ChatSessionsRail';
+import { AgentPresenceRail } from './AgentPresenceRail';
 
 export function ChatTab() {
   const ctx = useAgentContext();
@@ -336,8 +336,8 @@ export function ChatTab() {
         onStartVoiceCall={startVoiceCall}
       />
 
-      <div className="flex flex-1 min-h-0 gap-3 lg:gap-4">
-        <ChatSessionsRail />
+      <div className="flex min-h-0 flex-1 flex-col gap-3 md:flex-row lg:gap-4">
+        <AgentPresenceRail />
 
         <div className="flex min-w-0 flex-1 flex-col">
           <MessageList
