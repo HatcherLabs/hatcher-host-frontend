@@ -139,13 +139,18 @@ function IntegrationFieldsForm({
     integrationSaveMsg, saveIntegrationSecrets,
   } = ctx;
 
-  // Channel settings (DM policy, group policy, streaming) are only read
-  // by the OpenClaw adapter via build-spec.ts. Hermes
-  // have no code path that honors these fields, so rendering them for
-  // those frameworks just gives users controls that silently do nothing.
+  // Channel settings (DM/group policy, allowlists, streaming, require-mention)
+  // are honored by both adapters:
+  //   - OpenClaw: managed-openclaw.ts merges `channelSettings.<platform>.*`
+  //     into channels.<name>.* and writes via init.mjs.
+  //   - Hermes: managed-hermes.ts maps `channelSettings.<platform>.*` →
+  //     init.py's _merge_channel_settings → platforms.<name>.extra.* in
+  //     config.yaml. Plus init.py translates the legacy `groupPolicy:"mention"`
+  //     value to `require_mention: true` for backward compat.
+  // ElizaOS / Milady have no channelSettings code path yet, so keep the gate.
   const showChannelSettings =
     integration.hasChannelSettings === true
-    && (agent?.framework ?? 'openclaw') === 'openclaw';
+    && ['openclaw', 'hermes'].includes(agent?.framework ?? 'openclaw');
 
   const sk = integrationStateKey(integration);
   const isSaving = savingIntegration === sk;
