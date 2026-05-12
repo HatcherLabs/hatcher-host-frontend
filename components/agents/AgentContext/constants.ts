@@ -57,7 +57,7 @@ export const CHANNEL_SETTINGS_FIELDS: IntegrationField[] = [
   { key: '_CS_DM_POLICY', label: 'DM Policy', type: 'select', helper: 'Who can message the bot in DMs',
     options: [{ value: 'open', label: 'Open — anyone' }, { value: 'allowlist', label: 'Allowlist only' }, { value: 'disabled', label: 'Disabled' }] },
   { key: '_CS_GROUP_POLICY', label: 'Group Policy', type: 'select', helper: 'How the bot responds in group chats',
-    options: [{ value: 'open', label: 'Open — all messages' }, { value: 'mention', label: 'Mention only' }, { value: 'disabled', label: 'Disabled' }] },
+    options: [{ value: 'open', label: 'Open — all messages' }, { value: 'allowlist', label: 'Allowlisted groups' }, { value: 'disabled', label: 'Disabled' }] },
   { key: '_CS_STREAMING', label: 'Streaming', type: 'select', helper: 'How responses are delivered',
     options: [{ value: 'partial', label: 'Partial — edit as tokens arrive' }, { value: 'full', label: 'Full — send complete' }, { value: 'off', label: 'Off' }] },
 ];

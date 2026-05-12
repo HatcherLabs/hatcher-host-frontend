@@ -152,14 +152,23 @@ export function useAgentIntegrations(
     if (hasSettings) {
       const channelName = integration.secretPrefix.toLowerCase();
       const mapped: Record<string, unknown> = {};
+      const csv = (value: string) => value.split(',').map((s) => s.trim()).filter(Boolean);
       if (channelSettingsUpdate._CS_DM_POLICY) mapped.dmPolicy = channelSettingsUpdate._CS_DM_POLICY;
       if (channelSettingsUpdate._CS_GROUP_POLICY) mapped.groupPolicy = channelSettingsUpdate._CS_GROUP_POLICY;
       if (channelSettingsUpdate._CS_STREAMING) mapped.streaming = channelSettingsUpdate._CS_STREAMING;
       if (channelSettingsUpdate._CS_DM_ALLOWLIST) {
-        mapped.allowFrom = channelSettingsUpdate._CS_DM_ALLOWLIST.split(',').map((s) => s.trim()).filter(Boolean);
+        mapped.allowFrom = csv(channelSettingsUpdate._CS_DM_ALLOWLIST);
       }
       if (channelSettingsUpdate._CS_GROUP_ALLOWLIST) {
-        mapped.groupAllowFrom = channelSettingsUpdate._CS_GROUP_ALLOWLIST.split(',').map((s) => s.trim()).filter(Boolean);
+        const groupIds = csv(channelSettingsUpdate._CS_GROUP_ALLOWLIST);
+        if (channelName === 'telegram') {
+          mapped.groupAllowFrom = ['*'];
+          mapped.groups = Object.fromEntries(
+            groupIds.map((groupId) => [groupId, { groupPolicy: 'open', requireMention: true }]),
+          );
+        } else {
+          mapped.groupAllowFrom = groupIds;
+        }
       }
       channelSettingsMerge = {
         channelSettings: {
