@@ -41,7 +41,7 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   viewportFit: 'cover',
-  themeColor: '#8b5cf6',
+  themeColor: '#39FF88',
 };
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hatcher.host';
@@ -75,7 +75,12 @@ export const metadata: Metadata = {
     title: 'Hatcher — Hatch Your AI Agent in 60 Seconds',
     description:
       'Deploy OpenClaw and Hermes agents instantly. Configure with no code, launch on Telegram, Discord, WhatsApp, and manage agents in 3D rooms.',
-    images: [{ url: `${SITE_URL}/og?title=Hatcher&subtitle=Deploy+OpenClaw+and+Hermes+agents+instantly.+Configure+with+no+code%2C+launch+on+Telegram%2C+Discord%2C+WhatsApp.&tag=AI+Agent+Hosting`, width: 1200, height: 630, alt: 'Hatcher — Hatch Your AI Agent in 60 Seconds' }],
+    // Homepage social preview = the hero robot-hatching-from-egg image directly,
+    // not the dynamic /og card. Static asset keeps the visual identical to the
+    // landing hero (phosphor green theme) and avoids drift when the OG renderer
+    // is updated. 1672x941 is 16:9 — within Twitter/X summary_large_image bounds.
+    // Sub-pages (blog, agent rooms, affiliate) still use the dynamic /og route.
+    images: [{ url: `${SITE_URL}/landing-v3/robot-hatch-hero.png`, width: 1672, height: 941, alt: 'Hatcher — Hatch Your AI Agent in 60 Seconds' }],
     locale: 'en_US',
   },
   twitter: {
@@ -85,7 +90,7 @@ export const metadata: Metadata = {
     title: 'Hatcher — Hatch Your AI Agent in 60 Seconds',
     description:
       'Deploy OpenClaw and Hermes agents instantly. Configure with no code, launch on Telegram, Discord, WhatsApp, and manage agents in 3D rooms.',
-    images: [`${SITE_URL}/og?title=Hatcher&subtitle=Deploy+OpenClaw+and+Hermes+agents+instantly.+Configure+with+no+code%2C+launch+on+Telegram%2C+Discord%2C+WhatsApp.&tag=AI+Agent+Hosting`],
+    images: [`${SITE_URL}/landing-v3/robot-hatch-hero.png`],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   alternates: { canonical: SITE_URL },

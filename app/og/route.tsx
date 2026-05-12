@@ -18,12 +18,12 @@ export async function GET(req: NextRequest) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(135deg, #0D0B1A 0%, #1a1333 50%, #0D0B1A 100%)',
+          background: 'linear-gradient(135deg, #050505 0%, #0A0F0A 50%, #050505 100%)',
           fontFamily: 'system-ui',
           padding: '60px',
         }}
       >
-        {/* Decorative grid lines */}
+        {/* Decorative phosphor grid lines */}
         <div
           style={{
             position: 'absolute',
@@ -33,11 +33,11 @@ export async function GET(req: NextRequest) {
             bottom: 0,
             display: 'flex',
             backgroundImage:
-              'linear-gradient(rgba(139,92,246,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.06) 1px, transparent 1px)',
+              'linear-gradient(rgba(57,255,136,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,136,0.05) 1px, transparent 1px)',
             backgroundSize: '60px 60px',
           }}
         />
-        {/* Purple glow */}
+        {/* Phosphor green glow */}
         <div
           style={{
             position: 'absolute',
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
             transform: 'translate(-50%, -50%)',
             width: 500,
             height: 300,
-            background: 'radial-gradient(ellipse, rgba(139,92,246,0.15) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse, rgba(57,255,136,0.18) 0%, transparent 70%)',
             display: 'flex',
           }}
         />
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', maxWidth: 900, zIndex: 1 }}>
           {/* Brand */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-            <div style={{ fontSize: 28, fontWeight: 700, color: '#a78bfa', letterSpacing: '-0.02em' }}>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#39FF88', letterSpacing: '-0.02em' }}>
               🥚 hatcher.host
             </div>
           </div>
@@ -65,10 +65,10 @@ export async function GET(req: NextRequest) {
               style={{
                 display: 'flex',
                 padding: '6px 14px',
-                background: 'rgba(139,92,246,0.15)',
-                border: '1px solid rgba(139,92,246,0.3)',
+                background: 'rgba(57,255,136,0.12)',
+                border: '1px solid rgba(57,255,136,0.35)',
                 borderRadius: 20,
-                color: '#c4b5fd',
+                color: '#39FF88',
                 fontSize: 14,
                 fontWeight: 600,
                 textTransform: 'uppercase',
@@ -99,7 +99,7 @@ export async function GET(req: NextRequest) {
           <div
             style={{
               fontSize: 22,
-              color: 'var(--text-secondary)',
+              color: '#d4d4d8',
               lineHeight: 1.5,
               maxWidth: 760,
             }}
@@ -118,11 +118,11 @@ export async function GET(req: NextRequest) {
               alignItems: 'center',
             }}
           >
-            <span style={{ color: 'var(--text-muted)' }}>Deploy AI agents in 60 seconds</span>
+            <span style={{ color: '#a1a1aa' }}>Deploy AI agents in 60 seconds</span>
             <span style={{ color: '#3f3f46' }}>•</span>
-            <span style={{ color: 'var(--text-muted)' }}>Free tier included</span>
+            <span style={{ color: '#a1a1aa' }}>Free tier included</span>
             <span style={{ color: '#3f3f46' }}>•</span>
-            <span style={{ color: 'var(--text-muted)' }}>BYOK any LLM</span>
+            <span style={{ color: '#a1a1aa' }}>BYOK any LLM</span>
           </div>
         </div>
       </div>
