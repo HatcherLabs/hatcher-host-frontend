@@ -319,6 +319,18 @@
   left: auto;
   min-width: 280px;
 }
+@media (max-width: 600px) {
+  .userDropdown {
+    position: fixed;
+    top: 56px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+    min-width: 0;
+    max-height: calc(100dvh - 68px);
+    overflow-y: auto;
+  }
+}
 
 .userMeta {
   display: flex;
