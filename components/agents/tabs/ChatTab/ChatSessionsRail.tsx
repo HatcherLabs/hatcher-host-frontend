@@ -166,7 +166,7 @@ export function ChatSessionsRail() {
           <button
             onClick={toggleCollapsed}
             className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[var(--color-accent)]/25 bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/15 transition-colors"
-            title={`${activeMessageCount} dashboard messages`}
+            title={`${activeMessageCount} dashboard turns`}
             aria-label="Expand dashboard chat sessions"
           >
             <MessageSquare size={15} />
@@ -224,7 +224,7 @@ export function ChatSessionsRail() {
                   {session.preview || 'Empty session'}
                 </p>
                 <div className="mt-1 text-[10px] text-[var(--text-muted)]">
-                  {session.messageCount} message{session.messageCount === 1 ? '' : 's'}
+                  {session.messageCount} turn{session.messageCount === 1 ? '' : 's'}
                 </div>
               </button>
             );
@@ -254,7 +254,7 @@ export function ChatSessionsRail() {
                   <p className="text-[11px] leading-relaxed text-[var(--text-muted)] line-clamp-2">{session.preview}</p>
                 )}
                 {session.count !== undefined && (
-                  <div className="mt-1 text-[10px] text-[var(--text-muted)]">{session.count} messages</div>
+                  <div className="mt-1 text-[10px] text-[var(--text-muted)]">{session.count} turns</div>
                 )}
               </button>
             ))}

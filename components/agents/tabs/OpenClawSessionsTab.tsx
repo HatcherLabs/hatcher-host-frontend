@@ -209,7 +209,7 @@ export function OpenClawSessionsTab() {
                   <div className="flex items-center gap-3 text-[10px] text-[var(--text-muted)]">
                     <span className="flex items-center gap-1">
                       <MessageSquare size={10} />
-                      {session.messageCount} message{session.messageCount === 1 ? '' : 's'}
+                      {session.messageCount} turn{session.messageCount === 1 ? '' : 's'}
                     </span>
                     {session.modelId && (
                       <span className="flex items-center gap-1 font-mono truncate max-w-[240px]">

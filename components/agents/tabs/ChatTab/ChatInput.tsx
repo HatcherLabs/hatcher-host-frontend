@@ -1,9 +1,8 @@
 'use client';
 
 import { type RefObject, useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
-import { Send, Mic, MicOff, MessageSquare, Terminal, Paperclip, X, Loader2, FileText } from 'lucide-react';
+import { Send, Mic, MicOff, Terminal, Paperclip, X, Loader2, FileText, Zap } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { GlassCard } from '../../AgentContext';
 
@@ -35,7 +34,6 @@ const FRAMEWORK_COMMANDS: Record<string, Array<{ cmd: string; desc: string }>> =
 interface ChatInputProps {
   agent: { name: string; status?: string; framework?: string };
   isAuthenticated: boolean;
-  isLimitReached: boolean;
   agentStarting?: boolean;
   input: string;
   setInput: (val: string) => void;
@@ -48,10 +46,6 @@ interface ChatInputProps {
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   inputRef: RefObject<HTMLTextAreaElement | null>;
   llmProvider: string;
-  hasUnlimitedChat: boolean;
-  msgCount: number;
-  msgLimit: number;
-  remaining: number | null;
   /** Files the user picked/dropped since the last send. Owned by the
    *  ChatTab parent so sendMessage can prepend the "[Attachments: ...]"
    *  marker before clearing the list. */
@@ -68,7 +62,6 @@ interface ChatInputProps {
 export function ChatInput({
   agent,
   isAuthenticated,
-  isLimitReached,
   agentStarting,
   input,
   setInput,
@@ -81,10 +74,6 @@ export function ChatInput({
   onKeyDown,
   inputRef,
   llmProvider,
-  hasUnlimitedChat,
-  msgCount,
-  msgLimit,
-  remaining,
   attachments,
   attachmentError,
   uploadingAttachments,
@@ -177,23 +166,6 @@ export function ChatInput({
           {t('signInToChat')}
         </p>
       </GlassCard>
-    );
-  }
-
-  if (isLimitReached) {
-    return (
-      <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-4 py-3 text-center">
-        <p className="text-sm text-amber-400">
-          {t('limitReached')}{' '}
-          <Link
-            className="underline hover:opacity-80 transition-opacity text-[var(--color-accent)]"
-            href="/dashboard/billing"
-          >
-            {t('upgradeToPro')}
-          </Link>
-          {' '}{t('limitReachedSuffix')}
-        </p>
-      </div>
     );
   }
 
@@ -421,23 +393,10 @@ export function ChatInput({
           {t('poweredBy', { provider: llmProvider })}
         </span>
         <div className="flex items-center gap-3">
-          {isAuthenticated && !hasUnlimitedChat && msgLimit > 0 && (
-            <span className="inline-flex items-center gap-1 text-[10px] text-[var(--text-muted)]">
-              <MessageSquare size={9} />
-              <span className={`font-medium ${
-                remaining === null || remaining / msgLimit > 0.5
-                  ? 'text-emerald-400'
-                  : remaining / msgLimit > 0.25
-                  ? 'text-amber-400'
-                  : 'text-red-400'
-              }`}>{msgCount}/{msgLimit}</span>
-              {t('today')}
-            </span>
-          )}
-          {isAuthenticated && hasUnlimitedChat && (
-            <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400/70">
-              <MessageSquare size={9} />
-              {t('unlimited')}
+          {isAuthenticated && (
+            <span className="inline-flex items-center gap-1 text-[10px] text-[var(--color-accent)]/80">
+              <Zap size={9} />
+              AI Credits
             </span>
           )}
           <span className="hidden sm:block text-[10px] text-[var(--text-muted)]">

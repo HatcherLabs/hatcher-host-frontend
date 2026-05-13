@@ -201,7 +201,7 @@ export default function SettingsPage() {
 
   // ── Billing/profile data ──────────────────────────────────
   const [profile, setProfile] = useState<{
-    tier: string; hatchCredits: number; createdAt: string; agentCount?: number;
+    tier: string; aiCreditsBalance: number; createdAt: string; agentCount?: number;
   } | null>(null);
 
   // ── Referral state ────────────────────────────────────────
@@ -245,7 +245,7 @@ export default function SettingsPage() {
       if (res.success) {
         setProfile({
           tier: res.data.tier,
-          hatchCredits: res.data.hatchCredits,
+          aiCreditsBalance: res.data.aiCreditsBalance,
           createdAt: res.data.createdAt,
           agentCount: res.data.agentCount,
         });
@@ -583,7 +583,7 @@ export default function SettingsPage() {
                     {/* Referral */}
                     <Section title={t('profile.referralTitle')} icon={<Gift size={16} />} iconColor="text-emerald-400" iconBg="bg-emerald-500/15">
                       <p className="text-sm text-[var(--text-secondary)] mb-5 leading-relaxed">
-                        Invite friends to Hatcher. You both get <span className="text-emerald-400 font-semibold">$2 credit</span> when they create their first agent.
+                        Invite friends to Hatcher. You both get <span className="text-emerald-400 font-semibold">100 AI Credits</span> when they create their first agent.
                       </p>
                       {referralCode && (
                         <div className="space-y-3 mb-5">
@@ -610,7 +610,7 @@ export default function SettingsPage() {
                           <div className="flex gap-3">
                             {[
                               { label: 'Referred', value: String(referralStats.totalReferred), icon: <Users size={12} />, color: 'text-[var(--text-primary)]' },
-                              { label: 'Earned', value: `$${referralStats.totalEarned}`, icon: <Gift size={12} />, color: 'text-emerald-400' },
+                              { label: 'Earned', value: `${referralStats.totalEarned.toLocaleString()} AI`, icon: <Gift size={12} />, color: 'text-emerald-400' },
                             ].map(({ label, value, icon, color }) => (
                               <div key={label} className="flex-1 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] p-3 text-center">
                                 <div className="flex items-center justify-center gap-1.5 mb-1 text-[var(--text-muted)]">{icon}<span className="text-[10px] font-medium uppercase tracking-wider">{label}</span></div>
@@ -899,20 +899,20 @@ export default function SettingsPage() {
                             {profile.tier === 'founding_member' ? 'Founding Member' : profile.tier}
                           </p>
                           <p className="text-sm text-[var(--text-muted)] mt-0.5">
-                            {profile.tier === 'free' ? 'Free — 1 agent, 20 messages/day' :
-                             profile.tier === 'starter' ? '$6.99/mo — 50 messages/day' :
-                             profile.tier === 'pro' ? '$19.99/mo — 100 messages/day, dedicated resources' :
-                             profile.tier === 'business' ? '$49.99/mo — 300 messages/day, always-on, priority support' :
-                             profile.tier === 'founding_member' ? '$99 lifetime — 10 agents, 300 messages/day, 4 GB RAM, 2 GB workspace, always-on' :
+                            {profile.tier === 'free' ? 'Free — 500 AI Credits/month' :
+                             profile.tier === 'starter' ? '$6.99/mo — 3,000 AI Credits/month' :
+                             profile.tier === 'pro' ? '$19.99/mo — 15,000 AI Credits/month, dedicated resources' :
+                             profile.tier === 'business' ? '$49.99/mo — 40,000 AI Credits/month, always-on, priority support' :
+                             profile.tier === 'founding_member' ? '$99 lifetime — 25,000 AI Credits/month, 2 CPU / 3 GB RAM, 40 GB workspace, always active' :
                              profile.tier}
                           </p>
                         </div>
 
-                        {/* Credits */}
+                        {/* AI Credits */}
                         <div className="rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] p-4 mb-5">
-                          <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider block mb-1">HATCHER Credits</span>
-                          <p className="text-2xl font-bold text-emerald-400" style={displayFont}>${profile.hatchCredits.toFixed(2)}</p>
-                          <p className="text-xs text-[var(--text-muted)] mt-0.5">Automatically applied at checkout</p>
+                          <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider block mb-1">AI Credits</span>
+                          <p className="text-2xl font-bold text-emerald-400" style={displayFont}>{profile.aiCreditsBalance.toLocaleString()}</p>
+                          <p className="text-xs text-[var(--text-muted)] mt-0.5">Used for hosted LLM calls and web search</p>
                         </div>
 
                         <Link
@@ -1026,7 +1026,7 @@ export default function SettingsPage() {
               </div>
               <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">{t('danger.dialogTitle')}</h2>
               <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-5">
-                {t('danger.dialogDesc').replace('{emphasis}', t('danger.dialogEmphasis'))}
+                {t('danger.dialogDesc', { emphasis: t('danger.dialogEmphasis') })}
               </p>
               <div className="mb-5">
                 <label className="block text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-1.5">

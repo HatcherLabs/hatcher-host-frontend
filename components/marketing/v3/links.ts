@@ -36,7 +36,6 @@ export const NAV_GROUPS: ReadonlyArray<NavGroup> = [
     labelKey: 'build',
     items: [
       { key: 'hatchAgent',  labelKey: 'hatchAgentLabel',  subKey: 'hatchAgentSub',  href: '/create',          glyph: '✦' },
-      { key: 'createTpl',   labelKey: 'createTplLabel',   subKey: 'createTplSub',   href: '/create/template', glyph: '⊞' },
       { key: 'myAgents',    labelKey: 'myAgentsLabel',    subKey: 'myAgentsSub',    href: '/dashboard',     glyph: '◐' },
     ],
   },
@@ -68,7 +67,6 @@ export const FOOTER_COLUMNS = [
     headKey: 'colBuild',
     items: [
       { labelKey: 'itemHatchAgent', href: '/create' as Href },
-      { labelKey: 'itemCreateTpl',  href: '/create/template' as Href },
       { labelKey: 'itemMyAgents',   href: '/dashboard' as Href },
     ],
   },
@@ -110,8 +108,7 @@ export const SOCIAL_LINKS = {
 export const PRIMARY_CTA = {
   href: '/create' as Href,
   /** Translation key under namespace `nav`. Brand-distinct verb that
-   *  now lands on the create hub so users can choose Chat-to-Hatch or
-   *  template-based creation. */
+   *  lands on the Chat-to-Hatch creation flow. */
   labelKey: 'hatchAgent',
 } as const;
 

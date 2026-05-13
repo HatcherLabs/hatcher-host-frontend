@@ -23,7 +23,6 @@ import {
   Hash,
   ExternalLink,
   Zap,
-  DollarSign,
   Activity,
   Info,
   ArrowUpRight,
@@ -34,7 +33,6 @@ import {
   CheckCircle,
   MessageSquare,
   Tag,
-  Key,
   Shield,
   Cpu,
   HardDrive,
@@ -44,7 +42,6 @@ import {
   RefreshCw,
   RotateCcw,
 } from 'lucide-react';
-import { Infinity as InfinityIcon } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAgentContext, GlassCard, FRAMEWORK_BADGE } from '../AgentContext';
 import { useAuth } from '@/lib/auth-context';
@@ -127,12 +124,12 @@ const DEFAULT_THEME = FRAMEWORK_THEME.openclaw;
 
 const FRAMEWORK_TIPS: Record<string, string> = {
   openclaw: 'OpenClaw agents benefit from tracking tool usage patterns. Watch token output — high output suggests verbose tool responses you can optimize.',
-  hermes: 'Hermes agents are conversation-heavy. Monitor messages/day and token costs closely, especially if using paid LLM providers.',
+  hermes: 'Hermes agents are conversation-heavy. Monitor AI Credit usage and token output closely, especially on longer conversations.',
 };
 
 const FRAMEWORK_CONTEXT: Record<string, { text: string; accent: string; accentBg: string; accentBorder: string }> = {
-  openclaw: { text: 'Each message sent to the agent counts toward your daily limit, regardless of channel. BYOK users have unlimited messages.', accent: 'text-amber-400', accentBg: 'bg-amber-500/[0.06]', accentBorder: 'border-amber-500/20' },
-  hermes: { text: 'Each message sent to the agent counts toward your daily limit, regardless of channel. BYOK users have unlimited messages.', accent: 'text-purple-400', accentBg: 'bg-purple-500/[0.06]', accentBorder: 'border-purple-500/20' },
+  openclaw: { text: 'Hosted model and web-search usage consumes AI Credits. BYOK users pay their own provider directly.', accent: 'text-amber-400', accentBg: 'bg-amber-500/[0.06]', accentBorder: 'border-amber-500/20' },
+  hermes: { text: 'Hosted model and web-search usage consumes AI Credits. BYOK users pay their own provider directly.', accent: 'text-purple-400', accentBg: 'bg-purple-500/[0.06]', accentBorder: 'border-purple-500/20' },
 };
 
 const TIER_BADGE: Record<string, { label: string; className: string }> = {
@@ -189,6 +186,16 @@ function formatTokens(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return String(n);
+}
+
+function providerUsdCostToAiCredits(cost: number): number {
+  if (!Number.isFinite(cost) || cost <= 0) return 0;
+  return Math.max(1, Math.ceil(cost * 1000));
+}
+
+function formatAiCredits(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  return n.toLocaleString();
 }
 
 function formatHour(hour: number): string {
@@ -251,34 +258,6 @@ function ChartTooltipContent({ active, payload, label, theme }: RechartsTooltipP
           {p.name}: {typeof p.value === 'number' ? p.value.toLocaleString() : p.value}
         </p>
       ))}
-    </div>
-  );
-}
-
-function MessageProgressBar({ used, limit }: { used: number; limit: number }) {
-  const pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
-  let barColor = '#22c55e';
-  if (pct >= 80) barColor = '#ef4444';
-  else if (pct >= 50) barColor = '#f59e0b';
-  return (
-    <div className="w-full">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-[11px] text-[var(--text-muted)]">Daily usage</span>
-        <span className="text-xs font-medium" style={{ color: barColor }}>{pct.toFixed(0)}%</span>
-      </div>
-      <div className="h-2.5 rounded-full bg-[var(--bg-card)] overflow-hidden">
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="h-full rounded-full"
-          style={{ background: `linear-gradient(90deg, ${barColor}cc, ${barColor})` }}
-        />
-      </div>
-      <div className="flex justify-between items-center mt-1.5">
-        <span className="text-[10px] text-[var(--text-muted)]">{used} used</span>
-        <span className="text-[10px] text-[var(--text-muted)]">{limit} limit</span>
-      </div>
     </div>
   );
 }
@@ -435,8 +414,9 @@ export function StatsTab() {
   const fwColors = FRAMEWORK_COLORS[framework] ?? FRAMEWORK_COLORS.openclaw;
   const tip = FRAMEWORK_TIPS[framework] ?? FRAMEWORK_TIPS.openclaw;
 
-  // ── Section 1: Messages (Usage) ──────────────────────────────
+  // ── Section 1: AI usage + runtime usage ──────────────────────
   const [usageData, setUsageData] = useState<UsageData | null>(null);
+  const [aiCredits, setAiCredits] = useState<{ balance: number; monthlyGrant: number; tier: string } | null>(null);
   const [usageLoading, setUsageLoading] = useState(true);
   const [usageError, setUsageError] = useState<string | null>(null);
 
@@ -445,9 +425,13 @@ export function StatsTab() {
     setUsageLoading(true);
     setUsageError(null);
     try {
-      const res = await api.getAgentUsage(agent.id);
-      if (res.success) setUsageData(res.data);
-      else setUsageError(res.error ?? 'Failed to load usage data');
+      const [usageRes, creditsRes] = await Promise.all([
+        api.getAgentUsage(agent.id),
+        api.getAiCreditBalance(),
+      ]);
+      if (usageRes.success) setUsageData(usageRes.data);
+      else setUsageError(usageRes.error ?? 'Failed to load usage data');
+      if (creditsRes.success) setAiCredits(creditsRes.data);
     } catch {
       setUsageError('Failed to load usage data');
     } finally {
@@ -608,10 +592,10 @@ export function StatsTab() {
     >
 
       {/* ════════════════════════════════════════════════════
-          SECTION 1 — MESSAGES
+          SECTION 1 — AI USAGE
       ════════════════════════════════════════════════════ */}
       <div>
-        <SectionHeader label="Messages" />
+        <SectionHeader label="AI Usage" />
 
         {usageLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -647,58 +631,43 @@ export function StatsTab() {
               </div>
             </div>
 
-            {/* Messages Today card */}
+            {/* AI Credits card */}
             <div className="rounded-2xl border p-5" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <MessageSquare size={16} className="text-[var(--color-accent)]" />
-                  <h3 className="text-sm font-semibold text-[var(--text-primary)]">Messages Today</h3>
+                  <Zap size={16} className="text-[var(--color-accent)]" />
+                  <h3 className="text-sm font-semibold text-[var(--text-primary)]">AI Credits</h3>
                 </div>
-                <div className="flex items-center gap-2">
-                  {usageData.messages.isByok ? (
-                    <span className="inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full border border-emerald-500/30 text-emerald-400 bg-emerald-500/10 font-medium">
-                      <Key size={10} />
-                      BYOK
-                      <span className="inline-flex items-center gap-0.5 ml-0.5 px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[9px] font-bold uppercase tracking-wider">
-                        <InfinityIcon size={9} />
-                        Unlimited
-                      </span>
-                    </span>
-                  ) : (
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${tierBadge.className}`}>
-                      {tierBadge.label}
-                    </span>
-                  )}
-                </div>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${tierBadge.className}`}>
+                  {tierBadge.label}
+                </span>
               </div>
               <div className="flex items-end gap-3 mb-4">
-                <span className="text-3xl font-bold text-[var(--text-primary)]">{usageData.messages.today}</span>
-                {!usageData.messages.isByok && usageData.messages.limit > 0 && (
-                  <span className="text-base text-[var(--text-muted)] mb-1">/ {usageData.messages.limit} daily</span>
-                )}
-                {usageData.messages.isByok && (
-                  <span className="text-base text-emerald-400/60 mb-1">messages sent</span>
+                <span className="text-3xl font-bold text-[var(--text-primary)]">
+                  {(aiCredits?.balance ?? 0).toLocaleString()}
+                </span>
+                {aiCredits && aiCredits.monthlyGrant > 0 && (
+                  <span className="text-base text-[var(--text-muted)] mb-1">
+                    / {aiCredits.monthlyGrant.toLocaleString()} monthly grant
+                  </span>
                 )}
               </div>
-              {usageData.messages.isByok ? (
-                <div className="rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] p-3 flex items-center gap-3">
-                  <div className="h-2.5 flex-1 rounded-full bg-[var(--bg-card)] overflow-hidden">
+              {aiCredits && aiCredits.monthlyGrant > 0 && (
+                <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-3 flex items-center gap-3">
+                  <div className="h-2.5 flex-1 rounded-full bg-[var(--bg-elevated)] overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
-                      animate={{ width: '100%' }}
+                      animate={{ width: `${Math.min(100, (aiCredits.balance / aiCredits.monthlyGrant) * 100)}%` }}
                       transition={{ duration: 1.2, ease: 'easeOut' }}
-                      className="h-full rounded-full"
-                      style={{ background: 'linear-gradient(90deg, #22c55e40, #22c55e80, #22c55e40)' }}
+                      className="h-full rounded-full bg-[var(--color-accent)]"
                     />
                   </div>
-                  <span className="text-[10px] text-emerald-400/80 whitespace-nowrap">No daily cap</span>
+                  <span className="text-[10px] text-[var(--text-muted)] whitespace-nowrap">Account balance</span>
                 </div>
-              ) : usageData.messages.limit > 0 ? (
-                <MessageProgressBar used={usageData.messages.today} limit={usageData.messages.limit} />
-              ) : null}
+              )}
             </div>
 
-            {/* Message Activity chart removed — data available in KPI summary */}
+            {/* Message-limit chart removed — hosted usage is metered from account AI Credits. */}
           </div>
         ) : null}
       </div>
@@ -729,7 +698,7 @@ export function StatsTab() {
           {/* KPI Summary Row */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { icon: Hash, label: 'Total Messages', value: analytics ? analytics.totalMessages.toLocaleString() : '--', trend: analytics ? msgTrend : null, color: undefined as string | undefined },
+              { icon: Hash, label: 'Total Interactions', value: analytics ? analytics.totalMessages.toLocaleString() : '--', trend: analytics ? msgTrend : null, color: undefined as string | undefined },
               { icon: TrendingUp, label: 'Avg / Day', value: analytics ? String(analytics.avgPerDay) : '--', trend: null, color: undefined },
               { icon: Clock, label: 'Avg Response', value: deep ? formatMs(deep.responseTimes.avgMs) : '--', trend: null, color: undefined },
               {
@@ -783,7 +752,7 @@ export function StatsTab() {
                 {[
                   { icon: CheckCircle, label: 'Success', value: `${(100 - deep.errorRate.rate).toFixed(1)}%`, bg: 'bg-emerald-500/10', hex: '#22c55e' },
                   { icon: AlertTriangle, label: 'Error Rate', value: `${deep.errorRate.rate.toFixed(1)}%`, bg: 'bg-red-500/10', hex: '#ef4444' },
-                  { icon: MessageSquare, label: 'Total', value: deep.errorRate.total.toLocaleString(), bg: theme.primaryBg, hex: theme.primary },
+                  { icon: MessageSquare, label: 'Interactions', value: deep.errorRate.total.toLocaleString(), bg: theme.primaryBg, hex: theme.primary },
                 ].map(({ icon: Icon, label, value, bg, hex }) => (
                   <div key={label} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'var(--bg-card)' }}>
                     <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${bg}`}>
@@ -804,10 +773,10 @@ export function StatsTab() {
             <GlassCard>
               <div className="flex items-center gap-2 mb-5">
                 <Zap size={16} style={{ color: theme.primary }} />
-                <h3 className="text-sm font-semibold text-[var(--text-primary)]">Token Usage</h3>
+        <h3 className="text-sm font-semibold text-[var(--text-primary)]">Provider Usage</h3>
                 {tokenTrend.direction !== 'flat' && <TrendBadge pct={tokenTrend.pct} direction={tokenTrend.direction} />}
                 <span className="ml-auto text-[10px] text-[var(--text-muted)] uppercase tracking-wider">
-                  {analytics.tokens.hasByok ? 'BYOK' : 'Hatcher Key'}
+                  {analytics.tokens.hasByok ? 'BYOK' : 'AI Credits'}
                 </span>
               </div>
               <div className="mb-4">
@@ -824,7 +793,15 @@ export function StatsTab() {
                 {[
                   { icon: Activity, label: 'Input', value: formatTokens(analytics.tokens.inputTokens), color: theme.primary, dim: false },
                   { icon: Activity, label: 'Output', value: formatTokens(analytics.tokens.outputTokens), color: theme.primary, dim: true },
-                  { icon: DollarSign, label: 'Est. Cost', value: analytics.tokens.hasByok ? 'Your key' : `$${analytics.tokens.totalCost.toFixed(4)}`, color: 'var(--text-muted)', dim: false },
+                  {
+                    icon: Zap,
+                    label: analytics.tokens.hasByok ? 'Billing' : 'AI Credits Used',
+                    value: analytics.tokens.hasByok
+                      ? 'BYOK'
+                      : formatAiCredits(providerUsdCostToAiCredits(analytics.tokens.totalCost)),
+                    color: 'var(--text-muted)',
+                    dim: false,
+                  },
                 ].map(({ icon: Icon, label, value, color, dim }) => (
                   <div key={label} className="flex items-center gap-2.5 rounded-xl px-3 py-2.5" style={{ background: 'var(--bg-card)' }}>
                     <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${color}18`, opacity: dim ? 0.7 : 1 }}>

@@ -20,7 +20,7 @@ interface ChatErrorBarProps {
 const ERROR_MESSAGES: Record<string, { icon: string; message: string; canRetry: boolean }> = {
   ratelimit: {
     icon: '⏳',
-    message: 'Daily message limit reached.',
+    message: 'AI Credits exhausted.',
     canRetry: false,
   },
   llm_down: {
@@ -58,6 +58,9 @@ export function ChatErrorBar({
   if (!chatError) return null;
 
   const info = ERROR_MESSAGES[chatErrorType ?? 'generic'] ?? ERROR_MESSAGES.generic;
+  const message = chatErrorType === 'ratelimit'
+    ? info.message
+    : chatError.trim() || info.message;
 
   return (
     <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-lg px-4 py-2.5 mb-3 flex items-center gap-3">
@@ -69,12 +72,11 @@ export function ChatErrorBar({
               className="underline hover:opacity-80 transition-opacity text-[var(--color-accent)]"
               href="/dashboard/billing"
             >
-              {t('upgradeToPro')}
+              Billing
             </Link>
-            {' '}{t('limitReachedSuffix')}
           </>
         ) : (
-          <>{info.icon} {info.message}</>
+          <>{info.icon} {message}</>
         )}
       </span>
       {info.canRetry && (

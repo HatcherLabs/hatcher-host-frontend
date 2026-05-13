@@ -12,7 +12,6 @@ import {
   AlertTriangle,
   RotateCcw,
   Check,
-  ArrowUpRight,
   Package,
   RefreshCw,
   Star,
@@ -28,7 +27,6 @@ import {
 } from '../AgentContext';
 import { useToast } from '@/components/ui/ToastProvider';
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -53,7 +51,7 @@ interface AvailableItem {
 
 interface PluginLimits {
   used: number;
-  max: number;
+  max: number | null;
 }
 
 interface BundledSkill {
@@ -462,8 +460,6 @@ export function PluginsTab() {
 
   // ─── Render ─────────────────────────────────────────────────
 
-  const atLimit = limits ? limits.used >= limits.max : false;
-
   return (
     <motion.div key="plugins" variants={tabContentVariants} initial="enter" animate="center" exit="exit" className="space-y-5">
       {/* Header with limits */}
@@ -472,12 +468,8 @@ export function PluginsTab() {
           <Package size={20} className="text-[var(--color-accent)]" />
           <h2 className="text-lg font-semibold text-[var(--text-primary)]">Plugins & Skills</h2>
           {limits && (
-            <span className={`text-sm px-2.5 py-0.5 rounded-full border ${
-              atLimit
-                ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-                : 'bg-[var(--color-accent)]/10 text-[var(--color-accent)] border-[var(--color-accent)]/30'
-            }`}>
-              {limits.used}/{limits.max} installed
+            <span className="text-sm px-2.5 py-0.5 rounded-full border bg-[var(--color-accent)]/10 text-[var(--color-accent)] border-[var(--color-accent)]/30">
+              {limits.used} installed
             </span>
           )}
         </div>
@@ -489,24 +481,6 @@ export function PluginsTab() {
           <RefreshCw size={16} />
         </button>
       </div>
-
-      {/* Upgrade banner */}
-      {atLimit && limits && (
-        <GlassCard className="!p-3 flex items-center gap-3 border-amber-500/20">
-          <AlertTriangle size={16} className="text-amber-400 shrink-0" />
-          <p className="text-sm text-[var(--text-secondary)]">
-            You've reached the limit of {limits.max} plugin+skill slots for this agent.{' '}
-            <Link href="/dashboard/settings/billing" className="text-[var(--color-accent)] hover:underline inline-flex items-center gap-0.5">
-              Upgrade tier <ArrowUpRight size={12} />
-            </Link>
-            {' '}or buy the{' '}
-            <Link href="/dashboard/settings/billing?addon=extra_plugins" className="text-[var(--color-accent)] hover:underline">
-              +10 plugins addon
-            </Link>
-            .
-          </p>
-        </GlassCard>
-      )}
 
       {/* Sub-tabs */}
       <div className="flex gap-1 p-1 rounded-lg bg-white/[0.03] border border-white/5 w-fit">
@@ -721,11 +695,11 @@ export function PluginsTab() {
                         <p className="text-xs text-[var(--text-muted)] mt-0.5 line-clamp-2">{item.description}</p>
                       )}
                     </div>
-                    <button
+                      <button
                       onClick={() => handleInstall(item.name, subTab === 'skills' ? 'skill' : 'plugin', item.source)}
-                      disabled={!!installing || atLimit}
+                      disabled={!!installing}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
-                      title={atLimit ? 'Plugin limit reached' : `Install ${item.name}`}
+                      title={`Install ${item.name}`}
                     >
                       {installing === item.name ? (
                         <Loader2 size={12} className="animate-spin" />
@@ -769,11 +743,11 @@ export function PluginsTab() {
                       <p className="text-sm font-medium text-[var(--text-primary)] truncate">{item.displayName || item.name}</p>
                       <p className="text-xs text-[var(--text-muted)] mt-0.5 line-clamp-2">{item.description}</p>
                     </div>
-                    <button
+                      <button
                       onClick={() => handleInstall(item.name, item.type, item.source)}
-                      disabled={!!installing || atLimit}
+                      disabled={!!installing}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
-                      title={atLimit ? 'Plugin limit reached' : `Install ${item.name}`}
+                      title={`Install ${item.name}`}
                     >
                       {installing === item.name ? (
                         <Loader2 size={12} className="animate-spin" />
@@ -825,7 +799,7 @@ export function PluginsTab() {
             />
             <button
               onClick={handleManualInstall}
-              disabled={!manualName.trim() || !!installing || atLimit}
+              disabled={!manualName.trim() || !!installing}
               className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium rounded-lg bg-[var(--color-accent)]/10 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {installing ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}

@@ -58,6 +58,13 @@ export const CHANNEL_SETTINGS_FIELDS: IntegrationField[] = [
     options: [{ value: 'open', label: 'Open — anyone' }, { value: 'allowlist', label: 'Allowlist only' }, { value: 'disabled', label: 'Disabled' }] },
   { key: '_CS_GROUP_POLICY', label: 'Group Policy', type: 'select', helper: 'How the bot responds in group chats',
     options: [{ value: 'open', label: 'Open — all messages' }, { value: 'allowlist', label: 'Allowlisted groups' }, { value: 'disabled', label: 'Disabled' }] },
+  { key: '_CS_REQUIRE_MENTION', label: '@Mention Required in Groups', type: 'select',
+    helper: 'When on, the bot only replies in groups when @-mentioned (or replied to). Default (empty) uses the platform default — typically on for Telegram/Discord.',
+    options: [
+      { value: '', label: 'Default (platform default)' },
+      { value: 'true', label: 'On — require @mention' },
+      { value: 'false', label: 'Off — reply to all group messages' },
+    ] },
   { key: '_CS_STREAMING', label: 'Streaming', type: 'select', helper: 'How responses are delivered',
     options: [{ value: 'partial', label: 'Partial — edit as tokens arrive' }, { value: 'full', label: 'Full — send complete' }, { value: 'off', label: 'Off' }] },
 ];

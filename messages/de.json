@@ -39,11 +39,14 @@
     "affiliateBecome": "Affiliate werden",
     "userMenu": {
       "sub_myAgents": "Durchsuchen, bearbeiten, bereitstellen.",
-      "sub_create": "Vorlage manuell auswählen.",
-      "sub_billing": "Tarif, Add-ons, Guthaben.",
+      "sub_create": "Agent beschreiben und ausbrüten.",
+      "sub_analytics": "AI Credits, Tokens, Trends.",
+      "sub_billing": "Tarif, Extras, Guthaben.",
+      "sub_wallets": "Solana-Zahlungs-Wallets.",
+      "sub_team": "Mitglieder und Zusammenarbeit.",
       "sub_settings": "Profil, API-Schlüssel, Einstellungen.",
       "sub_support": "Hilfe, Docs, Kontakt.",
-      "sub_affiliate": "Credits durch Empfehlungen verdienen.",
+      "sub_affiliate": "Cash durch Empfehlungen verdienen.",
       "sub_admin": "Plattform-Steuerung.",
       "sub_signOut": "Sitzung auf diesem Gerät beenden.",
       "tierSuffix": "Tarif"
@@ -54,8 +57,6 @@
       "resources": "Ressourcen",
       "hatchAgentLabel": "Agent ausbrüten (Chat)",
       "hatchAgentSub": "Beschreib was du willst — in Sekunden.",
-      "createTplLabel": "Aus Vorlage erstellen",
-      "createTplSub": "Framework + Tools manuell wählen.",
       "myAgentsLabel": "Meine Agenten",
       "myAgentsSub": "Dashboard für laufende Agenten.",
       "cityLabel": "Hatcher City",
@@ -117,7 +118,6 @@
     "colResources": "Ressourcen",
     "colLegal": "Rechtliches",
     "itemHatchAgent": "Agent ausbrüten",
-    "itemCreateTpl": "Aus Vorlage",
     "itemMyAgents": "Meine Agenten",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Frameworks",
@@ -175,7 +175,7 @@
       "copiedAriaLabel": "Kopiert",
       "step01": "Senden Sie diesen Prompt an Ihren KI-Coding-Agenten — Claude Code, Cursor, OpenClaw, Hermes oder jeden Agenten, der URLs abrufen und Shell-Befehle ausführen kann.",
       "step02": "Der Agent registriert ein Konto mit Ihrer E-Mail und sendet Ihnen einen Bestätigungslink.",
-      "step03": "Link bestätigen. Ihr Agent wählt eine Vorlage, deployt und übergibt Ihnen einen laufenden KI-Agenten.",
+      "step03": "Link bestätigen. Hatcher erstellt die Konfiguration, deployt und übergibt Ihnen einen laufenden KI-Agenten.",
       "viewSkillMd": "skill.md anzeigen",
       "githubSource": "GitHub-Quellcode"
     },
@@ -288,7 +288,7 @@
         },
         {
           "title": "Eigenen Key mitbringen",
-          "desc": "Nutzen Sie Ihren eigenen LLM-API-Key für unbegrenzte Nachrichten in jedem Tarif."
+          "desc": "Nutzen Sie Ihren eigenen LLM-API-Key für provider-bezahlte Nutzung in jedem Tarif."
         },
         {
           "title": "Standardmäßig sicher",
@@ -307,7 +307,7 @@
     "pricing": {
       "eyebrow": "Preise",
       "heading": "Kostenlos starten, wachsen wenn bereit",
-      "subheading": "Alle Plattformen in jedem Plan enthalten. Eigenen KI-Key mitbringen für unbegrenzte Nachrichten in jedem Tarif.",
+      "subheading": "Alle Plattformen in jedem Plan enthalten. Gehostete KI und Websuche nutzen AI Credits; BYOK bleibt direkt beim Anbieter bezahlt.",
       "popularLabel": "Beliebt",
       "tiers": [
         {
@@ -316,9 +316,10 @@
           "sub": "/Monat",
           "features": [
             "1 KI-Agent",
-            "20 Nachrichten/Tag",
+            "500 AI Credits/Monat",
+            "2 GB Arbeitsbereich",
             "Alle Plattformen",
-            "KI kostenlos inklusive"
+            "Dateimanager + Vollständige Logs"
           ],
           "cta": "Jetzt starten"
         },
@@ -328,9 +329,10 @@
           "sub": "/Monat",
           "features": [
             "1 KI-Agent",
-            "50 Nachrichten/Tag",
-            "BYOK = unbegrenzt",
-            "Längere Aktivzeit"
+            "3.000 AI Credits/Monat",
+            "10 GB Arbeitsbereich",
+            "BYOK direkt beim Anbieter",
+            "Immer aktiv"
           ],
           "cta": "Starter wählen"
         },
@@ -340,8 +342,9 @@
           "sub": "/Monat",
           "features": [
             "3 KI-Agenten",
-            "100 Nachrichten/Tag",
-            "BYOK = unbegrenzt",
+            "15.000 AI Credits/Monat",
+            "25 GB Arbeitsbereich",
+            "BYOK direkt beim Anbieter",
             "Dedizierte Ressourcen"
           ],
           "cta": "Pro wählen"
@@ -351,15 +354,16 @@
           "price": "$49.99",
           "sub": "/Monat",
           "features": [
-            "10 KI-Agenten",
-            "300 Nachrichten/Tag",
+            "5 KI-Agenten",
+            "40.000 AI Credits/Monat",
+            "50 GB Arbeitsbereich",
             "Immer-aktive Container",
-            "Prioritäts-Support"
+            "Team-Zusammenarbeit"
           ],
           "cta": "Business wählen"
         }
       ],
-      "addonsNote": "Mehr Agenten, Nachrichten oder Speicher benötigt? Stapelbare Pakete hinzufügen — alle Tarife erhalten Add-on-Flexibilität.",
+      "addonsNote": "Mehr Agenten, AI Credits oder Speicher benötigt? Stapelbare Pakete hinzufügen — alle Tarife erhalten Add-on-Flexibilität.",
       "addonsCta": "Alle Preise anzeigen →"
     },
     "founding": {
@@ -376,15 +380,15 @@
       "claimed": "{claimed} von {max} vergeben · sobald sie weg sind, ist das Angebot vorbei.",
       "includedHeading": "Alles inklusive, für immer",
       "includedItems": [
-        "10 Agenten inklusive",
+        "5 Agenten inklusive",
         "Immer aktiv (kein Ruhezustand)",
-        "300 Nachrichten/Tag pro Konto",
-        "200 Web-Suchen/Tag",
-        "2 CPU · 4 GB RAM pro Agent",
-        "2 GB Arbeitsbereich pro Agent",
+        "25.000 AI Credits/Monat",
+        "Websuche nutzt AI Credits",
+        "2 CPU · 3 GB RAM pro Agent",
+        "40 GB Arbeitsbereich pro Agent",
         "Dateimanager + Vollständige Logs",
-        "Team-Zusammenarbeit + Prioritäts-Support",
-        "Gründungsabzeichen",
+        "Prioritäts-Support",
+        "Founding-Discord-Rolle + Telegram-Tag",
         "Preis für immer festgeschrieben"
       ],
       "ctaSoldOut": "Ausverkauft",
@@ -396,7 +400,7 @@
       "items": [
         {
           "q": "Ist es wirklich kostenlos?",
-          "a": "Ja. Der kostenlose Plan gibt Ihnen 1 Agenten, 20 Nachrichten pro Tag und Zugang zu allen Plattformen. Keine Kreditkarte erforderlich. BYOK (eigenen LLM-Key mitbringen) = unbegrenzte Nachrichten in jedem Tarif."
+          "a": "Ja. Der kostenlose Plan gibt Ihnen 1 Agenten, 500 AI Credits/Monat, 2 GB Arbeitsbereich, Dateimanager, vollständige Logs und Zugang zu allen Plattformen. Keine Kreditkarte erforderlich. BYOK bleibt in jedem Tarif direkt beim Anbieter bezahlt."
         },
         {
           "q": "Muss ich programmieren können?",
@@ -404,7 +408,7 @@
         },
         {
           "q": "Was bedeutet \"Eigenen Key mitbringen\"?",
-          "a": "Verbinden Sie Ihren eigenen OpenAI-, Anthropic-, Google- oder Groq-Key für unbegrenzte Nachrichten. Sie zahlen nur direkt bei Ihrem KI-Anbieter."
+          "a": "Verbinden Sie Ihren eigenen OpenAI-, Anthropic-, Google-, OpenRouter- oder anderen Provider-Key für provider-bezahlte Nutzung. Sie zahlen nur direkt bei Ihrem KI-Anbieter."
         },
         {
           "q": "Wo läuft mein Agent?",
@@ -414,7 +418,7 @@
     },
     "finalCta": {
       "heading": "Bereit, Ihren ersten Agenten zu deployen?",
-      "body": "Der kostenlose Tarif umfasst 1 Agenten mit 20 Nachrichten/Tag. BYOK = unbegrenzt. Keine Kreditkarte erforderlich.",
+      "body": "Der kostenlose Tarif umfasst 1 Agenten, 500 AI Credits/Monat, Dateimanager, vollständige Logs und 2 GB Arbeitsbereich. BYOK wird direkt beim Anbieter bezahlt. Keine Kreditkarte erforderlich.",
       "ctaPrimary": "Ihren Agenten erstellen",
       "ctaSecondary": "Preise anzeigen",
       "trustNoCreditCard": "Keine Kreditkarte",
@@ -450,11 +454,11 @@
       "panelTagline": "Hatcher",
       "panelHeadlinePrefix": "Starten Sie Ihren",
       "panelHeadlineAccent": "KI-Agenten.",
-      "panelBody": "Kostenloser Tarif mit BYOK = unbegrenzte Nachrichten. Keine Kreditkarte erforderlich.",
+      "panelBody": "Kostenloser Tarif mit AI Credits; BYOK wird direkt beim Anbieter bezahlt. Keine Kreditkarte erforderlich.",
       "statsUsers": "Nutzer",
       "statsAgents": "Agenten",
       "statsOnline": "Jetzt online",
-      "referralBadge": "Empfohlen von {referrer} — Sie beide erhalten {credit} Guthaben!",
+      "referralBadge": "Empfohlen von {referrer} — Sie beide erhalten {credit}!",
       "emailLabel": "E-Mail",
       "emailPlaceholder": "you@example.com",
       "emailTaken": "Bereits registriert.",
@@ -544,7 +548,7 @@
   "pricing": {
     "eyebrow": "Preise",
     "heading": "Plan wählen",
-    "subheading": "Kostenlos mit jedem Framework starten. Skalieren wenn bereit. Alle Integrationen in jedem Tarif inklusive. BYOK immer unbegrenzt.",
+    "subheading": "Kostenlos mit jedem Framework starten. Skalieren wenn bereit. Alle Integrationen in jedem Tarif inklusive. BYOK bleibt direkt beim Anbieter bezahlt.",
     "billingToggle": {
       "monthly": "Monatlich",
       "annual": "Jährlich",
@@ -572,64 +576,59 @@
     "tiers": {
       "free": {
         "agents": "1 Agent inklusive",
-        "messages": "20 Nachrichten/Tag",
-        "cpu": "0,5 CPU",
+        "messages": "500 AI Credits/Monat",
+        "cpu": "1 CPU",
         "ram": "1 GB RAM",
-        "storage": "50 MB Arbeitsbereich",
-        "sleep": "Automatischer Ruhezustand nach 1 Std. Inaktivität",
+        "storage": "2 GB Arbeitsbereich",
+        "sleep": "Automatischer Ruhezustand nach 12 Std. Inaktivität",
         "features": [
-          "Llama 4 Scout auf Groq",
-          "BYOK = unbegrenzte Nachrichten",
-          "3 Web-Suchen/Tag",
+          "Gehostete Modelle über OpenRouter",
+          "Websuche nutzt AI Credits",
+          "Dateimanager + Vollständige Logs inklusive",
           "Alle Integrationen (Telegram, Discord, Twitter, usw.)"
         ],
-        "missing": [
-          "Logs, Dateimanager als Add-ons verfügbar"
-        ]
+        "missing": []
       },
       "starter": {
         "agents": "1 Agent inklusive",
-        "messages": "50 Nachrichten/Tag",
+        "messages": "3.000 AI Credits/Monat",
         "cpu": "1 CPU",
         "ram": "1,5 GB RAM",
-        "storage": "150 MB Arbeitsbereich",
-        "sleep": "Automatischer Ruhezustand nach 4 Std. Inaktivität",
+        "storage": "10 GB Arbeitsbereich",
+        "sleep": "Immer aktiv",
         "features": [
-          "BYOK = unbegrenzte Nachrichten",
-          "10 Web-Suchen/Tag",
+          "Gehostete Modelle über OpenRouter",
+          "Websuche nutzt AI Credits",
+          "Dateimanager + Vollständige Logs inklusive",
           "Alle Integrationen"
         ],
-        "missing": [
-          "Logs, Dateimanager als Add-ons verfügbar"
-        ]
+        "missing": []
       },
       "pro": {
         "agents": "3 Agenten inklusive",
-        "messages": "100 Nachrichten/Tag",
+        "messages": "15.000 AI Credits/Monat",
         "cpu": "1,5 CPU",
         "ram": "2 GB RAM",
-        "storage": "500 MB Arbeitsbereich",
-        "sleep": "Automatischer Ruhezustand nach 12 Std. Inaktivität",
+        "storage": "25 GB Arbeitsbereich",
+        "sleep": "Immer aktiv",
         "features": [
-          "BYOK = unbegrenzte Nachrichten",
-          "50 Web-Suchen/Tag",
-          "Alle Integrationen",
-          "Immer aktiv pro Agent für 24/7 kaufen"
+          "Gehostete Modelle über OpenRouter",
+          "Websuche nutzt AI Credits",
+          "Dateimanager + Vollständige Logs inklusive",
+          "Alle Integrationen"
         ],
-        "missing": [
-          "Logs, Dateimanager als Add-ons verfügbar"
-        ]
+        "missing": []
       },
       "business": {
-        "agents": "10 Agenten inklusive",
-        "messages": "300 Nachrichten/Tag",
+        "agents": "5 Agenten inklusive",
+        "messages": "40.000 AI Credits/Monat",
         "cpu": "2 CPU",
         "ram": "3 GB RAM",
-        "storage": "1 GB Arbeitsbereich",
-        "sleep": "Immer aktiv (kein automatischer Ruhezustand)",
+        "storage": "50 GB Arbeitsbereich",
+        "sleep": "Immer aktiv",
         "features": [
-          "BYOK = unbegrenzte Nachrichten",
-          "200 Web-Suchen/Tag",
+          "Gehostete Modelle über OpenRouter",
+          "Websuche nutzt AI Credits",
           "Dateimanager inklusive",
           "Vollständige Logs inklusive",
           "Prioritäts-Support",
@@ -639,27 +638,27 @@
         "missing": []
       },
       "founding_member": {
-        "agents": "10 Agenten inklusive",
-        "messages": "300 Nachrichten/Tag",
+        "agents": "5 Agenten inklusive",
+        "messages": "25.000 AI Credits/Monat",
         "cpu": "2 CPU",
-        "ram": "4 GB RAM",
-        "storage": "2 GB Arbeitsbereich",
-        "sleep": "Immer aktiv (kein automatischer Ruhezustand)",
+        "ram": "3 GB RAM",
+        "storage": "40 GB Arbeitsbereich",
+        "sleep": "Immer aktiv",
         "features": [
           "$99 einmalig — lebenslanger Zugang",
-          "200 Web-Suchen/Tag",
+          "Gehostete Modelle über OpenRouter",
+          "Websuche nutzt AI Credits",
           "Dateimanager + Vollständige Logs inklusive",
           "Prioritäts-Support",
-          "Team-Zusammenarbeit",
           "Alle Integrationen",
-          "Gründungsabzeichen"
+          "Founding-Discord-Rolle + Telegram-Tag"
         ],
         "missing": []
       }
     },
     "addons": {
-      "heading": "Add-ons",
-      "subheading": "Passen Sie Ihren Plan an. Add-ons in jedem Tarif stapeln. Nach Bedarf kombinieren.",
+      "heading": "Extras",
+      "subheading": "Fügen Sie AI-Credit-Pakete oder zusätzliche Agenten-Slots hinzu, wenn Sie mehr Kapazität brauchen.",
       "annualDiscount": "15% Rabatt jährlich",
       "groups": {
         "extraAgents": {
@@ -687,66 +686,36 @@
             }
           ]
         },
-        "extraMessages": {
-          "label": "Zusätzliche Nachrichten (Konto)",
+        "aiCredits": {
+          "label": "AI Credits",
           "items": [
             {
-              "name": "+20 Nachr./Tag",
-              "period": "/Mo.",
-              "description": "Stapelbar"
+              "name": "5.000 AI Credits",
+              "period": "einmalig",
+              "description": "Gehostete Modelle und Websuche"
             },
             {
-              "name": "+50 Nachr./Tag",
-              "period": "/Mo.",
-              "description": "Stapelbar"
+              "name": "10.000 AI Credits",
+              "period": "einmalig",
+              "description": "Schwerere Modellläufe und Recherche"
             },
             {
-              "name": "+100 Nachr./Tag",
-              "period": "/Mo.",
-              "description": "Stapelbar"
+              "name": "25.000 AI Credits",
+              "period": "einmalig",
+              "description": "Größere Agent-Workloads"
             },
             {
-              "name": "+200 Nachr./Tag",
-              "period": "/Mo.",
-              "description": "Stapelbar"
-            }
-          ]
-        },
-        "extraSearches": {
-          "label": "Zusätzliche Suchen (Konto)",
-          "items": [
-            {
-              "name": "+25 Suchen/Tag",
-              "period": "/Mo.",
-              "description": "Stapelbar"
-            },
-            {
-              "name": "+50 Suchen/Tag",
-              "period": "/Mo.",
-              "description": "Stapelbar"
+              "name": "50.000 AI Credits",
+              "period": "einmalig",
+              "description": "Hohes gehostetes Nutzungsvolumen"
             }
           ]
         },
         "perAgent": {
-          "label": "Pro Agent",
+          "label": "Plugins pro Agent",
           "items": [
             {
-              "name": "Immer aktiv",
-              "period": "/Mo. pro Agent",
-              "description": "24/7 laufen lassen"
-            },
-            {
-              "name": "Dateimanager",
-              "period": "einmalig pro Agent",
-              "description": "Dateien durchsuchen & bearbeiten"
-            },
-            {
-              "name": "Vollständige Logs",
-              "period": "/Mo. pro Agent",
-              "description": "Log-Viewer freischalten"
-            },
-            {
-              "name": "+10 Plugins",
+              "name": "Plugins inklusive",
               "period": "/Mo. pro Agent",
               "description": "Zusätzliche Plugin-Slots stapeln"
             }
@@ -758,7 +727,7 @@
       "heading": "Alle Integrationen kostenlos",
       "badge": "jeder Tarif",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage und 14+ weitere Plattformen sind in allen Tarifen kostenlos inklusive. Nie ein Aufpreis.",
-      "note": "Alle Preise in USD, zahlbar in SOL oder $HATCHER. BYOK (Eigenen Key mitbringen) = unbegrenzte Nachrichten mit Ihrem eigenen LLM-API-Key in jedem Tarif."
+      "note": "Alle Preise in USD, zahlbar per Karte, SOL, USDC auf Solana oder $HATCHER. Nutzung gehosteter Modelle und Websuche wird über AI Credits gemessen; BYOK wird direkt mit Ihrem eigenen Provider-Key bezahlt."
     },
     "compareTable": {
       "heading": "Pläne vergleichen",
@@ -767,9 +736,9 @@
       "onceSuffix": " einmalig",
       "rows": {
         "agents": "Enthaltene Agenten",
-        "messages": "Nachrichten/Tag (Konto)",
-        "searches": "Web-Suchen/Tag",
-        "byok": "BYOK-Nachrichten",
+        "messages": "AI Credits/Monat",
+        "searches": "Websuche",
+        "byok": "BYOK-Provider-Nutzung",
         "cpuRam": "CPU / RAM",
         "storage": "Speicher",
         "autoSleep": "Automatischer Ruhezustand",
@@ -780,13 +749,13 @@
         "plugins": "Plugins + Fähigkeiten",
         "integrations": "Alle Integrationen",
         "byokKey": "BYOK (eigener LLM-Key)",
-        "defaultLlm": "Standard-LLM (Groq)"
+        "defaultLlm": "Standard-LLM (OpenRouter)"
       },
       "values": {
         "unlimited": "Unbegrenzt",
         "alwaysOn": "Immer aktiv",
         "addon": "Add-on",
-        "llama4Scout": "Llama 4 Scout"
+        "llama4Scout": "DeepSeek V4 Flash"
       }
     },
     "faq": {
@@ -794,11 +763,11 @@
       "items": [
         {
           "q": "Was ist BYOK (Eigenen Key mitbringen)?",
-          "a": "BYOK ermöglicht Ihnen die Nutzung Ihres eigenen API-Keys für jeden LLM-Anbieter (OpenAI, Anthropic, Google, xAI, Groq, OpenRouter). Dies ist in allen Tarifen immer kostenlos — Sie zahlen direkt beim Anbieter, kein Hatcher-Aufschlag. Nachrichten mit Ihrem eigenen Key sind unbegrenzt."
+          "a": "BYOK ermöglicht Ihnen die Nutzung Ihres eigenen API-Keys für jeden unterstützten LLM-Anbieter (OpenAI, Anthropic, Google, xAI, OpenRouter und mehr). Dies ist in allen Tarifen immer kostenlos — Sie zahlen direkt beim Anbieter, kein Hatcher-Aufschlag. Hatcher misst BYOK-Nutzung nicht über AI Credits."
         },
         {
-          "q": "Wie funktionieren Add-ons?",
-          "a": "Add-ons sind in jedem Tarif stapelbar. Wenn Sie z. B. im Starter-Tarif (1 Agent) sind und ein +3-Agenten-Add-on kaufen, können Sie insgesamt 4 Agenten betreiben. Sie können mehrere Add-ons stapeln."
+          "q": "Wie funktionieren Extras?",
+          "a": "AI-Credit-Pakete sind einmalige Top-ups für gehostete Modelle und Websuche. Zusätzliche Agenten-Slots erhöhen die Kapazität separat."
         },
         {
           "q": "Was ist der Unterschied zwischen gemeinsamen und dedizierten Ressourcen?",
@@ -806,7 +775,7 @@
         },
         {
           "q": "Welche Zahlungsmethoden werden akzeptiert?",
-          "a": "Sie können mit SOL oder $HATCHER bezahlen. Preise sind in USD angegeben und werden über Jupiter zu Live-Kursen umgerechnet."
+          "a": "Sie können per Karte, SOL, USDC auf Solana oder $HATCHER bezahlen. Crypto-Preise sind in USD angegeben und werden über Jupiter zu Live-Kursen umgerechnet."
         },
         {
           "q": "Kann ich meinen Tarif herabstufen?",
@@ -814,15 +783,15 @@
         },
         {
           "q": "Was ist der automatische Ruhezustand?",
-          "a": "Kostenlose Agenten schlafen nach 1 Stunde Inaktivität ein, Starter nach 4 Stunden, Pro nach 12 Stunden. Business- und Gründungsmitglied-Agenten sind immer aktiv ohne automatischen Ruhezustand. Sie erwachen sofort bei der nächsten Nachricht. Sie können Immer aktiv für $7,99/Mo. zu jedem Agenten hinzufügen."
+          "a": "Kostenlose Agenten schlafen nach 12 Stunden Inaktivität ein. Starter-, Pro-, Business- und Gründungsmitglied-Agenten bleiben immer aktiv ohne automatischen Ruhezustand."
         },
         {
           "q": "Welches LLM erhalte ich mit dem kostenlosen Tarif?",
-          "a": "Kostenlose und Starter-Tarife nutzen GPT-OSS 20B auf Groq. Pro-, Business- und Gründungsmitglied-Tarife erhalten Llama 3.3 70B auf Groq — ein leistungsfähigeres Modell. Nachrichtenlimits gelten kontoweit: Free 20/Tag, Starter 50/Tag, Pro 100/Tag, Business 300/Tag, Founding 300/Tag. BYOK umgeht alle Limits in jedem Tarif."
+          "a": "Gehostete Nutzung läuft über OpenRouter und verbraucht Ihr AI-Credit-Guthaben. Sie können aus unterstützten gehosteten Modellen wählen; BYOK umgeht die Hatcher-AI-Credit-Messung, weil Sie direkt Ihren Anbieter bezahlen."
         },
         {
           "q": "Was ist der Gründungsmitglied-Tarif?",
-          "a": "Gründungsmitglied ist eine einmalige Zahlung von $99, die Ihnen lebenslangen Zugang zu Hatcher gibt: 10 Agenten, 300 Nachrichten/Tag, 4 GB RAM, 2 GB Arbeitsbereich, immer aktiv und alle Premium-Funktionen (Dateimanager, Vollständige Logs, Prioritäts-Support) inklusive. Keine monatlichen Gebühren, jemals. Begrenzt auf 20 Plätze — sobald sie weg sind, ist dieser Tarif weg."
+          "a": "Gründungsmitglied ist eine einmalige Zahlung von $99, die Ihnen lebenslangen Zugang zu Hatcher gibt: 5 Agenten, 25.000 AI Credits monatlich, 2 CPU / 3 GB RAM, 40 GB Arbeitsbereich, immer aktive Agenten, Dateimanager, vollständige Logs, Prioritäts-Support und Founding-Discord-Rolle + Telegram-Tag. Keine monatlichen Gebühren, jemals. Begrenzt auf 20 Plätze — sobald sie weg sind, ist dieser Tarif weg."
         }
       ]
     },
@@ -834,11 +803,11 @@
     },
     "cta": {
       "heading": "Bereit, Ihren Agenten zu deployen?",
-      "body": "Framework wählen, Vorlage auswählen und in Sekunden deployen. Kostenlos mit einem integrierten LLM starten. Upgraden wenn Sie mehr Power benötigen.",
+      "body": "Beschreiben Sie den gewünschten Agenten und deployen Sie in Sekunden. Kostenlos mit gehosteten AI Credits starten. Upgraden, wenn Sie mehr Power benötigen.",
       "createAgent": "Agent erstellen",
       "seeFrameworks": "Frameworks ansehen"
     },
-    "footerNote": "Alle Preise in USD, zahlbar in SOL oder $HATCHER. BYOK (Eigenen Key mitbringen) = unbegrenzte Nachrichten mit Ihrem eigenen LLM-API-Key in jedem Tarif."
+    "footerNote": "Alle Preise in USD, zahlbar per Karte, SOL, USDC auf Solana oder $HATCHER. Gehostete Modell- und Websuche-Nutzung wird über AI Credits gemessen; BYOK wird direkt beim Provider bezahlt."
   },
   "dashboard": {
     "common": {
@@ -872,7 +841,7 @@
       "frameworkAll": "Alle Frameworks",
       "sortNewest": "Neueste",
       "sortAZ": "A-Z",
-      "sortMessages": "Meiste Nachrichten",
+      "sortMessages": "Most Active",
       "sortActive": "Zuletzt aktiv",
       "emptyTitle": "Noch keine Agenten",
       "emptyDescription": "Erstellen Sie Ihren ersten KI-Agenten und deployen Sie ihn in 60 Sekunden.",
@@ -891,31 +860,19 @@
       "tourFilterTitle": "Nach Framework filtern",
       "tourFilterDescription": "OpenClaw oder Hermes — jedes hat einzigartige Stärken.",
       "tourSearchTitle": "Suchen & Entdecken",
-      "tourSearchDescription": "Agenten suchen oder 200+ Vorlagen durchsuchen, um schnell zu starten.",
+      "tourSearchDescription": "Agenten suchen oder Chat-to-Hatch starten, um schnell loszulegen.",
       "tourPlanTitle": "Ihr Plan",
-      "tourPlanDescription": "Kostenlos starten mit 1 Agenten und 20 Nachrichten/Tag. Jederzeit upgraden.",
+      "tourPlanDescription": "Kostenlos starten mit 1 Agenten, AI Credits und enthaltenen Tools. Jederzeit upgraden.",
       "statTotal": "Gesamt",
       "statActive": "Aktiv",
       "statSleeping": "Schlafend",
-      "msgsShort": "Nachr.",
+      "msgsShort": "interactions",
       "cardOpen": "3D-Raum",
       "cardOpenTooltip": "3D-Raum betreten",
       "actionStop": "Stoppen",
       "actionStart": "Starten",
       "actionRestart": "Neustarten",
       "noResultsAction": "Filter zurücksetzen"
-    },
-    "newAgent": {
-      "eyebrow": "Neuer Agent",
-      "heading": "Vorlage wählen",
-      "subheading": "Starten Sie mit einer vorkonfigurierten Vorlage oder von Grund auf. Jede Vorlage enthält eine Persönlichkeit, System-Prompt und vorgeschlagene Integrationen.",
-      "searchPlaceholder": "Vorlagen suchen...",
-      "allTemplates": "Alle Vorlagen",
-      "startFromScratch": "Von Grund auf beginnen",
-      "startFromScratchDesc": "Volle Kontrolle über jede Einstellung",
-      "noTemplatesTitle": "Keine Vorlagen gefunden",
-      "noTemplatesDesc": "Versuchen Sie eine andere Suche oder Kategorie.",
-      "footerHint": "Alle Vorlagen sind nach dem Deployment vollständig anpassbar — Name, System-Prompt, Modell und Integrationen jederzeit ändern."
     },
     "billing": {
       "eyebrow": "Konto",
@@ -928,9 +885,9 @@
       "disconnect": "Trennen",
       "loadingBilling": "Abrechnung wird geladen...",
       "signInDescription": "Melden Sie sich an, um Ihren Plan und die Abrechnung zu verwalten.",
-      "creditsBalance": "Guthaben",
-      "creditsUsd": "USD",
-      "creditsDesc": "Guthaben kann für Abonnements, Add-ons und gehostete LLM-Nutzung verwendet werden.",
+      "creditsBalance": "AI Credits Guthaben",
+      "creditsUsd": "AI Credits",
+      "creditsDesc": "AI Credits werden für gehostete LLMs, Websuche, Research, Extract und Crawl verwendet.",
       "recentTransactions": "Letzte Transaktionen",
       "currentTier": "Aktueller Plan",
       "freeTier": "Kostenloser Tarif",
@@ -940,7 +897,7 @@
       "agentsOver": "{over} über Limit",
       "slotsRemaining": "{slots} Platz verbleibend",
       "slotsRemainingPlural": "{slots} Plätze verbleibend",
-      "activeAddons": "Aktive Add-ons",
+      "activeAddons": "Aktive Extras",
       "expires": "Läuft ab {date}",
       "extend": "Verlängern",
       "extend30Days": "+30 Tage verlängern (${price})",
@@ -956,17 +913,17 @@
       "lifetimePrice": "lebenslang",
       "lifetimePriceFull": "${price} lebenslang",
       "monthlyPrice": "${price} / 30 Tage",
-      "unlimitedMessages": "unbegrenzt",
-      "messagesPerDay": "{count} Nachrichten/Tag",
-      "byokUnlimited": " (BYOK = unbegrenzt)",
+      "unlimitedMessages": "AI Credits",
+      "messagesPerDay": "{count} AI Credits",
+      "byokUnlimited": "",
       "upgradeSection": "Plan upgraden",
-      "upgradeDesc": "Mehr Agenten, Nachrichten und Rechenleistung.",
-      "addonsSection": "Add-ons",
+      "upgradeDesc": "Mehr Agenten, AI Credits und Rechenleistung.",
+      "addonsSection": "Extras",
       "addonsDesc": "Zusätzliche Kapazität zu Ihrem aktuellen Plan stapeln.",
-      "accountAddons": "Kontoweite Add-ons",
-      "perAgentAddons": "Add-ons pro Agent",
+      "accountAddons": "Kontoweite Extras",
+      "perAgentAddons": "Extras pro Agent",
       "annualBilling": "Jährliche Abrechnung",
-      "annualBillingDesc": "15% Rabatt — alle Abonnement-Add-ons",
+      "annualBillingDesc": "15% Rabatt — wiederkehrende Extras",
       "monthly": "Monatlich",
       "annual": "Jährlich",
       "monthSuffix": "/ 30 Tage",
@@ -985,23 +942,16 @@
       "choosePayment": "Zahlungsmethode wählen",
       "applyToAgent": "Auf Agent anwenden:",
       "noAgentsFound": "Keine Agenten gefunden. Erstellen Sie zuerst einen Agenten.",
-      "payWithCredits": "Mit Guthaben bezahlen",
       "payWithSol": "Mit SOL bezahlen",
       "solDesc": "Solana-Wallet-Zahlung",
       "payWithHatcher": "Mit $HATCHER bezahlen",
       "hatcherDesc": "HATCHER Token auf Solana",
-      "payWithSkaleUsdc": "Mit USDC auf SKALE bezahlen",
-      "skaleUsdcDesc": "Schnelle x402-Abwicklung per EVM-Wallet",
-      "payWithBaseUsdc": "Mit USDC auf Base bezahlen",
-      "baseUsdcDesc": "Native USDC per EVM-Wallet",
       "payWithUsdcSolana": "Mit USDC auf Solana bezahlen",
       "usdcSolanaDesc": "SPL USDC per Solana-Wallet",
       "payWithUsdc": "Mit USDC bezahlen",
       "usdcDesc": "Stablecoin — 1 USDC = $1",
       "payWithCard": "Mit Karte bezahlen",
       "cardDesc": "Kredit-/Debitkarte via Stripe",
-      "creditAvailable": "${balance} verfügbar — sofort",
-      "creditInsufficient": "Nicht genug — ${need} benötigt, ${have} vorhanden",
       "foundingSlots": "{remaining} von {max} Plätzen verfügbar",
       "foundingSoldOut": "Ausverkauft",
       "oneTimeSuffix": "einmalig",
@@ -1014,28 +964,42 @@
     },
     "analytics": {
       "eyebrow": "Dashboard",
-      "heading": "Analytics",
-      "subheading": "Kontoweite Nutzungseinblicke.",
+      "heading": "Nutzungs-Analytics",
+      "subheading": "Interaktionen, Hosted Usage und AI Credits für das ganze Konto.",
       "signInDescription": "Melden Sie sich an, um Analytics anzuzeigen.",
-      "messageVolume": "Nachrichtenvolumen",
+      "interactionVolume": "Interaktionsvolumen",
+      "messageVolume": "Interaktionsvolumen",
       "last14Days": "Letzte 14 Tage",
+      "last30Days": "Letzte 30 Tage",
       "frameworks": "Frameworks",
       "agentStatus": "Agenten-Status",
-      "totalMessages": "Gesamtnachrichten nach Agent",
-      "noMessageData": "Noch keine Nachrichtendaten — chatte Sie mit Ihren Agenten!",
+      "totalMessages": "Agenten-Interaktionen",
+      "noMessageData": "Noch keine Interaktionsdaten — chatten Sie mit Ihren Agenten!",
       "noAgentsYet": "Noch keine Agenten",
       "noAgentsEmpty": "Noch keine Agenten. Erstellen Sie Ihren ersten Agenten, um Analytics zu sehen.",
       "createAgent": "Agent erstellen",
       "totalAgents": "Agenten gesamt",
       "totalAgentsSub": "{active} aktiv",
-      "messages": "Nachrichten",
+      "messages": "Interaktionen",
       "messagesAllTime": "Gesamt",
       "llmCalls": "LLM-Aufrufe",
       "llmCallsAllTime": "Gesamt",
+      "aiCreditsBalance": "AI Credits",
+      "monthlyGrant": "{count} monatlicher Grant",
+      "aiCreditsUsed": "AI Credits verbraucht",
+      "hostedUsage": "Hosted Usage",
+      "hostedUsageSubheading": "Hosted LLM, Websuche, Research, Extract und Crawl verbrauchen AI Credits des Kontos. BYOK umgeht dieses Metering.",
+      "remainingBalance": "Verbleibender Stand",
+      "usedLast30": "Verbraucht in 30 Tagen",
+      "usageByKind": "Nutzung nach Typ",
+      "tokensProcessed": "Verarbeitete Tokens",
+      "inputTokens": "Input",
+      "outputTokens": "Output",
+      "noHostedUsageYet": "Noch keine Hosted Usage. BYOK verbraucht keine AI Credits.",
       "last14DaysLabel": "Letzte 14 Tage",
-      "last14DaysSub": "Nutzernachrichten",
+      "last14DaysSub": "Nutzerinteraktionen",
       "today": "Heute",
-      "noDataYet": "Noch keine Nachrichtendaten"
+      "noDataYet": "Noch keine Interaktionsdaten"
     },
     "team": {
       "eyebrow": "Zusammenarbeit",
@@ -1135,12 +1099,12 @@
       "payoutSettings": "Auszahlungseinstellungen",
       "payoutMode": "Modus",
       "payoutAddress": "Auszahlungsadresse",
-      "creditsOnly": "Nur Guthaben — keine Adresse",
+      "creditsOnly": "Adresse für Barauszahlung erforderlich",
       "changePrefs": "Auszahlungseinstellungen ändern?",
       "contactSupport": "Support kontaktieren",
       "modeCashOnly": "Nur Bar (20%)",
-      "modeCreditsOnly": "Nur Guthaben (40%)",
-      "modeHybrid": "Hybrid (15% Bar + 25% Guthaben)"
+      "modeCreditsOnly": "Eingestellt",
+      "modeHybrid": "Eingestellt"
     },
     "settings": {
       "eyebrow": "Konto",
@@ -1172,7 +1136,7 @@
         "walletDisconnect": "Wallet trennen",
         "walletNone": "Noch keine Wallet verknüpft. Ihre Solana-Wallet verbindet sich automatisch beim ersten On-Chain-Zahlungsvorgang auf der Abrechnungsseite.",
         "referralTitle": "Empfehlungsprogramm",
-        "referralDesc": "Laden Sie Freunde zu Hatcher ein. Sie beide erhalten {credit} Guthaben, wenn diese ihren ersten Agenten erstellen.",
+        "referralDesc": "Laden Sie Freunde zu Hatcher ein. Sie beide erhalten {credit}, wenn diese ihren ersten Agenten erstellen.",
         "referralCode": "Empfehlungscode",
         "shareLink": "Link teilen",
         "referred": "Empfohlen",
@@ -1272,9 +1236,9 @@
     },
     "quickStats": {
       "totalAgents": "Agenten gesamt",
-      "dailyMessages": "Tägliche Nachrichten",
+      "dailyMessages": "AI Credits",
       "unlimited": "∞",
-      "accountWide": "kontoweit · BYOK = unbegrenzt",
+      "accountWide": "account balance",
       "activeNow": "Jetzt aktiv",
       "noAgentsRunning": "Keine Agenten laufen",
       "agentsOnline": "{count} Agent online",
@@ -1361,7 +1325,7 @@
         "unlimited": "unbegrenzt",
         "enterToSend": "Enter zum Senden, Shift+Enter für neue Zeile",
         "signInToChat": "Melden Sie sich an, um mit diesem Agenten zu chatten.",
-        "limitReached": "Tägliches Nachrichtenlimit erreicht.",
+        "limitReached": "AI Credits aufgebraucht.",
         "upgradeToPro": "Auf Pro upgraden",
         "limitReachedSuffix": "für mehr, oder bringen Sie Ihren eigenen Schlüssel für unbegrenzten Zugriff mit.",
         "agentNotRunning": "Der Agent läuft nicht.",
@@ -1373,7 +1337,7 @@
         "stopRecording": "Aufnahme stoppen",
         "startVoice": "Spracheingabe starten",
         "errors": {
-          "rateLimit": "Tägliches Nachrichtenlimit erreicht.",
+          "rateLimit": "AI Credits aufgebraucht.",
           "llmDown": "Der KI-Dienst ist vorübergehend nicht verfügbar. Dies löst sich normalerweise innerhalb einer Minute.",
           "timeout": "Der Agent hat zu lange gebraucht, um zu antworten.",
           "network": "Verbindung unterbrochen. Überprüfen Sie Ihre Internetverbindung.",
@@ -1468,9 +1432,9 @@
         "autoScrollDisabled": "Auto-Scroll deaktiviert",
         "fullLogsGate": {
           "title": "Zeige die letzten {count} Protokollzeilen",
-          "description": "Dieser Agent hat {total} Einträge insgesamt. Entsperren Sie Vollprotokolle, um durch die vollständige Historie zu scrollen und jede Zeile zu exportieren.",
-          "descriptionEmpty": "Entsperren Sie Vollprotokolle für diesen Agenten, um alle Einträge über die letzten {count} Zeilen hinaus verfügbar zu halten.",
-          "unlock": "Entsperren"
+          "description": "Vollständige Logs sind in jedem Tarif enthalten. Aktualisieren Sie den Agenten, falls der vollständige Verlauf weiterhin nicht verfügbar ist.",
+          "descriptionEmpty": "Vollständige Logs sind in jedem Tarif enthalten. Aktualisieren Sie den Agenten, falls der vollständige Verlauf weiterhin nicht verfügbar ist.",
+          "unlock": "Aktualisieren"
         }
       },
       "integrations": {
@@ -1623,7 +1587,7 @@
         "source": "Quelle",
         "requiresRestart": "Neustart erforderlich",
         "refresh": "Aktualisieren",
-        "limitReached": "Plugin-Limit erreicht. Upgraden Sie Ihren Tarif oder fügen Sie ein Plugin-Addon hinzu."
+        "limitReached": "Plugins und Skills sind ohne kostenpflichtiges Slot-Addon enthalten."
       },
       "workflows": {
         "new": "Neuer Workflow",
@@ -1649,7 +1613,7 @@
         "delete": "Löschen",
         "download": "Herunterladen",
         "refresh": "Aktualisieren",
-        "locked": "Der Dateimanager erfordert den Business-Tarif oder das Dateimanager-Addon.",
+        "locked": "Der Dateimanager ist in jedem Tarif enthalten. Aktualisieren Sie den Agenten, falls der Zugriff weiterhin blockiert ist.",
         "unlock": "Entsperren"
       },
       "workspace": {
@@ -1733,7 +1697,7 @@
     },
     "analytics": {
       "heading": "Agenten-Analytics",
-      "messages": "Nachrichten",
+      "messages": "Interaktionen",
       "daysActive": "Aktive Tage",
       "uptime": "Betriebszeit",
       "status": "Status",
@@ -1756,7 +1720,7 @@
     "statusPage": {
       "poweredBy": "Betrieben von",
       "uptimeLabel": "24h-Betriebszeit",
-      "messages": "Nachrichten",
+      "messages": "Interaktionen",
       "days": "Tage",
       "since": "Seit",
       "framework": "Framework",
@@ -1806,8 +1770,8 @@
     "configRef": "Vollständige Konfigurationsreferenz →",
     "docsSuffix": "Docs",
     "llmSupport": "LLM-Unterstützung",
-    "llmSubheading": "Alle Frameworks unterstützen BYOK (Eigenen Key mitbringen) für unbegrenzte Nachrichten. Beim gehosteten LLM läuft jeder Tarif mit Llama 4 Scout (17B) auf Groq — Tool-Call-Zuverlässigkeit und Latenz sind über Free, Starter, Pro, Business und Gründungsmitglied gleich. Nur das tägliche Nachrichtenkontingent ändert sich pro Tarif.",
-    "byokNote": "* BYOK immer kostenlos — unbegrenzte Nachrichten in jedem Framework.",
+    "llmSubheading": "Alle Frameworks unterstützen BYOK (eigener Key) für provider-bezahlte Nutzung. Gehostete LLMs laufen über OpenRouter mit DeepSeek V4 Flash als Standard und nutzen AI Credits statt täglicher Nachrichtenkontingente.",
+    "byokNote": "* BYOK immer kostenlos — direkt beim Anbieter bezahlte Nutzung.",
     "byokSetupLink": "BYOK-Setup-Anleitung anzeigen →",
     "decisionGuide": "Schnelle Entscheidungshilfe",
     "readyCta": "Bereit zum Deployen?",
@@ -1832,7 +1796,7 @@
   "token": {
     "liveLabel": "Live auf Solana",
     "heading": "$HATCHER",
-    "subheading": "Der Ökosystem-Token von Hatcher. Ermöglicht Tarif-Abonnements, Agenten-Add-ons und Governance auf Solana.",
+    "subheading": "Der Ökosystem-Token von Hatcher. Ermöglicht Tarif-Abonnements, zusätzliche Agenten-Slots und Governance auf Solana.",
     "caLabel": "CA:",
     "viewDexscreener": "Auf Dexscreener ansehen",
     "viewSolscan": "Auf Solscan ansehen",
@@ -1851,7 +1815,7 @@
     "trading": "Handel",
     "contractLabel": "Vertrag",
     "platformLabel": "Plattform",
-    "platformValue": "Kostenloser Tarif jetzt verfügbar — Token ermöglicht bezahlte Tarife & Add-ons",
+    "platformValue": "Kostenloser Tarif jetzt verfügbar — Token ermöglicht bezahlte Tarife und Extras",
     "stayInLoop": "Auf dem Laufenden bleiben",
     "stayInLoopBody": "Der Token ist live und die Plattform ist bereit. Deployen Sie Ihren ersten Agenten in Minuten.",
     "followOnX": "Auf X folgen"
@@ -1953,312 +1917,6 @@
     "footerNote": "Tastenkürzel sind beim Tippen in Textfeldern deaktiviert. Auf macOS Cmd statt Ctrl verwenden."
   },
   "create": {
-    "eyebrow": "Agent erstellen",
-    "heading": "Ihren Agent erstellen",
-    "subheading": "Kostenlosen AI-Agent in unter 2 Minuten starten.",
-    "stepsAriaLabel": "Erstellungsschritte",
-    "stepLabels": {
-      "style": "Stil",
-      "category": "Kategorie",
-      "template": "Vorlage",
-      "setUp": "Einrichtung",
-      "launch": "Starten"
-    },
-    "authLoading": "Authentifizierung...",
-    "authRequired": "Ihren Agent erstellen",
-    "authRequiredBody": "Melden Sie sich an, um AI-Agents zu erstellen und bereitzustellen.",
-    "signIn": "Anmelden",
-    "back": "Zurück",
-    "continue": "Weiter",
-    "step1Heading": "Welche Art von Agent möchten Sie?",
-    "step1Subheading": "Jedes Framework hat andere Stärken — wählen Sie das passende.",
-    "step2Heading": "Welcher Agent-Typ?",
-    "step2Subheading": "Kategorie wählen — wir zeigen Ihnen die besten Vorlagen",
-    "searchTemplates": "200+ Vorlagen durchsuchen...",
-    "clearSearch": "Suche löschen",
-    "noTemplatesFound": "Keine Vorlagen für \"{query}\" gefunden",
-    "clearSearchLink": "Suche löschen",
-    "categoryCount": "{count} Vorlagen",
-    "step3Heading": "Vorlage wählen",
-    "step3Subheading": "Vorlage wählen — alles im nächsten Schritt anpassbar",
-    "customAgent": "Eigener Agent",
-    "customAgentDesc": "Mit eigenem System-Prompt von Grund auf starten",
-    "customOption": "Von Grund auf",
-    "customOptionDesc": "Vollständige Kontrolle über alle Einstellungen",
-    "step4Heading": "Agent personalisieren",
-    "step4Subheading": "Namen vergeben und Denkweise festlegen",
-    "agentNameLabel": "Agent-Name",
-    "agentNamePlaceholder": "z. B. AlphaResearcher, TweetLord...",
-    "agentNameHintCount": "{count}/50 Zeichen",
-    "agentNameTooShort": "Name muss mindestens 3 Zeichen haben",
-    "agentNameInvalidChars": "Nur Buchstaben, Zahlen, Leerzeichen, Bindestriche, Doppelpunkte, Apostrophe erlaubt",
-    "descriptionLabel": "Beschreibung",
-    "descriptionPlaceholder": "Kurze Beschreibung Ihres Agents...",
-    "descriptionHint": "Kurzer Slogan für Ihren Agent",
-    "platformsHeading": "Wo soll Ihr Agent aktiv sein?",
-    "platformsSubheading": "Plattformen wählen und API-Schlüssel eingeben. Später in den Einstellungen erweiterbar.",
-    "noPlatformsNote": "Keine Plattform gewählt? Kein Problem — jederzeit im Einstellungs-Tab des Agents hinzufügbar.",
-    "hideValue": "Wert verbergen",
-    "showValue": "Wert anzeigen",
-    "llmModelLabel": "AI-Modell",
-    "llmModelAria": "AI-Modell-Auswahl",
-    "llmFreeLabel": "Kostenloses AI-Modell",
-    "llmFreeTag": "KOSTENLOS",
-    "llmFreeSubtext": "Powered by Groq — kein API-Schlüssel nötig",
-    "llmByokLabel": "Eigenen AI-Schlüssel verwenden",
-    "llmByokTag": "immer kostenlos",
-    "llmByokSubtext": "Eigenen OpenAI-, Anthropic- oder anderen API-Schlüssel verbinden",
-    "byokProviderLabel": "Anbieter",
-    "byokModelLabel": "Modell",
-    "byokModelPlaceholder": "Modell-Bezeichner...",
-    "byokBackToList": "Zurück zur Modellliste",
-    "byokSelectModel": "Modell auswählen...",
-    "byokCustomModel": "Eigenes Modell...",
-    "byokApiKeyLabel": "API-Schlüssel",
-    "byokApiKeyEncrypted": "verschlüsselt gespeichert",
-    "byokBaseUrlLabel": "Base URL",
-    "skillsHeading": "Agent-Fähigkeiten",
-    "skillsSubheading": "Wählen Sie, was Ihr Agent können soll",
-    "toolsHeading": "Agent-Werkzeuge",
-    "toolsSubheading": "Wählen Sie, was Ihr Agent können soll",
-    "pluginsHeading": "Plugins",
-    "pluginsSubheading": "Wählen Sie, was Ihr Agent können soll",
-    "capabilitiesHeading": "Fähigkeiten",
-    "capabilitiesSubheading": "Wählen Sie, was Ihr Agent können soll",
-    "templateSkillsHeading": "In dieser Vorlage enthalten",
-    "templateSkillsSubheading": "Diese ClawHub-Fähigkeiten werden beim ersten Start automatisch installiert.",
-    "systemPromptLabel": "System-Prompt",
-    "systemPromptCustomNote": "Ihre Anweisungen ersetzen den Vorlagen-Standard",
-    "systemPromptDefaultNote": "Die Persönlichkeit Ihres Agents ist vorkonfiguriert. Anpassen nach Bedarf.",
-    "systemPromptCustomize": "Anpassen",
-    "systemPromptUseDefault": "Vorlage verwenden",
-    "systemPromptPlaceholder": "Eigenen System-Prompt hier eingeben. Ersetzt vollständig den Vorlage-Standard.",
-    "systemPromptHint": "Definiert Persönlichkeit, Fähigkeiten und Regeln des Agents",
-    "systemPromptCount": "{count}/8000",
-    "systemPromptWarning": "System-Prompt empfohlen für bessere Ergebnisse",
-    "moreOptionsLabel": "Weitere Optionen",
-    "moreOptionsHints": {
-      "openclaw": "Suche, Sprache, Sitzungen",
-      "hermes": "Persönlichkeit, Gedächtnis, Freigaben"
-    },
-    "sessionScopeLabel": "Sitzungsumfang",
-    "sessionScopeHint": "Wie Konversationskontext zwischen Nutzern geteilt wird",
-    "sessionScopePerUser": "Pro Nutzer",
-    "sessionScopeGlobal": "Global",
-    "webSearchLabel": "Websuche aktivieren",
-    "webSearchHint": "Agent darf das Web nach Echtzeit-Infos durchsuchen",
-    "searchProviderLabel": "Suchanbieter",
-    "searchProviderHint": "Welche Such-API verwendet wird",
-    "ttsLabel": "Sprache aktivieren (TTS)",
-    "ttsHint": "Text-zu-Sprache für Sprachantworten",
-    "ttsProviderLabel": "TTS-Anbieter",
-    "ttsProviderHint": "Sprachsynthese-Engine",
-    "hermesPersonalityLabel": "Persönlichkeit",
-    "hermesPersonalityHint": "Gesprächston und -stil",
-    "hermesPersonalityDefault": "Standard",
-    "hermesPersonalityHelpful": "Hilfsbereit",
-    "hermesPersonalityTechnical": "Technisch",
-    "hermesPersonalityCreative": "Kreativ",
-    "hermesPersonalityConcise": "Prägnant",
-    "memoryLabel": "Gedächtnis aktivieren",
-    "memoryHint": "Kontext über Gespräche hinweg beibehalten",
-    "approvalModeLabel": "Freigabe-Modus",
-    "approvalModeHint": "Wie Aktionen vor der Ausführung genehmigt werden",
-    "approvalModeAuto": "Automatisch",
-    "approvalModeAsk": "Vor Aktionen fragen",
-    "approvalModeManual": "Manuell",
-    "databaseLabel": "Datenbank",
-    "databaseHint": "Speicher-Backend für Agent-Zustand und Gedächtnis",
-    "imageGenLabel": "Bildgenerierung aktivieren",
-    "imageGenHint": "Agent darf Bilder generieren",
-    "voiceLabel": "Sprache aktivieren",
-    "voiceHint": "Sprache-zu-Text und Text-zu-Sprache",
-    "localFirstLabel": "Local-First-Modus",
-    "localFirstHint": "Daten lokal verarbeiten vor der Synchronisierung",
-    "step5Heading": "Bereit zum Starten?",
-    "step5Subheading": "Konfiguration vor dem Start prüfen",
-    "summaryAgentType": "Agent-Typ",
-    "summaryTemplate": "Vorlage",
-    "summaryTemplateCustom": "Eigene",
-    "summaryAiModel": "AI-Modell",
-    "summaryDescription": "Beschreibung",
-    "summaryPlatforms": "Plattformen",
-    "summaryPersonality": "Persönlichkeit",
-    "summaryPersonalityDefault": "Vorlage-Standard",
-    "summaryPersonalityCustom": "Eigene Anweisungen",
-    "summaryCost": "Kosten",
-    "summaryCostFree": "$0.00 — Kostenlos",
-    "summaryCostByok": "$0.00 — Eigener Schlüssel",
-    "summaryLaunchIncludes": "Nach dem Start",
-    "summaryLaunchIncludesValue": "Dashboard, Chat, Mail, Benachrichtigungen",
-    "summaryFrameworkLabels": {
-      "openclaw": "Multi-Skill-Assistent",
-      "hermes": "Autonomer Agent"
-    },
-    "testChatLabel": "Agent testen",
-    "testChatSubtext": "Vorschau der Agent-Antworten",
-    "testChatPreviewLabel": "Chat-Vorschau",
-    "testChatSimulated": "Simulierte Vorschau. Agent deployen für echte Gespräche.",
-    "testChatEmpty": "Nachricht senden für Agent-Vorschau",
-    "testChatEmptyHint": "Versuchen Sie \"Hallo\" oder \"Was können Sie tun?\"",
-    "testChatPlaceholder": "Nachricht eingeben...",
-    "launchedHeading": "Ihr Agent ist live!",
-    "launchedSubtext": "Weiterleitung zum Agent-Dashboard...",
-    "launchCtaLabel": "Agent starten",
-    "launchCtaCreating": "Agent wird erstellt...",
-    "launchCtaCreated": "Agent erfolgreich erstellt",
-    "launchCta": "Agent starten!",
-    "launching": "Wird gestartet...",
-    "launched": "Gestartet!",
-    "frameworkFeatures": {
-      "openclaw": {
-        "desc": "Vielseitiger KI-Assistent mit tausenden Community-Fähigkeiten und Multi-Channel-Messaging.",
-        "f1": "Tausende Fähigkeiten",
-        "f2": "Websuche",
-        "f3": "Geplante Aufgaben"
-      },
-      "hermes": {
-        "desc": "Intelligenter KI-Agent mit kontextübergreifendem Gedächtnis und Lernfähigkeit.",
-        "f1": "Langzeitgedächtnis",
-        "f2": "40+ integrierte Tools",
-        "f3": "Selbstverbesserung"
-      }
-    },
-    "skills": {
-      "webSearch": {
-        "name": "Websuche",
-        "desc": "Web nach Echtzeit-Infos durchsuchen"
-      },
-      "calculator": {
-        "name": "Rechner",
-        "desc": "Mathematik und Berechnungen"
-      },
-      "weather": {
-        "name": "Wetter",
-        "desc": "Wettervorhersagen"
-      },
-      "codeInterpreter": {
-        "name": "Code-Ausführung",
-        "desc": "Code-Snippets ausführen"
-      },
-      "fileManager": {
-        "name": "Dateimanager",
-        "desc": "Dateien lesen und schreiben"
-      },
-      "imageGen": {
-        "name": "Bildgenerierung",
-        "desc": "Bilder aus Text generieren"
-      }
-    },
-    "tools": {
-      "webSearch": {
-        "name": "Websuche",
-        "desc": "Internet nach Informationen durchsuchen"
-      },
-      "calculator": {
-        "name": "Rechner",
-        "desc": "Mathematische Berechnungen"
-      },
-      "codeExecution": {
-        "name": "Code-Ausführung",
-        "desc": "Code-Snippets ausführen"
-      },
-      "fileOperations": {
-        "name": "Dateioperationen",
-        "desc": "Dateien lesen und schreiben"
-      },
-      "memory": {
-        "name": "Gedächtnis",
-        "desc": "Gespräche und Fakten merken"
-      },
-      "summarize": {
-        "name": "Zusammenfassung",
-        "desc": "Lange Texte zusammenfassen"
-      },
-      "translate": {
-        "name": "Übersetzer",
-        "desc": "Zwischen Sprachen übersetzen"
-      },
-      "weather": {
-        "name": "Wetter",
-        "desc": "Wettervorhersagen"
-      }
-    },
-    "plugins": {
-      "database": {
-        "name": "Datenbank",
-        "desc": "SQL-Datenbankzugriff"
-      },
-      "imageGen": {
-        "name": "Bildgenerierung",
-        "desc": "Bilder generieren"
-      },
-      "video": {
-        "name": "Video",
-        "desc": "Videoverarbeitung"
-      },
-      "tts": {
-        "name": "Text-zu-Sprache",
-        "desc": "Sprachausgabe"
-      },
-      "nodeRuntime": {
-        "name": "Node-Laufzeit",
-        "desc": "Serverseitige Operationen"
-      },
-      "bootstrap": {
-        "name": "Bootstrap",
-        "desc": "Kernhilfsprogramme"
-      }
-    },
-    "capabilities": {
-      "chat": {
-        "name": "Chat",
-        "desc": "Kernkonversation"
-      },
-      "defi": {
-        "name": "DeFi",
-        "desc": "DeFi-Protokollinteraktionen"
-      },
-      "social": {
-        "name": "Social",
-        "desc": "Social-Media-Integration"
-      },
-      "analysis": {
-        "name": "Analyse",
-        "desc": "Datenanalyse"
-      },
-      "privacy": {
-        "name": "Datenschutz",
-        "desc": "Datenschutz-Tools"
-      },
-      "memes": {
-        "name": "Memes",
-        "desc": "Meme-Generierung"
-      }
-    },
-    "platforms": {
-      "telegram": {
-        "desc": "Als Telegram-Bot bereitstellen",
-        "helperField": "Telegram → @BotFather → /newbot → Token kopieren"
-      },
-      "discord": {
-        "desc": "Als Discord-Bot bereitstellen",
-        "helperField": "Discord Entwicklerportal → Neue App → Bot → Token kopieren"
-      },
-      "whatsapp": {
-        "desc": "Via QR-Code verbinden",
-        "note": "QR-Kopplung nach Deployment verfügbar"
-      },
-      "slack": {
-        "desc": "Im Slack-Workspace bereitstellen",
-        "helperField": "Slack API → App erstellen → OAuth & Berechtigungen → Bot-Token"
-      },
-      "twitter": {
-        "desc": "Auf X posten, antworten und interagieren"
-      }
-    },
-    "llmFreeSummary": "Kostenloses AI-Modell (Groq)",
-    "llmByokSummary": "Eigener Schlüssel: {provider}{model}",
     "errorHeading": "Erstellungsfehler",
     "errorBody": "Beim Einrichten Ihres Agents ist ein Fehler aufgetreten. Ihr Fortschritt wurde nicht verloren.",
     "errorIdLabel": "Fehler-ID:",
@@ -2312,12 +1970,12 @@
   "affiliate": {
     "eyebrow": "Affiliate-Programm",
     "heading": "Verdienen Sie mit jedem Nutzer, den Sie zu Hatcher bringen.",
-    "subheading": "Bis zu 40% wiederkehrende Provisionen auf jeden zahlenden Nutzer, den Sie empfehlen. Bargeld in Ihrer Wallet, Guthaben für Ihre eigenen Agenten oder ein Hybrid-Split — Ihre Wahl. Zuordnung ist linkbasiert und gilt für die Lebensdauer des empfohlenen Kontos.",
+    "subheading": "Verdienen Sie 20% wiederkehrende Barprovision auf jeden zahlenden Nutzer, den Sie empfehlen. Zuordnung ist linkbasiert und gilt für die Lebensdauer des empfohlenen Kontos.",
     "applyNowCta": "Jetzt bewerben",
     "howItWorksLink": "So funktioniert es",
-    "pickYourPayout": "Auszahlungsart wählen",
-    "threeWays": "Drei Wege, bezahlt zu werden.",
-    "threeWaysSubheading": "Gleiche anrechenbare Einnahmen, unterschiedliche Aufteilung. Wählen Sie den Modus, der dazu passt, wie Sie Wert aus dem Programm ziehen möchten — Sie können später durch Kontaktaufnahme mit dem Support wechseln.",
+    "pickYourPayout": "Provisionsstruktur",
+    "threeWays": "Barprovisionen, einfaches Ledger.",
+    "threeWaysSubheading": "Affiliate-Einnahmen sind nur Barzahlungen: 20% wiederkehrend auf anrechenbare Umsätze, mit 30 Tagen Haltefrist vor Auszahlung.",
     "popularLabel": "Beliebt",
     "foundingBonusLabel": "Gründungsmitglied-Bonus",
     "foundingBonusHeading": "Gründungsmitglied empfehlen → Pauschal $20 Bar-Bonus.",
@@ -2384,7 +2042,7 @@
       "validateUrlInvalid": "Muss eine gültige URL sein",
       "validatePitchMin": "Pitch muss mindestens 50 Zeichen lang sein",
       "validatePitchMax": "Pitch darf höchstens 2000 Zeichen lang sein",
-      "validateAddressRequired": "Erforderlich für CASH_ONLY und HYBRID",
+      "validateAddressRequired": "Für Affiliate-Barauszahlungen erforderlich",
       "validateAddressFormat": "Muss eine gültige Solana-Base58-Adresse sein (32–44 Zeichen)",
       "slugTooShort": "Zu kurz — min. 3 Zeichen",
       "slugTooLong": "Zu lang — max. 30 Zeichen",
@@ -2461,23 +2119,23 @@
     "tiers": {
       "free": {
         "name": "Free",
-        "description": "1 Agent, 20 Nachrichten/Tag, 50 MB Speicher"
+        "description": "1 Agent, 500 AI Credits/Monat, 2 GB Arbeitsbereich"
       },
       "starter": {
         "name": "Starter",
-        "description": "1 Agent, 50 Nachrichten/Tag, 150 MB Speicher"
+        "description": "1 Agent, 3.000 AI Credits/Monat, 10 GB Arbeitsbereich"
       },
       "pro": {
         "name": "Pro",
-        "description": "3 Agenten, 100 Nachrichten/Tag, 500 MB Speicher"
+        "description": "3 Agenten, 15.000 AI Credits/Monat, 25 GB Arbeitsbereich"
       },
       "business": {
         "name": "Business",
-        "description": "10 Agenten, 300 Nachrichten/Tag, 1 GB Speicher, immer aktiv"
+        "description": "5 Agenten, 40.000 AI Credits/Monat, 50 GB Arbeitsbereich, immer aktiv"
       },
       "founding_member": {
         "name": "Gründungsmitglied",
-        "description": "10 Agenten, 300 Nachrichten/Tag, 2 GB Speicher, lebenslanger Zugang"
+        "description": "5 Agenten, 25.000 AI Credits/Monat, 40 GB Arbeitsbereich, lebenslanger Zugang"
       }
     },
     "addons": {
@@ -2497,45 +2155,21 @@
         "name": "+10 Agenten",
         "description": "10 zusätzliche Agenten-Plätze"
       },
-      "messages_plus20": {
-        "name": "+20 Nachr./Tag",
-        "description": "20 zusätzliche Nachrichten pro Tag"
+      "ai_credits_5000": {
+        "name": "5.000 AI Credits",
+        "description": "Einmalige Aufladung für gehostete Modelle und Websuche"
       },
-      "messages_plus50": {
-        "name": "+50 Nachr./Tag",
-        "description": "50 zusätzliche Nachrichten pro Tag"
+      "ai_credits_10000": {
+        "name": "10.000 AI Credits",
+        "description": "Einmalige Aufladung für schwerere Modellläufe und Recherche"
       },
-      "messages_plus100": {
-        "name": "+100 Nachr./Tag",
-        "description": "100 zusätzliche Nachrichten pro Tag"
+      "ai_credits_25000": {
+        "name": "25.000 AI Credits",
+        "description": "Einmalige Aufladung für größere Agent-Workloads"
       },
-      "messages_plus200": {
-        "name": "+200 Nachr./Tag",
-        "description": "200 zusätzliche Nachrichten pro Tag"
-      },
-      "searches_plus25": {
-        "name": "+25 Suchen/Tag",
-        "description": "25 zusätzliche Web-Suchen pro Tag"
-      },
-      "searches_plus50": {
-        "name": "+50 Suchen/Tag",
-        "description": "50 zusätzliche Web-Suchen pro Tag"
-      },
-      "always_on": {
-        "name": "Immer aktiv",
-        "description": "Diesen Agenten 24/7 laufen lassen"
-      },
-      "file_manager": {
-        "name": "Dateimanager",
-        "description": "Arbeitsbereich-Dateien durchsuchen, bearbeiten & herunterladen"
-      },
-      "full_logs": {
-        "name": "Vollständige Logs",
-        "description": "Vollständigen Log-Viewer für diesen Agenten freischalten"
-      },
-      "plugins_plus10": {
-        "name": "+10 Plugins",
-        "description": "10 zusätzliche Plugin+Fähigkeiten-Plätze für diesen Agenten"
+      "ai_credits_50000": {
+        "name": "50.000 AI Credits",
+        "description": "Einmalige Aufladung für hohes gehostetes Nutzungsvolumen"
       }
     },
     "frameworks": {
@@ -2578,7 +2212,7 @@
     "h1Accent": "Brüte ihn aus.",
     "authChecking": "Sitzung wird geprüft…",
     "assistantTitle": "Hatcher Assistent",
-    "assistantSub": "Powered by Llama 4 Scout · wandelt Absicht in eine vollständige Agent-Konfiguration um",
+    "assistantSub": "Powered by DeepSeek V4 Flash · wandelt Absicht in eine vollständige Agent-Konfiguration um",
     "live": "Live",
     "assistantWho": "Hatcher",
     "intro": "Beschreib den Agenten, den du willst — was er tut, wo er läuft, in welchem Ton. Ich wähle ein Framework, generiere Name + Identität + Skills und stelle ihn zum Ausbrüten ein. Ein oder zwei Sätze reichen; jedes Feld ist danach editierbar.",
@@ -2748,7 +2382,7 @@
       "boxLabel": "Bereit",
       "headline": "Deploy deinen ersten Agenten.",
       "ctaPrimary": "Agent ausbrüten",
-      "ctaGhost": "Vorlagen ansehen",
+      "ctaGhost": "Agenten ansehen",
       "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "keine Kreditkarte"
     }

@@ -39,11 +39,14 @@
     "affiliateBecome": "Devenir affilié",
     "userMenu": {
       "sub_myAgents": "Parcourir, modifier, déployer.",
-      "sub_create": "Choisir un modèle manuellement.",
+      "sub_create": "Décrire un agent à faire éclore.",
+      "sub_analytics": "AI Credits, tokens, tendances.",
       "sub_billing": "Forfait, modules, crédits.",
+      "sub_wallets": "Wallets de paiement Solana.",
+      "sub_team": "Membres et collaboration.",
       "sub_settings": "Profil, clés API, préférences.",
       "sub_support": "Aide, docs, contact.",
-      "sub_affiliate": "Gagnez des crédits en partageant.",
+      "sub_affiliate": "Gagnez du cash en partageant.",
       "sub_admin": "Contrôles plateforme.",
       "sub_signOut": "Terminer la session sur cet appareil.",
       "tierSuffix": "forfait"
@@ -54,8 +57,6 @@
       "resources": "Ressources",
       "hatchAgentLabel": "Faire éclore (chat)",
       "hatchAgentSub": "Décris ce que tu veux — en quelques secondes.",
-      "createTplLabel": "Depuis un modèle",
-      "createTplSub": "Framework + outils manuellement.",
       "myAgentsLabel": "Mes agents",
       "myAgentsSub": "Tableau de bord pour tes agents en cours.",
       "cityLabel": "Hatcher City",
@@ -117,7 +118,6 @@
     "colResources": "Ressources",
     "colLegal": "Légal",
     "itemHatchAgent": "Faire éclore",
-    "itemCreateTpl": "Depuis un modèle",
     "itemMyAgents": "Mes agents",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Frameworks",
@@ -175,7 +175,7 @@
       "copiedAriaLabel": "Copié",
       "step01": "Envoyez cette invite à votre agent de codage IA — Claude Code, Cursor, OpenClaw, Hermes, ou tout agent capable de récupérer des URL et d'exécuter des commandes shell.",
       "step02": "L'agent crée un compte avec votre e-mail et vous envoie un lien de vérification.",
-      "step03": "Cliquez sur le lien. Votre agent choisit un modèle, déploie et vous remet une IA opérationnelle.",
+      "step03": "Cliquez sur le lien. Hatcher prépare la configuration, déploie et vous remet une IA opérationnelle.",
       "viewSkillMd": "Voir skill.md",
       "githubSource": "Source GitHub"
     },
@@ -288,7 +288,7 @@
         },
         {
           "title": "Apportez votre propre clé",
-          "desc": "Utilisez votre propre clé API LLM pour des messages illimités sur n'importe quel forfait."
+          "desc": "Utilisez votre propre clé API LLM pour des utilisation payée au fournisseur sur n'importe quel forfait."
         },
         {
           "title": "Sécurisé par défaut",
@@ -307,7 +307,7 @@
     "pricing": {
       "eyebrow": "Tarifs",
       "heading": "Commencez gratuitement, évoluez quand vous êtes prêt",
-      "subheading": "Toutes les plateformes incluses dans chaque forfait. Apportez votre propre clé IA pour des messages illimités sur n'importe quel forfait.",
+      "subheading": "Toutes les plateformes incluses dans chaque forfait. L'IA hébergée et la recherche web utilisent des AI Credits ; BYOK reste payé directement au fournisseur.",
       "popularLabel": "Populaire",
       "tiers": [
         {
@@ -316,9 +316,10 @@
           "sub": "/mois",
           "features": [
             "1 agent IA",
-            "20 messages/jour",
+            "500 AI Credits/mois",
+            "2 GB d'espace de travail",
             "Toutes les plateformes",
-            "IA gratuite incluse"
+            "Gestionnaire de fichiers + journaux complets"
           ],
           "cta": "Commencer"
         },
@@ -328,9 +329,10 @@
           "sub": "/mois",
           "features": [
             "1 agent IA",
-            "50 messages/jour",
-            "BYOK = illimité",
-            "Temps d'activité prolongé"
+            "3 000 AI Credits/mois",
+            "10 GB d'espace de travail",
+            "BYOK payé au fournisseur",
+            "Toujours actif"
           ],
           "cta": "Choisir Starter"
         },
@@ -340,8 +342,9 @@
           "sub": "/mois",
           "features": [
             "3 agents IA",
-            "100 messages/jour",
-            "BYOK = illimité",
+            "15 000 AI Credits/mois",
+            "25 GB d'espace de travail",
+            "BYOK payé au fournisseur",
             "Ressources dédiées"
           ],
           "cta": "Choisir Pro"
@@ -351,15 +354,16 @@
           "price": "$49.99",
           "sub": "/mois",
           "features": [
-            "10 agents IA",
-            "300 messages/jour",
+            "5 agents IA",
+            "40 000 AI Credits/mois",
+            "50 GB d'espace de travail",
             "Conteneurs toujours actifs",
-            "Support prioritaire"
+            "Collaboration en équipe"
           ],
           "cta": "Choisir Business"
         }
       ],
-      "addonsNote": "Besoin de plus d'agents, de messages ou de stockage ? Ajoutez des packs cumulables — tous les forfaits bénéficient de la flexibilité des extensions.",
+      "addonsNote": "Besoin de plus d'agents, d'AI Credits ou de stockage ? Ajoutez des packs cumulables — tous les forfaits bénéficient de la flexibilité des extensions.",
       "addonsCta": "Voir tous les tarifs →"
     },
     "founding": {
@@ -376,15 +380,15 @@
       "claimed": "{claimed} sur {max} réservées · une fois parties, l'offre disparaît.",
       "includedHeading": "Tout inclus, pour toujours",
       "includedItems": [
-        "10 agents inclus",
+        "5 agents inclus",
         "Toujours actif (pas de veille)",
-        "300 messages/jour par compte",
-        "200 recherches web/jour",
-        "2 CPU · 4 GB RAM par agent",
-        "2 GB d'espace de travail par agent",
+        "25 000 AI Credits/mois",
+        "La recherche web utilise les AI Credits",
+        "2 CPU · 3 GB RAM par agent",
+        "40 GB d'espace de travail par agent",
         "Gestionnaire de fichiers + journaux complets",
-        "Collaboration en équipe + support prioritaire",
-        "Badge fondateur",
+        "Support prioritaire",
+        "Rôle Discord fondateur + tag Telegram",
         "Prix fixé définitivement"
       ],
       "ctaSoldOut": "Épuisé",
@@ -396,7 +400,7 @@
       "items": [
         {
           "q": "Est-ce vraiment gratuit ?",
-          "a": "Oui. Le forfait gratuit vous donne 1 agent, 20 messages par jour et l'accès à toutes les plateformes. Aucune carte bancaire requise. BYOK (apportez votre propre clé LLM) = messages illimités sur n'importe quel forfait."
+          "a": "Oui. Le forfait gratuit vous donne 1 agent, des AI Credits mensuels, 2 GB d'espace de travail, le gestionnaire de fichiers, les journaux complets et l'accès à toutes les plateformes. Aucune carte bancaire requise. BYOK reste payé directement au fournisseur sur n'importe quel forfait."
         },
         {
           "q": "Dois-je savoir coder ?",
@@ -404,7 +408,7 @@
         },
         {
           "q": "Qu'est-ce que « Apportez votre propre clé » ?",
-          "a": "Connectez votre propre clé OpenAI, Anthropic, Google ou Groq pour des messages illimités. Vous payez uniquement votre fournisseur IA directement."
+          "a": "Connectez votre propre clé OpenAI, Anthropic, Google, OpenRouter ou autre fournisseur pour une utilisation payée directement au fournisseur. Vous payez uniquement votre fournisseur IA."
         },
         {
           "q": "Où s'exécute mon agent ?",
@@ -414,7 +418,7 @@
     },
     "finalCta": {
       "heading": "Prêt à déployer votre premier agent ?",
-      "body": "Le forfait gratuit inclut 1 agent avec 20 messages/jour. BYOK = illimité. Aucune carte bancaire requise.",
+      "body": "Le forfait gratuit inclut 1 agent, 500 AI Credits/mois, le gestionnaire de fichiers, les journaux complets et 2 GB d'espace de travail. BYOK est payé directement au fournisseur. Aucune carte bancaire requise.",
       "ctaPrimary": "Créer votre agent",
       "ctaSecondary": "Voir les tarifs",
       "trustNoCreditCard": "Sans carte bancaire",
@@ -450,11 +454,11 @@
       "panelTagline": "Hatcher",
       "panelHeadlinePrefix": "Déployez votre",
       "panelHeadlineAccent": "agent IA.",
-      "panelBody": "Forfait gratuit avec BYOK = messages illimités. Aucune carte bancaire requise.",
+      "panelBody": "Forfait gratuit avec BYOK = paiement fournisseur. Aucune carte bancaire requise.",
       "statsUsers": "Utilisateurs",
       "statsAgents": "Agents",
       "statsOnline": "En ligne maintenant",
-      "referralBadge": "Parrainé par {referrer} — vous recevez tous les deux {credit} de crédit !",
+      "referralBadge": "Parrainé par {referrer} — vous recevez tous les deux {credit} !",
       "emailLabel": "E-mail",
       "emailPlaceholder": "vous@exemple.com",
       "emailTaken": "Déjà inscrit.",
@@ -544,7 +548,7 @@
   "pricing": {
     "eyebrow": "Tarifs",
     "heading": "Choisissez votre forfait",
-    "subheading": "Commencez gratuitement avec n'importe quel framework. Évoluez quand vous êtes prêt. Toutes les intégrations incluses dans chaque forfait. BYOK toujours illimité.",
+    "subheading": "Commencez gratuitement avec n'importe quel framework. Évoluez quand vous êtes prêt. Toutes les intégrations sont incluses. BYOK reste payé directement au fournisseur.",
     "billingToggle": {
       "monthly": "Mensuel",
       "annual": "Annuel",
@@ -572,64 +576,59 @@
     "tiers": {
       "free": {
         "agents": "1 agent inclus",
-        "messages": "20 messages/jour",
-        "cpu": "0,5 CPU",
+        "messages": "500 AI Credits/mois",
+        "cpu": "1 CPU",
         "ram": "1 GB RAM",
-        "storage": "50 MB d'espace de travail",
-        "sleep": "Veille automatique après 1h d'inactivité",
+        "storage": "2 GB d'espace de travail",
+        "sleep": "Veille automatique après 12h d'inactivité",
         "features": [
-          "Llama 4 Scout sur Groq",
-          "BYOK = messages illimités",
-          "3 recherches web/jour",
+          "Modèles hébergés via OpenRouter",
+          "La recherche web utilise les AI Credits",
+          "Gestionnaire de fichiers + journaux complets inclus",
           "Toutes les intégrations (Telegram, Discord, Twitter, etc.)"
         ],
-        "missing": [
-          "Journaux, gestionnaire de fichiers disponibles en extension"
-        ]
+        "missing": []
       },
       "starter": {
         "agents": "1 agent inclus",
-        "messages": "50 messages/jour",
+        "messages": "3 000 AI Credits/mois",
         "cpu": "1 CPU",
         "ram": "1,5 GB RAM",
-        "storage": "150 MB d'espace de travail",
-        "sleep": "Veille automatique après 4h d'inactivité",
+        "storage": "10 GB d'espace de travail",
+        "sleep": "Toujours actif",
         "features": [
-          "BYOK = messages illimités",
-          "10 recherches web/jour",
+          "Modèles hébergés via OpenRouter",
+          "La recherche web utilise les AI Credits",
+          "Gestionnaire de fichiers + journaux complets inclus",
           "Toutes les intégrations"
         ],
-        "missing": [
-          "Journaux, gestionnaire de fichiers disponibles en extension"
-        ]
+        "missing": []
       },
       "pro": {
         "agents": "3 agents inclus",
-        "messages": "100 messages/jour",
+        "messages": "15 000 AI Credits/mois",
         "cpu": "1,5 CPU",
         "ram": "2 GB RAM",
-        "storage": "500 MB d'espace de travail",
-        "sleep": "Veille automatique après 12h d'inactivité",
+        "storage": "25 GB d'espace de travail",
+        "sleep": "Toujours actif",
         "features": [
-          "BYOK = messages illimités",
-          "50 recherches web/jour",
-          "Toutes les intégrations",
-          "Achetez Toujours actif par agent pour 24h/24"
+          "Modèles hébergés via OpenRouter",
+          "La recherche web utilise les AI Credits",
+          "Gestionnaire de fichiers + journaux complets inclus",
+          "Toutes les intégrations"
         ],
-        "missing": [
-          "Journaux, gestionnaire de fichiers disponibles en extension"
-        ]
+        "missing": []
       },
       "business": {
-        "agents": "10 agents inclus",
-        "messages": "300 messages/jour",
+        "agents": "5 agents inclus",
+        "messages": "40 000 AI Credits/mois",
         "cpu": "2 CPU",
         "ram": "3 GB RAM",
-        "storage": "1 GB d'espace de travail",
-        "sleep": "Toujours actif (pas de veille automatique)",
+        "storage": "50 GB d'espace de travail",
+        "sleep": "Toujours actif",
         "features": [
-          "BYOK = messages illimités",
-          "200 recherches web/jour",
+          "Modèles hébergés via OpenRouter",
+          "La recherche web utilise les AI Credits",
           "Gestionnaire de fichiers inclus",
           "Journaux complets inclus",
           "Support prioritaire",
@@ -639,27 +638,27 @@
         "missing": []
       },
       "founding_member": {
-        "agents": "10 agents inclus",
-        "messages": "300 messages/jour",
+        "agents": "5 agents inclus",
+        "messages": "25 000 AI Credits/mois",
         "cpu": "2 CPU",
-        "ram": "4 GB RAM",
-        "storage": "2 GB d'espace de travail",
-        "sleep": "Toujours actif (pas de veille automatique)",
+        "ram": "3 GB RAM",
+        "storage": "40 GB d'espace de travail",
+        "sleep": "Toujours actif",
         "features": [
           "$99 paiement unique — accès à vie",
-          "200 recherches web/jour",
+          "Modèles hébergés via OpenRouter",
+          "La recherche web utilise les AI Credits",
           "Gestionnaire de fichiers + journaux complets inclus",
           "Support prioritaire",
-          "Collaboration en équipe",
           "Toutes les intégrations",
-          "Badge fondateur"
+          "Rôle Discord fondateur + tag Telegram"
         ],
         "missing": []
       }
     },
     "addons": {
       "heading": "Extensions",
-      "subheading": "Personnalisez votre forfait. Cumulez les extensions sur n'importe quel forfait. Combinez selon vos besoins.",
+      "subheading": "Ajoutez des packs AI Credits ou des emplacements d'agents quand vous avez besoin de plus de capacité.",
       "annualDiscount": "15% de réduction annuelle",
       "groups": {
         "extraAgents": {
@@ -687,68 +686,38 @@
             }
           ]
         },
-        "extraMessages": {
-          "label": "Messages supplémentaires (compte)",
+        "aiCredits": {
+          "label": "AI Credits",
           "items": [
             {
-              "name": "+20 msg/jour",
-              "period": "/mois",
-              "description": "Cumulable"
+              "name": "5 000 AI Credits",
+              "period": "paiement unique",
+              "description": "Modèles hébergés et recherche web"
             },
             {
-              "name": "+50 msg/jour",
-              "period": "/mois",
-              "description": "Cumulable"
+              "name": "10 000 AI Credits",
+              "period": "paiement unique",
+              "description": "Exécutions de modèles plus lourdes"
             },
             {
-              "name": "+100 msg/jour",
-              "period": "/mois",
-              "description": "Cumulable"
+              "name": "25 000 AI Credits",
+              "period": "paiement unique",
+              "description": "Charges agent plus importantes"
             },
             {
-              "name": "+200 msg/jour",
-              "period": "/mois",
-              "description": "Cumulable"
-            }
-          ]
-        },
-        "extraSearches": {
-          "label": "Recherches supplémentaires (compte)",
-          "items": [
-            {
-              "name": "+25 recherches/jour",
-              "period": "/mois",
-              "description": "Cumulable"
-            },
-            {
-              "name": "+50 recherches/jour",
-              "period": "/mois",
-              "description": "Cumulable"
+              "name": "50 000 AI Credits",
+              "period": "paiement unique",
+              "description": "Usage hébergé à volume élevé"
             }
           ]
         },
         "perAgent": {
-          "label": "Par agent",
+          "label": "Plugins + compétences",
           "items": [
             {
-              "name": "Toujours actif",
-              "period": "/mois par agent",
-              "description": "Fonctionnement 24h/24"
-            },
-            {
-              "name": "Gestionnaire de fichiers",
-              "period": "paiement unique par agent",
-              "description": "Parcourir & modifier les fichiers"
-            },
-            {
-              "name": "Journaux complets",
-              "period": "/mois par agent",
-              "description": "Déverrouiller la visionneuse de journaux"
-            },
-            {
-              "name": "+10 plugins",
-              "period": "/mois par agent",
-              "description": "Emplacements de plugins supplémentaires"
+              "name": "Plugins inclus",
+              "period": "inclus",
+              "description": "Inclus sur chaque forfait"
             }
           ]
         }
@@ -758,7 +727,7 @@
       "heading": "Toutes les intégrations gratuites",
       "badge": "chaque forfait",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage et 14+ autres plateformes sont inclus gratuitement sur tous les forfaits. Sans frais supplémentaires, jamais.",
-      "note": "Tous les prix en USD, payables en SOL ou $HATCHER. BYOK (apportez votre propre clé) = messages illimités avec votre propre clé API LLM sur n'importe quel forfait."
+      "note": "Tous les prix en USD, payables par carte, SOL, USDC sur Solana ou $HATCHER. L'usage des modèles hébergés et de la recherche web est mesuré en AI Credits ; BYOK est payé directement avec votre propre clé fournisseur."
     },
     "compareTable": {
       "heading": "Comparer les forfaits",
@@ -767,9 +736,9 @@
       "onceSuffix": " paiement unique",
       "rows": {
         "agents": "Agents inclus",
-        "messages": "Messages/jour (compte)",
-        "searches": "Recherches web/jour",
-        "byok": "Messages BYOK",
+        "messages": "AI Credits/mois",
+        "searches": "Recherche web",
+        "byok": "Usage BYOK fournisseur",
         "cpuRam": "CPU / RAM",
         "storage": "Stockage",
         "autoSleep": "Veille automatique",
@@ -780,13 +749,13 @@
         "plugins": "Plugins + compétences",
         "integrations": "Toutes les intégrations",
         "byokKey": "BYOK (propre clé LLM)",
-        "defaultLlm": "LLM par défaut (Groq)"
+        "defaultLlm": "LLM par défaut (OpenRouter)"
       },
       "values": {
         "unlimited": "Illimité",
         "alwaysOn": "Toujours actif",
         "addon": "Extension",
-        "llama4Scout": "Llama 4 Scout"
+        "llama4Scout": "DeepSeek V4 Flash"
       }
     },
     "faq": {
@@ -794,11 +763,11 @@
       "items": [
         {
           "q": "Qu'est-ce que BYOK (Bring Your Own Key) ?",
-          "a": "BYOK vous permet d'utiliser votre propre clé API pour n'importe quel fournisseur LLM (OpenAI, Anthropic, Google, xAI, Groq, OpenRouter). C'est toujours gratuit sur tous les forfaits — vous payez le fournisseur directement, sans majoration Hatcher. Les messages avec votre propre clé sont illimités."
+          "a": "BYOK vous permet d'utiliser votre propre clé API pour tout fournisseur LLM pris en charge (OpenAI, Anthropic, Google, xAI, OpenRouter, et plus). C'est toujours gratuit sur tous les forfaits — vous payez le fournisseur directement, sans majoration Hatcher. Hatcher ne mesure pas l'utilisation BYOK avec des AI Credits."
         },
         {
           "q": "Comment fonctionnent les extensions ?",
-          "a": "Les extensions sont cumulables sur n'importe quel forfait. Par exemple, si vous êtes sur le forfait Starter (1 agent) et achetez une extension +3 agents, vous pouvez exécuter 4 agents au total. Vous pouvez cumuler plusieurs extensions."
+          "a": "Les packs AI Credits sont des recharges ponctuelles pour les modèles hébergés et la recherche web. Les emplacements d'agents supplémentaires augmentent la capacité séparément."
         },
         {
           "q": "Quelle est la différence entre les ressources partagées et dédiées ?",
@@ -806,7 +775,7 @@
         },
         {
           "q": "Quels modes de paiement sont acceptés ?",
-          "a": "Vous pouvez payer en SOL ou en $HATCHER. Les prix sont affichés en USD et convertis aux taux en temps réel via Jupiter."
+          "a": "Vous pouvez payer par carte, SOL, USDC sur Solana ou $HATCHER. Les prix crypto sont affichés en USD et convertis aux taux en temps réel via Jupiter."
         },
         {
           "q": "Puis-je rétrograder mon forfait ?",
@@ -814,15 +783,15 @@
         },
         {
           "q": "Qu'est-ce que la veille automatique ?",
-          "a": "Les agents gratuits passent en veille après 1 heure d'inactivité, Starter après 4 heures, Pro après 12 heures. Les agents Business et Membre fondateur sont toujours actifs sans veille automatique. Ils se réveillent instantanément au prochain message. Vous pouvez ajouter Toujours actif à n'importe quel agent pour 7,99$/mois."
+          "a": "Les agents gratuits passent en veille après 12 heures d'inactivité. Les agents Starter, Pro, Business et Membre fondateur restent toujours actifs sans veille automatique."
         },
         {
           "q": "Quel LLM est inclus dans le forfait gratuit ?",
-          "a": "Les forfaits Gratuit et Starter utilisent GPT-OSS 20B sur Groq. Les forfaits Pro, Business et Membre fondateur bénéficient de Llama 3.3 70B sur Groq — un modèle plus performant. Les limites de messages sont par compte : Gratuit 20/jour, Starter 50/jour, Pro 100/jour, Business 300/jour, Fondateur 300/jour. BYOK (apportez votre propre clé LLM) contourne toutes les limites sur n'importe quel forfait."
+          "a": "L'usage hébergé passe par OpenRouter et consomme votre solde d'AI Credits. Vous pouvez choisir parmi les modèles hébergés pris en charge ; BYOK contourne la mesure Hatcher en AI Credits parce que vous payez directement votre fournisseur."
         },
         {
           "q": "Qu'est-ce que le forfait Membre fondateur ?",
-          "a": "Membre fondateur est un paiement unique de 99$ qui vous donne un accès à vie à Hatcher : 10 agents, 300 messages/jour, 4 GB RAM, 2 GB d'espace de travail, toujours actif, et toutes les fonctionnalités premium (gestionnaire de fichiers, journaux complets, support prioritaire) incluses. Aucun frais mensuel, jamais. Limité à 20 places — une fois parties, ce forfait disparaît."
+          "a": "Membre fondateur est un paiement unique de 99$ qui vous donne un accès à vie à Hatcher : 5 agents, 25 000 AI Credits mensuels, 2 CPU / 3 GB RAM, 40 GB d'espace de travail, agents toujours actifs, gestionnaire de fichiers, journaux complets, support prioritaire et rôle Discord fondateur + tag Telegram. Aucun frais mensuel, jamais. Limité à 20 places — une fois parties, ce forfait disparaît."
         }
       ]
     },
@@ -834,11 +803,11 @@
     },
     "cta": {
       "heading": "Prêt à déployer votre agent ?",
-      "body": "Choisissez votre framework, sélectionnez un modèle et déployez en quelques secondes. Commencez gratuitement avec un LLM intégré. Montez en puissance quand vous en avez besoin.",
+      "body": "Décrivez l'agent souhaité et déployez en quelques secondes. Commencez gratuitement avec des AI Credits hébergés. Montez en puissance quand vous en avez besoin.",
       "createAgent": "Créer un agent",
       "seeFrameworks": "Voir les frameworks"
     },
-    "footerNote": "Tous les prix en USD, payables en SOL ou $HATCHER. BYOK (apportez votre propre clé) = messages illimités avec votre propre clé API LLM sur n'importe quel forfait."
+    "footerNote": "Tous les prix en USD, payables par carte, SOL, USDC sur Solana ou $HATCHER. L'usage des modèles hébergés et de la recherche web est mesuré en AI Credits ; BYOK est payé directement au fournisseur."
   },
   "dashboard": {
     "common": {
@@ -872,7 +841,7 @@
       "frameworkAll": "Tous les frameworks",
       "sortNewest": "Plus récents",
       "sortAZ": "A-Z",
-      "sortMessages": "Plus de messages",
+      "sortMessages": "Most Active",
       "sortActive": "Dernière activité",
       "emptyTitle": "Aucun agent pour l'instant",
       "emptyDescription": "Créez votre premier agent IA et déployez-le en 60 secondes.",
@@ -891,31 +860,19 @@
       "tourFilterTitle": "Filtrer par framework",
       "tourFilterDescription": "OpenClaw ou Hermes — chacun a ses points forts.",
       "tourSearchTitle": "Rechercher & explorer",
-      "tourSearchDescription": "Recherchez des agents ou parcourez 200+ modèles pour démarrer rapidement.",
+      "tourSearchDescription": "Recherchez des agents ou lancez Chat-to-Hatch pour démarrer rapidement.",
       "tourPlanTitle": "Votre forfait",
-      "tourPlanDescription": "Commencez gratuitement avec 1 agent et 20 messages/jour. Évoluez à tout moment.",
+      "tourPlanDescription": "Commencez gratuitement avec 1 agent, des AI Credits et les outils inclus. Évoluez à tout moment.",
       "statTotal": "Total",
       "statActive": "Actifs",
       "statSleeping": "En veille",
-      "msgsShort": "msgs",
+      "msgsShort": "interactions",
       "cardOpen": "Salle 3D",
       "cardOpenTooltip": "Entrer dans la salle 3D",
       "actionStop": "Arrêter",
       "actionStart": "Démarrer",
       "actionRestart": "Redémarrer",
       "noResultsAction": "Effacer les filtres"
-    },
-    "newAgent": {
-      "eyebrow": "Nouvel agent",
-      "heading": "Choisissez un modèle",
-      "subheading": "Partez d'un modèle préconfiguré ou construisez de zéro. Chaque modèle est fourni avec une personnalité, un prompt système et des intégrations suggérées.",
-      "searchPlaceholder": "Rechercher des modèles...",
-      "allTemplates": "Tous les modèles",
-      "startFromScratch": "Partir de zéro",
-      "startFromScratchDesc": "Contrôle total sur chaque paramètre",
-      "noTemplatesTitle": "Aucun modèle trouvé",
-      "noTemplatesDesc": "Essayez une autre recherche ou catégorie.",
-      "footerHint": "Tous les modèles sont entièrement personnalisables après déploiement — changez le nom, le prompt système, le modèle et les intégrations à tout moment."
     },
     "billing": {
       "eyebrow": "Compte",
@@ -928,9 +885,9 @@
       "disconnect": "Déconnecter",
       "loadingBilling": "Chargement de la facturation...",
       "signInDescription": "Connectez-vous pour gérer votre forfait et votre facturation.",
-      "creditsBalance": "Solde de crédits",
-      "creditsUsd": "USD",
-      "creditsDesc": "Les crédits peuvent être utilisés pour les abonnements, les extensions et l'utilisation LLM hébergée.",
+      "creditsBalance": "Solde AI Credits",
+      "creditsUsd": "AI Credits",
+      "creditsDesc": "Les AI Credits sont utilisés pour les LLM hébergés, la recherche web, research, extract et crawl.",
       "recentTransactions": "Transactions récentes",
       "currentTier": "Forfait actuel",
       "freeTier": "Forfait gratuit",
@@ -956,17 +913,17 @@
       "lifetimePrice": "à vie",
       "lifetimePriceFull": "${price} à vie",
       "monthlyPrice": "${price} / 30 jours",
-      "unlimitedMessages": "illimité",
-      "messagesPerDay": "{count} messages/jour",
-      "byokUnlimited": " (BYOK = illimité)",
+      "unlimitedMessages": "AI Credits",
+      "messagesPerDay": "{count} AI Credits",
+      "byokUnlimited": "",
       "upgradeSection": "Améliorer votre forfait",
-      "upgradeDesc": "Obtenez plus d'agents, de messages et de puissance de calcul.",
+      "upgradeDesc": "Obtenez plus d'agents, d'AI Credits et de puissance de calcul.",
       "addonsSection": "Extensions",
       "addonsDesc": "Ajoutez de la capacité à votre forfait actuel.",
       "accountAddons": "Extensions au niveau du compte",
       "perAgentAddons": "Extensions par agent",
       "annualBilling": "Facturation annuelle",
-      "annualBillingDesc": "15% de réduction — toutes les extensions d'abonnement",
+      "annualBillingDesc": "15% de réduction — extras récurrents",
       "monthly": "Mensuel",
       "annual": "Annuel",
       "monthSuffix": "/ 30 jours",
@@ -985,23 +942,16 @@
       "choosePayment": "Choisir le mode de paiement",
       "applyToAgent": "Appliquer à l'agent :",
       "noAgentsFound": "Aucun agent trouvé. Créez d'abord un agent.",
-      "payWithCredits": "Payer avec des crédits",
       "payWithSol": "Payer avec SOL",
       "solDesc": "Paiement par portefeuille Solana",
       "payWithHatcher": "Payer avec $HATCHER",
       "hatcherDesc": "Token HATCHER sur Solana",
-      "payWithSkaleUsdc": "Payer avec USDC sur SKALE",
-      "skaleUsdcDesc": "Règlement x402 rapide via portefeuille EVM",
-      "payWithBaseUsdc": "Payer avec USDC sur Base",
-      "baseUsdcDesc": "USDC natif via portefeuille EVM",
       "payWithUsdcSolana": "Payer avec USDC sur Solana",
       "usdcSolanaDesc": "SPL USDC via portefeuille Solana",
       "payWithUsdc": "Payer avec USDC",
       "usdcDesc": "Stablecoin — 1 USDC = 1$",
       "payWithCard": "Payer par carte",
       "cardDesc": "Carte de crédit/débit via Stripe",
-      "creditAvailable": "${balance} disponible — instantané",
-      "creditInsufficient": "Insuffisant — besoin de ${need}, vous avez ${have}",
       "foundingSlots": "{remaining} sur {max} emplacements restants",
       "foundingSoldOut": "Épuisé",
       "oneTimeSuffix": "paiement unique",
@@ -1014,28 +964,42 @@
     },
     "analytics": {
       "eyebrow": "Tableau de bord",
-      "heading": "Analytiques",
-      "subheading": "Aperçu de l'utilisation de tout le compte.",
+      "heading": "Analytiques d'utilisation",
+      "subheading": "Interactions, usage hébergé et AI Credits pour tout le compte.",
       "signInDescription": "Connectez-vous pour voir les analytiques.",
-      "messageVolume": "Volume de messages",
+      "interactionVolume": "Volume d'interactions",
+      "messageVolume": "Volume d'interactions",
       "last14Days": "14 derniers jours",
+      "last30Days": "30 derniers jours",
       "frameworks": "Frameworks",
       "agentStatus": "Statut des agents",
-      "totalMessages": "Total des messages par agent",
-      "noMessageData": "Aucune donnée de message pour l'instant — commencez à discuter avec vos agents !",
+      "totalMessages": "Interactions par agent",
+      "noMessageData": "Aucune donnée d'interaction pour l'instant — commencez à discuter avec vos agents !",
       "noAgentsYet": "Aucun agent pour l'instant",
       "noAgentsEmpty": "Aucun agent pour l'instant. Créez votre premier agent pour commencer à voir les analytiques.",
       "createAgent": "Créer un agent",
       "totalAgents": "Total des agents",
       "totalAgentsSub": "{active} actifs",
-      "messages": "Messages",
+      "messages": "Interactions",
       "messagesAllTime": "Depuis toujours",
       "llmCalls": "Appels LLM",
       "llmCallsAllTime": "Depuis toujours",
+      "aiCreditsBalance": "AI Credits",
+      "monthlyGrant": "{count} allocation mensuelle",
+      "aiCreditsUsed": "AI Credits utilisés",
+      "hostedUsage": "Usage hébergé",
+      "hostedUsageSubheading": "Les LLM hébergés, la recherche web, research, extract et crawl consomment les AI Credits du compte. BYOK contourne ce compteur.",
+      "remainingBalance": "Solde restant",
+      "usedLast30": "Utilisés sur 30 jours",
+      "usageByKind": "Usage par type",
+      "tokensProcessed": "Tokens traités",
+      "inputTokens": "Entrée",
+      "outputTokens": "Sortie",
+      "noHostedUsageYet": "Aucun usage hébergé pour l'instant. BYOK ne consomme pas d'AI Credits.",
       "last14DaysLabel": "14 derniers jours",
-      "last14DaysSub": "Messages utilisateurs",
+      "last14DaysSub": "Interactions utilisateur",
       "today": "Aujourd'hui",
-      "noDataYet": "Aucune donnée de message pour l'instant"
+      "noDataYet": "Aucune donnée d'interaction pour l'instant"
     },
     "team": {
       "eyebrow": "Collaboration",
@@ -1135,12 +1099,12 @@
       "payoutSettings": "Paramètres de versement",
       "payoutMode": "Mode",
       "payoutAddress": "Adresse de versement",
-      "creditsOnly": "Crédits uniquement — aucune adresse",
+      "creditsOnly": "Adresse requise pour le versement en espèces",
       "changePrefs": "Besoin de modifier vos préférences de versement ?",
       "contactSupport": "Contacter le support",
       "modeCashOnly": "Espèces uniquement (20%)",
-      "modeCreditsOnly": "Crédits uniquement (40%)",
-      "modeHybrid": "Hybride (15% espèces + 25% crédits)"
+      "modeCreditsOnly": "Retiré",
+      "modeHybrid": "Retiré"
     },
     "settings": {
       "eyebrow": "Compte",
@@ -1172,7 +1136,7 @@
         "walletDisconnect": "Déconnecter le portefeuille",
         "walletNone": "Aucun portefeuille lié pour l'instant. Votre portefeuille Solana se connecte automatiquement la première fois que vous effectuez un paiement on-chain depuis la page de facturation.",
         "referralTitle": "Programme de parrainage",
-        "referralDesc": "Invitez des amis sur Hatcher. Vous recevez tous les deux {credit} de crédit lorsqu'ils créent leur premier agent.",
+        "referralDesc": "Invitez des amis sur Hatcher. Vous recevez tous les deux {credit} lorsqu'ils créent leur premier agent.",
         "referralCode": "Code de parrainage",
         "shareLink": "Partager le lien",
         "referred": "Parrainé(s)",
@@ -1272,9 +1236,9 @@
     },
     "quickStats": {
       "totalAgents": "Total des agents",
-      "dailyMessages": "Messages quotidiens",
+      "dailyMessages": "AI Credits",
       "unlimited": "∞",
-      "accountWide": "par compte · BYOK = illimité",
+      "accountWide": "account balance",
       "activeNow": "Actifs maintenant",
       "noAgentsRunning": "Aucun agent en cours d'exécution",
       "agentsOnline": "{count} agent en ligne",
@@ -1361,7 +1325,7 @@
         "unlimited": "illimité",
         "enterToSend": "Entrée pour envoyer, Shift+Entrée pour nouvelle ligne",
         "signInToChat": "Connectez-vous pour discuter avec cet agent.",
-        "limitReached": "Limite quotidienne de messages atteinte.",
+        "limitReached": "AI Credits épuisés.",
         "upgradeToPro": "Passer à Pro",
         "limitReachedSuffix": "pour plus, ou apportez votre propre clé pour un accès illimité.",
         "agentNotRunning": "L'agent ne fonctionne pas.",
@@ -1373,7 +1337,7 @@
         "stopRecording": "Arrêter l'enregistrement",
         "startVoice": "Démarrer la saisie vocale",
         "errors": {
-          "rateLimit": "Limite quotidienne de messages atteinte.",
+          "rateLimit": "AI Credits épuisés.",
           "llmDown": "Le service IA est temporairement indisponible. Cela se résout généralement en une minute.",
           "timeout": "L'agent a mis trop de temps à répondre.",
           "network": "Connexion perdue. Vérifiez votre connexion Internet.",
@@ -1468,9 +1432,9 @@
         "autoScrollDisabled": "Défilement automatique désactivé",
         "fullLogsGate": {
           "title": "Affichage des {count} dernières lignes",
-          "description": "Cet agent a {total} entrées au total. Débloquez les journaux complets pour parcourir l'historique complet et exporter chaque ligne.",
-          "descriptionEmpty": "Débloquez les journaux complets pour cet agent afin de garder toutes les entrées disponibles au-delà des {count} dernières lignes.",
-          "unlock": "Débloquer"
+          "description": "Les journaux complets sont inclus dans chaque forfait. Rechargez l'agent si l'historique complet reste indisponible.",
+          "descriptionEmpty": "Les journaux complets sont inclus dans chaque forfait. Rechargez l'agent si l'historique complet reste indisponible.",
+          "unlock": "Recharger"
         }
       },
       "integrations": {
@@ -1623,7 +1587,7 @@
         "source": "Source",
         "requiresRestart": "Nécessite un redémarrage",
         "refresh": "Actualiser",
-        "limitReached": "Limite de plugins atteinte. Améliorez votre forfait ou ajoutez un addon plugin."
+        "limitReached": "Plugins et compétences sont inclus sur chaque forfait."
       },
       "workflows": {
         "new": "Nouveau workflow",
@@ -1649,7 +1613,7 @@
         "delete": "Supprimer",
         "download": "Télécharger",
         "refresh": "Actualiser",
-        "locked": "Le gestionnaire de fichiers nécessite le forfait Business ou l'addon Gestionnaire de fichiers.",
+        "locked": "Le gestionnaire de fichiers est inclus dans chaque forfait. Rechargez l'agent si l'accès reste bloqué.",
         "unlock": "Débloquer"
       },
       "workspace": {
@@ -1733,7 +1697,7 @@
     },
     "analytics": {
       "heading": "Analytiques de l'agent",
-      "messages": "Messages",
+      "messages": "Interactions",
       "daysActive": "Jours d'activité",
       "uptime": "Disponibilité",
       "status": "Statut",
@@ -1756,7 +1720,7 @@
     "statusPage": {
       "poweredBy": "Propulsé par",
       "uptimeLabel": "Disponibilité 24h",
-      "messages": "Messages",
+      "messages": "Interactions",
       "days": "Jours",
       "since": "Depuis",
       "framework": "framework",
@@ -1806,8 +1770,8 @@
     "configRef": "Référence de configuration complète →",
     "docsSuffix": "docs",
     "llmSupport": "Support LLM",
-    "llmSubheading": "Tous les frameworks prennent en charge BYOK (apportez votre propre clé) pour des messages illimités. Sur le LLM hébergé, chaque forfait utilise Llama 4 Scout (17B) sur Groq — la fiabilité des appels d'outils et la latence sont identiques sur Gratuit, Starter, Pro, Business et Membre fondateur. Seul le quota de messages quotidien change par forfait.",
-    "byokNote": "* BYOK toujours gratuit — messages illimités sur n'importe quel framework.",
+    "llmSubheading": "Tous les frameworks prennent en charge BYOK pour une utilisation payée directement au fournisseur. Les LLM hébergés passent par OpenRouter avec DeepSeek V4 Flash par défaut et utilisent des AI Credits.",
+    "byokNote": "* BYOK toujours gratuit — utilisation payée directement au fournisseur.",
     "byokSetupLink": "Voir le guide de configuration BYOK →",
     "decisionGuide": "Guide de décision rapide",
     "readyCta": "Prêt à déployer ?",
@@ -1851,7 +1815,7 @@
     "trading": "Trading",
     "contractLabel": "Contrat",
     "platformLabel": "Plateforme",
-    "platformValue": "Forfait gratuit disponible maintenant — le token active les forfaits payants et les extensions",
+    "platformValue": "Forfait gratuit disponible maintenant — le token active les forfaits payants et les extras",
     "stayInLoop": "Restez informé",
     "stayInLoopBody": "Le token est en ligne et la plateforme est prête. Déployez votre premier agent en quelques minutes.",
     "followOnX": "Suivre sur X"
@@ -1953,312 +1917,6 @@
     "footerNote": "Les raccourcis sont désactivés lors de la saisie dans des champs texte. Sur macOS, utilisez Cmd au lieu de Ctrl."
   },
   "create": {
-    "eyebrow": "Créer un agent",
-    "heading": "Créer votre agent",
-    "subheading": "Lancez un agent IA gratuit en moins de 2 minutes.",
-    "stepsAriaLabel": "Étapes de création",
-    "stepLabels": {
-      "style": "Style",
-      "category": "Catégorie",
-      "template": "Modèle",
-      "setUp": "Configuration",
-      "launch": "Lancer"
-    },
-    "authLoading": "Authentification...",
-    "authRequired": "Créer votre agent",
-    "authRequiredBody": "Connectez-vous pour créer et déployer des agents IA.",
-    "signIn": "Se connecter",
-    "back": "Retour",
-    "continue": "Suivant",
-    "step1Heading": "Quel type d'agent souhaitez-vous ?",
-    "step1Subheading": "Chaque framework a ses forces — choisissez celui qui convient.",
-    "step2Heading": "Quel type d'agent ?",
-    "step2Subheading": "Choisissez une catégorie — nous vous montrerons les meilleurs modèles",
-    "searchTemplates": "Rechercher parmi 200+ modèles...",
-    "clearSearch": "Effacer la recherche",
-    "noTemplatesFound": "Aucun modèle trouvé pour \"{query}\"",
-    "clearSearchLink": "Effacer la recherche",
-    "categoryCount": "{count} modèles",
-    "step3Heading": "Choisir un modèle",
-    "step3Subheading": "Choisissez un modèle — tout est personnalisable à l'étape suivante",
-    "customAgent": "Agent personnalisé",
-    "customAgentDesc": "Partir de zéro avec votre propre invite système",
-    "customOption": "Partir de zéro",
-    "customOptionDesc": "Contrôle total sur chaque paramètre",
-    "step4Heading": "Personnaliser votre agent",
-    "step4Subheading": "Donnez un nom à votre agent et choisissez son mode de réflexion",
-    "agentNameLabel": "Nom de l'agent",
-    "agentNamePlaceholder": "ex. AlphaResearcher, TweetLord...",
-    "agentNameHintCount": "{count}/50 caractères",
-    "agentNameTooShort": "Le nom doit comporter au moins 3 caractères",
-    "agentNameInvalidChars": "Seuls lettres, chiffres, espaces, tirets, deux-points, apostrophes autorisés",
-    "descriptionLabel": "Description",
-    "descriptionPlaceholder": "Brève description de votre agent...",
-    "descriptionHint": "Accroche courte pour votre agent",
-    "platformsHeading": "Où votre agent doit-il vivre ?",
-    "platformsSubheading": "Sélectionnez les plateformes et ajoutez vos clés API. Ajout possible plus tard dans les Paramètres.",
-    "noPlatformsNote": "Aucune plateforme ? Pas de problème — ajoutez-en depuis l'onglet Paramètres.",
-    "hideValue": "Masquer la valeur",
-    "showValue": "Afficher la valeur",
-    "llmModelLabel": "Modèle IA",
-    "llmModelAria": "Sélection du modèle IA",
-    "llmFreeLabel": "Modèle IA gratuit",
-    "llmFreeTag": "GRATUIT",
-    "llmFreeSubtext": "Propulsé par Groq — aucune clé API requise",
-    "llmByokLabel": "Utiliser votre propre clé IA",
-    "llmByokTag": "toujours gratuit",
-    "llmByokSubtext": "Connectez votre propre clé API OpenAI, Anthropic ou autre",
-    "byokProviderLabel": "Fournisseur",
-    "byokModelLabel": "Modèle",
-    "byokModelPlaceholder": "identifiant du modèle...",
-    "byokBackToList": "Retour à la liste",
-    "byokSelectModel": "Choisir un modèle...",
-    "byokCustomModel": "Modèle personnalisé...",
-    "byokApiKeyLabel": "Clé API",
-    "byokApiKeyEncrypted": "chiffrée au repos",
-    "byokBaseUrlLabel": "URL de base",
-    "skillsHeading": "Compétences de l'agent",
-    "skillsSubheading": "Choisissez ce que votre agent peut faire",
-    "toolsHeading": "Outils de l'agent",
-    "toolsSubheading": "Choisissez ce que votre agent peut faire",
-    "pluginsHeading": "Plugins",
-    "pluginsSubheading": "Choisissez ce que votre agent peut faire",
-    "capabilitiesHeading": "Capacités",
-    "capabilitiesSubheading": "Choisissez ce que votre agent peut faire",
-    "templateSkillsHeading": "Inclus dans ce modèle",
-    "templateSkillsSubheading": "Ces compétences ClawHub s'installent automatiquement au premier démarrage.",
-    "systemPromptLabel": "Invite système",
-    "systemPromptCustomNote": "Vos instructions personnalisées remplaceront le modèle par défaut",
-    "systemPromptDefaultNote": "La personnalité de votre agent est préconfigurée. Personnalisez si vous souhaitez la modifier.",
-    "systemPromptCustomize": "Personnaliser",
-    "systemPromptUseDefault": "Utiliser le modèle par défaut",
-    "systemPromptPlaceholder": "Rédigez ici votre invite système. Remplace entièrement le modèle par défaut.",
-    "systemPromptHint": "Définit la personnalité, les capacités et les règles de l'agent",
-    "systemPromptCount": "{count}/8000",
-    "systemPromptWarning": "Ajoutez une invite système pour de meilleurs résultats",
-    "moreOptionsLabel": "Plus d'options",
-    "moreOptionsHints": {
-      "openclaw": "Recherche, voix, sessions",
-      "hermes": "Personnalité, mémoire, approbations"
-    },
-    "sessionScopeLabel": "Portée de session",
-    "sessionScopeHint": "Comment le contexte de conversation est partagé entre les utilisateurs",
-    "sessionScopePerUser": "Par utilisateur",
-    "sessionScopeGlobal": "Global",
-    "webSearchLabel": "Activer la recherche web",
-    "webSearchHint": "Permettre à l'agent de chercher des infos en temps réel",
-    "searchProviderLabel": "Fournisseur de recherche",
-    "searchProviderHint": "Quelle API de recherche utiliser",
-    "ttsLabel": "Activer la voix (TTS)",
-    "ttsHint": "Sortie texte-vers-parole pour les réponses vocales",
-    "ttsProviderLabel": "Fournisseur TTS",
-    "ttsProviderHint": "Moteur de synthèse vocale",
-    "hermesPersonalityLabel": "Personnalité",
-    "hermesPersonalityHint": "Ton et style de conversation",
-    "hermesPersonalityDefault": "Par défaut",
-    "hermesPersonalityHelpful": "Serviable",
-    "hermesPersonalityTechnical": "Technique",
-    "hermesPersonalityCreative": "Créatif",
-    "hermesPersonalityConcise": "Concis",
-    "memoryLabel": "Activer la mémoire",
-    "memoryHint": "Conserver le contexte entre les conversations",
-    "approvalModeLabel": "Mode d'approbation",
-    "approvalModeHint": "Comment les actions sont autorisées avant exécution",
-    "approvalModeAuto": "Automatique",
-    "approvalModeAsk": "Demander avant d'agir",
-    "approvalModeManual": "Manuel",
-    "databaseLabel": "Base de données",
-    "databaseHint": "Backend de stockage pour l'état et la mémoire de l'agent",
-    "imageGenLabel": "Activer la génération d'images",
-    "imageGenHint": "Permettre à l'agent de générer des images",
-    "voiceLabel": "Activer la voix",
-    "voiceHint": "Capacités parole-vers-texte et texte-vers-parole",
-    "localFirstLabel": "Mode local en priorité",
-    "localFirstHint": "Traiter les données localement avant synchronisation",
-    "step5Heading": "Prêt à lancer ?",
-    "step5Subheading": "Vérifiez votre configuration avant de lancer",
-    "summaryAgentType": "Type d'agent",
-    "summaryTemplate": "Modèle",
-    "summaryTemplateCustom": "Personnalisé",
-    "summaryAiModel": "Modèle IA",
-    "summaryDescription": "Description",
-    "summaryPlatforms": "Plateformes",
-    "summaryPersonality": "Personnalité",
-    "summaryPersonalityDefault": "Modèle par défaut",
-    "summaryPersonalityCustom": "Instructions personnalisées",
-    "summaryCost": "Coût",
-    "summaryCostFree": "$0.00 — gratuit",
-    "summaryCostByok": "$0.00 — clé personnelle",
-    "summaryLaunchIncludes": "Après le lancement",
-    "summaryLaunchIncludesValue": "Tableau de bord, chat, mail, notifications",
-    "summaryFrameworkLabels": {
-      "openclaw": "Assistant multi-compétences",
-      "hermes": "Agent autonome"
-    },
-    "testChatLabel": "Tester votre agent",
-    "testChatSubtext": "Aperçu des réponses de l'agent",
-    "testChatPreviewLabel": "Aperçu du chat",
-    "testChatSimulated": "Aperçu simulé. Déployez l'agent pour de vraies conversations.",
-    "testChatEmpty": "Envoyez un message pour prévisualiser l'agent",
-    "testChatEmptyHint": "Essayez \"Bonjour\" ou \"Que pouvez-vous faire ?\"",
-    "testChatPlaceholder": "Tapez un message...",
-    "launchedHeading": "Votre agent est en ligne !",
-    "launchedSubtext": "Redirection vers le tableau de bord de l'agent...",
-    "launchCtaLabel": "Lancer l'agent",
-    "launchCtaCreating": "Création de l'agent...",
-    "launchCtaCreated": "Agent créé avec succès",
-    "launchCta": "Lancer mon agent !",
-    "launching": "Éclosion...",
-    "launched": "Éclos !",
-    "frameworkFeatures": {
-      "openclaw": {
-        "desc": "Assistant IA polyvalent avec des milliers de compétences communautaires et messagerie multi-canal.",
-        "f1": "Des milliers de compétences",
-        "f2": "Navigation web",
-        "f3": "Tâches planifiées"
-      },
-      "hermes": {
-        "desc": "Agent IA intelligent qui mémorise le contexte entre les conversations et apprend au fil du temps.",
-        "f1": "Mémoire à long terme",
-        "f2": "40+ outils intégrés",
-        "f3": "Auto-amélioration"
-      }
-    },
-    "skills": {
-      "webSearch": {
-        "name": "Recherche web",
-        "desc": "Chercher des infos en temps réel"
-      },
-      "calculator": {
-        "name": "Calculatrice",
-        "desc": "Calculs mathématiques"
-      },
-      "weather": {
-        "name": "Météo",
-        "desc": "Prévisions météo"
-      },
-      "codeInterpreter": {
-        "name": "Exécution code",
-        "desc": "Exécuter des extraits de code"
-      },
-      "fileManager": {
-        "name": "Gestionnaire fichiers",
-        "desc": "Lire et écrire des fichiers"
-      },
-      "imageGen": {
-        "name": "Génération d'images",
-        "desc": "Générer des images à partir de texte"
-      }
-    },
-    "tools": {
-      "webSearch": {
-        "name": "Recherche web",
-        "desc": "Rechercher des informations sur internet"
-      },
-      "calculator": {
-        "name": "Calculatrice",
-        "desc": "Calculs mathématiques"
-      },
-      "codeExecution": {
-        "name": "Exécution code",
-        "desc": "Exécuter des extraits de code"
-      },
-      "fileOperations": {
-        "name": "Opérations fichiers",
-        "desc": "Lire et écrire des fichiers"
-      },
-      "memory": {
-        "name": "Mémoire",
-        "desc": "Retenir conversations et faits"
-      },
-      "summarize": {
-        "name": "Résumeur",
-        "desc": "Résumer des textes longs"
-      },
-      "translate": {
-        "name": "Traducteur",
-        "desc": "Traduire entre langues"
-      },
-      "weather": {
-        "name": "Météo",
-        "desc": "Prévisions météo"
-      }
-    },
-    "plugins": {
-      "database": {
-        "name": "Base de données",
-        "desc": "Accès base de données SQL"
-      },
-      "imageGen": {
-        "name": "Génération d'images",
-        "desc": "Générer des images"
-      },
-      "video": {
-        "name": "Vidéo",
-        "desc": "Traitement vidéo"
-      },
-      "tts": {
-        "name": "Texte-vers-parole",
-        "desc": "Sortie vocale"
-      },
-      "nodeRuntime": {
-        "name": "Runtime Node",
-        "desc": "Opérations côté serveur"
-      },
-      "bootstrap": {
-        "name": "Bootstrap",
-        "desc": "Utilitaires essentiels"
-      }
-    },
-    "capabilities": {
-      "chat": {
-        "name": "Chat",
-        "desc": "Conversation principale"
-      },
-      "defi": {
-        "name": "DeFi",
-        "desc": "Interactions protocoles DeFi"
-      },
-      "social": {
-        "name": "Social",
-        "desc": "Intégration réseaux sociaux"
-      },
-      "analysis": {
-        "name": "Analyse",
-        "desc": "Analyse de données"
-      },
-      "privacy": {
-        "name": "Confidentialité",
-        "desc": "Outils de confidentialité"
-      },
-      "memes": {
-        "name": "Mèmes",
-        "desc": "Génération de mèmes"
-      }
-    },
-    "platforms": {
-      "telegram": {
-        "desc": "Déployer comme bot Telegram",
-        "helperField": "Telegram → @BotFather → /newbot → copier le token"
-      },
-      "discord": {
-        "desc": "Déployer comme bot Discord",
-        "helperField": "Portail développeurs Discord → Nouvelle app → Bot → Copier le token"
-      },
-      "whatsapp": {
-        "desc": "Connexion via QR code",
-        "note": "Couplage QR disponible après déploiement"
-      },
-      "slack": {
-        "desc": "Déployer dans l'espace Slack",
-        "helperField": "Slack API → Créer app → OAuth et permissions → Bot Token"
-      },
-      "twitter": {
-        "desc": "Publier, répondre et interagir sur X"
-      }
-    },
-    "llmFreeSummary": "Modèle IA gratuit (Groq)",
-    "llmByokSummary": "Votre clé : {provider}{model}",
     "errorHeading": "Erreur de création",
     "errorBody": "Une erreur s'est produite lors de la configuration de votre agent. Votre progression n'a pas été perdue.",
     "errorIdLabel": "ID d'erreur :",
@@ -2312,12 +1970,12 @@
   "affiliate": {
     "eyebrow": "Programme d'affiliation",
     "heading": "Gagnez sur chaque utilisateur que vous amenez à Hatcher.",
-    "subheading": "Jusqu'à 40% de commissions récurrentes sur chaque utilisateur payant que vous parrainez. Espèces dans votre portefeuille, crédits pour financer vos propres agents, ou un partage hybride — à vous de choisir. L'attribution est basée sur le lien et s'applique pour la durée de vie du compte parrainé.",
+    "subheading": "Gagnez 20% de commissions récurrentes en espèces sur chaque utilisateur payant que vous parrainez. L'attribution est basée sur le lien et s'applique pour la durée de vie du compte parrainé.",
     "applyNowCta": "Candidater maintenant",
     "howItWorksLink": "Comment ça marche",
-    "pickYourPayout": "Choisissez votre versement",
-    "threeWays": "Trois façons d'être payé.",
-    "threeWaysSubheading": "Mêmes revenus éligibles, répartition différente. Choisissez le mode qui correspond à la valeur que vous voulez tirer du programme — vous pouvez changer en contactant le support.",
+    "pickYourPayout": "Structure de commission",
+    "threeWays": "Commissions en espèces, registre simple.",
+    "threeWaysSubheading": "Les gains d'affiliation sont uniquement en espèces : 20% récurrents sur les revenus éligibles, avec une retenue de 30 jours avant paiement.",
     "popularLabel": "Populaire",
     "foundingBonusLabel": "Bonus membre fondateur",
     "foundingBonusHeading": "Parrainer un membre fondateur → bonus fixe de 20$ en espèces.",
@@ -2384,7 +2042,7 @@
       "validateUrlInvalid": "Doit être une URL valide",
       "validatePitchMin": "La présentation doit comporter au moins 50 caractères",
       "validatePitchMax": "La présentation doit comporter au plus 2000 caractères",
-      "validateAddressRequired": "Requis pour CASH_ONLY et HYBRID",
+      "validateAddressRequired": "Requis pour les versements d'affiliation en espèces",
       "validateAddressFormat": "Doit être une adresse Solana base58 valide (32 à 44 caractères)",
       "slugTooShort": "Trop court — minimum 3 caractères",
       "slugTooLong": "Trop long — maximum 30 caractères",
@@ -2461,23 +2119,23 @@
     "tiers": {
       "free": {
         "name": "Gratuit",
-        "description": "1 agent, 20 messages/jour, 50 MB de stockage"
+        "description": "1 agent, 500 AI Credits/mois, 2 GB d'espace de travail"
       },
       "starter": {
         "name": "Starter",
-        "description": "1 agent, 50 messages/jour, 150 MB de stockage"
+        "description": "1 agent, 3 000 AI Credits/mois, 10 GB d'espace de travail"
       },
       "pro": {
         "name": "Pro",
-        "description": "3 agents, 100 messages/jour, 500 MB de stockage"
+        "description": "3 agents, 15 000 AI Credits/mois, 25 GB d'espace de travail"
       },
       "business": {
         "name": "Business",
-        "description": "10 agents, 300 messages/jour, 1 GB de stockage, toujours actif"
+        "description": "5 agents, 40 000 AI Credits/mois, 50 GB d'espace de travail, toujours actif"
       },
       "founding_member": {
         "name": "Membre fondateur",
-        "description": "10 agents, 300 messages/jour, 2 GB de stockage, accès à vie"
+        "description": "5 agents, 25 000 AI Credits/mois, 40 GB d'espace de travail, accès à vie"
       }
     },
     "addons": {
@@ -2497,45 +2155,21 @@
         "name": "+10 agents",
         "description": "10 emplacements d'agents supplémentaires"
       },
-      "messages_plus20": {
-        "name": "+20 msg/jour",
-        "description": "20 messages supplémentaires par jour"
+      "ai_credits_5000": {
+        "name": "5 000 AI Credits",
+        "description": "Recharge unique pour modèles hébergés et recherche web"
       },
-      "messages_plus50": {
-        "name": "+50 msg/jour",
-        "description": "50 messages supplémentaires par jour"
+      "ai_credits_10000": {
+        "name": "10 000 AI Credits",
+        "description": "Recharge unique pour exécutions plus lourdes et recherche"
       },
-      "messages_plus100": {
-        "name": "+100 msg/jour",
-        "description": "100 messages supplémentaires par jour"
+      "ai_credits_25000": {
+        "name": "25 000 AI Credits",
+        "description": "Recharge unique pour charges agent plus importantes"
       },
-      "messages_plus200": {
-        "name": "+200 msg/jour",
-        "description": "200 messages supplémentaires par jour"
-      },
-      "searches_plus25": {
-        "name": "+25 recherches/jour",
-        "description": "25 recherches web supplémentaires par jour"
-      },
-      "searches_plus50": {
-        "name": "+50 recherches/jour",
-        "description": "50 recherches web supplémentaires par jour"
-      },
-      "always_on": {
-        "name": "Toujours actif",
-        "description": "Garder cet agent actif 24h/24"
-      },
-      "file_manager": {
-        "name": "Gestionnaire de fichiers",
-        "description": "Parcourir, modifier et télécharger les fichiers de l'espace de travail"
-      },
-      "full_logs": {
-        "name": "Journaux complets",
-        "description": "Déverrouiller la visionneuse de journaux complète pour cet agent"
-      },
-      "plugins_plus10": {
-        "name": "+10 plugins",
-        "description": "10 emplacements de plugins et compétences supplémentaires pour cet agent"
+      "ai_credits_50000": {
+        "name": "50 000 AI Credits",
+        "description": "Recharge unique pour usage hébergé à volume élevé"
       }
     },
     "frameworks": {
@@ -2578,7 +2212,7 @@
     "h1Accent": "Fais-le éclore.",
     "authChecking": "Vérification de la session…",
     "assistantTitle": "Assistant Hatcher",
-    "assistantSub": "Propulsé par Llama 4 Scout · transforme l'intention en une configuration d'agent complète",
+    "assistantSub": "Propulsé par DeepSeek V4 Flash · transforme l'intention en une configuration d'agent complète",
     "live": "En direct",
     "assistantWho": "Hatcher",
     "intro": "Décris l'agent que tu veux — ce qu'il fait, où il tourne, quel ton. Je choisis un framework, je génère un nom + identité + compétences, et je le mets en file pour l'éclosion. Une ou deux phrases suffisent ; tout est éditable ensuite.",
@@ -2748,7 +2382,7 @@
       "boxLabel": "Prêt",
       "headline": "Déploie ton premier agent.",
       "ctaPrimary": "Faire éclore un agent",
-      "ctaGhost": "Parcourir les modèles",
+      "ctaGhost": "Voir les agents",
       "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "pas de carte"
     }

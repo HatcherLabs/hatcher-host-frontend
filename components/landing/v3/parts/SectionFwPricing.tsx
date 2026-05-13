@@ -13,6 +13,13 @@ const FRAMEWORKS = [
 ] as const;
 
 const TIER_ORDER: ReadonlyArray<UserTierKey> = ['free', 'starter', 'pro', 'business', 'founding_member'];
+const AI_CREDITS_BY_TIER: Record<UserTierKey, number> = {
+  free: 500,
+  starter: 3000,
+  pro: 15000,
+  business: 40000,
+  founding_member: 25000,
+};
 
 export function SectionFwPricing() {
   const tFw = useTranslations('landingV3.frameworks');
@@ -55,7 +62,7 @@ export function SectionFwPricing() {
                       <td className={styles.tier}>{t.name}</td>
                       <td className={styles.amount}>{priceLabel}</td>
                       <td className={styles.limits}>
-                        {t.includedAgents} {agentWord} · {t.messagesPerDay} {tPr('msgsPerDay')}
+                        {t.includedAgents} {agentWord} · {AI_CREDITS_BY_TIER[key].toLocaleString('en-US')} AI Credits/mo
                       </td>
                     </tr>
                   );

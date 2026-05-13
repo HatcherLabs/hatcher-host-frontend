@@ -48,6 +48,9 @@ export function useAgentIntegrations(
           if (settings.dmPolicy) mapped._CS_DM_POLICY = String(settings.dmPolicy);
           if (settings.groupPolicy) mapped._CS_GROUP_POLICY = String(settings.groupPolicy);
           if (settings.streaming) mapped._CS_STREAMING = String(settings.streaming);
+          if (typeof settings.requireMention === 'boolean') {
+            mapped._CS_REQUIRE_MENTION = settings.requireMention ? 'true' : 'false';
+          }
           if (Array.isArray(settings.allowFrom)) mapped._CS_DM_ALLOWLIST = settings.allowFrom.join(', ');
           if (Array.isArray(settings.groupAllowFrom)) mapped._CS_GROUP_ALLOWLIST = settings.groupAllowFrom.join(', ');
           if (Object.keys(mapped).length > 0) {
@@ -156,6 +159,8 @@ export function useAgentIntegrations(
       if (channelSettingsUpdate._CS_DM_POLICY) mapped.dmPolicy = channelSettingsUpdate._CS_DM_POLICY;
       if (channelSettingsUpdate._CS_GROUP_POLICY) mapped.groupPolicy = channelSettingsUpdate._CS_GROUP_POLICY;
       if (channelSettingsUpdate._CS_STREAMING) mapped.streaming = channelSettingsUpdate._CS_STREAMING;
+      if (channelSettingsUpdate._CS_REQUIRE_MENTION === 'true') mapped.requireMention = true;
+      else if (channelSettingsUpdate._CS_REQUIRE_MENTION === 'false') mapped.requireMention = false;
       if (channelSettingsUpdate._CS_DM_ALLOWLIST) {
         mapped.allowFrom = csv(channelSettingsUpdate._CS_DM_ALLOWLIST);
       }

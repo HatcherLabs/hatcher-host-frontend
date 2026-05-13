@@ -100,7 +100,7 @@ export default function PrivacyPolicyPage() {
             <ul className="list-disc pl-6 space-y-1.5">
               <li>IP address (truncated after 24h), browser type, device information</li>
               <li>Pages visited, features used, session duration</li>
-              <li>API usage patterns, message counts, search counts</li>
+              <li>API usage patterns, interaction counts, search counts</li>
             </ul>
 
             <h3 className="text-base font-medium text-[var(--text-primary)] mt-4 mb-2">Payment Information</h3>
@@ -142,7 +142,7 @@ export default function PrivacyPolicyPage() {
               <li>Provide, maintain, and improve the Service</li>
               <li>Authenticate your identity and manage your account</li>
               <li>Process payments and manage subscriptions / addons</li>
-              <li>Enforce tier limits (daily messages, agent count, resource quotas)</li>
+              <li>Enforce tier limits (AI Credits, agent count, resource quotas)</li>
               <li>Send transactional emails (signup, password reset, billing, expiry reminders)</li>
               <li>Monitor platform health, detect abuse, prevent fraud</li>
               <li>Analyze aggregate usage to improve features</li>
@@ -194,7 +194,7 @@ export default function PrivacyPolicyPage() {
                 <tbody className="divide-y divide-[var(--border-default)]">
                   <tr><td className="px-3 py-2">Hetzner</td><td className="px-3 py-2">Hosting + compute</td><td className="px-3 py-2">All account + agent data</td><td className="px-3 py-2">Germany</td></tr>
                   <tr><td className="px-3 py-2">Cloudflare</td><td className="px-3 py-2">CDN, DDoS, DNS</td><td className="px-3 py-2">Request metadata</td><td className="px-3 py-2">Global</td></tr>
-                  <tr><td className="px-3 py-2">Groq</td><td className="px-3 py-2">LLM inference (hosted key)</td><td className="px-3 py-2">Chat messages</td><td className="px-3 py-2">USA</td></tr>
+                  <tr><td className="px-3 py-2">OpenRouter</td><td className="px-3 py-2">LLM inference (hosted key)</td><td className="px-3 py-2">Hosted AI requests</td><td className="px-3 py-2">USA</td></tr>
                   <tr><td className="px-3 py-2">Stripe</td><td className="px-3 py-2">Card payments</td><td className="px-3 py-2">Email, billing address, card token</td><td className="px-3 py-2">Ireland / USA</td></tr>
                   <tr><td className="px-3 py-2">Resend</td><td className="px-3 py-2">Transactional email</td><td className="px-3 py-2">Email address, email content</td><td className="px-3 py-2">EU / USA</td></tr>
                   <tr><td className="px-3 py-2">PostHog</td><td className="px-3 py-2">Product analytics (opt-in)</td><td className="px-3 py-2">Anonymized events, session IDs</td><td className="px-3 py-2">EU</td></tr>
@@ -279,7 +279,7 @@ export default function PrivacyPolicyPage() {
           <section>
             <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-3">11. International Transfers</h2>
             <p>
-              Primary data storage is in Germany (EU/EEA). Certain sub-processors (Groq, Stripe, Helius) are US-based.
+              Primary data storage is in Germany (EU/EEA). Certain sub-processors (OpenRouter, Stripe, Helius) are US-based.
               Transfers outside the EU/EEA rely on the EU-US Data Privacy Framework and/or Standard Contractual
               Clauses as approved by the European Commission.
             </p>

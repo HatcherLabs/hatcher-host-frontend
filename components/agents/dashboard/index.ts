@@ -16,6 +16,5 @@ export { HermesSkillsCard } from './cards/hermes/HermesSkillsCard';
 // OpenClaw-specific cards
 export { OpenClawGatewayCard } from './cards/openclaw/OpenClawGatewayCard';
 export { OpenClawSchedulesCard } from './cards/openclaw/OpenClawSchedulesCard';
-export { OpenClawWorkspaceCard } from './cards/openclaw/OpenClawWorkspaceCard';
 // Primitives
 export { ResourceBar } from './primitives/ResourceBar';

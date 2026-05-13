@@ -32,26 +32,29 @@ function formatValue(v: unknown): string {
   if (v === undefined || v === null) return '—';
   if (typeof v === 'boolean') return v ? 'On' : 'Off';
   if (typeof v === 'number') return String(v);
-  if (typeof v === 'string') return v.length > 0 ? v : '—';
+  if (typeof v === 'string') {
+    if (!v) return '—';
+    if (v === 'hatcher') return 'Hatcher Hosted';
+    return v;
+  }
   return JSON.stringify(v);
 }
 
-// The seven config keys the PATCH allowlist accepts (same ones the
-// existing ConfigTab PATCH UI touches). See
+// Runtime config keys worth surfacing on the overview. See
 // apps/api/src/services/container-lifecycle/hermes-config-snapshot.ts.
 const CONFIG_KEYS: Array<{ path: string; label: string; color: string }> = [
   { path: 'model.default', label: 'Model', color: 'text-purple-400' },
+  { path: 'model.provider', label: 'Provider', color: 'text-purple-300' },
   { path: 'agent.max_turns', label: 'Max Turns', color: 'text-blue-400' },
   { path: 'agent.reasoning_effort', label: 'Reasoning Effort', color: 'text-emerald-400' },
   { path: 'compression.threshold', label: 'Compression Threshold', color: 'text-amber-400' },
   { path: 'memory.memory_enabled', label: 'Memory', color: 'text-rose-400' },
   { path: 'streaming.enabled', label: 'Streaming', color: 'text-cyan-400' },
-  { path: 'display.personality', label: 'Personality', color: 'text-indigo-400' },
 ];
 
 /**
- * Hermes config snapshot card — read-only view of the 7 keys the
- * Hatcher config UI can PATCH. The API returns live config when the
+ * Hermes config snapshot card — read-only view of the core runtime keys.
+ * The API returns live config when the
  * container is running, otherwise the last DB snapshot when available.
  */
 export function HermesConfigSnapshotCard() {

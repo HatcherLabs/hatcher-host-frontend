@@ -71,38 +71,27 @@ export const BLOG_POSTS: BlogPost[] = [
 <ul>
 <li>An email address for your Hatcher account</li>
 <li>A platform token (Telegram bot token, Discord bot token, etc.) if you want to connect to a messaging platform</li>
-<li>Optionally, an LLM API key if you want unlimited messages (BYOK)</li>
+<li>Optionally, an LLM API key if you want provider-paid BYOK usage (BYOK)</li>
 </ul>
 <p>If you do not have platform tokens yet, don't worry — we cover how to get them below.</p>
 
 <h2>Step 1: Create Your Free Account</h2>
-<p>Head to <a href="https://hatcher.host/register">hatcher.host/register</a> and create a free account. All you need is an email and password. No credit card required. Every free account includes <strong>one agent</strong> with <strong>10 messages per day</strong> using our hosted Groq models.</p>
+<p>Head to <a href="https://hatcher.host/register">hatcher.host/register</a> and create a free account. All you need is an email and password. No credit card required. Every free account includes <strong>one agent</strong> with <strong>500 AI Credits/month</strong> using our hosted OpenRouter models.</p>
 
-<h2>Step 2: Pick Your Framework</h2>
-<p>From your dashboard, click <strong>Create Agent</strong>. You will see the available frameworks:</p>
+<h2>Step 2: Describe the Agent</h2>
+<p>From your dashboard, click <strong>Create Agent</strong>. Chat-to-Hatch asks what you want to build and drafts the framework, identity files, skills, model, and launch configuration for you:</p>
 <ul>
 <li><strong>OpenClaw</strong> — The integration powerhouse with 13,700+ community skills, 20+ platform connectors, and a plugin ecosystem. Best for community bots, social media agents, and multi-platform deployments.</li>
 <li><strong>Hermes</strong> — NousResearch's lightweight framework with persistent memory, 40+ built-in tools, and SOUL.md identity files. Best for research assistants, coding agents, and autonomous task runners.</li>
 </ul>
-<p>Not sure which to pick? Start with <strong>OpenClaw</strong> if you want maximum integrations, or <strong>Hermes</strong> if you want autonomous task execution.</p>
+<p>You can accept the generated draft or adjust it before launch.</p>
 
-<h2>Step 3: Choose a Template</h2>
-<p>Hatcher offers 23 pre-built templates to get you started fast. Templates include pre-configured system prompts, tool selections, and platform settings. Popular templates include:</p>
-<ul>
-<li><strong>Community Manager</strong> — Moderates chats, answers FAQs, onboards new members</li>
-<li><strong>Trading Assistant</strong> — Monitors markets, provides analysis, executes alerts</li>
-<li><strong>Customer Support</strong> — Handles first-line support with escalation rules</li>
-<li><strong>Research Agent</strong> — Crawls the web, summarizes findings, compiles reports</li>
-<li><strong>Personal Assistant</strong> — Manages tasks, schedules, and reminders</li>
-</ul>
-<p>You can always customize the template after deployment, so do not overthink this step.</p>
-
-<h2>Step 4: Configure Your Agent</h2>
+<h2>Step 3: Configure Your Agent</h2>
 <p>Give your agent a <strong>name</strong> and <strong>description</strong>. Then write a <strong>system prompt</strong> that defines your agent's personality and behavior. For example:</p>
 <blockquote>You are a friendly crypto community manager. You answer questions about tokenomics, help new members, share daily market updates, and maintain a positive atmosphere. You never give financial advice.</blockquote>
 <p>The system prompt is the single most important configuration. A clear, specific prompt produces a much better agent than a vague one.</p>
 
-<h2>Step 5: Connect Your Platforms</h2>
+<h2>Step 4: Connect Your Platforms</h2>
 <p>Now connect the messaging platforms where your agent will operate:</p>
 <h3>Telegram</h3>
 <ol>
@@ -121,7 +110,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>You can also connect <strong>Twitter/X</strong>, <strong>WhatsApp</strong>, and <strong>Slack</strong> — each requires its own API credentials from the respective platform.</p>
 
 <h2>Step 6: Choose Your LLM</h2>
-<p>Every free account includes 10 messages per day using our hosted Groq models — no API key needed. If you want <strong>unlimited messages</strong>, enable <strong>BYOK</strong> (Bring Your Own Key) and connect your own API key from OpenAI, Anthropic, Google, Groq, xAI, or OpenRouter. BYOK is free to use on every plan — you only pay your provider's API costs.</p>
+<p>Every free account includes 500 AI Credits/month using our hosted OpenRouter models — no API key needed. If you want <strong>provider-paid BYOK usage</strong>, enable <strong>BYOK</strong> (Bring Your Own Key) and connect your own API key from OpenAI, Anthropic, Google, xAI, OpenRouter, or another supported provider. BYOK is free to use on every plan — you only pay your provider's API costs.</p>
 
 <h2>Step 7: Deploy</h2>
 <p>Click <strong>Deploy</strong>. Hatcher builds your agent's isolated Docker container, injects your encrypted configuration, connects to the LLM proxy, and starts the agent process. Within seconds, your agent is live and responding on every platform you configured.</p>
@@ -133,17 +122,17 @@ export const BLOG_POSTS: BlogPost[] = [
 <li>Encrypts and injects your API keys, platform tokens, and system prompt</li>
 <li>Routes LLM requests through the Hatcher proxy for rate limiting and usage tracking</li>
 <li>Monitors agent health and automatically restarts on crashes</li>
-<li>Provides real-time logs, message counts, and uptime statistics in your dashboard</li>
+<li>Provides real-time logs, interaction counts, and uptime statistics in your dashboard</li>
 </ol>
 
 <h2>After Deployment: Your Dashboard</h2>
 <p>Once your agent is running, explore the dashboard tabs:</p>
 <ul>
-<li><strong>Overview</strong> — Uptime, message count, resource usage at a glance</li>
+<li><strong>Overview</strong> — Uptime, AI Credits, and resource usage at a glance</li>
 <li><strong>Chat</strong> — Test your agent with a built-in chat interface (with voice support)</li>
 <li><strong>Configuration</strong> — Update system prompt, LLM settings, and platform connections</li>
-<li><strong>Logs</strong> — Real-time container logs (Pro plan)</li>
-<li><strong>File Manager</strong> — Browse and edit agent files (Pro plan)</li>
+<li><strong>Logs</strong> — Real-time container logs</li>
+<li><strong>File Manager</strong> — Browse and edit agent files</li>
 <li><strong>Webhooks</strong> — Set up external integrations</li>
 <li><strong>Cron Jobs</strong> — Schedule recurring tasks</li>
 <li><strong>Versions</strong> — Auto-versioned snapshots with diff viewer and one-click restore</li>
@@ -153,7 +142,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <ul>
 <li><strong>Be specific in your system prompt</strong> — Tell the agent exactly what it should and should not do</li>
 <li><strong>Start with one platform</strong> — Get it working on Telegram first, then expand</li>
-<li><strong>Use BYOK for production</strong> — The free 10 messages/day is great for testing, but BYOK gives you unlimited messages</li>
+<li><strong>Use BYOK for production</strong> — Hosted usage spends AI Credits; BYOK routes requests to your own provider account</li>
 <li><strong>Monitor your logs</strong> — Check the dashboard regularly to see how your agent is performing</li>
 </ul>
 <p>Welcome to the future of AI deployment. Your first agent is live.</p>`,
@@ -182,7 +171,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <li>Executes pre-defined trading strategies based on technical indicators</li>
 </ul>
 <h3>Recommended Setup</h3>
-<p>Use <strong>OpenClaw</strong> on Hatcher with market-data and automation skills enabled. Connect the alert channels your community uses and configure price thresholds. Pair with a BYOK key for fast, low-latency responses. Start with the <strong>Trading Assistant</strong> template.</p>
+<p>Use <strong>OpenClaw</strong> on Hatcher with market-data and automation skills enabled. Connect the alert channels your community uses and configure price thresholds. Pair with a BYOK key for fast, low-latency responses. In Chat-to-Hatch, ask for a trading assistant with market alerts.</p>
 <blockquote>Tip: Start with monitoring and alerts only. Add automated execution after you have tested the agent's analysis quality for at least a week.</blockquote>
 
 <h2>2. Customer Support Automation</h2>
@@ -197,7 +186,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <li>Handles onboarding flows: welcome messages, account setup guides, feature tours</li>
 </ul>
 <h3>Recommended Setup</h3>
-<p>Use <strong>OpenClaw</strong> with the <strong>Customer Support</strong> template. Upload your FAQ and documentation to the knowledge base. Connect Telegram and Discord for community support, or WhatsApp for direct customer channels. Set clear escalation rules in the system prompt (e.g., "If the user mentions billing, refund, or legal, respond that a team member will follow up within 24 hours").</p>
+<p>Use <strong>OpenClaw</strong> and ask Chat-to-Hatch for a customer-support agent. Upload your FAQ and documentation to the knowledge base. Connect Telegram and Discord for community support, or WhatsApp for direct customer channels. Set clear escalation rules in the system prompt (e.g., "If the user mentions billing, refund, or legal, respond that a team member will follow up within 24 hours").</p>
 
 <h2>3. Community Management</h2>
 <p><strong>Time saved: 2-3 hours/week</strong></p>
@@ -211,7 +200,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <li>Runs engagement activities: polls, quizzes, AMAs, and trivia games</li>
 </ul>
 <h3>Recommended Setup</h3>
-<p>Use <strong>OpenClaw</strong> with the <strong>Community Manager</strong> template. Its 20+ platform integrations and community-focused skills make it ideal. Connect both Discord and Telegram to manage your communities from a single agent. Use BYOK with Groq for fast response times that feel natural in group chats.</p>
+<p>Use <strong>OpenClaw</strong> and ask Chat-to-Hatch for a community manager. Its platform integrations and community-focused skills make it ideal. Connect both Discord and Telegram to manage your communities from a single agent. Use hosted OpenRouter models or BYOK with your preferred provider for natural group-chat latency.</p>
 
 <h2>4. Research and Intelligence Gathering</h2>
 <p><strong>Time saved: 2-3 hours/week</strong></p>
@@ -225,7 +214,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <li>Answers follow-up questions about its findings with full source citations</li>
 </ul>
 <h3>Recommended Setup</h3>
-<p>Use <strong>Hermes</strong> with the <strong>Research Agent</strong> template. Hermes's persistent memory means it remembers everything it has found, building a growing knowledge base over time. Its 40+ built-in tools include web browsing, file management, and data processing — no plugins needed. Pair with Anthropic's Claude or OpenAI's GPT-4o via BYOK for the best reasoning quality on complex research tasks.</p>
+<p>Use <strong>Hermes</strong> and ask Chat-to-Hatch for a research agent. Hermes's persistent memory means it remembers everything it has found, building a growing knowledge base over time. Its 40+ built-in tools include web browsing, file management, and data processing. Pair with Anthropic's Claude or OpenAI's GPT-4o via BYOK for the best reasoning quality on complex research tasks.</p>
 <blockquote>Tip: Set up a cron job in Hatcher to have your research agent deliver a morning briefing to your Telegram every day at 8 AM.</blockquote>
 
 <h2>5. Personal AI Assistant</h2>
@@ -240,11 +229,11 @@ export const BLOG_POSTS: BlogPost[] = [
 <li>Translates text, converts units, calculates figures, and handles other micro-tasks</li>
 </ul>
 <h3>Recommended Setup</h3>
-<p>Use <strong>Hermes</strong> with the <strong>Personal Assistant</strong> template. Its persistent memory means it learns your preferences and frequently-referenced information over time. Connect it to Telegram for always-available mobile access. BYOK with Groq gives you fast responses, or use Anthropic's Claude for more nuanced writing assistance.</p>
+<p>Use <strong>Hermes</strong> and ask Chat-to-Hatch for a personal assistant. Its persistent memory means it learns your preferences and frequently-referenced information over time. Connect it to Telegram for always-available mobile access. Use hosted OpenRouter models or BYOK with Anthropic's Claude for more nuanced writing assistance.</p>
 
 <h2>Getting Started</h2>
-<p>All five of these agents can be deployed on Hatcher's <strong>free tier</strong> with 10 messages per day. That is enough to test and validate the workflow. When you are ready for production, enable <strong>BYOK</strong> for unlimited messages or upgrade to a paid plan for more resources and multiple agents.</p>
-<p>The math is simple: if an agent saves you even 10 hours per week at a conservative $25/hour value, that is $1,000/month in recovered productivity. Hatcher's Pro plan costs $14.99/month. The ROI is immediate.</p>
+<p>All five of these agents can be deployed on Hatcher's <strong>free tier</strong> with 500 AI Credits/month. That is enough to test and validate the workflow. When you are ready for production, enable <strong>BYOK</strong> for provider-paid BYOK usage or upgrade to a paid plan for more resources and multiple agents.</p>
+<p>The math is simple: if an agent saves you even 10 hours per week at a conservative $25/hour value, that is $1,000/month in recovered productivity. Hatcher's Pro plan costs $19.99/month. The ROI is immediate.</p>
 <p>Deploy your first agent at <a href="https://hatcher.host">hatcher.host</a> and start reclaiming your time today.</p>`,
     author: 'HatcherLabs Team',
     date: '2026-03-20',
@@ -257,16 +246,16 @@ export const BLOG_POSTS: BlogPost[] = [
     title: 'BYOK Explained: Why Bringing Your Own API Key Saves You Money',
     excerpt:
       'A complete guide to BYOK on Hatcher — what it is, which providers are supported, cost comparisons, and step-by-step setup instructions.',
-    content: `<p>One of Hatcher's most powerful features is <strong>BYOK</strong> — Bring Your Own Key. Instead of relying on our hosted LLM with daily message limits, you plug in your own API key and unlock <strong>unlimited messages</strong> on any plan, including Free. This guide explains exactly how it works and why it saves you money.</p>
+    content: `<p>One of Hatcher's most powerful features is <strong>BYOK</strong> — Bring Your Own Key. Instead of relying on our hosted LLM with AI Credit metering, you plug in your own API key and unlock <strong>provider-paid BYOK usage</strong> on any plan, including Free. This guide explains exactly how it works and why it saves you money.</p>
 
 <h2>What Is BYOK?</h2>
-<p>BYOK stands for <strong>Bring Your Own Key</strong>. When you create an agent on Hatcher, it needs access to a large language model (LLM) to think and respond. By default, Hatcher provides a hosted Groq LLM with daily message limits based on your plan:</p>
+<p>BYOK stands for <strong>Bring Your Own Key</strong>. When you create an agent on Hatcher, it needs access to a large language model (LLM) to think and respond. By default, Hatcher provides a hosted OpenRouter LLM with AI Credit metering based on your plan:</p>
 <ul>
-<li><strong>Free:</strong> 10 messages per day per agent</li>
-<li><strong>Starter ($4.99/mo):</strong> 50 messages per day per agent</li>
-<li><strong>Pro ($14.99/mo):</strong> 200 messages per day per agent</li>
+<li><strong>Free:</strong> 500 AI Credits/month</li>
+<li><strong>Starter ($6.99/mo):</strong> 3,000 AI Credits/month</li>
+<li><strong>Pro ($19.99/mo):</strong> 15,000 AI Credits/month</li>
 </ul>
-<p>With BYOK, you bypass these limits entirely. You provide your own API key from a supported LLM provider, and your agent sends requests directly to that provider. No daily caps, no throttling, no restrictions. You pay your provider directly at their published rates.</p>
+<p>With BYOK, Hatcher does not meter usage with AI Credits. You provide your own API key from a supported LLM provider, and your agent sends requests directly to that provider. You pay your provider directly at their published rates.</p>
 
 <h2>Supported Providers</h2>
 <p>Hatcher supports BYOK with the following LLM providers:</p>
@@ -276,7 +265,6 @@ export const BLOG_POSTS: BlogPost[] = [
 <tr><td><strong>OpenAI</strong></td><td>GPT-4o, GPT-4 Turbo, GPT-4o-mini</td><td>General purpose, coding, creative writing</td></tr>
 <tr><td><strong>Anthropic</strong></td><td>Claude 3.5 Sonnet, Claude 3 Opus</td><td>Analysis, research, long-form writing, safety</td></tr>
 <tr><td><strong>Google</strong></td><td>Gemini 2.0 Flash, Gemini Pro</td><td>Multimodal tasks, fast inference, large context</td></tr>
-<tr><td><strong>Groq</strong></td><td>GPT-OSS 20B, Llama 3.3 70B, Mixtral 8x7B</td><td>Speed-critical applications, low-latency responses</td></tr>
 <tr><td><strong>xAI</strong></td><td>Grok-2, Grok-3</td><td>Real-time information, X/Twitter integration</td></tr>
 <tr><td><strong>OpenRouter</strong></td><td>Any model (routes to best provider)</td><td>Model switching, fallback routing, cost optimization</td></tr>
 </tbody>
@@ -284,32 +272,32 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>Each provider has different pricing, speed, and model capabilities. The right choice depends on your use case and budget.</p>
 
 <h2>Cost Comparison: Managed vs BYOK</h2>
-<p>Let's compare the real costs for a community management agent that handles approximately 200 messages per day:</p>
+<p>Let.s compare how hosted AI Credits and BYOK behave for a community management agent with steady traffic:</p>
 <h3>Managed (Hatcher's Hosted LLM)</h3>
 <ul>
-<li>Free tier: 10 messages/day — far below the 200 needed. <strong>Not viable.</strong></li>
-<li>Starter ($4.99/mo): 50 messages/day — still insufficient. <strong>Not viable.</strong></li>
-<li>Pro ($14.99/mo): 200 messages/day — works, but you are paying $14.99/mo for the plan.</li>
+<li>Free tier: 500 AI Credits/month for testing hosted usage.</li>
+<li>Starter: 3,000 AI Credits/month for hosted usage.</li>
+<li>Pro and above: larger AI Credit grants plus more compute and storage.</li>
 </ul>
 <h3>BYOK on the Free Tier</h3>
 <ul>
 <li>Hatcher cost: <strong>$0/mo</strong> (free tier)</li>
-<li>Groq API cost for 200 messages/day (GPT-OSS 20B, avg 500 tokens in + 300 tokens out): approximately <strong>$1.80/mo</strong></li>
-<li><strong>Total: ~$1.80/mo</strong></li>
+<li>Provider cost depends on the model and token usage you choose.</li>
+<li><strong>Total: your provider bill only</strong></li>
 </ul>
 <h3>BYOK with OpenAI on the Free Tier</h3>
 <ul>
 <li>Hatcher cost: <strong>$0/mo</strong></li>
-<li>OpenAI API cost for 200 messages/day (GPT-4o-mini): approximately <strong>$3.60/mo</strong></li>
-<li><strong>Total: ~$3.60/mo</strong></li>
+<li>OpenAI cost depends on the selected model and token usage.</li>
+<li><strong>Total: your provider bill only</strong></li>
 </ul>
 <p>Even with a premium model, BYOK on the free tier is dramatically cheaper than a paid plan for most use cases. The paid plans make sense when you also want extra features like more agents, larger storage, file manager, or dedicated resources.</p>
 
 <h2>When Should You NOT Use BYOK?</h2>
 <p>BYOK is not always the right choice:</p>
 <ul>
-<li><strong>Testing and prototyping:</strong> The free 10 messages/day is plenty to test your agent. Do not bother with BYOK until you are ready for production.</li>
-<li><strong>Very low usage:</strong> If your agent handles fewer than 10 messages/day, the managed LLM on the free tier covers you at zero cost.</li>
+<li><strong>Testing and prototyping:</strong> Monthly AI Credits are enough to test hosted usage before adding BYOK.</li>
+<li><strong>Very low usage:</strong> If your agent uses little hosted AI, the included AI Credits may cover it.</li>
 <li><strong>Simplicity:</strong> BYOK requires you to manage your own API key, monitor usage, and handle billing with your LLM provider. If you prefer a fully managed experience, the paid plans are simpler.</li>
 </ul>
 
@@ -321,7 +309,6 @@ export const BLOG_POSTS: BlogPost[] = [
 <li>OpenAI: <a href="https://platform.openai.com/api-keys">platform.openai.com/api-keys</a></li>
 <li>Anthropic: <a href="https://console.anthropic.com">console.anthropic.com</a></li>
 <li>Google: <a href="https://aistudio.google.com/apikey">aistudio.google.com/apikey</a></li>
-<li>Groq: <a href="https://console.groq.com/keys">console.groq.com/keys</a></li>
 <li>xAI: <a href="https://console.x.ai">console.x.ai</a></li>
 <li>OpenRouter: <a href="https://openrouter.ai/keys">openrouter.ai/keys</a></li>
 </ul>
@@ -339,33 +326,33 @@ export const BLOG_POSTS: BlogPost[] = [
 </ol>
 
 <h3>Step 3: Restart Your Agent</h3>
-<p>Click <strong>Restart</strong> to apply the new configuration. Your agent will now route all LLM requests directly to your chosen provider with no daily message limits.</p>
+<p>Click <strong>Restart</strong> to apply the new configuration. Your agent will now route all LLM requests directly to your chosen provider with no AI Credit metering.</p>
 
 <h2>Security</h2>
 <p>Your API key is encrypted with <strong>AES-256-GCM</strong> before storage. It is only decrypted inside your agent's isolated Docker container at runtime. The key never passes through Hatcher's LLM proxy, is never logged, and is never accessible to any service other than your agent's container and your chosen provider.</p>
 
 <h2>Frequently Asked Questions</h2>
 <h3>Can I use BYOK on the free tier?</h3>
-<p>Yes. BYOK is available on every Hatcher plan, including Free. It unlocks unlimited messages regardless of your tier.</p>
+<p>Yes. BYOK is available on every Hatcher plan, including Free. It unlocks provider-paid BYOK usage regardless of your tier.</p>
 <h3>Can I switch providers later?</h3>
 <p>Yes. Update your API key and model selection in the Configuration tab at any time. Restart your agent to apply changes.</p>
 <h3>What happens if my API key runs out of credits?</h3>
 <p>Your agent will receive error responses from your provider and will not be able to generate replies until you add credits. Hatcher does not provide a fallback — if your key fails, the agent cannot think.</p>
 <h3>Can I use different providers for different agents?</h3>
-<p>Yes. Each agent has its own independent LLM configuration. You can run one agent on OpenAI and another on Groq, each with its own API key.</p>
+<p>Yes. Each agent has its own independent LLM configuration. You can run one agent on OpenAI and another on OpenRouter, each with its own API key.</p>
 
 <p>BYOK is the simplest way to unlock unlimited, unrestricted AI agent capabilities on Hatcher. Combined with the free tier, it makes running a production AI agent remarkably affordable.</p>`,
     author: 'HatcherLabs Team',
     date: '2026-03-18',
     category: 'Features',
     readTime: '8 min',
-    coverImageDescription: 'A golden key hovering over a digital keyhole, surrounded by logos of LLM providers (OpenAI, Anthropic, Google, Groq) connected by glowing lines',
+    coverImageDescription: 'A golden key hovering over a digital keyhole, surrounded by logos of LLM providers connected by glowing lines',
   },
   {
     slug: 'introducing-hatcher',
     title: 'Introducing Hatcher: Deploy AI Agents in 60 Seconds',
     excerpt:
-      'We built the platform we always wanted — one-click AI agent hosting with zero DevOps, free tier included, and BYOK for unlimited scale.',
+      'We built the platform we always wanted — one-click AI agent hosting with zero DevOps, free tier included, and BYOK for direct provider billing.',
     content: `<p>Today we are launching <strong>Hatcher</strong> — the easiest way to deploy autonomous AI agents across any platform, starting in under 60 seconds.</p>
 
 <p>We built Hatcher because we were tired of the same problem: you want to run an AI agent, but first you need to provision a server, write a Dockerfile, wire up environment variables, configure auto-restarts, manage uptime, and debug networking issues before your agent even sends its first message. That's hours of yak-shaving before you even know if your idea works.</p>
@@ -377,27 +364,19 @@ export const BLOG_POSTS: BlogPost[] = [
 <li><strong>20+ platform integrations</strong> — Telegram, Discord, Twitter, WhatsApp, Slack, and more, all wired up out of the box</li>
 <li><strong>2 frameworks</strong> — OpenClaw and Hermes, each with focused strengths and tooling</li>
 <li><strong>Auto-sleep and auto-wake</strong> — idle agents sleep to save resources, wake instantly on incoming messages</li>
-<li><strong>LLM proxy with rate limiting</strong> — use our hosted Groq models or bring your own key for unlimited messages</li>
+<li><strong>LLM proxy with rate limiting</strong> — use our hosted OpenRouter models or bring your own key for provider-paid BYOK usage</li>
 </ul>
 
 <h2>Free Tier, No Strings</h2>
-<p>Every account includes a free tier with one agent, 10 messages per day on our hosted LLM, and all integrations enabled. No credit card required. No trial period. Just sign up and deploy.</p>
-<p>If you bring your own LLM key (BYOK), messages are unlimited — even on the free tier. We made this choice deliberately: we believe you should be able to build and run a production agent without paying us anything, as long as you are willing to provide your own compute.</p>
+<p>Every account includes a free tier with one agent, 500 AI Credits/month on our hosted LLM, and all integrations enabled. No credit card required. No trial period. Just sign up and deploy.</p>
+<p>If you bring your own LLM key (BYOK), Hatcher does not spend or meter your AI Credits — even on the free tier. We made this choice deliberately: you should be able to build and run a production agent while paying your LLM provider directly.</p>
 
 <h2>The Stack</h2>
-<p>Under the hood, Hatcher runs each agent in its own Docker container with resource limits appropriate to your tier. The orchestrator monitors heartbeats, auto-sleeps idle containers, and wakes them on incoming messages — all transparently. You see a live dashboard with message counts, status, and logs.</p>
+<p>Under the hood, Hatcher runs each agent in its own Docker container with resource limits appropriate to your tier. The orchestrator monitors heartbeats, auto-sleeps idle free containers, and wakes them on incoming platform events — all transparently. You see a live dashboard with interaction counts, status, and logs.</p>
 <p>Payments for premium tiers are handled in SOL or our platform token, priced in USD and converted at the live Jupiter rate. We built on Solana because the transaction costs and speed make micropayments practical in a way that EVM chains still do not.</p>
 
-<h2>23 Templates to Get Started</h2>
-<p>We ship 23 pre-built agent templates covering the most common use cases:</p>
-<ul>
-<li>Community Manager — moderates Discord servers, answers FAQs, onboards new members</li>
-<li>Trading Assistant — monitors markets, sends alerts, tracks on-chain activity</li>
-<li>Customer Support — handles first-line support with escalation rules</li>
-<li>Content Creator — writes tweets, newsletters, and blog posts on a schedule</li>
-<li>Research Agent — crawls the web, summarizes findings, compiles reports</li>
-</ul>
-<p>Templates are fully customizable after deployment. They are starting points, not restrictions.</p>
+<h2>Chat-to-Hatch to Get Started</h2>
+<p>Instead of browsing a static template catalog, describe the outcome you want. Hatcher drafts the framework, identity, skills, integrations, and model settings, then gives you a launch review before deployment.</p>
 
 <h2>What's Next</h2>
 <p>We are a small team and we ship fast. The roadmap includes multi-agent workflows, visual workflow editors, custom domain routing for public-facing agents, and a lot more integrations. We will be posting updates here as we go.</p>
@@ -420,7 +399,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <li>A Telegram account (mobile app or web)</li>
 <li>A free Hatcher account — <a href="https://hatcher.host/register">sign up here</a>, no credit card needed</li>
 </ul>
-<p>That's it. The LLM is provided by Hatcher (10 messages/day on free tier). If you want unlimited messages, add a free Groq API key at the end.</p>
+<p>That.s it. Hosted AI is covered by AI Credits. If you want provider-paid BYOK usage, add your provider API key at the end.</p>
 
 <h2>Step 1: Get a Bot Token from BotFather (60 seconds)</h2>
 <p>Open Telegram and search for <strong>@BotFather</strong> — the official bot for creating bots.</p>
@@ -445,7 +424,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>Hatcher builds the container, starts the agent, and connects it to Telegram. The whole process takes under 30 seconds.</p>
 
 <h2>Step 3: Test It</h2>
-<p>Open Telegram and search for your bot by username. Send it a message — any message. It should reply almost instantly using the default AI model (GPT-OSS 20B via Groq on the free tier).</p>
+<p>Open Telegram and search for your bot by username. Send it a message — any message. It should reply almost instantly using the hosted OpenRouter model.</p>
 <p>The default system prompt makes the agent a general-purpose assistant. You can customize it from the <strong>Config</strong> tab in your Hatcher dashboard.</p>
 
 <h2>Customizing Your Bot</h2>
@@ -453,17 +432,17 @@ export const BLOG_POSTS: BlogPost[] = [
 <ul>
 <li><strong>System Prompt</strong> — define the bot's personality, role, and knowledge</li>
 <li><strong>Model</strong> — switch to GPT-4, Claude, Gemini, or any BYOK provider</li>
-<li><strong>Tools</strong> — enable web search (via Brave, Pro+ only), file access, memory, and more</li>
+<li><strong>Tools</strong> — enable web search, file access, memory, and more. Hosted web search uses AI Credits.</li>
 <li><strong>Welcome Message</strong> — the first message users see when they start the bot</li>
 </ul>
 
-<h2>Adding a Groq Key for Unlimited Messages</h2>
-<p>The free tier includes 10 messages per day using our hosted Groq key. If you want unlimited messages:</p>
+<h2>Adding a BYOK Provider Key</h2>
+<p>The free tier includes 500 AI Credits/month using our hosted OpenRouter budget. If you want provider-paid BYOK usage:</p>
 <ol>
-<li>Get a free API key at <a href="https://console.groq.com">console.groq.com</a></li>
+<li>Get an API key from your preferred supported LLM provider</li>
 <li>In your agent's Config tab, find <strong>BYOK Settings</strong></li>
-<li>Set provider to <code>groq</code> and paste your key</li>
-<li>Click Save — unlimited messages from this point on, for free</li>
+<li>Select your provider and paste your key</li>
+<li>Click Save — provider-paid BYOK usage from this point on, for free</li>
 </ol>
 
 <h2>Going Further</h2>
@@ -526,7 +505,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <h3>Lower Barrier to Entry</h3>
 <p>Non-engineers can deploy and manage agents. A product manager can configure a customer support agent without filing a DevOps ticket. A founder can spin up a community bot for their token launch without hiring a backend engineer.</p>
 <h3>The Agent Marketplace</h3>
-<p>When deploying an agent is as easy as clicking a button, a marketplace for pre-built agents becomes viable. Creators can build specialized agents (crypto trading monitors, content schedulers, support bots tuned to specific industries) and earn revenue by renting them to users who need that functionality without the build time.</p>
+<p>When deploying an agent is as easy as describing the outcome, specialized agents become viable for non-technical teams. Creators can build trading monitors, content schedulers, and support bots tuned to specific industries without owning the infrastructure.</p>
 <p>This is the next frontier — an economy where agent expertise is a tradeable asset.</p>
 
 <h2>The BYOK Inflection Point</h2>
@@ -539,7 +518,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <li>Support multiple frameworks without vendor lock-in</li>
 <li>Make BYOK a first-class citizen</li>
 <li>Offer a meaningful free tier for experimentation</li>
-<li>Build marketplace infrastructure that lets agent creators monetize their work</li>
+<li>Build agent-sharing infrastructure that lets creators distribute useful configurations</li>
 </ul>
 <p>We are building Hatcher to be that platform. If you want to see where agent hosting is headed, <a href="https://hatcher.host/register">sign up and deploy your first agent for free.</a></p>`,
     author: 'Hatcher Labs',
@@ -552,11 +531,11 @@ export const BLOG_POSTS: BlogPost[] = [
     slug: 'byok-explained-free-ai-agents',
     title: 'BYOK Explained: How to Run AI Agents for $0 with Your Own API Key',
     excerpt:
-      'Bring Your Own Key (BYOK) lets you run unlimited AI agent messages for free. Here is how it works and why it changes everything about AI agent hosting costs.',
+      'Bring Your Own Key (BYOK) lets you pay your LLM provider directly instead of spending Hatcher AI Credits. Here is how it works and why it changes AI agent hosting costs.',
     content: `<p>The biggest barrier to running AI agents is not deployment — it is cost. Most platforms charge $30-60/month per bot, and that is before you pay for LLM tokens. But there is a better way: <strong>BYOK (Bring Your Own Key)</strong>.</p>
 
 <h2>What Is BYOK?</h2>
-<p>BYOK means you plug your own LLM API key into your agent instead of using the platform's built-in credits. On Hatcher, this unlocks <strong>unlimited messages at no extra cost</strong> — on any tier, including the free tier.</p>
+<p>BYOK means you plug your own LLM API key into your agent instead of using the platform's built-in credits. On Hatcher, this unlocks <strong>provider-paid BYOK usage at no extra cost</strong> — on any tier, including the free tier.</p>
 <p>Your agent sends requests directly through your API key. You pay the LLM provider directly (often at much lower rates than middleman platforms charge), and Hatcher handles everything else: hosting, platform integrations, container management, auto-restart, and logs.</p>
 
 <h2>Why BYOK Changes the Economics</h2>
@@ -572,9 +551,8 @@ export const BLOG_POSTS: BlogPost[] = [
 
 <h3>With BYOK on Hatcher</h3>
 <ul>
-<li>Platform fee: $0 (free tier) or $4.99/month (Starter)</li>
+<li>Platform fee: $0 (free tier) or $6.99/month (Starter)</li>
 <li>LLM cost: depends on your provider</li>
-<li>Groq (GPT-OSS 20B): <strong>free tier available</strong></li>
 <li>OpenRouter: from $0.10 per million tokens</li>
 <li>Together AI: competitive rates with free credits</li>
 <li><strong>Monthly cost for an active bot: $0-5</strong></li>
@@ -585,20 +563,20 @@ export const BLOG_POSTS: BlogPost[] = [
 <h2>How to Set Up BYOK on Hatcher</h2>
 <p>Setting up BYOK takes about 30 seconds:</p>
 <ol>
-<li><strong>Get an API key</strong> from your preferred LLM provider. We support Groq, OpenAI, Anthropic, OpenRouter, Together AI, Google Gemini, Mistral, and more.</li>
+<li><strong>Get an API key</strong> from your preferred LLM provider. We support OpenAI, Anthropic, OpenRouter, Together AI, Google Gemini, Mistral, and more.</li>
 <li><strong>Go to your agent's Config tab</strong> on the Hatcher dashboard.</li>
 <li><strong>Select your BYOK provider</strong> from the dropdown menu.</li>
 <li><strong>Paste your API key</strong> — it is encrypted with AES-256-GCM and never exposed.</li>
 <li><strong>Choose your model</strong> — each provider offers different models at different price points.</li>
 <li><strong>Save and restart</strong> your agent. Done.</li>
 </ol>
-<p>Your agent now uses your API key for all LLM requests. The daily message limit disappears — you get unlimited messages.</p>
+<p>Your agent now uses your API key for all LLM requests. The AI Credit balance disappears — you get provider-paid BYOK usage.</p>
 
 <h2>Best BYOK Providers for AI Agents</h2>
 <p>Here is our recommendation based on cost and quality:</p>
 
-<h3>Groq (Best Free Option)</h3>
-<p>Groq offers free access to GPT-OSS 20B with generous rate limits. For most personal and small-scale agents, you will never hit the ceiling. This is the genuine $0 setup.</p>
+<h3>BYOK provider option</h3>
+<p>BYOK providers vary by price and rate limits. Use whichever provider fits your latency and quality needs.</p>
 
 <h3>OpenRouter (Best Variety)</h3>
 <p>OpenRouter aggregates 100+ models from multiple providers. You can switch between GPT-4, Claude, Llama, Mistral, and others without changing your API key. Great for experimentation.</p>
@@ -626,19 +604,19 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>Here is the math that matters:</p>
 <ul>
 <li>Hatcher free tier: $0/month — includes 1 agent, all integrations, all frameworks</li>
-<li>Groq free API key: $0/month — includes GPT-OSS 20B with generous limits</li>
+<li>BYOK provider key: paid directly to your chosen provider</li>
 <li>Telegram/Discord bot tokens: free to create</li>
 <li><strong>Total: $0/month for a fully functional AI agent</strong></li>
 </ul>
-<p>This is not a trial. This is not a 14-day offer. This is the permanent free tier. Your agent runs 24/7 with auto-restart, connects to any platform, and handles unlimited messages through BYOK.</p>
+<p>This is not a trial. This is not a 14-day offer. This is the permanent free tier. Your agent runs 24/7 with auto-restart, connects to any platform, and handles provider-paid BYOK usage through BYOK.</p>
 
 <h2>When to Upgrade from Free</h2>
 <p>The free tier is genuinely sufficient for most individual use cases. Consider upgrading when:</p>
 <ul>
-<li>You need <strong>more than one agent</strong> — Starter includes 1, Pro includes 3, plus add-on packs</li>
+<li>You need <strong>more than one agent</strong> — Starter includes 1, Pro includes 3, plus extra agent slots</li>
 <li>You want <strong>dedicated resources</strong> — Pro gives 1.5 CPU, 2GB RAM per agent instead of shared</li>
-<li>You need <strong>file manager access</strong> — browse and edit your agent's workspace files</li>
-<li>You want <strong>longer idle time</strong> — free agents auto-sleep after 10 minutes, Starter after 2 hours, Pro stays on</li>
+<li>You need <strong>more workspace</strong> — paid tiers include larger agent workspaces</li>
+<li>You want <strong>always-active agents</strong> — free agents auto-sleep after 12 hours, while Starter and above stay active</li>
 </ul>
 <p>But for a single agent with BYOK? Free works indefinitely.</p>
 
@@ -647,9 +625,9 @@ export const BLOG_POSTS: BlogPost[] = [
 <ol>
 <li>Sign up at <a href="https://hatcher.host/register">hatcher.host</a> (free, no credit card)</li>
 <li>Create an agent with any framework</li>
-<li>Get a free Groq API key at <a href="https://console.groq.com">console.groq.com</a></li>
+<li>Get a BYOK provider API key from your preferred supported provider</li>
 <li>Add the key in your agent's Config tab</li>
-<li>Deploy — your agent is live with unlimited messages</li>
+<li>Deploy — your agent is live with provider-paid BYOK usage</li>
 </ol>
 <p>Stop paying middleman markup on AI tokens. Bring your own key and keep your costs at zero.</p>`,
     author: 'Hatcher Labs',
@@ -709,7 +687,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <ul>
 <li>Create account at hatcher.host (free, no credit card)</li>
 <li>Pick a framework: OpenClaw or Hermes</li>
-<li>Choose a template or start blank</li>
+<li>Describe the agent in Chat-to-Hatch</li>
 <li>Add your platform tokens (Telegram, Discord, etc.)</li>
 <li>Hit Deploy</li>
 </ul>
@@ -728,10 +706,10 @@ export const BLOG_POSTS: BlogPost[] = [
 <h3>True Monthly Cost</h3>
 <table>
 <tr><th>Tier</th><th>Cost</th><th>What You Get</th></tr>
-<tr><td>Free</td><td>$0</td><td>1 agent, 10 msg/day, all integrations</td></tr>
-<tr><td>Free + BYOK</td><td>$0</td><td>1 agent, unlimited messages</td></tr>
-<tr><td>Starter</td><td>$4.99/mo</td><td>1 agent, 50 msg/day, better resources</td></tr>
-<tr><td>Pro</td><td>$14.99/mo</td><td>3 agents, 200 msg/day, file manager, full logs</td></tr>
+<tr><td>Free</td><td>$0</td><td>1 agent, 500 AI Credits/month, all integrations</td></tr>
+<tr><td>Free + BYOK</td><td>$0</td><td>1 agent, provider-paid BYOK usage</td></tr>
+<tr><td>Starter</td><td>$6.99/mo</td><td>1 agent, 3,000 AI Credits/month, 10 GB workspace</td></tr>
+<tr><td>Pro</td><td>$19.99/mo</td><td>3 agents, 15,000 AI Credits/month, 25 GB workspace</td></tr>
 </table>
 
 <h2>The Comparison</h2>
@@ -740,7 +718,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <tr><th>Factor</th><th>Self-Hosting</th><th>Managed (Hatcher)</th></tr>
 <tr><td>Setup time</td><td>4–12 hours</td><td>60 seconds</td></tr>
 <tr><td>Technical skill needed</td><td>Docker, Linux, networking</td><td>None</td></tr>
-<tr><td>Monthly cost (1 agent)</td><td>$13–76 + time</td><td>$0–4.99</td></tr>
+<tr><td>Monthly cost (1 agent)</td><td>$13–76 + time</td><td>$0–6.99</td></tr>
 <tr><td>Uptime management</td><td>You handle it</td><td>Automatic</td></tr>
 <tr><td>Multi-platform support</td><td>You code each integration</td><td>20+ built-in</td></tr>
 <tr><td>Scaling to 5+ agents</td><td>Bigger VPS, more config</td><td>Upgrade tier</td></tr>
@@ -767,7 +745,7 @@ export const BLOG_POSTS: BlogPost[] = [
 </ul>
 
 <h2>The BYOK Factor</h2>
-<p>This is the hidden advantage of managed platforms that support Bring Your Own Key. With self-hosting, you still pay for the VPS <em>on top of</em> your LLM API costs. With Hatcher's free tier + BYOK, you pay only for LLM tokens — and if you use Groq (which offers free access to Llama 4), the total cost is zero.</p>
+<p>This is the hidden advantage of managed platforms that support Bring Your Own Key. With self-hosting, you still pay for the VPS <em>on top of</em> your LLM API costs. With Hatcher's free tier + BYOK, you pay Hatcher $0 and pay only your chosen provider for LLM tokens.</p>
 <p>That math does not work with self-hosting. You always pay for the server.</p>
 
 <h2>Bottom Line</h2>

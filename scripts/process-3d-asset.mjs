@@ -5,11 +5,8 @@
  * Usage:
  *   node scripts/process-3d-asset.mjs <path-to-raw-asset>
  *
- * Mapping from raw path to output dir:
- *   assets-raw/quaternius/city/small-building-a.fbx
- *     → public/assets/3d/city/buildings/small-building-a.{high,low}.glb
- *
- * Override with --out <abs-dir>.
+ * Outputs to public/assets/3d/misc by default. Use --out <dir> for
+ * runtime assets that belong in a specific scene folder.
  */
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, existsSync, copyFileSync } from 'node:fs';
@@ -30,22 +27,9 @@ if (!rawPath || !existsSync(rawPath)) {
 const absRaw = path.resolve(rawPath);
 const assetName = path.basename(absRaw, path.extname(absRaw));
 
-// Heuristic: derive output dir from raw path when --out not given.
-//   assets-raw/quaternius/city/<name>  → public/assets/3d/city/buildings/<name>
-//   assets-raw/quaternius/robot/<name> → public/assets/3d/avatars/<name>
-//   assets-raw/meshy/<name>            → public/assets/3d/avatars/<name>
-//   assets-raw/poly-haven/hdri/<name>  → public/assets/3d/city/skybox/<name>
 let outDir = values.out;
 if (!outDir) {
-  if (absRaw.includes('/city/') || absRaw.includes('/kenney/')) {
-    outDir = path.resolve('public/assets/3d/city/buildings');
-  } else if (absRaw.includes('/robot/') || absRaw.includes('/meshy/')) {
-    outDir = path.resolve('public/assets/3d/avatars');
-  } else if (absRaw.includes('/hdri/')) {
-    outDir = path.resolve('public/assets/3d/city/skybox');
-  } else {
-    outDir = path.resolve('public/assets/3d/misc');
-  }
+  outDir = path.resolve('public/assets/3d/misc');
 }
 mkdirSync(outDir, { recursive: true });
 

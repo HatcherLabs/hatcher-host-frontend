@@ -20,7 +20,7 @@ import { HermesStatsCard } from './cards/hermes/HermesStatsCard';
  * reads when running and cached snapshots where supported.
  *
  * Layout:
- *   1. HermesConfigSnapshotCard  — 7 allowlisted live config keys
+ *   1. HermesConfigSnapshotCard  — live runtime config keys
  *   2. HealthPerformanceCard     — shared
  *   3. CostCard                  — shared
  *   4. HermesRecentErrorsCard    — WARN/ERROR/FATAL from errors.log

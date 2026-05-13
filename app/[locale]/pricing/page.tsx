@@ -6,7 +6,7 @@ import { FOUNDING_MEMBER_MAX_SLOTS } from '@hatcher/shared';
 import { Link } from '@/i18n/routing';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import { useAuth } from '@/lib/auth-context';
 import { loginHrefForReturn } from '@/lib/safe-redirect';
@@ -80,34 +80,36 @@ const TIERS_META: TierDef[] = [
   },
 ];
 
-/* ── Add-on group keys (for messages lookup) ─────────────── */
+const AI_CREDITS_BY_TIER: Record<string, number> = {
+  free: 500,
+  starter: 3000,
+  pro: 15000,
+  business: 40000,
+  founding_member: 25000,
+};
 
-const ADDON_GROUP_KEYS = ['extraAgents', 'extraMessages', 'extraSearches', 'perAgent'] as const;
+function formatAiCredits(value: number, locale: string): string {
+  return new Intl.NumberFormat(locale).format(value);
+}
+
+/* ── Add-on group keys (for translation lookup) ──────────── */
+
+const ADDON_GROUP_KEYS = ['aiCredits', 'extraAgents'] as const;
 type AddonGroupKey = typeof ADDON_GROUP_KEYS[number];
 
 /* The prices stay hardcoded (USD amounts, not translatable) */
 const ADDON_PRICES: Record<AddonGroupKey, { price: string; isSubscription: boolean }[]> = {
+  aiCredits: [
+    { price: '$7',  isSubscription: false },
+    { price: '$13', isSubscription: false },
+    { price: '$30', isSubscription: false },
+    { price: '$60', isSubscription: false },
+  ],
   extraAgents:   [
     { price: '$2.99',  isSubscription: true },
     { price: '$6.99',  isSubscription: true },
     { price: '$11.99', isSubscription: true },
     { price: '$19.99', isSubscription: true },
-  ],
-  extraMessages: [
-    { price: '$1.99', isSubscription: true },
-    { price: '$3.99', isSubscription: true },
-    { price: '$5.99', isSubscription: true },
-    { price: '$9.99', isSubscription: true },
-  ],
-  extraSearches: [
-    { price: '$3.99', isSubscription: true },
-    { price: '$6.99', isSubscription: true },
-  ],
-  perAgent: [
-    { price: '$7.99', isSubscription: true  },
-    { price: '$4.99', isSubscription: false },
-    { price: '$2.99', isSubscription: true  },
-    { price: '$5.99', isSubscription: true  },
   ],
 };
 
@@ -115,6 +117,7 @@ const ADDON_PRICES: Record<AddonGroupKey, { price: string; isSubscription: boole
 export default function PricingPage() {
   const t = useTranslations('pricing');
   const tTiers = useTranslations('shared.tiers');
+  const locale = useLocale();
   const { isAuthenticated } = useAuth();
   const [isAnnual, setIsAnnual] = useState(false);
   // Founding Member availability — fetched from /features (public).
@@ -207,7 +210,6 @@ export default function PricingPage() {
             // Tier-specific translated strings
             const tierKey = tier.key as 'free' | 'starter' | 'pro' | 'business' | 'founding_member';
             const tierAgents   = t(`tiers.${tierKey}.agents`);
-            const tierMessages = t(`tiers.${tierKey}.messages`);
             const tierCpu      = t(`tiers.${tierKey}.cpu`);
             const tierRam      = t(`tiers.${tierKey}.ram`);
             const tierStorage  = t(`tiers.${tierKey}.storage`);
@@ -307,7 +309,10 @@ export default function PricingPage() {
                 {/* Features */}
                 <div className="space-y-2 flex-1 mb-7">
                   <FeatureCheck color="var(--color-accent)">{tierAgents}</FeatureCheck>
-                  <FeatureCheck color="var(--color-accent)">{tierMessages}</FeatureCheck>
+                  <FeatureCheck color="var(--color-accent)">
+                    {formatAiCredits(AI_CREDITS_BY_TIER[tier.key] ?? 0, locale)} AI Credits{t('priceUnit.perMonth')}
+                  </FeatureCheck>
+                  <FeatureCheck color="var(--color-accent)">OpenRouter model picker</FeatureCheck>
                   <FeatureCheck color="var(--color-accent)">{tierCpu} / {tierRam}</FeatureCheck>
                   <FeatureCheck color="var(--color-accent)">{tierStorage}</FeatureCheck>
                   <FeatureCheck color="var(--color-accent)">{tierSleep}</FeatureCheck>
@@ -480,22 +485,24 @@ export default function PricingPage() {
                 <tbody>
                   {(
                     [
-                      { rowKey: 'agents',         free: '1',         starter: '1',         pro: '3',    business: '10',  founding: '10' },
-                      { rowKey: 'messages',        free: '20',        starter: '50',        pro: '100',  business: '300', founding: '300' },
-                      { rowKey: 'searches',        free: '3',         starter: '10',        pro: '50',   business: '200', founding: '200' },
-                      { rowKey: 'byok',            free: 'unlimited', starter: 'unlimited', pro: 'unlimited', business: 'unlimited', founding: 'unlimited' },
-                      { rowKey: 'cpuRam',          free: '0.5 / 1GB', starter: '1 / 1.5GB', pro: '1.5 / 2GB', business: '2 / 3GB', founding: '2 / 4GB' },
-                      { rowKey: 'storage',         free: '50 MB',     starter: '150 MB',    pro: '500 MB', business: '1 GB', founding: '2 GB' },
-                      { rowKey: 'autoSleep',       free: '1h',        starter: '4h',        pro: '12h',  business: 'alwaysOn', founding: 'alwaysOn' },
-                      { rowKey: 'fileManager',     free: 'addon',     starter: 'addon',     pro: 'addon', business: true, founding: true },
-                      { rowKey: 'fullLogs',        free: 'addon',     starter: 'addon',     pro: 'addon', business: true, founding: true },
-                      { rowKey: 'teamCollab',      free: false,       starter: false,       pro: false,  business: true,  founding: true },
+                      { rowKey: 'agents',         free: '1',         starter: '1',         pro: '3',    business: '5',  founding: '5' },
+                      { rowKey: 'aiCredits', label: 'AI Credits / month', free: '500', starter: '3,000', pro: '15,000', business: '40,000', founding: '25,000' },
+                      { rowKey: 'models', label: 'Hosted models', free: 'OpenRouter', starter: 'OpenRouter', pro: 'OpenRouter', business: 'OpenRouter', founding: 'OpenRouter' },
+                      { rowKey: 'webSearch', label: 'Web search', free: 'Uses AI Credits', starter: 'Uses AI Credits', pro: 'Uses AI Credits', business: 'Uses AI Credits', founding: 'Uses AI Credits' },
+                      { rowKey: 'byok',            free: 'Provider-paid', starter: 'Provider-paid', pro: 'Provider-paid', business: 'Provider-paid', founding: 'Provider-paid' },
+                      { rowKey: 'cpuRam',          free: '1 / 1GB', starter: '1 / 1.5GB', pro: '1.5 / 2GB', business: '2 / 3GB', founding: '2 / 3GB' },
+                      { rowKey: 'storage',         free: '2 GB',     starter: '10 GB',    pro: '25 GB', business: '50 GB', founding: '40 GB' },
+                      { rowKey: 'autoSleep',       free: '12h',      starter: 'alwaysOn', pro: 'alwaysOn',  business: 'alwaysOn', founding: 'alwaysOn' },
+                      { rowKey: 'fileManager',     free: true,       starter: true,       pro: true, business: true, founding: true },
+                      { rowKey: 'fullLogs',        free: true,       starter: true,       pro: true, business: true, founding: true },
+                      { rowKey: 'teamCollab',      free: false,       starter: false,       pro: false,  business: true,  founding: false },
                       { rowKey: 'prioritySupport', free: false,       starter: false,       pro: false,  business: true,  founding: true },
-                      { rowKey: 'plugins',         free: '3',         starter: '10',        pro: '25',   business: '50',  founding: '50' },
+                      { rowKey: 'community', label: 'Community perks', free: false, starter: false, pro: false, business: false, founding: 'Discord role + Telegram tag' },
+                      { rowKey: 'plugins',         free: 'Included', starter: 'Included', pro: 'Included', business: 'Included', founding: 'Included' },
                       { rowKey: 'integrations',    free: true,        starter: true,        pro: true,   business: true,  founding: true },
                       { rowKey: 'byokKey',         free: true,        starter: true,        pro: true,   business: true,  founding: true },
                       { rowKey: 'defaultLlm',      free: 'llama4Scout', starter: 'llama4Scout', pro: 'llama4Scout', business: 'llama4Scout', founding: 'llama4Scout' },
-                    ] as Array<{ rowKey: string; free: string | boolean; starter: string | boolean; pro: string | boolean; business: string | boolean; founding: string | boolean }>
+                    ] as Array<{ rowKey: string; label?: string; free: string | boolean; starter: string | boolean; pro: string | boolean; business: string | boolean; founding: string | boolean }>
                   ).map((row, i) => (
                     <tr
                       key={row.rowKey}
@@ -504,7 +511,7 @@ export default function PricingPage() {
                         i % 2 === 0 && 'bg-[var(--bg-card)]'
                       )}
                     >
-                      <td className="px-2.5 py-3 sm:p-4 text-[var(--text-secondary)] text-xs sm:text-sm">{t(`compareTable.rows.${row.rowKey}`)}</td>
+                      <td className="px-2.5 py-3 sm:p-4 text-[var(--text-secondary)] text-xs sm:text-sm">{row.label ?? t(`compareTable.rows.${row.rowKey}`)}</td>
                       <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.free, t)}</td>
                       <td className="px-2 py-3 sm:p-4 text-center">{renderCell(row.starter, t)}</td>
                       <td className="px-2 py-3 sm:p-4 text-center bg-[#8b5cf6]/[0.03]">{renderCell(row.pro, t)}</td>

@@ -351,7 +351,7 @@ export function AgentPageClient() {
               {t('analytics.heading')}
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {/* Messages Processed — big stat */}
+              {/* Interactions processed — big stat */}
               <div className="rounded-xl bg-[var(--bg-elevated)] p-5 text-center col-span-2 sm:col-span-1">
                 <div className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-2 flex items-center justify-center gap-1">
                   <MessageSquare className="w-3 h-3" />
@@ -419,7 +419,7 @@ export function AgentPageClient() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
-                  href={`/create${publicStats?.template ? `?template=${publicStats.template}&framework=${agent.framework}` : `?framework=${agent.framework}`}`}
+                  href="/chat-to-hatch"
                   className="btn-primary inline-flex items-center gap-2 justify-center"
                 >
                   <Rocket className="w-4 h-4" />

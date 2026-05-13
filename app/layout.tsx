@@ -41,7 +41,7 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   viewportFit: 'cover',
-  themeColor: '#8b5cf6',
+  themeColor: '#39FF88',
 };
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hatcher.host';
@@ -75,7 +75,12 @@ export const metadata: Metadata = {
     title: 'Hatcher — Hatch Your AI Agent in 60 Seconds',
     description:
       'Deploy OpenClaw and Hermes agents instantly. Configure with no code, launch on Telegram, Discord, WhatsApp, and manage agents in 3D rooms.',
-    images: [{ url: `${SITE_URL}/og?title=Hatcher&subtitle=Deploy+OpenClaw+and+Hermes+agents+instantly.+Configure+with+no+code%2C+launch+on+Telegram%2C+Discord%2C+WhatsApp.&tag=AI+Agent+Hosting`, width: 1200, height: 630, alt: 'Hatcher — Hatch Your AI Agent in 60 Seconds' }],
+    // Homepage social preview = the hero robot-hatching-from-egg image directly,
+    // not the dynamic /og card. Static asset keeps the visual identical to the
+    // landing hero (phosphor green theme) and avoids drift when the OG renderer
+    // is updated. 1672x941 is 16:9 — within Twitter/X summary_large_image bounds.
+    // Sub-pages (blog, agent rooms, affiliate) still use the dynamic /og route.
+    images: [{ url: `${SITE_URL}/landing-v3/robot-hatch-hero.png`, width: 1672, height: 941, alt: 'Hatcher — Hatch Your AI Agent in 60 Seconds' }],
     locale: 'en_US',
   },
   twitter: {
@@ -85,7 +90,7 @@ export const metadata: Metadata = {
     title: 'Hatcher — Hatch Your AI Agent in 60 Seconds',
     description:
       'Deploy OpenClaw and Hermes agents instantly. Configure with no code, launch on Telegram, Discord, WhatsApp, and manage agents in 3D rooms.',
-    images: [`${SITE_URL}/og?title=Hatcher&subtitle=Deploy+OpenClaw+and+Hermes+agents+instantly.+Configure+with+no+code%2C+launch+on+Telegram%2C+Discord%2C+WhatsApp.&tag=AI+Agent+Hosting`],
+    images: [`${SITE_URL}/landing-v3/robot-hatch-hero.png`],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   alternates: { canonical: SITE_URL },
@@ -146,7 +151,7 @@ const softwareApplicationJsonLd = {
       name: 'Free Tier',
       price: '0',
       priceCurrency: 'USD',
-      description: '1 agent, 20 messages/day, 3 searches/day, all integrations.',
+      description: '1 agent, 500 AI Credits/month, 1 CPU/1GB RAM, 2GB workspace, all integrations.',
     },
     {
       '@type': 'Offer',
@@ -154,7 +159,7 @@ const softwareApplicationJsonLd = {
       price: '6.99',
       priceCurrency: 'USD',
       billingIncrement: 'P1M',
-      description: '1 agent, 50 messages/day, 10 searches/day, 1 CPU/1.5GB RAM.',
+      description: '1 agent, 3,000 AI Credits/month, 1 CPU/1.5GB RAM, 10GB workspace.',
     },
     {
       '@type': 'Offer',
@@ -162,7 +167,7 @@ const softwareApplicationJsonLd = {
       price: '19.99',
       priceCurrency: 'USD',
       billingIncrement: 'P1M',
-      description: '3 agents, 100 messages/day, 50 searches/day, dedicated resources.',
+      description: '3 agents, 15,000 AI Credits/month, 1.5 CPU/2GB RAM, 25GB workspace.',
     },
     {
       '@type': 'Offer',
@@ -170,14 +175,14 @@ const softwareApplicationJsonLd = {
       price: '49.99',
       priceCurrency: 'USD',
       billingIncrement: 'P1M',
-      description: '10 agents, 300 messages/day, 200 searches/day, always-on, priority support.',
+      description: '5 agents, 40,000 AI Credits/month, 2 CPU/3GB RAM, 50GB workspace, always active, team collaboration.',
     },
     {
       '@type': 'Offer',
       name: 'Founding Member',
       price: '99',
       priceCurrency: 'USD',
-      description: '10 agents, 300 messages/day, 200 searches/day, lifetime access, always-on, 20 spots only.',
+      description: '5 agents, 25,000 AI Credits/month, 2 CPU/3GB RAM, 40GB workspace, lifetime access, 20 spots only.',
     },
   ],
   creator: {
@@ -196,7 +201,7 @@ const faqJsonLd = {
       name: 'Is it really free?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. The free plan gives you 1 agent, 20 messages per day, and access to all platforms. No credit card required.',
+        text: 'Yes. The free plan gives you 1 agent, 500 AI Credits/month, 2GB workspace, File Manager, Full Logs, and access to all platforms. No credit card required.',
       },
     },
     {
@@ -212,7 +217,7 @@ const faqJsonLd = {
       name: 'What is "Bring Your Own Key"?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Connect your own OpenAI, Anthropic, Google, OpenRouter, Groq, or other supported LLM key for unlimited messages. You only pay your AI provider directly.',
+        text: 'Connect your own OpenAI, Anthropic, Google, OpenRouter, or other supported LLM key. BYOK usage is paid directly to your provider and does not spend Hatcher AI Credits.',
       },
     },
     {

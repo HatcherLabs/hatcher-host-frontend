@@ -2,35 +2,29 @@
 
 import { motion } from 'framer-motion';
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { MessageSquare, Infinity as InfinityIcon } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import { api } from '@/lib/api';
 import { GlassCard, Skeleton } from '../../AgentContext';
 
 interface UsageData {
-  messages: {
-    today: number;
-    limit: number;
-    isByok: boolean;
-  };
+  balance: number;
+  monthlyGrant: number;
+  tier: string;
 }
 
 /**
- * Daily messages consumption card — used today vs tier daily limit,
- * with a progress bar and BYOK (unlimited) badge handling. Shared
- * across all per-framework dashboards per the Etapa 1 "cost card:
- * messages/limit for v1" decision (no dollar-amount tracking).
- *
- * Polls `/agents/:id/usage` every 60s so the bar stays near-real-time
- * without hammering the API. Pauses when document.hidden.
+ * Account-level AI Credits card. Hosted LLM and web-search usage is
+ * metered by the proxy; the UI reads the wallet balance instead of
+ * estimating per-agent caps.
  */
-export function CostCard({ agentId }: { agentId: string }) {
+export function CostCard(_props: { agentId: string }) {
   const [data, setData] = useState<UsageData | null>(null);
   const [loading, setLoading] = useState(true);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchUsage = useCallback(async () => {
     try {
-      const res = await api.getAgentUsage(agentId);
+      const res = await api.getAiCreditBalance();
       if (res.success) {
         setData(res.data);
       }
@@ -39,7 +33,7 @@ export function CostCard({ agentId }: { agentId: string }) {
     } finally {
       setLoading(false);
     }
-  }, [agentId]);
+  }, []);
 
   useEffect(() => {
     fetchUsage();
@@ -79,32 +73,26 @@ export function CostCard({ agentId }: { agentId: string }) {
 
   if (!data) return null;
 
-  const { today, limit, isByok } = data.messages;
-  const pct = limit > 0 ? Math.min((today / limit) * 100, 100) : 0;
-  const barColor = pct > 90 ? 'bg-red-500' : pct > 70 ? 'bg-amber-500' : 'bg-[var(--color-accent)]';
+  const pct = data.monthlyGrant > 0 ? Math.min((data.balance / data.monthlyGrant) * 100, 100) : 0;
+  const barColor = pct < 10 ? 'bg-red-500' : pct < 25 ? 'bg-amber-500' : 'bg-[var(--color-accent)]';
 
   return (
     <GlassCard>
       <div className="flex items-center gap-2 mb-3">
-        <MessageSquare size={14} className="text-[var(--color-accent)]" />
-        <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Daily Messages</h3>
-        {isByok && (
-          <span className="ml-auto flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            <InfinityIcon size={10} />
-            BYOK — unlimited
-          </span>
-        )}
+        <Zap size={14} className="text-[var(--color-accent)]" />
+        <h3 className="text-sm font-semibold text-[var(--text-secondary)]">AI Credits</h3>
       </div>
 
       <div className="flex items-baseline gap-2 mb-3">
-        <span className="text-2xl font-bold text-[var(--text-primary)] tabular-nums">{today}</span>
-        {!isByok && limit > 0 && (
-          <span className="text-sm text-[var(--text-muted)]">/ {limit} today</span>
+        <span className="text-2xl font-bold text-[var(--text-primary)] tabular-nums">
+          {data.balance.toLocaleString()}
+        </span>
+        {data.monthlyGrant > 0 && (
+          <span className="text-sm text-[var(--text-muted)]">/ {data.monthlyGrant.toLocaleString()} monthly grant</span>
         )}
-        {isByok && <span className="text-sm text-[var(--text-muted)]">messages today</span>}
       </div>
 
-      {!isByok && limit > 0 && (
+      {data.monthlyGrant > 0 && (
         <div className="h-2 rounded-full bg-[var(--bg-card)] overflow-hidden">
           <motion.div
             className={`h-full rounded-full ${barColor}`}
@@ -115,9 +103,9 @@ export function CostCard({ agentId }: { agentId: string }) {
         </div>
       )}
 
-      {!isByok && limit > 0 && pct >= 90 && (
-        <p className="text-[11px] text-red-400 mt-2">
-          Close to the daily cap — upgrade your tier or switch to BYOK for unlimited.
+      {data.monthlyGrant > 0 && pct < 25 && (
+        <p className="text-[11px] text-amber-400 mt-2">
+          Low AI Credits balance. Top up or switch to BYOK before hosted usage pauses.
         </p>
       )}
     </GlassCard>

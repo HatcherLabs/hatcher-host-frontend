@@ -55,9 +55,7 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
   const tTiers = useTranslations('shared.tiers');
   const [tier, setTier]             = useState<string>('free');
   const [agentLimit, setAgentLimit] = useState<number>(1);
-  // Live tier limit from the server (includes active `+N msg/day` addons).
-  // 0 = unlimited / BYOK legacy.
-  const [chatLimit, setChatLimit]   = useState<number>(0);
+  const [aiCredits, setAiCredits]   = useState<{ balance: number; monthlyGrant: number } | null>(null);
   const [loading, setLoading]       = useState(true);
 
   useEffect(() => {
@@ -66,12 +64,14 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
       if (res.success) {
         setTier(res.data.tier);
         setAgentLimit(res.data.agentLimit);
-        setChatLimit(res.data.chatLimit ?? 0);
+        setAiCredits(res.data.aiCredits ? {
+          balance: res.data.aiCredits.balance,
+          monthlyGrant: res.data.aiCredits.monthlyGrant,
+        } : null);
       }
     });
   }, []);
 
-  const rawLimit: number | 'unlimited' = chatLimit === 0 ? 'unlimited' : chatLimit;
   const validTierKey = (tier in TIER_KEYS) ? tier as keyof typeof TIER_KEYS : 'free';
   const tierLabel = tTiers(`${validTierKey}.name`);
   const tierColor = TIER_COLORS[tier]  ?? 'text-[var(--text-muted)]';
@@ -114,7 +114,7 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
         </div>
       </motion.div>
 
-      {/* Daily Message Limit */}
+      {/* AI Credits */}
       <motion.div className="card glass-noise p-5" variants={cardVariants}>
         <div className="flex items-center gap-3 mb-3">
           <div className="w-9 h-9 rounded-lg bg-amber-500/15 flex items-center justify-center flex-shrink-0">
@@ -122,11 +122,9 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
           </div>
           <div className="text-xs text-[var(--text-muted)] leading-tight">{t('dailyMessages')}</div>
         </div>
-        {rawLimit === 'unlimited' ? (
-          <div className="text-2xl font-bold text-emerald-400">{t('unlimited')}</div>
-        ) : (
-          <div className="text-2xl font-bold text-[var(--text-primary)]">{rawLimit}</div>
-        )}
+        <div className="text-2xl font-bold text-[var(--text-primary)] tabular-nums">
+          {aiCredits ? aiCredits.balance.toLocaleString() : '0'}
+        </div>
         <div className="text-[10px] text-[var(--text-muted)] mt-1">{t('accountWide')}</div>
       </motion.div>
 
@@ -148,7 +146,11 @@ export function QuickStats({ agentCount, activeCount }: QuickStatsProps) {
           )}
         </div>
         <div className="text-[10px] text-[var(--text-muted)] mt-1">
-          {activeCount === 0 ? t('noAgentsRunning') : activeCount !== 1 ? t('agentsOnlinePlural').replace('{count}', String(activeCount)) : t('agentsOnline').replace('{count}', String(activeCount))}
+          {activeCount === 0
+            ? t('noAgentsRunning')
+            : activeCount !== 1
+              ? t('agentsOnlinePlural', { count: activeCount })
+              : t('agentsOnline', { count: activeCount })}
         </div>
       </motion.div>
 

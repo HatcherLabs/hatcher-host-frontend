@@ -112,7 +112,7 @@ apps/frontend/
 | `/dashboard/agent/[id]` | Agent management | Required |
 | `/dashboard/billing` | Billing & plans | Required |
 | `/dashboard/team` | Team collaboration | Required |
-| `/create` | Agent creation wizard (23 templates) | Required |
+| `/create` | Chat-to-Hatch agent creation flow | Required |
 | `/settings` | Account settings, BYOK config, API keys | Required |
 | `/support` | Support tickets | Required |
 | `/help` | Help center & FAQ | Required |
@@ -134,7 +134,7 @@ The `/dashboard/agent/[id]` page has 13 tabs:
 | Chat | In-browser chat with voice UI (STT/TTS) |
 | Workflows | Visual workflow builder (React Flow) |
 | Versions | Config version history, diff viewer, restore |
-| Marketplace | Template browser |
+| Marketplace | Not currently exposed |
 | Analytics | Message stats, usage graphs |
 | Team | Shared access, roles |
 | Domains | Custom domain config, DNS verify |
@@ -195,14 +195,13 @@ All tokens are encrypted at rest (AES-256-GCM) in the backend.
 
 ## BYOK (Bring Your Own Key)
 
-Users can provide their own LLM API keys to bypass daily message limits entirely. Supported providers:
+Users can provide their own LLM API keys for provider-paid BYOK usage without spending Hatcher AI Credits. Supported providers:
 
 | Provider | Models |
 |----------|--------|
 | OpenAI | GPT-4o, GPT-4o mini, o3-mini |
 | Anthropic | Claude Haiku, Sonnet, Opus |
 | Google | Gemini 2.0 Flash, Pro |
-| Groq | Llama 4 Scout, Llama 3.3 |
 | xAI | Grok-2 |
 | OpenRouter | Any model |
 | Ollama | Local models |

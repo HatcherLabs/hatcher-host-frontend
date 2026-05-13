@@ -155,12 +155,6 @@ export async function payWithSol(params: {
 }): Promise<{ signature: string }> {
   const { wallet, connection, quote } = params;
   const { publicKey, sendTransaction } = wallet;
-  console.log('[pay-sol] start', {
-    publicKey: publicKey?.toBase58(),
-    hasSendTx: !!sendTransaction,
-    endpoint: connection.rpcEndpoint,
-    lamports: quote.lamports,
-  });
   if (!publicKey || !sendTransaction) throw new Error('Connect a Solana wallet first');
 
   const treasury = new PublicKey(TREASURY_WALLET);
@@ -177,7 +171,6 @@ export async function payWithSol(params: {
     const bh = await connection.getLatestBlockhash('confirmed');
     blockhash = bh.blockhash;
     lastValidBlockHeight = bh.lastValidBlockHeight;
-    console.log('[pay-sol] got blockhash', blockhash.slice(0, 8));
   } catch (e) {
     console.error('[pay-sol] getLatestBlockhash FAILED', e);
     throw new Error(`RPC error: ${(e as Error).message}. Check NEXT_PUBLIC_SOLANA_RPC.`);
@@ -185,14 +178,12 @@ export async function payWithSol(params: {
   tx.recentBlockhash = blockhash;
   tx.feePayer = publicKey;
 
-  console.log('[pay-sol] calling wallet.sendTransaction — Phantom should pop up NOW');
   let signature: string;
   try {
     signature = await sendTransaction(tx, connection, {
       skipPreflight: false,
       preflightCommitment: 'confirmed',
     });
-    console.log('[pay-sol] tx sent, sig:', signature);
   } catch (e) {
     console.error('[pay-sol] sendTransaction FAILED', e);
     throw e;

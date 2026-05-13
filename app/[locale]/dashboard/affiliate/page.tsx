@@ -107,24 +107,13 @@ function fmtUsd(n: number): string {
   return `$${n.toFixed(2)}`;
 }
 
-function fmtCredits(n: number): string {
-  // Strip trailing ".00" to keep credits lines compact — round-number
-  // credits are the common case, decimals happen only on prorated
-  // refunds and upgrade credits.
-  const s = n.toFixed(2);
-  return s.endsWith('.00') ? s.slice(0, -3) : s;
-}
-
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function payoutModeLabel(mode: AffiliateMe['affiliate']['payoutMode'], t: (key: string) => string): string {
-  switch (mode) {
-    case 'CASH_ONLY': return t('modeCashOnly');
-    case 'CREDITS_ONLY': return t('modeCreditsOnly');
-    case 'HYBRID': return t('modeHybrid');
-  }
+  void mode;
+  return t('modeCashOnly');
 }
 
 // sourceLabel is called within the component so will receive t from closure
@@ -213,7 +202,7 @@ function CopyButton({ value }: { value: string }) {
 
 // ─── Share actions ───────────────────────────────────────────
 function ShareActions({ shareLink }: { shareLink: string }) {
-  const text = `I'm hosting my AI agents on Hatcher — join via my link and we both get credits.`;
+  const text = `I'm hosting my AI agents on Hatcher — join via my link.`;
   const xUrl = `https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareLink)}`;
   const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(shareLink)}&text=${encodeURIComponent(text)}`;
 
@@ -340,6 +329,12 @@ export default function AffiliateDashboardPage() {
   // dashboard can still partially render (stats may load even if one
   // list endpoint blips).
   const gateByAffiliate = useCallback(async () => {
+    const status = await api.getAffiliateStatus();
+    if (status.success && !status.data.active) {
+      router.replace('/affiliate/apply?reason=not-active');
+      return null;
+    }
+
     const res = await api.getAffiliateMe();
     if (!res.success) {
       if (res.error === 'Not an active affiliate') {
@@ -431,7 +426,7 @@ export default function AffiliateDashboardPage() {
   }
 
   const aff = me?.affiliate;
-  const payableHighlight = (stats?.payable.cashUsd ?? 0) > 0 || (stats?.payable.credits ?? 0) > 0;
+  const payableHighlight = (stats?.payable.cashUsd ?? 0) > 0;
 
   return (
     <main className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
@@ -459,7 +454,7 @@ export default function AffiliateDashboardPage() {
                   Code <span className="font-mono text-[var(--text-primary)]">{aff.referralCode}</span>
                   <span className="mx-2">·</span>
                   <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-[var(--border-default)] text-[10px] font-semibold uppercase tracking-wider">
-                    {aff.payoutMode.replace('_', ' ')}
+                    CASH PAYOUT
                   </span>
                 </p>
               )}
@@ -543,20 +538,20 @@ export default function AffiliateDashboardPage() {
               />
               <StatCard
                 label={t('pending30d')}
-                value={`${fmtUsd(stats.pending.cashUsd)} + ${fmtCredits(stats.pending.credits)} cr`}
+                value={fmtUsd(stats.pending.cashUsd)}
                 icon={Clock}
                 iconColor="#f59e0b"
               />
               <StatCard
                 label={t('payableNow')}
-                value={`${fmtUsd(stats.payable.cashUsd)} + ${fmtCredits(stats.payable.credits)} cr`}
+                value={fmtUsd(stats.payable.cashUsd)}
                 icon={Wallet}
                 iconColor="#22c55e"
                 highlight={payableHighlight}
               />
               <StatCard
                 label={t('lifetimeEarned')}
-                value={`${fmtUsd(stats.lifetime.cashUsdEarned)} + ${fmtCredits(stats.lifetime.creditsEarned)} cr`}
+                value={fmtUsd(stats.lifetime.cashUsdEarned)}
                 sub={`${fmtUsd(stats.lifetime.cashUsdPaidOut)} ${t('statusPaid').toLowerCase()} out`}
                 icon={TrendingUp}
                 iconColor="#60a5fa"
@@ -634,7 +629,7 @@ export default function AffiliateDashboardPage() {
                   <td className="px-5 py-3 text-xs text-[var(--text-muted)]">{fmtDate(c.createdAt)}</td>
                   <td className="px-5 py-3 text-xs text-[var(--text-primary)]">{sourceLabel(c.sourceType, t)}</td>
                   <td className="px-5 py-3 text-xs text-[var(--text-primary)] font-medium">
-                    {fmtUsd(c.cashAmountUsd)}{c.creditsAmount > 0 && <span className="text-[var(--text-muted)]"> + {fmtCredits(c.creditsAmount)} cr</span>}
+                    {fmtUsd(c.cashAmountUsd)}
                   </td>
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
@@ -664,7 +659,6 @@ export default function AffiliateDashboardPage() {
               <tr className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-default)]">
                 <th className="text-left font-semibold px-5 py-3">Date</th>
                 <th className="text-left font-semibold px-5 py-3">Cash</th>
-                <th className="text-left font-semibold px-5 py-3">Credits</th>
                 <th className="text-left font-semibold px-5 py-3">Note</th>
               </tr>
             </thead>
@@ -688,9 +682,6 @@ export default function AffiliateDashboardPage() {
                         )}
                       </div>
                     ) : <span className="text-[var(--text-muted)]">—</span>}
-                  </td>
-                  <td className="px-5 py-3 text-xs text-[var(--text-primary)]">
-                    {p.creditsAmount > 0 ? `${fmtCredits(p.creditsAmount)} cr` : <span className="text-[var(--text-muted)]">—</span>}
                   </td>
                   <td className="px-5 py-3 text-xs text-[var(--text-muted)]">{p.adminNote || '—'}</td>
                 </tr>
@@ -719,7 +710,7 @@ export default function AffiliateDashboardPage() {
               <div>
                 <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">{t('payoutAddress')}</p>
                 <p className="text-xs font-mono text-[var(--text-primary)] break-all">
-                  {aff.payoutAddress ?? <span className="text-[var(--text-muted)]">{t('creditsOnly')}</span>}
+                  {aff.payoutAddress ?? <span className="text-[var(--text-muted)]">Contact support</span>}
                 </p>
               </div>
             </div>

@@ -3,11 +3,7 @@
 import { useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { AgentContext, FRAMEWORK_ROOT_PATH, FRAMEWORK_BADGE, GlassCard } from '../AgentContext';
-import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
-import { usePaymentDrivers } from '@/lib/payment-drivers';
-import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
-import { PaymentRailButtons } from '@/components/payments/PaymentRailButtons';
 import { motion } from 'framer-motion';
 import {
   File,
@@ -17,7 +13,6 @@ import {
   ArrowLeft,
   Trash2,
   Plus,
-  Lock,
   Loader2,
   RefreshCw,
   FileText,
@@ -29,13 +24,10 @@ import {
   Info,
   ShieldAlert,
   Home,
-  Crown,
   FileJson,
   Settings,
   HardDrive,
 } from 'lucide-react';
-import { Link } from '@/i18n/routing';
-import { AnimatePresence } from 'framer-motion';
 
 interface FileEntry {
   name: string;
@@ -60,12 +52,12 @@ const FRAMEWORK_ACCENT: Record<string, { color: string; border: string; bg: stri
 
 const FRAMEWORK_FS_INFO: Record<string, { label: string; description: string }> = {
   openclaw: {
-    label: 'OpenClaw Workspace',
-    description: 'Config and data live in /home/node/.openclaw. Edit settings.json to change behavior, personality, and integrations.',
+    label: 'OpenClaw Files',
+    description: 'Managed OpenClaw state lives in /home/node/.openclaw. Runtime config is openclaw.json; working files, memories, sessions, and plugin-skill data live in their folders.',
   },
   hermes: {
-    label: 'Hermes Workspace',
-    description: 'Agent files are stored in /home/hermes/.hermes. Modify character.json and plugin configs here.',
+    label: 'Hermes Files',
+    description: 'Managed Hermes state lives in /home/hermes/.hermes. config.yaml, SOUL.md, memories, sessions, skills, and platform data are stored here.',
   },
 };
 
@@ -100,17 +92,12 @@ function getFileTypeTag(name: string): { label: string; color: string } | null {
 
 export function FilesTab() {
   const ctx = useContext(AgentContext);
-  const { user } = useAuth();
   const t = useTranslations('dashboard.agentDetail.files');
-  const { confirmState, closeConfirm, driveSol, driveUsdc, driveHatch } = usePaymentDrivers();
   const agentId = ctx?.agent?.id ?? '';
   const framework = ctx?.agent?.framework ?? 'openclaw';
   const ROOT_PATH = FRAMEWORK_ROOT_PATH[framework] ?? '/home/node/.openclaw';
   const accent = FRAMEWORK_ACCENT[framework] ?? FRAMEWORK_ACCENT.openclaw;
   const fsInfo = FRAMEWORK_FS_INFO[framework] ?? FRAMEWORK_FS_INFO.openclaw;
-  const userTier = user?.tier ?? 'free';
-  const isPro = userTier === 'pro' || userTier === 'business' || userTier === 'founding_member';
-
   const [files, setFiles] = useState<FileEntry[]>([]);
   const [currentPath, setCurrentPath] = useState(ROOT_PATH);
   const [loading, setLoading] = useState(true);
@@ -118,8 +105,6 @@ export function FilesTab() {
   const [unlocked, setUnlocked] = useState<boolean | null>(null);
   const [agentStopped, setAgentStopped] = useState(false);
   const [stoppedMessage, setStoppedMessage] = useState('');
-  const [purchasing, setPurchasing] = useState(false);
-  const [showPayModal, setShowPayModal] = useState(false);
   const [showInfoBanner, setShowInfoBanner] = useState(true);
 
   // Editor state
@@ -157,7 +142,7 @@ export function FilesTab() {
         setUnlocked(true);
       }
     } else {
-      if (res.error?.includes('File Manager requires')) {
+      if (res.error?.includes('File Manager')) {
         setUnlocked(false);
       } else {
         setError(res.error ?? 'Failed to load files');
@@ -242,44 +227,6 @@ export function FilesTab() {
     setDeleting(null);
   };
 
-  // ── File Manager unlock — $4.99 one-time addon, per agent ──────────
-  //
-  // Uses the shared payment-drivers hook so the unlock flow matches the
-  // billing page exactly: 4 rail buttons, live rate in the confirm
-  // modal, $HATCHER breakdown with burn, Stripe placeholder disabled
-  // until live keys land. Single driver per rail feeds /features/addon
-  // with the on-chain signature for server-side verification.
-  const FILE_MANAGER_PRICE = 4.99;
-  const FILE_MANAGER_LABEL = 'File Manager unlock';
-
-  const finalizeAddon = async (
-    paymentToken: 'sol' | 'usdc' | 'hatch',
-    txSignature: string,
-  ): Promise<void> => {
-    const res = await api.purchaseAddon('addon.file_manager', txSignature, agentId, paymentToken);
-    if (!res.success) throw new Error(res.error ?? 'Purchase failed');
-    setUnlocked(true);
-    setShowPayModal(false);
-    loadFiles();
-  };
-
-  const runUnlock = async (rail: 'sol' | 'usdc' | 'hatch') => {
-    setPurchasing(true);
-    setError(null);
-    try {
-      const driver = rail === 'sol' ? driveSol : rail === 'usdc' ? driveUsdc : driveHatch;
-      const signature = await driver(FILE_MANAGER_PRICE, FILE_MANAGER_LABEL);
-      await finalizeAddon(rail, signature);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Purchase failed';
-      // Cancelled via modal or wallet popup — silent, not an error the user
-      // needs to see as a red banner.
-      if (msg !== 'Cancelled') setError(msg);
-    } finally {
-      setPurchasing(false);
-    }
-  };
-
   // Breadcrumb segments
   const breadcrumbs = useMemo(() => {
     const relative = currentPath.startsWith(ROOT_PATH)
@@ -315,100 +262,19 @@ export function FilesTab() {
     );
   }
 
-  // ── Locked (not Pro and no addon) ──
+  // ── Unexpected legacy lock ──
   if (unlocked === false) {
     return (
-      <>
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-16">
-          <div
-            className={`w-16 h-16 rounded-2xl ${accent.bg} ${accent.border} border flex items-center justify-center mx-auto mb-6`}
-          >
-            <Lock className={`w-8 h-8 ${accent.text}`} />
-          </div>
-          <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2" style={{ fontFamily: 'var(--font-display)' }}>
-            File Manager
-          </h3>
-
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 mb-4">
-            <Crown size={12} className="text-amber-400" />
-            <span className="text-[11px] font-medium text-amber-400">Add-on</span>
-          </div>
-
-          <p className="text-sm text-[var(--text-secondary)] mb-6 max-w-sm mx-auto">
-            Browse, edit, and download your agent&apos;s configuration and workspace files.
-            <span className="block mt-1 text-xs text-[var(--text-muted)]">
-              One-time purchase per agent — $4.99
-            </span>
-          </p>
-          {error && (
-            <p className="text-xs text-red-400 mb-3">{error}</p>
-          )}
-          <div className="flex flex-col items-center gap-3">
-            <button
-              onClick={() => setShowPayModal(true)}
-              className="px-6 py-2.5 rounded-xl text-sm font-medium text-white transition-colors flex items-center gap-2"
-              style={{ backgroundColor: accent.color }}
-            >
-              <FolderOpen className="w-4 h-4" /> Unlock File Manager — $4.99
-            </button>
-            <Link href="/pricing" className="text-xs hover:underline transition-colors" style={{ color: accent.color }}>
-              Or upgrade to a tier that includes it
-            </Link>
-          </div>
-        </motion.div>
-
-        {/* Payment modal */}
-        <AnimatePresence>
-          {showPayModal && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-              onClick={() => !purchasing && setShowPayModal(false)}
-            >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] w-full max-w-md mx-4 overflow-hidden shadow-xl"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
-                  <h3 className="font-semibold text-[var(--text-primary)]">Unlock File Manager</h3>
-                  <button onClick={() => !purchasing && setShowPayModal(false)} className="text-[var(--text-muted)] hover:text-[var(--text-primary)]">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-                <div className="p-6 space-y-3">
-                  <p className="text-sm text-[var(--text-secondary)] mb-4">
-                    File Manager for this agent — <span className="font-bold text-[var(--text-primary)]">$4.99</span> <span className="text-xs text-[var(--text-muted)]">(one-time)</span>
-                  </p>
-
-                  {error && (
-                    <p className="text-[11px] text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
-                      {error}
-                    </p>
-                  )}
-
-                  <PaymentRailButtons
-                    onPayWithSOL={() => runUnlock('sol')}
-                    onPayWithUSDC={() => runUnlock('usdc')}
-                    onPayWithHATCHER={() => runUnlock('hatch')}
-                    loading={purchasing}
-                    /* onPayWithCard omitted — Stripe stays disabled with
-                       "Coming soon" label until live keys are wired. */
-                  />
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Pre-sign review modal — rendered alongside the paywall so the
-            live rate + burn split shows after the user picks a rail. */}
-        <ConfirmPaymentModal state={confirmState} onClose={closeConfirm} />
-      </>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center py-16">
+        <FolderOpen className={`w-10 h-10 mx-auto mb-3 ${accent.text}`} />
+        <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2" style={{ fontFamily: 'var(--font-display)' }}>
+          File Manager is included
+        </h3>
+        <p className="text-sm text-[var(--text-secondary)] max-w-sm mx-auto">
+          File Manager is now included on every tier. Refresh the agent or restart it if this stale lock persists.
+        </p>
+        {error && <p className="text-xs text-red-400 mt-3">{error}</p>}
+      </motion.div>
     );
   }
 
@@ -662,16 +528,6 @@ export function FilesTab() {
         </div>
       )}
 
-      {/* Pro tier hint for non-pro users */}
-      {!isPro && (
-        <div className="mt-4 flex items-center justify-center gap-2 text-[11px] text-[var(--text-muted)]">
-          <Crown size={12} className="text-amber-400" />
-          <span>File Manager add-on active.</span>
-          <Link href="/pricing" className="hover:underline transition-colors" style={{ color: accent.color }}>
-            Upgrade to Pro for all agents
-          </Link>
-        </div>
-      )}
     </motion.div>
   );
 }

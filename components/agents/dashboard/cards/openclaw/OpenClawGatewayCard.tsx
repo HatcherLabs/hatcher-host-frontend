@@ -13,6 +13,45 @@ interface OpenClawConfigSnapshot {
   managed: boolean;
 }
 
+const HOSTED_PROXY_PREFIX = 'hatcher-llm-proxy/';
+
+const PROVIDER_LABELS: Record<string, string> = {
+  anthropic: 'Anthropic',
+  deepseek: 'DeepSeek',
+  google: 'Google',
+  meta: 'Meta',
+  'meta-llama': 'Meta',
+  mistral: 'Mistral',
+  mistralai: 'Mistral',
+  moonshotai: 'Moonshot AI',
+  nvidia: 'NVIDIA',
+  openai: 'OpenAI',
+  openrouter: 'OpenRouter',
+  qwen: 'Qwen',
+  'x-ai': 'xAI',
+  xai: 'xAI',
+  'z-ai': 'Z.ai',
+};
+
+function cleanHostedModelName(value: string | null | undefined): string | null {
+  if (!value) return null;
+  return value
+    .replace(new RegExp(`^${HOSTED_PROXY_PREFIX}`), '')
+    .replace(/\s+\(via Hatcher LLM Proxy\)$/i, '')
+    .trim() || null;
+}
+
+function providerLabelFromModel(model: string | null | undefined, fallbackProvider: string | null): string | null {
+  const normalized = cleanHostedModelName(model);
+  const providerKey = normalized?.split('/')[0] || fallbackProvider;
+  if (!providerKey) return null;
+  if (providerKey === 'hatcher-llm-proxy') return 'Hatcher Hosted';
+  return PROVIDER_LABELS[providerKey] ?? providerKey
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
 /**
  * Drill down into the openclaw.json config for a gateway summary.
  * Pulls the top-level model provider, gateway bind, endpoint toggles,
@@ -23,19 +62,24 @@ function pickGatewayInfo(config: Record<string, unknown> | null) {
   const gateway = (config.gateway as Record<string, unknown> | undefined) ?? {};
   const http = (gateway.http as Record<string, unknown> | undefined) ?? {};
   const endpoints = (http.endpoints as Record<string, unknown> | undefined) ?? {};
+  const agents = (config.agents as Record<string, unknown> | undefined) ?? {};
+  const defaults = (agents.defaults as Record<string, unknown> | undefined) ?? {};
+  const defaultModel = (defaults.model as Record<string, unknown> | undefined) ?? {};
+  const managedPrimaryModel = cleanHostedModelName(defaultModel.primary as string | undefined);
   const models = (config.models as Record<string, unknown> | undefined) ?? {};
   const providers = (models.providers as Record<string, unknown> | undefined) ?? {};
   const providerList = Object.keys(providers);
 
   // Walk the first provider to pull the primary model name
-  let primaryModel: string | null = null;
+  let primaryModel: string | null = managedPrimaryModel;
   if (providerList.length > 0) {
     const firstProvider = providers[providerList[0]!] as Record<string, unknown> | undefined;
     const modelsArr = firstProvider?.models as Array<{ id?: string; name?: string }> | undefined;
     if (modelsArr && modelsArr.length > 0) {
-      primaryModel = modelsArr[0]?.name ?? modelsArr[0]?.id ?? null;
+      primaryModel = primaryModel ?? cleanHostedModelName(modelsArr[0]?.name ?? modelsArr[0]?.id);
     }
   }
+  const firstProvider = providerLabelFromModel(primaryModel, providerList[0] ?? null);
 
   // Active channels — each entry under `config.channels.<platform>` with
   // `enabled !== false` is considered on. Auth tokens have already been
@@ -61,7 +105,7 @@ function pickGatewayInfo(config: Record<string, unknown> | null) {
       (endpoints.chatCompletions as Record<string, unknown> | undefined)?.enabled,
     ),
     providerCount: providerList.length,
-    firstProvider: providerList[0] ?? null,
+    firstProvider,
     primaryModel,
     activeChannels,
   };

@@ -13,7 +13,6 @@ import { ChatHeader } from './ChatHeader';
 import { MessageList } from './MessageList';
 import { VoiceControlBar } from './VoiceControlBar';
 import { ChatErrorBar } from './ChatErrorBar';
-import { RateLimitIndicator } from './RateLimitIndicator';
 import { ChatInput } from './ChatInput';
 import { VoiceCallOverlay } from './VoiceCallOverlay';
 import { ChatStyles } from './ChatStyles';
@@ -30,9 +29,6 @@ export function ChatTab() {
     sending, sendCooldown,
     chatError, setChatError,
     chatErrorType, setChatErrorType,
-    msgCount, msgLimit,
-    hasUnlimitedChat, isByok,
-    remaining, isLimitReached,
     bottomRef, inputRef,
     sendMessage, handleKeyDown,
     setTab,
@@ -378,20 +374,9 @@ export function ChatTab() {
             sendMessage={sendMessage}
           />
 
-          <RateLimitIndicator
-            isAuthenticated={!!isAuthenticated}
-            isLimitReached={isLimitReached}
-            hasUnlimitedChat={hasUnlimitedChat}
-            isByok={isByok}
-            msgCount={msgCount}
-            msgLimit={msgLimit}
-            remaining={remaining}
-          />
-
           <ChatInput
             agent={agent}
             isAuthenticated={isAuthenticated}
-            isLimitReached={isLimitReached}
             agentStarting={agent.status === 'starting'}
             input={input}
             setInput={setInput}
@@ -413,10 +398,6 @@ export function ChatTab() {
             }}
             inputRef={inputRef}
             llmProvider={llmProvider}
-            hasUnlimitedChat={hasUnlimitedChat}
-            msgCount={msgCount}
-            msgLimit={msgLimit}
-            remaining={remaining}
             attachments={attachments}
             attachmentError={attachmentError}
             uploadingAttachments={uploadingAttachments}

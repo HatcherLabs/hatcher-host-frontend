@@ -52,7 +52,7 @@ const nextConfig = {
     //     own effort (custom middleware + per-request nonces for every
     //     <Script>/<script>). Tracked separately.
     //
-    // City V2 additions (2026-04-24):
+    // 3D scene additions (2026-04-24):
     //   - `worker-src 'self' blob:` — three.js DRACOLoader spins up a
     //     decoder Web Worker from a blob URL; without this every GLB
     //     fails to decompress.
@@ -178,6 +178,12 @@ const nextConfig = {
     out.push({
       source: `/:locale(zh|de|fr|ro)/city/${cityCategory}`,
       destination: '/:locale/city',
+      permanent: true,
+    });
+    out.push({ source: '/create/template', destination: '/chat-to-hatch', permanent: true });
+    out.push({
+      source: '/:locale(zh|de|fr|ro)/create/template',
+      destination: '/:locale/chat-to-hatch',
       permanent: true,
     });
 

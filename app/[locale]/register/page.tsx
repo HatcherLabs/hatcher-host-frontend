@@ -186,7 +186,7 @@ export default function RegisterPage() {
             <div className="flex items-center gap-2 px-3 py-2 mb-4 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
               <Gift size={14} className="text-emerald-400 flex-shrink-0" />
               <p className="text-xs text-emerald-300">
-                {t('referralBadge', { referrer: referrerUsername, credit: '$2' })}
+                {t('referralBadge', { referrer: referrerUsername, credit: '100 AI Credits' })}
               </p>
             </div>
           )}
@@ -252,7 +252,7 @@ export default function RegisterPage() {
                   required
                   minLength={3}
                   maxLength={30}
-                  pattern="^[a-zA-Z0-9_-]+$"
+                  pattern={'^[a-zA-Z0-9_\\-]+$'}
                   aria-invalid={usernameStatus.state === 'taken' || usernameStatus.state === 'invalid'}
                   className={`w-full h-10 pl-3 pr-9 rounded-lg text-sm text-[var(--text-primary)] bg-[var(--bg-card)] border focus:outline-none focus:ring-1 placeholder:text-[var(--text-muted)] transition-colors ${
                     usernameStatus.state === 'taken' || usernameStatus.state === 'invalid'

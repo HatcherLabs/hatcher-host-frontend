@@ -26,8 +26,6 @@ import {
   Check,
   Clock,
   Wallet,
-  Coins,
-  Sparkles,
   AlertCircle,
   Loader2,
   Plus,
@@ -59,7 +57,8 @@ const RESERVED_SLUGS = new Set<string>([
 const MAX_PLATFORMS = 5;
 
 type PlatformType = 'x' | 'youtube' | 'telegram' | 'discord' | 'other';
-type PayoutMode = 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
+type PayoutMode = 'CASH_ONLY';
+type LegacyPayoutMode = PayoutMode | 'CREDITS_ONLY' | 'HYBRID';
 
 type PlatformEntry = {
   type: PlatformType;
@@ -80,7 +79,7 @@ type Application = {
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   platforms: ApplicationPlatform[];
   pitch: string;
-  payoutMode: PayoutMode;
+  payoutMode: LegacyPayoutMode;
   payoutAddress: string | null;
   desiredSlug: string | null;
   createdAt: string;
@@ -109,20 +108,6 @@ const PAYOUT_OPTIONS: Array<{
     breakdown: '20% recurring, paid in SOL / USDC / $HATCHER',
     icon: Wallet,
     accent: '#22c55e',
-  },
-  {
-    value: 'CREDITS_ONLY',
-    label: 'Credits Only',
-    breakdown: '40% recurring, paid as Hatcher credits',
-    icon: Coins,
-    accent: 'var(--color-accent)',
-  },
-  {
-    value: 'HYBRID',
-    label: 'Hybrid',
-    breakdown: '15% cash + 25% credits (40% total)',
-    icon: Sparkles,
-    accent: '#8b5cf6',
   },
 ];
 
@@ -395,7 +380,7 @@ function ApplyForm({
         : [makeEmptyPlatform()],
     desiredSlug: previousApplication?.desiredSlug ?? '',
     pitch: previousApplication?.pitch ?? '',
-    payoutMode: previousApplication?.payoutMode ?? 'CASH_ONLY',
+    payoutMode: 'CASH_ONLY',
     payoutAddress: previousApplication?.payoutAddress ?? '',
   }));
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -403,7 +388,7 @@ function ApplyForm({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const needsPayoutAddress = form.payoutMode !== 'CREDITS_ONLY';
+  const needsPayoutAddress = true;
 
   const pitchLen = form.pitch.trim().length;
   const pitchCountClass = useMemo(() => {
@@ -545,7 +530,7 @@ function ApplyForm({
           platforms: platformsPayload,
           pitch: form.pitch.trim(),
           payoutMode: form.payoutMode,
-          payoutAddress: needsPayoutAddress ? form.payoutAddress.trim() : undefined,
+          payoutAddress: form.payoutAddress.trim(),
           desiredSlug: desiredSlugFinal || undefined,
         });
 
@@ -562,7 +547,7 @@ function ApplyForm({
             })),
             pitch: form.pitch.trim(),
             payoutMode: form.payoutMode,
-            payoutAddress: needsPayoutAddress ? form.payoutAddress.trim() : null,
+            payoutAddress: form.payoutAddress.trim(),
             desiredSlug: desiredSlugFinal || null,
             createdAt: res.data.application.createdAt,
             reviewedAt: null,

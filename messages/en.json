@@ -39,11 +39,14 @@
     "affiliateBecome": "Become an affiliate",
     "userMenu": {
       "sub_myAgents": "Browse, edit, deploy.",
-      "sub_create": "Pick a template manually.",
+      "sub_create": "Describe an agent to hatch.",
+      "sub_analytics": "AI Credits, tokens, trends.",
       "sub_billing": "Tier, addons, credits.",
+      "sub_wallets": "Solana payment wallets.",
+      "sub_team": "Members and collaboration.",
       "sub_settings": "Profile, API keys, prefs.",
       "sub_support": "Help, docs, contact.",
-      "sub_affiliate": "Earn credits sharing Hatcher.",
+      "sub_affiliate": "Earn cash sharing Hatcher.",
       "sub_admin": "Platform controls.",
       "sub_signOut": "End session on this device.",
       "tierSuffix": "tier"
@@ -54,8 +57,6 @@
       "resources": "Resources",
       "hatchAgentLabel": "Hatch agent (chat)",
       "hatchAgentSub": "Describe what you want — done in seconds.",
-      "createTplLabel": "Create from template",
-      "createTplSub": "Pick a framework + tools manually.",
       "myAgentsLabel": "My agents",
       "myAgentsSub": "Dashboard for your running agents.",
       "cityLabel": "Hatcher City",
@@ -117,7 +118,6 @@
     "colResources": "Resources",
     "colLegal": "Legal",
     "itemHatchAgent": "Hatch agent",
-    "itemCreateTpl": "Create from template",
     "itemMyAgents": "My agents",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Frameworks",
@@ -175,7 +175,7 @@
       "copiedAriaLabel": "Copied",
       "step01": "Send this prompt to your AI coding agent — Claude Code, Cursor, OpenClaw, Hermes, or any agent that can fetch URLs and run shell commands.",
       "step02": "Agent registers an account with your email and sends you a verification link.",
-      "step03": "Click verify. Your agent picks a template, deploys, and hands you a running AI.",
+      "step03": "Click verify. Hatcher drafts the config, deploys, and hands you a running AI.",
       "viewSkillMd": "View skill.md",
       "githubSource": "GitHub source"
     },
@@ -288,7 +288,7 @@
         },
         {
           "title": "Bring your own key",
-          "desc": "Use your own LLM API key for unlimited messages on any tier."
+          "desc": "Use your own LLM API key without spending AI Credits."
         },
         {
           "title": "Secure by default",
@@ -307,7 +307,7 @@
     "pricing": {
       "eyebrow": "Pricing",
       "heading": "Start free, grow when ready",
-      "subheading": "All platforms included on every plan. Bring your own AI key for unlimited messages on any tier.",
+      "subheading": "All platforms included on every plan. Hosted AI and web search use AI Credits; BYOK stays provider-paid.",
       "popularLabel": "Popular",
       "tiers": [
         {
@@ -316,9 +316,10 @@
           "sub": "/month",
           "features": [
             "1 AI agent",
-            "20 messages/day",
+            "500 AI Credits/month",
+            "2 GB workspace",
             "All platforms",
-            "Free AI included"
+            "File Manager + Full Logs"
           ],
           "cta": "Get started"
         },
@@ -328,9 +329,10 @@
           "sub": "/month",
           "features": [
             "1 AI agent",
-            "50 messages/day",
-            "BYOK = unlimited",
-            "Longer active time"
+            "3,000 AI Credits/month",
+            "10 GB workspace",
+            "BYOK direct billing",
+            "Always active"
           ],
           "cta": "Choose Starter"
         },
@@ -340,8 +342,9 @@
           "sub": "/month",
           "features": [
             "3 AI agents",
-            "100 messages/day",
-            "BYOK = unlimited",
+            "15,000 AI Credits/month",
+            "25 GB workspace",
+            "BYOK direct billing",
             "Dedicated resources"
           ],
           "cta": "Choose Pro"
@@ -351,15 +354,16 @@
           "price": "$49.99",
           "sub": "/month",
           "features": [
-            "10 AI agents",
-            "300 messages/day",
+            "5 AI agents",
+            "40,000 AI Credits/month",
+            "50 GB workspace",
             "Always-on containers",
-            "Priority support"
+            "Team collaboration"
           ],
           "cta": "Choose Business"
         }
       ],
-      "addonsNote": "Need more agents, messages, or storage? Add stackable packs — all tiers get add-on flexibility.",
+      "addonsNote": "Need more agents, AI Credits, or storage? Add extra capacity when you need it.",
       "addonsCta": "See full pricing →"
     },
     "founding": {
@@ -376,15 +380,15 @@
       "claimed": "{claimed} of {max} claimed · once they're gone, this offer is gone.",
       "includedHeading": "Everything included, forever",
       "includedItems": [
-        "10 agents included",
+        "5 agents included",
         "Always-on (no sleep)",
-        "300 messages/day per account",
-        "200 web searches/day",
-        "2 CPU · 4 GB RAM per agent",
-        "2 GB workspace per agent",
+        "25,000 AI Credits/month",
+        "Web search uses AI Credits",
+        "2 CPU · 3 GB RAM per agent",
+        "40 GB workspace per agent",
         "File Manager + Full Logs",
-        "Team collaboration + priority support",
-        "Founding badge",
+        "Priority support",
+        "Founding Discord role + Telegram tag",
         "Locked-in price forever"
       ],
       "ctaSoldOut": "Sold out",
@@ -396,7 +400,7 @@
       "items": [
         {
           "q": "Is it really free?",
-          "a": "Yes. The free plan gives you 1 agent, 20 messages per day, and access to all platforms. No credit card required. BYOK (bring your own LLM key) = unlimited messages on any tier."
+          "a": "Yes. The free plan gives you 1 agent, 500 AI Credits/month, 2 GB workspace, File Manager, Full Logs, and access to all platforms. No credit card required. BYOK (bring your own LLM key) stays provider-paid on any tier."
         },
         {
           "q": "Do I need to know how to code?",
@@ -404,7 +408,7 @@
         },
         {
           "q": "What is \"Bring Your Own Key\"?",
-          "a": "Connect your own OpenAI, Anthropic, Google, OpenRouter, or other supported LLM key for unlimited messages. You only pay your AI provider directly."
+          "a": "Connect your own OpenAI, Anthropic, Google, OpenRouter, or other supported LLM key. BYOK usage is paid directly to your provider and does not spend Hatcher AI Credits."
         },
         {
           "q": "Where does my agent run?",
@@ -414,7 +418,7 @@
     },
     "finalCta": {
       "heading": "Ready to deploy your first agent?",
-      "body": "Free tier includes 1 agent with 20 messages/day. BYOK = unlimited. No credit card required.",
+      "body": "Free tier includes 1 agent, 500 AI Credits/month, File Manager, Full Logs, and 2 GB workspace. BYOK direct billing. No credit card required.",
       "ctaPrimary": "Create your agent",
       "ctaSecondary": "See pricing",
       "trustNoCreditCard": "No credit card",
@@ -450,11 +454,11 @@
       "panelTagline": "Hatcher",
       "panelHeadlinePrefix": "Hatch your",
       "panelHeadlineAccent": "AI agent.",
-      "panelBody": "Free tier with BYOK = unlimited messages. No credit card required.",
+      "panelBody": "Free tier includes AI Credits. BYOK usage is paid directly to your provider. No credit card required.",
       "statsUsers": "Users",
       "statsAgents": "Agents",
       "statsOnline": "Online now",
-      "referralBadge": "Referred by {referrer} — you both get {credit} credit!",
+      "referralBadge": "Referred by {referrer} — you both get {credit}!",
       "emailLabel": "Email",
       "emailPlaceholder": "you@example.com",
       "emailTaken": "Already registered.",
@@ -544,7 +548,7 @@
   "pricing": {
     "eyebrow": "Pricing",
     "heading": "Choose your plan",
-    "subheading": "Start free with any framework. Scale when ready. All integrations included on every tier. BYOK always unlimited.",
+    "subheading": "Start free with any framework. Scale when ready. All integrations included on every tier. BYOK stays provider-paid on every tier.",
     "billingToggle": {
       "monthly": "Monthly",
       "annual": "Annual",
@@ -572,64 +576,59 @@
     "tiers": {
       "free": {
         "agents": "1 agent included",
-        "messages": "20 messages/day",
-        "cpu": "0.5 CPU",
+        "messages": "500 AI Credits/month",
+        "cpu": "1 CPU",
         "ram": "1 GB RAM",
-        "storage": "50 MB workspace",
-        "sleep": "Auto-sleep after 1h idle",
+        "storage": "2 GB workspace",
+        "sleep": "Auto-sleep after 12h idle",
         "features": [
-          "DeepSeek V4 Flash on OpenRouter",
-          "BYOK = unlimited messages",
-          "3 web searches/day",
+          "Hosted models via OpenRouter",
+          "Web search uses AI Credits",
+          "File Manager + Full Logs included",
           "All integrations (Telegram, Discord, Twitter, etc)"
         ],
-        "missing": [
-          "Logs, File Manager available as add-ons"
-        ]
+        "missing": []
       },
       "starter": {
         "agents": "1 agent included",
-        "messages": "50 messages/day",
+        "messages": "3,000 AI Credits/month",
         "cpu": "1 CPU",
         "ram": "1.5 GB RAM",
-        "storage": "150 MB workspace",
-        "sleep": "Auto-sleep after 4h idle",
+        "storage": "10 GB workspace",
+        "sleep": "Always active",
         "features": [
-          "BYOK = unlimited messages",
-          "10 web searches/day",
+          "Hosted models via OpenRouter",
+          "Web search uses AI Credits",
+          "File Manager + Full Logs included",
           "All integrations"
         ],
-        "missing": [
-          "Logs, File Manager available as add-ons"
-        ]
+        "missing": []
       },
       "pro": {
         "agents": "3 agents included",
-        "messages": "100 messages/day",
+        "messages": "15,000 AI Credits/month",
         "cpu": "1.5 CPU",
         "ram": "2 GB RAM",
-        "storage": "500 MB workspace",
-        "sleep": "Auto-sleep after 12h idle",
+        "storage": "25 GB workspace",
+        "sleep": "Always active",
         "features": [
-          "BYOK = unlimited messages",
-          "50 web searches/day",
-          "All integrations",
-          "Buy Always On per agent for 24/7"
+          "Hosted models via OpenRouter",
+          "Web search uses AI Credits",
+          "File Manager + Full Logs included",
+          "All integrations"
         ],
-        "missing": [
-          "Logs, File Manager available as add-ons"
-        ]
+        "missing": []
       },
       "business": {
-        "agents": "10 agents included",
-        "messages": "300 messages/day",
+        "agents": "5 agents included",
+        "messages": "40,000 AI Credits/month",
         "cpu": "2 CPU",
         "ram": "3 GB RAM",
-        "storage": "1 GB workspace",
-        "sleep": "Always-on (no auto-sleep)",
+        "storage": "50 GB workspace",
+        "sleep": "Always active",
         "features": [
-          "BYOK = unlimited messages",
-          "200 web searches/day",
+          "Hosted models via OpenRouter",
+          "Web search uses AI Credits",
           "File Manager included",
           "Full logs included",
           "Priority support",
@@ -639,27 +638,27 @@
         "missing": []
       },
       "founding_member": {
-        "agents": "10 agents included",
-        "messages": "300 messages/day",
+        "agents": "5 agents included",
+        "messages": "25,000 AI Credits/month",
         "cpu": "2 CPU",
-        "ram": "4 GB RAM",
-        "storage": "2 GB workspace",
-        "sleep": "Always-on (no auto-sleep)",
+        "ram": "3 GB RAM",
+        "storage": "40 GB workspace",
+        "sleep": "Always active",
         "features": [
           "$99 one-time — lifetime access",
-          "200 web searches/day",
+          "Hosted models via OpenRouter",
+          "Web search uses AI Credits",
           "File Manager + Full Logs included",
           "Priority support",
-          "Team collaboration",
           "All integrations",
-          "Founding badge"
+          "Founding Discord role + Telegram tag"
         ],
         "missing": []
       }
     },
     "addons": {
-      "heading": "Add-ons",
-      "subheading": "Customize your plan. Stack add-ons on any tier. Mix and match as needed.",
+      "heading": "Extras",
+      "subheading": "Add AI Credit packs or extra agent slots when you need more capacity.",
       "annualDiscount": "15% off annual",
       "groups": {
         "extraAgents": {
@@ -687,68 +686,38 @@
             }
           ]
         },
-        "extraMessages": {
-          "label": "Extra Messages (account)",
+        "aiCredits": {
+          "label": "AI Credits",
           "items": [
             {
-              "name": "+20 msg/day",
-              "period": "/mo",
-              "description": "Stackable"
+              "name": "5,000 AI Credits",
+              "period": "one-time",
+              "description": "Hosted models and web search"
             },
             {
-              "name": "+50 msg/day",
-              "period": "/mo",
-              "description": "Stackable"
+              "name": "10,000 AI Credits",
+              "period": "one-time",
+              "description": "Heavier model runs and research"
             },
             {
-              "name": "+100 msg/day",
-              "period": "/mo",
-              "description": "Stackable"
+              "name": "25,000 AI Credits",
+              "period": "one-time",
+              "description": "Larger agent workloads"
             },
             {
-              "name": "+200 msg/day",
-              "period": "/mo",
-              "description": "Stackable"
-            }
-          ]
-        },
-        "extraSearches": {
-          "label": "Extra Searches (account)",
-          "items": [
-            {
-              "name": "+25 searches/day",
-              "period": "/mo",
-              "description": "Stackable"
-            },
-            {
-              "name": "+50 searches/day",
-              "period": "/mo",
-              "description": "Stackable"
+              "name": "50,000 AI Credits",
+              "period": "one-time",
+              "description": "High-volume hosted usage"
             }
           ]
         },
         "perAgent": {
-          "label": "Per-Agent",
+          "label": "Plugins + Skills",
           "items": [
             {
-              "name": "Always On",
-              "period": "/mo per agent",
-              "description": "Keep running 24/7"
-            },
-            {
-              "name": "File Manager",
-              "period": "one-time per agent",
-              "description": "Browse & edit files"
-            },
-            {
-              "name": "Full Logs",
-              "period": "/mo per agent",
-              "description": "Unlock log viewer"
-            },
-            {
-              "name": "+10 Plugins",
-              "period": "/mo per agent",
-              "description": "Stack extra plugin slots"
+              "name": "Plugins included",
+              "period": "included",
+              "description": "Included on every tier"
             }
           ]
         }
@@ -758,7 +727,7 @@
       "heading": "All Integrations Free",
       "badge": "every tier",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage, and 14+ more platforms are included free on all tiers. No extra charge, ever.",
-      "note": "All prices in USD, payable in SOL or $HATCHER. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier."
+      "note": "All prices in USD, payable by card, SOL, USDC on Solana, or $HATCHER. Hosted model and web-search usage is metered with AI Credits; BYOK is paid directly with your own provider key."
     },
     "compareTable": {
       "heading": "Compare Plans",
@@ -767,9 +736,9 @@
       "onceSuffix": " once",
       "rows": {
         "agents": "Agents included",
-        "messages": "Messages/day (account)",
-        "searches": "Web searches/day",
-        "byok": "BYOK messages",
+        "messages": "AI Credits/month",
+        "searches": "Web search",
+        "byok": "BYOK provider usage",
         "cpuRam": "CPU / RAM",
         "storage": "Storage",
         "autoSleep": "Auto-sleep",
@@ -794,11 +763,11 @@
       "items": [
         {
           "q": "What is BYOK (Bring Your Own Key)?",
-          "a": "BYOK lets you use your own API key for any LLM provider (OpenAI, Anthropic, Google, xAI, Groq, OpenRouter). This is always free on all tiers -- you pay the provider directly, no Hatcher markup. Messages with your own key are unlimited."
+          "a": "BYOK lets you use your own API key for any supported LLM provider (OpenAI, Anthropic, Google, xAI, OpenRouter, and more). This is always free on all tiers -- you pay the provider directly, no Hatcher markup. Hatcher does not meter BYOK usage with AI Credits."
         },
         {
-          "q": "How do add-ons work?",
-          "a": "Add-ons are stackable on any tier. For example, if you are on the Starter tier (1 agent) and purchase a +3 Agents add-on, you can run 4 agents total. You can stack multiple add-ons."
+          "q": "How do extras work?",
+          "a": "AI Credit packs are one-time top-ups for hosted models and web search. Extra agent slots increase capacity separately."
         },
         {
           "q": "What is the difference between shared and dedicated resources?",
@@ -806,7 +775,7 @@
         },
         {
           "q": "What payment methods are accepted?",
-          "a": "You can pay with SOL or $HATCHER. Prices are listed in USD and converted at live rates via Jupiter."
+          "a": "You can pay by card, SOL, USDC on Solana, or $HATCHER. Crypto prices are listed in USD and converted at live rates via Jupiter."
         },
         {
           "q": "Can I downgrade my tier?",
@@ -814,15 +783,15 @@
         },
         {
           "q": "What is auto-sleep?",
-          "a": "Free agents sleep after 1 hour of inactivity, Starter after 4 hours, Pro after 12 hours. Business and Founding Member agents are always-on with no auto-sleep. They wake instantly on the next message. You can add Always On to any agent for $7.99/mo."
+          "a": "Free agents sleep after 12 hours of inactivity. Starter, Pro, Business, and Founding Member agents are always active with no auto-sleep."
         },
         {
           "q": "What LLM do I get with the free tier?",
-          "a": "Hosted messages use DeepSeek V4 Flash through OpenRouter by default. Message limits are account-wide: Free 20/day, Starter 50/day, Pro 100/day, Business 300/day, Founding 300/day. BYOK (bring your own LLM key) bypasses all limits on any tier."
+          "a": "Hosted usage is routed through OpenRouter and charged from your AI Credit balance. You can choose from supported hosted models; BYOK bypasses Hatcher AI Credit metering because you pay your provider directly."
         },
         {
           "q": "What is the Founding Member tier?",
-          "a": "Founding Member is a one-time $99 payment that gives you lifetime access to Hatcher: 10 agents, 300 messages/day, 4 GB RAM, 2 GB workspace, always-on, and all premium features (File Manager, Full Logs, priority support) included. No monthly fees, ever. Limited to 20 spots — once they are gone, this tier is gone."
+          "a": "Founding Member is a one-time $99 payment that gives you lifetime access to Hatcher: 5 agents, 25,000 AI Credits/month, 2 CPU / 3 GB RAM, 40 GB workspace, always active agents, File Manager, Full Logs, priority support, and Founding Discord role + Telegram tag. No monthly fees, ever. Limited to 20 spots — once they are gone, this tier is gone."
         }
       ]
     },
@@ -834,11 +803,11 @@
     },
     "cta": {
       "heading": "Ready to deploy your agent?",
-      "body": "Pick your framework, choose a template, and deploy in seconds. Start free with a built-in LLM. Upgrade when you need more power.",
+      "body": "Describe the agent you want and deploy in seconds. Start free with hosted AI Credits. Upgrade when you need more power.",
       "createAgent": "Create Agent",
       "seeFrameworks": "See Frameworks"
     },
-    "footerNote": "All prices in USD, payable in SOL or $HATCHER. BYOK (Bring Your Own Key) = unlimited messages with your own LLM API key on any tier."
+    "footerNote": "All prices in USD, payable by card, SOL, USDC on Solana, or $HATCHER. Hosted model and web-search usage is metered with AI Credits; BYOK is paid directly with your own provider key."
   },
   "dashboard": {
     "common": {
@@ -872,7 +841,7 @@
       "frameworkAll": "All Frameworks",
       "sortNewest": "Newest",
       "sortAZ": "A-Z",
-      "sortMessages": "Most Messages",
+      "sortMessages": "Most Active",
       "sortActive": "Last Active",
       "emptyTitle": "No agents yet",
       "emptyDescription": "Create your first AI agent and deploy it in 60 seconds.",
@@ -891,31 +860,19 @@
       "tourFilterTitle": "Filter by Framework",
       "tourFilterDescription": "OpenClaw is best for automation; Hermes is best for adaptive memory workflows.",
       "tourSearchTitle": "Search & Explore",
-      "tourSearchDescription": "Search agents or browse 200+ templates to get started quickly.",
+      "tourSearchDescription": "Search agents or launch Chat-to-Hatch to get started quickly.",
       "tourPlanTitle": "Your Plan",
-      "tourPlanDescription": "Start free with 1 agent and 20 messages/day. Upgrade anytime.",
+      "tourPlanDescription": "Start free with 1 agent, 500 AI Credits/month, and included tools. Upgrade anytime.",
       "statTotal": "Total",
       "statActive": "Active",
       "statSleeping": "Sleeping",
-      "msgsShort": "msgs",
+      "msgsShort": "interactions",
       "cardOpen": "3D Room",
       "cardOpenTooltip": "Enter 3D Room",
       "actionStop": "Stop",
       "actionStart": "Start",
       "actionRestart": "Restart",
       "noResultsAction": "Clear filters"
-    },
-    "newAgent": {
-      "eyebrow": "New agent",
-      "heading": "Choose a template",
-      "subheading": "Start from a pre-configured template or build from scratch. Each template comes with a personality, system prompt, and suggested integrations.",
-      "searchPlaceholder": "Search templates...",
-      "allTemplates": "All Templates",
-      "startFromScratch": "Start from Scratch",
-      "startFromScratchDesc": "Full control over every setting",
-      "noTemplatesTitle": "No templates found",
-      "noTemplatesDesc": "Try a different search or category.",
-      "footerHint": "All templates are fully customizable after deployment — change the name, system prompt, model, and integrations at any time."
     },
     "billing": {
       "eyebrow": "Account",
@@ -928,9 +885,9 @@
       "disconnect": "Disconnect",
       "loadingBilling": "Loading billing...",
       "signInDescription": "Sign in to manage your plan and billing.",
-      "creditsBalance": "Credits Balance",
-      "creditsUsd": "USD",
-      "creditsDesc": "Credits can be used for subscriptions, add-ons, and hosted LLM usage.",
+      "creditsBalance": "AI Credits Balance",
+      "creditsUsd": "AI Credits",
+      "creditsDesc": "AI Credits are used for hosted LLMs, web search, research, extract, and crawl tools.",
       "recentTransactions": "Recent Transactions",
       "currentTier": "Current Plan",
       "freeTier": "Free Tier",
@@ -940,7 +897,7 @@
       "agentsOver": "{over} over limit",
       "slotsRemaining": "{slots} slot remaining",
       "slotsRemainingPlural": "{slots} slots remaining",
-      "activeAddons": "Active Add-ons",
+      "activeAddons": "Active Extras",
       "expires": "Expires {date}",
       "extend": "Extend",
       "extend30Days": "Extend +30 days (${price})",
@@ -956,17 +913,17 @@
       "lifetimePrice": "lifetime",
       "lifetimePriceFull": "${price} lifetime",
       "monthlyPrice": "${price} / 30 days",
-      "unlimitedMessages": "unlimited",
-      "messagesPerDay": "{count} messages/day",
-      "byokUnlimited": " (BYOK = unlimited)",
+      "unlimitedMessages": "AI Credits",
+      "messagesPerDay": "{count} AI Credits",
+      "byokUnlimited": "",
       "upgradeSection": "Upgrade Your Plan",
-      "upgradeDesc": "Get more agents, messages, and compute power.",
-      "addonsSection": "Add-ons",
+      "upgradeDesc": "Get more agents, AI Credits, and compute power.",
+      "addonsSection": "Extras",
       "addonsDesc": "Stack extra capacity on your current plan.",
-      "accountAddons": "Account-level Add-ons",
-      "perAgentAddons": "Per-agent Add-ons",
+      "accountAddons": "Account-level Extras",
+      "perAgentAddons": "Per-agent Extras",
       "annualBilling": "Annual billing",
-      "annualBillingDesc": "15% off — all subscription add-ons",
+      "annualBillingDesc": "15% off — recurring extras",
       "monthly": "Monthly",
       "annual": "Annual",
       "monthSuffix": "/ 30 days",
@@ -985,23 +942,16 @@
       "choosePayment": "Choose Payment Method",
       "applyToAgent": "Apply to agent:",
       "noAgentsFound": "No agents found. Create an agent first.",
-      "payWithCredits": "Pay with Credits",
       "payWithSol": "Pay with SOL",
       "solDesc": "Solana wallet payment",
       "payWithHatcher": "Pay with $HATCHER",
       "hatcherDesc": "HATCHER token on Solana",
-      "payWithSkaleUsdc": "Pay with USDC on SKALE",
-      "skaleUsdcDesc": "Fast x402 settlement via EVM wallet",
-      "payWithBaseUsdc": "Pay with USDC on Base",
-      "baseUsdcDesc": "Native USDC via EVM wallet",
       "payWithUsdcSolana": "Pay with USDC on Solana",
       "usdcSolanaDesc": "SPL USDC via Solana wallet",
       "payWithUsdc": "Pay with USDC",
       "usdcDesc": "Stablecoin — 1 USDC = $1",
       "payWithCard": "Pay with Card",
       "cardDesc": "Credit/debit card via Stripe",
-      "creditAvailable": "${balance} available — instant",
-      "creditInsufficient": "Not enough — need ${need}, have ${have}",
       "foundingSlots": "{remaining} of {max} slots remaining",
       "foundingSoldOut": "Sold out",
       "oneTimeSuffix": "one-time",
@@ -1014,28 +964,42 @@
     },
     "analytics": {
       "eyebrow": "Dashboard",
-      "heading": "Analytics",
-      "subheading": "Account-wide usage insights.",
+      "heading": "Usage Analytics",
+      "subheading": "Account-wide interactions, hosted usage, and AI Credits.",
       "signInDescription": "Sign in to view analytics.",
-      "messageVolume": "Message Volume",
+      "interactionVolume": "Interaction Volume",
+      "messageVolume": "Interaction Volume",
       "last14Days": "Last 14 days",
+      "last30Days": "Last 30 days",
       "frameworks": "Frameworks",
       "agentStatus": "Agent Status",
-      "totalMessages": "Total Messages by Agent",
-      "noMessageData": "No message data yet — start chatting with your agents!",
+      "totalMessages": "Agent Interactions",
+      "noMessageData": "No interaction data yet — start chatting with your agents!",
       "noAgentsYet": "No agents yet",
       "noAgentsEmpty": "No agents yet. Create your first agent to start seeing analytics.",
       "createAgent": "Create Agent",
       "totalAgents": "Total Agents",
       "totalAgentsSub": "{active} active",
-      "messages": "Messages",
+      "messages": "Interactions",
       "messagesAllTime": "All time",
       "llmCalls": "LLM Calls",
       "llmCallsAllTime": "All time",
+      "aiCreditsBalance": "AI Credits",
+      "monthlyGrant": "{count} monthly grant",
+      "aiCreditsUsed": "AI Credits Used",
+      "hostedUsage": "Hosted Usage",
+      "hostedUsageSubheading": "Hosted LLM, web search, research, extract, and crawl consume account AI Credits. BYOK usage bypasses this meter.",
+      "remainingBalance": "Remaining balance",
+      "usedLast30": "Used last 30 days",
+      "usageByKind": "Usage by kind",
+      "tokensProcessed": "Tokens processed",
+      "inputTokens": "Input",
+      "outputTokens": "Output",
+      "noHostedUsageYet": "No hosted usage yet. BYOK usage does not spend AI Credits.",
       "last14DaysLabel": "Last 14 Days",
-      "last14DaysSub": "User messages",
+      "last14DaysSub": "User interactions",
       "today": "Today",
-      "noDataYet": "No message data yet"
+      "noDataYet": "No interaction data yet"
     },
     "team": {
       "eyebrow": "Collaboration",
@@ -1135,12 +1099,12 @@
       "payoutSettings": "Payout Settings",
       "payoutMode": "Mode",
       "payoutAddress": "Payout Address",
-      "creditsOnly": "Credits only — no address",
+      "creditsOnly": "Cash payout address required",
       "changePrefs": "Need to change payout preferences?",
       "contactSupport": "Contact support",
       "modeCashOnly": "Cash only (20%)",
-      "modeCreditsOnly": "Credits only (40%)",
-      "modeHybrid": "Hybrid (15% cash + 25% credits)"
+      "modeCreditsOnly": "Retired",
+      "modeHybrid": "Retired"
     },
     "settings": {
       "eyebrow": "Account",
@@ -1172,7 +1136,7 @@
         "walletDisconnect": "Disconnect wallet",
         "walletNone": "No wallet linked yet. Your Solana wallet connects automatically the first time you make an on-chain payment from the billing page.",
         "referralTitle": "Referral Program",
-        "referralDesc": "Invite friends to Hatcher. You both get {credit} credit when they create their first agent.",
+        "referralDesc": "Invite friends to Hatcher. You both get {credit} when they create their first agent.",
         "referralCode": "Referral Code",
         "shareLink": "Share Link",
         "referred": "Referred",
@@ -1272,9 +1236,9 @@
     },
     "quickStats": {
       "totalAgents": "Total Agents",
-      "dailyMessages": "Daily Messages",
+      "dailyMessages": "AI Credits",
       "unlimited": "∞",
-      "accountWide": "account-wide · BYOK = unlimited",
+      "accountWide": "account balance",
       "activeNow": "Active Now",
       "noAgentsRunning": "No agents running",
       "agentsOnline": "{count} agent online",
@@ -1298,7 +1262,7 @@
         "memory": "Memory",
         "sessions": "Sessions",
         "knowledge": "Knowledge",
-        "addons": "Add-ons",
+        "addons": "Extras",
         "wallet": "Wallet",
         "files": "Files",
         "workspace": "Workspace",
@@ -1361,7 +1325,7 @@
         "unlimited": "unlimited",
         "enterToSend": "Enter to send, Shift+Enter for new line",
         "signInToChat": "Sign in to chat with this agent.",
-        "limitReached": "Daily message limit reached.",
+        "limitReached": "AI Credits exhausted.",
         "upgradeToPro": "Upgrade to Pro",
         "limitReachedSuffix": "for more, or bring your own key for unlimited.",
         "agentNotRunning": "Agent is not running.",
@@ -1373,7 +1337,7 @@
         "stopRecording": "Stop recording",
         "startVoice": "Start voice input",
         "errors": {
-          "rateLimit": "Daily message limit reached.",
+          "rateLimit": "AI Credits exhausted.",
           "llmDown": "AI service is temporarily unavailable. This usually resolves within a minute.",
           "timeout": "Agent took too long to respond.",
           "network": "Connection lost. Check your internet connection.",
@@ -1468,9 +1432,9 @@
         "autoScrollDisabled": "Auto-scroll disabled",
         "fullLogsGate": {
           "title": "Showing the last {count} log lines",
-          "description": "This agent has {total} total entries. Unlock Full Logs to scroll back through the complete history and export every line.",
-          "descriptionEmpty": "Unlock Full Logs on this agent to keep every entry available for scrollback and export, beyond the last {count} lines.",
-          "unlock": "Unlock"
+          "description": "Full Logs are included on every tier. Refresh the agent if complete history is still unavailable.",
+          "descriptionEmpty": "Full Logs are included on every tier. Refresh the agent if complete history is still unavailable.",
+          "unlock": "Refresh"
         }
       },
       "integrations": {
@@ -1623,7 +1587,7 @@
         "source": "Source",
         "requiresRestart": "Requires restart",
         "refresh": "Refresh",
-        "limitReached": "Plugin limit reached. Upgrade your plan or add a plugin addon."
+        "limitReached": "Plugins and skills are included on every tier."
       },
       "workflows": {
         "new": "New Workflow",
@@ -1649,7 +1613,7 @@
         "delete": "Delete",
         "download": "Download",
         "refresh": "Refresh",
-        "locked": "File Manager requires the Business plan or the File Manager add-on.",
+        "locked": "File Manager is included on every tier. Refresh the agent if access is still blocked.",
         "unlock": "Unlock"
       },
       "workspace": {
@@ -1658,9 +1622,9 @@
         "loading": "Loading workspace..."
       },
       "addons": {
-        "title": "Add-ons",
+        "title": "Extras",
         "description": "Extend your agent with extra capabilities.",
-        "noAddons": "No add-ons purchased yet.",
+        "noAddons": "No extras purchased yet.",
         "purchase": "Purchase",
         "active": "Active",
         "expires": "Expires {date}",
@@ -1733,7 +1697,7 @@
     },
     "analytics": {
       "heading": "Agent Analytics",
-      "messages": "Messages",
+      "messages": "Interactions",
       "daysActive": "Days Active",
       "uptime": "Uptime",
       "status": "Status",
@@ -1756,7 +1720,7 @@
     "statusPage": {
       "poweredBy": "Powered by",
       "uptimeLabel": "24h uptime",
-      "messages": "Messages",
+      "messages": "Interactions",
       "days": "Days",
       "since": "Since",
       "framework": "framework",
@@ -1806,8 +1770,8 @@
     "configRef": "Full configuration reference →",
     "docsSuffix": "docs",
     "llmSupport": "LLM support",
-    "llmSubheading": "Both frameworks support BYOK (Bring Your Own Key) for unlimited messages. On the hosted LLM, Hatcher routes through OpenRouter with DeepSeek V4 Flash by default; daily message quotas still depend on your tier.",
-    "byokNote": "* BYOK always free — unlimited messages on any framework.",
+    "llmSubheading": "Both frameworks support BYOK (Bring Your Own Key) for provider-paid usage. On hosted LLMs, Hatcher routes through OpenRouter with DeepSeek V4 Flash by default and meters usage with AI Credits.",
+    "byokNote": "* BYOK always free — provider-paid usage without Hatcher AI Credits.",
     "byokSetupLink": "View BYOK setup guide →",
     "decisionGuide": "Quick decision guide",
     "readyCta": "Ready to deploy?",
@@ -1844,7 +1808,7 @@
   "token": {
     "liveLabel": "Live on Solana",
     "heading": "$HATCHER",
-    "subheading": "The ecosystem token of Hatcher. Powers tier subscriptions, agent add-ons, and governance on Solana.",
+    "subheading": "The ecosystem token of Hatcher. Powers tier subscriptions, extra agent slots, and governance on Solana.",
     "caLabel": "CA:",
     "viewDexscreener": "View on Dexscreener",
     "viewSolscan": "View on Solscan",
@@ -1863,7 +1827,7 @@
     "trading": "Trading",
     "contractLabel": "Contract",
     "platformLabel": "Platform",
-    "platformValue": "Free tier available now — token enables paid tiers & add-ons",
+    "platformValue": "Free tier available now — token enables paid tiers and extras",
     "stayInLoop": "Stay in the Loop",
     "stayInLoopBody": "The token is live and the platform is ready. Deploy your first agent in minutes.",
     "followOnX": "Follow on X"
@@ -1965,312 +1929,6 @@
     "footerNote": "Shortcuts are disabled when typing in text fields. On macOS, use Cmd instead of Ctrl."
   },
   "create": {
-    "eyebrow": "Create agent",
-    "heading": "Create your agent",
-    "subheading": "Launch a free AI agent in under 2 minutes.",
-    "stepsAriaLabel": "Creation steps",
-    "stepLabels": {
-      "style": "Style",
-      "category": "Category",
-      "template": "Template",
-      "setUp": "Set Up",
-      "launch": "Launch"
-    },
-    "authLoading": "Authenticating...",
-    "authRequired": "Create Your Agent",
-    "authRequiredBody": "Sign in to your account to create and deploy AI agents.",
-    "signIn": "Sign In",
-    "back": "Back",
-    "continue": "Continue",
-    "step1Heading": "What kind of agent do you want?",
-    "step1Subheading": "Each framework has different strengths — pick the one that fits.",
-    "step2Heading": "What type of agent?",
-    "step2Subheading": "Choose a category — we'll show you the best templates",
-    "searchTemplates": "Search 200+ templates...",
-    "clearSearch": "Clear search",
-    "noTemplatesFound": "No templates found for \"{query}\"",
-    "clearSearchLink": "Clear search",
-    "categoryCount": "{count} templates",
-    "step3Heading": "Pick a template",
-    "step3Subheading": "Pick a template — you can customize everything in the next step",
-    "customAgent": "Custom Agent",
-    "customAgentDesc": "Start from scratch with your own system prompt",
-    "customOption": "Start from scratch",
-    "customOptionDesc": "Full control over every setting",
-    "step4Heading": "Personalize your agent",
-    "step4Subheading": "Give your agent a name and choose how it thinks",
-    "agentNameLabel": "Agent Name",
-    "agentNamePlaceholder": "e.g. AlphaResearcher, TweetLord...",
-    "agentNameHintCount": "{count}/50 characters",
-    "agentNameTooShort": "Name must be at least 3 characters",
-    "agentNameInvalidChars": "Only letters, numbers, spaces, hyphens, colons, apostrophes allowed",
-    "descriptionLabel": "Description",
-    "descriptionPlaceholder": "Brief description of what your agent does...",
-    "descriptionHint": "Brief tagline for your agent",
-    "platformsHeading": "Where should your agent live?",
-    "platformsSubheading": "Select platforms and add your API keys. You can add more later in Settings.",
-    "noPlatformsNote": "No platforms selected? No problem — add them anytime from your agent's Settings tab.",
-    "hideValue": "Hide value",
-    "showValue": "Show value",
-    "llmModelLabel": "AI Model",
-    "llmModelAria": "AI Model selection",
-    "llmFreeLabel": "Free AI Model",
-    "llmFreeTag": "FREE",
-    "llmFreeSubtext": "Powered by OpenRouter and DeepSeek V4 Flash — no API key needed",
-    "llmByokLabel": "Use Your Own AI Key",
-    "llmByokTag": "always free",
-    "llmByokSubtext": "Connect your own OpenAI, Anthropic, or other API key",
-    "byokProviderLabel": "Provider",
-    "byokModelLabel": "Model",
-    "byokModelPlaceholder": "model identifier...",
-    "byokBackToList": "Back to model list",
-    "byokSelectModel": "Select a model...",
-    "byokCustomModel": "Custom model...",
-    "byokApiKeyLabel": "API Key",
-    "byokApiKeyEncrypted": "encrypted at rest",
-    "byokBaseUrlLabel": "Base URL",
-    "skillsHeading": "Agent Skills",
-    "skillsSubheading": "Choose what your agent can do",
-    "toolsHeading": "Agent Tools",
-    "toolsSubheading": "Choose what your agent can do",
-    "pluginsHeading": "Plugins",
-    "pluginsSubheading": "Choose what your agent can do",
-    "capabilitiesHeading": "Capabilities",
-    "capabilitiesSubheading": "Choose what your agent can do",
-    "templateSkillsHeading": "Included with this template",
-    "templateSkillsSubheading": "These ClawHub skills install automatically when your agent first starts.",
-    "systemPromptLabel": "System Prompt",
-    "systemPromptCustomNote": "Your custom instructions will replace the template default",
-    "systemPromptDefaultNote": "Your agent's personality is pre-configured. Customize if you want to change it.",
-    "systemPromptCustomize": "Customize",
-    "systemPromptUseDefault": "Use template default",
-    "systemPromptPlaceholder": "Write your custom system prompt here. This completely replaces the template default.",
-    "systemPromptHint": "Defines your agent's personality, capabilities, and rules",
-    "systemPromptCount": "{count}/8000",
-    "systemPromptWarning": "Consider adding a system prompt for better results",
-    "moreOptionsLabel": "More Options",
-    "moreOptionsHints": {
-      "openclaw": "Search, voice, sessions",
-      "hermes": "Personality, memory, approvals"
-    },
-    "sessionScopeLabel": "Session Scope",
-    "sessionScopeHint": "How conversation context is shared between users",
-    "sessionScopePerUser": "Per User",
-    "sessionScopeGlobal": "Global",
-    "webSearchLabel": "Enable Web Search",
-    "webSearchHint": "Allow your agent to search the web for real-time info",
-    "searchProviderLabel": "Search Provider",
-    "searchProviderHint": "Which search API to use",
-    "ttsLabel": "Enable Voice (TTS)",
-    "ttsHint": "Text-to-speech output for voice replies",
-    "ttsProviderLabel": "TTS Provider",
-    "ttsProviderHint": "Voice synthesis engine",
-    "hermesPersonalityLabel": "Personality",
-    "hermesPersonalityHint": "Conversation tone and style",
-    "hermesPersonalityDefault": "Default",
-    "hermesPersonalityHelpful": "Helpful",
-    "hermesPersonalityTechnical": "Technical",
-    "hermesPersonalityCreative": "Creative",
-    "hermesPersonalityConcise": "Concise",
-    "memoryLabel": "Enable Memory",
-    "memoryHint": "Persist context across conversations",
-    "approvalModeLabel": "Approval Mode",
-    "approvalModeHint": "How actions are authorized before execution",
-    "approvalModeAuto": "Auto",
-    "approvalModeAsk": "Ask Before Actions",
-    "approvalModeManual": "Manual",
-    "databaseLabel": "Database",
-    "databaseHint": "Storage backend for agent state and memory",
-    "imageGenLabel": "Enable Image Generation",
-    "imageGenHint": "Allow the agent to generate images",
-    "voiceLabel": "Enable Voice",
-    "voiceHint": "Speech-to-text and text-to-speech capabilities",
-    "localFirstLabel": "Local-First Mode",
-    "localFirstHint": "Process data locally before syncing",
-    "step5Heading": "Ready to launch?",
-    "step5Subheading": "Review your configuration before launching",
-    "summaryAgentType": "Agent Type",
-    "summaryTemplate": "Template",
-    "summaryTemplateCustom": "Custom",
-    "summaryAiModel": "AI Model",
-    "summaryDescription": "Description",
-    "summaryPlatforms": "Platforms",
-    "summaryPersonality": "Personality",
-    "summaryPersonalityDefault": "Template default",
-    "summaryPersonalityCustom": "Custom instructions",
-    "summaryCost": "Cost",
-    "summaryCostFree": "$0.00 — free tier",
-    "summaryCostByok": "$0.00 — using your own key",
-    "summaryLaunchIncludes": "After launch",
-    "summaryLaunchIncludesValue": "Dashboard, chat, mail, notifications",
-    "summaryFrameworkLabels": {
-      "openclaw": "Multi-skill assistant",
-      "hermes": "Autonomous agent"
-    },
-    "testChatLabel": "Test Your Agent",
-    "testChatSubtext": "Preview how your agent will respond",
-    "testChatPreviewLabel": "Chat Preview",
-    "testChatSimulated": "This is a simulated preview. Deploy your agent for real conversations.",
-    "testChatEmpty": "Send a message to preview your agent",
-    "testChatEmptyHint": "Try \"Hello\" or \"What can you do?\"",
-    "testChatPlaceholder": "Type a message...",
-    "launchedHeading": "Your agent is alive!",
-    "launchedSubtext": "Redirecting to your agent's dashboard...",
-    "launchCtaLabel": "Launch your agent",
-    "launchCtaCreating": "Creating agent...",
-    "launchCtaCreated": "Agent created successfully",
-    "launchCta": "Launch My Agent!",
-    "launching": "Hatching...",
-    "launched": "Hatched!",
-    "frameworkFeatures": {
-      "openclaw": {
-        "desc": "Versatile AI assistant with thousands of community skills and multi-channel messaging.",
-        "f1": "Thousands of skills",
-        "f2": "Web browsing",
-        "f3": "Scheduled tasks"
-      },
-      "hermes": {
-        "desc": "Smart AI agent that remembers context across conversations and learns over time.",
-        "f1": "Long-term memory",
-        "f2": "40+ built-in tools",
-        "f3": "Self-improving"
-      }
-    },
-    "skills": {
-      "webSearch": {
-        "name": "Web Search",
-        "desc": "Search the web for real-time info"
-      },
-      "calculator": {
-        "name": "Calculator",
-        "desc": "Math and calculations"
-      },
-      "weather": {
-        "name": "Weather",
-        "desc": "Weather forecasts"
-      },
-      "codeInterpreter": {
-        "name": "Code Runner",
-        "desc": "Execute code snippets"
-      },
-      "fileManager": {
-        "name": "File Manager",
-        "desc": "Read and write files"
-      },
-      "imageGen": {
-        "name": "Image Gen",
-        "desc": "Generate images from text"
-      }
-    },
-    "tools": {
-      "webSearch": {
-        "name": "Web Search",
-        "desc": "Search the internet for information"
-      },
-      "calculator": {
-        "name": "Calculator",
-        "desc": "Math calculations"
-      },
-      "codeExecution": {
-        "name": "Code Runner",
-        "desc": "Execute code snippets"
-      },
-      "fileOperations": {
-        "name": "File Operations",
-        "desc": "Read and write files"
-      },
-      "memory": {
-        "name": "Memory",
-        "desc": "Remember conversations and facts"
-      },
-      "summarize": {
-        "name": "Summarizer",
-        "desc": "Summarize long texts"
-      },
-      "translate": {
-        "name": "Translator",
-        "desc": "Translate between languages"
-      },
-      "weather": {
-        "name": "Weather",
-        "desc": "Weather forecasts"
-      }
-    },
-    "plugins": {
-      "database": {
-        "name": "Database",
-        "desc": "SQL database access"
-      },
-      "imageGen": {
-        "name": "Image Gen",
-        "desc": "Generate images"
-      },
-      "video": {
-        "name": "Video",
-        "desc": "Video processing"
-      },
-      "tts": {
-        "name": "Text-to-Speech",
-        "desc": "Voice output"
-      },
-      "nodeRuntime": {
-        "name": "Node Runtime",
-        "desc": "Server-side operations"
-      },
-      "bootstrap": {
-        "name": "Bootstrap",
-        "desc": "Core utilities"
-      }
-    },
-    "capabilities": {
-      "chat": {
-        "name": "Chat",
-        "desc": "Core conversation"
-      },
-      "defi": {
-        "name": "DeFi",
-        "desc": "DeFi protocol interactions"
-      },
-      "social": {
-        "name": "Social",
-        "desc": "Social media integration"
-      },
-      "analysis": {
-        "name": "Analysis",
-        "desc": "Data analysis"
-      },
-      "privacy": {
-        "name": "Privacy",
-        "desc": "Privacy tools"
-      },
-      "memes": {
-        "name": "Memes",
-        "desc": "Meme generation"
-      }
-    },
-    "platforms": {
-      "telegram": {
-        "desc": "Deploy as a Telegram bot",
-        "helperField": "Message @BotFather on Telegram → /newbot → copy the token"
-      },
-      "discord": {
-        "desc": "Deploy as a Discord bot",
-        "helperField": "Discord Developer Portal → New Application → Bot → Copy Token"
-      },
-      "whatsapp": {
-        "desc": "Connect via QR code",
-        "note": "QR pairing will be available after deployment"
-      },
-      "slack": {
-        "desc": "Deploy in Slack workspace",
-        "helperField": "Slack API → Create App → OAuth & Permissions → Bot Token"
-      },
-      "twitter": {
-        "desc": "Post, reply and engage on X"
-      }
-    },
-    "llmFreeSummary": "Hosted AI Model (OpenRouter)",
-    "llmByokSummary": "Your key: {provider}{model}",
     "errorHeading": "Creation Error",
     "errorBody": "Something went wrong while setting up your agent. Your progress has not been lost.",
     "errorIdLabel": "Error ID:",
@@ -2324,12 +1982,12 @@
   "affiliate": {
     "eyebrow": "Affiliate Program",
     "heading": "Earn from every user you bring to Hatcher.",
-    "subheading": "Up to 40% recurring commissions on every paid user you refer. Cash in your wallet, credits to fund your own agents, or a hybrid split — your call. Attribution is link-based and sticks for the lifetime of the referred account.",
+    "subheading": "Earn 20% recurring cash commissions on every paid user you refer. Attribution is link-based and sticks for the lifetime of the referred account.",
     "applyNowCta": "Apply now",
     "howItWorksLink": "How it works",
-    "pickYourPayout": "Pick your payout",
-    "threeWays": "Three ways to get paid.",
-    "threeWaysSubheading": "Same eligible revenue, different split. Pick the mode that matches how you want value out of the program — you can switch later by contacting support.",
+    "pickYourPayout": "Commission structure",
+    "threeWays": "Cash commissions, simple ledger.",
+    "threeWaysSubheading": "Affiliate earnings are cash only: 20% recurring on eligible paid revenue, with a 30-day hold before commissions become payable.",
     "popularLabel": "Popular",
     "foundingBonusLabel": "Founding Member bonus",
     "foundingBonusHeading": "Refer a Founding Member → flat $20 cash bonus.",
@@ -2396,7 +2054,7 @@
       "validateUrlInvalid": "Must be a valid URL",
       "validatePitchMin": "Pitch must be at least 50 characters",
       "validatePitchMax": "Pitch must be at most 2000 characters",
-      "validateAddressRequired": "Required for CASH_ONLY and HYBRID",
+      "validateAddressRequired": "Required for cash affiliate payouts",
       "validateAddressFormat": "Must be a valid Solana base58 address (32–44 chars)",
       "slugTooShort": "Too short — min 3 characters",
       "slugTooLong": "Too long — max 30 characters",
@@ -2473,23 +2131,23 @@
     "tiers": {
       "free": {
         "name": "Free",
-        "description": "1 agent, 20 messages/day, 50 MB storage"
+        "description": "1 agent, 500 AI Credits/month, 2 GB workspace"
       },
       "starter": {
         "name": "Starter",
-        "description": "1 agent, 50 messages/day, 150 MB storage"
+        "description": "1 agent, 3,000 AI Credits/month, 10 GB workspace"
       },
       "pro": {
         "name": "Pro",
-        "description": "3 agents, 100 messages/day, 500 MB storage"
+        "description": "3 agents, 15,000 AI Credits/month, 25 GB workspace"
       },
       "business": {
         "name": "Business",
-        "description": "10 agents, 300 messages/day, 1 GB storage, always-on"
+        "description": "5 agents, 40,000 AI Credits/month, 50 GB workspace, always active"
       },
       "founding_member": {
         "name": "Founding Member",
-        "description": "10 agents, 300 messages/day, 2 GB storage, lifetime access"
+        "description": "5 agents, 25,000 AI Credits/month, 40 GB workspace, lifetime access"
       }
     },
     "addons": {
@@ -2509,45 +2167,21 @@
         "name": "+10 Agents",
         "description": "10 additional agent slots"
       },
-      "messages_plus20": {
-        "name": "+20 msg/day",
-        "description": "20 extra messages per day"
+      "ai_credits_5000": {
+        "name": "5,000 AI Credits",
+        "description": "One-time top-up for hosted models and web search"
       },
-      "messages_plus50": {
-        "name": "+50 msg/day",
-        "description": "50 extra messages per day"
+      "ai_credits_10000": {
+        "name": "10,000 AI Credits",
+        "description": "One-time top-up for heavier model runs and research"
       },
-      "messages_plus100": {
-        "name": "+100 msg/day",
-        "description": "100 extra messages per day"
+      "ai_credits_25000": {
+        "name": "25,000 AI Credits",
+        "description": "One-time top-up for larger agent workloads"
       },
-      "messages_plus200": {
-        "name": "+200 msg/day",
-        "description": "200 extra messages per day"
-      },
-      "searches_plus25": {
-        "name": "+25 searches/day",
-        "description": "25 extra web searches per day"
-      },
-      "searches_plus50": {
-        "name": "+50 searches/day",
-        "description": "50 extra web searches per day"
-      },
-      "always_on": {
-        "name": "Always On",
-        "description": "Keep this agent running 24/7"
-      },
-      "file_manager": {
-        "name": "File Manager",
-        "description": "Browse, edit & download workspace files"
-      },
-      "full_logs": {
-        "name": "Full Logs",
-        "description": "Unlock full log viewer for this agent"
-      },
-      "plugins_plus10": {
-        "name": "+10 Plugins",
-        "description": "10 extra plugin+skill slots for this agent"
+      "ai_credits_50000": {
+        "name": "50,000 AI Credits",
+        "description": "One-time top-up for high-volume hosted usage"
       }
     },
     "frameworks": {
@@ -2729,7 +2363,7 @@
       "perMonth": "/mo",
       "agentSingular": "agent",
       "agentPlural": "agents",
-      "msgsPerDay": "msg/day"
+      "msgsPerDay": "AI Credits/mo"
     },
     "ecosystem": {
       "boxLabel": "Ecosystem",
@@ -2760,7 +2394,7 @@
       "boxLabel": "Ready",
       "headline": "Deploy your first agent.",
       "ctaPrimary": "Hatch agent",
-      "ctaGhost": "Browse templates",
+      "ctaGhost": "View agents",
       "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "no credit card"
     }

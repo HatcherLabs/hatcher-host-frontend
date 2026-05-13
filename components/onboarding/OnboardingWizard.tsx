@@ -18,7 +18,7 @@ const DASHBOARD_FEATURES = [
   { icon: MessageSquare, title: 'Chat with your agent',    description: 'Test responses in real-time.' },
   { icon: Plug,          title: 'Configure integrations',   description: 'Connect Telegram, Discord, Twitter & more.' },
   { icon: BarChart3,     title: 'Monitor performance',      description: 'Analytics, usage stats, and logs.' },
-  { icon: Key,           title: 'Bring your own key',       description: 'Use your own LLM API key for unlimited messages.' },
+  { icon: Key,           title: 'Bring your own key',       description: 'Use your own LLM API key without spending AI Credits.' },
 ];
 
 const STEPS = ['Welcome', 'Framework', 'Features', 'Ready'];
@@ -207,7 +207,7 @@ export function OnboardingWizard({ onClose }: { onClose: () => void }) {
                     <selectedFw.icon className="w-5 h-5 text-[var(--color-accent)] shrink-0" strokeWidth={1.75} />
                     <div>
                       <p className="text-sm font-semibold text-[var(--text-primary)]">{selectedFw.name}</p>
-                      <p className="text-xs text-[var(--text-muted)]">Free tier — 20 messages/day, BYOK unlimited</p>
+                      <p className="text-xs text-[var(--text-muted)]">Free tier - 500 AI Credits/month, BYOK direct billing</p>
                     </div>
                   </div>
                 )}

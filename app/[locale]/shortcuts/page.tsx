@@ -30,7 +30,6 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
     title: 'Navigation',
     shortcuts: [
       { keys: ['N'], description: 'New agent' },
-      { keys: ['T'], description: 'Templates' },
       { keys: ['/'], description: 'Focus search' },
     ],
   },
