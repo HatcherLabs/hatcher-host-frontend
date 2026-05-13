@@ -401,7 +401,7 @@ function AnalyticsTab() {
       {/* LLM proxy stats */}
       {llmStats && (
         <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
-          <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)] mb-3">LLM Proxy — messages/day (last 7d)</div>
+          <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)] mb-3">LLM Proxy — hosted requests/day (last 7d)</div>
           <ResponsiveContainer width="100%" height={140}>
             <BarChart data={llmStats.perDay}>
               <XAxis dataKey="date" tick={{ fontSize: 10 }} stroke="var(--text-muted)" />
@@ -932,7 +932,7 @@ export default function AdminPage() {
     isAdmin: boolean;
     agentCount: number;
     paymentCount: number;
-    hatchCredits: number;
+    aiCreditsBalance: number;
     createdAt: string;
     emailVerified: boolean;
   }>>([]);
@@ -977,7 +977,7 @@ export default function AdminPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [userTierFilter, setUserTierFilter] = useState<string>('all');
-  const [userSortBy, setUserSortBy] = useState<'createdAt' | 'agentCount' | 'paymentCount' | 'hatchCredits'>('createdAt');
+  const [userSortBy, setUserSortBy] = useState<'createdAt' | 'agentCount' | 'paymentCount' | 'aiCreditsBalance'>('createdAt');
   const [userSortDir, setUserSortDir] = useState<'asc' | 'desc'>('desc');
   const [frameworkFilter, setFrameworkFilter] = useState<string>('all');
 
@@ -1000,7 +1000,7 @@ export default function AdminPage() {
   // ── User detail slide-over ─────────────────────────────────
   type UserDetail = {
     id: string; email: string; username: string; walletAddress: string | null;
-    tier: string; isAdmin: boolean; hatchCredits: number; emailVerified: boolean;
+    tier: string; isAdmin: boolean; aiCreditsBalance: number; emailVerified: boolean;
     createdAt: string;
     features: Array<{ id: string; featureKey: string; type: string; expiresAt: string | null; createdAt: string; txSignature: string; usdPrice: number }>;
     payments: Array<{ id: string; featureKey: string; usdAmount: number; txSignature: string; status: string; createdAt: string; agentId: string | null }>;
@@ -1226,7 +1226,7 @@ export default function AdminPage() {
       if (userSortBy === 'createdAt') return dir * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
       if (userSortBy === 'agentCount') return dir * (a.agentCount - b.agentCount);
       if (userSortBy === 'paymentCount') return dir * (a.paymentCount - b.paymentCount);
-      if (userSortBy === 'hatchCredits') return dir * (a.hatchCredits - b.hatchCredits);
+      if (userSortBy === 'aiCreditsBalance') return dir * (a.aiCreditsBalance - b.aiCreditsBalance);
       return 0;
     });
 
@@ -1436,12 +1436,12 @@ export default function AdminPage() {
   // ── Main admin dashboard ───────────────────────────────────
   return (
     <motion.div
-      className="min-h-screen p-4 sm:p-6 lg:p-10"
+      className="min-h-screen w-full max-w-full overflow-x-hidden p-4 sm:p-6 lg:p-10"
       variants={pageVariants}
       initial="hidden"
       animate="visible"
     >
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="mx-auto w-full max-w-7xl space-y-6">
         {/* ── Header ────────────────────────────────────────── */}
         <motion.div
           className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
@@ -1629,7 +1629,7 @@ export default function AdminPage() {
                       {extras.containerTopN.map((c) => (
                         <tr key={c.agentId} className="border-b border-[var(--border-primary)]/40 hover:bg-[var(--bg-tertiary)]/50">
                           <td className="py-2 pr-4">
-                            <Link href={`/dashboard/agent/${c.agentId}`} className="text-[var(--color-accent)] hover:underline">
+                            <Link href={`/admin/agent/${c.agentId}`} className="text-[var(--color-accent)] hover:underline">
                               {c.agentName}
                             </Link>
                           </td>
@@ -1661,10 +1661,10 @@ export default function AdminPage() {
         )}
 
         {/* ── Tab Switcher + Table Area ─────────────────────── */}
-        <motion.div className="card glass-noise p-3 sm:p-5" variants={cardVariants}>
+        <motion.div className="card glass-noise min-w-0 p-3 sm:p-5" variants={cardVariants}>
           {/* Tab switcher */}
-          <div className="flex items-center gap-4 mb-5 overflow-x-auto -mx-1 px-1">
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-[rgba(46,43,74,0.3)] overflow-x-auto min-w-0">
+          <div className="-mx-1 mb-5 w-full max-w-full overflow-x-auto overscroll-x-contain px-1">
+            <div className="inline-flex min-w-max items-center gap-1 rounded-xl bg-[rgba(46,43,74,0.3)] p-1">
               {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics', 'audit', 'affiliate'] as const).map((tab) => {
                 const tabIcons: Record<string, LucideIcon> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp, audit: ScrollText, affiliate: UserPlus };
                 const TabIcon = tabIcons[tab] ?? BarChart3;
@@ -2166,7 +2166,7 @@ export default function AdminPage() {
                           { key: 'tier', label: 'Tier', sortable: false },
                           { key: 'agentCount', label: 'Agents', sortable: true },
                           { key: 'paymentCount', label: 'Payments', sortable: true },
-                          { key: 'hatchCredits', label: 'Credits', sortable: true },
+                          { key: 'aiCreditsBalance', label: 'AI Credits', sortable: true },
                           { key: 'createdAt', label: 'Joined', sortable: true },
                           { key: 'actions', label: '', sortable: false },
                         ].map((col) => (
@@ -2235,10 +2235,10 @@ export default function AdminPage() {
                             </span>
                           </td>
 
-                          {/* Credits */}
+                          {/* AI Credits */}
                           <td className="py-3.5 pr-4">
                             <span className="text-sm font-mono text-[var(--text-primary)]">
-                              {u.hatchCredits.toFixed(2)}
+                              {u.aiCreditsBalance.toLocaleString()}
                             </span>
                           </td>
 
@@ -2820,8 +2820,8 @@ export default function AdminPage() {
                         <div className="font-semibold text-[var(--text-primary)]"><TierBadge tier={userDetail.tier} /></div>
                       </div>
                       <div className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
-                        <div className="text-[var(--text-muted)] mb-0.5">Credits</div>
-                        <div className="font-semibold text-[var(--text-primary)]">{userDetail.hatchCredits}</div>
+                        <div className="text-[var(--text-muted)] mb-0.5">AI Credits</div>
+                        <div className="font-semibold text-[var(--text-primary)]">{userDetail.aiCreditsBalance.toLocaleString()}</div>
                       </div>
                       <div className="p-2.5 rounded-lg bg-[var(--bg-card)] border border-[var(--border-default)]">
                         <div className="text-[var(--text-muted)] mb-0.5">Joined</div>

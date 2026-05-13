@@ -14,6 +14,7 @@ const EMAIL = `flow1+${Date.now()}@hatcher-test.local`;
 const PASSWORD = 'TestPass123!';
 const USERNAME = `flow1_${Date.now()}`;
 const AGENT_NAME = `E2E Agent ${Date.now()}`;
+const API_BASE_URL = process.env.E2E_API_URL ?? 'http://localhost:3001';
 
 test('register → login → create agent → agent appears in dashboard', async ({ page }) => {
   // ── 1. Register ─────────────────────────────────────────────
@@ -43,32 +44,24 @@ test('register → login → create agent → agent appears in dashboard', async
   // Confirm dashboard loaded
   await expect(page).toHaveURL(/\/dashboard/);
 
-  // ── 3. Navigate to "Create Agent" ───────────────────────────
-  await page.goto('/create/template');
-  await expect(page).toHaveURL(/\/create\/template/);
-
-  // Template selection page — pick the first available template
-  const firstTemplate = page.locator('[data-testid="template-card"], .template-card, [class*="TemplateCard"]').first();
-  // If there's a grid of cards, click the first one
-  await firstTemplate.click({ timeout: 10_000 });
-
-  // Fill in agent name if there's a name field on the creation form
-  const nameInput = page.locator('input[name="name"], input[placeholder*="name" i]').first();
-  if (await nameInput.isVisible({ timeout: 3_000 }).catch(() => false)) {
-    await nameInput.fill(AGENT_NAME);
-  }
-
-  // Submit / deploy button
-  const deployBtn = page.locator('button:has-text("Deploy"), button:has-text("Create"), button:has-text("Launch")').first();
-  if (await deployBtn.isVisible({ timeout: 3_000 }).catch(() => false)) {
-    await deployBtn.click();
-    // Wait for redirect to agent page or dashboard
-    await page.waitForURL(/\/dashboard\/(agent|agents)/, { timeout: 20_000 });
-  }
+  // ── 3. Create a custom agent through the API ────────────────
+  const createResponse = await page.request.post(`${API_BASE_URL}/agents`, {
+    data: {
+      name: AGENT_NAME,
+      description: 'Created by the registration flow E2E test',
+      framework: 'openclaw',
+      template: 'custom',
+      config: {
+        model: 'deepseek/deepseek-v4-flash',
+        provider: 'openrouter',
+        skills: ['web_search'],
+        systemPrompt: 'You are a concise test agent.',
+      },
+    },
+  });
+  expect(createResponse.status()).toBe(201);
 
   // ── 4. Verify agent appears somewhere in dashboard ───────────
   await page.goto('/dashboard/agents');
-  // The agents list page should show at least one agent card
-  await expect(page.locator('[data-testid="agent-card"], [class*="agent-card"], [class*="AgentCard"]').first())
-    .toBeVisible({ timeout: 10_000 });
+  await expect(page.getByText(AGENT_NAME)).toBeVisible({ timeout: 10_000 });
 });

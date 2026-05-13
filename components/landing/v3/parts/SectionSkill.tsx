@@ -16,9 +16,8 @@ const PROMPT = `Read ${SKILL_URL} and follow the instructions to deploy AI agent
  * agent and it registers an account + spins up subagents on the
  * platform.
  *
- * Restored from the v2 landing's `AgentDiscoverySection`. Same i18n
- * namespace (`landing.agentDiscovery`) and same external links so
- * existing translations + skill.md route keep working.
+ * Keeps the same i18n namespace (`landing.agentDiscovery`) and same
+ * external links so existing translations + skill.md route keep working.
  */
 export function SectionSkill() {
   const t = useTranslations('landing.agentDiscovery');

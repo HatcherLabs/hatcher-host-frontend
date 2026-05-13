@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
+import { ChatToHatch } from '@/components/chat-to-hatch/ChatToHatch';
 
 export default function LegacyNewAgentPage() {
-  redirect('/create/template');
+  return <ChatToHatch />;
 }

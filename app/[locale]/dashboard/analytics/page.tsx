@@ -14,9 +14,10 @@ import {
   Cpu,
   Hash,
   Zap,
+  Coins,
+  Gauge,
   ArrowLeft,
   RefreshCw,
-  MessageSquare,
   Shield,
 } from 'lucide-react';
 
@@ -30,6 +31,16 @@ interface AccountAnalytics {
   frameworkBreakdown: Record<string, number>;
   agentMessageBreakdown: Array<{ id: string; name: string; framework: string; count: number }>;
   dailyVolume: Array<{ date: string; count: number }>;
+  aiCredits?: {
+    balance: number;
+    monthlyGrant: number;
+    tier: string;
+    usedLast30: number;
+    actionsLast30: number;
+    inputTokensLast30: number;
+    outputTokensLast30: number;
+    byKind: Array<{ kind: string; credits: number; actions: number }>;
+  };
   tokenSummary: { inputTokens: number; outputTokens: number; totalTokens: number; usdCost: number };
 }
 
@@ -40,6 +51,20 @@ function formatNumber(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return n.toString();
+}
+
+function formatTokens(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return n.toLocaleString();
+}
+
+function formatUsageKind(kind: string): string {
+  return kind
+    .split('_')
+    .filter(Boolean)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
 }
 
 const FRAMEWORK_COLORS: Record<string, string> = {
@@ -125,8 +150,8 @@ function BarChartSection({ data, color = 'var(--color-accent)' }: { data: Array<
     <div className="w-full overflow-hidden">
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" preserveAspectRatio="xMidYMid meet">
         {/* Grid lines */}
-        {yTicks.map(t => (
-          <g key={t.val}>
+        {yTicks.map((t, i) => (
+          <g key={`tick-${t.val}-${i}`}>
             <line x1={PAD.left} y1={t.y} x2={W - PAD.right} y2={t.y} stroke="var(--border-default)" strokeWidth="0.5" strokeDasharray="4 4" />
             <text x={PAD.left - 6} y={t.y + 3} textAnchor="end" fill="var(--text-muted)" fontSize="9" fontFamily="var(--font-mono, monospace)">{t.val}</text>
           </g>
@@ -147,7 +172,7 @@ function BarChartSection({ data, color = 'var(--color-accent)' }: { data: Array<
             <circle cx={p.x} cy={p.y} r={p.date === today ? 4 : 2.5} fill={p.date === today ? color : `${color}80`} stroke={p.date === today ? 'white' : 'none'} strokeWidth="1.5" />
             {/* Hover target + tooltip */}
             <circle cx={p.x} cy={p.y} r="12" fill="transparent" className="cursor-pointer">
-              <title>{formatChartDate(p.date)}: {p.count} messages</title>
+              <title>{formatChartDate(p.date)}: {p.count} interactions</title>
             </circle>
           </g>
         ))}
@@ -204,6 +229,13 @@ export default function AnalyticsPage() {
   }, [isAuthenticated, load]);
 
   const totalDailyMessages = data ? data.dailyVolume.reduce((s, d) => s + d.count, 0) : 0;
+  const aiCredits = data?.aiCredits;
+  const aiCreditBalancePct = aiCredits && aiCredits.monthlyGrant > 0
+    ? Math.min(100, (aiCredits.balance / aiCredits.monthlyGrant) * 100)
+    : 0;
+  const aiInputTokens = aiCredits?.inputTokensLast30 ?? data?.tokenSummary.inputTokens ?? 0;
+  const aiOutputTokens = aiCredits?.outputTokensLast30 ?? data?.tokenSummary.outputTokens ?? 0;
+  const aiTotalTokens = aiInputTokens + aiOutputTokens;
 
   if (authLoading) {
     return (
@@ -276,15 +308,133 @@ export default function AnalyticsPage() {
             ))
           ) : (
             <>
-              <StatCard icon={Bot} label={t('totalAgents')} value={data?.totalAgents ?? 0} sub={`${data?.activeAgents ?? 0} active`} color="#8b5cf6" />
-              <StatCard icon={MessageSquare} label={t('messages')} value={formatNumber(data?.totalMessages ?? 0)} sub={t('messagesAllTime')} color="var(--color-accent)" />
-              <StatCard icon={Zap} label={t('llmCalls')} value={formatNumber(data?.totalLlmCalls ?? 0)} sub={t('llmCallsAllTime')} color="#f59e0b" />
+              <StatCard icon={Bot} label={t('totalAgents')} value={data?.totalAgents ?? 0} sub={t('totalAgentsSub', { active: data?.activeAgents ?? 0 })} color="#8b5cf6" />
+              <StatCard icon={Coins} label={t('aiCreditsBalance')} value={formatNumber(aiCredits?.balance ?? 0)} sub={t('monthlyGrant', { count: aiCredits?.monthlyGrant ?? 0 })} color="#22c55e" />
+              <StatCard icon={Zap} label={t('aiCreditsUsed')} value={formatNumber(aiCredits?.usedLast30 ?? 0)} sub={t('last30Days')} color="#f59e0b" />
               <StatCard icon={Activity} label={t('last14DaysLabel')} value={formatNumber(totalDailyMessages)} sub={t('last14DaysSub')} color="#22c55e" />
             </>
           )}
         </div>
 
-        {/* Daily Volume Chart */}
+        {/* AI Credits + hosted usage */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08 }}
+          className="rounded-2xl border p-6 mb-6"
+          style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-default)' }}
+        >
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between mb-5">
+            <div className="flex items-center gap-2">
+              <Gauge size={18} className="text-[var(--color-accent)]" />
+              <div>
+                <h3 className="text-sm font-semibold text-[var(--text-primary)]">{t('hostedUsage')}</h3>
+                <p className="text-xs text-[var(--text-muted)] mt-0.5">{t('hostedUsageSubheading')}</p>
+              </div>
+            </div>
+            {!loading && aiCredits && (
+              <span className="inline-flex items-center rounded-full border border-[var(--border-default)] px-2.5 py-1 text-[11px] uppercase tracking-wider text-[var(--text-muted)]">
+                {aiCredits.tier.replace('_', ' ')}
+              </span>
+            )}
+          </div>
+
+          {loading ? (
+            <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+              <div className="space-y-3">
+                <Skeleton className="h-4 w-40" />
+                <Skeleton className="h-9 w-56" />
+                <Skeleton className="h-2 w-full" />
+              </div>
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-9 w-full" />)}
+              </div>
+            </div>
+          ) : aiCredits ? (
+            <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+              <div>
+                <div className="flex items-end justify-between gap-4 mb-3">
+                  <div>
+                    <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider">{t('remainingBalance')}</p>
+                    <p className="text-3xl font-bold text-[var(--text-primary)] tabular-nums mt-1">
+                      {aiCredits.balance.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-[var(--text-muted)]">{t('usedLast30')}</p>
+                    <p className="text-lg font-semibold text-[var(--text-primary)] tabular-nums">
+                      {aiCredits.usedLast30.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+                {aiCredits.monthlyGrant > 0 && (
+                  <>
+                    <div className="h-2.5 rounded-full bg-[var(--bg-card)] overflow-hidden">
+                      <motion.div
+                        className="h-full rounded-full bg-[#22c55e]"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${aiCreditBalancePct}%` }}
+                        transition={{ duration: 0.6, ease: 'easeOut' }}
+                      />
+                    </div>
+                    <p className="text-[11px] text-[var(--text-muted)] mt-2">
+                      {t('monthlyGrant', { count: aiCredits.monthlyGrant })}
+                    </p>
+                  </>
+                )}
+
+                {aiTotalTokens > 0 && (
+                  <div className="mt-5">
+                    <div className="flex items-center justify-between text-xs mb-2">
+                      <span className="text-[var(--text-muted)]">{t('tokensProcessed')}</span>
+                      <span className="text-[var(--text-primary)] font-medium">{formatTokens(aiTotalTokens)}</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div className="rounded-xl border border-[var(--border-default)] px-3 py-2">
+                        <span className="block text-[var(--text-muted)]">{t('inputTokens')}</span>
+                        <span className="mt-1 block text-sm font-semibold text-[var(--text-primary)]">{formatTokens(aiInputTokens)}</span>
+                      </div>
+                      <div className="rounded-xl border border-[var(--border-default)] px-3 py-2">
+                        <span className="block text-[var(--text-muted)]">{t('outputTokens')}</span>
+                        <span className="mt-1 block text-sm font-semibold text-[var(--text-primary)]">{formatTokens(aiOutputTokens)}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-3">{t('usageByKind')}</p>
+                {aiCredits.byKind.length > 0 ? (
+                  <div className="space-y-3">
+                    {aiCredits.byKind.map((item) => {
+                      const pct = aiCredits.usedLast30 > 0 ? (item.credits / aiCredits.usedLast30) * 100 : 0;
+                      return (
+                        <div key={item.kind}>
+                          <div className="flex items-center justify-between gap-3 mb-1.5">
+                            <span className="text-xs font-medium text-[var(--text-primary)]">{formatUsageKind(item.kind)}</span>
+                            <span className="text-xs text-[var(--text-muted)] tabular-nums">
+                              {item.credits.toLocaleString()} · {item.actions.toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="h-2 rounded-full bg-[var(--bg-card)] overflow-hidden">
+                            <div className="h-full rounded-full bg-[var(--color-accent)]" style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-sm text-[var(--text-muted)] py-3">{t('noHostedUsageYet')}</p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-[var(--text-muted)]">{t('noHostedUsageYet')}</p>
+          )}
+        </motion.div>
+
+        {/* Daily Interaction Chart */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -295,7 +445,7 @@ export default function AnalyticsPage() {
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
               <BarChart3 size={18} className="text-[var(--color-accent)]" />
-              <h3 className="text-sm font-semibold text-[var(--text-primary)]">{t('messageVolume')}</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">{t('interactionVolume')}</h3>
             </div>
             <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">{t('last14Days')}</span>
           </div>
@@ -407,7 +557,7 @@ export default function AnalyticsPage() {
           </motion.div>
         </div>
 
-        {/* Per-Agent Message Breakdown */}
+        {/* Per-agent interaction breakdown */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

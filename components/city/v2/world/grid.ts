@@ -1,5 +1,5 @@
 // ====================================================================
-// Shared geometry constants for the City V2 grid.
+// Shared geometry constants retained for scene layout and collision helpers.
 // ====================================================================
 // Every world/* file that places something on the map (buildings,
 // streets, pads, landmarks, traffic lanes, NPCs, minimap, streetlights,

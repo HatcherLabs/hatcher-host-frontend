@@ -275,7 +275,7 @@ function ApplicationsView() {
     setLoading(true);
     setError(null);
     const res = await api.adminListAffiliateApplications({
-      status: status === 'ALL' ? undefined : status,
+      status,
       limit: 50,
     });
     setLoading(false);
@@ -320,7 +320,64 @@ function ApplicationsView() {
         ) : rows.length === 0 ? (
           <EmptyState message="No applications match this filter." />
         ) : (
-          <div className="overflow-x-auto">
+          <div className="space-y-3">
+            <div className="sm:hidden divide-y divide-[var(--border-primary)]/30">
+              {rows.map((r) => {
+                const first = r.platforms[0];
+                const extra = r.platforms.length - 1;
+                const totalAudience = r.platforms.reduce((s, p) => s + (p.audienceSize ?? 0), 0);
+                return (
+                  <article key={r.id} className="p-4 space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">
+                          {timeAgo(r.createdAt)}
+                        </p>
+                        <p className="text-sm font-semibold text-[var(--text-primary)] break-words">
+                          {r.userEmail}
+                        </p>
+                      </div>
+                      <StatusPill status={r.status} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="rounded-lg bg-[var(--bg-card)] border border-[var(--border-primary)]/50 p-2">
+                        <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">Platform</p>
+                        <p className="text-[var(--text-primary)]">
+                          {first ? (
+                            <>
+                              <span className="font-mono text-[var(--color-accent)]">{first.type}</span>
+                              {' · '}
+                              {first.handle}
+                              {extra > 0 && <span className="text-[var(--color-accent)]"> +{extra}</span>}
+                            </>
+                          ) : '—'}
+                        </p>
+                      </div>
+                      <div className="rounded-lg bg-[var(--bg-card)] border border-[var(--border-primary)]/50 p-2">
+                        <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">Audience</p>
+                        <p className="text-[var(--text-primary)]">{totalAudience > 0 ? totalAudience.toLocaleString() : '—'}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setExpandPitch(expandPitch === r.id ? null : r.id)}
+                      className="block w-full text-left text-xs text-[var(--text-muted)] rounded-lg bg-[var(--bg-card)] border border-[var(--border-primary)]/50 p-3"
+                    >
+                      <span className={expandPitch === r.id ? 'whitespace-pre-wrap' : 'line-clamp-2'}>
+                        {r.pitch}
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => setSelected(r)}
+                      className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--color-accent)]/30 bg-[var(--color-accent)]/10 px-3 py-2 text-xs font-semibold text-[var(--color-accent)]"
+                    >
+                      Review <ChevronRight size={12} />
+                    </button>
+                  </article>
+                );
+              })}
+            </div>
+
+            <div className="hidden sm:block overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-primary)]/40 bg-[var(--bg-tertiary)]/30">
@@ -374,7 +431,7 @@ function ApplicationsView() {
                     <td className="py-2 px-3 text-[var(--text-muted)]">
                       {totalAudience > 0 ? totalAudience.toLocaleString() : '—'}
                     </td>
-                    <td className="py-2 px-3 text-[var(--text-muted)]">{r.payoutMode}</td>
+                    <td className="py-2 px-3 text-[var(--text-muted)]">Cash</td>
                     <td className="py-2 px-3"><StatusPill status={r.status} /></td>
                     <td className="py-2 px-3">
                       <button
@@ -399,6 +456,7 @@ function ApplicationsView() {
                 })}
               </tbody>
             </table>
+            </div>
           </div>
         )}
       </div>
@@ -526,7 +584,7 @@ function ApplicationPanel({ id, onClose, onActionComplete }: { id: string; onClo
           </section>
 
           <section className="grid grid-cols-2 gap-2 text-xs">
-            <DataCell label="Payout mode" value={detail.application.payoutMode} />
+            <DataCell label="Payout" value="Cash commission" />
             <DataCell
               label="Payout address"
               value={detail.application.payoutAddress ? `${detail.application.payoutAddress.slice(0, 8)}…${detail.application.payoutAddress.slice(-6)}` : '—'}
@@ -728,7 +786,51 @@ function AffiliatesView() {
         ) : rows.length === 0 ? (
           <EmptyState message="No affiliates match this filter." />
         ) : (
-          <div className="overflow-x-auto">
+          <div className="space-y-3">
+            <div className="sm:hidden divide-y divide-[var(--border-primary)]/30">
+              {rows.map((a) => (
+                <article key={a.id} className="p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <code className="font-mono text-sm text-[var(--color-accent)]">{a.referralCode}</code>
+                      <p className="text-xs text-[var(--text-primary)] break-words mt-1">{a.userEmail}</p>
+                      <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
+                        Joined {new Date(a.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    {a.isFrozen ? (
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-500/10 text-red-400 border border-red-500/20">frozen</span>
+                    ) : a.isActive ? (
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">active</span>
+                    ) : (
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-[var(--text-muted)]/10 text-[var(--text-muted)]">inactive</span>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="rounded-lg bg-[var(--bg-card)] border border-[var(--border-primary)]/50 p-2">
+                      <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">Referrals</p>
+                      <p className="text-[var(--text-primary)]">{a.totalReferrals} total · {a.totalPaidRefs} paid</p>
+                    </div>
+                    <div className="rounded-lg bg-[var(--bg-card)] border border-[var(--border-primary)]/50 p-2">
+                      <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">Payable</p>
+                      <p className="text-[var(--text-primary)]">{formatUsd(a.payableCashUsd)}</p>
+                    </div>
+                    <div className="rounded-lg bg-[var(--bg-card)] border border-[var(--border-primary)]/50 p-2 col-span-2">
+                      <p className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] mb-1">Lifetime earned</p>
+                      <p className="text-[var(--text-primary)]">{formatUsd(a.lifetimeEarnedCashUsd)}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSelectedId(a.id)}
+                    className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--color-accent)]/30 bg-[var(--color-accent)]/10 px-3 py-2 text-xs font-semibold text-[var(--color-accent)]"
+                  >
+                    Open <ChevronRight size={12} />
+                  </button>
+                </article>
+              ))}
+            </div>
+
+            <div className="hidden sm:block overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-primary)]/40 bg-[var(--bg-tertiary)]/30">
@@ -762,14 +864,14 @@ function AffiliatesView() {
                     <td className="py-2 px-3 text-right text-[var(--text-primary)]">{a.totalReferrals}</td>
                     <td className="py-2 px-3 text-right text-[var(--text-primary)]">{a.totalPaidRefs}</td>
                     <td className="py-2 px-3 text-right text-[var(--text-primary)]">
-                      {formatUsd(a.payableCashUsd + a.payableCredits)}
-                      {(a.payableCashUsd > 0 || a.payableCredits > 0) && (
+                      {formatUsd(a.payableCashUsd)}
+                      {a.payableCashUsd > 0 && (
                         <div className="text-[10px] text-[var(--text-muted)]">
-                          {formatUsd(a.payableCashUsd)}$ · {formatUsd(a.payableCredits)}c
+                          cash payable
                         </div>
                       )}
                     </td>
-                    <td className="py-2 px-3 text-right text-[var(--text-muted)]">{formatUsd(a.lifetimeEarnedCashUsd + a.lifetimeEarnedCredits)}</td>
+                    <td className="py-2 px-3 text-right text-[var(--text-muted)]">{formatUsd(a.lifetimeEarnedCashUsd)}</td>
                     <td className="py-2 px-3 text-[var(--text-muted)] whitespace-nowrap">{new Date(a.createdAt).toLocaleDateString()}</td>
                     <td className="py-2 px-3">
                       <button
@@ -783,6 +885,7 @@ function AffiliatesView() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         )}
       </div>
@@ -877,10 +980,10 @@ function AffiliateDetailPanel({ id, onClose, onUpdate }: { id: string; onClose: 
           <section className="grid grid-cols-2 gap-2 text-xs">
             <DataCell label="Referrals" value={String(detail.stats.totalReferrals)} />
             <DataCell label="Paid referrals" value={String(detail.stats.paidReferrals)} />
-            <DataCell label="Payable" value={`${formatUsd(detail.stats.payable.cashUsd)}$ · ${formatUsd(detail.stats.payable.credits)}c`} />
-            <DataCell label="Lifetime earned" value={`${formatUsd(detail.stats.lifetime.cashUsdEarned)}$ · ${formatUsd(detail.stats.lifetime.creditsEarned)}c`} />
-            <DataCell label="Paid out" value={`${formatUsd(detail.stats.lifetime.cashUsdPaidOut)}$ · ${formatUsd(detail.stats.lifetime.creditsPaidOut)}c`} />
-            <DataCell label="Payout mode" value={detail.affiliate.payoutMode} />
+            <DataCell label="Payable" value={formatUsd(detail.stats.payable.cashUsd)} />
+            <DataCell label="Lifetime earned" value={formatUsd(detail.stats.lifetime.cashUsdEarned)} />
+            <DataCell label="Paid out" value={formatUsd(detail.stats.lifetime.cashUsdPaidOut)} />
+            <DataCell label="Payout" value="Cash commission" />
           </section>
 
           {/* Freeze / Unfreeze */}
@@ -967,7 +1070,7 @@ function AffiliateDetailPanel({ id, onClose, onUpdate }: { id: string; onClose: 
                 {detail.commissions.map((c) => (
                   <div key={c.id} className="text-xs p-2 rounded bg-[var(--bg-card)] border border-[var(--border-primary)]">
                     <div className="flex items-center justify-between">
-                      <span className="text-[var(--text-primary)]">{formatUsd(c.cashAmountUsd)}$ · {formatUsd(c.creditsAmount)}c</span>
+                      <span className="text-[var(--text-primary)]">{formatUsd(c.cashAmountUsd)}</span>
                       <StatusPill status={c.status} />
                     </div>
                     <div className="text-[10px] text-[var(--text-muted)] mt-0.5">
@@ -990,7 +1093,7 @@ function AffiliateDetailPanel({ id, onClose, onUpdate }: { id: string; onClose: 
                   <div key={p.id} className="text-xs p-2 rounded bg-[var(--bg-card)] border border-[var(--border-primary)]">
                     <div className="flex items-center justify-between">
                       <span className="text-[var(--text-primary)]">
-                        {formatUsd(p.cashAmountUsd)}$ · {formatUsd(p.creditsAmount)}c
+                        {formatUsd(p.cashAmountUsd)}
                       </span>
                       <span className="text-[var(--text-muted)]">{timeAgo(p.processedAt)}</span>
                     </div>
@@ -1086,9 +1189,7 @@ function PayoutsPending() {
                 <tr className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] border-b border-[var(--border-primary)]/40 bg-[var(--bg-tertiary)]/30">
                   <th className="text-left font-semibold py-2.5 px-3">Code</th>
                   <th className="text-left font-semibold py-2.5 px-3">User</th>
-                  <th className="text-left font-semibold py-2.5 px-3">Mode</th>
                   <th className="text-right font-semibold py-2.5 px-3">Cash</th>
-                  <th className="text-right font-semibold py-2.5 px-3">Credits</th>
                   <th className="text-right font-semibold py-2.5 px-3">#</th>
                   <th className="text-left font-semibold py-2.5 px-3">Oldest</th>
                   <th className="py-2.5 px-3 w-0"></th>
@@ -1099,9 +1200,7 @@ function PayoutsPending() {
                   <tr key={r.affiliateId} className="border-b border-[var(--border-primary)]/20 hover:bg-[var(--bg-card)]/40">
                     <td className="py-2 px-3"><code className="font-mono text-[var(--color-accent)]">{r.referralCode}</code></td>
                     <td className="py-2 px-3 text-[var(--text-primary)]">{r.userEmail}</td>
-                    <td className="py-2 px-3 text-[var(--text-muted)]">{r.payoutMode}</td>
                     <td className="py-2 px-3 text-right text-[var(--text-primary)]">{formatUsd(r.payableCashUsd)}</td>
-                    <td className="py-2 px-3 text-right text-[var(--text-primary)]">{formatUsd(r.payableCredits)}</td>
                     <td className="py-2 px-3 text-right text-[var(--text-muted)]">{r.commissionCount}</td>
                     <td className="py-2 px-3 text-[var(--text-muted)]">{r.oldestPayableAt ? timeAgo(r.oldestPayableAt) : '—'}</td>
                     <td className="py-2 px-3">
@@ -1158,7 +1257,7 @@ function PayoutModal({ row, onClose, onDone }: { row: PendingRow; onClose: () =>
       if (res.success) {
         const d = res.data as AffiliateDetail;
         setDetail(d);
-        const eligible = d.commissions.filter((c) => c.status === 'PAYABLE' && !c.payoutId);
+        const eligible = d.commissions.filter((c) => c.status === 'PAYABLE' && !c.payoutId && c.cashAmountUsd > 0);
         setChecked(new Set(eligible.map((c) => c.id)));
       } else {
         setError(res.error);
@@ -1168,12 +1267,11 @@ function PayoutModal({ row, onClose, onDone }: { row: PendingRow; onClose: () =>
   }, [row.affiliateId]);
 
   const eligible = useMemo(
-    () => detail?.commissions.filter((c) => c.status === 'PAYABLE' && !c.payoutId) ?? [],
+    () => detail?.commissions.filter((c) => c.status === 'PAYABLE' && !c.payoutId && c.cashAmountUsd > 0) ?? [],
     [detail],
   );
   const selected = useMemo(() => eligible.filter((c) => checked.has(c.id)), [eligible, checked]);
   const totalCash = selected.reduce((s, c) => s + c.cashAmountUsd, 0);
-  const totalCredits = selected.reduce((s, c) => s + c.creditsAmount, 0);
 
   function toggle(id: string) {
     setChecked((prev) => {
@@ -1217,7 +1315,7 @@ function PayoutModal({ row, onClose, onDone }: { row: PendingRow; onClose: () =>
       {detail && !loading && (
         <div className="space-y-4">
           <div className="text-xs text-[var(--text-muted)]">
-            {row.userEmail} · mode: <code className="font-mono text-[var(--text-primary)]">{row.payoutMode}</code>
+            {row.userEmail} · cash commission payout
             {detail.affiliate.payoutAddress && (
               <> · <button
                 onClick={() => navigator.clipboard.writeText(detail.affiliate.payoutAddress ?? '')}
@@ -1245,7 +1343,7 @@ function PayoutModal({ row, onClose, onDone }: { row: PendingRow; onClose: () =>
                     />
                     <div className="flex-1 text-xs">
                       <div className="text-[var(--text-primary)]">
-                        {formatUsd(c.cashAmountUsd)}$ · {formatUsd(c.creditsAmount)}c
+                        {formatUsd(c.cashAmountUsd)}
                       </div>
                       <div className="text-[10px] text-[var(--text-muted)]">
                         {c.sourceType} · {timeAgo(c.createdAt)}
@@ -1258,14 +1356,10 @@ function PayoutModal({ row, onClose, onDone }: { row: PendingRow; onClose: () =>
           </section>
 
           <section className="p-3 rounded-lg bg-[var(--bg-card)] border border-[var(--border-primary)]">
-            <div className="grid grid-cols-2 gap-3 text-xs">
+            <div className="grid grid-cols-1 gap-3 text-xs">
               <div>
                 <div className="text-[var(--text-muted)]">Cash</div>
                 <div className="text-[var(--text-primary)] font-semibold text-base">{formatUsd(totalCash)}</div>
-              </div>
-              <div>
-                <div className="text-[var(--text-muted)]">Credits</div>
-                <div className="text-[var(--text-primary)] font-semibold text-base">{formatUsd(totalCredits)}</div>
               </div>
             </div>
           </section>
@@ -1315,7 +1409,7 @@ function PayoutModal({ row, onClose, onDone }: { row: PendingRow; onClose: () =>
               disabled={submitting || selected.length === 0 || (totalCash > 0 && !txHash.trim())}
               className="flex-1 bg-[var(--color-accent)]/20 border border-[var(--color-accent)]/40 text-[var(--color-accent)] rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-40"
             >
-              {submitting ? 'Processing…' : `Process payout — ${formatUsd(totalCash + totalCredits)}`}
+              {submitting ? 'Processing…' : `Process payout — ${formatUsd(totalCash)}`}
             </button>
             <button onClick={onClose} className="btn-secondary px-4 py-2 text-sm">Cancel</button>
           </div>
@@ -1397,7 +1491,6 @@ function PayoutsHistory() {
                   <th className="text-left font-semibold py-2.5 px-3">Date</th>
                   <th className="text-left font-semibold py-2.5 px-3">Affiliate</th>
                   <th className="text-right font-semibold py-2.5 px-3">Cash</th>
-                  <th className="text-right font-semibold py-2.5 px-3">Credits</th>
                   <th className="text-left font-semibold py-2.5 px-3">Tx</th>
                   <th className="text-left font-semibold py-2.5 px-3">Note</th>
                 </tr>
@@ -1408,7 +1501,6 @@ function PayoutsHistory() {
                     <td className="py-2 px-3 text-[var(--text-muted)] whitespace-nowrap">{new Date(r.processedAt).toLocaleString()}</td>
                     <td className="py-2 px-3"><code className="font-mono text-[var(--color-accent)]">{r.affiliateCode}</code></td>
                     <td className="py-2 px-3 text-right text-[var(--text-primary)]">{formatUsd(r.cashAmountUsd)}</td>
-                    <td className="py-2 px-3 text-right text-[var(--text-primary)]">{formatUsd(r.creditsAmount)}</td>
                     <td className="py-2 px-3 text-[var(--text-muted)] font-mono text-[10px]">
                       {r.cashTxHash ? `${r.cashCurrency} · ${r.cashTxHash.slice(0, 10)}…` : '—'}
                     </td>

@@ -200,7 +200,7 @@ export function AgentPresenceRail() {
         <div className="flex items-center gap-2 text-[11px] text-[var(--text-muted)]">
           <Bot size={13} />
           <span className="truncate">
-            {messages.length > 0 ? `${messages.length} messages in view` : 'No messages yet'}
+            {messages.length > 0 ? `${messages.length} turns in view` : 'No turns yet'}
           </span>
         </div>
       </div>

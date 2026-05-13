@@ -18,11 +18,11 @@ const FAQS: Array<{ q: string; a: string }> = [
   },
   {
     q: 'When do payouts happen?',
-    a: 'Manual for now — an admin reviews pending commissions monthly and settles cash (SOL / USDC / $HATCHER) + applies credits in the same pass. Every commission has a 30-day hold window before it becomes payable; that matches the Stripe refund window and lets us void commissions cleanly if the underlying payment gets refunded.',
+    a: 'Manual for now — an admin reviews pending commissions monthly and settles cash in SOL, USDC, or $HATCHER. Every commission has a 30-day hold window before it becomes payable; that matches the Stripe refund window and lets us void commissions cleanly if the underlying payment gets refunded.',
   },
   {
-    q: 'Can I change my payout mode?',
-    a: 'Yes, but not self-service yet. Contact support@hatcher.host (or ping us on Telegram / Discord) and we\'ll update your affiliate record. Past commissions stay under the mode they accrued under — the change applies to new commissions only.',
+    q: 'Can I change my payout address?',
+    a: 'Yes, but not self-service yet. Contact support@hatcher.host (or ping us on Telegram / Discord) and we\'ll update the payout wallet on your affiliate record.',
   },
   {
     q: 'What counts as fraud?',
@@ -34,7 +34,7 @@ const FAQS: Array<{ q: string; a: string }> = [
   },
   {
     q: 'What exactly counts as a commissionable payment?',
-    a: 'Every paid tier subscription (Starter, Pro, Business), every addon renewal, and the one-time Founding Member purchase. Credits grants and free-tier usage earn nothing. BYOK messages also earn nothing since they don\'t generate revenue for Hatcher.',
+    a: 'Every paid tier subscription (Starter, Pro, Business), eligible extra AI Credit purchases, and the one-time Founding Member purchase. Free-tier usage earns nothing. BYOK usage also earns nothing since it is paid directly to the provider.',
   },
 ];
 

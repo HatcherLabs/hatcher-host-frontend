@@ -17,7 +17,7 @@ interface HermesSkillsData {
  *   - Category count
  *   - Top 5 categories by skill count
  *
- * The real skills browser lives in the Skills tab — this card is
+ * The real skills browser lives in the Plugins & Skills tab — this card is
  * just a snapshot so the user sees "I have 2000 skills, what are
  * the big categories?" at a glance.
  */
@@ -108,7 +108,7 @@ export function HermesSkillsCard() {
           <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Bundled Skills</h3>
         </div>
         <button
-          onClick={() => setTab('skills')}
+          onClick={() => setTab('plugins')}
           className="text-[11px] px-3 py-1 rounded-lg border border-white/10 hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5 transition-all text-[var(--text-muted)] hover:text-[var(--text-secondary)] cursor-pointer"
         >
           Browse

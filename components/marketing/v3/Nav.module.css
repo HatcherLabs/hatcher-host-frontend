@@ -148,10 +148,13 @@
   .inner {
     gap: 10px;
     padding: 8px 12px;
+    min-width: 0;
   }
   .actions {
     gap: 6px;
     min-width: 0;
+    flex-shrink: 1;
+    justify-content: flex-end;
   }
 }
 
@@ -285,6 +288,16 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .userPill {
+    gap: 6px;
+    padding: 7px 8px;
+  }
+
+  .userName {
+    display: none;
+  }
 }
 
 .userPillSkeleton {

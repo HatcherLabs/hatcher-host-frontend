@@ -889,7 +889,7 @@ const ChartArtifactView = memo(function ChartArtifactView({ artifact }: { artifa
         <div className="mb-2 text-xs font-semibold text-[var(--text-secondary)]">{artifact.title}</div>
       )}
       <div className="h-56 w-full min-w-[260px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={260} minHeight={224}>
           {artifact.type === 'line' ? (
             <LineChart data={artifact.data}>
               <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />

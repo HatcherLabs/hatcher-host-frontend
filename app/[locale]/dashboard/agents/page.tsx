@@ -183,8 +183,8 @@ export default function MyAgentsPage() {
               {total === 0
                 ? t('subtitleEmpty')
                 : (total === 1
-                    ? t('agentsCount').replace('{count}', String(total)).replace('{active}', String(activeCount))
-                    : t('agentsCountPlural').replace('{count}', String(total)).replace('{active}', String(activeCount)))}
+                    ? t('agentsCount', { count: total, active: activeCount })
+                    : t('agentsCountPlural', { count: total, active: activeCount }))}
             </p>
           </div>
           <Link href="/create" className={styles.cta}>

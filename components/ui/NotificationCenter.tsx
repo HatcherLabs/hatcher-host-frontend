@@ -24,10 +24,16 @@ import {
 interface Notification {
   id: string;
   type: string;
+  title: string;
   message: string;
   timestamp: string;
+  read: boolean;
   link?: string;
 }
+
+type NotificationsPayload = {
+  items: Notification[];
+};
 
 const ICON_MAP: Record<string, typeof Server> = {
   agent_started: Server,
@@ -102,6 +108,44 @@ function timeAgo(dateStr: string): string {
 
 // Persist dismissed notification IDs in localStorage
 const DISMISSED_KEY = 'hatcher:dismissed-notifications';
+const NOTIFICATIONS_FETCH_MIN_INTERVAL_MS = 15_000;
+
+let notificationsCacheByUser = new Map<string, { data: NotificationsPayload; fetchedAt: number }>();
+let notificationsInFlightByUser = new Map<string, Promise<NotificationsPayload | null>>();
+
+async function loadNotificationsSnapshot(userId: string, force = false): Promise<NotificationsPayload | null> {
+  const now = Date.now();
+  const cached = notificationsCacheByUser.get(userId);
+  if (!force && cached && now - cached.fetchedAt < NOTIFICATIONS_FETCH_MIN_INTERVAL_MS) {
+    return cached.data;
+  }
+
+  const inFlight = notificationsInFlightByUser.get(userId);
+  if (inFlight) return inFlight;
+
+  const request = api.getNotifications()
+    .then((res) => {
+      if (!res.success || !res.data) return null;
+      const data = {
+        items: (res.data.notifications ?? []).slice(0, 20).map((n) => ({
+          id: n.id,
+          type: n.type,
+          title: n.title,
+          message: n.body,
+          timestamp: n.createdAt,
+          read: n.read,
+        })),
+      };
+      notificationsCacheByUser.set(userId, { data, fetchedAt: Date.now() });
+      return data;
+    })
+    .finally(() => {
+      notificationsInFlightByUser.delete(userId);
+    });
+
+  notificationsInFlightByUser.set(userId, request);
+  return request;
+}
 
 function getDismissed(): Set<string> {
   try {
@@ -123,12 +167,11 @@ function saveDismissed(ids: Set<string>) {
 }
 
 export function NotificationCenter() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const router = useRouter();
   const t = useTranslations('notifications');
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [readAt, setReadAt] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -137,18 +180,16 @@ export function NotificationCenter() {
     setDismissed(getDismissed());
   }, []);
 
-  const fetchNotifications = useCallback(async () => {
-    if (!isAuthenticated) return;
+  const fetchNotifications = useCallback(async (force = false) => {
+    if (!isAuthenticated || !user?.id) return;
     try {
-      const res = await api.getNotifications();
-      if (res.success && res.data) {
-        setNotifications((res.data.items ?? []).slice(0, 20));
-        setReadAt((prev) => prev ?? res.data.readAt ?? null);
-      }
+      const data = await loadNotificationsSnapshot(user.id, force);
+      if (!data) return;
+      setNotifications(data.items);
     } catch {
       // silently fail
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user?.id]);
 
   useEffect(() => {
     fetchNotifications();
@@ -183,16 +224,21 @@ export function NotificationCenter() {
   const visibleNotifications = notifications.filter(n => !dismissed.has(n.id));
 
   // Count unread (only visible ones)
-  const unreadCount = readAt
-    ? visibleNotifications.filter((n) => new Date(n.timestamp).getTime() > new Date(readAt).getTime()).length
-    : visibleNotifications.length;
+  const unreadCount = visibleNotifications.filter((n) => !n.read).length;
 
   const markAllRead = async () => {
-    const now = new Date().toISOString();
-    setReadAt(now);
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    if (user?.id) {
+      const cached = notificationsCacheByUser.get(user.id);
+      if (cached) {
+        notificationsCacheByUser.set(user.id, {
+          ...cached,
+          data: { items: cached.data.items.map((n) => ({ ...n, read: true })) },
+        });
+      }
+    }
     try {
-      const res = await api.markNotificationsRead();
-      if (res.success) setReadAt(res.data.readAt);
+      await api.markNotificationsRead();
     } catch (e) { console.debug('Failed to mark notifications as read', e); }
   };
 
@@ -218,7 +264,7 @@ export function NotificationCenter() {
       <button
         onClick={() => setOpen((o) => {
           if (!o) {
-            void fetchNotifications();
+            void fetchNotifications(true);
             if (unreadCount > 0) void markAllRead();
           }
           return !o;
@@ -281,9 +327,7 @@ export function NotificationCenter() {
                 </div>
               ) : (
                 visibleNotifications.map((n) => {
-                  const isUnread = readAt
-                    ? new Date(n.timestamp).getTime() > new Date(readAt).getTime()
-                    : true;
+                  const isUnread = !n.read;
                   const Icon = ICON_MAP[n.type] || Activity;
                   const colorClass = ICON_COLOR_MAP[n.type] || 'text-[var(--text-secondary)] bg-white/10';
                   const [iconText, iconBg] = colorClass.split(' ');
@@ -324,8 +368,13 @@ export function NotificationCenter() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className={`text-xs leading-relaxed ${isUnread ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
-                          {n.message}{href ? ' \u2192' : ''}
+                          {n.title}{href ? ' \u2192' : ''}
                         </p>
+                        {n.message && (
+                          <p className="text-[11px] leading-snug text-[var(--text-muted)] mt-0.5 line-clamp-2">
+                            {n.message}
+                          </p>
+                        )}
                         <p className="text-[10px] text-[var(--text-muted)] mt-0.5">
                           {timeAgo(n.timestamp)}
                         </p>
@@ -333,7 +382,7 @@ export function NotificationCenter() {
                       <button
                         onClick={(e) => { e.stopPropagation(); dismissOne(n.id); }}
                         className="opacity-0 group-hover:opacity-100 flex-shrink-0 mt-0.5 p-1 rounded hover:bg-[var(--bg-card)] transition-all focus:opacity-100"
-                        aria-label={`Dismiss notification: ${n.message}`}
+                        aria-label={`Dismiss notification: ${n.title}`}
                       >
                         <X size={12} className="text-[var(--text-muted)]" aria-hidden="true" />
                       </button>

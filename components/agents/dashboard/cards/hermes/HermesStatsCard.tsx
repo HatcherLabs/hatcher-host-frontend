@@ -191,10 +191,10 @@ export function HermesStatsCard() {
           sub={stats.containerOffline ? 'container offline' : undefined}
         />
 
-        {/* Messages */}
+        {/* Interactions */}
         <StatItem
           icon={<MessageSquare size={12} />}
-          label="Messages"
+          label="Interactions"
           value={stats.messages.total.toLocaleString()}
           sub={`${stats.messages.today.toLocaleString()} today`}
         />

@@ -4,7 +4,7 @@ import { buildLanguagesMap } from '@/lib/seo';
 export const metadata: Metadata = {
   title: 'Pricing — Free Tier, Starter, Pro & Business Plans',
   description:
-    'Hatcher pricing: Free tier included. Starter $4.99/mo, Pro $14.99/mo, Business $39.99/mo. BYOK any LLM for unlimited messages.',
+    'Hatcher pricing: Free tier included. Starter $6.99/mo, Pro $19.99/mo, Business $49.99/mo. Hosted AI and web search use AI Credits; BYOK is paid directly to your provider.',
   keywords: [
     'AI agent pricing',
     'agent hosting plans',
@@ -16,11 +16,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Pricing — Free Tier, Starter, Pro & Business Plans | Hatcher',
     description:
-      'Deploy AI agents free. Upgrade for more messages, dedicated resources, and file management. BYOK any LLM for unlimited usage.',
+      'Deploy AI agents free. Upgrade for more AI Credits, workspace, dedicated resources, and team collaboration. File Manager and Full Logs are included on every tier.',
     url: 'https://hatcher.host/pricing',
     images: [
       {
-        url: 'https://hatcher.host/og?title=Hatcher+Pricing&subtitle=Free+tier+included.+Starter+%244.99%2Fmo.+Pro+%2414.99%2Fmo.+Business+%2439.99%2Fmo.+BYOK+for+unlimited+messages.&tag=Pricing',
+        url: 'https://hatcher.host/og?title=Hatcher+Pricing&subtitle=Free+tier+included.+Starter+%246.99%2Fmo.+Pro+%2419.99%2Fmo.+Business+%2449.99%2Fmo.+AI+Credits+for+hosted+usage.&tag=Pricing',
         width: 1200,
         height: 630,
         alt: 'Hatcher Pricing Plans',
@@ -30,8 +30,8 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Hatcher Pricing — Free Tier Included',
-    description: 'Deploy AI agents free. Upgrade for more messages and dedicated resources.',
-    images: ['https://hatcher.host/og?title=Hatcher+Pricing&subtitle=Free+tier+included.+Starter+%244.99%2Fmo.+Pro+%2414.99%2Fmo.+Business+%2439.99%2Fmo.+BYOK+for+unlimited+messages.&tag=Pricing'],
+    description: 'Deploy AI agents free. Upgrade for more AI Credits, workspace, and dedicated resources.',
+    images: ['https://hatcher.host/og?title=Hatcher+Pricing&subtitle=Free+tier+included.+Starter+%246.99%2Fmo.+Pro+%2419.99%2Fmo.+Business+%2449.99%2Fmo.+AI+Credits+for+hosted+usage.&tag=Pricing'],
   },
   alternates: { canonical: 'https://hatcher.host/pricing', languages: buildLanguagesMap('/pricing') },
 };

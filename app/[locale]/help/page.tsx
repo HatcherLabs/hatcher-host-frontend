@@ -59,7 +59,7 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'How do I create my first agent?',
-        a: 'Click "Create Agent" from the dashboard or the navigation bar. Start with Chat-to-Hatch or choose a template, pick OpenClaw or Hermes, configure the agent personality and system prompt, then click Deploy. Your agent will be live in about 60 seconds.',
+        a: 'Click "Create Agent" from the dashboard or the navigation bar. Chat-to-Hatch will ask what you want, draft the OpenClaw or Hermes configuration, and let you adjust the agent before deployment. Your agent will be live in about 60 seconds.',
       },
       {
         q: 'What frameworks are available?',
@@ -67,11 +67,11 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'How does the free tier work?',
-        a: 'Every account starts with a free tier that includes 1 agent. Free agents get 20 hosted messages per day through OpenRouter with DeepSeek V4 Flash by default, with a 24-hour rolling reset. You get access to all integrations (Telegram, Discord, Twitter, WhatsApp, Slack). If you bring your own API key (BYOK), messages are always unlimited and free on Hatcher.',
+        a: 'Every account starts with a free tier that includes 1 agent, 500 AI Credits/month, File Manager, Full Logs, all integrations, and 2GB workspace. Hosted model and web-search usage spends AI Credits. If you bring your own API key (BYOK), provider usage is paid directly to your provider and does not consume Hatcher AI Credits.',
       },
       {
         q: 'What is BYOK (Bring Your Own Key)?',
-        a: 'BYOK stands for "Bring Your Own Key." Instead of using Hatcher\'s hosted OpenRouter model with daily message limits, you can provide your own API key from any supported provider (OpenAI, Anthropic, Google, OpenRouter, Groq, etc.). With BYOK, you pay the provider directly and get unlimited messages on Hatcher at no extra cost.',
+        a: 'BYOK stands for "Bring Your Own Key." Instead of using Hatcher-funded hosted OpenRouter usage, you can provide your own API key from any supported provider (OpenAI, Anthropic, Google, OpenRouter, etc.). With BYOK, you pay the provider directly and Hatcher does not spend your AI Credits.',
       },
       {
         q: 'How do I connect Telegram or Discord?',
@@ -115,11 +115,11 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'What plans are available?',
-        a: 'Hatcher offers four tiers plus a lifetime option. Free: 1 agent, 20 messages/day, 3 searches/day, shared resources, auto-sleep after 1 hour. Starter ($6.99/mo): 1 agent, 50 messages/day, 10 searches/day, 1 CPU/1.5GB RAM, auto-sleep after 4 hours. Pro ($19.99/mo): 3 agents, 100 messages/day, 50 searches/day, dedicated resources (1.5 CPU, 2GB RAM), auto-sleep after 12 hours. Business ($49.99/mo): 10 agents, 300 messages/day, 200 searches/day, always-on, priority support. Founding Member ($99 one-time, 20 spots): everything in Business with 4GB RAM and 2GB workspace, forever. Hosted messages use OpenRouter by default. BYOK is always unlimited.',
+        a: 'Hatcher offers four tiers plus a lifetime option. Free: 1 agent, 500 AI Credits/month, 1 CPU/1GB RAM, 2GB workspace, auto-sleep after 12 hours. Starter ($6.99/mo): 1 agent, 3,000 AI Credits/month, 1 CPU/1.5GB RAM, 10GB workspace, always active. Pro ($19.99/mo): 3 agents, 15,000 AI Credits/month, 1.5 CPU/2GB RAM, 25GB workspace, always active. Business ($49.99/mo): 5 agents, 40,000 AI Credits/month, 2 CPU/3GB RAM, 50GB workspace, always active, team collaboration, priority support. Founding Member ($99 one-time, 20 spots): 5 agents, 25,000 AI Credits/month, 2 CPU/3GB RAM, 40GB workspace, lifetime access. Hosted models and web search use AI Credits. BYOK is paid directly to your provider.',
       },
       {
-        q: 'How do add-ons work?',
-        a: 'Add-ons expand your plan. Account-level (stack by count + expiry): Extra agents (+1 $2.99, +3 $6.99, +5 $11.99, +10 $19.99 /mo), Extra messages (+20 $1.99, +50 $3.99, +100 $5.99, +200 $9.99 /mo), Extra searches (+25 $3.99, +50 $6.99 /mo). Per-agent (extend expiry): Always On ($7.99/mo), File Manager ($4.99 one-time), Full Logs ($2.99/mo), +10 Plugins ($5.99/mo). Every subscription add-on has an annual variant at 15% off. All stackable.',
+        q: 'How do extras work?',
+        a: 'Extras expand capacity. Account-level extras cover extra agent slots and one-time AI Credit top-ups for hosted models, web search, and research. Plugins and skills are included on every tier. File Manager, Full Logs, and always-active paid tiers are included by plan instead of sold separately.',
       },
       {
         q: 'How do I upgrade or downgrade?',
@@ -127,11 +127,11 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'What payment methods are accepted?',
-        a: 'Hatcher accepts payments in SOL (Solana) or $HATCHER. Prices are listed in USD and converted to the equivalent token amount using the live Jupiter Price API rate at the time of purchase. You\'ll sign a Solana transaction from your connected wallet, and the feature is unlocked once the transaction is confirmed on-chain. Stripe (credit card) support is also available.',
+        a: 'Hatcher accepts payments by card, SOL, USDC on Solana, or $HATCHER. Crypto prices are listed in USD and converted to the equivalent token amount using the live Jupiter Price API rate at the time of purchase. You\'ll sign a Solana transaction from your connected wallet for crypto payments, and the feature is unlocked once the transaction is confirmed on-chain.',
       },
       {
         q: 'Do I need crypto to use Hatcher?',
-        a: 'No. The free tier requires no payment at all. For paid plans, Hatcher supports both crypto payments (SOL or $HATCHER via your Solana wallet) and traditional payments through Stripe (credit/debit card). You can use Hatcher without ever touching cryptocurrency. Connecting a wallet is optional and only needed for crypto-based payments.',
+        a: 'No. The free tier requires no payment at all. For paid plans, Hatcher supports crypto payments (SOL, USDC on Solana, or $HATCHER via your Solana wallet) and traditional payments through Stripe (credit/debit card). You can use Hatcher without ever touching cryptocurrency. Connecting a wallet is optional and only needed for crypto-based payments.',
       },
     ],
   },
@@ -141,7 +141,7 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'My agent is not responding',
-        a: 'First, check if your agent is running (status should show "running" on the dashboard). If it\'s stopped or sleeping, start it. If it\'s running but not responding: check that your integrations are properly configured with valid tokens, verify your daily message limit hasn\'t been reached (account-wide: Free 20/day, Starter 50/day, Pro 100/day, Business 300/day, Founding 300/day), and check the Logs tab for errors. If using BYOK, confirm your API key is valid and has credits with the provider.',
+        a: 'First, check if your agent is running (status should show "running" on the dashboard). If it\'s stopped or sleeping, start it. If it\'s running but not responding: check that your integrations are properly configured with valid tokens, verify your AI Credit balance for hosted models/web search, and check the Logs tab for errors. If using BYOK, confirm your API key is valid and has credits with the provider.',
       },
       {
         q: 'My agent keeps restarting',
@@ -149,7 +149,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'How do I check logs?',
-        a: 'Open your agent\'s dashboard and click the Logs tab. Free and Starter users see recent log entries. Pro and Business users have access to the full log viewer with search and filtering. Logs show agent startup, incoming messages, LLM calls, errors, and integration events. If your agent is crashing, the last few log lines before the crash will usually explain why.',
+        a: 'Open your agent\'s dashboard and click the Logs tab. The full log viewer with search, filtering, and export is included on every tier. Logs show agent startup, incoming messages, LLM calls, errors, and integration events. If your agent is crashing, the last few log lines before the crash will usually explain why.',
       },
       {
         q: 'My integration is not working',
@@ -157,7 +157,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'I am getting rate limited',
-        a: 'Rate limiting means you\'ve hit your daily message quota. Limits are account-wide: Free 20/day, Starter 50/day, Pro 100/day, Business 300/day, Founding 300/day. The 24h window resets per-user on a rolling basis. Solutions: upgrade your plan, stack a "+N messages/day" addon (e.g. +200 for $9.99/mo), switch to BYOK (unlimited on any tier), or wait for the reset. The 429 error in logs confirms rate limiting.',
+        a: 'Hosted model and web-search usage is metered with AI Credits. If a request is blocked, check your AI Credit balance, top up credits, upgrade for a larger monthly grant, or switch the agent to BYOK. BYOK traffic is paid directly to your provider and does not consume Hatcher AI Credits.',
       },
     ],
   },

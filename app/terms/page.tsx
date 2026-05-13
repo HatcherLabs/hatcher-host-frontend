@@ -153,8 +153,9 @@ export default function TermsOfServicePage() {
             <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-3">7. Payment Terms</h2>
             <p>
               Paid features are billed as one-time charges for a fixed period. Prices are listed in USD and payable in
-              SOL, USDC, $HATCHER (on-chain), by credit/debit card via Stripe, or with HATCHER credits on your
-              account. Crypto amounts are calculated at the live Jupiter rate at checkout time.
+              SOL, USDC, $HATCHER (on-chain), or by credit/debit card via Stripe. Crypto amounts are calculated at
+              the live Jupiter rate at checkout time. AI Credits are usage credits for hosted AI services and cannot
+              be used to buy plans.
             </p>
             <ul className="list-disc pl-6 mt-3 space-y-1.5">
               <li>
@@ -170,14 +171,13 @@ export default function TermsOfServicePage() {
                 tier; capped at 20 seats. Once sold out it&apos;s gone for good.
               </li>
               <li>
-                <strong className="text-[var(--text-primary)]">Add-ons</strong> stack with your tier — agent slots,
-                message quotas, searches, per-agent utilities. Account-level subscription addons accumulate by count
-                on each purchase.
+                <strong className="text-[var(--text-primary)]">Extras</strong> stack with your tier — agent slots
+                and AI Credit top-ups. Account-level recurring extras accumulate by count on each purchase.
               </li>
             </ul>
             <p className="mt-3">
-              Upgrading from a lower tier mid-cycle refunds the unused portion of the old tier as HATCHER credits
-              (applied automatically).
+              Upgrading from a lower tier mid-cycle can grant prorated AI Credits for the higher plan. Purchases do
+              not create cash-equivalent refund credits.
             </p>
             <p className="mt-3">
               VAT: prices are displayed exclusive of VAT where applicable. EU B2B buyers with a valid VAT ID receive
@@ -214,8 +214,8 @@ export default function TermsOfServicePage() {
             </p>
             <p className="mt-3">
               <strong className="text-[var(--text-primary)]">On-chain payments (SOL/USDC/$HATCHER)</strong> are
-              technically non-reversible. We can issue refunds as HATCHER credits on your account, but we cannot
-              refund crypto on-chain because the blockchain doesn&apos;t let us.
+              technically non-reversible. We do not issue cash-equivalent account credits for these purchases; billing
+              errors are handled manually by support.
             </p>
           </section>
 
@@ -223,13 +223,13 @@ export default function TermsOfServicePage() {
           <section>
             <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-3">9. Free Tier &amp; BYOK</h2>
             <p>
-              The Free tier includes 1 agent, 20 messages/day (account-wide), 150 MB workspace, and auto-sleep after
-              4 hours of inactivity. It&apos;s for evaluation and personal use.
+              The Free tier includes 1 agent, 500 AI Credits/month, 2 GB workspace, File Manager, Full Logs, and
+              auto-sleep after 12 hours of inactivity. It&apos;s for evaluation and personal use.
             </p>
             <p className="mt-3">
               <strong className="text-[var(--text-primary)]">BYOK</strong> (Bring Your Own LLM Key — OpenAI,
-              Anthropic, Groq, Google, etc.) bypasses our daily message limit entirely on every tier. Your requests
-              go through our proxy directly to the provider, whose pricing and terms apply separately.
+              Anthropic, Google, OpenRouter, etc.) bypasses Hatcher AI Credit metering on every tier. Your
+              requests go through our proxy directly to the provider, whose pricing and terms apply separately.
             </p>
           </section>
 
@@ -238,7 +238,7 @@ export default function TermsOfServicePage() {
             <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-3">10. Service Availability</h2>
             <p>
               The Service is provided on a &ldquo;best effort&rdquo; basis. We target high uptime but do not promise
-              an SLA. Maintenance windows, network incidents, and upstream provider issues (Groq, Stripe, Cloudflare,
+              an SLA. Maintenance windows, network incidents, and upstream provider issues (OpenRouter, Stripe, Cloudflare,
               Hetzner) can cause downtime.
             </p>
             <p className="mt-3">
@@ -263,8 +263,9 @@ export default function TermsOfServicePage() {
             </p>
             <p className="mt-3">
               Upon termination, your right to use the Service ends. We don&apos;t refund pre-paid subscriptions in
-              termination cases caused by your violations. Legitimate termination by us (e.g., we shut down the
-              Service) → we refund the prorated unused portion.
+              termination cases caused by your violations. If we discontinue the Service, we&apos;ll handle remaining
+              prepaid access as required by law and our current billing policy. AI Credits are non-cash service
+              credits and are not refundable.
             </p>
           </section>
 

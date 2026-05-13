@@ -77,7 +77,7 @@ export function StatusPanel({
         <Stat label="Status" value={status} />
         <Stat label="Tier" value={tier ?? '—'} />
         <Stat label="Uptime" value={uptimeSec ? `${minsUp}m` : '—'} />
-        <Stat label="Msgs today" value={messagesToday ?? '—'} />
+        <Stat label="Interactions" value={messagesToday ?? '—'} />
       </div>
       {reputation && (reputation.total > 0 || reputation.onChainCount > 0) && (
         <div className="mb-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-2">

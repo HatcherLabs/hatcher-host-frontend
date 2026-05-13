@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 
 interface ShortcutHandlers {
   onNewAgent?: () => void;
-  onTemplates?: () => void;
   onSearch?: () => void;
   onHelp?: () => void;
   onAgentSelect?: (index: number) => void;
@@ -13,7 +12,6 @@ interface ShortcutHandlers {
 
 export const SHORTCUTS = [
   { key: 'n', label: 'New agent', category: 'Navigation' },
-  { key: 't', label: 'Templates', category: 'Navigation' },
   { key: '/', label: 'Focus search', category: 'Navigation' },
   { key: '?', label: 'Show shortcuts', category: 'General' },
   { key: '1-9', label: 'Select agent by index', category: 'Agents' },
@@ -44,11 +42,6 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers = {}) {
           e.preventDefault();
           if (handlers.onNewAgent) handlers.onNewAgent();
           else router.push('/create');
-          break;
-        case 't':
-          e.preventDefault();
-          if (handlers.onTemplates) handlers.onTemplates();
-          else router.push('/create/template');
           break;
         case '/':
           e.preventDefault();

@@ -118,7 +118,7 @@ export function LiveCityHud({
                   </span>
                 </div>
                 <p className="mt-1 text-[10px] uppercase tracking-wide text-amber-200/70">
-                  {agent.framework} · {agent.messageCount} msgs
+                  {agent.framework} · {agent.messageCount} interactions
                 </p>
               </Link>
             ))}

@@ -67,39 +67,18 @@ test.describe('Agent Lifecycle', () => {
     await page.goto('/create');
     await expect(page).toHaveURL(/\/create/);
 
-    // The page should show framework or template selection
+    // The page should show Chat-to-Hatch
     await page.waitForLoadState('networkidle', { timeout: 10_000 });
-
-    const hasCreationUI =
-      (await page.locator('text=/openclaw/i').count()) > 0 ||
-      (await page.locator('text=/hermes/i').count()) > 0 ||
-      (await page.locator('text=/template/i').count()) > 0 ||
-      (await page.locator('text=/framework/i').count()) > 0 ||
-      (await page.locator('[data-testid="template-card"], .template-card').count()) > 0;
-    expect(hasCreationUI).toBe(true);
+    await expect(page.getByText(/Hatcher Assistant/i)).toBeVisible();
+    await expect(page.locator('textarea').first()).toBeVisible();
   });
 
-  test('user can complete the current template wizard to launch review', async ({ page }) => {
+  test('legacy template route redirects to Chat-to-Hatch', async ({ page }) => {
     await loginAs(page, email, password);
 
     await page.goto('/create/template');
-    await page.waitForLoadState('networkidle', { timeout: 10_000 });
-
-    await expect(page.getByRole('heading', { name: /what kind of agent/i })).toBeVisible();
-    await page.getByRole('button', { name: /continue/i }).click();
-
-    await expect(page.getByRole('heading', { name: /what type of agent/i })).toBeVisible();
-    await page.getByRole('button', { name: /custom agent/i }).click();
-
-    await expect(page.getByRole('heading', { name: /personalize your agent/i })).toBeVisible();
-    const agentName = `E2E Wizard ${Date.now()}`;
-    await page.locator('#agent-name').fill(agentName);
-    await page.locator('#agent-description').fill('Current wizard smoke test');
-    await page.getByRole('button', { name: /continue/i }).click();
-
-    await expect(page.getByRole('heading', { name: /ready to launch/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /launch your agent/i })).toBeVisible();
-    await expect(page.getByText(agentName)).toBeVisible();
+    await expect(page).toHaveURL(/\/chat-to-hatch/);
+    await expect(page.getByText(/Hatcher Assistant/i)).toBeVisible();
   });
 
   test('user can create and delete a custom agent through the backend', async ({ page }) => {

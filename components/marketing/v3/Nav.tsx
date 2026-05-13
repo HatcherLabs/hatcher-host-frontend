@@ -31,6 +31,7 @@ export function Nav() {
 
   const USER_MENU = useMemo(() => ([
     { key: 'agents',   label: tNav('myAgents'),  sub: tMenu('sub_myAgents'), href: '/dashboard/agents',   glyph: '◐' },
+    { key: 'analytics', label: tNav('analytics'), sub: tMenu('sub_analytics'), href: '/dashboard/analytics', glyph: '▥' },
     { key: 'create',   label: tNav('create'),    sub: tMenu('sub_create'),   href: '/create',             glyph: '⊞' },
     { key: 'billing',  label: tNav('billing'),   sub: tMenu('sub_billing'),  href: '/dashboard/billing',  glyph: '◇' },
     { key: 'settings', label: tNav('settings'),  sub: tMenu('sub_settings'), href: '/dashboard/settings', glyph: '◆' },

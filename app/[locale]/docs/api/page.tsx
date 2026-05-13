@@ -460,7 +460,7 @@ res = requests.post(
     "walletAddress": "7xKXtg...AsU",
     "agentCount": 3,
     "maxAgents": 5,
-    "hatchCredits": 12.50,
+    "aiCreditsBalance": 3000,
     "createdAt": "2026-02-01T00:00:00Z"
   }
 }`,

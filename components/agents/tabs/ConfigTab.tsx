@@ -1,10 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Settings,
-  Cpu,
   Zap,
   Lock,
   CheckCircle,
@@ -13,1365 +11,981 @@ import {
   ChevronDown,
   ChevronUp,
   AlertTriangle,
-  Shield,
   RefreshCw,
   History,
   RotateCcw,
-  Sliders,
-  Globe,
-  Mic,
-  Brain,
-  Database,
-  Puzzle,
-  ShieldCheck,
-  Volume2,
-  Users,
-  Upload,
-  Download,
-  Sparkles,
-  Heart,
-  Briefcase,
-  Palette,
-  Search,
-  Layers,
 } from 'lucide-react';
-import { BYOK_PROVIDERS, getBYOKProvider, FRAMEWORKS } from '@hatcher/shared';
-import type { AgentFramework } from '@hatcher/shared';
+import { BYOK_PROVIDERS } from '@hatcher/shared';
 import { api } from '@/lib/api';
 import {
   useAgentContext,
   tabContentVariants,
   GlassCard,
-  getIntegrationsForFramework,
-  CHANNEL_SETTINGS_FIELDS,
-  integrationStateKey,
 } from '../AgentContext';
 
-export function ConfigTab() {
-  const ctx = useAgentContext();
-  const {
-    agent,
-    configName, setConfigName,
-    configDesc, setConfigDesc,
-    configBio, setConfigBio,
-    configLore, setConfigLore,
-    configTopics, setConfigTopics,
-    configStyle, setConfigStyle,
-    configAdjectives, setConfigAdjectives,
-    configSystemPrompt, setConfigSystemPrompt,
-    configSkills, setConfigSkills,
-    configModel, setConfigModel,
-    configProvider, setConfigProvider,
-    customModelInput, setCustomModelInput,
-    useCustomModel, setUseCustomModel,
-    byokKeyInput, setByokKeyInput,
-    showByokKey, setShowByokKey,
-    saving, saveMsg,
-    saveConfig,
-    llmProvider, currentProviderMeta, providerModels, hasApiKey,
-    activeFeatures, activeFeatureKeys, featuresLoading,
-    integrationSecrets, expandedIntegrations, visibleFields,
-    savingIntegration, integrationSaveMsg,
-    toggleIntegrationExpanded, toggleFieldVisibility,
-    setIntegrationField, saveIntegrationSecrets,
-    hasExistingSecret,
-    setTab,
-  } = ctx;
-
-  const [commitMessage, setCommitMessage] = useState('');
-
-  // Memoize BYOK provider list (static array — only recomputed if BYOK_PROVIDERS changes)
-  const byokProvidersFiltered = useMemo(
-    () => BYOK_PROVIDERS.filter((p) => p.key !== 'groq'),
-    [],
-  );
-
-  // ─── Config Import/Export ───────────────────────────────────
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [importMsg, setImportMsg] = useState<string | null>(null);
-
-  async function handleExport() {
-    if (!agent?.id) return;
-    try {
-      const result = await api.exportAgent(agent.id);
-      if ('success' in result && !result.success) {
-        setImportMsg('Error: ' + (result as { error: string }).error);
-        setTimeout(() => setImportMsg(null), 3000);
-        return;
-      }
-      const data = 'data' in result ? result.data : result;
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${(data as Record<string, unknown>).name || configName || 'agent'}-config.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch {
-      setImportMsg('Error: Failed to export config');
-      setTimeout(() => setImportMsg(null), 3000);
-    }
-  }
-
-  function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      try {
-        const config = JSON.parse(ev.target?.result as string);
-        if (config.name) setConfigName(config.name);
-        if (config.description) setConfigDesc(config.description);
-        if (config.systemPrompt) setConfigSystemPrompt(config.systemPrompt);
-        if (config.skills) setConfigSkills(Array.isArray(config.skills) ? config.skills.join(', ') : config.skills);
-        if (config.bio) setConfigBio(config.bio);
-        if (config.lore) setConfigLore(typeof config.lore === 'string' ? config.lore : Array.isArray(config.lore) ? config.lore.join('\n') : '');
-        if (config.topics) setConfigTopics(Array.isArray(config.topics) ? config.topics.join(', ') : config.topics);
-        if (config.adjectives) ctx.setConfigAdjectives(Array.isArray(config.adjectives) ? config.adjectives.join(', ') : config.adjectives);
-        if (config.style) setConfigStyle(typeof config.style === 'string' ? config.style : Array.isArray(config.style?.all) ? config.style.all.join('\n') : '');
-        setImportMsg('Config imported successfully');
-        setTimeout(() => setImportMsg(null), 3000);
-      } catch {
-        setImportMsg('Error: Invalid JSON file');
-        setTimeout(() => setImportMsg(null), 3000);
-      }
-    };
-    reader.readAsText(file);
-    // Reset input so the same file can be re-imported
-    e.target.value = '';
-  }
-
-  // ─── Personality Builder ────────────────────────────────────
-  const [personality, setPersonality] = useState({
-    formality: 50,
-    verbosity: 50,
-    creativity: 30,
-    friendliness: 60,
-    expertise: 50,
-  });
-
-  function generatePromptFromPersonality() {
-    const parts: string[] = [];
-    parts.push(`You are ${configName || 'an AI assistant'}.`);
-
-    if (personality.formality > 70) parts.push('Communicate in a formal, professional tone.');
-    else if (personality.formality < 30) parts.push('Keep your tone casual and conversational.');
-
-    if (personality.verbosity > 70) parts.push('Provide detailed, thorough explanations.');
-    else if (personality.verbosity < 30) parts.push('Be concise and to the point.');
-
-    if (personality.creativity > 70) parts.push('Be creative and imaginative in your responses.');
-    else if (personality.creativity < 30) parts.push('Stick to facts and established information.');
-
-    if (personality.friendliness > 70) parts.push('Be warm, encouraging, and supportive.');
-    else if (personality.friendliness < 30) parts.push('Maintain a neutral, objective demeanor.');
-
-    if (personality.expertise > 70) parts.push('Demonstrate deep domain expertise and use technical terminology.');
-    else if (personality.expertise < 30) parts.push('Explain things in simple, accessible language.');
-
-    if (configDesc) parts.push(configDesc);
-
-    setConfigSystemPrompt(parts.join(' '));
-  }
-
-  // ─── Advanced Settings (local to ConfigTab) ─────────────────
-  const [showAdvanced, setShowAdvanced] = useState(false);
-
-  // OpenClaw advanced
-  const [ocSessionScope, setOcSessionScope] = useState('per_user');
-  const [ocCompaction, setOcCompaction] = useState('safeguard');
-  const [ocWebSearch, setOcWebSearch] = useState(false);
-  const [ocSearchProvider, setOcSearchProvider] = useState('brave');
-  const [ocTts, setOcTts] = useState(false);
-  const [ocTtsProvider, setOcTtsProvider] = useState('elevenlabs');
-  const [ocMaxConversations, setOcMaxConversations] = useState(8);
-  const [ocMaxSubagents, setOcMaxSubagents] = useState(16);
-
-  // Hermes advanced
-  const [hmPersonality, setHmPersonality] = useState('default');
-  const [hmPersistentMemory, setHmPersistentMemory] = useState(true);
-  const [hmApprovalMode, setHmApprovalMode] = useState('auto');
-  const [hmVoice, setHmVoice] = useState(false);
-  const [hmSttProvider, setHmSttProvider] = useState('whisper');
-  const [hmTtsProvider, setHmTtsProvider] = useState('elevenlabs');
-
-  // Load advanced settings from existing agent config
-  useEffect(() => {
-    if (!agent?.config) return;
-    const adv = (agent.config as Record<string, unknown>).advanced as Record<string, unknown> | undefined;
-    if (!adv) return;
-
-    if (agent.framework === 'openclaw') {
-      if (adv.sessionScope) setOcSessionScope(adv.sessionScope as string);
-      if (adv.compaction) setOcCompaction(adv.compaction as string);
-      if (typeof adv.webSearch === 'boolean') setOcWebSearch(adv.webSearch);
-      if (adv.searchProvider) setOcSearchProvider(adv.searchProvider as string);
-      if (typeof adv.tts === 'boolean') setOcTts(adv.tts);
-      if (adv.ttsProvider) setOcTtsProvider(adv.ttsProvider as string);
-      if (typeof adv.maxConversations === 'number') setOcMaxConversations(adv.maxConversations);
-      if (typeof adv.maxSubagents === 'number') setOcMaxSubagents(adv.maxSubagents);
-    } else if (agent.framework === 'hermes') {
-      if (adv.personality) setHmPersonality(adv.personality as string);
-      if (typeof adv.persistentMemory === 'boolean') setHmPersistentMemory(adv.persistentMemory);
-      if (adv.approvalMode) setHmApprovalMode(adv.approvalMode as string);
-      if (typeof adv.voice === 'boolean') setHmVoice(adv.voice);
-      if (adv.sttProvider) setHmSttProvider(adv.sttProvider as string);
-      if (adv.ttsProvider) setHmTtsProvider(adv.ttsProvider as string);
-    }
-  }, [agent?.config, agent?.framework]);
-
-  /** Build the advanced config object for the current framework */
-  const buildAdvancedConfig = useCallback(() => {
-    const fw = agent?.framework;
-    if (fw === 'openclaw') {
-      return {
-        sessionScope: ocSessionScope,
-        compaction: ocCompaction,
-        webSearch: ocWebSearch,
-        searchProvider: ocSearchProvider,
-        tts: ocTts,
-        ttsProvider: ocTtsProvider,
-        maxConversations: ocMaxConversations,
-        maxSubagents: ocMaxSubagents,
-      };
-    }
-    if (fw === 'hermes') {
-      return {
-        personality: hmPersonality,
-        persistentMemory: hmPersistentMemory,
-        approvalMode: hmApprovalMode,
-        voice: hmVoice,
-        sttProvider: hmSttProvider,
-        ttsProvider: hmTtsProvider,
-      };
-    }
-    return {};
-  }, [
-    agent?.framework,
-    ocSessionScope, ocCompaction, ocWebSearch, ocSearchProvider, ocTts, ocTtsProvider, ocMaxConversations, ocMaxSubagents,
-    hmPersonality, hmPersistentMemory, hmApprovalMode, hmVoice, hmSttProvider, hmTtsProvider,
-  ]);
-
-  /** Wrapper that merges advanced settings into the config before saving */
-  const handleSaveAll = useCallback(async (commit?: string) => {
-    if (!agent) return;
-    // Run the normal save first (handles validation, UI feedback, main config)
-    await saveConfig(commit);
-    // Then patch the advanced settings — backend uses deepMerge so this is additive
-    const advancedPayload = buildAdvancedConfig();
-    await api.updateAgent(agent.id, {
-      config: { advanced: advancedPayload },
-    } as Parameters<typeof api.updateAgent>[1]).catch(() => {
-      // Silent fail — main config was already saved
-    });
-  }, [agent, buildAdvancedConfig, saveConfig]);
-
-  return (
-    <motion.div key="tab-config" className="w-full max-w-2xl space-y-6 px-1 sm:px-0" variants={tabContentVariants} initial="enter" animate="center" exit="exit">
-      {/* Config Import / Export */}
-      <div className="flex items-center gap-2">
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".json,application/json"
-          onChange={handleImport}
-          className="hidden"
-        />
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-default)] hover:border-[var(--color-accent)]/40 bg-[var(--bg-card)] hover:bg-[var(--color-accent)]/10 rounded-xl px-3 py-2 transition-all duration-200"
-        >
-          <Upload size={13} />
-          Import Config
-        </button>
-        <button
-          type="button"
-          onClick={handleExport}
-          className="flex items-center gap-1.5 text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-default)] hover:border-[var(--color-accent)]/40 bg-[var(--bg-card)] hover:bg-[var(--color-accent)]/10 rounded-xl px-3 py-2 transition-all duration-200"
-        >
-          <Download size={13} />
-          Export Config
-        </button>
-        {importMsg && (
-          <motion.span
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            className={`text-xs font-medium ${importMsg.startsWith('Error') ? 'text-red-400' : 'text-emerald-400'}`}
-          >
-            {importMsg}
-          </motion.span>
-        )}
-      </div>
-
-      {/* Hatcher City visibility toggle */}
-      <HatcherCityVisibility />
-
-      {/* Agent basic info */}
-      <GlassCard>
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-7 h-7 rounded-lg bg-[var(--color-accent)]/10 flex items-center justify-center">
-            <Settings size={14} className="text-[var(--color-accent)]" />
-          </div>
-          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Agent Info</h3>
-        </div>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="config-name" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Name</label>
-            <input
-              id="config-name"
-              type="text"
-              className="config-input"
-              value={configName}
-              onChange={(e) => setConfigName(e.target.value)}
-              maxLength={50}
-            />
-          </div>
-          <div>
-            <label htmlFor="config-description" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Description</label>
-            <textarea
-              id="config-description"
-              className="config-input resize-none"
-              rows={2}
-              value={configDesc}
-              onChange={(e) => setConfigDesc(e.target.value)}
-              maxLength={500}
-            />
-            <div className="text-right mt-1">
-              <span className={`text-[10px] ${configDesc.length > 450 ? 'text-amber-400' : 'text-[var(--text-muted)]'}`}>
-                {configDesc.length}/500
-              </span>
-            </div>
-          </div>
-        </div>
-      </GlassCard>
-
-      {/* Framework Config */}
-      <GlassCard>
-        <div className="flex items-center gap-2 mb-4">
-          <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${agent?.framework === 'hermes' ? 'bg-purple-500/10' : 'bg-amber-500/10'}`}>
-            <Cpu size={14} className={agent?.framework === 'hermes' ? 'text-purple-400' : 'text-amber-400'} />
-          </div>
-          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">{FRAMEWORKS[(agent?.framework ?? 'openclaw') as AgentFramework]?.name ?? 'Agent'} Config</h3>
-        </div>
-
-        <div className="space-y-4">
-          {/* Personality Builder */}
-          <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-4 space-y-4">
-            <div className="flex items-center gap-2">
-              <Sparkles size={14} className="text-[#A78BFA]" />
-              <h4 className="text-xs font-semibold text-[var(--text-secondary)]">Personality Builder</h4>
-            </div>
-            <p className="text-[10px] text-[var(--text-muted)]">
-              Adjust sliders to shape your agent&apos;s personality, then click &quot;Apply to Prompt&quot; to generate a system prompt. Or write your own prompt below.
-            </p>
-
-            {/* Formality */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] text-[var(--text-muted)]">Casual</span>
-                <span className="text-[11px] font-medium text-[var(--text-secondary)]">Formality</span>
-                <span className="text-[10px] text-[var(--text-muted)]">Formal</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <input
-                  type="range" min={0} max={100}
-                  value={personality.formality}
-                  onChange={(e) => setPersonality(p => ({ ...p, formality: parseInt(e.target.value, 10) }))}
-                  className="w-full h-1 rounded-full appearance-none cursor-pointer bg-[var(--border-default)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--color-accent)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[var(--color-accent)] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
-                />
-                <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.formality}</span>
-              </div>
-            </div>
-
-            {/* Verbosity */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] text-[var(--text-muted)]">Concise</span>
-                <span className="text-[11px] font-medium text-[var(--text-secondary)]">Verbosity</span>
-                <span className="text-[10px] text-[var(--text-muted)]">Detailed</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <input
-                  type="range" min={0} max={100}
-                  value={personality.verbosity}
-                  onChange={(e) => setPersonality(p => ({ ...p, verbosity: parseInt(e.target.value, 10) }))}
-                  className="w-full h-1 rounded-full appearance-none cursor-pointer bg-[var(--border-default)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--color-accent)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[var(--color-accent)] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
-                />
-                <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.verbosity}</span>
-              </div>
-            </div>
-
-            {/* Creativity */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] text-[var(--text-muted)]">Factual</span>
-                <span className="text-[11px] font-medium text-[var(--text-secondary)]">Creativity</span>
-                <span className="text-[10px] text-[var(--text-muted)]">Creative</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <input
-                  type="range" min={0} max={100}
-                  value={personality.creativity}
-                  onChange={(e) => setPersonality(p => ({ ...p, creativity: parseInt(e.target.value, 10) }))}
-                  className="w-full h-1 rounded-full appearance-none cursor-pointer bg-[var(--border-default)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--color-accent)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[var(--color-accent)] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
-                />
-                <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.creativity}</span>
-              </div>
-            </div>
-
-            {/* Friendliness */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] text-[var(--text-muted)]">Neutral</span>
-                <span className="text-[11px] font-medium text-[var(--text-secondary)]">Friendliness</span>
-                <span className="text-[10px] text-[var(--text-muted)]">Warm</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <input
-                  type="range" min={0} max={100}
-                  value={personality.friendliness}
-                  onChange={(e) => setPersonality(p => ({ ...p, friendliness: parseInt(e.target.value, 10) }))}
-                  className="w-full h-1 rounded-full appearance-none cursor-pointer bg-[var(--border-default)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--color-accent)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[var(--color-accent)] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
-                />
-                <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.friendliness}</span>
-              </div>
-            </div>
-
-            {/* Expertise */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] text-[var(--text-muted)]">Generalist</span>
-                <span className="text-[11px] font-medium text-[var(--text-secondary)]">Expertise</span>
-                <span className="text-[10px] text-[var(--text-muted)]">Specialist</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <input
-                  type="range" min={0} max={100}
-                  value={personality.expertise}
-                  onChange={(e) => setPersonality(p => ({ ...p, expertise: parseInt(e.target.value, 10) }))}
-                  className="w-full h-1 rounded-full appearance-none cursor-pointer bg-[var(--border-default)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[var(--color-accent)] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[var(--color-accent)] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
-                />
-                <span className="text-[10px] font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-1.5 py-0.5 rounded min-w-[28px] text-center">{personality.expertise}</span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={generatePromptFromPersonality}
-              className="flex items-center gap-1.5 text-xs font-medium text-[#A78BFA] hover:text-[var(--text-primary)] border border-[#A78BFA]/30 hover:border-[#A78BFA]/60 bg-[#A78BFA]/10 hover:bg-[#A78BFA]/20 rounded-xl px-3 py-2 transition-all duration-200"
-            >
-              <Sparkles size={13} />
-              Apply to Prompt
-            </button>
-          </div>
-
-          <div>
-            <label htmlFor="config-system-prompt" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Behavior Instructions</label>
-            <textarea
-              id="config-system-prompt"
-              className="config-textarea"
-              rows={6}
-              value={configSystemPrompt}
-              onChange={(e) => setConfigSystemPrompt(e.target.value)}
-              placeholder="You are a helpful AI assistant..."
-            />
-            <p className="text-[10px] mt-1 text-[var(--text-muted)]">
-              Tell your agent how to behave, what tone to use, and what it should know. You can write multiple lines.
-            </p>
-          </div>
-          <div>
-            {(() => {
-              const parsedSkills = configSkills ? configSkills.split(',').map((s) => s.trim()).filter(Boolean) : [];
-              return (
-                <>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label htmlFor="config-skills" className="block text-[11px] font-medium uppercase tracking-wider text-[var(--text-muted)]">Agent Skills</label>
-                    <span className="text-[10px] font-medium text-[var(--text-muted)]">
-                      {parsedSkills.length} skills
-                    </span>
-                  </div>
-                  <input
-                    id="config-skills"
-                    type="text"
-                    className="config-input"
-                    value={configSkills}
-                    onChange={(e) => setConfigSkills(e.target.value)}
-                    placeholder="e.g. chat, search, calculator (comma-separated)"
-                  />
-                  {/* Skills are unlimited on all tiers */}
-                  {parsedSkills.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-2">
-                      {parsedSkills.map((skill, i) => (
-                        <span key={skill} className="text-[10px] px-2 py-0.5 rounded-full border bg-[var(--color-accent)]/10 text-[var(--color-accent)] border-[var(--color-accent)]/20">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </>
-              );
-            })()}
-          </div>
-        </div>
-      </GlassCard>
-
-      {/* ─── Advanced Settings (collapsible) ───────────────────── */}
-      <GlassCard>
-        <button
-          type="button"
-          onClick={() => setShowAdvanced(!showAdvanced)}
-          className="flex items-center justify-between w-full"
-        >
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#A78BFA]/10 flex items-center justify-center">
-              <Sliders size={14} className="text-[#A78BFA]" />
-            </div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-[var(--text-secondary)]">Advanced Settings</h3>
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#A78BFA]/10 text-[#A78BFA] border border-[#A78BFA]/20">
-                {FRAMEWORKS[(agent?.framework ?? 'openclaw') as AgentFramework]?.name ?? 'Agent'}
-              </span>
-            </div>
-          </div>
-          {showAdvanced ? <ChevronUp size={16} className="text-[var(--text-muted)]" /> : <ChevronDown size={16} className="text-[var(--text-muted)]" />}
-        </button>
-
-        <AnimatePresence>
-          {showAdvanced && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="overflow-hidden"
-            >
-              <div className="mt-4 space-y-5">
-
-                {/* ── OpenClaw Advanced ── */}
-                {agent?.framework === 'openclaw' && (
-                  <>
-                    {/* Session & Memory */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-1.5">
-                        <Brain size={12} className="text-amber-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Session &amp; Memory</span>
-                      </div>
-
-                      <div>
-                        <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Session Scope</label>
-                        <div className="relative">
-                          <select
-                            className="config-input text-sm appearance-none pr-8 cursor-pointer"
-                            value={ocSessionScope}
-                            onChange={(e) => setOcSessionScope(e.target.value)}
-                          >
-                            <option value="per_user" style={{ background: 'var(--bg-base)' }}>Per User (recommended)</option>
-                            <option value="global" style={{ background: 'var(--bg-base)' }}>Global (shared)</option>
-                          </select>
-                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-                        </div>
-                        <div className="mt-2 space-y-1">
-                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocSessionScope === 'per_user' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-[var(--bg-card)]'}`}>
-                            <Users size={11} className={`mt-0.5 shrink-0 ${ocSessionScope === 'per_user' ? 'text-amber-400' : 'text-[var(--text-muted)]'}`} />
-                            <p className={`text-[10px] leading-relaxed ${ocSessionScope === 'per_user' ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'}`}>
-                              <span className="font-medium">Per User</span> — Each user has their own conversation thread
-                            </p>
-                          </div>
-                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocSessionScope === 'global' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-[var(--bg-card)]'}`}>
-                            <Globe size={11} className={`mt-0.5 shrink-0 ${ocSessionScope === 'global' ? 'text-amber-400' : 'text-[var(--text-muted)]'}`} />
-                            <p className={`text-[10px] leading-relaxed ${ocSessionScope === 'global' ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'}`}>
-                              <span className="font-medium">Global</span> — All users share a single conversation
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Compaction Mode</label>
-                        <div className="relative">
-                          <select
-                            className="config-input text-sm appearance-none pr-8 cursor-pointer"
-                            value={ocCompaction}
-                            onChange={(e) => setOcCompaction(e.target.value)}
-                          >
-                            <option value="safeguard" style={{ background: 'var(--bg-base)' }}>Safeguard (recommended)</option>
-                            <option value="aggressive" style={{ background: 'var(--bg-base)' }}>Aggressive</option>
-                            <option value="off" style={{ background: 'var(--bg-base)' }}>Off</option>
-                          </select>
-                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-                        </div>
-                        <div className="mt-2 space-y-1">
-                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocCompaction === 'safeguard' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-[var(--bg-card)]'}`}>
-                            <Shield size={11} className={`mt-0.5 shrink-0 ${ocCompaction === 'safeguard' ? 'text-amber-400' : 'text-[var(--text-muted)]'}`} />
-                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'safeguard' ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'}`}>
-                              <span className="font-medium">Safeguard</span> — Preserves full conversation history, uses more memory
-                            </p>
-                          </div>
-                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocCompaction === 'aggressive' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-[var(--bg-card)]'}`}>
-                            <Zap size={11} className={`mt-0.5 shrink-0 ${ocCompaction === 'aggressive' ? 'text-amber-400' : 'text-[var(--text-muted)]'}`} />
-                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'aggressive' ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'}`}>
-                              <span className="font-medium">Aggressive</span> — Summarizes older messages to save memory
-                            </p>
-                          </div>
-                          <div className={`flex items-start gap-2 rounded-lg px-2.5 py-1.5 transition-colors ${ocCompaction === 'off' ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-[var(--bg-card)]'}`}>
-                            <History size={11} className={`mt-0.5 shrink-0 ${ocCompaction === 'off' ? 'text-amber-400' : 'text-[var(--text-muted)]'}`} />
-                            <p className={`text-[10px] leading-relaxed ${ocCompaction === 'off' ? 'text-[var(--text-secondary)]' : 'text-[var(--text-muted)]'}`}>
-                              <span className="font-medium">Off</span> — No compaction, conversation grows unbounded
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="border-t border-[var(--border-default)]" />
-
-                    {/* Tools & Search */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-1.5">
-                        <Search size={12} className="text-amber-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Tools &amp; Search</span>
-                      </div>
-
-                      <ToggleSwitch
-                        label="Enable Web Search"
-                        checked={ocWebSearch}
-                        onChange={setOcWebSearch}
-                        helper="Let your agent search the web for real-time information."
-                      />
-
-                      {ocWebSearch && (
-                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
-                          <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Search Provider</label>
-                          <div className="relative">
-                            <select
-                              className="config-input text-sm appearance-none pr-8 cursor-pointer"
-                              value={ocSearchProvider}
-                              onChange={(e) => setOcSearchProvider(e.target.value)}
-                            >
-                              <option value="brave" style={{ background: 'var(--bg-base)' }}>Brave</option>
-                              <option value="google" style={{ background: 'var(--bg-base)' }}>Google (Gemini)</option>
-                              <option value="grok" style={{ background: 'var(--bg-base)' }}>Grok (xAI)</option>
-                              <option value="perplexity" style={{ background: 'var(--bg-base)' }}>Perplexity</option>
-                            </select>
-                            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-                          </div>
-                        </motion.div>
-                      )}
-                    </div>
-
-                    <div className="border-t border-[var(--border-default)]" />
-
-                    {/* Voice & TTS */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-1.5">
-                        <Mic size={12} className="text-amber-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Voice &amp; TTS</span>
-                      </div>
-
-                      <ToggleSwitch
-                        label="Enable Text-to-Speech"
-                        checked={ocTts}
-                        onChange={setOcTts}
-                        helper="Agent will speak responses aloud when supported."
-                      />
-
-                      {ocTts && (
-                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
-                          <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">TTS Provider</label>
-                          <div className="relative">
-                            <select
-                              className="config-input text-sm appearance-none pr-8 cursor-pointer"
-                              value={ocTtsProvider}
-                              onChange={(e) => setOcTtsProvider(e.target.value)}
-                            >
-                              <option value="elevenlabs" style={{ background: 'var(--bg-base)' }}>ElevenLabs</option>
-                              <option value="openai" style={{ background: 'var(--bg-base)' }}>OpenAI</option>
-                            </select>
-                            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-                          </div>
-                        </motion.div>
-                      )}
-                    </div>
-
-                    <div className="border-t border-[var(--border-default)]" />
-
-                    {/* Limits */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-1.5">
-                        <Layers size={12} className="text-amber-400" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Limits</span>
-                      </div>
-
-                      <SliderInput
-                        label="Max Concurrent Conversations"
-                        value={ocMaxConversations}
-                        onChange={setOcMaxConversations}
-                        min={1}
-                        max={16}
-                        helper="How many users can chat simultaneously."
-                      />
-
-                      <SliderInput
-                        label="Max Subagents"
-                        value={ocMaxSubagents}
-                        onChange={setOcMaxSubagents}
-                        min={0}
-                        max={32}
-                        helper="Maximum number of subagent spawns for parallel tasks."
-                      />
-                    </div>
-                  </>
-                )}
-
-                {/* ── Hermes Advanced ── */}
-                {agent?.framework === 'hermes' && (
-                  <>
-                    {/* ── Personality & Behavior ── */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                          <Brain size={13} className="text-purple-400" />
-                        </div>
-                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Personality & Behavior</span>
-                      </div>
-
-                      <label className="block text-[11px] font-medium mb-1 text-[var(--text-muted)]">Personality Preset</label>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {([
-                          { key: 'default', name: 'Default', desc: 'Balanced and versatile', icon: Sliders, color: 'purple' as const },
-                          { key: 'helpful', name: 'Helpful', desc: 'Friendly and supportive', icon: Heart, color: 'emerald' as const },
-                          { key: 'technical', name: 'Technical', desc: 'Precise and analytical', icon: Cpu, color: 'blue' as const },
-                          { key: 'creative', name: 'Creative', desc: 'Imaginative and expressive', icon: Sparkles, color: 'amber' as const },
-                          { key: 'concise', name: 'Concise', desc: 'Brief and to the point', icon: Zap, color: 'cyan' as const },
-                        ]).map((preset) => {
-                          const isSelected = hmPersonality === preset.key;
-                          const colorMap = {
-                            purple: { border: 'border-purple-500/40', bg: 'bg-purple-500/[0.06]', icon: 'text-purple-400', iconBg: 'bg-purple-500/15', ring: 'ring-purple-500/30' },
-                            emerald: { border: 'border-emerald-500/40', bg: 'bg-emerald-500/[0.06]', icon: 'text-emerald-400', iconBg: 'bg-emerald-500/15', ring: 'ring-emerald-500/30' },
-                            blue: { border: 'border-blue-500/40', bg: 'bg-blue-500/[0.06]', icon: 'text-blue-400', iconBg: 'bg-blue-500/15', ring: 'ring-blue-500/30' },
-                            amber: { border: 'border-amber-500/40', bg: 'bg-amber-500/[0.06]', icon: 'text-amber-400', iconBg: 'bg-amber-500/15', ring: 'ring-amber-500/30' },
-                            cyan: { border: 'border-cyan-500/40', bg: 'bg-cyan-500/[0.06]', icon: 'text-cyan-400', iconBg: 'bg-cyan-500/15', ring: 'ring-cyan-500/30' },
-                          };
-                          const colors = colorMap[preset.color];
-                          const Icon = preset.icon;
-
-                          return (
-                            <button
-                              key={preset.key}
-                              type="button"
-                              onClick={() => setHmPersonality(preset.key)}
-                              className={`group relative flex flex-col items-center gap-1.5 w-full text-center rounded-xl px-3 py-3 border transition-all duration-200 ${
-                                isSelected
-                                  ? `${colors.border} ${colors.bg} ring-1 ${colors.ring}`
-                                  : 'border-[var(--border-default)] bg-[var(--bg-elevated)]/80 hover:border-[var(--border-hover)] hover:bg-[var(--bg-elevated)]'
-                              }`}
-                            >
-                              <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors duration-200 ${
-                                isSelected ? colors.iconBg : 'bg-[var(--bg-card)]'
-                              }`}>
-                                <Icon size={14} className={`transition-colors duration-200 ${isSelected ? colors.icon : 'text-[var(--text-muted)]'}`} />
-                              </div>
-                              <div>
-                                <div className="flex items-center justify-center gap-1">
-                                  <span className={`text-[12px] font-medium transition-colors duration-200 ${isSelected ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>
-                                    {preset.name}
-                                  </span>
-                                  {isSelected && <CheckCircle size={11} className={colors.icon} />}
-                                </div>
-                                <p className="text-[10px] text-[var(--text-muted)] mt-0.5 leading-snug">{preset.desc}</p>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                      <p className="text-[10px] text-[var(--text-muted)]">Quick personality template. Combine with behavior instructions for best results.</p>
-                    </div>
-
-                    <div className="border-t border-[var(--border-default)]" />
-
-                    {/* ── Security ── */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                          <ShieldCheck size={13} className="text-purple-400" />
-                        </div>
-                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Security</span>
-                      </div>
-
-                      <div>
-                        <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">Approval Mode</label>
-                        <div className="relative">
-                          <select
-                            className="config-input text-sm appearance-none pr-8 cursor-pointer"
-                            value={hmApprovalMode}
-                            onChange={(e) => setHmApprovalMode(e.target.value)}
-                          >
-                            <option value="auto" style={{ background: 'var(--bg-base)' }}>Auto (recommended)</option>
-                            <option value="ask" style={{ background: 'var(--bg-base)' }}>Ask Before Actions</option>
-                            <option value="manual" style={{ background: 'var(--bg-base)' }}>Manual Only</option>
-                          </select>
-                          <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-                        </div>
-                        <p className="text-[10px] mt-1 text-[var(--text-muted)]">Controls whether the agent can take actions automatically or must ask for confirmation.</p>
-                      </div>
-                    </div>
-
-                    <div className="border-t border-[var(--border-default)]" />
-
-                    {/* ── Memory & Learning ── */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                          <Database size={13} className="text-purple-400" />
-                        </div>
-                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Memory & Learning</span>
-                      </div>
-
-                      <ToggleSwitch
-                        label="Enable Persistent Memory"
-                        checked={hmPersistentMemory}
-                        onChange={setHmPersistentMemory}
-                        helper="Agent remembers conversations across restarts. Disable for stateless mode."
-                      />
-
-                      <AnimatePresence>
-                        {hmPersistentMemory && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="overflow-hidden"
-                          >
-                            <div className="flex items-start gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] px-3.5 py-3">
-                              <div className="flex-shrink-0 mt-0.5">
-                                <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.6)]" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[12px] font-medium text-emerald-300/90">Persistent Memory Active</p>
-                                <p className="text-[10px] text-[var(--text-muted)] mt-0.5 leading-relaxed">
-                                  Your agent learns from conversations and remembers across restarts. Powered by ChromaDB.
-                                </p>
-                              </div>
-                              <Database size={14} className="flex-shrink-0 text-emerald-400/50 mt-0.5" />
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-
-                    <div className="border-t border-[var(--border-default)]" />
-
-                    {/* ── Voice & Speech ── */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                          <Volume2 size={13} className="text-purple-400" />
-                        </div>
-                        <span className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-secondary)]">Voice & Speech</span>
-                      </div>
-
-                      <ToggleSwitch
-                        label="Enable Voice"
-                        checked={hmVoice}
-                        onChange={setHmVoice}
-                        helper="Enable speech-to-text and text-to-speech capabilities."
-                      />
-
-                      <AnimatePresence>
-                        {hmVoice && (
-                          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-3 overflow-hidden">
-                            <div>
-                              <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">STT Provider</label>
-                              <div className="relative">
-                                <select
-                                  className="config-input text-sm appearance-none pr-8 cursor-pointer"
-                                  value={hmSttProvider}
-                                  onChange={(e) => setHmSttProvider(e.target.value)}
-                                >
-                                  <option value="whisper" style={{ background: 'var(--bg-base)' }}>Whisper</option>
-                                  <option value="deepgram" style={{ background: 'var(--bg-base)' }}>Deepgram</option>
-                                </select>
-                                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-                              </div>
-                            </div>
-                            <div>
-                              <label className="block text-[11px] font-medium mb-1.5 text-[var(--text-muted)]">TTS Provider</label>
-                              <div className="relative">
-                                <select
-                                  className="config-input text-sm appearance-none pr-8 cursor-pointer"
-                                  value={hmTtsProvider}
-                                  onChange={(e) => setHmTtsProvider(e.target.value)}
-                                >
-                                  <option value="elevenlabs" style={{ background: 'var(--bg-base)' }}>ElevenLabs</option>
-                                  <option value="openai" style={{ background: 'var(--bg-base)' }}>OpenAI</option>
-                                  <option value="kokoro" style={{ background: 'var(--bg-base)' }}>Kokoro</option>
-                                </select>
-                                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-                              </div>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </>
-                )}
-
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </GlassCard>
-
-      {/* LLM Configuration */}
-      <GlassCard>
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-7 h-7 rounded-lg bg-cyan-500/10 flex items-center justify-center">
-            <Zap size={14} className="text-cyan-400" />
-          </div>
-          <h3 className="text-sm font-semibold text-[var(--text-secondary)]">AI Model</h3>
-        </div>
-        <div className="space-y-4">
-          {/* 1. LLM Mode toggle */}
-          <div>
-            <label className="block text-[11px] font-medium uppercase tracking-wider mb-2 text-[var(--text-muted)]">Mode</label>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setConfigProvider('groq');
-                  setUseCustomModel(false);
-                  setByokKeyInput('');
-                }}
-                className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-left transition-all ${
-                  configProvider === 'groq'
-                    ? 'border-[var(--color-accent)]/40 bg-[var(--color-accent)]/10 text-[var(--text-primary)]'
-                    : 'border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-muted)] hover:border-[var(--border-hover)]'
-                }`}
-              >
-                <Zap size={16} className={configProvider === 'groq' ? 'text-[var(--color-accent)]' : ''} />
-                <div>
-                  <p className="text-xs font-medium">Hatcher Platform</p>
-                  <p className="text-[10px] opacity-60">Free, no setup needed</p>
-                </div>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  if (configProvider === 'groq') {
-                    const firstBYOK = BYOK_PROVIDERS.find(p => p.key !== 'groq') ?? BYOK_PROVIDERS[0];
-                    setConfigProvider(firstBYOK!.key);
-                    const meta = getBYOKProvider(firstBYOK!.key);
-                    setConfigModel(meta?.models[0]?.id ?? '');
-                  }
-                }}
-                className={`flex items-center gap-2 px-4 py-3 rounded-xl border text-left transition-all ${
-                  configProvider !== 'groq'
-                    ? 'border-emerald-500/40 bg-emerald-500/10 text-[var(--text-primary)]'
-                    : 'border-[var(--border-default)] bg-[var(--bg-card)] text-[var(--text-muted)] hover:border-[var(--border-hover)]'
-                }`}
-              >
-                <Shield size={16} className={configProvider !== 'groq' ? 'text-emerald-400' : ''} />
-                <div>
-                  <p className="text-xs font-medium">Use Your Own AI</p>
-                  <p className="text-[10px] opacity-60">Bring your own API key</p>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          {/* Platform mode — show info only */}
-          {configProvider === 'groq' && (
-            <div className="rounded-xl p-4 border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5">
-              <div className="flex items-center gap-2 mb-1">
-                <CheckCircle size={14} className="text-[var(--color-accent)]" />
-                <p className="text-xs font-medium text-[var(--text-primary)]">Platform Model Active</p>
-              </div>
-              <p className="text-[10px] text-[var(--text-secondary)] ml-[22px]">
-                Your agent is using Hatcher&apos;s built-in AI model. No setup needed. Switch to &quot;Use Your Own AI&quot; to connect your own provider.
-              </p>
-            </div>
-          )}
-
-          {/* BYOK mode — provider, model, and API key */}
-          {configProvider !== 'groq' && (
-            <>
-              {/* BYOK Provider selector */}
-              <div>
-                <label htmlFor="config-provider" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Provider</label>
-                <div className="relative">
-                  <select
-                    id="config-provider"
-                    className="config-input text-sm appearance-none pr-8 cursor-pointer"
-                    value={configProvider}
-                    onChange={(e) => {
-                      const newProvider = e.target.value;
-                      setConfigProvider(newProvider);
-                      setUseCustomModel(false);
-                      setCustomModelInput('');
-                      const meta = getBYOKProvider(newProvider);
-                      setConfigModel(meta?.models[0]?.id ?? '');
-                    }}
-                  >
-                    {byokProvidersFiltered.map((p) => (
-                      <option key={p.key} value={p.key} style={{ background: 'var(--bg-base)' }}>{p.name} — {p.description}</option>
-                    ))}
-                  </select>
-                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-                </div>
-              </div>
-
-              {/* BYOK Model selector */}
-              <div>
-                <label htmlFor="config-model" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Model</label>
-                {!useCustomModel ? (
-                  <>
-                    <div className="relative">
-                      <select
-                        id="config-model"
-                        className="config-input text-sm font-mono appearance-none pr-8 cursor-pointer"
-                        value={configModel}
-                        onChange={(e) => {
-                          if (e.target.value === '__custom__') {
-                            setUseCustomModel(true);
-                            setCustomModelInput(configModel);
-                          } else {
-                            setConfigModel(e.target.value);
-                          }
-                        }}
-                      >
-                        {providerModels.map((m) => (
-                          <option key={m.id} value={m.id} style={{ background: 'var(--bg-base)' }}>
-                            {m.name}{m.context ? ` (${m.context})` : ''}
-                          </option>
-                        ))}
-                        <option value="__custom__" style={{ background: 'var(--bg-base)' }}>Custom model...</option>
-                      </select>
-                      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-                    </div>
-                    <p className="text-[10px] mt-1 text-[var(--text-muted)]">
-                      Select a model or choose &quot;Custom model...&quot; to enter an ID manually.
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <input
-                      id="config-model-custom"
-                      type="text"
-                      className="config-input font-mono text-xs"
-                      value={customModelInput}
-                      onChange={(e) => setCustomModelInput(e.target.value)}
-                      placeholder="e.g. my-fine-tuned-model-v2"
-                    />
-                    <div className="flex items-center justify-between mt-1">
-                      <p className="text-[10px] text-[var(--text-muted)]">
-                        Enter a custom model ID for {currentProviderMeta?.name ?? configProvider}.
-                      </p>
-                      <button
-                        type="button"
-                        className="text-[10px] text-[#A78BFA] hover:text-[#c4b5fd] transition-colors"
-                        onClick={() => {
-                          setUseCustomModel(false);
-                          if (!customModelInput.trim()) {
-                            setConfigModel(providerModels[0]?.id ?? '');
-                          } else {
-                            setConfigModel(customModelInput.trim());
-                          }
-                        }}
-                      >
-                        Back to model list
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-            </>
-          )}
-
-          {/* 3. BYOK API Key — only shown in BYOK mode */}
-          {configProvider !== 'groq' && (
-            <div>
-              <label htmlFor="config-byok-key" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">
-                API Key <span className="text-red-400">*</span>
-              </label>
-              <div className="relative">
-                <input
-                  id="config-byok-key"
-                  type={showByokKey ? 'text' : 'password'}
-                  className="config-input font-mono text-xs pr-10"
-                  placeholder={hasApiKey ? '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022 (already set)' : `Enter ${currentProviderMeta?.name ?? 'provider'} API key`}
-                  value={byokKeyInput}
-                  onChange={(e) => setByokKeyInput(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
-                  onClick={() => setShowByokKey(!showByokKey)}
-                >
-                  {showByokKey ? <EyeOff size={14} /> : <Eye size={14} />}
-                </button>
-              </div>
-              <p className="text-[10px] mt-1 text-[var(--text-muted)]">
-                {hasApiKey
-                  ? 'Key already saved. Enter a new one to replace it. Your key is securely encrypted and never shared.'
-                  : 'Your key is securely encrypted and never shared.'}
-              </p>
-
-              {/* Disclaimer warning */}
-              <div className="mt-3 flex items-start gap-2.5 p-3 rounded-lg border border-amber-500/20 bg-amber-500/10">
-                <AlertTriangle size={14} className="text-amber-400 mt-0.5 flex-shrink-0" />
-                <p className="text-xs leading-relaxed text-amber-400">
-                  Make sure your API key is correct and has sufficient credits. If the key is invalid or exhausted, your agent will stop responding. You can always revert to the free Groq tier.
-                </p>
-              </div>
-
-              {/* Revert to Free Tier button */}
-              <button
-                type="button"
-                className="mt-3 flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[rgba(46,43,74,0.6)] hover:border-[rgba(124,58,237,0.5)] bg-transparent hover:bg-[#2E2B4A] rounded-xl px-3 py-1.5 transition-all duration-200 font-medium"
-                onClick={() => {
-                  const groqMeta = getBYOKProvider('groq');
-                  setConfigProvider('groq');
-                  setByokKeyInput('');
-                  setUseCustomModel(false);
-                  setCustomModelInput('');
-                  setConfigModel(groqMeta?.models[0]?.id ?? '');
-                }}
-              >
-                <RefreshCw size={12} />
-                Switch back to Hatcher Platform
-              </button>
-            </div>
-          )}
-          {byokKeyInput.trim() && (
-            <button
-              onClick={() => handleSaveAll()}
-              disabled={saving}
-              className="mt-3 flex items-center gap-1.5 text-xs font-medium text-white bg-[var(--color-accent)] hover:bg-[#0891b2] rounded-xl px-4 py-2 transition-all duration-200 disabled:opacity-40"
-            >
-              {saving ? (
-                <><div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
-              ) : (
-                <><CheckCircle size={13} /> Save API Key</>
-              )}
-            </button>
-          )}
-        </div>
-      </GlassCard>
-
-      {/* Integrations are configured in the Integrations tab */}
-
-      {/* Integrations hint — all integrations are free */}
-
-      {/* Environment Variables */}
-      <EnvVarsEditor agentId={agent?.id} />
-
-      {/* Config History */}
-      <ConfigHistory agentId={agent?.id} />
-
-      {/* Change note + Save button */}
-      <div className="space-y-3 pt-2">
-        <div>
-          <label htmlFor="commit-message" className="block text-[11px] font-medium uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">Change Note <span className="normal-case font-normal">(optional)</span></label>
-          <input
-            id="commit-message"
-            type="text"
-            className="config-input"
-            value={commitMessage}
-            onChange={(e) => setCommitMessage(e.target.value)}
-            placeholder="e.g. Updated system prompt, changed LLM model..."
-            maxLength={200}
-          />
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => { handleSaveAll(commitMessage); setCommitMessage(''); }}
-            disabled={saving}
-            className="btn-primary text-sm"
-          >
-            {saving ? (
-              <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
-            ) : (
-              <><CheckCircle size={15} /> Save Configuration</>
-            )}
-          </button>
-        {saveMsg && (
-          <motion.span
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            className={`text-sm font-medium ${saveMsg.startsWith('Error') ? 'text-red-400' : 'text-emerald-400'}`}
-          >
-            {saveMsg}
-          </motion.span>
-        )}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-// ─── Reusable UI Components for Advanced Settings ────────────
-
-function ToggleSwitch({ label, checked, onChange, helper }: {
-  label: string;
-  checked: boolean;
-  onChange: (v: boolean) => void;
-  helper?: string;
-}) {
-  return (
-    <div>
-      <button
-        type="button"
-        onClick={() => onChange(!checked)}
-        className="flex items-center justify-between w-full group"
-      >
-        <div className="flex-1 text-left">
-          <span className="text-xs font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">{label}</span>
-        </div>
-        <div className={`relative w-9 h-5 rounded-full transition-colors duration-200 flex-shrink-0 ${
-          checked ? 'bg-[var(--color-accent)]' : 'bg-[var(--bg-hover)] border border-[var(--border-hover)]'
-        }`}>
-          <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
-            checked ? 'translate-x-[18px]' : 'translate-x-0.5'
-          }`} />
-        </div>
-      </button>
-      {helper && <p className="text-[10px] mt-1 text-[var(--text-muted)]">{helper}</p>}
-    </div>
-  );
-}
-
-function SliderInput({ label, value, onChange, min, max, helper }: {
-  label: string;
-  value: number;
-  onChange: (v: number) => void;
-  min: number;
-  max: number;
-  helper?: string;
-}) {
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-1.5">
-        <label className="text-[11px] font-medium text-[var(--text-muted)]">{label}</label>
-        <span className="text-xs font-mono font-medium text-[var(--text-secondary)] bg-[var(--bg-card)] px-2 py-0.5 rounded">{value}</span>
-      </div>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        value={value}
-        onChange={(e) => onChange(parseInt(e.target.value, 10))}
-        className="w-full h-1.5 rounded-full appearance-none cursor-pointer
-          bg-[var(--bg-hover)]
-          [&::-webkit-slider-thumb]:appearance-none
-          [&::-webkit-slider-thumb]:w-4
-          [&::-webkit-slider-thumb]:h-4
-          [&::-webkit-slider-thumb]:rounded-full
-          [&::-webkit-slider-thumb]:bg-[var(--color-accent)]
-          [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(6,182,212,0.4)]
-          [&::-webkit-slider-thumb]:cursor-pointer
-          [&::-webkit-slider-thumb]:transition-shadow
-          [&::-webkit-slider-thumb]:hover:shadow-[0_0_12px_rgba(6,182,212,0.6)]
-          [&::-moz-range-thumb]:w-4
-          [&::-moz-range-thumb]:h-4
-          [&::-moz-range-thumb]:rounded-full
-          [&::-moz-range-thumb]:bg-[var(--color-accent)]
-          [&::-moz-range-thumb]:border-0
-          [&::-moz-range-thumb]:cursor-pointer"
-      />
-      <div className="flex justify-between mt-0.5">
-        <span className="text-[9px] text-[var(--text-muted)]">{min}</span>
-        <span className="text-[9px] text-[var(--text-muted)]">{max}</span>
-      </div>
-      {helper && <p className="text-[10px] mt-0.5 text-[var(--text-muted)]">{helper}</p>}
-    </div>
-  );
-}
-
-const TAG_COLORS: Record<string, { bg: string; text: string; border: string; remove: string }> = {
-  cyan: { bg: 'bg-cyan-500/10', text: 'text-cyan-300', border: 'border-cyan-500/20', remove: 'hover:bg-cyan-500/20 hover:text-cyan-200' },
-  purple: { bg: 'bg-purple-500/10', text: 'text-purple-300', border: 'border-purple-500/20', remove: 'hover:bg-purple-500/20 hover:text-purple-200' },
-  amber: { bg: 'bg-amber-500/10', text: 'text-amber-300', border: 'border-amber-500/20', remove: 'hover:bg-amber-500/20 hover:text-amber-200' },
+type HostedModelCost = 'Low' | 'Medium' | 'High' | 'Premium' | 'Variable';
+
+type HostedModelProvider = {
+  key: string;
+  name: string;
+  description: string;
 };
 
-function TagInput({ tags, onChange, placeholder, color = 'cyan' }: {
-  tags: string[];
-  onChange: (tags: string[]) => void;
-  placeholder?: string;
-  color?: 'cyan' | 'purple' | 'amber';
-}) {
-  const [inputValue, setInputValue] = useState('');
-  const c = TAG_COLORS[color] || TAG_COLORS.cyan;
+type HostedModelOption = {
+  id: string;
+  name: string;
+  providerKey: string;
+  provider: string;
+  category: string;
+  cost: HostedModelCost;
+  context: string;
+  description: string;
+  warning?: string;
+};
 
-  function addTag() {
-    const value = inputValue.trim();
-    if (!value) return;
-    // Support comma-separated bulk add
-    const newTags = value.split(',').map(s => s.trim()).filter(Boolean);
-    const unique = newTags.filter(t => !tags.includes(t));
-    if (unique.length > 0) {
-      onChange([...tags, ...unique]);
-    }
-    setInputValue('');
+type AiCreditBalance = {
+  balance: number;
+  monthlyGrant: number;
+  tier: string;
+};
+
+const HOSTED_MODEL_PROVIDERS: HostedModelProvider[] = [
+  { key: 'deepseek', name: 'DeepSeek', description: 'Fast, cost-efficient long-context models.' },
+  { key: 'openai', name: 'OpenAI', description: 'General, coding, and frontier models.' },
+  { key: 'anthropic', name: 'Anthropic', description: 'Claude models for reasoning and writing.' },
+  { key: 'google', name: 'Google', description: 'Gemini models with large context windows.' },
+  { key: 'qwen', name: 'Qwen', description: 'Efficient coding and agentic tool-use models.' },
+  { key: 'x-ai', name: 'xAI', description: 'Grok models for fast reasoning and code.' },
+  { key: 'mistralai', name: 'Mistral', description: 'European general and coding models.' },
+  { key: 'moonshotai', name: 'Moonshot AI', description: 'Kimi models for analysis-heavy workflows.' },
+  { key: 'z-ai', name: 'Z.ai', description: 'GLM models with strong price-performance.' },
+  { key: 'nvidia', name: 'NVIDIA', description: 'Nemotron models for low-cost tool loops.' },
+  { key: 'openrouter', name: 'OpenRouter', description: 'Router-managed fallback selection.' },
+];
+
+const HOSTED_MODELS: HostedModelOption[] = [
+  {
+    id: 'deepseek/deepseek-v4-flash',
+    name: 'DeepSeek V4 Flash',
+    providerKey: 'deepseek',
+    provider: 'DeepSeek',
+    category: 'Default',
+    cost: 'Low',
+    context: '1M',
+    description: 'Default hosted model. Fast, low-cost, and strong enough for most agent loops.',
+  },
+  {
+    id: 'deepseek/deepseek-v4-pro',
+    name: 'DeepSeek V4 Pro',
+    providerKey: 'deepseek',
+    provider: 'DeepSeek',
+    category: 'Balanced',
+    cost: 'Medium',
+    context: '1M',
+    description: 'Higher quality DeepSeek option for broader analysis and longer tasks.',
+  },
+  {
+    id: 'deepseek/deepseek-v3.2',
+    name: 'DeepSeek V3.2',
+    providerKey: 'deepseek',
+    provider: 'DeepSeek',
+    category: 'Fast',
+    cost: 'Low',
+    context: '128K',
+    description: 'Efficient fallback for quick general-purpose agent replies.',
+  },
+  {
+    id: 'openai/gpt-5-nano',
+    name: 'GPT-5 Nano',
+    providerKey: 'openai',
+    provider: 'OpenAI',
+    category: 'Fast',
+    cost: 'Low',
+    context: '400K',
+    description: 'Very low-cost OpenAI option for lightweight chat and extraction.',
+  },
+  {
+    id: 'openai/gpt-5-mini',
+    name: 'GPT-5 Mini',
+    providerKey: 'openai',
+    provider: 'OpenAI',
+    category: 'Balanced',
+    cost: 'Medium',
+    context: '400K',
+    description: 'Balanced OpenAI model for most hosted agent work.',
+  },
+  {
+    id: 'openai/gpt-5.1-codex-mini',
+    name: 'GPT-5.1 Codex Mini',
+    providerKey: 'openai',
+    provider: 'OpenAI',
+    category: 'Coding',
+    cost: 'Medium',
+    context: '400K',
+    description: 'Lower-cost OpenAI coding model for repo edits and tool use.',
+  },
+  {
+    id: 'openai/gpt-5.3-codex',
+    name: 'GPT-5.3 Codex',
+    providerKey: 'openai',
+    provider: 'OpenAI',
+    category: 'Coding',
+    cost: 'High',
+    context: '400K',
+    description: 'Premium coding model for complex implementation and debugging work.',
+  },
+  {
+    id: 'openai/gpt-5.4-nano',
+    name: 'GPT-5.4 Nano',
+    providerKey: 'openai',
+    provider: 'OpenAI',
+    category: 'Fast',
+    cost: 'Low',
+    context: '400K',
+    description: 'Newer low-cost OpenAI option for short tasks and quick responses.',
+  },
+  {
+    id: 'openai/gpt-5.4-mini',
+    name: 'GPT-5.4 Mini',
+    providerKey: 'openai',
+    provider: 'OpenAI',
+    category: 'Balanced',
+    cost: 'Medium',
+    context: '400K',
+    description: 'Stronger balanced OpenAI model for daily agent workloads.',
+  },
+  {
+    id: 'openai/gpt-5.4',
+    name: 'GPT-5.4',
+    providerKey: 'openai',
+    provider: 'OpenAI',
+    category: 'Premium',
+    cost: 'High',
+    context: '1.05M',
+    description: 'High-quality OpenAI model for complex general tasks.',
+  },
+  {
+    id: 'openai/gpt-5.5',
+    name: 'GPT-5.5',
+    providerKey: 'openai',
+    provider: 'OpenAI',
+    category: 'Premium',
+    cost: 'Premium',
+    context: '1.05M',
+    description: 'Frontier OpenAI model for high-value workflows.',
+    warning: 'Consumes AI Credits quickly.',
+  },
+  {
+    id: 'openai/gpt-5.5-pro',
+    name: 'GPT-5.5 Pro',
+    providerKey: 'openai',
+    provider: 'OpenAI',
+    category: 'Premium',
+    cost: 'Premium',
+    context: '1.05M',
+    description: 'Highest-cost OpenAI option for rare, high-stakes tasks.',
+    warning: 'Consumes AI Credits very quickly.',
+  },
+  {
+    id: 'anthropic/claude-haiku-4.5',
+    name: 'Claude Haiku 4.5',
+    providerKey: 'anthropic',
+    provider: 'Anthropic',
+    category: 'Balanced',
+    cost: 'Medium',
+    context: '200K',
+    description: 'Quick Claude option for structured assistant tasks.',
+  },
+  {
+    id: 'anthropic/claude-sonnet-4.5',
+    name: 'Claude Sonnet 4.5',
+    providerKey: 'anthropic',
+    provider: 'Anthropic',
+    category: 'Premium',
+    cost: 'High',
+    context: '1M',
+    description: 'Strong premium reasoning and coding model.',
+  },
+  {
+    id: 'anthropic/claude-sonnet-4.6',
+    name: 'Claude Sonnet 4.6',
+    providerKey: 'anthropic',
+    provider: 'Anthropic',
+    category: 'Premium',
+    cost: 'High',
+    context: '1M',
+    description: 'Newer Sonnet model for complex reasoning and agent workflows.',
+  },
+  {
+    id: 'anthropic/claude-opus-4.7',
+    name: 'Claude Opus 4.7',
+    providerKey: 'anthropic',
+    provider: 'Anthropic',
+    category: 'Premium',
+    cost: 'Premium',
+    context: '1M',
+    description: 'Most expensive Claude option for difficult reasoning.',
+    warning: 'Consumes AI Credits quickly.',
+  },
+  {
+    id: 'google/gemini-3.1-flash-lite',
+    name: 'Gemini 3.1 Flash Lite',
+    providerKey: 'google',
+    provider: 'Google',
+    category: 'Fast',
+    cost: 'Low',
+    context: '1M',
+    description: 'Low-latency model for simple assistant and extraction workflows.',
+  },
+  {
+    id: 'google/gemini-2.5-flash',
+    name: 'Gemini 2.5 Flash',
+    providerKey: 'google',
+    provider: 'Google',
+    category: 'Balanced',
+    cost: 'Medium',
+    context: '1M',
+    description: 'Stable Gemini option with tool support and broad context.',
+  },
+  {
+    id: 'google/gemini-3-flash-preview',
+    name: 'Gemini 3 Flash Preview',
+    providerKey: 'google',
+    provider: 'Google',
+    category: 'Balanced',
+    cost: 'Medium',
+    context: '1M',
+    description: 'Large-context Google model for broader research and summaries.',
+  },
+  {
+    id: 'google/gemini-3.1-pro-preview',
+    name: 'Gemini 3.1 Pro Preview',
+    providerKey: 'google',
+    provider: 'Google',
+    category: 'Premium',
+    cost: 'High',
+    context: '1M',
+    description: 'Higher quality Gemini option for complex reasoning.',
+  },
+  {
+    id: 'qwen/qwen3.5-flash-02-23',
+    name: 'Qwen3.5 Flash',
+    providerKey: 'qwen',
+    provider: 'Qwen',
+    category: 'Fast',
+    cost: 'Low',
+    context: '1M',
+    description: 'Very efficient Qwen model for high-volume agent loops.',
+  },
+  {
+    id: 'qwen/qwen3-coder-flash',
+    name: 'Qwen3 Coder Flash',
+    providerKey: 'qwen',
+    provider: 'Qwen',
+    category: 'Coding',
+    cost: 'Low',
+    context: '1M',
+    description: 'Fast code-oriented model for tool use and routine development tasks.',
+  },
+  {
+    id: 'qwen/qwen3.6-flash',
+    name: 'Qwen3.6 Flash',
+    providerKey: 'qwen',
+    provider: 'Qwen',
+    category: 'Fast',
+    cost: 'Medium',
+    context: '1M',
+    description: 'Newer Qwen flash model with strong price-performance.',
+  },
+  {
+    id: 'qwen/qwen3.6-35b-a3b',
+    name: 'Qwen3.6 35B A3B',
+    providerKey: 'qwen',
+    provider: 'Qwen',
+    category: 'Balanced',
+    cost: 'Medium',
+    context: '256K',
+    description: 'Current Qwen hosted option that replaces the retired Qwen3 32B ID.',
+  },
+  {
+    id: 'qwen/qwen3.5-35b-a3b',
+    name: 'Qwen3.5 35B A3B',
+    providerKey: 'qwen',
+    provider: 'Qwen',
+    category: 'Balanced',
+    cost: 'Medium',
+    context: '256K',
+    description: 'Balanced Qwen model for general chat, research, and tool-use loops.',
+  },
+  {
+    id: 'qwen/qwen3-coder',
+    name: 'Qwen3 Coder',
+    providerKey: 'qwen',
+    provider: 'Qwen',
+    category: 'Coding',
+    cost: 'Medium',
+    context: '256K',
+    description: 'Higher quality coding model for edits, repo analysis, and agentic coding.',
+  },
+  {
+    id: 'qwen/qwen3-coder-next',
+    name: 'Qwen3 Coder Next',
+    providerKey: 'qwen',
+    provider: 'Qwen',
+    category: 'Coding',
+    cost: 'Medium',
+    context: '1M',
+    description: 'Newer Qwen coding model for repo edits and structured tool calls.',
+  },
+  {
+    id: 'qwen/qwen3-coder-plus',
+    name: 'Qwen3 Coder Plus',
+    providerKey: 'qwen',
+    provider: 'Qwen',
+    category: 'Coding',
+    cost: 'High',
+    context: '1M',
+    description: 'Larger Qwen coding option for difficult implementation tasks.',
+  },
+  {
+    id: 'qwen/qwen3.6-plus',
+    name: 'Qwen3.6 Plus',
+    providerKey: 'qwen',
+    provider: 'Qwen',
+    category: 'Premium',
+    cost: 'High',
+    context: '1M',
+    description: 'Higher quality Qwen option for more complex reasoning tasks.',
+  },
+  {
+    id: 'qwen/qwen3-max',
+    name: 'Qwen3 Max',
+    providerKey: 'qwen',
+    provider: 'Qwen',
+    category: 'Premium',
+    cost: 'High',
+    context: '1M',
+    description: 'Large Qwen model for demanding agent work.',
+  },
+  {
+    id: 'qwen/qwen3-max-thinking',
+    name: 'Qwen3 Max Thinking',
+    providerKey: 'qwen',
+    provider: 'Qwen',
+    category: 'Reasoning',
+    cost: 'Premium',
+    context: '1M',
+    description: 'Reasoning-focused Qwen model for selective high-value tasks.',
+    warning: 'Consumes AI Credits quickly.',
+  },
+  {
+    id: 'x-ai/grok-4.1-fast',
+    name: 'Grok 4.1 Fast',
+    providerKey: 'x-ai',
+    provider: 'xAI',
+    category: 'Fast',
+    cost: 'Low',
+    context: '2M',
+    description: 'Fast Grok model with very large context.',
+  },
+  {
+    id: 'x-ai/grok-code-fast-1',
+    name: 'Grok Code Fast 1',
+    providerKey: 'x-ai',
+    provider: 'xAI',
+    category: 'Coding',
+    cost: 'Medium',
+    context: '256K',
+    description: 'xAI coding model tuned for fast code generation.',
+  },
+  {
+    id: 'x-ai/grok-4.3',
+    name: 'Grok 4.3',
+    providerKey: 'x-ai',
+    provider: 'xAI',
+    category: 'Premium',
+    cost: 'High',
+    context: '1M',
+    description: 'Higher quality Grok model for reasoning-heavy tasks.',
+  },
+  {
+    id: 'mistralai/mistral-small-2603',
+    name: 'Mistral Small 4',
+    providerKey: 'mistralai',
+    provider: 'Mistral',
+    category: 'Fast',
+    cost: 'Low',
+    context: '256K',
+    description: 'Efficient general model from Mistral.',
+  },
+  {
+    id: 'mistralai/codestral-2508',
+    name: 'Codestral 2508',
+    providerKey: 'mistralai',
+    provider: 'Mistral',
+    category: 'Coding',
+    cost: 'Medium',
+    context: '256K',
+    description: 'Mistral coding model for code edits and tool use.',
+  },
+  {
+    id: 'mistralai/mistral-large-2512',
+    name: 'Mistral Large 3',
+    providerKey: 'mistralai',
+    provider: 'Mistral',
+    category: 'Premium',
+    cost: 'Medium',
+    context: '256K',
+    description: 'Stronger Mistral model for complex general tasks.',
+  },
+  {
+    id: 'moonshotai/kimi-k2-thinking',
+    name: 'Kimi K2 Thinking',
+    providerKey: 'moonshotai',
+    provider: 'Moonshot AI',
+    category: 'Reasoning',
+    cost: 'Medium',
+    context: '256K',
+    description: 'Reasoning-focused option for analysis-heavy tasks.',
+  },
+  {
+    id: 'moonshotai/kimi-k2.6',
+    name: 'Kimi K2.6',
+    providerKey: 'moonshotai',
+    provider: 'Moonshot AI',
+    category: 'Balanced',
+    cost: 'High',
+    context: '256K',
+    description: 'Newer Kimi model for long-form analysis and synthesis.',
+  },
+  {
+    id: 'z-ai/glm-4.7-flash',
+    name: 'GLM 4.7 Flash',
+    providerKey: 'z-ai',
+    provider: 'Z.ai',
+    category: 'Fast',
+    cost: 'Low',
+    context: '200K',
+    description: 'Low-cost GLM model for quick agent loops.',
+  },
+  {
+    id: 'z-ai/glm-5.1',
+    name: 'GLM 5.1',
+    providerKey: 'z-ai',
+    provider: 'Z.ai',
+    category: 'Balanced',
+    cost: 'High',
+    context: '200K',
+    description: 'Higher quality GLM model for reasoning and planning.',
+  },
+  {
+    id: 'nvidia/nemotron-3-nano-30b-a3b',
+    name: 'Nemotron 3 Nano',
+    providerKey: 'nvidia',
+    provider: 'NVIDIA',
+    category: 'Fast',
+    cost: 'Low',
+    context: '256K',
+    description: 'Low-cost NVIDIA model for lightweight workflows.',
+  },
+  {
+    id: 'openrouter/auto',
+    name: 'OpenRouter Auto',
+    providerKey: 'openrouter',
+    provider: 'OpenRouter',
+    category: 'Advanced',
+    cost: 'Variable',
+    context: '2M',
+    description: 'Lets OpenRouter route automatically. Useful as a fallback, not a default.',
+  },
+];
+
+const DEFAULT_HOSTED_MODEL = 'deepseek/deepseek-v4-flash';
+const HOSTED_PROXY_PROVIDER_PREFIX = 'hatcher-llm-proxy/';
+const HOSTED_MODEL_ALIASES = new Map<string, string>([
+  ['meta-llama/llama-4-scout-17b-16e-instruct', 'qwen/qwen3.6-35b-a3b'],
+  ['qwen/qwen3-32b', 'qwen/qwen3.6-35b-a3b'],
+  ['qwen/qwen3-235b-a22b-2507', 'qwen/qwen3.6-35b-a3b'],
+]);
+
+function normalizeHostedModelForUi(model: string | undefined): string {
+  let trimmed = model?.trim();
+  if (!trimmed) return DEFAULT_HOSTED_MODEL;
+  if (trimmed.startsWith(HOSTED_PROXY_PROVIDER_PREFIX)) {
+    trimmed = trimmed.slice(HOSTED_PROXY_PROVIDER_PREFIX.length);
   }
-
-  function removeTag(index: number) {
-    onChange(tags.filter((_, i) => i !== index));
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      addTag();
-    } else if (e.key === 'Backspace' && !inputValue && tags.length > 0) {
-      removeTag(tags.length - 1);
-    }
-  }
-
-  return (
-    <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-card)] p-2.5 min-h-[42px]">
-      <div className="flex flex-wrap gap-1.5">
-        {tags.map((tag, i) => (
-          <span
-            key={`${tag}-${i}`}
-            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium border ${c.bg} ${c.text} ${c.border}`}
-          >
-            {tag}
-            <button
-              type="button"
-              onClick={() => removeTag(i)}
-              className={`inline-flex items-center justify-center w-3.5 h-3.5 rounded-full text-[10px] leading-none opacity-60 transition-all ${c.remove}`}
-              aria-label={`Remove ${tag}`}
-            >
-              &times;
-            </button>
-          </span>
-        ))}
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={addTag}
-          placeholder={tags.length === 0 ? placeholder : ''}
-          className="flex-1 min-w-[100px] bg-transparent border-0 outline-none text-xs text-[var(--text-primary)] placeholder:text-[var(--text-muted)] py-1 px-1"
-        />
-      </div>
-    </div>
-  );
+  return HOSTED_MODEL_ALIASES.get(trimmed) ?? trimmed;
 }
 
-// ─── Environment Variables Editor ────────────────────────────
+function providerKeyFromHostedModelId(modelId: string): string {
+  const [providerKey] = modelId.split('/');
+  return providerKey?.trim() || 'openrouter';
+}
+
+function providerNameFromKey(providerKey: string): string {
+  return HOSTED_MODEL_PROVIDERS.find((provider) => provider.key === providerKey)?.name
+    ?? providerKey
+      .split('-')
+      .map((part) => part ? part[0]!.toUpperCase() + part.slice(1) : part)
+      .join(' ');
+}
+
+function createSavedHostedModelOption(modelId: string): HostedModelOption {
+  const providerKey = providerKeyFromHostedModelId(modelId);
+  const provider = providerNameFromKey(providerKey);
+  return {
+    id: modelId,
+    name: modelId,
+    providerKey,
+    provider,
+    category: 'Saved',
+    cost: 'Variable',
+    context: 'Provider-defined',
+    description: 'Saved hosted model from this agent configuration.',
+  };
+}
 
 const ENV_KEY_REGEX = /^[A-Z][A-Z0-9_]*$/;
 const MAX_ENV_VARS = 50;
 
-interface EnvVarEntry {
+type EnvVarEntry = {
   key: string;
   hasValue: boolean;
   editing: boolean;
   newValue: string;
   visible: boolean;
+};
+
+function hostedCostClass(cost: HostedModelCost): string {
+  switch (cost) {
+    case 'Low':
+      return 'border-emerald-500/20 bg-emerald-500/10 text-emerald-300';
+    case 'Medium':
+      return 'border-cyan-500/20 bg-cyan-500/10 text-cyan-300';
+    case 'High':
+      return 'border-amber-500/20 bg-amber-500/10 text-amber-300';
+    case 'Premium':
+      return 'border-rose-500/25 bg-rose-500/10 text-rose-300';
+    case 'Variable':
+      return 'border-violet-500/25 bg-violet-500/10 text-violet-300';
+  }
+}
+
+function hostedCostEstimate(cost: HostedModelCost): string {
+  switch (cost) {
+    case 'Low':
+      return 'about 1-5 AI Credits per short reply';
+    case 'Medium':
+      return 'about 5-25 AI Credits per short reply';
+    case 'High':
+      return 'about 25-100 AI Credits per short reply';
+    case 'Premium':
+      return '100+ AI Credits for many replies';
+    case 'Variable':
+      return 'variable, depends on OpenRouter routing';
+  }
+}
+
+export function ConfigTab() {
+  const {
+    agent,
+    configName,
+    setConfigName,
+    configDesc,
+    setConfigDesc,
+    configModel,
+    setConfigModel,
+    configProvider,
+    setConfigProvider,
+    customModelInput,
+    setCustomModelInput,
+    useCustomModel,
+    setUseCustomModel,
+    byokKeyInput,
+    setByokKeyInput,
+    showByokKey,
+    setShowByokKey,
+    saving,
+    saveMsg,
+    saveConfig,
+    currentProviderMeta,
+    providerModels,
+    hasApiKey,
+  } = useAgentContext();
+
+  const [commitMessage, setCommitMessage] = useState('');
+  const [aiCreditBalance, setAiCreditBalance] = useState<AiCreditBalance | null>(null);
+  const [showAdvancedTools, setShowAdvancedTools] = useState(false);
+
+  const hostedProvider = 'openrouter';
+  const isHostedMode = configProvider === hostedProvider;
+  const normalizedHostedModel = normalizeHostedModelForUi(configModel);
+  const selectedHostedModel = useMemo(
+    () => HOSTED_MODELS.find((m) => m.id === normalizedHostedModel)
+      ?? createSavedHostedModelOption(normalizedHostedModel),
+    [normalizedHostedModel],
+  );
+  const selectedHostedProvider = useMemo(
+    () => HOSTED_MODEL_PROVIDERS.find((p) => p.key === selectedHostedModel.providerKey)
+      ?? {
+        key: selectedHostedModel.providerKey,
+        name: selectedHostedModel.provider,
+        description: 'Saved provider from this agent configuration.',
+      },
+    [selectedHostedModel.provider, selectedHostedModel.providerKey],
+  );
+  const hostedModelProviders = useMemo(
+    () => HOSTED_MODEL_PROVIDERS.some((provider) => provider.key === selectedHostedProvider.key)
+      ? HOSTED_MODEL_PROVIDERS
+      : [...HOSTED_MODEL_PROVIDERS, selectedHostedProvider],
+    [selectedHostedProvider],
+  );
+  const hostedModelsForProvider = useMemo(() => {
+    const models = HOSTED_MODELS.filter((m) => m.providerKey === selectedHostedProvider.key);
+    if (
+      selectedHostedModel.providerKey === selectedHostedProvider.key
+      && !models.some((model) => model.id === selectedHostedModel.id)
+    ) {
+      return [selectedHostedModel, ...models];
+    }
+    return models;
+  }, [selectedHostedModel, selectedHostedProvider.key]);
+  const lowAiCreditBalance = isHostedMode && aiCreditBalance !== null && aiCreditBalance.balance < 100;
+
+  const byokProvidersFiltered = useMemo(
+    () => BYOK_PROVIDERS.filter((p) => p.key !== hostedProvider && (p.key !== 'groq' || configProvider === 'groq')),
+    [configProvider],
+  );
+
+  const selectHostedModel = useCallback((modelId: string) => {
+    setConfigProvider(hostedProvider);
+    setConfigModel(modelId);
+    setUseCustomModel(false);
+    setCustomModelInput('');
+    setByokKeyInput('');
+  }, [setByokKeyInput, setConfigModel, setConfigProvider, setCustomModelInput, setUseCustomModel]);
+
+  useEffect(() => {
+    if (!isHostedMode) return;
+    if (normalizedHostedModel !== configModel) {
+      setConfigModel(normalizedHostedModel);
+    }
+  }, [configModel, isHostedMode, normalizedHostedModel, setConfigModel]);
+
+  useEffect(() => {
+    if (!isHostedMode) return;
+    let cancelled = false;
+    api.getAiCreditBalance()
+      .then((res) => {
+        if (!cancelled && res.success) setAiCreditBalance(res.data);
+      })
+      .catch(() => {
+        if (!cancelled) setAiCreditBalance(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isHostedMode]);
+
+  const handleSave = async () => {
+    await saveConfig(commitMessage);
+    setCommitMessage('');
+  };
+
+  return (
+    <motion.div
+      key="config"
+      variants={tabContentVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      className="space-y-6 max-w-4xl"
+    >
+      <GlassCard className="p-5">
+        <div className="flex items-start justify-between gap-4 mb-5">
+          <div>
+            <h3 className="text-lg font-semibold text-[var(--text-primary)]">Agent Configuration</h3>
+            <p className="text-sm text-[var(--text-secondary)] mt-1">
+              Shared settings for Hermes and OpenClaw agents.
+            </p>
+          </div>
+          {agent?.framework && (
+            <span className="px-3 py-1 rounded-full text-xs font-medium bg-[var(--bg-muted)] text-[var(--text-secondary)] border border-[var(--border-subtle)] uppercase">
+              {agent.framework}
+            </span>
+          )}
+        </div>
+
+        <div className="grid gap-4">
+          <label className="block">
+            <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Name</span>
+            <input
+              value={configName}
+              onChange={(e) => setConfigName(e.target.value)}
+              className="config-input"
+              placeholder="Agent name"
+            />
+          </label>
+          <label className="block">
+            <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Description</span>
+            <textarea
+              value={configDesc}
+              onChange={(e) => setConfigDesc(e.target.value)}
+              className="config-input min-h-[96px] resize-y"
+              placeholder="What this agent does"
+            />
+          </label>
+        </div>
+      </GlassCard>
+
+      <GlassCard className="p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-5">
+          <div>
+            <h3 className="text-lg font-semibold text-[var(--text-primary)] flex items-center gap-2">
+              <Zap className="w-5 h-5 text-[var(--accent-primary)]" />
+              AI Model
+            </h3>
+            <p className="text-sm text-[var(--text-secondary)] mt-1">
+              Hosted models spend AI Credits. BYOK uses your own provider key.
+            </p>
+          </div>
+          {aiCreditBalance && (
+            <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-muted)] px-3 py-2 text-right">
+              <p className="text-xs uppercase tracking-[0.08em] text-[var(--text-tertiary)]">AI Credits</p>
+              <p className="text-lg font-semibold text-[var(--text-primary)]">
+                {aiCreditBalance.balance.toLocaleString()}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-1 mb-5">
+          <button
+            type="button"
+            onClick={() => selectHostedModel(selectedHostedModel.id)}
+            className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              isHostedMode
+                ? 'bg-[var(--bg-panel)] text-[var(--text-primary)] shadow-sm'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            Hatcher Platform
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const firstProvider = byokProvidersFiltered[0];
+              if (!firstProvider) return;
+              const firstModel = firstProvider.models[0]?.id ?? '';
+              setConfigProvider(firstProvider.key);
+              setConfigModel(firstModel);
+              setUseCustomModel(false);
+              setCustomModelInput('');
+              setByokKeyInput('');
+            }}
+            className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              !isHostedMode
+                ? 'bg-[var(--bg-panel)] text-[var(--text-primary)] shadow-sm'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            BYOK
+          </button>
+        </div>
+
+        {isHostedMode ? (
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-[240px,1fr]">
+              <label className="block">
+                <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Provider</span>
+                <div className="relative">
+                  <select
+                    value={selectedHostedProvider.key}
+                    onChange={(e) => {
+                      const firstModel = HOSTED_MODELS.find((m) => m.providerKey === e.target.value);
+                      if (firstModel) selectHostedModel(firstModel.id);
+                    }}
+                    className="config-input appearance-none pr-10"
+                  >
+                    {hostedModelProviders.map((provider) => (
+                      <option key={provider.key} value={provider.key}>
+                        {provider.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)] pointer-events-none" />
+                </div>
+              </label>
+
+              <label className="block">
+                <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Model</span>
+                <div className="relative">
+                  <select
+                    value={selectedHostedModel.id}
+                    onChange={(e) => selectHostedModel(e.target.value)}
+                    className="config-input appearance-none pr-10"
+                  >
+                    {hostedModelsForProvider.map((model) => (
+                      <option key={model.id} value={model.id}>
+                        {model.name} · {model.category} · {model.cost}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)] pointer-events-none" />
+                </div>
+              </label>
+            </div>
+
+            <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-[var(--text-primary)]">{selectedHostedModel.name}</span>
+                    <span className="px-2 py-0.5 rounded text-xs bg-[var(--bg-panel)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
+                      {selectedHostedModel.provider}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm text-[var(--text-secondary)]">{selectedHostedModel.description}</p>
+                </div>
+                <div className="flex flex-wrap gap-2 text-xs text-[var(--text-secondary)]">
+                  <span className="px-2 py-1 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)]">
+                    {selectedHostedModel.context}
+                  </span>
+                  <span className="px-2 py-1 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)]">
+                    {hostedCostEstimate(selectedHostedModel.cost)}
+                  </span>
+                </div>
+              </div>
+              {(selectedHostedModel.warning || lowAiCreditBalance) && (
+                <div className="mt-4 flex items-start gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-700 dark:text-yellow-300">
+                  <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span>{selectedHostedModel.warning || 'AI Credits are low for hosted model usage.'}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <label className="block">
+              <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Provider</span>
+              <div className="relative">
+                <select
+                  value={configProvider}
+                  onChange={(e) => {
+                    const provider = e.target.value;
+                    const providerMeta = byokProvidersFiltered.find((candidate) => candidate.key === provider);
+                    setConfigProvider(provider);
+                    setConfigModel(providerMeta?.models[0]?.id ?? '');
+                    setUseCustomModel(false);
+                    setCustomModelInput('');
+                    setByokKeyInput('');
+                  }}
+                  className="config-input appearance-none pr-10"
+                >
+                  {byokProvidersFiltered.map((provider) => (
+                    <option key={provider.key} value={provider.key}>
+                      {provider.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)] pointer-events-none" />
+              </div>
+            </label>
+
+            <label className="block">
+              <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Model</span>
+              <input
+                value={useCustomModel ? customModelInput : configModel}
+                onChange={(e) => {
+                  setUseCustomModel(true);
+                  setCustomModelInput(e.target.value);
+                }}
+                className="config-input"
+                placeholder={providerModels[0]?.id || currentProviderMeta?.models?.[0]?.id || 'provider/model'}
+              />
+            </label>
+
+            <label className="block">
+              <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">API Key</span>
+              <div className="relative">
+                <input
+                  type={showByokKey ? 'text' : 'password'}
+                  value={byokKeyInput}
+                  onChange={(e) => setByokKeyInput(e.target.value)}
+                  className="config-input pr-12"
+                  placeholder={hasApiKey ? 'Existing key saved. Enter a new key to replace it.' : 'Provider API key'}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowByokKey(!showByokKey)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
+                  aria-label={showByokKey ? 'Hide API key' : 'Show API key'}
+                >
+                  {showByokKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {hasApiKey && !byokKeyInput && (
+                <p className="text-xs text-[var(--text-tertiary)] mt-2">
+                  A saved key exists for this provider.
+                </p>
+              )}
+            </label>
+          </div>
+        )}
+      </GlassCard>
+
+      <GlassCard className="p-5">
+        <label className="block mb-4">
+          <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Change note</span>
+          <input
+            value={commitMessage}
+            onChange={(e) => setCommitMessage(e.target.value)}
+            className="config-input"
+            placeholder="Optional note for this update"
+          />
+        </label>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-h-[20px]">
+            {saveMsg && (
+              <p className={`text-sm ${saveMsg.includes('saved') ? 'text-green-600' : 'text-red-600'}`}>
+                {saveMsg}
+              </p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving}
+            className="btn-primary inline-flex items-center justify-center gap-2 disabled:opacity-60"
+          >
+            {saving ? (
+              <RefreshCw className="w-4 h-4 animate-spin" />
+            ) : (
+              <CheckCircle className="w-4 h-4" />
+            )}
+            Save Configuration
+          </button>
+        </div>
+      </GlassCard>
+
+      <div>
+        <button
+          type="button"
+          onClick={() => setShowAdvancedTools((value) => !value)}
+          className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+        >
+          {showAdvancedTools ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          Advanced tools
+        </button>
+        {showAdvancedTools && (
+          <div className="mt-4 space-y-6">
+            <EnvVarsEditor agentId={agent?.id} />
+            <ConfigHistory />
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
 }
 
 function EnvVarsEditor({ agentId }: { agentId?: string }) {
@@ -1825,94 +1439,6 @@ function ConfigHistory({ agentId }: { agentId?: string }) {
           </motion.div>
         )}
       </AnimatePresence>
-    </GlassCard>
-  );
-}
-
-// ─── Hatcher City visibility toggle ─────────────────────────────
-// Owners can opt any of their agents out of the public /city map. Field
-// is stored on Agent.isPublic; backend busts the city:v1 Redis cache on
-// change so the toggle takes effect immediately.
-function HatcherCityVisibility() {
-  const { agent, loadAgent } = useAgentContext();
-  const [isPublic, setIsPublic] = useState<boolean>(agent?.isPublic !== false);
-  const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
-
-  useEffect(() => {
-    setIsPublic(agent?.isPublic !== false);
-  }, [agent?.isPublic]);
-
-  async function toggle() {
-    if (!agent || saving) return;
-    const next = !isPublic;
-    setSaving(true);
-    setMsg(null);
-    try {
-      const res = await api.updateAgent(agent.id, {
-        isPublic: next,
-      } as Parameters<typeof api.updateAgent>[1]);
-      if ('error' in res && res.error) {
-        setMsg(`Error: ${res.error}`);
-      } else {
-        setIsPublic(next);
-        setMsg(next ? 'Now visible on Hatcher City' : 'Hidden from Hatcher City');
-        await loadAgent?.();
-      }
-    } catch (e) {
-      setMsg(`Error: ${e instanceof Error ? e.message : 'Failed to save'}`);
-    } finally {
-      setSaving(false);
-      setTimeout(() => setMsg(null), 3500);
-    }
-  }
-
-  return (
-    <GlassCard>
-      <div className="flex items-start gap-3">
-        <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-          <Globe size={14} className="text-amber-500" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-sm font-semibold text-[var(--text-primary)]">Hatcher City</h3>
-            <span className="text-[10px] uppercase tracking-widest text-amber-500">public</span>
-          </div>
-          <p className="text-xs text-[var(--text-secondary)] mb-3">
-            Show this agent on the public 3D map at{' '}
-            <a href="/city" target="_blank" rel="noreferrer" className="text-[var(--color-accent)] hover:underline">
-              hatcher.host/city
-            </a>
-            . Name, framework, and category are visible. No config, no secrets, no chats are ever exposed.
-          </p>
-          <button
-            type="button"
-            onClick={toggle}
-            disabled={saving}
-            role="switch"
-            aria-checked={isPublic}
-            className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full border transition-colors ${
-              isPublic
-                ? 'bg-amber-500 border-amber-500'
-                : 'bg-[var(--bg-card)] border-[var(--border-default)]'
-            } ${saving ? 'opacity-60 cursor-wait' : 'cursor-pointer'}`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                isPublic ? 'translate-x-6' : 'translate-x-1'
-              }`}
-            />
-          </button>
-          <span className="ml-3 text-xs text-[var(--text-secondary)] align-middle">
-            {isPublic ? 'Visible' : 'Hidden'}
-          </span>
-          {msg && (
-            <p className={`text-xs font-medium mt-2 ${msg.startsWith('Error') ? 'text-red-400' : 'text-emerald-400'}`}>
-              {msg}
-            </p>
-          )}
-        </div>
-      </div>
     </GlassCard>
   );
 }

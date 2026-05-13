@@ -38,21 +38,15 @@ test.describe('Public Page Navigation', () => {
     await expect(page.locator('text=Business').first()).toBeVisible();
 
     // Price values
-    await expect(page.locator('text=$9.99').first()).toBeVisible();
+    await expect(page.locator('text=$6.99').first()).toBeVisible();
     await expect(page.locator('text=$19.99').first()).toBeVisible();
   });
 
-  test('templates page loads with search', async ({ page }) => {
-    await page.goto('/templates');
-    await page.waitForLoadState('networkidle', { timeout: 10_000 });
-
-    await expect(page.locator('text=Agent Templates').first()).toBeVisible();
-
-    // Search input should be present
-    const searchInput = page.locator(
-      'input[placeholder*="search" i], input[type="search"], [data-testid="search"]'
-    ).first();
-    await expect(searchInput).toBeVisible({ timeout: 5_000 });
+  test('create path uses Chat-to-Hatch auth gate', async ({ page }) => {
+    await page.goto('/create');
+    await expect(
+      page.locator('input[type="email"]').or(page.getByText(/Hatcher Assistant/i)).first(),
+    ).toBeVisible({ timeout: 10_000 });
   });
 
   test('terms page loads', async ({ page }) => {

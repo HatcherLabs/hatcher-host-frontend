@@ -140,8 +140,8 @@ function buildDraft(
   const settings = asRecord(cfg.settings);
   const advanced = asRecord(cfg.advanced);
   const style = asRecord(cfg.style);
-  const model = asString(settings.model) || asString(cfg.model);
-  const provider = asString(settings.modelProvider) || asString(cfg.provider, 'groq');
+  const model = asString(cfg.model) || asString(settings.model);
+  const provider = asString(cfg.provider) || asString(settings.modelProvider, 'openrouter');
 
   return {
     name: agentName ?? '',
@@ -188,7 +188,7 @@ function buildConfigPatch(
   const settings = asRecord(cfg.settings);
   const style = asRecord(cfg.style);
   const advanced = asRecord(cfg.advanced);
-  const provider = draft.provider.trim() || 'groq';
+  const provider = draft.provider.trim() || 'openrouter';
   const model = draft.model.trim();
 
   const nextAdvanced =
@@ -399,7 +399,7 @@ export function LaptopPanel({
                 <LaptopCard title="Runtime">
                   <KeyValue label="Framework" value={framework} />
                   <KeyValue label="Tier" value={tier || 'free'} />
-                  <KeyValue label="Messages today" value={String(messagesToday ?? 0)} />
+                  <KeyValue label="Interactions today" value={String(messagesToday ?? 0)} />
                   <KeyValue label="Uptime" value={formatUptime(uptimeSec)} />
                 </LaptopCard>
                 <LaptopCard title="Quick actions">

@@ -18,8 +18,6 @@ import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import {
   ArrowRight,
   Wallet,
-  Coins,
-  Sparkles,
   Crown,
   Rocket,
   Check,
@@ -33,7 +31,7 @@ import { AffiliateFAQ } from './faq-client';
 export const metadata: Metadata = {
   title: 'Affiliate Program — Hatcher',
   description:
-    'Earn up to 40% recurring commissions referring developers and AI builders to Hatcher. Pick cash, credits, or a hybrid split. Flat $20 bonus on every Founding Member signup.',
+    'Earn 20% recurring cash commissions referring developers and AI builders to Hatcher. Flat $20 cash bonus on every Founding Member signup.',
   alternates: {
     canonical: '/affiliate',
     languages: buildLanguagesMap('/affiliate'),
@@ -41,17 +39,17 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Affiliate Program — Hatcher',
     description:
-      'Up to 40% recurring commissions. Cash, credits, or hybrid. Flat $20 on every Founding Member. Apply in minutes.',
+      '20% recurring cash commissions. Flat $20 on every Founding Member. Apply in minutes.',
     type: 'website',
   },
 };
 
-// ─── Payout mode cards ───────────────────────────────────────
+// ─── Commission card ─────────────────────────────────────────
 // One flat structure so both the layout and the apply page can
 // cross-reference the percentages without drifting. Typed explicitly
 // so `highlighted` stays optional (TS narrows literal arrays otherwise).
 type PayoutModeCard = {
-  key: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
+  key: 'CASH_ONLY';
   title: string;
   tagline: string;
   percent: string;
@@ -66,51 +64,18 @@ type PayoutModeCard = {
 const PAYOUT_MODES: readonly PayoutModeCard[] = [
   {
     key: 'CASH_ONLY',
-    title: 'Cash Only',
+    title: 'Cash Commission',
     tagline: '20% recurring, paid out in SOL, USDC, or $HATCHER.',
     percent: '20%',
     payoutLabel: 'cash',
     icon: Wallet,
     accent: '#22c55e',
     tradeoff:
-      'Lower headline rate, but money hits your wallet on the first monthly review. Ideal if you want revenue you can spend anywhere.',
+      'Simple payout model: affiliates earn cash from eligible paid revenue, with a 30-day hold before each commission unlocks.',
     bullets: [
       'Pay out in SOL, USDC, or $HATCHER',
       'Monthly admin review',
       '30-day hold before each commission unlocks',
-    ],
-  },
-  {
-    key: 'CREDITS_ONLY',
-    title: 'Credits Only',
-    tagline: '40% recurring, paid as Hatcher platform credits.',
-    percent: '40%',
-    payoutLabel: 'credits',
-    icon: Coins,
-    accent: 'var(--color-accent)',
-    highlighted: true,
-    tradeoff:
-      'Highest percentage. Credits spend 1:1 USD on any Hatcher tier, addon, or hosted LLM usage — great if you deploy agents yourself.',
-    bullets: [
-      '1:1 USD spend across tiers, addons, LLM',
-      'Applied automatically to your account balance',
-      'No wallet, no on-chain friction',
-    ],
-  },
-  {
-    key: 'HYBRID',
-    title: 'Hybrid',
-    tagline: '15% cash + 25% credits on every eligible payment.',
-    percent: '15% + 25%',
-    payoutLabel: 'cash and credits',
-    icon: Sparkles,
-    accent: '#8b5cf6',
-    tradeoff:
-      'Best of both. Some cash to spend off-platform, some credits to stack with your own deployment usage. Recommended for active builders.',
-    bullets: [
-      '15% cash + 25% credits (40% total value)',
-      'Cash paid to your Solana wallet',
-      'Credits applied to your account',
     ],
   },
 ];
@@ -119,7 +84,7 @@ const HOW_IT_WORKS = [
   {
     step: '01',
     title: 'Apply',
-    body: 'Tell us about your platform, audience, and how you\'ll share Hatcher. Pick a payout mode — you can change it later.',
+    body: 'Tell us about your platform, audience, and how you\'ll share Hatcher. Add your payout wallet so we can process cash commissions.',
     icon: UserPlus,
   },
   {
@@ -194,7 +159,7 @@ export default async function AffiliatePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl">
             {PAYOUT_MODES.map((mode) => {
               const Icon = mode.icon;
               return (

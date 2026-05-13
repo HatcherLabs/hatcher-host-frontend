@@ -8,16 +8,9 @@ import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import { API_URL } from '@/lib/config';
 import type { Agent, AgentFeature, ChatSessionSummary } from '@/lib/api';
-
-/** Extra fields the GET /agents/:id response includes beyond the base Agent type */
-interface AgentDetail extends Agent {
-  chatUsedToday?: number;
-  chatLimit?: number | null;
-  isByok?: boolean;
-}
 import { useAuth } from '@/lib/auth-context';
 import { useWebSocketChat, type ChatToolEvent } from '@/hooks/useWebSocketChat';
-import { FRAMEWORKS, TIERS, getBYOKProvider } from '@hatcher/shared';
+import { FRAMEWORKS, getBYOKProvider } from '@hatcher/shared';
 import type { UserTierKey } from '@hatcher/shared';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ui/ToastProvider';
@@ -49,6 +42,16 @@ import { useAgentIntegrations } from '@/hooks/useAgentIntegrations';
 import { useAgentActions } from '@/hooks/useAgentActions';
 import { useAgentLogs } from '@/hooks/useAgentLogs';
 import dynamic from 'next/dynamic';
+
+const CHAT_HISTORY_MESSAGE_LIMIT = 4000;
+const CHAT_HISTORY_TRUNCATION_MARKER = '[Earlier content truncated]\n';
+
+function trimChatHistoryContent(content: string): string {
+  if (content.length <= CHAT_HISTORY_MESSAGE_LIMIT) return content;
+  return `${CHAT_HISTORY_TRUNCATION_MARKER}${content.slice(
+    -(CHAT_HISTORY_MESSAGE_LIMIT - CHAT_HISTORY_TRUNCATION_MARKER.length),
+  )}`;
+}
 
 // Dynamically import tab components — only the active tab JS is loaded
 function TabSkeleton() {
@@ -101,11 +104,6 @@ const MemoryTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
-const HermesSkillsTab = dynamic(
-  () => import('@/components/agents/tabs/HermesSkillsTab').then(mod => ({ default: mod.HermesSkillsTab })),
-  { loading: () => <TabSkeleton /> }
-);
-
 const OpenClawSessionsTab = dynamic(
   () => import('@/components/agents/tabs/OpenClawSessionsTab').then(mod => ({ default: mod.OpenClawSessionsTab })),
   { loading: () => <TabSkeleton /> }
@@ -116,16 +114,6 @@ const HermesMemoryTab = dynamic(
   { loading: () => <TabSkeleton /> }
 );
 
-const HermesConfigTab = dynamic(
-  () => import('@/components/agents/tabs/HermesConfigTab').then(mod => ({ default: mod.HermesConfigTab })),
-  { loading: () => <TabSkeleton /> }
-);
-
-const OpenClawConfigTab = dynamic(
-  () => import('@/components/agents/tabs/OpenClawConfigTab').then(mod => ({ default: mod.OpenClawConfigTab })),
-  { loading: () => <TabSkeleton /> }
-);
-
 const StatsTab = dynamic(
   () => import('@/components/agents/tabs/StatsTab').then(mod => ({ default: mod.StatsTab })),
   { loading: () => <TabSkeleton /> }
@@ -133,11 +121,6 @@ const StatsTab = dynamic(
 
 const SchedulesTab = dynamic(
   () => import('@/components/agents/tabs/SchedulesTab').then(mod => ({ default: mod.SchedulesTab })),
-  { loading: () => <TabSkeleton /> }
-);
-
-const SkillsTab = dynamic(
-  () => import('@/components/agents/tabs/SkillsTab').then(mod => ({ default: mod.SkillsTab })),
   { loading: () => <TabSkeleton /> }
 );
 
@@ -156,18 +139,8 @@ const TerminalTab = dynamic(
   { loading: TabSkeleton },
 );
 
-const WorkspaceTab = dynamic(
-  () => import('@/components/agents/tabs/WorkspaceTab').then(mod => ({ default: mod.WorkspaceTab })),
-  { loading: () => <TabSkeleton /> },
-);
-
 const KnowledgeTab = dynamic(
   () => import('@/components/agents/tabs/KnowledgeTab').then(mod => ({ default: mod.KnowledgeTab })),
-  { loading: () => <TabSkeleton /> },
-);
-
-const AddonsTab = dynamic(
-  () => import('@/components/agents/tabs/AddonsTab').then(mod => ({ default: mod.AddonsTab })),
   { loading: () => <TabSkeleton /> },
 );
 
@@ -181,16 +154,17 @@ const WalletTab = dynamic(
 export default function AgentManagePage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const { toast } = useToast();
   const t = useTranslations('dashboard.agentDetail');
   const tHeader = useTranslations('dashboard.agentDetail.header');
   const tNotFound = useTranslations('dashboard.agentDetail.notFound');
   const tStatusPoll = useTranslations('dashboard.agentDetail.statusPoll');
 
-  // View mode (easy = operational tabs only, advanced = everything)
+  // View mode (easy = operational tabs only, advanced = everything).
+  // Default to advanced so Files/Logs/Terminal/etc. are discoverable for new users.
   const EASY_TABS: Tab[] = ['overview', 'chat', 'mail', 'integrations', 'logs', 'stats'];
-  const [viewMode, setViewModeRaw] = useState<'easy' | 'advanced'>('easy');
+  const [viewMode, setViewModeRaw] = useState<'easy' | 'advanced'>('advanced');
   useEffect(() => {
     const saved = localStorage.getItem('hatcher-view-mode') as 'easy' | 'advanced' | null;
     if (saved) setViewModeRaw(saved);
@@ -209,12 +183,13 @@ export default function AgentManagePage() {
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','workspace','logs','terminal','memory','sessions','knowledge','addons','schedules','workflows','chat','mail','stats','wallet'];
+  const validTabs: Tab[] = ['overview','config','integrations','skills','plugins','files','logs','terminal','memory','sessions','knowledge','schedules','workflows','chat','mail','stats','wallet'];
   // 'skills' kept in validTabs for backwards compat (deep links), but redirects to plugins tab
   const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  const rawTab = searchParams.get('tab') as Tab;
+  const rawTab = searchParams.get('tab');
   const normalizeTab = (t: string | null): Tab => {
     if (!t) return 'overview';
+    if (t === 'workspace') return 'files';
     return validTabs.includes(t as Tab) ? (t as Tab) : 'overview';
   };
   const initialTab = normalizeTab(rawTab);
@@ -226,6 +201,11 @@ export default function AgentManagePage() {
     url.searchParams.set('tab', t);
     window.history.replaceState({}, '', url.pathname + url.search);
   }, []);
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('tab') === 'workspace') {
+      setTab('files');
+    }
+  }, [setTab]);
   useEffect(() => {
     setTerminalMounted((mounted) => shouldMountTerminalTab(tab, mounted));
   }, [tab]);
@@ -244,7 +224,6 @@ export default function AgentManagePage() {
   const sendCooldownRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [chatError, setChatError] = useState<string | null>(null);
   const [chatErrorType, setChatErrorType] = useState<'timeout' | 'ratelimit' | 'network' | 'llm_down' | 'generic' | null>(null);
-  const [msgCount, setMsgCount] = useState(0);
   const [portModalOpen, setPortModalOpen] = useState(false);
 
   const historyLoadedRef = useRef(false);
@@ -257,9 +236,6 @@ export default function AgentManagePage() {
   const [featuresLoading, setFeaturesLoading] = useState(false);
 
   const userTier = (user?.tier ?? 'free') as UserTierKey;
-  const [hasUnlimitedChat, setHasUnlimitedChat] = useState(false);
-  const [isByok, setIsByok] = useState(false);
-  const [msgLimit, setMsgLimit] = useState(TIERS[userTier]?.messagesPerDay ?? TIERS.free.messagesPerDay);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -310,46 +286,13 @@ export default function AgentManagePage() {
   ), []);
 
   const loadAgent = useCallback(async () => {
+    if (!isAuthenticated) return;
     const res = await api.getAgent(id);
     setLoading(false);
     if (res.success) {
       setAgent(res.data);
-      const agentData = res.data as AgentDetail;
-      if (typeof agentData.chatUsedToday === 'number') {
-        setMsgCount(agentData.chatUsedToday);
-      }
-      if (agentData.isByok) {
-        setHasUnlimitedChat(true);
-        setIsByok(true);
-      } else if (typeof agentData.chatLimit === 'number' && agentData.chatLimit === 0) {
-        setHasUnlimitedChat(true);
-      } else if (typeof agentData.chatLimit === 'number' && agentData.chatLimit > 0) {
-        setMsgLimit(agentData.chatLimit);
-        setHasUnlimitedChat(false);
-      }
     }
-  }, [id]);
-
-  const loadUsage = useCallback(async () => {
-    try {
-      const res = await api.getAgentUsage(id);
-      if (res.success) {
-        setMsgCount(res.data.messages.today);
-        if (res.data.messages.isByok) {
-          setHasUnlimitedChat(true);
-          setIsByok(true);
-        } else if (res.data.messages.limit === 0) {
-          setHasUnlimitedChat(true);
-          setIsByok(false);
-        } else if (res.data.messages.limit > 0) {
-          setMsgLimit(res.data.messages.limit);
-          setHasUnlimitedChat(false);
-        }
-      }
-    } catch {
-      // Fall back to tier-based limit
-    }
-  }, [id]);
+  }, [id, isAuthenticated]);
 
   const loadFeatures = useCallback(async () => {
     setFeaturesLoading(true);
@@ -369,7 +312,7 @@ export default function AgentManagePage() {
     if (prevIdRef.current !== id) {
       prevIdRef.current = id;
       const params = new URLSearchParams(window.location.search);
-      setTab(normalizeTab(params.get('tab') as Tab));
+      setTab(normalizeTab(params.get('tab')));
       setMessages([]);
       setChatSessions([]);
       setActiveChatSessionIdState(null);
@@ -385,20 +328,19 @@ export default function AgentManagePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  // ─── Flip `hasUnlimitedChat` when the user holds an unlimited tier ──
-  // We don't overwrite msgLimit here — that's populated from
-  // loadUsage() which returns the authoritative server value (tier +
-  // active addons like +200 msg/day). An earlier effect used to clobber
-  // addon-inclusive limits back down to the raw tier base, so users
-  // who bought `addon.messages.200` saw no change on the agent page.
-  useEffect(() => {
-    const tierLimit = TIERS[userTier]?.messagesPerDay ?? TIERS.free.messagesPerDay;
-    if (tierLimit === 0) setHasUnlimitedChat(true);
-  }, [userTier]);
-
   // ─── Initial load ─────────────────────────────────────────
 
-  useEffect(() => { loadAgent(); loadUsage(); }, [loadAgent, loadUsage]);
+  useEffect(() => {
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      const current = typeof window !== 'undefined'
+        ? `/dashboard/agent/${id}${window.location.search}`
+        : `/dashboard/agent/${id}`;
+      router.replace(`/login?return=${encodeURIComponent(current)}`);
+      return;
+    }
+    loadAgent();
+  }, [authLoading, id, isAuthenticated, loadAgent, router]);
 
   useEffect(() => { sendingRef.current = sending; }, [sending]);
 
@@ -732,6 +674,8 @@ export default function AgentManagePage() {
     agentId: id,
     enabled: isAuthenticated && !!id,
     onToken: (token) => {
+      setChatError(null);
+      setChatErrorType(null);
       setMessages((prev) => {
         const updated = [...prev];
         const last = updated[updated.length - 1];
@@ -795,6 +739,9 @@ export default function AgentManagePage() {
       if (!_content) {
         setChatErrorType('generic');
         setChatError('Agent returned an empty response. Try again or check if the agent is running.');
+      } else {
+        setChatError(null);
+        setChatErrorType(null);
       }
       setSending(false);
       window.setTimeout(() => void loadChatSessions(), 500);
@@ -802,10 +749,10 @@ export default function AgentManagePage() {
     onError: (errMsg) => {
       wsStreamingMsgRef.current = false;
       const lower = errMsg.toLowerCase();
-      if (lower.includes('429') || lower.includes('rate limit') || lower.includes('daily limit')) {
+      if (lower.includes('429') || lower.includes('rate limit') || lower.includes('daily limit') || lower.includes('ai credit') || lower.includes('credit')) {
         setChatErrorType('ratelimit');
-        setChatError('Daily message limit reached. Upgrade to Pro for more, or bring your own key for unlimited.');
-        toast.warning('Daily limit reached. Upgrade to Pro or bring your own API key for unlimited.');
+        setChatError('AI Credits exhausted. Top up credits, upgrade for a larger monthly grant, or bring your own key.');
+        toast.warning('AI Credits exhausted. Top up, upgrade, or bring your own API key.');
       } else if (lower.includes('content policy') || lower.includes('filtered')) {
         setChatErrorType('generic');
         setChatError('Agent response was blocked by content policy.');
@@ -823,7 +770,7 @@ export default function AgentManagePage() {
       wsStreamingMsgRef.current = false;
       setChatErrorType('ratelimit');
       setChatError(error);
-      toast.warning('Daily limit reached. Upgrade to Pro or bring your own API key for unlimited.');
+      toast.warning('AI Credits exhausted. Top up, upgrade, or bring your own API key.');
       setMessages((prev) => prev.filter((m) => !(m.streaming && m.content === '')));
       setSending(false);
     },
@@ -835,12 +782,6 @@ export default function AgentManagePage() {
     const text = (overrideText ?? input).trim();
     if (!text || sending || sendCooldown) return;
     if (agent?.status !== 'active') return;
-    if (!hasUnlimitedChat && msgCount >= msgLimit) {
-      setChatErrorType('ratelimit');
-      setChatError('Daily message limit reached. Upgrade to Pro for more, or bring your own key for unlimited.');
-      toast.warning('Daily limit reached. Upgrade to Pro or bring your own API key for unlimited.');
-      return;
-    }
     setInput('');
     setChatError(null);
     setChatErrorType(null);
@@ -850,7 +791,7 @@ export default function AgentManagePage() {
     const selectedHistory = messages
       .filter((m) => !m.streaming)
       .slice(-40)
-      .map((m) => ({ role: m.role, content: m.content }));
+      .map((m) => ({ role: m.role, content: trimChatHistoryContent(m.content) }));
 
     // If the user is viewing an older session and sends a message, start a
     // fresh current session and use the selected session only as context.
@@ -876,7 +817,6 @@ export default function AgentManagePage() {
     const userMsg: Message = { id: genId(), role: 'user', content: text, timestamp: new Date() };
     setMessages((prev) => [...prev, userMsg]);
     setSending(true);
-    setMsgCount((c) => c + 1);
     const history = selectedHistory;
     setMessages((prev) => [...prev, { id: genId(), role: 'assistant', content: '', streaming: true, timestamp: new Date() }]);
 
@@ -895,6 +835,8 @@ export default function AgentManagePage() {
         text,
         history,
         (token) => {
+          setChatError(null);
+          setChatErrorType(null);
           setMessages((prev) => {
             const updated = [...prev];
             const last = updated[updated.length - 1];
@@ -905,6 +847,8 @@ export default function AgentManagePage() {
           });
         },
         () => {
+          setChatError(null);
+          setChatErrorType(null);
           setMessages((prev) => {
             const updated = [...prev];
             const last = updated[updated.length - 1];
@@ -921,10 +865,10 @@ export default function AgentManagePage() {
         },
         (errMsg) => {
           const lower = errMsg.toLowerCase();
-          if (lower.includes('429') || lower.includes('rate limit') || lower.includes('daily limit')) {
+          if (lower.includes('429') || lower.includes('rate limit') || lower.includes('daily limit') || lower.includes('ai credit') || lower.includes('credit')) {
             setChatErrorType('ratelimit');
-            setChatError('Daily message limit reached. Upgrade to Pro for more, or bring your own key for unlimited.');
-            toast.warning('Daily limit reached. Upgrade to Pro or bring your own API key for unlimited.');
+            setChatError('AI Credits exhausted. Top up credits, upgrade for a larger monthly grant, or bring your own key.');
+            toast.warning('AI Credits exhausted. Top up, upgrade, or bring your own API key.');
           } else if (lower.includes('503') || lower.includes('no_groq_key') || lower.includes('service unavailable') || lower.includes('groq') || lower.includes('llm') || lower.includes('proxy_error')) {
             setChatErrorType('llm_down');
             setChatError('AI service is temporarily unavailable.');
@@ -997,13 +941,10 @@ export default function AgentManagePage() {
 
   const activeFeatureKeys = new Set(activeFeatures.map((f) => f.featureKey));
 
-  const remaining = !hasUnlimitedChat ? Math.max(0, msgLimit - msgCount) : null;
-  const isLimitReached = !hasUnlimitedChat && remaining !== null && remaining === 0;
-
   const llmProvider = config.configProvider || (() => {
     const char = agent?.config ?? {};
     const settings = (char as Record<string, unknown>).settings as Record<string, unknown> | undefined;
-    return (settings?.modelProvider as string) ?? (char as Record<string, unknown>).provider as string ?? 'groq';
+    return (char as Record<string, unknown>).provider as string ?? settings?.modelProvider as string ?? 'openrouter';
   })();
   const currentProviderMeta = getBYOKProvider(llmProvider);
   const providerModels = currentProviderMeta?.models ?? [];
@@ -1024,7 +965,6 @@ export default function AgentManagePage() {
       filteredLogs: logs.filteredLogs, logsEndRef: logs.logsEndRef, loadLogs: logs.loadLogs, wsLogsConnected,
       messages, setMessages, input, setInput, sending,
       chatError, setChatError, chatErrorType, setChatErrorType,
-      msgCount, hasUnlimitedChat, isByok, msgLimit, remaining, isLimitReached,
       bottomRef, inputRef, sendMessage, handleKeyDown, sendCooldown,
       wsConnected: wsChat.isConnected,
       chatSessions,
@@ -1077,7 +1017,7 @@ export default function AgentManagePage() {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, agent, stats, tab, logs.logs, logs.logsLoading, logs.logFilter, logs.logSearch, logs.autoScroll, logs.filteredLogs, wsLogsConnected,
-    messages, input, sending, sendCooldown, chatError, chatErrorType, msgCount, msgLimit, remaining, isLimitReached,
+    messages, input, sending, sendCooldown, chatError, chatErrorType,
     chatSessions, activeChatSessionId, setActiveChatSessionId, startNewChatSession, loadChatSessions,
     inflightTools, completedTools,
     config.configName, config.configDesc, config.configBio, config.configLore, config.configTopics,
@@ -1091,7 +1031,7 @@ export default function AgentManagePage() {
     actions.actionLoading, actions.actionError, actions.actionSuccess,
     llmProvider, currentProviderMeta, providerModels, config.hasApiKey,
     displayUptime, isLiveUptime, isActive, isNotActive, statusInfo, frameworkMeta,
-    isAuthenticated, userTier, hasUnlimitedChat, viewMode]);
+    isAuthenticated, userTier, viewMode]);
 
   // ─── Loading state ───────────────────────────────────────
 
@@ -1316,23 +1256,10 @@ export default function AgentManagePage() {
             <div className={`${tab === 'chat' || tab === 'terminal' || tab === 'mail' ? 'w-full max-w-none px-4 sm:px-6 lg:px-8 2xl:px-10' : 'max-w-[1280px] mx-auto px-4 sm:px-6'} py-6`}>
             <AnimatePresence mode="wait">
               {tab === 'overview' && <OverviewTab />}
-              {tab === 'config' && (
-                agent?.framework === 'hermes' ? <HermesConfigTab /> :
-                (agent?.framework === 'openclaw' && true) ? (
-                  // Managed OpenClaw: stack the live PATCH editor on top of
-                  // the legacy DB-backed form. Live editor handles runtime
-                  // tweaks (tools profile, logging, session scope), the old
-                  // form still owns model selection + rebuild-required settings.
-                  <div className="space-y-6">
-                    <OpenClawConfigTab />
-                    <ConfigTab />
-                  </div>
-                ) : <ConfigTab />
-              )}
+              {tab === 'config' && <ConfigTab />}
               {tab === 'integrations' && <IntegrationsTab />}
               {(tab === 'skills' || tab === 'plugins') && <PluginsTab />}
               {tab === 'files' && <FilesTab />}
-              {tab === 'workspace' && <WorkspaceTab />}
               {tab === 'logs' && <LogsTab />}
               {tab === 'memory' && (
                 agent?.framework === 'hermes' ? <HermesMemoryTab /> :
@@ -1345,7 +1272,6 @@ export default function AgentManagePage() {
               {tab === 'chat' && <ChatTab />}
               {tab === 'mail' && <MailTab />}
               {tab === 'knowledge' && <KnowledgeTab />}
-              {tab === 'addons' && <AddonsTab />}
               {tab === 'wallet' && <WalletTab />}
               {tab === 'stats' && <StatsTab />}
               {tab === 'schedules' && <SchedulesTab />}

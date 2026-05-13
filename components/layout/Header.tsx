@@ -33,7 +33,7 @@ export function Header() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isAdmin = user?.isAdmin ?? false;
-  const [creditBalance, setCreditBalance] = useState<number | null>(null);
+  const [aiCreditBalance, setAiCreditBalance] = useState<number | null>(null);
 
   // ── Affiliate menu state ───────────────────────────────────
   // Three public states for the dropdown entry:
@@ -51,7 +51,7 @@ export function Header() {
   // user's affiliate/credit state until a hard refresh.
   useEffect(() => {
     setAffiliateState(null);
-    setCreditBalance(null);
+    setAiCreditBalance(null);
   }, [user?.id]);
 
   // Lock body scroll when mobile menu is open
@@ -63,12 +63,12 @@ export function Header() {
   }, [mobileOpen]);
 
   useEffect(() => {
-    if (isAuthenticated && dropdownOpen && creditBalance === null) {
-      api.getCreditBalance().then(res => {
-        if (res.success) setCreditBalance(res.data.balance);
+    if (isAuthenticated && dropdownOpen && aiCreditBalance === null) {
+      api.getAiCreditBalance().then(res => {
+        if (res.success) setAiCreditBalance(res.data.balance);
       });
     }
-  }, [isAuthenticated, dropdownOpen, creditBalance]);
+  }, [isAuthenticated, dropdownOpen, aiCreditBalance]);
 
   // Affiliate state fetch — only when the dropdown is opened by a
   // logged-in user, and only once per session. getAffiliateMe returns
@@ -172,11 +172,11 @@ export function Header() {
 
   // ── User dropdown links ──
   const USER_EXTRA_LINKS = [
-    { href: '/dashboard/analytics', label: t('analytics'), icon: Activity },
-    { href: '/dashboard/skale',     label: t('skale'),     icon: Wallet },
-    { href: '/dashboard/team',      label: t('team'),      icon: Users },
-    { href: '/support',             label: t('support'),   icon: MessageSquare },
-    { href: '/dashboard/settings',  label: t('settings'),  icon: Settings },
+    { href: '/dashboard/analytics', label: t('analytics'), icon: Activity, description: t('userMenu.sub_analytics') },
+    { href: '/dashboard/skale',     label: t('skale'),     icon: Wallet, description: t('userMenu.sub_wallets') },
+    { href: '/dashboard/team',      label: t('team'),      icon: Users, description: t('userMenu.sub_team') },
+    { href: '/support',             label: t('support'),   icon: MessageSquare, description: t('userMenu.sub_support') },
+    { href: '/dashboard/settings',  label: t('settings'),  icon: Settings, description: t('userMenu.sub_settings') },
   ];
 
   // ── Mobile links (when logged in) ──
@@ -363,7 +363,7 @@ export function Header() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -4 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute right-0 mt-1 w-52 rounded-xl shadow-xl z-50 overflow-hidden"
+                          className="absolute right-0 mt-1 w-64 rounded-xl shadow-xl z-50 overflow-hidden"
                           style={{
                             background: 'color-mix(in srgb, var(--bg-surface) 95%, transparent)',
                             backdropFilter: 'blur(24px)',
@@ -387,14 +387,14 @@ export function Header() {
                             <div className="min-w-0 flex-1">
                               <p className="text-xs text-[var(--text-primary)] font-medium truncate group-hover:text-purple-300 transition-colors">{user.username}</p>
                               <p className="text-[10px] text-[var(--text-secondary)] truncate">{user.email}</p>
-                              {creditBalance !== null && creditBalance > 0 && (
+                              {aiCreditBalance !== null && aiCreditBalance > 0 && (
                                 <span
                                   onClick={(e) => { e.stopPropagation(); e.preventDefault(); setDropdownOpen(false); window.location.href = '/dashboard/billing'; }}
                                   className="mt-1.5 inline-flex items-center gap-1.5 text-[10px] text-green-400 hover:text-green-300 transition-colors cursor-pointer"
                                 >
                                   <Wallet className="w-3 h-3" />
-                                  <span className="font-semibold">${creditBalance.toFixed(2)}</span>
-                                  <span className="text-[var(--text-secondary)]">{t('credits')}</span>
+                                  <span className="font-semibold">{aiCreditBalance.toLocaleString()}</span>
+                                  <span className="text-[var(--text-secondary)]">AI Credits</span>
                                 </span>
                               )}
                             </div>
@@ -424,14 +424,19 @@ export function Header() {
                                 href={link.href}
                                 onClick={() => setDropdownOpen(false)}
                                 className={clsx(
-                                  'flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium transition-colors duration-200',
+                                  'flex items-start gap-2.5 px-4 py-2.5 text-xs font-medium transition-colors duration-200',
                                   isActive(pathname, link.href)
                                     ? 'text-[var(--text-primary)] bg-[var(--bg-card)]'
                                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)]'
                                 )}
                               >
-                                <Icon className="w-3.5 h-3.5" />
-                                {link.label}
+                                <Icon className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                                <span className="min-w-0">
+                                  <span className="block">{link.label}</span>
+                                  <span className="block text-[10px] font-normal leading-snug text-[var(--text-muted)]">
+                                    {link.description}
+                                  </span>
+                                </span>
                               </Link>
                             );
                           })}

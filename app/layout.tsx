@@ -151,7 +151,7 @@ const softwareApplicationJsonLd = {
       name: 'Free Tier',
       price: '0',
       priceCurrency: 'USD',
-      description: '1 agent, 20 messages/day, 3 searches/day, all integrations.',
+      description: '1 agent, 500 AI Credits/month, 1 CPU/1GB RAM, 2GB workspace, all integrations.',
     },
     {
       '@type': 'Offer',
@@ -159,7 +159,7 @@ const softwareApplicationJsonLd = {
       price: '6.99',
       priceCurrency: 'USD',
       billingIncrement: 'P1M',
-      description: '1 agent, 50 messages/day, 10 searches/day, 1 CPU/1.5GB RAM.',
+      description: '1 agent, 3,000 AI Credits/month, 1 CPU/1.5GB RAM, 10GB workspace.',
     },
     {
       '@type': 'Offer',
@@ -167,7 +167,7 @@ const softwareApplicationJsonLd = {
       price: '19.99',
       priceCurrency: 'USD',
       billingIncrement: 'P1M',
-      description: '3 agents, 100 messages/day, 50 searches/day, dedicated resources.',
+      description: '3 agents, 15,000 AI Credits/month, 1.5 CPU/2GB RAM, 25GB workspace.',
     },
     {
       '@type': 'Offer',
@@ -175,14 +175,14 @@ const softwareApplicationJsonLd = {
       price: '49.99',
       priceCurrency: 'USD',
       billingIncrement: 'P1M',
-      description: '10 agents, 300 messages/day, 200 searches/day, always-on, priority support.',
+      description: '5 agents, 40,000 AI Credits/month, 2 CPU/3GB RAM, 50GB workspace, always active, team collaboration.',
     },
     {
       '@type': 'Offer',
       name: 'Founding Member',
       price: '99',
       priceCurrency: 'USD',
-      description: '10 agents, 300 messages/day, 200 searches/day, lifetime access, always-on, 20 spots only.',
+      description: '5 agents, 25,000 AI Credits/month, 2 CPU/3GB RAM, 40GB workspace, lifetime access, 20 spots only.',
     },
   ],
   creator: {
@@ -201,7 +201,7 @@ const faqJsonLd = {
       name: 'Is it really free?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. The free plan gives you 1 agent, 20 messages per day, and access to all platforms. No credit card required.',
+        text: 'Yes. The free plan gives you 1 agent, 500 AI Credits/month, 2GB workspace, File Manager, Full Logs, and access to all platforms. No credit card required.',
       },
     },
     {
@@ -217,7 +217,7 @@ const faqJsonLd = {
       name: 'What is "Bring Your Own Key"?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Connect your own OpenAI, Anthropic, Google, OpenRouter, Groq, or other supported LLM key for unlimited messages. You only pay your AI provider directly.',
+        text: 'Connect your own OpenAI, Anthropic, Google, OpenRouter, or other supported LLM key. BYOK usage is paid directly to your provider and does not spend Hatcher AI Credits.',
       },
     },
     {

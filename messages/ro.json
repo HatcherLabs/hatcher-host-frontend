@@ -39,11 +39,14 @@
     "affiliateBecome": "Devino afiliat",
     "userMenu": {
       "sub_myAgents": "Răsfoiește, editează, lansează.",
-      "sub_create": "Alege un șablon manual.",
+      "sub_create": "Descrie un agent pentru eclozare.",
+      "sub_analytics": "AI Credits, tokeni, trenduri.",
       "sub_billing": "Tier, adăugiri, credite.",
+      "sub_wallets": "Portofele de plată Solana.",
+      "sub_team": "Membri și colaborare.",
       "sub_settings": "Profil, chei API, preferințe.",
       "sub_support": "Ajutor, documentație, contact.",
-      "sub_affiliate": "Câștigă credite recomandând Hatcher.",
+      "sub_affiliate": "Câștigă cash recomandând Hatcher.",
       "sub_admin": "Control platformă.",
       "sub_signOut": "Termină sesiunea pe acest dispozitiv.",
       "tierSuffix": "tier"
@@ -54,8 +57,6 @@
       "resources": "Resurse",
       "hatchAgentLabel": "Eclozează agent (chat)",
       "hatchAgentSub": "Descrie ce vrei — gata în câteva secunde.",
-      "createTplLabel": "Din template",
-      "createTplSub": "Alege manual framework + tool-uri.",
       "myAgentsLabel": "Agenții mei",
       "myAgentsSub": "Dashboard pentru agenții care rulează.",
       "cityLabel": "Hatcher City",
@@ -117,7 +118,6 @@
     "colResources": "Resurse",
     "colLegal": "Legal",
     "itemHatchAgent": "Eclozează agent",
-    "itemCreateTpl": "Din template",
     "itemMyAgents": "Agenții mei",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Framework-uri",
@@ -175,7 +175,7 @@
       "copiedAriaLabel": "Copiat",
       "step01": "Trimite acest prompt agentului tău AI de cod — Claude Code, Cursor, OpenClaw, Hermes, sau orice agent care poate accesa URL-uri și rula comenzi shell.",
       "step02": "Agentul înregistrează un cont cu email-ul tău și îți trimite un link de verificare.",
-      "step03": "Dă click pe verificare. Agentul alege un template, îl deployează și îți predă un AI funcțional.",
+      "step03": "Dă click pe verificare. Hatcher generează configurația, o deployează și îți predă un AI funcțional.",
       "viewSkillMd": "Vezi skill.md",
       "githubSource": "Sursă GitHub"
     },
@@ -288,7 +288,7 @@
         },
         {
           "title": "Aduce-ți propria cheie",
-          "desc": "Folosește-ți propria cheie API LLM pentru mesaje nelimitate pe orice plan."
+          "desc": "Folosește-ți propria cheie API LLM pentru utilizare plătită direct la provider pe orice plan."
         },
         {
           "title": "Securizat implicit",
@@ -307,7 +307,7 @@
     "pricing": {
       "eyebrow": "Prețuri",
       "heading": "Începe gratuit, crești când ești gata",
-      "subheading": "Toate platformele incluse pe fiecare plan. Aduce-ți propria cheie AI pentru mesaje nelimitate pe orice plan.",
+      "subheading": "Toate platformele incluse pe fiecare plan. AI-ul găzduit și web search consumă AI Credits; BYOK rămâne plătit direct la provider.",
       "popularLabel": "Popular",
       "tiers": [
         {
@@ -316,9 +316,10 @@
           "sub": "/lună",
           "features": [
             "1 agent AI",
-            "20 mesaje/zi",
+            "500 AI Credits/lună",
+            "2 GB spațiu de lucru",
             "Toate platformele",
-            "AI gratuit inclus"
+            "File Manager + Jurnale complete"
           ],
           "cta": "Începe acum"
         },
@@ -328,9 +329,10 @@
           "sub": "/lună",
           "features": [
             "1 agent AI",
-            "50 mesaje/zi",
-            "BYOK = nelimitat",
-            "Timp activ mai lung"
+            "3.000 AI Credits/lună",
+            "10 GB spațiu de lucru",
+            "BYOK direct la provider",
+            "Mereu activ"
           ],
           "cta": "Alege Starter"
         },
@@ -340,8 +342,9 @@
           "sub": "/lună",
           "features": [
             "3 agenți AI",
-            "100 mesaje/zi",
-            "BYOK = nelimitat",
+            "15.000 AI Credits/lună",
+            "25 GB spațiu de lucru",
+            "BYOK direct la provider",
             "Resurse dedicate"
           ],
           "cta": "Alege Pro"
@@ -351,15 +354,16 @@
           "price": "$49.99",
           "sub": "/lună",
           "features": [
-            "10 agenți AI",
-            "300 mesaje/zi",
+            "5 agenți AI",
+            "40.000 AI Credits/lună",
+            "50 GB spațiu de lucru",
             "Containere mereu active",
-            "Suport prioritar"
+            "Colaborare în echipă"
           ],
           "cta": "Alege Business"
         }
       ],
-      "addonsNote": "Ai nevoie de mai mulți agenți, mesaje sau stocare? Adaugă pachete suplimentare — toate planurile au flexibilitate add-on.",
+      "addonsNote": "Ai nevoie de mai mulți agenți, AI Credits sau stocare? Adaugă extra capacitate când ai nevoie.",
       "addonsCta": "Vezi prețurile complete →"
     },
     "founding": {
@@ -376,15 +380,15 @@
       "claimed": "{claimed} din {max} revendicate · odată ce sunt toate, oferta dispare.",
       "includedHeading": "Totul inclus, pentru totdeauna",
       "includedItems": [
-        "10 agenți incluși",
+        "5 agenți incluși",
         "Mereu activ (fără somn)",
-        "300 mesaje/zi per cont",
-        "200 căutări web/zi",
-        "2 CPU · 4 GB RAM per agent",
-        "2 GB spațiu de lucru per agent",
+        "25.000 AI Credits/lună",
+        "Web search consumă AI Credits",
+        "2 CPU · 3 GB RAM per agent",
+        "40 GB spațiu de lucru per agent",
         "File Manager + Jurnale complete",
-        "Colaborare în echipă + suport prioritar",
-        "Insignă de fondator",
+        "Suport prioritar",
+        "Rol Discord Founding + tag Telegram",
         "Preț blocat pentru totdeauna"
       ],
       "ctaSoldOut": "Epuizat",
@@ -396,7 +400,7 @@
       "items": [
         {
           "q": "Este cu adevărat gratuit?",
-          "a": "Da. Planul gratuit îți oferă 1 agent, 20 de mesaje pe zi și acces la toate platformele. Nu este necesară cardul bancar. BYOK (aduce-ți propria cheie LLM) = mesaje nelimitate pe orice plan."
+          "a": "Da. Planul gratuit îți oferă 1 agent, AI Credits lunare, 2 GB spațiu de lucru, File Manager, Jurnale complete și acces la toate platformele. Nu este necesar cardul bancar. BYOK (adu-ți propria cheie LLM) rămâne plătit direct la provider pe orice plan."
         },
         {
           "q": "Trebuie să știu să programez?",
@@ -404,7 +408,7 @@
         },
         {
           "q": "Ce înseamnă \"Bring Your Own Key\"?",
-          "a": "Conectează propria cheie OpenAI, Anthropic, Google, OpenRouter sau alt furnizor LLM suportat pentru mesaje nelimitate. Plătești direct furnizorul AI."
+          "a": "Conectează propria cheie OpenAI, Anthropic, Google, OpenRouter sau alt furnizor LLM suportat pentru utilizare plătită direct la provider. Plătești direct furnizorul AI."
         },
         {
           "q": "Unde rulează agentul meu?",
@@ -414,7 +418,7 @@
     },
     "finalCta": {
       "heading": "Gata să deployezi primul tău agent?",
-      "body": "Planul gratuit include 1 agent cu 20 mesaje/zi. BYOK = nelimitat. Nu este necesar cardul bancar.",
+      "body": "Planul gratuit include 1 agent, 500 AI Credits/lună, File Manager, Jurnale complete și 2 GB spațiu de lucru. BYOK se plătește direct la provider. Nu este necesar cardul bancar.",
       "ctaPrimary": "Creează-ți agentul",
       "ctaSecondary": "Vezi prețurile",
       "trustNoCreditCard": "Fără card bancar",
@@ -450,11 +454,11 @@
       "panelTagline": "Hatcher",
       "panelHeadlinePrefix": "Lansează-ți",
       "panelHeadlineAccent": "agentul AI.",
-      "panelBody": "Plan gratuit cu BYOK = mesaje nelimitate. Nu este necesar cardul bancar.",
+      "panelBody": "Plan gratuit cu AI Credits; BYOK se plătește direct la provider. Nu este necesar cardul bancar.",
       "statsUsers": "Utilizatori",
       "statsAgents": "Agenți",
       "statsOnline": "Online acum",
-      "referralBadge": "Recomandat de {referrer} — amândoi primiți {credit} credit!",
+      "referralBadge": "Recomandat de {referrer} — amândoi primiți {credit}!",
       "emailLabel": "Email",
       "emailPlaceholder": "you@example.com",
       "emailTaken": "Deja înregistrat.",
@@ -544,7 +548,7 @@
   "pricing": {
     "eyebrow": "Prețuri",
     "heading": "Alege planul tău",
-    "subheading": "Începe gratuit cu orice framework. Extinde când ești gata. Toate integrările incluse pe fiecare plan. BYOK mereu nelimitat.",
+    "subheading": "Începe gratuit cu orice framework. Extinde când ești gata. Toate integrările incluse pe fiecare plan. BYOK rămâne plătit direct la provider.",
     "billingToggle": {
       "monthly": "Lunar",
       "annual": "Anual",
@@ -572,64 +576,59 @@
     "tiers": {
       "free": {
         "agents": "1 agent inclus",
-        "messages": "20 mesaje/zi",
-        "cpu": "0.5 CPU",
+        "messages": "500 AI Credits/lună",
+        "cpu": "1 CPU",
         "ram": "1 GB RAM",
-        "storage": "50 MB spațiu de lucru",
-        "sleep": "Adormit automat după 1h inactiv",
+        "storage": "2 GB spațiu de lucru",
+        "sleep": "Adormire automată după 12h inactiv",
         "features": [
-          "DeepSeek V4 Flash pe OpenRouter",
-          "BYOK = mesaje nelimitate",
-          "3 căutări web/zi",
+          "Modele găzduite prin OpenRouter",
+          "Web search consumă AI Credits",
+          "File Manager + Jurnale complete incluse",
           "Toate integrările (Telegram, Discord, Twitter, etc)"
         ],
-        "missing": [
-          "Jurnale, File Manager disponibile ca add-on"
-        ]
+        "missing": []
       },
       "starter": {
         "agents": "1 agent inclus",
-        "messages": "50 mesaje/zi",
+        "messages": "3.000 AI Credits/lună",
         "cpu": "1 CPU",
         "ram": "1.5 GB RAM",
-        "storage": "150 MB spațiu de lucru",
-        "sleep": "Adormit automat după 4h inactiv",
+        "storage": "10 GB spațiu de lucru",
+        "sleep": "Mereu activ",
         "features": [
-          "BYOK = mesaje nelimitate",
-          "10 căutări web/zi",
+          "Modele găzduite prin OpenRouter",
+          "Web search consumă AI Credits",
+          "File Manager + Jurnale complete incluse",
           "Toate integrările"
         ],
-        "missing": [
-          "Jurnale, File Manager disponibile ca add-on"
-        ]
+        "missing": []
       },
       "pro": {
         "agents": "3 agenți incluși",
-        "messages": "100 mesaje/zi",
+        "messages": "15.000 AI Credits/lună",
         "cpu": "1.5 CPU",
         "ram": "2 GB RAM",
-        "storage": "500 MB spațiu de lucru",
-        "sleep": "Adormit automat după 12h inactiv",
+        "storage": "25 GB spațiu de lucru",
+        "sleep": "Mereu activ",
         "features": [
-          "BYOK = mesaje nelimitate",
-          "50 căutări web/zi",
-          "Toate integrările",
-          "Cumpără Always On per agent pentru 24/7"
+          "Modele găzduite prin OpenRouter",
+          "Web search consumă AI Credits",
+          "File Manager + Jurnale complete incluse",
+          "Toate integrările"
         ],
-        "missing": [
-          "Jurnale, File Manager disponibile ca add-on"
-        ]
+        "missing": []
       },
       "business": {
-        "agents": "10 agenți incluși",
-        "messages": "300 mesaje/zi",
+        "agents": "5 agenți incluși",
+        "messages": "40.000 AI Credits/lună",
         "cpu": "2 CPU",
         "ram": "3 GB RAM",
-        "storage": "1 GB spațiu de lucru",
-        "sleep": "Mereu activ (fără adormire automată)",
+        "storage": "50 GB spațiu de lucru",
+        "sleep": "Mereu activ",
         "features": [
-          "BYOK = mesaje nelimitate",
-          "200 căutări web/zi",
+          "Modele găzduite prin OpenRouter",
+          "Web search consumă AI Credits",
           "File Manager inclus",
           "Jurnale complete incluse",
           "Suport prioritar",
@@ -639,27 +638,27 @@
         "missing": []
       },
       "founding_member": {
-        "agents": "10 agenți incluși",
-        "messages": "300 mesaje/zi",
+        "agents": "5 agenți incluși",
+        "messages": "25.000 AI Credits/lună",
         "cpu": "2 CPU",
-        "ram": "4 GB RAM",
-        "storage": "2 GB spațiu de lucru",
-        "sleep": "Mereu activ (fără adormire automată)",
+        "ram": "3 GB RAM",
+        "storage": "40 GB spațiu de lucru",
+        "sleep": "Mereu activ",
         "features": [
           "$99 o singură dată — acces pe viață",
-          "200 căutări web/zi",
+          "Modele găzduite prin OpenRouter",
+          "Web search consumă AI Credits",
           "File Manager + Jurnale complete incluse",
           "Suport prioritar",
-          "Colaborare în echipă",
           "Toate integrările",
-          "Insignă de fondator"
+          "Rol Discord Founding + tag Telegram"
         ],
         "missing": []
       }
     },
     "addons": {
-      "heading": "Add-on-uri",
-      "subheading": "Personalizează-ți planul. Adaugă add-on-uri pe orice plan. Combină după nevoie.",
+      "heading": "Extra",
+      "subheading": "Adaugă pachete AI Credits sau sloturi de agenți când ai nevoie de mai multă capacitate.",
       "annualDiscount": "15% reducere anual",
       "groups": {
         "extraAgents": {
@@ -687,68 +686,38 @@
             }
           ]
         },
-        "extraMessages": {
-          "label": "Mesaje suplimentare (cont)",
+        "aiCredits": {
+          "label": "AI Credits",
           "items": [
             {
-              "name": "+20 msg/zi",
-              "period": "/lună",
-              "description": "Cumulabil"
+              "name": "5.000 AI Credits",
+              "period": "o singură dată",
+              "description": "Modele găzduite și web search"
             },
             {
-              "name": "+50 msg/zi",
-              "period": "/lună",
-              "description": "Cumulabil"
+              "name": "10.000 AI Credits",
+              "period": "o singură dată",
+              "description": "Rulări mai grele și research"
             },
             {
-              "name": "+100 msg/zi",
-              "period": "/lună",
-              "description": "Cumulabil"
+              "name": "25.000 AI Credits",
+              "period": "o singură dată",
+              "description": "Workload-uri mai mari pentru agenți"
             },
             {
-              "name": "+200 msg/zi",
-              "period": "/lună",
-              "description": "Cumulabil"
-            }
-          ]
-        },
-        "extraSearches": {
-          "label": "Căutări suplimentare (cont)",
-          "items": [
-            {
-              "name": "+25 căutări/zi",
-              "period": "/lună",
-              "description": "Cumulabil"
-            },
-            {
-              "name": "+50 căutări/zi",
-              "period": "/lună",
-              "description": "Cumulabil"
+              "name": "50.000 AI Credits",
+              "period": "o singură dată",
+              "description": "Volum mare de utilizare găzduită"
             }
           ]
         },
         "perAgent": {
-          "label": "Per agent",
+          "label": "Plugin-uri + Abilități",
           "items": [
             {
-              "name": "Always On",
-              "period": "/lună per agent",
-              "description": "Rulează non-stop 24/7"
-            },
-            {
-              "name": "File Manager",
-              "period": "o singură dată per agent",
-              "description": "Navighează & editează fișiere"
-            },
-            {
-              "name": "Full Logs",
-              "period": "/lună per agent",
-              "description": "Deblochează vizualizatorul de jurnale"
-            },
-            {
-              "name": "+10 Plugins",
-              "period": "/lună per agent",
-              "description": "Sloturi suplimentare de plugin"
+              "name": "Plugin-uri incluse",
+              "period": "incluse",
+              "description": "Incluse pe fiecare plan"
             }
           ]
         }
@@ -758,7 +727,7 @@
       "heading": "Toate integrările gratuite",
       "badge": "fiecare plan",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage și 14+ alte platforme sunt incluse gratuit pe toate planurile. Niciun cost suplimentar, niciodată.",
-      "note": "Toate prețurile în USD, plătibile în SOL sau $HATCHER. BYOK (Bring Your Own Key) = mesaje nelimitate cu propria cheie API LLM pe orice plan."
+      "note": "Toate prețurile sunt în USD, plătibile cu cardul, SOL, USDC pe Solana sau $HATCHER. Utilizarea modelelor găzduite și web search se contorizează în AI Credits; BYOK este plătit direct cu cheia ta de provider."
     },
     "compareTable": {
       "heading": "Compară planurile",
@@ -767,9 +736,9 @@
       "onceSuffix": " o dată",
       "rows": {
         "agents": "Agenți incluși",
-        "messages": "Mesaje/zi (cont)",
-        "searches": "Căutări web/zi",
-        "byok": "Mesaje BYOK",
+        "messages": "AI Credits/lună",
+        "searches": "Web search",
+        "byok": "Utilizare BYOK la provider",
         "cpuRam": "CPU / RAM",
         "storage": "Stocare",
         "autoSleep": "Adormire automată",
@@ -794,11 +763,11 @@
       "items": [
         {
           "q": "Ce este BYOK (Bring Your Own Key)?",
-          "a": "BYOK îți permite să folosești propria cheie API pentru orice furnizor LLM (OpenAI, Anthropic, Google, xAI, Groq, OpenRouter). Este mereu gratuit pe toate planurile — plătești direct furnizorul, fără marjă Hatcher. Mesajele cu propria cheie sunt nelimitate."
+          "a": "BYOK îți permite să folosești propria cheie API pentru orice furnizor LLM suportat (OpenAI, Anthropic, Google, xAI, OpenRouter și altele). Este mereu gratuit pe toate planurile — plătești direct furnizorul, fără marjă Hatcher. Hatcher nu contorizează utilizarea BYOK în AI Credits."
         },
         {
-          "q": "Cum funcționează add-on-urile?",
-          "a": "Add-on-urile sunt cumulabile pe orice plan. De exemplu, dacă ești pe planul Starter (1 agent) și cumperi un add-on +3 Agenți, poți rula 4 agenți total. Poți cumula mai multe add-on-uri."
+          "q": "Cum funcționează extra opțiunile?",
+          "a": "Pachetele AI Credits sunt top-up-uri one-time pentru modele găzduite și web search. Sloturile extra de agenți cresc capacitatea separat."
         },
         {
           "q": "Care este diferența dintre resurse partajate și dedicate?",
@@ -806,7 +775,7 @@
         },
         {
           "q": "Ce metode de plată sunt acceptate?",
-          "a": "Poți plăti cu SOL sau $HATCHER. Prețurile sunt în USD și convertite la cursuri live prin Jupiter."
+          "a": "Poți plăti cu cardul, SOL, USDC pe Solana sau $HATCHER. Prețurile crypto sunt în USD și convertite la cursuri live prin Jupiter."
         },
         {
           "q": "Pot să cobor la un plan inferior?",
@@ -814,15 +783,15 @@
         },
         {
           "q": "Ce este adormirea automată?",
-          "a": "Agenții gratuiți adorm după 1 oră de inactivitate, Starter după 4 ore, Pro după 12 ore. Agenții Business și Founding Member sunt mereu activi, fără adormire automată. Se trezesc instant la primul mesaj. Poți adăuga Always On la orice agent pentru $7.99/lună."
+          "a": "Agenții gratuiți adorm după 12 ore de inactivitate. Agenții Starter, Pro, Business și Founding Member sunt mereu activi, fără adormire automată."
         },
         {
           "q": "Ce LLM primesc pe planul gratuit?",
-          "a": "Mesajele găzduite folosesc implicit DeepSeek V4 Flash prin OpenRouter. Limitele de mesaje sunt la nivel de cont: Gratuit 20/zi, Starter 50/zi, Pro 100/zi, Business 300/zi, Founding 300/zi. BYOK (aduce-ți propria cheie LLM) depășește toate limitele pe orice plan."
+          "a": "Utilizarea găzduită este rutată prin OpenRouter și consumă din balanța de AI Credits. Poți alege din modelele găzduite suportate; BYOK ocolește contorizarea Hatcher în AI Credits fiindcă plătești direct furnizorul."
         },
         {
           "q": "Ce este planul Founding Member?",
-          "a": "Founding Member este o plată o singură dată de $99 care îți oferă acces pe viață la Hatcher: 10 agenți, 300 mesaje/zi, 4 GB RAM, 2 GB spațiu de lucru, mereu activ și toate funcțiile premium (File Manager, Jurnale complete, suport prioritar) incluse. Fără taxe lunare, niciodată. Limitat la 20 de locuri — odată ce s-au epuizat, acest plan dispare."
+          "a": "Founding Member este o plată o singură dată de $99 care îți oferă acces pe viață la Hatcher: 5 agenți, 25.000 AI Credits lunar, 2 CPU / 3 GB RAM, 40 GB spațiu de lucru, agenți mereu activi, File Manager, Jurnale complete, suport prioritar și rol Discord Founding + tag Telegram. Fără taxe lunare, niciodată. Limitat la 20 de locuri — odată ce s-au epuizat, acest plan dispare."
         }
       ]
     },
@@ -834,11 +803,11 @@
     },
     "cta": {
       "heading": "Gata să-ți deployezi agentul?",
-      "body": "Alege frameworkul, selectează un template și deployează în câteva secunde. Începe gratuit cu un LLM inclus. Extinde când ai nevoie de mai multă putere.",
+      "body": "Descrie agentul dorit și deployează în câteva secunde. Începe gratuit cu AI Credits găzduite. Extinde când ai nevoie de mai multă putere.",
       "createAgent": "Creează Agent",
       "seeFrameworks": "Vezi Frameworks"
     },
-    "footerNote": "Toate prețurile în USD, plătibile în SOL sau $HATCHER. BYOK (Bring Your Own Key) = mesaje nelimitate cu propria cheie API LLM pe orice plan."
+    "footerNote": "Toate prețurile sunt în USD, plătibile cu cardul, SOL, USDC pe Solana sau $HATCHER. Utilizarea modelelor găzduite și web search se contorizează în AI Credits; BYOK este plătit direct cu cheia ta de provider."
   },
   "dashboard": {
     "common": {
@@ -872,7 +841,7 @@
       "frameworkAll": "Toate Frameworks",
       "sortNewest": "Cele mai noi",
       "sortAZ": "A-Z",
-      "sortMessages": "Cele mai multe mesaje",
+      "sortMessages": "Most Active",
       "sortActive": "Ultima activitate",
       "emptyTitle": "Niciun agent încă",
       "emptyDescription": "Creează primul tău agent AI și deployează-l în 60 de secunde.",
@@ -891,31 +860,19 @@
       "tourFilterTitle": "Filtrează după Framework",
       "tourFilterDescription": "OpenClaw este bun pentru automatizări; Hermes este bun pentru workflow-uri adaptive cu memorie.",
       "tourSearchTitle": "Caută & Explorează",
-      "tourSearchDescription": "Caută agenți sau răsfoiește 200+ template-uri pentru a începe rapid.",
+      "tourSearchDescription": "Caută agenți sau pornește Chat-to-Hatch pentru a începe rapid.",
       "tourPlanTitle": "Planul Tău",
-      "tourPlanDescription": "Începe gratuit cu 1 agent și 20 mesaje/zi. Extinde oricând.",
+      "tourPlanDescription": "Începe gratuit cu 1 agent, AI Credits și tool-uri incluse. Extinde oricând.",
       "statTotal": "Total",
       "statActive": "Active",
       "statSleeping": "În pauză",
-      "msgsShort": "mesaje",
+      "msgsShort": "interactions",
       "cardOpen": "Camera 3D",
       "cardOpenTooltip": "Intră în camera 3D",
       "actionStop": "Oprește",
       "actionStart": "Pornește",
       "actionRestart": "Repornește",
       "noResultsAction": "Șterge filtrele"
-    },
-    "newAgent": {
-      "eyebrow": "Agent nou",
-      "heading": "Alege un template",
-      "subheading": "Pornește dintr-un template pre-configurat sau construiește de la zero. Fiecare template vine cu o personalitate, prompt de sistem și integrări sugerate.",
-      "searchPlaceholder": "Caută template-uri...",
-      "allTemplates": "Toate Template-urile",
-      "startFromScratch": "Pornește de la zero",
-      "startFromScratchDesc": "Control total asupra fiecărei setări",
-      "noTemplatesTitle": "Niciun template găsit",
-      "noTemplatesDesc": "Încearcă o altă căutare sau categorie.",
-      "footerHint": "Toate template-urile sunt complet personalizabile după deploy — schimbă numele, promptul de sistem, modelul și integrările oricând."
     },
     "billing": {
       "eyebrow": "Cont",
@@ -928,9 +885,9 @@
       "disconnect": "Deconectează",
       "loadingBilling": "Se încarcă facturarea...",
       "signInDescription": "Autentifică-te pentru a gestiona planul și facturarea.",
-      "creditsBalance": "Sold credite",
-      "creditsUsd": "USD",
-      "creditsDesc": "Creditele pot fi folosite pentru abonamente, add-on-uri și utilizarea LLM-ului găzduit.",
+      "creditsBalance": "Sold AI Credits",
+      "creditsUsd": "AI Credits",
+      "creditsDesc": "AI Credits sunt folosite pentru LLM-uri găzduite, web search, research, extract și crawl.",
       "recentTransactions": "Tranzacții recente",
       "currentTier": "Plan curent",
       "freeTier": "Plan gratuit",
@@ -940,7 +897,7 @@
       "agentsOver": "{over} peste limită",
       "slotsRemaining": "{slots} slot rămas",
       "slotsRemainingPlural": "{slots} sloturi rămase",
-      "activeAddons": "Add-on-uri active",
+      "activeAddons": "Extra active",
       "expires": "Expiră {date}",
       "extend": "Extinde",
       "extend30Days": "Extinde +30 zile (${price})",
@@ -956,17 +913,17 @@
       "lifetimePrice": "pe viață",
       "lifetimePriceFull": "${price} pe viață",
       "monthlyPrice": "${price} / 30 zile",
-      "unlimitedMessages": "nelimitat",
-      "messagesPerDay": "{count} mesaje/zi",
-      "byokUnlimited": " (BYOK = nelimitat)",
+      "unlimitedMessages": "AI Credits",
+      "messagesPerDay": "{count} AI Credits",
+      "byokUnlimited": "",
       "upgradeSection": "Extinde-ți planul",
-      "upgradeDesc": "Obține mai mulți agenți, mesaje și putere de calcul.",
-      "addonsSection": "Add-on-uri",
+      "upgradeDesc": "Obține mai mulți agenți, AI Credits și putere de calcul.",
+      "addonsSection": "Extra",
       "addonsDesc": "Adaugă capacitate suplimentară pe planul curent.",
-      "accountAddons": "Add-on-uri la nivel de cont",
-      "perAgentAddons": "Add-on-uri per agent",
+      "accountAddons": "Extra la nivel de cont",
+      "perAgentAddons": "Extra per agent",
       "annualBilling": "Facturare anuală",
-      "annualBillingDesc": "15% reducere — toate add-on-urile de abonament",
+      "annualBillingDesc": "15% reducere — extra recurente",
       "monthly": "Lunar",
       "annual": "Anual",
       "monthSuffix": "/ 30 zile",
@@ -985,23 +942,16 @@
       "choosePayment": "Alege metoda de plată",
       "applyToAgent": "Aplică la agent:",
       "noAgentsFound": "Niciun agent găsit. Creează mai întâi un agent.",
-      "payWithCredits": "Plătește cu Credite",
       "payWithSol": "Plătește cu SOL",
       "solDesc": "Plată prin portofel Solana",
       "payWithHatcher": "Plătește cu $HATCHER",
       "hatcherDesc": "Token HATCHER pe Solana",
-      "payWithSkaleUsdc": "Plătește cu USDC pe SKALE",
-      "skaleUsdcDesc": "Decontare rapidă x402 prin portofel EVM",
-      "payWithBaseUsdc": "Plătește cu USDC pe Base",
-      "baseUsdcDesc": "USDC nativ prin portofel EVM",
       "payWithUsdcSolana": "Plătește cu USDC pe Solana",
       "usdcSolanaDesc": "SPL USDC prin portofel Solana",
       "payWithUsdc": "Plătește cu USDC",
       "usdcDesc": "Stablecoin — 1 USDC = $1",
       "payWithCard": "Plătește cu cardul",
       "cardDesc": "Card credit/debit prin Stripe",
-      "creditAvailable": "${balance} disponibil — instant",
-      "creditInsufficient": "Insuficient — ai nevoie de ${need}, ai ${have}",
       "foundingSlots": "{remaining} din {max} sloturi rămase",
       "foundingSoldOut": "Epuizat",
       "oneTimeSuffix": "o singură dată",
@@ -1014,28 +964,42 @@
     },
     "analytics": {
       "eyebrow": "Panou",
-      "heading": "Analytics",
-      "subheading": "Statistici de utilizare la nivel de cont.",
+      "heading": "Usage Analytics",
+      "subheading": "Interacțiuni, hosted usage și AI Credits la nivel de cont.",
       "signInDescription": "Autentifică-te pentru a vedea analytics-ul.",
-      "messageVolume": "Volum mesaje",
+      "interactionVolume": "Volum interacțiuni",
+      "messageVolume": "Volum interacțiuni",
       "last14Days": "Ultimele 14 zile",
+      "last30Days": "Ultimele 30 zile",
       "frameworks": "Frameworks",
       "agentStatus": "Stare agenți",
-      "totalMessages": "Total mesaje per agent",
-      "noMessageData": "Nicio date despre mesaje încă — începe să discuți cu agenții tăi!",
+      "totalMessages": "Interacțiuni per agent",
+      "noMessageData": "Nu există încă date despre interacțiuni — începe să discuți cu agenții tăi!",
       "noAgentsYet": "Niciun agent încă",
       "noAgentsEmpty": "Niciun agent încă. Creează primul tău agent pentru a vedea analytics-ul.",
       "createAgent": "Creează Agent",
       "totalAgents": "Total Agenți",
       "totalAgentsSub": "{active} activi",
-      "messages": "Mesaje",
+      "messages": "Interacțiuni",
       "messagesAllTime": "Toate timpurile",
       "llmCalls": "Apeluri LLM",
       "llmCallsAllTime": "Toate timpurile",
+      "aiCreditsBalance": "AI Credits",
+      "monthlyGrant": "{count} grant lunar",
+      "aiCreditsUsed": "AI Credits folosite",
+      "hostedUsage": "Hosted usage",
+      "hostedUsageSubheading": "LLM-urile hosted, web search, research, extract și crawl consumă AI Credits din cont. BYOK ocolește acest metering.",
+      "remainingBalance": "Sold rămas",
+      "usedLast30": "Folosite în ultimele 30 zile",
+      "usageByKind": "Usage pe tip",
+      "tokensProcessed": "Tokeni procesați",
+      "inputTokens": "Input",
+      "outputTokens": "Output",
+      "noHostedUsageYet": "Nu există încă hosted usage. BYOK nu consumă AI Credits.",
       "last14DaysLabel": "Ultimele 14 zile",
-      "last14DaysSub": "Mesaje utilizatori",
+      "last14DaysSub": "Interacțiuni utilizatori",
       "today": "Astăzi",
-      "noDataYet": "Nicio date despre mesaje încă"
+      "noDataYet": "Nu există încă date despre interacțiuni"
     },
     "team": {
       "eyebrow": "Colaborare",
@@ -1135,12 +1099,12 @@
       "payoutSettings": "Setări plată",
       "payoutMode": "Mod",
       "payoutAddress": "Adresă de plată",
-      "creditsOnly": "Doar credite — fără adresă",
+      "creditsOnly": "Adresă necesară pentru plata cash",
       "changePrefs": "Trebuie să schimbi preferințele de plată?",
       "contactSupport": "Contactează suportul",
       "modeCashOnly": "Doar cash (20%)",
-      "modeCreditsOnly": "Doar credite (40%)",
-      "modeHybrid": "Hibrid (15% cash + 25% credite)"
+      "modeCreditsOnly": "Retras",
+      "modeHybrid": "Retras"
     },
     "settings": {
       "eyebrow": "Cont",
@@ -1172,7 +1136,7 @@
         "walletDisconnect": "Deconectează portofelul",
         "walletNone": "Niciun portofel conectat încă. Portofelul tău Solana se conectează automat prima dată când faci o plată on-chain din pagina de facturare.",
         "referralTitle": "Program de recomandare",
-        "referralDesc": "Invită prieteni la Hatcher. Amândoi primiți {credit} credit când creează primul agent.",
+        "referralDesc": "Invită prieteni la Hatcher. Amândoi primiți {credit} când creează primul agent.",
         "referralCode": "Cod de recomandare",
         "shareLink": "Distribuie link",
         "referred": "Recomandat",
@@ -1272,9 +1236,9 @@
     },
     "quickStats": {
       "totalAgents": "Total Agenți",
-      "dailyMessages": "Mesaje zilnice",
+      "dailyMessages": "AI Credits",
       "unlimited": "∞",
-      "accountWide": "la nivel de cont · BYOK = nelimitat",
+      "accountWide": "account balance",
       "activeNow": "Activi acum",
       "noAgentsRunning": "Niciun agent rulează",
       "agentsOnline": "{count} agent online",
@@ -1361,7 +1325,7 @@
         "unlimited": "nelimitat",
         "enterToSend": "Enter pentru trimitere, Shift+Enter pentru linie nouă",
         "signInToChat": "Autentifică-te pentru a chata cu acest agent.",
-        "limitReached": "Limita zilnică de mesaje a fost atinsă.",
+        "limitReached": "AI Credits epuizate.",
         "upgradeToPro": "Treci la Pro",
         "limitReachedSuffix": "pentru mai multe, sau adaugă propria cheie pentru acces nelimitat.",
         "agentNotRunning": "Agentul nu rulează.",
@@ -1373,7 +1337,7 @@
         "stopRecording": "Oprește înregistrarea",
         "startVoice": "Pornește introducerea vocală",
         "errors": {
-          "rateLimit": "Limita zilnică de mesaje a fost atinsă.",
+          "rateLimit": "AI Credits epuizate.",
           "llmDown": "Serviciul AI este temporar indisponibil. De obicei se rezolvă într-un minut.",
           "timeout": "Agentul a durat prea mult să răspundă.",
           "network": "Conexiune pierdută. Verifică conexiunea la internet.",
@@ -1468,9 +1432,9 @@
         "autoScrollDisabled": "Derulare automată dezactivată",
         "fullLogsGate": {
           "title": "Afișând ultimele {count} rânduri de jurnal",
-          "description": "Acest agent are {total} intrări totale. Deblochează jurnalele complete pentru a derula prin istoricul complet și a exporta fiecare rând.",
-          "descriptionEmpty": "Deblochează jurnalele complete pentru a păstra toate intrările disponibile dincolo de ultimele {count} rânduri.",
-          "unlock": "Deblochează"
+          "description": "Jurnalele complete sunt incluse pe fiecare plan. Reîmprospătează agentul dacă istoricul complet este încă indisponibil.",
+          "descriptionEmpty": "Jurnalele complete sunt incluse pe fiecare plan. Reîmprospătează agentul dacă istoricul complet este încă indisponibil.",
+          "unlock": "Reîmprospătează"
         }
       },
       "integrations": {
@@ -1623,7 +1587,7 @@
         "source": "Sursă",
         "requiresRestart": "Necesită repornire",
         "refresh": "Reîmprospătează",
-        "limitReached": "Limita de plugin-uri atinsă. Upgradează planul sau adaugă un addon de plugin-uri."
+        "limitReached": "Plugin-urile și abilitățile sunt incluse pe fiecare plan."
       },
       "workflows": {
         "new": "Workflow nou",
@@ -1649,7 +1613,7 @@
         "delete": "Șterge",
         "download": "Descarcă",
         "refresh": "Reîmprospătează",
-        "locked": "Managerul de fișiere necesită planul Business sau addon-ul Manager de fișiere.",
+        "locked": "File Manager este inclus pe fiecare plan. Reîmprospătează agentul dacă accesul este încă blocat.",
         "unlock": "Deblochează"
       },
       "workspace": {
@@ -1733,7 +1697,7 @@
     },
     "analytics": {
       "heading": "Analytics agent",
-      "messages": "Mesaje",
+      "messages": "Interacțiuni",
       "daysActive": "Zile active",
       "uptime": "Uptime",
       "status": "Stare",
@@ -1756,7 +1720,7 @@
     "statusPage": {
       "poweredBy": "Alimentat de",
       "uptimeLabel": "uptime 24h",
-      "messages": "Mesaje",
+      "messages": "Interacțiuni",
       "days": "Zile",
       "since": "Din",
       "framework": "framework",
@@ -1806,8 +1770,8 @@
     "configRef": "Referință configurare completă →",
     "docsSuffix": "docs",
     "llmSupport": "Suport LLM",
-    "llmSubheading": "Ambele framework-uri suportă BYOK (Bring Your Own Key) pentru mesaje nelimitate. Pe LLM-ul găzduit, Hatcher rutează prin OpenRouter cu DeepSeek V4 Flash implicit; cotele zilnice depind în continuare de plan.",
-    "byokNote": "* BYOK mereu gratuit — mesaje nelimitate pe orice framework.",
+    "llmSubheading": "Ambele framework-uri suportă BYOK (Bring Your Own Key) pentru utilizare plătită direct la provider. LLM-ul găzduit rutează prin OpenRouter cu DeepSeek V4 Flash implicit și folosește AI Credits în loc de cote zilnice de mesaje.",
+    "byokNote": "* BYOK mereu gratuit — utilizare plătită direct la provider.",
     "byokSetupLink": "Vezi ghidul de configurare BYOK →",
     "decisionGuide": "Ghid rapid de decizie",
     "readyCta": "Gata să deployezi?",
@@ -1844,7 +1808,7 @@
   "token": {
     "liveLabel": "Live pe Solana",
     "heading": "$HATCHER",
-    "subheading": "Tokenul ecosistemului Hatcher. Alimentează abonamentele la planuri, add-on-urile de agenți și guvernanța pe Solana.",
+    "subheading": "Tokenul ecosistemului Hatcher. Alimentează abonamentele la planuri, sloturile extra de agenți și guvernanța pe Solana.",
     "caLabel": "CA:",
     "viewDexscreener": "Vezi pe Dexscreener",
     "viewSolscan": "Vezi pe Solscan",
@@ -1863,7 +1827,7 @@
     "trading": "Tranzacționare",
     "contractLabel": "Contract",
     "platformLabel": "Platformă",
-    "platformValue": "Plan gratuit disponibil acum — tokenul activează planurile plătite și add-on-urile",
+    "platformValue": "Plan gratuit disponibil acum — tokenul activează planurile plătite și extra opțiunile",
     "stayInLoop": "Rămâi la curent",
     "stayInLoopBody": "Tokenul este live și platforma este pregătită. Deployează primul tău agent în câteva minute.",
     "followOnX": "Urmărește pe X"
@@ -1965,312 +1929,6 @@
     "footerNote": "Scurtăturile sunt dezactivate când scrii în câmpuri text. Pe macOS, folosește Cmd în loc de Ctrl."
   },
   "create": {
-    "eyebrow": "Crează agent",
-    "heading": "Creează-ți agentul",
-    "subheading": "Pornește un agent AI gratuit în mai puțin de 2 minute.",
-    "stepsAriaLabel": "Pași de creare",
-    "stepLabels": {
-      "style": "Stil",
-      "category": "Categorie",
-      "template": "Șablon",
-      "setUp": "Configurare",
-      "launch": "Pornire"
-    },
-    "authLoading": "Autentificare...",
-    "authRequired": "Creează-ți agentul",
-    "authRequiredBody": "Conectează-te la cont pentru a crea și implementa agenți AI.",
-    "signIn": "Conectare",
-    "back": "Înapoi",
-    "continue": "Următorul",
-    "step1Heading": "Ce tip de agent dorești?",
-    "step1Subheading": "Fiecare framework are avantaje diferite — alege-l pe cel potrivit.",
-    "step2Heading": "Ce tip de agent?",
-    "step2Subheading": "Alege o categorie — îți vom arăta cele mai bune șabloane",
-    "searchTemplates": "Caută printre 200+ șabloane...",
-    "clearSearch": "Șterge căutarea",
-    "noTemplatesFound": "Niciun șablon găsit pentru \"{query}\"",
-    "clearSearchLink": "Șterge căutarea",
-    "categoryCount": "{count} șabloane",
-    "step3Heading": "Alege un șablon",
-    "step3Subheading": "Alege un șablon — poți personaliza totul la pasul următor",
-    "customAgent": "Agent personalizat",
-    "customAgentDesc": "Pornește de la zero cu propriul tău system prompt",
-    "customOption": "Pornește de la zero",
-    "customOptionDesc": "Control complet asupra fiecărei setări",
-    "step4Heading": "Personalizează-ți agentul",
-    "step4Subheading": "Dă-i un nume agentului și alege cum gândește",
-    "agentNameLabel": "Numele agentului",
-    "agentNamePlaceholder": "ex. AlphaResearcher, TweetLord...",
-    "agentNameHintCount": "{count}/50 de caractere",
-    "agentNameTooShort": "Numele trebuie să aibă cel puțin 3 caractere",
-    "agentNameInvalidChars": "Sunt permise doar litere, cifre, spații, cratime, două puncte, apostrofuri",
-    "descriptionLabel": "Descriere",
-    "descriptionPlaceholder": "Descriere scurtă a funcționalității agentului...",
-    "descriptionHint": "Scurt slogan pentru agentul tău",
-    "platformsHeading": "Unde să funcționeze agentul tău?",
-    "platformsSubheading": "Selectează platformele și adaugă cheile API. Poți adăuga mai multe oricând din Setări.",
-    "noPlatformsNote": "Nicio platformă selectată? Nu-i problemă — adaugă oricând din tab-ul Setări al agentului.",
-    "hideValue": "Ascunde valoarea",
-    "showValue": "Arată valoarea",
-    "llmModelLabel": "Model AI",
-    "llmModelAria": "Selecție model AI",
-    "llmFreeLabel": "Model AI gratuit",
-    "llmFreeTag": "GRATUIT",
-    "llmFreeSubtext": "Alimentat de OpenRouter și DeepSeek V4 Flash — nu necesită cheie API",
-    "llmByokLabel": "Folosește propria cheie AI",
-    "llmByokTag": "mereu gratuit",
-    "llmByokSubtext": "Conectează propria cheie API OpenAI, Anthropic sau altă platformă",
-    "byokProviderLabel": "Furnizor",
-    "byokModelLabel": "Model",
-    "byokModelPlaceholder": "identificator model...",
-    "byokBackToList": "Înapoi la lista de modele",
-    "byokSelectModel": "Selectează un model...",
-    "byokCustomModel": "Model personalizat...",
-    "byokApiKeyLabel": "Cheie API",
-    "byokApiKeyEncrypted": "criptată la stocare",
-    "byokBaseUrlLabel": "URL de bază",
-    "skillsHeading": "Abilități agent",
-    "skillsSubheading": "Alege ce poate face agentul tău",
-    "toolsHeading": "Instrumente agent",
-    "toolsSubheading": "Alege ce poate face agentul tău",
-    "pluginsHeading": "Plugin-uri",
-    "pluginsSubheading": "Alege ce poate face agentul tău",
-    "capabilitiesHeading": "Capacități",
-    "capabilitiesSubheading": "Alege ce poate face agentul tău",
-    "templateSkillsHeading": "Inclus în acest șablon",
-    "templateSkillsSubheading": "Aceste abilități ClawHub se instalează automat la prima pornire.",
-    "systemPromptLabel": "System Prompt",
-    "systemPromptCustomNote": "Instrucțiunile tale personalizate vor înlocui valoarea implicită a șablonului",
-    "systemPromptDefaultNote": "Personalitatea agentului este preconfigurată. Personalizează dacă dorești să o schimbi.",
-    "systemPromptCustomize": "Personalizează",
-    "systemPromptUseDefault": "Folosește șablonul implicit",
-    "systemPromptPlaceholder": "Scrie aici system prompt-ul personalizat. Înlocuiește complet valoarea implicită.",
-    "systemPromptHint": "Definește personalitatea, capacitățile și regulile agentului",
-    "systemPromptCount": "{count}/8000",
-    "systemPromptWarning": "Adaugă un system prompt pentru rezultate mai bune",
-    "moreOptionsLabel": "Mai multe opțiuni",
-    "moreOptionsHints": {
-      "openclaw": "Căutare, voce, sesiuni",
-      "hermes": "Personalitate, memorie, aprobare"
-    },
-    "sessionScopeLabel": "Domeniu sesiune",
-    "sessionScopeHint": "Cum se partajează contextul conversației între utilizatori",
-    "sessionScopePerUser": "Per utilizator",
-    "sessionScopeGlobal": "Global",
-    "webSearchLabel": "Activează căutarea web",
-    "webSearchHint": "Permite agentului să caute informații în timp real",
-    "searchProviderLabel": "Furnizor căutare",
-    "searchProviderHint": "Ce API de căutare să folosești",
-    "ttsLabel": "Activează vocea (TTS)",
-    "ttsHint": "Ieșire text-în-voce pentru răspunsuri vocale",
-    "ttsProviderLabel": "Furnizor TTS",
-    "ttsProviderHint": "Motor de sinteză vocală",
-    "hermesPersonalityLabel": "Personalitate",
-    "hermesPersonalityHint": "Ton și stil de conversație",
-    "hermesPersonalityDefault": "Implicit",
-    "hermesPersonalityHelpful": "Util",
-    "hermesPersonalityTechnical": "Tehnic",
-    "hermesPersonalityCreative": "Creativ",
-    "hermesPersonalityConcise": "Concis",
-    "memoryLabel": "Activează memoria",
-    "memoryHint": "Păstrează contextul între conversații",
-    "approvalModeLabel": "Mod aprobare",
-    "approvalModeHint": "Cum sunt autorizate acțiunile înainte de execuție",
-    "approvalModeAuto": "Automat",
-    "approvalModeAsk": "Întreabă înainte de acțiuni",
-    "approvalModeManual": "Manual",
-    "databaseLabel": "Bază de date",
-    "databaseHint": "Backend stocare pentru starea și memoria agentului",
-    "imageGenLabel": "Activează generarea de imagini",
-    "imageGenHint": "Permite agentului să genereze imagini",
-    "voiceLabel": "Activează vocea",
-    "voiceHint": "Capacități voce-în-text și text-în-voce",
-    "localFirstLabel": "Mod Local-First",
-    "localFirstHint": "Procesează datele local înainte de sincronizare",
-    "step5Heading": "Gata de pornire?",
-    "step5Subheading": "Verifică configurația înainte de pornire",
-    "summaryAgentType": "Tip agent",
-    "summaryTemplate": "Șablon",
-    "summaryTemplateCustom": "Personalizat",
-    "summaryAiModel": "Model AI",
-    "summaryDescription": "Descriere",
-    "summaryPlatforms": "Platforme",
-    "summaryPersonality": "Personalitate",
-    "summaryPersonalityDefault": "Implicit șablon",
-    "summaryPersonalityCustom": "Instrucțiuni personalizate",
-    "summaryCost": "Cost",
-    "summaryCostFree": "$0.00 — gratuit",
-    "summaryCostByok": "$0.00 — cheie proprie",
-    "summaryLaunchIncludes": "După lansare",
-    "summaryLaunchIncludesValue": "Dashboard, chat, mail, notificări",
-    "summaryFrameworkLabels": {
-      "openclaw": "Asistent multi-abilitate",
-      "hermes": "Agent autonom"
-    },
-    "testChatLabel": "Testează agentul",
-    "testChatSubtext": "Previzualizează cum va răspunde agentul",
-    "testChatPreviewLabel": "Previzualizare chat",
-    "testChatSimulated": "Previzualizare simulată. Implementează agentul pentru conversații reale.",
-    "testChatEmpty": "Trimite un mesaj pentru a previzualiza agentul",
-    "testChatEmptyHint": "Încearcă \"Salut\" sau \"Ce poți face?\"",
-    "testChatPlaceholder": "Scrie un mesaj...",
-    "launchedHeading": "Agentul tău este live!",
-    "launchedSubtext": "Redirecționare către dashboard-ul agentului...",
-    "launchCtaLabel": "Pornește agentul",
-    "launchCtaCreating": "Se creează agentul...",
-    "launchCtaCreated": "Agent creat cu succes",
-    "launchCta": "Pornește agentul meu!",
-    "launching": "Se eclozionează...",
-    "launched": "Eclozionat!",
-    "frameworkFeatures": {
-      "openclaw": {
-        "desc": "Asistent AI versatil cu mii de abilități din comunitate și mesagerie multi-canal.",
-        "f1": "Mii de abilități",
-        "f2": "Navigare web",
-        "f3": "Sarcini programate"
-      },
-      "hermes": {
-        "desc": "Agent AI inteligent care memorează contextul din conversații și învață în timp.",
-        "f1": "Memorie pe termen lung",
-        "f2": "40+ instrumente integrate",
-        "f3": "Auto-îmbunătățire"
-      }
-    },
-    "skills": {
-      "webSearch": {
-        "name": "Căutare web",
-        "desc": "Caută informații în timp real"
-      },
-      "calculator": {
-        "name": "Calculator",
-        "desc": "Matematică și calcule"
-      },
-      "weather": {
-        "name": "Vreme",
-        "desc": "Prognoze meteo"
-      },
-      "codeInterpreter": {
-        "name": "Rulare cod",
-        "desc": "Execută fragmente de cod"
-      },
-      "fileManager": {
-        "name": "Manager fișiere",
-        "desc": "Citește și scrie fișiere"
-      },
-      "imageGen": {
-        "name": "Generare imagini",
-        "desc": "Generează imagini din text"
-      }
-    },
-    "tools": {
-      "webSearch": {
-        "name": "Căutare web",
-        "desc": "Caută informații pe internet"
-      },
-      "calculator": {
-        "name": "Calculator",
-        "desc": "Calcule matematice"
-      },
-      "codeExecution": {
-        "name": "Rulare cod",
-        "desc": "Execută fragmente de cod"
-      },
-      "fileOperations": {
-        "name": "Operațiuni fișiere",
-        "desc": "Citește și scrie fișiere"
-      },
-      "memory": {
-        "name": "Memorie",
-        "desc": "Ține minte conversații și fapte"
-      },
-      "summarize": {
-        "name": "Rezumat",
-        "desc": "Rezumă texte lungi"
-      },
-      "translate": {
-        "name": "Traducător",
-        "desc": "Traduce între limbi"
-      },
-      "weather": {
-        "name": "Vreme",
-        "desc": "Prognoze meteo"
-      }
-    },
-    "plugins": {
-      "database": {
-        "name": "Bază de date",
-        "desc": "Acces bază de date SQL"
-      },
-      "imageGen": {
-        "name": "Generare imagini",
-        "desc": "Generează imagini"
-      },
-      "video": {
-        "name": "Video",
-        "desc": "Procesare video"
-      },
-      "tts": {
-        "name": "Text-în-voce",
-        "desc": "Ieșire vocală"
-      },
-      "nodeRuntime": {
-        "name": "Runtime Node",
-        "desc": "Operațiuni pe server"
-      },
-      "bootstrap": {
-        "name": "Bootstrap",
-        "desc": "Utilități de bază"
-      }
-    },
-    "capabilities": {
-      "chat": {
-        "name": "Chat",
-        "desc": "Conversație principală"
-      },
-      "defi": {
-        "name": "DeFi",
-        "desc": "Interacțiuni protocoale DeFi"
-      },
-      "social": {
-        "name": "Social",
-        "desc": "Integrare rețele sociale"
-      },
-      "analysis": {
-        "name": "Analiză",
-        "desc": "Analiza datelor"
-      },
-      "privacy": {
-        "name": "Confidențialitate",
-        "desc": "Instrumente de confidențialitate"
-      },
-      "memes": {
-        "name": "Meme-uri",
-        "desc": "Generare meme-uri"
-      }
-    },
-    "platforms": {
-      "telegram": {
-        "desc": "Implementează ca bot Telegram",
-        "helperField": "Telegram → @BotFather → /newbot → copiază token-ul"
-      },
-      "discord": {
-        "desc": "Implementează ca bot Discord",
-        "helperField": "Portal dezvoltatori Discord → Aplicație nouă → Bot → Copiază token"
-      },
-      "whatsapp": {
-        "desc": "Conectare prin cod QR",
-        "note": "Asocierea QR va fi disponibilă după implementare"
-      },
-      "slack": {
-        "desc": "Implementează în spațiul Slack",
-        "helperField": "Slack API → Crează aplicație → OAuth și permisiuni → Bot Token"
-      },
-      "twitter": {
-        "desc": "Postează, răspunde și interacționează pe X"
-      }
-    },
-    "llmFreeSummary": "Model AI găzduit (OpenRouter)",
-    "llmByokSummary": "Cheia ta: {provider}{model}",
     "errorHeading": "Eroare la creare",
     "errorBody": "A apărut o eroare la configurarea agentului. Progresul tău nu a fost pierdut.",
     "errorIdLabel": "ID eroare:",
@@ -2324,16 +1982,16 @@
   "affiliate": {
     "eyebrow": "Program de afiliere",
     "heading": "Câștigă din fiecare utilizator pe care îl aduci la Hatcher.",
-    "subheading": "Comisioane recurente de până la 40% pentru fiecare utilizator plătitor recomandat. Cash în portofelul tău, credite pentru propriii agenți sau o împărțire hibridă — tu decizi. Atribuirea este bazată pe link și rămâne pe viața contului recomandat.",
+    "subheading": "Câștigi 20% comision cash recurent pentru fiecare utilizator plătitor recomandat. Atribuirea este bazată pe link și rămâne pe viața contului recomandat.",
     "applyNowCta": "Aplică acum",
     "howItWorksLink": "Cum funcționează",
-    "pickYourPayout": "Alege-ți modalitatea de plată",
-    "threeWays": "Trei moduri de a fi plătit.",
-    "threeWaysSubheading": "Aceleași venituri eligibile, împărțire diferită. Alege modul care se potrivește cu cum vrei să profiți de pe urma programului — poți schimba mai târziu contactând suportul.",
+    "pickYourPayout": "Structura comisionului",
+    "threeWays": "Comisioane cash, ledger simplu.",
+    "threeWaysSubheading": "Câștigurile de afiliat sunt doar cash: 20% recurent din veniturile eligibile, cu o perioadă de așteptare de 30 de zile înainte să devină plătibile.",
     "popularLabel": "Popular",
     "foundingBonusLabel": "Bonus Founding Member",
     "foundingBonusHeading": "Recomandă un Founding Member → bonus fix de $20 cash.",
-    "foundingBonusBody": "Planul lifetime de $99 plătește un bonus fix de $20 afiliantului care a recomandat — pe lângă orice câștigă din achizițiile ulterioare de add-on sau agent ale acelui utilizator. Plătit în cash indiferent de modul implicit de plată.",
+    "foundingBonusBody": "Planul lifetime de $99 plătește un bonus fix de $20 afiliantului care a recomandat — pe lângă orice câștigă din achizițiile ulterioare de extra capacitate sau agent ale acelui utilizator. Plătit în cash indiferent de modul implicit de plată.",
     "applyLabel": "Aplică",
     "howItWorksLabel": "Cum funcționează",
     "fourSteps": "Patru pași, zero surprize.",
@@ -2396,7 +2054,7 @@
       "validateUrlInvalid": "Trebuie să fie un URL valid",
       "validatePitchMin": "Pitch-ul trebuie să aibă cel puțin 50 de caractere",
       "validatePitchMax": "Pitch-ul trebuie să aibă cel mult 2000 de caractere",
-      "validateAddressRequired": "Obligatoriu pentru CASH_ONLY și HYBRID",
+      "validateAddressRequired": "Obligatoriu pentru plățile cash de afiliat",
       "validateAddressFormat": "Trebuie să fie o adresă Solana base58 validă (32–44 caractere)",
       "slugTooShort": "Prea scurt — minim 3 caractere",
       "slugTooLong": "Prea lung — maximum 30 de caractere",
@@ -2473,23 +2131,23 @@
     "tiers": {
       "free": {
         "name": "Gratuit",
-        "description": "1 agent, 20 mesaje/zi, 50 MB stocare"
+        "description": "1 agent, 500 AI Credits/lună, 2 GB spațiu de lucru"
       },
       "starter": {
         "name": "Starter",
-        "description": "1 agent, 50 mesaje/zi, 150 MB stocare"
+        "description": "1 agent, 3.000 AI Credits/lună, 10 GB spațiu de lucru"
       },
       "pro": {
         "name": "Pro",
-        "description": "3 agenți, 100 mesaje/zi, 500 MB stocare"
+        "description": "3 agenți, 15.000 AI Credits/lună, 25 GB spațiu de lucru"
       },
       "business": {
         "name": "Business",
-        "description": "10 agenți, 300 mesaje/zi, 1 GB stocare, mereu activ"
+        "description": "5 agenți, 40.000 AI Credits/lună, 50 GB spațiu de lucru, mereu activ"
       },
       "founding_member": {
         "name": "Founding Member",
-        "description": "10 agenți, 300 mesaje/zi, 2 GB stocare, acces pe viață"
+        "description": "5 agenți, 25.000 AI Credits/lună, 40 GB spațiu de lucru, acces pe viață"
       }
     },
     "addons": {
@@ -2509,45 +2167,21 @@
         "name": "+10 Agenți",
         "description": "10 sloturi suplimentare de agent"
       },
-      "messages_plus20": {
-        "name": "+20 msg/zi",
-        "description": "20 mesaje suplimentare pe zi"
+      "ai_credits_5000": {
+        "name": "5.000 AI Credits",
+        "description": "Top-up one-time pentru modele găzduite și web search"
       },
-      "messages_plus50": {
-        "name": "+50 msg/zi",
-        "description": "50 mesaje suplimentare pe zi"
+      "ai_credits_10000": {
+        "name": "10.000 AI Credits",
+        "description": "Top-up one-time pentru rulări mai grele și research"
       },
-      "messages_plus100": {
-        "name": "+100 msg/zi",
-        "description": "100 mesaje suplimentare pe zi"
+      "ai_credits_25000": {
+        "name": "25.000 AI Credits",
+        "description": "Top-up one-time pentru workload-uri mai mari de agenți"
       },
-      "messages_plus200": {
-        "name": "+200 msg/zi",
-        "description": "200 mesaje suplimentare pe zi"
-      },
-      "searches_plus25": {
-        "name": "+25 căutări/zi",
-        "description": "25 căutări web suplimentare pe zi"
-      },
-      "searches_plus50": {
-        "name": "+50 căutări/zi",
-        "description": "50 căutări web suplimentare pe zi"
-      },
-      "always_on": {
-        "name": "Always On",
-        "description": "Menține agentul activ 24/7"
-      },
-      "file_manager": {
-        "name": "File Manager",
-        "description": "Navighează, editează și descarcă fișierele din spațiul de lucru"
-      },
-      "full_logs": {
-        "name": "Full Logs",
-        "description": "Deblochează vizualizatorul complet de jurnale pentru acest agent"
-      },
-      "plugins_plus10": {
-        "name": "+10 Plugins",
-        "description": "10 sloturi suplimentare de plugin+abilitate pentru acest agent"
+      "ai_credits_50000": {
+        "name": "50.000 AI Credits",
+        "description": "Top-up one-time pentru volum mare de utilizare găzduită"
       }
     },
     "frameworks": {
@@ -2760,7 +2394,7 @@
       "boxLabel": "Gata",
       "headline": "Lansează primul tău agent.",
       "ctaPrimary": "Eclozează agent",
-      "ctaGhost": "Răsfoiește template-uri",
+      "ctaGhost": "Vezi agenții",
       "metaFrameworks": "OpenClaw + Hermes",
       "metaNoCard": "fără card"
     }

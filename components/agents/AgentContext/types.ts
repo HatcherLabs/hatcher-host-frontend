@@ -3,7 +3,7 @@ import type { AgentFramework } from '@hatcher/shared';
 
 // ─── Types ───────────────────────────────────────────────────
 
-export type Tab = 'overview' | 'config' | 'integrations' | 'skills' | 'plugins' | 'files' | 'workspace' | 'logs' | 'terminal' | 'memory' | 'sessions' | 'knowledge' | 'addons' | 'schedules' | 'workflows' | 'chat' | 'mail' | 'stats' | 'wallet';
+export type Tab = 'overview' | 'config' | 'integrations' | 'skills' | 'plugins' | 'files' | 'logs' | 'terminal' | 'memory' | 'sessions' | 'knowledge' | 'schedules' | 'workflows' | 'chat' | 'mail' | 'stats' | 'wallet';
 
 export interface Message {
   id: string;
@@ -99,12 +99,6 @@ export interface AgentContextValue {
   setChatError: (error: string | null) => void;
   chatErrorType: 'timeout' | 'ratelimit' | 'network' | 'llm_down' | 'generic' | null;
   setChatErrorType: (type: 'timeout' | 'ratelimit' | 'network' | 'llm_down' | 'generic' | null) => void;
-  msgCount: number;
-  hasUnlimitedChat: boolean;
-  isByok: boolean;
-  msgLimit: number;
-  remaining: number | null;
-  isLimitReached: boolean;
   bottomRef: React.RefObject<HTMLDivElement | null>;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
   sendMessage: (overrideText?: string) => Promise<void>;

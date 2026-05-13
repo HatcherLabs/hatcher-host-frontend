@@ -14,7 +14,7 @@ import type { UserTierKey, AddonKey } from '@hatcher/shared';
 import { usePaymentDrivers } from '@/lib/payment-drivers';
 import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
 import { formatFeatureKey } from '@/lib/feature-labels';
-import { payWithBaseX402, payWithSkaleX402, payWithSolanaX402 } from '@/lib/skale-x402-client';
+import { payWithSolanaX402 } from '@/lib/solana-x402-client';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -49,6 +49,109 @@ const itemVariants = {
 
 const cardClass = 'card-solid';
 const displayFont = { fontFamily: 'var(--font-display), system-ui, sans-serif' };
+const AI_CREDITS_BY_TIER: Record<UserTierKey, number> = {
+  free: 500,
+  starter: 3000,
+  pro: 15000,
+  business: 40000,
+  founding_member: 25000,
+};
+
+const TIER_RESOURCE_OVERRIDES: Record<UserTierKey, { includedAgents: number; cpuLimit: number; memoryMb: number; storageMb: number; autoSleep: boolean; autoSleepMinutes: number; fileManager: boolean; fullLogs: boolean }> = {
+  free: { includedAgents: 1, cpuLimit: 1, memoryMb: 1024, storageMb: 2048, autoSleep: true, autoSleepMinutes: 720, fileManager: true, fullLogs: true },
+  starter: { includedAgents: 1, cpuLimit: 1, memoryMb: 1536, storageMb: 10240, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
+  pro: { includedAgents: 3, cpuLimit: 1.5, memoryMb: 2048, storageMb: 25600, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
+  business: { includedAgents: 5, cpuLimit: 2, memoryMb: 3072, storageMb: 51200, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
+  founding_member: { includedAgents: 5, cpuLimit: 2, memoryMb: 3072, storageMb: 40960, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
+};
+
+type RetiredAddonKey =
+  | 'addon.always_on'
+  | 'addon.messages.20'
+  | 'addon.messages.50'
+  | 'addon.messages.100'
+  | 'addon.messages.200'
+  | 'addon.searches.25'
+  | 'addon.searches.50'
+  | 'addon.file_manager'
+  | 'addon.full_logs'
+  | 'addon.extra_plugins';
+
+type BillingAddonKey = Exclude<AddonKey, RetiredAddonKey>
+  | 'addon.ai_credits.5000'
+  | 'addon.ai_credits.10000'
+  | 'addon.ai_credits.25000'
+  | 'addon.ai_credits.50000';
+
+type BillingAddon = {
+  key: BillingAddonKey;
+  name: string;
+  description: string;
+  usdPrice: number;
+  type: 'subscription' | 'one_time';
+  perAgent: boolean;
+  extraAgents?: number;
+  aiCredits?: number;
+};
+
+const AI_CREDIT_ADDONS: BillingAddon[] = [
+  {
+    key: 'addon.ai_credits.5000',
+    name: '5,000 AI Credits',
+    description: 'One-time top-up for hosted models and web search.',
+    usdPrice: 7,
+    type: 'one_time',
+    perAgent: false,
+    aiCredits: 5000,
+  },
+  {
+    key: 'addon.ai_credits.10000',
+    name: '10,000 AI Credits',
+    description: 'One-time top-up for heavier model runs and research.',
+    usdPrice: 13,
+    type: 'one_time',
+    perAgent: false,
+    aiCredits: 10000,
+  },
+  {
+    key: 'addon.ai_credits.25000',
+    name: '25,000 AI Credits',
+    description: 'One-time top-up for larger agent workloads.',
+    usdPrice: 30,
+    type: 'one_time',
+    perAgent: false,
+    aiCredits: 25000,
+  },
+  {
+    key: 'addon.ai_credits.50000',
+    name: '50,000 AI Credits',
+    description: 'One-time top-up for high-volume hosted usage.',
+    usdPrice: 60,
+    type: 'one_time',
+    perAgent: false,
+    aiCredits: 50000,
+  },
+];
+
+const VISIBLE_ADDONS: BillingAddon[] = [
+  ...(ADDONS as unknown as BillingAddon[]).filter(
+    (addon) => {
+      const addonKey = addon.key as string;
+      return !addonKey.startsWith('addon.messages.')
+        && !addonKey.startsWith('addon.searches.')
+        && addonKey !== 'addon.always_on'
+        && addonKey !== 'addon.file_manager'
+        && addonKey !== 'addon.full_logs'
+        && addonKey !== 'addon.extra_plugins';
+    },
+  ),
+  ...AI_CREDIT_ADDONS,
+];
+
+function findBillingAddon(addonKey: string | undefined): BillingAddon | undefined {
+  if (!addonKey) return undefined;
+  return VISIBLE_ADDONS.find((addon) => addon.key === addonKey);
+}
 
 /* ── Helpers ─────────────────────────────────────────────── */
 function StatusBadge({ status }: { status: Payment['status'] }) {
@@ -77,11 +180,7 @@ interface PaymentModalProps {
   onPayWithSOL: () => void;
   onPayWithHATCHER: () => void;
   onPayWithUSDC: () => void;
-  onPayWithSkaleUSDC: () => void;
-  onPayWithBaseUSDC: () => void;
   onPayWithCard: () => void;
-  onPayWithCredits?: () => void;
-  creditBalance: number;
   loading: boolean;
   requiresAgent?: boolean;
   agents?: Array<{ id: string; name: string }>;
@@ -89,11 +188,10 @@ interface PaymentModalProps {
   onSelectAgent?: (agentId: string) => void;
 }
 
-function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithHATCHER, onPayWithUSDC, onPayWithSkaleUSDC, onPayWithBaseUSDC, onPayWithCard, onPayWithCredits, creditBalance, loading, requiresAgent, agents, selectedAgentId, onSelectAgent }: PaymentModalProps) {
+function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPayWithHATCHER, onPayWithUSDC, onPayWithCard, loading, requiresAgent, agents, selectedAgentId, onSelectAgent }: PaymentModalProps) {
   const t = useTranslations('dashboard.billing');
   const tc = useTranslations('dashboard.common');
   if (!isOpen) return null;
-  const hasEnoughCredits = creditBalance >= price && price > 0;
   const needsAgentSelection = requiresAgent && !selectedAgentId;
   return (
     <AnimatePresence>
@@ -123,7 +221,7 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
               {title} — <span className="font-bold text-[var(--text-primary)]">${price}</span>
             </p>
 
-            {/* Agent selector for per-agent addons */}
+            {/* Agent selector for future scoped addons */}
             {requiresAgent && (
               <div className="mb-4">
                 <label className="block text-xs text-[var(--text-muted)] mb-2">{t('applyToAgent')}</label>
@@ -145,38 +243,6 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
                   )}
                 </div>
               </div>
-            )}
-
-            {/* Pay with Credits — always shown when the handler is wired,
-                disabled if balance is short. Users should see the credit
-                option exists even when they can't yet afford it. */}
-            {onPayWithCredits && price > 0 && (
-              <button
-                onClick={onPayWithCredits}
-                disabled={loading || needsAgentSelection || !hasEnoughCredits}
-                className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border transition-all ${
-                  hasEnoughCredits
-                    ? 'border-green-500/30 hover:border-green-400/50 hover:bg-green-500/[0.05]'
-                    : 'border-[var(--border-default)] opacity-60 cursor-not-allowed'
-                } disabled:opacity-40`}
-              >
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                  hasEnoughCredits
-                    ? 'bg-gradient-to-br from-green-500 to-emerald-600'
-                    : 'bg-[var(--bg-elevated)] border border-[var(--border-default)]'
-                }`}>
-                  <span className={`font-bold text-sm ${hasEnoughCredits ? 'text-white' : 'text-[var(--text-muted)]'}`}>$</span>
-                </div>
-                <div className="text-left flex-1">
-                  <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithCredits')}</p>
-                  <p className="text-[11px] text-[var(--text-muted)]">
-                    {hasEnoughCredits
-                      ? t('creditAvailable').replace('{balance}', creditBalance.toFixed(2))
-                      : t('creditInsufficient').replace('{need}', price.toFixed(2)).replace('{have}', creditBalance.toFixed(2))}
-                  </p>
-                </div>
-                {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
-              </button>
             )}
 
             {/* Pay with SOL */}
@@ -207,38 +273,6 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
               <div className="text-left">
                 <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithHatcher')}</p>
                 <p className="text-[11px] text-[var(--text-muted)]">{t('hatcherDesc')}</p>
-              </div>
-              {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
-            </button>
-
-            {/* Pay with USDC */}
-            <button
-              onClick={onPayWithSkaleUSDC}
-              disabled={loading || needsAgentSelection}
-              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#2775CA]/40 hover:bg-[#2775CA]/[0.05] transition-all disabled:opacity-40"
-            >
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#2775CA] to-[#1E5AA0] flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-bold text-[10px]">USDC</span>
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithSkaleUsdc')}</p>
-                <p className="text-[11px] text-[var(--text-muted)]">{t('skaleUsdcDesc')}</p>
-              </div>
-              {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
-            </button>
-
-            {/* Pay with Base USDC */}
-            <button
-              onClick={onPayWithBaseUSDC}
-              disabled={loading || needsAgentSelection}
-              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border border-[var(--border-default)] hover:border-[#0052FF]/40 hover:bg-[#0052FF]/[0.05] transition-all disabled:opacity-40"
-            >
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#0052FF] to-[#2775CA] flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-bold text-[10px]">USDC</span>
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithBaseUsdc')}</p>
-                <p className="text-[11px] text-[var(--text-muted)]">{t('baseUsdcDesc')}</p>
               </div>
               {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
             </button>
@@ -286,11 +320,12 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
 interface AccountFeatures {
   tier: string;  // tier key string (e.g. 'free', 'starter', 'pro', 'business')
   tierConfig?: typeof TIERS['free'];  // full tier config object (optional)
-  activeAddons: Array<{ id: string; key: AddonKey; name: string; expiresAt: string | null; agentId: string | null; agentName: string | null; type: string; perAgent: boolean; extraAgents?: number }>;
+  activeAddons: Array<{ id: string; key: string; name: string; expiresAt: string | null; agentId: string | null; agentName: string | null; type: string; perAgent: boolean; extraAgents?: number }>;
   agentLimit: number;
   agentCount: number;
   subscriptionExpiresAt?: string | null;
   hatchCredits?: number;
+  aiCredits?: { balance: number; monthlyGrant: number; tier: string };
 }
 
 /* ── Page ─────────────────────────────────────────────────── */
@@ -317,14 +352,14 @@ export default function BillingPage() {
   const [subscribing, setSubscribing] = useState<string | null>(null);
   const [purchasingAddon, setPurchasingAddon] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
-  const [creditBalance, setCreditBalance] = useState(0);
+  const [aiCreditBalance, setAiCreditBalance] = useState(0);
   // Cancel flow removed — all tiers are one-time purchases now, no
   // recurring subscription to cancel. Access simply expires at
   // `agentFeature.expiresAt`. Users who want early downgrade can wait
   // out the expiry or delete the account via Settings.
   const [openingPortal, setOpeningPortal] = useState(false);
-  const [creditHistory, setCreditHistory] = useState<Array<{
-    id: string; amount: number; balance: number; type: string; description: string | null; createdAt: string;
+  const [aiCreditHistory, setAiCreditHistory] = useState<Array<{
+    id: string; kind: string; provider: string; model: string | null; credits: number; providerCostUsd: string | number; createdAt: string;
   }>>([]);
   const [userAgents, setUserAgents] = useState<Array<{ id: string; name: string }>>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
@@ -346,7 +381,7 @@ export default function BillingPage() {
   // Monthly / Annual billing toggle. Annual = 12 months × 85% (15% off).
   // The backend honors this on both /features/subscribe and
   // /features/addon (only for subscription-type addons — one-time
-  // addons like File Manager ignore it).
+  // AI Credit packs ignore it).
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
   const annualDiscountFactor = 0.85; // 15% off
   // Convert a monthly USD price into the currently-selected billing period.
@@ -360,7 +395,7 @@ export default function BillingPage() {
     isOpen: boolean;
     type: 'subscription' | 'addon';
     tierKey?: UserTierKey;
-    addonKey?: AddonKey;
+    addonKey?: BillingAddonKey;
     title: string;
     price: number;
   }>({ isOpen: false, type: 'subscription', title: '', price: 0 });
@@ -385,6 +420,29 @@ export default function BillingPage() {
     setError(msg);
   };
 
+  const logCryptoPaymentIntent = (
+    rail: 'sol' | 'hatch' | 'usdc',
+    flow: 'tier' | 'addon',
+    targetKey: string,
+    billingPeriod: 'monthly' | 'annual',
+    amountUsd: number,
+    agentId?: string,
+    stage: 'clicked' | 'wallet_confirmed' = 'clicked',
+    txSignature?: string,
+  ): void => {
+    void api.logCryptoPaymentIntent({
+      rail,
+      flow,
+      targetKey,
+      billingPeriod,
+      amountUsd,
+      agentId,
+      source: 'billing_page',
+      stage,
+      txSignature,
+    }).catch(() => {});
+  };
+
   // Handle Stripe redirect success/cancel
   useEffect(() => {
     if (searchParams?.get('success') === 'true') {
@@ -405,16 +463,16 @@ export default function BillingPage() {
   const loadAccountData = useCallback(async () => {
     const [acctRes, balRes, payRes, histRes, catalogRes, agentsRes] = await Promise.all([
       api.getAccountFeatures(),
-      api.getCreditBalance(),
+      api.getAiCreditBalance(),
       api.getPayments(),
-      api.getCreditHistory(10),
+      api.getAiCreditHistory(10),
       api.getTiersCatalog(),
       api.getMyAgents(),
     ]);
     if (acctRes.success) setAccountData(acctRes.data as unknown as AccountFeatures);
-    if (balRes.success) setCreditBalance(balRes.data.balance);
+    if (balRes.success) setAiCreditBalance(balRes.data.balance);
     if (payRes.success) setPayments(payRes.data.payments);
-    if (histRes.success) setCreditHistory(histRes.data.transactions);
+    if (histRes.success) setAiCreditHistory(histRes.data.usage);
     if (catalogRes.success) setFoundingInfo(catalogRes.data.founding);
     if (agentsRes.success && agentsRes.data) {
       const agents = (agentsRes.data as unknown as Array<{ id: string; name: string }>);
@@ -430,15 +488,15 @@ export default function BillingPage() {
     Promise.all([
       api.getAccountFeatures(),
       api.getPayments(),
-      api.getCreditBalance(),
-      api.getCreditHistory(10),
+      api.getAiCreditBalance(),
+      api.getAiCreditHistory(10),
       api.getMyAgents(),
       api.getTiersCatalog(),
     ]).then(([acctRes, payRes, balRes, histRes, agentsRes, catalogRes]) => {
       if (acctRes.success) setAccountData(acctRes.data as unknown as AccountFeatures);
       if (payRes.success) setPayments(payRes.data.payments);
-      if (balRes.success) setCreditBalance(balRes.data.balance);
-      if (histRes.success) setCreditHistory(histRes.data.transactions);
+      if (balRes.success) setAiCreditBalance(balRes.data.balance);
+      if (histRes.success) setAiCreditHistory(histRes.data.usage);
       if (agentsRes.success && agentsRes.data) {
         const agents = (agentsRes.data as unknown as Array<{ id: string; name: string }>);
         setUserAgents(agents.map(a => ({ id: a.id, name: a.name })));
@@ -468,13 +526,13 @@ export default function BillingPage() {
   };
 
   const openAddonModal = (
-    addonKey: AddonKey,
+    addonKey: BillingAddonKey,
     opts: { presetAgentId?: string | null; mode?: 'buy' | 'renew' } = {},
   ) => {
-    const addon = ADDONS.find(a => a.key === addonKey);
+    const addon = findBillingAddon(addonKey);
     setSelectedAgentId(opts.presetAgentId ?? null);
     // Subscription-type addons honor the monthly/annual toggle.
-    // one_time addons (File Manager) always charge flat price.
+    // one_time addons always charge flat price.
     const isSubscription = addon?.type === 'subscription';
     const price = computePrice(addon?.usdPrice ?? 0, isSubscription);
     setPaymentModal({
@@ -511,14 +569,16 @@ export default function BillingPage() {
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
+      logCryptoPaymentIntent('sol', 'tier', tierKey, period, price);
       const txSignature = await driveSol(price, `Subscribe to ${tierConfig.name}${period === 'annual' ? ' (annual)' : ''}`);
+      logCryptoPaymentIntent('sol', 'tier', tierKey, period, price, undefined, 'wallet_confirmed', txSignature);
       const res = await api.subscribe(tierKey, txSignature, 'sol', period);
       if (res.success) {
         await loadAccountData();
-        const credit = res.data?.proratedCredit ?? 0;
+        const credit = res.data?.proratedAiCredits ?? 0;
         showSuccess(
           credit > 0
-            ? `Subscribed to ${tierConfig.name}! $${credit.toFixed(2)} credit added for your unused days.`
+            ? `Subscribed to ${tierConfig.name}! ${credit.toLocaleString()} AI Credits added for your unused days.`
             : `Subscribed to ${tierConfig.name}!`,
         );
       } else {
@@ -544,13 +604,15 @@ export default function BillingPage() {
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
+      logCryptoPaymentIntent('hatch', 'tier', tierKey, period, price);
       const txSignature = await driveHatch(price, `Subscribe to ${tierConfig.name}${period === 'annual' ? ' (annual)' : ''}`);
+      logCryptoPaymentIntent('hatch', 'tier', tierKey, period, price, undefined, 'wallet_confirmed', txSignature);
       const res = await api.subscribe(tierKey, txSignature, 'hatch', period);
       if (res.success) {
         await loadAccountData();
         showSuccess(
-          (res.data?.proratedCredit ?? 0) > 0
-            ? `Subscribed to ${tierConfig.name} with $HATCHER! $${(res.data!.proratedCredit).toFixed(2)} credit added for your unused days.`
+          (res.data?.proratedAiCredits ?? 0) > 0
+            ? `Subscribed to ${tierConfig.name} with $HATCHER! ${(res.data!.proratedAiCredits).toLocaleString()} AI Credits added for your unused days.`
             : `Subscribed to ${tierConfig.name} with $HATCHER!`,
         );
       } else {
@@ -570,78 +632,26 @@ export default function BillingPage() {
     if (!tierKey) return;
     const tierConfig = TIERS[tierKey];
     const period = subscribePeriod(tierKey);
+    const price = subscribePrice(tierKey);
     setPaymentLoading(true);
     setSubscribing(tierKey);
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
+      logCryptoPaymentIntent('usdc', 'tier', tierKey, period, price);
       const result = await payWithSolanaX402(
         { kind: 'tier', key: tierKey, billingPeriod: period },
         driveUsdc,
       );
       await loadAccountData();
-      const credit = result.proratedCredit ?? 0;
+      const credit = (result as { proratedAiCredits?: number; proratedCredit?: number }).proratedAiCredits ?? result.proratedCredit ?? 0;
       showSuccess(
         credit > 0
-          ? `Subscribed to ${tierConfig.name} with USDC on Solana! $${credit.toFixed(2)} credit added for your unused days.`
+          ? `Subscribed to ${tierConfig.name} with USDC on Solana! ${credit.toLocaleString()} AI Credits added for your unused days.`
           : `Subscribed to ${tierConfig.name} with USDC on Solana!`,
       );
     } catch (err) {
       reportCatch(err, 'Subscription failed');
-    } finally {
-      setSubscribing(null);
-      setPaymentLoading(false);
-    }
-  };
-
-  /* ── Subscribe to a tier (SKALE x402 USDC payment) ─────── */
-  const handleSubscribeSkaleUSDC = async () => {
-    const tierKey = paymentModal.tierKey;
-    if (!tierKey) return;
-    const tierConfig = TIERS[tierKey];
-    const period = subscribePeriod(tierKey);
-    setPaymentLoading(true);
-    setSubscribing(tierKey);
-    setError(null);
-    setPaymentModal(prev => ({ ...prev, isOpen: false }));
-    try {
-      const result = await payWithSkaleX402({ kind: 'tier', key: tierKey, billingPeriod: period });
-      await loadAccountData();
-      const credit = result.proratedCredit ?? 0;
-      showSuccess(
-        credit > 0
-          ? `Subscribed to ${tierConfig.name} with USDC on SKALE! $${credit.toFixed(2)} credit added for your unused days.`
-          : `Subscribed to ${tierConfig.name} with USDC on SKALE!`,
-      );
-    } catch (err) {
-      reportCatch(err, 'SKALE USDC payment failed');
-    } finally {
-      setSubscribing(null);
-      setPaymentLoading(false);
-    }
-  };
-
-  /* ── Subscribe to a tier (Base x402 USDC payment) ──────── */
-  const handleSubscribeBaseUSDC = async () => {
-    const tierKey = paymentModal.tierKey;
-    if (!tierKey) return;
-    const tierConfig = TIERS[tierKey];
-    const period = subscribePeriod(tierKey);
-    setPaymentLoading(true);
-    setSubscribing(tierKey);
-    setError(null);
-    setPaymentModal(prev => ({ ...prev, isOpen: false }));
-    try {
-      const result = await payWithBaseX402({ kind: 'tier', key: tierKey, billingPeriod: period });
-      await loadAccountData();
-      const credit = result.proratedCredit ?? 0;
-      showSuccess(
-        credit > 0
-          ? `Subscribed to ${tierConfig.name} with USDC on Base! $${credit.toFixed(2)} credit added for your unused days.`
-          : `Subscribed to ${tierConfig.name} with USDC on Base!`,
-      );
-    } catch (err) {
-      reportCatch(err, 'Base USDC payment failed');
     } finally {
       setSubscribing(null);
       setPaymentLoading(false);
@@ -680,7 +690,7 @@ export default function BillingPage() {
   };
 
   // Shared helper — subscription addons honor the annual toggle; one-time
-  // addons (File Manager) always charge flat price.
+  // one-time addons always charge flat price.
   const addonPeriod = (addonConfig: { type: string }): 'monthly' | 'annual' =>
     addonConfig.type === 'subscription' ? billingPeriod : 'monthly';
   const addonPrice = (addonConfig: { type: string; usdPrice: number }): number =>
@@ -690,7 +700,7 @@ export default function BillingPage() {
   const handlePurchaseAddonSOL = async () => {
     const addonKey = paymentModal.addonKey;
     if (!addonKey) return;
-    const addonConfig = ADDONS.find(a => a.key === addonKey);
+    const addonConfig = findBillingAddon(addonKey);
     if (!addonConfig) return;
     if (addonConfig.perAgent && !selectedAgentId) return;
     const period = addonPeriod(addonConfig);
@@ -700,7 +710,9 @@ export default function BillingPage() {
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
+      logCryptoPaymentIntent('sol', 'addon', addonKey, period, price, selectedAgentId ?? undefined);
       const txSignature = await driveSol(price, `${addonConfig.name}${period === 'annual' ? ' (annual)' : ''}`);
+      logCryptoPaymentIntent('sol', 'addon', addonKey, period, price, selectedAgentId ?? undefined, 'wallet_confirmed', txSignature);
       const res = await api.purchaseAddon(addonKey, txSignature, selectedAgentId ?? undefined, 'sol', period);
       if (res.success) {
         await loadAccountData();
@@ -720,7 +732,7 @@ export default function BillingPage() {
   const handlePurchaseAddonHATCHER = async () => {
     const addonKey = paymentModal.addonKey;
     if (!addonKey) return;
-    const addonConfig = ADDONS.find(a => a.key === addonKey);
+    const addonConfig = findBillingAddon(addonKey);
     if (!addonConfig) return;
     if (addonConfig.perAgent && !selectedAgentId) return;
     const period = addonPeriod(addonConfig);
@@ -730,7 +742,9 @@ export default function BillingPage() {
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
+      logCryptoPaymentIntent('hatch', 'addon', addonKey, period, price, selectedAgentId ?? undefined);
       const txSignature = await driveHatch(price, `${addonConfig.name}${period === 'annual' ? ' (annual)' : ''}`);
+      logCryptoPaymentIntent('hatch', 'addon', addonKey, period, price, selectedAgentId ?? undefined, 'wallet_confirmed', txSignature);
       const res = await api.purchaseAddon(addonKey, txSignature, selectedAgentId ?? undefined, 'hatch', period);
       if (res.success) {
         await loadAccountData();
@@ -750,15 +764,17 @@ export default function BillingPage() {
   const handlePurchaseAddonUSDC = async () => {
     const addonKey = paymentModal.addonKey;
     if (!addonKey) return;
-    const addonConfig = ADDONS.find(a => a.key === addonKey);
+    const addonConfig = findBillingAddon(addonKey);
     if (!addonConfig) return;
     if (addonConfig.perAgent && !selectedAgentId) return;
     const period = addonPeriod(addonConfig);
+    const price = addonPrice(addonConfig);
     setPaymentLoading(true);
     setPurchasingAddon(addonKey);
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
     try {
+      logCryptoPaymentIntent('usdc', 'addon', addonKey, period, price, selectedAgentId ?? undefined);
       await payWithSolanaX402({
         kind: 'addon',
         key: addonKey,
@@ -775,69 +791,11 @@ export default function BillingPage() {
     }
   };
 
-  /* ── Purchase add-on (SKALE x402 USDC payment) ─────────── */
-  const handlePurchaseAddonSkaleUSDC = async () => {
-    const addonKey = paymentModal.addonKey;
-    if (!addonKey) return;
-    const addonConfig = ADDONS.find(a => a.key === addonKey);
-    if (!addonConfig) return;
-    if (addonConfig.perAgent && !selectedAgentId) return;
-    const period = addonPeriod(addonConfig);
-    setPaymentLoading(true);
-    setPurchasingAddon(addonKey);
-    setError(null);
-    setPaymentModal(prev => ({ ...prev, isOpen: false }));
-    try {
-      await payWithSkaleX402({
-        kind: 'addon',
-        key: addonKey,
-        billingPeriod: period,
-        ...(selectedAgentId ? { agentId: selectedAgentId } : {}),
-      });
-      await loadAccountData();
-      showSuccess(`${addonConfig.name} purchased with USDC on SKALE!`);
-    } catch (err) {
-      reportCatch(err, 'SKALE USDC payment failed');
-    } finally {
-      setPurchasingAddon(null);
-      setPaymentLoading(false);
-    }
-  };
-
-  /* ── Purchase add-on (Base x402 USDC payment) ──────────── */
-  const handlePurchaseAddonBaseUSDC = async () => {
-    const addonKey = paymentModal.addonKey;
-    if (!addonKey) return;
-    const addonConfig = ADDONS.find(a => a.key === addonKey);
-    if (!addonConfig) return;
-    if (addonConfig.perAgent && !selectedAgentId) return;
-    const period = addonPeriod(addonConfig);
-    setPaymentLoading(true);
-    setPurchasingAddon(addonKey);
-    setError(null);
-    setPaymentModal(prev => ({ ...prev, isOpen: false }));
-    try {
-      await payWithBaseX402({
-        kind: 'addon',
-        key: addonKey,
-        billingPeriod: period,
-        ...(selectedAgentId ? { agentId: selectedAgentId } : {}),
-      });
-      await loadAccountData();
-      showSuccess(`${addonConfig.name} purchased with USDC on Base!`);
-    } catch (err) {
-      reportCatch(err, 'Base USDC payment failed');
-    } finally {
-      setPurchasingAddon(null);
-      setPaymentLoading(false);
-    }
-  };
-
   /* ── Purchase add-on via Stripe Card checkout ──────────── */
   const handlePurchaseAddonStripe = async () => {
     const addonKey = paymentModal.addonKey;
     if (!addonKey) return;
-    const addonConfig = ADDONS.find(a => a.key === addonKey);
+    const addonConfig = findBillingAddon(addonKey);
     if (!addonConfig) return;
     if (addonConfig.perAgent && !selectedAgentId) return;
     const period = addonPeriod(addonConfig);
@@ -856,79 +814,6 @@ export default function BillingPage() {
       window.location.href = res.data.url;
     } catch (err) {
       reportCatch(err, 'Stripe checkout failed');
-      setPurchasingAddon(null);
-      setPaymentLoading(false);
-    }
-  };
-
-  /* ── Subscribe with Credits ─────────────────────────────
-     Uses the HATCHER credit balance on the user account. Does NOT open
-     Phantom — the /features/subscribe-with-credits endpoint settles the
-     whole purchase server-side, deducting creditBalance atomically with
-     the tier upgrade. */
-  const handleSubscribeCredits = async () => {
-    const tierKey = paymentModal.tierKey;
-    if (!tierKey) return;
-    const tierConfig = TIERS[tierKey];
-    const period = subscribePeriod(tierKey);
-    const price = subscribePrice(tierKey);
-    if (creditBalance < price) {
-      setError(`Not enough credits. Need $${price.toFixed(2)}, have $${creditBalance.toFixed(2)}.`);
-      return;
-    }
-    setPaymentLoading(true);
-    setSubscribing(tierKey);
-    setError(null);
-    setPaymentModal(prev => ({ ...prev, isOpen: false }));
-    try {
-      const res = await api.subscribeWithCredits(tierKey, period);
-      if (res.success) {
-        await loadAccountData();
-        const refund = res.data.proratedCredit ?? 0;
-        const base = `Subscribed to ${tierConfig.name} with credits! $${res.data.amountDeducted.toFixed(2)} deducted`;
-        const suffix = refund > 0
-          ? `, $${refund.toFixed(2)} refunded for unused days. Balance: $${res.data.remainingBalance.toFixed(2)}.`
-          : `. Balance: $${res.data.remainingBalance.toFixed(2)}.`;
-        showSuccess(base + suffix);
-      } else {
-        setError(res.error ?? 'Credit payment failed');
-      }
-    } catch (err) {
-      reportCatch(err, 'Credit payment failed');
-    } finally {
-      setSubscribing(null);
-      setPaymentLoading(false);
-    }
-  };
-
-  /* ── Purchase add-on with Credits ───────────────────────── */
-  const handlePurchaseAddonCredits = async () => {
-    const addonKey = paymentModal.addonKey;
-    if (!addonKey) return;
-    const addonConfig = ADDONS.find(a => a.key === addonKey);
-    if (!addonConfig) return;
-    if (addonConfig.perAgent && !selectedAgentId) return;
-    const period = addonPeriod(addonConfig);
-    const price = addonPrice(addonConfig);
-    if (creditBalance < price) {
-      setError(`Not enough credits. Need $${price.toFixed(2)}, have $${creditBalance.toFixed(2)}.`);
-      return;
-    }
-    setPaymentLoading(true);
-    setPurchasingAddon(addonKey);
-    setError(null);
-    setPaymentModal(prev => ({ ...prev, isOpen: false }));
-    try {
-      const res = await api.purchaseAddonWithCredits(addonKey, selectedAgentId ?? undefined, period);
-      if (res.success) {
-        await loadAccountData();
-        showSuccess(`${addonConfig.name} purchased with credits! $${res.data.amountDeducted.toFixed(2)} deducted, $${res.data.remainingBalance.toFixed(2)} remaining.`);
-      } else {
-        setError(res.error ?? 'Credit payment failed');
-      }
-    } catch (err) {
-      reportCatch(err, 'Credit payment failed');
-    } finally {
       setPurchasingAddon(null);
       setPaymentLoading(false);
     }
@@ -961,7 +846,7 @@ export default function BillingPage() {
   };
 
   /* ── Legacy direct addon handler ───────────────────────── */
-  const handlePurchaseAddon = async (addonKey: AddonKey) => {
+  const handlePurchaseAddon = async (addonKey: BillingAddonKey) => {
     openAddonModal(addonKey);
   };
 
@@ -1095,46 +980,47 @@ export default function BillingPage() {
         </motion.div>
       )}
 
-      {/* ── Credits Balance Card ──────────────────────────── */}
+      {/* ── AI Credits Balance Card ───────────────────────── */}
       <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
         <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
           <div className="flex items-center gap-2">
             <Wallet className="w-4 h-4 text-green-400" />
-            <h2 className="font-semibold text-[var(--text-primary)]">{t('creditsBalance')}</h2>
+            <h2 className="font-semibold text-[var(--text-primary)]">AI Credits</h2>
           </div>
         </div>
         <div className="p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-            <div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-extrabold text-green-400 tabular-nums" style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}>
-                  {format.number(creditBalance, { style: 'currency', currency: 'USD' })}
-                </span>
-              </div>
-              <p className="text-xs text-[var(--text-muted)] mt-1">
-                {t('creditsDesc')}
-              </p>
-            </div>
-          </div>
+	            <div>
+	              <div className="flex items-baseline gap-1">
+	                <span className="text-3xl font-extrabold text-green-400 tabular-nums" style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}>
+	                  {format.number(aiCreditBalance)}
+	                </span>
+	                <span className="text-sm text-[var(--text-muted)]">credits</span>
+	              </div>
+	              <p className="text-xs text-[var(--text-muted)] mt-1">
+	                Used by hosted LLMs, web search, research, extract, and crawl tools. Not refundable and not usable for plan payments.
+	              </p>
+	            </div>
+	          </div>
 
-          {/* Recent credit transactions */}
-          {creditHistory.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-[var(--border-default)]">
-              <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium mb-3">{t('recentTransactions')}</p>
-              <div className="space-y-2">
-                {creditHistory.slice(0, 5).map((tx) => (
-                  <div key={tx.id} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2 min-w-0 flex-1">
-                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${tx.amount > 0 ? 'bg-green-400' : 'bg-red-400'}`} />
-                      <span className="text-[var(--text-secondary)] text-xs truncate">
-                        {tx.description ?? tx.type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                      <span className={`text-xs font-semibold tabular-nums ${tx.amount > 0 ? 'text-green-400' : 'text-red-400'}`}
-                        style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}>
-                        {tx.amount > 0 ? '+' : ''}${tx.amount.toFixed(2)}
-                      </span>
+	          {/* Recent AI credit usage */}
+	          {aiCreditHistory.length > 0 && (
+	            <div className="mt-4 pt-4 border-t border-[var(--border-default)]">
+	              <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium mb-3">Recent AI usage</p>
+	              <div className="space-y-2">
+	                {aiCreditHistory.slice(0, 5).map((tx) => (
+	                  <div key={tx.id} className="flex items-center justify-between text-sm">
+	                    <div className="flex items-center gap-2 min-w-0 flex-1">
+	                      <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-green-400" />
+	                      <span className="text-[var(--text-secondary)] text-xs truncate">
+	                        {[tx.provider, tx.model ?? tx.kind].filter(Boolean).join(' / ')}
+	                      </span>
+	                    </div>
+	                    <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+	                      <span className="text-xs font-semibold tabular-nums text-red-400"
+	                        style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}>
+	                        -{tx.credits.toLocaleString()}
+	                      </span>
                       <span className="text-[10px] text-[var(--text-muted)] whitespace-nowrap hidden sm:inline">
                         {formatDate(tx.createdAt)}
                       </span>
@@ -1189,10 +1075,10 @@ export default function BillingPage() {
                     {currentTier === 'free' ? t('freeTier') : t('active')}
                   </span>
                 </div>
-                <p className="text-sm text-[var(--text-muted)]">
-                {tierConfig.usdPrice === 0 ? t('noCharge') : currentTier === 'founding_member' ? `$${tierConfig.usdPrice} ${t('lifetimePrice')}` : `$${tierConfig.usdPrice} ${t('monthSuffix')}`}
-                  {` -- ${tierConfig.messagesPerDay === 0 ? 'unlimited' : tierConfig.messagesPerDay} messages/day`}{tierConfig.usdPrice > 0 && ' (BYOK = unlimited)'}
-                </p>
+	                <p className="text-sm text-[var(--text-muted)]">
+	                {tierConfig.usdPrice === 0 ? t('noCharge') : currentTier === 'founding_member' ? `$${tierConfig.usdPrice} ${t('lifetimePrice')}` : `$${tierConfig.usdPrice} ${t('monthSuffix')}`}
+	                  {` -- ${(accountData?.aiCredits?.monthlyGrant ?? AI_CREDITS_BY_TIER[currentTier]).toLocaleString()} AI Credits/month`}
+	                </p>
                 {accountData?.subscriptionExpiresAt && (() => {
                   const expires = new Date(accountData.subscriptionExpiresAt);
                   const daysLeft = Math.ceil((expires.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
@@ -1205,8 +1091,8 @@ export default function BillingPage() {
                         {isExpired
                           ? t('planExpired')
                           : isExpiring
-                            ? (daysLeft > 1 ? t('planExpiringPlural').replace('{days}', String(daysLeft)) : t('planExpiring').replace('{days}', String(daysLeft)))
-                            : t('planActiveUntil').replace('{date}', formatDate(accountData.subscriptionExpiresAt))}
+                            ? (daysLeft > 1 ? t('planExpiringPlural', { days: daysLeft }) : t('planExpiring', { days: daysLeft }))
+                            : t('planActiveUntil', { date: formatDate(accountData.subscriptionExpiresAt) })}
                       </div>
                       {(isExpiring || isExpired) && (
                         <button
@@ -1215,7 +1101,7 @@ export default function BillingPage() {
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-[var(--color-accent)] hover:bg-[#0891b2] disabled:opacity-50 transition-colors"
                         >
                           {subscribing === currentTier ? <Loader2 className="w-3 h-3 animate-spin" /> : <ArrowRight className="w-3 h-3" />}
-                          {t('renewFor').replace('{price}', String(tierConfig.usdPrice))}
+                          {t('renewFor', { price: tierConfig.usdPrice })}
                         </button>
                       )}
                     </div>
@@ -1252,7 +1138,7 @@ export default function BillingPage() {
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white transition-colors"
                   >
                     <Clock className="w-3 h-3" />
-                    {t('extend30Days').replace('{price}', String(tierMonthly))}
+                    {t('extend30Days', { price: tierMonthly })}
                   </button>
                   <button
                     onClick={() => {
@@ -1263,7 +1149,7 @@ export default function BillingPage() {
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#8b5cf6] to-[#06b6d4] text-white hover:shadow-[0_0_20px_rgba(139,92,246,0.25)] transition-all"
                   >
                     <Clock className="w-3 h-3" />
-                    {t('upgradeAnnual').replace('{price}', String(tierAnnual))}
+                    {t('upgradeAnnual', { price: tierAnnual })}
                     <span className="inline-flex items-center px-1 py-px rounded-full bg-white/20 text-white text-[9px] font-bold leading-none">
                       -15%
                     </span>
@@ -1286,12 +1172,14 @@ export default function BillingPage() {
         <div className="p-4 sm:p-6">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-[var(--text-secondary)]">
-              {t('agentsOf').replace('{count}', String(agentCount)).replace('{limit}', String(agentLimit))}
+              {t('agentsOf', { count: agentCount, limit: agentLimit })}
             </span>
             <span className={`text-xs ${agentCount > agentLimit ? 'text-red-400' : 'text-[var(--text-muted)]'}`}>
               {agentCount > agentLimit
-                ? t('agentsOver').replace('{over}', String(agentCount - agentLimit))
-                : (agentLimit - agentCount !== 1 ? t('slotsRemainingPlural').replace('{slots}', String(agentLimit - agentCount)) : t('slotsRemaining').replace('{slots}', String(agentLimit - agentCount)))}
+                ? t('agentsOver', { over: agentCount - agentLimit })
+                : (agentLimit - agentCount !== 1
+                  ? t('slotsRemainingPlural', { slots: agentLimit - agentCount })
+                  : t('slotsRemaining', { slots: agentLimit - agentCount }))}
             </span>
           </div>
           <div className="w-full h-2.5 bg-white/5 rounded-full overflow-hidden">
@@ -1306,18 +1194,18 @@ export default function BillingPage() {
             />
           </div>
 
-          {/* Active add-ons — each subscription-type addon (always_on,
-              messages.200, agents.3 / agents.10) gets an Extend button
+          {/* Active add-ons — each current subscription-type addon
+              (agents.3 / agents.10) gets an Extend button
               that reopens the payment modal in "renew" mode, preserving
-              the agent context for per-agent addons so the buyer never
-              has to re-pick the agent. one_time addons (file_manager)
-              have no expiry and are skipped. */}
+              the agent context for scoped addons so the buyer never
+              has to re-pick the agent. one_time addons are skipped. */}
           {activeAddons.length > 0 && (
             <div className="mt-4 pt-4 border-t border-[var(--border-default)]">
               <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium mb-2">{t('activeAddons')}</p>
               <div className="space-y-2">
                 {activeAddons.map((addon) => {
-                  const isRenewable = addon.type === 'subscription';
+                  const catalogAddon = findBillingAddon(addon.key);
+                  const isRenewable = addon.type === 'subscription' && Boolean(catalogAddon);
                   return (
                     <div key={addon.id} className="flex flex-wrap items-center justify-between gap-2 text-sm">
                       <div className="flex items-center gap-2 min-w-0">
@@ -1332,12 +1220,12 @@ export default function BillingPage() {
                       <div className="flex items-center gap-2 shrink-0">
                         {addon.expiresAt && (
                           <span className="text-xs text-[var(--text-muted)]">
-                            {t('expires').replace('{date}', formatDate(addon.expiresAt))}
+                            {t('expires', { date: formatDate(addon.expiresAt) })}
                           </span>
                         )}
                         {isRenewable && (
                           <button
-                            onClick={() => openAddonModal(addon.key, {
+                            onClick={() => catalogAddon && openAddonModal(catalogAddon.key, {
                               presetAgentId: addon.agentId ?? null,
                               mode: 'renew',
                             })}
@@ -1356,11 +1244,11 @@ export default function BillingPage() {
             </div>
           )}
 
-          {/* Need more agents? */}
+          {/* Need more agent slots? */}
           <div className="mt-4 pt-4 border-t border-[var(--border-default)]">
             <a href="#addons" className="text-xs text-[var(--color-accent)] hover:text-[#fed7aa] transition-colors flex items-center gap-1">
               <Plus className="w-3 h-3" />
-              Need more agents? Purchase an add-on
+              Need more agent slots? Add extra capacity
             </a>
           </div>
         </div>
@@ -1412,6 +1300,7 @@ export default function BillingPage() {
             <div className="grid sm:grid-cols-2 gap-4">
               {TIER_ORDER.filter(k => k !== 'free' && TIER_ORDER.indexOf(k) > TIER_ORDER.indexOf(currentTier)).map((tierKey) => {
                 const tier = TIERS[tierKey];
+                const tierResources = TIER_RESOURCE_OVERRIDES[tierKey];
                 const isSubscribing = subscribing === tierKey;
 
                 return (
@@ -1441,7 +1330,7 @@ export default function BillingPage() {
                           }`}>
                             {foundingInfo.remaining === 0
                               ? t('foundingSoldOut')
-                              : t('foundingSlots').replace('{remaining}', String(foundingInfo.remaining)).replace('{max}', String(foundingInfo.maxSlots))}
+                              : t('foundingSlots', { remaining: foundingInfo.remaining, max: foundingInfo.maxSlots })}
                           </span>
                         )}
                       </div>
@@ -1470,23 +1359,21 @@ export default function BillingPage() {
                       })()}
                     </div>
                     <div className="space-y-1.5 mb-4">
+	                      <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
+	                        <Check className="w-3 h-3 text-[var(--color-accent)]" />
+                        {tierResources.includedAgents} agent{tierResources.includedAgents > 1 ? 's' : ''}, {AI_CREDITS_BY_TIER[tierKey].toLocaleString()} AI Credits/month
+	                      </p>
                       <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
                         <Check className="w-3 h-3 text-[var(--color-accent)]" />
-                        {tier.includedAgents} agent{tier.includedAgents > 1 ? 's' : ''}, {tier.messagesPerDay} messages/day
+                        {tierResources.cpuLimit} CPU, {tierResources.memoryMb >= 1024 ? `${tierResources.memoryMb / 1024} GB` : `${tierResources.memoryMb} MB`} RAM, {tierResources.storageMb >= 1024 ? `${tierResources.storageMb / 1024} GB` : `${tierResources.storageMb} MB`} storage
                       </p>
                       <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
                         <Check className="w-3 h-3 text-[var(--color-accent)]" />
-                        {tier.cpuLimit} CPU, {tier.memoryMb >= 1024 ? `${tier.memoryMb / 1024} GB` : `${tier.memoryMb} MB`} RAM, {tier.storageMb >= 1024 ? `${tier.storageMb / 1024} GB` : `${tier.storageMb} MB`} storage
+                        File Manager + Full Logs included
                       </p>
-                      {tier.fileManager && (
-                        <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
-                          <Check className="w-3 h-3 text-[var(--color-accent)]" />
-                          File Manager + Full Logs
-                        </p>
-                      )}
                       <p className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5">
                         <Check className="w-3 h-3 text-[var(--color-accent)]" />
-                        No auto-sleep
+                        {tierResources.autoSleep ? `Sleeps after ${tierResources.autoSleepMinutes / 60}h idle` : 'Always active'}
                       </p>
                     </div>
                     {(() => {
@@ -1535,17 +1422,14 @@ export default function BillingPage() {
           <span className="text-[10px] text-[var(--text-muted)]">Stackable · shared across all agents</span>
         </div>
         <div className="p-4 sm:p-6 space-y-6">
-          {/* Grouped by category for readability. One section per
-              group → single `grid` per section → cards flow naturally
-              on all breakpoints. */}
+          {/* Grouped by category for readability. */}
           {([
+            { label: 'AI Credits', keys: ['addon.ai_credits.5000', 'addon.ai_credits.10000', 'addon.ai_credits.25000', 'addon.ai_credits.50000'] },
             { label: 'Extra Agents', keys: ['addon.agents.1', 'addon.agents.3', 'addon.agents.5', 'addon.agents.10'] },
-            { label: 'Extra Messages', keys: ['addon.messages.20', 'addon.messages.50', 'addon.messages.100', 'addon.messages.200'] },
-            { label: 'Extra Searches', keys: ['addon.searches.25', 'addon.searches.50'] },
           ] as const).map((group) => {
             const groupAddons = group.keys
-              .map((k) => ADDONS.find((a) => a.key === k))
-              .filter((a): a is typeof ADDONS[number] => Boolean(a));
+              .map((k) => findBillingAddon(k))
+              .filter((a): a is BillingAddon => Boolean(a));
             if (groupAddons.length === 0) return null;
 
             return (
@@ -1570,7 +1454,11 @@ export default function BillingPage() {
                         className="p-4 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 transition-all flex flex-col min-w-0"
                       >
                         <div className="flex items-center gap-2 mb-2 min-w-0">
-                          <Users className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
+                          {addon.aiCredits ? (
+                            <Zap className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
+                          ) : (
+                            <Users className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
+                          )}
                           <span className="text-sm font-semibold text-[var(--text-primary)] truncate">{addon.name}</span>
                         </div>
                         <div className="flex items-baseline gap-1 mb-1">
@@ -1588,7 +1476,7 @@ export default function BillingPage() {
                           {addon.description}
                         </p>
                         <button
-                          onClick={() => handlePurchaseAddon(addon.key as AddonKey)}
+                          onClick={() => handlePurchaseAddon(addon.key)}
                           disabled={isBuying || purchasingAddon !== null}
                           className="w-full inline-flex items-center justify-center gap-1.5 text-xs px-3 py-2 rounded-lg border border-[var(--color-accent)]/30 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 hover:text-[var(--color-accent)] transition-all disabled:opacity-40 font-semibold"
                         >
@@ -1611,84 +1499,6 @@ export default function BillingPage() {
               </div>
             );
           })}
-        </div>
-      </motion.div>
-
-      {/* ── Per-Agent Add-ons ────────────────────────────── */}
-      <motion.div className={`mb-8 ${cardClass}`} variants={itemVariants}>
-        <div className="px-4 sm:px-6 py-4 flex items-center justify-between border-b border-[var(--border-default)]">
-          <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-[var(--color-accent)]" />
-            <h2 className="font-semibold text-[var(--text-primary)]">{t('perAgentAddons')}</h2>
-          </div>
-          <span className="text-[10px] text-[var(--text-muted)]">Purchased per agent</span>
-        </div>
-        <div className="p-4 sm:p-6">
-          <div className="grid sm:grid-cols-2 gap-4">
-            {/* Explicit whitelist instead of `ADDONS.filter(a => a.perAgent)` —
-                if a stale @hatcher/shared bundle sneaks in, the flag-based
-                filter would dump account-level messages/searches addons in
-                here by mistake. Hard-coding the keys makes the render
-                deterministic regardless of what the dist package reports. */}
-            {(['addon.always_on', 'addon.file_manager', 'addon.full_logs', 'addon.extra_plugins'] as const)
-              .map((key) => ADDONS.find((a) => a.key === key))
-              .filter((a): a is typeof ADDONS[number] => Boolean(a))
-              .map((addon) => {
-              const isBuying = purchasingAddon === addon.key;
-              const isSub = addon.type === 'subscription';
-              const displayPrice = isSub && billingPeriod === 'annual'
-                ? computePrice(addon.usdPrice, true)
-                : addon.usdPrice;
-              const suffix = addon.type === 'one_time'
-                ? t('oneTimeAgent')
-                : billingPeriod === 'annual' ? t('annualAgent') : t('monthAgent');
-              return (
-                <div
-                  key={addon.key}
-                  className="p-4 rounded-xl border border-[var(--border-default)] hover:border-[var(--color-accent)]/30 transition-all"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <Zap className="w-4 h-4 text-[var(--color-accent)]" />
-                    <span className="text-sm font-semibold text-[var(--text-primary)]">{addon.name}</span>
-                  </div>
-                  <div className="flex items-baseline gap-1 mb-1">
-                    <span className="text-2xl font-bold text-[var(--text-primary)] tabular-nums">
-                      ${displayPrice}
-                    </span>
-                    <span className="text-xs text-[var(--text-muted)]">{suffix}</span>
-                  </div>
-                  {isSub && billingPeriod === 'annual' && (
-                    <p className="text-[10px] text-green-400 font-semibold mb-2">
-                      Save ${(addon.usdPrice * 12 - displayPrice).toFixed(2)}/yr
-                    </p>
-                  )}
-                  <p className="text-xs text-[var(--text-secondary)] mb-3">
-                    {addon.description}
-                  </p>
-                  <button
-                    onClick={() => openAddonModal(addon.key as AddonKey)}
-                    disabled={isBuying || purchasingAddon !== null}
-                    className="w-full inline-flex items-center justify-center gap-1.5 text-xs px-3 py-2 rounded-lg border border-[var(--color-accent)]/30 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 transition-all disabled:opacity-40 font-semibold"
-                  >
-                    {isBuying ? (
-                      <>
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                        Purchasing...
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="w-3 h-3" />
-                        Buy for ${displayPrice}
-                      </>
-                    )}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-          <p className="text-[11px] text-[var(--text-muted)] mt-3">
-            Also available from each agent&apos;s Add-ons tab for quick access.
-          </p>
         </div>
       </motion.div>
 
@@ -1797,13 +1607,9 @@ export default function BillingPage() {
         onPayWithSOL={paymentModal.type === 'subscription' ? handleSubscribeSOL : handlePurchaseAddonSOL}
         onPayWithHATCHER={paymentModal.type === 'subscription' ? handleSubscribeHATCHER : handlePurchaseAddonHATCHER}
         onPayWithUSDC={paymentModal.type === 'subscription' ? handleSubscribeUSDC : handlePurchaseAddonUSDC}
-        onPayWithSkaleUSDC={paymentModal.type === 'subscription' ? handleSubscribeSkaleUSDC : handlePurchaseAddonSkaleUSDC}
-        onPayWithBaseUSDC={paymentModal.type === 'subscription' ? handleSubscribeBaseUSDC : handlePurchaseAddonBaseUSDC}
         onPayWithCard={paymentModal.type === 'subscription' ? handleSubscribeStripe : handlePurchaseAddonStripe}
-        onPayWithCredits={paymentModal.type === 'subscription' ? handleSubscribeCredits : handlePurchaseAddonCredits}
-        creditBalance={creditBalance}
         loading={paymentLoading}
-        requiresAgent={paymentModal.type === 'addon' && ADDONS.find(a => a.key === paymentModal.addonKey)?.perAgent}
+        requiresAgent={paymentModal.type === 'addon' && findBillingAddon(paymentModal.addonKey)?.perAgent}
         agents={userAgents}
         selectedAgentId={selectedAgentId}
         onSelectAgent={setSelectedAgentId}

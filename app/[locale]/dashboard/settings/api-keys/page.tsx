@@ -176,18 +176,18 @@ function ApiKeyCard({
           <div className="flex items-center gap-4 flex-wrap">
             <span className="flex items-center gap-1 text-[11px] text-[var(--text-muted)]">
               <Activity size={10} />
-              {t('reqStats').replace('{today}', String(apiKey.requestsToday)).replace('{week}', String(apiKey.requestsThisWeek))}
+              {t('reqStats', { today: apiKey.requestsToday, week: apiKey.requestsThisWeek })}
             </span>
             {apiKey.lastUsedAt ? (
               <span className="flex items-center gap-1 text-[11px] text-[var(--text-muted)]">
                 <Clock size={10} />
-                {t('lastUsed').replace('{time}', relativeTime(apiKey.lastUsedAt))}
+                {t('lastUsed', { time: relativeTime(apiKey.lastUsedAt) })}
               </span>
             ) : (
               <span className="text-[11px] text-[var(--text-muted)] italic">{t('neverUsed')}</span>
             )}
             <span className="text-[11px] text-[var(--text-muted)]">
-              {t('created').replace('{date}', new Date(apiKey.createdAt).toLocaleDateString())}
+              {t('created', { date: new Date(apiKey.createdAt).toLocaleDateString() })}
             </span>
           </div>
         </div>
@@ -222,6 +222,18 @@ export default function ApiKeysPage() {
   const [newlyCreated, setNewlyCreated] = useState<{ id: string; key: string; label: string } | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [revokeTarget, setRevokeTarget] = useState<string | null>(null);
+
+  const apiKeyPrefix = 'hk_';
+  const docsLinkLabel = t('docsLinkLabel');
+  const docsLinkLabel2 = t('docsLinkLabel2');
+  const headerExample = t('headerExample');
+  const subheading = t('subheading', { docsLink: docsLinkLabel, prefix: apiKeyPrefix });
+  const [subheadingBeforeDocs, subheadingAfterDocsRaw = ''] = subheading.split(docsLinkLabel);
+  const [subheadingBetweenDocsAndPrefix, subheadingAfterPrefix = ''] =
+    subheadingAfterDocsRaw.split(apiKeyPrefix);
+  const usageNote = t('usageNote', { header: headerExample, docsLink: docsLinkLabel2 });
+  const [usageBeforeHeader, usageAfterHeaderRaw = ''] = usageNote.split(headerExample);
+  const [usageBetweenHeaderAndDocs, usageAfterDocs = ''] = usageAfterHeaderRaw.split(docsLinkLabel2);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -318,18 +330,20 @@ export default function ApiKeysPage() {
             {t('heading')}
           </h1>
           <p className="text-sm text-[var(--text-secondary)] mt-2">
-            {t('subheading').split('{docsLink}')[0]}
+            {subheadingBeforeDocs}
             <Link
               href="https://docs.hatcher.host"
               target="_blank"
               rel="noopener noreferrer"
               className="text-cyan-400 hover:text-cyan-300 inline-flex items-center gap-0.5 transition-colors"
             >
-              {t('docsLinkLabel')} <ExternalLink size={11} />
+              {docsLinkLabel} <ExternalLink size={11} />
             </Link>
-            {t('subheading').split('{docsLink}')[1]?.split('{prefix}')[0]}
-            <code className="font-mono text-xs bg-[var(--bg-card)] px-1 py-0.5 rounded text-cyan-400">hk_</code>
-            {t('subheading').split('{prefix}')[1]}
+            {subheadingBetweenDocsAndPrefix}
+            <code className="font-mono text-xs bg-[var(--bg-card)] px-1 py-0.5 rounded text-cyan-400">
+              {apiKeyPrefix}
+            </code>
+            {subheadingAfterPrefix}
           </p>
         </div>
 
@@ -437,18 +451,18 @@ export default function ApiKeysPage() {
         <div className="mt-5 p-4 rounded-xl bg-[var(--bg-card)] border border-[var(--border-default)] flex items-start gap-3">
           <ExternalLink size={14} className="text-cyan-400 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-            {t('usageNote').split('{header}')[0]}
-            <code className="font-mono text-cyan-400">{t('headerExample')}</code>
-            {t('usageNote').split('{header}')[1]?.split('{docsLink}')[0]}
+            {usageBeforeHeader}
+            <code className="font-mono text-cyan-400">{headerExample}</code>
+            {usageBetweenHeaderAndDocs}
             <Link
               href="https://docs.hatcher.host"
               target="_blank"
               rel="noopener noreferrer"
               className="text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-2"
             >
-              {t('docsLinkLabel2')}
+              {docsLinkLabel2}
             </Link>
-            {t('usageNote').split('{docsLink}')[1]}
+            {usageAfterDocs}
           </p>
         </div>
 

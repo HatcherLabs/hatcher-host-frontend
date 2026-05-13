@@ -62,7 +62,7 @@ export async function generateMetadata({
 
   const statusLabel = stats.status === 'active' ? 'Online' : stats.status === 'sleeping' ? 'Sleeping' : 'Offline';
   const title = `${stats.name} — Status`;
-  const description = `${stats.name} is ${statusLabel} · ${stats.uptimePercent}% uptime · ${stats.messagesProcessed.toLocaleString()} messages processed`;
+  const description = `${stats.name} is ${statusLabel} · ${stats.uptimePercent}% uptime · ${stats.messagesProcessed.toLocaleString()} interactions processed`;
 
   return {
     title,

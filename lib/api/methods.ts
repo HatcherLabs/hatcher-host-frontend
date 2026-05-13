@@ -109,6 +109,7 @@ export const api = {
       walletAddress: string | null;
       apiKey: string | null;
       hatchCredits: number;
+      aiCreditsBalance: number;
       isAdmin: boolean;
       tier: string;
       avatarUrl: string | null;
@@ -178,11 +179,24 @@ export const api = {
       method: 'PATCH', body: JSON.stringify({ label }),
     }),
 
-  /** Get recent notifications/activity */
-  getNotifications: () => req<{ items: Array<{id: string; type: string; message: string; timestamp: string; link?: string}>; readAt: string | null }>('/auth/notifications'),
+  /** Get persistent in-app notifications */
+  getNotifications: () =>
+    req<{
+      notifications: Array<{
+        id: string;
+        type: string;
+        title: string;
+        body: string;
+        read: boolean;
+        createdAt: string;
+      }>;
+      total: number;
+      limit: number;
+      offset: number;
+    }>('/notifications?limit=20&offset=0'),
 
   /** Mark all notifications as read (persists server-side) */
-  markNotificationsRead: () => req<{ readAt: string }>('/auth/notifications/read', { method: 'PATCH' }),
+  markNotificationsRead: () => req<{ marked: number }>('/notifications/read-all', { method: 'POST' }),
 
   /** Get referral code + share link */
   getReferralCode: () =>
@@ -445,15 +459,16 @@ export const api = {
       agentLimit: number;
       agentCount: number;
       subscriptionExpiresAt?: string | null;
-      /** Account-wide chat-message daily cap (tier base + active
-       *  `addon.messages.*` bonuses). 0 = unlimited (legacy tiers). */
+      /** Legacy account-wide chat-message daily cap. Hosted AI usage is
+       *  metered by AI Credits instead of message add-ons. */
       chatLimit: number;
-      /** Account-wide web-search daily cap (tier base + active
-       *  `addon.searches.*` bonuses). 0 = unlimited. */
+      /** Legacy account-wide web-search daily cap. Hosted web search is
+       *  metered by AI Credits instead of search add-ons. */
       searchLimit: number;
       // Legacy compat fields
       activeFeatures?: Array<{ featureKey: string; type: string; expiresAt: string | null }>;
       hatchCredits?: number;
+      aiCredits?: { balance: number; monthlyGrant: number; tier: string };
     }>('/features/account'),
 
   /** Public tier catalog + Founding Member availability. Used by both
@@ -467,11 +482,11 @@ export const api = {
       founding: { maxSlots: number; taken: number; remaining: number };
     }>('/features'),
 
-  /** Subscribe to a tier. Returns prorated credit refunded for the
-   *  unused portion of the previous tier on an upgrade (zero otherwise).
+  /** Subscribe to a tier. Upgrades may grant prorated AI Credits for the
+   *  unused portion of the current billing period.
    *  `billingPeriod='annual'` → 12 months at 15% off (server enforces). */
   subscribe: (tier: string, txSignature: string, paymentToken: 'sol' | 'hatch' | 'usdc' = 'sol', billingPeriod: 'monthly' | 'annual' = 'monthly') =>
-    req<{ tier: string; expiresAt: string | null; paymentId: string; proratedCredit: number }>('/features/subscribe', {
+    req<{ tier: string; expiresAt: string | null; paymentId: string; proratedAiCredits: number; monthlyAiCreditsGranted?: number }>('/features/subscribe', {
       method: 'POST',
       body: JSON.stringify({ tier, txSignature, paymentToken, billingPeriod }),
     }),
@@ -485,28 +500,23 @@ export const api = {
       body: JSON.stringify({ addonKey, txSignature, paymentToken, billingPeriod, ...(agentId ? { agentId } : {}) }),
     }),
 
-  /** Subscribe to a tier paying entirely with HATCHER credits. Requires
-   *  sufficient balance — returns 400 with `remainingBalance` otherwise.
-   *  On upgrade (lower → higher tier) the unused portion of the current
-   *  tier is refunded as credits (`proratedCredit`). */
-  subscribeWithCredits: (tier: string, billingPeriod: 'monthly' | 'annual' = 'monthly') =>
-    req<{
-      tier: string;
-      expiresAt: string | null;
-      paidWith: 'credits';
-      amountDeducted: number;
-      proratedCredit: number;
-      remainingBalance: number;
-    }>('/features/subscribe-with-credits', {
+  /** Audit-log a crypto payment button click before the wallet popup opens.
+   *  This is intentionally fire-and-forget in the UI; payment must continue
+   *  even if observability logging fails. */
+  logCryptoPaymentIntent: (payload: {
+    rail: 'sol' | 'hatch' | 'usdc';
+    flow: 'tier' | 'addon';
+    targetKey: string;
+    billingPeriod?: 'monthly' | 'annual' | 'lifetime';
+    amountUsd?: number;
+    agentId?: string;
+    source?: string;
+    stage?: 'clicked' | 'wallet_confirmed';
+    txSignature?: string;
+  }) =>
+    req<{ logged: true }>('/payments/intent-log', {
       method: 'POST',
-      body: JSON.stringify({ tier, billingPeriod }),
-    }),
-
-  /** Purchase an add-on (optionally per-agent) paying with credits. */
-  purchaseAddonWithCredits: (addonKey: string, agentId?: string, billingPeriod: 'monthly' | 'annual' = 'monthly') =>
-    req<{ addonKey: string; paidWith: 'credits'; amountDeducted: number; remainingBalance: number }>('/features/addon-with-credits', {
-      method: 'POST',
-      body: JSON.stringify({ addonKey, billingPeriod, ...(agentId ? { agentId } : {}) }),
+      body: JSON.stringify(payload),
     }),
 
   /** Start a Stripe checkout session for a tier (Card payment).
@@ -543,34 +553,6 @@ export const api = {
       status?: string;
       message?: string;
     }>(`/agents/${id}/memory`),
-
-  /**
-   * Managed OpenClaw workspace viewer (Etapa 3).
-   *
-   * Returns a recursive listing of files under the agent's `workspace/`
-   * directory. Requires the container to be running — when stopped, the
-   * API returns 409 and the UI should prompt the user to start the agent.
-   */
-  getAgentWorkspaceTree: (id: string, depth = 4) =>
-    req<{
-      base: string;
-      entries: Array<{ path: string; type: 'file' | 'dir'; size: number }>;
-      truncated: boolean;
-    }>(`/agents/${id}/workspace/tree?depth=${depth}`),
-
-  /**
-   * Read a single file under the agent's `workspace/`. `path` is relative
-   * to workspace/ (no leading slash). Binary or oversized files return
-   * `{content: null, reason: "..."}` — the UI should render the reason
-   * instead of trying to display raw bytes.
-   */
-  getAgentWorkspaceFile: (id: string, filePath: string) =>
-    req<{
-      path: string;
-      size: number;
-      content: string | null;
-      reason?: string;
-    }>(`/agents/${id}/workspace/file?path=${encodeURIComponent(filePath)}`),
 
   /**
    * Hermes config — returns parsed `config.yaml` from whichever source
@@ -848,7 +830,7 @@ export const api = {
       status: string;
     }>(`/agents/${id}/stats`),
 
-  /** Get agent analytics (message activity + token usage) */
+  /** Get agent analytics (interaction activity + token/provider usage) */
   getAgentAnalytics: (id: string, range: '7d' | '30d' | '90d' = '7d') =>
     req<{
       range: string;
@@ -889,6 +871,16 @@ export const api = {
       frameworkBreakdown: Record<string, number>;
       agentMessageBreakdown: Array<{ id: string; name: string; framework: string; count: number }>;
       dailyVolume: Array<{ date: string; count: number }>;
+      aiCredits: {
+        balance: number;
+        monthlyGrant: number;
+        tier: string;
+        usedLast30: number;
+        actionsLast30: number;
+        inputTokensLast30: number;
+        outputTokensLast30: number;
+        byKind: Array<{ kind: string; credits: number; actions: number }>;
+      };
       tokenSummary: { inputTokens: number; outputTokens: number; totalTokens: number; usdCost: number };
     }>('/analytics/overview'),
 
@@ -1012,7 +1004,7 @@ export const api = {
         emailVerified: boolean;
         agentCount: number;
         paymentCount: number;
-        hatchCredits: number;
+        aiCreditsBalance: number;
         createdAt: string;
       }>;
       pagination: { total: number; limit: number; offset: number; hasMore: boolean };
@@ -1526,65 +1518,6 @@ export const api = {
   getAgentScheduleLogs: (agentId: string, jobId: string) =>
     req<{ logs: Array<{ timestamp: string; success: boolean; response?: string; error?: string }> }>(`/agents/${agentId}/schedules/${jobId}/logs`),
 
-  // ─── Marketplace ──────────────────────────────────────────
-
-  /** List marketplace templates */
-  getMarketplaceTemplates: (params?: {
-    search?: string;
-    category?: string;
-    framework?: string;
-    sort?: string;
-    page?: number;
-    limit?: number;
-  }) => {
-    const sp = new URLSearchParams();
-    if (params?.search) sp.set('search', params.search);
-    if (params?.category) sp.set('category', params.category);
-    if (params?.framework) sp.set('framework', params.framework);
-    if (params?.sort) sp.set('sort', params.sort);
-    if (params?.page) sp.set('page', String(params.page));
-    if (params?.limit) sp.set('limit', String(params.limit));
-    const qs = sp.toString();
-    return req<{
-      templates: Array<{
-        id: string;
-        name: string;
-        description: string;
-        framework: string;
-        category: string;
-        author: string;
-        authorId: string;
-        usageCount: number;
-        createdAt: string;
-      }>;
-      total: number;
-      page: number;
-      limit: number;
-    }>(`/marketplace/templates${qs ? `?${qs}` : ''}`);
-  },
-
-  /** Publish an agent as a marketplace template */
-  publishToMarketplace: (agentId: string, category?: string) =>
-    req<{
-      id: string;
-      name: string;
-      description: string;
-      framework: string;
-      category: string;
-      author: string;
-      usageCount: number;
-      createdAt: string;
-    }>('/marketplace/templates', {
-      method: 'POST',
-      body: JSON.stringify({ agentId, ...(category ? { category } : {}) }),
-    }),
-
-  /** Clone a marketplace template to create a new agent */
-  cloneFromMarketplace: (templateId: string) =>
-    req<{ agentId: string; name: string }>(`/marketplace/templates/${templateId}/clone`, {
-      method: 'POST',
-    }),
-
   /** Clone an existing agent (own or public) — creates a "(Copy)" with all config preserved */
   cloneAgent: (agentId: string) =>
     req<Agent>(`/agents/${agentId}/clone`, { method: 'POST' }),
@@ -1725,7 +1658,7 @@ export const api = {
       };
       limits: {
         used: number;
-        max: number;
+        max: number | null;
       };
     }>(`/agents/${agentId}/plugins`),
 
@@ -1894,6 +1827,23 @@ export const api = {
       }>;
     }>(`/credits/history?limit=${limit}`),
 
+  getAiCreditBalance: () =>
+    req<{ balance: number; monthlyGrant: number; tier: string }>('/ai-credits/balance'),
+
+  getAiCreditHistory: (limit = 20) =>
+    req<{
+      usage: Array<{
+        id: string;
+        agentId: string | null;
+        kind: string;
+        provider: string;
+        model: string | null;
+        credits: number;
+        providerCostUsd: string | number;
+        createdAt: string;
+      }>;
+    }>(`/ai-credits/history?limit=${limit}`),
+
   /** Submit thumbs up/down feedback for a message */
   submitFeedback: (agentId: string, messageId: string, rating: 'up' | 'down') =>
     req<{ success: true }>(`/agents/${agentId}/feedback`, {
@@ -1944,6 +1894,13 @@ export const api = {
   // partner-only surface. Callers typically narrow with `if (success)`
   // before touching `data`; 403 on non-affiliate is surfaced as a
   // failed response + error === 'Not an active affiliate'.
+  getAffiliateStatus: () =>
+    req<{
+      active: boolean;
+      isFrozen: boolean;
+      applicationStatus: 'PENDING' | 'APPROVED' | 'REJECTED' | null;
+    }>('/affiliate/status'),
+
   getAffiliateMe: () =>
     req<{
       affiliate: {
@@ -2075,7 +2032,7 @@ export const api = {
       url?: string;
     }>;
     pitch: string;
-    payoutMode: 'CASH_ONLY' | 'CREDITS_ONLY' | 'HYBRID';
+    payoutMode: 'CASH_ONLY';
     payoutAddress?: string;
     desiredSlug?: string;
   }) =>
@@ -2096,7 +2053,7 @@ export const api = {
   // returns 403 "Admin access required" otherwise.
 
   adminListAffiliateApplications: (
-    params: { status?: 'PENDING' | 'APPROVED' | 'REJECTED'; limit?: number; cursor?: string } = {},
+    params: { status?: 'PENDING' | 'APPROVED' | 'REJECTED' | 'ALL'; limit?: number; cursor?: string } = {},
   ) => {
     const qs = new URLSearchParams();
     if (params.status) qs.set('status', params.status);

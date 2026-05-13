@@ -20,15 +20,15 @@ type UseCase = {
 const PLANNED_USE_CASES: UseCase[] = [
   {
     icon: Zap,
-    title: 'Subscriptions & Add-ons',
-    description: 'Pay for any subscription tier or agent add-on directly with $HATCHER. Prices settled at live rates on-chain.',
+    title: 'Subscriptions & Extras',
+    description: 'Pay for any subscription tier or extra agent slots directly with $HATCHER. Prices settled at live rates on-chain.',
     linkHref: '/pricing',
-    linkLabel: 'See plans & add-ons',
+    linkLabel: 'See plans & extras',
   },
   {
     icon: CreditCard,
     title: 'Token Economy',
-    description: 'Prices listed in USD. Pay with SOL or $HATCHER at live rates.',
+    description: 'Prices listed in USD. Pay by card, SOL, USDC on Solana, or $HATCHER at live rates.',
   },
   {
     icon: Users,
