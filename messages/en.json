@@ -2308,6 +2308,7 @@
     "labelInstallPlan": "Install plan",
     "labelGreeting": "Sample greeting",
     "labelModel": "Model",
+    "labelModelProvider": "Provider",
     "labelAvatar": "Avatar idea",
     "labelAvatarVariant": "3D avatar",
     "frameworkOpenClaw": "Browser, files, code, research, and agentic tool use.",

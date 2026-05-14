@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { api, req } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
@@ -14,6 +15,23 @@ type InstallPlanItem = {
   type: 'skill' | 'plugin' | 'integration';
   name: string;
   reason: string;
+};
+
+type ModelCost = 'Low' | 'Medium' | 'High' | 'Premium' | 'Variable';
+
+type HostedModelProvider = {
+  key: string;
+  name: string;
+};
+
+type HostedModel = {
+  id: string;
+  name: string;
+  providerKey: string;
+  provider: string;
+  category: string;
+  cost: ModelCost;
+  context: string;
 };
 
 interface ParsedConfig {
@@ -50,6 +68,105 @@ const FW_VISUAL: Record<Framework, { color: string; mark: string; label: string 
   openclaw: { color: '#FFD23F', mark: 'OC', label: 'OpenClaw' },
   hermes:   { color: '#9B5BFF', mark: 'HE', label: 'Hermes' },
 };
+
+const AgentRoomAvatarPreview = dynamic(
+  () => import('@/components/agents/tabs/ChatTab/AgentRoomAvatarPreview').then((m) => m.AgentRoomAvatarPreview),
+  {
+    ssr: false,
+    loading: () => <div className={styles.avatarFallback} aria-hidden />,
+  },
+);
+
+const AVATAR_OPTIONS = [
+  { id: '', name: 'Auto' },
+  { id: 'openclaw-mech', name: 'OpenClaw mech' },
+  { id: 'openclaw-scout', name: 'OpenClaw scout' },
+  { id: 'openclaw-heavy', name: 'OpenClaw heavy' },
+  { id: 'openclaw-drone', name: 'OpenClaw drone' },
+  { id: 'hermes-oracle', name: 'Hermes oracle' },
+  { id: 'hermes-scribe', name: 'Hermes scribe' },
+  { id: 'ready-player', name: 'Humanoid' },
+  { id: 'fox-companion', name: 'Companion' },
+  { id: 'blob', name: 'Orb' },
+  { id: 'cat', name: 'Cat' },
+  { id: 'crab', name: 'Crab' },
+];
+
+const MODEL_PROVIDERS: HostedModelProvider[] = [
+  { key: 'deepseek', name: 'DeepSeek' },
+  { key: 'openai', name: 'OpenAI' },
+  { key: 'anthropic', name: 'Anthropic' },
+  { key: 'google', name: 'Google' },
+  { key: 'qwen', name: 'Qwen' },
+  { key: 'x-ai', name: 'xAI' },
+  { key: 'mistralai', name: 'Mistral' },
+  { key: 'moonshotai', name: 'Moonshot AI' },
+  { key: 'z-ai', name: 'Z.ai' },
+  { key: 'nvidia', name: 'NVIDIA' },
+  { key: 'openrouter', name: 'OpenRouter' },
+];
+
+const HOSTED_MODELS: HostedModel[] = [
+  ['deepseek/deepseek-v4-flash', 'DeepSeek V4 Flash', 'deepseek', 'DeepSeek', 'Default', 'Low', '1M'],
+  ['deepseek/deepseek-v4-pro', 'DeepSeek V4 Pro', 'deepseek', 'DeepSeek', 'Balanced', 'Medium', '1M'],
+  ['deepseek/deepseek-v3.2', 'DeepSeek V3.2', 'deepseek', 'DeepSeek', 'Fast', 'Low', '128K'],
+  ['openai/gpt-5-nano', 'GPT-5 Nano', 'openai', 'OpenAI', 'Fast', 'Low', '400K'],
+  ['openai/gpt-5-mini', 'GPT-5 Mini', 'openai', 'OpenAI', 'Balanced', 'Medium', '400K'],
+  ['openai/gpt-5.1-codex-mini', 'GPT-5.1 Codex Mini', 'openai', 'OpenAI', 'Coding', 'Medium', '400K'],
+  ['openai/gpt-5.3-codex', 'GPT-5.3 Codex', 'openai', 'OpenAI', 'Coding', 'High', '400K'],
+  ['openai/gpt-5.4-nano', 'GPT-5.4 Nano', 'openai', 'OpenAI', 'Fast', 'Low', '400K'],
+  ['openai/gpt-5.4-mini', 'GPT-5.4 Mini', 'openai', 'OpenAI', 'Balanced', 'Medium', '400K'],
+  ['openai/gpt-5.4', 'GPT-5.4', 'openai', 'OpenAI', 'Premium', 'High', '1.05M'],
+  ['openai/gpt-5.5', 'GPT-5.5', 'openai', 'OpenAI', 'Premium', 'Premium', '1.05M'],
+  ['openai/gpt-5.5-pro', 'GPT-5.5 Pro', 'openai', 'OpenAI', 'Premium', 'Premium', '1.05M'],
+  ['anthropic/claude-haiku-4.5', 'Claude Haiku 4.5', 'anthropic', 'Anthropic', 'Balanced', 'Medium', '200K'],
+  ['anthropic/claude-sonnet-4.5', 'Claude Sonnet 4.5', 'anthropic', 'Anthropic', 'Premium', 'High', '1M'],
+  ['anthropic/claude-sonnet-4.6', 'Claude Sonnet 4.6', 'anthropic', 'Anthropic', 'Premium', 'High', '1M'],
+  ['anthropic/claude-opus-4.7', 'Claude Opus 4.7', 'anthropic', 'Anthropic', 'Premium', 'Premium', '1M'],
+  ['google/gemini-3.1-flash-lite', 'Gemini 3.1 Flash Lite', 'google', 'Google', 'Fast', 'Low', '1M'],
+  ['google/gemini-2.5-flash', 'Gemini 2.5 Flash', 'google', 'Google', 'Balanced', 'Medium', '1M'],
+  ['google/gemini-3-flash-preview', 'Gemini 3 Flash Preview', 'google', 'Google', 'Balanced', 'Medium', '1M'],
+  ['google/gemini-3.1-pro-preview', 'Gemini 3.1 Pro Preview', 'google', 'Google', 'Premium', 'High', '1M'],
+  ['qwen/qwen3.5-flash-02-23', 'Qwen3.5 Flash', 'qwen', 'Qwen', 'Fast', 'Low', '1M'],
+  ['qwen/qwen3-coder-flash', 'Qwen3 Coder Flash', 'qwen', 'Qwen', 'Coding', 'Low', '1M'],
+  ['qwen/qwen3.6-flash', 'Qwen3.6 Flash', 'qwen', 'Qwen', 'Fast', 'Medium', '1M'],
+  ['qwen/qwen3.6-35b-a3b', 'Qwen3.6 35B A3B', 'qwen', 'Qwen', 'Balanced', 'Medium', '256K'],
+  ['qwen/qwen3.5-35b-a3b', 'Qwen3.5 35B A3B', 'qwen', 'Qwen', 'Balanced', 'Medium', '256K'],
+  ['qwen/qwen3-coder', 'Qwen3 Coder', 'qwen', 'Qwen', 'Coding', 'Medium', '256K'],
+  ['qwen/qwen3-coder-next', 'Qwen3 Coder Next', 'qwen', 'Qwen', 'Coding', 'Medium', '1M'],
+  ['qwen/qwen3-coder-plus', 'Qwen3 Coder Plus', 'qwen', 'Qwen', 'Coding', 'High', '1M'],
+  ['qwen/qwen3.6-plus', 'Qwen3.6 Plus', 'qwen', 'Qwen', 'Premium', 'High', '1M'],
+  ['qwen/qwen3-max', 'Qwen3 Max', 'qwen', 'Qwen', 'Premium', 'High', '1M'],
+  ['qwen/qwen3-max-thinking', 'Qwen3 Max Thinking', 'qwen', 'Qwen', 'Reasoning', 'Premium', '1M'],
+  ['x-ai/grok-4.1-fast', 'Grok 4.1 Fast', 'x-ai', 'xAI', 'Fast', 'Low', '2M'],
+  ['x-ai/grok-code-fast-1', 'Grok Code Fast 1', 'x-ai', 'xAI', 'Coding', 'Medium', '256K'],
+  ['x-ai/grok-4.3', 'Grok 4.3', 'x-ai', 'xAI', 'Premium', 'High', '1M'],
+  ['mistralai/mistral-small-2603', 'Mistral Small 4', 'mistralai', 'Mistral', 'Fast', 'Low', '256K'],
+  ['mistralai/codestral-2508', 'Codestral 2508', 'mistralai', 'Mistral', 'Coding', 'Medium', '256K'],
+  ['mistralai/mistral-large-2512', 'Mistral Large 3', 'mistralai', 'Mistral', 'Premium', 'Medium', '256K'],
+  ['moonshotai/kimi-k2-thinking', 'Kimi K2 Thinking', 'moonshotai', 'Moonshot AI', 'Reasoning', 'Medium', '256K'],
+  ['moonshotai/kimi-k2.6', 'Kimi K2.6', 'moonshotai', 'Moonshot AI', 'Balanced', 'High', '256K'],
+  ['z-ai/glm-4.7-flash', 'GLM 4.7 Flash', 'z-ai', 'Z.ai', 'Fast', 'Low', '200K'],
+  ['z-ai/glm-5.1', 'GLM 5.1', 'z-ai', 'Z.ai', 'Balanced', 'High', '200K'],
+  ['nvidia/nemotron-3-nano-30b-a3b', 'Nemotron 3 Nano', 'nvidia', 'NVIDIA', 'Fast', 'Low', '256K'],
+  ['openrouter/auto', 'OpenRouter Auto', 'openrouter', 'OpenRouter', 'Advanced', 'Variable', '2M'],
+].map(([id, name, providerKey, provider, category, cost, context]) => ({
+  id,
+  name,
+  providerKey,
+  provider,
+  category,
+  cost: cost as ModelCost,
+  context,
+}));
+
+const DEFAULT_HOSTED_MODEL = 'deepseek/deepseek-v4-flash';
+const HOSTED_PROXY_PROVIDER_PREFIX = 'hatcher-llm-proxy/';
+const HOSTED_MODEL_ALIASES = new Map<string, string>([
+  ['meta-llama/llama-4-scout-17b-16e-instruct', 'qwen/qwen3.6-35b-a3b'],
+  ['qwen/qwen3-32b', 'qwen/qwen3.6-35b-a3b'],
+  ['qwen/qwen3-235b-a22b-2507', 'qwen/qwen3.6-35b-a3b'],
+]);
 
 const NAME_REGEX = /^[a-zA-Z0-9 \-:'.()&]+$/;
 const MAX_PARSE_INPUT = 16000;
@@ -132,6 +249,42 @@ function syncInstallPlan(
   return out.slice(0, 12);
 }
 
+function normalizeHostedModelForUi(model: string | undefined): string {
+  let trimmed = model?.trim();
+  if (!trimmed) return DEFAULT_HOSTED_MODEL;
+  if (trimmed.startsWith(HOSTED_PROXY_PROVIDER_PREFIX)) {
+    trimmed = trimmed.slice(HOSTED_PROXY_PROVIDER_PREFIX.length);
+  }
+  return HOSTED_MODEL_ALIASES.get(trimmed) ?? trimmed;
+}
+
+function providerKeyFromModel(modelId: string): string {
+  const [providerKey] = modelId.split('/');
+  return providerKey?.trim() || 'openrouter';
+}
+
+function providerNameFromKey(providerKey: string): string {
+  return MODEL_PROVIDERS.find((provider) => provider.key === providerKey)?.name
+    ?? providerKey
+      .split('-')
+      .map((part) => part ? part[0]!.toUpperCase() + part.slice(1) : part)
+      .join(' ');
+}
+
+function createSavedHostedModelOption(modelId: string): HostedModel {
+  const providerKey = providerKeyFromModel(modelId);
+  const provider = providerNameFromKey(providerKey);
+  return {
+    id: modelId,
+    name: modelId,
+    providerKey,
+    provider,
+    category: 'Saved',
+    cost: 'Variable',
+    context: 'Provider-defined',
+  };
+}
+
 function normalizeConfig(config: ParsedConfig): ParsedConfig {
   const selectedSkills = uniq(
     config.selectedSkills?.length ? config.selectedSkills : config.suggestedSkills ?? [],
@@ -144,6 +297,7 @@ function normalizeConfig(config: ParsedConfig): ParsedConfig {
   const installPlan = syncInstallPlan(selectedSkills, selectedPlugins, config.installPlan ?? []);
   return {
     ...config,
+    model: normalizeHostedModelForUi(config.model),
     frameworkReason: config.frameworkReason ?? '',
     suggestedSkills: uniq(config.suggestedSkills?.length ? config.suggestedSkills : selectedSkills, 10),
     suggestedPlugins: selectedPlugins,
@@ -238,11 +392,10 @@ export function ChatToHatch() {
         ]);
         setOriginal(normalized);
         setDraft(normalized);
-        // Auto-open the personality / SOUL.md sections only when the LLM
-        // actually populated them, but only on the *fresh* parse so the
-        // user can collapse them again afterwards.
-        setShowPersonality(!!normalized.personality);
-        setShowSystemPrompt(!!normalized.systemPrompt);
+        // Keep long generated files collapsed by default so the preview
+        // does not push the chat controls out of the first viewport.
+        setShowPersonality(false);
+        setShowSystemPrompt(false);
       }
     } catch {
       if (myReqId !== reqIdRef.current) return;
@@ -417,6 +570,18 @@ export function ChatToHatch() {
 
   const fwVisual = draft ? FW_VISUAL[draft.framework] : null;
   const slug = draft ? slugify(draft.name) : '';
+  const selectedModelId = draft ? normalizeHostedModelForUi(draft.model) : DEFAULT_HOSTED_MODEL;
+  const selectedModel = HOSTED_MODELS.find((model) => model.id === selectedModelId)
+    ?? createSavedHostedModelOption(selectedModelId);
+  const selectedProvider = MODEL_PROVIDERS.find((provider) => provider.key === selectedModel.providerKey)
+    ?? { key: selectedModel.providerKey, name: selectedModel.provider };
+  const modelProviders = MODEL_PROVIDERS.some((provider) => provider.key === selectedProvider.key)
+    ? MODEL_PROVIDERS
+    : [...MODEL_PROVIDERS, selectedProvider];
+  const modelsForProvider = HOSTED_MODELS.filter((model) => model.providerKey === selectedProvider.key);
+  const hostedModelsForProvider = modelsForProvider.some((model) => model.id === selectedModel.id)
+    ? modelsForProvider
+    : [selectedModel, ...modelsForProvider];
 
   return (
     <div className={styles.page}>
@@ -442,7 +607,7 @@ export function ChatToHatch() {
 
         <div className={styles.grid}>
           {/* ─── Chat ─── */}
-          <div className={styles.col}>
+          <div className={`${styles.col} ${styles.chatCol}`}>
             <div className={styles.chatHead}>
               <div>
                 <h2 className={styles.chatTitle}>{t('assistantTitle')}</h2>
@@ -515,7 +680,7 @@ export function ChatToHatch() {
           </div>
 
           {/* ─── Preview (editable) ─── */}
-          <div className={styles.col}>
+          <div className={`${styles.col} ${styles.previewCol}`}>
             <div className={styles.previewHead}>
               <h2 className={styles.previewTitle}>{t('previewTitle')}</h2>
               <span className={styles.previewTag}>
@@ -529,57 +694,134 @@ export function ChatToHatch() {
 
             {draft && fwVisual && (
               <div className={styles.previewBody}>
-                <div className={styles.previewTopRow}>
-                  <span
-                    className={styles.fwBadge}
-                    style={{ '--fw': fwVisual.color } as React.CSSProperties}
-                  >
-	                    <span className={styles.fwGlyph} aria-hidden>{fwVisual.mark}</span>
-	                    {fwVisual.label}
-	                  </span>
-                  {original && (
-                    <button
-                      type="button"
-                      className={styles.resetBtn}
-                      onClick={applySuggested}
-                      aria-label={t('resetTooltip')}
-                      title={t('resetTooltip')}
-                    >
-                      {t('reset')}
-                    </button>
-                  )}
-	                </div>
+                <div className={styles.previewHero}>
+                  <div className={styles.avatarStage}>
+                    <AgentRoomAvatarPreview
+                      agentId={slug || draft.name || 'draft-agent'}
+                      framework={draft.framework}
+                      status="running"
+                      avatarVariant={draft.avatarVariant}
+                      activeEmote={thinking ? 'think' : 'wave'}
+                      emoteNonce={messages.length + (thinking ? 1 : 0)}
+                      isStreaming={thinking}
+                    />
+                    <span className={styles.avatarBadge}>
+                      {draft.avatarVariant || 'auto avatar'}
+                    </span>
+                  </div>
 
-	                <div className={styles.frameworkChooser} aria-label={t('labelFramework')}>
-	                  {(['openclaw', 'hermes'] as const).map((framework) => {
-	                    const visual = FW_VISUAL[framework];
-	                    const active = draft.framework === framework;
-	                    return (
-	                      <button
-	                        key={framework}
-	                        type="button"
-	                        className={`${styles.frameworkOption} ${active ? styles.frameworkOptionActive : ''}`}
-	                        style={{ '--fw': visual.color } as React.CSSProperties}
-	                        onClick={() => patchDraft({ framework })}
-	                      >
-	                        <span className={styles.frameworkOptionMark}>{visual.mark}</span>
-	                        <span>
-	                          <span className={styles.frameworkOptionName}>{visual.label}</span>
-	                          <span className={styles.frameworkOptionDesc}>
-	                            {framework === 'openclaw' ? t('frameworkOpenClaw') : t('frameworkHermes')}
-	                          </span>
-	                        </span>
-	                      </button>
-	                    );
-	                  })}
-	                </div>
+                  <div className={styles.previewHeroMeta}>
+                    <div className={styles.previewTopRow}>
+                      <span
+                        className={styles.fwBadge}
+                        style={{ '--fw': fwVisual.color } as React.CSSProperties}
+                      >
+                        <span className={styles.fwGlyph} aria-hidden>{fwVisual.mark}</span>
+                        {fwVisual.label}
+                      </span>
+                      {original && (
+                        <button
+                          type="button"
+                          className={styles.resetBtn}
+                          onClick={applySuggested}
+                          aria-label={t('resetTooltip')}
+                          title={t('resetTooltip')}
+                        >
+                          {t('reset')}
+                        </button>
+                      )}
+                    </div>
 
-	                {draft.frameworkReason && (
-	                  <div className={styles.reasonBox}>
-	                    <span className={styles.reasonLabel}>{t('labelFrameworkReason')}</span>
-	                    <p>{draft.frameworkReason}</p>
-	                  </div>
-	                )}
+                    <div className={styles.frameworkChooser} aria-label={t('labelFramework')}>
+                      {(['openclaw', 'hermes'] as const).map((framework) => {
+                        const visual = FW_VISUAL[framework];
+                        const active = draft.framework === framework;
+                        return (
+                          <button
+                            key={framework}
+                            type="button"
+                            className={`${styles.frameworkOption} ${active ? styles.frameworkOptionActive : ''}`}
+                            style={{ '--fw': visual.color } as React.CSSProperties}
+                            onClick={() => patchDraft({ framework })}
+                          >
+                            <span className={styles.frameworkOptionMark}>{visual.mark}</span>
+                            <span>
+                              <span className={styles.frameworkOptionName}>{visual.label}</span>
+                              <span className={styles.frameworkOptionDesc}>
+                                {framework === 'openclaw' ? t('frameworkOpenClaw') : t('frameworkHermes')}
+                              </span>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className={styles.modelChooser}>
+                      <label className={styles.selectLabel}>
+                        {t('labelModelProvider')}
+                        <select
+                          className={styles.selectInput}
+                          value={selectedProvider.key}
+                          onChange={(e) => {
+                            const firstModel = HOSTED_MODELS.find(
+                              (model) => model.providerKey === e.target.value,
+                            );
+                            if (firstModel) patchDraft({ model: firstModel.id });
+                          }}
+                        >
+                          {modelProviders.map((provider) => (
+                            <option key={provider.key} value={provider.key}>
+                              {provider.name}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+
+                      <label className={styles.selectLabel}>
+                        {t('labelModel')}
+                        <select
+                          className={styles.selectInput}
+                          value={selectedModel.id}
+                          onChange={(e) => patchDraft({ model: e.target.value })}
+                        >
+                          {hostedModelsForProvider.map((model) => (
+                            <option key={model.id} value={model.id}>
+                              {model.name} · {model.category} · {model.cost}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
+
+                    <div className={styles.modelSummary}>
+                      <span>{selectedModel.provider}</span>
+                      <span>{selectedModel.context}</span>
+                      <span>{selectedModel.cost}</span>
+                    </div>
+
+                    <label className={styles.selectLabel}>
+                      {t('labelAvatarVariant')}
+                      <select
+                        className={styles.selectInput}
+                        value={draft.avatarVariant}
+                        onChange={(e) => patchDraft({ avatarVariant: e.target.value })}
+                      >
+                        {AVATAR_OPTIONS.map((avatar) => (
+                          <option key={avatar.id || 'auto'} value={avatar.id}>
+                            {avatar.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                </div>
+
+                {draft.frameworkReason && (
+                  <div className={styles.reasonBox}>
+                    <span className={styles.reasonLabel}>{t('labelFrameworkReason')}</span>
+                    <p>{draft.frameworkReason}</p>
+                  </div>
+                )}
 
                 {/* Name */}
                 <label className={styles.fieldLabel}>
@@ -752,25 +994,14 @@ export function ChatToHatch() {
                   </div>
                 )}
 
-                {/* Model + avatar hint inline */}
-                <div className={styles.metaRow}>
-                  <span className={styles.metaItem}>
-                    <span className={styles.metaLabel}>{t('labelModel')}</span>
-                    <code className={styles.metaValue}>{draft.model.split('/').pop()}</code>
-                  </span>
-	                  {draft.avatarHint && (
-	                    <span className={styles.metaItem}>
-	                      <span className={styles.metaLabel}>{t('labelAvatar')}</span>
-	                      <span className={styles.metaValue}>{draft.avatarHint}</span>
-	                    </span>
-	                  )}
-	                  {draft.avatarVariant && (
-	                    <span className={styles.metaItem}>
-	                      <span className={styles.metaLabel}>{t('labelAvatarVariant')}</span>
-	                      <span className={styles.metaValue}>{draft.avatarVariant}</span>
-	                    </span>
-	                  )}
-	                </div>
+                {draft.avatarHint && (
+                  <div className={styles.metaRow}>
+                    <span className={styles.metaItem}>
+                      <span className={styles.metaLabel}>{t('labelAvatar')}</span>
+                      <span className={styles.metaValue}>{draft.avatarHint}</span>
+                    </span>
+                  </div>
+                )}
 
                 {draftError && (
                   <p className={styles.errorLine}>✕ {draftError}</p>

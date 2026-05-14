@@ -112,6 +112,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px;
+  align-items: start;
 }
 @media (max-width: 1000px) {
   .grid { grid-template-columns: 1fr; }
@@ -127,12 +128,39 @@
   min-height: 560px;
 }
 
+.chatCol {
+  position: sticky;
+  top: 18px;
+  height: min(640px, calc(100vh - 36px));
+}
+
+.previewCol {
+  min-height: 0;
+}
+
+@media (max-width: 1000px) {
+  .chatCol {
+    position: relative;
+    top: auto;
+    height: min(680px, calc(100vh - 36px));
+    min-height: 520px;
+  }
+}
+
+@media (max-width: 620px) {
+  .chatCol {
+    height: calc(100vh - 28px);
+    min-height: 520px;
+  }
+}
+
 /* ─── Chat column ─────────────────────────────────────── */
 
 .chatHead {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  flex: 0 0 auto;
   padding-bottom: 16px;
   border-bottom: 1px dashed var(--line-bright);
   margin-bottom: 18px;
@@ -185,7 +213,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  min-height: 240px;
+  min-height: 0;
 }
 .log::-webkit-scrollbar { width: 6px; }
 .log::-webkit-scrollbar-thumb { background: var(--line-bright); border-radius: 3px; }
@@ -256,6 +284,7 @@
   display: flex;
   gap: 10px;
   align-items: flex-end;
+  flex: 0 0 auto;
 }
 @media (max-width: 620px) {
   .inputWrap {
@@ -381,7 +410,76 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
+}
+
+.previewHero {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.avatarStage {
+  position: relative;
+  min-height: 206px;
+  overflow: hidden;
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(57, 255, 136, 0.18), transparent 48%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.24)),
+    var(--bg-2);
+}
+
+.avatarStage canvas {
+  display: block;
+}
+
+.avatarFallback {
+  width: 100%;
+  height: 100%;
+  min-height: 206px;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(57, 255, 136, 0.16), transparent 44%),
+    var(--bg-2);
+}
+
+.avatarBadge {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  padding: 6px 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.58);
+  color: var(--ink-soft);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.previewHeroMeta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (max-width: 620px) {
+  .previewHero {
+    grid-template-columns: 1fr;
+  }
+
+  .avatarStage {
+    min-height: 220px;
+  }
 }
 
 .fwBadge {
@@ -424,7 +522,7 @@
   align-items: flex-start;
   gap: 10px;
   width: 100%;
-  min-height: 74px;
+  min-height: 62px;
   padding: 10px;
   border: 1px solid var(--line-bright);
   border-radius: 8px;
@@ -467,9 +565,74 @@
 }
 .frameworkOptionDesc {
   margin-top: 4px;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.35;
   color: var(--ink-soft);
+}
+
+.modelChooser {
+  display: grid;
+  grid-template-columns: 0.82fr 1.18fr;
+  gap: 8px;
+}
+
+@media (max-width: 620px) {
+  .modelChooser {
+    grid-template-columns: 1fr;
+  }
+}
+
+.selectLabel {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.selectInput {
+  appearance: none;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line-bright);
+  border-radius: 6px;
+  background: var(--bg-2);
+  color: var(--ink);
+  padding: 9px 10px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.35;
+  letter-spacing: 0;
+  text-transform: none;
+  outline: none;
+}
+
+.selectInput:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(57, 255, 136, 0.18);
+}
+
+.modelSummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.modelSummary span {
+  min-width: 0;
+  padding: 4px 7px;
+  border: 1px solid var(--line-bright);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 5%, var(--bg-2));
+  color: var(--ink-soft);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .reasonBox {
