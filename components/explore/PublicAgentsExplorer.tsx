@@ -51,59 +51,67 @@ export function PublicAgentsExplorer({ agents, locale, copy }: Props) {
     () => filterExploreAgents(agents, { query, framework, liveOnly }),
     [agents, framework, liveOnly, query],
   );
+  const cardGridClassName = useMemo(() => {
+    if (filteredAgents.length === 1) return 'grid w-full max-w-md gap-4 md:mx-auto';
+    if (filteredAgents.length === 2) return 'grid gap-4 md:grid-cols-2 xl:max-w-4xl';
+    return 'grid gap-4 md:grid-cols-2 xl:grid-cols-3';
+  }, [filteredAgents.length]);
+  const showFilters = agents.length > 1;
 
   if (agents.length === 0) return null;
 
   return (
-    <div className="space-y-5">
-      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-3">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <label className="relative block flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder={copy.searchPlaceholder}
-              className="h-11 w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-base)] pl-10 pr-3 text-sm text-[var(--text-primary)] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--color-accent)]/70"
-            />
-          </label>
+    <div className="space-y-4 sm:space-y-5">
+      {showFilters ? (
+        <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-2.5 sm:p-3">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <label className="relative block flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={copy.searchPlaceholder}
+                className="h-11 w-full rounded-md border border-[var(--border-default)] bg-[var(--bg-base)] pl-10 pr-3 text-sm text-[var(--text-primary)] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--color-accent)]/70"
+              />
+            </label>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="inline-flex items-center gap-1 rounded-md border border-[var(--border-default)] bg-[var(--bg-base)] p-1">
-              {FRAMEWORK_FILTERS.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => setFramework(item)}
-                  className={`h-9 rounded-[6px] px-3 text-xs font-semibold transition-colors ${
-                    framework === item
-                      ? 'bg-[var(--color-accent)] text-white'
-                      : 'text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]'
-                  }`}
-                >
-                  {frameworkLabel(item, copy)}
-                </button>
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={() => setLiveOnly((value) => !value)}
-              className={`inline-flex h-11 items-center gap-2 rounded-md border px-3 text-sm font-semibold transition-colors ${
-                liveOnly
-                  ? 'border-emerald-400/45 bg-emerald-400/12 text-emerald-200'
-                  : 'border-[var(--border-default)] bg-[var(--bg-base)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-              }`}
-            >
-              <Radio className="h-4 w-4" />
-              {copy.filterLive}
-            </button>
-            <div className="inline-flex h-11 items-center gap-2 rounded-md border border-[var(--border-default)] bg-[var(--bg-base)] px-3 text-sm font-medium text-[var(--text-muted)]">
-              <SlidersHorizontal className="h-4 w-4" />
-              {copy.showingCount.replace('{count}', numberFormat.format(filteredAgents.length))}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-1 rounded-md border border-[var(--border-default)] bg-[var(--bg-base)] p-1">
+                {FRAMEWORK_FILTERS.map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => setFramework(item)}
+                    className={`h-9 rounded-[6px] px-2.5 text-xs font-semibold transition-colors sm:px-3 ${
+                      framework === item
+                        ? 'bg-[var(--color-accent)] text-white'
+                        : 'text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    {frameworkLabel(item, copy)}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => setLiveOnly((value) => !value)}
+                className={`inline-flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-semibold transition-colors sm:h-11 ${
+                  liveOnly
+                    ? 'border-emerald-400/45 bg-emerald-400/12 text-emerald-200'
+                    : 'border-[var(--border-default)] bg-[var(--bg-base)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                <Radio className="h-4 w-4" />
+                {copy.filterLive}
+              </button>
+              <div className="inline-flex h-10 items-center gap-2 rounded-md border border-[var(--border-default)] bg-[var(--bg-base)] px-3 text-sm font-medium text-[var(--text-muted)] sm:h-11">
+                <SlidersHorizontal className="h-4 w-4" />
+                {copy.showingCount.replace('{count}', numberFormat.format(filteredAgents.length))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      ) : null}
 
       {filteredAgents.length === 0 ? (
         <div className="flex min-h-[260px] flex-col items-center justify-center rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-6 py-12 text-center">
@@ -116,12 +124,12 @@ export function PublicAgentsExplorer({ agents, locale, copy }: Props) {
           </p>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className={cardGridClassName}>
           {filteredAgents.map((agent, index) => (
             <PublicAgentCard
               key={agent.id}
               agent={agent}
-              featured={index < 3}
+              featured={index === 0}
               numberFormat={numberFormat}
               copy={copy}
             />
