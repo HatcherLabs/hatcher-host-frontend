@@ -55,7 +55,7 @@ export default async function ExplorePage() {
 
   return (
     <MarketingShell>
-      <section className="border-b border-[var(--border-default)] bg-[var(--bg-base)] pt-28 pb-10">
+      <section className="border-b border-[var(--border-default)] bg-[var(--bg-base)] pt-14 pb-4 sm:pt-24 sm:pb-10">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
@@ -63,13 +63,13 @@ export default async function ExplorePage() {
                 <Sparkles className="h-3.5 w-3.5" />
                 {t('eyebrow')}
               </div>
-              <h1 className="mt-5 text-4xl font-semibold tracking-normal text-[var(--text-primary)] sm:text-5xl">
+              <h1 className="mt-4 text-3xl font-semibold tracking-normal text-[var(--text-primary)] sm:mt-5 sm:text-5xl">
                 {t('title')}
               </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--text-secondary)]">
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--text-secondary)] sm:mt-4 sm:text-base sm:leading-7">
                 {t('body')}
               </p>
-              <div className="mt-5 grid max-w-2xl gap-2 sm:grid-cols-3">
+              <div className="mt-4 grid max-w-2xl grid-cols-3 gap-2 sm:mt-5">
                 <ExploreStat label={t('statsAgents', { count: stats.total })} />
                 <ExploreStat label={t('statsLive', { count: stats.live })} accent />
                 <ExploreStat label={t('statsInteractions', { count: stats.interactions })} />
@@ -86,7 +86,7 @@ export default async function ExplorePage() {
         </div>
       </section>
 
-      <section className="bg-[var(--bg-base)] py-10">
+      <section className="bg-[var(--bg-base)] py-4 sm:py-10">
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
           {agents.length === 0 ? (
             <div className="flex min-h-[320px] flex-col items-center justify-center rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-6 py-12 text-center">
@@ -134,7 +134,7 @@ export default async function ExplorePage() {
 function ExploreStat({ label, accent = false }: { label: string; accent?: boolean }) {
   return (
     <div
-      className={`rounded-lg border px-3 py-2 text-sm font-semibold ${
+      className={`rounded-lg border px-2 py-2 text-[11px] font-semibold leading-tight sm:px-3 sm:text-sm ${
         accent
           ? 'border-emerald-400/25 bg-emerald-400/10 text-emerald-300'
           : 'border-[var(--border-default)] bg-[var(--bg-muted)] text-[var(--text-secondary)]'
