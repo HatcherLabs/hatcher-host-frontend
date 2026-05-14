@@ -1,19 +1,25 @@
 'use client';
 import { useFrame } from '@react-three/fiber';
+import type { MutableRefObject } from 'react';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { liveAgentColor } from './LiveCityColors';
-import { makeLiveAgentLoopPath, sampleLiveAgentPath } from './liveAgentMotion';
+import {
+  makeLiveAgentLoopPath,
+  sampleLiveAgentPath,
+  type LiveAgentPose,
+} from './liveAgentMotion';
 import type { LiveAgentMarkerLayout } from './liveLayout';
 
 interface Props {
   markers: LiveAgentMarkerLayout[];
   onMarkerClick?: (agentId: string) => void;
+  poseRef?: MutableRefObject<Map<string, LiveAgentPose>>;
 }
 
 const TRAIL_LEN = 22;
 
-export function LiveAgentMarkers({ markers, onMarkerClick }: Props) {
+export function LiveAgentMarkers({ markers, onMarkerClick, poseRef }: Props) {
   if (markers.length === 0) return null;
 
   return (
@@ -23,6 +29,7 @@ export function LiveAgentMarkers({ markers, onMarkerClick }: Props) {
           key={marker.agentId}
           marker={marker}
           onMarkerClick={onMarkerClick}
+          poseRef={poseRef}
         />
       ))}
     </group>
@@ -32,9 +39,11 @@ export function LiveAgentMarkers({ markers, onMarkerClick }: Props) {
 function LiveRobotAgent({
   marker,
   onMarkerClick,
+  poseRef,
 }: {
   marker: LiveAgentMarkerLayout;
   onMarkerClick?: (agentId: string) => void;
+  poseRef?: MutableRefObject<Map<string, LiveAgentPose>>;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const leftArmRef = useRef<THREE.Mesh>(null);
@@ -83,16 +92,19 @@ function LiveRobotAgent({
   }, [colorObject, marker.x, marker.z, trail]);
 
   useEffect(() => {
+    const poseRegistry = poseRef?.current;
     return () => {
       trail.geometry.dispose();
       (trail.material as THREE.Material).dispose();
+      poseRegistry?.delete(marker.agentId);
     };
-  }, [trail]);
+  }, [marker.agentId, poseRef, trail]);
 
   useFrame(({ clock }, delta) => {
     const elapsed = clock.elapsedTime;
     const travel = elapsed * marker.speed + marker.phase;
     const pose = sampleLiveAgentPath(path, travel);
+    poseRef?.current.set(marker.agentId, pose);
     const bob = Math.sin((elapsed + marker.phase) * 18) * 0.025;
     const swing = Math.sin((elapsed + marker.phase) * 9) * 0.55;
 

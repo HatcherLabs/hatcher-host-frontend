@@ -39,6 +39,7 @@ import {
   cityBuildingTitle,
   isViewerBuilding,
 } from './cityNavigation';
+import { agentFocusTargetFor, type AgentFocusTarget } from './agentFocusTarget';
 import { publicAgentChatHref, selectActiveCityAgents } from './activeAgentList';
 import { LIVE_CITY_TIERS, type LiveCityGrid, type LiveCityTimeMode } from './liveCityHandoff';
 import { layoutLiveCity, type LiveAgentMarkerLayout, type LiveBuildingLayout } from './liveLayout';
@@ -47,7 +48,11 @@ import { LiveActivityPulses } from './LiveActivityPulses';
 import { LiveBuildings } from './LiveBuildings';
 import { LiveCityHud } from './LiveCityHud';
 import { LiveCityInfrastructure } from './LiveCityInfrastructure';
-import { makeLiveAgentLoopPath, sampleLiveAgentPath } from './liveAgentMotion';
+import {
+  makeLiveAgentLoopPath,
+  sampleLiveAgentPath,
+  type LiveAgentPose,
+} from './liveAgentMotion';
 import {
   createAgentColliders,
   createWalkCollisionMap,
@@ -66,13 +71,6 @@ interface Props {
   pulseAts: Map<string, number>;
   canEnterBuilding?: boolean;
   viewerUsername?: string | null;
-}
-
-interface SurveyFocusTarget {
-  key: string;
-  x: number;
-  z: number;
-  height: number;
 }
 
 const EMPTY_COUNTS: CityResponse['counts'] = {
@@ -201,7 +199,8 @@ function LiveCitySceneBody({
   const [viewMode, setViewMode] = useState<'survey' | 'walk'>('survey');
   const [selectedOwnerKey, setSelectedOwnerKey] = useState<string | null>(null);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
-  const [cameraFocus, setCameraFocus] = useState<SurveyFocusTarget | null>(null);
+  const [cameraFocus, setCameraFocus] = useState<AgentFocusTarget | null>(null);
+  const agentPosesRef = useRef<Map<string, LiveAgentPose>>(new Map());
   const mobileWalkVector = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const layout = useMemo(
     () =>
@@ -280,12 +279,9 @@ function LiveCitySceneBody({
     setViewMode('survey');
     setSelectedOwnerKey(null);
     setSelectedAgentId(marker.agentId);
-    setCameraFocus({
-      key: `agent:${marker.agentId}:${Date.now()}`,
-      x: marker.x,
-      z: marker.z,
-      height: marker.height,
-    });
+    setCameraFocus(
+      agentFocusTargetFor(marker, agentPosesRef.current.get(marker.agentId)),
+    );
   };
   const selectedAgentChatHref = selectedAgent ? publicAgentChatHref(selectedAgent) : null;
   const mobilePrimaryAction =
@@ -360,6 +356,7 @@ function LiveCitySceneBody({
         <SceneErrorBoundary label="LiveAgentMarkers">
           <LiveAgentMarkers
             markers={layout.markers}
+            poseRef={agentPosesRef}
             onMarkerClick={(agentId) => {
               setSelectedOwnerKey(null);
               setSelectedAgentId(agentId);
@@ -831,7 +828,7 @@ function SurveyCamera({
   focusTarget,
 }: {
   grid: LiveCityGrid;
-  focusTarget: SurveyFocusTarget | null;
+  focusTarget: AgentFocusTarget | null;
 }) {
   const { camera } = useThree();
   const mapTarget = useMemo<[number, number, number]>(
