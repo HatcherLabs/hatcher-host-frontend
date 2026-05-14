@@ -14,6 +14,7 @@ interface Props {
   agentId?: string;
   status?: string;
   avatarVariant?: string | null;
+  avatarTraits?: unknown;
   activeEmote?: RoomEmoteId | null;
   emoteNonce?: number;
 }
@@ -28,6 +29,7 @@ export function AgentAvatar({
   agentId,
   status,
   avatarVariant,
+  avatarTraits,
   activeEmote,
   emoteNonce,
 }: Props) {
@@ -57,6 +59,7 @@ export function AgentAvatar({
           isStreaming={!!isStreaming}
           status={status}
           avatarVariant={avatarVariant}
+          avatarTraits={avatarTraits}
           activeEmote={activeEmote}
           emoteNonce={emoteNonce}
         />

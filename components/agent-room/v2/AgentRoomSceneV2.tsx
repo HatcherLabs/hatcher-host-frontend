@@ -32,6 +32,7 @@ interface Props {
   quality: Quality;
   isChatStreaming?: boolean;
   avatarVariant?: string | null;
+  avatarTraits?: unknown;
   activeEmote?: RoomEmoteId | null;
   emoteNonce?: number;
   onStationClick: (id: StationId) => void;
@@ -66,6 +67,7 @@ export function AgentRoomSceneV2({
   quality,
   isChatStreaming,
   avatarVariant,
+  avatarTraits,
   activeEmote,
   emoteNonce,
   onStationClick,
@@ -126,6 +128,7 @@ export function AgentRoomSceneV2({
             isNear={nearest === 'agentAvatar'}
             isStreaming={isChatStreaming}
             avatarVariant={avatarVariant}
+            avatarTraits={avatarTraits}
             activeEmote={activeEmote}
             emoteNonce={emoteNonce}
           />

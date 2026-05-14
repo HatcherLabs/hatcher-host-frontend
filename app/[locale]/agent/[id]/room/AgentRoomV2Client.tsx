@@ -373,6 +373,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
 
   const nearest = useStationProximity(posRef, layout);
   const selectedAvatarVariant = normalizeAvatarVariant(agent?.config?.roomAvatarVariant);
+  const selectedAvatarTraits = agent?.config?.roomAvatarTraits ?? agent?.config?.avatarTraits;
   const mobileBackTarget = useMemo(
     () => resolveMobileBackTarget(searchParams.get('from'), apiId),
     [apiId, searchParams],
@@ -528,6 +529,7 @@ export function AgentRoomV2Client({ agentId }: Props) {
         quality={quality}
         isChatStreaming={isChatStreaming}
         avatarVariant={selectedAvatarVariant}
+        avatarTraits={selectedAvatarTraits}
         activeEmote={activeEmote}
         emoteNonce={emoteNonce}
         onStationClick={handleStationClick}

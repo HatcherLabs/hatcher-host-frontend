@@ -132,6 +132,7 @@ export function AgentPresenceRail() {
               framework={agent.framework}
               status={agent.status}
               avatarVariant={selectedVariant}
+              avatarTraits={agent.config?.roomAvatarTraits ?? agent.config?.avatarTraits}
               activeEmote={activeEmote}
               emoteNonce={emoteNonce}
               isStreaming={thinking}
