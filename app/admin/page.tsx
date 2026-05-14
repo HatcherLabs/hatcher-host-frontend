@@ -1444,12 +1444,12 @@ export default function AdminPage() {
       <div className="mx-auto w-full max-w-7xl space-y-6">
         {/* ── Header ────────────────────────────────────────── */}
         <motion.div
-          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+          className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4"
           variants={cardVariants}
         >
           <div>
             <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--text-muted)]">Internal</p>
-            <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-display), system-ui, sans-serif' }}>
               Admin panel
             </h1>
             <p className="text-sm mt-2 text-[var(--text-secondary)]">
@@ -1460,7 +1460,7 @@ export default function AdminPage() {
           <button
             onClick={handleRefresh}
             disabled={loading}
-            className="btn-secondary text-sm"
+            className="btn-secondary text-sm w-full sm:w-auto justify-center"
           >
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
             Refresh
@@ -1939,7 +1939,98 @@ export default function AdminPage() {
                   </p>
                 </div>
               ) : (
-                <div className="overflow-x-auto -mx-3 sm:-mx-0 px-3 sm:px-0">
+                <>
+                <div className="sm:hidden space-y-3">
+                  {frameworkFilteredAgents.map((agent) => {
+                    const inProgress = actionInProgress[agent.id];
+                    return (
+                      <article
+                        key={agent.id}
+                        className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-4"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <Link href={`/admin/agent/${agent.id}`} className="min-w-0 flex-1 group">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-lg bg-[var(--color-accent)]/12 flex items-center justify-center flex-shrink-0">
+                                <Bot size={14} className="text-[var(--color-accent)]" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-sm font-semibold truncate text-[var(--text-primary)] group-hover:text-[var(--color-accent)]">
+                                  {agent.name}
+                                </p>
+                                <p className="text-[10px] font-mono truncate text-[var(--text-muted)]">
+                                  {agent.id.slice(0, 10)} · {timeAgo(agent.createdAt)}
+                                </p>
+                              </div>
+                            </div>
+                          </Link>
+                          <StatusBadge status={agent.status} />
+                        </div>
+
+                        <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-2">
+                            <p className="mb-1 text-[10px] uppercase tracking-wider text-[var(--text-muted)]">Owner</p>
+                            <button
+                              onClick={() => {
+                                const ownerUser = users.find((u) => u.username === agent.ownerUsername);
+                                if (ownerUser) loadUserDetail(ownerUser.id);
+                              }}
+                              className="max-w-full truncate text-left font-mono text-[var(--text-secondary)] hover:text-[var(--color-accent)]"
+                            >
+                              {agent.ownerUsername ?? shortenAddress(agent.ownerWallet ?? '', 4)}
+                            </button>
+                          </div>
+                          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-2">
+                            <p className="mb-1 text-[10px] uppercase tracking-wider text-[var(--text-muted)]">Framework</p>
+                            <FrameworkTag framework={agent.framework} />
+                          </div>
+                          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-2">
+                            <p className="mb-1 text-[10px] uppercase tracking-wider text-[var(--text-muted)]">Messages</p>
+                            <p className="font-mono text-[var(--text-primary)]">{agent.messageCount?.toLocaleString() ?? 0}</p>
+                          </div>
+                          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-2">
+                            <p className="mb-1 text-[10px] uppercase tracking-wider text-[var(--text-muted)]">Created</p>
+                            <p className="text-[var(--text-primary)]">{timeAgo(agent.createdAt)}</p>
+                          </div>
+                        </div>
+
+                        <div className="mt-3 grid grid-cols-3 gap-2">
+                          <Link
+                            href={`/admin/agent/${agent.id}`}
+                            className="flex items-center justify-center gap-1 rounded-lg border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/10 px-3 py-2 text-xs font-semibold text-[var(--color-accent)]"
+                          >
+                            <ExternalLink size={11} />
+                            View
+                          </Link>
+                          <button
+                            onClick={() => handlePause(agent.id)}
+                            disabled={
+                              agent.status === 'paused' ||
+                              agent.status === 'killed' ||
+                              agent.status === 'sleeping' ||
+                              agent.status === 'restarting' ||
+                              !!inProgress
+                            }
+                            className="flex items-center justify-center gap-1 rounded-lg border border-amber-400/20 bg-amber-400/10 px-3 py-2 text-xs font-semibold text-amber-400 disabled:opacity-30"
+                          >
+                            {inProgress === 'pause' ? <RefreshCw size={11} className="animate-spin" /> : <Pause size={11} />}
+                            Pause
+                          </button>
+                          <button
+                            onClick={() => handleKill(agent.id)}
+                            disabled={agent.status === 'killed' || !!inProgress}
+                            className="flex items-center justify-center gap-1 rounded-lg border border-red-400/20 bg-red-400/10 px-3 py-2 text-xs font-semibold text-red-400 disabled:opacity-30"
+                          >
+                            {inProgress === 'kill' ? <RefreshCw size={11} className="animate-spin" /> : <XCircle size={11} />}
+                            Kill
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+
+                <div className="hidden sm:block overflow-x-auto -mx-3 sm:-mx-0 px-3 sm:px-0">
                   <table className="w-full text-left text-xs sm:text-sm" style={{ tableLayout: 'auto', minWidth: '700px' }}>
                     <thead>
                       <tr className="border-b border-[var(--border-default)]">
@@ -2071,6 +2162,7 @@ export default function AdminPage() {
                     </tbody>
                   </table>
                 </div>
+                </>
               )}
 
               {/* Load More / Load All */}

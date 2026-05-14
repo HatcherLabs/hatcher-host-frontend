@@ -284,7 +284,7 @@ export function NotificationCenter() {
 
       {open && (
           <div
-            className="absolute right-0 mt-1 w-80 rounded-xl shadow-xl z-50 overflow-hidden bg-[var(--bg-card-solid)] border border-[var(--border-default)]"
+            className="fixed left-3 right-3 top-16 z-50 overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--bg-card-solid)] shadow-xl sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-1 sm:w-80"
             style={{
               backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',
