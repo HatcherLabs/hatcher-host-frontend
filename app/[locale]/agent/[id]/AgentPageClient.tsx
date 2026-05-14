@@ -280,7 +280,7 @@ function PublicAgentChat({
   }, [sendMessage]);
 
   return (
-    <motion.div ref={rootRef} className={`${cardClass} mb-6 overflow-hidden`} variants={itemVariants}>
+    <motion.div ref={rootRef} className={`${cardClass} mb-6 scroll-mt-24 overflow-hidden`} variants={itemVariants}>
       <div className="flex items-center justify-between gap-3 border-b border-[var(--border-default)] px-5 py-4">
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-accent)]">
