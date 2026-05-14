@@ -157,7 +157,7 @@
         "Planificateur de voyage",
         "Assistant personnel"
       ],
-      "body": "Choisissez un framework. Configurez. Lancez en 60 secondes. Aucun code requis, aucune infrastructure à gérer. 4 frameworks, 20+ plateformes, forfait gratuit avec BYOK.",
+      "body": "Choisissez un framework. Configurez. Lancez en 60 secondes. Aucun code requis, aucune infrastructure à gérer. OpenClaw et Hermes, 20+ plateformes, forfait gratuit avec BYOK.",
       "ctaPrimary": "Commencer gratuitement",
       "ctaSecondary": "Lire la documentation",
       "agentPreviewOnline": "CryptoHelper — En ligne"
@@ -752,13 +752,13 @@
         "plugins": "Plugins + compétences",
         "integrations": "Toutes les intégrations",
         "byokKey": "BYOK (propre clé LLM)",
-        "defaultLlm": "LLM par défaut (OpenRouter)"
+        "defaultLlm": "Sélection du modèle"
       },
       "values": {
         "unlimited": "Illimité",
         "alwaysOn": "Toujours actif",
         "addon": "Extension",
-        "llama4Scout": "DeepSeek V4 Flash"
+        "llama4Scout": "Sélecteur fournisseur/modèle"
       }
     },
     "faq": {
@@ -1800,7 +1800,7 @@
   "frameworks": {
     "eyebrow": "Frameworks",
     "heading": "Choisissez le bon framework",
-    "subheading": "Hatcher prend en charge 4 frameworks d'agents éprouvés. Chacun a des points forts uniques — voici comment choisir.",
+    "subheading": "Hatcher se concentre sur deux frameworks d'agents prêts pour la production : OpenClaw pour l'automatisation riche en outils et Hermes pour les agents adaptatifs de longue durée.",
     "deployCta": "Déployer un agent",
     "docsLink": "Documentation complète",
     "atAGlance": "En un coup d'œil",
@@ -1814,13 +1814,13 @@
     "memoryUsage": "Utilisation mémoire de base",
     "lowerFaster": "Plus bas = plus rapide",
     "lowerLeaner": "Plus bas = plus léger",
-    "benchmarkCallout": "🌸 Hermes est le plus rapide et le plus léger — idéal pour les déploiements gratuits. 🦞 OpenClaw offre le plus d'outils mais nécessite plus de ressources.",
+    "benchmarkCallout": "OpenClaw est idéal quand vous avez besoin du plus grand ensemble de skills et d'automatisations. Hermes est plus léger pour les agents adaptatifs avec mémoire et workflows de recherche.",
     "configExamples": "Exemples de configuration",
     "configSubheading": "Chaque framework a son propre format de config. Voici à quoi ressemble une configuration typique.",
     "configRef": "Référence de configuration complète →",
     "docsSuffix": "docs",
     "llmSupport": "Support LLM",
-    "llmSubheading": "Tous les frameworks prennent en charge BYOK pour une utilisation payée directement au fournisseur. Les LLM hébergés passent par OpenRouter avec DeepSeek V4 Flash par défaut et utilisent des AI Credits.",
+    "llmSubheading": "Les deux frameworks prennent en charge BYOK pour une utilisation payée directement au fournisseur. Les LLM hébergés passent par OpenRouter avec le fournisseur et le modèle choisis dans la configuration de chaque agent, puis utilisent des AI Credits.",
     "byokNote": "* BYOK toujours gratuit — utilisation payée directement au fournisseur.",
     "byokSetupLink": "Voir le guide de configuration BYOK →",
     "decisionGuide": "Guide de décision rapide",
@@ -2136,44 +2136,52 @@
         "description": "Configurez votre premier agent IA en moins de 60 secondes. Guide de démarrage rapide, prérequis et premier déploiement."
       },
       {
-        "title": "Configuration de l'agent",
-        "description": "Configurez la personnalité, les modèles, la mémoire, les tâches cron, les webhooks et le routage multi-agent."
+        "title": "Agents & Chat-to-Hatch",
+        "description": "Utilisez Chat-to-Hatch, choisissez OpenClaw ou Hermes, puis ajustez le runtime, les fichiers, les intégrations et le routage du modèle."
       },
       {
-        "title": "Intégrations de plateformes",
-        "description": "Connectez-vous à Telegram, Discord, WhatsApp, Slack et 20+ plateformes de messagerie."
+        "title": "AI Credits",
+        "description": "Découvrez comment les crédits mensuels et les top-ups alimentent les LLM hébergés, la recherche web, research, extract et crawl."
       },
       {
         "title": "Configuration BYOK",
-        "description": "Apportez vos propres clés API pour OpenAI, Anthropic, Google, xAI et plus. Toujours gratuit."
+        "description": "Ajoutez vos propres clés fournisseur pour OpenAI, Anthropic, Google, xAI, OpenRouter et plus. BYOK ne consomme pas d'AI Credits Hatcher."
       },
       {
-        "title": "Facturation & tarifs",
-        "description": "Comprenez les paiements en tokens, les déverrouillages de fonctionnalités, les crédits hébergés et la gestion des abonnements."
+        "title": "Frameworks",
+        "description": "Comparez OpenClaw et Hermes : cas d'usage, routage du modèle, BYOK et comportement du runtime hébergé."
+      },
+      {
+        "title": "Intégrations de plateformes",
+        "description": "Connectez Telegram, Discord, Slack, Twitter/X, Signal, webhooks et d'autres canaux inclus dans chaque forfait."
+      },
+      {
+        "title": "Application Android",
+        "description": "Installez l'application Android, connectez-vous, gérez vos agents et recevez des notifications push sur mobile."
       },
       {
         "title": "Référence API",
-        "description": "Endpoints REST API pour les agents, les fonctionnalités, les paiements et les opérations d'administration."
+        "description": "Endpoints REST API pour les agents, la facturation, les AI Credits, les paiements, le chat public et l'administration."
       }
     ],
     "topics": [
       {
-        "label": "Comment déployer votre premier agent"
+        "label": "Décrire un agent avec Chat-to-Hatch"
       },
       {
-        "label": "Fournisseurs LLM pris en charge"
+        "label": "Comment les AI Credits sont utilisés"
       },
       {
-        "label": "Configuration du framework d'agent"
+        "label": "Modèles hébergés et BYOK"
       },
       {
-        "label": "Cycle de vie du conteneur et codes de statut"
+        "label": "Notifications push Android"
       },
       {
         "label": "Configuration de l'intégration Telegram"
       },
       {
-        "label": "Comprendre les paiements en tokens"
+        "label": "Moyens de paiement pris en charge"
       }
     ]
   },
@@ -2274,7 +2282,7 @@
     "h1Accent": "Fais-le éclore.",
     "authChecking": "Vérification de la session…",
     "assistantTitle": "Assistant Hatcher",
-    "assistantSub": "Propulsé par DeepSeek V4 Flash · transforme l'intention en une configuration d'agent complète",
+    "assistantSub": "Propulsé par Hatcher AI · transforme l'intention en une configuration d'agent complète",
     "live": "En direct",
     "assistantWho": "Hatcher",
     "intro": "Décris l'agent que tu veux — ce qu'il fait, où il tourne, quel ton. Je choisis un framework, je génère un nom + identité + compétences, et je le mets en file pour l'éclosion. Une ou deux phrases suffisent ; tout est éditable ensuite.",

@@ -11,6 +11,7 @@ import {
   KeyRound,
   CreditCard,
   Code,
+  Smartphone,
   Search,
   ExternalLink,
   HelpCircle,
@@ -18,7 +19,7 @@ import {
   ArrowRight,
   BookOpen,
   Plug,
-  Zap,
+  Boxes,
 } from 'lucide-react';
 import { DOCS_URL } from '@/lib/config';
 
@@ -50,10 +51,12 @@ const staggerItem = {
 // ── Quick link icons + hrefs (titles/descriptions come from i18n) ──
 const QUICK_LINKS_ICONS = [
   { icon: Rocket, href: '/getting-started', color: 'var(--color-accent)' },
-  { icon: Bot, href: '/agent-configuration', color: '#22d3ee' },
-  { icon: Globe, href: '/integrations', color: '#a78bfa' },
+  { icon: Bot, href: '/agents', color: '#22d3ee' },
+  { icon: CreditCard, href: '/billing/credits', color: '#fbbf24' },
   { icon: KeyRound, href: '/byok', color: '#4ade80' },
-  { icon: CreditCard, href: '/billing', color: '#fbbf24' },
+  { icon: Boxes, href: '/frameworks', color: '#a78bfa' },
+  { icon: Globe, href: '/integrations', color: '#38bdf8' },
+  { icon: Smartphone, href: '/mobile', color: '#fb7185' },
   { icon: Code, href: '/api-reference', color: '#f87171' },
 ];
 
@@ -209,12 +212,12 @@ export default function DocsPage() {
           <div className="grid gap-3 sm:grid-cols-2">
             {(t.raw('topics') as Array<{ label: string }>).map((topic, idx) => {
               const topicHrefs = [
-                '/getting-started#deploy',
+                '/getting-started#describe-the-agent-in-chat-to-hatch',
+                '/billing/credits',
                 '/byok#providers',
-                '/agent-configuration#openclaw',
-                '/api-reference#containers',
+                '/mobile#push-notifications',
                 '/integrations#telegram',
-                '/billing#hatch-payments',
+                '/billing/payments',
               ];
               return (
                 <a

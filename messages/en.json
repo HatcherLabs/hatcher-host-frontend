@@ -752,13 +752,13 @@
         "plugins": "Plugins + Skills",
         "integrations": "All integrations",
         "byokKey": "BYOK (own LLM key)",
-        "defaultLlm": "Default LLM (OpenRouter)"
+        "defaultLlm": "Model selection"
       },
       "values": {
         "unlimited": "Unlimited",
         "alwaysOn": "Always-on",
         "addon": "Add-on",
-        "llama4Scout": "DeepSeek V4 Flash"
+        "llama4Scout": "Provider/model selector"
       }
     },
     "faq": {
@@ -1820,7 +1820,7 @@
     "configRef": "Full configuration reference →",
     "docsSuffix": "docs",
     "llmSupport": "LLM support",
-    "llmSubheading": "Both frameworks support BYOK (Bring Your Own Key) for provider-paid usage. On hosted LLMs, Hatcher routes through OpenRouter with DeepSeek V4 Flash by default and meters usage with AI Credits.",
+    "llmSubheading": "Both frameworks support BYOK (Bring Your Own Key) for provider-paid usage. Hosted LLMs route through OpenRouter using the provider and model selected in each agent config, then meter usage with AI Credits.",
     "byokNote": "* BYOK always free — provider-paid usage without Hatcher AI Credits.",
     "byokSetupLink": "View BYOK setup guide →",
     "decisionGuide": "Quick decision guide",
@@ -2137,43 +2137,51 @@
       },
       {
         "title": "Agent Configuration",
-        "description": "Configure personality, models, memory, cron jobs, webhooks, and multi-agent routing."
+        "description": "Use Chat-to-Hatch, choose OpenClaw or Hermes, and tune runtime, files, integrations, and model routing."
       },
       {
-        "title": "Platform Integrations",
-        "description": "Connect to Telegram, Discord, WhatsApp, Slack, and 20+ messaging platforms."
+        "title": "AI Credits",
+        "description": "See how monthly AI Credits and one-time top-ups power hosted LLMs, web search, research, extract, and crawl tools."
       },
       {
         "title": "BYOK Setup",
-        "description": "Bring your own API keys for OpenAI, Anthropic, Google, xAI, and more. Always free."
+        "description": "Bring your own provider keys for OpenAI, Anthropic, Google, xAI, OpenRouter, and more. BYOK never spends Hatcher AI Credits."
       },
       {
-        "title": "Billing & Pricing",
-        "description": "Understand token payments, feature unlocks, hosted credits, and subscription management."
+        "title": "Frameworks",
+        "description": "Compare OpenClaw and Hermes, including framework fit, model routing, BYOK, and hosted runtime behavior."
+      },
+      {
+        "title": "Platform Integrations",
+        "description": "Connect Telegram, Discord, Slack, Twitter/X, Signal, webhooks, and other channels included on every tier."
+      },
+      {
+        "title": "Android App",
+        "description": "Install the Android app, sign in, manage agents, and receive push notifications from your mobile device."
       },
       {
         "title": "API Reference",
-        "description": "REST API endpoints for agents, features, payments, and admin operations."
+        "description": "REST API endpoints for agents, billing, AI Credits, payments, public chat, and admin operations."
       }
     ],
     "topics": [
       {
-        "label": "How to deploy your first agent"
+        "label": "Describe an agent with Chat-to-Hatch"
       },
       {
-        "label": "Supported LLM providers"
+        "label": "How AI Credits are spent"
       },
       {
-        "label": "Agent framework configuration"
+        "label": "Hosted models and BYOK"
       },
       {
-        "label": "Container lifecycle & status codes"
+        "label": "Android push notifications"
       },
       {
         "label": "Setting up Telegram integration"
       },
       {
-        "label": "Understanding token payments"
+        "label": "Supported payment methods"
       }
     ]
   },
@@ -2274,7 +2282,7 @@
     "h1Accent": "Hatch it.",
     "authChecking": "Checking session…",
     "assistantTitle": "Hatcher Assistant",
-    "assistantSub": "Powered by DeepSeek V4 Flash · parses intent into a full agent config",
+    "assistantSub": "Powered by Hatcher AI · parses intent into a full agent config",
     "live": "Live",
     "assistantWho": "Hatcher",
     "intro": "Describe the agent you want — what it does, where it runs, what tone of voice. I'll pick a framework, generate a name + identity + skills, and queue it for hatching. One or two sentences is enough; you can edit every field after.",

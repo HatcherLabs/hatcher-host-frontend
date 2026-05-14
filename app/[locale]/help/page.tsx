@@ -101,7 +101,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'How do I change the AI model?',
-        a: 'Open your agent\'s Config tab and look for the model settings section. If you\'re using Hatcher\'s hosted model, requests route through OpenRouter with DeepSeek V4 Flash by default. If you have BYOK configured, you can select from any model supported by your provider (e.g., GPT-4o, Claude, Gemini, or another OpenRouter model). Change the model identifier, save, and restart.',
+        a: 'Open your agent\'s Config tab and look for the model settings section. For Hatcher-hosted usage, choose the OpenRouter provider and model you want from the selector; hosted usage spends AI Credits. If you have BYOK configured, select any model supported by your own provider key. Save the configuration and restart the agent so the runtime loads the new model.',
       },
       {
         q: 'How do I start, stop, or restart my agent?',
