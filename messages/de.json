@@ -1838,8 +1838,20 @@
         "pick": "Hermes"
       },
       {
+        "condition": "Ich benötige Multi-Channel-Messaging und Trigger",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "Ich brauche einen speicherintensiven Research-Assistenten",
+        "pick": "Hermes"
+      },
+      {
         "condition": "Ich benötige Multi-Channel-Messaging (Telegram + Discord + WhatsApp)",
         "pick": "OpenClaw oder Hermes"
+      },
+      {
+        "condition": "Ich möchte einen Workspace-Agenten mit Dateien, Logs und Skills",
+        "pick": "OpenClaw"
       }
     ]
   },

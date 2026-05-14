@@ -1838,8 +1838,20 @@
         "pick": "Hermes"
       },
       {
+        "condition": "我需要多渠道消息和触发器",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "我需要一个重记忆的研究助手",
+        "pick": "Hermes"
+      },
+      {
         "condition": "我需要多渠道消息（Telegram + Discord + WhatsApp）",
         "pick": "OpenClaw 或 Hermes"
+      },
+      {
+        "condition": "我想要一个带文件、日志和技能的工作区智能体",
+        "pick": "OpenClaw"
       }
     ]
   },

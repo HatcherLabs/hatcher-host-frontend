@@ -1838,8 +1838,20 @@
         "pick": "Hermes"
       },
       {
+        "condition": "J'ai besoin de messagerie multi-canal et de déclencheurs",
+        "pick": "OpenClaw"
+      },
+      {
+        "condition": "J'ai besoin d'un assistant de recherche avec beaucoup de mémoire",
+        "pick": "Hermes"
+      },
+      {
         "condition": "J'ai besoin de messagerie multi-canal (Telegram + Discord + WhatsApp)",
         "pick": "OpenClaw ou Hermes"
+      },
+      {
+        "condition": "Je veux un agent de workspace avec fichiers, logs et skills",
+        "pick": "OpenClaw"
       }
     ]
   },
