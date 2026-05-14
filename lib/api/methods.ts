@@ -4,7 +4,7 @@
 
 import { API_URL } from '@/lib/config';
 import { getToken, req } from './core';
-import type { Agent, AgentPassport, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection } from './types';
+import type { Agent, AgentPassport, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection } from './types';
 import type { TierConfig, AdminOverviewExtras } from '@hatcher/shared';
 
 const API_BASE = API_URL;
@@ -373,6 +373,8 @@ export const api = {
     req<{
       enabled: boolean;
       dailyAiCreditCap: number | null;
+      dailyAiCreditsSpent: number | null;
+      dailyAiCreditsRemaining: number | null;
       agent: {
         id: string;
         name: string;
@@ -411,7 +413,14 @@ export const api = {
       history?: Array<{ role: 'user' | 'assistant'; content: string }>;
     },
   ) =>
-    req<{ content: string; model: string; starting?: boolean }>(`/agents/${id}/public-chat`, {
+    req<{
+      content: string;
+      model: string;
+      starting?: boolean;
+      dailyAiCreditCap: number | null;
+      dailyAiCreditsSpent: number | null;
+      dailyAiCreditsRemaining: number | null;
+    }>(`/agents/${id}/public-chat`, {
       method: 'POST',
       body: JSON.stringify(data),
     }),
@@ -1233,6 +1242,15 @@ export const api = {
 
   /** Admin: LLM proxy usage stats */
   adminGetLlmStats: () => req<LlmStatsResponse>('/admin/llm-stats'),
+
+  /** Admin: recent agent CONNECT egress decisions from the LLM proxy */
+  adminGetEgressEvents: (opts: { agentId?: string; limit?: number } = {}) => {
+    const qs = new URLSearchParams();
+    if (opts.agentId) qs.set('agentId', opts.agentId);
+    if (opts.limit !== undefined) qs.set('limit', String(opts.limit));
+    const query = qs.toString() ? `?${qs.toString()}` : '';
+    return req<AdminEgressEventsResponse>(`/admin/egress-events${query}`);
+  },
 
   /** List files in agent's running container */
   listContainerFiles: (agentId: string, path?: string) =>

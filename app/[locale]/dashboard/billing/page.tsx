@@ -94,6 +94,19 @@ type BillingAddon = {
   aiCredits?: number;
 };
 
+type AiCreditHistoryItem = {
+  id: string;
+  kind: string;
+  provider: string;
+  model: string | null;
+  agentId?: string | null;
+  credits: number;
+  providerCostUsd: string | number;
+  inputTokens?: number | null;
+  outputTokens?: number | null;
+  createdAt: string;
+};
+
 const AI_CREDIT_ADDONS: BillingAddon[] = [
   {
     key: 'addon.ai_credits.5000',
@@ -336,6 +349,10 @@ export default function BillingPage() {
   const format = useFormatter();
   const formatDate = (dateStr: string) =>
     format.dateTime(new Date(dateStr), { year: 'numeric', month: 'short', day: 'numeric' });
+  const formatUsageKind = (kind: string) =>
+    kind.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+  const formatTokenCount = (value?: number | null) =>
+    typeof value === 'number' && value > 0 ? value.toLocaleString() : '0';
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const searchParams = useSearchParams();
   const {
@@ -358,9 +375,7 @@ export default function BillingPage() {
   // `agentFeature.expiresAt`. Users who want early downgrade can wait
   // out the expiry or delete the account via Settings.
   const [openingPortal, setOpeningPortal] = useState(false);
-  const [aiCreditHistory, setAiCreditHistory] = useState<Array<{
-    id: string; kind: string; provider: string; model: string | null; credits: number; providerCostUsd: string | number; createdAt: string;
-  }>>([]);
+  const [aiCreditHistory, setAiCreditHistory] = useState<AiCreditHistoryItem[]>([]);
   const [userAgents, setUserAgents] = useState<Array<{ id: string; name: string }>>([]);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
 
@@ -1004,32 +1019,53 @@ export default function BillingPage() {
 	          </div>
 
 	          {/* Recent AI credit usage */}
-	          {aiCreditHistory.length > 0 && (
-	            <div className="mt-4 pt-4 border-t border-[var(--border-default)]">
-	              <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium mb-3">Recent AI usage</p>
+	          <div className="mt-4 pt-4 border-t border-[var(--border-default)]">
+	            <div className="mb-3 flex items-center justify-between gap-3">
+	              <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium">Recent AI usage</p>
+	              <Link href="/dashboard/analytics" className="text-xs text-[var(--color-accent)] hover:underline">
+	                Full analytics
+	              </Link>
+	            </div>
+	            {aiCreditHistory.length > 0 ? (
 	              <div className="space-y-2">
-	                {aiCreditHistory.slice(0, 5).map((tx) => (
-	                  <div key={tx.id} className="flex items-center justify-between text-sm">
-	                    <div className="flex items-center gap-2 min-w-0 flex-1">
-	                      <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-green-400" />
-	                      <span className="text-[var(--text-secondary)] text-xs truncate">
-	                        {[tx.provider, tx.model ?? tx.kind].filter(Boolean).join(' / ')}
+	                {aiCreditHistory.slice(0, 10).map((tx) => (
+	                  <div key={tx.id} className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-2">
+	                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+	                      <div className="min-w-0">
+	                        <div className="flex flex-wrap items-center gap-2">
+	                          <span className="rounded-md bg-[var(--color-accent)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-accent)]">
+	                            {formatUsageKind(tx.kind)}
+	                          </span>
+	                          <span className="truncate text-xs font-medium text-[var(--text-primary)]">
+	                            {[tx.provider, tx.model].filter(Boolean).join(' / ') || 'Hosted usage'}
+	                          </span>
+	                        </div>
+	                        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-[var(--text-muted)]">
+	                          <span>{formatDate(tx.createdAt)}</span>
+	                          {(tx.inputTokens || tx.outputTokens) ? (
+	                            <span>
+	                              in {formatTokenCount(tx.inputTokens)} / out {formatTokenCount(tx.outputTokens)} tokens
+	                            </span>
+	                          ) : null}
+	                          {tx.agentId ? <span className="font-mono">agent {tx.agentId.slice(0, 8)}...</span> : null}
+	                        </div>
+	                      </div>
+	                      <span
+	                        className="text-sm font-semibold tabular-nums text-red-400 sm:text-right"
+	                        style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}
+	                      >
+	                        -{tx.credits.toLocaleString()} AI
 	                      </span>
 	                    </div>
-	                    <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-	                      <span className="text-xs font-semibold tabular-nums text-red-400"
-	                        style={{ fontFamily: 'var(--font-mono, "JetBrains Mono"), monospace' }}>
-	                        -{tx.credits.toLocaleString()}
-	                      </span>
-                      <span className="text-[10px] text-[var(--text-muted)] whitespace-nowrap hidden sm:inline">
-                        {formatDate(tx.createdAt)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+	                  </div>
+	                ))}
+	              </div>
+	            ) : (
+	              <div className="rounded-lg border border-dashed border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-4 text-sm text-[var(--text-muted)]">
+	                No hosted AI usage yet. Hosted model calls, web search, research, extract, and crawl actions will appear here.
+	              </div>
+	            )}
+	          </div>
         </div>
       </motion.div>
 

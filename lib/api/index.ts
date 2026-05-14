@@ -40,5 +40,6 @@ export type {
   ErrorRateResponse,
   WsCountResponse,
   LlmStatsResponse,
+  AdminEgressEventsResponse,
 } from './types';
 export { api } from './methods';

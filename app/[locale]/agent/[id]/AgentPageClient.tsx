@@ -120,6 +120,18 @@ const PUBLIC_CHAT_SUGGESTIONS = [
   'Find current market research on liquid restaking.',
 ];
 
+type PublicChatUsage = {
+  dailyAiCreditCap: number | null;
+  dailyAiCreditsSpent: number | null;
+  dailyAiCreditsRemaining: number | null;
+};
+
+function formatAiCredits(value: number | null | undefined): string {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? Math.max(0, Math.floor(value)).toLocaleString()
+    : '--';
+}
+
 function loadPublicChatMessages(agentId: string, sessionId: string): PublicChatMessage[] {
   if (typeof window === 'undefined') return [];
   try {
@@ -146,10 +158,14 @@ function PublicAgentChat({
   agentId,
   agentName,
   autoFocus,
+  usage,
+  onUsageChange,
 }: {
   agentId: string;
   agentName: string;
   autoFocus: boolean;
+  usage: PublicChatUsage | null;
+  onUsageChange: (usage: PublicChatUsage) => void;
 }) {
   const t = useTranslations('agentPublic.publicChat');
   const [session, setSession] = useState<PublicChatSession | null>(null);
@@ -266,11 +282,21 @@ function PublicAgentChat({
       return;
     }
     if (res.data.starting) {
+      onUsageChange({
+        dailyAiCreditCap: res.data.dailyAiCreditCap ?? usage?.dailyAiCreditCap ?? null,
+        dailyAiCreditsSpent: res.data.dailyAiCreditsSpent ?? usage?.dailyAiCreditsSpent ?? null,
+        dailyAiCreditsRemaining: res.data.dailyAiCreditsRemaining ?? usage?.dailyAiCreditsRemaining ?? null,
+      });
       setError(res.data.content);
       return;
     }
+    onUsageChange({
+      dailyAiCreditCap: res.data.dailyAiCreditCap ?? usage?.dailyAiCreditCap ?? null,
+      dailyAiCreditsSpent: res.data.dailyAiCreditsSpent ?? usage?.dailyAiCreditsSpent ?? null,
+      dailyAiCreditsRemaining: res.data.dailyAiCreditsRemaining ?? usage?.dailyAiCreditsRemaining ?? null,
+    });
     setMessages((prev) => [...prev, createPublicChatMessage('assistant', res.data.content)]);
-  }, [agentId, busy, draft, messages, session, t]);
+  }, [agentId, busy, draft, messages, onUsageChange, session, t, usage]);
 
   const handleKeyDown = useCallback((event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -288,6 +314,14 @@ function PublicAgentChat({
             {t('eyebrow')}
           </div>
           <h2 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">{t('heading', { name: agentName })}</h2>
+          {usage?.dailyAiCreditCap !== null && usage?.dailyAiCreditCap !== undefined && (
+            <div className="mt-2 inline-flex max-w-full items-center gap-2 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2.5 py-1 text-xs text-[var(--text-secondary)]">
+              <Sparkles className="h-3.5 w-3.5 flex-shrink-0 text-[var(--color-accent)]" />
+              <span className="truncate">
+                {formatAiCredits(usage.dailyAiCreditsRemaining)} / {formatAiCredits(usage.dailyAiCreditCap)} AI Credits today
+              </span>
+            </div>
+          )}
         </div>
         {session && (
           <button
@@ -428,6 +462,7 @@ export function AgentPageClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [publicChatEnabled, setPublicChatEnabled] = useState(false);
+  const [publicChatUsage, setPublicChatUsage] = useState<PublicChatUsage | null>(null);
   const [copied, setCopied] = useState(false);
   const [publicStats, setPublicStats] = useState<{
     messagesProcessed: number;
@@ -456,8 +491,17 @@ export function AgentPageClient() {
     }).catch(() => {/* ignore */});
 
     api.getAgentPublicChat(id).then((res) => {
-      setPublicChatEnabled(res.success && res.data.enabled);
-    }).catch(() => setPublicChatEnabled(false));
+      const enabled = res.success && res.data.enabled;
+      setPublicChatEnabled(enabled);
+      setPublicChatUsage(enabled ? {
+        dailyAiCreditCap: res.data.dailyAiCreditCap,
+        dailyAiCreditsSpent: res.data.dailyAiCreditsSpent,
+        dailyAiCreditsRemaining: res.data.dailyAiCreditsRemaining,
+      } : null);
+    }).catch(() => {
+      setPublicChatEnabled(false);
+      setPublicChatUsage(null);
+    });
   }, [id]);
 
   const handleShare = useCallback(() => {
@@ -674,6 +718,8 @@ export function AgentPageClient() {
               agentId={id}
               agentName={agent.name}
               autoFocus={publicChatAutoFocus}
+              usage={publicChatUsage}
+              onUsageChange={setPublicChatUsage}
             />
           )}
 

@@ -376,3 +376,27 @@ export interface LlmStatsResponse {
   rateLimitHitsYesterday: number;
   generatedAt: string;
 }
+
+export interface AdminEgressEventsResponse {
+  events: Array<{
+    id: string;
+    timestamp: string;
+    agentId: string;
+    host: string;
+    port: number;
+    allowed: boolean;
+    reason?: string;
+    tier?: string;
+    address?: string;
+    family?: 4 | 6;
+    rateLimit?: { limit: number; remaining: number; resetMs?: number };
+  }>;
+  summary: {
+    allowed: number;
+    blocked: number;
+    hosts: Array<{ host: string; allowed: number; blocked: number; lastSeenAt: string }>;
+  };
+  limit: number;
+  agentId: string | null;
+  generatedAt: string;
+}

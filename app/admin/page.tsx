@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
-import type { Agent, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse } from '@/lib/api';
+import type { Agent, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse } from '@/lib/api';
 import { shortenAddress, timeAgo } from '@/lib/utils';
 import { formatFeatureKey } from '@/lib/feature-labels';
 import { motion } from 'framer-motion';
@@ -654,6 +654,138 @@ function AnalyticsTab() {
   );
 }
 
+function EgressTab() {
+  const [agentId, setAgentId] = useState('');
+  const [data, setData] = useState<AdminEgressEventsResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async (filterAgentId: string) => {
+    setLoading(true);
+    setError(null);
+    const cleanAgentId = filterAgentId.trim();
+    const res = await api.adminGetEgressEvents({
+      limit: 100,
+      ...(cleanAgentId ? { agentId: cleanAgentId } : {}),
+    });
+    setLoading(false);
+    if (res.success) setData(res.data);
+    else setError(res.error);
+  }, []);
+
+  useEffect(() => {
+    void load('');
+  }, [load]);
+
+  const events = data?.events ?? [];
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">Agent egress</h2>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">
+            Recent CONNECT decisions from agent containers. Public HTTPS should pass; private/internal targets stay blocked.
+          </p>
+        </div>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            void load(agentId);
+          }}
+          className="flex flex-col gap-2 sm:flex-row sm:items-center"
+        >
+          <input
+            value={agentId}
+            onChange={(event) => setAgentId(event.target.value)}
+            placeholder="Filter agent id"
+            className="h-10 min-w-0 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] px-3 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--color-accent)] sm:w-72"
+          />
+          <button type="submit" disabled={loading} className="btn-secondary h-10 justify-center text-sm">
+            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            Refresh
+          </button>
+        </form>
+      </div>
+
+      {error && (
+        <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+          {error}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <StatCard label="Allowed" value={data?.summary.allowed ?? 0} icon={CheckCircle2} iconColor="#4ADE80" />
+        <StatCard label="Blocked" value={data?.summary.blocked ?? 0} icon={AlertTriangle} iconColor="#F87171" />
+        <StatCard label="Hosts" value={data?.summary.hosts.length ?? 0} icon={Globe} iconColor="#60A5FA" />
+      </div>
+
+      {data?.summary.hosts.length ? (
+        <div className="rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] p-4">
+          <div className="mb-3 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">Top hosts</div>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {data.summary.hosts.slice(0, 9).map((host) => (
+              <div key={host.host} className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-3">
+                <div className="truncate font-mono text-xs text-[var(--text-primary)]">{host.host}</div>
+                <div className="mt-2 flex items-center gap-2 text-[11px] text-[var(--text-muted)]">
+                  <span className="text-emerald-400">{host.allowed} allowed</span>
+                  <span>{host.blocked} blocked</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      <div className="overflow-x-auto rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)]">
+        <table className="w-full min-w-[860px] text-left text-sm">
+          <thead>
+            <tr className="border-b border-[var(--border-default)] text-[11px] uppercase tracking-wider text-[var(--text-muted)]">
+              <th className="px-4 py-3">Time</th>
+              <th className="px-4 py-3">Agent</th>
+              <th className="px-4 py-3">Host</th>
+              <th className="px-4 py-3">Decision</th>
+              <th className="px-4 py-3">Reason</th>
+              <th className="px-4 py-3">Rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            {events.map((event) => (
+              <tr key={event.id} className="border-b border-[var(--border-default)]/60 last:border-0">
+                <td className="px-4 py-3 text-xs text-[var(--text-muted)]">{timeAgo(event.timestamp)}</td>
+                <td className="px-4 py-3">
+                  <Link href={`/admin/agent/${event.agentId}`} className="font-mono text-xs text-[var(--color-accent)] hover:underline">
+                    {event.agentId.slice(0, 12)}
+                  </Link>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="font-mono text-xs text-[var(--text-primary)]">{event.host}:{event.port}</div>
+                  {event.address && <div className="text-[10px] text-[var(--text-muted)]">{event.address}</div>}
+                </td>
+                <td className="px-4 py-3">
+                  <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${event.allowed ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                    {event.allowed ? 'Allowed' : 'Blocked'}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-xs text-[var(--text-muted)]">{event.reason ?? 'public_https'}</td>
+                <td className="px-4 py-3 text-xs text-[var(--text-muted)]">
+                  {event.rateLimit ? `${event.rateLimit.remaining}/${event.rateLimit.limit} left` : 'n/a'}
+                </td>
+              </tr>
+            ))}
+            {!events.length && (
+              <tr>
+                <td colSpan={6} className="px-4 py-8 text-center text-sm text-[var(--text-muted)]">
+                  {loading ? 'Loading egress events...' : 'No egress events found.'}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 // ── Audit Log Tab ─────────────────────────────────────────────
 type AuditEntry = {
   ts: string;
@@ -962,11 +1094,11 @@ export default function AdminPage() {
   const [agentsPagination, setAgentsPagination] = useState<{ total: number; hasMore: boolean }>({ total: 0, hasMore: false });
   const [error, setError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health' | 'analytics' | 'audit' | 'affiliate'>(() => {
+  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health' | 'analytics' | 'egress' | 'audit' | 'affiliate'>(() => {
     if (typeof window === 'undefined') return 'overview';
     const params = new URLSearchParams(window.location.search);
     const t = params.get('tab');
-    if (t === 'affiliate' || t === 'overview' || t === 'agents' || t === 'users' || t === 'tickets' || t === 'purchases' || t === 'health' || t === 'analytics' || t === 'audit') return t;
+    if (t === 'affiliate' || t === 'overview' || t === 'agents' || t === 'users' || t === 'tickets' || t === 'purchases' || t === 'health' || t === 'analytics' || t === 'egress' || t === 'audit') return t;
     return 'overview';
   });
   const [payments, setPayments] = useState<AdminPayment[]>([]);
@@ -1665,10 +1797,10 @@ export default function AdminPage() {
           {/* Tab switcher */}
           <div className="-mx-1 mb-5 w-full max-w-full overflow-x-auto overscroll-x-contain px-1">
             <div className="inline-flex min-w-max items-center gap-1 rounded-xl bg-[rgba(46,43,74,0.3)] p-1">
-              {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics', 'audit', 'affiliate'] as const).map((tab) => {
-                const tabIcons: Record<string, LucideIcon> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp, audit: ScrollText, affiliate: UserPlus };
+              {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics', 'egress', 'audit', 'affiliate'] as const).map((tab) => {
+                const tabIcons: Record<string, LucideIcon> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp, egress: Network, audit: ScrollText, affiliate: UserPlus };
                 const TabIcon = tabIcons[tab] ?? BarChart3;
-                const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health', analytics: 'Analytics', audit: 'Audit Log', affiliate: 'Affiliate' };
+                const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health', analytics: 'Analytics', egress: 'Egress', audit: 'Audit Log', affiliate: 'Affiliate' };
                 return (
                   <button
                     key={tab}
@@ -2830,6 +2962,8 @@ export default function AdminPage() {
           })()}
 
           {activeTab === 'analytics' && <AnalyticsTab />}
+
+          {activeTab === 'egress' && <EgressTab />}
 
           {activeTab === 'audit' && <AuditLogTab />}
 
