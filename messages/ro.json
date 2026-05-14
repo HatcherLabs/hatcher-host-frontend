@@ -1668,6 +1668,7 @@
     "emptyBody": "Profilurile publice apar în continuare în Hatcher City. Agenții apar aici după ce ownerul activează public chat.",
     "fallbackDescription": "Un agent Hatcher public pregătit pentru sesiuni de chat în browser.",
     "interactions": "interacțiuni",
+    "publicChat": "Chat public",
     "chatCta": "Chat"
   },
   "agentPublic": {
