@@ -2,14 +2,72 @@ import { withSentryConfig } from '@sentry/nextjs';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
-import createNextIntlPlugin from 'next-intl/plugin';
 
-const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
+const NEXT_INTL_REQUEST_CONFIG = './i18n/request.ts';
 
 // Inject the app version from package.json into the client bundle so the
 // LandingV3 footer line ("$ hatcher --version  v<X.Y.Z>") shows real data.
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf8'));
+
+class SuppressWebpackCacheBigStringWarningPlugin {
+  apply(compiler) {
+    compiler.hooks.infrastructureLog.tap(
+      'SuppressWebpackCacheBigStringWarningPlugin',
+      (origin, type, args) => {
+        const message = args?.[0];
+
+        if (
+          origin === 'webpack.cache.PackFileCacheStrategy' &&
+          type === 'warn' &&
+          typeof message === 'string' &&
+          message.startsWith('Serializing big strings')
+        ) {
+          return true;
+        }
+
+        return undefined;
+      }
+    );
+  }
+}
+
+function withNextIntlConfig(config) {
+  const nextIntlConfig = {
+    ...config,
+    webpack(webpackConfig, context) {
+      webpackConfig.resolve ??= {};
+      webpackConfig.resolve.alias ??= {};
+      webpackConfig.resolve.alias['next-intl/config'] = resolve(
+        webpackConfig.context || __dirname,
+        NEXT_INTL_REQUEST_CONFIG
+      );
+      webpackConfig.plugins ??= [];
+      webpackConfig.plugins.push(new SuppressWebpackCacheBigStringWarningPlugin());
+
+      return typeof config.webpack === 'function' ? config.webpack(webpackConfig, context) : webpackConfig;
+    },
+  };
+
+  if (process.env.TURBOPACK != null) {
+    nextIntlConfig.turbopack = {
+      ...config.turbopack,
+      resolveAlias: {
+        ...config.turbopack?.resolveAlias,
+        'next-intl/config': NEXT_INTL_REQUEST_CONFIG,
+      },
+    };
+  }
+
+  if (config.trailingSlash) {
+    nextIntlConfig.env = {
+      ...config.env,
+      _next_intl_trailing_slash: 'true',
+    };
+  }
+
+  return nextIntlConfig;
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -231,7 +289,7 @@ const nextConfig = {
   },
 };
 
-export default withSentryConfig(withNextIntl(nextConfig), {
+export default withSentryConfig(withNextIntlConfig(nextConfig), {
   silent: true,
   hideSourceMaps: true,
 });

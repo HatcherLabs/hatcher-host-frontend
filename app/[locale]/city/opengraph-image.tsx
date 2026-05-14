@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { API_URL } from '@/lib/config';
+import { shouldSkipStaticApiFetch } from '@/lib/static-api-fetch';
 import type { CityResponse } from '@/components/city/types';
 
 // nodejs runtime — pm2-managed deploy doesn't ship the edge runtime.
@@ -10,6 +11,8 @@ export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 async function fetchCounts(): Promise<CityResponse['counts'] | null> {
+  if (shouldSkipStaticApiFetch(API_URL)) return null;
+
   try {
     const res = await fetch(`${API_URL}/public/city`, { next: { revalidate: 300 } });
     if (!res.ok) return null;

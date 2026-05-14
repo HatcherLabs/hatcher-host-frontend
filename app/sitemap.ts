@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { BLOG_POSTS } from '@/lib/blog';
 import { API_URL } from '@/lib/config';
+import { shouldSkipStaticApiFetch } from '@/lib/static-api-fetch';
 import { routing } from '@/i18n/routing';
 
 export const dynamic = 'force-static';
@@ -88,21 +89,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Fetch public agents for dynamic pages (English only)
   let agentEntries: MetadataRoute.Sitemap = [];
-  try {
-    const res = await fetch(`${API_URL}/agents/explore`, { next: { revalidate: 3600 } });
-    if (res.ok) {
-      const json = (await res.json()) as { agents: ExploreAgent[] };
-      if (json.agents?.length) {
-        agentEntries = json.agents.map((agent) => ({
-          url: `${SITE_URL}/agent/${agent.id}`,
-          lastModified: agent.updatedAt ? new Date(agent.updatedAt) : now,
-          changeFrequency: 'daily' as const,
-          priority: 0.5,
-        }));
+  if (!shouldSkipStaticApiFetch(API_URL)) {
+    try {
+      const res = await fetch(`${API_URL}/agents/explore`, { next: { revalidate: 3600 } });
+      if (res.ok) {
+        const json = (await res.json()) as { agents: ExploreAgent[] };
+        if (json.agents?.length) {
+          agentEntries = json.agents.map((agent) => ({
+            url: `${SITE_URL}/agent/${agent.id}`,
+            lastModified: agent.updatedAt ? new Date(agent.updatedAt) : now,
+            changeFrequency: 'daily' as const,
+            priority: 0.5,
+          }));
+        }
       }
+    } catch {
+      // Skip dynamic pages if API is unavailable
     }
-  } catch {
-    // Skip dynamic pages if API is unavailable
   }
 
   return [

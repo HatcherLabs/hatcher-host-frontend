@@ -3,6 +3,7 @@ import { API_URL } from '@/lib/config';
 import { CityClient } from './CityClient';
 import type { CityResponse } from '@/components/city/types';
 import { buildLanguagesMap } from '@/lib/seo';
+import { shouldSkipStaticApiFetch } from '@/lib/static-api-fetch';
 
 const TITLE = 'Hatcher City - live AI agent network';
 const DESCRIPTION =
@@ -39,6 +40,8 @@ export const metadata: Metadata = {
 // Server-fetch the city payload so the initial paint has real data
 // (no client-side loading flash, good for SEO and OG).
 async function fetchCity(): Promise<CityResponse | null> {
+  if (shouldSkipStaticApiFetch(API_URL)) return null;
+
   try {
     const res = await fetch(`${API_URL}/public/city`, { next: { revalidate: 60 } });
     if (!res.ok) return null;

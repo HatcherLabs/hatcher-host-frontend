@@ -5,6 +5,7 @@ import { API_URL } from '@/lib/config';
 import { Link } from '@/i18n/routing';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import { buildLanguagesMap } from '@/lib/seo';
+import { shouldSkipStaticApiFetch } from '@/lib/static-api-fetch';
 import { PublicAgentsExplorer } from '@/components/explore/PublicAgentsExplorer';
 import { getExploreStats, type PublicExploreAgent } from '@/components/explore/publicAgents';
 
@@ -35,6 +36,8 @@ export const metadata: Metadata = {
 };
 
 async function fetchPublicAgents(): Promise<PublicExploreAgent[]> {
+  if (shouldSkipStaticApiFetch(API_URL)) return [];
+
   try {
     const res = await fetch(`${API_URL}/agents/explore?limit=60&sort=popular`, {
       next: { revalidate: 60 },

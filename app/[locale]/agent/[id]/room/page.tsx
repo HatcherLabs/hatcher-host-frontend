@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { API_URL } from '@/lib/config';
+import { shouldSkipStaticApiFetch } from '@/lib/static-api-fetch';
 import { AgentRoomV2Client } from './AgentRoomV2Client';
 
 interface PublicAgent {
@@ -11,6 +12,8 @@ interface PublicAgent {
 }
 
 async function fetchPublicAgent(id: string): Promise<PublicAgent | null> {
+  if (shouldSkipStaticApiFetch(API_URL)) return null;
+
   try {
     const res = await fetch(`${API_URL}/public/city`, { next: { revalidate: 300 } });
     if (!res.ok) return null;
