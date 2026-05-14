@@ -453,6 +453,7 @@ function GLBAvatar({
 function ProceduralAvatar({
   variant,
   palette,
+  signature,
   isStreaming,
   status,
   activeEmote,
@@ -460,6 +461,7 @@ function ProceduralAvatar({
 }: {
   variant: AvatarVariant;
   palette: FrameworkPalette;
+  signature: AvatarSignatureConfig;
   isStreaming?: boolean;
   status?: string;
 } & EmotePlaybackProps) {
@@ -468,6 +470,7 @@ function ProceduralAvatar({
       <group rotation={[0, Math.PI, 0]} scale={[0.76, 0.76, 0.76]}>
         <OpenClawMech
           palette={palette}
+          signature={signature}
           isStreaming={isStreaming}
           status={status}
           activeEmote={activeEmote}
@@ -481,6 +484,7 @@ function ProceduralAvatar({
       <group rotation={[0, Math.PI, 0]} scale={[0.7, 0.7, 0.7]}>
         <OpenClawScout
           palette={palette}
+          signature={signature}
           isStreaming={isStreaming}
           status={status}
           activeEmote={activeEmote}
@@ -494,6 +498,7 @@ function ProceduralAvatar({
       <group rotation={[0, Math.PI, 0]} scale={[0.65, 0.65, 0.65]}>
         <OpenClawHeavy
           palette={palette}
+          signature={signature}
           isStreaming={isStreaming}
           status={status}
           activeEmote={activeEmote}
@@ -507,6 +512,7 @@ function ProceduralAvatar({
       <group rotation={[0, Math.PI, 0]} scale={[0.82, 0.82, 0.82]}>
         <OpenClawDrone
           palette={palette}
+          signature={signature}
           isStreaming={isStreaming}
           status={status}
           activeEmote={activeEmote}
@@ -520,6 +526,7 @@ function ProceduralAvatar({
       <group rotation={[0, Math.PI, 0]} scale={[0.82, 0.82, 0.82]}>
         <HermesOracle
           palette={palette}
+          signature={signature}
           isStreaming={isStreaming}
           status={status}
           activeEmote={activeEmote}
@@ -533,6 +540,7 @@ function ProceduralAvatar({
       <group rotation={[0, Math.PI, 0]} scale={[0.74, 0.74, 0.74]}>
         <HermesScribe
           palette={palette}
+          signature={signature}
           isStreaming={isStreaming}
           status={status}
           activeEmote={activeEmote}
@@ -545,6 +553,9 @@ function ProceduralAvatar({
     return (
       <group rotation={[0, Math.PI, 0]} scale={[1.05, 1.05, 1.05]}>
         <BlobAvatar isStreaming={isStreaming} activeEmote={activeEmote} emoteNonce={emoteNonce} />
+        <group position={[0, 1.35, 0.54]}>
+          <AvatarSkinMark signature={signature} size={0.38} />
+        </group>
       </group>
     );
   }
@@ -552,6 +563,9 @@ function ProceduralAvatar({
     return (
       <group rotation={[0, Math.PI, 0]}>
         <CrabAvatar isStreaming={isStreaming} activeEmote={activeEmote} emoteNonce={emoteNonce} />
+        <group position={[0, 0.88, 0.54]}>
+          <AvatarSkinMark signature={signature} size={0.26} />
+        </group>
       </group>
     );
   }
@@ -559,12 +573,16 @@ function ProceduralAvatar({
     return (
       <group rotation={[0, Math.PI, 0]}>
         <CatAvatar isStreaming={isStreaming} activeEmote={activeEmote} emoteNonce={emoteNonce} />
+        <group position={[0, 0.96, 0.36]}>
+          <AvatarSkinMark signature={signature} size={0.2} />
+        </group>
       </group>
     );
   }
   return (
     <HumanoidAvatar
       palette={palette}
+      signature={signature}
       isStreaming={isStreaming}
       status={status}
       activeEmote={activeEmote}
@@ -669,32 +687,24 @@ function AgentStatusAura({
   );
 }
 
-function AvatarSignature({
+function AvatarSkinMark({
   signature,
-  isStreaming,
+  size = 1,
 }: {
   signature: AvatarSignatureConfig;
-  isStreaming?: boolean;
+  size?: number;
 }) {
-  const root = useRef<THREE.Group>(null);
   const orbit = useRef<THREE.Group>(null);
-  const offsetX = ((signature.seed % 5) - 2) * 0.08;
-  const offsetY = ((Math.floor(signature.seed / 7) % 5) - 2) * 0.035;
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
-    if (root.current) {
-      root.current.position.y = 1.92 + offsetY + Math.sin(t * 1.2 + signature.seed) * 0.035;
-      root.current.rotation.y = Math.sin(t * 0.42 + signature.seed) * 0.16;
-    }
     if (orbit.current) {
-      orbit.current.rotation.z = t * (isStreaming ? 0.96 : 0.42);
-      orbit.current.rotation.x = Math.sin(t * 0.34 + signature.seed) * 0.16;
+      orbit.current.rotation.z = t * 0.46;
     }
   });
 
   return (
-    <group ref={root} position={[0.58 + offsetX, 1.92, 0.52]} scale={[0.36, 0.36, 0.36]}>
+    <group scale={[size, size, size]}>
       <group ref={orbit}>
         <mesh>
           <torusGeometry args={[0.48, 0.025, 8, 56]} />
@@ -774,11 +784,12 @@ function AvatarSignature({
 
 function OpenClawMech({
   palette,
+  signature,
   isStreaming,
   status,
   activeEmote,
   emoteNonce,
-}: Omit<Props, 'framework' | 'agentId'> & EmotePlaybackProps) {
+}: Omit<Props, 'framework' | 'agentId'> & EmotePlaybackProps & { signature: AvatarSignatureConfig }) {
   const root = useRef<THREE.Group>(null);
   const leftArm = useRef<THREE.Group>(null);
   const rightArm = useRef<THREE.Group>(null);
@@ -852,7 +863,7 @@ function OpenClawMech({
       <mesh position={[0, 1.42, 0]}>
         <boxGeometry args={[0.95, 0.92, 0.62]} />
         <meshStandardMaterial
-          color={0x22212a}
+          color={palette.dim}
           metalness={0.92}
           roughness={0.28}
           emissive={palette.primary}
@@ -863,12 +874,15 @@ function OpenClawMech({
         <circleGeometry args={[0.24, 32]} />
         <meshBasicMaterial color={palette.primary} toneMapped={false} transparent opacity={0.78} />
       </mesh>
+      <group position={[0, 1.42, 0.38]}>
+        <AvatarSkinMark signature={signature} size={0.22} />
+      </group>
 
       <group ref={head} position={[0, 2.12, 0]}>
         <mesh>
           <boxGeometry args={[0.7, 0.42, 0.48]} />
           <meshStandardMaterial
-            color={0x272630}
+            color={palette.dim}
             metalness={0.86}
             roughness={0.3}
             emissive={palette.primary}
@@ -926,7 +940,7 @@ function OpenClawMech({
   );
 }
 
-function OpenClawScout(props: Omit<Props, 'framework' | 'agentId'>) {
+function OpenClawScout(props: Omit<Props, 'framework' | 'agentId'> & { signature: AvatarSignatureConfig }) {
   return (
     <group scale={[0.76, 1.14, 0.76]}>
       <OpenClawMech {...props} />
@@ -934,7 +948,7 @@ function OpenClawScout(props: Omit<Props, 'framework' | 'agentId'>) {
   );
 }
 
-function OpenClawHeavy(props: Omit<Props, 'framework' | 'agentId'>) {
+function OpenClawHeavy(props: Omit<Props, 'framework' | 'agentId'> & { signature: AvatarSignatureConfig }) {
   return (
     <group scale={[1.28, 1.05, 1.18]}>
       <OpenClawMech {...props} />
@@ -944,15 +958,24 @@ function OpenClawHeavy(props: Omit<Props, 'framework' | 'agentId'>) {
 
 function OpenClawDrone({
   palette,
+  signature,
   isStreaming,
   status,
   activeEmote,
   emoteNonce,
-}: Omit<Props, 'framework' | 'agentId'> & EmotePlaybackProps) {
+}: Omit<Props, 'framework' | 'agentId'> & EmotePlaybackProps & { signature: AvatarSignatureConfig }) {
   const root = useRef<THREE.Group>(null);
   const rotor = useRef<THREE.Group>(null);
   const pulse = pulseFor(status);
-  const droneAccent = 0xff5fa2;
+  const droneAccent = palette.primary;
+  const shellColor = useMemo(
+    () => new THREE.Color(palette.primary).lerp(new THREE.Color(0xa5b4cc), 0.42).getHex(),
+    [palette.primary],
+  );
+  const darkShellColor = useMemo(
+    () => new THREE.Color(palette.dim).lerp(new THREE.Color(0x25242d), 0.35).getHex(),
+    [palette.dim],
+  );
   const emoteStart = useEmoteStart(activeEmote, emoteNonce);
 
   useFrame(({ clock }) => {
@@ -992,7 +1015,7 @@ function OpenClawDrone({
       <mesh>
         <sphereGeometry args={[0.58, 28, 20]} />
         <meshStandardMaterial
-          color={0xa5b4cc}
+          color={shellColor}
           metalness={0.86}
           roughness={0.27}
           emissive={droneAccent}
@@ -1003,12 +1026,26 @@ function OpenClawDrone({
         <circleGeometry args={[0.26, 32]} />
         <meshBasicMaterial color={droneAccent} toneMapped={false} transparent opacity={0.8} />
       </mesh>
+      <group position={[0, 0.02, 0.61]}>
+        <AvatarSkinMark signature={signature} size={0.24} />
+      </group>
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[side * 0.3, -0.02, 0.51]} rotation={[0, 0, side * 0.16]}>
+          <boxGeometry args={[0.16, 0.3, 0.024]} />
+          <meshBasicMaterial
+            color={side > 0 ? signature.secondary : signature.accent}
+            toneMapped={false}
+            transparent
+            opacity={0.76}
+          />
+        </mesh>
+      ))}
       <group ref={rotor} position={[0, 0.58, 0]}>
         {[0, Math.PI / 2].map((r) => (
           <mesh key={r} rotation={[0, r, 0]}>
             <boxGeometry args={[1.5, 0.035, 0.12]} />
             <meshBasicMaterial
-              color={droneAccent}
+              color={signature.secondary}
               toneMapped={false}
               transparent
               opacity={0.62}
@@ -1026,7 +1063,7 @@ function OpenClawDrone({
             </mesh>
             <mesh rotation={[0, a, 0]}>
               <boxGeometry args={[0.8, 0.035, 0.035]} />
-              <meshStandardMaterial color={0x25242d} metalness={0.9} roughness={0.3} />
+              <meshStandardMaterial color={darkShellColor} metalness={0.9} roughness={0.3} />
             </mesh>
           </group>
         );
@@ -1046,11 +1083,12 @@ function OpenClawDrone({
 
 function HermesOracle({
   palette,
+  signature,
   isStreaming,
   status,
   activeEmote,
   emoteNonce,
-}: Omit<Props, 'framework' | 'agentId'> & EmotePlaybackProps) {
+}: Omit<Props, 'framework' | 'agentId'> & EmotePlaybackProps & { signature: AvatarSignatureConfig }) {
   const root = useRef<THREE.Group>(null);
   const rings = useRef<THREE.Group>(null);
   const pulse = pulseFor(status);
@@ -1100,7 +1138,7 @@ function HermesOracle({
       <mesh position={[0, 0.75, 0]}>
         <coneGeometry args={[0.72, 1.45, 5]} />
         <meshStandardMaterial
-          color={0x1e1728}
+          color={palette.dim}
           metalness={0.24}
           roughness={0.78}
           emissive={palette.primary}
@@ -1110,7 +1148,7 @@ function HermesOracle({
       <mesh position={[0, 1.55, 0]}>
         <sphereGeometry args={[0.34, 22, 18]} />
         <meshStandardMaterial
-          color={0x241832}
+          color={palette.dim}
           metalness={0.42}
           roughness={0.48}
           emissive={palette.primary}
@@ -1121,6 +1159,9 @@ function HermesOracle({
         <circleGeometry args={[0.16, 32]} />
         <meshBasicMaterial color={palette.bright} toneMapped={false} transparent opacity={0.82} />
       </mesh>
+      <group position={[0, 1.55, 0.39]}>
+        <AvatarSkinMark signature={signature} size={0.18} />
+      </group>
 
       <group ref={rings} position={[0, 1.55, 0]}>
         {[0, Math.PI / 2, Math.PI / 4].map((r, i) => (
@@ -1161,11 +1202,12 @@ function HermesOracle({
 
 function HermesScribe({
   palette,
+  signature,
   isStreaming,
   status,
   activeEmote,
   emoteNonce,
-}: Omit<Props, 'framework' | 'agentId'> & EmotePlaybackProps) {
+}: Omit<Props, 'framework' | 'agentId'> & EmotePlaybackProps & { signature: AvatarSignatureConfig }) {
   const root = useRef<THREE.Group>(null);
   const pages = useRef<THREE.Group>(null);
   const pulse = pulseFor(status);
@@ -1212,7 +1254,7 @@ function HermesScribe({
       <mesh position={[0, 1.28, 0]}>
         <boxGeometry args={[0.75, 0.88, 0.44]} />
         <meshStandardMaterial
-          color={0x241832}
+          color={palette.dim}
           metalness={0.32}
           roughness={0.58}
           emissive={palette.primary}
@@ -1233,6 +1275,9 @@ function HermesScribe({
         <boxGeometry args={[0.38, 0.07, 0.025]} />
         <meshBasicMaterial color={palette.bright} toneMapped={false} />
       </mesh>
+      <group position={[0, 1.27, 0.27]}>
+        <AvatarSkinMark signature={signature} size={0.18} />
+      </group>
 
       <group ref={pages} position={[0, 1.32, 0]}>
         {Array.from({ length: 6 }, (_, i) => {
@@ -1260,11 +1305,12 @@ function HermesScribe({
 
 function HumanoidAvatar({
   palette,
+  signature,
   isStreaming,
   status,
   activeEmote,
   emoteNonce,
-}: Omit<Props, 'framework' | 'agentId'> & EmotePlaybackProps) {
+}: Omit<Props, 'framework' | 'agentId'> & EmotePlaybackProps & { signature?: AvatarSignatureConfig }) {
   const root = useRef<THREE.Group>(null);
   const leftArm = useRef<THREE.Group>(null);
   const rightArm = useRef<THREE.Group>(null);
@@ -1312,12 +1358,17 @@ function HumanoidAvatar({
       <mesh position={[0, 0.82, 0]}>
         <cylinderGeometry args={[0.28, 0.36, 0.78, 14]} />
         <meshStandardMaterial
-          color={0xe7d6c3}
+          color={palette.dim}
           roughness={0.58}
           emissive={palette.primary}
           emissiveIntensity={0.04 * pulse}
         />
       </mesh>
+      {signature && (
+        <group position={[0, 0.92, 0.31]}>
+          <AvatarSkinMark signature={signature} size={0.14} />
+        </group>
+      )}
       <mesh position={[0, 1.42, 0]}>
         <sphereGeometry args={[0.25, 18, 14]} />
         <meshStandardMaterial color={0xe7d6c3} roughness={0.52} />
@@ -1684,13 +1735,13 @@ export function AgentBody({
         <ProceduralAvatar
           variant={variant}
           palette={personalizedPalette}
+          signature={signature}
           isStreaming={isStreaming}
           status={status}
           activeEmote={activeEmote}
           emoteNonce={emoteNonce}
         />
       )}
-      <AvatarSignature signature={signature} isStreaming={isStreaming} />
     </>
   );
 }
