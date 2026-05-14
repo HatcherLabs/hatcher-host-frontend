@@ -174,6 +174,7 @@ describe('layoutLiveCity', () => {
           status: 'running',
           tier: 1,
           messageCount: 16,
+          publicChatEnabled: true,
         }),
       ],
       { maxBuildings: 10, routeLimit: 4 },
@@ -189,6 +190,9 @@ describe('layoutLiveCity', () => {
     expect(layout.markers.every((marker) => marker.pathNodes.length > 1)).toBe(
       true,
     );
+    expect(
+      layout.markers.find((marker) => marker.agentId === 'active-b')?.publicChatEnabled,
+    ).toBe(true);
   });
 
   it('represents every public agent through an owner building or active marker', () => {

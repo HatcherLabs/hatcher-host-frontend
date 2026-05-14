@@ -8,6 +8,7 @@ import {
   Footprints,
   LayoutDashboard,
   Map as MapIcon,
+  MessageSquare,
   Signal,
   UserRound,
   Users,
@@ -38,6 +39,7 @@ import {
   cityBuildingTitle,
   isViewerBuilding,
 } from './cityNavigation';
+import { publicAgentChatHref, selectActiveCityAgents } from './activeAgentList';
 import { LIVE_CITY_TIERS, type LiveCityGrid, type LiveCityTimeMode } from './liveCityHandoff';
 import { layoutLiveCity, type LiveAgentMarkerLayout, type LiveBuildingLayout } from './liveLayout';
 import { LiveAgentMarkers } from './LiveAgentMarkers';
@@ -166,6 +168,7 @@ export function LiveCityScene({
         generatedAt={generatedAt}
         pulseAts={pulseAts}
         onDashboardClick={(agentId) => router.push(`/dashboard/agent/${agentId}`)}
+        onPublicChatClick={(href) => router.push(href)}
         canEnterBuilding={canEnterBuilding}
         viewerUsername={viewerUsername}
         onBuildingEnterClick={() => router.push(buildingHref)}
@@ -183,10 +186,12 @@ function LiveCitySceneBody({
   canEnterBuilding = false,
   viewerUsername = null,
   onDashboardClick,
+  onPublicChatClick,
   onBuildingEnterClick,
 }: Props & {
   counts: CityResponse['counts'];
   onDashboardClick: (agentId: string) => void;
+  onPublicChatClick: (href: string) => void;
   onBuildingEnterClick: () => void;
 }) {
   const quality = useQuality();
@@ -196,10 +201,7 @@ function LiveCitySceneBody({
   const [viewMode, setViewMode] = useState<'survey' | 'walk'>('survey');
   const [selectedOwnerKey, setSelectedOwnerKey] = useState<string | null>(null);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
-  const [cameraFocus, setCameraFocus] = useState<{
-    ownerKey: string;
-    nonce: number;
-  } | null>(null);
+  const [cameraFocus, setCameraFocus] = useState<SurveyFocusTarget | null>(null);
   const mobileWalkVector = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const layout = useMemo(
     () =>
@@ -250,18 +252,7 @@ function LiveCitySceneBody({
         viewerUsername,
       })
     : false;
-  const focusTarget = useMemo<SurveyFocusTarget | null>(() => {
-    if (!cameraFocus) return null;
-    const building =
-      layout.buildings.find((candidate) => candidate.ownerKey === cameraFocus.ownerKey) ?? null;
-    if (!building) return null;
-    return {
-      key: `${building.ownerKey}:${cameraFocus.nonce}`,
-      x: building.x,
-      z: building.z,
-      height: building.height,
-    };
-  }, [cameraFocus, layout.buildings]);
+  const focusTarget = cameraFocus;
 
   useEffect(() => {
     if (selectedOwnerKey && !selectedBuilding) setSelectedOwnerKey(null);
@@ -276,15 +267,39 @@ function LiveCitySceneBody({
     setViewMode('survey');
     setSelectedAgentId(null);
     setSelectedOwnerKey(myBuilding.ownerKey);
-    setCameraFocus({ ownerKey: myBuilding.ownerKey, nonce: Date.now() });
+    setCameraFocus({
+      key: `building:${myBuilding.ownerKey}:${Date.now()}`,
+      x: myBuilding.x,
+      z: myBuilding.z,
+      height: myBuilding.height,
+    });
   };
+  const focusAgentMarker = (agentId: string) => {
+    const marker = layout.markers.find((candidate) => candidate.agentId === agentId);
+    if (!marker) return;
+    setViewMode('survey');
+    setSelectedOwnerKey(null);
+    setSelectedAgentId(marker.agentId);
+    setCameraFocus({
+      key: `agent:${marker.agentId}:${Date.now()}`,
+      x: marker.x,
+      z: marker.z,
+      height: marker.height,
+    });
+  };
+  const selectedAgentChatHref = selectedAgent ? publicAgentChatHref(selectedAgent) : null;
   const mobilePrimaryAction =
     selectedBuilding && selectedBuildingIsMine && canEnterBuilding
       ? {
           label: 'Enter',
           onClick: onBuildingEnterClick,
         }
-      : selectedAgent && selectedAgent.mine && selectedAgent.visibility !== 'private'
+      : selectedAgentChatHref
+        ? {
+            label: 'Chat',
+            onClick: () => onPublicChatClick(selectedAgentChatHref),
+          }
+        : selectedAgent && selectedAgent.mine && selectedAgent.visibility !== 'private'
         ? {
             label: 'Dashboard',
             onClick: () => onDashboardClick(selectedAgent.agentId),
@@ -390,10 +405,12 @@ function LiveCitySceneBody({
       <LiveCityHud
         counts={counts}
         ownedAgents={layout.ownedAgents}
+        activeAgents={layout.markers}
         generatedAt={generatedAt}
         hasMyBuilding={canEnterBuilding || myBuilding !== null}
         onMyBuildingClick={onBuildingEnterClick}
         onFindMyBuildingClick={myBuilding ? focusMyBuilding : undefined}
+        onAgentViewClick={focusAgentMarker}
       />
       {selectedBuilding && (
         <LiveBuildingPanel
@@ -414,6 +431,7 @@ function LiveCitySceneBody({
       <LiveCityMobileMenu
         counts={counts}
         ownedAgents={layout.ownedAgents}
+        activeAgents={layout.markers}
         generatedAt={generatedAt}
         viewMode={viewMode}
         timeMode={timeMode}
@@ -422,6 +440,7 @@ function LiveCitySceneBody({
         hasMyBuilding={canEnterBuilding || myBuilding !== null}
         onMyBuildingClick={onBuildingEnterClick}
         onFindMyBuildingClick={myBuilding ? focusMyBuilding : undefined}
+        onAgentViewClick={focusAgentMarker}
         onToggleViewMode={() => setViewMode((mode) => (mode === 'walk' ? 'survey' : 'walk'))}
       />
       {viewMode === 'walk' && (
@@ -445,6 +464,7 @@ function LiveCitySceneBody({
 function LiveCityMobileMenu({
   counts,
   ownedAgents,
+  activeAgents,
   generatedAt,
   viewMode,
   timeMode,
@@ -452,11 +472,13 @@ function LiveCityMobileMenu({
   hasMyBuilding,
   onMyBuildingClick,
   onFindMyBuildingClick,
+  onAgentViewClick,
   onToggleViewMode,
   onQualityChange,
 }: {
   counts: CityResponse['counts'];
   ownedAgents: CityAgent[];
+  activeAgents: LiveAgentMarkerLayout[];
   generatedAt?: string | null;
   viewMode: 'survey' | 'walk';
   timeMode: LiveCityTimeMode;
@@ -464,6 +486,7 @@ function LiveCityMobileMenu({
   hasMyBuilding: boolean;
   onMyBuildingClick: () => void;
   onFindMyBuildingClick?: () => void;
+  onAgentViewClick: (agentId: string) => void;
   onToggleViewMode: () => void;
   onQualityChange: (quality: 'auto' | 'high' | 'low') => void;
 }) {
@@ -471,6 +494,7 @@ function LiveCityMobileMenu({
     .filter((agent) => agent.visibility !== 'private')
     .sort((a, b) => Number(b.status === 'running') - Number(a.status === 'running'))
     .slice(0, 4);
+  const topActive = selectActiveCityAgents(activeAgents, 6);
 
   return (
     <MobileSceneMenu
@@ -563,6 +587,51 @@ function LiveCityMobileMenu({
                 </span>
               </Link>
             ))}
+          </div>
+        </div>
+      )}
+
+      {topActive.length > 0 && (
+        <div>
+          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/45">
+            Active agents
+          </div>
+          <div className="grid gap-1.5">
+            {topActive.map((agent) => {
+              const chatHref = publicAgentChatHref(agent);
+              return (
+                <div
+                  key={agent.agentId}
+                  className="rounded-[7px] border border-white/10 bg-white/[0.045] px-3 py-2"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="truncate text-sm font-medium text-white">
+                      {agent.agentName}
+                    </span>
+                    <span className="shrink-0 text-[11px] text-emerald-200/70">
+                      {labelAgentStatus(agent.status)}
+                    </span>
+                  </div>
+                  <div className={`mt-2 grid gap-2 ${chatHref ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                    <button
+                      type="button"
+                      onClick={() => onAgentViewClick(agent.agentId)}
+                      className="rounded-[6px] border border-white/12 bg-white/[0.06] px-2 py-1.5 text-xs font-semibold text-white"
+                    >
+                      View
+                    </button>
+                    {chatHref ? (
+                      <Link
+                        href={chatHref}
+                        className="rounded-[6px] border border-emerald-300/30 bg-emerald-300 px-2 py-1.5 text-center text-xs font-semibold text-black"
+                      >
+                        Chat
+                      </Link>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -662,6 +731,7 @@ function LiveAgentPanel({
   onDashboardClick: (agentId: string) => void;
 }) {
   const owner = marker.ownerUsername?.trim() || 'Builder';
+  const chatHref = publicAgentChatHref(marker);
 
   return (
     <aside className="pointer-events-auto absolute bottom-24 left-3 right-3 z-20 rounded-[4px] border border-white/18 bg-[#08111a]/88 p-4 text-white shadow-2xl backdrop-blur-xl md:bottom-5 md:left-auto md:right-5 md:w-[min(320px,calc(100vw-2.5rem))]">
@@ -702,6 +772,15 @@ function LiveAgentPanel({
           <LayoutDashboard size={14} />
           Go to dashboard
         </button>
+      )}
+      {chatHref && (
+        <Link
+          href={chatHref}
+          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[4px] border border-emerald-300/30 bg-emerald-300 px-3 py-2 text-xs font-semibold text-black transition hover:bg-emerald-200"
+        >
+          <MessageSquare size={14} />
+          Chat
+        </Link>
       )}
     </aside>
   );
