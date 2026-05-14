@@ -25,16 +25,13 @@ interface MemorySection {
  * their own headers instead of the generic MemoryTab's
  * "MEMORY.md + random logs" layout:
  *   - SOUL.md   = persona / identity block (seeded at init)
- *   - MEMORY.md = things the agent learned about ITSELF
- *   - USER.md   = things the agent learned about the HUMAN
+ *   - MEMORY.md = stable agent, environment, and workflow facts
+ *   - USER.md   = stable user context and preferences
  * Plus: any additional .md files inside memories/ are treated as
  * tag-based memories and rendered below with their filenames.
  *
- * The HUMAN-vs-AGENT distinction is crucial for Hermes: writing
- * "your name is X" to USER.md when it should go to MEMORY.md (or
- * vice versa) is a common failure mode the framework tries hard
- * to prevent. Surfacing the two separately in the UI reinforces
- * the mental model.
+ * Keeping the buckets separate makes the memory browser easier to
+ * audit without embedding framework-specific prompt rules in the UI.
  */
 export function HermesMemoryTab() {
   const { agent } = useAgentContext();
