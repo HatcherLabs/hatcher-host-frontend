@@ -61,7 +61,7 @@ async function fetchPublicAgents(): Promise<ExploreAgent[]> {
 }
 
 function agentHref(agent: ExploreAgent): string {
-  return `/agent/${agent.slug ?? agent.id}?chat=1`;
+  return `/agent/${agent.id}?chat=1`;
 }
 
 function agentInitial(name: string): string {
@@ -130,9 +130,9 @@ export default async function ExplorePage() {
                       </div>
                       <div className="min-w-0">
                         <h2 className="truncate text-lg font-semibold text-[var(--text-primary)]">{agent.name}</h2>
-                        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[var(--text-muted)]">
-                          <span className="uppercase">{agent.framework}</span>
-                          <span>{agent.status}</span>
+                        <div className="mt-1 inline-flex items-center gap-1.5 rounded-md bg-[var(--bg-muted)] px-2 py-1 text-xs font-medium text-[var(--text-secondary)]">
+                          <MessageSquare className="h-3 w-3" />
+                          {t('publicChat')}
                         </div>
                       </div>
                     </div>

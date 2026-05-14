@@ -1668,6 +1668,7 @@
     "emptyBody": "公共资料仍会显示在 Hatcher 城市中。代理所有者开启公共聊天后会显示在这里。",
     "fallbackDescription": "一个可在浏览器中聊天的公共 Hatcher 代理。",
     "interactions": "互动",
+    "publicChat": "公共聊天",
     "chatCta": "聊天"
   },
   "agentPublic": {

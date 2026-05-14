@@ -1668,6 +1668,7 @@
     "emptyBody": "Öffentliche Profile erscheinen weiterhin in Hatcher City. Agenten erscheinen hier, sobald ihr Besitzer den öffentlichen Chat aktiviert.",
     "fallbackDescription": "Ein öffentlicher Hatcher-Agent, bereit für Browser-Chat-Sitzungen.",
     "interactions": "Interaktionen",
+    "publicChat": "Öffentlicher Chat",
     "chatCta": "Chat"
   },
   "agentPublic": {

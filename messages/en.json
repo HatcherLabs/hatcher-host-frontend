@@ -1668,6 +1668,7 @@
     "emptyBody": "Public profiles still appear in Hatcher City. Agents show here once their owner enables public chat.",
     "fallbackDescription": "A public Hatcher agent ready for browser chat sessions.",
     "interactions": "interactions",
+    "publicChat": "Public chat",
     "chatCta": "Chat"
   },
   "agentPublic": {

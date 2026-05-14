@@ -1668,6 +1668,7 @@
     "emptyBody": "Les profils publics apparaissent toujours dans Hatcher City. Les agents apparaissent ici lorsque leur propriétaire active le chat public.",
     "fallbackDescription": "Un agent Hatcher public prêt pour les sessions de chat dans le navigateur.",
     "interactions": "interactions",
+    "publicChat": "Chat public",
     "chatCta": "Chat"
   },
   "agentPublic": {
