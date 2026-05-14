@@ -60,6 +60,7 @@ export interface LiveAgentMarkerLayout {
   tier: number;
   mine: boolean;
   visibility?: CityAgent['visibility'];
+  publicChatEnabled?: boolean;
   rank: number;
   pathNodes: LiveCityNode[];
   speed: number;
@@ -438,6 +439,7 @@ function layoutAgentMarkers(
         tier: agent.tier,
         mine: agent.mine,
         visibility: agent.visibility,
+        publicChatEnabled: agent.publicChatEnabled === true,
         rank: rankAgentForCity(agent),
         pathNodes,
         speed: 1.35 + hashStr(`${agent.id}:walk-speed`) * 0.95,

@@ -43,6 +43,7 @@ export interface CityAgent {
   messageCount: number;
   mine: boolean;
   visibility?: 'public' | 'private';
+  publicChatEnabled?: boolean;
 }
 
 export interface CityUser {
