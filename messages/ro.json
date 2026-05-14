@@ -752,13 +752,13 @@
         "plugins": "Plugins + Abilități",
         "integrations": "Toate integrările",
         "byokKey": "BYOK (cheie LLM proprie)",
-        "defaultLlm": "LLM implicit (OpenRouter)"
+        "defaultLlm": "Selecție model"
       },
       "values": {
         "unlimited": "Nelimitat",
         "alwaysOn": "Mereu activ",
         "addon": "Add-on",
-        "llama4Scout": "DeepSeek V4 Flash"
+        "llama4Scout": "Selector provider/model"
       }
     },
     "faq": {
@@ -1820,7 +1820,7 @@
     "configRef": "Referință configurare completă →",
     "docsSuffix": "docs",
     "llmSupport": "Suport LLM",
-    "llmSubheading": "Ambele framework-uri suportă BYOK (Bring Your Own Key) pentru utilizare plătită direct la provider. LLM-ul găzduit rutează prin OpenRouter cu DeepSeek V4 Flash implicit și folosește AI Credits în loc de cote zilnice de mesaje.",
+    "llmSubheading": "Ambele framework-uri suportă BYOK (Bring Your Own Key) pentru utilizare plătită direct la provider. LLM-urile găzduite rutează prin OpenRouter folosind providerul și modelul ales în configurația fiecărui agent, apoi consumă AI Credits.",
     "byokNote": "* BYOK mereu gratuit — utilizare plătită direct la provider.",
     "byokSetupLink": "Vezi ghidul de configurare BYOK →",
     "decisionGuide": "Ghid rapid de decizie",
@@ -2136,44 +2136,52 @@
         "description": "Configurează primul tău agent AI în mai puțin de 60 de secunde. Ghid de start rapid, cerințe preliminare și primul deploy."
       },
       {
-        "title": "Configurarea agentului",
-        "description": "Configurează personalitate, modele, memorie, cron jobs, webhook-uri și rutare multi-agent."
+        "title": "Agenți & Chat-to-Hatch",
+        "description": "Folosește Chat-to-Hatch, alege OpenClaw sau Hermes și ajustează runtime-ul, fișierele, integrările și rutarea modelului."
       },
       {
-        "title": "Integrări de platforme",
-        "description": "Conectează-te la Telegram, Discord, WhatsApp, Slack și 20+ platforme de mesagerie."
+        "title": "AI Credits",
+        "description": "Vezi cum creditele lunare și top-up-urile alimentează LLM-urile găzduite, web search, research, extract și crawl."
       },
       {
         "title": "Configurare BYOK",
-        "description": "Aduce-ți propriile chei API pentru OpenAI, Anthropic, Google, xAI și altele. Mereu gratuit."
+        "description": "Adu-ți propriile chei de provider pentru OpenAI, Anthropic, Google, xAI, OpenRouter și altele. BYOK nu consumă AI Credits Hatcher."
       },
       {
-        "title": "Facturare & Prețuri",
-        "description": "Înțelege plățile cu token, deblocarea funcțiilor, creditele găzduite și gestionarea abonamentelor."
+        "title": "Framework-uri",
+        "description": "Compară OpenClaw și Hermes: potrivire, rutare de model, BYOK și comportamentul runtime-ului găzduit."
+      },
+      {
+        "title": "Integrări de platforme",
+        "description": "Conectează Telegram, Discord, Slack, Twitter/X, Signal, webhook-uri și alte canale incluse pe fiecare tier."
+      },
+      {
+        "title": "Aplicația Android",
+        "description": "Instalează aplicația Android, autentifică-te, gestionează agenții și primește notificări push pe mobil."
       },
       {
         "title": "Referință API",
-        "description": "Endpoint-uri REST API pentru agenți, funcții, plăți și operații de administrare."
+        "description": "Endpoint-uri REST API pentru agenți, billing, AI Credits, plăți, public chat și operații admin."
       }
     ],
     "topics": [
       {
-        "label": "Cum să deployezi primul tău agent"
+        "label": "Descrie un agent cu Chat-to-Hatch"
       },
       {
-        "label": "Furnizori LLM suportați"
+        "label": "Cum se consumă AI Credits"
       },
       {
-        "label": "Configurarea framework-ului agentului"
+        "label": "Modele găzduite și BYOK"
       },
       {
-        "label": "Ciclul de viață al containerului & coduri de stare"
+        "label": "Notificări push pe Android"
       },
       {
         "label": "Configurarea integrării Telegram"
       },
       {
-        "label": "Înțelegerea plăților cu token"
+        "label": "Metode de plată acceptate"
       }
     ]
   },
@@ -2274,7 +2282,7 @@
     "h1Accent": "Fă-l să eclozeze.",
     "authChecking": "Se verifică sesiunea…",
     "assistantTitle": "Asistent Hatcher",
-    "assistantSub": "Powered by DeepSeek V4 Flash · transformă intenția într-o configurație completă de agent",
+    "assistantSub": "Powered by Hatcher AI · transformă intenția într-o configurație completă de agent",
     "live": "Live",
     "assistantWho": "Hatcher",
     "intro": "Descrie agentul pe care îl vrei — ce face, unde rulează, ce ton. Aleg un framework, generez nume + identitate + skill-uri și îl pregătesc pentru eclozare. Una-două propoziții sunt destule; orice câmp e editabil după.",

@@ -752,13 +752,13 @@
         "plugins": "插件 + 技能",
         "integrations": "所有集成",
         "byokKey": "BYOK（自带LLM密钥）",
-        "defaultLlm": "默认LLM（OpenRouter）"
+        "defaultLlm": "模型选择"
       },
       "values": {
         "unlimited": "无限制",
         "alwaysOn": "始终在线",
         "addon": "扩展项",
-        "llama4Scout": "DeepSeek V4 Flash"
+        "llama4Scout": "提供商/模型选择器"
       }
     },
     "faq": {
@@ -1800,7 +1800,7 @@
   "frameworks": {
     "eyebrow": "框架",
     "heading": "选择合适的框架",
-    "subheading": "Hatcher 支持4种久经考验的智能体框架，各有独特优势——以下是选择指南。",
+    "subheading": "Hatcher 专注于两种生产级智能体框架：OpenClaw 适合工具密集型自动化，Hermes 适合长期运行的自适应智能体。",
     "deployCta": "部署智能体",
     "docsLink": "完整文档",
     "atAGlance": "快速概览",
@@ -1814,13 +1814,13 @@
     "memoryUsage": "基准内存用量",
     "lowerFaster": "越低越快",
     "lowerLeaner": "越低越轻量",
-    "benchmarkCallout": "🌸 Hermes 最快最轻量——最适合免费套餐部署。🦞 OpenClaw 工具最全面，但需要更多资源。",
+    "benchmarkCallout": "OpenClaw 适合需要广泛技能和自动化能力的场景。Hermes 更轻量，适合带记忆和研究流程的自适应智能体。",
     "configExamples": "配置示例",
     "configSubheading": "每个框架都有自己的配置格式，以下是典型设置示例。",
     "configRef": "完整配置参考 →",
     "docsSuffix": "文档",
     "llmSupport": "LLM 支持",
-    "llmSubheading": "所有框架均支持 BYOK，由用户直接向提供商付费。托管 LLM 默认通过 OpenRouter 使用 DeepSeek V4 Flash，并使用 AI Credits，而不是每日消息配额。",
+    "llmSubheading": "两种框架都支持 BYOK，由用户直接向提供商付费。托管 LLM 通过 OpenRouter 使用每个智能体配置中选择的提供商和模型，并消耗 AI Credits。",
     "byokNote": "* BYOK 始终免费使用 Hatcher 平台；提供商用量由您自己的密钥支付。",
     "byokSetupLink": "查看 BYOK 设置指南 →",
     "decisionGuide": "快速决策指南",
@@ -2136,44 +2136,52 @@
         "description": "60秒内设置您的第一个AI智能体。快速入门指南、前提条件和首次部署。"
       },
       {
-        "title": "智能体配置",
-        "description": "配置人格、模型、记忆、定时任务、Webhook和多智能体路由。"
+        "title": "智能体与 Chat-to-Hatch",
+        "description": "使用 Chat-to-Hatch，选择 OpenClaw 或 Hermes，并调整运行时、文件、集成和模型路由。"
       },
       {
-        "title": "平台集成",
-        "description": "连接至Telegram、Discord、WhatsApp、Slack及20+消息平台。"
+        "title": "AI Credits",
+        "description": "了解月度额度和一次性充值如何用于托管 LLM、网页搜索、研究、提取和爬取工具。"
       },
       {
         "title": "BYOK 设置",
-        "description": "为OpenAI、Anthropic、Google、xAI等携带自己的API密钥，始终免费。"
+        "description": "连接 OpenAI、Anthropic、Google、xAI、OpenRouter 等提供商密钥。BYOK 不会消耗 Hatcher AI Credits。"
       },
       {
-        "title": "账单与定价",
-        "description": "了解代币付款、功能解锁、托管积分和订阅管理。"
+        "title": "框架",
+        "description": "比较 OpenClaw 和 Hermes，包括适用场景、模型路由、BYOK 和托管运行时行为。"
+      },
+      {
+        "title": "平台集成",
+        "description": "连接 Telegram、Discord、Slack、Twitter/X、Signal、Webhook 和每个套餐都包含的其他渠道。"
+      },
+      {
+        "title": "Android 应用",
+        "description": "安装 Android 应用，登录，管理智能体，并在移动设备上接收推送通知。"
       },
       {
         "title": "API 参考",
-        "description": "智能体、功能、付款和管理操作的REST API端点。"
+        "description": "智能体、账单、AI Credits、付款、公开聊天和管理操作的 REST API 端点。"
       }
     ],
     "topics": [
       {
-        "label": "如何部署您的第一个智能体"
+        "label": "用 Chat-to-Hatch 描述智能体"
       },
       {
-        "label": "支持的LLM提供商"
+        "label": "AI Credits 如何消耗"
       },
       {
-        "label": "智能体框架配置"
+        "label": "托管模型与 BYOK"
       },
       {
-        "label": "容器生命周期与状态码"
+        "label": "Android 推送通知"
       },
       {
         "label": "设置Telegram集成"
       },
       {
-        "label": "了解代币付款"
+        "label": "支持的付款方式"
       }
     ]
   },
@@ -2181,7 +2189,7 @@
     "tiers": {
       "free": {
         "name": "免费",
-        "description": "1个智能体，AI Credits，2 GB 工作区"
+        "description": "1个智能体，每月 500 AI Credits，2 GB 工作区"
       },
       "starter": {
         "name": "Starter",
@@ -2274,7 +2282,7 @@
     "h1Accent": "孵化它。",
     "authChecking": "正在检查会话…",
     "assistantTitle": "Hatcher 助手",
-    "assistantSub": "由 DeepSeek V4 Flash 驱动 · 将意图解析为完整代理配置",
+    "assistantSub": "由 Hatcher AI 驱动 · 将意图解析为完整代理配置",
     "live": "在线",
     "assistantWho": "Hatcher",
     "intro": "描述你想要的代理 — 它做什么、在哪里运行、什么语调。我会挑选框架、生成名称 + 身份 + 技能，并准备孵化。一两句话就够了；之后每个字段都可编辑。",

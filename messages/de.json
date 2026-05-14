@@ -752,13 +752,13 @@
         "plugins": "Plugins + Fähigkeiten",
         "integrations": "Alle Integrationen",
         "byokKey": "BYOK (eigener LLM-Key)",
-        "defaultLlm": "Standard-LLM (OpenRouter)"
+        "defaultLlm": "Modellauswahl"
       },
       "values": {
         "unlimited": "Unbegrenzt",
         "alwaysOn": "Immer aktiv",
         "addon": "Add-on",
-        "llama4Scout": "DeepSeek V4 Flash"
+        "llama4Scout": "Provider-/Modell-Auswahl"
       }
     },
     "faq": {
@@ -1800,7 +1800,7 @@
   "frameworks": {
     "eyebrow": "Frameworks",
     "heading": "Das richtige Framework wählen",
-    "subheading": "Hatcher unterstützt 4 bewährte Agenten-Frameworks. Jedes hat einzigartige Stärken — so wählen Sie.",
+    "subheading": "Hatcher konzentriert sich auf zwei produktionsreife Agenten-Frameworks: OpenClaw für tool-lastige Automatisierung und Hermes für adaptive Langzeit-Agenten.",
     "deployCta": "Agenten deployen",
     "docsLink": "Vollständige Docs",
     "atAGlance": "Auf einen Blick",
@@ -1814,13 +1814,13 @@
     "memoryUsage": "Basis-Speichernutzung",
     "lowerFaster": "Niedriger ist schneller",
     "lowerLeaner": "Niedriger ist schlanker",
-    "benchmarkCallout": "🌸 Hermes ist das schnellste und leichteste — ideal für kostenlose Tarif-Deployments. 🦞 OpenClaw bietet die meisten Tools, benötigt aber mehr Ressourcen.",
+    "benchmarkCallout": "OpenClaw ist stark, wenn Sie die breiteste Skill- und Automatisierungsfläche brauchen. Hermes ist schlanker für adaptive Agenten mit speicherintensiven Research-Workflows.",
     "configExamples": "Konfigurationsbeispiele",
     "configSubheading": "Jedes Framework hat sein eigenes Konfigurationsformat. So sieht ein typisches Setup aus.",
     "configRef": "Vollständige Konfigurationsreferenz →",
     "docsSuffix": "Docs",
     "llmSupport": "LLM-Unterstützung",
-    "llmSubheading": "Alle Frameworks unterstützen BYOK (eigener Key) für provider-bezahlte Nutzung. Gehostete LLMs laufen über OpenRouter mit DeepSeek V4 Flash als Standard und nutzen AI Credits statt täglicher Nachrichtenkontingente.",
+    "llmSubheading": "Beide Frameworks unterstützen BYOK (eigener Key) für provider-bezahlte Nutzung. Gehostete LLMs laufen über OpenRouter mit dem Provider und Modell aus der jeweiligen Agenten-Konfiguration und nutzen AI Credits.",
     "byokNote": "* BYOK immer kostenlos — direkt beim Anbieter bezahlte Nutzung.",
     "byokSetupLink": "BYOK-Setup-Anleitung anzeigen →",
     "decisionGuide": "Schnelle Entscheidungshilfe",
@@ -2136,44 +2136,52 @@
         "description": "Richten Sie Ihren ersten KI-Agenten in unter 60 Sekunden ein. Schnellstartanleitung, Voraussetzungen und erstes Deployment."
       },
       {
-        "title": "Agenten-Konfiguration",
-        "description": "Persönlichkeit, Modelle, Gedächtnis, Cron-Jobs, Webhooks und Multi-Agent-Routing konfigurieren."
+        "title": "Agenten & Chat-to-Hatch",
+        "description": "Chat-to-Hatch nutzen, OpenClaw oder Hermes wählen und Runtime, Dateien, Integrationen und Modell-Routing anpassen."
       },
       {
-        "title": "Plattform-Integrationen",
-        "description": "Verbindung zu Telegram, Discord, WhatsApp, Slack und 20+ Messaging-Plattformen."
+        "title": "AI Credits",
+        "description": "So finanzieren monatliche Credits und einmalige Top-ups gehostete LLMs, Websuche, Research, Extract und Crawl."
       },
       {
         "title": "BYOK-Setup",
-        "description": "Eigene API-Keys für OpenAI, Anthropic, Google, xAI und mehr mitbringen. Immer kostenlos."
+        "description": "Eigene Provider-Keys für OpenAI, Anthropic, Google, xAI, OpenRouter und mehr nutzen. BYOK verbraucht keine Hatcher AI Credits."
       },
       {
-        "title": "Abrechnung & Preise",
-        "description": "Token-Zahlungen, Funktionsfreischaltungen, gehostetes Guthaben und Abonnementverwaltung verstehen."
+        "title": "Frameworks",
+        "description": "OpenClaw und Hermes vergleichen: Einsatzgebiet, Modell-Routing, BYOK und gehostetes Runtime-Verhalten."
+      },
+      {
+        "title": "Plattform-Integrationen",
+        "description": "Telegram, Discord, Slack, Twitter/X, Signal, Webhooks und weitere Kanäle verbinden, die in jedem Tarif enthalten sind."
+      },
+      {
+        "title": "Android-App",
+        "description": "Android-App installieren, anmelden, Agenten verwalten und Push-Benachrichtigungen auf dem Mobilgerät erhalten."
       },
       {
         "title": "API-Referenz",
-        "description": "REST-API-Endpunkte für Agenten, Funktionen, Zahlungen und Admin-Operationen."
+        "description": "REST-API-Endpunkte für Agenten, Abrechnung, AI Credits, Zahlungen, Public Chat und Admin-Operationen."
       }
     ],
     "topics": [
       {
-        "label": "So deployen Sie Ihren ersten Agenten"
+        "label": "Einen Agenten mit Chat-to-Hatch beschreiben"
       },
       {
-        "label": "Unterstützte LLM-Anbieter"
+        "label": "Wie AI Credits verbraucht werden"
       },
       {
-        "label": "Agenten-Framework-Konfiguration"
+        "label": "Gehostete Modelle und BYOK"
       },
       {
-        "label": "Container-Lebenszyklus & Statuscodes"
+        "label": "Android-Push-Benachrichtigungen"
       },
       {
         "label": "Telegram-Integration einrichten"
       },
       {
-        "label": "Token-Zahlungen verstehen"
+        "label": "Unterstützte Zahlungsmethoden"
       }
     ]
   },
@@ -2274,7 +2282,7 @@
     "h1Accent": "Brüte ihn aus.",
     "authChecking": "Sitzung wird geprüft…",
     "assistantTitle": "Hatcher Assistent",
-    "assistantSub": "Powered by DeepSeek V4 Flash · wandelt Absicht in eine vollständige Agent-Konfiguration um",
+    "assistantSub": "Powered by Hatcher AI · wandelt Absicht in eine vollständige Agent-Konfiguration um",
     "live": "Live",
     "assistantWho": "Hatcher",
     "intro": "Beschreib den Agenten, den du willst — was er tut, wo er läuft, in welchem Ton. Ich wähle ein Framework, generiere Name + Identität + Skills und stelle ihn zum Ausbrüten ein. Ein oder zwei Sätze reichen; jedes Feld ist danach editierbar.",
