@@ -270,23 +270,35 @@ function ApplicationsView() {
   const [selected, setSelected] = useState<ApplicationRow | null>(null);
   const [expandPitch, setExpandPitch] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (cursor?: string) => {
     setLoading(true);
     setError(null);
     const res = await api.adminListAffiliateApplications({
       status,
       limit: 50,
+      cursor,
     });
     setLoading(false);
-    if (res.success) setRows(res.data.applications as ApplicationRow[]);
+    if (res.success) {
+      setRows((prev) => (
+        cursor
+          ? [...(prev ?? []), ...(res.data.applications as ApplicationRow[])]
+          : (res.data.applications as ApplicationRow[])
+      ));
+      setNextCursor(res.data.nextCursor ?? null);
+    }
     else {
       setError(res.error);
       setRows([]);
+      setNextCursor(null);
     }
   }, [status]);
 
   useEffect(() => {
+    setRows(null);
+    setNextCursor(null);
     void load();
   }, [load]);
 
@@ -306,7 +318,7 @@ function ApplicationsView() {
             {s}
           </button>
         ))}
-        <button onClick={load} disabled={loading} className="btn-secondary text-xs px-3 py-1.5 ml-auto flex items-center gap-1.5">
+        <button onClick={() => load()} disabled={loading} className="btn-secondary text-xs px-3 py-1.5 ml-auto flex items-center gap-1.5">
           <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
           Refresh
         </button>
@@ -460,6 +472,19 @@ function ApplicationsView() {
           </div>
         )}
       </div>
+
+      {nextCursor && (
+        <div className="flex justify-center">
+          <button
+            onClick={() => load(nextCursor)}
+            disabled={loading}
+            className="btn-secondary text-xs px-4 py-2 flex items-center gap-1.5"
+          >
+            <ChevronRight size={12} />
+            {loading ? 'Loading…' : 'Load more applications'}
+          </button>
+        </div>
+      )}
 
       {selected && (
         <ApplicationPanel
@@ -742,18 +767,32 @@ function AffiliatesView() {
   const [rows, setRows] = useState<AffiliateRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (cursor?: string) => {
+    setLoading(true);
     setError(null);
-    const res = await api.adminListAffiliates({ status, limit: 50 });
-    if (res.success) setRows(res.data.affiliates as AffiliateRow[]);
+    const res = await api.adminListAffiliates({ status, limit: 50, cursor });
+    setLoading(false);
+    if (res.success) {
+      setRows((prev) => (
+        cursor
+          ? [...(prev ?? []), ...(res.data.affiliates as AffiliateRow[])]
+          : (res.data.affiliates as AffiliateRow[])
+      ));
+      setNextCursor(res.data.nextCursor ?? null);
+    }
     else {
       setError(res.error);
       setRows([]);
+      setNextCursor(null);
     }
   }, [status]);
 
   useEffect(() => {
+    setRows(null);
+    setNextCursor(null);
     void load();
   }, [load]);
 
@@ -773,8 +812,8 @@ function AffiliatesView() {
             {s}
           </button>
         ))}
-        <button onClick={load} className="btn-secondary text-xs px-3 py-1.5 ml-auto flex items-center gap-1.5">
-          <RefreshCw size={12} /> Refresh
+        <button onClick={() => load()} disabled={loading} className="btn-secondary text-xs px-3 py-1.5 ml-auto flex items-center gap-1.5">
+          <RefreshCw size={12} className={loading ? 'animate-spin' : ''} /> Refresh
         </button>
       </div>
 
@@ -889,6 +928,19 @@ function AffiliatesView() {
           </div>
         )}
       </div>
+
+      {nextCursor && (
+        <div className="flex justify-center">
+          <button
+            onClick={() => load(nextCursor)}
+            disabled={loading}
+            className="btn-secondary text-xs px-4 py-2 flex items-center gap-1.5"
+          >
+            <ChevronRight size={12} />
+            {loading ? 'Loading…' : 'Load more affiliates'}
+          </button>
+        </div>
+      )}
 
       {selectedId && (
         <AffiliateDetailPanel
