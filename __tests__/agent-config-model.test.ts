@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  DEFAULT_PUBLIC_CHAT_DAILY_AI_CREDIT_CAP,
+  buildPublicChatUpdatePatch,
+  resolveLoadedPublicChatConfig,
   resolveInitialCustomModelState,
   resolveLoadedModelConfig,
   resolveSavedModel,
@@ -71,6 +74,45 @@ describe('agent config model selection', () => {
     })).toEqual({
       provider: 'anthropic',
       model: 'claude-opus-4-7',
+    });
+  });
+
+  it('loads public chat config with the default daily cap for older enabled agents', () => {
+    expect(resolveLoadedPublicChatConfig({
+      isPublic: true,
+      config: { publicChat: { enabled: true } },
+    })).toEqual({
+      isPublic: true,
+      publicChatEnabled: true,
+      publicChatDailyAiCreditCap: DEFAULT_PUBLIC_CHAT_DAILY_AI_CREDIT_CAP,
+    });
+  });
+
+  it('builds a public chat patch that makes chat-enabled agents public', () => {
+    expect(buildPublicChatUpdatePatch({
+      isPublic: false,
+      publicChatEnabled: true,
+      publicChatDailyAiCreditCap: 750,
+    })).toEqual({
+      isPublic: true,
+      publicChat: {
+        enabled: true,
+        dailyAiCreditCap: 750,
+      },
+    });
+  });
+
+  it('disables public chat when the public profile is disabled', () => {
+    expect(buildPublicChatUpdatePatch({
+      isPublic: false,
+      publicChatEnabled: false,
+      publicChatDailyAiCreditCap: 750,
+    })).toEqual({
+      isPublic: false,
+      publicChat: {
+        enabled: false,
+        dailyAiCreditCap: 750,
+      },
     });
   });
 });

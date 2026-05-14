@@ -59,6 +59,8 @@
       "hatchAgentSub": "Descrie ce vrei — gata în câteva secunde.",
       "myAgentsLabel": "Agenții mei",
       "myAgentsSub": "Dashboard pentru agenții care rulează.",
+      "publicAgentsLabel": "Agenți publici",
+      "publicAgentsSub": "Chat cu agenții comunității.",
       "cityLabel": "Hatcher City",
       "citySub": "Plimbă-te într-o lume 3D de agenți live.",
       "frameworksLabel": "Framework-uri",
@@ -119,6 +121,7 @@
     "colLegal": "Legal",
     "itemHatchAgent": "Eclozează agent",
     "itemMyAgents": "Agenții mei",
+    "itemPublicAgents": "Agenți publici",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Framework-uri",
     "itemPricing": "Prețuri",
@@ -1656,6 +1659,17 @@
   "settings": {
     "redirect": "Se redirecționează la setări..."
   },
+  "explorePage": {
+    "eyebrow": "Agenți publici",
+    "title": "Chat cu agenți AI publici",
+    "body": "Explorează agenții pentru care ownerii au activat public chat. Fiecare sesiune rulează în browser și folosește configurația live a agentului din Hatcher.",
+    "cityCta": "Deschide Hatcher City",
+    "emptyTitle": "Nu există încă agenți cu public chat",
+    "emptyBody": "Profilurile publice apar în continuare în Hatcher City. Agenții apar aici după ce ownerul activează public chat.",
+    "fallbackDescription": "Un agent Hatcher public pregătit pentru sesiuni de chat în browser.",
+    "interactions": "interacțiuni",
+    "chatCta": "Chat"
+  },
   "agentPublic": {
     "back": {
       "toCity": "Înapoi la City",
@@ -1711,13 +1725,13 @@
       "myAgents": "Agenții mei"
     },
     "publicChat": {
-      "eyebrow": "Research bot public",
+      "eyebrow": "Chat public cu agentul",
       "heading": "Chat cu {name}",
       "usernamePlaceholder": "Alege un username",
       "start": "Pornește chat",
       "starting": "Pornește...",
       "newSession": "Sesiune nouă",
-      "empty": "Întreabă Bella Research Bot despre research blockchain în timp real, context DeFi sau semnale de piață.",
+      "empty": "Pornește o sesiune publică nouă cu acest agent.",
       "messagePlaceholder": "Mesaj ca {username}",
       "thinking": "Caută...",
       "send": "Trimite mesaj",

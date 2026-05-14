@@ -14,6 +14,8 @@ import {
   RefreshCw,
   History,
   RotateCcw,
+  Globe2,
+  MessageSquare,
 } from 'lucide-react';
 import { BYOK_PROVIDERS } from '@hatcher/shared';
 import { api } from '@/lib/api';
@@ -48,6 +50,14 @@ type AiCreditBalance = {
   monthlyGrant: number;
   tier: string;
 };
+
+function isAiCreditBalance(value: unknown): value is AiCreditBalance {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const source = value as Record<string, unknown>;
+  return typeof source.balance === 'number'
+    && typeof source.monthlyGrant === 'number'
+    && typeof source.tier === 'string';
+}
 
 const HOSTED_MODEL_PROVIDERS: HostedModelProvider[] = [
   { key: 'deepseek', name: 'DeepSeek', description: 'Fast, cost-efficient long-context models.' },
@@ -605,6 +615,12 @@ export function ConfigTab() {
     setByokKeyInput,
     showByokKey,
     setShowByokKey,
+    configIsPublic,
+    setConfigIsPublic,
+    configPublicChatEnabled,
+    setConfigPublicChatEnabled,
+    configPublicChatDailyAiCreditCap,
+    setConfigPublicChatDailyAiCreditCap,
     saving,
     saveMsg,
     saveConfig,
@@ -673,11 +689,19 @@ export function ConfigTab() {
   }, [configModel, isHostedMode, normalizedHostedModel, setConfigModel]);
 
   useEffect(() => {
+    if (!isHostedMode && configPublicChatEnabled) {
+      setConfigPublicChatEnabled(false);
+    }
+  }, [configPublicChatEnabled, isHostedMode, setConfigPublicChatEnabled]);
+
+  useEffect(() => {
     if (!isHostedMode) return;
     let cancelled = false;
     api.getAiCreditBalance()
       .then((res) => {
-        if (!cancelled && res.success) setAiCreditBalance(res.data);
+        if (!cancelled && res.success) {
+          setAiCreditBalance(isAiCreditBalance(res.data) ? res.data : null);
+        }
       })
       .catch(() => {
         if (!cancelled) setAiCreditBalance(null);
@@ -735,6 +759,94 @@ export function ConfigTab() {
               placeholder="What this agent does"
             />
           </label>
+        </div>
+      </GlassCard>
+
+      <GlassCard className="p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-5">
+          <div>
+            <h3 className="text-lg font-semibold text-[var(--text-primary)] flex items-center gap-2">
+              <Globe2 className="w-5 h-5 text-[var(--accent-primary)]" />
+              Public Access
+            </h3>
+            <p className="text-sm text-[var(--text-secondary)] mt-1">
+              Public profile appears in Hatcher City. Public chat appears in Explore.
+            </p>
+          </div>
+          {isHostedMode && configPublicChatEnabled && agent?.id && (
+            <a
+              href={`/agent/${agent.slug ?? agent.id}?chat=1`}
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border-subtle)] px-3 py-2 text-sm text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-primary)]/50 hover:text-[var(--accent-primary)]"
+            >
+              <MessageSquare className="w-4 h-4" />
+              Open public chat
+            </a>
+          )}
+        </div>
+
+        <div className="space-y-4">
+          <label className="flex items-start gap-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
+            <input
+              type="checkbox"
+              checked={configIsPublic}
+              onChange={(event) => {
+                setConfigIsPublic(event.target.checked);
+                if (!event.target.checked) setConfigPublicChatEnabled(false);
+              }}
+              className="mt-1 h-4 w-4 accent-[var(--accent-primary)]"
+            />
+            <span>
+              <span className="block text-sm font-medium text-[var(--text-primary)]">Public profile</span>
+              <span className="mt-1 block text-sm text-[var(--text-secondary)]">
+                Show this agent as a public building in Hatcher City.
+              </span>
+            </span>
+          </label>
+
+          <label className="flex items-start gap-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
+            <input
+              type="checkbox"
+              checked={isHostedMode && configPublicChatEnabled}
+              disabled={!isHostedMode}
+              onChange={(event) => {
+                if (!isHostedMode) return;
+                const checked = event.target.checked;
+                setConfigPublicChatEnabled(checked);
+                if (checked) setConfigIsPublic(true);
+              }}
+              className="mt-1 h-4 w-4 accent-[var(--accent-primary)] disabled:opacity-50"
+            />
+            <span>
+              <span className="block text-sm font-medium text-[var(--text-primary)]">Public chat</span>
+              <span className="mt-1 block text-sm text-[var(--text-secondary)]">
+                Let visitors start anonymous browser sessions. Usage spends this owner account&apos;s AI Credits.
+                {!isHostedMode ? ' Switch to Hatcher Platform to enable an AI Credit cap.' : ''}
+              </span>
+            </span>
+          </label>
+
+          {isHostedMode && configPublicChatEnabled && (
+            <label className="block rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
+              <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+                Daily public AI Credit cap
+              </span>
+              <input
+                type="number"
+                min={1}
+                max={100000}
+                step={100}
+                value={configPublicChatDailyAiCreditCap}
+                onChange={(event) => {
+                  const next = Number.parseInt(event.target.value, 10);
+                  setConfigPublicChatDailyAiCreditCap(Number.isFinite(next) ? next : 0);
+                }}
+                className="config-input"
+              />
+              <p className="mt-2 text-xs text-[var(--text-tertiary)]">
+                Public chat stops for visitors once this agent reaches the cap over a rolling 24h window.
+              </p>
+            </label>
+          )}
         </div>
       </GlassCard>
 

@@ -20,6 +20,7 @@ const LOCALIZED_ROUTES: Array<{
 }> = [
   { path: '/', changeFrequency: 'daily', priority: 1.0 },
   { path: '/pricing', changeFrequency: 'weekly', priority: 0.9 },
+  { path: '/explore', changeFrequency: 'daily', priority: 0.85 },
   { path: '/frameworks', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/create', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/token', changeFrequency: 'weekly', priority: 0.7 },

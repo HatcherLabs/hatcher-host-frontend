@@ -361,10 +361,11 @@ export const api = {
       lastActiveAt: string;
     }>(`/agents/${id}/public-stats`),
 
-  /** Get public chat availability for a partner public agent (no auth required) */
+  /** Get public chat availability for a public agent (no auth required) */
   getAgentPublicChat: (id: string) =>
     req<{
       enabled: boolean;
+      dailyAiCreditCap: number | null;
       agent: {
         id: string;
         name: string;
@@ -375,7 +376,7 @@ export const api = {
       } | null;
     }>(`/agents/${id}/public-chat`),
 
-  /** Create a browser-scoped public chat session for a partner agent */
+  /** Create a browser-scoped public chat session for a public agent */
   createAgentPublicChatSession: (id: string, username: string) =>
     req<{
       sessionId: string;
@@ -393,7 +394,7 @@ export const api = {
       body: JSON.stringify({ username }),
     }),
 
-  /** Send a message to a partner public agent chat session */
+  /** Send a message to a public agent chat session */
   sendAgentPublicChatMessage: (
     id: string,
     data: {
@@ -453,6 +454,7 @@ export const api = {
     name?: string;
     description?: string;
     commitMessage?: string;
+    isPublic?: boolean;
     config?: { personality?: string; systemPrompt?: string; [key: string]: unknown };
   }) =>
     req<Agent>(`/agents/${id}`, {
