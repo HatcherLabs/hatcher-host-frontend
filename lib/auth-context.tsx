@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { api, getToken, setToken, clearToken, isAuthenticated } from './api';
+import type { AuthProfileData } from './api';
 
 interface UserProfile {
   id: string;
@@ -37,6 +38,18 @@ const AuthContext = createContext<AuthContextValue>({
   refreshUser: async () => {},
 });
 
+function mapProfile(profile: AuthProfileData): UserProfile {
+  return {
+    id: profile.id,
+    email: profile.email,
+    username: profile.username,
+    walletAddress: profile.walletAddress ?? null,
+    isAdmin: profile.isAdmin ?? false,
+    tier: profile.tier ?? 'free',
+    avatarUrl: profile.avatarUrl ?? null,
+  };
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authed, setAuthed] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // true until initial auth check completes
@@ -57,15 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Login response may not include tier — fetch full profile to get it
       const profile = await api.getProfile();
       if (profile.success) {
-        setUser({
-          id: profile.data.id,
-          email: profile.data.email,
-          username: profile.data.username,
-          walletAddress: profile.data.walletAddress ?? null,
-          isAdmin: profile.data.isAdmin ?? false,
-          tier: profile.data.tier ?? 'free',
-          avatarUrl: profile.data.avatarUrl ?? null,
-        });
+        setUser(mapProfile(profile.data));
       } else {
         // Fallback: use login response data (tier may default to 'free')
         setUser({
@@ -121,41 +126,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshUser = useCallback(async () => {
     const res = await api.getProfile();
     if (res.success) {
-      setUser({
-        id: res.data.id,
-        email: res.data.email,
-        username: res.data.username,
-        walletAddress: res.data.walletAddress ?? null,
-        isAdmin: res.data.isAdmin ?? false,
-        tier: res.data.tier ?? 'free',
-        avatarUrl: res.data.avatarUrl ?? null,
-      });
+      setUser(mapProfile(res.data));
     }
   }, []);
 
   // Sync state with token on mount (e.g. page refresh)
-  // Check both localStorage token AND httpOnly cookie (via profile fetch)
+  // Check both localStorage token AND httpOnly cookie via a non-error session probe.
   useEffect(() => {
-    // Always attempt a profile fetch — the httpOnly cookie may authenticate
-    // even if localStorage is empty (cookie-based session after migration)
     const hasLocalToken = isAuthenticated();
-    
-    api.getProfile().then((res) => {
-      if (res.success) {
+
+    api.getSession().then((res) => {
+      if (res.success && res.data.authenticated && res.data.user) {
         setAuthed(true);
-        setUser({
-          id: res.data.id,
-          email: res.data.email,
-          username: res.data.username,
-          walletAddress: res.data.walletAddress ?? null,
-          isAdmin: res.data.isAdmin ?? false,
-          tier: res.data.tier ?? 'free',
-          avatarUrl: res.data.avatarUrl ?? null,
-        });
+        setUser(mapProfile(res.data.user));
       } else {
-        // Neither cookie nor localStorage token is valid
         if (hasLocalToken) clearToken();
         setAuthed(false);
+        setUser(null);
       }
     }).finally(() => setIsLoading(false));
   }, []);
