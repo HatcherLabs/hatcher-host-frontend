@@ -570,7 +570,7 @@ function ApplyForm({
         setSubmitting(false);
       }
     },
-    [form, needsPayoutAddress, onSubmitted, submitting, validate],
+    [form, onSubmitted, submitting, validate],
   );
 
   if (success) {

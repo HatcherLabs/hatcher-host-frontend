@@ -975,6 +975,8 @@ const CodeArtifactView = memo(function CodeArtifactView({ artifact }: { artifact
 const ImageArtifactView = memo(function ImageArtifactView({ artifact }: { artifact: ImageArtifact }) {
   return (
     <figure className="my-3 overflow-hidden rounded-lg border border-white/10 bg-black/20">
+      {/* Agent artifacts can be data/blob URLs or arbitrary remote images; Next Image cannot optimize them reliably. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={artifact.url}
         alt={artifact.alt}
