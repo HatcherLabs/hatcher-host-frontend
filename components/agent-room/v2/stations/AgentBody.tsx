@@ -6,6 +6,12 @@ import { useFrame } from '@react-three/fiber';
 import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import * as THREE from 'three';
 import type { FrameworkPalette } from '../three-palette';
+import {
+  buildAvatarSignature,
+  normalizeAvatarTraits,
+  personalizePalette,
+  type AvatarSignature as AvatarSignatureConfig,
+} from './avatarTraits';
 
 export const AVATAR_VARIANTS = [
   {
@@ -94,6 +100,7 @@ interface Props {
   isStreaming?: boolean;
   status?: string;
   avatarVariant?: string | null;
+  avatarTraits?: unknown;
   activeEmote?: RoomEmoteId | null;
   emoteNonce?: number;
   showStatusAura?: boolean;
@@ -658,6 +665,109 @@ function AgentStatusAura({
           </mesh>
         ))}
       </group>
+    </group>
+  );
+}
+
+function AvatarSignature({
+  signature,
+  isStreaming,
+}: {
+  signature: AvatarSignatureConfig;
+  isStreaming?: boolean;
+}) {
+  const root = useRef<THREE.Group>(null);
+  const orbit = useRef<THREE.Group>(null);
+  const offsetX = ((signature.seed % 5) - 2) * 0.08;
+  const offsetY = ((Math.floor(signature.seed / 7) % 5) - 2) * 0.035;
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    if (root.current) {
+      root.current.position.y = 1.92 + offsetY + Math.sin(t * 1.2 + signature.seed) * 0.035;
+      root.current.rotation.y = Math.sin(t * 0.42 + signature.seed) * 0.16;
+    }
+    if (orbit.current) {
+      orbit.current.rotation.z = t * (isStreaming ? 0.96 : 0.42);
+      orbit.current.rotation.x = Math.sin(t * 0.34 + signature.seed) * 0.16;
+    }
+  });
+
+  return (
+    <group ref={root} position={[0.58 + offsetX, 1.92, 0.52]} scale={[0.36, 0.36, 0.36]}>
+      <group ref={orbit}>
+        <mesh>
+          <torusGeometry args={[0.48, 0.025, 8, 56]} />
+          <meshBasicMaterial color={signature.accent} toneMapped={false} transparent opacity={0.78} />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.64, 0.011, 8, 56]} />
+          <meshBasicMaterial color={signature.secondary} toneMapped={false} transparent opacity={0.42} />
+        </mesh>
+      </group>
+
+      {signature.pattern === 'cards' && (
+        <group>
+          {[-1, 0, 1].map((index) => (
+            <mesh key={index} position={[index * 0.18, index * 0.03, 0.02]} rotation={[0, 0, index * 0.16]}>
+              <boxGeometry args={[0.18, 0.28, 0.026]} />
+              <meshBasicMaterial
+                color={index === 0 ? signature.accent : signature.secondary}
+                toneMapped={false}
+                transparent
+                opacity={0.86}
+              />
+            </mesh>
+          ))}
+        </group>
+      )}
+
+      {signature.pattern === 'scanner' && (
+        <group>
+          <mesh rotation={[0, 0, Math.PI / 4]}>
+            <boxGeometry args={[0.62, 0.035, 0.035]} />
+            <meshBasicMaterial color={signature.accent} toneMapped={false} />
+          </mesh>
+          <mesh rotation={[0, 0, -Math.PI / 4]}>
+            <boxGeometry args={[0.62, 0.035, 0.035]} />
+            <meshBasicMaterial color={signature.secondary} toneMapped={false} />
+          </mesh>
+        </group>
+      )}
+
+      {signature.pattern === 'terminal' && (
+        <group>
+          {Array.from({ length: 4 }, (_, index) => (
+            <mesh key={index} position={[(index - 1.5) * 0.12, 0, 0.02]}>
+              <boxGeometry args={[0.055, 0.18 + (index % 2) * 0.16, 0.03]} />
+              <meshBasicMaterial
+                color={index % 2 ? signature.secondary : signature.accent}
+                toneMapped={false}
+                transparent
+                opacity={0.82}
+              />
+            </mesh>
+          ))}
+        </group>
+      )}
+
+      {signature.pattern === 'spark' && (
+        <group>
+          {[0, Math.PI / 3, (Math.PI * 2) / 3].map((rotation) => (
+            <mesh key={rotation} rotation={[0, 0, rotation]}>
+              <boxGeometry args={[0.72, 0.028, 0.028]} />
+              <meshBasicMaterial color={signature.accent} toneMapped={false} />
+            </mesh>
+          ))}
+        </group>
+      )}
+
+      {signature.pattern === 'rings' && (
+        <mesh>
+          <sphereGeometry args={[0.14, 16, 12]} />
+          <meshBasicMaterial color={signature.secondary} toneMapped={false} transparent opacity={0.92} />
+        </mesh>
+      )}
     </group>
   );
 }
@@ -1537,6 +1647,7 @@ export function AgentBody({
   isStreaming,
   status,
   avatarVariant,
+  avatarTraits,
   activeEmote,
   emoteNonce,
   showStatusAura = true,
@@ -1545,11 +1656,21 @@ export function AgentBody({
     () => pickVariant(framework, agentId, avatarVariant),
     [framework, agentId, avatarVariant],
   );
+  const normalizedTraits = useMemo(() => normalizeAvatarTraits(avatarTraits), [avatarTraits]);
+  const seedInput = `${framework}:${agentId ?? 'draft'}:${variant}:${avatarVariant ?? ''}`;
+  const personalizedPalette = useMemo(
+    () => personalizePalette(palette, normalizedTraits, seedInput),
+    [normalizedTraits, palette, seedInput],
+  );
+  const signature = useMemo(
+    () => buildAvatarSignature(normalizedTraits, seedInput),
+    [normalizedTraits, seedInput],
+  );
 
   return (
     <>
       {showStatusAura && isStreaming && (
-        <AgentStatusAura palette={palette} isStreaming={isStreaming} status={status} />
+        <AgentStatusAura palette={personalizedPalette} isStreaming={isStreaming} status={status} />
       )}
       {isGlbAvatarVariant(variant) ? (
         <GLBAvatar
@@ -1562,13 +1683,14 @@ export function AgentBody({
       ) : (
         <ProceduralAvatar
           variant={variant}
-          palette={palette}
+          palette={personalizedPalette}
           isStreaming={isStreaming}
           status={status}
           activeEmote={activeEmote}
           emoteNonce={emoteNonce}
         />
       )}
+      <AvatarSignature signature={signature} isStreaming={isStreaming} />
     </>
   );
 }

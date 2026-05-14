@@ -11,6 +11,7 @@ interface AgentRoomAvatarPreviewProps {
   framework: string;
   status: string;
   avatarVariant?: unknown;
+  avatarTraits?: unknown;
   activeEmote?: RoomEmoteId | null;
   emoteNonce?: number;
   isStreaming?: boolean;
@@ -43,6 +44,7 @@ function AvatarRig({
   framework,
   status,
   avatarVariant,
+  avatarTraits,
   activeEmote,
   emoteNonce,
   isStreaming,
@@ -64,6 +66,7 @@ function AvatarRig({
         palette={palette}
         status={status}
         avatarVariant={normalizedVariant}
+        avatarTraits={avatarTraits}
         activeEmote={activeEmote}
         emoteNonce={emoteNonce}
         isStreaming={isStreaming}

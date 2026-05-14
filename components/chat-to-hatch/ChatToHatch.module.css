@@ -616,6 +616,40 @@
   box-shadow: 0 0 0 2px rgba(57, 255, 136, 0.18);
 }
 
+.traitGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+@media (max-width: 620px) {
+  .traitGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.traitInput {
+  appearance: none;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line-bright);
+  border-radius: 6px;
+  background: var(--bg-2);
+  color: var(--ink);
+  padding: 8px 10px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.35;
+  letter-spacing: 0;
+  text-transform: none;
+  outline: none;
+}
+
+.traitInput:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(57, 255, 136, 0.18);
+}
+
 .modelSummary {
   display: flex;
   flex-wrap: wrap;

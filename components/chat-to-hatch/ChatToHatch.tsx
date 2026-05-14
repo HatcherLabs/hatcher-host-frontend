@@ -17,6 +17,16 @@ type InstallPlanItem = {
   reason: string;
 };
 
+type AvatarTraits = {
+  seed?: string;
+  palette?: string;
+  accentColor?: string;
+  secondaryColor?: string;
+  emblem?: string;
+  accessory?: string;
+  mood?: string;
+};
+
 type ModelCost = 'Low' | 'Medium' | 'High' | 'Premium' | 'Variable';
 
 type HostedModelProvider = {
@@ -50,6 +60,7 @@ interface ParsedConfig {
   greeting: string;
   avatarHint: string;
   avatarVariant: string;
+  avatarTraits: AvatarTraits;
 }
 
 interface ParseResponse {
@@ -285,6 +296,23 @@ function createSavedHostedModelOption(modelId: string): HostedModel {
   };
 }
 
+function sanitizeAvatarTraits(value: AvatarTraits | undefined, fallbackSeed: string): AvatarTraits {
+  const trim = (raw: string | undefined, max = 48) => raw?.trim().replace(/\s+/g, ' ').slice(0, max) || undefined;
+  const hex = (raw: string | undefined) => {
+    const value = raw?.trim();
+    return value && /^#[0-9a-f]{6}$/i.test(value) ? value.toUpperCase() : undefined;
+  };
+  return {
+    seed: trim(value?.seed, 80) ?? fallbackSeed,
+    palette: trim(value?.palette) ?? 'adaptive accent',
+    accentColor: hex(value?.accentColor),
+    secondaryColor: hex(value?.secondaryColor),
+    emblem: trim(value?.emblem) ?? 'agent mark',
+    accessory: trim(value?.accessory) ?? 'identity halo',
+    mood: trim(value?.mood) ?? 'focused',
+  };
+}
+
 function normalizeConfig(config: ParsedConfig): ParsedConfig {
   const selectedSkills = uniq(
     config.selectedSkills?.length ? config.selectedSkills : config.suggestedSkills ?? [],
@@ -305,6 +333,10 @@ function normalizeConfig(config: ParsedConfig): ParsedConfig {
     selectedPlugins,
     installPlan,
     avatarVariant: config.avatarVariant ?? '',
+    avatarTraits: sanitizeAvatarTraits(
+      config.avatarTraits,
+      `${config.framework}:${config.name}:${config.avatarHint || config.description}`,
+    ),
   };
 }
 
@@ -450,6 +482,10 @@ export function ChatToHatch() {
       if (draft.avatarVariant.trim()) {
         configBody.avatarVariant = draft.avatarVariant.trim();
         configBody.roomAvatarVariant = draft.avatarVariant.trim();
+      }
+      if (Object.values(draft.avatarTraits).some(Boolean)) {
+        configBody.avatarTraits = draft.avatarTraits;
+        configBody.roomAvatarTraits = draft.avatarTraits;
       }
 
       const created = await req<{ id: string; slug?: string | null }>('/agents', {
@@ -701,6 +737,7 @@ export function ChatToHatch() {
                       framework={draft.framework}
                       status="running"
                       avatarVariant={draft.avatarVariant}
+                      avatarTraits={draft.avatarTraits}
                       activeEmote={thinking ? 'think' : 'wave'}
                       emoteNonce={messages.length + (thinking ? 1 : 0)}
                       isStreaming={thinking}
@@ -813,6 +850,53 @@ export function ChatToHatch() {
                         ))}
                       </select>
                     </label>
+
+                    <div className={styles.traitGrid}>
+                      <label className={styles.selectLabel}>
+                        {t('labelAvatarPalette')}
+                        <input
+                          className={styles.traitInput}
+                          value={draft.avatarTraits.palette ?? ''}
+                          onChange={(e) => patchDraft({
+                            avatarTraits: { ...draft.avatarTraits, palette: e.target.value },
+                          })}
+                          maxLength={48}
+                        />
+                      </label>
+                      <label className={styles.selectLabel}>
+                        {t('labelAvatarEmblem')}
+                        <input
+                          className={styles.traitInput}
+                          value={draft.avatarTraits.emblem ?? ''}
+                          onChange={(e) => patchDraft({
+                            avatarTraits: { ...draft.avatarTraits, emblem: e.target.value },
+                          })}
+                          maxLength={48}
+                        />
+                      </label>
+                      <label className={styles.selectLabel}>
+                        {t('labelAvatarAccessory')}
+                        <input
+                          className={styles.traitInput}
+                          value={draft.avatarTraits.accessory ?? ''}
+                          onChange={(e) => patchDraft({
+                            avatarTraits: { ...draft.avatarTraits, accessory: e.target.value },
+                          })}
+                          maxLength={48}
+                        />
+                      </label>
+                      <label className={styles.selectLabel}>
+                        {t('labelAvatarMood')}
+                        <input
+                          className={styles.traitInput}
+                          value={draft.avatarTraits.mood ?? ''}
+                          onChange={(e) => patchDraft({
+                            avatarTraits: { ...draft.avatarTraits, mood: e.target.value },
+                          })}
+                          maxLength={48}
+                        />
+                      </label>
+                    </div>
                   </div>
                 </div>
 
