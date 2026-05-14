@@ -148,6 +148,12 @@ export interface AgentContextValue {
   setByokKeyInput: (value: string) => void;
   showByokKey: boolean;
   setShowByokKey: (value: boolean) => void;
+  configIsPublic: boolean;
+  setConfigIsPublic: (value: boolean) => void;
+  configPublicChatEnabled: boolean;
+  setConfigPublicChatEnabled: (value: boolean) => void;
+  configPublicChatDailyAiCreditCap: number;
+  setConfigPublicChatDailyAiCreditCap: (value: number) => void;
   saving: boolean;
   saveMsg: string | null;
   setSaveMsg: (msg: string | null) => void;

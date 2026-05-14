@@ -97,7 +97,7 @@ export function CommandPalette() {
   useEffect(() => {
     if (!isAuthenticated) return;
     api.getMyAgents().then((res) => {
-      if (res.success) setAgents(res.data);
+      if (res.success) setAgents(Array.isArray(res.data) ? res.data : []);
     });
   }, [isAuthenticated]);
 

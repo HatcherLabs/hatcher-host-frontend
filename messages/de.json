@@ -59,6 +59,8 @@
       "hatchAgentSub": "Beschreib was du willst — in Sekunden.",
       "myAgentsLabel": "Meine Agenten",
       "myAgentsSub": "Dashboard für laufende Agenten.",
+      "publicAgentsLabel": "Öffentliche Agenten",
+      "publicAgentsSub": "Mit Community-Agenten chatten.",
       "cityLabel": "Hatcher City",
       "citySub": "Eine 3D-Welt aus Live-Agenten begehen.",
       "frameworksLabel": "Frameworks",
@@ -119,6 +121,7 @@
     "colLegal": "Rechtliches",
     "itemHatchAgent": "Agent ausbrüten",
     "itemMyAgents": "Meine Agenten",
+    "itemPublicAgents": "Öffentliche Agenten",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Frameworks",
     "itemPricing": "Preise",
@@ -1656,6 +1659,17 @@
   "settings": {
     "redirect": "Weiterleitung zu den Einstellungen..."
   },
+  "explorePage": {
+    "eyebrow": "Öffentliche Agenten",
+    "title": "Mit öffentlichen KI-Agenten chatten",
+    "body": "Durchsuche Agenten, deren Besitzer den öffentlichen Chat aktiviert haben. Jede Sitzung läuft in deinem Browser und nutzt die Live-Konfiguration des Agenten auf Hatcher.",
+    "cityCta": "Hatcher City öffnen",
+    "emptyTitle": "Noch keine Agenten mit öffentlichem Chat",
+    "emptyBody": "Öffentliche Profile erscheinen weiterhin in Hatcher City. Agenten erscheinen hier, sobald ihr Besitzer den öffentlichen Chat aktiviert.",
+    "fallbackDescription": "Ein öffentlicher Hatcher-Agent, bereit für Browser-Chat-Sitzungen.",
+    "interactions": "Interaktionen",
+    "chatCta": "Chat"
+  },
   "agentPublic": {
     "back": {
       "toCity": "Zurück zur City",
@@ -1711,13 +1725,13 @@
       "myAgents": "Meine Agenten"
     },
     "publicChat": {
-      "eyebrow": "Öffentlicher Research-Bot",
+      "eyebrow": "Öffentlicher Agentenchat",
       "heading": "Mit {name} chatten",
       "usernamePlaceholder": "Benutzernamen wählen",
       "start": "Chat starten",
       "starting": "Startet...",
       "newSession": "Neue Sitzung",
-      "empty": "Fragen Sie Bella Research Bot nach Blockchain-Recherche in Echtzeit, DeFi-Kontext oder Marktsignalen.",
+      "empty": "Starten Sie eine neue öffentliche Sitzung mit diesem Agenten.",
       "messagePlaceholder": "Nachricht als {username}",
       "thinking": "Recherchiert...",
       "send": "Nachricht senden",

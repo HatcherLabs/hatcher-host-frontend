@@ -298,7 +298,7 @@ export default function AgentManagePage() {
     setFeaturesLoading(true);
     const res = await api.getAgentFeatures(id);
     setFeaturesLoading(false);
-    if (res.success) setActiveFeatures(res.data);
+    if (res.success) setActiveFeatures(Array.isArray(res.data) ? res.data : []);
   }, [id]);
 
   // ─── Actions hook (depends on loadAgent) ──────────────────
@@ -546,8 +546,9 @@ export default function AgentManagePage() {
     const res = await api.getChatSessions(id);
     if (!res.success) return;
 
-    setChatSessions(res.data.sessions);
-    const current = res.data.sessions.find((session) => session.current) ?? res.data.sessions[0];
+    const sessions = Array.isArray(res.data.sessions) ? res.data.sessions : [];
+    setChatSessions(sessions);
+    const current = sessions.find((session) => session.current) ?? sessions[0];
     if (current && activeChatSessionIdRef.current !== current.id) {
       activeChatSessionIdRef.current = current.id;
       setActiveChatSessionIdState(current.id);
@@ -563,7 +564,7 @@ export default function AgentManagePage() {
     try {
       const res = await api.getChatHistory(id, activeChatSessionIdRef.current ?? undefined);
       if (res.success) {
-        const loaded = normalizeHistoryMessages(res.data.messages);
+        const loaded = normalizeHistoryMessages(Array.isArray(res.data.messages) ? res.data.messages : []);
         const signature = historySignature(loaded);
 
         if (mode === 'initial') {
@@ -988,6 +989,10 @@ export default function AgentManagePage() {
       useCustomModel: config.useCustomModel, setUseCustomModel: config.setUseCustomModel,
       byokKeyInput: config.byokKeyInput, setByokKeyInput: config.setByokKeyInput,
       showByokKey: config.showByokKey, setShowByokKey: config.setShowByokKey,
+      configIsPublic: config.configIsPublic, setConfigIsPublic: config.setConfigIsPublic,
+      configPublicChatEnabled: config.configPublicChatEnabled, setConfigPublicChatEnabled: config.setConfigPublicChatEnabled,
+      configPublicChatDailyAiCreditCap: config.configPublicChatDailyAiCreditCap,
+      setConfigPublicChatDailyAiCreditCap: config.setConfigPublicChatDailyAiCreditCap,
       saving: config.saving, saveMsg: config.saveMsg, setSaveMsg: config.setSaveMsg,
       saveConfig: config.saveConfig,
       llmProvider, currentProviderMeta, providerModels, hasApiKey: config.hasApiKey,

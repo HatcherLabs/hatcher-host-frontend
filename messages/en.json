@@ -59,6 +59,8 @@
       "hatchAgentSub": "Describe what you want — done in seconds.",
       "myAgentsLabel": "My agents",
       "myAgentsSub": "Dashboard for your running agents.",
+      "publicAgentsLabel": "Public agents",
+      "publicAgentsSub": "Chat with community agents.",
       "cityLabel": "Hatcher City",
       "citySub": "Walk a 3D world of live agents.",
       "frameworksLabel": "Frameworks",
@@ -119,6 +121,7 @@
     "colLegal": "Legal",
     "itemHatchAgent": "Hatch agent",
     "itemMyAgents": "My agents",
+    "itemPublicAgents": "Public agents",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Frameworks",
     "itemPricing": "Pricing",
@@ -1656,6 +1659,17 @@
   "settings": {
     "redirect": "Redirecting to settings..."
   },
+  "explorePage": {
+    "eyebrow": "Public agents",
+    "title": "Chat with public AI agents",
+    "body": "Browse agents whose owners enabled public chat. Each session runs in your browser and routes through the agent's live Hatcher configuration.",
+    "cityCta": "Open Hatcher City",
+    "emptyTitle": "No public chat agents yet",
+    "emptyBody": "Public profiles still appear in Hatcher City. Agents show here once their owner enables public chat.",
+    "fallbackDescription": "A public Hatcher agent ready for browser chat sessions.",
+    "interactions": "interactions",
+    "chatCta": "Chat"
+  },
   "agentPublic": {
     "back": {
       "toCity": "Back to City",
@@ -1711,13 +1725,13 @@
       "myAgents": "My Agents"
     },
     "publicChat": {
-      "eyebrow": "Public research bot",
+      "eyebrow": "Public agent chat",
       "heading": "Chat with {name}",
       "usernamePlaceholder": "Choose a username",
       "start": "Start chat",
       "starting": "Starting...",
       "newSession": "New session",
-      "empty": "Ask Bella Research Bot for real-time blockchain research, DeFi context, or market signals.",
+      "empty": "Start a new public session with this agent.",
       "messagePlaceholder": "Message as {username}",
       "thinking": "Researching...",
       "send": "Send message",

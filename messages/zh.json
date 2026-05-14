@@ -59,6 +59,8 @@
       "hatchAgentSub": "描述你想要的 — 几秒内完成。",
       "myAgentsLabel": "我的代理",
       "myAgentsSub": "运行中代理的仪表板。",
+      "publicAgentsLabel": "公共代理",
+      "publicAgentsSub": "与社区代理聊天。",
       "cityLabel": "Hatcher 城市",
       "citySub": "步行 3D 上线代理世界。",
       "frameworksLabel": "框架",
@@ -119,6 +121,7 @@
     "colLegal": "法律",
     "itemHatchAgent": "孵化代理",
     "itemMyAgents": "我的代理",
+    "itemPublicAgents": "公共代理",
     "itemCity": "Hatcher 城市",
     "itemFrameworks": "框架",
     "itemPricing": "定价",
@@ -1656,6 +1659,17 @@
   "settings": {
     "redirect": "正在跳转至设置..."
   },
+  "explorePage": {
+    "eyebrow": "公共代理",
+    "title": "与公共 AI 代理聊天",
+    "body": "浏览已由所有者开启公共聊天的代理。每个会话都在浏览器中运行，并使用该代理在 Hatcher 上的实时配置。",
+    "cityCta": "打开 Hatcher 城市",
+    "emptyTitle": "还没有开启公共聊天的代理",
+    "emptyBody": "公共资料仍会显示在 Hatcher 城市中。代理所有者开启公共聊天后会显示在这里。",
+    "fallbackDescription": "一个可在浏览器中聊天的公共 Hatcher 代理。",
+    "interactions": "互动",
+    "chatCta": "聊天"
+  },
   "agentPublic": {
     "back": {
       "toCity": "返回城市",
@@ -1711,13 +1725,13 @@
       "myAgents": "我的智能体"
     },
     "publicChat": {
-      "eyebrow": "公共研究机器人",
+      "eyebrow": "公共智能体聊天",
       "heading": "与 {name} 聊天",
       "usernamePlaceholder": "选择用户名",
       "start": "开始聊天",
       "starting": "正在启动...",
       "newSession": "新会话",
-      "empty": "向 Bella Research Bot 查询实时区块链研究、DeFi 背景或市场信号。",
+      "empty": "与此智能体开启新的公共会话。",
       "messagePlaceholder": "以 {username} 发送消息",
       "thinking": "正在研究...",
       "send": "发送消息",

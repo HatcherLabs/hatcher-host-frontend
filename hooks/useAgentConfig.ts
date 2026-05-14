@@ -6,6 +6,8 @@ import type { Agent } from '@/lib/api';
 import { getBYOKProvider } from '@hatcher/shared';
 
 export const HOSTED_PROVIDER = 'openrouter';
+export const DEFAULT_PUBLIC_CHAT_DAILY_AI_CREDIT_CAP = 1000;
+const MAX_PUBLIC_CHAT_DAILY_AI_CREDIT_CAP = 100_000;
 const HOSTED_PROXY_PROVIDER_PREFIX = 'hatcher-llm-proxy/';
 const HOSTED_MODEL_ALIASES = new Map<string, string>([
   ['meta-llama/llama-4-scout-17b-16e-instruct', 'qwen/qwen3.6-35b-a3b'],
@@ -23,8 +25,63 @@ type LoadedModelConfig = {
   model: string;
 };
 
+type LoadedPublicChatConfig = {
+  isPublic: boolean;
+  publicChatEnabled: boolean;
+  publicChatDailyAiCreditCap: number;
+};
+
+type PublicChatPatch = {
+  isPublic: boolean;
+  publicChat: {
+    enabled: boolean;
+    dailyAiCreditCap: number;
+  };
+};
+
 export function normalizeConfigProvider(provider: string | null | undefined): string {
   return (provider || HOSTED_PROVIDER).toLowerCase();
+}
+
+function normalizePublicChatCap(value: unknown): number {
+  const raw = typeof value === 'number'
+    ? value
+    : typeof value === 'string' && value.trim()
+      ? Number(value)
+      : DEFAULT_PUBLIC_CHAT_DAILY_AI_CREDIT_CAP;
+  const integer = Math.floor(Number.isFinite(raw) ? raw : DEFAULT_PUBLIC_CHAT_DAILY_AI_CREDIT_CAP);
+  return Math.max(0, Math.min(integer, MAX_PUBLIC_CHAT_DAILY_AI_CREDIT_CAP));
+}
+
+export function resolveLoadedPublicChatConfig(
+  agent: Pick<Agent, 'isPublic' | 'config'> | null | undefined,
+): LoadedPublicChatConfig {
+  const config = agent?.config ?? {};
+  const publicChat = (config as Record<string, unknown>).publicChat as Record<string, unknown> | undefined;
+  const publicChatEnabled = publicChat?.enabled === true;
+  return {
+    isPublic: agent?.isPublic === true,
+    publicChatEnabled,
+    publicChatDailyAiCreditCap: publicChatEnabled
+      ? normalizePublicChatCap(publicChat?.dailyAiCreditCap)
+      : DEFAULT_PUBLIC_CHAT_DAILY_AI_CREDIT_CAP,
+  };
+}
+
+export function buildPublicChatUpdatePatch(params: {
+  isPublic: boolean;
+  publicChatEnabled: boolean;
+  publicChatDailyAiCreditCap: number;
+}): PublicChatPatch {
+  const dailyAiCreditCap = normalizePublicChatCap(params.publicChatDailyAiCreditCap);
+  const enabled = params.publicChatEnabled && dailyAiCreditCap > 0;
+  return {
+    isPublic: enabled ? true : params.isPublic,
+    publicChat: {
+      enabled,
+      dailyAiCreditCap,
+    },
+  };
 }
 
 export function resolveLoadedModelConfig(config: Record<string, unknown>): LoadedModelConfig {
@@ -99,6 +156,11 @@ export function useAgentConfig(
   const [useCustomModel, setUseCustomModel] = useState(false);
   const [byokKeyInput, setByokKeyInput] = useState('');
   const [showByokKey, setShowByokKey] = useState(false);
+  const [configIsPublic, setConfigIsPublic] = useState(false);
+  const [configPublicChatEnabled, setConfigPublicChatEnabled] = useState(false);
+  const [configPublicChatDailyAiCreditCap, setConfigPublicChatDailyAiCreditCap] = useState(
+    DEFAULT_PUBLIC_CHAT_DAILY_AI_CREDIT_CAP,
+  );
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
 
@@ -126,6 +188,10 @@ export function useAgentConfig(
     const customState = resolveInitialCustomModelState(normalizedProvider, loadedModel);
     setUseCustomModel(customState.useCustomModel);
     setCustomModelInput(customState.customModelInput);
+    const publicChatConfig = resolveLoadedPublicChatConfig(agent);
+    setConfigIsPublic(publicChatConfig.isPublic);
+    setConfigPublicChatEnabled(publicChatConfig.publicChatEnabled);
+    setConfigPublicChatDailyAiCreditCap(publicChatConfig.publicChatDailyAiCreditCap);
   }, [agent]);
 
   const hasApiKey = (() => {
@@ -165,6 +231,12 @@ export function useAgentConfig(
       description: configDesc.trim() || undefined,
       ...(commitMessage?.trim() ? { commitMessage: commitMessage.trim() } : {}),
     };
+    const publicChatPatch = buildPublicChatUpdatePatch({
+      isPublic: configIsPublic,
+      publicChatEnabled: isHostedProvider && configPublicChatEnabled,
+      publicChatDailyAiCreditCap: configPublicChatDailyAiCreditCap,
+    });
+    updateData.isPublic = publicChatPatch.isPublic;
     const savedModel = resolveSavedModel({
       configProvider: normalizedProvider,
       configModel,
@@ -177,6 +249,7 @@ export function useAgentConfig(
       settings: null,
       model: savedModel,
       provider: normalizedProvider || undefined,
+      publicChat: publicChatPatch.publicChat,
       ...(isHostedProvider ? { byok: null } : {}),
       ...(!isHostedProvider && byokKeyInput.trim() ? {
         byok: {
@@ -201,7 +274,8 @@ export function useAgentConfig(
     }
   }, [agent, id, setAgent, configName, configDesc, configSystemPrompt, configSkills, configModel, configProvider,
     configBio, configLore, configTopics, configAdjectives, configStyle,
-    useCustomModel, customModelInput, byokKeyInput, hasApiKey]);
+    useCustomModel, customModelInput, byokKeyInput, hasApiKey,
+    configIsPublic, configPublicChatEnabled, configPublicChatDailyAiCreditCap]);
 
   return {
     configName, setConfigName,
@@ -219,6 +293,9 @@ export function useAgentConfig(
     useCustomModel, setUseCustomModel,
     byokKeyInput, setByokKeyInput,
     showByokKey, setShowByokKey,
+    configIsPublic, setConfigIsPublic,
+    configPublicChatEnabled, setConfigPublicChatEnabled,
+    configPublicChatDailyAiCreditCap, setConfigPublicChatDailyAiCreditCap,
     saving,
     saveMsg, setSaveMsg,
     saveConfig,

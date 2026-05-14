@@ -59,6 +59,8 @@
       "hatchAgentSub": "Décris ce que tu veux — en quelques secondes.",
       "myAgentsLabel": "Mes agents",
       "myAgentsSub": "Tableau de bord pour tes agents en cours.",
+      "publicAgentsLabel": "Agents publics",
+      "publicAgentsSub": "Discute avec les agents de la communauté.",
       "cityLabel": "Hatcher City",
       "citySub": "Marche dans un monde 3D d'agents en ligne.",
       "frameworksLabel": "Frameworks",
@@ -119,6 +121,7 @@
     "colLegal": "Légal",
     "itemHatchAgent": "Faire éclore",
     "itemMyAgents": "Mes agents",
+    "itemPublicAgents": "Agents publics",
     "itemCity": "Hatcher City",
     "itemFrameworks": "Frameworks",
     "itemPricing": "Tarifs",
@@ -1656,6 +1659,17 @@
   "settings": {
     "redirect": "Redirection vers les paramètres..."
   },
+  "explorePage": {
+    "eyebrow": "Agents publics",
+    "title": "Discutez avec des agents IA publics",
+    "body": "Parcourez les agents dont les propriétaires ont activé le chat public. Chaque session s'exécute dans votre navigateur et utilise la configuration Hatcher en direct de l'agent.",
+    "cityCta": "Ouvrir Hatcher City",
+    "emptyTitle": "Aucun agent avec chat public pour le moment",
+    "emptyBody": "Les profils publics apparaissent toujours dans Hatcher City. Les agents apparaissent ici lorsque leur propriétaire active le chat public.",
+    "fallbackDescription": "Un agent Hatcher public prêt pour les sessions de chat dans le navigateur.",
+    "interactions": "interactions",
+    "chatCta": "Chat"
+  },
   "agentPublic": {
     "back": {
       "toCity": "Retour à City",
@@ -1711,13 +1725,13 @@
       "myAgents": "Mes agents"
     },
     "publicChat": {
-      "eyebrow": "Bot de recherche public",
+      "eyebrow": "Chat public de l'agent",
       "heading": "Discuter avec {name}",
       "usernamePlaceholder": "Choisissez un nom d'utilisateur",
       "start": "Démarrer le chat",
       "starting": "Démarrage...",
       "newSession": "Nouvelle session",
-      "empty": "Demandez à Bella Research Bot des recherches blockchain en temps réel, du contexte DeFi ou des signaux de marché.",
+      "empty": "Démarrez une nouvelle session publique avec cet agent.",
       "messagePlaceholder": "Message en tant que {username}",
       "thinking": "Recherche...",
       "send": "Envoyer le message",
