@@ -361,6 +361,53 @@ export const api = {
       lastActiveAt: string;
     }>(`/agents/${id}/public-stats`),
 
+  /** Get public chat availability for a partner public agent (no auth required) */
+  getAgentPublicChat: (id: string) =>
+    req<{
+      enabled: boolean;
+      agent: {
+        id: string;
+        name: string;
+        description: string | null;
+        avatarUrl: string | null;
+        framework: string;
+        status: string;
+      } | null;
+    }>(`/agents/${id}/public-chat`),
+
+  /** Create a browser-scoped public chat session for a partner agent */
+  createAgentPublicChatSession: (id: string, username: string) =>
+    req<{
+      sessionId: string;
+      username: string;
+      agent: {
+        id: string;
+        name: string;
+        description: string | null;
+        avatarUrl: string | null;
+        framework: string;
+        status: string;
+      };
+    }>(`/agents/${id}/public-chat/session`, {
+      method: 'POST',
+      body: JSON.stringify({ username }),
+    }),
+
+  /** Send a message to a partner public agent chat session */
+  sendAgentPublicChatMessage: (
+    id: string,
+    data: {
+      sessionId: string;
+      username: string;
+      message: string;
+      history?: Array<{ role: 'user' | 'assistant'; content: string }>;
+    },
+  ) =>
+    req<{ content: string; model: string; starting?: boolean }>(`/agents/${id}/public-chat`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
   /** Create a new agent */
   createAgent: (data: {
     name: string;

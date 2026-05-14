@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useParams } from 'next/navigation';
+import { useEffect, useState, useCallback, useMemo, useRef, type KeyboardEvent } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 
@@ -55,6 +55,14 @@ import { useAuth } from '@/lib/auth-context';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { shortenAddress, timeAgo } from '@/lib/utils';
 import { generateAgentAvatar } from '@/lib/avatar-generator';
+import {
+  buildPublicChatStorageKeys,
+  createPublicChatMessage,
+  publicChatHistoryForRequest,
+  type PublicChatMessage,
+  type PublicChatSession,
+} from '@/lib/public-chat';
+import { RichMarkdown } from '@/components/agents/tabs/ChatTab/ArtifactRenderer';
 import { FRAMEWORKS } from '@hatcher/shared';
 import type { AgentFramework } from '@hatcher/shared';
 import { motion } from 'framer-motion';
@@ -73,6 +81,10 @@ import {
   Clock,
   BarChart3,
   Rocket,
+  RefreshCw,
+  Send,
+  Sparkles,
+  UserRound,
 } from 'lucide-react';
 
 const FRAMEWORK_AVATAR: Record<string, { gradient: string; icon: React.ComponentType<{ className?: string }> }> = {
@@ -102,12 +114,320 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const } },
 };
 
+const PUBLIC_CHAT_SUGGESTIONS = [
+  'What are the most important DeFi updates today?',
+  'Summarize recent on-chain activity for BTC and ETH.',
+  'Find current market research on liquid restaking.',
+];
+
+function loadPublicChatMessages(agentId: string, sessionId: string): PublicChatMessage[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(buildPublicChatStorageKeys(agentId, sessionId).history);
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.flatMap((item): PublicChatMessage[] => {
+      if (!item || typeof item !== 'object') return [];
+      const msg = item as Partial<PublicChatMessage>;
+      if ((msg.role !== 'user' && msg.role !== 'assistant') || typeof msg.content !== 'string') return [];
+      return [{
+        id: typeof msg.id === 'string' ? msg.id : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        role: msg.role,
+        content: msg.content,
+        createdAt: typeof msg.createdAt === 'number' ? msg.createdAt : Date.now(),
+      }];
+    });
+  } catch {
+    return [];
+  }
+}
+
+function PublicAgentChat({
+  agentId,
+  agentName,
+  autoFocus,
+}: {
+  agentId: string;
+  agentName: string;
+  autoFocus: boolean;
+}) {
+  const t = useTranslations('agentPublic.publicChat');
+  const [session, setSession] = useState<PublicChatSession | null>(null);
+  const [messages, setMessages] = useState<PublicChatMessage[]>([]);
+  const [username, setUsername] = useState('');
+  const [draft, setDraft] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = window.localStorage.getItem(buildPublicChatStorageKeys(agentId).session);
+      const parsed = raw ? JSON.parse(raw) as Partial<PublicChatSession> : null;
+      if (!parsed?.sessionId || !parsed.username) return;
+      const restored = { sessionId: parsed.sessionId, username: parsed.username };
+      setSession(restored);
+      setUsername(restored.username);
+      setMessages(loadPublicChatMessages(agentId, restored.sessionId));
+    } catch {
+      setSession(null);
+      setMessages([]);
+    }
+  }, [agentId]);
+
+  useEffect(() => {
+    if (!session || typeof window === 'undefined') return;
+    try {
+      const keys = buildPublicChatStorageKeys(agentId, session.sessionId);
+      window.localStorage.setItem(keys.session, JSON.stringify(session));
+      window.localStorage.setItem(keys.history, JSON.stringify(messages.slice(-80)));
+    } catch {
+      // Public chat should continue even when browser storage is unavailable.
+    }
+  }, [agentId, messages, session]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages, busy]);
+
+  useEffect(() => {
+    if (!autoFocus) return;
+    rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.setTimeout(() => inputRef.current?.focus(), 350);
+  }, [autoFocus, session]);
+
+  const startSession = useCallback(async (nameOverride?: string) => {
+    const cleanName = (nameOverride ?? username).trim();
+    if (!cleanName || busy) return;
+    setBusy(true);
+    setError(null);
+    const res = await api.createAgentPublicChatSession(agentId, cleanName);
+    setBusy(false);
+    if (!res.success) {
+      setError(res.error || t('errors.session'));
+      return;
+    }
+    const nextSession = { sessionId: res.data.sessionId, username: res.data.username };
+    setSession(nextSession);
+    setUsername(nextSession.username);
+    setMessages([]);
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem(buildPublicChatStorageKeys(agentId).session, JSON.stringify(nextSession));
+        window.localStorage.removeItem(buildPublicChatStorageKeys(agentId, nextSession.sessionId).history);
+      } catch {
+        // Keep the in-memory session if browser storage is unavailable.
+      }
+    }
+    window.setTimeout(() => inputRef.current?.focus(), 50);
+  }, [agentId, busy, t, username]);
+
+  const startNewSession = useCallback(() => {
+    const currentName = session?.username ?? username;
+    setMessages([]);
+    setSession(null);
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.removeItem(buildPublicChatStorageKeys(agentId).session);
+        if (session?.sessionId) {
+          window.localStorage.removeItem(buildPublicChatStorageKeys(agentId, session.sessionId).history);
+        }
+      } catch {
+        // Ignore storage cleanup failures.
+      }
+    }
+    if (currentName.trim()) void startSession(currentName);
+  }, [agentId, session, startSession, username]);
+
+  const sendMessage = useCallback(async (textOverride?: string) => {
+    const text = (textOverride ?? draft).trim();
+    if (!text || !session || busy) return;
+
+    const outgoing = createPublicChatMessage('user', text);
+    const history = publicChatHistoryForRequest(messages);
+    setMessages((prev) => [...prev, outgoing]);
+    setDraft('');
+    setBusy(true);
+    setError(null);
+
+    const res = await api.sendAgentPublicChatMessage(agentId, {
+      sessionId: session.sessionId,
+      username: session.username,
+      message: text,
+      history,
+    });
+
+    setBusy(false);
+    if (!res.success) {
+      setError(res.error || t('errors.message'));
+      return;
+    }
+    if (res.data.starting) {
+      setError(res.data.content);
+      return;
+    }
+    setMessages((prev) => [...prev, createPublicChatMessage('assistant', res.data.content)]);
+  }, [agentId, busy, draft, messages, session, t]);
+
+  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      void sendMessage();
+    }
+  }, [sendMessage]);
+
+  return (
+    <motion.div ref={rootRef} className={`${cardClass} mb-6 overflow-hidden`} variants={itemVariants}>
+      <div className="flex items-center justify-between gap-3 border-b border-[var(--border-default)] px-5 py-4">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-accent)]">
+            <Sparkles className="h-4 w-4" />
+            {t('eyebrow')}
+          </div>
+          <h2 className="mt-1 text-lg font-semibold text-[var(--text-primary)]">{t('heading', { name: agentName })}</h2>
+        </div>
+        {session && (
+          <button
+            type="button"
+            onClick={startNewSession}
+            className="inline-flex h-9 items-center gap-2 rounded-lg border border-[var(--border-default)] px-3 text-sm text-[var(--text-secondary)] transition-colors hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)]"
+            disabled={busy}
+          >
+            <RefreshCw className="h-4 w-4" />
+            {t('newSession')}
+          </button>
+        )}
+      </div>
+
+      {!session ? (
+        <div className="p-5">
+          <form
+            className="flex flex-col gap-3 sm:flex-row"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void startSession();
+            }}
+          >
+            <label className="flex min-h-[44px] flex-1 items-center gap-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3">
+              <UserRound className="h-4 w-4 flex-shrink-0 text-[var(--text-muted)]" />
+              <input
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                maxLength={40}
+                placeholder={t('usernamePlaceholder')}
+                className="w-full bg-transparent text-sm text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)]"
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={busy || !username.trim()}
+              className="btn-primary inline-flex min-h-[44px] items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <MessageSquare className="h-4 w-4" />
+              {busy ? t('starting') : t('start')}
+            </button>
+          </form>
+          {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
+        </div>
+      ) : (
+        <div className="flex h-[560px] flex-col">
+          <div className="flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-5">
+            {messages.length === 0 && (
+              <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] p-4">
+                <p className="text-sm text-[var(--text-secondary)]">{t('empty')}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {PUBLIC_CHAT_SUGGESTIONS.map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      onClick={() => {
+                        setDraft(suggestion);
+                        window.setTimeout(() => inputRef.current?.focus(), 20);
+                      }}
+                      className="rounded-lg border border-[var(--border-default)] px-3 py-2 text-left text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)]"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[86%] rounded-lg px-4 py-3 text-sm leading-relaxed ${
+                    message.role === 'user'
+                      ? 'bg-[var(--color-accent)] text-white'
+                      : 'border border-[var(--border-default)] bg-[var(--bg-elevated)] text-[var(--text-primary)]'
+                  }`}
+                >
+                  {message.role === 'assistant' ? (
+                    <RichMarkdown content={message.content} />
+                  ) : (
+                    <span className="whitespace-pre-wrap">{message.content}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+            {busy && (
+              <div className="flex justify-start">
+                <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-4 py-3 text-sm text-[var(--text-muted)]">
+                  {t('thinking')}
+                </div>
+              </div>
+            )}
+            <div ref={bottomRef} />
+          </div>
+
+          {error && (
+            <div className="border-t border-[var(--border-default)] px-5 py-3 text-sm text-red-400">
+              {error}
+            </div>
+          )}
+
+          <div className="border-t border-[var(--border-default)] p-4">
+            <div className="flex items-end gap-3">
+              <textarea
+                ref={inputRef}
+                value={draft}
+                onChange={(event) => setDraft(event.target.value)}
+                onKeyDown={handleKeyDown}
+                maxLength={4000}
+                rows={1}
+                placeholder={t('messagePlaceholder', { username: session.username })}
+                className="min-h-[44px] flex-1 resize-none rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)] px-3 py-3 text-sm text-[var(--text-primary)] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--color-accent)]/50"
+              />
+              <button
+                type="button"
+                onClick={() => void sendMessage()}
+                disabled={busy || !draft.trim()}
+                className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-[var(--color-accent)] text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
+                aria-label={t('send')}
+              >
+                <Send className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
 export function AgentPageClient() {
   const { id } = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
   const t = useTranslations('agentPublic');
   const [agent, setAgent] = useState<Agent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [publicChatEnabled, setPublicChatEnabled] = useState(false);
   const [copied, setCopied] = useState(false);
   const [publicStats, setPublicStats] = useState<{
     messagesProcessed: number;
@@ -134,6 +454,10 @@ export function AgentPageClient() {
     api.getAgentPublicStats(id).then((res) => {
       if (res.success) setPublicStats(res.data);
     }).catch(() => {/* ignore */});
+
+    api.getAgentPublicChat(id).then((res) => {
+      setPublicChatEnabled(res.success && res.data.enabled);
+    }).catch(() => setPublicChatEnabled(false));
   }, [id]);
 
   const handleShare = useCallback(() => {
@@ -216,6 +540,7 @@ export function AgentPageClient() {
   const isOwner = !!(authed && authUser && agent.ownerId === authUser.id);
   const statusStyle = STATUS_STYLES[agent.status] ?? STATUS_STYLES['paused']!;
   const featureCount = agent.features?.length ?? 0;
+  const publicChatAutoFocus = searchParams.get('chat') === '1';
 
   return (
     <motion.div
@@ -344,6 +669,14 @@ export function AgentPageClient() {
         </motion.div>
       ) : (
         <>
+          {publicChatEnabled && (
+            <PublicAgentChat
+              agentId={id}
+              agentName={agent.name}
+              autoFocus={publicChatAutoFocus}
+            />
+          )}
+
           {/* Analytics Section */}
           <motion.div className={`${cardClass} p-6 mb-6`} variants={itemVariants}>
             <h2 className="text-lg font-semibold mb-4 text-[var(--text-primary)] flex items-center gap-2">
@@ -407,30 +740,31 @@ export function AgentPageClient() {
             </div>
           </motion.div>
 
-          {/* Deploy CTA */}
-          <motion.div className={`${cardClass} p-6`} variants={itemVariants}>
-            <div className="text-center">
-              <Rocket className="w-8 h-8 text-purple-400 mx-auto mb-3" />
-              <h2 className="text-lg font-semibold mb-2 text-[var(--text-primary)]">
-                {t('deploy.heading')}
-              </h2>
-              <p className="text-sm mb-5 text-[var(--text-muted)]">
-                {t('deploy.body', { framework: frameworkMeta?.name ?? agent.framework })}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link
-                  href="/chat-to-hatch"
-                  className="btn-primary inline-flex items-center gap-2 justify-center"
-                >
-                  <Rocket className="w-4 h-4" />
-                  {t('deploy.cta')}
-                </Link>
-                <Link href="/dashboard/agents" className="btn-secondary inline-flex items-center gap-2 justify-center">
-                  {t('deploy.myAgents')}
-                </Link>
+          {!publicChatEnabled && (
+            <motion.div className={`${cardClass} p-6`} variants={itemVariants}>
+              <div className="text-center">
+                <Rocket className="w-8 h-8 text-purple-400 mx-auto mb-3" />
+                <h2 className="text-lg font-semibold mb-2 text-[var(--text-primary)]">
+                  {t('deploy.heading')}
+                </h2>
+                <p className="text-sm mb-5 text-[var(--text-muted)]">
+                  {t('deploy.body', { framework: frameworkMeta?.name ?? agent.framework })}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Link
+                    href="/chat-to-hatch"
+                    className="btn-primary inline-flex items-center gap-2 justify-center"
+                  >
+                    <Rocket className="w-4 h-4" />
+                    {t('deploy.cta')}
+                  </Link>
+                  <Link href="/dashboard/agents" className="btn-secondary inline-flex items-center gap-2 justify-center">
+                    {t('deploy.myAgents')}
+                  </Link>
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
         </>
       )}
     </motion.div>

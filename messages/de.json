@@ -1710,6 +1710,22 @@
       "cta": "Ähnlichen Agenten deployen",
       "myAgents": "Meine Agenten"
     },
+    "publicChat": {
+      "eyebrow": "Öffentlicher Research-Bot",
+      "heading": "Mit {name} chatten",
+      "usernamePlaceholder": "Benutzernamen wählen",
+      "start": "Chat starten",
+      "starting": "Startet...",
+      "newSession": "Neue Sitzung",
+      "empty": "Fragen Sie Bella Research Bot nach Blockchain-Recherche in Echtzeit, DeFi-Kontext oder Marktsignalen.",
+      "messagePlaceholder": "Nachricht als {username}",
+      "thinking": "Recherchiert...",
+      "send": "Nachricht senden",
+      "errors": {
+        "session": "Die öffentliche Chat-Sitzung konnte nicht gestartet werden.",
+        "message": "Diese Nachricht konnte nicht gesendet werden."
+      }
+    },
     "errorPage": {
       "heading": "Agent konnte nicht geladen werden",
       "body": "Wir konnten die Details dieses Agenten nicht laden. Er wurde möglicherweise entfernt oder es gibt ein Verbindungsproblem.",

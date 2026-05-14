@@ -1710,6 +1710,22 @@
       "cta": "Déployer un agent similaire",
       "myAgents": "Mes agents"
     },
+    "publicChat": {
+      "eyebrow": "Bot de recherche public",
+      "heading": "Discuter avec {name}",
+      "usernamePlaceholder": "Choisissez un nom d'utilisateur",
+      "start": "Démarrer le chat",
+      "starting": "Démarrage...",
+      "newSession": "Nouvelle session",
+      "empty": "Demandez à Bella Research Bot des recherches blockchain en temps réel, du contexte DeFi ou des signaux de marché.",
+      "messagePlaceholder": "Message en tant que {username}",
+      "thinking": "Recherche...",
+      "send": "Envoyer le message",
+      "errors": {
+        "session": "Impossible de démarrer une session de chat publique.",
+        "message": "Impossible d'envoyer ce message."
+      }
+    },
     "errorPage": {
       "heading": "Échec du chargement de l'agent",
       "body": "Nous n'avons pas pu charger les détails de cet agent. Il a peut-être été supprimé ou il y a un problème de connexion.",

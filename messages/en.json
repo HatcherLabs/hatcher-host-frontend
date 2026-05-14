@@ -1710,6 +1710,22 @@
       "cta": "Deploy Similar Agent",
       "myAgents": "My Agents"
     },
+    "publicChat": {
+      "eyebrow": "Public research bot",
+      "heading": "Chat with {name}",
+      "usernamePlaceholder": "Choose a username",
+      "start": "Start chat",
+      "starting": "Starting...",
+      "newSession": "New session",
+      "empty": "Ask Bella Research Bot for real-time blockchain research, DeFi context, or market signals.",
+      "messagePlaceholder": "Message as {username}",
+      "thinking": "Researching...",
+      "send": "Send message",
+      "errors": {
+        "session": "Could not start a public chat session.",
+        "message": "Could not send this message."
+      }
+    },
     "errorPage": {
       "heading": "Failed to Load Agent",
       "body": "We couldn't load this agent's details. It may have been removed or there's a connection issue.",

@@ -1710,6 +1710,22 @@
       "cta": "Deployează agent similar",
       "myAgents": "Agenții mei"
     },
+    "publicChat": {
+      "eyebrow": "Research bot public",
+      "heading": "Chat cu {name}",
+      "usernamePlaceholder": "Alege un username",
+      "start": "Pornește chat",
+      "starting": "Pornește...",
+      "newSession": "Sesiune nouă",
+      "empty": "Întreabă Bella Research Bot despre research blockchain în timp real, context DeFi sau semnale de piață.",
+      "messagePlaceholder": "Mesaj ca {username}",
+      "thinking": "Caută...",
+      "send": "Trimite mesaj",
+      "errors": {
+        "session": "Nu am putut porni sesiunea publică de chat.",
+        "message": "Nu am putut trimite mesajul."
+      }
+    },
     "errorPage": {
       "heading": "Eroare la încărcarea agentului",
       "body": "Nu am putut încărca detaliile acestui agent. Poate a fost eliminat sau există o problemă de conexiune.",

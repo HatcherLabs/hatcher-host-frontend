@@ -1710,6 +1710,22 @@
       "cta": "部署类似智能体",
       "myAgents": "我的智能体"
     },
+    "publicChat": {
+      "eyebrow": "公共研究机器人",
+      "heading": "与 {name} 聊天",
+      "usernamePlaceholder": "选择用户名",
+      "start": "开始聊天",
+      "starting": "正在启动...",
+      "newSession": "新会话",
+      "empty": "向 Bella Research Bot 查询实时区块链研究、DeFi 背景或市场信号。",
+      "messagePlaceholder": "以 {username} 发送消息",
+      "thinking": "正在研究...",
+      "send": "发送消息",
+      "errors": {
+        "session": "无法启动公共聊天会话。",
+        "message": "无法发送此消息。"
+      }
+    },
     "errorPage": {
       "heading": "加载智能体失败",
       "body": "无法加载此智能体的详情，它可能已被移除或存在连接问题。",
