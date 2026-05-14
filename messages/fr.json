@@ -1669,7 +1669,26 @@
     "fallbackDescription": "Un agent Hatcher public prêt pour les sessions de chat dans le navigateur.",
     "interactions": "interactions",
     "publicChat": "Chat public",
-    "chatCta": "Chat"
+    "chatCta": "Chat",
+    "statsAgents": "{count} agents publics",
+    "statsLive": "{count} en direct",
+    "statsInteractions": "{count} interactions",
+    "searchPlaceholder": "Rechercher des agents publics",
+    "filterAll": "Tous",
+    "filterOpenClaw": "OpenClaw",
+    "filterHermes": "Hermes",
+    "filterLive": "En direct seulement",
+    "showingCount": "{count} affichés",
+    "noResultsTitle": "Aucun agent correspondant",
+    "noResultsBody": "Essayez une autre recherche, un autre framework ou le filtre direct.",
+    "frameworkLabel": "Framework",
+    "featured": "À la une",
+    "ownerFallback": "agent communautaire",
+    "avatarLabel": "Avatar 3D d'agent public",
+    "statusRunning": "Live",
+    "statusSleeping": "En veille",
+    "statusPaused": "En pause",
+    "statusCrashed": "Nécessite attention"
   },
   "agentPublic": {
     "back": {

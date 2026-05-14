@@ -1669,7 +1669,26 @@
     "fallbackDescription": "Ein öffentlicher Hatcher-Agent, bereit für Browser-Chat-Sitzungen.",
     "interactions": "Interaktionen",
     "publicChat": "Öffentlicher Chat",
-    "chatCta": "Chat"
+    "chatCta": "Chat",
+    "statsAgents": "{count} öffentliche Agenten",
+    "statsLive": "{count} jetzt live",
+    "statsInteractions": "{count} Interaktionen",
+    "searchPlaceholder": "Öffentliche Agenten suchen",
+    "filterAll": "Alle",
+    "filterOpenClaw": "OpenClaw",
+    "filterHermes": "Hermes",
+    "filterLive": "Nur live",
+    "showingCount": "{count} angezeigt",
+    "noResultsTitle": "Keine passenden Agenten",
+    "noResultsBody": "Versuche eine andere Suche, ein anderes Framework oder den Live-Filter.",
+    "frameworkLabel": "Framework",
+    "featured": "Empfohlen",
+    "ownerFallback": "Community-Agent",
+    "avatarLabel": "3D-Avatar eines öffentlichen Agenten",
+    "statusRunning": "Live",
+    "statusSleeping": "Schläft",
+    "statusPaused": "Pausiert",
+    "statusCrashed": "Benötigt Aufmerksamkeit"
   },
   "agentPublic": {
     "back": {

@@ -1,29 +1,17 @@
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
-import { Bot, MessageSquare, Radio, Search, Sparkles } from 'lucide-react';
+import { getLocale, getTranslations } from 'next-intl/server';
+import { Radio, Search, Sparkles } from 'lucide-react';
 import { API_URL } from '@/lib/config';
 import { Link } from '@/i18n/routing';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import { buildLanguagesMap } from '@/lib/seo';
-
-type ExploreAgent = {
-  id: string;
-  slug?: string | null;
-  name: string;
-  description: string | null;
-  avatarUrl: string | null;
-  framework: string;
-  status: string;
-  messageCount: number;
-  createdAt: string;
-  publicChatEnabled?: boolean;
-  owner?: { username?: string | null; walletAddress?: string | null };
-};
+import { PublicAgentsExplorer } from '@/components/explore/PublicAgentsExplorer';
+import { getExploreStats, type PublicExploreAgent } from '@/components/explore/publicAgents';
 
 type ExploreResponse = {
   success?: boolean;
   data?: {
-    agents?: ExploreAgent[];
+    agents?: PublicExploreAgent[];
     pagination?: { total: number };
   };
 };
@@ -46,7 +34,7 @@ export const metadata: Metadata = {
   },
 };
 
-async function fetchPublicAgents(): Promise<ExploreAgent[]> {
+async function fetchPublicAgents(): Promise<PublicExploreAgent[]> {
   try {
     const res = await fetch(`${API_URL}/agents/explore?limit=60&sort=popular`, {
       next: { revalidate: 60 },
@@ -60,17 +48,10 @@ async function fetchPublicAgents(): Promise<ExploreAgent[]> {
   }
 }
 
-function agentHref(agent: ExploreAgent): string {
-  return `/agent/${agent.id}?chat=1`;
-}
-
-function agentInitial(name: string): string {
-  return name.trim().slice(0, 1).toUpperCase() || 'A';
-}
-
 export default async function ExplorePage() {
-  const t = await getTranslations('explorePage');
+  const [t, locale] = await Promise.all([getTranslations('explorePage'), getLocale()]);
   const agents = await fetchPublicAgents();
+  const stats = getExploreStats(agents);
 
   return (
     <MarketingShell>
@@ -88,6 +69,11 @@ export default async function ExplorePage() {
               <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--text-secondary)]">
                 {t('body')}
               </p>
+              <div className="mt-5 grid max-w-2xl gap-2 sm:grid-cols-3">
+                <ExploreStat label={t('statsAgents', { count: stats.total })} />
+                <ExploreStat label={t('statsLive', { count: stats.live })} accent />
+                <ExploreStat label={t('statsInteractions', { count: stats.interactions })} />
+              </div>
             </div>
             <Link
               href="/city"
@@ -109,57 +95,52 @@ export default async function ExplorePage() {
               <p className="mt-2 max-w-md text-sm leading-6 text-[var(--text-secondary)]">{t('emptyBody')}</p>
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {agents.map((agent) => (
-                <article
-                  key={agent.id}
-                  className="flex min-h-[240px] flex-col justify-between rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-5 transition-colors hover:border-[var(--color-accent)]/40"
-                >
-                  <div>
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-muted)] text-sm font-semibold text-[var(--text-primary)]">
-                        {agent.avatarUrl ? (
-                          <span
-                            aria-hidden="true"
-                            className="h-full w-full bg-cover bg-center"
-                            style={{ backgroundImage: `url("${agent.avatarUrl}")` }}
-                          />
-                        ) : (
-                          agentInitial(agent.name)
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <h2 className="truncate text-lg font-semibold text-[var(--text-primary)]">{agent.name}</h2>
-                        <div className="mt-1 inline-flex items-center gap-1.5 rounded-md bg-[var(--bg-muted)] px-2 py-1 text-xs font-medium text-[var(--text-secondary)]">
-                          <MessageSquare className="h-3 w-3" />
-                          {t('publicChat')}
-                        </div>
-                      </div>
-                    </div>
-                    <p className="mt-4 line-clamp-3 min-h-[72px] text-sm leading-6 text-[var(--text-secondary)]">
-                      {agent.description || t('fallbackDescription')}
-                    </p>
-                  </div>
-
-                  <div className="mt-5 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
-                      <Bot className="h-4 w-4" />
-                      {(agent.messageCount ?? 0).toLocaleString()} {t('interactions')}
-                    </div>
-                    <Link
-                      href={agentHref(agent)}
-                      className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-[var(--color-accent)] px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                    >
-                      <MessageSquare className="h-4 w-4" />
-                      {t('chatCta')}
-                    </Link>
-                  </div>
-                </article>
-              ))}
-            </div>
+            <PublicAgentsExplorer
+              agents={agents}
+              locale={locale}
+              copy={{
+                searchPlaceholder: t('searchPlaceholder'),
+                filterAll: t('filterAll'),
+                filterOpenClaw: t('filterOpenClaw'),
+                filterHermes: t('filterHermes'),
+                filterLive: t('filterLive'),
+                showingCount: t('showingCount', { count: '{count}' }),
+                noResultsTitle: t('noResultsTitle'),
+                noResultsBody: t('noResultsBody'),
+                fallbackDescription: t('fallbackDescription'),
+                publicChat: t('publicChat'),
+                chatCta: t('chatCta'),
+                interactions: t('interactions'),
+                frameworkLabel: t('frameworkLabel'),
+                featured: t('featured'),
+                ownerFallback: t('ownerFallback'),
+                avatarLabel: t('avatarLabel'),
+                statuses: {
+                  active: t('statusRunning'),
+                  running: t('statusRunning'),
+                  sleeping: t('statusSleeping'),
+                  paused: t('statusPaused'),
+                  crashed: t('statusCrashed'),
+                },
+              }}
+            />
           )}
         </div>
       </section>
     </MarketingShell>
+  );
+}
+
+function ExploreStat({ label, accent = false }: { label: string; accent?: boolean }) {
+  return (
+    <div
+      className={`rounded-lg border px-3 py-2 text-sm font-semibold ${
+        accent
+          ? 'border-emerald-400/25 bg-emerald-400/10 text-emerald-300'
+          : 'border-[var(--border-default)] bg-[var(--bg-muted)] text-[var(--text-secondary)]'
+      }`}
+    >
+      {label}
+    </div>
   );
 }

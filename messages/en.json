@@ -1669,7 +1669,26 @@
     "fallbackDescription": "A public Hatcher agent ready for browser chat sessions.",
     "interactions": "interactions",
     "publicChat": "Public chat",
-    "chatCta": "Chat"
+    "chatCta": "Chat",
+    "statsAgents": "{count} public agents",
+    "statsLive": "{count} live now",
+    "statsInteractions": "{count} interactions",
+    "searchPlaceholder": "Search public agents",
+    "filterAll": "All",
+    "filterOpenClaw": "OpenClaw",
+    "filterHermes": "Hermes",
+    "filterLive": "Live only",
+    "showingCount": "{count} shown",
+    "noResultsTitle": "No matching agents",
+    "noResultsBody": "Try another search, framework, or live filter.",
+    "frameworkLabel": "Framework",
+    "featured": "Featured",
+    "ownerFallback": "community agent",
+    "avatarLabel": "3D public agent avatar",
+    "statusRunning": "Live",
+    "statusSleeping": "Sleeping",
+    "statusPaused": "Paused",
+    "statusCrashed": "Needs attention"
   },
   "agentPublic": {
     "back": {

@@ -1669,7 +1669,26 @@
     "fallbackDescription": "一个可在浏览器中聊天的公共 Hatcher 代理。",
     "interactions": "互动",
     "publicChat": "公共聊天",
-    "chatCta": "聊天"
+    "chatCta": "聊天",
+    "statsAgents": "{count} 个公共代理",
+    "statsLive": "{count} 个在线",
+    "statsInteractions": "{count} 次互动",
+    "searchPlaceholder": "搜索公共代理",
+    "filterAll": "全部",
+    "filterOpenClaw": "OpenClaw",
+    "filterHermes": "Hermes",
+    "filterLive": "仅在线",
+    "showingCount": "显示 {count} 个",
+    "noResultsTitle": "没有匹配的代理",
+    "noResultsBody": "尝试其他搜索、框架或在线筛选。",
+    "frameworkLabel": "框架",
+    "featured": "推荐",
+    "ownerFallback": "社区代理",
+    "avatarLabel": "公共代理 3D 头像",
+    "statusRunning": "在线",
+    "statusSleeping": "休眠",
+    "statusPaused": "暂停",
+    "statusCrashed": "需要关注"
   },
   "agentPublic": {
     "back": {
