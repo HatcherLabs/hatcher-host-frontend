@@ -36,6 +36,24 @@ export type ConfigPatchResult =
       remaining?: string[];
     };
 
+export type AuthProfileData = {
+  id: string;
+  email: string;
+  username: string;
+  walletAddress: string | null;
+  apiKey: string | null;
+  hatchCredits: number;
+  aiCreditsBalance: number;
+  isAdmin: boolean;
+  tier: string;
+  avatarUrl: string | null;
+  agentCount: number;
+  activeAgentCount?: number;
+  activeAgents?: number;
+  featureCount: number;
+  createdAt: string;
+};
+
 export const api = {
   /** Register a new account */
   register: (email: string, username: string, password: string, referralCode?: string) =>
@@ -102,22 +120,11 @@ export const api = {
    *  shape so the settings page can read them without `as any`.
    */
   getProfile: () =>
-    req<{
-      id: string;
-      email: string;
-      username: string;
-      walletAddress: string | null;
-      apiKey: string | null;
-      hatchCredits: number;
-      aiCreditsBalance: number;
-      isAdmin: boolean;
-      tier: string;
-      avatarUrl: string | null;
-      agentCount: number;
-      activeAgents: number;
-      featureCount: number;
-      createdAt: string;
-    }>('/auth/me'),
+    req<AuthProfileData>('/auth/me'),
+
+  /** Browser-safe session bootstrap; anonymous users return success with authenticated=false. */
+  getSession: () =>
+    req<{ authenticated: boolean; user: AuthProfileData | null }>('/auth/session'),
 
   /** Update profile (username, email, password, or avatarUrl) */
   updateProfile: (data: { username?: string; email?: string; avatarUrl?: string | null; currentPassword?: string; newPassword?: string }) =>
