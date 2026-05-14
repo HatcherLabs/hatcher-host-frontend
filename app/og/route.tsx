@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -120,9 +120,9 @@ export async function GET(req: NextRequest) {
           >
             <span style={{ color: '#a1a1aa' }}>Deploy AI agents in 60 seconds</span>
             <span style={{ color: '#3f3f46' }}>•</span>
-            <span style={{ color: '#a1a1aa' }}>Free tier included</span>
+            <span style={{ color: '#a1a1aa' }}>AI Credits included</span>
             <span style={{ color: '#3f3f46' }}>•</span>
-            <span style={{ color: '#a1a1aa' }}>BYOK any LLM</span>
+            <span style={{ color: '#a1a1aa' }}>Choose any LLM</span>
           </div>
         </div>
       </div>
