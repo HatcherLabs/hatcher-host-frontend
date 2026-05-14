@@ -6,6 +6,7 @@ import { HealthPerformanceCard } from './cards/HealthPerformanceCard';
 import { LiveLogsPreviewCard } from './cards/LiveLogsPreviewCard';
 import { QuickActionsCard } from './cards/QuickActionsCard';
 import { CostCard } from './cards/CostCard';
+import { EgressCard } from './cards/EgressCard';
 import { OpenClawGatewayCard } from './cards/openclaw/OpenClawGatewayCard';
 import { OpenClawSchedulesCard } from './cards/openclaw/OpenClawSchedulesCard';
 import { OpenClawRecentErrorsCard } from './cards/openclaw/OpenClawRecentErrorsCard';
@@ -40,6 +41,7 @@ export function OpenClawDashboard() {
       <OpenClawGatewayCard />
       <HealthPerformanceCard agentId={agent.id} isActive={isActive} />
       <CostCard agentId={agent.id} />
+      <EgressCard agentId={agent.id} />
       <OpenClawRecentErrorsCard />
       <OpenClawSchedulesCard />
       <LiveLogsPreviewCard />

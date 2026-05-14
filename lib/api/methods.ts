@@ -4,7 +4,7 @@
 
 import { API_URL } from '@/lib/config';
 import { getToken, req } from './core';
-import type { Agent, AgentPassport, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection } from './types';
+import type { Agent, AgentPassport, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse, AgentEgressEventsResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection } from './types';
 import type { TierConfig, AdminOverviewExtras } from '@hatcher/shared';
 
 const API_BASE = API_URL;
@@ -350,6 +350,12 @@ export const api = {
       };
       storage: { usedMb: number; limitMb: number };
     }>(`/agents/${id}/usage`),
+
+  /** Recent CONNECT egress decisions visible to the agent owner/team */
+  getAgentEgressEvents: (id: string, limit = 50) =>
+    req<AgentEgressEventsResponse>(
+      `/agents/${id}/egress-events?limit=${encodeURIComponent(String(limit))}`,
+    ),
 
   /** Get public stats for an agent (no auth required) */
   getAgentPublicStats: (id: string) =>

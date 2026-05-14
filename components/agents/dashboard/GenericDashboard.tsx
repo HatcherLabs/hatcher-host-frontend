@@ -8,6 +8,7 @@ import { FrameworkCapabilitiesCard } from './cards/FrameworkCapabilitiesCard';
 import { AgentDetailsCard } from './cards/AgentDetailsCard';
 import { LiveLogsPreviewCard } from './cards/LiveLogsPreviewCard';
 import { QuickActionsCard } from './cards/QuickActionsCard';
+import { EgressCard } from './cards/EgressCard';
 
 /**
  * The generic / fallback dashboard, rendered for any framework that
@@ -33,6 +34,7 @@ export function GenericDashboard() {
     >
       <HealthPerformanceCard agentId={agent.id} isActive={isActive} />
       <ActivityFeedCard agentId={agent.id} agent={agent} />
+      <EgressCard agentId={agent.id} />
       <FrameworkCapabilitiesCard framework={agent.framework} />
       <AgentDetailsCard framework={agent.framework} />
       <LiveLogsPreviewCard />

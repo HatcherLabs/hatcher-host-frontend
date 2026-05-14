@@ -6,6 +6,7 @@ import { HealthPerformanceCard } from './cards/HealthPerformanceCard';
 import { LiveLogsPreviewCard } from './cards/LiveLogsPreviewCard';
 import { QuickActionsCard } from './cards/QuickActionsCard';
 import { CostCard } from './cards/CostCard';
+import { EgressCard } from './cards/EgressCard';
 import { HermesConfigSnapshotCard } from './cards/hermes/HermesConfigSnapshotCard';
 import { HermesSkillsCard } from './cards/hermes/HermesSkillsCard';
 import { HermesCronCard } from './cards/hermes/HermesCronCard';
@@ -45,6 +46,7 @@ export function HermesDashboard() {
       <HermesConfigSnapshotCard />
       <HealthPerformanceCard agentId={agent.id} isActive={isActive} />
       <CostCard agentId={agent.id} />
+      <EgressCard agentId={agent.id} />
       <HermesRecentErrorsCard />
       <HermesStatsCard />
       <HermesCronCard />

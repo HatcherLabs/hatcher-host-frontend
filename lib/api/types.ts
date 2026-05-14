@@ -400,3 +400,7 @@ export interface AdminEgressEventsResponse {
   agentId: string | null;
   generatedAt: string;
 }
+
+export type AgentEgressEventsResponse = Omit<AdminEgressEventsResponse, 'agentId'> & {
+  agentId: string;
+};
