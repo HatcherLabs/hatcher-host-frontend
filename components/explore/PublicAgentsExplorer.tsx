@@ -146,6 +146,7 @@ function PublicAgentCard({
   const accent = publicAgentAccent(agent);
   return (
     <article
+      data-public-agent-card
       className="group flex min-h-[360px] flex-col overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] transition-colors hover:border-[var(--color-accent)]/45"
       style={{ '--agent-accent': accent } as CSSProperties}
     >
@@ -218,6 +219,7 @@ function AgentAvatar3D({
 
   return (
     <div
+      data-public-agent-avatar
       className="relative h-44 overflow-hidden border-b border-[var(--border-default)] bg-[var(--bg-muted)]"
       style={style}
       aria-label={copy.avatarLabel}
