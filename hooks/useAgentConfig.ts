@@ -273,7 +273,6 @@ export function useAgentConfig(
       setSaveMsg('Error: ' + res.error);
     }
   }, [agent, id, setAgent, configName, configDesc, configSystemPrompt, configSkills, configModel, configProvider,
-    configBio, configLore, configTopics, configAdjectives, configStyle,
     useCustomModel, customModelInput, byokKeyInput, hasApiKey,
     configIsPublic, configPublicChatEnabled, configPublicChatDailyAiCreditCap]);
 
