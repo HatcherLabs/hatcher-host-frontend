@@ -1669,7 +1669,26 @@
     "fallbackDescription": "Un agent Hatcher public pregătit pentru sesiuni de chat în browser.",
     "interactions": "interacțiuni",
     "publicChat": "Chat public",
-    "chatCta": "Chat"
+    "chatCta": "Chat",
+    "statsAgents": "{count} agenți publici",
+    "statsLive": "{count} live acum",
+    "statsInteractions": "{count} interacțiuni",
+    "searchPlaceholder": "Caută agenți publici",
+    "filterAll": "Toți",
+    "filterOpenClaw": "OpenClaw",
+    "filterHermes": "Hermes",
+    "filterLive": "Doar live",
+    "showingCount": "{count} afișați",
+    "noResultsTitle": "Nu există agenți potriviți",
+    "noResultsBody": "Încearcă altă căutare, framework sau filtrul live.",
+    "frameworkLabel": "Framework",
+    "featured": "Promovat",
+    "ownerFallback": "agent comunitar",
+    "avatarLabel": "Avatar 3D pentru agent public",
+    "statusRunning": "Live",
+    "statusSleeping": "Sleeping",
+    "statusPaused": "Pauză",
+    "statusCrashed": "Necesită atenție"
   },
   "agentPublic": {
     "back": {
