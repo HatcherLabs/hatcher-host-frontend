@@ -257,6 +257,12 @@
   gap: 10px;
   align-items: flex-end;
 }
+@media (max-width: 620px) {
+  .inputWrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
 .input {
   flex: 1;
   background: var(--bg-2);
@@ -267,9 +273,9 @@
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 14px;
   line-height: 1.5;
-  resize: none;
-  min-height: 48px;
-  max-height: 200px;
+  resize: vertical;
+  min-height: 92px;
+  max-height: 320px;
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -279,6 +285,26 @@
 }
 .input::placeholder { color: var(--mute); }
 .input:disabled { opacity: 0.5; cursor: not-allowed; }
+.inputActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.inputCount {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--mute);
+}
+@media (max-width: 620px) {
+  .inputActions {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
 
 .send {
   appearance: none;
@@ -374,7 +400,99 @@
   color: var(--fw, var(--accent));
 }
 .fwGlyph {
-  font-size: 16px;
+  display: inline-flex;
+  width: 24px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-size: 9px;
+}
+
+.frameworkChooser {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+@media (max-width: 620px) {
+  .frameworkChooser { grid-template-columns: 1fr; }
+}
+.frameworkOption {
+  appearance: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  min-height: 74px;
+  padding: 10px;
+  border: 1px solid var(--line-bright);
+  border-radius: 8px;
+  background: var(--bg-2);
+  color: var(--ink-soft);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, color 0.15s;
+}
+.frameworkOption:hover,
+.frameworkOptionActive {
+  border-color: var(--fw, var(--accent));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--fw, var(--accent)) 35%, transparent);
+  color: var(--ink);
+}
+.frameworkOptionMark {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--fw, var(--accent));
+  border-radius: 5px;
+  color: var(--fw, var(--accent));
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+}
+.frameworkOptionName,
+.frameworkOptionDesc {
+  display: block;
+}
+.frameworkOptionName {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.frameworkOptionDesc {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+
+.reasonBox {
+  border-left: 2px solid var(--accent);
+  background: var(--bg-2);
+  padding: 10px 12px;
+  border-radius: 0 6px 6px 0;
+}
+.reasonLabel,
+.installPlanHead {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mute);
+  margin-bottom: 5px;
+}
+.reasonBox p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  line-height: 1.45;
 }
 
 .agentName {
@@ -661,6 +779,54 @@
   cursor: pointer;
   padding: 0 4px;
   line-height: 1;
+}
+
+.installPlan {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.installPlanList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.installPlanItem {
+  display: grid;
+  grid-template-columns: auto minmax(120px, 0.7fr) minmax(0, 1.3fr);
+  gap: 8px;
+  align-items: center;
+  padding: 7px 9px;
+  border: 1px solid var(--line-bright);
+  border-radius: 6px;
+  background: var(--bg-2);
+}
+@media (max-width: 620px) {
+  .installPlanItem {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+}
+.installPlanType {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.installPlanName {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ink);
+}
+.installPlanReason {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--ink-soft);
 }
 
 .greetingBox {
