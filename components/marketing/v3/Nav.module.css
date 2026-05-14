@@ -193,41 +193,6 @@
   }
 }
 
-.mobileGuestAuth {
-  display: none;
-}
-@media (max-width: 600px) {
-  .mobileGuestAuth {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-}
-
-.mobileSignIn,
-.mobileSignUp {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
-  text-decoration: none;
-  white-space: nowrap;
-  border-radius: 4px;
-}
-
-.mobileSignIn {
-  color: var(--text-primary);
-  border: 1px solid var(--border-default);
-  padding: 9px 8px;
-}
-
-.mobileSignUp {
-  color: var(--bg-base);
-  background: var(--accent);
-  border: 1px solid var(--accent);
-  padding: 9px 8px;
-}
-
 .notificationSlot {
   display: inline-flex;
   align-items: center;

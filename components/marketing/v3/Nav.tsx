@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import styles from './Nav.module.css';
-import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA, SIGN_UP_CTA } from './links';
+import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA } from './links';
 import { NavDrawer } from './NavDrawer';
 import { LocaleSwitcher } from '@/components/layout/LocaleSwitcher';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
@@ -288,14 +288,6 @@ export function Nav() {
                 <Link href={SECONDARY_CTA.href} className={styles.signIn}>
                   {tNav(SECONDARY_CTA.labelKey)}
                 </Link>
-                <div className={styles.mobileGuestAuth}>
-                  <Link href={SECONDARY_CTA.href} className={styles.mobileSignIn}>
-                    {tNav(SECONDARY_CTA.labelKey)}
-                  </Link>
-                  <Link href={SIGN_UP_CTA.href} className={styles.mobileSignUp}>
-                    {tNav(SIGN_UP_CTA.labelKey)}
-                  </Link>
-                </div>
               </>
             )}
             <Link
