@@ -57,7 +57,7 @@ const ChatMessage = memo(function ChatMessage({ msg, isSpeakingThis, ttsSupporte
         >
           {msg.content ? (
             msg.role === 'assistant' ? (
-              <AssistantBody content={msg.content} streaming={Boolean(msg.streaming)} />
+              <AssistantBody content={msg.content} streaming={Boolean(msg.streaming)} agentId={agentId} />
             ) : (
               <p className="whitespace-pre-wrap">{msg.content}</p>
             )
@@ -121,9 +121,11 @@ export default ChatMessage;
 const AssistantBody = memo(function AssistantBody({
   content,
   streaming,
+  agentId,
 }: {
   content: string;
   streaming: boolean;
+  agentId: string;
 }) {
   const segments = useMemo(() => parseMessageSegments(content), [content]);
 
@@ -132,7 +134,7 @@ const AssistantBody = memo(function AssistantBody({
   if (segments.length === 1 && segments[0]?.kind === 'text') {
     return (
       <div className="markdown-body">
-        <RichMarkdown content={segments[0].content} />
+        <RichMarkdown content={segments[0].content} agentId={agentId} />
         {streaming && (
           <span className="inline-block w-[2px] h-4 ml-0.5 align-text-bottom bg-[var(--color-accent)] animate-pulse rounded-full" />
         )}
@@ -156,7 +158,7 @@ const AssistantBody = memo(function AssistantBody({
         // text segment
         return (
           <Fragment key={i}>
-            <RichMarkdown content={seg.content} />
+            <RichMarkdown content={seg.content} agentId={agentId} />
           </Fragment>
         );
       })}

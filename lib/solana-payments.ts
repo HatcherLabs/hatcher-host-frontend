@@ -43,6 +43,11 @@ export interface SolQuote {
   quotedAt: number;    // Date.now() — frontend expires the quote after ~60s
 }
 
+interface PaymentCallbacks {
+  /** Fired immediately after wallet broadcast returns a signature, before RPC confirmation. */
+  onSignature?: (signature: string) => void;
+}
+
 /**
  * Compute how much SOL to send for a given USD amount using the live
  * SOL/USD rate. Adds a 1% buffer on top so that small price drifts
@@ -143,6 +148,78 @@ function createBurnInstruction(
   });
 }
 
+function formatTokenUnits(amount: bigint, decimals: number): string {
+  const base = 10n ** BigInt(decimals);
+  const whole = amount / base;
+  const fraction = amount % base;
+  if (fraction === 0n) return whole.toString();
+
+  const fractionText = fraction.toString().padStart(decimals, '0').replace(/0+$/, '');
+  return `${whole.toString()}.${fractionText}`;
+}
+
+function parsedTokenAmount(raw: unknown): bigint | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const value = (raw as { amount?: unknown }).amount;
+  if (typeof value !== 'string' || !/^\d+$/.test(value)) return null;
+  return BigInt(value);
+}
+
+async function getTokenAccountBaseUnits(
+  connection: Connection,
+  tokenAccount: PublicKey,
+): Promise<bigint | null> {
+  try {
+    const balance = await connection.getTokenAccountBalance(tokenAccount, 'confirmed');
+    return parsedTokenAmount(balance.value);
+  } catch {
+    return null;
+  }
+}
+
+async function resolveSourceTokenAccount(params: {
+  connection: Connection;
+  owner: PublicKey;
+  associatedTokenAccount: PublicKey;
+  mint: PublicKey;
+  tokenProgramId: PublicKey;
+  requiredBaseUnits: bigint;
+}): Promise<{ account: PublicKey; availableBaseUnits: bigint }> {
+  const ataBalance = await getTokenAccountBaseUnits(params.connection, params.associatedTokenAccount);
+  if (ataBalance !== null && ataBalance >= params.requiredBaseUnits) {
+    return { account: params.associatedTokenAccount, availableBaseUnits: ataBalance };
+  }
+
+  let bestAccount = params.associatedTokenAccount;
+  let bestBalance = ataBalance ?? 0n;
+  try {
+    const ownedAccounts = await params.connection.getParsedTokenAccountsByOwner(
+      params.owner,
+      { programId: params.tokenProgramId },
+      'confirmed',
+    );
+
+    for (const row of ownedAccounts.value) {
+      const parsed = 'parsed' in row.account.data ? row.account.data.parsed : null;
+      const info = parsed && typeof parsed === 'object'
+        ? (parsed as { info?: { mint?: string; owner?: string; tokenAmount?: unknown } }).info
+        : null;
+      if (!info || info.mint !== params.mint.toBase58() || info.owner !== params.owner.toBase58()) continue;
+
+      const balance = parsedTokenAmount(info.tokenAmount);
+      if (balance !== null && balance > bestBalance) {
+        bestAccount = row.pubkey;
+        bestBalance = balance;
+      }
+    }
+  } catch {
+    // The ATA balance above is still enough to produce a useful insufficient
+    // balance error. Falling back keeps wallet payment failures readable.
+  }
+
+  return { account: bestAccount, availableBaseUnits: bestBalance };
+}
+
 /**
  * Build + sign + broadcast a SOL transfer to the platform treasury.
  * Returns the tx signature once the cluster confirms it. Throws on
@@ -152,6 +229,7 @@ export async function payWithSol(params: {
   wallet: WalletContextState;
   connection: Connection;
   quote: SolQuote;
+  onSignature?: PaymentCallbacks['onSignature'];
 }): Promise<{ signature: string }> {
   const { wallet, connection, quote } = params;
   const { publicKey, sendTransaction } = wallet;
@@ -184,6 +262,7 @@ export async function payWithSol(params: {
       skipPreflight: false,
       preflightCommitment: 'confirmed',
     });
+    params.onSignature?.(signature);
   } catch (e) {
     console.error('[pay-sol] sendTransaction FAILED', e);
     throw e;
@@ -217,6 +296,7 @@ export async function payWithSplToken(params: {
   mint: 'usdc' | 'hatch';
   amountHuman: number; // e.g. 4.99 USDC or 100000 HATCH
   recipientWallet?: string;
+  onSignature?: PaymentCallbacks['onSignature'];
 }): Promise<{ signature: string }> {
   const { wallet, connection, mint, amountHuman, recipientWallet } = params;
   const { publicKey, sendTransaction } = wallet;
@@ -236,6 +316,20 @@ export async function payWithSplToken(params: {
 
   const decimals = mint === 'usdc' ? 6 : 6; // both USDC + $HATCHER use 6 decimals
   const totalBaseUnits = BigInt(Math.floor(amountHuman * 10 ** decimals));
+  const symbol = mint === 'usdc' ? 'USDC' : '$HATCHER';
+  const source = await resolveSourceTokenAccount({
+    connection,
+    owner: publicKey,
+    associatedTokenAccount: fromAta,
+    mint: mintPubkey,
+    tokenProgramId,
+    requiredBaseUnits: totalBaseUnits,
+  });
+  if (source.availableBaseUnits < totalBaseUnits) {
+    throw new Error(
+      `Insufficient ${symbol} balance. Need ${formatTokenUnits(totalBaseUnits, decimals)} ${symbol}, wallet has ${formatTokenUnits(source.availableBaseUnits, decimals)} ${symbol}.`,
+    );
+  }
 
   // For $HATCHER payments, split the amount 90/10: treasury receives 90%, the
   // remaining 10% is burned in the same tx. This ties revenue directly to
@@ -263,7 +357,7 @@ export async function payWithSplToken(params: {
 
   tx.add(
     createTransferInstruction(
-      fromAta,
+      source.account,
       toAta,
       publicKey,
       transferBaseUnits,
@@ -274,7 +368,7 @@ export async function payWithSplToken(params: {
   if (burnBaseUnits > 0n) {
     tx.add(
       createBurnInstruction(
-        fromAta,         // burn straight from the payer's ATA
+        source.account,  // burn straight from the payer's token account
         mintPubkey,
         publicKey,       // authority
         burnBaseUnits,
@@ -287,10 +381,17 @@ export async function payWithSplToken(params: {
   tx.recentBlockhash = blockhash;
   tx.feePayer = publicKey;
 
-  const signature = await sendTransaction(tx, connection, {
-    skipPreflight: false,
-    preflightCommitment: 'confirmed',
-  });
+  let signature: string;
+  try {
+    signature = await sendTransaction(tx, connection, {
+      skipPreflight: false,
+      preflightCommitment: 'confirmed',
+    });
+  } catch (e) {
+    console.error(`[pay-${mint}] sendTransaction FAILED`, e);
+    throw e;
+  }
+  params.onSignature?.(signature);
   const result = await connection.confirmTransaction(
     { signature, blockhash, lastValidBlockHeight },
     'confirmed',

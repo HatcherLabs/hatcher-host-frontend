@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { splitMessageArtifacts } from './ArtifactRenderer';
+import { chartValueDomain, splitMessageArtifacts } from './ArtifactRenderer';
 
 describe('splitMessageArtifacts', () => {
   it('extracts chart artifacts from fenced JSON while preserving surrounding markdown', () => {
@@ -43,6 +43,9 @@ describe('splitMessageArtifacts', () => {
         artifact: {
           alt: 'Revenue chart',
           url: 'https://example.com/chart.png',
+          filename: 'chart.png',
+          downloadUrl: '/api/artifacts/download?url=https%3A%2F%2Fexample.com%2Fchart.png&filename=chart.png',
+          mediaType: 'image/png',
         },
       },
       { kind: 'markdown', content: '\n' },
@@ -52,6 +55,7 @@ describe('splitMessageArtifacts', () => {
           filename: 'report.pdf',
           title: 'Quarterly report',
           url: 'https://example.com/report.pdf',
+          downloadUrl: '/api/artifacts/download?url=https%3A%2F%2Fexample.com%2Freport.pdf&filename=report.pdf',
           mediaType: 'application/pdf',
           sizeBytes: 12345,
         },
@@ -63,9 +67,175 @@ describe('splitMessageArtifacts', () => {
           filename: 'raw.csv',
           title: 'raw.csv',
           url: 'https://example.com/raw.csv',
+          downloadUrl: '/api/artifacts/download?url=https%3A%2F%2Fexample.com%2Fraw.csv&filename=raw.csv',
         },
       },
     ]);
+  });
+
+  it('rewrites OpenClaw MEDIA image references to authenticated media artifact URLs', () => {
+    const parts = splitMessageArtifacts(
+      '![Robotel iesind din ou](MEDIA:/tmp/robot_egg.png)',
+      { agentId: 'agent_123' },
+    );
+
+    expect(parts).toEqual([
+      {
+        kind: 'image',
+        artifact: {
+          alt: 'Robotel iesind din ou',
+          url: '/api/agents/agent_123/media?path=%2Ftmp%2Frobot_egg.png',
+          downloadUrl: '/api/agents/agent_123/media?path=%2Ftmp%2Frobot_egg.png&download=1',
+          filename: 'robot_egg.png',
+          mediaType: 'image/png',
+        },
+      },
+    ]);
+  });
+
+  it('rewrites OpenClaw MEDIA audio file artifacts as playable audio', () => {
+    const parts = splitMessageArtifacts([
+      '```hatcher-artifact',
+      '{"kind":"file","title":"Theme sound","url":"MEDIA:/tmp/theme.wav"}',
+      '```',
+    ].join('\n'), { agentId: 'agent_123' });
+
+    expect(parts).toEqual([
+      {
+        kind: 'audio',
+        artifact: {
+          title: 'Theme sound',
+          url: '/api/agents/agent_123/media?path=%2Ftmp%2Ftheme.wav',
+          downloadUrl: '/api/agents/agent_123/media?path=%2Ftmp%2Ftheme.wav&download=1',
+          filename: 'theme.wav',
+          mediaType: 'audio/wav',
+        },
+      },
+    ]);
+  });
+
+  it('extracts downloadable audio and video artifacts', () => {
+    const parts = splitMessageArtifacts([
+      'Media:',
+      '```hatcher-artifact',
+      '{"kind":"video","title":"Demo clip","url":"https://cdn.example.com/demo.mp4"}',
+      '```',
+      '```hatcher-artifact',
+      '{"kind":"audio","title":"Narration","url":"https://cdn.example.com/narration.mp3"}',
+      '```',
+    ].join('\n'));
+
+    expect(parts).toEqual([
+      { kind: 'markdown', content: 'Media:\n' },
+      {
+        kind: 'video',
+        artifact: {
+          title: 'Demo clip',
+          url: 'https://cdn.example.com/demo.mp4',
+          downloadUrl: '/api/artifacts/download?url=https%3A%2F%2Fcdn.example.com%2Fdemo.mp4&filename=demo.mp4',
+          filename: 'demo.mp4',
+          mediaType: 'video/mp4',
+        },
+      },
+      { kind: 'markdown', content: '\n' },
+      {
+        kind: 'audio',
+        artifact: {
+          title: 'Narration',
+          url: 'https://cdn.example.com/narration.mp3',
+          downloadUrl: '/api/artifacts/download?url=https%3A%2F%2Fcdn.example.com%2Fnarration.mp3&filename=narration.mp3',
+          filename: 'narration.mp3',
+          mediaType: 'audio/mpeg',
+        },
+      },
+    ]);
+  });
+
+  it('adds a proxy download URL for external image artifacts', () => {
+    const parts = splitMessageArtifacts('![Logo](https://assets.example.com/logo.png)');
+
+    expect(parts).toEqual([
+      {
+        kind: 'image',
+        artifact: {
+          alt: 'Logo',
+          url: 'https://assets.example.com/logo.png',
+          downloadUrl: '/api/artifacts/download?url=https%3A%2F%2Fassets.example.com%2Flogo.png&filename=logo.png',
+          filename: 'logo.png',
+          mediaType: 'image/png',
+        },
+      },
+    ]);
+  });
+
+  it('renders markdown image syntax pointing at video files as video artifacts', () => {
+    const parts = splitMessageArtifacts('![Robotel iesind din ou](https://v3.fal.media/files/penguin/demo.mp4)');
+
+    expect(parts).toEqual([
+      {
+        kind: 'video',
+        artifact: {
+          title: 'Robotel iesind din ou',
+          url: 'https://v3.fal.media/files/penguin/demo.mp4',
+          downloadUrl: '/api/artifacts/download?url=https%3A%2F%2Fv3.fal.media%2Ffiles%2Fpenguin%2Fdemo.mp4&filename=demo.mp4',
+          filename: 'demo.mp4',
+          mediaType: 'video/mp4',
+        },
+      },
+    ]);
+  });
+
+  it('rewrites OpenRouter video content URLs through the authenticated agent media proxy', () => {
+    const parts = splitMessageArtifacts(
+      '```hatcher-artifact\n{"kind":"video","title":"Generated video","url":"https://openrouter.ai/api/v1/videos/job-123/content?index=0"}\n```',
+      { agentId: 'agent_123' },
+    );
+
+    expect(parts).toEqual([
+      {
+        kind: 'video',
+        artifact: {
+          title: 'Generated video',
+          url: '/api/agents/agent_123/media?videoJobId=job-123&index=0',
+          downloadUrl: '/api/agents/agent_123/media?videoJobId=job-123&index=0&download=1',
+          filename: 'job-123.mp4',
+          mediaType: 'video/mp4',
+        },
+      },
+    ]);
+  });
+
+  it('keeps generated data URL images downloadable without turning the filename into base64', () => {
+    const parts = splitMessageArtifacts('![Generated](data:image/png;base64,AAA=)');
+
+    expect(parts).toEqual([
+      {
+        kind: 'image',
+        artifact: {
+          alt: 'Generated',
+          url: 'data:image/png;base64,AAA=',
+          downloadUrl: 'data:image/png;base64,AAA=',
+          filename: 'artifact.png',
+          mediaType: 'image/png',
+        },
+      },
+    ]);
+  });
+
+
+  it('uses a padded line-chart domain instead of flattening small price moves against zero', () => {
+    const domain = chartValueDomain(
+      [
+        { date: 'Mon', price: 0.000102 },
+        { date: 'Tue', price: 0.000108 },
+        { date: 'Wed', price: 0.000105 },
+      ],
+      'price',
+    );
+
+    expect(domain[0]).toBeGreaterThan(0);
+    expect(domain[0]).toBeLessThan(0.000102);
+    expect(domain[1]).toBeGreaterThan(0.000108);
   });
 
   it('extracts generic code fences as downloadable code artifacts', () => {
@@ -205,6 +375,9 @@ describe('splitMessageArtifacts', () => {
         artifact: {
           alt: 'Solana Logo',
           url: 'https://assets.coingecko.com/coins/images/4128/standard/solana.png',
+          filename: 'solana.png',
+          downloadUrl: '/api/artifacts/download?url=https%3A%2F%2Fassets.coingecko.com%2Fcoins%2Fimages%2F4128%2Fstandard%2Fsolana.png&filename=solana.png',
+          mediaType: 'image/png',
         },
       },
     ]);

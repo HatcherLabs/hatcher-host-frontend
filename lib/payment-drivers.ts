@@ -31,21 +31,25 @@ import type { ConfirmPaymentModalState } from '@/components/payments/ConfirmPaym
 
 export type PaymentRail = 'sol' | 'usdc' | 'hatch';
 
+export interface PaymentDriverOptions {
+  onSignature?: (signature: string) => void;
+}
+
 export interface UsePaymentDrivers {
   /** Pass to <ConfirmPaymentModal state={...} onClose={...} />. */
   confirmState: ConfirmPaymentModalState;
   /** Fire this as the modal's onClose handler. */
   closeConfirm: (approved: boolean) => void;
   /** SOL → treasury. Live Jupiter quote, 1% buffer for slippage. */
-  driveSol: (usdAmount: number, label: string) => Promise<string>;
+  driveSol: (usdAmount: number, label: string, options?: PaymentDriverOptions) => Promise<string>;
   /** USDC (1:1 pegged) → treasury SPL ATA, or an explicit x402 recipient. */
-  driveUsdc: (usdAmount: number, label: string, recipientWallet?: string) => Promise<string>;
+  driveUsdc: (usdAmount: number, label: string, recipientWallet?: string, options?: PaymentDriverOptions) => Promise<string>;
   /**
    * $HATCHER → 90% to treasury + 10% burn in the same signed tx. Live
    * Jupiter quote with 1% buffer. On-chain proof of burn visible to the
    * buyer before signing (breakdown in the confirm modal).
    */
-  driveHatch: (usdAmount: number, label: string) => Promise<string>;
+  driveHatch: (usdAmount: number, label: string, options?: PaymentDriverOptions) => Promise<string>;
   /** Open the wallet-select modal so the user can connect / switch. */
   openWalletModal: () => void;
   /** Disconnect + re-prompt. Use when the wallet is stuck after the
@@ -152,7 +156,7 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     return /User rejected|User denied|cancelled|canceled/i.test(msg);
   };
 
-  const driveSol = useCallback(async (usdAmount: number, label: string): Promise<string> => {
+  const driveSol = useCallback(async (usdAmount: number, label: string, options: PaymentDriverOptions = {}): Promise<string> => {
     await ensureConnected();
     const priceRes = await api.getPrice('sol');
     if (!priceRes.success || !priceRes.data?.price) {
@@ -165,19 +169,19 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     });
     if (!approved) throw new Error('Cancelled');
     try {
-      const { signature } = await payWithSol({ wallet: walletRef.current, connection, quote });
+      const { signature } = await payWithSol({ wallet: walletRef.current, connection, quote, onSignature: options.onSignature });
       return signature;
     } catch (e) {
       if (isUserCancellation(e)) throw new Error('Cancelled');
       if (!isTrustRevokedError(e)) throw e;
       // Phantom revoked trust — disconnect, re-prompt, retry once.
       await forceReconnect();
-      const { signature } = await payWithSol({ wallet: walletRef.current, connection, quote });
+      const { signature } = await payWithSol({ wallet: walletRef.current, connection, quote, onSignature: options.onSignature });
       return signature;
     }
   }, [connection, ensureConnected, askConfirm, forceReconnect]);
 
-  const driveUsdc = useCallback(async (usdAmount: number, label: string, recipientWallet?: string): Promise<string> => {
+  const driveUsdc = useCallback(async (usdAmount: number, label: string, recipientWallet?: string, options: PaymentDriverOptions = {}): Promise<string> => {
     await ensureConnected();
     const approved = await askConfirm({
       token: 'usdc', label, usdAmount,
@@ -186,7 +190,7 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     if (!approved) throw new Error('Cancelled');
     try {
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'usdc', amountHuman: usdAmount, recipientWallet,
+        wallet: walletRef.current, connection, mint: 'usdc', amountHuman: usdAmount, recipientWallet, onSignature: options.onSignature,
       });
       return signature;
     } catch (e) {
@@ -194,13 +198,13 @@ export function usePaymentDrivers(): UsePaymentDrivers {
       if (!isTrustRevokedError(e)) throw e;
       await forceReconnect();
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'usdc', amountHuman: usdAmount, recipientWallet,
+        wallet: walletRef.current, connection, mint: 'usdc', amountHuman: usdAmount, recipientWallet, onSignature: options.onSignature,
       });
       return signature;
     }
   }, [connection, ensureConnected, askConfirm, forceReconnect]);
 
-  const driveHatch = useCallback(async (usdAmount: number, label: string): Promise<string> => {
+  const driveHatch = useCallback(async (usdAmount: number, label: string, options: PaymentDriverOptions = {}): Promise<string> => {
     await ensureConnected();
     const priceRes = await api.getPrice('hatch');
     if (!priceRes.success || !priceRes.data?.price) {
@@ -216,7 +220,7 @@ export function usePaymentDrivers(): UsePaymentDrivers {
     if (!approved) throw new Error('Cancelled');
     try {
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'hatch', amountHuman: hatchAmount,
+        wallet: walletRef.current, connection, mint: 'hatch', amountHuman: hatchAmount, onSignature: options.onSignature,
       });
       return signature;
     } catch (e) {
@@ -224,7 +228,7 @@ export function usePaymentDrivers(): UsePaymentDrivers {
       if (!isTrustRevokedError(e)) throw e;
       await forceReconnect();
       const { signature } = await payWithSplToken({
-        wallet: walletRef.current, connection, mint: 'hatch', amountHuman: hatchAmount,
+        wallet: walletRef.current, connection, mint: 'hatch', amountHuman: hatchAmount, onSignature: options.onSignature,
       });
       return signature;
     }

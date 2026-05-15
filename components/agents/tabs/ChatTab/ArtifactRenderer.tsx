@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { Code2, Download, ExternalLink, FileText, Image as ImageIcon } from 'lucide-react';
 import {
   Bar,
@@ -11,7 +11,6 @@ import {
   LineChart,
   Pie,
   PieChart,
-  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
@@ -32,15 +31,27 @@ interface ChartArtifact {
 interface ImageArtifact {
   alt: string;
   url: string;
+  filename: string;
+  downloadUrl: string;
+  mediaType?: string;
 }
 
 interface FileArtifact {
   title: string;
   filename: string;
   url?: string;
+  downloadUrl?: string;
   content?: string;
   mediaType?: string;
   sizeBytes?: number;
+}
+
+interface PlaybackArtifact {
+  title: string;
+  url: string;
+  filename: string;
+  downloadUrl: string;
+  mediaType?: string;
 }
 
 interface CodeArtifact {
@@ -62,12 +73,18 @@ export type MessagePart =
   | { kind: 'markdown'; content: string }
   | { kind: 'chart'; artifact: ChartArtifact }
   | { kind: 'image'; artifact: ImageArtifact }
+  | { kind: 'video'; artifact: PlaybackArtifact }
+  | { kind: 'audio'; artifact: PlaybackArtifact }
   | { kind: 'file'; artifact: FileArtifact }
   | { kind: 'code'; artifact: CodeArtifact }
   | { kind: 'embed'; artifact: EmbedArtifact };
 
 const ARTIFACT_RE = /```([^\n`]*)\n([\s\S]*?)```|!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)|\[File:\s*([^\]\n]+?)\]|<iframe\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*(?:<\/iframe>)?/gi;
 const COLORS = ['#22d3ee', '#a3e635', '#f59e0b', '#f472b6', '#818cf8', '#34d399'];
+
+interface ArtifactParseOptions {
+  agentId?: string;
+}
 
 function normalizeDatum(value: unknown): ChartDatum | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
@@ -264,17 +281,77 @@ function codeArtifactFromFence(language: string, body: string, before = '', afte
   };
 }
 
-function cleanArtifactUrl(raw: unknown): string | null {
+function mediaArtifactUrl(raw: string, agentId?: string): string | null {
+  if (!agentId) return null;
+  const match = /^MEDIA:(.+)$/i.exec(raw.trim());
+  const mediaPath = match?.[1]?.trim();
+  if (!mediaPath || !mediaPath.startsWith('/') || mediaPath.includes('\0')) return null;
+  return `/api/agents/${encodeURIComponent(agentId)}/media?path=${encodeURIComponent(mediaPath)}`;
+}
+
+function agentVideoContentUrl(raw: string, agentId?: string): string | null {
+  if (!agentId) return null;
+  try {
+    const parsed = new URL(raw.trim());
+    const isOpenRouterContent =
+      parsed.protocol === 'https:'
+      && parsed.hostname === 'openrouter.ai'
+      && /^\/api\/v1\/videos\/[^/]+\/content$/i.test(parsed.pathname);
+    const isInternalProxyContent =
+      ['host.docker.internal', 'localhost', '127.0.0.1'].includes(parsed.hostname)
+      && /^\/media\/videos\/[^/]+\/content$/i.test(parsed.pathname);
+    if (!isOpenRouterContent && !isInternalProxyContent) return null;
+    const parts = parsed.pathname.split('/').filter(Boolean);
+    const videosIndex = parts.findIndex((part) => part === 'videos');
+    const jobId = videosIndex >= 0 ? parts[videosIndex + 1] : null;
+    if (!jobId || !/^[A-Za-z0-9._-]+$/.test(jobId)) return null;
+    const index = parsed.searchParams.get('index') ?? '0';
+    if (!/^\d+$/.test(index)) return null;
+    const proxyUrl = new URL(`/api/agents/${encodeURIComponent(agentId)}/media`, 'https://hatcher.local');
+    proxyUrl.searchParams.set('videoJobId', jobId);
+    proxyUrl.searchParams.set('index', index);
+    return `${proxyUrl.pathname}${proxyUrl.search}`;
+  } catch {
+    return null;
+  }
+}
+
+function cleanArtifactUrl(raw: unknown, options: ArtifactParseOptions = {}): string | null {
   if (typeof raw !== 'string') return null;
   const url = raw.trim().replace(/^<|>$/g, '');
   if (!url) return null;
+  const mediaUrl = mediaArtifactUrl(url, options.agentId);
+  if (mediaUrl) return mediaUrl;
+  const videoContentUrl = agentVideoContentUrl(url, options.agentId);
+  if (videoContentUrl) return videoContentUrl;
   if (/^(https?:\/\/|data:|blob:|\/)/i.test(url)) return url;
   return null;
 }
 
 function filenameFromUrl(url: string): string {
+  if (url.startsWith('data:')) {
+    const mime = /^data:([^;,]+)/i.exec(url)?.[1]?.toLowerCase();
+    const ext =
+      mime === 'image/jpeg' ? 'jpg'
+        : mime === 'image/png' ? 'png'
+          : mime === 'image/gif' ? 'gif'
+            : mime === 'image/webp' ? 'webp'
+              : mime === 'audio/mpeg' ? 'mp3'
+                : mime === 'audio/wav' ? 'wav'
+                  : mime === 'video/mp4' ? 'mp4'
+                    : 'bin';
+    return `artifact.${ext}`;
+  }
+  if (url.startsWith('blob:')) return 'artifact';
   try {
     const parsed = new URL(url, 'https://hatcher.local');
+    const mediaPath = parsed.searchParams.get('path');
+    if (mediaPath) {
+      const fromMediaPath = mediaPath.split('/').filter(Boolean).pop();
+      if (fromMediaPath) return decodeURIComponent(fromMediaPath);
+    }
+    const videoJobId = parsed.searchParams.get('videoJobId');
+    if (videoJobId) return `${sanitizeFilename(videoJobId)}.mp4`;
     const name = parsed.pathname.split('/').filter(Boolean).pop();
     return name ? decodeURIComponent(name) : 'file';
   } catch {
@@ -282,10 +359,75 @@ function filenameFromUrl(url: string): string {
   }
 }
 
-function normalizeFileArtifact(raw: unknown): FileArtifact | null {
+function withSearchParam(url: string, key: string, value: string): string {
+  try {
+    const parsed = new URL(url, 'https://hatcher.local');
+    parsed.searchParams.set(key, value);
+    if (url.startsWith('/')) return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    return parsed.toString();
+  } catch {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+  }
+}
+
+function artifactDownloadUrl(url: string, filename: string): string {
+  if (/^(data:|blob:)/i.test(url)) return url;
+  if (url.startsWith('/api/agents/') && url.includes('/media?')) {
+    return withSearchParam(url, 'download', '1');
+  }
+  if (url.startsWith('/')) return url;
+  if (/^https?:\/\//i.test(url)) {
+    return `/api/artifacts/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
+  }
+  return url;
+}
+
+function inferMediaTypeFromUrl(url: string): string | undefined {
+  const dataMime = /^data:([^;,]+)/i.exec(url)?.[1];
+  if (dataMime) return dataMime.toLowerCase();
+  let clean = url.split('?')[0]?.toLowerCase() ?? '';
+  try {
+    const parsed = new URL(url, 'https://hatcher.local');
+    if (parsed.pathname.includes('/media')) {
+      const mediaPath = parsed.searchParams.get('path');
+      if (mediaPath) clean = mediaPath.toLowerCase();
+    }
+  } catch {
+    // Fall back to the raw path above.
+  }
+  if (/\.png$/.test(clean)) return 'image/png';
+  if (/\.jpe?g$/.test(clean)) return 'image/jpeg';
+  if (/\.gif$/.test(clean)) return 'image/gif';
+  if (/\.webp$/.test(clean)) return 'image/webp';
+  if (/\.svg$/.test(clean)) return 'image/svg+xml';
+  if (/\.mp4$/.test(clean)) return 'video/mp4';
+  if (/\.webm$/.test(clean)) return 'video/webm';
+  if (/\.mov$/.test(clean)) return 'video/quicktime';
+  if (/\.m4v$/.test(clean)) return 'video/x-m4v';
+  if (url.startsWith('/api/agents/') && url.includes('/media?') && url.includes('videoJobId=')) return 'video/mp4';
+  if (/\.mp3$/.test(clean)) return 'audio/mpeg';
+  if (/\.wav$/.test(clean)) return 'audio/wav';
+  if (/\.ogg$/.test(clean)) return 'audio/ogg';
+  if (/\.m4a$/.test(clean)) return 'audio/mp4';
+  if (/\.flac$/.test(clean)) return 'audio/flac';
+  if (/\.opus$/.test(clean)) return 'audio/opus';
+  if (/\.aac$/.test(clean)) return 'audio/aac';
+  return undefined;
+}
+
+function mediaKindFromUrlOrType(url: string, mediaType?: string): 'image' | 'video' | 'audio' | null {
+  const type = (mediaType ?? inferMediaTypeFromUrl(url) ?? '').toLowerCase();
+  if (type.startsWith('image/')) return 'image';
+  if (type.startsWith('video/')) return 'video';
+  if (type.startsWith('audio/')) return 'audio';
+  return null;
+}
+
+function normalizeFileArtifact(raw: unknown, options: ArtifactParseOptions = {}): FileArtifact | null {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
   const source = raw as Record<string, unknown>;
-  const url = cleanArtifactUrl(source.url ?? source.href ?? source.file ?? source.path);
+  const url = cleanArtifactUrl(source.url ?? source.href ?? source.file ?? source.path, options);
   const content = typeof source.content === 'string'
     ? source.content
     : typeof source.text === 'string'
@@ -305,7 +447,7 @@ function normalizeFileArtifact(raw: unknown): FileArtifact | null {
     ? source.mediaType
     : typeof source.mimeType === 'string'
       ? source.mimeType
-      : undefined;
+      : url ? inferMediaTypeFromUrl(url) : undefined;
   const sizeBytes = typeof source.sizeBytes === 'number' && Number.isFinite(source.sizeBytes)
     ? source.sizeBytes
     : undefined;
@@ -314,30 +456,85 @@ function normalizeFileArtifact(raw: unknown): FileArtifact | null {
     title,
     filename,
     ...(url ? { url } : {}),
+    ...(url ? { downloadUrl: artifactDownloadUrl(url, filename) } : {}),
     ...(content !== undefined ? { content } : {}),
     ...(mediaType ? { mediaType } : {}),
     ...(sizeBytes !== undefined ? { sizeBytes } : {}),
   };
 }
 
-function parseFile(rawJson: string): FileArtifact | null {
+function parseFile(rawJson: string, options: ArtifactParseOptions = {}): FileArtifact | null {
   try {
-    return normalizeFileArtifact(JSON.parse(rawJson));
+    return normalizeFileArtifact(JSON.parse(rawJson), options);
   } catch {
     return null;
   }
 }
 
-function fileArtifactFromUrl(rawUrl: string): FileArtifact | null {
-  const url = cleanArtifactUrl(rawUrl.replace(/[),.;]+$/g, ''));
+function fileArtifactFromUrl(rawUrl: string, options: ArtifactParseOptions = {}): FileArtifact | null {
+  const url = cleanArtifactUrl(rawUrl.replace(/[),.;]+$/g, ''), options);
   if (!url) return null;
   const filename = filenameFromUrl(url);
-  return { title: filename, filename, url };
+  const mediaType = inferMediaTypeFromUrl(url);
+  return {
+    title: filename,
+    filename,
+    url,
+    downloadUrl: artifactDownloadUrl(url, filename),
+    ...(mediaType ? { mediaType } : {}),
+  };
 }
 
 function looksLikeImageUrl(url: string): boolean {
   const clean = url.split('?')[0]?.toLowerCase() ?? '';
   return /\.(png|jpe?g|gif|webp|svg)$/.test(clean);
+}
+
+function imageArtifactFromUrl(url: string, alt: string, mediaType?: string): ImageArtifact {
+  const filename = filenameFromUrl(url);
+  return {
+    alt,
+    url,
+    filename,
+    downloadUrl: artifactDownloadUrl(url, filename),
+    ...(mediaType ? { mediaType } : {}),
+  };
+}
+
+function playbackArtifactFromUrl(url: string, title: string, mediaType?: string): PlaybackArtifact {
+  const filename = filenameFromUrl(url);
+  return {
+    title,
+    url,
+    filename,
+    downloadUrl: artifactDownloadUrl(url, filename),
+    ...(mediaType ? { mediaType } : {}),
+  };
+}
+
+function mediaPartFromFileArtifact(artifact: FileArtifact): MessagePart | null {
+  const url = artifact.url ?? fileDownloadHref(artifact);
+  if (!url) return null;
+  const kind = mediaKindFromUrlOrType(url, artifact.mediaType);
+  if (kind === 'image') {
+    return {
+      kind: 'image',
+      artifact: imageArtifactFromUrl(url, artifact.title, artifact.mediaType),
+    };
+  }
+  if (kind === 'video') {
+    return {
+      kind: 'video',
+      artifact: playbackArtifactFromUrl(url, artifact.title, artifact.mediaType),
+    };
+  }
+  if (kind === 'audio') {
+    return {
+      kind: 'audio',
+      artifact: playbackArtifactFromUrl(url, artifact.title, artifact.mediaType),
+    };
+  }
+  return null;
 }
 
 function tradingViewWidgetUrl(symbol: string): string {
@@ -476,7 +673,7 @@ function parseEmbed(raw: string): EmbedArtifact | null {
   }
 }
 
-function parseEmbedPart(raw: string): MessagePart | null {
+function parseEmbedPart(raw: string, options: ArtifactParseOptions = {}): MessagePart | null {
   const iframeUrl = iframeSrcFromHtml(raw);
   if (iframeUrl) {
     const artifact = embedArtifactFromIframe(iframeUrl);
@@ -494,12 +691,16 @@ function parseEmbedPart(raw: string): MessagePart | null {
   const kind = String(source.kind ?? source.artifactType ?? source.type ?? '').toLowerCase();
 
   if (kind === 'image') {
-    const artifact = normalizeImageArtifact(source);
+    const artifact = normalizeImageArtifact(source, options);
     return artifact ? { kind: 'image', artifact } : null;
   }
+  if (kind === 'video' || kind === 'audio') {
+    const artifact = normalizePlaybackArtifact(source, kind, options);
+    return artifact ? { kind, artifact } : null;
+  }
   if (kind === 'file' || kind === 'document' || kind === 'attachment') {
-    const artifact = normalizeFileArtifact(source);
-    return artifact ? { kind: 'file', artifact } : null;
+    const artifact = normalizeFileArtifact(source, options);
+    return artifact ? (mediaPartFromFileArtifact(artifact) ?? { kind: 'file', artifact }) : null;
   }
   if (kind === 'code') {
     const artifact = normalizeCodeArtifact(source);
@@ -510,32 +711,65 @@ function parseEmbedPart(raw: string): MessagePart | null {
     return artifact ? { kind: 'chart', artifact } : null;
   }
 
-  const rawUrl = cleanArtifactUrl(source.url ?? source.src ?? source.href);
+  const rawUrl = cleanArtifactUrl(source.url ?? source.src ?? source.href, options);
   if (rawUrl && looksLikeImageUrl(rawUrl)) {
-    const artifact = normalizeImageArtifact(source);
+    const artifact = normalizeImageArtifact(source, options);
     return artifact ? { kind: 'image', artifact } : null;
+  }
+  if (rawUrl) {
+    const mediaType = typeof source.mediaType === 'string' ? source.mediaType : inferMediaTypeFromUrl(rawUrl);
+    const mediaKind = mediaKindFromUrlOrType(rawUrl, mediaType);
+    if (mediaKind === 'video' || mediaKind === 'audio') {
+      const artifact = normalizePlaybackArtifact(source, mediaKind, options);
+      return artifact ? { kind: mediaKind, artifact } : null;
+    }
   }
 
   const embed = normalizeEmbedArtifact(source);
   return embed ? { kind: 'embed', artifact: embed } : null;
 }
 
-function normalizeImageArtifact(raw: unknown): ImageArtifact | null {
+function normalizeImageArtifact(raw: unknown, options: ArtifactParseOptions = {}): ImageArtifact | null {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
   const source = raw as Record<string, unknown>;
-  const url = cleanArtifactUrl(source.url ?? source.src ?? source.href);
+  const url = cleanArtifactUrl(source.url ?? source.src ?? source.href, options);
   if (!url) return null;
-  return {
-    alt: typeof source.alt === 'string' && source.alt.trim()
-      ? source.alt.trim()
-      : typeof source.title === 'string' && source.title.trim()
-        ? source.title.trim()
-        : 'Image',
-    url,
-  };
+  const alt = typeof source.alt === 'string' && source.alt.trim()
+    ? source.alt.trim()
+    : typeof source.title === 'string' && source.title.trim()
+      ? source.title.trim()
+      : 'Image';
+  const mediaType = typeof source.mediaType === 'string'
+    ? source.mediaType
+    : typeof source.mimeType === 'string'
+      ? source.mimeType
+      : inferMediaTypeFromUrl(url);
+  return imageArtifactFromUrl(url, alt, mediaType);
 }
 
-function parseHatcherArtifact(rawJson: string): MessagePart | null {
+function normalizePlaybackArtifact(
+  raw: unknown,
+  kind: 'video' | 'audio',
+  options: ArtifactParseOptions = {},
+): PlaybackArtifact | null {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+  const source = raw as Record<string, unknown>;
+  const url = cleanArtifactUrl(source.url ?? source.src ?? source.href, options);
+  if (!url) return null;
+  const mediaType = typeof source.mediaType === 'string'
+    ? source.mediaType
+    : typeof source.mimeType === 'string'
+      ? source.mimeType
+      : inferMediaTypeFromUrl(url);
+  const title = typeof source.title === 'string' && source.title.trim()
+    ? source.title.trim()
+    : typeof source.alt === 'string' && source.alt.trim()
+      ? source.alt.trim()
+      : kind === 'video' ? 'Video' : 'Audio';
+  return playbackArtifactFromUrl(url, title, mediaType);
+}
+
+function parseHatcherArtifact(rawJson: string, options: ArtifactParseOptions = {}): MessagePart | null {
   let parsed: unknown;
   try {
     parsed = JSON.parse(rawJson);
@@ -551,12 +785,16 @@ function parseHatcherArtifact(rawJson: string): MessagePart | null {
     return artifact ? { kind: 'code', artifact } : null;
   }
   if (kind === 'file' || kind === 'document' || kind === 'attachment') {
-    const artifact = normalizeFileArtifact(source);
-    return artifact ? { kind: 'file', artifact } : null;
+    const artifact = normalizeFileArtifact(source, options);
+    return artifact ? (mediaPartFromFileArtifact(artifact) ?? { kind: 'file', artifact }) : null;
   }
   if (kind === 'image') {
-    const artifact = normalizeImageArtifact(source);
+    const artifact = normalizeImageArtifact(source, options);
     return artifact ? { kind: 'image', artifact } : null;
+  }
+  if (kind === 'video' || kind === 'audio') {
+    const artifact = normalizePlaybackArtifact(source, kind, options);
+    return artifact ? { kind, artifact } : null;
   }
   if (kind === 'embed' || kind === 'iframe' || kind === 'chart_embed' || kind === 'chart-embed') {
     const artifact = normalizeEmbedArtifact(source);
@@ -572,8 +810,8 @@ function parseHatcherArtifact(rawJson: string): MessagePart | null {
       || typeof source.path === 'string'
     )
   ) {
-    const artifact = normalizeFileArtifact(source);
-    return artifact ? { kind: 'file', artifact } : null;
+    const artifact = normalizeFileArtifact(source, options);
+    return artifact ? (mediaPartFromFileArtifact(artifact) ?? { kind: 'file', artifact }) : null;
   }
 
   const chart = normalizeChartArtifact(source);
@@ -710,7 +948,7 @@ function formatFileSize(sizeBytes?: number): string | null {
   return `${(sizeBytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function splitMessageArtifacts(content: string): MessagePart[] {
+export function splitMessageArtifacts(content: string, options: ArtifactParseOptions = {}): MessagePart[] {
   const parts: MessagePart[] = [];
   let lastIndex = 0;
 
@@ -724,7 +962,7 @@ export function splitMessageArtifacts(content: string): MessagePart[] {
     const fenceType = fenceInfo.split(/\s+/)[0]?.toLowerCase() ?? '';
     const fenceBody = match[2] ?? '';
     const imageAlt = match[3];
-    const imageUrl = cleanArtifactUrl(match[4]);
+    const imageUrl = cleanArtifactUrl(match[4], options);
     const fileUrl = match[5];
     const iframeUrl = match[6];
     const beforeContext = content.slice(Math.max(0, index - 800), index);
@@ -734,19 +972,14 @@ export function splitMessageArtifacts(content: string): MessagePart[] {
     );
 
     if (fenceType === 'hatcher-file' || fenceType === 'file') {
-      const artifact = parseFile(fenceBody);
+      const artifact = parseFile(fenceBody, options);
       if (artifact) {
-        const imageUrl = artifact.mediaType?.startsWith('image/') ? fileDownloadHref(artifact) : null;
-        if (imageUrl) {
-          parts.push({ kind: 'image', artifact: { alt: artifact.title, url: imageUrl } });
-        } else {
-          parts.push({ kind: 'file', artifact });
-        }
+        parts.push(mediaPartFromFileArtifact(artifact) ?? { kind: 'file', artifact });
       } else {
         parts.push({ kind: 'markdown', content: match[0] });
       }
     } else if (fenceType === 'hatcher-artifact' || fenceType === 'hatcher_artifact' || fenceType === 'artifact') {
-      const part = parseHatcherArtifact(fenceBody);
+      const part = parseHatcherArtifact(fenceBody, options);
       if (part) {
         parts.push(part);
       } else {
@@ -767,7 +1000,7 @@ export function splitMessageArtifacts(content: string): MessagePart[] {
       || fenceType === 'embed'
       || fenceType === 'iframe'
     ) {
-      const part = parseEmbedPart(fenceBody);
+      const part = parseEmbedPart(fenceBody, options);
       if (part) {
         parts.push(part);
       } else {
@@ -777,7 +1010,7 @@ export function splitMessageArtifacts(content: string): MessagePart[] {
       const htmlEmbedArtifact = fenceType === 'html' ? parseEmbed(fenceBody) : null;
       const genericArtifact = htmlEmbedArtifact
         ? { kind: 'embed' as const, artifact: htmlEmbedArtifact }
-        : fenceType === 'json' ? parseHatcherArtifact(fenceBody) : null;
+        : fenceType === 'json' ? parseHatcherArtifact(fenceBody, options) : null;
       if (genericArtifact?.kind === 'file' && isDuplicateFileSpec(parts, genericArtifact.artifact)) {
         trimTrailingDownloadIntro(parts);
       } else if (genericArtifact) {
@@ -794,11 +1027,25 @@ export function splitMessageArtifacts(content: string): MessagePart[] {
         }
       }
     } else if (imageUrl) {
-      parts.push({ kind: 'image', artifact: { alt: imageAlt || 'Image', url: imageUrl } });
+      const mediaType = inferMediaTypeFromUrl(imageUrl);
+      const mediaKind = mediaKindFromUrlOrType(imageUrl, mediaType);
+      if (mediaKind === 'video') {
+        parts.push({
+          kind: 'video',
+          artifact: playbackArtifactFromUrl(imageUrl, imageAlt || 'Video', mediaType),
+        });
+      } else if (mediaKind === 'audio') {
+        parts.push({
+          kind: 'audio',
+          artifact: playbackArtifactFromUrl(imageUrl, imageAlt || 'Audio', mediaType),
+        });
+      } else {
+        parts.push({ kind: 'image', artifact: imageArtifactFromUrl(imageUrl, imageAlt || 'Image', mediaType) });
+      }
     } else if (fileUrl) {
-      const artifact = fileArtifactFromUrl(fileUrl);
+      const artifact = fileArtifactFromUrl(fileUrl, options);
       if (artifact) {
-        parts.push({ kind: 'file', artifact });
+        parts.push(mediaPartFromFileArtifact(artifact) ?? { kind: 'file', artifact });
       } else {
         parts.push({ kind: 'markdown', content: match[0] });
       }
@@ -822,15 +1069,27 @@ export function splitMessageArtifacts(content: string): MessagePart[] {
   return parts.length > 0 ? parts : [{ kind: 'markdown', content }];
 }
 
-export const RichMarkdown = memo(function RichMarkdown({ content }: { content: string }) {
+export const RichMarkdown = memo(function RichMarkdown({
+  content,
+  agentId,
+}: {
+  content: string;
+  agentId?: string;
+}) {
   return (
     <>
-      {splitMessageArtifacts(content).map((part, index) => {
+      {splitMessageArtifacts(content, { agentId }).map((part, index) => {
         if (part.kind === 'chart') {
           return <ChartArtifactView key={`chart-${index}`} artifact={part.artifact} />;
         }
         if (part.kind === 'image') {
           return <ImageArtifactView key={`image-${index}`} artifact={part.artifact} />;
+        }
+        if (part.kind === 'video') {
+          return <VideoArtifactView key={`video-${index}`} artifact={part.artifact} />;
+        }
+        if (part.kind === 'audio') {
+          return <AudioArtifactView key={`audio-${index}`} artifact={part.artifact} />;
         }
         if (part.kind === 'file') {
           return <FileArtifactView key={`file-${index}`} artifact={part.artifact} />;
@@ -851,8 +1110,32 @@ function makeDataUrl(content: string, mediaType = 'text/plain'): string {
   return `data:${mediaType};charset=utf-8,${encodeURIComponent(content)}`;
 }
 
+function useMeasuredWidth(minWidth = 260) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const update = () => {
+      const nextWidth = Math.floor(element.getBoundingClientRect().width);
+      if (nextWidth > 0) {
+        setWidth(Math.max(minWidth, nextWidth));
+      }
+    };
+
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [minWidth]);
+
+  return { ref, width };
+}
+
 function fileDownloadHref(artifact: FileArtifact): string | null {
-  if (artifact.url) return artifact.url;
+  if (artifact.url) return artifact.downloadUrl ?? artifactDownloadUrl(artifact.url, artifact.filename);
   if (artifact.content === undefined) return null;
   return makeDataUrl(artifact.content, artifact.mediaType ?? 'text/plain');
 }
@@ -878,28 +1161,61 @@ function chartToCsv(artifact: ChartArtifact): string {
   ].join('\n');
 }
 
+export function chartValueDomain(data: ChartDatum[], yKey: string): [number, number] {
+  const values = data
+    .map((row) => row[yKey])
+    .filter((value): value is number => typeof value === 'number' && Number.isFinite(value));
+  if (values.length === 0) return [0, 1];
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  if (min === max) {
+    const pad = Math.max(Math.abs(min) * 0.08, 1);
+    return [min >= 0 ? Math.max(0, min - pad) : min - pad, max + pad];
+  }
+  const pad = (max - min) * 0.12;
+  const lower = min >= 0 ? Math.max(0, min - pad) : min - pad;
+  return [lower, max + pad];
+}
+
+function formatChartTick(value: unknown): string {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return String(value ?? '');
+  const abs = Math.abs(value);
+  if (abs > 0 && abs < 0.01) return value.toPrecision(3);
+  if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (abs >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+  return Number.isInteger(value) ? String(value) : value.toFixed(abs < 1 ? 4 : 2).replace(/\.?0+$/, '');
+}
+
 const ChartArtifactView = memo(function ChartArtifactView({ artifact }: { artifact: ChartArtifact }) {
   const baseName = slugifyFilename(artifact.title ?? 'chart');
   const jsonHref = makeDataUrl(JSON.stringify(artifact, null, 2), 'application/json');
   const csvHref = makeDataUrl(chartToCsv(artifact), 'text/csv');
+  const lineDomain = chartValueDomain(artifact.data, artifact.yKey);
+  const chart = useMeasuredWidth();
+  const chartHeight = 224;
 
   return (
     <div className="my-3 min-w-[260px] max-w-full rounded-lg border border-white/10 bg-black/20 p-3 sm:w-[min(100%,720px)]">
       {artifact.title && (
         <div className="mb-2 text-xs font-semibold text-[var(--text-secondary)]">{artifact.title}</div>
       )}
-      <div className="h-56 w-full min-w-[260px]">
-        <ResponsiveContainer width="100%" height="100%" minWidth={260} minHeight={224}>
-          {artifact.type === 'line' ? (
-            <LineChart data={artifact.data}>
+      <div ref={chart.ref} className="h-56 w-full min-w-[260px]">
+        {chart.width > 0 && (
+          artifact.type === 'line' ? (
+            <LineChart data={artifact.data} width={chart.width} height={chartHeight}>
               <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
               <XAxis dataKey={artifact.xKey} tick={{ fill: '#a1a1aa', fontSize: 10 }} />
-              <YAxis tick={{ fill: '#a1a1aa', fontSize: 10 }} width={36} />
+              <YAxis
+                tick={{ fill: '#a1a1aa', fontSize: 10 }}
+                tickFormatter={formatChartTick}
+                width={52}
+                domain={lineDomain}
+              />
               <Tooltip contentStyle={{ background: '#101014', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6 }} />
-              <Line type="monotone" dataKey={artifact.yKey} stroke={COLORS[0]} strokeWidth={2} dot={{ r: 3 }} />
+              <Line type="monotone" dataKey={artifact.yKey} stroke={COLORS[0]} strokeWidth={2.25} dot={{ r: 3 }} activeDot={{ r: 4 }} />
             </LineChart>
           ) : artifact.type === 'pie' ? (
-            <PieChart>
+            <PieChart width={chart.width} height={chartHeight}>
               <Tooltip contentStyle={{ background: '#101014', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6 }} />
               <Pie data={artifact.data} dataKey={artifact.yKey} nameKey={artifact.xKey} outerRadius={78} innerRadius={38} paddingAngle={2}>
                 {artifact.data.map((_, index) => (
@@ -908,7 +1224,7 @@ const ChartArtifactView = memo(function ChartArtifactView({ artifact }: { artifa
               </Pie>
             </PieChart>
           ) : (
-            <BarChart data={artifact.data}>
+            <BarChart data={artifact.data} width={chart.width} height={chartHeight}>
               <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
               <XAxis dataKey={artifact.xKey} tick={{ fill: '#a1a1aa', fontSize: 10 }} />
               <YAxis tick={{ fill: '#a1a1aa', fontSize: 10 }} width={36} />
@@ -919,8 +1235,8 @@ const ChartArtifactView = memo(function ChartArtifactView({ artifact }: { artifa
                 ))}
               </Bar>
             </BarChart>
-          )}
-        </ResponsiveContainer>
+          )
+        )}
       </div>
       <div className="mt-3 flex items-center justify-end gap-2 border-t border-white/10 pt-2">
         <a
@@ -983,13 +1299,68 @@ const ImageArtifactView = memo(function ImageArtifactView({ artifact }: { artifa
         className="max-h-72 w-full object-contain bg-black/30"
         loading="lazy"
       />
-      {artifact.alt && (
-        <figcaption className="flex items-center gap-2 border-t border-white/10 px-3 py-2 text-xs text-[var(--text-muted)]">
-          <ImageIcon size={13} />
-          <span className="truncate">{artifact.alt}</span>
-        </figcaption>
-      )}
+      <figcaption className="flex items-center gap-2 border-t border-white/10 px-3 py-2 text-xs text-[var(--text-muted)]">
+        {artifact.alt && (
+          <>
+            <ImageIcon size={13} />
+            <span className="min-w-0 flex-1 truncate">{artifact.alt}</span>
+          </>
+        )}
+        <a
+          href={artifact.downloadUrl}
+          download={artifact.filename}
+          className="ml-auto inline-flex flex-none items-center gap-1 rounded-md px-1.5 py-1 text-[11px] text-[var(--color-accent)] no-underline hover:bg-white/5"
+        >
+          <Download size={13} />
+          Download
+        </a>
+      </figcaption>
     </figure>
+  );
+});
+
+const VideoArtifactView = memo(function VideoArtifactView({ artifact }: { artifact: PlaybackArtifact }) {
+  return (
+    <figure className="my-3 w-full overflow-hidden rounded-lg border border-white/10 bg-black/20 sm:w-[min(100%,900px)]">
+      <video
+        src={artifact.url}
+        className="aspect-video min-h-[220px] max-h-[440px] w-full bg-black object-contain"
+        controls
+        preload="metadata"
+      />
+      <figcaption className="flex items-center gap-2 border-t border-white/10 px-3 py-2 text-xs text-[var(--text-muted)]">
+        <FileText size={13} />
+        <span className="min-w-0 flex-1 truncate">{artifact.title}</span>
+        <a
+          href={artifact.downloadUrl}
+          download={artifact.filename}
+          className="ml-auto inline-flex flex-none items-center gap-1 rounded-md px-1.5 py-1 text-[11px] text-[var(--color-accent)] no-underline hover:bg-white/5"
+        >
+          <Download size={13} />
+          Download
+        </a>
+      </figcaption>
+    </figure>
+  );
+});
+
+const AudioArtifactView = memo(function AudioArtifactView({ artifact }: { artifact: PlaybackArtifact }) {
+  return (
+    <div className="my-3 overflow-hidden rounded-lg border border-white/10 bg-black/20 p-3">
+      <div className="mb-2 flex items-center gap-2 text-xs text-[var(--text-muted)]">
+        <FileText size={13} />
+        <span className="min-w-0 flex-1 truncate">{artifact.title}</span>
+        <a
+          href={artifact.downloadUrl}
+          download={artifact.filename}
+          className="inline-flex flex-none items-center gap-1 rounded-md px-1.5 py-1 text-[11px] text-[var(--color-accent)] no-underline hover:bg-white/5"
+        >
+          <Download size={13} />
+          Download
+        </a>
+      </div>
+      <audio src={artifact.url} className="w-full" controls preload="metadata" />
+    </div>
   );
 });
 
@@ -1072,12 +1443,10 @@ const FileArtifactView = memo(function FileArtifactView({ artifact }: { artifact
   const size = formatFileSize(artifact.sizeBytes);
   const href = fileDownloadHref(artifact);
   if (!href) return null;
-  const external = Boolean(artifact.url);
   return (
     <a
       href={href}
       download={artifact.filename}
-      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
       className="my-3 flex min-w-[240px] max-w-full items-center gap-3 rounded-lg border border-white/10 bg-black/20 p-3 text-left no-underline transition-colors hover:border-[var(--color-accent)]/40 hover:bg-black/30"
     >
       <span className="flex h-9 w-9 flex-none items-center justify-center rounded-md border border-white/10 bg-white/5 text-[var(--color-accent)]">
@@ -1093,7 +1462,6 @@ const FileArtifactView = memo(function FileArtifactView({ artifact }: { artifact
       </span>
       <span className="flex flex-none items-center gap-1 text-xs text-[var(--color-accent)]">
         <Download size={14} />
-        {external && <ExternalLink size={13} />}
       </span>
     </a>
   );

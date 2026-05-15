@@ -2,7 +2,7 @@
 
 import { type RefObject, useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { Send, Mic, MicOff, Terminal, Paperclip, X, Loader2, FileText, Zap } from 'lucide-react';
+import { Send, Mic, MicOff, Terminal, Paperclip, X, Loader2, FileText, Zap, ImagePlus, BarChart3, Code2, WandSparkles, Video, AudioLines } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { GlassCard } from '../../AgentContext';
 
@@ -85,6 +85,7 @@ export function ChatInput({
   const t = useTranslations('dashboard.agentDetail.chat');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [artifactMenuOpen, setArtifactMenuOpen] = useState(false);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -130,6 +131,13 @@ export function ChatInput({
     setSlashIndex(0);
     inputRef.current?.focus();
   }, [setInput, inputRef]);
+
+  const insertArtifactPrompt = useCallback((prompt: string) => {
+    const current = input.trim();
+    setInput(current ? `${current}\n\n${prompt}` : prompt);
+    setArtifactMenuOpen(false);
+    window.setTimeout(() => inputRef.current?.focus(), 20);
+  }, [input, inputRef, setInput]);
 
   const handleSlashKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -333,6 +341,59 @@ export function ChatInput({
         {/* Attach button — uploads to the agent's knowledge/ dir via
             POST /agents/:id/knowledge. Accepts any file type; the
             backend caps payload size and the chip row surfaces errors. */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setArtifactMenuOpen((v) => !v)}
+            className="h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] border border-transparent hover:border-[var(--text-muted)]/30"
+            title="Request artifact"
+            aria-label="Request artifact"
+            aria-haspopup="menu"
+            aria-expanded={artifactMenuOpen}
+            disabled={inputDisabled}
+          >
+            <WandSparkles size={15} className="text-[var(--text-secondary)]" />
+          </button>
+          <AnimatePresence>
+            {artifactMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 6 }}
+                transition={{ duration: 0.15 }}
+                className="absolute bottom-full right-0 z-50 mb-2 w-64 overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-2xl"
+                role="menu"
+              >
+                {[
+                  { label: 'Image', icon: ImagePlus, prompt: 'Create an image artifact: ' },
+                  { label: 'Video', icon: Video, prompt: 'Create a video artifact: ' },
+                  { label: 'Audio', icon: AudioLines, prompt: 'Create an audio artifact: ' },
+                  { label: 'Chart', icon: BarChart3, prompt: 'Create a chart artifact from this data: ' },
+                  { label: 'Document', icon: FileText, prompt: 'Create a downloadable document artifact: ' },
+                  { label: 'Code', icon: Code2, prompt: 'Create a code artifact: ' },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.label}
+                      type="button"
+                      role="menuitem"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        insertArtifactPrompt(item.prompt);
+                      }}
+                      className="flex w-full items-center gap-3 px-3.5 py-2.5 text-left text-sm text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"
+                    >
+                      <Icon size={15} className="text-[var(--color-accent)]" />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
