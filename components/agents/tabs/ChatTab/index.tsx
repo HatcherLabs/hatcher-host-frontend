@@ -167,7 +167,9 @@ export function ChatTab() {
   const visibleMessages = useMemo(() => messages.slice(windowStart), [messages, windowStart]);
   const hasMore = windowStart > 0;
 
-  const voice = useVoice();
+  const [voiceCallMode, setVoiceCallMode] = useState(false);
+  const previousAutoSpeakRef = useRef(false);
+  const voice = useVoice(agent.id, { preferGeneratedSpeech: voiceCallMode });
 
   // Reset extra-loaded window when switching agents
   useEffect(() => { setExtraLoaded(0); }, [agent.id]);
@@ -257,7 +259,6 @@ export function ChatTab() {
   }, [voice]);
 
   const hasVoiceSupport = voice.sttSupported || voice.ttsSupported;
-  const [voiceCallMode, setVoiceCallMode] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
   const callTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -290,8 +291,9 @@ export function ChatTab() {
   }, [voiceCallMode]);
 
   const startVoiceCall = useCallback(() => {
+    previousAutoSpeakRef.current = voice.autoSpeak;
+    voice.setAutoSpeakEnabled(true);
     setVoiceCallMode(true);
-    voice.toggleAutoSpeak();
     voice.startListening((finalText: string) => {
       if (finalText.trim()) sendMessage(finalText.trim());
     });
@@ -299,6 +301,7 @@ export function ChatTab() {
 
   const endVoiceCall = useCallback(() => {
     setVoiceCallMode(false);
+    voice.setAutoSpeakEnabled(previousAutoSpeakRef.current);
     voice.stopListening();
     voice.stopSpeaking();
   }, [voice]);
@@ -319,7 +322,14 @@ export function ChatTab() {
   }
 
   return (
-    <motion.div key="tab-chat" className="flex w-full min-w-0 flex-col" style={{ height: 'calc(100dvh - 280px)', minHeight: '300px' }} variants={tabContentVariants} initial="enter" animate="center" exit="exit">
+    <motion.div
+      key="tab-chat"
+      className="flex h-[calc(100dvh-205px)] min-h-[500px] w-full min-w-0 flex-col 2xl:h-[calc(100dvh-185px)] 2xl:min-h-[620px]"
+      variants={tabContentVariants}
+      initial="enter"
+      animate="center"
+      exit="exit"
+    >
       <ChatHeader
         agent={agent}
         wsConnected={wsConnected}

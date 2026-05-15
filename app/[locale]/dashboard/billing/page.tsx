@@ -16,6 +16,19 @@ import { ConfirmPaymentModal } from '@/components/payments/ConfirmPaymentModal';
 import { formatFeatureKey } from '@/lib/feature-labels';
 import { payWithSolanaX402 } from '@/lib/solana-x402-client';
 import {
+  createPendingCryptoSettlement,
+  hasPendingCryptoSettlement,
+  markPendingCryptoSettlementFailure,
+  readPendingCryptoSettlements,
+  removePendingCryptoSettlement,
+  settlePendingCryptoPayment,
+  shouldDropPendingCryptoSettlement,
+  upsertPendingCryptoSettlement,
+  type PendingCryptoSettlement,
+  type PendingPaymentFlow,
+  type PendingPaymentRail,
+} from '@/lib/crypto-settlements';
+import {
   ArrowRight,
   ArrowUpRight,
   Check,
@@ -359,7 +372,7 @@ export default function BillingPage() {
     kind.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
   const formatTokenCount = (value?: number | null) =>
     typeof value === 'number' && value > 0 ? value.toLocaleString() : '0';
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const searchParams = useSearchParams();
   const {
     confirmState, closeConfirm, driveSol, driveUsdc, driveHatch,
@@ -423,10 +436,10 @@ export default function BillingPage() {
   const [paymentLoading, setPaymentLoading] = useState(false);
 
 
-  const showSuccess = (msg: string) => {
+  const showSuccess = useCallback((msg: string) => {
     setSuccessMsg(msg);
     setTimeout(() => setSuccessMsg(null), 6000);
-  };
+  }, []);
 
   /**
    * Wrap a caught error into a user-facing message, but swallow the
@@ -475,7 +488,7 @@ export default function BillingPage() {
       setError(t('canceledPayment'));
       window.history.replaceState({}, '', '/dashboard/billing');
     }
-  }, [searchParams, t]);
+  }, [searchParams, showSuccess, t]);
 
   // Full reload after any payment — mirrors the initial-load fetches so
   // the page never shows stale data (credit balance, payment history,
@@ -500,6 +513,92 @@ export default function BillingPage() {
       setUserAgents(agents.map(a => ({ id: a.id, name: a.name })));
     }
   }, []);
+
+  const registerPendingCryptoPayment = (
+    rail: PendingPaymentRail,
+    flow: PendingPaymentFlow,
+    targetKey: string,
+    period: 'monthly' | 'annual',
+    amountUsd: number,
+    txSignature: string,
+    agentId?: string,
+  ): PendingCryptoSettlement => {
+    const pending = createPendingCryptoSettlement({
+      rail,
+      flow,
+      targetKey,
+      billingPeriod: period,
+      amountUsd,
+      txSignature,
+      ...(user?.id ? { userId: user.id } : {}),
+      ...(agentId ? { agentId } : {}),
+    });
+    upsertPendingCryptoSettlement(pending);
+    logCryptoPaymentIntent(rail, flow, targetKey, period, amountUsd, agentId, 'wallet_confirmed', txSignature);
+    return pending;
+  };
+
+  const finalizePendingCryptoPayment = useCallback(async (
+    pending: PendingCryptoSettlement,
+    options: {
+      successMessage?: string;
+      pendingMessage?: string;
+      suppressFailureMessage?: boolean;
+    } = {},
+  ): Promise<boolean> => {
+    if (!hasPendingCryptoSettlement(pending.id, pending.userId)) {
+      await loadAccountData();
+      return true;
+    }
+
+    const result = await settlePendingCryptoPayment(pending);
+    if (result.success) {
+      removePendingCryptoSettlement(pending.id);
+      await loadAccountData();
+      if (options.successMessage) showSuccess(options.successMessage);
+      return true;
+    }
+
+    if (shouldDropPendingCryptoSettlement(result.error)) {
+      removePendingCryptoSettlement(pending.id);
+      await loadAccountData();
+      if (options.successMessage) showSuccess(options.successMessage);
+      return true;
+    }
+
+    markPendingCryptoSettlementFailure(pending, result.error);
+    if (!options.suppressFailureMessage) {
+      if (/Transaction not found|timed out|Network error|Rate limit/i.test(result.error)) {
+        showSuccess(options.pendingMessage ?? 'Payment submitted on-chain. Finalizing automatically.');
+      } else {
+        setError(result.error);
+      }
+    }
+    return false;
+  }, [loadAccountData, showSuccess]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return;
+    let cancelled = false;
+
+    const retryPending = async () => {
+      const pendingItems = readPendingCryptoSettlements(user.id);
+      for (const pending of pendingItems) {
+        if (cancelled) break;
+        await finalizePendingCryptoPayment(pending, {
+          successMessage: 'On-chain payment finalized. Billing has been updated.',
+          suppressFailureMessage: true,
+        });
+      }
+    };
+
+    void retryPending();
+    const interval = window.setInterval(() => void retryPending(), 15_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [finalizePendingCryptoPayment, isAuthenticated, user?.id]);
 
   // Initial load
   useEffect(() => {
@@ -589,24 +688,32 @@ export default function BillingPage() {
     setSubscribing(tierKey);
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    let pending: PendingCryptoSettlement | null = null;
     try {
       logCryptoPaymentIntent('sol', 'tier', tierKey, period, price);
-      const txSignature = await driveSol(price, `Subscribe to ${tierConfig.name}${period === 'annual' ? ' (annual)' : ''}`);
-      logCryptoPaymentIntent('sol', 'tier', tierKey, period, price, undefined, 'wallet_confirmed', txSignature);
-      const res = await api.subscribe(tierKey, txSignature, 'sol', period);
-      if (res.success) {
-        await loadAccountData();
-        const credit = res.data?.proratedAiCredits ?? 0;
-        showSuccess(
-          credit > 0
-            ? `Subscribed to ${tierConfig.name}! ${credit.toLocaleString()} AI Credits added for your unused days.`
-            : `Subscribed to ${tierConfig.name}!`,
-        );
-      } else {
-        setError(res.error ?? 'Subscription failed');
-      }
+      const txSignature = await driveSol(
+        price,
+        `Subscribe to ${tierConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
+        {
+          onSignature: (signature) => {
+            pending = registerPendingCryptoPayment('sol', 'tier', tierKey, period, price, signature);
+          },
+        },
+      );
+      pending = pending ?? registerPendingCryptoPayment('sol', 'tier', tierKey, period, price, txSignature);
+      await finalizePendingCryptoPayment(pending, {
+        successMessage: `Subscribed to ${tierConfig.name}!`,
+        pendingMessage: 'Payment submitted on-chain. Tier activation will retry automatically.',
+      });
     } catch (err) {
-      reportCatch(err, 'Subscription failed');
+      if (pending) {
+        await finalizePendingCryptoPayment(pending, {
+          successMessage: `Subscribed to ${tierConfig.name}!`,
+          pendingMessage: 'Payment submitted on-chain. Tier activation will retry automatically.',
+        });
+      } else {
+        reportCatch(err, 'Subscription failed');
+      }
     } finally {
       setSubscribing(null);
       setPaymentLoading(false);
@@ -624,23 +731,32 @@ export default function BillingPage() {
     setSubscribing(tierKey);
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    let pending: PendingCryptoSettlement | null = null;
     try {
       logCryptoPaymentIntent('hatch', 'tier', tierKey, period, price);
-      const txSignature = await driveHatch(price, `Subscribe to ${tierConfig.name}${period === 'annual' ? ' (annual)' : ''}`);
-      logCryptoPaymentIntent('hatch', 'tier', tierKey, period, price, undefined, 'wallet_confirmed', txSignature);
-      const res = await api.subscribe(tierKey, txSignature, 'hatch', period);
-      if (res.success) {
-        await loadAccountData();
-        showSuccess(
-          (res.data?.proratedAiCredits ?? 0) > 0
-            ? `Subscribed to ${tierConfig.name} with $HATCHER! ${(res.data!.proratedAiCredits).toLocaleString()} AI Credits added for your unused days.`
-            : `Subscribed to ${tierConfig.name} with $HATCHER!`,
-        );
-      } else {
-        setError(res.error ?? 'Subscription failed');
-      }
+      const txSignature = await driveHatch(
+        price,
+        `Subscribe to ${tierConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
+        {
+          onSignature: (signature) => {
+            pending = registerPendingCryptoPayment('hatch', 'tier', tierKey, period, price, signature);
+          },
+        },
+      );
+      pending = pending ?? registerPendingCryptoPayment('hatch', 'tier', tierKey, period, price, txSignature);
+      await finalizePendingCryptoPayment(pending, {
+        successMessage: `Subscribed to ${tierConfig.name} with $HATCHER!`,
+        pendingMessage: 'Payment submitted on-chain. Tier activation will retry automatically.',
+      });
     } catch (err) {
-      reportCatch(err, 'Subscription failed');
+      if (pending) {
+        await finalizePendingCryptoPayment(pending, {
+          successMessage: `Subscribed to ${tierConfig.name} with $HATCHER!`,
+          pendingMessage: 'Payment submitted on-chain. Tier activation will retry automatically.',
+        });
+      } else {
+        reportCatch(err, 'Subscription failed');
+      }
     } finally {
       setSubscribing(null);
       setPaymentLoading(false);
@@ -658,12 +774,20 @@ export default function BillingPage() {
     setSubscribing(tierKey);
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    let pending: PendingCryptoSettlement | null = null;
     try {
       logCryptoPaymentIntent('usdc', 'tier', tierKey, period, price);
       const result = await payWithSolanaX402(
         { kind: 'tier', key: tierKey, billingPeriod: period },
         driveUsdc,
+        {
+          onSignature: (signature) => {
+            pending = registerPendingCryptoPayment('usdc', 'tier', tierKey, period, price, signature);
+          },
+        },
       );
+      const settledPending = pending as PendingCryptoSettlement | null;
+      if (settledPending) removePendingCryptoSettlement(settledPending.id);
       await loadAccountData();
       const credit = (result as { proratedAiCredits?: number; proratedCredit?: number }).proratedAiCredits ?? result.proratedCredit ?? 0;
       showSuccess(
@@ -672,7 +796,14 @@ export default function BillingPage() {
           : `Subscribed to ${tierConfig.name} with USDC on Solana!`,
       );
     } catch (err) {
-      reportCatch(err, 'Subscription failed');
+      if (pending) {
+        await finalizePendingCryptoPayment(pending, {
+          successMessage: `Subscribed to ${tierConfig.name} with USDC on Solana!`,
+          pendingMessage: 'Payment submitted on-chain. Tier activation will retry automatically.',
+        });
+      } else {
+        reportCatch(err, 'Subscription failed');
+      }
     } finally {
       setSubscribing(null);
       setPaymentLoading(false);
@@ -730,19 +861,32 @@ export default function BillingPage() {
     setPurchasingAddon(addonKey);
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    let pending: PendingCryptoSettlement | null = null;
     try {
       logCryptoPaymentIntent('sol', 'addon', addonKey, period, price, selectedAgentId ?? undefined);
-      const txSignature = await driveSol(price, `${addonConfig.name}${period === 'annual' ? ' (annual)' : ''}`);
-      logCryptoPaymentIntent('sol', 'addon', addonKey, period, price, selectedAgentId ?? undefined, 'wallet_confirmed', txSignature);
-      const res = await api.purchaseAddon(addonKey, txSignature, selectedAgentId ?? undefined, 'sol', period);
-      if (res.success) {
-        await loadAccountData();
-        showSuccess(`${addonConfig.name} purchased!`);
-      } else {
-        setError(res.error ?? 'Purchase failed');
-      }
+      const txSignature = await driveSol(
+        price,
+        `${addonConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
+        {
+          onSignature: (signature) => {
+            pending = registerPendingCryptoPayment('sol', 'addon', addonKey, period, price, signature, selectedAgentId ?? undefined);
+          },
+        },
+      );
+      pending = pending ?? registerPendingCryptoPayment('sol', 'addon', addonKey, period, price, txSignature, selectedAgentId ?? undefined);
+      await finalizePendingCryptoPayment(pending, {
+        successMessage: `${addonConfig.name} purchased!`,
+        pendingMessage: 'Payment submitted on-chain. Add-on activation will retry automatically.',
+      });
     } catch (err) {
-      reportCatch(err, 'Purchase failed');
+      if (pending) {
+        await finalizePendingCryptoPayment(pending, {
+          successMessage: `${addonConfig.name} purchased!`,
+          pendingMessage: 'Payment submitted on-chain. Add-on activation will retry automatically.',
+        });
+      } else {
+        reportCatch(err, 'Purchase failed');
+      }
     } finally {
       setPurchasingAddon(null);
       setPaymentLoading(false);
@@ -762,19 +906,32 @@ export default function BillingPage() {
     setPurchasingAddon(addonKey);
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    let pending: PendingCryptoSettlement | null = null;
     try {
       logCryptoPaymentIntent('hatch', 'addon', addonKey, period, price, selectedAgentId ?? undefined);
-      const txSignature = await driveHatch(price, `${addonConfig.name}${period === 'annual' ? ' (annual)' : ''}`);
-      logCryptoPaymentIntent('hatch', 'addon', addonKey, period, price, selectedAgentId ?? undefined, 'wallet_confirmed', txSignature);
-      const res = await api.purchaseAddon(addonKey, txSignature, selectedAgentId ?? undefined, 'hatch', period);
-      if (res.success) {
-        await loadAccountData();
-        showSuccess(`${addonConfig.name} purchased with $HATCHER!`);
-      } else {
-        setError(res.error ?? 'Purchase failed');
-      }
+      const txSignature = await driveHatch(
+        price,
+        `${addonConfig.name}${period === 'annual' ? ' (annual)' : ''}`,
+        {
+          onSignature: (signature) => {
+            pending = registerPendingCryptoPayment('hatch', 'addon', addonKey, period, price, signature, selectedAgentId ?? undefined);
+          },
+        },
+      );
+      pending = pending ?? registerPendingCryptoPayment('hatch', 'addon', addonKey, period, price, txSignature, selectedAgentId ?? undefined);
+      await finalizePendingCryptoPayment(pending, {
+        successMessage: `${addonConfig.name} purchased with $HATCHER!`,
+        pendingMessage: 'Payment submitted on-chain. Add-on activation will retry automatically.',
+      });
     } catch (err) {
-      reportCatch(err, 'Purchase failed');
+      if (pending) {
+        await finalizePendingCryptoPayment(pending, {
+          successMessage: `${addonConfig.name} purchased with $HATCHER!`,
+          pendingMessage: 'Payment submitted on-chain. Add-on activation will retry automatically.',
+        });
+      } else {
+        reportCatch(err, 'Purchase failed');
+      }
     } finally {
       setPurchasingAddon(null);
       setPaymentLoading(false);
@@ -794,6 +951,7 @@ export default function BillingPage() {
     setPurchasingAddon(addonKey);
     setError(null);
     setPaymentModal(prev => ({ ...prev, isOpen: false }));
+    let pending: PendingCryptoSettlement | null = null;
     try {
       logCryptoPaymentIntent('usdc', 'addon', addonKey, period, price, selectedAgentId ?? undefined);
       await payWithSolanaX402({
@@ -801,11 +959,24 @@ export default function BillingPage() {
         key: addonKey,
         billingPeriod: period,
         ...(selectedAgentId ? { agentId: selectedAgentId } : {}),
-      }, driveUsdc);
+      }, driveUsdc, {
+        onSignature: (signature) => {
+          pending = registerPendingCryptoPayment('usdc', 'addon', addonKey, period, price, signature, selectedAgentId ?? undefined);
+        },
+      });
+      const settledPending = pending as PendingCryptoSettlement | null;
+      if (settledPending) removePendingCryptoSettlement(settledPending.id);
       await loadAccountData();
       showSuccess(`${addonConfig.name} purchased with USDC on Solana!`);
     } catch (err) {
-      reportCatch(err, 'Purchase failed');
+      if (pending) {
+        await finalizePendingCryptoPayment(pending, {
+          successMessage: `${addonConfig.name} purchased with USDC on Solana!`,
+          pendingMessage: 'Payment submitted on-chain. Add-on activation will retry automatically.',
+        });
+      } else {
+        reportCatch(err, 'Purchase failed');
+      }
     } finally {
       setPurchasingAddon(null);
       setPaymentLoading(false);

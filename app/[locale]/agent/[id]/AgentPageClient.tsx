@@ -402,7 +402,7 @@ function PublicAgentChat({
                   }`}
                 >
                   {message.role === 'assistant' ? (
-                    <RichMarkdown content={message.content} />
+                    <RichMarkdown content={message.content} agentId={agentId} />
                   ) : (
                     <span className="whitespace-pre-wrap">{message.content}</span>
                   )}

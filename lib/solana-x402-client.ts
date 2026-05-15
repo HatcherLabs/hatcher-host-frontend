@@ -56,6 +56,7 @@ export type SolanaUsdcSender = (
   usdAmount: number,
   label: string,
   recipientWallet?: string,
+  options?: { onSignature?: (signature: string) => void },
 ) => Promise<string>;
 
 function rawUsdcToHuman(raw: string, decimals = 6): number {
@@ -69,6 +70,7 @@ function rawUsdcToHuman(raw: string, decimals = 6): number {
 export async function payWithSolanaX402(
   target: PaymentTarget,
   sendUsdc: SolanaUsdcSender,
+  options: { onSignature?: (signature: string) => void } = {},
 ): Promise<SettleResult> {
   const checkoutRes = await fetch(`${API_URL}/payments/solana-x402/checkout`, {
     method: 'POST',
@@ -88,11 +90,20 @@ export async function payWithSolanaX402(
   if (!requirements) throw new Error('Server returned no payment requirements');
 
   const amount = rawUsdcToHuman(requirements.maxAmountRequired, requirements.extra.decimals ?? 6);
-  const txSignature = await sendUsdc(amount, requirements.description, requirements.payTo);
+  const txSignature = await sendUsdc(amount, requirements.description, requirements.payTo, {
+    onSignature: options.onSignature,
+  });
+  return settleSolanaX402Payment(target, txSignature);
+}
+
+export async function settleSolanaX402Payment(
+  target: PaymentTarget,
+  txSignature: string,
+): Promise<SettleResult> {
   const xPayment = base64Encode(JSON.stringify({
     x402Version: 1,
-    scheme: requirements.scheme,
-    network: requirements.network,
+    scheme: 'exact',
+    network: 'solana-mainnet',
     payload: {
       txSignature,
       signature: txSignature,

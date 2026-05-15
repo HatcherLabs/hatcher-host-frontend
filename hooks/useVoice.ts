@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { api } from '@/lib/api';
 
 // Extend Window for vendor-prefixed SpeechRecognition
 interface SpeechRecognitionEvent extends Event {
@@ -76,7 +77,19 @@ function getVoicesReady(): Promise<SpeechSynthesisVoice[]> {
   return voicesReady;
 }
 
-export function useVoice() {
+function cleanSpeechText(text: string): string {
+  return text
+    .replace(/```[\s\S]*?```/g, 'code block')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/#{1,6}\s/g, '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, 'image: $1')
+    .trim();
+}
+
+export function useVoice(agentId?: string, options: { preferGeneratedSpeech?: boolean } = {}) {
   // STT state
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -92,6 +105,21 @@ export function useVoice() {
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onFinalResultRef = useRef<((text: string) => void) | null>(null);
   const resumeTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
+  const speakRunRef = useRef(0);
+
+  const clearAudioPlayback = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = '';
+      audioRef.current = null;
+    }
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = null;
+    }
+  }, []);
 
   // Check browser support on mount + warm up voices
   useEffect(() => {
@@ -99,7 +127,7 @@ export function useVoice() {
     setSttSupported(!!SpeechRecognition);
 
     const hasTTS = 'speechSynthesis' in window;
-    setTtsSupported(hasTTS);
+    setTtsSupported(hasTTS || Boolean(agentId));
 
     // Warm up: trigger voice loading early
     if (hasTTS) {
@@ -128,9 +156,10 @@ export function useVoice() {
         try { recognitionRef.current.abort(); } catch { /* ignore */ }
       }
       if (hasTTS) window.speechSynthesis.cancel();
+      clearAudioPlayback();
       if (resumeTimerRef.current) clearInterval(resumeTimerRef.current);
     };
-  }, []);
+  }, [agentId, clearAudioPlayback]);
 
   const startListening = useCallback((onFinalResult?: (text: string) => void) => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -213,27 +242,65 @@ export function useVoice() {
   }, []);
 
   const speak = useCallback(async (text: string) => {
-    if (!('speechSynthesis' in window)) return;
+    const runId = ++speakRunRef.current;
 
     // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
+    clearAudioPlayback();
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     if (resumeTimerRef.current) {
       clearInterval(resumeTimerRef.current);
       resumeTimerRef.current = null;
     }
 
-    // Strip markdown-like formatting for cleaner speech
-    const cleanText = text
-      .replace(/```[\s\S]*?```/g, 'code block')
-      .replace(/`([^`]+)`/g, '$1')
-      .replace(/\*\*([^*]+)\*\*/g, '$1')
-      .replace(/\*([^*]+)\*/g, '$1')
-      .replace(/#{1,6}\s/g, '')
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-      .replace(/!\[([^\]]*)\]\([^)]+\)/g, 'image: $1')
-      .trim();
+    const cleanText = cleanSpeechText(text);
 
     if (!cleanText) return;
+
+    const hasBrowserTts = 'speechSynthesis' in window;
+    const shouldUseGeneratedSpeech = Boolean(agentId && (options.preferGeneratedSpeech || !hasBrowserTts));
+
+    if (shouldUseGeneratedSpeech && agentId) {
+      setIsSpeaking(true);
+      const result = await api.synthesizeAgentSpeech(agentId, cleanText);
+      if (runId !== speakRunRef.current) return;
+
+      if (result.success) {
+        const audioUrl = URL.createObjectURL(result.data.blob);
+        const audio = new Audio(audioUrl);
+        audioRef.current = audio;
+        audioUrlRef.current = audioUrl;
+        audio.onended = () => {
+          if (runId !== speakRunRef.current) return;
+          clearAudioPlayback();
+          setIsSpeaking(false);
+        };
+        audio.onerror = () => {
+          if (runId !== speakRunRef.current) return;
+          clearAudioPlayback();
+          setIsSpeaking(false);
+        };
+        try {
+          await audio.play();
+          return;
+        } catch (error) {
+          clearAudioPlayback();
+          setIsSpeaking(false);
+          if (!hasBrowserTts) {
+            console.warn('Failed to play generated speech:', error);
+            return;
+          }
+        }
+      } else if (!hasBrowserTts) {
+        console.warn('Generated speech failed:', result.error);
+        setIsSpeaking(false);
+        return;
+      } else {
+        console.warn('Generated speech failed, falling back to browser TTS:', result.error);
+        setIsSpeaking(false);
+      }
+    }
+
+    if (!hasBrowserTts) return;
 
     // Wait for voices to be ready
     const voices = await getVoicesReady();
@@ -295,9 +362,11 @@ export function useVoice() {
         window.speechSynthesis.resume();
       }
     }, 10000);
-  }, []);
+  }, [agentId, clearAudioPlayback, options.preferGeneratedSpeech]);
 
   const stopSpeaking = useCallback(() => {
+    speakRunRef.current += 1;
+    clearAudioPlayback();
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
@@ -306,7 +375,7 @@ export function useVoice() {
       resumeTimerRef.current = null;
     }
     setIsSpeaking(false);
-  }, []);
+  }, [clearAudioPlayback]);
 
   const toggleAutoSpeak = useCallback(() => {
     setAutoSpeak((prev) => {
@@ -314,6 +383,11 @@ export function useVoice() {
       try { localStorage.setItem(LS_AUTO_SPEAK_KEY, String(next)); } catch { /* ignore */ }
       return next;
     });
+  }, []);
+
+  const setAutoSpeakEnabled = useCallback((enabled: boolean) => {
+    setAutoSpeak(enabled);
+    try { localStorage.setItem(LS_AUTO_SPEAK_KEY, String(enabled)); } catch { /* ignore */ }
   }, []);
 
   return {
@@ -331,5 +405,6 @@ export function useVoice() {
     // Auto-speak
     autoSpeak,
     toggleAutoSpeak,
+    setAutoSpeakEnabled,
   };
 }

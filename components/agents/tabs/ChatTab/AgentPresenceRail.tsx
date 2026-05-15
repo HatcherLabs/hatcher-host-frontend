@@ -117,10 +117,10 @@ export function AgentPresenceRail() {
   const MoodIcon = moodMeta.Icon;
 
   return (
-    <aside className="flex w-full shrink-0 flex-col overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)]/60 md:w-72 lg:w-80 2xl:w-96">
+    <aside className="flex w-full shrink-0 flex-col overflow-hidden rounded-lg border border-[var(--border-default)] bg-[var(--bg-elevated)]/60 md:w-72 lg:w-[22rem] 2xl:w-96">
       <div className="border-b border-[var(--border-default)] px-3 py-3 md:px-4 md:py-4">
         <div className="flex gap-3 md:flex-col">
-          <div className="relative h-28 w-28 flex-none overflow-hidden rounded-lg border border-white/10 bg-[radial-gradient(circle_at_50%_20%,rgba(34,211,238,0.14),rgba(0,0,0,0.45)_58%,rgba(0,0,0,0.72))] md:h-72 md:w-full lg:h-[22rem] 2xl:h-96">
+          <div className="relative h-[7.5rem] w-[7.5rem] flex-none overflow-hidden rounded-lg border border-white/10 bg-[radial-gradient(circle_at_50%_20%,rgba(34,211,238,0.14),rgba(0,0,0,0.45)_58%,rgba(0,0,0,0.72))] md:h-[clamp(13rem,28dvh,18rem)] md:w-full">
             <AgentRoomAvatarPreview
               agentId={agent.id}
               framework={agent.framework}
@@ -164,12 +164,12 @@ export function AgentPresenceRail() {
                 <span className="text-[11px] leading-tight text-red-300">{variantError}</span>
               )}
             </label>
-            <div className={`mt-3 rounded-md border px-3 py-2 md:hidden ${moodMeta.className}`}>
-              <div className="flex items-center gap-2 text-xs font-semibold">
+            <div className={`mt-3 rounded-md border px-3 py-2.5 ${moodMeta.className}`}>
+              <div className="flex min-h-5 items-center gap-2 text-xs font-semibold leading-5">
                 <MoodIcon size={14} />
                 {moodMeta.label}
               </div>
-              <div className="mt-1 truncate text-[11px] opacity-80">{moodMeta.detail}</div>
+              <div className="mt-1 min-h-4 truncate text-[11px] leading-4 opacity-80">{moodMeta.detail}</div>
             </div>
           </div>
         </div>
@@ -179,16 +179,6 @@ export function AgentPresenceRail() {
             {agent.description}
           </p>
         )}
-      </div>
-
-      <div className="hidden border-b border-[var(--border-default)] px-4 py-3 md:block">
-        <div className={`rounded-md border px-3 py-2 ${moodMeta.className}`}>
-          <div className="flex items-center gap-2 text-xs font-semibold">
-            <MoodIcon size={14} />
-            {moodMeta.label}
-          </div>
-          <div className="mt-1 truncate text-[11px] opacity-80">{moodMeta.detail}</div>
-        </div>
       </div>
 
       <div className="mt-auto hidden border-t border-[var(--border-default)] px-4 py-3 md:block">

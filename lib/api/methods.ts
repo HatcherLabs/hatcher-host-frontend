@@ -1281,6 +1281,56 @@ export const api = {
       method: 'DELETE',
     }),
 
+  /** Generate speech audio for webchat read-aloud / voice mode. */
+  synthesizeAgentSpeech: async (
+    agentId: string,
+    input: string,
+    options?: { voice?: string; model?: string; responseFormat?: string },
+  ): Promise<
+    | { success: true; data: { blob: Blob; contentType: string; creditsCharged: number | null } }
+    | { success: false; error: string }
+  > => {
+    const token = getToken();
+    try {
+      const res = await fetch(`${API_BASE}/agents/${agentId}/media/speech`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          input,
+          ...(options?.voice ? { voice: options.voice } : {}),
+          ...(options?.model ? { model: options.model } : {}),
+          response_format: options?.responseFormat ?? 'mp3',
+        }),
+      });
+      if (!res.ok) {
+        let message = `Speech request failed with status ${res.status}`;
+        try {
+          const json = await res.json() as { error?: string; message?: string };
+          message = json.error ?? json.message ?? message;
+        } catch {
+          // Keep the status fallback for non-JSON failures.
+        }
+        return { success: false, error: message };
+      }
+      const blob = await res.blob();
+      const credits = Number(res.headers.get('x-hatcher-ai-credits-charged') ?? '');
+      return {
+        success: true,
+        data: {
+          blob,
+          contentType: res.headers.get('content-type') ?? blob.type ?? 'audio/mpeg',
+          creditsCharged: Number.isFinite(credits) ? credits : null,
+        },
+      };
+    } catch (error) {
+      return { success: false, error: error instanceof Error ? error.message : 'Speech request failed' };
+    }
+  },
+
   /** Streaming chat — falls back to non-streaming if stream unavailable */
   chatStream: async (
     agentId: string,

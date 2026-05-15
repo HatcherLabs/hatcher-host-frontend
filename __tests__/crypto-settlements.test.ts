@@ -1,0 +1,78 @@
+import { afterEach, describe, expect, it } from 'vitest';
+import {
+  createPendingCryptoSettlement,
+  hasPendingCryptoSettlement,
+  readPendingCryptoSettlements,
+  removePendingCryptoSettlement,
+  shouldDropPendingCryptoSettlement,
+  upsertPendingCryptoSettlement,
+} from '@/lib/crypto-settlements';
+
+const originalWindow = (globalThis as { window?: unknown }).window;
+
+function installLocalStorage(): void {
+  const values = new Map<string, string>();
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: {
+      localStorage: {
+        getItem: (key: string) => values.get(key) ?? null,
+        setItem: (key: string, value: string) => {
+          values.set(key, value);
+        },
+        removeItem: (key: string) => {
+          values.delete(key);
+        },
+      },
+    },
+  });
+}
+
+afterEach(() => {
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: originalWindow,
+  });
+});
+
+describe('crypto settlement queue', () => {
+  it('keeps pending payments scoped by user without deleting other users', () => {
+    installLocalStorage();
+    const first = createPendingCryptoSettlement({
+      rail: 'hatch',
+      flow: 'tier',
+      targetKey: 'founding_member',
+      billingPeriod: 'monthly',
+      amountUsd: 90,
+      txSignature: 'tx-user-1',
+      userId: 'user-1',
+    });
+    const second = createPendingCryptoSettlement({
+      rail: 'usdc',
+      flow: 'addon',
+      targetKey: 'addon.ai_credits.5000',
+      billingPeriod: 'monthly',
+      amountUsd: 7,
+      txSignature: 'tx-user-2',
+      userId: 'user-2',
+    });
+
+    upsertPendingCryptoSettlement(first);
+    upsertPendingCryptoSettlement(second);
+
+    expect(readPendingCryptoSettlements('user-1')).toEqual([first]);
+    expect(readPendingCryptoSettlements('user-2')).toEqual([second]);
+    expect(hasPendingCryptoSettlement(first.id, 'user-1')).toBe(true);
+
+    removePendingCryptoSettlement(first.id);
+
+    expect(hasPendingCryptoSettlement(first.id, 'user-1')).toBe(false);
+    expect(readPendingCryptoSettlements('user-2')).toEqual([second]);
+  });
+
+  it('does not silently drop failed verification or unknown duplicate signatures', () => {
+    expect(shouldDropPendingCryptoSettlement('Payment verification failed: Transaction too old (>30 minutes)')).toBe(false);
+    expect(shouldDropPendingCryptoSettlement('Transaction signature has already been used')).toBe(false);
+    expect(shouldDropPendingCryptoSettlement('Add-on already unlocked')).toBe(true);
+  });
+});

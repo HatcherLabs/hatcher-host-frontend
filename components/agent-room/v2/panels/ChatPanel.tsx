@@ -168,7 +168,7 @@ export function ChatPanel({
               {m.content ? (
                 m.role === 'assistant' ? (
                   <span className="markdown-body block whitespace-normal text-left">
-                    <RichMarkdown content={m.content} />
+                    <RichMarkdown content={m.content} agentId={agentId} />
                   </span>
                 ) : (
                   m.content
