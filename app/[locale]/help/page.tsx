@@ -115,7 +115,7 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'What plans are available?',
-        a: 'Hatcher offers four tiers plus a lifetime option. Free: 1 agent, 500 AI Credits/month, 1 CPU/1GB RAM, 2GB workspace, auto-sleep after 12 hours. Starter ($6.99/mo): 1 agent, 3,000 AI Credits/month, 1 CPU/1.5GB RAM, 10GB workspace, always active. Pro ($19.99/mo): 3 agents, 15,000 AI Credits/month, 1.5 CPU/2GB RAM, 25GB workspace, always active. Business ($49.99/mo): 5 agents, 40,000 AI Credits/month, 2 CPU/3GB RAM, 50GB workspace, always active, team collaboration, priority support. Founding Member ($99 one-time, 20 spots): 5 agents, 25,000 AI Credits/month, 2 CPU/3GB RAM, 40GB workspace, lifetime access. Hosted models and web search use AI Credits. BYOK is paid directly to your provider.',
+        a: 'Hatcher offers four tiers plus a lifetime option. Free: 1 agent, 500 AI Credits/month, 1 CPU/1GB RAM, 2GB workspace, auto-sleep after 12 hours. Starter ($6.99/mo): 1 agent, 3,000 AI Credits/month, 1 CPU/1.5GB RAM, 10GB workspace, always active. Pro ($19.99/mo): 3 agents, 15,000 AI Credits/month, 1.5 CPU/2GB RAM, 25GB workspace, always active. Business ($49.99/mo): 5 agents, 40,000 AI Credits/month, 2 CPU/3GB RAM, 50GB workspace, always active, team collaboration, priority support. Founding Member ($99 one-time, 20 spots): 10 agents, 25,000 AI Credits/month, 2 CPU/4GB RAM, 40GB workspace, lifetime access. Hosted models and web search use AI Credits. BYOK is paid directly to your provider.',
       },
       {
         q: 'How do extras work?',

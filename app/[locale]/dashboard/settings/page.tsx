@@ -903,7 +903,7 @@ export default function SettingsPage() {
                              profile.tier === 'starter' ? '$6.99/mo — 3,000 AI Credits/month' :
                              profile.tier === 'pro' ? '$19.99/mo — 15,000 AI Credits/month, dedicated resources' :
                              profile.tier === 'business' ? '$49.99/mo — 40,000 AI Credits/month, always-on, priority support' :
-                             profile.tier === 'founding_member' ? '$99 lifetime — 25,000 AI Credits/month, 2 CPU / 3 GB RAM, 40 GB workspace, always active' :
+                             profile.tier === 'founding_member' ? '$99 lifetime — 10 agents, 25,000 AI Credits/month, 2 CPU / 4 GB RAM, 40 GB workspace, always active' :
                              profile.tier}
                           </p>
                         </div>

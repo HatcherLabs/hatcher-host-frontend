@@ -78,7 +78,7 @@ const TIER_RESOURCE_OVERRIDES: Record<UserTierKey, { includedAgents: number; cpu
   starter: { includedAgents: 1, cpuLimit: 1, memoryMb: 1536, storageMb: 10240, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
   pro: { includedAgents: 3, cpuLimit: 1.5, memoryMb: 2048, storageMb: 25600, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
   business: { includedAgents: 5, cpuLimit: 2, memoryMb: 3072, storageMb: 51200, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
-  founding_member: { includedAgents: 5, cpuLimit: 2, memoryMb: 3072, storageMb: 40960, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
+  founding_member: { includedAgents: 10, cpuLimit: 2, memoryMb: 4096, storageMb: 40960, autoSleep: false, autoSleepMinutes: 0, fileManager: true, fullLogs: true },
 };
 
 type RetiredAddonKey =

@@ -383,12 +383,12 @@
       "claimed": "{claimed} of {max} claimed · once they're gone, this offer is gone.",
       "includedHeading": "Everything included, forever",
       "includedItems": [
-        "5 agents included",
+        "10 agents included",
         "Always-on (no sleep)",
         "25,000 AI Credits/month",
         "Web search uses AI Credits",
-        "2 CPU · 3 GB RAM per agent",
-        "40 GB workspace per agent",
+        "2 CPU · 4 GB RAM per agent",
+        "40 GB workspace",
         "File Manager + Full Logs",
         "Priority support",
         "Founding Discord role + Telegram tag",
@@ -644,10 +644,10 @@
         "missing": []
       },
       "founding_member": {
-        "agents": "5 agents included",
+        "agents": "10 agents included",
         "messages": "25,000 AI Credits/month",
         "cpu": "2 CPU",
-        "ram": "3 GB RAM",
+        "ram": "4 GB RAM",
         "storage": "40 GB workspace",
         "sleep": "Always active",
         "features": [
@@ -798,7 +798,7 @@
         },
         {
           "q": "What is the Founding Member tier?",
-          "a": "Founding Member is a one-time $99 payment that gives you lifetime access to Hatcher: 5 agents, 25,000 AI Credits/month, 2 CPU / 3 GB RAM, 40 GB workspace, always active agents, File Manager, Full Logs, priority support, and Founding Discord role + Telegram tag. No monthly fees, ever. Limited to 20 spots — once they are gone, this tier is gone."
+          "a": "Founding Member is a one-time $99 payment that gives you lifetime access to Hatcher: 10 agents, 25,000 AI Credits/month, 2 CPU / 4 GB RAM, 40 GB workspace, always active agents, File Manager, Full Logs, priority support, and Founding Discord role + Telegram tag. No monthly fees, ever. Limited to 20 spots — once they are gone, this tier is gone."
         }
       ]
     },
@@ -2212,7 +2212,7 @@
       },
       "founding_member": {
         "name": "Founding Member",
-        "description": "5 agents, 25,000 AI Credits/month, 40 GB workspace, lifetime access"
+        "description": "10 agents, 25,000 AI Credits/month, 40 GB workspace, lifetime access"
       }
     },
     "addons": {

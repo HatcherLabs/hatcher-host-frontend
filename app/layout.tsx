@@ -182,7 +182,7 @@ const softwareApplicationJsonLd = {
       name: 'Founding Member',
       price: '99',
       priceCurrency: 'USD',
-      description: '5 agents, 25,000 AI Credits/month, 2 CPU/3GB RAM, 40GB workspace, lifetime access, 20 spots only.',
+      description: '10 agents, 25,000 AI Credits/month, 2 CPU/4GB RAM, 40GB workspace, lifetime access, 20 spots only.',
     },
   ],
   creator: {
