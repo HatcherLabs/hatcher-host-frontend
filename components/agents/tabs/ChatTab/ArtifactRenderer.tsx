@@ -16,6 +16,7 @@ import {
   YAxis,
 } from 'recharts';
 import ReactMarkdown from 'react-markdown';
+import { API_URL } from '@/lib/config';
 
 type ChartType = 'bar' | 'line' | 'pie';
 type ChartDatum = Record<string, string | number>;
@@ -307,8 +308,28 @@ function normalizeContainerMediaPath(raw: string, requireMediaExtension: boolean
   return `${isAbsolute ? '/' : ''}${segments.join('/')}`;
 }
 
+function buildApiUrl(pathname: string, params: Record<string, string>): string {
+  const base = API_URL.replace(/\/+$/, '');
+  const isAbsolute = /^https?:\/\//i.test(base);
+  const parsed = new URL(`${base}${pathname}`, isAbsolute ? undefined : 'https://hatcher.local');
+  for (const [key, value] of Object.entries(params)) {
+    parsed.searchParams.set(key, value);
+  }
+  return isAbsolute ? parsed.toString() : `${parsed.pathname}${parsed.search}${parsed.hash}`;
+}
+
 function proxiedContainerMediaUrl(mediaPath: string, agentId: string): string {
-  return `/api/agents/${encodeURIComponent(agentId)}/media?path=${encodeURIComponent(mediaPath)}`;
+  return buildApiUrl(
+    `/agents/${encodeURIComponent(agentId)}/container-files/media`,
+    { path: mediaPath },
+  );
+}
+
+function proxiedVideoMediaUrl(jobId: string, index: string, agentId: string): string {
+  return buildApiUrl(
+    `/agents/${encodeURIComponent(agentId)}/media/video`,
+    { jobId, index },
+  );
 }
 
 function mediaArtifactUrl(raw: string, agentId?: string): string | null {
@@ -346,10 +367,7 @@ function agentVideoContentUrl(raw: string, agentId?: string): string | null {
     if (!jobId || !/^[A-Za-z0-9._-]+$/.test(jobId)) return null;
     const index = parsed.searchParams.get('index') ?? '0';
     if (!/^\d+$/.test(index)) return null;
-    const proxyUrl = new URL(`/api/agents/${encodeURIComponent(agentId)}/media`, 'https://hatcher.local');
-    proxyUrl.searchParams.set('videoJobId', jobId);
-    proxyUrl.searchParams.set('index', index);
-    return `${proxyUrl.pathname}${proxyUrl.search}`;
+    return proxiedVideoMediaUrl(jobId, index, agentId);
   } catch {
     return null;
   }
@@ -390,7 +408,7 @@ function filenameFromUrl(url: string): string {
       const fromMediaPath = mediaPath.split('/').filter(Boolean).pop();
       if (fromMediaPath) return decodeURIComponent(fromMediaPath);
     }
-    const videoJobId = parsed.searchParams.get('videoJobId');
+    const videoJobId = parsed.searchParams.get('videoJobId') ?? parsed.searchParams.get('jobId');
     if (videoJobId) return `${sanitizeFilename(videoJobId)}.mp4`;
     const name = parsed.pathname.split('/').filter(Boolean).pop();
     return name ? decodeURIComponent(name) : 'file';
@@ -411,9 +429,34 @@ function withSearchParam(url: string, key: string, value: string): string {
   }
 }
 
+function isAgentVideoArtifactUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url, 'https://hatcher.local');
+    return (
+      /^\/api\/agents\/[^/]+\/media$/i.test(parsed.pathname)
+      && parsed.searchParams.has('videoJobId')
+    ) || /^\/agents\/[^/]+\/media\/video$/i.test(parsed.pathname);
+  } catch {
+    return false;
+  }
+}
+
+function isAgentMediaArtifactUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url, 'https://hatcher.local');
+    return (
+      /^\/api\/agents\/[^/]+\/media$/i.test(parsed.pathname)
+      || /^\/agents\/[^/]+\/container-files\/media$/i.test(parsed.pathname)
+      || /^\/agents\/[^/]+\/media\/video$/i.test(parsed.pathname)
+    );
+  } catch {
+    return false;
+  }
+}
+
 function artifactDownloadUrl(url: string, filename: string): string {
   if (/^(data:|blob:)/i.test(url)) return url;
-  if (url.startsWith('/api/agents/') && url.includes('/media?')) {
+  if (isAgentMediaArtifactUrl(url)) {
     return withSearchParam(url, 'download', '1');
   }
   if (url.startsWith('/')) return url;
@@ -445,7 +488,7 @@ function inferMediaTypeFromUrl(url: string): string | undefined {
   if (/\.webm$/.test(clean)) return 'video/webm';
   if (/\.mov$/.test(clean)) return 'video/quicktime';
   if (/\.m4v$/.test(clean)) return 'video/x-m4v';
-  if (url.startsWith('/api/agents/') && url.includes('/media?') && url.includes('videoJobId=')) return 'video/mp4';
+  if (isAgentVideoArtifactUrl(url)) return 'video/mp4';
   if (/\.mp3$/.test(clean)) return 'audio/mpeg';
   if (/\.wav$/.test(clean)) return 'audio/wav';
   if (/\.ogg$/.test(clean)) return 'audio/ogg';
