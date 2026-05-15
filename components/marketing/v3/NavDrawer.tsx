@@ -55,7 +55,7 @@ export function NavDrawer({ open, onClose }: Props) {
         ))}
 
         <div className={styles.localeRow}>
-          <LocaleSwitcher />
+          <LocaleSwitcher align="start" side="top" />
         </div>
 
         <div className={styles.bottom}>

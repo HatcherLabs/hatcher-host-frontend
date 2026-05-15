@@ -45,7 +45,12 @@ function buildLocaleUrl(cleanPath: string, targetLocale: Locale): string {
   return prefix + path || '/';
 }
 
-export function LocaleSwitcher() {
+interface LocaleSwitcherProps {
+  align?: 'start' | 'end';
+  side?: 'top' | 'bottom';
+}
+
+export function LocaleSwitcher({ align = 'end', side = 'bottom' }: LocaleSwitcherProps) {
   const locale = useLocale() as Locale;
   const rawPathname = useRawPathname();
   const t = useTranslations('localeSwitcher');
@@ -117,7 +122,11 @@ export function LocaleSwitcher() {
         <ul
           role="listbox"
           aria-label={t('label')}
-          className="absolute right-0 top-full mt-1 min-w-[10rem] rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-lg backdrop-blur-xl py-1 z-50"
+          className={`absolute min-w-[10rem] max-w-[calc(100vw-1rem)] rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-lg backdrop-blur-xl py-1 z-50 ${
+            side === 'top' ? 'bottom-full mb-1' : 'top-full mt-1'
+          } ${
+            align === 'start' ? 'left-0' : 'right-0'
+          }`}
         >
           {locales.map((loc) => {
             const active = loc === locale;
