@@ -552,6 +552,9 @@
     "eyebrow": "Tarifs",
     "heading": "Choisissez votre forfait",
     "subheading": "Commencez gratuitement avec n'importe quel framework. Évoluez quand vous êtes prêt. Toutes les intégrations sont incluses. BYOK reste payé directement au fournisseur.",
+    "hatcherDiscountBanner": "Payez avec $HATCHER pour 10 % de réduction sur les forfaits et les extras.",
+    "hatcherDiscountLine": "Prix $HATCHER : ${price}",
+    "hatcherDiscountAnnual": "Prix annuel $HATCHER : ${price}",
     "billingToggle": {
       "monthly": "Mensuel",
       "annual": "Annuel",
@@ -663,6 +666,7 @@
       "heading": "Extensions",
       "subheading": "Ajoutez des packs AI Credits ou des emplacements d'agents quand vous avez besoin de plus de capacité.",
       "annualDiscount": "15% de réduction annuelle",
+      "hatcherDiscount": "$HATCHER : ${price}",
       "groups": {
         "extraAgents": {
           "label": "Agents supplémentaires",
@@ -730,7 +734,7 @@
       "heading": "Toutes les intégrations gratuites",
       "badge": "chaque forfait",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage et 14+ autres plateformes sont inclus gratuitement sur tous les forfaits. Sans frais supplémentaires, jamais.",
-      "note": "Tous les prix en USD, payables par carte, SOL, USDC sur Solana ou $HATCHER. L'usage des modèles hébergés et de la recherche web est mesuré en AI Credits ; BYOK est payé directement avec votre propre clé fournisseur."
+      "note": "Tous les prix sont en USD, payables par carte, SOL, USDC sur Solana ou $HATCHER. Les paiements $HATCHER bénéficient de 10 % de réduction; l'usage des modèles hébergés et de la recherche web est mesuré en AI Credits, tandis que BYOK est payé directement avec votre propre clé fournisseur."
     },
     "compareTable": {
       "heading": "Comparer les forfaits",
@@ -927,6 +931,8 @@
       "perAgentAddons": "Extensions par agent",
       "annualBilling": "Facturation annuelle",
       "annualBillingDesc": "15% de réduction — extras récurrents",
+      "hatcherDiscountTitle": "10 % de réduction avec $HATCHER",
+      "hatcherDiscountBody": "Utilisez $HATCHER sur Solana pour les forfaits, packs AI Credits et emplacements d'agents supplémentaires. La réduction est appliquée avant la confirmation du wallet.",
       "monthly": "Mensuel",
       "annual": "Annuel",
       "monthSuffix": "/ 30 jours",

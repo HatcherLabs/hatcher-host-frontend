@@ -552,6 +552,9 @@
     "eyebrow": "Preise",
     "heading": "Plan wählen",
     "subheading": "Kostenlos mit jedem Framework starten. Skalieren wenn bereit. Alle Integrationen in jedem Tarif inklusive. BYOK bleibt direkt beim Anbieter bezahlt.",
+    "hatcherDiscountBanner": "Zahle mit $HATCHER und erhalte 10 % Rabatt auf Pläne und Extras.",
+    "hatcherDiscountLine": "$HATCHER-Preis: ${price}",
+    "hatcherDiscountAnnual": "$HATCHER-Jahrespreis: ${price}",
     "billingToggle": {
       "monthly": "Monatlich",
       "annual": "Jährlich",
@@ -663,6 +666,7 @@
       "heading": "Extras",
       "subheading": "Fügen Sie AI-Credit-Pakete oder zusätzliche Agenten-Slots hinzu, wenn Sie mehr Kapazität brauchen.",
       "annualDiscount": "15% Rabatt jährlich",
+      "hatcherDiscount": "$HATCHER: ${price}",
       "groups": {
         "extraAgents": {
           "label": "Zusätzliche Agenten",
@@ -730,7 +734,7 @@
       "heading": "Alle Integrationen kostenlos",
       "badge": "jeder Tarif",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage und 14+ weitere Plattformen sind in allen Tarifen kostenlos inklusive. Nie ein Aufpreis.",
-      "note": "Alle Preise in USD, zahlbar per Karte, SOL, USDC auf Solana oder $HATCHER. Nutzung gehosteter Modelle und Websuche wird über AI Credits gemessen; BYOK wird direkt mit Ihrem eigenen Provider-Key bezahlt."
+      "note": "Alle Preise sind in USD, zahlbar per Karte, SOL, USDC auf Solana oder $HATCHER. $HATCHER-Zahlungen erhalten 10 % Rabatt; Nutzung gehosteter Modelle und Websuche wird über AI Credits gemessen, BYOK wird direkt mit Ihrem eigenen Provider-Key bezahlt."
     },
     "compareTable": {
       "heading": "Pläne vergleichen",
@@ -927,6 +931,8 @@
       "perAgentAddons": "Extras pro Agent",
       "annualBilling": "Jährliche Abrechnung",
       "annualBillingDesc": "15% Rabatt — wiederkehrende Extras",
+      "hatcherDiscountTitle": "10 % Rabatt mit $HATCHER",
+      "hatcherDiscountBody": "Nutzen Sie $HATCHER auf Solana für Pläne, AI-Credit-Pakete und zusätzliche Agent-Slots. Der Rabatt wird vor der Wallet-Bestätigung angewendet.",
       "monthly": "Monatlich",
       "annual": "Jährlich",
       "monthSuffix": "/ 30 Tage",

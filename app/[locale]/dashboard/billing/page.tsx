@@ -995,6 +995,19 @@ export default function BillingPage() {
         </motion.div>
       </div>
 
+      <motion.div
+        variants={itemVariants}
+        className="mb-6 rounded-xl border border-amber-500/25 bg-amber-500/[0.06] px-4 py-3 text-sm text-amber-100"
+      >
+        <div className="flex items-start gap-3">
+          <Diamond className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
+          <div>
+            <p className="font-semibold text-amber-200">{t('hatcherDiscountTitle')}</p>
+            <p className="mt-0.5 text-xs leading-relaxed text-amber-100/80">{t('hatcherDiscountBody')}</p>
+          </div>
+        </div>
+      </motion.div>
+
       {error && (
         <motion.div variants={itemVariants} className="mb-6 p-4 rounded-xl border border-red-500/30 bg-red-500/5 text-sm text-red-400">
           {error}
@@ -1380,6 +1393,7 @@ export default function BillingPage() {
                         const isLifetime = tierKey === 'founding_member';
                         const monthly = tier.usdPrice;
                         const displayPrice = isLifetime ? monthly : (billingPeriod === 'annual' ? computePrice(monthly, true) : monthly);
+                        const hatcherPrice = priceForHatcherPayment(displayPrice);
                         const suffix = isLifetime
                           ? t('lifetimePrice')
                           : billingPeriod === 'annual'
@@ -1396,6 +1410,9 @@ export default function BillingPage() {
                                 Save ${(monthly * 12 - displayPrice).toFixed(2)}/yr
                               </span>
                             )}
+                            <span className="text-[10px] text-amber-300 font-semibold">
+                              {t('hatcherDiscountDesc', { price: `$${hatcherPrice.toFixed(2)}` })}
+                            </span>
                           </div>
                         );
                       })()}
@@ -1486,6 +1503,7 @@ export default function BillingPage() {
                     const displayPrice = isSub && billingPeriod === 'annual'
                       ? computePrice(addon.usdPrice, true)
                       : addon.usdPrice;
+                    const hatcherPrice = priceForHatcherPayment(displayPrice);
                     const suffix = addon.type === 'one_time'
                       ? t('oneTimeSuffix')
                       : billingPeriod === 'annual' ? t('annualSuffix') : t('monthSuffix');
@@ -1514,6 +1532,9 @@ export default function BillingPage() {
                             Save ${(addon.usdPrice * 12 - displayPrice).toFixed(2)}/yr
                           </p>
                         )}
+                        <p className="text-[10px] text-amber-300 font-semibold mb-2">
+                          {t('hatcherDiscountDesc', { price: `$${hatcherPrice.toFixed(2)}` })}
+                        </p>
                         <p className="text-xs text-[var(--text-secondary)] mb-3 flex-1">
                           {addon.description}
                         </p>

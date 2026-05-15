@@ -88,6 +88,11 @@ const AI_CREDITS_BY_TIER: Record<string, number> = {
   founding_member: 25000,
 };
 
+const HATCHER_PAYMENT_DISCOUNT_FACTOR = 0.9;
+function priceForHatcherPayment(usdPrice: number): number {
+  return Math.round(usdPrice * HATCHER_PAYMENT_DISCOUNT_FACTOR * 100) / 100;
+}
+
 function formatAiCredits(value: number, locale: string): string {
   return new Intl.NumberFormat(locale).format(value);
 }
@@ -196,6 +201,11 @@ export default function PricingPage() {
               <span className="text-[10px] font-semibold text-[var(--color-accent)]">{t('billingToggle.annualDiscount')}</span>
             </button>
           </div>
+
+          <div className="mt-4 inline-flex max-w-full items-center gap-2 rounded-lg border border-amber-500/25 bg-amber-500/[0.06] px-3 py-2 text-xs font-medium text-amber-200">
+            <Sparkles className="h-3.5 w-3.5 shrink-0" />
+            <span>{t('hatcherDiscountBanner')}</span>
+          </div>
         </div>
 
         {/* TIER CARDS */}
@@ -206,6 +216,8 @@ export default function PricingPage() {
             const annualMonthlyPrice = monthlyPrice === 0 || isLifetime ? monthlyPrice : parseFloat((monthlyPrice * 0.85).toFixed(2));
             const displayPrice = isLifetime ? monthlyPrice : (isAnnual ? annualMonthlyPrice : monthlyPrice);
             const annualTotal = isAnnual && monthlyPrice > 0 && !isLifetime ? parseFloat((annualMonthlyPrice * 12).toFixed(2)) : null;
+            const hatcherCharge = annualTotal ?? displayPrice;
+            const hatcherPrice = priceForHatcherPayment(hatcherCharge);
 
             // Tier-specific translated strings
             const tierKey = tier.key as 'free' | 'starter' | 'pro' | 'business' | 'founding_member';
@@ -270,6 +282,13 @@ export default function PricingPage() {
                   )}
                   {isLifetime && (
                     <p className="text-[11px] text-[var(--color-accent)] font-medium mt-1.5">{t('payOnce')}</p>
+                  )}
+                  {monthlyPrice > 0 && (
+                    <p className="text-[11px] text-amber-300 font-medium mt-1.5">
+                      {annualTotal
+                        ? t('hatcherDiscountAnnual', { price: hatcherPrice.toFixed(2) })
+                        : t('hatcherDiscountLine', { price: hatcherPrice.toFixed(2) })}
+                    </p>
                   )}
                 </div>
 
@@ -382,6 +401,7 @@ export default function PricingPage() {
                       const monthlyNum = parseFloat(price.replace('$', ''));
                       const annualMonthly = isSubscription && isAnnual ? parseFloat((monthlyNum * 0.85).toFixed(2)) : monthlyNum;
                       const displayPrice = isAnnual && isSubscription ? `$${annualMonthly}` : price;
+                      const hatcherPrice = priceForHatcherPayment(annualMonthly);
                       return (
                         <motion.div
                           key={addon.name}
@@ -395,6 +415,9 @@ export default function PricingPage() {
                           </div>
                           <p className="text-[var(--text-muted)] text-[10px] mb-2 font-medium">
                             {addon.period}
+                          </p>
+                          <p className="text-[10px] text-amber-300 font-semibold mb-2">
+                            {t('addons.hatcherDiscount', { price: hatcherPrice.toFixed(2) })}
                           </p>
                           <p className="text-[11px] text-[var(--text-secondary)]">
                             {addon.description}

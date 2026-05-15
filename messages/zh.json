@@ -552,6 +552,9 @@
     "eyebrow": "定价",
     "heading": "选择您的套餐",
     "subheading": "任意框架免费开始。准备好后随时扩展。每个套餐均包含所有集成。BYOK 由用户直接向提供商付费。",
+    "hatcherDiscountBanner": "使用 $HATCHER 支付，套餐和附加项享 10% 折扣。",
+    "hatcherDiscountLine": "$HATCHER 价格：${price}",
+    "hatcherDiscountAnnual": "$HATCHER 年付价格：${price}",
     "billingToggle": {
       "monthly": "按月",
       "annual": "按年",
@@ -663,6 +666,7 @@
       "heading": "扩展项",
       "subheading": "自定义您的套餐。在任意套餐上叠加扩展项，按需搭配。",
       "annualDiscount": "年付享85折",
+      "hatcherDiscount": "$HATCHER：${price}",
       "groups": {
         "extraAgents": {
           "label": "额外智能体",
@@ -730,7 +734,7 @@
       "heading": "所有集成免费",
       "badge": "每个套餐",
       "body": "Telegram、Discord、WhatsApp、Slack、Signal、iMessage 及14+个平台在所有套餐中均免费包含，永不额外收费。",
-      "note": "所有价格以USD计，可用信用卡、SOL、Solana 上的 USDC 或 $HATCHER 支付。托管模型和网页搜索使用 AI Credits 计量；BYOK 使用您自己的提供商密钥并直接向提供商付费。"
+      "note": "所有价格以 USD 标价，可用信用卡、SOL、Solana 上的 USDC 或 $HATCHER 支付。使用 $HATCHER 支付享 10% 折扣；托管模型和网页搜索使用 AI Credits 计量，BYOK 使用您自己的提供商密钥并直接向提供商付费。"
     },
     "compareTable": {
       "heading": "套餐对比",
@@ -927,6 +931,8 @@
       "perAgentAddons": "按智能体扩展项",
       "annualBilling": "年付账单",
       "annualBillingDesc": "85折——所有订阅扩展项",
+      "hatcherDiscountTitle": "使用 $HATCHER 享 10% 折扣",
+      "hatcherDiscountBody": "可用 Solana 上的 $HATCHER 支付套餐、AI Credits 包和额外 Agent 名额。折扣会在钱包确认前应用。",
       "monthly": "按月",
       "annual": "按年",
       "monthSuffix": "/ 30天",

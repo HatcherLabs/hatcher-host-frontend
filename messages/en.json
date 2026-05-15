@@ -552,6 +552,9 @@
     "eyebrow": "Pricing",
     "heading": "Choose your plan",
     "subheading": "Start free with any framework. Scale when ready. All integrations included on every tier. BYOK stays provider-paid on every tier.",
+    "hatcherDiscountBanner": "Pay with $HATCHER for 10% off plans and extras.",
+    "hatcherDiscountLine": "$HATCHER price: ${price}",
+    "hatcherDiscountAnnual": "$HATCHER annual price: ${price}",
     "billingToggle": {
       "monthly": "Monthly",
       "annual": "Annual",
@@ -663,6 +666,7 @@
       "heading": "Extras",
       "subheading": "Add AI Credit packs or extra agent slots when you need more capacity.",
       "annualDiscount": "15% off annual",
+      "hatcherDiscount": "$HATCHER: ${price}",
       "groups": {
         "extraAgents": {
           "label": "Extra Agents",
@@ -730,7 +734,7 @@
       "heading": "All Integrations Free",
       "badge": "every tier",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage, and 14+ more platforms are included free on all tiers. No extra charge, ever.",
-      "note": "All prices in USD, payable by card, SOL, USDC on Solana, or $HATCHER. Hosted model and web-search usage is metered with AI Credits; BYOK is paid directly with your own provider key."
+      "note": "All prices are listed in USD. Pay by card, SOL, USDC on Solana, or $HATCHER. $HATCHER payments get 10% off; hosted model and web-search usage is metered with AI Credits, while BYOK is paid directly with your own provider key."
     },
     "compareTable": {
       "heading": "Compare Plans",
@@ -927,6 +931,8 @@
       "perAgentAddons": "Per-agent Extras",
       "annualBilling": "Annual billing",
       "annualBillingDesc": "15% off — recurring extras",
+      "hatcherDiscountTitle": "10% off with $HATCHER",
+      "hatcherDiscountBody": "Use $HATCHER on Solana for plans, AI Credit packs, and extra agent slots. The discount is applied before wallet confirmation.",
       "monthly": "Monthly",
       "annual": "Annual",
       "monthSuffix": "/ 30 days",

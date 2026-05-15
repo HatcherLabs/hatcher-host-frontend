@@ -124,8 +124,13 @@ export const OPENCLAW_INTEGRATIONS: IntegrationDef[] = [
     docsUrl: 'https://docs.hatcher.host/integrations/twitter',
     hasChannelSettings: false,
     fields: [
-      { key: 'XURL_CLIENT_ID', label: 'OAuth2 Client ID', type: 'password', placeholder: 'Your X API OAuth2 Client ID', helper: 'From X Developer Portal > App > Keys and tokens > OAuth 2.0 Client ID', required: true },
-      { key: 'XURL_CLIENT_SECRET', label: 'OAuth2 Client Secret', type: 'password', placeholder: 'Your X API OAuth2 Client Secret', helper: 'From X Developer Portal > App > Keys and tokens > OAuth 2.0 Client Secret', required: true },
+      { key: 'X_BEARER_TOKEN', label: 'Bearer Token', type: 'password', placeholder: 'Your X API Bearer Token', helper: 'Required for xurl app-auth read/search actions. From X Developer Portal > App > Keys and tokens > Bearer Token.', required: true },
+      { key: 'XURL_CLIENT_ID', label: 'OAuth2 Client ID', type: 'password', placeholder: 'Optional OAuth2 Client ID', helper: 'Optional. Register the app for OAuth2 flows in xurl.', required: false },
+      { key: 'XURL_CLIENT_SECRET', label: 'OAuth2 Client Secret', type: 'password', placeholder: 'Optional OAuth2 Client Secret', helper: 'Optional. Pair with OAuth2 Client ID when needed.', required: false },
+      { key: 'X_API_KEY', label: 'OAuth1 API Key', type: 'password', placeholder: 'Optional X API Key', helper: 'Optional for write actions such as post/reply when paired with OAuth1 access tokens.', required: false },
+      { key: 'X_API_SECRET', label: 'OAuth1 API Secret', type: 'password', placeholder: 'Optional X API Secret', helper: 'Optional for write actions such as post/reply.', required: false },
+      { key: 'X_ACCESS_TOKEN', label: 'OAuth1 Access Token', type: 'password', placeholder: 'Optional Access Token', helper: 'Optional for write actions such as post/reply.', required: false },
+      { key: 'X_ACCESS_TOKEN_SECRET', label: 'OAuth1 Access Token Secret', type: 'password', placeholder: 'Optional Access Token Secret', helper: 'Optional for write actions such as post/reply.', required: false },
     ],
   },
   {

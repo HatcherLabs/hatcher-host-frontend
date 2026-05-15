@@ -408,8 +408,8 @@ const GUIDES: Record<string, PlatformGuide> = {
         content: 'In your App Settings, set the app permissions to "Read and Write." This is required for your agent to both read mentions and post tweets.',
       },
       {
-        title: 'Generate all four keys',
-        content: 'Go to Keys and Tokens. Generate and copy all four credentials: API Key (Consumer Key), API Secret (Consumer Secret), Access Token, and Access Token Secret.',
+        title: 'Generate app credentials',
+        content: 'Go to Keys and Tokens. Generate a Bearer Token for app-auth read/search actions. For posting and replies, also generate API Key, API Secret, Access Token, and Access Token Secret.',
       },
       {
         title: 'Load Pay-Per-Use credits (for read access)',
@@ -417,14 +417,14 @@ const GUIDES: Record<string, PlatformGuide> = {
       },
       {
         title: 'Configure in Hatcher',
-        content: 'Go to your agent\'s Integrations tab. Select Twitter/X and enter all four keys.',
+        content: 'Go to your agent\'s Integrations tab. Select Twitter/X and enter the Bearer Token. Add OAuth1 keys too if the agent should post or reply.',
       },
     ],
     hatcherConfig: [
-      { field: 'API Key', value: 'xABC123...', description: 'Also called Consumer Key' },
-      { field: 'API Secret', value: 'xDEF456...', description: 'Also called Consumer Secret' },
-      { field: 'Access Token', value: '12345-xGHI...', description: 'User-specific access token' },
-      { field: 'Access Token Secret', value: 'xJKL789...', description: 'User-specific access token secret' },
+      { field: 'Bearer Token', value: 'AAAAAAAA...', description: 'Required for xurl app-auth read/search actions' },
+      { field: 'OAuth2 Client ID / Secret', value: 'client-id / client-secret', description: 'Optional, registers the app with xurl for OAuth2 flows' },
+      { field: 'OAuth1 API Key / Secret', value: 'xABC123... / xDEF456...', description: 'Optional for posting and reply actions' },
+      { field: 'OAuth1 Access Token / Secret', value: '12345-xGHI... / xJKL789...', description: 'Optional user-specific write credentials' },
     ],
     testSteps: [
       'Post a test tweet by sending a command to your agent',

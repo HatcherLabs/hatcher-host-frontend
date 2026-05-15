@@ -195,7 +195,7 @@ export function useAgentIntegrations(
       if (res.success) {
         setAgent(res.data);
         setIntegrationSecrets((prev) => ({ ...prev, [sk]: {} }));
-        const restartNote = (res.data as unknown as Record<string, unknown>)?.restarted
+        const restartNote = (res.data as unknown as Record<string, unknown>)?.restarting
           ? ' — container restarting with new config'
           : '';
         setIntegrationSaveMsg((prev) => ({ ...prev, [sk]: `Credentials saved and encrypted${restartNote}` }));

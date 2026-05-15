@@ -552,6 +552,9 @@
     "eyebrow": "Prețuri",
     "heading": "Alege planul tău",
     "subheading": "Începe gratuit cu orice framework. Extinde când ești gata. Toate integrările incluse pe fiecare plan. BYOK rămâne plătit direct la provider.",
+    "hatcherDiscountBanner": "Plătește cu $HATCHER pentru 10% reducere la planuri și extra opțiuni.",
+    "hatcherDiscountLine": "Preț cu $HATCHER: ${price}",
+    "hatcherDiscountAnnual": "Preț anual cu $HATCHER: ${price}",
     "billingToggle": {
       "monthly": "Lunar",
       "annual": "Anual",
@@ -663,6 +666,7 @@
       "heading": "Extra",
       "subheading": "Adaugă pachete AI Credits sau sloturi de agenți când ai nevoie de mai multă capacitate.",
       "annualDiscount": "15% reducere anual",
+      "hatcherDiscount": "$HATCHER: ${price}",
       "groups": {
         "extraAgents": {
           "label": "Agenți suplimentari",
@@ -730,7 +734,7 @@
       "heading": "Toate integrările gratuite",
       "badge": "fiecare plan",
       "body": "Telegram, Discord, WhatsApp, Slack, Signal, iMessage și 14+ alte platforme sunt incluse gratuit pe toate planurile. Niciun cost suplimentar, niciodată.",
-      "note": "Toate prețurile sunt în USD, plătibile cu cardul, SOL, USDC pe Solana sau $HATCHER. Utilizarea modelelor găzduite și web search se contorizează în AI Credits; BYOK este plătit direct cu cheia ta de provider."
+      "note": "Toate prețurile sunt în USD, plătibile cu cardul, SOL, USDC pe Solana sau $HATCHER. Plățile cu $HATCHER au 10% reducere; utilizarea modelelor găzduite și web search se contorizează în AI Credits, iar BYOK este plătit direct cu cheia ta de provider."
     },
     "compareTable": {
       "heading": "Compară planurile",
@@ -927,6 +931,8 @@
       "perAgentAddons": "Extra per agent",
       "annualBilling": "Facturare anuală",
       "annualBillingDesc": "15% reducere — extra recurente",
+      "hatcherDiscountTitle": "10% reducere cu $HATCHER",
+      "hatcherDiscountBody": "Folosește $HATCHER pe Solana pentru planuri, pachete AI Credits și sloturi extra de agenți. Reducerea se aplică înainte de confirmarea în wallet.",
       "monthly": "Lunar",
       "annual": "Anual",
       "monthSuffix": "/ 30 zile",
