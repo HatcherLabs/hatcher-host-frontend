@@ -13,6 +13,25 @@ function mockWallet(signature: string, calls: string[]): WalletContextState {
   } as unknown as WalletContextState;
 }
 
+function mockSigningWallet(calls: string[]): { wallet: WalletContextState; keypair: Keypair } {
+  const keypair = Keypair.generate();
+  return {
+    keypair,
+    wallet: {
+      publicKey: keypair.publicKey,
+      sendTransaction: vi.fn(async () => {
+        calls.push('wallet-send');
+        return 'wallet-send-signature';
+      }),
+      signTransaction: vi.fn(async (tx) => {
+        calls.push('sign');
+        tx.partialSign(keypair);
+        return tx;
+      }),
+    } as unknown as WalletContextState,
+  };
+}
+
 function mockConnection(calls: string[], tokenBalance = '1000000000000000'): Connection {
   return {
     getLatestBlockhash: vi.fn(async () => ({
@@ -22,6 +41,10 @@ function mockConnection(calls: string[], tokenBalance = '1000000000000000'): Con
     getAccountInfo: vi.fn(async () => ({})),
     getTokenAccountBalance: vi.fn(async () => ({ value: { amount: tokenBalance } })),
     getParsedTokenAccountsByOwner: vi.fn(async () => ({ value: [] })),
+    sendRawTransaction: vi.fn(async () => {
+      calls.push('broadcast');
+      return 'raw-signature-123';
+    }),
     confirmTransaction: vi.fn(async () => {
       calls.push('confirm');
       throw new Error('confirmation expired after broadcast');
@@ -30,6 +53,26 @@ function mockConnection(calls: string[], tokenBalance = '1000000000000000'): Con
 }
 
 describe('Solana payment helpers', () => {
+  it('uses wallet signing plus app RPC broadcast when signTransaction is available', async () => {
+    const calls: string[] = [];
+    const { wallet } = mockSigningWallet(calls);
+    const connection = mockConnection(calls);
+
+    await expect(
+      payWithSol({
+        wallet,
+        connection,
+        quote: quoteSolForUsd(10, 100),
+        onSignature: (value) => calls.push(`signature:${value}`),
+      }),
+    ).rejects.toThrow('confirmation expired after broadcast');
+
+    expect(wallet.signTransaction).toHaveBeenCalled();
+    expect(wallet.sendTransaction).not.toHaveBeenCalled();
+    expect(connection.sendRawTransaction).toHaveBeenCalled();
+    expect(calls).toEqual(['sign', 'broadcast', 'signature:raw-signature-123', 'confirm']);
+  });
+
   it('emits the SOL signature before confirmation can fail', async () => {
     const calls: string[] = [];
     const signature = 'sol-signature-123';

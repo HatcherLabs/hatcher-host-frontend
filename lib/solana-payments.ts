@@ -48,6 +48,30 @@ interface PaymentCallbacks {
   onSignature?: (signature: string) => void;
 }
 
+async function signAndBroadcastTransaction(params: {
+  wallet: WalletContextState;
+  connection: Connection;
+  transaction: Transaction;
+  label: string;
+}): Promise<string> {
+  const { wallet, connection, transaction, label } = params;
+
+  if (wallet.signTransaction) {
+    const signed = await wallet.signTransaction(transaction);
+    return connection.sendRawTransaction(signed.serialize(), {
+      skipPreflight: false,
+      preflightCommitment: 'confirmed',
+    });
+  }
+
+  if (!wallet.sendTransaction) throw new Error('Connect a Solana wallet first');
+  console.warn(`[${label}] wallet does not expose signTransaction; falling back to wallet sendTransaction`);
+  return wallet.sendTransaction(transaction, connection, {
+    skipPreflight: false,
+    preflightCommitment: 'confirmed',
+  });
+}
+
 /**
  * Compute how much SOL to send for a given USD amount using the live
  * SOL/USD rate. Adds a 1% buffer on top so that small price drifts
@@ -232,8 +256,10 @@ export async function payWithSol(params: {
   onSignature?: PaymentCallbacks['onSignature'];
 }): Promise<{ signature: string }> {
   const { wallet, connection, quote } = params;
-  const { publicKey, sendTransaction } = wallet;
-  if (!publicKey || !sendTransaction) throw new Error('Connect a Solana wallet first');
+  const { publicKey } = wallet;
+  if (!publicKey || (!wallet.signTransaction && !wallet.sendTransaction)) {
+    throw new Error('Connect a Solana wallet first');
+  }
 
   const treasury = new PublicKey(TREASURY_WALLET);
   const tx = new Transaction().add(
@@ -258,9 +284,11 @@ export async function payWithSol(params: {
 
   let signature: string;
   try {
-    signature = await sendTransaction(tx, connection, {
-      skipPreflight: false,
-      preflightCommitment: 'confirmed',
+    signature = await signAndBroadcastTransaction({
+      wallet,
+      connection,
+      transaction: tx,
+      label: 'pay-sol',
     });
     params.onSignature?.(signature);
   } catch (e) {
@@ -299,8 +327,10 @@ export async function payWithSplToken(params: {
   onSignature?: PaymentCallbacks['onSignature'];
 }): Promise<{ signature: string }> {
   const { wallet, connection, mint, amountHuman, recipientWallet } = params;
-  const { publicKey, sendTransaction } = wallet;
-  if (!publicKey || !sendTransaction) throw new Error('Connect a Solana wallet first');
+  const { publicKey } = wallet;
+  if (!publicKey || (!wallet.signTransaction && !wallet.sendTransaction)) {
+    throw new Error('Connect a Solana wallet first');
+  }
 
   // $HATCHER is a Token-2022 token (pump.fun launched it on the 2022 program
   // for metadata pointer support). USDC is a classic SPL Token. The ATA
@@ -383,9 +413,11 @@ export async function payWithSplToken(params: {
 
   let signature: string;
   try {
-    signature = await sendTransaction(tx, connection, {
-      skipPreflight: false,
-      preflightCommitment: 'confirmed',
+    signature = await signAndBroadcastTransaction({
+      wallet,
+      connection,
+      transaction: tx,
+      label: `pay-${mint}`,
     });
   } catch (e) {
     console.error(`[pay-${mint}] sendTransaction FAILED`, e);
