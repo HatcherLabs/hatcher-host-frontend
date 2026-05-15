@@ -949,6 +949,7 @@
       "solDesc": "Solana-Wallet-Zahlung",
       "payWithHatcher": "Mit $HATCHER bezahlen",
       "hatcherDesc": "HATCHER Token auf Solana",
+      "hatcherDiscountDesc": "10 % Rabatt mit $HATCHER: {price}",
       "payWithUsdcSolana": "Mit USDC auf Solana bezahlen",
       "usdcSolanaDesc": "SPL USDC per Solana-Wallet",
       "payWithUsdc": "Mit USDC bezahlen",

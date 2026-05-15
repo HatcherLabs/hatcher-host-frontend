@@ -49,6 +49,9 @@ const itemVariants = {
 
 const cardClass = 'card-solid';
 const displayFont = { fontFamily: 'var(--font-display), system-ui, sans-serif' };
+const HATCHER_PAYMENT_DISCOUNT_FACTOR = 0.9;
+const priceForHatcherPayment = (usdPrice: number): number =>
+  Math.round(usdPrice * HATCHER_PAYMENT_DISCOUNT_FACTOR * 100) / 100;
 const AI_CREDITS_BY_TIER: Record<UserTierKey, number> = {
   free: 500,
   starter: 3000,
@@ -206,6 +209,7 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
   const tc = useTranslations('dashboard.common');
   if (!isOpen) return null;
   const needsAgentSelection = requiresAgent && !selectedAgentId;
+  const hatcherPrice = priceForHatcherPayment(price);
   return (
     <AnimatePresence>
       <motion.div
@@ -283,9 +287,11 @@ function PaymentMethodModal({ isOpen, onClose, title, price, onPayWithSOL, onPay
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#f59e0b] to-[#f97316] flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-extrabold text-[7px] tracking-tight">HATCHER</span>
               </div>
-              <div className="text-left">
+              <div className="text-left min-w-0">
                 <p className="text-sm font-semibold text-[var(--text-primary)]">{t('payWithHatcher')}</p>
-                <p className="text-[11px] text-[var(--text-muted)]">{t('hatcherDesc')}</p>
+                <p className="text-[11px] text-[var(--text-muted)]">
+                  {t('hatcherDiscountDesc', { price: `$${hatcherPrice.toFixed(2)}` })}
+                </p>
               </div>
               {loading && <Loader2 className="w-4 h-4 animate-spin text-[var(--text-muted)] ml-auto" />}
             </button>
@@ -613,7 +619,7 @@ export default function BillingPage() {
     if (!tierKey) return;
     const tierConfig = TIERS[tierKey];
     const period = subscribePeriod(tierKey);
-    const price = subscribePrice(tierKey);
+    const price = priceForHatcherPayment(subscribePrice(tierKey));
     setPaymentLoading(true);
     setSubscribing(tierKey);
     setError(null);
@@ -751,7 +757,7 @@ export default function BillingPage() {
     if (!addonConfig) return;
     if (addonConfig.perAgent && !selectedAgentId) return;
     const period = addonPeriod(addonConfig);
-    const price = addonPrice(addonConfig);
+    const price = priceForHatcherPayment(addonPrice(addonConfig));
     setPaymentLoading(true);
     setPurchasingAddon(addonKey);
     setError(null);

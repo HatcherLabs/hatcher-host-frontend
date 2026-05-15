@@ -63,12 +63,6 @@ export function AgentPresenceRail() {
   const handleAvatarChange = useCallback(async (value: string) => {
     const nextVariant = normalizeAvatarVariant(value);
     const previous = selectedVariant;
-    const nextConfig: Record<string, unknown> = { ...(agent.config ?? {}) };
-    if (nextVariant) {
-      nextConfig.roomAvatarVariant = nextVariant;
-    } else {
-      delete nextConfig.roomAvatarVariant;
-    }
 
     setSelectedVariant(nextVariant);
     setSavingVariant(true);
@@ -76,7 +70,7 @@ export function AgentPresenceRail() {
     setEmoteNonce((current) => current + 1);
 
     const res = await api.updateAgent(agent.id, {
-      config: nextConfig,
+      config: { roomAvatarVariant: nextVariant || null },
       commitMessage: 'Update room avatar variant from chat',
     });
     setSavingVariant(false);
@@ -86,7 +80,7 @@ export function AgentPresenceRail() {
       return;
     }
     await loadAgent();
-  }, [agent.config, agent.id, loadAgent, selectedVariant]);
+  }, [agent.id, loadAgent, selectedVariant]);
 
   const moodMeta = useMemo(() => {
     if (mood === 'greeting') {
