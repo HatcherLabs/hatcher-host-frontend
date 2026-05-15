@@ -93,6 +93,57 @@ describe('splitMessageArtifacts', () => {
     ]);
   });
 
+  it('rewrites relative generated image filenames to authenticated workspace media URLs', () => {
+    const parts = splitMessageArtifacts(
+      'Here it is:\n![Hatcher Robot](hatcher_robot.png)',
+      { agentId: 'agent_123' },
+    );
+
+    expect(parts).toEqual([
+      { kind: 'markdown', content: 'Here it is:\n' },
+      {
+        kind: 'image',
+        artifact: {
+          alt: 'Hatcher Robot',
+          url: '/api/agents/agent_123/media?path=hatcher_robot.png',
+          downloadUrl: '/api/agents/agent_123/media?path=hatcher_robot.png&download=1',
+          filename: 'hatcher_robot.png',
+          mediaType: 'image/png',
+        },
+      },
+    ]);
+  });
+
+  it('renders markdown media links and standalone MEDIA lines as playback artifacts', () => {
+    const parts = splitMessageArtifacts([
+      '[Generated clip](generated/demo.mp4)',
+      'MEDIA:voiceover.mp3',
+    ].join('\n'), { agentId: 'agent_123' });
+
+    expect(parts).toEqual([
+      {
+        kind: 'video',
+        artifact: {
+          title: 'Generated clip',
+          url: '/api/agents/agent_123/media?path=generated%2Fdemo.mp4',
+          downloadUrl: '/api/agents/agent_123/media?path=generated%2Fdemo.mp4&download=1',
+          filename: 'demo.mp4',
+          mediaType: 'video/mp4',
+        },
+      },
+      {
+        kind: 'audio',
+        artifact: {
+          title: 'voiceover.mp3',
+          url: '/api/agents/agent_123/media?path=voiceover.mp3',
+          downloadUrl: '/api/agents/agent_123/media?path=voiceover.mp3&download=1',
+          filename: 'voiceover.mp3',
+          mediaType: 'audio/mpeg',
+        },
+      },
+    ]);
+  });
+
   it('rewrites OpenClaw MEDIA audio file artifacts as playable audio', () => {
     const parts = splitMessageArtifacts([
       '```hatcher-artifact',

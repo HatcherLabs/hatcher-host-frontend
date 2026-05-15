@@ -79,7 +79,20 @@ export type MessagePart =
   | { kind: 'code'; artifact: CodeArtifact }
   | { kind: 'embed'; artifact: EmbedArtifact };
 
-const ARTIFACT_RE = /```([^\n`]*)\n([\s\S]*?)```|!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)|\[File:\s*([^\]\n]+?)\]|<iframe\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*(?:<\/iframe>)?/gi;
+const MEDIA_EXT_PATTERN = String.raw`(?:png|jpe?g|gif|webp|svg|mp4|webm|mov|m4v|mp3|wav|ogg|opus|m4a|flac|aac)`;
+const MEDIA_FILE_EXTENSION_RE = new RegExp(String.raw`\.${MEDIA_EXT_PATTERN}(?:[?#].*)?$`, 'i');
+const ARTIFACT_RE = new RegExp(
+  [
+    '```([^\\n`]*)\\n([\\s\\S]*?)```',
+    String.raw`!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)`,
+    String.raw`\[([^\]\n]+)\]\(([^)\s]+)(?:\s+"[^"]*")?\)`,
+    String.raw`\[File:\s*([^\]\n]+?)\]`,
+    String.raw`<iframe\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*(?:<\/iframe>)?`,
+    String.raw`(^|\n)[ \t]*(MEDIA:[^\s<>)]+)[ \t]*(?=\n|$)`,
+    String.raw`((?:https?:\/\/|\/|\./|[A-Za-z0-9_-])[\w./~:%@?&=+#-]*\.${MEDIA_EXT_PATTERN}(?:[?#][^\s<>)]*)?)`,
+  ].join('|'),
+  'gi',
+);
 const COLORS = ['#22d3ee', '#a3e635', '#f59e0b', '#f472b6', '#818cf8', '#34d399'];
 
 interface ArtifactParseOptions {
@@ -281,12 +294,38 @@ function codeArtifactFromFence(language: string, body: string, before = '', afte
   };
 }
 
+function normalizeContainerMediaPath(raw: string, requireMediaExtension: boolean): string | null {
+  const withoutAngles = raw.trim().replace(/^<|>$/g, '');
+  if (!withoutAngles || withoutAngles.includes('\0') || withoutAngles.includes('\\')) return null;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(withoutAngles)) return null;
+  if (requireMediaExtension && !MEDIA_FILE_EXTENSION_RE.test(withoutAngles)) return null;
+
+  const isAbsolute = withoutAngles.startsWith('/');
+  const segments = withoutAngles.split('/').filter((segment) => segment.length > 0 && segment !== '.');
+  if (segments.length === 0 || segments.some((segment) => segment === '..')) return null;
+
+  return `${isAbsolute ? '/' : ''}${segments.join('/')}`;
+}
+
+function proxiedContainerMediaUrl(mediaPath: string, agentId: string): string {
+  return `/api/agents/${encodeURIComponent(agentId)}/media?path=${encodeURIComponent(mediaPath)}`;
+}
+
 function mediaArtifactUrl(raw: string, agentId?: string): string | null {
   if (!agentId) return null;
-  const match = /^MEDIA:(.+)$/i.exec(raw.trim());
-  const mediaPath = match?.[1]?.trim();
-  if (!mediaPath || !mediaPath.startsWith('/') || mediaPath.includes('\0')) return null;
-  return `/api/agents/${encodeURIComponent(agentId)}/media?path=${encodeURIComponent(mediaPath)}`;
+  const trimmed = raw.trim();
+  const mediaDirective = /^MEDIA:(.+)$/i.exec(trimmed);
+
+  if (mediaDirective) {
+    const target = mediaDirective[1]?.trim();
+    if (!target) return null;
+    if (/^(https?:\/\/|data:|blob:|\/)/i.test(target) && !target.startsWith('/')) return target;
+    const mediaPath = normalizeContainerMediaPath(target, false);
+    return mediaPath ? proxiedContainerMediaUrl(mediaPath, agentId) : null;
+  }
+
+  const mediaPath = normalizeContainerMediaPath(trimmed, true);
+  return mediaPath ? proxiedContainerMediaUrl(mediaPath, agentId) : null;
 }
 
 function agentVideoContentUrl(raw: string, agentId?: string): string | null {
@@ -320,10 +359,11 @@ function cleanArtifactUrl(raw: unknown, options: ArtifactParseOptions = {}): str
   if (typeof raw !== 'string') return null;
   const url = raw.trim().replace(/^<|>$/g, '');
   if (!url) return null;
+  const mediaDirectiveTarget = /^MEDIA:(.+)$/i.exec(url)?.[1]?.trim();
+  const videoContentUrl = agentVideoContentUrl(mediaDirectiveTarget ?? url, options.agentId);
+  if (videoContentUrl) return videoContentUrl;
   const mediaUrl = mediaArtifactUrl(url, options.agentId);
   if (mediaUrl) return mediaUrl;
-  const videoContentUrl = agentVideoContentUrl(url, options.agentId);
-  if (videoContentUrl) return videoContentUrl;
   if (/^(https?:\/\/|data:|blob:|\/)/i.test(url)) return url;
   return null;
 }
@@ -963,8 +1003,12 @@ export function splitMessageArtifacts(content: string, options: ArtifactParseOpt
     const fenceBody = match[2] ?? '';
     const imageAlt = match[3];
     const imageUrl = cleanArtifactUrl(match[4], options);
-    const fileUrl = match[5];
-    const iframeUrl = match[6];
+    const linkText = match[5];
+    const linkUrl = cleanArtifactUrl(match[6], options);
+    const fileUrl = match[7];
+    const iframeUrl = match[8];
+    const mediaLineUrl = cleanArtifactUrl(match[10], options);
+    const bareMediaUrl = cleanArtifactUrl(match[11], options);
     const beforeContext = content.slice(Math.max(0, index - 800), index);
     const afterContext = content.slice(
       index + match[0].length,
@@ -1042,6 +1086,24 @@ export function splitMessageArtifacts(content: string, options: ArtifactParseOpt
       } else {
         parts.push({ kind: 'image', artifact: imageArtifactFromUrl(imageUrl, imageAlt || 'Image', mediaType) });
       }
+    } else if (linkUrl) {
+      const mediaType = inferMediaTypeFromUrl(linkUrl);
+      const mediaKind = mediaKindFromUrlOrType(linkUrl, mediaType);
+      if (mediaKind === 'image') {
+        parts.push({ kind: 'image', artifact: imageArtifactFromUrl(linkUrl, linkText || 'Image', mediaType) });
+      } else if (mediaKind === 'video') {
+        parts.push({
+          kind: 'video',
+          artifact: playbackArtifactFromUrl(linkUrl, linkText || 'Video', mediaType),
+        });
+      } else if (mediaKind === 'audio') {
+        parts.push({
+          kind: 'audio',
+          artifact: playbackArtifactFromUrl(linkUrl, linkText || 'Audio', mediaType),
+        });
+      } else {
+        parts.push({ kind: 'markdown', content: match[0] });
+      }
     } else if (fileUrl) {
       const artifact = fileArtifactFromUrl(fileUrl, options);
       if (artifact) {
@@ -1053,6 +1115,19 @@ export function splitMessageArtifacts(content: string, options: ArtifactParseOpt
       const artifact = embedArtifactFromIframe(iframeUrl);
       if (artifact) {
         parts.push({ kind: 'embed', artifact });
+      } else {
+        parts.push({ kind: 'markdown', content: match[0] });
+      }
+    } else if (mediaLineUrl || bareMediaUrl) {
+      const url = mediaLineUrl ?? bareMediaUrl ?? '';
+      const mediaType = inferMediaTypeFromUrl(url);
+      const mediaKind = mediaKindFromUrlOrType(url, mediaType);
+      if (mediaKind === 'image') {
+        parts.push({ kind: 'image', artifact: imageArtifactFromUrl(url, filenameFromUrl(url), mediaType) });
+      } else if (mediaKind === 'video') {
+        parts.push({ kind: 'video', artifact: playbackArtifactFromUrl(url, filenameFromUrl(url), mediaType) });
+      } else if (mediaKind === 'audio') {
+        parts.push({ kind: 'audio', artifact: playbackArtifactFromUrl(url, filenameFromUrl(url), mediaType) });
       } else {
         parts.push({ kind: 'markdown', content: match[0] });
       }

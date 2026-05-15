@@ -25,7 +25,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
   const { agentId } = await context.params;
   const mediaPath = request.nextUrl.searchParams.get('path');
   const videoJobId = request.nextUrl.searchParams.get('videoJobId');
-  if (!agentId || (!mediaPath?.startsWith('/') && !videoJobId)) {
+  if (!agentId || (!mediaPath && !videoJobId)) {
     return NextResponse.json({ error: 'Invalid media artifact request' }, { status: 400 });
   }
 
