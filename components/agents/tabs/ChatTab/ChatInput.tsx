@@ -16,6 +16,8 @@ const FRAMEWORK_COMMANDS: Record<string, Array<{ cmd: string; desc: string }>> =
     { cmd: '/status', desc: 'Agent status and health' },
     { cmd: '/reset', desc: 'Start a fresh conversation' },
     { cmd: '/new', desc: 'Start a new session' },
+    { cmd: '/think', desc: 'Set thinking level, e.g. /think minimal' },
+    { cmd: '/thinking', desc: 'Alias for /think' },
     { cmd: '/reasoning', desc: 'Toggle reasoning mode' },
     { cmd: '/model', desc: 'Show or change the active model' },
     { cmd: '/memory', desc: 'Search agent memory' },
