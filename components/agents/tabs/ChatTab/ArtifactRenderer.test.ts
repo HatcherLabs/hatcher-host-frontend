@@ -256,6 +256,46 @@ describe('splitMessageArtifacts', () => {
     ]);
   });
 
+  it('rewrites internal Hatcher video content URLs through the authenticated agent media proxy', () => {
+    const parts = splitMessageArtifacts(
+      '```hatcher-artifact\n{"kind":"video","title":"Generated video","url":"http://host.docker.internal:8080/media/videos/job-456/content?index=1"}\n```',
+      { agentId: 'agent_123' },
+    );
+
+    expect(parts).toEqual([
+      {
+        kind: 'video',
+        artifact: {
+          title: 'Generated video',
+          url: '/api/agents/agent_123/media?videoJobId=job-456&index=1',
+          downloadUrl: '/api/agents/agent_123/media?videoJobId=job-456&index=1&download=1',
+          filename: 'job-456.mp4',
+          mediaType: 'video/mp4',
+        },
+      },
+    ]);
+  });
+
+  it('renders generated audio data URLs as playable and downloadable audio artifacts', () => {
+    const parts = splitMessageArtifacts(
+      '```hatcher-artifact\n{"kind":"audio","title":"Hatcher song","url":"data:audio/mpeg;base64,AAAA"}\n```',
+      { agentId: 'agent_123' },
+    );
+
+    expect(parts).toEqual([
+      {
+        kind: 'audio',
+        artifact: {
+          title: 'Hatcher song',
+          url: 'data:audio/mpeg;base64,AAAA',
+          downloadUrl: 'data:audio/mpeg;base64,AAAA',
+          filename: 'artifact.mp3',
+          mediaType: 'audio/mpeg',
+        },
+      },
+    ]);
+  });
+
   it('keeps generated data URL images downloadable without turning the filename into base64', () => {
     const parts = splitMessageArtifacts('![Generated](data:image/png;base64,AAA=)');
 
