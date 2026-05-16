@@ -276,6 +276,26 @@ describe('splitMessageArtifacts', () => {
     ]);
   });
 
+  it('rewrites Docker service Hatcher video content URLs through the authenticated agent media proxy', () => {
+    const parts = splitMessageArtifacts(
+      '```hatcher-artifact\n{"kind":"video","title":"Generated video","url":"http://hatcher-llm-proxy:8080/media/videos/job-789/content"}\n```',
+      { agentId: 'agent_123' },
+    );
+
+    expect(parts).toEqual([
+      {
+        kind: 'video',
+        artifact: {
+          title: 'Generated video',
+          url: 'http://localhost:3001/agents/agent_123/media/video?jobId=job-789&index=0',
+          downloadUrl: 'http://localhost:3001/agents/agent_123/media/video?jobId=job-789&index=0&download=1',
+          filename: 'job-789.mp4',
+          mediaType: 'video/mp4',
+        },
+      },
+    ]);
+  });
+
   it('renders generated audio data URLs as playable and downloadable audio artifacts', () => {
     const parts = splitMessageArtifacts(
       '```hatcher-artifact\n{"kind":"audio","title":"Hatcher song","url":"data:audio/mpeg;base64,AAAA"}\n```',
