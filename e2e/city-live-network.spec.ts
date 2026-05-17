@@ -182,8 +182,9 @@ test.describe('Hatcher City live network', () => {
     });
     await expect(page.getByText('5 agents')).toBeVisible();
     await expect(page.getByText('3 active')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Back to site' })).toHaveAttribute('href', '/');
     await expect(page.getByRole('link', { name: 'Create agent' })).toBeVisible();
-    await expect(page.locator('#main-content').getByText('My agents')).toBeVisible();
+    await expect(page.getByText('My agents')).toBeVisible();
     await expect(page.getByRole('link', { name: /Aurora Planner/ })).toBeVisible();
 
     const canvas = page.locator('canvas').first();
@@ -201,5 +202,13 @@ test.describe('Hatcher City live network', () => {
     await page.goto('/city/development', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/city$/);
     await expect(page.getByRole('heading', { name: 'Live Agent Network' })).toBeVisible();
+  });
+
+  test('mobile menu exposes a back to site link', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 667 });
+    await page.goto('/city', { waitUntil: 'domcontentloaded' });
+
+    await page.getByLabel('Open scene menu').click();
+    await expect(page.getByRole('link', { name: 'Back to site' })).toHaveAttribute('href', '/');
   });
 });

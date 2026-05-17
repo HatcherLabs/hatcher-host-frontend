@@ -2,6 +2,7 @@
 import { MapControls } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
+  ArrowLeft,
   Bot,
   Building2,
   DoorOpen,
@@ -501,6 +502,14 @@ function LiveCityMobileMenu({
       }`}
       tone="cool"
     >
+      <Link
+        href="/"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-[7px] border border-white/12 bg-white/[0.06] px-3 py-2.5 text-sm font-semibold text-white"
+      >
+        <ArrowLeft size={15} />
+        Back to site
+      </Link>
+
       <div className="grid grid-cols-2 gap-2">
         <button
           type="button"
