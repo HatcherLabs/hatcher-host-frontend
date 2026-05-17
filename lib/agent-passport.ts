@@ -132,8 +132,8 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
           chainId: 8453,
           walletAddress: agent?.skaleWalletAddress ?? null,
           agentId: null,
-          registry: 'ERC-8004 Identity Registry',
-          registryStatus: 'planned',
+          registry: null,
+          registryStatus: agent?.skaleWalletAddress ? 'wallet-ready' : 'planned',
           registeredAt: null,
           explorerUrl: agent?.skaleWalletAddress
             ? `https://basescan.org/address/${agent.skaleWalletAddress}`
@@ -148,7 +148,7 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
           caip2: `solana:${SOLANA_NETWORK}`,
           walletAddress: null,
           agentId: null,
-          registry: 'Hatcher Solana Memo Registry',
+          registry: null,
           registryStatus: 'planned',
           registeredAt: null,
           explorerUrl: null,
@@ -162,7 +162,7 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
         status: agent?.skaleWalletAddress ? 'wallet-ready' : 'planned',
         address: agent?.skaleWalletAddress ?? null,
         networks: ['skale', 'base'],
-        signerMode: 'receive-only',
+        signerMode: 'runtime-signing',
       },
       {
         id: 'agent-solana',
@@ -174,11 +174,10 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
       },
     ],
     runtime: {
-      signerMode: 'receive-only',
+      signerMode: 'runtime-signing',
       trading: {
-        status: 'disabled',
-        networks: [],
-        requiresExplicitUserIntent: true,
+        status: agent?.skaleWalletAddress ? 'enabled' : 'disabled',
+        networks: agent?.skaleWalletAddress ? ['skale', 'base'] : [],
         quoteProviders: [
           {
             id: 'jupiter',
@@ -187,41 +186,10 @@ export function buildFallbackPassport(agent: PassportFallbackAgent | null, route
             baseUrl: 'https://api.jup.ag',
           },
         ],
-        notes: ['Runtime signing is disabled; wallets are receive-only from inside the agent process.'],
+        notes: ['Runtime signing is enabled by default for provisioned agent wallets.'],
       },
     },
-    payments: [
-      {
-        id: 'x402-skale-usdc',
-        protocol: 'x402',
-        network: 'skale',
-        status: 'planned',
-        caip2: 'eip155:1187947933',
-        asset: null,
-        receivingAddress: null,
-        facilitatorUrl: null,
-      },
-      {
-        id: 'x402-base-usdc',
-        protocol: 'x402',
-        network: 'base',
-        status: 'planned',
-        caip2: 'eip155:8453',
-        asset: null,
-        receivingAddress: null,
-        facilitatorUrl: null,
-      },
-      {
-        id: 'x402-solana-usdc',
-        protocol: 'x402',
-        network: 'solana',
-        status: 'planned',
-        caip2: `solana:${SOLANA_NETWORK}`,
-        asset: null,
-        receivingAddress: null,
-        facilitatorUrl: null,
-      },
-    ],
+    payments: [],
     mcp: {
       status: 'planned',
       manifestUrl: `${apiBase}/agents/${publicId}/mcp/manifest.json`,

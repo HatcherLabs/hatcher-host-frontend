@@ -1,42 +1,25 @@
 'use client';
 
-// ============================================================
-// WalletTab — SKALE wallet, identity, reputation, signing
-//
-// Renders five cards stacked top-to-bottom:
-//   1. Agent Passport — multichain identity, x402 rails, MCP links.
-//   2. Wallet — public address, CREDIT + USDC balances, deposit QR.
-//   3. ERC-8004 Identity — on-chain agentId, registry contract,
-//      registered-at timestamp; "Verify on SKALE" button when not
-//      yet registered.
-//   4. On-Chain Reputation — DB thumbs aggregate (up/down/score%)
-//      paired with the on-chain attestation count cached from the
-//      ReputationRegistry, plus a link to the latest tx.
-//   5. Runtime Signing — opt-in toggle that injects the encrypted
-//      private key into the container env so the agent process can
-//      sign + submit transactions itself. Off by default; receive-only
-//      until the user explicitly enables it.
-// ============================================================
-
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Wallet as WalletIcon,
-  Copy,
-  RefreshCw,
-  ExternalLink,
-  ShieldCheck,
-  Zap,
-  Key,
   AlertTriangle,
-  Star,
-  ThumbsUp,
-  ThumbsDown,
+  Copy,
+  Eye,
+  EyeOff,
+  ExternalLink,
   Fingerprint,
-  Server,
-  CreditCard,
-  Link2,
-  Network,
+  Key,
+  Layers3,
+  Lock,
+  RefreshCw,
+  ShieldCheck,
+  Star,
+  ThumbsDown,
+  ThumbsUp,
+  Wallet as WalletIcon,
+  X,
+  Zap,
 } from 'lucide-react';
 import { useAgentContext, GlassCard } from '../AgentContext';
 import { api } from '@/lib/api';
@@ -44,23 +27,11 @@ import type {
   AgentPassport,
   AgentPassportNetwork,
   AgentPassportNetworkId,
-  AgentPassportPaymentRail,
-  AgentPassportStatus,
+  AgentWalletNetworkBalance,
+  AgentWalletPrivateKeyResponse,
+  AgentWalletsResponse,
 } from '@/lib/api';
-import { buildFallbackPassport, networkStatusLabel, networkStatusTone, shortAddress } from '@/lib/agent-passport';
-
-interface WalletState {
-  address: string;
-  chainId: number;
-  rpcUrl: string;
-  ethFormatted: string;
-  usdcFormatted: string;
-  usdcContract: string;
-  erc8004AgentId: string | null;
-  erc8004RegisteredAt: string | null;
-  erc8004IdentityContract: string;
-  hubAddress: string | null;
-}
+import { buildFallbackPassport, shortAddress } from '@/lib/agent-passport';
 
 interface ReputationState {
   upCount: number;
@@ -78,87 +49,153 @@ interface ReputationState {
   };
 }
 
-type IdentityRegisterNetwork = Extract<AgentPassportNetworkId, 'skale' | 'base' | 'solana'>;
+type WalletPanel = 'passport' | AgentPassportNetworkId;
 
-interface DepositTarget {
-  id: string;
-  label: string;
-  networkLabel: string;
-  address: string;
-  explorerUrl: string | null;
+const TAB_ORDER: WalletPanel[] = ['passport', 'skale', 'solana', 'base'];
+const NETWORK_ORDER: AgentPassportNetworkId[] = ['skale', 'solana', 'base'];
+
+function labelForPanel(panel: WalletPanel): string {
+  if (panel === 'passport') return 'Passport';
+  if (panel === 'skale') return 'SKALE';
+  if (panel === 'solana') return 'Solana';
+  return 'Base';
 }
 
-function explorerBase(_chainId: number): string {
-  return 'https://skale-base-explorer.skalenodes.com';
-}
-
-function explorerAddrUrl(address: string, chainId: number): string {
-  return `${explorerBase(chainId)}/address/${address}`;
+function iconForPanel(panel: WalletPanel) {
+  if (panel === 'passport') return <Fingerprint size={14} />;
+  if (panel === 'skale') return <ShieldCheck size={14} />;
+  if (panel === 'solana') return <Zap size={14} />;
+  return <Layers3 size={14} />;
 }
 
 function explorerTxUrl(txHash: string, chainId: number): string {
-  return `${explorerBase(chainId)}/tx/${txHash}`;
+  return `https://skale-base-explorer.skalenodes.com/tx/${txHash}`;
 }
 
-function shortAddr(addr: string): string {
-  return addr.length > 14 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr;
+function explorerAddrUrl(address: string, chainId: number): string {
+  return `https://skale-base-explorer.skalenodes.com/address/${address}`;
+}
+
+function formatDate(value: string | null | undefined): string {
+  if (!value) return '-';
+  return new Date(value).toLocaleString();
+}
+
+function formatBalance(value: string | null | undefined): string {
+  if (!value) return '0';
+  if (!value.includes('.')) return value;
+  const [whole, fraction = ''] = value.split('.');
+  const trimmed = fraction.replace(/0+$/, '').slice(0, 6);
+  return trimmed ? `${whole}.${trimmed}` : whole;
+}
+
+function walletEnvFor(id: AgentPassportNetworkId): { walletEnvVar: string; privateKeyEnvVar: string } {
+  if (id === 'skale') return { walletEnvVar: 'SKALE_WALLET_ADDRESS', privateKeyEnvVar: 'SKALE_PRIVATE_KEY' };
+  if (id === 'base') return { walletEnvVar: 'BASE_WALLET_ADDRESS', privateKeyEnvVar: 'BASE_PRIVATE_KEY' };
+  return { walletEnvVar: 'SOLANA_WALLET_ADDRESS', privateKeyEnvVar: 'SOLANA_PRIVATE_KEY' };
+}
+
+function fallbackWalletNetwork(network: AgentPassportNetwork): AgentWalletNetworkBalance {
+  const env = walletEnvFor(network.id);
+  return {
+    id: network.id,
+    label: network.label,
+    chainType: network.chainType,
+    status: network.status,
+    caip2: network.caip2,
+    chainId: network.chainId ? String(network.chainId) : null,
+    address: network.walletAddress,
+    explorerUrl: network.explorerUrl,
+    sharedWalletWith: network.sharedWalletWith,
+    walletEnvVar: env.walletEnvVar,
+    privateKeyEnvVar: env.privateKeyEnvVar,
+    canSign: !!network.walletAddress,
+    nativeBalance: null,
+    tokenBalances: [],
+    balanceError: null,
+    identity:
+      network.id === 'skale'
+        ? {
+            agentId: network.agentId,
+            registry: network.contracts?.identity ?? network.registry,
+            registrationTxHash: null,
+            registeredAt: network.registeredAt,
+          }
+        : null,
+  };
 }
 
 export function WalletTab() {
   const { agent, loadAgent } = useAgentContext();
-  const [wallet, setWallet] = useState<WalletState | null>(null);
   const [passport, setPassport] = useState<AgentPassport | null>(null);
+  const [wallets, setWallets] = useState<AgentWalletsResponse | null>(null);
   const [reputation, setReputation] = useState<ReputationState | null>(null);
+  const [activePanel, setActivePanel] = useState<WalletPanel>('passport');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copyMsg, setCopyMsg] = useState<string | null>(null);
-  const [registeringNetwork, setRegisteringNetwork] = useState<IdentityRegisterNetwork | null>(null);
+  const [registeringSkale, setRegisteringSkale] = useState(false);
   const [registerMsg, setRegisterMsg] = useState<string | null>(null);
-  const [signingToggling, setSigningToggling] = useState(false);
-  const [signingPendingConfirm, setSigningPendingConfirm] = useState(false);
-  const [signingError, setSigningError] = useState<string | null>(null);
   const [provisioningChains, setProvisioningChains] = useState(false);
   const [runtimeRestartNeeded, setRuntimeRestartNeeded] = useState(false);
   const [restartingRuntime, setRestartingRuntime] = useState(false);
+  const [privateKeyNetwork, setPrivateKeyNetwork] = useState<AgentWalletNetworkBalance | null>(null);
+  const [privateKeyPassword, setPrivateKeyPassword] = useState('');
+  const [privateKeyValue, setPrivateKeyValue] = useState<AgentWalletPrivateKeyResponse | null>(null);
+  const [privateKeyLoading, setPrivateKeyLoading] = useState(false);
+  const [privateKeyError, setPrivateKeyError] = useState<string | null>(null);
+  const [privateKeyVisible, setPrivateKeyVisible] = useState(false);
 
-  const advanced = (agent.config?.advanced as Record<string, unknown> | undefined) ?? {};
-  const signingEnabled = advanced['agent_wallet_signer'] === true;
   const activePassport = useMemo(() => passport ?? buildFallbackPassport(agent, agent.id), [agent, passport]);
 
-  const loadWallet = useCallback(async () => {
+  const networks = useMemo(() => {
+    const fromWallets = new Map((wallets?.networks ?? []).map((network) => [network.id, network]));
+    const fromPassport = new Map(
+      activePassport.identity.networks.map((network) => [network.id, fallbackWalletNetwork(network)]),
+    );
+    return NETWORK_ORDER.map((id) => fromWallets.get(id) ?? fromPassport.get(id)).filter(
+      (network): network is AgentWalletNetworkBalance => !!network,
+    );
+  }, [activePassport.identity.networks, wallets]);
+
+  const networkById = useMemo(() => new Map(networks.map((network) => [network.id, network])), [networks]);
+
+  const loadWalletData = useCallback(async () => {
     setLoading(true);
     setError(null);
-    try {
-      const res = await api.getAgentSkaleWallet(agent.id);
-      if (res.success) setWallet(res.data);
-      else setError(res.error ?? 'Could not load wallet');
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not load wallet');
-    } finally {
-      setLoading(false);
+
+    const [walletsRes, passportRes, reputationRes] = await Promise.allSettled([
+      api.getAgentWallets(agent.id),
+      api.getAgentPassport(agent.id),
+      api.getAgentReputation(agent.id),
+    ]);
+
+    if (walletsRes.status === 'fulfilled' && walletsRes.value.success) {
+      setWallets(walletsRes.value.data);
+    } else {
+      let message: string | null = null;
+      if (walletsRes.status === 'fulfilled') {
+        message = walletsRes.value.success ? null : walletsRes.value.error;
+      } else if (walletsRes.reason instanceof Error) {
+        message = walletsRes.reason.message;
+      }
+      setError(message ?? 'Could not load wallet balances');
     }
-    // Reputation is best-effort — failure shouldn't break the rest of the
-    // wallet view (it's a public endpoint that can be down independently).
-    try {
-      const rep = await api.getAgentReputation(agent.id);
-      if (rep.success) setReputation(rep.data);
-    } catch {
-      /* swallow — keep card hidden */
+
+    if (passportRes.status === 'fulfilled' && passportRes.value.success) {
+      setPassport(passportRes.value.data);
     }
-    // Passport powers the dashboard multichain card. It is best-effort here:
-    // the SKALE wallet view remains usable even if the public manifest route
-    // is temporarily unavailable during local development.
-    try {
-      const pass = await api.getAgentPassport(agent.id);
-      if (pass.success) setPassport(pass.data);
-    } catch {
-      /* fallback derived from the already-loaded agent stays visible */
+
+    if (reputationRes.status === 'fulfilled' && reputationRes.value.success) {
+      setReputation(reputationRes.value.data);
     }
+
+    setLoading(false);
   }, [agent.id]);
 
   useEffect(() => {
-    void loadWallet();
-  }, [loadWallet]);
+    void loadWalletData();
+  }, [loadWalletData]);
 
   const copy = (value: string | null | undefined, label: string) => {
     if (!value) return;
@@ -174,61 +211,21 @@ export function WalletTab() {
       });
   };
 
-  // Two-step inline confirm — native confirm() is blocked in iOS WKWebView
-  // (the Android app embeds the dashboard in a WebView), and an inline
-  // pattern is consistent with how the rest of the dashboard gates
-  // destructive toggles (e.g. delete-agent on the management page).
-  const requestEnableSigning = () => {
-    setSigningError(null);
-    setSigningPendingConfirm(true);
-  };
-
-  const cancelEnableSigning = () => {
-    setSigningPendingConfirm(false);
-  };
-
-  const applySigningChange = async (next: boolean) => {
-    setSigningPendingConfirm(false);
-    setSigningError(null);
-    setSigningToggling(true);
-    try {
-      await api.updateAgent(agent.id, {
-        config: { advanced: { agent_wallet_signer: next } },
-      } as never);
-      await loadAgent();
-      await loadWallet();
-      setRuntimeRestartNeeded(true);
-    } catch (e) {
-      setSigningError(e instanceof Error ? e.message : 'Failed to toggle signing');
-    } finally {
-      setSigningToggling(false);
-    }
-  };
-
-  const registerIdentity = async (network: IdentityRegisterNetwork) => {
-    setRegisteringNetwork(network);
+  const registerSkaleIdentity = async () => {
+    setRegisteringSkale(true);
     setRegisterMsg(null);
     try {
-      const res =
-        network === 'skale'
-          ? await api.registerAgentSkale(agent.id)
-          : network === 'base'
-            ? await api.registerAgentBase(agent.id)
-            : await api.registerAgentSolana(agent.id);
-      const label = networkLabel(network);
-      if (res.success) {
-        setRegisterMsg(
-          res.data.txHash ? `${label} registered. tx=${res.data.txHash.slice(0, 10)}…` : `${label} synced`,
-        );
-        await loadWallet();
-        await loadAgent();
-      } else {
-        setRegisterMsg(res.error ?? `${label} registration failed`);
-      }
+      const res = await api.registerAgentSkale(agent.id);
+      if (!res.success) throw new Error(res.error || 'SKALE registration failed');
+      setRegisterMsg(
+        res.data.txHash ? `SKALE identity registered. tx=${res.data.txHash.slice(0, 10)}...` : 'SKALE identity synced',
+      );
+      await loadWalletData();
+      await loadAgent();
     } catch (e) {
-      setRegisterMsg(e instanceof Error ? e.message : 'Registration failed');
+      setRegisterMsg(e instanceof Error ? e.message : 'SKALE registration failed');
     } finally {
-      setRegisteringNetwork(null);
+      setRegisteringSkale(false);
       setTimeout(() => setRegisterMsg(null), 6000);
     }
   };
@@ -238,15 +235,14 @@ export function WalletTab() {
     try {
       const res = await api.provisionAgentChainAccounts(agent.id);
       if (!res.success) throw new Error(res.error || 'Provisioning failed');
-      const pass = await api.getAgentPassport(agent.id);
-      if (pass.success) setPassport(pass.data);
+      await loadWalletData();
       setRuntimeRestartNeeded(res.data.needsRestart);
       setCopyMsg(
         res.data.needsRestart
           ? 'Provisioned. Restart agent to refresh runtime env'
           : res.data.provisioned
-            ? 'Multichain accounts provisioned'
-            : 'Multichain accounts already provisioned',
+            ? 'Wallets provisioned'
+            : 'Wallets already provisioned',
       );
       setTimeout(() => setCopyMsg(null), res.data.needsRestart ? 3200 : 1800);
     } catch (e) {
@@ -274,795 +270,760 @@ export function WalletTab() {
     }
   };
 
-  if (loading && !wallet) {
+  const openPrivateKeyModal = (network: AgentWalletNetworkBalance) => {
+    setPrivateKeyNetwork(network);
+    setPrivateKeyPassword('');
+    setPrivateKeyValue(null);
+    setPrivateKeyError(null);
+    setPrivateKeyVisible(false);
+  };
+
+  const closePrivateKeyModal = () => {
+    setPrivateKeyNetwork(null);
+    setPrivateKeyPassword('');
+    setPrivateKeyValue(null);
+    setPrivateKeyError(null);
+    setPrivateKeyVisible(false);
+    setPrivateKeyLoading(false);
+  };
+
+  const exportPrivateKey = async () => {
+    if (!privateKeyNetwork) return;
+    setPrivateKeyLoading(true);
+    setPrivateKeyError(null);
+    try {
+      const res = await api.exportAgentWalletPrivateKey(agent.id, privateKeyNetwork.id, privateKeyPassword);
+      if (!res.success) throw new Error(res.error || 'Private key export failed');
+      setPrivateKeyValue(res.data);
+      setPrivateKeyVisible(true);
+      setPrivateKeyPassword('');
+    } catch (e) {
+      setPrivateKeyError(e instanceof Error ? e.message : 'Private key export failed');
+      setPrivateKeyValue(null);
+      setPrivateKeyVisible(false);
+    } finally {
+      setPrivateKeyLoading(false);
+    }
+  };
+
+  const missingWallets = networks.some((network) => !network.address);
+  const activeNetwork = activePanel === 'passport' ? null : networkById.get(activePanel);
+
+  if (loading && !wallets && !passport) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 p-6">
-        <div className="shimmer rounded-xl h-8 w-48" />
-        <div className="shimmer rounded-xl h-32 w-full" />
-        <div className="shimmer rounded-xl h-24 w-full" />
+        <div className="shimmer h-8 w-48 rounded-xl" />
+        <div className="shimmer h-32 w-full rounded-xl" />
+        <div className="shimmer h-24 w-full rounded-xl" />
       </motion.div>
     );
   }
-
-  if (error || !wallet) {
-    return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6">
-        <GlassCard className="p-6">
-          <div className="flex items-center gap-3 text-[var(--text-muted)]">
-            <WalletIcon size={18} />
-            <span>{error ?? 'No wallet found for this agent.'}</span>
-          </div>
-          <button
-            onClick={() => void loadWallet()}
-            className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 text-xs uppercase tracking-wider border border-[var(--border-subtle)] hover:border-[var(--phosphor)] transition"
-          >
-            <RefreshCw size={12} /> Retry
-          </button>
-        </GlassCard>
-      </motion.div>
-    );
-  }
-
-  const primaryNetwork = activePassport.identity.networks.find(
-    (network) => network.id === activePassport.identity.primaryNetwork,
-  );
-  const solanaNetwork = activePassport.identity.networks.find((network) => network.id === 'solana');
-  const registeredIdentityCount = activePassport.identity.networks.filter(
-    (network) => network.registryStatus === 'registered',
-  ).length;
-  const depositTargets: DepositTarget[] = [
-    {
-      id: 'evm',
-      label: 'EVM wallet',
-      networkLabel: 'SKALE / Base',
-      address: wallet.address,
-      explorerUrl: explorerAddrUrl(wallet.address, wallet.chainId),
-    },
-    ...(solanaNetwork?.walletAddress
-      ? [
-          {
-            id: 'solana',
-            label: 'Solana wallet',
-            networkLabel: 'Solana',
-            address: solanaNetwork.walletAddress,
-            explorerUrl: solanaNetwork.explorerUrl,
-          },
-        ]
-      : []),
-  ];
 
   return (
-    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 border border-[var(--phosphor)]/40 flex items-center justify-center">
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-5 p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center border border-[var(--phosphor)]/40">
             <WalletIcon size={18} className="text-[var(--phosphor)]" />
           </div>
-          <div>
+          <div className="min-w-0">
             <h2 className="text-lg font-semibold text-[var(--text-primary)]">Agent Wallets</h2>
-            <p className="text-xs text-[var(--text-muted)]">
-              Primary identity{' '}
-              <span className="font-mono text-[var(--phosphor)]">{primaryNetwork?.label ?? 'SKALE'}</span> ·{' '}
-              {registeredIdentityCount}/{activePassport.identity.networks.length} anchors live
-            </p>
+            <button
+              type="button"
+              onClick={() => copy(activePassport.identity.handle, 'Passport handle')}
+              className="block max-w-full truncate font-mono text-xs text-[var(--phosphor)] hover:underline"
+              title={activePassport.identity.handle}
+            >
+              {activePassport.identity.handle}
+            </button>
           </div>
         </div>
         <button
-          onClick={() => void loadWallet()}
+          onClick={() => void loadWalletData()}
           disabled={loading}
-          className="inline-flex items-center gap-2 px-3 py-1.5 text-xs uppercase tracking-wider border border-[var(--border-subtle)] hover:border-[var(--phosphor)] disabled:opacity-50 transition"
+          className="inline-flex items-center gap-2 border border-[var(--border-subtle)] px-3 py-1.5 text-xs uppercase tracking-wider transition hover:border-[var(--phosphor)] disabled:opacity-50"
         >
           <RefreshCw size={12} className={loading ? 'animate-spin' : ''} /> Refresh
         </button>
       </div>
 
-      <AgentPassportDashboardCard
-        passport={activePassport}
-        onCopy={copy}
-        onProvision={() => void provisionChainAccounts()}
-        provisioning={provisioningChains}
-        onRestartRuntime={() => void restartRuntime()}
-        runtimeRestartNeeded={runtimeRestartNeeded}
-        restartingRuntime={restartingRuntime}
-      />
-
-      {/* Deposit addresses */}
-      <GlassCard className="p-6">
-        <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
-          <WalletIcon size={12} /> Deposit addresses
-        </div>
-        <div className="grid lg:grid-cols-2 gap-4">
-          {depositTargets.map((target) => (
-            <DepositAddressCard key={target.id} target={target} onCopy={copy} />
-          ))}
-        </div>
-        {copyMsg && <div className="text-[10px] text-[var(--phosphor)] mt-3">{copyMsg}</div>}
-      </GlassCard>
-
-      {/* Balance grid */}
-      <div className="grid sm:grid-cols-2 gap-4">
-        <GlassCard className="p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
-              <Zap size={12} /> SKALE Native Gas
-            </div>
-            <span className="text-[10px] text-[var(--text-muted)]">CREDIT</span>
-          </div>
-          <div className="text-2xl font-mono text-[var(--text-primary)]">{wallet.ethFormatted}</div>
-        </GlassCard>
-
-        <GlassCard className="p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
-              <WalletIcon size={12} /> SKALE USDC
-            </div>
-            <a
-              href={explorerAddrUrl(wallet.usdcContract, wallet.chainId)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[10px] text-[var(--text-muted)] hover:text-[var(--phosphor)] transition"
-              title={wallet.usdcContract}
-            >
-              {shortAddr(wallet.usdcContract)} <ExternalLink size={9} className="inline" />
-            </a>
-          </div>
-          <div className="text-2xl font-mono text-[var(--text-primary)]">${wallet.usdcFormatted}</div>
-        </GlassCard>
+      <div className="grid grid-cols-2 gap-2 rounded-lg border border-[var(--border-subtle)] bg-black/20 p-1 md:grid-cols-4">
+        {TAB_ORDER.map((panel) => (
+          <button
+            key={panel}
+            type="button"
+            onClick={() => setActivePanel(panel)}
+            className={`flex min-h-10 items-center justify-center gap-2 rounded-md px-3 text-xs font-medium uppercase tracking-wider transition ${
+              activePanel === panel
+                ? 'border border-[var(--phosphor)]/40 bg-[var(--phosphor)]/10 text-[var(--phosphor)]'
+                : 'border border-transparent text-[var(--text-muted)] hover:bg-white/5 hover:text-[var(--text-primary)]'
+            }`}
+          >
+            {iconForPanel(panel)}
+            {labelForPanel(panel)}
+          </button>
+        ))}
       </div>
 
-      <IdentityAnchorsCard
-        networks={activePassport.identity.networks}
-        primaryNetwork={activePassport.identity.primaryNetwork}
-        registeringNetwork={registeringNetwork}
-        registerMsg={registerMsg}
-        onRegister={(network) => void registerIdentity(network)}
-      />
-
-      {/* ERC-8004 Reputation — DB thumbs aggregate + on-chain attestations */}
-      {wallet.erc8004AgentId && reputation && (
-        <GlassCard className="p-5">
-          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-            <div className="flex items-center gap-3">
-              <Star size={16} className="text-[var(--phosphor)]" />
-              <h3 className="text-sm font-semibold text-[var(--text-primary)]">On-Chain Reputation</h3>
-            </div>
-            {reputation.scorePct !== null && (
-              <span className="px-2 py-0.5 border border-[var(--phosphor)]/40 text-[var(--phosphor)] text-[10px] uppercase tracking-wider">
-                {reputation.scorePct}% positive
-              </span>
-            )}
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
-            <ReputationStat
-              label="Thumbs up"
-              value={reputation.upCount}
-              icon={<ThumbsUp size={11} />}
-              tone="phosphor"
-            />
-            <ReputationStat
-              label="Thumbs down"
-              value={reputation.downCount}
-              icon={<ThumbsDown size={11} />}
-              tone="muted"
-            />
-            <ReputationStat
-              label="On-chain"
-              value={reputation.onChain.attestationCount}
-              icon={<ShieldCheck size={11} />}
-              tone="phosphor"
-            />
-            <ReputationStat
-              label="Activity"
-              value={reputation.onChain.activityMilestone}
-              icon={<Zap size={11} />}
-              tone="muted"
-            />
-          </div>
-          <div className="space-y-1.5 text-xs text-[var(--text-muted)]">
-            <div className="font-mono break-all">
-              Registry:{' '}
-              <a
-                href={explorerAddrUrl(reputation.onChain.contract, reputation.onChain.chainId)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--phosphor)] hover:underline"
-              >
-                {shortAddr(reputation.onChain.contract)}
-              </a>
-            </div>
-            {reputation.onChain.lastTxHash && (
-              <div className="font-mono break-all">
-                Last attestation:{' '}
-                <a
-                  href={explorerTxUrl(reputation.onChain.lastTxHash, reputation.onChain.chainId)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[var(--phosphor)] hover:underline"
-                >
-                  {shortAddr(reputation.onChain.lastTxHash)}
-                </a>
-                {reputation.onChain.lastTxAt && (
-                  <span className="ml-2 text-[var(--text-muted)]">
-                    {new Date(reputation.onChain.lastTxAt).toLocaleString()}
-                  </span>
-                )}
-              </div>
-            )}
-            {reputation.onChain.attestationCount === 0 && reputation.total === 0 && (
-              <div className="text-[10px] italic">
-                No feedback yet. User thumbs go on-chain automatically; activity milestones every 100 messages.
-              </div>
-            )}
-          </div>
-        </GlassCard>
+      {error && (
+        <div className="flex items-start gap-2 border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-200">
+          <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
+          <span>{error}. Showing cached passport data where available.</span>
+        </div>
       )}
 
-      {/* Runtime signing — opt-in private-key injection */}
-      <GlassCard className="p-5">
-        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-          <div className="flex items-center gap-3">
-            <Key size={16} className={signingEnabled ? 'text-amber-400' : 'text-[var(--phosphor)]'} />
-            <h3 className="text-sm font-semibold text-[var(--text-primary)]">Agent Runtime Signing</h3>
-          </div>
-          <span
-            className={`px-2 py-0.5 border text-[10px] uppercase tracking-wider ${
-              signingEnabled
-                ? 'border-amber-500/40 text-amber-400'
-                : 'border-[var(--border-subtle)] text-[var(--text-muted)]'
-            }`}
-          >
-            {signingEnabled ? 'Signing ON' : 'Receive-only'}
-          </span>
-        </div>
-        <div className="text-xs text-[var(--text-muted)] leading-relaxed mb-3">
-          Off (default): the agent process can read balances and build unsigned transactions but cannot submit them.
-          Wallet is receive-only.
-          <br />
-          <br />
-          On: the SKALE/Base EVM key and Solana key are injected into the container env at start time. The agent can use
-          the bundled wallet skills, <code className="text-[var(--phosphor)] font-mono">skale</code> CLI,{' '}
-          <code className="text-[var(--phosphor)] font-mono">ethers</code>, or Solana tooling to sign + submit
-          transactions, including x402 payments, ERC-8004 reputation calls, and Solana trades.
-        </div>
-        {signingEnabled && (
-          <div className="flex items-start gap-2 p-3 mb-3 border border-amber-500/30 bg-amber-500/5 text-[11px] text-amber-400">
-            <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
-            <span>
-              Active. The agent runtime now controls funds in this wallet. Restart the container after the toggle for
-              the change to take effect. Only enable for trusted skill sets.
-            </span>
-          </div>
-        )}
-        {signingPendingConfirm ? (
-          <div className="border border-amber-500/40 bg-amber-500/5 p-3 space-y-3">
-            <div className="flex items-start gap-2 text-[11px] text-amber-400">
-              <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
-              <span>
-                Enabling injects the agent&apos;s EVM and Solana private keys into the container env (
-                <code className="font-mono">SKALE_PRIVATE_KEY</code>,
-                <code className="font-mono"> BASE_PRIVATE_KEY</code>,
-                <code className="font-mono"> SOLANA_PRIVATE_KEY</code>) on next start. The agent will be able to sign +
-                submit transactions on its own. You can revoke at any time. Restart the container after toggling for the
-                change to take effect.
-              </span>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => void applySigningChange(true)}
-                disabled={signingToggling}
-                className="inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-wider border border-amber-500/60 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition disabled:opacity-50"
-              >
-                <Key size={12} />
-                {signingToggling ? 'Enabling…' : 'Confirm enable'}
-              </button>
-              <button
-                onClick={cancelEnableSigning}
-                disabled={signingToggling}
-                className="inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-wider border border-[var(--border-subtle)] text-[var(--text-muted)] hover:bg-white/5 transition disabled:opacity-50"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        ) : (
-          <button
-            onClick={() => (signingEnabled ? void applySigningChange(false) : requestEnableSigning())}
-            disabled={signingToggling}
-            className={`inline-flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-wider border transition disabled:opacity-50 disabled:cursor-not-allowed ${
-              signingEnabled
-                ? 'border-amber-500/40 text-amber-400 hover:bg-amber-500/10'
-                : 'border-[var(--phosphor)]/40 text-[var(--phosphor)] hover:bg-[var(--phosphor)]/10'
-            }`}
-          >
-            <Key size={12} />
-            {signingToggling ? 'Updating…' : signingEnabled ? 'Disable signing' : 'Enable agent signing'}
-          </button>
-        )}
-        {signingError && (
-          <div className="mt-3 flex items-start gap-2 p-3 border border-red-500/30 bg-red-500/5 text-[11px] text-red-400">
-            <AlertTriangle size={14} className="flex-shrink-0 mt-0.5" />
-            <span>{signingError}</span>
-          </div>
-        )}
-      </GlassCard>
+      {copyMsg && <div className="text-[10px] text-[var(--phosphor)]">{copyMsg}</div>}
 
-      {/* Network footer */}
-      <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)] text-center">
-        SKALE balances shown from Chain ID {wallet.chainId}
-      </div>
+      {activePanel === 'passport' ? (
+        <PassportPanel
+          passport={activePassport}
+          wallets={wallets}
+          networks={networks}
+          missingWallets={missingWallets}
+          provisioningChains={provisioningChains}
+          runtimeRestartNeeded={runtimeRestartNeeded}
+          restartingRuntime={restartingRuntime}
+          onCopy={copy}
+          onProvision={() => void provisionChainAccounts()}
+          onRestartRuntime={() => void restartRuntime()}
+          onOpenNetwork={setActivePanel}
+        />
+      ) : activeNetwork ? (
+        <ChainWalletPanel
+          network={activeNetwork}
+          reputation={reputation}
+          registeringSkale={registeringSkale}
+          registerMsg={registerMsg}
+          onRegisterSkale={() => void registerSkaleIdentity()}
+          onCopy={copy}
+          onViewPrivateKey={openPrivateKeyModal}
+        />
+      ) : (
+        <GlassCard className="p-6 text-sm text-[var(--text-muted)]">Wallet not provisioned yet.</GlassCard>
+      )}
+
+      {privateKeyNetwork && (
+        <PrivateKeyModal
+          network={privateKeyNetwork}
+          password={privateKeyPassword}
+          privateKey={privateKeyValue}
+          loading={privateKeyLoading}
+          error={privateKeyError}
+          visible={privateKeyVisible}
+          onPasswordChange={setPrivateKeyPassword}
+          onSubmit={() => void exportPrivateKey()}
+          onToggleVisible={() => setPrivateKeyVisible((value) => !value)}
+          onCopy={() => copy(privateKeyValue?.privateKey, `${labelForPanel(privateKeyNetwork.id)} private key`)}
+          onClose={closePrivateKeyModal}
+        />
+      )}
     </motion.div>
   );
 }
 
-const PASSPORT_NETWORK_ORDER: AgentPassportNetworkId[] = ['skale', 'base', 'solana'];
+function PassportPanel({
+  passport,
+  wallets,
+  networks,
+  missingWallets,
+  provisioningChains,
+  runtimeRestartNeeded,
+  restartingRuntime,
+  onCopy,
+  onProvision,
+  onRestartRuntime,
+  onOpenNetwork,
+}: {
+  passport: AgentPassport;
+  wallets: AgentWalletsResponse | null;
+  networks: AgentWalletNetworkBalance[];
+  missingWallets: boolean;
+  provisioningChains: boolean;
+  runtimeRestartNeeded: boolean;
+  restartingRuntime: boolean;
+  onCopy: (value: string | null | undefined, label: string) => void;
+  onProvision: () => void;
+  onRestartRuntime: () => void;
+  onOpenNetwork: (panel: WalletPanel) => void;
+}) {
+  const transactionNetworks =
+    wallets?.runtime.transactionNetworks ?? networks.filter((network) => network.canSign).map((network) => network.id);
 
-function dashboardNetworkIcon(id: AgentPassportNetworkId) {
-  if (id === 'solana') return <Network size={14} />;
-  if (id === 'base') return <Link2 size={14} />;
-  return <ShieldCheck size={14} />;
-}
-
-function statusPill(status: AgentPassportStatus) {
   return (
-    <span
-      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-wider ${networkStatusTone(status)}`}
-    >
-      {networkStatusLabel(status)}
-    </span>
+    <div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
+      <GlassCard className="p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
+              <Fingerprint size={12} /> Passport Overview
+            </div>
+            <h3 className="text-base font-semibold text-[var(--text-primary)]">{passport.agent.name}</h3>
+            <p className="mt-1 max-w-2xl text-xs leading-relaxed text-[var(--text-muted)]">
+              SKALE remains the identity and reputation anchor. SKALE, Solana, and Base wallets are available to
+              OpenClaw and Hermes runtimes by default for delegated autonomous trading.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {missingWallets && (
+              <button
+                type="button"
+                onClick={onProvision}
+                disabled={provisioningChains}
+                className="inline-flex items-center gap-1 border border-[var(--phosphor)]/40 px-2 py-1 text-[10px] uppercase tracking-wider text-[var(--phosphor)] transition hover:bg-[var(--phosphor)]/10 disabled:opacity-50"
+              >
+                <RefreshCw size={10} className={provisioningChains ? 'animate-spin' : ''} />
+                {provisioningChains ? 'Provisioning' : 'Provision wallets'}
+              </button>
+            )}
+            {runtimeRestartNeeded && (
+              <button
+                type="button"
+                onClick={onRestartRuntime}
+                disabled={restartingRuntime}
+                className="inline-flex items-center gap-1 border border-amber-400/40 px-2 py-1 text-[10px] uppercase tracking-wider text-amber-200 transition hover:bg-amber-400/10 disabled:opacity-50"
+              >
+                <RefreshCw size={10} className={restartingRuntime ? 'animate-spin' : ''} />
+                {restartingRuntime ? 'Restarting' : 'Restart runtime'}
+              </button>
+            )}
+            <LinkButton href={passport.links.passport} label="passport.json" />
+            <LinkButton href={passport.mcp.manifestUrl} label="MCP manifest" />
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {networks.map((network) => (
+            <button
+              key={network.id}
+              type="button"
+              onClick={() => onOpenNetwork(network.id)}
+              className="min-w-0 border border-[var(--border-subtle)] bg-black/20 p-3 text-left transition hover:border-[var(--phosphor)]/50"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex min-w-0 items-center gap-2">
+                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center border border-[var(--border-subtle)] text-[var(--phosphor)]">
+                    {iconForPanel(network.id)}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-semibold text-[var(--text-primary)]">{network.label}</div>
+                    <div className="truncate font-mono text-[10px] text-[var(--text-muted)]">{network.caip2}</div>
+                  </div>
+                </div>
+                <div className="text-[var(--phosphor)]">{iconForPanel(network.id)}</div>
+              </div>
+              <div className="mt-3 truncate font-mono text-xs text-[var(--text-primary)]">
+                {shortAddress(network.address)}
+              </div>
+              <div className="mt-2 text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+                {network.id === 'skale' ? 'Identity and reputation' : 'Runtime wallet'}
+              </div>
+            </button>
+          ))}
+        </div>
+      </GlassCard>
+
+      <GlassCard className="p-5">
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            <Key size={12} /> Runtime Access
+          </div>
+        </div>
+        <div className="space-y-3 text-xs leading-relaxed text-[var(--text-muted)]">
+          <p>
+            The agent runtime can sign on every provisioned chain and can run delegated autonomous trading when
+            the wallet has enough gas or fees.
+          </p>
+          <div className="grid gap-2">
+            {networks.map((network) => (
+              <div key={network.id} className="border border-[var(--border-subtle)] bg-black/20 px-3 py-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[var(--text-primary)]">{network.label}</span>
+                  <button
+                    type="button"
+                    onClick={() => onCopy(network.address, `${network.label} address`)}
+                    disabled={!network.address}
+                    className="max-w-[70%] truncate font-mono text-[10px] text-[var(--phosphor)] hover:underline disabled:cursor-default disabled:text-[var(--text-muted)] disabled:no-underline"
+                    title={network.address ?? 'Not provisioned'}
+                  >
+                    {network.address ?? 'Not provisioned'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-[11px]">
+            Transaction networks:{' '}
+            <span className="text-[var(--text-primary)]">
+              {transactionNetworks.length > 0 ? transactionNetworks.join(', ') : 'none'}
+            </span>
+          </p>
+        </div>
+      </GlassCard>
+    </div>
   );
 }
 
-function signerModeLabel(mode: AgentPassport['runtime']['signerMode']): string {
-  if (mode === 'runtime-signing') return 'Runtime signing';
-  if (mode === 'planned') return 'Planned';
-  return 'Receive-only';
-}
-
-function signerModeTone(mode: AgentPassport['runtime']['signerMode']): string {
-  if (mode === 'runtime-signing') return 'border-amber-400/40 bg-amber-500/10 text-amber-200';
-  if (mode === 'planned') return 'border-violet-400/35 bg-violet-500/10 text-violet-200';
-  return 'border-[var(--border-subtle)] bg-black/20 text-[var(--text-muted)]';
-}
-
-function networkLabel(id: AgentPassportNetworkId): string {
-  if (id === 'skale') return 'SKALE';
-  if (id === 'base') return 'Base';
-  return 'Solana';
-}
-
-function identityActionLabel(id: IdentityRegisterNetwork): string {
-  if (id === 'solana') return 'Anchor Solana';
-  return `Verify ${networkLabel(id)}`;
-}
-
-function formatDate(value: string | null): string {
-  if (!value) return '-';
-  return new Date(value).toLocaleDateString();
-}
-
-function registryContract(network: AgentPassportNetwork): string | null {
-  return network.contracts?.identity ?? network.contracts?.registryProgram ?? null;
-}
-
-function isIdentityRegisterNetwork(id: AgentPassportNetworkId): id is IdentityRegisterNetwork {
-  return id === 'skale' || id === 'base' || id === 'solana';
-}
-
-function DepositAddressCard({
-  target,
+function ChainWalletPanel({
+  network,
+  reputation,
+  registeringSkale,
+  registerMsg,
+  onRegisterSkale,
   onCopy,
+  onViewPrivateKey,
 }: {
-  target: DepositTarget;
+  network: AgentWalletNetworkBalance;
+  reputation: ReputationState | null;
+  registeringSkale: boolean;
+  registerMsg: string | null;
+  onRegisterSkale: () => void;
   onCopy: (value: string | null | undefined, label: string) => void;
+  onViewPrivateKey: (network: AgentWalletNetworkBalance) => void;
 }) {
-  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(target.address)}&bgcolor=0a0a0a&color=39ff88&margin=8`;
+  const isSkale = network.id === 'skale';
+  const native = network.nativeBalance;
+  const token = network.tokenBalances[0] ?? null;
 
   return (
-    <div className="grid grid-cols-[112px_1fr] gap-4 border border-[var(--border-subtle)] bg-black/20 p-3">
-      <div className="flex items-center justify-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={qrSrc}
-          alt={`${target.label} QR`}
-          width={112}
-          height={112}
-          className="border border-[var(--border-subtle)] bg-black"
-        />
-      </div>
-      <div className="min-w-0 space-y-2">
-        <div>
-          <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">{target.label}</div>
-          <div className="text-xs text-[var(--phosphor)]">{target.networkLabel}</div>
+    <div className="space-y-4">
+      <GlassCard className="p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
+              {iconForPanel(network.id)} {network.label} Wallet
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-base font-semibold text-[var(--text-primary)]">
+                {network.label} wallet
+              </h3>
+            </div>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">
+              {isSkale
+                ? 'SKALE stores the Hatcher agent identity and reputation anchor.'
+                : 'Available to the agent runtime for delegated autonomous trading.'}
+            </p>
+          </div>
+          {network.explorerUrl && <LinkButton href={network.explorerUrl} label="Explorer" />}
         </div>
-        <code className="block break-all font-mono text-xs text-[var(--text-primary)]">{target.address}</code>
-        <div className="flex flex-wrap gap-2">
+
+        <div className="mt-4 grid gap-4 lg:grid-cols-[0.75fr_1.25fr_0.8fr]">
+          <WalletQr address={network.address} label={network.label} />
+
+          <div className="min-w-0 border border-[var(--border-subtle)] bg-black/20 p-4">
+            <div className="mb-2 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Address</div>
+            <button
+              type="button"
+              onClick={() => onCopy(network.address, `${network.label} address`)}
+              disabled={!network.address}
+              className="block max-w-full break-all text-left font-mono text-sm text-[var(--text-primary)] hover:text-[var(--phosphor)] disabled:cursor-default disabled:hover:text-[var(--text-primary)]"
+            >
+              {network.address ?? 'Not provisioned'}
+            </button>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => onCopy(network.address, `${network.label} address`)}
+                disabled={!network.address}
+                className="inline-flex items-center gap-1 border border-[var(--border-subtle)] px-2 py-1 text-[10px] uppercase tracking-wider transition hover:border-[var(--phosphor)] disabled:opacity-50"
+              >
+                <Copy size={10} /> Copy
+              </button>
+              <button
+                type="button"
+                onClick={() => onViewPrivateKey(network)}
+                disabled={!network.address}
+                className="inline-flex items-center gap-1 border border-red-400/30 px-2 py-1 text-[10px] uppercase tracking-wider text-red-200 transition hover:bg-red-500/10 disabled:opacity-50"
+              >
+                <Key size={10} /> View private key
+              </button>
+              {network.sharedWalletWith && (
+                <span className="inline-flex items-center border border-[var(--border-subtle)] px-2 py-1 text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+                  Shares EVM key with {network.sharedWalletWith}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+            <BalanceTile
+              label={native ? `${network.label} ${native.symbol}` : 'Native balance'}
+              value={native ? formatBalance(native.formatted) : '-'}
+              symbol={native?.symbol ?? ''}
+              error={network.balanceError}
+            />
+            <BalanceTile
+              label={token ? `${token.symbol} balance` : 'Token balance'}
+              value={token ? formatBalance(token.formatted) : '-'}
+              symbol={token?.symbol ?? ''}
+            />
+          </div>
+        </div>
+      </GlassCard>
+
+      {isSkale ? (
+        <SkaleIdentityPanel
+          network={network}
+          reputation={reputation}
+          registeringSkale={registeringSkale}
+          registerMsg={registerMsg}
+          onRegisterSkale={onRegisterSkale}
+          onCopy={onCopy}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function PrivateKeyModal({
+  network,
+  password,
+  privateKey,
+  loading,
+  error,
+  visible,
+  onPasswordChange,
+  onSubmit,
+  onToggleVisible,
+  onCopy,
+  onClose,
+}: {
+  network: AgentWalletNetworkBalance;
+  password: string;
+  privateKey: AgentWalletPrivateKeyResponse | null;
+  loading: boolean;
+  error: string | null;
+  visible: boolean;
+  onPasswordChange: (value: string) => void;
+  onSubmit: () => void;
+  onToggleVisible: () => void;
+  onCopy: () => void;
+  onClose: () => void;
+}) {
+  const maskedKey = privateKey ? '*'.repeat(Math.min(privateKey.privateKey.length, 96)) : '';
+  const passwordInputId = `wallet-private-key-password-${network.id}`;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (!privateKey) onSubmit();
+        }}
+        className="w-full max-w-xl border border-red-400/30 bg-[#050807] p-5 shadow-2xl shadow-black/60"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-red-200">
+              <Lock size={12} /> Private Key Export
+            </div>
+            <h3 className="text-base font-semibold text-[var(--text-primary)]">
+              {network.label} private key
+            </h3>
+            <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">
+              Confirm your account password to reveal this managed wallet key. Anyone with this key can move funds from
+              the wallet.
+            </p>
+          </div>
           <button
-            onClick={() => onCopy(target.address, target.label)}
-            className="inline-flex items-center gap-1 px-2 py-1 text-[10px] uppercase tracking-wider border border-[var(--border-subtle)] hover:border-[var(--phosphor)] transition"
-            title="Copy address"
+            type="button"
+            onClick={onClose}
+            className="flex h-8 w-8 flex-shrink-0 items-center justify-center border border-[var(--border-subtle)] text-[var(--text-muted)] transition hover:border-red-300 hover:text-red-200"
+            aria-label="Close private key dialog"
           >
-            <Copy size={10} /> Copy
+            <X size={14} />
           </button>
-          {target.explorerUrl && (
+        </div>
+
+        <div className="mt-4 border border-[var(--border-subtle)] bg-black/25 p-3">
+          <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Wallet address</div>
+          <div className="mt-1 break-all font-mono text-xs text-[var(--text-primary)]">
+            {network.address}
+          </div>
+          {privateKey?.sharedWalletWith && (
+            <div className="mt-2 text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+              Shares EVM key with {privateKey.sharedWalletWith}
+            </div>
+          )}
+        </div>
+
+        {!privateKey ? (
+          <div className="mt-4">
+            <label
+              htmlFor={passwordInputId}
+              className="block text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]"
+            >
+              Account password
+            </label>
+            <input
+              id={passwordInputId}
+              type="password"
+              value={password}
+              onChange={(event) => onPasswordChange(event.target.value)}
+              autoComplete="current-password"
+              autoFocus
+              className="mt-2 w-full border border-[var(--border-subtle)] bg-black/30 px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition focus:border-[var(--phosphor)]"
+            />
+          </div>
+        ) : (
+          <div className="mt-4">
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                Private key ({privateKey.format})
+              </div>
+              <button
+                type="button"
+                onClick={onToggleVisible}
+                className="inline-flex items-center gap-1 border border-[var(--border-subtle)] px-2 py-1 text-[10px] uppercase tracking-wider text-[var(--text-muted)] transition hover:border-[var(--phosphor)] hover:text-[var(--phosphor)]"
+              >
+                {visible ? <EyeOff size={10} /> : <Eye size={10} />}
+                {visible ? 'Hide' : 'Show'}
+              </button>
+            </div>
+            <div className="max-h-44 overflow-auto break-all border border-red-400/30 bg-red-500/5 p-3 font-mono text-xs leading-relaxed text-red-100">
+              {visible ? privateKey.privateKey : maskedKey}
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="mt-3 flex items-start gap-2 border border-red-500/30 bg-red-500/5 p-3 text-xs text-red-200">
+            <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        <div className="mt-5 flex flex-wrap justify-end gap-2">
+          {privateKey ? (
+            <>
+              <button
+                type="button"
+                onClick={onCopy}
+                className="inline-flex items-center gap-2 border border-[var(--phosphor)]/40 px-3 py-1.5 text-xs uppercase tracking-wider text-[var(--phosphor)] transition hover:bg-[var(--phosphor)]/10"
+              >
+                <Copy size={12} /> Copy key
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="border border-[var(--border-subtle)] px-3 py-1.5 text-xs uppercase tracking-wider text-[var(--text-muted)] transition hover:border-[var(--text-primary)] hover:text-[var(--text-primary)]"
+              >
+                Close
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={onClose}
+                className="border border-[var(--border-subtle)] px-3 py-1.5 text-xs uppercase tracking-wider text-[var(--text-muted)] transition hover:border-[var(--text-primary)] hover:text-[var(--text-primary)]"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading || !password.trim()}
+                className="inline-flex items-center gap-2 border border-red-400/40 px-3 py-1.5 text-xs uppercase tracking-wider text-red-200 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Lock size={12} /> {loading ? 'Checking' : 'View private key'}
+              </button>
+            </>
+          )}
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function WalletQr({ address, label }: { address: string | null; label: string }) {
+  const qrUrl = address
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=8&data=${encodeURIComponent(address)}`
+    : null;
+
+  return (
+    <div className="flex min-h-[190px] items-center justify-center border border-[var(--border-subtle)] bg-black/20 p-4">
+      {qrUrl ? (
+        <div className="space-y-3 text-center">
+          <div className="mx-auto border border-white/10 bg-white p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={qrUrl} alt={`${label} wallet QR code`} className="h-36 w-36" loading="lazy" />
+          </div>
+          <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Receive</div>
+        </div>
+      ) : (
+        <div className="text-center text-xs text-[var(--text-muted)]">QR unavailable until wallet is provisioned.</div>
+      )}
+    </div>
+  );
+}
+
+function BalanceTile({
+  label,
+  value,
+  symbol,
+  error,
+}: {
+  label: string;
+  value: string;
+  symbol: string;
+  error?: string | null;
+}) {
+  return (
+    <div className="border border-[var(--border-subtle)] bg-black/20 p-4">
+      <div className="mb-2 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">{label}</div>
+      <div className="truncate font-mono text-2xl text-[var(--text-primary)]">
+        {value} {symbol && <span className="text-sm text-[var(--text-muted)]">{symbol}</span>}
+      </div>
+      {error && <div className="mt-2 text-[10px] text-amber-300">Balance lookup failed: {error}</div>}
+    </div>
+  );
+}
+
+function SkaleIdentityPanel({
+  network,
+  reputation,
+  registeringSkale,
+  registerMsg,
+  onRegisterSkale,
+  onCopy,
+}: {
+  network: AgentWalletNetworkBalance;
+  reputation: ReputationState | null;
+  registeringSkale: boolean;
+  registerMsg: string | null;
+  onRegisterSkale: () => void;
+  onCopy: (value: string | null | undefined, label: string) => void;
+}) {
+  const identity = network.identity;
+  const agentId = identity?.agentId ?? null;
+  const onChainRep = identity?.reputation;
+  const needsRegister = !!network.address && !agentId;
+  const registerMsgIsError = !!registerMsg && /failed|unavailable|awaiting|error|temporarily/i.test(registerMsg);
+  const registrationHref = identity?.registrationTxHash
+    ? explorerTxUrl(identity.registrationTxHash, Number(network.chainId ?? 0))
+    : identity?.registry
+      ? explorerAddrUrl(identity.registry, Number(network.chainId ?? 0))
+      : null;
+  const registrationLabel = identity?.registrationTxHash ? 'Registration tx' : 'Registry';
+  const registrationValue = identity?.registrationTxHash ?? identity?.registry ?? '-';
+  const reputationTxHash = onChainRep?.lastTxHash ?? reputation?.onChain.lastTxHash ?? null;
+  const reputationHref = reputationTxHash
+    ? explorerTxUrl(reputationTxHash, reputation?.onChain.chainId ?? Number(network.chainId ?? 0))
+    : onChainRep?.contract
+      ? explorerAddrUrl(onChainRep.contract, reputation?.onChain.chainId ?? Number(network.chainId ?? 0))
+      : null;
+
+  return (
+    <div className="grid gap-4 xl:grid-cols-[1fr_1fr]">
+      <GlassCard className="p-5">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            <ShieldCheck size={12} /> Agent Identity
+          </div>
+        </div>
+        <div className="space-y-3 text-xs text-[var(--text-muted)]">
+          <InfoLine label="Agent ID" value={agentId ?? '-'} onCopy={() => onCopy(agentId, 'SKALE agent ID')} />
+          <InfoLine
+            label={registrationLabel}
+            value={registrationValue}
+            href={registrationHref ?? undefined}
+            onCopy={() => onCopy(registrationValue === '-' ? null : registrationValue, registrationLabel)}
+          />
+          <InfoLine label="Registered" value={formatDate(identity?.registeredAt)} />
+        </div>
+        {needsRegister && (
+          <button
+            type="button"
+            onClick={onRegisterSkale}
+            disabled={registeringSkale}
+            className="mt-4 inline-flex items-center gap-2 border border-[var(--phosphor)]/40 px-3 py-1.5 text-[10px] uppercase tracking-wider text-[var(--phosphor)] transition hover:bg-[var(--phosphor)]/10 disabled:opacity-50"
+          >
+            <ShieldCheck size={11} />
+            {registeringSkale ? 'Registering' : 'Verify on SKALE'}
+          </button>
+        )}
+        {registerMsg && (
+          <div className={`mt-3 text-[10px] ${registerMsgIsError ? 'text-red-400' : 'text-[var(--phosphor)]'}`}>
+            {registerMsg}
+          </div>
+        )}
+      </GlassCard>
+
+      <GlassCard className="p-5">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
+            <Star size={12} /> Reputation
+          </div>
+          {reputation?.scorePct !== null && reputation?.scorePct !== undefined && (
+            <span className="border border-[var(--phosphor)]/40 px-2 py-0.5 text-[10px] uppercase tracking-wider text-[var(--phosphor)]">
+              {reputation.scorePct}% positive
+            </span>
+          )}
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <ReputationStat label="Thumbs up" value={reputation?.upCount ?? 0} icon={<ThumbsUp size={11} />} />
+          <ReputationStat label="Thumbs down" value={reputation?.downCount ?? 0} icon={<ThumbsDown size={11} />} />
+          <ReputationStat
+            label="On-chain"
+            value={onChainRep?.attestationCount ?? reputation?.onChain.attestationCount ?? 0}
+            icon={<ShieldCheck size={11} />}
+          />
+          <ReputationStat label="Activity" value={reputation?.onChain.activityMilestone ?? 0} icon={<Zap size={11} />} />
+        </div>
+        <div className="mt-3 space-y-1.5 text-[11px] text-[var(--text-muted)]">
+          {reputationHref && (
             <a
-              href={target.explorerUrl}
+              href={reputationHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-2 py-1 text-[10px] uppercase tracking-wider border border-[var(--border-subtle)] hover:border-[var(--phosphor)] transition"
+              className="inline-flex max-w-full items-center gap-1 truncate font-mono text-[var(--phosphor)] hover:underline"
             >
-              <ExternalLink size={10} /> Explorer
+              {reputationTxHash ? 'Reputation tx' : 'Reputation contract'}{' '}
+              {shortAddress(reputationTxHash ?? onChainRep?.contract)} <ExternalLink size={10} />
             </a>
           )}
         </div>
-      </div>
+      </GlassCard>
     </div>
   );
 }
 
-function IdentityAnchorsCard({
-  networks,
-  primaryNetwork,
-  registeringNetwork,
-  registerMsg,
-  onRegister,
-}: {
-  networks: AgentPassportNetwork[];
-  primaryNetwork: AgentPassportNetworkId;
-  registeringNetwork: IdentityRegisterNetwork | null;
-  registerMsg: string | null;
-  onRegister: (network: IdentityRegisterNetwork) => void;
-}) {
-  const ordered = PASSPORT_NETWORK_ORDER.map((id) => networks.find((network) => network.id === id)).filter(
-    (network): network is AgentPassportNetwork => !!network,
-  );
-  const registerMsgIsError = !!registerMsg && /failed|unavailable|awaiting|error|temporarily/i.test(registerMsg);
-
-  return (
-    <GlassCard className="p-5">
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-        <div className="flex items-center gap-3">
-          <ShieldCheck size={16} className="text-[var(--phosphor)]" />
-          <h3 className="text-sm font-semibold text-[var(--text-primary)]">Identity Anchors</h3>
-        </div>
-        <span className="px-2 py-0.5 border border-[var(--phosphor)]/40 text-[var(--phosphor)] text-[10px] uppercase tracking-wider">
-          Primary {networkLabel(primaryNetwork)}
-        </span>
-      </div>
-
-      <div className="grid lg:grid-cols-3 gap-3">
-        {ordered.map((network) => {
-          const registered = network.registryStatus === 'registered' && !!network.agentId;
-          const canRegister = isIdentityRegisterNetwork(network.id) && !!network.walletAddress && !registered;
-          const busy = registeringNetwork === network.id;
-          const contract = registryContract(network);
-
-          return (
-            <div key={network.id} className="border border-[var(--border-subtle)] bg-black/20 p-3">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <div className="text-sm font-semibold text-[var(--text-primary)]">{network.label}</div>
-                  <div className="truncate font-mono text-[10px] text-[var(--text-muted)]">{network.caip2}</div>
-                </div>
-                {statusPill(network.registryStatus)}
-              </div>
-
-              <div className="mt-3 space-y-1.5 text-[11px] text-[var(--text-muted)]">
-                <div className="min-w-0 truncate">
-                  Agent ID:{' '}
-                  <span className="font-mono text-[var(--text-primary)]">
-                    {network.agentId ? shortAddress(network.agentId) : '-'}
-                  </span>
-                </div>
-                <div className="min-w-0 truncate">
-                  Registered:{' '}
-                  <span className="font-mono text-[var(--text-primary)]">{formatDate(network.registeredAt)}</span>
-                </div>
-                <div className="min-w-0 truncate">
-                  Registry:{' '}
-                  <span className="font-mono text-[var(--text-primary)]">
-                    {contract ? shortAddress(contract) : (network.registry ?? '-')}
-                  </span>
-                </div>
-              </div>
-
-              {canRegister && (
-                <button
-                  onClick={() => onRegister(network.id)}
-                  disabled={!!registeringNetwork}
-                  className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 text-[10px] uppercase tracking-wider border border-[var(--phosphor)]/40 text-[var(--phosphor)] hover:bg-[var(--phosphor)]/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                >
-                  <ShieldCheck size={11} />
-                  {busy ? 'Registering' : identityActionLabel(network.id)}
-                </button>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {registerMsg && (
-        <div className={`mt-3 text-[10px] ${registerMsgIsError ? 'text-red-400' : 'text-[var(--phosphor)]'}`}>
-          {registerMsg}
-        </div>
-      )}
-    </GlassCard>
-  );
-}
-
-function AgentPassportDashboardCard({
-  passport,
+function InfoLine({
+  label,
+  value,
+  href,
   onCopy,
-  onProvision,
-  provisioning,
-  onRestartRuntime,
-  runtimeRestartNeeded,
-  restartingRuntime,
 }: {
-  passport: AgentPassport;
-  onCopy: (value: string | null | undefined, label: string) => void;
-  onProvision: () => void;
-  provisioning: boolean;
-  onRestartRuntime: () => void;
-  runtimeRestartNeeded: boolean;
-  restartingRuntime: boolean;
+  label: string;
+  value: string;
+  href?: string;
+  onCopy?: () => void;
 }) {
-  const networks = PASSPORT_NETWORK_ORDER.map((id) =>
-    passport.identity.networks.find((network) => network.id === id),
-  ).filter((network): network is AgentPassportNetwork => !!network);
-  const hasSolanaWallet = networks.some((network) => network.id === 'solana' && network.walletAddress);
-  const trading = passport.runtime.trading;
-  const tradingEnabled = trading.status === 'enabled';
-  const tradingProvider = trading.quoteProviders[0];
-
   return (
-    <GlassCard className="p-5">
-      <div className="flex items-start justify-between gap-3 flex-wrap mb-4">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 border border-[var(--phosphor)]/40 flex items-center justify-center">
-            <Fingerprint size={18} className="text-[var(--phosphor)]" />
-          </div>
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold text-[var(--text-primary)]">Agent Passport</h3>
-            <p className="mt-1 text-xs text-[var(--text-muted)]">
-              Identity, wallet, x402 and MCP surface shared by dashboard and 3D room.
-            </p>
-            <button
-              type="button"
-              onClick={() => onCopy(passport.identity.handle, 'Passport handle')}
-              className="mt-2 block max-w-full truncate font-mono text-[11px] text-[var(--phosphor)] hover:underline"
-              title={passport.identity.handle}
-            >
-              {passport.identity.handle}
-            </button>
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {!hasSolanaWallet && (
-            <button
-              type="button"
-              onClick={onProvision}
-              disabled={provisioning}
-              className="inline-flex items-center gap-1 px-2 py-1 text-[10px] uppercase tracking-wider border border-[var(--phosphor)]/40 text-[var(--phosphor)] hover:bg-[var(--phosphor)]/10 transition disabled:opacity-50"
-            >
-              <RefreshCw size={10} className={provisioning ? 'animate-spin' : ''} />
-              {provisioning ? 'Provisioning' : 'Provision chains'}
-            </button>
-          )}
-          {runtimeRestartNeeded && (
-            <button
-              type="button"
-              onClick={onRestartRuntime}
-              disabled={restartingRuntime}
-              className="inline-flex items-center gap-1 px-2 py-1 text-[10px] uppercase tracking-wider border border-amber-400/40 text-amber-200 hover:bg-amber-400/10 transition disabled:opacity-50"
-            >
-              <RefreshCw size={10} className={restartingRuntime ? 'animate-spin' : ''} />
-              {restartingRuntime ? 'Restarting' : 'Restart runtime'}
-            </button>
-          )}
-          <DashboardLinkButton href={passport.links.room} label="3D room" />
-          <DashboardLinkButton href={passport.links.passport} label="passport.json" />
-          <DashboardLinkButton href={passport.mcp.manifestUrl} label="MCP manifest" />
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-3">
-        {networks.map((network) => (
-          <DashboardNetworkCard key={network.id} network={network} onCopy={onCopy} />
-        ))}
-      </div>
-
-      <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-3 mt-3">
-        <div className="border border-[var(--border-subtle)] bg-black/20 p-3">
-          <div className="flex items-center justify-between gap-2 mb-3">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
-              <WalletIcon size={12} /> Wallets
-            </div>
-            {statusPill(passport.wallets[0]?.status ?? 'planned')}
-          </div>
-          <div className="grid sm:grid-cols-2 gap-2">
-            {passport.wallets.map((wallet) => (
-              <button
-                key={wallet.id}
-                type="button"
-                onClick={() => onCopy(wallet.address, `${wallet.chainType.toUpperCase()} wallet`)}
-                disabled={!wallet.address}
-                className="min-w-0 text-left border border-[var(--border-subtle)] bg-[var(--bg-base)]/40 px-3 py-2 disabled:cursor-default"
-              >
-                <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
-                  {wallet.chainType} · {wallet.networks.join(', ')}
-                </div>
-                <div className="mt-1 truncate font-mono text-xs text-[var(--text-primary)]">
-                  {shortAddress(wallet.address)}
-                </div>
-                <div
-                  className={`mt-2 inline-flex rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-wider ${signerModeTone(wallet.signerMode)}`}
-                >
-                  {signerModeLabel(wallet.signerMode)}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="border border-[var(--border-subtle)] bg-black/20 p-3">
-          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[var(--text-muted)] mb-3">
-            <CreditCard size={12} /> x402 Payments
-          </div>
-          <div className="space-y-2">
-            {passport.payments.map((rail) => (
-              <DashboardPaymentRail key={rail.id} rail={rail} onCopy={onCopy} />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-3 border border-violet-400/25 bg-violet-500/5 p-3">
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-violet-200">
-            <Server size={12} /> MCP
-          </div>
-          {statusPill(passport.mcp.status)}
-        </div>
+    <div className="min-w-0 border border-[var(--border-subtle)] bg-black/20 px-3 py-2">
+      <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">{label}</div>
+      <div className="mt-1 flex min-w-0 items-center gap-2">
         <button
           type="button"
-          onClick={() => onCopy(passport.mcp.manifestUrl, 'MCP manifest URL')}
-          className="mt-2 max-w-full truncate font-mono text-[11px] text-violet-200/80 hover:text-violet-100"
-          title={passport.mcp.manifestUrl}
+          onClick={onCopy}
+          disabled={!onCopy || value === '-'}
+          className="block min-w-0 truncate font-mono text-xs text-[var(--text-primary)] hover:text-[var(--phosphor)] disabled:cursor-default disabled:hover:text-[var(--text-primary)]"
+          title={value}
         >
-          {passport.mcp.manifestUrl}
+          {value}
         </button>
-      </div>
-
-      <div
-        className={`mt-3 border p-3 ${
-          tradingEnabled ? 'border-emerald-400/30 bg-emerald-500/5' : 'border-[var(--border-subtle)] bg-black/20'
-        }`}
-      >
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div
-            className={`flex items-center gap-2 text-xs uppercase tracking-[0.18em] ${
-              tradingEnabled ? 'text-emerald-200' : 'text-[var(--text-muted)]'
-            }`}
+        {href && value !== '-' && (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-shrink-0 text-[var(--phosphor)] hover:text-[var(--text-primary)]"
+            aria-label={`Open ${label}`}
           >
-            <Zap size={12} /> Trading
-          </div>
-          <span
-            className={`inline-flex rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-wider ${
-              tradingEnabled
-                ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200'
-                : 'border-[var(--border-subtle)] bg-black/20 text-[var(--text-muted)]'
-            }`}
-          >
-            {tradingEnabled ? 'Enabled' : signerModeLabel(passport.runtime.signerMode)}
-          </span>
-        </div>
-        <div className="mt-2 grid sm:grid-cols-2 gap-2 text-[11px] text-[var(--text-muted)]">
-          <div className="min-w-0">
-            Networks:{' '}
-            <span className="text-[var(--text-primary)]">
-              {trading.networks.length > 0 ? trading.networks.join(', ') : 'solana pending'}
-            </span>
-          </div>
-          <div className="min-w-0 truncate">
-            Provider:{' '}
-            <span className="font-mono text-[var(--text-primary)]">
-              {tradingProvider ? tradingProvider.baseUrl.replace(/^https?:\/\//, '') : '-'}
-            </span>
-          </div>
-        </div>
+            <ExternalLink size={11} />
+          </a>
+        )}
       </div>
-    </GlassCard>
-  );
-}
-
-function DashboardNetworkCard({
-  network,
-  onCopy,
-}: {
-  network: AgentPassportNetwork;
-  onCopy: (value: string | null | undefined, label: string) => void;
-}) {
-  return (
-    <div className="min-w-0 border border-[var(--border-subtle)] bg-black/20 p-3">
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 border border-[var(--border-subtle)] flex items-center justify-center text-[var(--phosphor)]">
-          {dashboardNetworkIcon(network.id)}
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-sm font-semibold text-[var(--text-primary)]">{network.label}</div>
-          <div className="truncate font-mono text-[10px] text-[var(--text-muted)]">{network.caip2}</div>
-        </div>
-      </div>
-      <div className="mt-3">{statusPill(network.status)}</div>
-      <button
-        type="button"
-        onClick={() => onCopy(network.walletAddress, `${network.label} wallet`)}
-        disabled={!network.walletAddress}
-        className="mt-3 flex w-full items-center justify-between gap-2 border border-[var(--border-subtle)] bg-[var(--bg-base)]/40 px-2 py-1.5 disabled:cursor-default"
-      >
-        <span className="truncate font-mono text-[11px] text-[var(--text-primary)]">
-          {shortAddress(network.walletAddress)}
-        </span>
-        {network.walletAddress && <Copy size={12} className="flex-shrink-0 text-[var(--text-muted)]" />}
-      </button>
-      <div className="mt-2 truncate text-[11px] text-[var(--text-muted)]">
-        {network.agentId ? `agentId ${network.agentId}` : (network.registry ?? 'registry pending')}
-      </div>
-      {network.explorerUrl && (
-        <a
-          href={network.explorerUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-flex items-center gap-1 text-[11px] text-[var(--phosphor)] hover:underline"
-        >
-          Explorer <ExternalLink size={10} />
-        </a>
-      )}
     </div>
-  );
-}
-
-function DashboardPaymentRail({
-  rail,
-  onCopy,
-}: {
-  rail: AgentPassportPaymentRail;
-  onCopy: (value: string | null | undefined, label: string) => void;
-}) {
-  return (
-    <div className="border border-[var(--border-subtle)] bg-[var(--bg-base)]/40 px-3 py-2">
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">{rail.network}</span>
-        {statusPill(rail.status)}
-      </div>
-      <button
-        type="button"
-        onClick={() => onCopy(rail.receivingAddress, `${rail.network} payTo`)}
-        disabled={!rail.receivingAddress}
-        className="mt-1 block w-full min-w-0 text-left disabled:cursor-default"
-      >
-        <span className="block truncate font-mono text-[11px] text-[var(--text-primary)]">
-          payTo {shortAddress(rail.receivingAddress)}
-        </span>
-        <span className="block truncate font-mono text-[10px] text-[var(--text-muted)]">
-          asset {rail.asset ? shortAddress(rail.asset) : rail.caip2}
-        </span>
-      </button>
-    </div>
-  );
-}
-
-function DashboardLinkButton({ href, label }: { href: string; label: string }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-1 px-2 py-1 text-[10px] uppercase tracking-wider border border-[var(--border-subtle)] text-[var(--text-muted)] hover:border-[var(--phosphor)] hover:text-[var(--phosphor)] transition"
-    >
-      {label} <ExternalLink size={10} />
-    </a>
   );
 }
 
@@ -1070,21 +1031,31 @@ function ReputationStat({
   label,
   value,
   icon,
-  tone,
 }: {
   label: string;
   value: number;
-  icon: React.ReactNode;
-  tone: 'phosphor' | 'muted';
+  icon: ReactNode;
 }) {
-  const valueClass = tone === 'phosphor' ? 'text-[var(--phosphor)]' : 'text-[var(--text-primary)]';
   return (
     <div className="border border-[var(--border-subtle)] bg-black/20 px-3 py-2">
       <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
         {icon}
         {label}
       </div>
-      <div className={`mt-1 text-lg font-mono font-semibold ${valueClass}`}>{value.toLocaleString()}</div>
+      <div className="mt-1 font-mono text-lg font-semibold text-[var(--text-primary)]">{value.toLocaleString()}</div>
     </div>
+  );
+}
+
+function LinkButton({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1 border border-[var(--border-subtle)] px-2 py-1 text-[10px] uppercase tracking-wider text-[var(--text-muted)] transition hover:border-[var(--phosphor)] hover:text-[var(--phosphor)]"
+    >
+      {label} <ExternalLink size={10} />
+    </a>
   );
 }
