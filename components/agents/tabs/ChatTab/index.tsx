@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { X } from 'lucide-react';
 import { useVoice } from '@/hooks/useVoice';
 import { api } from '@/lib/api';
 import {
@@ -38,6 +39,7 @@ export function ChatTab() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const speakingMsgIdRef = useRef<string | null>(null);
   const lastAutoSpokenIdRef = useRef<string | null>(null);
+  const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
 
   // ── Chat attachments ──────────────────────────────────────────
   //
@@ -306,6 +308,23 @@ export function ChatTab() {
     voice.stopSpeaking();
   }, [voice]);
 
+  useEffect(() => {
+    if (!mobilePanelOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMobilePanelOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [mobilePanelOpen]);
+
   // Voice Call Mode overlay
   if (voiceCallMode) {
     return (
@@ -338,12 +357,43 @@ export function ChatTab() {
         ttsSupported={voice.ttsSupported}
         isAuthenticated={isAuthenticated}
         autoSpeak={voice.autoSpeak}
+        onOpenMobilePanel={() => setMobilePanelOpen(true)}
         onToggleAutoSpeak={voice.toggleAutoSpeak}
         onStartVoiceCall={startVoiceCall}
       />
 
       <div className="flex min-h-0 flex-1 flex-col gap-3 md:flex-row lg:gap-4">
-        <AgentPresenceRail />
+        <div className="hidden min-h-0 md:flex">
+          <AgentPresenceRail />
+        </div>
+
+        {mobilePanelOpen && (
+          <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true" aria-label="Chat sessions">
+            <button
+              type="button"
+              className="absolute inset-0 bg-black/65"
+              aria-label="Close chats sidebar"
+              onClick={() => setMobilePanelOpen(false)}
+            />
+            <div className="absolute inset-y-0 left-0 flex w-[min(22rem,88vw)] flex-col border-r border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-2xl">
+              <div className="flex h-12 shrink-0 items-center justify-between border-b border-[var(--border-default)] px-3">
+                <span className="text-xs font-semibold text-[var(--text-primary)]">Chats</span>
+                <button
+                  type="button"
+                  onClick={() => setMobilePanelOpen(false)}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--text-muted)] transition-colors hover:bg-white/5 hover:text-[var(--text-primary)]"
+                  aria-label="Close chats sidebar"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+              <AgentPresenceRail
+                className="min-h-0 flex-1 rounded-none border-0 md:w-full lg:w-full 2xl:w-full"
+                onSessionSelect={() => setMobilePanelOpen(false)}
+              />
+            </div>
+          </div>
+        )}
 
         <div className="flex min-w-0 flex-1 flex-col">
           <MessageList

@@ -1,6 +1,6 @@
 'use client';
 
-import { Bot, Phone, Volume2, VolumeX } from 'lucide-react';
+import { Bot, PanelLeftOpen, Phone, Volume2, VolumeX } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { FRAMEWORKS, type AgentFramework } from '@hatcher/shared';
 import { FRAMEWORK_BADGE } from '../../AgentContext';
@@ -13,6 +13,7 @@ interface ChatHeaderProps {
   ttsSupported: boolean;
   isAuthenticated: boolean;
   autoSpeak: boolean;
+  onOpenMobilePanel: () => void;
   onToggleAutoSpeak: () => void;
   onStartVoiceCall: () => void;
 }
@@ -25,6 +26,7 @@ export function ChatHeader({
   ttsSupported,
   isAuthenticated,
   autoSpeak,
+  onOpenMobilePanel,
   onToggleAutoSpeak,
   onStartVoiceCall,
 }: ChatHeaderProps) {
@@ -46,6 +48,15 @@ export function ChatHeader({
         )}
       </div>
       <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onOpenMobilePanel}
+          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--border-default)] text-[var(--text-muted)] transition-colors hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)] md:hidden"
+          aria-label="Open chats sidebar"
+          title="Chats"
+        >
+          <PanelLeftOpen size={13} />
+        </button>
         {/* Voice Call button */}
         {hasVoiceSupport && sttSupported && isAuthenticated && (
           <button

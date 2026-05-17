@@ -57,7 +57,11 @@ interface UseWebSocketChatOptions {
 
 interface UseWebSocketChatReturn {
   /** Send a chat message through the WebSocket */
-  send: (message: string, history?: Array<{ role: 'user' | 'assistant'; content: string }>) => boolean;
+  send: (
+    message: string,
+    history?: Array<{ role: 'user' | 'assistant'; content: string }>,
+    sessionId?: string | null,
+  ) => boolean;
   /** Current connection state */
   connectionState: ConnectionState;
   /** Whether the WebSocket is connected and ready to send */
@@ -248,12 +252,20 @@ export function useWebSocketChat({
   }, [agentId, enabled, connect, cleanup]);
 
   const send = useCallback(
-    (message: string, history?: Array<{ role: 'user' | 'assistant'; content: string }>): boolean => {
+    (
+      message: string,
+      history?: Array<{ role: 'user' | 'assistant'; content: string }>,
+      sessionId?: string | null,
+    ): boolean => {
       if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
         return false;
       }
       try {
-        wsRef.current.send(JSON.stringify({ message, ...(history?.length ? { history } : {}) }));
+        wsRef.current.send(JSON.stringify({
+          message,
+          ...(sessionId ? { sessionId } : {}),
+          ...(history?.length ? { history } : {}),
+        }));
         return true;
       } catch {
         return false;

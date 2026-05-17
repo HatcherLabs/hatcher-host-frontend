@@ -109,6 +109,8 @@ export interface AgentContextValue {
   activeChatSessionId: string | null;
   setActiveChatSessionId: (sessionId: string) => void;
   startNewChatSession: () => Promise<void>;
+  deleteChatSession: (sessionId: string) => Promise<void>;
+  deletingChatSessionId: string | null;
   refreshChatSessions: () => Promise<void>;
   /** Tool calls currently in flight on the agent container, surfaced live
    *  via the WS chat stream. Cleared between messages. */
