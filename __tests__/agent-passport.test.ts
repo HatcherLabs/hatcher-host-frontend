@@ -22,7 +22,10 @@ describe('agent passport helpers', () => {
     expect(networkById(passport, 'skale')?.status).toBe('registered');
     expect(networkById(passport, 'base')?.sharedWalletWith).toBe('skale');
     expect(networkById(passport, 'solana')?.caip2).toBe('solana:mainnet-beta');
-    expect(passport.payments.find((payment) => payment.id === 'x402-solana-usdc')?.caip2)
-      .toBe('solana:mainnet-beta');
+    expect(networkById(passport, 'base')?.agentId).toBeNull();
+    expect(networkById(passport, 'solana')?.agentId).toBeNull();
+    expect(passport.payments).toEqual([]);
+    expect(passport.runtime.signerMode).toBe('runtime-signing');
+    expect((passport.runtime.trading as Record<string, unknown>).requiresExplicitUserIntent).toBeUndefined();
   });
 });

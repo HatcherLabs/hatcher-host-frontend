@@ -422,7 +422,7 @@ export default function SkaleDashboardPage() {
       )}
 
       <div className="text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)] text-center mt-6">
-        Phase 1+2 live · Phase 3 (CLI) and Phase 4 (x402) ship per-agent in the Wallet tab
+        SKALE identity and reputation live · Base and Solana wallets available per-agent in the Wallet tab
       </div>
     </div>
   );

@@ -200,7 +200,7 @@ export interface AgentPassportNetwork {
 
 export interface AgentPassportPaymentRail {
   id: string;
-  protocol: 'x402';
+  protocol: string;
   network: AgentPassportNetworkId;
   status: AgentPassportStatus;
   caip2: string;
@@ -248,7 +248,6 @@ export interface AgentPassport {
     trading: {
       status: AgentPassportTradingStatus;
       networks: AgentPassportNetworkId[];
-      requiresExplicitUserIntent: boolean;
       quoteProviders: Array<{
         id: 'jupiter';
         network: 'solana';
@@ -271,6 +270,69 @@ export interface AgentPassport {
     skaleMetadata: string;
     solanaMetadata: string;
   };
+}
+
+export interface AgentWalletTokenBalance {
+  symbol: string;
+  assetAddress: string | null;
+  raw: string;
+  formatted: string;
+  decimals: number;
+}
+
+export interface AgentWalletNativeBalance {
+  symbol: string;
+  raw: string;
+  formatted: string;
+  decimals: number;
+}
+
+export interface AgentWalletNetworkBalance {
+  id: AgentPassportNetworkId;
+  label: string;
+  chainType: AgentPassportChainType;
+  status: AgentPassportStatus | string;
+  caip2: string;
+  chainId: string | null;
+  address: string | null;
+  explorerUrl: string | null;
+  sharedWalletWith?: AgentPassportNetworkId;
+  walletEnvVar: string;
+  privateKeyEnvVar: string;
+  canSign: boolean;
+  nativeBalance: AgentWalletNativeBalance | null;
+  tokenBalances: AgentWalletTokenBalance[];
+  balanceError: string | null;
+  identity: {
+    agentId: string | null;
+    registry: string | null;
+    registrationTxHash: string | null;
+    registeredAt: string | null;
+    reputation?: {
+      attestationCount: number;
+      lastTxHash: string | null;
+      lastTxAt: string | null;
+      contract: string | null;
+    };
+  } | null;
+}
+
+export interface AgentWalletsResponse {
+  networks: AgentWalletNetworkBalance[];
+  runtime: {
+    signerMode: AgentPassportSignerMode;
+    transactionNetworks: AgentPassportNetworkId[];
+    notes: string[];
+  };
+}
+
+export interface AgentWalletPrivateKeyResponse {
+  network: AgentPassportNetworkId;
+  chainType: AgentPassportChainType;
+  address: string;
+  privateKey: string;
+  format: 'evm-hex' | 'solana-base58-secret-key';
+  sharedWalletWith?: AgentPassportNetworkId;
 }
 
 /**

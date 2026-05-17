@@ -4,7 +4,7 @@
 
 import { API_URL } from '@/lib/config';
 import { getToken, req } from './core';
-import type { Agent, AgentPassport, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse, AgentEgressEventsResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection } from './types';
+import type { Agent, AgentPassport, AgentPassportNetworkId, AgentWalletPrivateKeyResponse, AgentWalletsResponse, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse, AgentEgressEventsResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection } from './types';
 import type { TierConfig, AdminOverviewExtras } from '@hatcher/shared';
 
 const API_BASE = API_URL;
@@ -244,6 +244,16 @@ export const api = {
 
   /** Get the agent's public/owner-safe on-chain passport. */
   getAgentPassport: (id: string) => req<AgentPassport>(`/agents/${id}/passport`),
+
+  /** Get owner-visible wallet addresses and best-effort balances for every managed chain. */
+  getAgentWallets: (id: string) => req<AgentWalletsResponse>(`/agents/${id}/wallets`),
+
+  /** Export an owner-only managed wallet private key after account password confirmation. */
+  exportAgentWalletPrivateKey: (id: string, network: AgentPassportNetworkId, password: string) =>
+    req<AgentWalletPrivateKeyResponse>(`/agents/${id}/wallets/${network}/private-key`, {
+      method: 'POST',
+      body: JSON.stringify({ password }),
+    }),
 
   /** Get the agent's platform-owned mailbox, runtime hints, and mail settings. */
   getAgentMailbox: (id: string) =>
