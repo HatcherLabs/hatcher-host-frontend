@@ -1339,7 +1339,8 @@ export const api = {
     onToken: (token: string) => void,
     onDone: (model: string) => void,
     onError: (err: string) => void,
-    onMessage?: (content: string) => void
+    onMessage?: (content: string) => void,
+    sessionId?: string | null
   ) => {
     const token = getToken();
 
@@ -1353,7 +1354,7 @@ export const api = {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         credentials: 'include',
-        body: JSON.stringify({ message, history }),
+        body: JSON.stringify({ message, history, ...(sessionId ? { sessionId } : {}) }),
       });
     } catch {
       // Streaming endpoint failed — fall back to regular chat
@@ -1365,7 +1366,7 @@ export const api = {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           credentials: 'include',
-          body: JSON.stringify({ message, history }),
+          body: JSON.stringify({ message, history, ...(sessionId ? { sessionId } : {}) }),
         });
         if (!fallback.ok) { onError(`HTTP ${fallback.status}`); return; }
         const data = await fallback.json() as {
@@ -1516,10 +1517,10 @@ export const api = {
     ),
 
   /** Save chat messages to history */
-  saveChatHistory: (agentId: string, messages: Array<{ role: string; content: string; ts?: number }>) =>
+  saveChatHistory: (agentId: string, messages: Array<{ role: string; content: string; ts?: number }>, sessionId?: string | null) =>
     req<{ saved: number }>(`/agents/${agentId}/chat/history`, {
       method: 'POST',
-      body: JSON.stringify({ messages }),
+      body: JSON.stringify({ messages, ...(sessionId ? { sessionId } : {}) }),
     }),
 
   /** Get channel connection status */

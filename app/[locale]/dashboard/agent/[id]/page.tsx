@@ -30,6 +30,7 @@ import {
   type AgentStats,
   type AgentContextValue,
   genId,
+  getNextChatSessionIdAfterDelete,
   Skeleton,
   STATUS_STYLES,
   pageEntranceVariants,
@@ -217,6 +218,7 @@ export default function AgentManagePage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [chatSessions, setChatSessions] = useState<ChatSessionSummary[]>([]);
   const [activeChatSessionId, setActiveChatSessionIdState] = useState<string | null>(null);
+  const [deletingChatSessionId, setDeletingChatSessionId] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const sendingRef = useRef(false);
@@ -549,7 +551,8 @@ export default function AgentManagePage() {
     const sessions = Array.isArray(res.data.sessions) ? res.data.sessions : [];
     setChatSessions(sessions);
     const current = sessions.find((session) => session.current) ?? sessions[0];
-    if (current && activeChatSessionIdRef.current !== current.id) {
+    const selectedStillExists = sessions.some((session) => session.id === activeChatSessionIdRef.current);
+    if (current && !selectedStillExists) {
       activeChatSessionIdRef.current = current.id;
       setActiveChatSessionIdState(current.id);
     }
@@ -630,6 +633,39 @@ export default function AgentManagePage() {
     historyLoadedRef.current = true;
   }, [id, setActiveChatSessionId, toast]);
 
+  const deleteChatSession = useCallback(async (sessionId: string) => {
+    if (!id || deletingChatSessionId) return;
+    const target = chatSessions.find((session) => session.id === sessionId);
+    const confirmed = window.confirm(`Delete "${target?.title ?? 'this chat'}"? This cannot be undone.`);
+    if (!confirmed) return;
+
+    const activeBeforeDelete = activeChatSessionIdRef.current;
+    const nextActiveId = getNextChatSessionIdAfterDelete(chatSessions, sessionId, activeBeforeDelete);
+    const deletingActiveSession = activeBeforeDelete === sessionId || (!activeBeforeDelete && target?.current);
+
+    setDeletingChatSessionId(sessionId);
+    const res = await api.deleteChatSession(id, sessionId);
+    setDeletingChatSessionId(null);
+
+    if (!res.success) {
+      toast.error(res.error ?? 'Failed to delete chat');
+      return;
+    }
+
+    setChatSessions((prev) => prev.filter((session) => session.id !== sessionId));
+    if (deletingActiveSession) {
+      activeChatSessionIdRef.current = nextActiveId;
+      setActiveChatSessionIdState(nextActiveId);
+      setMessages([]);
+      lastSavedCountRef.current = 0;
+      lastHistorySignatureRef.current = '';
+      historyLoadedRef.current = true;
+    }
+
+    toast.success('Chat deleted');
+    window.setTimeout(() => void loadChatSessions(), 300);
+  }, [chatSessions, deletingChatSessionId, id, loadChatSessions, toast]);
+
   // ─── Save chat history to server (debounced) ──────────────
 
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -649,7 +685,7 @@ export default function AgentManagePage() {
         if (prev && prev.role === m.role && prev.content === m.content) continue;
         deduped.push(m);
       }
-      api.saveChatHistory(id, deduped).catch(() => {});
+      api.saveChatHistory(id, deduped, activeChatSessionIdRef.current).catch(() => {});
     }, 2000);
   }, [messages, id]);
 
@@ -782,6 +818,11 @@ export default function AgentManagePage() {
   const sendMessage = async (overrideText?: string) => {
     const text = (overrideText ?? input).trim();
     if (!text || sending || sendCooldown) return;
+    if (text.toLowerCase() === '/reset' || text.toLowerCase() === '/new') {
+      setInput('');
+      await startNewChatSession();
+      return;
+    }
     if (agent?.status !== 'active') return;
     setInput('');
     setChatError(null);
@@ -793,6 +834,7 @@ export default function AgentManagePage() {
       .filter((m) => !m.streaming)
       .slice(-40)
       .map((m) => ({ role: m.role, content: trimChatHistoryContent(m.content) }));
+    let requestSessionId = activeChatSessionIdRef.current;
 
     // If the user is viewing an older session and sends a message, start a
     // fresh current session and use the selected session only as context.
@@ -802,6 +844,7 @@ export default function AgentManagePage() {
       const res = await api.createChatSession(id, `Continued: ${selectedSession.title}`);
       if (res.success) {
         setActiveChatSessionId(res.data.session.id);
+        requestSessionId = res.data.session.id;
         setChatSessions((prev) => [
           { ...res.data.session, current: true },
           ...prev.map((session) => ({ ...session, current: false })),
@@ -823,7 +866,7 @@ export default function AgentManagePage() {
 
     if (wsChat.isConnected) {
       wsStreamingMsgRef.current = true;
-      const sent = wsChat.send(text, history);
+      const sent = wsChat.send(text, history, requestSessionId);
       if (sent) {
         return;
       }
@@ -892,6 +935,7 @@ export default function AgentManagePage() {
             { id: genId(), role: 'assistant', content, timestamp: new Date() },
           ]);
         },
+        requestSessionId,
       );
     } catch (err) {
       const errMessage = err instanceof Error ? err.message : 'Connection error';
@@ -972,6 +1016,8 @@ export default function AgentManagePage() {
       activeChatSessionId,
       setActiveChatSessionId,
       startNewChatSession,
+      deleteChatSession,
+      deletingChatSessionId,
       refreshChatSessions: loadChatSessions,
       inflightTools, completedTools,
       configName: config.configName, setConfigName: config.setConfigName,
@@ -1023,7 +1069,7 @@ export default function AgentManagePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, agent, stats, tab, logs.logs, logs.logsLoading, logs.logFilter, logs.logSearch, logs.autoScroll, logs.filteredLogs, wsLogsConnected,
     messages, input, sending, sendCooldown, chatError, chatErrorType,
-    chatSessions, activeChatSessionId, setActiveChatSessionId, startNewChatSession, loadChatSessions,
+    chatSessions, activeChatSessionId, setActiveChatSessionId, startNewChatSession, deleteChatSession, deletingChatSessionId, loadChatSessions,
     inflightTools, completedTools,
     config.configName, config.configDesc, config.configBio, config.configLore, config.configTopics,
     config.configStyle, config.configAdjectives, config.configSystemPrompt, config.configSkills,
