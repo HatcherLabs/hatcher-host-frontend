@@ -47,5 +47,6 @@ export type {
   LlmStatsResponse,
   AdminEgressEventsResponse,
   AgentEgressEventsResponse,
+  AdminIdleOverviewResponse,
 } from './types';
 export { api } from './methods';
