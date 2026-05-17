@@ -10,6 +10,7 @@ import {
   Clock,
   Cpu,
   DollarSign,
+  HardDrive,
   Radio,
   RefreshCw,
   Server,
@@ -29,6 +30,14 @@ function formatUsd(value: number): string {
 
 function number(value: number): string {
   return value.toLocaleString('en-US');
+}
+
+function formatMaybePercent(value: number | null | undefined): string {
+  return value == null ? 'n/a' : `${value.toFixed(2)}%`;
+}
+
+function formatMaybeMb(value: number | null | undefined): string {
+  return value == null ? 'n/a' : `${number(Math.round(value))} MB`;
 }
 
 function StatusPill({ ok, label }: { ok: boolean; label: string }) {
@@ -190,6 +199,80 @@ export default function IdleTab() {
             <MetricCard label="Provider jobs" value={number(data.producer.totalJobs)} sub={data.producer.payoutSchedule ?? 'IDLE payout schedule'} icon={Wallet} tone="#FBBF24" />
             <MetricCard label="Eligible now" value={`${coverage?.idleEligibleNow ?? 0}/${coverage?.activeRunningAgents ?? 0}`} sub={`${coverage?.activeRunningIdleEnvReady ?? 0} env ready`} icon={Cpu} tone="#F472B6" />
           </div>
+
+          {data.directNode ? (
+            <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-4">
+              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <HardDrive size={16} className="text-[var(--color-accent)]" />
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Direct server node</h3>
+                  </div>
+                  <p className="mt-1 text-xs text-[var(--text-muted)]">
+                    Official IDLE node running on Hatcher server capacity, separate from agent provider registrations.
+                  </p>
+                </div>
+                <StatusPill ok={!!data.directNode.container?.running} label={data.directNode.container?.running ? 'Node running' : 'Node offline'} />
+              </div>
+              {data.directNode.errors.length ? (
+                <div className="mb-3 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-300">
+                  {data.directNode.errors.join(' · ')}
+                </div>
+              ) : null}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <MetricCard
+                  label="Node jobs"
+                  value={number(data.directNode.earnings.completedJobs)}
+                  sub={`${number(data.directNode.earnings.failedJobs)} failed`}
+                  icon={Activity}
+                  tone="#38BDF8"
+                />
+                <MetricCard
+                  label="Node earned"
+                  value={formatUsd(data.directNode.earnings.totalEarnedUsd)}
+                  sub={`${formatUsd(data.directNode.earnings.pendingUsd)} pending`}
+                  icon={DollarSign}
+                  tone="#34D399"
+                />
+                <MetricCard
+                  label="CPU cap / usage"
+                  value={`${data.directNode.container?.cpuLimitCores ?? 'n/a'} cores`}
+                  sub={formatMaybePercent(data.directNode.container?.cpuPercent)}
+                  icon={Cpu}
+                  tone="#F59E0B"
+                />
+                <MetricCard
+                  label="Memory"
+                  value={formatMaybeMb(data.directNode.container?.memoryUsageMb)}
+                  sub={`cap ${formatMaybeMb(data.directNode.container?.memoryLimitMb)}`}
+                  icon={HardDrive}
+                  tone="#A78BFA"
+                />
+              </div>
+              <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">Wallet</p>
+                  <p className="mt-1 break-all font-mono text-xs text-[var(--text-primary)]">{data.directNode.wallet ?? 'not configured'}</p>
+                  <p className="mt-2 text-[11px] text-[var(--text-muted)]">
+                    Session jobs: {data.directNode.session.processedJobs ?? 'n/a'}
+                    {data.directNode.session.lastJob ? ` · last ${data.directNode.session.lastJob.type} +${formatUsd(data.directNode.session.lastJob.earnedUsd)}` : ''}
+                  </p>
+                </div>
+                <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">Node by type</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {data.directNode.earnings.byType.length ? data.directNode.earnings.byType.slice(0, 8).map((row) => (
+                      <span key={row.type} className="rounded-full border border-[var(--border-default)] px-2 py-1 font-mono text-[11px] text-[var(--text-muted)]">
+                        {row.type}: {number(row.jobs)}
+                      </span>
+                    )) : (
+                      <span className="text-xs text-[var(--text-muted)]">No node jobs yet.</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] p-4">
