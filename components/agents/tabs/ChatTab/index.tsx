@@ -343,7 +343,8 @@ export function ChatTab() {
   return (
     <motion.div
       key="tab-chat"
-      className="flex h-[calc(100dvh-205px)] min-h-[500px] w-full min-w-0 flex-col 2xl:h-[calc(100dvh-185px)] 2xl:min-h-[620px]"
+      data-testid="agent-chat-root"
+      className="flex h-[calc(100dvh-260px)] max-h-[calc(100dvh-260px)] min-h-0 w-full min-w-0 flex-col md:h-[calc(100dvh-205px)] md:max-h-none md:min-h-[500px] 2xl:h-[calc(100dvh-185px)] 2xl:min-h-[620px]"
       variants={tabContentVariants}
       initial="enter"
       animate="center"
@@ -395,7 +396,7 @@ export function ChatTab() {
           </div>
         )}
 
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <MessageList
             messages={messages}
             visibleMessages={visibleMessages}
