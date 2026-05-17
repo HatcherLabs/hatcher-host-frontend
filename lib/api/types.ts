@@ -466,3 +466,76 @@ export interface AdminEgressEventsResponse {
 export type AgentEgressEventsResponse = Omit<AdminEgressEventsResponse, 'agentId'> & {
   agentId: string;
 };
+
+export interface AdminIdleOverviewResponse {
+  generatedAt: string;
+  config: {
+    computeEnabled: boolean;
+    providerEnabled: boolean;
+    consumerBillingMode: 'partner_free' | 'ai_credits';
+    providerCallbackConfigured: boolean;
+    payoutWalletConfigured: boolean;
+    providerDefaultPriceUsd: number;
+    partnerApiConfigured?: boolean;
+    partnerBaseUrl?: string | null;
+  };
+  partnerApi: {
+    agentsStatus: number | null;
+    usageStatus: number | null;
+    earningsStatus: number | null;
+    errors: string[];
+  };
+  consumer: {
+    totalRequests: number;
+    totalSpentUsd: number;
+    byType: Array<{ type: string; requests: number; spentUsd: number | null }>;
+    windows: Record<string, unknown> | null;
+    pricing: Record<string, unknown> | null;
+  };
+  producer: {
+    totalEarnedUsd: number;
+    totalPaidUsd: number;
+    totalPendingUsd: number;
+    totalJobs: number;
+    payoutSchedule: string | null;
+    wallets: unknown[];
+  };
+  providers: {
+    requiredCapabilities: string[];
+    coverage: {
+      activeRuntimeAgents: number;
+      activeRunningAgents: number;
+      activeRunningIdleEnvReady: number;
+      idleEligibleNow: number;
+      registeredHatcherProviders: number;
+      registeredWithCurrentCapabilities: number;
+    };
+    missingRegistration: Array<{
+      id: string;
+      name: string;
+      slug: string | null;
+      framework: string;
+      reason: string;
+    }>;
+    staleRegistrations: Array<{
+      agentId: string;
+      registryId: string | null;
+      name: string | null;
+      status: string | null;
+      totalRequests: number;
+    }>;
+    duplicateRegistrations: Array<{ agentId: string; count: number }>;
+    registrations: Array<{
+      registryId: string | null;
+      agentId: string | null;
+      name: string | null;
+      status: string | null;
+      capabilities: string[];
+      matchingCurrentCapabilities: boolean;
+      pricePerRequest: number | null;
+      totalRequests: number;
+      totalEarnedUsd: number;
+      stale: boolean;
+    }>;
+  };
+}

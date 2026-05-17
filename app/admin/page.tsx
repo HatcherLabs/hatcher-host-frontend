@@ -52,6 +52,7 @@ import {
 import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip as ReTooltip, BarChart, Bar, XAxis, YAxis } from 'recharts';
 import type { AdminOverviewExtras } from '@hatcher/shared';
 import AffiliateTab from './_components/AffiliateTab';
+import IdleTab from './_components/IdleTab';
 
 
 // ── Status filters ───────────────────────────────────────────
@@ -1094,11 +1095,11 @@ export default function AdminPage() {
   const [agentsPagination, setAgentsPagination] = useState<{ total: number; hasMore: boolean }>({ total: 0, hasMore: false });
   const [error, setError] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health' | 'analytics' | 'egress' | 'audit' | 'affiliate'>(() => {
+  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'tickets' | 'purchases' | 'health' | 'analytics' | 'egress' | 'idle' | 'audit' | 'affiliate'>(() => {
     if (typeof window === 'undefined') return 'overview';
     const params = new URLSearchParams(window.location.search);
     const t = params.get('tab');
-    if (t === 'affiliate' || t === 'overview' || t === 'agents' || t === 'users' || t === 'tickets' || t === 'purchases' || t === 'health' || t === 'analytics' || t === 'egress' || t === 'audit') return t;
+    if (t === 'affiliate' || t === 'overview' || t === 'agents' || t === 'users' || t === 'tickets' || t === 'purchases' || t === 'health' || t === 'analytics' || t === 'egress' || t === 'idle' || t === 'audit') return t;
     return 'overview';
   });
   const [payments, setPayments] = useState<AdminPayment[]>([]);
@@ -1797,10 +1798,10 @@ export default function AdminPage() {
           {/* Tab switcher */}
           <div className="-mx-1 mb-5 w-full max-w-full overflow-x-auto overscroll-x-contain px-1">
             <div className="inline-flex min-w-max items-center gap-1 rounded-xl bg-[rgba(46,43,74,0.3)] p-1">
-              {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics', 'egress', 'audit', 'affiliate'] as const).map((tab) => {
-                const tabIcons: Record<string, LucideIcon> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp, egress: Network, audit: ScrollText, affiliate: UserPlus };
+              {(['overview', 'agents', 'users', 'tickets', 'purchases', 'health', 'analytics', 'egress', 'idle', 'audit', 'affiliate'] as const).map((tab) => {
+                const tabIcons: Record<string, LucideIcon> = { overview: BarChart3, agents: Bot, users: Users, tickets: Ticket, purchases: DollarSign, health: HeartPulse, analytics: TrendingUp, egress: Network, idle: Radio, audit: ScrollText, affiliate: UserPlus };
                 const TabIcon = tabIcons[tab] ?? BarChart3;
-                const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health', analytics: 'Analytics', egress: 'Egress', audit: 'Audit Log', affiliate: 'Affiliate' };
+                const tabLabels: Record<string, string> = { overview: 'Overview', agents: `Agents (${agentsPagination.total || agents.length})`, users: `Users (${users.length})`, tickets: `Tickets${tickets.length ? ` (${tickets.length})` : ''}`, purchases: 'Purchases', health: 'Health', analytics: 'Analytics', egress: 'Egress', idle: 'IDLE', audit: 'Audit Log', affiliate: 'Affiliate' };
                 return (
                   <button
                     key={tab}
@@ -2964,6 +2965,8 @@ export default function AdminPage() {
           {activeTab === 'analytics' && <AnalyticsTab />}
 
           {activeTab === 'egress' && <EgressTab />}
+
+          {activeTab === 'idle' && <IdleTab />}
 
           {activeTab === 'audit' && <AuditLogTab />}
 

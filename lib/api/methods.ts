@@ -4,7 +4,7 @@
 
 import { API_URL } from '@/lib/config';
 import { getToken, req } from './core';
-import type { Agent, AgentPassport, AgentPassportNetworkId, AgentWalletPrivateKeyResponse, AgentWalletsResponse, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse, AgentEgressEventsResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection } from './types';
+import type { Agent, AgentPassport, AgentPassportNetworkId, AgentWalletPrivateKeyResponse, AgentWalletsResponse, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse, AgentEgressEventsResponse, AdminIdleOverviewResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection } from './types';
 import type { TierConfig, AdminOverviewExtras } from '@hatcher/shared';
 
 const API_BASE = API_URL;
@@ -1267,6 +1267,9 @@ export const api = {
     const query = qs.toString() ? `?${qs.toString()}` : '';
     return req<AdminEgressEventsResponse>(`/admin/egress-events${query}`);
   },
+
+  /** Admin: IDLE consumer/provider integration overview */
+  adminGetIdleOverview: () => req<AdminIdleOverviewResponse>('/admin/idle'),
 
   /** List files in agent's running container */
   listContainerFiles: (agentId: string, path?: string) =>
