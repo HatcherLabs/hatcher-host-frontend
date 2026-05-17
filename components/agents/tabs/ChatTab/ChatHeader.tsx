@@ -1,6 +1,6 @@
 'use client';
 
-import { Bot, PanelLeftOpen, Phone, Volume2, VolumeX } from 'lucide-react';
+import { Bot, Menu, Phone, Volume2, VolumeX } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { FRAMEWORKS, type AgentFramework } from '@hatcher/shared';
 import { FRAMEWORK_BADGE } from '../../AgentContext';
@@ -36,6 +36,16 @@ export function ChatHeader({
   return (
     <div className="flex items-center justify-between mb-2 px-1">
       <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onOpenMobilePanel}
+          data-testid="agent-chat-open-sessions"
+          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--border-default)] text-[var(--text-muted)] transition-colors hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)] md:hidden"
+          aria-label="Open chats sidebar"
+          title="Chats"
+        >
+          <Menu size={14} />
+        </button>
         <span className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-full border font-medium ${FRAMEWORK_BADGE[agent.framework] ?? 'bg-slate-500/15 text-slate-400 border-slate-500/30'}`}>
           <Bot size={10} />
           {frameworkMeta?.name ?? agent.framework}
@@ -48,15 +58,6 @@ export function ChatHeader({
         )}
       </div>
       <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={onOpenMobilePanel}
-          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--border-default)] text-[var(--text-muted)] transition-colors hover:border-[var(--color-accent)]/40 hover:text-[var(--color-accent)] md:hidden"
-          aria-label="Open chats sidebar"
-          title="Chats"
-        >
-          <PanelLeftOpen size={13} />
-        </button>
         {/* Voice Call button */}
         {hasVoiceSupport && sttSupported && isAuthenticated && (
           <button

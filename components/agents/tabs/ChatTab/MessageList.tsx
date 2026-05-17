@@ -63,7 +63,12 @@ export function MessageList({
     && messages.length > 0
     && messages[messages.length - 1]?.streaming;
   return (
-    <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overscroll-contain space-y-4 mb-4 pr-1" style={{ overflowAnchor: 'none' as const }}>
+    <div
+      ref={messagesContainerRef}
+      data-testid="agent-chat-messages"
+      className="min-h-0 flex-1 overflow-y-auto overscroll-contain space-y-4 mb-4 pr-1"
+      style={{ overflowAnchor: 'none' as const }}
+    >
       {messages.length === 0 && (
         <motion.div
           className="text-center py-16"
