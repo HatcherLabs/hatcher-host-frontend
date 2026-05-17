@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { Bot, DoorOpen, Eye, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Bot, DoorOpen, Eye, MessageSquare } from 'lucide-react';
 import type { CityAgent, CityResponse } from '@/components/city/types';
 import type { LiveAgentMarkerLayout } from './liveLayout';
 import { publicAgentChatHref, selectActiveCityAgents } from './activeAgentList';
@@ -70,6 +70,13 @@ export function LiveCityHud({
           </div>
         </div>
         <div className="pointer-events-auto flex items-center gap-2">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-xs font-semibold text-white/75 backdrop-blur-xl transition hover:border-cyan-300/45 hover:text-cyan-200"
+          >
+            <ArrowLeft size={14} />
+            Back to site
+          </Link>
           {hasMyBuilding && onMyBuildingClick && (
             <button
               type="button"

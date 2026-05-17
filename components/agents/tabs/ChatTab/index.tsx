@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useVoice } from '@/hooks/useVoice';
 import { api } from '@/lib/api';
 import {
@@ -369,7 +369,7 @@ export function ChatTab() {
         </div>
 
         {mobilePanelOpen && (
-          <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true" aria-label="Chat sessions">
+          <div className="fixed inset-0 z-[11000] md:hidden" role="dialog" aria-modal="true" aria-label="Chat sessions">
             <button
               type="button"
               className="absolute inset-0 bg-black/65"
@@ -377,15 +377,16 @@ export function ChatTab() {
               onClick={() => setMobilePanelOpen(false)}
             />
             <div className="absolute inset-y-0 left-0 flex w-[min(22rem,88vw)] flex-col border-r border-[var(--border-default)] bg-[var(--bg-elevated)] shadow-2xl">
-              <div className="flex h-12 shrink-0 items-center justify-between border-b border-[var(--border-default)] px-3">
-                <span className="text-xs font-semibold text-[var(--text-primary)]">Chats</span>
+              <div className="flex h-12 shrink-0 items-center border-b border-[var(--border-default)] px-3">
                 <button
                   type="button"
                   onClick={() => setMobilePanelOpen(false)}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--text-muted)] transition-colors hover:bg-white/5 hover:text-[var(--text-primary)]"
-                  aria-label="Close chats sidebar"
+                  data-testid="agent-chat-close-sessions"
+                  className="inline-flex h-8 items-center gap-2 rounded-md px-2 text-xs font-semibold text-[var(--text-muted)] transition-colors hover:bg-white/5 hover:text-[var(--text-primary)]"
+                  aria-label="Back to chat"
                 >
-                  <X size={15} />
+                  <ArrowLeft size={15} />
+                  <span>Back to chat</span>
                 </button>
               </div>
               <AgentPresenceRail
