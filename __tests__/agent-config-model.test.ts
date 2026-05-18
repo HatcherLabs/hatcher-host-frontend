@@ -10,7 +10,7 @@ import {
 } from '@/hooks/useAgentConfig';
 
 describe('agent config model selection', () => {
-  it('saves the selected hosted OpenRouter model instead of stale custom model state', () => {
+  it('saves the selected hosted platform model instead of stale custom model state', () => {
     expect(resolveSavedModel({
       configProvider: 'openrouter',
       configModel: 'qwen/qwen3-coder-flash',
@@ -19,7 +19,7 @@ describe('agent config model selection', () => {
     })).toBe('qwen/qwen3-coder-flash');
   });
 
-  it('does not treat hosted OpenRouter model ids as BYOK custom models on load', () => {
+  it('does not treat hosted platform model ids as BYOK custom models on load', () => {
     expect(resolveInitialCustomModelState('openrouter', 'qwen/qwen3-coder-flash')).toEqual({
       useCustomModel: false,
       customModelInput: '',

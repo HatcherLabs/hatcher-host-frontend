@@ -220,7 +220,7 @@ export function useAgentConfig(
       const hasNewKey = byokKeyInput.trim().length > 0;
       if (!hasExistingKey && !hasNewKey) {
         const providerName = getBYOKProvider(configProvider)?.name ?? configProvider;
-        setSaveMsg(`Error: API key is required for ${providerName}. Enter your key or switch back to hosted OpenRouter.`);
+        setSaveMsg(`Error: API key is required for ${providerName}. Enter your key or switch back to Hatcher-hosted models.`);
         return;
       }
     }

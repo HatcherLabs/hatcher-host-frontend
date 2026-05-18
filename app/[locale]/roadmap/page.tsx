@@ -51,7 +51,7 @@ const PHASES: Phase[] = [
       { text: 'SDK, CLI, Zapier app, Make module, GitHub Action' },
       { text: 'Teams collaboration, agent versioning with diff + restore, visual workflow builder' },
       { text: 'Referral program — earn credits for every signup you bring' },
-      { text: 'Skills + plugins ecosystem — ClawHub, Hermes tools, OpenRouter routing, npm support' },
+      { text: 'Skills + plugins ecosystem — ClawHub, Hermes tools, UsePod/OpenRouter routing, npm support' },
       { text: 'Knowledge base, voice mode, secure terminal, managed mode (OpenClaw + Hermes)' },
       { text: 'Full docs (35+ pages), live changelog, support tickets, admin panel' },
     ],

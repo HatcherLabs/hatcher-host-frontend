@@ -4,7 +4,7 @@ import { buildLanguagesMap } from '@/lib/seo';
 export const metadata: Metadata = {
   title: 'AI Frameworks — OpenClaw and Hermes',
   description:
-    'Compare OpenClaw and Hermes on Hatcher: skill-heavy automation, persistent memory, integrations, and OpenRouter-hosted LLM support. Deploy an agent in 60 seconds.',
+    'Compare OpenClaw and Hermes on Hatcher: skill-heavy automation, persistent memory, integrations, and UsePod/OpenRouter-hosted LLM support. Deploy an agent in 60 seconds.',
   keywords: ['OpenClaw', 'Hermes', 'OpenRouter', 'DeepSeek', 'AI frameworks', 'agent framework comparison'],
   alternates: {
     canonical: '/frameworks',

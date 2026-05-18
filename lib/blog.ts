@@ -76,7 +76,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>If you do not have platform tokens yet, don't worry — we cover how to get them below.</p>
 
 <h2>Step 1: Create Your Free Account</h2>
-<p>Head to <a href="https://hatcher.host/register">hatcher.host/register</a> and create a free account. All you need is an email and password. No credit card required. Every free account includes <strong>one agent</strong> with <strong>500 AI Credits/month</strong> using our hosted OpenRouter models.</p>
+<p>Head to <a href="https://hatcher.host/register">hatcher.host/register</a> and create a free account. All you need is an email and password. No credit card required. Every free account includes <strong>one agent</strong> with <strong>500 AI Credits/month</strong> using our hosted UsePod/OpenRouter models.</p>
 
 <h2>Step 2: Describe the Agent</h2>
 <p>From your dashboard, click <strong>Create Agent</strong>. Chat-to-Hatch asks what you want to build and drafts the framework, identity files, skills, model, and launch configuration for you:</p>
@@ -110,7 +110,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>You can also connect <strong>Twitter/X</strong>, <strong>WhatsApp</strong>, and <strong>Slack</strong> — each requires its own API credentials from the respective platform.</p>
 
 <h2>Step 6: Choose Your LLM</h2>
-<p>Every free account includes 500 AI Credits/month using our hosted OpenRouter models — no API key needed. If you want <strong>provider-paid BYOK usage</strong>, enable <strong>BYOK</strong> (Bring Your Own Key) and connect your own API key from OpenAI, Anthropic, Google, xAI, OpenRouter, or another supported provider. BYOK is free to use on every plan — you only pay your provider's API costs.</p>
+<p>Every free account includes 500 AI Credits/month using our hosted UsePod/OpenRouter models — no API key needed. If you want <strong>provider-paid BYOK usage</strong>, enable <strong>BYOK</strong> (Bring Your Own Key) and connect your own API key from OpenAI, Anthropic, Google, xAI, OpenRouter, or another supported provider. BYOK is free to use on every plan — you only pay your provider's API costs.</p>
 
 <h2>Step 7: Deploy</h2>
 <p>Click <strong>Deploy</strong>. Hatcher builds your agent's isolated Docker container, injects your encrypted configuration, connects to the LLM proxy, and starts the agent process. Within seconds, your agent is live and responding on every platform you configured.</p>
@@ -200,7 +200,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <li>Runs engagement activities: polls, quizzes, AMAs, and trivia games</li>
 </ul>
 <h3>Recommended Setup</h3>
-<p>Use <strong>OpenClaw</strong> and ask Chat-to-Hatch for a community manager. Its platform integrations and community-focused skills make it ideal. Connect both Discord and Telegram to manage your communities from a single agent. Use hosted OpenRouter models or BYOK with your preferred provider for natural group-chat latency.</p>
+<p>Use <strong>OpenClaw</strong> and ask Chat-to-Hatch for a community manager. Its platform integrations and community-focused skills make it ideal. Connect both Discord and Telegram to manage your communities from a single agent. Use hosted UsePod/OpenRouter models or BYOK with your preferred provider for natural group-chat latency.</p>
 
 <h2>4. Research and Intelligence Gathering</h2>
 <p><strong>Time saved: 2-3 hours/week</strong></p>
@@ -229,7 +229,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <li>Translates text, converts units, calculates figures, and handles other micro-tasks</li>
 </ul>
 <h3>Recommended Setup</h3>
-<p>Use <strong>Hermes</strong> and ask Chat-to-Hatch for a personal assistant. Its persistent memory means it learns your preferences and frequently-referenced information over time. Connect it to Telegram for always-available mobile access. Use hosted OpenRouter models or BYOK with Anthropic's Claude for more nuanced writing assistance.</p>
+<p>Use <strong>Hermes</strong> and ask Chat-to-Hatch for a personal assistant. Its persistent memory means it learns your preferences and frequently-referenced information over time. Connect it to Telegram for always-available mobile access. Use hosted UsePod/OpenRouter models or BYOK with Anthropic's Claude for more nuanced writing assistance.</p>
 
 <h2>Getting Started</h2>
 <p>All five of these agents can be deployed on Hatcher's <strong>free tier</strong> with 500 AI Credits/month. That is enough to test and validate the workflow. When you are ready for production, enable <strong>BYOK</strong> for provider-paid BYOK usage or upgrade to a paid plan for more resources and multiple agents.</p>
@@ -249,7 +249,7 @@ export const BLOG_POSTS: BlogPost[] = [
     content: `<p>One of Hatcher's most powerful features is <strong>BYOK</strong> — Bring Your Own Key. Instead of relying on our hosted LLM with AI Credit metering, you plug in your own API key and unlock <strong>provider-paid BYOK usage</strong> on any plan, including Free. This guide explains exactly how it works and why it saves you money.</p>
 
 <h2>What Is BYOK?</h2>
-<p>BYOK stands for <strong>Bring Your Own Key</strong>. When you create an agent on Hatcher, it needs access to a large language model (LLM) to think and respond. By default, Hatcher provides a hosted OpenRouter LLM with AI Credit metering based on your plan:</p>
+<p>BYOK stands for <strong>Bring Your Own Key</strong>. When you create an agent on Hatcher, it needs access to a large language model (LLM) to think and respond. By default, Hatcher provides hosted UsePod/OpenRouter LLM access with AI Credit metering based on your plan:</p>
 <ul>
 <li><strong>Free:</strong> 500 AI Credits/month</li>
 <li><strong>Starter ($6.99/mo):</strong> 3,000 AI Credits/month</li>
@@ -364,7 +364,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <li><strong>20+ platform integrations</strong> — Telegram, Discord, Twitter, WhatsApp, Slack, and more, all wired up out of the box</li>
 <li><strong>2 frameworks</strong> — OpenClaw and Hermes, each with focused strengths and tooling</li>
 <li><strong>Auto-sleep and auto-wake</strong> — idle agents sleep to save resources, wake instantly on incoming messages</li>
-<li><strong>LLM proxy with rate limiting</strong> — use our hosted OpenRouter models or bring your own key for provider-paid BYOK usage</li>
+<li><strong>LLM proxy with rate limiting</strong> — use our hosted UsePod/OpenRouter models or bring your own key for provider-paid BYOK usage</li>
 </ul>
 
 <h2>Free Tier, No Strings</h2>
@@ -424,7 +424,7 @@ export const BLOG_POSTS: BlogPost[] = [
 <p>Hatcher builds the container, starts the agent, and connects it to Telegram. The whole process takes under 30 seconds.</p>
 
 <h2>Step 3: Test It</h2>
-<p>Open Telegram and search for your bot by username. Send it a message — any message. It should reply almost instantly using the hosted OpenRouter model.</p>
+<p>Open Telegram and search for your bot by username. Send it a message — any message. It should reply almost instantly using the hosted UsePod/OpenRouter model.</p>
 <p>The default system prompt makes the agent a general-purpose assistant. You can customize it from the <strong>Config</strong> tab in your Hatcher dashboard.</p>
 
 <h2>Customizing Your Bot</h2>
@@ -437,7 +437,7 @@ export const BLOG_POSTS: BlogPost[] = [
 </ul>
 
 <h2>Adding a BYOK Provider Key</h2>
-<p>The free tier includes 500 AI Credits/month using our hosted OpenRouter budget. If you want provider-paid BYOK usage:</p>
+<p>The free tier includes 500 AI Credits/month using our hosted UsePod/OpenRouter budget. If you want provider-paid BYOK usage:</p>
 <ol>
 <li>Get an API key from your preferred supported LLM provider</li>
 <li>In your agent's Config tab, find <strong>BYOK Settings</strong></li>

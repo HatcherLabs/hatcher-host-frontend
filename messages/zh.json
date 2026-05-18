@@ -588,7 +588,7 @@
         "storage": "2 GB 工作区",
         "sleep": "闲置12小时后自动休眠",
         "features": [
-          "通过 OpenRouter 使用托管模型",
+          "通过 UsePod/OpenRouter 使用托管模型",
           "网页搜索使用 AI Credits",
           "已包含文件管理器 + 完整日志",
           "所有集成（Telegram、Discord、Twitter等）"
@@ -603,7 +603,7 @@
         "storage": "10 GB 工作区",
         "sleep": "始终在线",
         "features": [
-          "通过 OpenRouter 使用托管模型",
+          "通过 UsePod/OpenRouter 使用托管模型",
           "网页搜索使用 AI Credits",
           "已包含文件管理器 + 完整日志",
           "所有集成"
@@ -618,7 +618,7 @@
         "storage": "25 GB 工作区",
         "sleep": "始终在线",
         "features": [
-          "通过 OpenRouter 使用托管模型",
+          "通过 UsePod/OpenRouter 使用托管模型",
           "网页搜索使用 AI Credits",
           "已包含文件管理器 + 完整日志",
           "所有集成"
@@ -633,7 +633,7 @@
         "storage": "50 GB 工作区",
         "sleep": "始终在线",
         "features": [
-          "通过 OpenRouter 使用托管模型",
+          "通过 UsePod/OpenRouter 使用托管模型",
           "网页搜索使用 AI Credits",
           "已包含文件管理器",
           "已包含完整日志",
@@ -652,7 +652,7 @@
         "sleep": "始终在线",
         "features": [
           "$99 一次性付款——终身访问",
-          "通过 OpenRouter 使用托管模型",
+          "通过 UsePod/OpenRouter 使用托管模型",
           "网页搜索使用 AI Credits",
           "已包含文件管理器 + 完整日志",
           "优先支持",
@@ -794,7 +794,7 @@
         },
         {
           "q": "免费套餐提供哪种LLM？",
-          "a": "托管使用通过 OpenRouter 路由，并从您的 AI Credits 余额中扣除。您可以从支持的托管模型中选择；BYOK 不消耗 Hatcher AI Credits，因为您直接向自己的提供商付费。"
+          "a": "托管使用优先通过 UsePod 路由，并以 OpenRouter 作为 fallback，同时从您的 AI Credits 余额中扣除。您可以从支持的托管模型中选择；BYOK 不消耗 Hatcher AI Credits，因为您直接向自己的提供商付费。"
         },
         {
           "q": "什么是创始会员套餐？",
@@ -1827,7 +1827,7 @@
     "configRef": "完整配置参考 →",
     "docsSuffix": "文档",
     "llmSupport": "LLM 支持",
-    "llmSubheading": "两种框架都支持 BYOK，由用户直接向提供商付费。托管 LLM 通过 OpenRouter 使用每个智能体配置中选择的提供商和模型，并消耗 AI Credits。",
+    "llmSubheading": "两种框架都支持 BYOK，由用户直接向提供商付费。托管 LLM 优先使用 UsePod，并以 OpenRouter 作为 fallback，然后消耗 AI Credits。",
     "byokNote": "* BYOK 始终免费使用 Hatcher 平台；提供商用量由您自己的密钥支付。",
     "byokSetupLink": "查看 BYOK 设置指南 →",
     "decisionGuide": "快速决策指南",

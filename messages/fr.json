@@ -588,7 +588,7 @@
         "storage": "2 GB d'espace de travail",
         "sleep": "Veille automatique après 12h d'inactivité",
         "features": [
-          "Modèles hébergés via OpenRouter",
+          "Modèles hébergés via UsePod/OpenRouter",
           "La recherche web utilise les AI Credits",
           "Gestionnaire de fichiers + journaux complets inclus",
           "Toutes les intégrations (Telegram, Discord, Twitter, etc.)"
@@ -603,7 +603,7 @@
         "storage": "10 GB d'espace de travail",
         "sleep": "Toujours actif",
         "features": [
-          "Modèles hébergés via OpenRouter",
+          "Modèles hébergés via UsePod/OpenRouter",
           "La recherche web utilise les AI Credits",
           "Gestionnaire de fichiers + journaux complets inclus",
           "Toutes les intégrations"
@@ -618,7 +618,7 @@
         "storage": "25 GB d'espace de travail",
         "sleep": "Toujours actif",
         "features": [
-          "Modèles hébergés via OpenRouter",
+          "Modèles hébergés via UsePod/OpenRouter",
           "La recherche web utilise les AI Credits",
           "Gestionnaire de fichiers + journaux complets inclus",
           "Toutes les intégrations"
@@ -633,7 +633,7 @@
         "storage": "50 GB d'espace de travail",
         "sleep": "Toujours actif",
         "features": [
-          "Modèles hébergés via OpenRouter",
+          "Modèles hébergés via UsePod/OpenRouter",
           "La recherche web utilise les AI Credits",
           "Gestionnaire de fichiers inclus",
           "Journaux complets inclus",
@@ -652,7 +652,7 @@
         "sleep": "Toujours actif",
         "features": [
           "$99 paiement unique — accès à vie",
-          "Modèles hébergés via OpenRouter",
+          "Modèles hébergés via UsePod/OpenRouter",
           "La recherche web utilise les AI Credits",
           "Gestionnaire de fichiers + journaux complets inclus",
           "Support prioritaire",
@@ -794,7 +794,7 @@
         },
         {
           "q": "Quel LLM est inclus dans le forfait gratuit ?",
-          "a": "L'usage hébergé passe par OpenRouter et consomme votre solde d'AI Credits. Vous pouvez choisir parmi les modèles hébergés pris en charge ; BYOK contourne la mesure Hatcher en AI Credits parce que vous payez directement votre fournisseur."
+          "a": "L'usage hébergé utilise UsePod d'abord, avec OpenRouter en fallback, et consomme votre solde d'AI Credits. Vous pouvez choisir parmi les modèles hébergés pris en charge ; BYOK contourne la mesure Hatcher en AI Credits parce que vous payez directement votre fournisseur."
         },
         {
           "q": "Qu'est-ce que le forfait Membre fondateur ?",
@@ -1827,7 +1827,7 @@
     "configRef": "Référence de configuration complète →",
     "docsSuffix": "docs",
     "llmSupport": "Support LLM",
-    "llmSubheading": "Les deux frameworks prennent en charge BYOK pour une utilisation payée directement au fournisseur. Les LLM hébergés passent par OpenRouter avec le fournisseur et le modèle choisis dans la configuration de chaque agent, puis utilisent des AI Credits.",
+    "llmSubheading": "Les deux frameworks prennent en charge BYOK pour une utilisation payée directement au fournisseur. Les LLM hébergés utilisent d'abord UsePod, avec OpenRouter en fallback, puis utilisent des AI Credits.",
     "byokNote": "* BYOK toujours gratuit — utilisation payée directement au fournisseur.",
     "byokSetupLink": "Voir le guide de configuration BYOK →",
     "decisionGuide": "Guide de décision rapide",

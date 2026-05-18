@@ -588,7 +588,7 @@
         "storage": "2 GB Arbeitsbereich",
         "sleep": "Automatischer Ruhezustand nach 12 Std. Inaktivität",
         "features": [
-          "Gehostete Modelle über OpenRouter",
+          "Gehostete Modelle über UsePod/OpenRouter",
           "Websuche nutzt AI Credits",
           "Dateimanager + Vollständige Logs inklusive",
           "Alle Integrationen (Telegram, Discord, Twitter, usw.)"
@@ -603,7 +603,7 @@
         "storage": "10 GB Arbeitsbereich",
         "sleep": "Immer aktiv",
         "features": [
-          "Gehostete Modelle über OpenRouter",
+          "Gehostete Modelle über UsePod/OpenRouter",
           "Websuche nutzt AI Credits",
           "Dateimanager + Vollständige Logs inklusive",
           "Alle Integrationen"
@@ -618,7 +618,7 @@
         "storage": "25 GB Arbeitsbereich",
         "sleep": "Immer aktiv",
         "features": [
-          "Gehostete Modelle über OpenRouter",
+          "Gehostete Modelle über UsePod/OpenRouter",
           "Websuche nutzt AI Credits",
           "Dateimanager + Vollständige Logs inklusive",
           "Alle Integrationen"
@@ -633,7 +633,7 @@
         "storage": "50 GB Arbeitsbereich",
         "sleep": "Immer aktiv",
         "features": [
-          "Gehostete Modelle über OpenRouter",
+          "Gehostete Modelle über UsePod/OpenRouter",
           "Websuche nutzt AI Credits",
           "Dateimanager inklusive",
           "Vollständige Logs inklusive",
@@ -652,7 +652,7 @@
         "sleep": "Immer aktiv",
         "features": [
           "$99 einmalig — lebenslanger Zugang",
-          "Gehostete Modelle über OpenRouter",
+          "Gehostete Modelle über UsePod/OpenRouter",
           "Websuche nutzt AI Credits",
           "Dateimanager + Vollständige Logs inklusive",
           "Prioritäts-Support",
@@ -794,7 +794,7 @@
         },
         {
           "q": "Welches LLM erhalte ich mit dem kostenlosen Tarif?",
-          "a": "Gehostete Nutzung läuft über OpenRouter und verbraucht Ihr AI-Credit-Guthaben. Sie können aus unterstützten gehosteten Modellen wählen; BYOK umgeht die Hatcher-AI-Credit-Messung, weil Sie direkt Ihren Anbieter bezahlen."
+          "a": "Gehostete Nutzung verwendet zuerst UsePod mit OpenRouter als Fallback und verbraucht Ihr AI-Credit-Guthaben. Sie können aus unterstützten gehosteten Modellen wählen; BYOK umgeht die Hatcher-AI-Credit-Messung, weil Sie direkt Ihren Anbieter bezahlen."
         },
         {
           "q": "Was ist der Gründungsmitglied-Tarif?",
@@ -1827,7 +1827,7 @@
     "configRef": "Vollständige Konfigurationsreferenz →",
     "docsSuffix": "Docs",
     "llmSupport": "LLM-Unterstützung",
-    "llmSubheading": "Beide Frameworks unterstützen BYOK (eigener Key) für provider-bezahlte Nutzung. Gehostete LLMs laufen über OpenRouter mit dem Provider und Modell aus der jeweiligen Agenten-Konfiguration und nutzen AI Credits.",
+    "llmSubheading": "Beide Frameworks unterstützen BYOK (eigener Key) für provider-bezahlte Nutzung. Gehostete LLMs verwenden zuerst UsePod mit OpenRouter als Fallback und nutzen AI Credits.",
     "byokNote": "* BYOK immer kostenlos — direkt beim Anbieter bezahlte Nutzung.",
     "byokSetupLink": "BYOK-Setup-Anleitung anzeigen →",
     "decisionGuide": "Schnelle Entscheidungshilfe",
