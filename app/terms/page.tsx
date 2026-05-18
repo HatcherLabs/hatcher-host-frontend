@@ -238,7 +238,7 @@ export default function TermsOfServicePage() {
             <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-3">10. Service Availability</h2>
             <p>
               The Service is provided on a &ldquo;best effort&rdquo; basis. We target high uptime but do not promise
-              an SLA. Maintenance windows, network incidents, and upstream provider issues (OpenRouter, Stripe, Cloudflare,
+              an SLA. Maintenance windows, network incidents, and upstream provider issues (UsePod, OpenRouter, Stripe, Cloudflare,
               Hetzner) can cause downtime.
             </p>
             <p className="mt-3">

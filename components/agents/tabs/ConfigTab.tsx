@@ -72,7 +72,7 @@ const HOSTED_MODEL_PROVIDERS: HostedModelProvider[] = [
   { key: 'moonshotai', name: 'Moonshot AI', description: 'Kimi models for analysis-heavy workflows.' },
   { key: 'z-ai', name: 'Z.ai', description: 'GLM models with strong price-performance.' },
   { key: 'nvidia', name: 'NVIDIA', description: 'Nemotron models for low-cost tool loops.' },
-  { key: 'openrouter', name: 'OpenRouter', description: 'Router-managed fallback selection.' },
+  { key: 'openrouter', name: 'OpenRouter', description: 'Router-managed fallback selection through Hatcher.' },
 ];
 
 const HOSTED_MODELS: HostedModelOption[] = [
@@ -84,7 +84,7 @@ const HOSTED_MODELS: HostedModelOption[] = [
     category: 'Default',
     cost: 'Low',
     context: '1M',
-    description: 'Default hosted model. Fast, low-cost, and strong enough for most agent loops.',
+    description: 'Default hosted model. Fast, low-cost, and routed through the best available Hatcher provider.',
   },
   {
     id: 'deepseek/deepseek-v4-pro',
@@ -530,7 +530,7 @@ const HOSTED_MODELS: HostedModelOption[] = [
     category: 'Advanced',
     cost: 'Variable',
     context: '2M',
-    description: 'Lets OpenRouter route automatically. Useful as a fallback, not a default.',
+    description: 'Lets the fallback router select an available model. Useful as a fallback, not a default.',
   },
 ];
 
@@ -616,7 +616,7 @@ function hostedCostEstimate(cost: HostedModelCost): string {
     case 'Premium':
       return '100+ AI Credits for many replies';
     case 'Variable':
-      return 'variable, depends on OpenRouter routing';
+      return 'variable, depends on UsePod/OpenRouter routing';
   }
 }
 
@@ -882,7 +882,7 @@ export function ConfigTab() {
               AI Model
             </h3>
             <p className="text-sm text-[var(--text-secondary)] mt-1">
-              Hosted models spend AI Credits. BYOK uses your own provider key.
+              Hosted models use UsePod first with OpenRouter fallback. IDLE models stay fixed-price.
             </p>
           </div>
           {aiCreditBalance && (
@@ -982,6 +982,9 @@ export function ConfigTab() {
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-[var(--text-secondary)]">{selectedHostedModel.description}</p>
+                  <p className="mt-2 text-xs text-[var(--text-tertiary)]">
+                    Route: {selectedHostedModel.providerKey === 'idle' ? 'IDLE partner' : 'UsePod primary / OpenRouter fallback'}
+                  </p>
                 </div>
                 <div className="flex flex-wrap gap-2 text-xs text-[var(--text-secondary)]">
                   <span className="px-2 py-1 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)]">

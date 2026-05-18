@@ -157,7 +157,7 @@
         "Planificatorul de Călătorii",
         "Asistentul Personal"
       ],
-      "body": "Alege OpenClaw sau Hermes. Configurează. Lansează în 60 de secunde. Fără cod, fără infrastructură de gestionat. 20+ platforme, model găzduit pe OpenRouter și BYOK.",
+      "body": "Alege OpenClaw sau Hermes. Configurează. Lansează în 60 de secunde. Fără cod, fără infrastructură de gestionat. 20+ platforme, modele găzduite prin UsePod/OpenRouter și BYOK.",
       "ctaPrimary": "Începe gratuit",
       "ctaSecondary": "Citește documentația",
       "agentPreviewOnline": "CryptoHelper — Online"
@@ -588,7 +588,7 @@
         "storage": "2 GB spațiu de lucru",
         "sleep": "Adormire automată după 12h inactiv",
         "features": [
-          "Modele găzduite prin OpenRouter",
+          "Modele găzduite prin UsePod/OpenRouter",
           "Web search consumă AI Credits",
           "File Manager + Jurnale complete incluse",
           "Toate integrările (Telegram, Discord, Twitter, etc)"
@@ -603,7 +603,7 @@
         "storage": "10 GB spațiu de lucru",
         "sleep": "Mereu activ",
         "features": [
-          "Modele găzduite prin OpenRouter",
+          "Modele găzduite prin UsePod/OpenRouter",
           "Web search consumă AI Credits",
           "File Manager + Jurnale complete incluse",
           "Toate integrările"
@@ -618,7 +618,7 @@
         "storage": "25 GB spațiu de lucru",
         "sleep": "Mereu activ",
         "features": [
-          "Modele găzduite prin OpenRouter",
+          "Modele găzduite prin UsePod/OpenRouter",
           "Web search consumă AI Credits",
           "File Manager + Jurnale complete incluse",
           "Toate integrările"
@@ -633,7 +633,7 @@
         "storage": "50 GB spațiu de lucru",
         "sleep": "Mereu activ",
         "features": [
-          "Modele găzduite prin OpenRouter",
+          "Modele găzduite prin UsePod/OpenRouter",
           "Web search consumă AI Credits",
           "File Manager inclus",
           "Jurnale complete incluse",
@@ -652,7 +652,7 @@
         "sleep": "Mereu activ",
         "features": [
           "$99 o singură dată — acces pe viață",
-          "Modele găzduite prin OpenRouter",
+          "Modele găzduite prin UsePod/OpenRouter",
           "Web search consumă AI Credits",
           "File Manager + Jurnale complete incluse",
           "Suport prioritar",
@@ -794,7 +794,7 @@
         },
         {
           "q": "Ce LLM primesc pe planul gratuit?",
-          "a": "Utilizarea găzduită este rutată prin OpenRouter și consumă din balanța de AI Credits. Poți alege din modelele găzduite suportate; BYOK ocolește contorizarea Hatcher în AI Credits fiindcă plătești direct furnizorul."
+          "a": "Utilizarea găzduită folosește UsePod prima dată, cu fallback OpenRouter, și consumă din balanța de AI Credits. Poți alege din modelele găzduite suportate; BYOK ocolește contorizarea Hatcher în AI Credits fiindcă plătești direct furnizorul."
         },
         {
           "q": "Ce este planul Founding Member?",
@@ -1827,7 +1827,7 @@
     "configRef": "Referință configurare completă →",
     "docsSuffix": "docs",
     "llmSupport": "Suport LLM",
-    "llmSubheading": "Ambele framework-uri suportă BYOK (Bring Your Own Key) pentru utilizare plătită direct la provider. LLM-urile găzduite rutează prin OpenRouter folosind providerul și modelul ales în configurația fiecărui agent, apoi consumă AI Credits.",
+    "llmSubheading": "Ambele framework-uri suportă BYOK (Bring Your Own Key) pentru utilizare plătită direct la provider. LLM-urile găzduite folosesc UsePod prima dată, cu fallback OpenRouter, apoi consumă AI Credits.",
     "byokNote": "* BYOK mereu gratuit — utilizare plătită direct la provider.",
     "byokSetupLink": "Vezi ghidul de configurare BYOK →",
     "decisionGuide": "Ghid rapid de decizie",

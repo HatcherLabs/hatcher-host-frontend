@@ -157,7 +157,7 @@
         "Travel Planner",
         "Personal Assistant"
       ],
-      "body": "Pick OpenClaw or Hermes. Configure. Launch in 60 seconds. No code required, no infrastructure to manage. 20+ platforms, hosted OpenRouter model, and BYOK.",
+      "body": "Pick OpenClaw or Hermes. Configure. Launch in 60 seconds. No code required, no infrastructure to manage. 20+ platforms, hosted UsePod/OpenRouter models, and BYOK.",
       "ctaPrimary": "Get started free",
       "ctaSecondary": "Read docs",
       "agentPreviewOnline": "CryptoHelper — Online"
@@ -588,7 +588,7 @@
         "storage": "2 GB workspace",
         "sleep": "Auto-sleep after 12h idle",
         "features": [
-          "Hosted models via OpenRouter",
+          "Hosted models via UsePod/OpenRouter",
           "Web search uses AI Credits",
           "File Manager + Full Logs included",
           "All integrations (Telegram, Discord, Twitter, etc)"
@@ -603,7 +603,7 @@
         "storage": "10 GB workspace",
         "sleep": "Always active",
         "features": [
-          "Hosted models via OpenRouter",
+          "Hosted models via UsePod/OpenRouter",
           "Web search uses AI Credits",
           "File Manager + Full Logs included",
           "All integrations"
@@ -618,7 +618,7 @@
         "storage": "25 GB workspace",
         "sleep": "Always active",
         "features": [
-          "Hosted models via OpenRouter",
+          "Hosted models via UsePod/OpenRouter",
           "Web search uses AI Credits",
           "File Manager + Full Logs included",
           "All integrations"
@@ -633,7 +633,7 @@
         "storage": "50 GB workspace",
         "sleep": "Always active",
         "features": [
-          "Hosted models via OpenRouter",
+          "Hosted models via UsePod/OpenRouter",
           "Web search uses AI Credits",
           "File Manager included",
           "Full logs included",
@@ -652,7 +652,7 @@
         "sleep": "Always active",
         "features": [
           "$99 one-time — lifetime access",
-          "Hosted models via OpenRouter",
+          "Hosted models via UsePod/OpenRouter",
           "Web search uses AI Credits",
           "File Manager + Full Logs included",
           "Priority support",
@@ -794,7 +794,7 @@
         },
         {
           "q": "What LLM do I get with the free tier?",
-          "a": "Hosted usage is routed through OpenRouter and charged from your AI Credit balance. You can choose from supported hosted models; BYOK bypasses Hatcher AI Credit metering because you pay your provider directly."
+          "a": "Hosted usage uses UsePod first with OpenRouter fallback and is charged from your AI Credit balance. You can choose from supported hosted models; BYOK bypasses Hatcher AI Credit metering because you pay your provider directly."
         },
         {
           "q": "What is the Founding Member tier?",
@@ -1827,7 +1827,7 @@
     "configRef": "Full configuration reference →",
     "docsSuffix": "docs",
     "llmSupport": "LLM support",
-    "llmSubheading": "Both frameworks support BYOK (Bring Your Own Key) for provider-paid usage. Hosted LLMs route through OpenRouter using the provider and model selected in each agent config, then meter usage with AI Credits.",
+    "llmSubheading": "Both frameworks support BYOK (Bring Your Own Key) for provider-paid usage. Hosted LLMs use UsePod first with OpenRouter fallback, then meter usage with AI Credits.",
     "byokNote": "* BYOK always free — provider-paid usage without Hatcher AI Credits.",
     "byokSetupLink": "View BYOK setup guide →",
     "decisionGuide": "Quick decision guide",

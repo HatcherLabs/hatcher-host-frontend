@@ -194,6 +194,7 @@ export default function PrivacyPolicyPage() {
                 <tbody className="divide-y divide-[var(--border-default)]">
                   <tr><td className="px-3 py-2">Hetzner</td><td className="px-3 py-2">Hosting + compute</td><td className="px-3 py-2">All account + agent data</td><td className="px-3 py-2">Germany</td></tr>
                   <tr><td className="px-3 py-2">Cloudflare</td><td className="px-3 py-2">CDN, DDoS, DNS</td><td className="px-3 py-2">Request metadata</td><td className="px-3 py-2">Global</td></tr>
+                  <tr><td className="px-3 py-2">UsePod</td><td className="px-3 py-2">LLM inference (hosted key)</td><td className="px-3 py-2">Hosted AI requests</td><td className="px-3 py-2">USA / Global</td></tr>
                   <tr><td className="px-3 py-2">OpenRouter</td><td className="px-3 py-2">LLM inference (hosted key)</td><td className="px-3 py-2">Hosted AI requests</td><td className="px-3 py-2">USA</td></tr>
                   <tr><td className="px-3 py-2">Stripe</td><td className="px-3 py-2">Card payments</td><td className="px-3 py-2">Email, billing address, card token</td><td className="px-3 py-2">Ireland / USA</td></tr>
                   <tr><td className="px-3 py-2">Resend</td><td className="px-3 py-2">Transactional email</td><td className="px-3 py-2">Email address, email content</td><td className="px-3 py-2">EU / USA</td></tr>
@@ -279,7 +280,7 @@ export default function PrivacyPolicyPage() {
           <section>
             <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-3">11. International Transfers</h2>
             <p>
-              Primary data storage is in Germany (EU/EEA). Certain sub-processors (OpenRouter, Stripe, Helius) are US-based.
+              Primary data storage is in Germany (EU/EEA). Certain sub-processors (UsePod, OpenRouter, Stripe, Helius) are US-based.
               Transfers outside the EU/EEA rely on the EU-US Data Privacy Framework and/or Standard Contractual
               Clauses as approved by the European Commission.
             </p>
