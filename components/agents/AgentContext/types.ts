@@ -1,4 +1,4 @@
-import type { Agent, AgentFeature, ChatSessionSummary } from '@/lib/api';
+import type { Agent, AgentFeature, ChatAttachmentPayload, ChatSessionSummary } from '@/lib/api';
 import type { AgentFramework } from '@hatcher/shared';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -101,7 +101,7 @@ export interface AgentContextValue {
   setChatErrorType: (type: 'timeout' | 'ratelimit' | 'network' | 'llm_down' | 'generic' | null) => void;
   bottomRef: React.RefObject<HTMLDivElement | null>;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
-  sendMessage: (overrideText?: string) => Promise<void>;
+  sendMessage: (overrideText?: string, options?: { attachments?: ChatAttachmentPayload[] }) => Promise<void>;
   handleKeyDown: (e: React.KeyboardEvent) => void;
   sendCooldown: boolean;
   wsConnected: boolean;

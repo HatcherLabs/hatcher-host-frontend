@@ -7,7 +7,7 @@ import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import { API_URL } from '@/lib/config';
-import type { Agent, AgentFeature, ChatSessionSummary } from '@/lib/api';
+import type { Agent, AgentFeature, ChatAttachmentPayload, ChatSessionSummary } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { useWebSocketChat, type ChatToolEvent } from '@/hooks/useWebSocketChat';
 import { FRAMEWORKS, getBYOKProvider } from '@hatcher/shared';
@@ -815,7 +815,7 @@ export default function AgentManagePage() {
 
   // ─── Chat send ────────────────────────────────────────────
 
-  const sendMessage = async (overrideText?: string) => {
+  const sendMessage = async (overrideText?: string, options?: { attachments?: ChatAttachmentPayload[] }) => {
     const text = (overrideText ?? input).trim();
     if (!text || sending || sendCooldown) return;
     if (text.toLowerCase() === '/reset' || text.toLowerCase() === '/new') {
@@ -866,7 +866,7 @@ export default function AgentManagePage() {
 
     if (wsChat.isConnected) {
       wsStreamingMsgRef.current = true;
-      const sent = wsChat.send(text, history, requestSessionId);
+      const sent = wsChat.send(text, history, requestSessionId, options?.attachments);
       if (sent) {
         return;
       }
@@ -936,6 +936,7 @@ export default function AgentManagePage() {
           ]);
         },
         requestSessionId,
+        options?.attachments,
       );
     } catch (err) {
       const errMessage = err instanceof Error ? err.message : 'Connection error';

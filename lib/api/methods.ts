@@ -54,6 +54,13 @@ export type AuthProfileData = {
   createdAt: string;
 };
 
+export type ChatAttachmentPayload = {
+  name: string;
+  mimeType: string;
+  sizeBytes: number;
+  dataUrl?: string;
+};
+
 export const api = {
   /** Register a new account */
   register: (email: string, username: string, password: string, referralCode?: string) =>
@@ -1353,7 +1360,8 @@ export const api = {
     onDone: (model: string) => void,
     onError: (err: string) => void,
     onMessage?: (content: string) => void,
-    sessionId?: string | null
+    sessionId?: string | null,
+    attachments?: ChatAttachmentPayload[],
   ) => {
     const token = getToken();
 
@@ -1367,7 +1375,12 @@ export const api = {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         credentials: 'include',
-        body: JSON.stringify({ message, history, ...(sessionId ? { sessionId } : {}) }),
+        body: JSON.stringify({
+          message,
+          history,
+          ...(sessionId ? { sessionId } : {}),
+          ...(attachments?.length ? { attachments } : {}),
+        }),
       });
     } catch {
       // Streaming endpoint failed — fall back to regular chat
@@ -1379,7 +1392,12 @@ export const api = {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           credentials: 'include',
-          body: JSON.stringify({ message, history, ...(sessionId ? { sessionId } : {}) }),
+          body: JSON.stringify({
+            message,
+            history,
+            ...(sessionId ? { sessionId } : {}),
+            ...(attachments?.length ? { attachments } : {}),
+          }),
         });
         if (!fallback.ok) { onError(`HTTP ${fallback.status}`); return; }
         const data = await fallback.json() as {

@@ -5,6 +5,7 @@
 
 import { useRef, useCallback, useEffect, useState } from 'react';
 import { API_URL } from '@/lib/config';
+import type { ChatAttachmentPayload } from '@/lib/api/methods';
 
 /** Derive ws:// or wss:// URL from the API base URL */
 function getWsUrl(agentId: string): string {
@@ -61,6 +62,7 @@ interface UseWebSocketChatReturn {
     message: string,
     history?: Array<{ role: 'user' | 'assistant'; content: string }>,
     sessionId?: string | null,
+    attachments?: ChatAttachmentPayload[],
   ) => boolean;
   /** Current connection state */
   connectionState: ConnectionState;
@@ -256,6 +258,7 @@ export function useWebSocketChat({
       message: string,
       history?: Array<{ role: 'user' | 'assistant'; content: string }>,
       sessionId?: string | null,
+      attachments?: ChatAttachmentPayload[],
     ): boolean => {
       if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
         return false;
@@ -265,6 +268,7 @@ export function useWebSocketChat({
           message,
           ...(sessionId ? { sessionId } : {}),
           ...(history?.length ? { history } : {}),
+          ...(attachments?.length ? { attachments } : {}),
         }));
         return true;
       } catch {

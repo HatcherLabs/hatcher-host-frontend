@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useVoice } from '@/hooks/useVoice';
 import { api } from '@/lib/api';
+import type { ChatAttachmentPayload } from '@/lib/api';
 import {
   useAgentContext,
   tabContentVariants,
@@ -61,9 +62,12 @@ export function ChatTab() {
   const INLINE_MAX_BYTES = 40_000;
   type Attachment = {
     name: string;
+    mimeType: string;
     sizeBytes: number;
     /** Inline text (null for binary / oversize files handled via knowledge dir only). */
     content: string | null;
+    /** Browser-provided image bytes for platform actions such as Pump.fun launch. */
+    dataUrl?: string;
     /** True when the binary/large-file path was used (content is on disk only). */
     diskOnly: boolean;
   };
@@ -89,10 +93,30 @@ export function ChatTab() {
           || /\.(md|markdown|txt|json|csv|ya?ml|toml|ini|cfg|log|html|xml|tsv|env|sh|bash|zsh|py|js|ts|jsx|tsx|mjs|cjs|rs|go|java|kt|rb|php|c|cc|cpp|h|hpp|css|scss|sass|sql)$/i.test(file.name)
           || file.type === '';
         const inlineCapable = looksText && file.size <= INLINE_MAX_BYTES;
+        const inferredImageType = /\.(png|jpe?g|webp|gif)$/i.test(file.name)
+          ? file.name.toLowerCase().endsWith('.webp')
+            ? 'image/webp'
+            : file.name.toLowerCase().endsWith('.gif')
+              ? 'image/gif'
+              : file.name.toLowerCase().match(/\.jpe?g$/)
+                ? 'image/jpeg'
+                : 'image/png'
+          : '';
+        const mimeType = file.type || inferredImageType || 'application/octet-stream';
+        const isImage = /^image\/(png|jpe?g|webp|gif)$/i.test(mimeType);
 
         let content: string | null = null;
         if (looksText) {
           try { content = await file.text(); } catch { /* fall back to disk-only */ }
+        }
+        let dataUrl: string | undefined;
+        if (isImage) {
+          dataUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result ?? ''));
+            reader.onerror = () => reject(reader.error ?? new Error('Could not read image attachment'));
+            reader.readAsDataURL(file);
+          });
         }
         // Always persist to the volume so the Knowledge tab reflects it.
         // For binaries we send a placeholder — the agent's read_file /
@@ -112,8 +136,10 @@ export function ChatTab() {
                 ...prev,
                 {
                   name: file.name,
+                  mimeType,
                   sizeBytes: file.size,
                   content: inlineCapable ? content : null,
+                  ...(dataUrl ? { dataUrl } : {}),
                   diskOnly: !inlineCapable,
                 },
               ],
@@ -141,22 +167,33 @@ export function ChatTab() {
     }
     const inlineBlocks: string[] = [];
     const diskOnly: string[] = [];
+    const chatAttachments: ChatAttachmentPayload[] = [];
     for (const a of attachments) {
       if (a.content && !a.diskOnly) {
         inlineBlocks.push(`--- attached file: ${a.name} ---\n${a.content}\n--- end ${a.name} ---`);
+      } else if (a.dataUrl) {
+        diskOnly.push(a.name);
       } else {
         diskOnly.push(a.name);
       }
+      if (a.dataUrl) {
+        chatAttachments.push({
+          name: a.name,
+          mimeType: a.mimeType,
+          sizeBytes: a.sizeBytes,
+          dataUrl: a.dataUrl,
+        });
+      }
     }
     const diskMarker = diskOnly.length > 0
-      ? `[Files saved to knowledge/: ${diskOnly.join(', ')}. Open them from the Knowledge folder if you need to inspect their contents.]`
+      ? `[Attached files: ${diskOnly.join(', ')}. Image attachments are available to Hatcher platform actions such as Pump.fun launch.]`
       : null;
     const finalText = [
       inlineBlocks.join('\n\n'),
       diskMarker,
       base,
     ].filter(Boolean).join('\n\n');
-    sendMessage(finalText);
+    sendMessage(finalText, chatAttachments.length ? { attachments: chatAttachments } : undefined);
     setAttachments([]);
   }, [attachments, input, sendMessage]);
 

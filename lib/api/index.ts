@@ -3,7 +3,7 @@
 // ============================================================
 
 export { getToken, setToken, clearToken, isAuthenticated, req } from './core';
-export type { AuthProfileData } from './methods';
+export type { AuthProfileData, ChatAttachmentPayload } from './methods';
 export type {
   Payment,
   AgentFeature,
