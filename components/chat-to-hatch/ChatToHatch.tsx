@@ -42,6 +42,7 @@ type HostedModel = {
   category: string;
   cost: ModelCost;
   context: string;
+  fixedPrice?: string;
 };
 
 interface ParsedConfig {
@@ -107,6 +108,7 @@ const MODEL_PROVIDERS: HostedModelProvider[] = [
   { key: 'deepseek', name: 'DeepSeek' },
   { key: 'openai', name: 'OpenAI' },
   { key: 'anthropic', name: 'Anthropic' },
+  { key: 'idle', name: 'IDLE' },
   { key: 'google', name: 'Google' },
   { key: 'qwen', name: 'Qwen' },
   { key: 'x-ai', name: 'xAI' },
@@ -131,6 +133,8 @@ const HOSTED_MODELS: HostedModel[] = [
   ['openai/gpt-5.5', 'GPT-5.5', 'openai', 'OpenAI', 'Premium', 'Premium', '1.05M'],
   ['openai/gpt-5.5-pro', 'GPT-5.5 Pro', 'openai', 'OpenAI', 'Premium', 'Premium', '1.05M'],
   ['anthropic/claude-haiku-4.5', 'Claude Haiku 4.5', 'anthropic', 'Anthropic', 'Balanced', 'Medium', '200K'],
+  ['idle/claude-haiku-4-5', 'Claude Haiku 4.5 (IDLE)', 'idle', 'IDLE', 'Partner', 'Low', '200K', '1 AI Credit/request'],
+  ['idle/claude-sonnet-4-6', 'Claude Sonnet 4.6 (IDLE)', 'idle', 'IDLE', 'Partner', 'Medium', '1M', '3 AI Credits/request'],
   ['anthropic/claude-sonnet-4.5', 'Claude Sonnet 4.5', 'anthropic', 'Anthropic', 'Premium', 'High', '1M'],
   ['anthropic/claude-sonnet-4.6', 'Claude Sonnet 4.6', 'anthropic', 'Anthropic', 'Premium', 'High', '1M'],
   ['anthropic/claude-opus-4.7', 'Claude Opus 4.7', 'anthropic', 'Anthropic', 'Premium', 'Premium', '1M'],
@@ -161,7 +165,7 @@ const HOSTED_MODELS: HostedModel[] = [
   ['z-ai/glm-5.1', 'GLM 5.1', 'z-ai', 'Z.ai', 'Balanced', 'High', '200K'],
   ['nvidia/nemotron-3-nano-30b-a3b', 'Nemotron 3 Nano', 'nvidia', 'NVIDIA', 'Fast', 'Low', '256K'],
   ['openrouter/auto', 'OpenRouter Auto', 'openrouter', 'OpenRouter', 'Advanced', 'Variable', '2M'],
-].map(([id, name, providerKey, provider, category, cost, context]) => ({
+].map(([id, name, providerKey, provider, category, cost, context, fixedPrice]) => ({
   id,
   name,
   providerKey,
@@ -169,6 +173,7 @@ const HOSTED_MODELS: HostedModel[] = [
   category,
   cost: cost as ModelCost,
   context,
+  fixedPrice,
 }));
 
 const DEFAULT_HOSTED_MODEL = 'deepseek/deepseek-v4-flash';
@@ -823,7 +828,7 @@ export function ChatToHatch() {
                         >
                           {hostedModelsForProvider.map((model) => (
                             <option key={model.id} value={model.id}>
-                              {model.name} · {model.category} · {model.cost}
+                              {model.name} · {model.category} · {model.fixedPrice ?? model.cost}
                             </option>
                           ))}
                         </select>
@@ -833,7 +838,7 @@ export function ChatToHatch() {
                     <div className={styles.modelSummary}>
                       <span>{selectedModel.provider}</span>
                       <span>{selectedModel.context}</span>
-                      <span>{selectedModel.cost}</span>
+                      <span>{selectedModel.fixedPrice ?? selectedModel.cost}</span>
                     </div>
 
                     <label className={styles.selectLabel}>

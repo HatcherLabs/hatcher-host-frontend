@@ -42,6 +42,7 @@ type HostedModelOption = {
   cost: HostedModelCost;
   context: string;
   description: string;
+  fixedPrice?: string;
   warning?: string;
 };
 
@@ -63,6 +64,7 @@ const HOSTED_MODEL_PROVIDERS: HostedModelProvider[] = [
   { key: 'deepseek', name: 'DeepSeek', description: 'Fast, cost-efficient long-context models.' },
   { key: 'openai', name: 'OpenAI', description: 'General, coding, and frontier models.' },
   { key: 'anthropic', name: 'Anthropic', description: 'Claude models for reasoning and writing.' },
+  { key: 'idle', name: 'IDLE', description: 'Partner-hosted Claude models with fixed request pricing.' },
   { key: 'google', name: 'Google', description: 'Gemini models with large context windows.' },
   { key: 'qwen', name: 'Qwen', description: 'Efficient coding and agentic tool-use models.' },
   { key: 'x-ai', name: 'xAI', description: 'Grok models for fast reasoning and code.' },
@@ -205,6 +207,28 @@ const HOSTED_MODELS: HostedModelOption[] = [
     cost: 'Medium',
     context: '200K',
     description: 'Quick Claude option for structured assistant tasks.',
+  },
+  {
+    id: 'idle/claude-haiku-4-5',
+    name: 'Claude Haiku 4.5 (IDLE)',
+    providerKey: 'idle',
+    provider: 'IDLE',
+    category: 'Partner',
+    cost: 'Low',
+    context: '200K',
+    description: 'Partner-hosted Claude Haiku through IDLE. Fixed price per request.',
+    fixedPrice: '1 AI Credit per request',
+  },
+  {
+    id: 'idle/claude-sonnet-4-6',
+    name: 'Claude Sonnet 4.6 (IDLE)',
+    providerKey: 'idle',
+    provider: 'IDLE',
+    category: 'Partner',
+    cost: 'Medium',
+    context: '1M',
+    description: 'Partner-hosted Claude Sonnet through IDLE. Fixed price per request.',
+    fixedPrice: '3 AI Credits per request',
   },
   {
     id: 'anthropic/claude-sonnet-4.5',
@@ -939,7 +963,7 @@ export function ConfigTab() {
                   >
                     {hostedModelsForProvider.map((model) => (
                       <option key={model.id} value={model.id}>
-                        {model.name} · {model.category} · {model.cost}
+                        {model.name} · {model.category} · {model.fixedPrice ?? model.cost}
                       </option>
                     ))}
                   </select>
@@ -964,7 +988,7 @@ export function ConfigTab() {
                     {selectedHostedModel.context}
                   </span>
                   <span className="px-2 py-1 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)]">
-                    {hostedCostEstimate(selectedHostedModel.cost)}
+                    {selectedHostedModel.fixedPrice ?? hostedCostEstimate(selectedHostedModel.cost)}
                   </span>
                 </div>
               </div>

@@ -70,7 +70,7 @@ export default function TermsOfServicePage() {
               Discord, X/Twitter, WhatsApp, Slack), and optionally provide your own API keys (BYOK) for LLM providers.
             </p>
             <p className="mt-3">
-              We provide compute, container orchestration, storage, and optional LLM access via our hosted OpenRouter configuration.
+              We provide compute, container orchestration, storage, and optional LLM access via hosted model configurations.
               You provide configuration, prompts, and any third-party tokens your agent needs.
             </p>
           </section>
