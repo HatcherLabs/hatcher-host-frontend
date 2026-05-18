@@ -71,7 +71,7 @@ const FAQ_SECTIONS: FAQSection[] = [
       },
       {
         q: 'What is BYOK (Bring Your Own Key)?',
-        a: 'BYOK stands for "Bring Your Own Key." Instead of using Hatcher-funded hosted OpenRouter usage, you can provide your own API key from any supported provider (OpenAI, Anthropic, Google, OpenRouter, etc.). With BYOK, you pay the provider directly and Hatcher does not spend your AI Credits.',
+        a: 'BYOK stands for "Bring Your Own Key." Instead of using Hatcher-funded hosted model usage, you can provide your own API key from any supported provider (OpenAI, Anthropic, Google, OpenRouter, etc.). With BYOK, you pay the provider directly and Hatcher does not spend your AI Credits.',
       },
       {
         q: 'How do I connect Telegram or Discord?',
