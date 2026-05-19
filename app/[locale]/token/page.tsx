@@ -6,6 +6,7 @@ import NextImage from 'next/image';
 import { MarketingShell } from '@/components/marketing/v3/MarketingShell';
 import { ArrowRight, Rocket, Zap, CreditCard, Users } from 'lucide-react';
 import { SOCIAL_LINKS } from '@/lib/config';
+import { TokenBurnTracker } from '@/components/token/TokenBurnTracker';
 
 const CA = 'Cntmo5DJNQkB2vYyS4mUx2UoTW4mPrHgWefz8miZpump';
 
@@ -161,6 +162,8 @@ export default function TokenPage() {
             </div>
           </div>
         </section>
+
+        <TokenBurnTracker />
 
         {/* ── PLANNED USE CASES ──────────────────────────────── */}
         <section className="py-16 px-4 border-t border-[var(--border-default)]">

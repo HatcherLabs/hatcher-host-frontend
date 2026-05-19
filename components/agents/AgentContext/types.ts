@@ -1,5 +1,6 @@
 import type { Agent, AgentFeature, ChatAttachmentPayload, ChatSessionSummary } from '@/lib/api';
 import type { AgentFramework } from '@hatcher/shared';
+import type { ActiveModelDisplay } from '@/lib/hosted-model-catalog';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -163,6 +164,7 @@ export interface AgentContextValue {
 
   // LLM helpers
   llmProvider: string;
+  activeModelDisplay: ActiveModelDisplay;
   currentProviderMeta: ReturnType<typeof import('@hatcher/shared').getBYOKProvider>;
   providerModels: { id: string; name: string; context?: string }[];
   hasApiKey: boolean;

@@ -38,10 +38,11 @@ import {
 import { AgentSidebar } from '@/components/agents/AgentSidebar';
 import { PortAgentModal } from '@/components/agents/PortAgentModal';
 import { shouldMountTerminalTab } from '@/components/agents/terminalPersistence';
-import { useAgentConfig } from '@/hooks/useAgentConfig';
+import { resolveLoadedModelConfig, useAgentConfig } from '@/hooks/useAgentConfig';
 import { useAgentIntegrations } from '@/hooks/useAgentIntegrations';
 import { useAgentActions } from '@/hooks/useAgentActions';
 import { useAgentLogs } from '@/hooks/useAgentLogs';
+import { resolveActiveModelDisplay } from '@/lib/hosted-model-catalog';
 import dynamic from 'next/dynamic';
 
 const CHAT_HISTORY_MESSAGE_LIMIT = 4000;
@@ -992,6 +993,13 @@ export default function AgentManagePage() {
     const settings = (char as Record<string, unknown>).settings as Record<string, unknown> | undefined;
     return (char as Record<string, unknown>).provider as string ?? settings?.modelProvider as string ?? 'openrouter';
   })();
+  const activeModelDisplay = useMemo(
+    () => {
+      const saved = resolveLoadedModelConfig((agent?.config ?? {}) as Record<string, unknown>);
+      return resolveActiveModelDisplay({ provider: saved.provider, model: saved.model });
+    },
+    [agent?.config],
+  );
   const currentProviderMeta = getBYOKProvider(llmProvider);
   const providerModels = currentProviderMeta?.models ?? [];
 
@@ -1042,7 +1050,7 @@ export default function AgentManagePage() {
       setConfigPublicChatDailyAiCreditCap: config.setConfigPublicChatDailyAiCreditCap,
       saving: config.saving, saveMsg: config.saveMsg, setSaveMsg: config.setSaveMsg,
       saveConfig: config.saveConfig,
-      llmProvider, currentProviderMeta, providerModels, hasApiKey: config.hasApiKey,
+      llmProvider, activeModelDisplay, currentProviderMeta, providerModels, hasApiKey: config.hasApiKey,
       displayUptime, isLiveUptime,
       activeFeatures, activeFeatureKeys, featuresLoading,
       unlocking: null, handleUnlockFeature: async () => {},
@@ -1081,7 +1089,7 @@ export default function AgentManagePage() {
     activeFeatures, activeFeatureKeys, featuresLoading,
     actions.deleteConfirm, actions.deleting, actions.deleteError,
     actions.actionLoading, actions.actionError, actions.actionSuccess,
-    llmProvider, currentProviderMeta, providerModels, config.hasApiKey,
+    llmProvider, activeModelDisplay, currentProviderMeta, providerModels, config.hasApiKey,
     displayUptime, isLiveUptime, isActive, isNotActive, statusInfo, frameworkMeta,
     isAuthenticated, userTier, viewMode]);
 
@@ -1159,6 +1167,18 @@ export default function AgentManagePage() {
               )}
               {statusInfo.label}
             </span>
+
+            <button
+              type="button"
+              onClick={() => setTab('config')}
+              className="inline-flex max-w-full items-center gap-1.5 rounded-[3px] border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2 py-1 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)] sm:max-w-[360px]"
+              title={`${activeModelDisplay.provider} · ${activeModelDisplay.name} · ${activeModelDisplay.route}`}
+            >
+              <span className="text-[var(--accent)]">Model</span>
+              <span className="min-w-0 truncate normal-case tracking-normal text-[var(--text-primary)]">
+                {activeModelDisplay.provider} · {activeModelDisplay.name}
+              </span>
+            </button>
 
             {/* Spacer */}
             <div className="flex-1" />
