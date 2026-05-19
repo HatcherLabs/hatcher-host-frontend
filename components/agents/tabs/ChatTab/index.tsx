@@ -19,6 +19,7 @@ import { ChatInput } from './ChatInput';
 import { VoiceCallOverlay } from './VoiceCallOverlay';
 import { ChatStyles } from './ChatStyles';
 import { AgentPresenceRail } from './AgentPresenceRail';
+import { CHAT_ATTACHMENT_MAX_BYTES, formatAttachmentSize } from './attachmentLimits';
 
 export function ChatTab() {
   const ctx = useAgentContext();
@@ -51,14 +52,13 @@ export function ChatTab() {
   //      no tool call required — works across every framework regardless
   //      of what file-reading tools it ships with.
   //
-  //   2. Larger text files OR binary files → we still upload to the agent's
-  //      knowledge/ volume (POST /agents/:id/knowledge) and drop a marker
-  //      in the message with the filename + path. Framework-specific tools
-  //      handle the read on demand. Binary payloads can't be read directly
-  //      anyway — the file lives on disk for whatever reader the agent has.
+  //   2. Larger text files OR binary files → we still upload a lightweight
+  //      marker to the agent's knowledge/ volume and drop a marker in the
+  //      message with the filename. Image bytes travel with chat attachments
+  //      for platform actions such as Pump.fun launch.
   //
-  // Either way, the file is uploaded so it persists across sessions and
-  // shows up in the Knowledge tab for later reuse.
+  // Either way, the attachment is tracked in chat; binary image bytes are
+  // sent with the chat request instead of being stored as full knowledge text.
   const INLINE_MAX_BYTES = 40_000;
   type Attachment = {
     name: string;
@@ -83,10 +83,8 @@ export function ChatTab() {
     setUploadingAttachments(true);
     try {
       for (const file of list) {
-        // Knowledge endpoint caps at 700KB of content (routes/agents/files.ts
-        // UploadFileBody). Over that, skip — users should split the file.
-        if (file.size > 700_000) {
-          setAttachmentError(`${file.name} is larger than 700 KB. Upload a smaller file or split it.`);
+        if (file.size > CHAT_ATTACHMENT_MAX_BYTES) {
+          setAttachmentError(`${file.name} is larger than ${formatAttachmentSize(CHAT_ATTACHMENT_MAX_BYTES)}.`);
           continue;
         }
         const looksText = /^(text\/|application\/(json|xml|yaml|x-yaml|csv)(;|$))/i.test(file.type)

@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Send, Mic, MicOff, Terminal, Paperclip, X, Loader2, FileText, Zap, ImagePlus, BarChart3, Code2, WandSparkles, Video, AudioLines } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { GlassCard } from '../../AgentContext';
+import { formatAttachmentSize } from './attachmentLimits';
 
 /* ── Slash command definitions per framework ── */
 const FRAMEWORK_COMMANDS: Record<string, Array<{ cmd: string; desc: string }>> = {
@@ -52,9 +53,8 @@ interface ChatInputProps {
    *  ChatTab parent so sendMessage can prepend the "[Attachments: ...]"
    *  marker before clearing the list. */
   attachments: Array<{ name: string; sizeBytes: number }>;
-  /** Transient upload error, e.g. file over the knowledge endpoint
-   *  size cap. Shown under the chip row; clears on next successful
-   *  attach. */
+  /** Transient upload error, e.g. file over the chat attachment size cap.
+   *  Shown under the chip row; clears on next successful attach. */
   attachmentError: string | null;
   uploadingAttachments: boolean;
   onAttachFiles: (files: FileList | File[]) => Promise<void>;
@@ -214,7 +214,7 @@ export function ChatInput({
             >
               <FileText size={12} className="text-[var(--color-accent)]" />
               <span className="font-medium truncate max-w-[180px]">{a.name}</span>
-              <span className="text-[10px] text-[var(--text-muted)]">{Math.max(1, Math.round(a.sizeBytes / 1024))} KB</span>
+              <span className="text-[10px] text-[var(--text-muted)]">{formatAttachmentSize(a.sizeBytes)}</span>
               <button
                 type="button"
                 onClick={() => onRemoveAttachment(a.name)}
@@ -338,9 +338,8 @@ export function ChatInput({
           }}
         />
 
-        {/* Attach button — uploads to the agent's knowledge/ dir via
-            POST /agents/:id/knowledge. Accepts any file type; the
-            backend caps payload size and the chip row surfaces errors. */}
+        {/* Attach button — accepts any file type and surfaces size errors
+            in the chip row before sending chat attachments. */}
         <div className="relative">
           <button
             type="button"
