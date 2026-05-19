@@ -3,6 +3,7 @@
 import { Bot, Menu, Phone, Volume2, VolumeX } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { FRAMEWORKS, type AgentFramework } from '@hatcher/shared';
+import type { ActiveModelDisplay } from '@/lib/hosted-model-catalog';
 import { FRAMEWORK_BADGE } from '../../AgentContext';
 
 interface ChatHeaderProps {
@@ -13,6 +14,8 @@ interface ChatHeaderProps {
   ttsSupported: boolean;
   isAuthenticated: boolean;
   autoSpeak: boolean;
+  activeModel: ActiveModelDisplay;
+  onOpenModelSettings: () => void;
   onOpenMobilePanel: () => void;
   onToggleAutoSpeak: () => void;
   onStartVoiceCall: () => void;
@@ -26,6 +29,8 @@ export function ChatHeader({
   ttsSupported,
   isAuthenticated,
   autoSpeak,
+  activeModel,
+  onOpenModelSettings,
   onOpenMobilePanel,
   onToggleAutoSpeak,
   onStartVoiceCall,
@@ -56,6 +61,15 @@ export function ChatHeader({
             {t('live')}
           </span>
         )}
+        <button
+          type="button"
+          onClick={onOpenModelSettings}
+          className="hidden max-w-[260px] items-center gap-1 truncate rounded-full border border-[var(--border-default)] bg-[var(--bg-elevated)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--color-accent)]/40 hover:text-[var(--text-primary)] sm:inline-flex"
+          title={`${activeModel.provider} · ${activeModel.name} · ${activeModel.route}`}
+        >
+          <span className="text-[var(--color-accent)]">{activeModel.provider}</span>
+          <span className="truncate">{activeModel.name}</span>
+        </button>
       </div>
       <div className="flex items-center gap-2">
         {/* Voice Call button */}

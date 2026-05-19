@@ -197,9 +197,16 @@
   display: inline-flex;
   align-items: center;
 }
+.creditSlot {
+  display: inline-flex;
+  align-items: center;
+}
 @media (max-width: 880px) {
   .notificationSlot {
     order: 1;
+  }
+  .creditSlot {
+    display: none;
   }
 }
 

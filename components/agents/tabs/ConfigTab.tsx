@@ -16,40 +16,48 @@ import {
   RotateCcw,
   Globe2,
   MessageSquare,
+  Search,
 } from 'lucide-react';
 import { BYOK_PROVIDERS } from '@hatcher/shared';
 import { api } from '@/lib/api';
+import {
+  HOSTED_MODEL_PROVIDERS,
+  HOSTED_MODELS,
+  createSavedHostedModelOption,
+  filterHostedModels,
+  getHostedModelOption,
+  hostedCostEstimate,
+  hostedCostRank,
+  hostedModelPrivacy,
+  hostedModelRoute,
+  hostedModelTags,
+  hostedPrivacyLabel,
+  normalizeHostedModelForUi,
+  type HostedModelCost,
+  type HostedModelPrivacy,
+  type HostedModelTag,
+} from '@/lib/hosted-model-catalog';
+import { resolveLoadedModelConfig } from '@/hooks/useAgentConfig';
 import {
   useAgentContext,
   tabContentVariants,
   GlassCard,
 } from '../AgentContext';
 
-type HostedModelCost = 'Low' | 'Medium' | 'High' | 'Premium' | 'Variable';
-
-type HostedModelProvider = {
-  key: string;
-  name: string;
-  description: string;
-};
-
-type HostedModelOption = {
-  id: string;
-  name: string;
-  providerKey: string;
-  provider: string;
-  category: string;
-  cost: HostedModelCost;
-  context: string;
-  description: string;
-  fixedPrice?: string;
-  warning?: string;
-};
-
 type AiCreditBalance = {
   balance: number;
   monthlyGrant: number;
   tier: string;
+};
+
+type ByokProviderOption = {
+  key: string;
+  name: string;
+  description: string;
+  requiresApiKey: boolean;
+  requiresBaseUrl: boolean;
+  defaultBaseUrl?: string;
+  models: Array<{ id: string; name: string; context?: string }>;
 };
 
 function isAiCreditBalance(value: unknown): value is AiCreditBalance {
@@ -58,525 +66,6 @@ function isAiCreditBalance(value: unknown): value is AiCreditBalance {
   return typeof source.balance === 'number'
     && typeof source.monthlyGrant === 'number'
     && typeof source.tier === 'string';
-}
-
-const HOSTED_MODEL_PROVIDERS: HostedModelProvider[] = [
-  { key: 'deepseek', name: 'DeepSeek', description: 'Fast, cost-efficient long-context models.' },
-  { key: 'openai', name: 'OpenAI', description: 'General, coding, and frontier models.' },
-  { key: 'anthropic', name: 'Anthropic', description: 'Claude models for reasoning and writing.' },
-  { key: 'idle', name: 'IDLE', description: 'Partner-hosted Claude models with fixed request pricing.' },
-  { key: 'google', name: 'Google', description: 'Gemini models with large context windows.' },
-  { key: 'qwen', name: 'Qwen', description: 'Efficient coding and agentic tool-use models.' },
-  { key: 'x-ai', name: 'xAI', description: 'Grok models for fast reasoning and code.' },
-  { key: 'mistralai', name: 'Mistral', description: 'European general and coding models.' },
-  { key: 'moonshotai', name: 'Moonshot AI', description: 'Kimi models for analysis-heavy workflows.' },
-  { key: 'z-ai', name: 'Z.ai', description: 'GLM models with strong price-performance.' },
-  { key: 'nvidia', name: 'NVIDIA', description: 'Nemotron models for low-cost tool loops.' },
-  { key: 'openrouter', name: 'OpenRouter', description: 'Router-managed fallback selection through Hatcher.' },
-];
-
-const HOSTED_MODELS: HostedModelOption[] = [
-  {
-    id: 'deepseek/deepseek-v4-flash',
-    name: 'DeepSeek V4 Flash',
-    providerKey: 'deepseek',
-    provider: 'DeepSeek',
-    category: 'Default',
-    cost: 'Low',
-    context: '1M',
-    description: 'Default hosted model. Fast, low-cost, and routed through the best available Hatcher provider.',
-  },
-  {
-    id: 'deepseek/deepseek-v4-pro',
-    name: 'DeepSeek V4 Pro',
-    providerKey: 'deepseek',
-    provider: 'DeepSeek',
-    category: 'Balanced',
-    cost: 'Medium',
-    context: '1M',
-    description: 'Higher quality DeepSeek option for broader analysis and longer tasks.',
-  },
-  {
-    id: 'deepseek/deepseek-v3.2',
-    name: 'DeepSeek V3.2',
-    providerKey: 'deepseek',
-    provider: 'DeepSeek',
-    category: 'Fast',
-    cost: 'Low',
-    context: '128K',
-    description: 'Efficient fallback for quick general-purpose agent replies.',
-  },
-  {
-    id: 'openai/gpt-5-nano',
-    name: 'GPT-5 Nano',
-    providerKey: 'openai',
-    provider: 'OpenAI',
-    category: 'Fast',
-    cost: 'Low',
-    context: '400K',
-    description: 'Very low-cost OpenAI option for lightweight chat and extraction.',
-  },
-  {
-    id: 'openai/gpt-5-mini',
-    name: 'GPT-5 Mini',
-    providerKey: 'openai',
-    provider: 'OpenAI',
-    category: 'Balanced',
-    cost: 'Medium',
-    context: '400K',
-    description: 'Balanced OpenAI model for most hosted agent work.',
-  },
-  {
-    id: 'openai/gpt-5.1-codex-mini',
-    name: 'GPT-5.1 Codex Mini',
-    providerKey: 'openai',
-    provider: 'OpenAI',
-    category: 'Coding',
-    cost: 'Medium',
-    context: '400K',
-    description: 'Lower-cost OpenAI coding model for repo edits and tool use.',
-  },
-  {
-    id: 'openai/gpt-5.3-codex',
-    name: 'GPT-5.3 Codex',
-    providerKey: 'openai',
-    provider: 'OpenAI',
-    category: 'Coding',
-    cost: 'High',
-    context: '400K',
-    description: 'Premium coding model for complex implementation and debugging work.',
-  },
-  {
-    id: 'openai/gpt-5.4-nano',
-    name: 'GPT-5.4 Nano',
-    providerKey: 'openai',
-    provider: 'OpenAI',
-    category: 'Fast',
-    cost: 'Low',
-    context: '400K',
-    description: 'Newer low-cost OpenAI option for short tasks and quick responses.',
-  },
-  {
-    id: 'openai/gpt-5.4-mini',
-    name: 'GPT-5.4 Mini',
-    providerKey: 'openai',
-    provider: 'OpenAI',
-    category: 'Balanced',
-    cost: 'Medium',
-    context: '400K',
-    description: 'Stronger balanced OpenAI model for daily agent workloads.',
-  },
-  {
-    id: 'openai/gpt-5.4',
-    name: 'GPT-5.4',
-    providerKey: 'openai',
-    provider: 'OpenAI',
-    category: 'Premium',
-    cost: 'High',
-    context: '1.05M',
-    description: 'High-quality OpenAI model for complex general tasks.',
-  },
-  {
-    id: 'openai/gpt-5.5',
-    name: 'GPT-5.5',
-    providerKey: 'openai',
-    provider: 'OpenAI',
-    category: 'Premium',
-    cost: 'Premium',
-    context: '1.05M',
-    description: 'Frontier OpenAI model for high-value workflows.',
-    warning: 'Consumes AI Credits quickly.',
-  },
-  {
-    id: 'openai/gpt-5.5-pro',
-    name: 'GPT-5.5 Pro',
-    providerKey: 'openai',
-    provider: 'OpenAI',
-    category: 'Premium',
-    cost: 'Premium',
-    context: '1.05M',
-    description: 'Highest-cost OpenAI option for rare, high-stakes tasks.',
-    warning: 'Consumes AI Credits very quickly.',
-  },
-  {
-    id: 'anthropic/claude-haiku-4.5',
-    name: 'Claude Haiku 4.5',
-    providerKey: 'anthropic',
-    provider: 'Anthropic',
-    category: 'Balanced',
-    cost: 'Medium',
-    context: '200K',
-    description: 'Quick Claude option for structured assistant tasks.',
-  },
-  {
-    id: 'idle/claude-haiku-4-5',
-    name: 'Claude Haiku 4.5 (IDLE)',
-    providerKey: 'idle',
-    provider: 'IDLE',
-    category: 'Partner',
-    cost: 'Low',
-    context: '200K',
-    description: 'Partner-hosted Claude Haiku through IDLE. Fixed price per request.',
-    fixedPrice: '1 AI Credit per request',
-  },
-  {
-    id: 'idle/claude-sonnet-4-6',
-    name: 'Claude Sonnet 4.6 (IDLE)',
-    providerKey: 'idle',
-    provider: 'IDLE',
-    category: 'Partner',
-    cost: 'Medium',
-    context: '1M',
-    description: 'Partner-hosted Claude Sonnet through IDLE. Fixed price per request.',
-    fixedPrice: '3 AI Credits per request',
-  },
-  {
-    id: 'anthropic/claude-sonnet-4.5',
-    name: 'Claude Sonnet 4.5',
-    providerKey: 'anthropic',
-    provider: 'Anthropic',
-    category: 'Premium',
-    cost: 'High',
-    context: '1M',
-    description: 'Strong premium reasoning and coding model.',
-  },
-  {
-    id: 'anthropic/claude-sonnet-4.6',
-    name: 'Claude Sonnet 4.6',
-    providerKey: 'anthropic',
-    provider: 'Anthropic',
-    category: 'Premium',
-    cost: 'High',
-    context: '1M',
-    description: 'Newer Sonnet model for complex reasoning and agent workflows.',
-  },
-  {
-    id: 'anthropic/claude-opus-4.7',
-    name: 'Claude Opus 4.7',
-    providerKey: 'anthropic',
-    provider: 'Anthropic',
-    category: 'Premium',
-    cost: 'Premium',
-    context: '1M',
-    description: 'Most expensive Claude option for difficult reasoning.',
-    warning: 'Consumes AI Credits quickly.',
-  },
-  {
-    id: 'google/gemini-3.1-flash-lite',
-    name: 'Gemini 3.1 Flash Lite',
-    providerKey: 'google',
-    provider: 'Google',
-    category: 'Fast',
-    cost: 'Low',
-    context: '1M',
-    description: 'Low-latency model for simple assistant and extraction workflows.',
-  },
-  {
-    id: 'google/gemini-2.5-flash',
-    name: 'Gemini 2.5 Flash',
-    providerKey: 'google',
-    provider: 'Google',
-    category: 'Balanced',
-    cost: 'Medium',
-    context: '1M',
-    description: 'Stable Gemini option with tool support and broad context.',
-  },
-  {
-    id: 'google/gemini-3-flash-preview',
-    name: 'Gemini 3 Flash Preview',
-    providerKey: 'google',
-    provider: 'Google',
-    category: 'Balanced',
-    cost: 'Medium',
-    context: '1M',
-    description: 'Large-context Google model for broader research and summaries.',
-  },
-  {
-    id: 'google/gemini-3.1-pro-preview',
-    name: 'Gemini 3.1 Pro Preview',
-    providerKey: 'google',
-    provider: 'Google',
-    category: 'Premium',
-    cost: 'High',
-    context: '1M',
-    description: 'Higher quality Gemini option for complex reasoning.',
-  },
-  {
-    id: 'qwen/qwen3.5-flash-02-23',
-    name: 'Qwen3.5 Flash',
-    providerKey: 'qwen',
-    provider: 'Qwen',
-    category: 'Fast',
-    cost: 'Low',
-    context: '1M',
-    description: 'Very efficient Qwen model for high-volume agent loops.',
-  },
-  {
-    id: 'qwen/qwen3-coder-flash',
-    name: 'Qwen3 Coder Flash',
-    providerKey: 'qwen',
-    provider: 'Qwen',
-    category: 'Coding',
-    cost: 'Low',
-    context: '1M',
-    description: 'Fast code-oriented model for tool use and routine development tasks.',
-  },
-  {
-    id: 'qwen/qwen3.6-flash',
-    name: 'Qwen3.6 Flash',
-    providerKey: 'qwen',
-    provider: 'Qwen',
-    category: 'Fast',
-    cost: 'Medium',
-    context: '1M',
-    description: 'Newer Qwen flash model with strong price-performance.',
-  },
-  {
-    id: 'qwen/qwen3.6-35b-a3b',
-    name: 'Qwen3.6 35B A3B',
-    providerKey: 'qwen',
-    provider: 'Qwen',
-    category: 'Balanced',
-    cost: 'Medium',
-    context: '256K',
-    description: 'Current Qwen hosted option that replaces the retired Qwen3 32B ID.',
-  },
-  {
-    id: 'qwen/qwen3.5-35b-a3b',
-    name: 'Qwen3.5 35B A3B',
-    providerKey: 'qwen',
-    provider: 'Qwen',
-    category: 'Balanced',
-    cost: 'Medium',
-    context: '256K',
-    description: 'Balanced Qwen model for general chat, research, and tool-use loops.',
-  },
-  {
-    id: 'qwen/qwen3-coder',
-    name: 'Qwen3 Coder',
-    providerKey: 'qwen',
-    provider: 'Qwen',
-    category: 'Coding',
-    cost: 'Medium',
-    context: '256K',
-    description: 'Higher quality coding model for edits, repo analysis, and agentic coding.',
-  },
-  {
-    id: 'qwen/qwen3-coder-next',
-    name: 'Qwen3 Coder Next',
-    providerKey: 'qwen',
-    provider: 'Qwen',
-    category: 'Coding',
-    cost: 'Medium',
-    context: '1M',
-    description: 'Newer Qwen coding model for repo edits and structured tool calls.',
-  },
-  {
-    id: 'qwen/qwen3-coder-plus',
-    name: 'Qwen3 Coder Plus',
-    providerKey: 'qwen',
-    provider: 'Qwen',
-    category: 'Coding',
-    cost: 'High',
-    context: '1M',
-    description: 'Larger Qwen coding option for difficult implementation tasks.',
-  },
-  {
-    id: 'qwen/qwen3.6-plus',
-    name: 'Qwen3.6 Plus',
-    providerKey: 'qwen',
-    provider: 'Qwen',
-    category: 'Premium',
-    cost: 'High',
-    context: '1M',
-    description: 'Higher quality Qwen option for more complex reasoning tasks.',
-  },
-  {
-    id: 'qwen/qwen3-max',
-    name: 'Qwen3 Max',
-    providerKey: 'qwen',
-    provider: 'Qwen',
-    category: 'Premium',
-    cost: 'High',
-    context: '1M',
-    description: 'Large Qwen model for demanding agent work.',
-  },
-  {
-    id: 'qwen/qwen3-max-thinking',
-    name: 'Qwen3 Max Thinking',
-    providerKey: 'qwen',
-    provider: 'Qwen',
-    category: 'Reasoning',
-    cost: 'Premium',
-    context: '1M',
-    description: 'Reasoning-focused Qwen model for selective high-value tasks.',
-    warning: 'Consumes AI Credits quickly.',
-  },
-  {
-    id: 'x-ai/grok-4.1-fast',
-    name: 'Grok 4.1 Fast',
-    providerKey: 'x-ai',
-    provider: 'xAI',
-    category: 'Fast',
-    cost: 'Low',
-    context: '2M',
-    description: 'Fast Grok model with very large context.',
-  },
-  {
-    id: 'x-ai/grok-code-fast-1',
-    name: 'Grok Code Fast 1',
-    providerKey: 'x-ai',
-    provider: 'xAI',
-    category: 'Coding',
-    cost: 'Medium',
-    context: '256K',
-    description: 'xAI coding model tuned for fast code generation.',
-  },
-  {
-    id: 'x-ai/grok-4.3',
-    name: 'Grok 4.3',
-    providerKey: 'x-ai',
-    provider: 'xAI',
-    category: 'Premium',
-    cost: 'High',
-    context: '1M',
-    description: 'Higher quality Grok model for reasoning-heavy tasks.',
-  },
-  {
-    id: 'mistralai/mistral-small-2603',
-    name: 'Mistral Small 4',
-    providerKey: 'mistralai',
-    provider: 'Mistral',
-    category: 'Fast',
-    cost: 'Low',
-    context: '256K',
-    description: 'Efficient general model from Mistral.',
-  },
-  {
-    id: 'mistralai/codestral-2508',
-    name: 'Codestral 2508',
-    providerKey: 'mistralai',
-    provider: 'Mistral',
-    category: 'Coding',
-    cost: 'Medium',
-    context: '256K',
-    description: 'Mistral coding model for code edits and tool use.',
-  },
-  {
-    id: 'mistralai/mistral-large-2512',
-    name: 'Mistral Large 3',
-    providerKey: 'mistralai',
-    provider: 'Mistral',
-    category: 'Premium',
-    cost: 'Medium',
-    context: '256K',
-    description: 'Stronger Mistral model for complex general tasks.',
-  },
-  {
-    id: 'moonshotai/kimi-k2-thinking',
-    name: 'Kimi K2 Thinking',
-    providerKey: 'moonshotai',
-    provider: 'Moonshot AI',
-    category: 'Reasoning',
-    cost: 'Medium',
-    context: '256K',
-    description: 'Reasoning-focused option for analysis-heavy tasks.',
-  },
-  {
-    id: 'moonshotai/kimi-k2.6',
-    name: 'Kimi K2.6',
-    providerKey: 'moonshotai',
-    provider: 'Moonshot AI',
-    category: 'Balanced',
-    cost: 'High',
-    context: '256K',
-    description: 'Newer Kimi model for long-form analysis and synthesis.',
-  },
-  {
-    id: 'z-ai/glm-4.7-flash',
-    name: 'GLM 4.7 Flash',
-    providerKey: 'z-ai',
-    provider: 'Z.ai',
-    category: 'Fast',
-    cost: 'Low',
-    context: '200K',
-    description: 'Low-cost GLM model for quick agent loops.',
-  },
-  {
-    id: 'z-ai/glm-5.1',
-    name: 'GLM 5.1',
-    providerKey: 'z-ai',
-    provider: 'Z.ai',
-    category: 'Balanced',
-    cost: 'High',
-    context: '200K',
-    description: 'Higher quality GLM model for reasoning and planning.',
-  },
-  {
-    id: 'nvidia/nemotron-3-nano-30b-a3b',
-    name: 'Nemotron 3 Nano',
-    providerKey: 'nvidia',
-    provider: 'NVIDIA',
-    category: 'Fast',
-    cost: 'Low',
-    context: '256K',
-    description: 'Low-cost NVIDIA model for lightweight workflows.',
-  },
-  {
-    id: 'openrouter/auto',
-    name: 'OpenRouter Auto',
-    providerKey: 'openrouter',
-    provider: 'OpenRouter',
-    category: 'Advanced',
-    cost: 'Variable',
-    context: '2M',
-    description: 'Lets the fallback router select an available model. Useful as a fallback, not a default.',
-  },
-];
-
-const DEFAULT_HOSTED_MODEL = 'deepseek/deepseek-v4-flash';
-const HOSTED_PROXY_PROVIDER_PREFIX = 'hatcher-llm-proxy/';
-const HOSTED_MODEL_ALIASES = new Map<string, string>([
-  ['meta-llama/llama-4-scout-17b-16e-instruct', 'qwen/qwen3.6-35b-a3b'],
-  ['qwen/qwen3-32b', 'qwen/qwen3.6-35b-a3b'],
-  ['qwen/qwen3-235b-a22b-2507', 'qwen/qwen3.6-35b-a3b'],
-]);
-
-function normalizeHostedModelForUi(model: string | undefined): string {
-  let trimmed = model?.trim();
-  if (!trimmed) return DEFAULT_HOSTED_MODEL;
-  if (trimmed.startsWith(HOSTED_PROXY_PROVIDER_PREFIX)) {
-    trimmed = trimmed.slice(HOSTED_PROXY_PROVIDER_PREFIX.length);
-  }
-  return HOSTED_MODEL_ALIASES.get(trimmed) ?? trimmed;
-}
-
-function providerKeyFromHostedModelId(modelId: string): string {
-  const [providerKey] = modelId.split('/');
-  return providerKey?.trim() || 'openrouter';
-}
-
-function providerNameFromKey(providerKey: string): string {
-  return HOSTED_MODEL_PROVIDERS.find((provider) => provider.key === providerKey)?.name
-    ?? providerKey
-      .split('-')
-      .map((part) => part ? part[0]!.toUpperCase() + part.slice(1) : part)
-      .join(' ');
-}
-
-function createSavedHostedModelOption(modelId: string): HostedModelOption {
-  const providerKey = providerKeyFromHostedModelId(modelId);
-  const provider = providerNameFromKey(providerKey);
-  return {
-    id: modelId,
-    name: modelId,
-    providerKey,
-    provider,
-    category: 'Saved',
-    cost: 'Variable',
-    context: 'Provider-defined',
-    description: 'Saved hosted model from this agent configuration.',
-  };
 }
 
 const ENV_KEY_REGEX = /^[A-Z][A-Z0-9_]*$/;
@@ -602,21 +91,6 @@ function hostedCostClass(cost: HostedModelCost): string {
       return 'border-rose-500/25 bg-rose-500/10 text-rose-300';
     case 'Variable':
       return 'border-violet-500/25 bg-violet-500/10 text-violet-300';
-  }
-}
-
-function hostedCostEstimate(cost: HostedModelCost): string {
-  switch (cost) {
-    case 'Low':
-      return 'about 1-5 AI Credits per short reply';
-    case 'Medium':
-      return 'about 5-25 AI Credits per short reply';
-    case 'High':
-      return 'about 25-100 AI Credits per short reply';
-    case 'Premium':
-      return '100+ AI Credits for many replies';
-    case 'Variable':
-      return 'variable, depends on UsePod/OpenRouter routing';
   }
 }
 
@@ -656,6 +130,11 @@ export function ConfigTab() {
   const [commitMessage, setCommitMessage] = useState('');
   const [aiCreditBalance, setAiCreditBalance] = useState<AiCreditBalance | null>(null);
   const [showAdvancedTools, setShowAdvancedTools] = useState(false);
+  const [modelSearch, setModelSearch] = useState('');
+  const [modelTagFilter, setModelTagFilter] = useState<HostedModelTag | 'all'>('all');
+  const [modelCostFilter, setModelCostFilter] = useState<HostedModelCost | 'all'>('all');
+  const [modelPrivacyFilter, setModelPrivacyFilter] = useState<HostedModelPrivacy | 'all'>('all');
+  const [hostedProviderFilter, setHostedProviderFilter] = useState<string>('all');
 
   const hostedProvider = 'openrouter';
   const isHostedMode = configProvider === hostedProvider;
@@ -674,27 +153,61 @@ export function ConfigTab() {
       },
     [selectedHostedModel.provider, selectedHostedModel.providerKey],
   );
+  const savedModelConfig = useMemo(
+    () => resolveLoadedModelConfig((agent.config ?? {}) as Record<string, unknown>),
+    [agent.config],
+  );
+  const savedHostedModel = useMemo(
+    () => savedModelConfig.provider === hostedProvider ? getHostedModelOption(savedModelConfig.model) : null,
+    [savedModelConfig.model, savedModelConfig.provider],
+  );
   const hostedModelProviders = useMemo(
     () => HOSTED_MODEL_PROVIDERS.some((provider) => provider.key === selectedHostedProvider.key)
       ? HOSTED_MODEL_PROVIDERS
       : [...HOSTED_MODEL_PROVIDERS, selectedHostedProvider],
     [selectedHostedProvider],
   );
-  const hostedModelsForProvider = useMemo(() => {
-    const models = HOSTED_MODELS.filter((m) => m.providerKey === selectedHostedProvider.key);
-    if (
-      selectedHostedModel.providerKey === selectedHostedProvider.key
-      && !models.some((model) => model.id === selectedHostedModel.id)
-    ) {
-      return [selectedHostedModel, ...models];
-    }
-    return models;
-  }, [selectedHostedModel, selectedHostedProvider.key]);
+  const modelCostRankFilter = modelCostFilter === 'all' ? undefined : hostedCostRank(modelCostFilter);
+  const filteredHostedModels = useMemo(
+    () => filterHostedModels({
+      provider: hostedProviderFilter === 'all' ? undefined : hostedProviderFilter,
+      tag: modelTagFilter,
+      privacy: modelPrivacyFilter,
+      maxCostRank: modelCostRankFilter,
+      search: modelSearch,
+    }),
+    [hostedProviderFilter, modelCostRankFilter, modelPrivacyFilter, modelSearch, modelTagFilter],
+  );
+  const hasPendingHostedModelChange = savedHostedModel !== null && savedHostedModel.id !== selectedHostedModel.id;
   const lowAiCreditBalance = isHostedMode && aiCreditBalance !== null && aiCreditBalance.balance < 100;
 
+  const byokProvidersWithVenice = useMemo<ByokProviderOption[]>(() => {
+    const providers = [...BYOK_PROVIDERS] as ByokProviderOption[];
+    if (!providers.some((provider) => provider.key === 'venice')) {
+      providers.push({
+        key: 'venice',
+        name: 'Venice AI',
+        description: 'Private OpenAI-compatible models via Venice',
+        requiresApiKey: true,
+        requiresBaseUrl: false,
+        defaultBaseUrl: 'https://api.venice.ai/api/v1',
+        models: [
+          { id: 'zai-org-glm-5.1', name: 'GLM 5.1', context: '200K' },
+          { id: 'venice-uncensored-1-2', name: 'Venice Uncensored 1.2', context: '128K' },
+          { id: 'deepseek-v3.2', name: 'DeepSeek V3.2', context: '160K' },
+        ],
+      });
+    }
+    return providers;
+  }, []);
+
   const byokProvidersFiltered = useMemo(
-    () => BYOK_PROVIDERS.filter((p) => p.key !== hostedProvider && (p.key !== 'groq' || configProvider === 'groq')),
-    [configProvider],
+    () => byokProvidersWithVenice.filter((p) => p.key !== hostedProvider && (p.key !== 'groq' || configProvider === 'groq')),
+    [byokProvidersWithVenice, configProvider],
+  );
+  const selectedByokProvider = useMemo(
+    () => byokProvidersWithVenice.find((provider) => provider.key === configProvider),
+    [byokProvidersWithVenice, configProvider],
   );
 
   const selectHostedModel = useCallback((modelId: string) => {
@@ -931,18 +444,16 @@ export function ConfigTab() {
 
         {isHostedMode ? (
           <div className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-[240px,1fr]">
+            <div className="grid gap-4 md:grid-cols-[220px,1fr]">
               <label className="block">
-                <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Provider</span>
+                <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Provider filter</span>
                 <div className="relative">
                   <select
-                    value={selectedHostedProvider.key}
-                    onChange={(e) => {
-                      const firstModel = HOSTED_MODELS.find((m) => m.providerKey === e.target.value);
-                      if (firstModel) selectHostedModel(firstModel.id);
-                    }}
+                    value={hostedProviderFilter}
+                    onChange={(e) => setHostedProviderFilter(e.target.value)}
                     className="config-input appearance-none pr-10"
                   >
+                    <option value="all">All providers</option>
                     {hostedModelProviders.map((provider) => (
                       <option key={provider.key} value={provider.key}>
                         {provider.name}
@@ -954,18 +465,62 @@ export function ConfigTab() {
               </label>
 
               <label className="block">
-                <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Model</span>
+                <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Search models</span>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-tertiary)]" />
+                  <input
+                    value={modelSearch}
+                    onChange={(event) => setModelSearch(event.target.value)}
+                    className="config-input"
+                    style={{ paddingLeft: '2.5rem' }}
+                    placeholder="Search by model, strength, route..."
+                  />
+                </div>
+              </label>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              <label className="block">
+                <span className="block text-xs font-medium text-[var(--text-tertiary)] mb-1.5">Strength</span>
                 <div className="relative">
                   <select
-                    value={selectedHostedModel.id}
-                    onChange={(e) => selectHostedModel(e.target.value)}
-                    className="config-input appearance-none pr-10"
+                    value={modelTagFilter}
+                    onChange={(event) => setModelTagFilter(event.target.value as HostedModelTag | 'all')}
+                    className="config-input appearance-none pr-10 text-sm"
                   >
-                    {hostedModelsForProvider.map((model) => (
-                      <option key={model.id} value={model.id}>
-                        {model.name} · {model.category} · {model.fixedPrice ?? model.cost}
-                      </option>
+                    {(['all', 'fast', 'low cost', 'balanced', 'coding', 'reasoning', 'long context', 'fixed price', 'privacy'] as const).map((tag) => (
+                      <option key={tag} value={tag}>{tag === 'all' ? 'All strengths' : tag}</option>
                     ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)] pointer-events-none" />
+                </div>
+              </label>
+              <label className="block">
+                <span className="block text-xs font-medium text-[var(--text-tertiary)] mb-1.5">Max cost</span>
+                <div className="relative">
+                  <select
+                    value={modelCostFilter}
+                    onChange={(event) => setModelCostFilter(event.target.value as HostedModelCost | 'all')}
+                    className="config-input appearance-none pr-10 text-sm"
+                  >
+                    {(['all', 'Low', 'Medium', 'High', 'Premium'] as const).map((cost) => (
+                      <option key={cost} value={cost}>{cost === 'all' ? 'Any cost' : `Up to ${cost}`}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)] pointer-events-none" />
+                </div>
+              </label>
+              <label className="block">
+                <span className="block text-xs font-medium text-[var(--text-tertiary)] mb-1.5">Privacy route</span>
+                <div className="relative">
+                  <select
+                    value={modelPrivacyFilter}
+                    onChange={(event) => setModelPrivacyFilter(event.target.value as HostedModelPrivacy | 'all')}
+                    className="config-input appearance-none pr-10 text-sm"
+                  >
+                    <option value="all">Any route</option>
+                    <option value="hatcher">Hatcher-hosted</option>
+                    <option value="partner">Partner-hosted</option>
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)] pointer-events-none" />
                 </div>
@@ -983,24 +538,100 @@ export function ConfigTab() {
                   </div>
                   <p className="mt-1 text-sm text-[var(--text-secondary)]">{selectedHostedModel.description}</p>
                   <p className="mt-2 text-xs text-[var(--text-tertiary)]">
-                    Route: {selectedHostedModel.providerKey === 'idle' ? 'IDLE partner' : 'UsePod primary / OpenRouter fallback'}
+                    Route: {hostedModelRoute(selectedHostedModel)} · {hostedPrivacyLabel(selectedHostedModel)}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2 text-xs text-[var(--text-secondary)]">
                   <span className="px-2 py-1 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)]">
                     {selectedHostedModel.context}
                   </span>
-                  <span className="px-2 py-1 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)]">
+                  <span className={`px-2 py-1 rounded border ${hostedCostClass(selectedHostedModel.cost)}`}>
                     {selectedHostedModel.fixedPrice ?? hostedCostEstimate(selectedHostedModel.cost)}
                   </span>
                 </div>
               </div>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {hostedModelTags(selectedHostedModel).map((tag) => (
+                  <span key={tag} className="rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-2 py-0.5 text-[11px] text-[var(--text-secondary)]">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              {hasPendingHostedModelChange && (
+                <p className="mt-3 rounded-lg border border-[var(--accent-primary)]/20 bg-[var(--accent-primary)]/10 px-3 py-2 text-xs text-[var(--text-secondary)]">
+                  Pending model change. Save Configuration to make {selectedHostedModel.name} active.
+                </p>
+              )}
               {(selectedHostedModel.warning || lowAiCreditBalance) && (
                 <div className="mt-4 flex items-start gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-700 dark:text-yellow-300">
                   <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <span>{selectedHostedModel.warning || 'AI Credits are low for hosted model usage.'}</span>
                 </div>
               )}
+            </div>
+
+            <div className="overflow-hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)]">
+              <div className="hidden grid-cols-[1.4fr,0.9fr,0.8fr,0.9fr,auto] gap-3 border-b border-[var(--border-subtle)] px-4 py-2 text-[11px] uppercase tracking-[0.08em] text-[var(--text-tertiary)] md:grid">
+                <span>Provider / Model</span>
+                <span>Strengths</span>
+                <span>Cost</span>
+                <span>Privacy</span>
+                <span className="text-right">Status</span>
+              </div>
+              <div className="max-h-[430px] overflow-y-auto">
+                {filteredHostedModels.length === 0 ? (
+                  <div className="p-4 text-sm text-[var(--text-secondary)]">
+                    No hosted models match these filters.
+                  </div>
+                ) : (
+                  filteredHostedModels.map((model) => {
+                    const selected = model.id === selectedHostedModel.id;
+                    const savedActive = savedHostedModel?.id === model.id;
+                    return (
+                      <button
+                        key={model.id}
+                        type="button"
+                        onClick={() => selectHostedModel(model.id)}
+                        className={`grid w-full gap-3 border-b border-[var(--border-subtle)] px-4 py-3 text-left transition-colors last:border-b-0 md:grid-cols-[1.4fr,0.9fr,0.8fr,0.9fr,auto] ${
+                          selected
+                            ? 'bg-[var(--accent-primary)]/10'
+                            : 'hover:bg-[var(--bg-panel)]'
+                        }`}
+                      >
+                        <span className="min-w-0">
+                          <span className="flex items-center gap-2">
+                            <span className="truncate text-sm font-medium text-[var(--text-primary)]">{model.name}</span>
+                            {model.fixedPrice && (
+                              <span className="rounded border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] text-emerald-300">
+                                fixed
+                              </span>
+                            )}
+                          </span>
+                          <span className="mt-0.5 block truncate text-xs text-[var(--text-tertiary)]">
+                            {model.provider} · {model.context} · {hostedModelRoute(model)}
+                          </span>
+                        </span>
+                        <span className="flex flex-wrap gap-1.5">
+                          {hostedModelTags(model).slice(0, 3).map((tag) => (
+                            <span key={tag} className="rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-1.5 py-0.5 text-[10px] text-[var(--text-secondary)]">
+                              {tag}
+                            </span>
+                          ))}
+                        </span>
+                        <span className={`inline-flex h-fit w-fit rounded-md border px-2 py-1 text-xs ${hostedCostClass(model.cost)}`}>
+                          {model.fixedPrice ?? model.cost}
+                        </span>
+                        <span className="text-xs text-[var(--text-secondary)]">
+                          {hostedModelPrivacy(model) === 'partner' ? 'Partner-hosted' : 'Hatcher-hosted'}
+                        </span>
+                        <span className={`text-xs font-medium ${selected || savedActive ? 'text-[var(--accent-primary)]' : 'text-[var(--text-tertiary)]'} md:text-right`}>
+                          {savedActive ? 'Active' : selected ? 'Selected' : 'Select'}
+                        </span>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
             </div>
           </div>
         ) : (
@@ -1043,6 +674,55 @@ export function ConfigTab() {
                 placeholder={providerModels[0]?.id || currentProviderMeta?.models?.[0]?.id || 'provider/model'}
               />
             </label>
+
+            {selectedByokProvider && (
+              <div className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)] p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium text-[var(--text-primary)]">{selectedByokProvider.name}</span>
+                      <span className="rounded-md border border-[var(--border-subtle)] bg-[var(--bg-panel)] px-2 py-0.5 text-xs text-[var(--text-secondary)]">
+                        BYOK direct
+                      </span>
+                      {selectedByokProvider.key === 'venice' && (
+                        <span className="rounded-md border border-cyan-500/20 bg-cyan-500/10 px-2 py-0.5 text-xs text-cyan-300">
+                          privacy-first
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-1 text-sm text-[var(--text-secondary)]">{selectedByokProvider.description}</p>
+                    <p className="mt-2 break-all text-xs text-[var(--text-tertiary)]">
+                      Route: {selectedByokProvider.defaultBaseUrl ?? 'Provider default endpoint'}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2 text-xs text-[var(--text-secondary)]">
+                    {(selectedByokProvider.models ?? []).slice(0, 3).map((model) => (
+                      <button
+                        key={model.id}
+                        type="button"
+                        onClick={() => {
+                          setConfigModel(model.id);
+                          setUseCustomModel(false);
+                          setCustomModelInput('');
+                        }}
+                        className={`rounded-md border px-2 py-1 transition-colors ${
+                          configModel === model.id && !useCustomModel
+                            ? 'border-[var(--accent-primary)]/40 bg-[var(--accent-primary)]/10 text-[var(--text-primary)]'
+                            : 'border-[var(--border-subtle)] bg-[var(--bg-panel)] hover:border-[var(--accent-primary)]/30'
+                        }`}
+                      >
+                        {model.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {selectedByokProvider.key === 'venice' && (
+                  <p className="mt-3 rounded-lg border border-cyan-500/20 bg-cyan-500/10 px-3 py-2 text-xs text-cyan-200">
+                    Venice is OpenAI-compatible. TEE/E2EE-capable models should be treated as model-level privacy tags until the full Hatcher logging and history path is audited for those modes.
+                  </p>
+                )}
+              </div>
+            )}
 
             <label className="block">
               <span className="block text-sm font-medium text-[var(--text-secondary)] mb-2">API Key</span>

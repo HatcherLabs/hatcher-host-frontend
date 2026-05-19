@@ -253,7 +253,7 @@ export function useAgentConfig(
       ...(isHostedProvider ? { byok: null } : {}),
       ...(!isHostedProvider && byokKeyInput.trim() ? {
         byok: {
-          provider: normalizedProvider as 'openai' | 'anthropic' | 'google' | 'groq' | 'xai' | 'openrouter',
+          provider: normalizedProvider as 'openai' | 'anthropic' | 'google' | 'groq' | 'xai' | 'openrouter' | 'venice',
           apiKey: byokKeyInput.trim(),
           model: savedModel,
         },

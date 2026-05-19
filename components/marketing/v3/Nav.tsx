@@ -10,6 +10,7 @@ import styles from './Nav.module.css';
 import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA } from './links';
 import { NavDrawer } from './NavDrawer';
 import { LocaleSwitcher } from '@/components/layout/LocaleSwitcher';
+import { AiCreditStatus } from '@/components/layout/AiCreditStatus';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api';
@@ -172,6 +173,9 @@ export function Nav() {
               <span className={styles.userPillSkeleton} aria-hidden />
             ) : isAuthenticated && user ? (
               <>
+                <span className={styles.creditSlot}>
+                  <AiCreditStatus />
+                </span>
                 <span className={styles.notificationSlot}>
                   <NotificationCenter />
                 </span>
