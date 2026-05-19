@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import styles from './NavDrawer.module.css';
 import { NAV_GROUPS, PRIMARY_CTA, SECONDARY_CTA, SIGN_UP_CTA } from './links';
 import { LocaleSwitcher } from '@/components/layout/LocaleSwitcher';
+import { AiCreditStatus } from '@/components/layout/AiCreditStatus';
 import { useAuth } from '@/lib/auth-context';
 
 interface Props {
@@ -57,6 +58,12 @@ export function NavDrawer({ open, onClose }: Props) {
         <div className={styles.localeRow}>
           <LocaleSwitcher align="start" side="top" />
         </div>
+
+        {!authLoading && isAuthenticated && (
+          <div className={styles.creditRow}>
+            <AiCreditStatus variant="drawer" onNavigate={onClose} />
+          </div>
+        )}
 
         <div className={styles.bottom}>
           {authLoading ? null : isAuthenticated ? (

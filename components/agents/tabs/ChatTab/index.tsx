@@ -25,6 +25,7 @@ export function ChatTab() {
     agent,
     isAuthenticated,
     llmProvider,
+    activeModelDisplay,
     messages, setMessages,
     input, setInput,
     sending, sendCooldown,
@@ -358,6 +359,8 @@ export function ChatTab() {
         ttsSupported={voice.ttsSupported}
         isAuthenticated={isAuthenticated}
         autoSpeak={voice.autoSpeak}
+        activeModel={activeModelDisplay}
+        onOpenModelSettings={() => setTab('config')}
         onOpenMobilePanel={() => setMobilePanelOpen(true)}
         onToggleAutoSpeak={voice.toggleAutoSpeak}
         onStartVoiceCall={startVoiceCall}
@@ -460,6 +463,7 @@ export function ChatTab() {
             }}
             inputRef={inputRef}
             llmProvider={llmProvider}
+            activeModel={activeModelDisplay}
             attachments={attachments}
             attachmentError={attachmentError}
             uploadingAttachments={uploadingAttachments}
