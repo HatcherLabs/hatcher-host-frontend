@@ -23,7 +23,8 @@ import { routing } from './i18n/routing';
 import { defaultLocale, locales } from './i18n/config';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-const PUBLIC_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://hatcher.host';
+const PUBLIC_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL
+  || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://hatcher.host');
 
 // next-intl middleware instance — runs first to handle locale detection/rewrites.
 const intlMiddleware = createMiddleware(routing);
@@ -146,7 +147,7 @@ function redirectDefaultLocalePath(req: NextRequest): NextResponse | null {
   response.cookies.set('HATCHER_LOCALE', defaultLocale, {
     path: '/',
     maxAge: 60 * 60 * 24 * 365,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
   });
   return response;

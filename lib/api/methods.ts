@@ -4,7 +4,7 @@
 
 import { API_URL } from '@/lib/config';
 import { getToken, req } from './core';
-import type { Agent, AgentPassport, AgentPassportNetworkId, AgentWalletPrivateKeyResponse, AgentWalletsResponse, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse, AgentEgressEventsResponse, AdminIdleOverviewResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection } from './types';
+import type { Agent, AgentPassport, AgentPassportNetworkId, AgentWalletPrivateKeyResponse, AgentWalletsResponse, Payment, AgentFeature, ChatMessage, ChatSessionSummary, Ticket, TicketMessage, TicketCategory, TicketPriority, AdminPayment, FunnelResponse, ChurnRadarResponse, ReferralLeaderboardResponse, SignupHeatmapResponse, ErrorRateResponse, WsCountResponse, LlmStatsResponse, AdminEgressEventsResponse, AgentEgressEventsResponse, AdminIdleOverviewResponse, GetAgentMailboxResponse, GetAgentMailMessagesResponse, SendAgentMailBody, SendAgentMailResponse, UpdateAgentMailSettingsBody, UpdateAgentMailSettingsResponse, AgentMailDirection, SpawnAgentsResponse, SpawnCreateAgentBody, SpawnDepositBody, SpawnDepositResponse, SpawnEventsResponse, SpawnPaymentInstructions, SpawnPositionsResponse, SpawnStatusResponse, SpawnTradesResponse } from './types';
 import type { TierConfig, AdminOverviewExtras } from '@hatcher/shared';
 
 const API_BASE = API_URL;
@@ -342,6 +342,47 @@ export const api = {
       registeredAt: string;
       registryProgram: string;
     }>(`/agents/${id}/solana-register`, { method: 'POST' }),
+
+  /** Spawn partner agents owned by this Hatcher agent's Solana wallet. */
+  getAgentSpawnAgents: (id: string) =>
+    req<SpawnAgentsResponse>(`/agents/${id}/spawn/agents`),
+
+  createAgentSpawnAgent: (id: string, body: SpawnCreateAgentBody) =>
+    req<SpawnPaymentInstructions>(`/agents/${id}/spawn/agents`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  fundAgentSpawnDeposit: (id: string, body: SpawnDepositBody) =>
+    req<SpawnDepositResponse>(`/agents/${id}/spawn/deposit`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  getAgentSpawnStatus: (id: string, params: { ref?: string; agentId?: string }) => {
+    const qs = new URLSearchParams();
+    if (params.ref) qs.set('ref', params.ref);
+    if (params.agentId) qs.set('agent_id', params.agentId);
+    return req<SpawnStatusResponse>(`/agents/${id}/spawn/status?${qs.toString()}`);
+  },
+
+  getAgentSpawnEvents: (id: string, params: { since: number; agentId?: string; limit?: number }) => {
+    const qs = new URLSearchParams({ since: String(params.since) });
+    if (params.agentId) qs.set('agent_id', params.agentId);
+    if (params.limit) qs.set('limit', String(params.limit));
+    return req<SpawnEventsResponse>(`/agents/${id}/spawn/events?${qs.toString()}`);
+  },
+
+  getAgentSpawnTrades: (id: string, spawnAgentId: string, params: { limit?: number; offset?: number } = {}) => {
+    const qs = new URLSearchParams();
+    if (params.limit) qs.set('limit', String(params.limit));
+    if (params.offset) qs.set('offset', String(params.offset));
+    const suffix = qs.toString() ? `?${qs.toString()}` : '';
+    return req<SpawnTradesResponse>(`/agents/${id}/spawn/agents/${spawnAgentId}/trades${suffix}`);
+  },
+
+  getAgentSpawnPositions: (id: string, spawnAgentId: string) =>
+    req<SpawnPositionsResponse>(`/agents/${id}/spawn/agents/${spawnAgentId}/positions`),
 
   /** Get usage analytics for an agent */
   getAgentUsage: (id: string) =>

@@ -169,6 +169,125 @@ export interface UpdateAgentMailSettingsResponse {
   settings: AgentMailSettings;
 }
 
+export type SpawnDna = Record<string, unknown>;
+
+export interface SpawnAgent {
+  id: string;
+  name: string;
+  owner_wallet: string;
+  agent_wallet?: string | null;
+  status: string;
+  generation?: number;
+  parent_id?: string | null;
+  born_at?: string | null;
+  died_at?: string | null;
+  death_reason?: string | null;
+  total_pnl_sol?: number;
+  total_trades?: number;
+  initial_capital_sol?: number;
+  total_withdrawn_sol?: number;
+  total_deposited_sol?: number;
+  paused?: boolean;
+  signing_mode?: string;
+  agent_type?: string;
+  avatar?: string | null;
+  bio?: string | null;
+  dna?: SpawnDna;
+}
+
+export interface SpawnAgentsResponse {
+  agents: SpawnAgent[];
+}
+
+export interface SpawnPaymentInstructions {
+  payment_id: string;
+  agent_id: string;
+  agent_name: string;
+  amount: number;
+  reference: string;
+  recipient: string;
+  owner_wallet: string;
+  dna?: SpawnDna;
+}
+
+export interface SpawnCreateAgentBody {
+  name: string;
+  solAmount: number;
+  dna: SpawnDna;
+  meta?: {
+    avatar?: string;
+    bio?: string;
+  };
+}
+
+export interface SpawnDepositBody {
+  recipient: string;
+  amount: number;
+  reference: string;
+  paymentId?: string;
+}
+
+export interface SpawnStatusResponse {
+  status: 'pending' | 'confirmed' | 'funding_failed' | 'expired' | string;
+  tx_signature: string | null;
+  buyer_wallet?: string | null;
+  agent_id?: string | null;
+  amount?: number;
+  agent_wallet?: string | null;
+}
+
+export interface SpawnTrade {
+  id: string | number;
+  agent_id: string;
+  token_address: string;
+  action: string;
+  amount_sol?: number | null;
+  token_amount?: number | null;
+  pnl_sol?: number | null;
+  tx_signature?: string | null;
+  timestamp?: string | number | null;
+}
+
+export interface SpawnTradesResponse {
+  trades: SpawnTrade[];
+  limit?: number;
+  offset?: number;
+}
+
+export interface SpawnPositionsResponse {
+  memecoin?: Array<Record<string, unknown>>;
+  prediction?: Array<Record<string, unknown>>;
+}
+
+export interface SpawnEvent {
+  id: string | number;
+  type: string;
+  agent_id?: string;
+  data?: Record<string, unknown>;
+  timestamp: number;
+}
+
+export interface SpawnEventsResponse {
+  events: SpawnEvent[];
+  cursor: number;
+  has_more: boolean;
+}
+
+export interface SpawnDepositResponse {
+  transfer: {
+    provider: 'solana';
+    action: 'transfer';
+    signature: string;
+    solscanUrl: string;
+    walletAddress: string;
+    recipient: string;
+    lamports: number;
+    amountSol: number;
+    reference: string | null;
+    memo: string | null;
+  };
+}
+
 export type AgentPassportNetworkId = 'skale' | 'base' | 'solana';
 export type AgentPassportChainType = 'evm' | 'solana';
 export type AgentPassportSignerMode = 'receive-only' | 'runtime-signing' | 'planned';
